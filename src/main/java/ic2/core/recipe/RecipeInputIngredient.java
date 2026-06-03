@@ -1,0 +1,31 @@
+package ic2.core.recipe;
+
+import ic2.api.recipe.IRecipeInput;
+import java.util.Arrays;
+import java.util.List;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.Ingredient;
+
+public class RecipeInputIngredient implements IRecipeInput {
+  private Ingredient ingredient;
+  
+  RecipeInputIngredient(Ingredient ingredient) {
+    this.ingredient = ingredient;
+  }
+  
+  public boolean matches(ItemStack subject) {
+    return this.ingredient.apply(subject);
+  }
+  
+  public List<ItemStack> getInputs() {
+    return Arrays.asList(this.ingredient.func_193365_a());
+  }
+  
+  public int getAmount() {
+    return 1;
+  }
+  
+  public Ingredient getIngredient() {
+    return this.ingredient;
+  }
+}

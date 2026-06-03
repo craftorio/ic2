@@ -1,0 +1,23 @@
+package ic2.core;
+
+import com.google.common.base.Charsets;
+import com.mojang.authlib.GameProfile;
+import java.util.UUID;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
+import net.minecraftforge.common.util.FakePlayerFactory;
+
+public class Ic2Player {
+  public static EntityPlayer get(World world) {
+    if (world instanceof WorldServer)
+      return (EntityPlayer)FakePlayerFactory.get((WorldServer)world, getGameProfile(world.field_73011_w.getDimension())); 
+    return null;
+  }
+  
+  private static GameProfile getGameProfile(int dim) {
+    String name = "[IC2 " + dim + "]";
+    UUID uuid = UUID.nameUUIDFromBytes(name.getBytes(Charsets.UTF_8));
+    return new GameProfile(uuid, name);
+  }
+}

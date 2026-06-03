@@ -1,0 +1,92 @@
+package ic2.core.item.block;
+
+import ic2.core.IC2;
+import ic2.core.block.BlockTileEntity;
+import ic2.core.block.ITeBlock;
+import ic2.core.block.TeBlockRegistry;
+import ic2.core.block.TileEntityBlock;
+import ic2.core.network.NetworkManager;
+import java.util.List;
+import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.EnumRarity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.NonNullList;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+
+public class ItemBlockTileEntity extends ItemBlockIC2 {
+  public final ResourceLocation identifier;
+  
+  public ItemBlockTileEntity(Block block, ResourceLocation identifier) {
+    super(block);
+    func_77627_a(true);
+    this.identifier = identifier;
+  }
+  
+  public String func_77667_c(ItemStack stack) {
+    ITeBlock teBlock = getTeBlock(stack);
+    String name = (teBlock == null) ? "invalid" : teBlock.getName();
+    return func_77658_a() + "." + name;
+  }
+  
+  public void func_150895_a(CreativeTabs tab, NonNullList<ItemStack> items) {
+    this.field_150939_a.func_149666_a(tab, items);
+  }
+  
+  @SideOnly(Side.CLIENT)
+  public void func_77624_a(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
+    ITeBlock block = getTeBlock(stack);
+    if (block != null && block.getDummyTe() != null)
+      block.getDummyTe().addInformation(stack, tooltip, advanced); 
+  }
+  
+  public boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, IBlockState newState) {
+    assert newState.func_177230_c() == this.field_150939_a;
+    if (!((BlockTileEntity)this.field_150939_a).canReplace(world, pos, side, stack))
+      return false; 
+    ITeBlock teBlock = getTeBlock(stack);
+    if (teBlock == null)
+      return false; 
+    Class<? extends TileEntityBlock> teClass = teBlock.getTeClass();
+    if (teClass == null)
+      return false; 
+    TileEntityBlock te = TileEntityBlock.instantiate(teClass);
+    if (!placeTeBlock(stack, (EntityLivingBase)player, world, pos, side, te))
+      return false; 
+    return true;
+  }
+  
+  public static boolean placeTeBlock(ItemStack stack, EntityLivingBase placer, World world, BlockPos pos, EnumFacing side, TileEntityBlock te) {
+    IBlockState oldState = world.func_180495_p(pos);
+    IBlockState newState = te.getBlockState();
+    if (!world.func_180501_a(pos, newState, 0))
+      return false; 
+    world.func_175690_a(pos, (TileEntity)te);
+    te.onPlaced(stack, placer, side);
+    world.markAndNotifyBlock(pos, world.func_175726_f(pos), oldState, newState, 3);
+    if (!world.field_72995_K)
+      ((NetworkManager)IC2.network.get(true)).sendInitialData((TileEntity)te); 
+    return true;
+  }
+  
+  public EnumRarity func_77613_e(ItemStack stack) {
+    ITeBlock teblock = getTeBlock(stack);
+    return (teblock != null) ? teblock.getRarity() : EnumRarity.COMMON;
+  }
+  
+  private ITeBlock getTeBlock(ItemStack stack) {
+    if (stack == null)
+      return null; 
+    return TeBlockRegistry.get(this.identifier, stack.func_77952_i());
+  }
+}

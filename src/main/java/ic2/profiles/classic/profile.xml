@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<profile>
+	<name>Classic</name>
+	<textures>OLD</textures>
+	<textures mod="compactsolars">compactsolars</textures>
+	<style type="OLD" />
+	<crafting>
+		<shaped>
+			<replacements>
+				<file path="shaped_recipes.ini" />
+			</replacements>
+		</shaped>
+		<shapeless>
+			<replacements>
+				<file path="shapeless_recipes.ini" />
+			</replacements>
+		</shapeless>
+	</crafting>
+	<furnace>
+		<replacements>
+			<file path="furnace.ini" />
+		</replacements>
+	</furnace>
+	<macerator>
+		<replacements>
+			<file path="macerator.ini" />
+		</replacements>
+	</macerator>
+	<compressor>
+		<replacements>
+			<file path="compressor.ini" />
+		</replacements>
+	</compressor>
+	<extractor>
+		<replacements>
+			<file path="extractor.ini" />
+		</replacements>
+	</extractor>
+	<ore_washer>
+		<replacements>
+		</replacements>
+	</ore_washer>
+	<thermal_centrifuge>
+		<replacements>
+		</replacements>
+	</thermal_centrifuge>
+	<blast_furnace>
+		<replacements>
+		</replacements>
+	</blast_furnace>
+	<block_cutter>
+		<replacements>
+		</replacements>
+	</block_cutter>
+	<metal_former>
+		<cutting>
+			<replacements>
+			</replacements>
+		</cutting>
+		<extruding>
+			<replacements>
+			</replacements>
+		</extruding>
+		<rolling>
+			<replacements>
+			</replacements>
+		</rolling>
+	</metal_former>
+</profile>

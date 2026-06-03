@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gui width="176" height="166">
+	<text y="6" align="center">%name%</text>
+<!--	<slot name="input" x="55" y="35"/>-->
+	<slot name="output" x="89" y="35"/>
+	<gauge name="progress" x="71" y="36" style="fuel"/>
+	<button type="recipe" x="71" y="35" width="16" height="16" event="minecraft.smelting"></button>
+<!--	<fluidslot x="103" y="46" name="creosote"/>-->
+	<playerInventory x="7" y="83"/>
+</gui>

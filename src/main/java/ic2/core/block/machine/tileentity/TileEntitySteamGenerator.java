@@ -1,0 +1,306 @@
+package ic2.core.block.machine.tileentity;
+
+import ic2.api.energy.tile.IHeatSource;
+import ic2.api.network.INetworkClientTileEntityEventListener;
+import ic2.core.ContainerBase;
+import ic2.core.ExplosionIC2;
+import ic2.core.IHasGui;
+import ic2.core.block.TileEntityBlock;
+import ic2.core.block.TileEntityInventory;
+import ic2.core.block.comp.Fluids;
+import ic2.core.block.comp.TileEntityComponent;
+import ic2.core.block.machine.container.ContainerSteamGenerator;
+import ic2.core.block.machine.gui.GuiSteamGenerator;
+import ic2.core.gui.dynamic.IGuiValueProvider;
+import ic2.core.profile.NotClassic;
+import ic2.core.ref.FluidName;
+import ic2.core.util.BiomeUtil;
+import ic2.core.util.LiquidUtil;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.world.World;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidTank;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+
+@NotClassic
+public class TileEntitySteamGenerator extends TileEntityInventory implements IHasGui, IGuiValueProvider, INetworkClientTileEntityEventListener {
+  protected final Fluids fluids = (Fluids)addComponent((TileEntityComponent)new Fluids((TileEntityBlock)this));
+  
+  public final FluidTank waterTank = (FluidTank)this.fluids.addTankInsert("waterTank", 10000, Fluids.fluidPredicate(new Fluid[] { FluidRegistry.WATER, FluidName.distilled_water.getInstance() }));
+  
+  public void func_145839_a(NBTTagCompound nbttagcompound) {
+    super.func_145839_a(nbttagcompound);
+    this.inputMB = nbttagcompound.func_74762_e("inputmb");
+    this.pressure = nbttagcompound.func_74762_e("pressurevalve");
+    this.systemHeat = nbttagcompound.func_74760_g("systemheat");
+    this.calcification = nbttagcompound.func_74762_e("calcification");
+  }
+  
+  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
+    super.func_189515_b(nbt);
+    nbt.func_74768_a("inputmb", this.inputMB);
+    nbt.func_74768_a("pressurevalve", this.pressure);
+    nbt.func_74776_a("systemheat", this.systemHeat);
+    nbt.func_74768_a("calcification", this.calcification);
+    return nbt;
+  }
+  
+  protected void updateEntityServer() {
+    super.updateEntityServer();
+    this.systemHeat = Math.max(this.systemHeat, BiomeUtil.getBiomeTemperature(func_145831_w(), this.field_174879_c));
+    if (isCalcified()) {
+      if (getActive())
+        setActive(false); 
+    } else {
+      this.newActive = work();
+      if (getActive() != this.newActive)
+        setActive(this.newActive); 
+    } 
+    if (!getActive())
+      cooldown(0.01F); 
+  }
+  
+  private boolean work() {
+    Fluid output;
+    this.heatInput = requestHeat(1200);
+    if (this.heatInput <= 0)
+      return false; 
+    assert this.heatInput <= 1200;
+    this.outputMB = 0;
+    this.outputFluid = outputType.NONE;
+    if (this.waterTank.getFluid() == null || this.waterTank.getFluidAmount() <= 0 || this.inputMB <= 0) {
+      heatup(this.heatInput);
+      return true;
+    } 
+    Fluid inputFluid = this.waterTank.getFluid().getFluid();
+    boolean hasDistilledWater = (inputFluid == FluidName.distilled_water.getInstance());
+    int maxAmount = Math.min(this.inputMB, this.waterTank.getFluidAmount());
+    float hUneeded = 100.0F + this.pressure / 220.0F * 100.0F;
+    float targetTemp = 100.0F + this.pressure / 220.0F * 100.0F * 2.74F;
+    float reqHeat = targetTemp - this.systemHeat;
+    float remainingHuInput = this.heatInput;
+    if (reqHeat > 1.0E-4F) {
+      int heatReq = (int)Math.ceil((reqHeat / 5.0E-4F));
+      if (this.heatInput <= heatReq) {
+        heatup(this.heatInput);
+        if (this.pressure == 0 && this.systemHeat < 99.9999F) {
+          this.outputMB = maxAmount;
+          this.outputFluid = hasDistilledWater ? outputType.DISTILLEDWATER : outputType.WATER;
+          int i = LiquidUtil.distribute((TileEntity)this, new FluidStack(inputFluid, maxAmount), false);
+          if (i > 0)
+            this.waterTank.drainInternal(i, true); 
+        } 
+        return true;
+      } 
+      heatup(heatReq);
+      remainingHuInput -= heatReq;
+      reqHeat = targetTemp - this.systemHeat;
+    } 
+    assert this.systemHeat >= targetTemp - 1.0E-4F;
+    assert this.systemHeat >= 99.9999F;
+    float availableSystemHu = Math.min(-reqHeat / 5.0E-4F, (1200 - this.heatInput));
+    int activeAmount = Math.min(maxAmount, (int)((remainingHuInput + availableSystemHu) / hUneeded));
+    int totalAmount = activeAmount;
+    remainingHuInput -= activeAmount * hUneeded;
+    if (remainingHuInput < 0.0F) {
+      cooldown(-remainingHuInput * 5.0E-4F);
+      reqHeat = targetTemp - this.systemHeat;
+    } 
+    if (reqHeat <= -0.1001F) {
+      int coolingAmount = Math.min(maxAmount, (int)(-reqHeat / 0.1F));
+      coolingAmount = Math.min(coolingAmount, (int)Math.ceil(20.0D));
+      assert coolingAmount >= 0;
+      cooldown(coolingAmount * 0.1F);
+      totalAmount = Math.max(activeAmount, coolingAmount);
+    } 
+    if (remainingHuInput > 0.0F)
+      heatup(remainingHuInput); 
+    if (totalAmount <= 0)
+      return true; 
+    if (!hasDistilledWater)
+      this.calcification += totalAmount; 
+    this.waterTank.drainInternal(totalAmount, true);
+    if (activeAmount <= 0)
+      return true; 
+    this.outputMB = activeAmount * 100;
+    if (this.systemHeat >= 373.9999F) {
+      output = FluidName.superheated_steam.getInstance();
+      this.outputFluid = outputType.SUPERHEATEDSTEAM;
+    } else {
+      output = FluidName.steam.getInstance();
+      this.outputFluid = outputType.STEAM;
+    } 
+    int transferred = LiquidUtil.distribute((TileEntity)this, new FluidStack(output, this.outputMB), false);
+    int remaining = this.outputMB - transferred;
+    if (remaining > 0) {
+      World world = func_145831_w();
+      if (world.field_73012_v.nextInt(10) == 0) {
+        (new ExplosionIC2(world, null, this.field_174879_c, 1, 1.0F, ExplosionIC2.Type.Heat)).doExplosion();
+      } else if (remaining >= 100) {
+        this.waterTank.fillInternal(new FluidStack(inputFluid, remaining / 100), true);
+      } 
+    } 
+    return true;
+  }
+  
+  private void heatup(float heatinput) {
+    assert heatinput >= -1.0E-4F;
+    this.systemHeat += heatinput * 5.0E-4F;
+    if (this.systemHeat > 500.0F) {
+      World world = func_145831_w();
+      world.func_175698_g(this.field_174879_c);
+      (new ExplosionIC2(world, null, this.field_174879_c, 10, 0.01F, ExplosionIC2.Type.Heat)).doExplosion();
+    } 
+  }
+  
+  private void cooldown(float cool) {
+    assert cool >= -1.0E-4F;
+    this.systemHeat = Math.max(this.systemHeat - cool, BiomeUtil.getBiomeTemperature(func_145831_w(), this.field_174879_c));
+  }
+  
+  private int requestHeat(int requestHeat) {
+    World world = func_145831_w();
+    int targetHeat = requestHeat;
+    for (EnumFacing dir : EnumFacing.field_82609_l) {
+      TileEntity target = world.func_175625_s(this.field_174879_c.func_177972_a(dir));
+      if (target instanceof IHeatSource) {
+        IHeatSource hs = (IHeatSource)target;
+        int request = hs.drawHeat(dir.func_176734_d(), targetHeat, true);
+        if (request > 0) {
+          targetHeat -= hs.drawHeat(dir.func_176734_d(), request, false);
+          if (targetHeat == 0)
+            return requestHeat; 
+        } 
+      } 
+    } 
+    return requestHeat - targetHeat;
+  }
+  
+  public void onNetworkEvent(EntityPlayer player, int event) {
+    if (event > 2000 || event < -2000) {
+      if (event > 2000)
+        this.pressure = Math.min(this.pressure + event - 2000, 300); 
+      if (event < -2000)
+        this.pressure = Math.max(this.pressure + event + 2000, 0); 
+    } else {
+      this.inputMB = Math.max(Math.min(this.inputMB + event, 1000), 0);
+    } 
+  }
+  
+  public int gaugeLiquidScaled(int i, int tank) {
+    if (tank == 0) {
+      if (this.waterTank.getFluidAmount() <= 0)
+        return 0; 
+      return this.waterTank.getFluidAmount() * i / this.waterTank.getCapacity();
+    } 
+    return 0;
+  }
+  
+  public ContainerBase<TileEntitySteamGenerator> getGuiContainer(EntityPlayer player) {
+    return (ContainerBase<TileEntitySteamGenerator>)new ContainerSteamGenerator(player, this);
+  }
+  
+  @SideOnly(Side.CLIENT)
+  public GuiScreen getGui(EntityPlayer player, boolean isAdmin) {
+    return (GuiScreen)new GuiSteamGenerator(new ContainerSteamGenerator(player, this));
+  }
+  
+  public void onGuiClosed(EntityPlayer player) {}
+  
+  public double getGuiValue(String name) {
+    if ("heat".equals(name))
+      return (this.systemHeat == 0.0F) ? 0.0D : (this.systemHeat / 500.0D); 
+    if ("calcification".equals(name))
+      return (this.calcification == 0) ? 0.0D : (this.calcification / 100000.0D); 
+    throw new IllegalArgumentException();
+  }
+  
+  public int getOutputMB() {
+    return this.outputMB;
+  }
+  
+  public int getInputMB() {
+    return this.inputMB;
+  }
+  
+  public int getHeatInput() {
+    return this.heatInput;
+  }
+  
+  public int getPressure() {
+    return this.pressure;
+  }
+  
+  public float getSystemHeat() {
+    return Math.round(this.systemHeat * 10.0F) / 10.0F;
+  }
+  
+  public float getCalcification() {
+    return Math.round(this.calcification / 100000.0F * 100.0F * 100.0F) / 100.0F;
+  }
+  
+  public boolean isCalcified() {
+    return (this.calcification >= 100000);
+  }
+  
+  public String getOutputFluidName() {
+    return this.outputFluid.getName();
+  }
+  
+  private enum outputType {
+    NONE(""),
+    WATER("ic2.SteamGenerator.output.water"),
+    DISTILLEDWATER("ic2.SteamGenerator.output.destiwater"),
+    STEAM("ic2.SteamGenerator.output.steam"),
+    SUPERHEATEDSTEAM("ic2.SteamGenerator.output.hotsteam");
+    
+    private final String name;
+    
+    outputType(String name) {
+      this.name = name;
+    }
+    
+    public String getName() {
+      return this.name;
+    }
+  }
+  
+  private int heatInput = 0;
+  
+  private int inputMB = 0;
+  
+  private int calcification = 0;
+  
+  private int outputMB = 0;
+  
+  private outputType outputFluid = outputType.NONE;
+  
+  private int pressure = 0;
+  
+  private boolean newActive = false;
+  
+  private static final float maxHeat = 500.0F;
+  
+  private static final float heatPerHu = 5.0E-4F;
+  
+  private static final float coolingPerMb = 0.1F;
+  
+  private static final float maxCooling = 2.0F;
+  
+  private static final int maxHuInput = 1200;
+  
+  private static final int maxCalcification = 100000;
+  
+  private static final int steamExpansion = 100;
+  
+  private static final float epsilon = 1.0E-4F;
+  
+  private float systemHeat;
+}

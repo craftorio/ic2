@@ -1,0 +1,167 @@
+package ic2.core;
+
+import ic2.core.network.NetworkManager;
+import ic2.core.util.Util;
+import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.inventory.IContainerListener;
+import net.minecraft.network.NetHandlerPlayServer;
+import net.minecraft.potion.Potion;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
+import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+
+public class Platform {
+  public boolean isSimulating() {
+    return !isRendering();
+  }
+  
+  public boolean isRendering() {
+    return false;
+  }
+  
+  public void displayError(String error, Object... args) {
+    if (args.length > 0)
+      error = String.format(error, args); 
+    error = "IndustrialCraft 2 Error\n\n == = IndustrialCraft 2 Error = == \n\n" + error + "\n\n == == == == == == == == == == ==\n";
+    error = error.replace("\n", System.getProperty("line.separator"));
+    throw new RuntimeException(error);
+  }
+  
+  public void displayError(Exception e, String error, Object... args) {
+    if (args.length > 0)
+      error = String.format(error, args); 
+    displayError("An unexpected Exception occured.\n\n" + getStackTrace(e) + "\n" + error, new Object[0]);
+  }
+  
+  public String getStackTrace(Exception e) {
+    StringWriter writer = new StringWriter();
+    PrintWriter printWriter = new PrintWriter(writer);
+    e.printStackTrace(printWriter);
+    return writer.toString();
+  }
+  
+  public EntityPlayer getPlayerInstance() {
+    return null;
+  }
+  
+  public World getWorld(int dimId) {
+    return (World)DimensionManager.getWorld(dimId);
+  }
+  
+  public World getPlayerWorld() {
+    return null;
+  }
+  
+  public void preInit() {}
+  
+  public void messagePlayer(EntityPlayer player, String message, Object... args) {
+    if (player instanceof EntityPlayerMP) {
+      TextComponentTranslation textComponentTranslation;
+      if (args.length > 0) {
+        textComponentTranslation = new TextComponentTranslation(message, (Object[])getMessageComponents(args));
+      } else {
+        textComponentTranslation = new TextComponentTranslation(message, new Object[0]);
+      } 
+      ((EntityPlayerMP)player).func_145747_a((ITextComponent)textComponentTranslation);
+    } 
+  }
+  
+  public boolean launchGui(EntityPlayer player, IHasGui inventory) {
+    if (!Util.isFakePlayer(player, true)) {
+      EntityPlayerMP playerMp = (EntityPlayerMP)player;
+      playerMp.func_71117_bO();
+      playerMp.func_71128_l();
+      int windowId = playerMp.field_71139_cq;
+      ((NetworkManager)IC2.network.get(true)).initiateGuiDisplay(playerMp, inventory, windowId);
+      player.field_71070_bA = inventory.getGuiContainer(player);
+      player.field_71070_bA.field_75152_c = windowId;
+      player.field_71070_bA.func_75132_a((IContainerListener)playerMp);
+      return true;
+    } 
+    return false;
+  }
+  
+  public boolean launchSubGui(EntityPlayer player, IHasGui inventory, int ID) {
+    if (!Util.isFakePlayer(player, true)) {
+      EntityPlayerMP playerMp = (EntityPlayerMP)player;
+      playerMp.func_71117_bO();
+      playerMp.func_71128_l();
+      int windowId = playerMp.field_71139_cq;
+      ((NetworkManager)IC2.network.get(true)).initiateGuiDisplay(playerMp, inventory, windowId, Integer.valueOf(ID));
+      player.field_71070_bA = inventory.getGuiContainer(player);
+      player.field_71070_bA.field_75152_c = windowId;
+      player.field_71070_bA.func_75132_a((IContainerListener)playerMp);
+      return true;
+    } 
+    return false;
+  }
+  
+  public boolean launchGuiClient(EntityPlayer player, IHasGui inventory, boolean isAdmin) {
+    return false;
+  }
+  
+  public void profilerStartSection(String section) {}
+  
+  public void profilerEndSection() {}
+  
+  public void profilerEndStartSection(String section) {}
+  
+  public File getMinecraftDir() {
+    return new File(".");
+  }
+  
+  public void playSoundSp(String sound, float f, float g) {}
+  
+  public void resetPlayerInAirTime(EntityPlayer player) {
+    if (!(player instanceof EntityPlayerMP))
+      return; 
+    ObfuscationReflectionHelper.setPrivateValue(NetHandlerPlayServer.class, ((EntityPlayerMP)player).field_71135_a, 
+        
+        Integer.valueOf(0), new String[] { "field_147365_f", "floatingTickCount" });
+  }
+  
+  public int getBlockTexture(Block block, IBlockAccess world, int x, int y, int z, int side) {
+    return 0;
+  }
+  
+  public void removePotion(EntityLivingBase entity, Potion potion) {
+    entity.func_184589_d(potion);
+  }
+  
+  public void onPostInit() {}
+  
+  protected ITextComponent[] getMessageComponents(Object... args) {
+    ITextComponent[] encodedArgs = new ITextComponent[args.length];
+    for (int i = 0; i < args.length; i++) {
+      if (args[i] instanceof String && ((String)args[i]).startsWith("ic2.")) {
+        encodedArgs[i] = (ITextComponent)new TextComponentTranslation((String)args[i], new Object[0]);
+      } else {
+        encodedArgs[i] = (ITextComponent)new TextComponentString(args[i].toString());
+      } 
+    } 
+    return encodedArgs;
+  }
+  
+  public void requestTick(boolean simulating, Runnable runnable) {
+    if (!simulating)
+      throw new IllegalStateException(); 
+    FMLCommonHandler.instance().getMinecraftServerInstance().func_152344_a(runnable);
+  }
+  
+  public int getColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tint) {
+    throw new UnsupportedOperationException("client only");
+  }
+}

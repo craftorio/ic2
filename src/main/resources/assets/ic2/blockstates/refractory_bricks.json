@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "refractory_bricks":    { "model": "ic2:refractory_bricks", "uvlock": true }
+  }
+}

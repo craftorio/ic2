@@ -141,14 +141,14 @@ public class TransferHandlerIndustrialWorkbench implements IRecipeTransferHandle
             return this.handlerHelper.createInternalError();
           } 
           filledCraftSlotCount++;
-          availableItemStacks.put(Integer.valueOf(slot.field_75222_d), stack.func_77946_l());
+          availableItemStacks.put(Integer.valueOf(slot.field_75222_d), stack.copy());
         } 
       } 
       List<Slot> inventorySlots = this.transferHelper.getInventorySlots((Container)container);
       for (Slot slot : inventorySlots) {
         ItemStack stack = slot.func_75211_c();
         if (!stack.func_190926_b()) {
-          availableItemStacks.put(Integer.valueOf(slot.field_75222_d), stack.func_77946_l());
+          availableItemStacks.put(Integer.valueOf(slot.field_75222_d), stack.copy());
           continue;
         } 
         emptySlotCount++;

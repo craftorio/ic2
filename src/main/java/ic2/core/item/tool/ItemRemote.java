@@ -67,30 +67,30 @@ public class ItemRemote extends ItemIC2 {
     NBTTagCompound compound = StackUtil.getOrCreateNbtData(freq);
     if (!compound.func_74764_b("coords"))
       compound.setTag("coords", (NBTBase)new NBTTagList()); 
-    NBTTagList coords = compound.func_150295_c("coords", 10);
+    NBTTagList coords = compound.getTagList("coords", 10);
     NBTTagCompound coord = new NBTTagCompound();
-    coord.func_74768_a("x", pos.getX());
-    coord.func_74768_a("y", pos.getY());
-    coord.func_74768_a("z", pos.getZ());
-    coords.func_74742_a((NBTBase)coord);
+    coord.setInteger("x", pos.getX());
+    coord.setInteger("y", pos.getY());
+    coord.setInteger("z", pos.getZ());
+    coords.appendTag((NBTBase)coord);
     compound.setTag("coords", (NBTBase)coords);
-    freq.func_77964_b(coords.func_74745_c());
+    freq.func_77964_b(coords.tagCount());
   }
   
   @SideOnly(Side.CLIENT)
   public void func_77624_a(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
-    if (stack.func_77952_i() > 0)
-      tooltip.add("Linked to " + stack.func_77952_i() + " dynamite"); 
+    if (stack.getItemDamage() > 0)
+      tooltip.add("Linked to " + stack.getItemDamage() + " dynamite"); 
   }
   
   public static void launchRemotes(World world, ItemStack freq, EntityPlayer player) {
     NBTTagCompound compound = StackUtil.getOrCreateNbtData(freq);
     if (!compound.func_74764_b("coords"))
       return; 
-    NBTTagList coords = compound.func_150295_c("coords", 10);
-    for (int i = 0; i < coords.func_74745_c(); ) {
-      NBTTagCompound coord = coords.func_150305_b(i);
-      BlockPos pos = new BlockPos(coord.func_74762_e("x"), coord.func_74762_e("y"), coord.func_74762_e("z"));
+    NBTTagList coords = compound.getTagList("coords", 10);
+    for (int i = 0; i < coords.tagCount(); ) {
+      NBTTagCompound coord = coords.getCompoundTagAt(i);
+      BlockPos pos = new BlockPos(coord.getInteger("x"), coord.getInteger("y"), coord.getInteger("z"));
       if (world.func_175667_e(pos)) {
         IBlockState state = world.getBlockState(pos);
         if (state.getBlock() == BlockName.dynamite.getInstance() && ((Boolean)state
@@ -110,12 +110,12 @@ public class ItemRemote extends ItemIC2 {
     NBTTagCompound compound = StackUtil.getOrCreateNbtData(freq);
     if (!compound.func_74764_b("coords"))
       return -1; 
-    NBTTagList coords = compound.func_150295_c("coords", 10);
-    for (int i = 0; i < coords.func_74745_c(); i++) {
-      NBTTagCompound coord = coords.func_150305_b(i);
-      if (coord.func_74762_e("x") == pos.getX() && coord
-        .func_74762_e("y") == pos.getY() && coord
-        .func_74762_e("z") == pos.getZ())
+    NBTTagList coords = compound.getTagList("coords", 10);
+    for (int i = 0; i < coords.tagCount(); i++) {
+      NBTTagCompound coord = coords.getCompoundTagAt(i);
+      if (coord.getInteger("x") == pos.getX() && coord
+        .getInteger("y") == pos.getY() && coord
+        .getInteger("z") == pos.getZ())
         return i; 
     } 
     return -1;
@@ -125,13 +125,13 @@ public class ItemRemote extends ItemIC2 {
     NBTTagCompound compound = StackUtil.getOrCreateNbtData(freq);
     if (!compound.func_74764_b("coords"))
       return; 
-    NBTTagList coords = compound.func_150295_c("coords", 10);
+    NBTTagList coords = compound.getTagList("coords", 10);
     NBTTagList newCoords = new NBTTagList();
-    for (int i = 0; i < coords.func_74745_c(); i++) {
+    for (int i = 0; i < coords.tagCount(); i++) {
       if (i != index)
-        newCoords.func_74742_a((NBTBase)coords.func_150305_b(i)); 
+        newCoords.appendTag((NBTBase)coords.getCompoundTagAt(i)); 
     } 
     compound.setTag("coords", (NBTBase)newCoords);
-    freq.func_77964_b(newCoords.func_74745_c());
+    freq.func_77964_b(newCoords.tagCount());
   }
 }

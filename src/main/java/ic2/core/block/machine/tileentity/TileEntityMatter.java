@@ -104,13 +104,13 @@ public class TileEntityMatter extends TileEntityElectricMachine implements IHasG
   
   public void readFromNBT(NBTTagCompound nbt) {
     super.readFromNBT(nbt);
-    this.scrap = nbt.func_74762_e("scrap");
+    this.scrap = nbt.getInteger("scrap");
     this.lastEnergy = nbt.getDouble("lastEnergy");
   }
   
   public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
     super.writeToNBT(nbt);
-    nbt.func_74768_a("scrap", this.scrap);
+    nbt.setInteger("scrap", this.scrap);
     nbt.setDouble("lastEnergy", this.lastEnergy);
     return nbt;
   }
@@ -162,7 +162,7 @@ public class TileEntityMatter extends TileEntityElectricMachine implements IHasG
       needsInvUpdate |= this.containerslot.processFromTank((IFluidTank)this.fluidTank, this.outputSlot);
       this.lastEnergy = this.energy.getEnergy();
       if (needsInvUpdate)
-        func_70296_d(); 
+        markDirty(); 
     } 
   }
   
@@ -244,8 +244,8 @@ public class TileEntityMatter extends TileEntityElectricMachine implements IHasG
     super.onNetworkUpdate(field);
   }
   
-  public void func_70296_d() {
-    super.func_70296_d();
+  public void markDirty() {
+    super.markDirty();
     if (IC2.platform.isSimulating())
       setUpgradestat(); 
   }

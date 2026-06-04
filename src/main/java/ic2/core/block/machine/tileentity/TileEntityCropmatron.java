@@ -57,7 +57,7 @@ public class TileEntityCropmatron extends TileEntityElectricMachine implements I
   
   public final InvSlotOutput wasseroutputSlot;
   
-  public final InvSlotOutput exOutputSlot;
+  public final InvSlotOutput exoutputSlot;
   
   public final InvSlotConsumableLiquidByTank wasserinputSlot;
   
@@ -85,7 +85,7 @@ public class TileEntityCropmatron extends TileEntityElectricMachine implements I
     this.wasserinputSlot = new InvSlotConsumableLiquidByTank((IInventorySlotHolder)this, "wasserinputSlot", InvSlot.Access.I, 1, InvSlot.InvSide.TOP, InvSlotConsumableLiquid.OpType.Drain, (IFluidTank)this.waterTank);
     this.exInputSlot = new InvSlotConsumableLiquidByTank((IInventorySlotHolder)this, "exInputSlot", InvSlot.Access.I, 1, InvSlot.InvSide.TOP, InvSlotConsumableLiquid.OpType.Drain, (IFluidTank)this.exTank);
     this.wasseroutputSlot = new InvSlotOutput((IInventorySlotHolder)this, "wasseroutputSlot", 1);
-    this.exOutputSlot = new InvSlotOutput((IInventorySlotHolder)this, "exOutputSlot", 1);
+    this.exoutputSlot = new InvSlotOutput((IInventorySlotHolder)this, "exoutputSlot", 1);
     this.upgradeSlot = new InvSlotUpgrade((IInventorySlotHolder)this, "upgrade", 4);
   }
   
@@ -93,9 +93,9 @@ public class TileEntityCropmatron extends TileEntityElectricMachine implements I
     super.updateEntityServer();
     this.upgradeSlot.tick();
     this.wasserinputSlot.processIntoTank((IFluidTank)this.waterTank, this.wasseroutputSlot);
-    this.exInputSlot.processIntoTank((IFluidTank)this.exTank, this.exOutputSlot);
+    this.exInputSlot.processIntoTank((IFluidTank)this.exTank, this.exoutputSlot);
     this.fertilizerSlot.organize();
-    if (this.field_145850_b.func_82737_E() % 10L == 0L && this.energy.getEnergy() >= 31.0D)
+    if (this.world.getTotalWorldTime() % 10L == 0L && this.energy.getEnergy() >= 31.0D)
       scan(); 
   }
   
@@ -112,8 +112,8 @@ public class TileEntityCropmatron extends TileEntityElectricMachine implements I
       } 
     } 
     this.energy.useEnergy(1.0D);
-    BlockPos scan = this.field_174879_c.func_177982_a(this.scanX, this.scanY, this.scanZ);
-    TileEntity te = getWorld().func_175625_s(scan);
+    BlockPos scan = this.pos.add(this.scanX, this.scanY, this.scanZ);
+    TileEntity te = getWorld().getTileEntity(scan);
     if (te instanceof TileEntityCrop) {
       TileEntityCrop crop = (TileEntityCrop)te;
       if (!this.fertilizerSlot.isEmpty() && this.fertilizerSlot.consume(1, true, false) != null && crop.applyFertilizer(false)) {

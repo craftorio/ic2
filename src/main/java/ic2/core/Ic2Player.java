@@ -11,7 +11,7 @@ import net.minecraftforge.common.util.FakePlayerFactory;
 public class Ic2Player {
   public static EntityPlayer get(World world) {
     if (world instanceof WorldServer)
-      return (EntityPlayer)FakePlayerFactory.get((WorldServer)world, getGameProfile(world.field_73011_w.getDimension())); 
+      return (EntityPlayer)FakePlayerFactory.get((WorldServer)world, getGameProfile(world.provider.getDimension())); 
     return null;
   }
   

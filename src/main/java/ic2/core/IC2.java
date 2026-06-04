@@ -157,7 +157,7 @@ public class IC2 implements IFuelHandler {
   
   static {
     try {
-      (new BlockPos(1, 2, 3)).func_177982_a(2, 3, 4);
+      (new BlockPos(1, 2, 3)).add(2, 3, 4);
     } catch (Throwable t) {
       throw new Error("IC2 is incompatible with this environment, use the normal IC2 version, not the dev one.", t);
     } 
@@ -212,7 +212,7 @@ public class IC2 implements IFuelHandler {
     Blocks.field_150381_bn.func_149752_b(60.0F);
     Blocks.field_150477_bB.func_149752_b(60.0F);
     Blocks.field_150467_bQ.func_149752_b(60.0F);
-    Blocks.field_150355_j.func_149752_b(30.0F);
+    Blocks.WATER.func_149752_b(30.0F);
     Blocks.field_150358_i.func_149752_b(30.0F);
     Blocks.field_150353_l.func_149752_b(30.0F);
     ExplosionWhitelist.addWhitelistedBlock(Blocks.field_150357_h);
@@ -417,7 +417,7 @@ public class IC2 implements IFuelHandler {
   }
   
   public static int getSeaLevel(World world) {
-    return world.field_73011_w.func_76557_i();
+    return world.provider.func_76557_i();
   }
   
   public static int getWorldHeight(World world) {
@@ -455,13 +455,13 @@ public class IC2 implements IFuelHandler {
   
   @SubscribeEvent
   public void onLivingSpecialSpawn(LivingSpawnEvent.SpecialSpawn event) {
-    if (seasonal && (event.getEntityLiving() instanceof net.minecraft.entity.monster.EntityZombie || event.getEntityLiving() instanceof net.minecraft.entity.monster.EntitySkeleton) && (event.getEntityLiving().getEntityWorld()).field_73012_v.nextFloat() < 0.1F) {
+    if (seasonal && (event.getEntityLiving() instanceof net.minecraft.entity.monster.EntityZombie || event.getEntityLiving() instanceof net.minecraft.entity.monster.EntitySkeleton) && (event.getEntityLiving().getEntityWorld()).rand.nextFloat() < 0.1F) {
       EntityLiving entity = (EntityLiving)event.getEntityLiving();
       for (EntityEquipmentSlot slot : EntityEquipmentSlot.values())
         entity.func_184642_a(slot, Float.NEGATIVE_INFINITY); 
       if (entity instanceof net.minecraft.entity.monster.EntityZombie)
         entity.func_184201_a(EntityEquipmentSlot.MAINHAND, ItemName.nano_saber.getItemStack()); 
-      if ((entity.getEntityWorld()).field_73012_v.nextFloat() < 0.1F) {
+      if ((entity.getEntityWorld()).rand.nextFloat() < 0.1F) {
         entity.func_184201_a(EntityEquipmentSlot.HEAD, ItemName.quantum_helmet.getItemStack());
         entity.func_184201_a(EntityEquipmentSlot.CHEST, ItemName.quantum_chestplate.getItemStack());
         entity.func_184201_a(EntityEquipmentSlot.LEGS, ItemName.quantum_leggings.getItemStack());
@@ -544,28 +544,28 @@ public class IC2 implements IFuelHandler {
                 spin = side;
                 break;
               case Y:
-                if (side.func_176740_k().func_176720_b()) {
+                if (side.getAxis().func_176720_b()) {
                   spin = EnumFacing.NORTH;
                   break;
                 } 
                 spin = EnumFacing.UP;
                 break;
               case Z:
-                if (side.func_176740_k().func_176720_b()) {
+                if (side.getAxis().func_176720_b()) {
                   spin = EnumFacing.SOUTH;
                   break;
                 } 
                 spin = EnumFacing.DOWN;
                 break;
               case null:
-                if (side.func_176740_k().func_176720_b()) {
+                if (side.getAxis().func_176720_b()) {
                   spin = EnumFacing.WEST;
                   break;
                 } 
                 spin = side.func_176746_e();
                 break;
               case null:
-                if (side.func_176740_k().func_176720_b()) {
+                if (side.getAxis().func_176720_b()) {
                   spin = EnumFacing.EAST;
                   break;
                 } 
@@ -575,7 +575,7 @@ public class IC2 implements IFuelHandler {
               case null:
               case null:
               case null:
-                spin = side.func_176734_d();
+                spin = side.getOpposite();
                 break;
               default:
                 throw new IllegalStateException("Unexpected segment: " + segment);
@@ -591,9 +591,9 @@ public class IC2 implements IFuelHandler {
               } 
               EnhancedOverlay.forFace(side).drawArea(segment, Tessellator.getInstance().getBuffer(), red, green, blue);
               if (hoveredSpin == spin)
-                if (side.func_176734_d() == spin) {
+                if (side.getOpposite() == spin) {
                   EnumFacing[] edges = null, sides = null;
-                  switch (side.func_176740_k()) {
+                  switch (side.getAxis()) {
                     case X:
                       edges = new EnumFacing[] { EnumFacing.DOWN, EnumFacing.UP, EnumFacing.NORTH, EnumFacing.SOUTH };
                       break;

@@ -10,7 +10,7 @@ import net.minecraft.inventory.Slot;
 public class ContainerCanner extends ContainerStandardMachine<TileEntityCanner> {
   public ContainerCanner(EntityPlayer player, TileEntityCanner tileEntity1) {
     super(player, tileEntity1, 184, 8, 80, 80, 44, 119, 17, 152, 26);
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)tileEntity1.canInputSlot, 0, 41, 17));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)tileEntity1.canInputSlot, 0, 41, 17));
   }
   
   public List<String> getNetworkedFields() {

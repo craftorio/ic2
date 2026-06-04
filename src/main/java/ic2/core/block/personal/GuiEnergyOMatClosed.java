@@ -15,11 +15,11 @@ public class GuiEnergyOMatClosed extends GuiIC2<ContainerEnergyOMatClosed> {
   
   protected void drawForegroundLayer(int mouseX, int mouseY) {
     super.drawForegroundLayer(mouseX, mouseY);
-    this.field_146289_q.func_78276_b(Localization.translate("container.inventory"), 8, this.field_147000_g - 96 + 2, 4210752);
-    this.field_146289_q.func_78276_b(Localization.translate("ic2.container.personalTrader.want"), 12, 21, 4210752);
-    this.field_146289_q.func_78276_b(Localization.translate("ic2.container.personalTrader.offer"), 12, 39, 4210752);
-    this.field_146289_q.func_78276_b(((TileEntityEnergyOMat)((ContainerEnergyOMatClosed)this.container).base).euOffer + " EU", 50, 39, 4210752);
-    this.field_146289_q.func_78276_b(Localization.translate("ic2.container.personalTraderEnergy.paidFor", new Object[] { Integer.valueOf(((TileEntityEnergyOMat)((ContainerEnergyOMatClosed)this.container).base).paidFor) }), 12, 57, 4210752);
+    this.fontRenderer.drawString(Localization.translate("container.inventory"), 8, this.field_147000_g - 96 + 2, 4210752);
+    this.fontRenderer.drawString(Localization.translate("ic2.container.personalTrader.want"), 12, 21, 4210752);
+    this.fontRenderer.drawString(Localization.translate("ic2.container.personalTrader.offer"), 12, 39, 4210752);
+    this.fontRenderer.drawString(((TileEntityEnergyOMat)((ContainerEnergyOMatClosed)this.container).base).euOffer + " EU", 50, 39, 4210752);
+    this.fontRenderer.drawString(Localization.translate("ic2.container.personalTraderEnergy.paidFor", new Object[] { Integer.valueOf(((TileEntityEnergyOMat)((ContainerEnergyOMatClosed)this.container).base).paidFor) }), 12, 57, 4210752);
   }
   
   protected ResourceLocation getTexture() {

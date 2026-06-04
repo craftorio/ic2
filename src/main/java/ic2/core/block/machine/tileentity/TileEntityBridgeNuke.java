@@ -49,7 +49,7 @@ public abstract class TileEntityBridgeNuke extends Explosive {
     if (power < 0.0F)
       return null; 
     int radiationRange = getRadiationRange();
-    return (EntityIC2Explosive)new EntityNuke(getWorld(), this.field_174879_c.getX() + 0.5D, this.field_174879_c.getY() + 0.5D, this.field_174879_c.getZ() + 0.5D, power, radiationRange);
+    return (EntityIC2Explosive)new EntityNuke(getWorld(), this.pos.getX() + 0.5D, this.pos.getY() + 0.5D, this.pos.getZ() + 0.5D, power, radiationRange);
   }
   
   protected void onIgnite(EntityLivingBase igniter) {

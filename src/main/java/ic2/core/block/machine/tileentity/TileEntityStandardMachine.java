@@ -84,7 +84,7 @@ public abstract class TileEntityStandardMachine<RI, RO, I> extends TileEntityEle
   
   public void readFromNBT(NBTTagCompound nbttagcompound) {
     super.readFromNBT(nbttagcompound);
-    this.progress = nbttagcompound.func_74765_d("progress");
+    this.progress = nbttagcompound.getShort("progress");
   }
   
   public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
@@ -111,8 +111,8 @@ public abstract class TileEntityStandardMachine<RI, RO, I> extends TileEntityEle
     } 
   }
   
-  public void func_70296_d() {
-    super.func_70296_d();
+  public void markDirty() {
+    super.markDirty();
     if (IC2.platform.isSimulating())
       setOverclockRates(); 
   }
@@ -146,7 +146,7 @@ public abstract class TileEntityStandardMachine<RI, RO, I> extends TileEntityEle
     needsInvUpdate |= this.upgradeSlot.tickNoMark();
     this.guiProgress = this.progress / this.operationLength;
     if (needsInvUpdate)
-      super.func_70296_d(); 
+      super.markDirty(); 
   }
   
   public void setOverclockRates() {

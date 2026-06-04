@@ -27,14 +27,14 @@ public class TileEntityWeightedFluidDistributor extends TileEntityFluidDistribut
       int[] indexes = new int[this.priority.size()];
       for (int i = 0; i < indexes.length; i++)
         indexes[i] = ((EnumFacing)this.priority.get(i)).func_176745_a(); 
-      nbt.func_74783_a("priority", indexes);
+      nbt.setIntArray("priority", indexes);
     } 
     return nbt;
   }
   
   public void readFromNBT(NBTTagCompound nbt) {
     super.readFromNBT(nbt);
-    int[] indexes = nbt.func_74759_k("priority");
+    int[] indexes = nbt.getIntArray("priority");
     if (indexes.length > 0)
       for (int index : indexes)
         this.priority.add(EnumFacing.func_82600_a(index));  
@@ -57,8 +57,8 @@ public class TileEntityWeightedFluidDistributor extends TileEntityFluidDistribut
       int tankAmount = this.fluidTank.getFluidAmount();
       for (EnumFacing dir : this.priority) {
         assert dir != getFacing();
-        TileEntity target = this.field_145850_b.func_175625_s(this.field_174879_c.func_177972_a(dir));
-        EnumFacing side = dir.func_176734_d();
+        TileEntity target = this.world.getTileEntity(this.pos.offset(dir));
+        EnumFacing side = dir.getOpposite();
         if (LiquidUtil.isFluidTile(target, side)) {
           int amount = LiquidUtil.fillTile(target, side, this.fluidTank.getFluid(), false);
           if (amount > 0) {

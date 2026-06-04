@@ -28,8 +28,8 @@ public class ItemBattery extends BaseElectricItem {
   public void registerModels(final ItemName name) {
     ModelLoader.setCustomMeshDefinition(this, new ItemMeshDefinition() {
           public ModelResourceLocation func_178113_a(ItemStack stack) {
-            int level, damage = stack.func_77952_i();
-            int maxDamage = stack.func_77958_k() - 1;
+            int level, damage = stack.getItemDamage();
+            int maxDamage = stack.getMaxDamage() - 1;
             if (maxDamage > 0) {
               level = Util.limit((damage * ItemBattery.maxLevel + maxDamage / 2) / maxDamage, 0, ItemBattery.maxLevel);
             } else {

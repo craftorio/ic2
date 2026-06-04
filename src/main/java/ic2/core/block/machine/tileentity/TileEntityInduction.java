@@ -76,8 +76,8 @@ public class TileEntityInduction extends TileEntityElectricMachine implements IH
   
   public void readFromNBT(NBTTagCompound nbt) {
     super.readFromNBT(nbt);
-    this.heat = nbt.func_74765_d("heat");
-    this.progress = nbt.func_74765_d("progress");
+    this.heat = nbt.getShort("heat");
+    this.progress = nbt.getShort("progress");
   }
   
   public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
@@ -149,7 +149,7 @@ public class TileEntityInduction extends TileEntityElectricMachine implements IH
     } 
     needsInvUpdate |= this.upgradeSlot.tickNoMark();
     if (needsInvUpdate)
-      func_70296_d(); 
+      markDirty(); 
     if (newActive != getActive())
       setActive(newActive); 
   }

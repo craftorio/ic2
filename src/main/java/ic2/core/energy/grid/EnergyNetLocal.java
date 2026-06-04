@@ -199,8 +199,8 @@ public class EnergyNetLocal {
   
   void addPositionToNotify(BlockPos pos) {
     this.positionsToNotify.add(pos);
-    for (EnumFacing facing : EnumFacing.field_82609_l)
-      this.positionsToNotify.add(pos.func_177972_a(facing)); 
+    for (EnumFacing facing : EnumFacing.VALUES)
+      this.positionsToNotify.add(pos.offset(facing)); 
   }
   
   boolean hasGrid(Grid grid) {

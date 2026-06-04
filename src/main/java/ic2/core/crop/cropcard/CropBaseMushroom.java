@@ -39,7 +39,7 @@ public class CropBaseMushroom extends IC2CropCard {
   }
   
   public ItemStack getGain(ICropTile crop) {
-    return this.cropDrop.func_77946_l();
+    return this.cropDrop.copy();
   }
   
   public int getGrowthDuration(ICropTile crop) {

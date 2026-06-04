@@ -49,7 +49,7 @@ public class ItemHandlers {
           World world = player.getEntityWorld();
           if (!world.canMineBlockBody(player, position.getBlockPos()))
             return new ActionResult(EnumActionResult.FAIL, stack); 
-          if (world.getBlockState(position.getBlockPos()).getBlock() == Blocks.field_150355_j) {
+          if (world.getBlockState(position.getBlockPos()).getBlock() == Blocks.WATER) {
             stack = StackUtil.decSize(stack);
             world.func_175656_a(position.getBlockPos(), FluidName.construction_foam.getInstance().getBlock().getDefaultState());
             new ActionResult(EnumActionResult.SUCCESS, stack);
@@ -86,7 +86,7 @@ public class ItemHandlers {
         } 
         if (side != EnumFacing.UP)
           return EnumActionResult.PASS; 
-        pos = pos.func_177984_a();
+        pos = pos.up();
         if (!state.getBlock().isAir(state, (IBlockAccess)world, pos) || 
           !BlockName.sheet.getInstance().func_176198_a(world, pos, side))
           return EnumActionResult.PASS; 
@@ -118,8 +118,8 @@ public class ItemHandlers {
   public static TeBlock.ITePlaceHandler reactorChamberPlace = new TeBlock.ITePlaceHandler() {
       public boolean canReplace(World world, BlockPos pos, EnumFacing side, ItemStack stack) {
         int count = 0;
-        for (EnumFacing dir : EnumFacing.field_82609_l) {
-          TileEntity te = world.func_175625_s(pos.func_177972_a(dir));
+        for (EnumFacing dir : EnumFacing.VALUES) {
+          TileEntity te = world.getTileEntity(pos.offset(dir));
           if (te instanceof ic2.core.block.reactor.tileentity.TileEntityNuclearReactorElectric)
             count++; 
         } 
@@ -142,7 +142,7 @@ public class ItemHandlers {
           assert stack.getItem() == ItemName.misc_resource.getInstance();
           World world = player.getEntityWorld();
           if (!world.getBlockState(pos).getBlock().func_176200_f((IBlockAccess)world, pos))
-            pos = pos.func_177972_a(side); 
+            pos = pos.offset(side); 
           if (player.func_175151_a(pos, side, stack) && world.func_190527_a(type, pos, false, side, null)) {
             IBlockState placedState = type.getStateForPlacement(world, pos, side, 0.0F, 0.0F, 0.0F, 0, (EntityLivingBase)player, hand);
             world.func_175656_a(pos, placedState);

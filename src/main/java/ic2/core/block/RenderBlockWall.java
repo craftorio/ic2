@@ -59,7 +59,7 @@ public class RenderBlockWall extends AbstractModel implements ISpecialParticleMo
     List[] arrayOfList = new List[6];
     int[] retextureStart = new int[6];
     IntBuffer buffer = VdUtil.getQuadBuffer();
-    for (EnumFacing side : EnumFacing.field_82609_l) {
+    for (EnumFacing side : EnumFacing.VALUES) {
       int[] sideColorMultipliers = colorMultipliers[side.ordinal()];
       List<BakedQuad> baseFaceQuads = baseModel.func_188616_a(state, side, 0L);
       if (sideColorMultipliers == null) {

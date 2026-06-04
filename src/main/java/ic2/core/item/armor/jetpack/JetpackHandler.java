@@ -64,7 +64,7 @@ public class JetpackHandler implements IBackupElectricItemManager {
       if (!stack.func_77942_o())
         return; 
       stack.func_77978_p().func_82580_o("hasIC2Jetpack");
-      if (stack.func_77978_p().func_82582_d())
+      if (stack.func_77978_p().hasNoTags())
         stack.func_77982_d(null); 
     } else if (EntityLiving.func_184640_d(stack) == EntityEquipmentSlot.CHEST) {
       StackUtil.getOrCreateNbtData(stack).func_74757_a("hasIC2Jetpack", true);
@@ -115,7 +115,7 @@ public class JetpackHandler implements IBackupElectricItemManager {
       charge -= amount;
       if (charge == 0.0D) {
         stack.func_77978_p().func_82580_o("charge");
-        if (stack.func_77978_p().func_82582_d())
+        if (stack.func_77978_p().hasNoTags())
           stack.func_77982_d(null); 
       } else {
         stack.func_77978_p().setDouble("charge", charge);
@@ -129,7 +129,7 @@ public class JetpackHandler implements IBackupElectricItemManager {
   }
   
   public double getMaxCharge(ItemStack stack) {
-    return ElectricItem.manager.getMaxCharge(jetpack.func_77946_l());
+    return ElectricItem.manager.getMaxCharge(jetpack.copy());
   }
   
   public boolean canUse(ItemStack stack, double amount) {
@@ -147,7 +147,7 @@ public class JetpackHandler implements IBackupElectricItemManager {
   }
   
   public int getTier(ItemStack stack) {
-    return ElectricItem.manager.getTier(jetpack.func_77946_l());
+    return ElectricItem.manager.getTier(jetpack.copy());
   }
   
   public synchronized boolean handles(ItemStack stack) {
@@ -169,7 +169,7 @@ public class JetpackHandler implements IBackupElectricItemManager {
     if (playerArmorBuffer.containsKey(event.player)) {
       ItemStack lastStack = playerArmorBuffer.get(event.player);
       if (StackUtil.isEmpty(lastStack) && hasJetpackAttached(lastStack) && StackUtil.isEmpty(stack)) {
-        ItemStack newJetpack = jetpack.func_77946_l();
+        ItemStack newJetpack = jetpack.copy();
         double oldCharge = ElectricItem.manager.getCharge(lastStack);
         ElectricItem.manager.charge(newJetpack, oldCharge, 2147483647, true, false);
         event.player.func_184201_a(EntityEquipmentSlot.CHEST, newJetpack);

@@ -72,7 +72,7 @@ public class JetpackAttachmentRecipe implements IRecipe {
     } 
     if (jetpack == null || armor == null || !attachmentPlate || JetpackHandler.hasJetpackAttached(armor))
       return StackUtil.emptyStack; 
-    ItemStack ret = armor.func_77946_l();
+    ItemStack ret = armor.copy();
     JetpackHandler.setJetpackAttached(ret, true);
     ElectricItem.manager.charge(ret, ElectricItem.manager.getCharge(jetpack), 2147483647, true, false);
     return ret;

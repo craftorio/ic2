@@ -47,7 +47,7 @@ public class TileEntityCentrifuge extends TileEntityStandardMachine<IRecipeInput
   
   public void readFromNBT(NBTTagCompound nbt) {
     super.readFromNBT(nbt);
-    this.heat = nbt.func_74765_d("heat");
+    this.heat = nbt.getShort("heat");
   }
   
   public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
@@ -73,7 +73,7 @@ public class TileEntityCentrifuge extends TileEntityStandardMachine<IRecipeInput
       short heatRequested = Short.MIN_VALUE;
       MachineRecipeResult<? extends IRecipeInput, ? extends Collection<ItemStack>, ? extends ItemStack> output = super.getOutput();
       if (output != null && !this.redstone.hasRedstoneInput()) {
-        heatRequested = min((short)5000, output.getRecipe().getMetaData().func_74765_d("minHeat"));
+        heatRequested = min((short)5000, output.getRecipe().getMetaData().getShort("minHeat"));
         this.workheat = heatRequested;
         if (this.heat > heatRequested)
           this.heat = heatRequested; 
@@ -98,7 +98,7 @@ public class TileEntityCentrifuge extends TileEntityStandardMachine<IRecipeInput
     if (ret != null) {
       if (ret.getRecipe().getMetaData() == null)
         return null; 
-      if (ret.getRecipe().getMetaData().func_74762_e("minHeat") > this.heat)
+      if (ret.getRecipe().getMetaData().getInteger("minHeat") > this.heat)
         return null; 
     } 
     return ret;

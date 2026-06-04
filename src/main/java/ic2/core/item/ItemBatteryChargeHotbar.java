@@ -41,7 +41,7 @@ public class ItemBatteryChargeHotbar extends ItemBattery implements IBoxable {
   
   public void func_77663_a(ItemStack stack, World world, Entity entity, int itemSlot, boolean isSelected) {
     Mode mode = getMode(stack);
-    if (entity instanceof net.minecraft.entity.player.EntityPlayerMP && world.func_82737_E() % 10L < getTier(stack) && mode.enabled) {
+    if (entity instanceof net.minecraft.entity.player.EntityPlayerMP && world.getTotalWorldTime() % 10L < getTier(stack) && mode.enabled) {
       EntityPlayer thePlayer = (EntityPlayer)entity;
       NonNullList<ItemStack> nonNullList = thePlayer.inventory.field_70462_a;
       double limit = getTransferLimit(stack);
@@ -76,14 +76,14 @@ public class ItemBatteryChargeHotbar extends ItemBattery implements IBoxable {
   
   public void setMode(ItemStack stack, Mode mode) {
     NBTTagCompound nbt = StackUtil.getOrCreateNbtData(stack);
-    nbt.func_74774_a("mode", (byte)mode.ordinal());
+    nbt.setByte("mode", (byte)mode.ordinal());
   }
   
   public Mode getMode(ItemStack stack) {
     NBTTagCompound nbt = StackUtil.getOrCreateNbtData(stack);
     if (!nbt.func_74764_b("mode"))
       return Mode.ENABLED; 
-    return getMode(nbt.func_74771_c("mode"));
+    return getMode(nbt.getByte("mode"));
   }
   
   private Mode getMode(int mode) {

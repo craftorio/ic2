@@ -47,7 +47,7 @@ public abstract class TileEntityTransformer extends TileEntityInventory implemen
   
   public void readFromNBT(NBTTagCompound nbt) {
     super.readFromNBT(nbt);
-    int mode = nbt.func_74762_e("mode");
+    int mode = nbt.getInteger("mode");
     if (mode >= 0 && mode < Mode.VALUES.length) {
       this.configuredMode = Mode.VALUES[mode];
     } else {
@@ -57,7 +57,7 @@ public abstract class TileEntityTransformer extends TileEntityInventory implemen
   
   public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
     super.writeToNBT(nbt);
-    nbt.func_74768_a("mode", this.configuredMode.ordinal());
+    nbt.setInteger("mode", this.configuredMode.ordinal());
     return nbt;
   }
   
@@ -90,7 +90,7 @@ public abstract class TileEntityTransformer extends TileEntityInventory implemen
     assert !(getWorld()).isRemote;
     switch (this.configuredMode) {
       case redstone:
-        newMode = getWorld().func_175640_z(this.field_174879_c) ? Mode.stepup : Mode.stepdown;
+        newMode = getWorld().isBlockPowered(this.pos) ? Mode.stepup : Mode.stepdown;
         break;
       case stepdown:
       case stepup:

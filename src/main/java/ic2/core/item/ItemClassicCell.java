@@ -27,7 +27,7 @@ public class ItemClassicCell extends ItemMulti<CellType> {
     ItemStack stack = StackUtil.get(player, hand);
     CellType type = getType(stack);
     if (type.hasCropAction()) {
-      TileEntity te = world.func_175625_s(pos);
+      TileEntity te = world.getTileEntity(pos);
       if (te instanceof TileEntityCrop)
         return type.doCropAction(stack, result -> StackUtil.set(player, hand, result), (TileEntityCrop)te, true); 
     } 

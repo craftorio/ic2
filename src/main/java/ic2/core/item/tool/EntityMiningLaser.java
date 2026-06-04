@@ -231,10 +231,10 @@ public class EntityMiningLaser extends Entity implements IThrowableEntity {
     if (this.power < 0.0F)
       return true; 
     List<ItemStack> replacements = new ArrayList<>();
-    if (state.func_185904_a() == Material.field_151590_u || state.func_185904_a() == MaterialIC2TNT.instance) {
+    if (state.getMaterial() == Material.field_151590_u || state.getMaterial() == MaterialIC2TNT.instance) {
       block.func_180652_a(world, event.pos, new Explosion(world, this, event.pos.getX() + 0.5D, event.pos.getY() + 0.5D, event.pos.getZ() + 0.5D, 1.0F, false, true));
     } else if (this.smelt) {
-      if (state.func_185904_a() == Material.field_151575_d) {
+      if (state.getMaterial() == Material.field_151575_d) {
         event.dropBlock = false;
       } else {
         for (ItemStack isa : StackUtil.getDrops((IBlockAccess)world, event.pos, state, block, 0)) {
@@ -254,7 +254,7 @@ public class EntityMiningLaser extends Entity implements IThrowableEntity {
           StackUtil.dropAsEntity(world, event.pos, replacement); 
         this.power = 0.0F;
       } 
-      if (world.field_73012_v.nextInt(10) == 0 && state.func_185904_a().func_76217_h())
+      if (world.rand.nextInt(10) == 0 && state.getMaterial().func_76217_h())
         world.func_175656_a(event.pos, Blocks.field_150480_ab.getDefaultState()); 
     } 
     this.blockBreaks--;

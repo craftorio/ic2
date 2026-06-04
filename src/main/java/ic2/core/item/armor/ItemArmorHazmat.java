@@ -43,8 +43,8 @@ public class ItemArmorHazmat extends ItemArmorUtility implements IHazmatLike {
       return new ISpecialArmor.ArmorProperties(10, 1.0D, 2147483647);
     } 
     if (this.field_77881_a == EntityEquipmentSlot.FEET && source == DamageSource.field_76379_h)
-      return new ISpecialArmor.ArmorProperties(10, (damage < 8.0D) ? 1.0D : 0.875D, (armor.func_77958_k() - armor.func_77952_i() + 2) * 2 * 25); 
-    return new ISpecialArmor.ArmorProperties(0, 0.05D, (armor.func_77958_k() - armor.func_77952_i() + 2) / 2 * 25);
+      return new ISpecialArmor.ArmorProperties(10, (damage < 8.0D) ? 1.0D : 0.875D, (armor.getMaxDamage() - armor.getItemDamage() + 2) * 2 * 25); 
+    return new ISpecialArmor.ArmorProperties(0, 0.05D, (armor.getMaxDamage() - armor.getItemDamage() + 2) / 2 * 25);
   }
   
   public void damageArmor(EntityLivingBase entity, ItemStack stack, DamageSource source, int damage, int slot) {
@@ -66,7 +66,7 @@ public class ItemArmorHazmat extends ItemArmorUtility implements IHazmatLike {
         if (fallDamage >= 8)
           return; 
         int armorDamage = (fallDamage + 1) / 2;
-        if (armorDamage <= armor.func_77958_k() - armor.func_77952_i() && armorDamage >= 0) {
+        if (armorDamage <= armor.getMaxDamage() - armor.getItemDamage() && armorDamage >= 0) {
           armor.func_77972_a(armorDamage, (EntityLivingBase)player);
           event.setCanceled(true);
         } 
@@ -122,7 +122,7 @@ public class ItemArmorHazmat extends ItemArmorUtility implements IHazmatLike {
     int y = (int)Math.floor(player.posY + 0.02D);
     int z = (int)Math.floor(player.posZ);
     IBlockState state = player.getEntityWorld().getBlockState(new BlockPos(x, y, z));
-    if (state.getBlock() instanceof BlockLiquid && (state.func_185904_a() == Material.field_151587_i || state.func_185904_a() == Material.field_151581_o)) {
+    if (state.getBlock() instanceof BlockLiquid && (state.getMaterial() == Material.field_151587_i || state.getMaterial() == Material.field_151581_o)) {
       float height = (y + 1) - BlockLiquid.func_149801_b(((Integer)state.func_177229_b((IProperty)BlockLiquid.field_176367_b)).intValue());
       return (player.posY < height);
     } 

@@ -25,8 +25,8 @@ public class GuiFluidRegulator extends GuiIC2<ContainerFluidRegulator> {
   
   protected void drawForegroundLayer(int mouseX, int mouseY) {
     super.drawForegroundLayer(mouseX, mouseY);
-    this.field_146289_q.func_78276_b(((TileEntityFluidRegulator)((ContainerFluidRegulator)this.container).base).getoutputmb() + Localization.translate("ic2.generic.text.mb"), 105, 57, 2157374);
-    this.field_146289_q.func_78276_b(((TileEntityFluidRegulator)((ContainerFluidRegulator)this.container).base).getmodegui(), 145, 57, 2157374);
+    this.fontRenderer.drawString(((TileEntityFluidRegulator)((ContainerFluidRegulator)this.container).base).getoutputmb() + Localization.translate("ic2.generic.text.mb"), 105, 57, 2157374);
+    this.fontRenderer.drawString(((TileEntityFluidRegulator)((ContainerFluidRegulator)this.container).base).getmodegui(), 145, 57, 2157374);
   }
   
   protected void func_73864_a(int i, int j, int k) throws IOException {

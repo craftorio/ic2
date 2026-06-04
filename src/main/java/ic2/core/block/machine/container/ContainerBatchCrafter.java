@@ -27,22 +27,22 @@ public class ContainerBatchCrafter extends ContainerElectricMachine<TileEntityBa
     this.indexToSlot = (TIntIntMap)new TIntIntHashMap();
     for (int y = 0; y < 3; y++) {
       for (int x = 0; x < 3; x++) {
-        func_75146_a((Slot)new SlotHologramSlot(tileEntity.craftingGrid, x + y * 3, 30 + x * 18, 17 + y * 18, 1, new SlotHologramSlot.ChangeCallback() {
+        addSlotToContainer((Slot)new SlotHologramSlot(tileEntity.craftingGrid, x + y * 3, 30 + x * 18, 17 + y * 18, 1, new SlotHologramSlot.ChangeCallback() {
                 public void onChanged(int index) {
-                  if (((TileEntityBatchCrafter)ContainerBatchCrafter.this.base).func_145830_o() && !(((TileEntityBatchCrafter)ContainerBatchCrafter.this.base).getWorld()).isRemote)
+                  if (((TileEntityBatchCrafter)ContainerBatchCrafter.this.base).hasWorld() && !(((TileEntityBatchCrafter)ContainerBatchCrafter.this.base).getWorld()).isRemote)
                     ((TileEntityBatchCrafter)ContainerBatchCrafter.this.base).matrixChange(index); 
                 }
               }));
       } 
     } 
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)tileEntity.craftingOutput, 0, 124, 35));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)tileEntity.craftingOutput, 0, 124, 35));
     int slot;
     for (slot = 0; slot < 9; slot++) {
-      this.indexToSlot.put(slot, (func_75146_a((Slot)new SlotInvSlot(tileEntity.ingredientsRow[slot], 0, 8 + slot * 18, 84))).field_75222_d);
-      func_75146_a((Slot)new SlotInvSlot((InvSlot)tileEntity.containerOutput, slot, 8 + slot * 18, 102));
+      this.indexToSlot.put(slot, (addSlotToContainer((Slot)new SlotInvSlot(tileEntity.ingredientsRow[slot], 0, 8 + slot * 18, 84))).field_75222_d);
+      addSlotToContainer((Slot)new SlotInvSlot((InvSlot)tileEntity.containerOutput, slot, 8 + slot * 18, 102));
     } 
     for (slot = 0; slot < 4; slot++)
-      func_75146_a((Slot)new SlotInvSlot((InvSlot)tileEntity.upgradeSlot, slot, 152, 8 + slot * 18)); 
+      addSlotToContainer((Slot)new SlotInvSlot((InvSlot)tileEntity.upgradeSlot, slot, 152, 8 + slot * 18)); 
   }
   
   protected ItemStack handlePlayerSlotShiftClick(EntityPlayer player, ItemStack sourceItemStack) {

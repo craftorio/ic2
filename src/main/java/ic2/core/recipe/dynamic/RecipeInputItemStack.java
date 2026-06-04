@@ -25,7 +25,7 @@ public class RecipeInputItemStack extends RecipeInputIngredient<ItemStack> {
   }
   
   public RecipeInputIngredient<ItemStack> copy() {
-    return of(this.ingredient.func_77946_l());
+    return of(this.ingredient.copy());
   }
   
   public boolean isEmpty() {

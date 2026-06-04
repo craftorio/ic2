@@ -222,7 +222,7 @@ public class ItemToolPainter extends ItemIC2 implements IMultiItem<Ic2Color>, IB
   public void damagePainter(EntityPlayer player, EnumHand hand, Ic2Color color) {
     assert color != null;
     ItemStack stack = StackUtil.get(player, hand);
-    if (stack.func_77952_i() >= stack.func_77958_k()) {
+    if (stack.getItemDamage() >= stack.getMaxDamage()) {
       NBTTagCompound nbtData = StackUtil.getOrCreateNbtData(stack);
       if (nbtData.func_74767_n("autoRefill") && 
         StackUtil.consumeFromPlayerInventory(player, StackUtil.oreDict(color.oreDictDyeName), 1, false)) {

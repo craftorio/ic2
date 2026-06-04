@@ -67,8 +67,8 @@ public class TileEntityClassicCropmatron extends TileEntityElectricMachine imple
       } 
     } 
     this.energy.useEnergy(1.0D);
-    BlockPos scan = this.field_174879_c.func_177982_a(this.scanX, this.scanY, this.scanZ);
-    TileEntity te = getWorld().func_175625_s(scan);
+    BlockPos scan = this.pos.add(this.scanX, this.scanY, this.scanZ);
+    TileEntity te = getWorld().getTileEntity(scan);
     if (te instanceof TileEntityCrop) {
       TileEntityCrop crop = (TileEntityCrop)te;
       if (!this.fertilizerSlot.isEmpty() && crop.applyFertilizer(false)) {

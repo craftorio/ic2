@@ -12,7 +12,7 @@ import net.minecraft.inventory.Slot;
 public class ContainerPatternStorage extends ContainerFullInv<TileEntityPatternStorage> {
   public ContainerPatternStorage(EntityPlayer player, TileEntityPatternStorage tileEntity1) {
     super(player, (IInventory)tileEntity1, 166);
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)tileEntity1.diskSlot, 0, 18, 20));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)tileEntity1.diskSlot, 0, 18, 20));
   }
   
   public List<String> getNetworkedFields() {

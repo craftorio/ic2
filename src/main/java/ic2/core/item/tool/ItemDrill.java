@@ -46,7 +46,7 @@ public class ItemDrill extends ItemElectricTool implements IMiningDrill, IHitSou
     float speed = super.func_150893_a(stack, state);
     EntityPlayer player = getPlayerHoldingItem(stack);
     if (player != null) {
-      if (player.func_70055_a(Material.field_151586_h) && !EnchantmentHelper.func_185287_i((EntityLivingBase)player))
+      if (player.func_70055_a(Material.WATER) && !EnchantmentHelper.func_185287_i((EntityLivingBase)player))
         speed *= 5.0F; 
       if (!player.field_70122_E)
         speed *= 5.0F; 

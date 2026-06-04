@@ -55,14 +55,14 @@ public class ItemFrequencyTransmitter extends ItemIC2 {
   public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
     if (world.isRemote)
       return EnumActionResult.PASS; 
-    TileEntity te = world.func_175625_s(pos);
+    TileEntity te = world.getTileEntity(pos);
     if (!(te instanceof TileEntityTeleporter))
       return EnumActionResult.PASS; 
     TileEntityTeleporter tp = (TileEntityTeleporter)te;
     NBTTagCompound nbtData = StackUtil.getOrCreateNbtData(StackUtil.get(player, hand));
     boolean targetSet = nbtData.func_74767_n("targetSet");
     boolean justSetTarget = true;
-    BlockPos target = new BlockPos(nbtData.func_74762_e("targetX"), nbtData.func_74762_e("targetY"), nbtData.func_74762_e("targetZ"));
+    BlockPos target = new BlockPos(nbtData.getInteger("targetX"), nbtData.getInteger("targetY"), nbtData.getInteger("targetZ"));
     if (!targetSet) {
       targetSet = true;
       target = tp.getPos();
@@ -72,7 +72,7 @@ public class ItemFrequencyTransmitter extends ItemIC2 {
     } else if (tp.hasTarget() && tp.getTarget().equals(target)) {
       IC2.platform.messagePlayer(player, "Teleportation link unchanged.", new Object[0]);
     } else {
-      TileEntity targetTe = world.func_175625_s(target);
+      TileEntity targetTe = world.getTileEntity(target);
       if (targetTe instanceof TileEntityTeleporter) {
         tp.setTarget(target);
         ((TileEntityTeleporter)targetTe).setTarget(pos);
@@ -83,9 +83,9 @@ public class ItemFrequencyTransmitter extends ItemIC2 {
     } 
     nbtData.func_74757_a("targetSet", targetSet);
     nbtData.func_74757_a("targetJustSet", justSetTarget);
-    nbtData.func_74768_a("targetX", target.getX());
-    nbtData.func_74768_a("targetY", target.getY());
-    nbtData.func_74768_a("targetZ", target.getZ());
+    nbtData.setInteger("targetX", target.getX());
+    nbtData.setInteger("targetY", target.getY());
+    nbtData.setInteger("targetZ", target.getZ());
     return EnumActionResult.SUCCESS;
   }
   
@@ -93,7 +93,7 @@ public class ItemFrequencyTransmitter extends ItemIC2 {
   public void func_77624_a(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
     NBTTagCompound nbtData = StackUtil.getOrCreateNbtData(stack);
     if (nbtData.func_74767_n("targetSet")) {
-      tooltip.add(Localization.translate("ic2.frequency_transmitter.tooltip.target", new Object[] { Integer.valueOf(nbtData.func_74762_e("targetX")), Integer.valueOf(nbtData.func_74762_e("targetY")), Integer.valueOf(nbtData.func_74762_e("targetZ")) }));
+      tooltip.add(Localization.translate("ic2.frequency_transmitter.tooltip.target", new Object[] { Integer.valueOf(nbtData.getInteger("targetX")), Integer.valueOf(nbtData.getInteger("targetY")), Integer.valueOf(nbtData.getInteger("targetZ")) }));
     } else {
       tooltip.add(Localization.translate("ic2.frequency_transmitter.tooltip.blank"));
     } 

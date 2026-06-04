@@ -11,9 +11,9 @@ import net.minecraft.inventory.Slot;
 public class ContainerCropnalyzer extends ContainerHandHeldInventory<HandHeldCropnalyzer> {
   public ContainerCropnalyzer(EntityPlayer player, HandHeldCropnalyzer cropnalyzer1) {
     super(cropnalyzer1);
-    func_75146_a((Slot)new SlotCustom((IInventory)cropnalyzer1, ItemName.crop_seed_bag.getInstance(), 0, 8, 7));
-    func_75146_a((Slot)new SlotCustom((IInventory)cropnalyzer1, null, 1, 41, 7));
-    func_75146_a((Slot)new SlotDischarge((IInventory)cropnalyzer1, 2, 152, 7));
+    addSlotToContainer((Slot)new SlotCustom((IInventory)cropnalyzer1, ItemName.crop_seed_bag.getInstance(), 0, 8, 7));
+    addSlotToContainer((Slot)new SlotCustom((IInventory)cropnalyzer1, null, 1, 41, 7));
+    addSlotToContainer((Slot)new SlotDischarge((IInventory)cropnalyzer1, 2, 152, 7));
     addPlayerInventorySlots(player, 223);
   }
 }

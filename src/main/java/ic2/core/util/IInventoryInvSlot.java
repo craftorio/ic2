@@ -59,7 +59,7 @@ public class IInventoryInvSlot implements IInventory {
     this.slot.clear();
   }
   
-  public void func_70296_d() {
+  public void markDirty() {
     this.slot.onChanged();
   }
   

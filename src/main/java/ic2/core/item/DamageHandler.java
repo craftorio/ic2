@@ -14,7 +14,7 @@ public class DamageHandler {
       return 0; 
     if (item instanceof ICustomDamageItem)
       return ((ICustomDamageItem)item).getCustomDamage(stack); 
-    return stack.func_77952_i();
+    return stack.getItemDamage();
   }
   
   public static void setDamage(ItemStack stack, int damage, boolean displayOnly) {
@@ -38,7 +38,7 @@ public class DamageHandler {
       return 0; 
     if (item instanceof ICustomDamageItem)
       return ((ICustomDamageItem)item).getMaxCustomDamage(stack); 
-    return stack.func_77958_k();
+    return stack.getMaxDamage();
   }
   
   public static boolean damage(ItemStack stack, int damage, EntityLivingBase src) {

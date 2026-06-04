@@ -64,14 +64,14 @@ public class TileEntityCokeKiln extends TileEntityInventory implements IMultiBlo
   
   public void readFromNBT(NBTTagCompound nbt) {
     super.readFromNBT(nbt);
-    this.progress = nbt.func_74762_e("progress");
-    this.operationLength = nbt.func_74762_e("operationLength");
+    this.progress = nbt.getInteger("progress");
+    this.operationLength = nbt.getInteger("operationLength");
   }
   
   public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
     super.writeToNBT(nbt);
-    nbt.func_74768_a("progress", this.progress);
-    nbt.func_74768_a("operationLength", this.operationLength);
+    nbt.setInteger("progress", this.progress);
+    nbt.setInteger("operationLength", this.operationLength);
     return nbt;
   }
   
@@ -107,12 +107,12 @@ public class TileEntityCokeKiln extends TileEntityInventory implements IMultiBlo
       this.guiProgress = this.progress / this.operationLength;
     } 
     if (needsInventoryUpdate)
-      func_70296_d(); 
+      markDirty(); 
   }
   
   protected boolean canWork() {
-    BlockPos hatchPos = new BlockPos(this.field_174879_c.getX() + -getFacing().getFrontOffsetX(), this.field_174879_c.getY() + 1, this.field_174879_c.getZ() + -getFacing().getFrontOffsetZ());
-    TileEntity hatch = this.field_145850_b.func_175625_s(hatchPos);
+    BlockPos hatchPos = new BlockPos(this.pos.getX() + -getFacing().getFrontOffsetX(), this.pos.getY() + 1, this.pos.getZ() + -getFacing().getFrontOffsetZ());
+    TileEntity hatch = this.world.getTileEntity(hatchPos);
     if (!(hatch instanceof TileEntityCokeKilnHatch))
       return false; 
     ItemStack input = ((TileEntityCokeKilnHatch)hatch).inventory.get();
@@ -132,8 +132,8 @@ public class TileEntityCokeKiln extends TileEntityInventory implements IMultiBlo
           continue;
         } 
         if (entry instanceof ic2.core.recipe.dynamic.RecipeOutputFluidStack) {
-          BlockPos gratePos = new BlockPos(this.field_174879_c.getX() + -getFacing().getFrontOffsetX(), this.field_174879_c.getY() - 1, this.field_174879_c.getZ() + -getFacing().getFrontOffsetZ());
-          TileEntity grate = this.field_145850_b.func_175625_s(gratePos);
+          BlockPos gratePos = new BlockPos(this.pos.getX() + -getFacing().getFrontOffsetX(), this.pos.getY() - 1, this.pos.getZ() + -getFacing().getFrontOffsetZ());
+          TileEntity grate = this.world.getTileEntity(gratePos);
           if (!(grate instanceof TileEntityCokeKilnGrate))
             return false; 
           if (((TileEntityCokeKilnGrate)grate).fluidTank.fillInternal((FluidStack)entry.ingredient, false) < ((FluidStack)entry.ingredient).amount)
@@ -153,8 +153,8 @@ public class TileEntityCokeKiln extends TileEntityInventory implements IMultiBlo
         continue;
       } 
       if (entry instanceof ic2.core.recipe.dynamic.RecipeOutputFluidStack) {
-        BlockPos gratePos = new BlockPos(this.field_174879_c.getX() + -getFacing().getFrontOffsetX(), this.field_174879_c.getY() - 1, this.field_174879_c.getZ() + -getFacing().getFrontOffsetZ());
-        TileEntity grate = this.field_145850_b.func_175625_s(gratePos);
+        BlockPos gratePos = new BlockPos(this.pos.getX() + -getFacing().getFrontOffsetX(), this.pos.getY() - 1, this.pos.getZ() + -getFacing().getFrontOffsetZ());
+        TileEntity grate = this.world.getTileEntity(gratePos);
         if (!(grate instanceof TileEntityCokeKilnGrate))
           return false; 
         if (((TileEntityCokeKilnGrate)grate).fluidTank.fillInternal((FluidStack)entry.ingredient, false) < ((FluidStack)entry.ingredient).amount)
@@ -165,8 +165,8 @@ public class TileEntityCokeKiln extends TileEntityInventory implements IMultiBlo
   }
   
   protected void finishWork() {
-    BlockPos hatchPos = new BlockPos(this.field_174879_c.getX() + -getFacing().getFrontOffsetX(), this.field_174879_c.getY() + 1, this.field_174879_c.getZ() + -getFacing().getFrontOffsetZ());
-    TileEntity hatch = this.field_145850_b.func_175625_s(hatchPos);
+    BlockPos hatchPos = new BlockPos(this.pos.getX() + -getFacing().getFrontOffsetX(), this.pos.getY() + 1, this.pos.getZ() + -getFacing().getFrontOffsetZ());
+    TileEntity hatch = this.world.getTileEntity(hatchPos);
     if (!(hatch instanceof TileEntityCokeKilnHatch))
       return; 
     InvSlot inventory = ((TileEntityCokeKilnHatch)hatch).inventory;
@@ -188,8 +188,8 @@ public class TileEntityCokeKiln extends TileEntityInventory implements IMultiBlo
       stack.func_190918_g(amount);
     } 
     itemOutputs.clear();
-    BlockPos gratePos = new BlockPos(this.field_174879_c.getX() + -getFacing().getFrontOffsetX(), this.field_174879_c.getY() - 1, this.field_174879_c.getZ() + -getFacing().getFrontOffsetZ());
-    TileEntity grate = this.field_145850_b.func_175625_s(gratePos);
+    BlockPos gratePos = new BlockPos(this.pos.getX() + -getFacing().getFrontOffsetX(), this.pos.getY() - 1, this.pos.getZ() + -getFacing().getFrontOffsetZ());
+    TileEntity grate = this.world.getTileEntity(gratePos);
     if (grate instanceof TileEntityCokeKilnGrate)
       for (FluidStack stack : fluidOutputs) {
         int amount = ((TileEntityCokeKilnGrate)grate).fluidTank.fillInternal(stack, true);
@@ -215,22 +215,22 @@ public class TileEntityCokeKiln extends TileEntityInventory implements IMultiBlo
     super.updateEntityClient();
     if (getActive()) {
       World world = getWorld();
-      ParticleUtil.showFlames(world, this.field_174879_c, getFacing());
-      if (world.field_73012_v.nextDouble() < 0.1D)
-        world.func_184134_a(this.field_174879_c.getX() + 0.5D, this.field_174879_c.getY() + 0.5D, this.field_174879_c.getZ() + 0.5D, SoundEvents.field_187652_bv, SoundCategory.BLOCKS, 1.0F, 1.0F, false); 
+      ParticleUtil.showFlames(world, this.pos, getFacing());
+      if (world.rand.nextDouble() < 0.1D)
+        world.func_184134_a(this.pos.getX() + 0.5D, this.pos.getY() + 0.5D, this.pos.getZ() + 0.5D, SoundEvents.field_187652_bv, SoundCategory.BLOCKS, 1.0F, 1.0F, false); 
     } 
   }
   
   public boolean hasValidStructure() {
     int range = 2;
-    ChunkCache cache = new ChunkCache(getWorld(), this.field_174879_c.func_177982_a(-2, -2, -2), this.field_174879_c.func_177982_a(2, 2, 2), 0);
+    ChunkCache cache = new ChunkCache(getWorld(), this.pos.add(-2, -2, -2), this.pos.add(2, 2, 2), 0);
     BlockPos.MutableBlockPos cPos = new BlockPos.MutableBlockPos();
     int x;
     for (x = -1; x <= 1; x++) {
       for (int z = -1; z <= 1; z++) {
-        cPos.func_181079_c(this.field_174879_c.getX() + x - getFacing().getFrontOffsetX(), this.field_174879_c.getY() - 1, this.field_174879_c.getZ() + z - getFacing().getFrontOffsetZ());
+        cPos.setPos(this.pos.getX() + x - getFacing().getFrontOffsetX(), this.pos.getY() - 1, this.pos.getZ() + z - getFacing().getFrontOffsetZ());
         if (x == 0 && z == 0) {
-          TileEntity tileEntity = cache.func_175625_s((BlockPos)cPos);
+          TileEntity tileEntity = cache.getTileEntity((BlockPos)cPos);
           if (tileEntity == null)
             return false; 
           if (!(tileEntity instanceof TileEntityCokeKilnGrate))
@@ -244,13 +244,13 @@ public class TileEntityCokeKiln extends TileEntityInventory implements IMultiBlo
     } 
     for (x = -1; x <= 1; x++) {
       for (int z = -1; z <= 1; z++) {
-        cPos.func_181079_c(this.field_174879_c.getX() + x - getFacing().getFrontOffsetX(), this.field_174879_c.getY(), this.field_174879_c.getZ() + z - getFacing().getFrontOffsetZ());
+        cPos.setPos(this.pos.getX() + x - getFacing().getFrontOffsetX(), this.pos.getY(), this.pos.getZ() + z - getFacing().getFrontOffsetZ());
         if (x == 0 && z == 0) {
           IBlockState state = cache.getBlockState((BlockPos)cPos);
           if (state.getBlock() != Blocks.AIR)
             return false; 
-        } else if (this.field_174879_c.getX() == cPos.getX() && this.field_174879_c.getZ() == cPos.getZ()) {
-          TileEntity tileEntity = cache.func_175625_s((BlockPos)cPos);
+        } else if (this.pos.getX() == cPos.getX() && this.pos.getZ() == cPos.getZ()) {
+          TileEntity tileEntity = cache.getTileEntity((BlockPos)cPos);
           if (tileEntity == null)
             return false; 
           if (tileEntity != this)
@@ -264,9 +264,9 @@ public class TileEntityCokeKiln extends TileEntityInventory implements IMultiBlo
     } 
     for (x = -1; x <= 1; x++) {
       for (int z = -1; z <= 1; z++) {
-        cPos.func_181079_c(this.field_174879_c.getX() + x - getFacing().getFrontOffsetX(), this.field_174879_c.getY() + 1, this.field_174879_c.getZ() + z - getFacing().getFrontOffsetZ());
+        cPos.setPos(this.pos.getX() + x - getFacing().getFrontOffsetX(), this.pos.getY() + 1, this.pos.getZ() + z - getFacing().getFrontOffsetZ());
         if (x == 0 && z == 0) {
-          TileEntity tileEntity = cache.func_175625_s((BlockPos)cPos);
+          TileEntity tileEntity = cache.getTileEntity((BlockPos)cPos);
           if (tileEntity == null)
             return false; 
           if (!(tileEntity instanceof TileEntityCokeKilnHatch))

@@ -48,7 +48,7 @@ public class ItemClassicSprayer extends ItemGradualInt {
         applyCustomDamage(stack, 100, (EntityLivingBase)player); 
       return EnumActionResult.SUCCESS;
     } 
-    if (sprayFoam(world, pos.func_177972_a(facing), calculateDirectionsFromPlayer(player), false)) {
+    if (sprayFoam(world, pos.offset(facing), calculateDirectionsFromPlayer(player), false)) {
       if (!pulledFromCFPack)
         applyCustomDamage(stack, 100, (EntityLivingBase)player); 
       return EnumActionResult.SUCCESS;
@@ -89,7 +89,7 @@ public class ItemClassicSprayer extends ItemGradualInt {
       if (canFoam(world, set, scaffold) && place.add(set)) {
         for (int i : generateRngSpread(IC2.random)) {
           if (scaffold || directions[i])
-            check.add(set.func_177972_a(EnumFacing.func_82600_a(i))); 
+            check.add(set.offset(EnumFacing.func_82600_a(i))); 
         } 
         foamcount--;
       } 
@@ -109,7 +109,7 @@ public class ItemClassicSprayer extends ItemGradualInt {
         continue;
       } 
       if (targetBlock == BlockName.te.getInstance()) {
-        TileEntity te = world.func_175625_s(pos);
+        TileEntity te = world.getTileEntity(pos);
         if (te instanceof TileEntityCable)
           ((TileEntityCable)te).foam(); 
         continue;
@@ -125,7 +125,7 @@ public class ItemClassicSprayer extends ItemGradualInt {
         return true; 
       if (world.getBlockState(pos).getBlock() != BlockName.te.getInstance())
         return false; 
-      TileEntity te = world.func_175625_s(pos);
+      TileEntity te = world.getTileEntity(pos);
       return (te instanceof TileEntityCable && !((TileEntityCable)te).isFoamed());
     } 
     return (world.getBlockState(pos).getBlock() == BlockName.scaffold.getInstance());

@@ -31,7 +31,7 @@ public class ItemMug extends ItemMulti<ItemMug.MugType> {
     if (type == MugType.empty) {
       if (world.isRemote)
         return EnumActionResult.FAIL; 
-      TileEntity te = world.func_175625_s(pos);
+      TileEntity te = world.getTileEntity(pos);
       if (!(te instanceof TileEntityBarrel))
         return EnumActionResult.PASS; 
       TileEntityBarrel barrel = (TileEntityBarrel)te;

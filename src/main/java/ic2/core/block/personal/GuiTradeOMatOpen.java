@@ -27,13 +27,13 @@ public class GuiTradeOMatOpen extends GuiIC2<ContainerTradeOMatOpen> {
   
   protected void drawForegroundLayer(int mouseX, int mouseY) {
     super.drawForegroundLayer(mouseX, mouseY);
-    this.field_146289_q.func_78276_b(Localization.translate("container.inventory"), 8, this.field_147000_g - 96 + 2, 4210752);
-    this.field_146289_q.func_78276_b(Localization.translate("ic2.container.personalTrader.want"), 12, 23, 4210752);
-    this.field_146289_q.func_78276_b(Localization.translate("ic2.container.personalTrader.offer"), 12, 57, 4210752);
-    this.field_146289_q.func_78276_b(Localization.translate("ic2.container.personalTrader.totalTrades0"), 108, 28, 4210752);
-    this.field_146289_q.func_78276_b(Localization.translate("ic2.container.personalTrader.totalTrades1"), 108, 36, 4210752);
-    this.field_146289_q.func_78276_b("" + ((TileEntityTradeOMat)((ContainerTradeOMatOpen)this.container).base).totalTradeCount, 112, 44, 4210752);
-    this.field_146289_q.func_78276_b(Localization.translate("ic2.container.personalTrader.stock") + " " + ((((TileEntityTradeOMat)((ContainerTradeOMatOpen)this.container).base).stock < 0) ? "∞" : ("" + ((TileEntityTradeOMat)((ContainerTradeOMatOpen)this.container).base).stock)), 108, 60, 4210752);
+    this.fontRenderer.drawString(Localization.translate("container.inventory"), 8, this.field_147000_g - 96 + 2, 4210752);
+    this.fontRenderer.drawString(Localization.translate("ic2.container.personalTrader.want"), 12, 23, 4210752);
+    this.fontRenderer.drawString(Localization.translate("ic2.container.personalTrader.offer"), 12, 57, 4210752);
+    this.fontRenderer.drawString(Localization.translate("ic2.container.personalTrader.totalTrades0"), 108, 28, 4210752);
+    this.fontRenderer.drawString(Localization.translate("ic2.container.personalTrader.totalTrades1"), 108, 36, 4210752);
+    this.fontRenderer.drawString("" + ((TileEntityTradeOMat)((ContainerTradeOMatOpen)this.container).base).totalTradeCount, 112, 44, 4210752);
+    this.fontRenderer.drawString(Localization.translate("ic2.container.personalTrader.stock") + " " + ((((TileEntityTradeOMat)((ContainerTradeOMatOpen)this.container).base).stock < 0) ? "∞" : ("" + ((TileEntityTradeOMat)((ContainerTradeOMatOpen)this.container).base).stock)), 108, 60, 4210752);
   }
   
   protected void func_146284_a(GuiButton guibutton) throws IOException {

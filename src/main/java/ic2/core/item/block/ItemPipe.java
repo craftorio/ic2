@@ -107,14 +107,14 @@ public class ItemPipe extends ItemIC2 implements IMultiItem<PipeType>, IBoxable 
   public static ItemStack getPipe(PipeType type, PipeSize size) {
     ItemStack ret = new ItemStack(ItemName.pipe.getInstance(), 1, type.getId());
     NBTTagCompound nbt = StackUtil.getOrCreateNbtData(ret);
-    nbt.func_74774_a("type", (byte)type.ordinal());
-    nbt.func_74774_a("size", (byte)size.ordinal());
+    nbt.setByte("type", (byte)type.ordinal());
+    nbt.setByte("size", (byte)size.ordinal());
     return ret;
   }
   
   private static PipeType getPipeType(ItemStack stack) {
     NBTTagCompound nbt = StackUtil.getOrCreateNbtData(stack);
-    int type = nbt.func_74771_c("type") & 0xFF;
+    int type = nbt.getByte("type") & 0xFF;
     if (type < PipeType.values.length)
       return PipeType.values[type]; 
     return PipeType.bronze;
@@ -122,7 +122,7 @@ public class ItemPipe extends ItemIC2 implements IMultiItem<PipeType>, IBoxable 
   
   private static PipeSize getSize(ItemStack stack) {
     NBTTagCompound nbt = StackUtil.getOrCreateNbtData(stack);
-    int size = nbt.func_74771_c("size") & 0xFF;
+    int size = nbt.getByte("size") & 0xFF;
     if (size < PipeSize.values.length)
       return PipeSize.values[size]; 
     return PipeSize.small;

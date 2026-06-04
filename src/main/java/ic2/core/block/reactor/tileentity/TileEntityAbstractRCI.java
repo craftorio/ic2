@@ -80,7 +80,7 @@ public abstract class TileEntityAbstractRCI extends TileEntityElectricMachine im
       }  
     needsInvUpdate |= this.upgradeSlot.tickNoMark();
     if (needsInvUpdate)
-      func_70296_d(); 
+      markDirty(); 
   }
   
   protected void onNeighborChange(Block neighbor, BlockPos neighborPos) {
@@ -98,8 +98,8 @@ public abstract class TileEntityAbstractRCI extends TileEntityElectricMachine im
   public void updateEnergyFacings() {
     World world = getWorld();
     Set<EnumFacing> ret = new HashSet<>();
-    for (EnumFacing facing : EnumFacing.field_82609_l) {
-      TileEntity te = world.func_175625_s(this.field_174879_c.func_177972_a(facing));
+    for (EnumFacing facing : EnumFacing.VALUES) {
+      TileEntity te = world.getTileEntity(this.pos.offset(facing));
       if (!(te instanceof TileEntityNuclearReactorElectric) && !(te instanceof TileEntityReactorChamberElectric))
         ret.add(facing); 
     } 
@@ -131,11 +131,11 @@ public abstract class TileEntityAbstractRCI extends TileEntityElectricMachine im
   
   private void updateReactor() {
     World world = getWorld();
-    if (!world.func_175697_a(this.field_174879_c, 2)) {
+    if (!world.isAreaLoaded(this.pos, 2)) {
       this.reactor = null;
       return;
     } 
-    TileEntity tileEntity = world.func_175625_s(this.field_174879_c.func_177972_a(getFacing().func_176734_d()));
+    TileEntity tileEntity = world.getTileEntity(this.pos.offset(getFacing().getOpposite()));
     if (tileEntity instanceof TileEntityNuclearReactorElectric) {
       this.reactor = (TileEntityNuclearReactorElectric)tileEntity;
       return;

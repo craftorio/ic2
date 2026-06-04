@@ -43,10 +43,10 @@ public class WorldGenRubTree extends WorldGenerator {
   
   public boolean func_180709_b(World world, Random random, BlockPos pos) {
     BlockPos.MutableBlockPos cPos = new BlockPos.MutableBlockPos();
-    cPos.func_181079_c(pos.getX() + 8, IC2.getWorldHeight(world) - 1, pos.getZ() + 8);
-    while (world.func_175623_d((BlockPos)cPos) && cPos.getY() > 0)
-      cPos.func_181079_c(cPos.getX(), cPos.getY() - 1, cPos.getZ()); 
-    cPos.func_181079_c(cPos.getX(), cPos.getY() + 1, cPos.getZ());
+    cPos.setPos(pos.getX() + 8, IC2.getWorldHeight(world) - 1, pos.getZ() + 8);
+    while (world.isAirBlock((BlockPos)cPos) && cPos.getY() > 0)
+      cPos.setPos(cPos.getX(), cPos.getY() - 1, cPos.getZ()); 
+    cPos.setPos(cPos.getX(), cPos.getY() + 1, cPos.getZ());
     return grow(world, (BlockPos)cPos, random);
   }
   
@@ -94,16 +94,16 @@ public class WorldGenRubTree extends WorldGenerator {
             if ((dx <= 1 && dz <= 1) || (dx <= 1 && random
               .nextInt(chance) == 0) || (dz <= 1 && random
               .nextInt(chance) == 0)) {
-              tmpPos.func_181079_c(cx, pos.getY() + cHeight, cz);
-              if (world.func_175623_d((BlockPos)tmpPos))
+              tmpPos.setPos(cx, pos.getY() + cHeight, cz);
+              if (world.isAirBlock((BlockPos)tmpPos))
                 func_175903_a(world, new BlockPos((Vec3i)tmpPos), leaves); 
             } 
           } 
         }  
     } 
     for (int i = 0; i <= height / 4 + random.nextInt(2); i++) {
-      tmpPos.func_181079_c(pos.getX(), pos.getY() + height + i, pos.getZ());
-      if (world.func_175623_d((BlockPos)tmpPos))
+      tmpPos.setPos(pos.getX(), pos.getY() + height + i, pos.getZ());
+      if (world.isAirBlock((BlockPos)tmpPos))
         func_175903_a(world, new BlockPos((Vec3i)tmpPos), leaves); 
     } 
     return true;
@@ -115,12 +115,12 @@ public class WorldGenRubTree extends WorldGenerator {
     Block baseBlock = baseState.getBlock();
     if (baseBlock.isAir(baseState, (IBlockAccess)world, below) || 
       !baseBlock.canSustainPlant(baseState, (IBlockAccess)world, below, EnumFacing.UP, (IPlantable)BlockName.sapling.getInstance()) || (
-      !world.func_175623_d(pos.func_177984_a()) && world.getBlockState(pos.func_177984_a()).getBlock() != BlockName.sapling.getInstance()))
+      !world.isAirBlock(pos.up()) && world.getBlockState(pos.up()).getBlock() != BlockName.sapling.getInstance()))
       return 0; 
     int height = 1;
-    pos = pos.func_177984_a();
-    while (world.func_175623_d(pos) && height < 8) {
-      pos = pos.func_177984_a();
+    pos = pos.up();
+    while (world.isAirBlock(pos) && height < 8) {
+      pos = pos.up();
       height++;
     } 
     return height;

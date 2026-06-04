@@ -72,22 +72,22 @@ public abstract class TileEntityChargepadBlock extends TileEntityElectricBlock {
       needsInvUpdate = true;
     } 
     if (needsInvUpdate)
-      func_70296_d(); 
+      markDirty(); 
   }
   
   @SideOnly(Side.CLIENT)
   protected void updateEntityClient() {
     super.updateEntityClient();
     World world = getWorld();
-    Random rnd = world.field_73012_v;
+    Random rnd = world.rand;
     if (rnd.nextInt(8) != 0)
       return; 
     if (getActive()) {
       ParticleManager effect = (FMLClientHandler.instance().getClient()).field_71452_i;
       for (int particles = 20; particles > 0; particles--) {
-        double x = (this.field_174879_c.getX() + 0.0F + rnd.nextFloat());
-        double y = (this.field_174879_c.getY() + 0.9F + rnd.nextFloat());
-        double z = (this.field_174879_c.getZ() + 0.0F + rnd.nextFloat());
+        double x = (this.pos.getX() + 0.0F + rnd.nextFloat());
+        double y = (this.pos.getY() + 0.9F + rnd.nextFloat());
+        double z = (this.pos.getZ() + 0.0F + rnd.nextFloat());
         effect.func_78873_a((Particle)new EntityIC2FX(world, x, y, z, 60, new double[] { 0.0D, 0.1D, 0.0D }, new float[] { 0.2F, 0.2F, 1.0F }));
       } 
     } 

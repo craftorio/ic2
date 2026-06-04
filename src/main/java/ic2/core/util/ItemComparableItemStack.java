@@ -18,7 +18,7 @@ public class ItemComparableItemStack {
     this.meta = stack.func_77981_g() ? stack.func_77960_j() : 0;
     NBTTagCompound nbt = stack.func_77978_p();
     if (nbt != null)
-      if (nbt.func_82582_d()) {
+      if (nbt.hasNoTags()) {
         nbt = null;
       } else {
         if (copyNbt)
@@ -31,7 +31,7 @@ public class ItemComparableItemStack {
           } 
           nbt.func_82580_o(key);
         } 
-        if (nbt.func_82582_d())
+        if (nbt.hasNoTags())
           nbt = null; 
       }  
     this.nbt = nbt;

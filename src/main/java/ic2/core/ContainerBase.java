@@ -46,10 +46,10 @@ public abstract class ContainerBase<T extends IInventory> extends Container {
     int xStart = (width - 162) / 2;
     for (int row = 0; row < 3; row++) {
       for (int i = 0; i < 9; i++)
-        func_75146_a(new Slot((IInventory)player.inventory, i + row * 9 + 9, xStart + i * 18, height + -82 + row * 18)); 
+        addSlotToContainer(new Slot((IInventory)player.inventory, i + row * 9 + 9, xStart + i * 18, height + -82 + row * 18)); 
     } 
     for (int col = 0; col < 9; col++)
-      func_75146_a(new Slot((IInventory)player.inventory, col, xStart + col * 18, height + -24)); 
+      addSlotToContainer(new Slot((IInventory)player.inventory, col, xStart + col * 18, height + -24)); 
   }
   
   public ItemStack func_184996_a(int slotId, int dragType, ClickType clickType, EntityPlayer player) {
@@ -171,7 +171,7 @@ public abstract class ContainerBase<T extends IInventory> extends Container {
   
   private int getTransferAmount(ItemStack stack, Slot dst) {
     int amount = Math.min(dst.field_75224_c.func_70297_j_(), dst.func_75219_a());
-    amount = Math.min(amount, stack.func_77985_e() ? stack.func_77976_d() : 1);
+    amount = Math.min(amount, stack.func_77985_e() ? stack.getMaxStackSize() : 1);
     ItemStack dstStack = dst.func_75211_c();
     if (!StackUtil.isEmpty(dstStack)) {
       if (!StackUtil.checkItemEqualityStrict(stack, dstStack))

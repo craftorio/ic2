@@ -63,9 +63,9 @@ public class CropBaseSapling extends IC2CropCard {
   
   public ItemStack[] getGains(ICropTile crop) {
     List<ItemStack> drops = new ArrayList<>();
-    drops.add(this.cropDrop.func_77946_l());
+    drops.add(this.cropDrop.copy());
     if (IC2.random.nextInt(100) >= 75)
-      drops.add(this.cropSapling.func_77946_l()); 
+      drops.add(this.cropSapling.copy()); 
     if (getId().equalsIgnoreCase("oak_sapling") && 
       IC2.random.nextInt(100) >= 75)
       drops.add(new ItemStack(Items.field_151034_e)); 

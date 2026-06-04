@@ -55,8 +55,8 @@ public class TileEntityCompressor extends TileEntityStandardMachine<IRecipeInput
   protected void findPumps() {
     World world = getWorld();
     this.pumps.clear();
-    for (EnumFacing side : EnumFacing.field_82609_l) {
-      TileEntity te = world.func_175625_s(this.field_174879_c.func_177972_a(side));
+    for (EnumFacing side : EnumFacing.VALUES) {
+      TileEntity te = world.getTileEntity(this.pos.offset(side));
       if (te instanceof TileEntityPump)
         this.pumps.add((TileEntityPump)te); 
     } 

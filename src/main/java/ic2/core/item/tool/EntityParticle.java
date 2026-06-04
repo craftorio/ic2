@@ -162,7 +162,7 @@ public class EntityParticle extends Entity implements IThrowableEntity {
       World world = getEntityWorld();
       IBlockState state = world.getBlockState(hit.getBlockPos());
       Block block = state.getBlock();
-      if (block == Blocks.field_150355_j || block == Blocks.field_150358_i) {
+      if (block == Blocks.WATER || block == Blocks.field_150358_i) {
         world.func_175698_g(hit.getBlockPos());
       } else {
         List<ItemStack> drops = StackUtil.getDrops((IBlockAccess)world, hit.getBlockPos(), state, null, 0, true);
@@ -172,7 +172,7 @@ public class EntityParticle extends Entity implements IThrowableEntity {
           if (smelted != null && smelted.getItem() instanceof ItemBlock) {
             world.func_175656_a(hit.getBlockPos(), ((ItemBlock)smelted.getItem()).func_179223_d().getDefaultState());
           } else if (block.isFlammable((IBlockAccess)world, hit.getBlockPos(), hit.field_178784_b)) {
-            world.func_175656_a(hit.getBlockPos().func_177972_a(hit.field_178784_b.func_176734_d()), Blocks.field_150480_ab.getDefaultState());
+            world.func_175656_a(hit.getBlockPos().offset(hit.field_178784_b.getOpposite()), Blocks.field_150480_ab.getDefaultState());
           } 
         } 
       } 

@@ -68,7 +68,7 @@ public class TileEntityReactorChamberElectric extends TileEntityBlock implements
     super.updateEntityClient();
     TileEntityNuclearReactorElectric reactor = getReactor();
     if (reactor != null)
-      TileEntityNuclearReactorElectric.showHeatEffects(getWorld(), this.field_174879_c, reactor.getHeat()); 
+      TileEntityNuclearReactorElectric.showHeatEffects(getWorld(), this.pos, reactor.getHeat()); 
   }
   
   protected boolean onActivated(EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
@@ -89,9 +89,9 @@ public class TileEntityReactorChamberElectric extends TileEntityBlock implements
   
   public void destoryChamber(boolean wrench) {
     World world = getWorld();
-    world.func_175698_g(this.field_174879_c);
+    world.func_175698_g(this.pos);
     for (ItemStack drop : getSelfDrops(0, wrench))
-      StackUtil.dropAsEntity(world, this.field_174879_c, drop); 
+      StackUtil.dropAsEntity(world, this.pos, drop); 
   }
   
   public String func_70005_c_() {
@@ -214,11 +214,11 @@ public class TileEntityReactorChamberElectric extends TileEntityBlock implements
   }
   
   private TileEntityNuclearReactorElectric getReactor() {
-    long time = getWorld().func_82737_E();
+    long time = getWorld().getTotalWorldTime();
     if (time != this.lastReactorUpdate) {
       updateReactor();
       this.lastReactorUpdate = time;
-    } else if (this.reactor != null && this.reactor.func_145837_r()) {
+    } else if (this.reactor != null && this.reactor.isInvalid()) {
       this.reactor = null;
     } 
     return this.reactor;
@@ -227,8 +227,8 @@ public class TileEntityReactorChamberElectric extends TileEntityBlock implements
   private void updateReactor() {
     World world = getWorld();
     this.reactor = null;
-    for (EnumFacing facing : EnumFacing.field_82609_l) {
-      TileEntity te = world.func_175625_s(this.field_174879_c.func_177972_a(facing));
+    for (EnumFacing facing : EnumFacing.VALUES) {
+      TileEntity te = world.getTileEntity(this.pos.offset(facing));
       if (te instanceof TileEntityNuclearReactorElectric) {
         this.reactor = (TileEntityNuclearReactorElectric)te;
         break;

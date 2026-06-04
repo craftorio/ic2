@@ -71,7 +71,7 @@ public class SlotHologramSlot extends Slot {
       if (!StackUtil.isEmpty(playerStack)) {
         int curSize = StackUtil.getSize(slotStack);
         int extraSize = (dragType == 0) ? StackUtil.getSize(playerStack) : 1;
-        int limit = Math.min(playerStack.func_77976_d(), this.stackSizeLimit);
+        int limit = Math.min(playerStack.getMaxStackSize(), this.stackSizeLimit);
         if (curSize + extraSize > limit)
           extraSize = Math.max(0, limit - curSize); 
         if (curSize == 0) {

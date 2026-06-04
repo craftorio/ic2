@@ -64,12 +64,12 @@ public class ItemArmorNanoSuit extends ItemArmorElectric implements IItemHudProv
   
   public void onArmorTick(World world, EntityPlayer player, ItemStack stack) {
     NBTTagCompound nbtData = StackUtil.getOrCreateNbtData(stack);
-    byte toggleTimer = nbtData.func_74771_c("toggleTimer");
+    byte toggleTimer = nbtData.getByte("toggleTimer");
     boolean ret = false;
     if (this.field_77881_a == EntityEquipmentSlot.HEAD) {
       IC2.platform.profilerStartSection("NanoHelmet");
       boolean Nightvision = nbtData.func_74767_n("Nightvision");
-      short hubmode = nbtData.func_74765_d("HudMode");
+      short hubmode = nbtData.getShort("HudMode");
       if (IC2.keyboard.isAltKeyDown(player) && IC2.keyboard.isModeSwitchKeyDown(player) && toggleTimer == 0) {
         toggleTimer = 10;
         Nightvision = !Nightvision;
@@ -96,7 +96,7 @@ public class ItemArmorNanoSuit extends ItemArmorElectric implements IItemHudProv
       } 
       if (IC2.platform.isSimulating() && toggleTimer > 0) {
         toggleTimer = (byte)(toggleTimer - 1);
-        nbtData.func_74774_a("toggleTimer", toggleTimer);
+        nbtData.setByte("toggleTimer", toggleTimer);
       } 
       if (Nightvision && IC2.platform.isSimulating() && 
         ElectricItem.manager.use(stack, 1.0D, (EntityLivingBase)player)) {
@@ -135,6 +135,6 @@ public class ItemArmorNanoSuit extends ItemArmorElectric implements IItemHudProv
   }
   
   public HudMode getHudMode(ItemStack stack) {
-    return HudMode.getFromID(StackUtil.getOrCreateNbtData(stack).func_74765_d("HudMode"));
+    return HudMode.getFromID(StackUtil.getOrCreateNbtData(stack).getShort("HudMode"));
   }
 }

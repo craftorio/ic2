@@ -34,14 +34,14 @@ public class TileEntityWeightedItemDistributor extends TileEntityInventory imple
       int[] indexes = new int[this.priority.size()];
       for (int i = 0; i < indexes.length; i++)
         indexes[i] = ((EnumFacing)this.priority.get(i)).func_176745_a(); 
-      nbt.func_74783_a("priority", indexes);
+      nbt.setIntArray("priority", indexes);
     } 
     return nbt;
   }
   
   public void readFromNBT(NBTTagCompound nbt) {
     super.readFromNBT(nbt);
-    int[] indexes = nbt.func_74759_k("priority");
+    int[] indexes = nbt.getIntArray("priority");
     if (indexes.length > 0)
       for (int index : indexes)
         this.priority.add(EnumFacing.func_82600_a(index));  
@@ -74,8 +74,8 @@ public class TileEntityWeightedItemDistributor extends TileEntityInventory imple
       World world = getWorld();
       boolean hasChanged = false;
       for (EnumFacing facing : this.priority) {
-        TileEntity te = world.func_175625_s(this.field_174879_c.func_177972_a(facing));
-        EnumFacing side = facing.func_176734_d();
+        TileEntity te = world.getTileEntity(this.pos.offset(facing));
+        EnumFacing side = facing.getOpposite();
         if (StackUtil.isInventoryTile(te, side)) {
           boolean empty = true;
           for (int index = 0; index < this.buffer.size(); index++) {
@@ -97,7 +97,7 @@ public class TileEntityWeightedItemDistributor extends TileEntityInventory imple
         } 
       } 
       if (hasChanged)
-        func_70296_d(); 
+        markDirty(); 
     } 
   }
   

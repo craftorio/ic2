@@ -41,7 +41,7 @@ public class TileEntityFluidDistributor extends TileEntityInventory implements I
   
   public final InvSlotConsumableLiquidByTank inputSlot = new InvSlotConsumableLiquidByTank((IInventorySlotHolder)this, "inputSlot", InvSlot.Access.I, 1, InvSlot.InvSide.BOTTOM, InvSlotConsumableLiquid.OpType.Fill, (IFluidTank)this.fluidTank);
   
-  public final InvSlotOutput OutputSlot = new InvSlotOutput((IInventorySlotHolder)this, "OutputSlot", 1);
+  public final InvSlotOutput outputSlot = new InvSlotOutput((IInventorySlotHolder)this, "outputSlot", 1);
   
   protected void onLoaded() {
     super.onLoaded();
@@ -67,7 +67,7 @@ public class TileEntityFluidDistributor extends TileEntityInventory implements I
   
   protected void updateEntityServer() {
     super.updateEntityServer();
-    this.inputSlot.processFromTank((IFluidTank)this.fluidTank, this.OutputSlot);
+    this.inputSlot.processFromTank((IFluidTank)this.fluidTank, this.outputSlot);
     if (this.fluidTank.getFluidAmount() > 0)
       moveFluid(); 
   }
@@ -75,8 +75,8 @@ public class TileEntityFluidDistributor extends TileEntityInventory implements I
   protected void moveFluid() {
     World world = getWorld();
     if (getActive()) {
-      TileEntity target = world.func_175625_s(this.field_174879_c.func_177972_a(getFacing()));
-      EnumFacing side = getFacing().func_176734_d();
+      TileEntity target = world.getTileEntity(this.pos.offset(getFacing()));
+      EnumFacing side = getFacing().getOpposite();
       if (LiquidUtil.isFluidTile(target, side)) {
         int amount = LiquidUtil.fillTile(target, side, this.fluidTank.getFluid(), false);
         if (amount > 0)
@@ -85,10 +85,10 @@ public class TileEntityFluidDistributor extends TileEntityInventory implements I
     } else {
       Map<EnumFacing, TileEntity> acceptingNeighbors = new EnumMap<>(EnumFacing.class);
       int acceptedVolume = 0;
-      for (EnumFacing dir : EnumFacing.field_82609_l) {
+      for (EnumFacing dir : EnumFacing.VALUES) {
         if (dir != getFacing()) {
-          TileEntity target = world.func_175625_s(this.field_174879_c.func_177972_a(dir));
-          EnumFacing side = dir.func_176734_d();
+          TileEntity target = world.getTileEntity(this.pos.offset(dir));
+          EnumFacing side = dir.getOpposite();
           if (LiquidUtil.isFluidTile(target, side)) {
             int amount = LiquidUtil.fillTile(target, side, this.fluidTank.getFluid(), true);
             if (amount > 0) {
@@ -107,7 +107,7 @@ public class TileEntityFluidDistributor extends TileEntityInventory implements I
           for (Iterator<Map.Entry<EnumFacing, TileEntity>> it = acceptingNeighbors.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry<EnumFacing, TileEntity> entry = it.next();
             TileEntity target = entry.getValue();
-            EnumFacing side = ((EnumFacing)entry.getKey()).func_176734_d();
+            EnumFacing side = ((EnumFacing)entry.getKey()).getOpposite();
             FluidStack fs = this.fluidTank.getFluid();
             if (fs == null)
               break; 
@@ -125,7 +125,7 @@ public class TileEntityFluidDistributor extends TileEntityInventory implements I
         } 
         for (Map.Entry<EnumFacing, TileEntity> entry : acceptingNeighbors.entrySet()) {
           TileEntity target = entry.getValue();
-          EnumFacing side = ((EnumFacing)entry.getKey()).func_176734_d();
+          EnumFacing side = ((EnumFacing)entry.getKey()).getOpposite();
           FluidStack fs = this.fluidTank.getFluid();
           if (fs == null)
             break; 

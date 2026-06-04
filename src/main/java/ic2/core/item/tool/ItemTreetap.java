@@ -53,9 +53,9 @@ public class ItemTreetap extends ItemIC2 implements IBoxable {
       if (!world.isRemote) {
         world.func_175656_a(pos, state.func_177226_a((IProperty)BlockRubWood.stateProperty, (Comparable)rwState.getDry()));
         if (stacks != null) {
-          stacks.add(StackUtil.copyWithSize(ItemName.misc_resource.getItemStack((Enum)MiscResourceType.resin), world.field_73012_v.nextInt(3) + 1));
+          stacks.add(StackUtil.copyWithSize(ItemName.misc_resource.getItemStack((Enum)MiscResourceType.resin), world.rand.nextInt(3) + 1));
         } else {
-          ejectResin(world, pos, side, world.field_73012_v.nextInt(3) + 1);
+          ejectResin(world, pos, side, world.rand.nextInt(3) + 1);
         } 
         if (player != null)
           IC2.achievements.issueAchievement(player, "acquireResin"); 
@@ -64,9 +64,9 @@ public class ItemTreetap extends ItemIC2 implements IBoxable {
         IC2.audioManager.playOnce(player, PositionSpec.Hand, "Tools/Treetap.ogg", true, IC2.audioManager.getDefaultVolume()); 
       return true;
     } 
-    if (!world.isRemote && world.field_73012_v.nextInt(5) == 0)
+    if (!world.isRemote && world.rand.nextInt(5) == 0)
       world.func_175656_a(pos, state.func_177226_a((IProperty)BlockRubWood.stateProperty, (Comparable)BlockRubWood.RubberWoodState.plain_y)); 
-    if (world.field_73012_v.nextInt(5) == 0) {
+    if (world.rand.nextInt(5) == 0) {
       if (!world.isRemote) {
         ejectResin(world, pos, side, 1);
         if (stacks != null) {
@@ -90,7 +90,7 @@ public class ItemTreetap extends ItemIC2 implements IBoxable {
     for (int i = 0; i < quantity; i++) {
       EntityItem entityitem = new EntityItem(world, ejectX, ejectY, ejectZ, ItemName.misc_resource.getItemStack((Enum)MiscResourceType.resin));
       entityitem.func_174869_p();
-      world.func_72838_d((Entity)entityitem);
+      world.spawnEntity((Entity)entityitem);
     } 
   }
   

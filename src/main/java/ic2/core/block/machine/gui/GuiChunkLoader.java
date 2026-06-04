@@ -59,7 +59,7 @@ public class GuiChunkLoader extends GuiIC2<ContainerChunkLoader> {
       } 
     } 
     GlStateManager.func_179141_d();
-    this.field_146289_q.func_78279_b(amountLoadedChunks + " / " + ChunkLoaderLogic.getInstance().getMaxChunksPerTicket(), 8, 16, 15, 4210752);
+    this.fontRenderer.func_78279_b(amountLoadedChunks + " / " + ChunkLoaderLogic.getInstance().getMaxChunksPerTicket(), 8, 16, 15, 4210752);
     super.drawForegroundLayer(mouseX, mouseY);
   }
   

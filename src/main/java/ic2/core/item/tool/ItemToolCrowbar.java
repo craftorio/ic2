@@ -48,8 +48,8 @@ public class ItemToolCrowbar extends ItemToolIC2 implements IEnhancedOverlayProv
     Block block = state.getBlock();
     if (block.isAir(state, (IBlockAccess)world, pos))
       return EnumActionResult.FAIL; 
-    if (world.func_175625_s(pos) instanceof ICoverHolder) {
-      ICoverHolder target = (ICoverHolder)world.func_175625_s(pos);
+    if (world.getTileEntity(pos) instanceof ICoverHolder) {
+      ICoverHolder target = (ICoverHolder)world.getTileEntity(pos);
       EnumFacing selectedFacing = RotationUtil.rotateByHit(side, hitX, hitY, hitZ);
       if (target.canRemoveCover(world, pos, selectedFacing))
         if (!world.isRemote) {
@@ -79,7 +79,7 @@ public class ItemToolCrowbar extends ItemToolIC2 implements IEnhancedOverlayProv
   }
   
   public boolean providesEnhancedOverlay(World world, BlockPos pos, EnumFacing side, EntityPlayer player, ItemStack stack) {
-    TileEntity tileEntity = world.func_175625_s(pos);
+    TileEntity tileEntity = world.getTileEntity(pos);
     if (tileEntity instanceof ICoverHolder)
       return true; 
     return false;

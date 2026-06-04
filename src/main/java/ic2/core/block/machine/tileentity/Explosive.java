@@ -83,10 +83,10 @@ public abstract class Explosive extends TileEntityInventory implements Redstone.
       return true; 
     entity.setIgniter(igniter);
     onIgnite(igniter);
-    world.func_175698_g(this.field_174879_c);
+    world.func_175698_g(this.pos);
     if (shortFuse)
-      entity.fuse = world.field_73012_v.nextInt(Math.max(1, entity.fuse / 4)) + entity.fuse / 8; 
-    world.func_72838_d((Entity)entity);
+      entity.fuse = world.rand.nextInt(Math.max(1, entity.fuse / 4)) + entity.fuse / 8; 
+    world.spawnEntity((Entity)entity);
     world.func_184148_a((EntityPlayer)null, entity.posX, entity.posY, entity.posZ, SoundEvents.field_187904_gd, SoundCategory.BLOCKS, 1.0F, 1.0F);
     this.exploded = true;
     return true;

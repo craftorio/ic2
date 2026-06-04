@@ -72,16 +72,16 @@ public class TileEntityFermenter extends TileEntityInventory implements IHasGui,
     super.readFromNBT(nbttagcompound);
     this.inputTank.readFromNBT(nbttagcompound.getCompoundTag("inputTank"));
     this.outputTank.readFromNBT(nbttagcompound.getCompoundTag("outputTank"));
-    this.progress = nbttagcompound.func_74762_e("progress");
-    this.heatBuffer = nbttagcompound.func_74762_e("heatBuffer");
+    this.progress = nbttagcompound.getInteger("progress");
+    this.heatBuffer = nbttagcompound.getInteger("heatBuffer");
   }
   
   public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
     super.writeToNBT(nbt);
     nbt.setTag("inputTank", (NBTBase)this.inputTank.writeToNBT(new NBTTagCompound()));
     nbt.setTag("outputTank", (NBTBase)this.outputTank.writeToNBT(new NBTTagCompound()));
-    nbt.func_74768_a("progress", this.progress);
-    nbt.func_74768_a("heatBuffer", this.heatBuffer);
+    nbt.setInteger("progress", this.progress);
+    nbt.setInteger("heatBuffer", this.heatBuffer);
     return nbt;
   }
   
@@ -101,11 +101,11 @@ public class TileEntityFermenter extends TileEntityInventory implements IHasGui,
       this.progress = 0;
     } 
     EnumFacing dir = getFacing();
-    TileEntity te = getWorld().func_175625_s(this.field_174879_c.func_177972_a(dir));
+    TileEntity te = getWorld().getTileEntity(this.pos.offset(dir));
     if (te instanceof IHeatSource && this.inputTank.getFluid() != null) {
       IFermenterRecipeManager.FermentationProperty fp = Recipes.fermenter.getFermentationInformation(this.inputTank.getFluid().getFluid());
       if (fp != null && this.inputTank.getFluidAmount() >= fp.inputAmount && fp.outputAmount <= this.outputTank.getCapacity() - this.outputTank.getFluidAmount()) {
-        this.heatBuffer += ((IHeatSource)te).drawHeat(dir.func_176734_d(), 100, false);
+        this.heatBuffer += ((IHeatSource)te).drawHeat(dir.getOpposite(), 100, false);
         if (this.heatBuffer >= fp.heat) {
           this.heatBuffer -= fp.heat;
           this.inputTank.drainInternal(fp.inputAmount, true);

@@ -27,11 +27,11 @@ public class GuiMatter extends GuiIC2<ContainerMatter> {
   
   protected void drawForegroundLayer(int mouseX, int mouseY) {
     super.drawForegroundLayer(mouseX, mouseY);
-    this.field_146289_q.func_78276_b(this.progressLabel, 8, 22, 4210752);
-    this.field_146289_q.func_78276_b(((TileEntityMatter)((ContainerMatter)this.container).base).getProgressAsString(), 18, 31, 4210752);
+    this.fontRenderer.drawString(this.progressLabel, 8, 22, 4210752);
+    this.fontRenderer.drawString(((TileEntityMatter)((ContainerMatter)this.container).base).getProgressAsString(), 18, 31, 4210752);
     if (((TileEntityMatter)((ContainerMatter)this.container).base).scrap > 0) {
-      this.field_146289_q.func_78276_b(this.amplifierLabel, 8, 46, 4210752);
-      this.field_146289_q.func_78276_b("" + ((TileEntityMatter)((ContainerMatter)this.container).base).scrap, 8, 58, 4210752);
+      this.fontRenderer.drawString(this.amplifierLabel, 8, 46, 4210752);
+      this.fontRenderer.drawString("" + ((TileEntityMatter)((ContainerMatter)this.container).base).scrap, 8, 58, 4210752);
     } 
   }
   

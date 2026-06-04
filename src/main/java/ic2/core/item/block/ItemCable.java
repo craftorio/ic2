@@ -137,14 +137,14 @@ public class ItemCable extends ItemIC2 implements IMultiItem<CableType>, IBoxabl
   public static ItemStack getCable(CableType type, int insulation) {
     ItemStack ret = new ItemStack(ItemName.cable.getInstance(), 1, type.getId());
     NBTTagCompound nbt = StackUtil.getOrCreateNbtData(ret);
-    nbt.func_74774_a("type", (byte)type.ordinal());
-    nbt.func_74774_a("insulation", (byte)insulation);
+    nbt.setByte("type", (byte)type.ordinal());
+    nbt.setByte("insulation", (byte)insulation);
     return ret;
   }
   
   private static CableType getCableType(ItemStack stack) {
     NBTTagCompound nbt = StackUtil.getOrCreateNbtData(stack);
-    int type = nbt.func_74771_c("type") & 0xFF;
+    int type = nbt.getByte("type") & 0xFF;
     if (type < CableType.values.length)
       return CableType.values[type]; 
     return CableType.copper;
@@ -153,7 +153,7 @@ public class ItemCable extends ItemIC2 implements IMultiItem<CableType>, IBoxabl
   private static int getInsulation(ItemStack stack) {
     CableType type = getCableType(stack);
     NBTTagCompound nbt = StackUtil.getOrCreateNbtData(stack);
-    int insulation = nbt.func_74771_c("insulation") & 0xFF;
+    int insulation = nbt.getByte("insulation") & 0xFF;
     return Math.min(insulation, type.maxInsulation);
   }
   
@@ -189,7 +189,7 @@ public class ItemCable extends ItemIC2 implements IMultiItem<CableType>, IBoxabl
     IBlockState oldState = world.getBlockState(pos);
     Block oldBlock = oldState.getBlock();
     if (!oldBlock.func_176200_f((IBlockAccess)world, pos))
-      pos = pos.func_177972_a(side); 
+      pos = pos.offset(side); 
     Block newBlock = BlockName.te.getInstance();
     if (StackUtil.isEmpty(stack) || !player.func_175151_a(pos, side, stack) || !world.func_190527_a(newBlock, pos, false, side, (Entity)player) || !((BlockTileEntity)newBlock).canReplace(world, pos, side, BlockName.te.getItemStack((Enum)TeBlock.cable)))
       return EnumActionResult.PASS; 

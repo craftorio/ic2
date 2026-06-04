@@ -16,7 +16,7 @@ import org.lwjgl.opengl.GL11;
 
 public class OverlayTesr extends TileEntitySpecialRenderer<TileEntityBlock> {
   public void func_192841_a(TileEntityBlock te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-    IBlockState state = te.func_145838_q().getDefaultState();
+    IBlockState state = te.getBlockType().getDefaultState();
     GL11.glPushAttrib(64);
     GL11.glPushMatrix();
     RenderHelper.func_74518_a();

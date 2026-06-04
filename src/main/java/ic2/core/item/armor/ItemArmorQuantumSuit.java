@@ -61,23 +61,23 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
   
   public void func_82815_c(ItemStack stack) {
     NBTTagCompound nbt = getDisplayNbt(stack, false);
-    if (nbt == null || !nbt.func_150297_b("color", 3))
+    if (nbt == null || !nbt.hasKey("color", 3))
       return; 
     nbt.func_82580_o("color");
-    if (nbt.func_82582_d())
+    if (nbt.hasNoTags())
       stack.func_77978_p().func_82580_o("display"); 
   }
   
   public int func_82814_b(ItemStack stack) {
     NBTTagCompound nbt = getDisplayNbt(stack, false);
-    if (nbt == null || !nbt.func_150297_b("color", 3))
+    if (nbt == null || !nbt.hasKey("color", 3))
       return -1; 
-    return nbt.func_74762_e("color");
+    return nbt.getInteger("color");
   }
   
   public void func_82813_b(ItemStack stack, int color) {
     NBTTagCompound nbt = getDisplayNbt(stack, true);
-    nbt.func_74768_a("color", color);
+    nbt.setInteger("color", color);
   }
   
   private NBTTagCompound getDisplayNbt(ItemStack stack, boolean create) {
@@ -88,7 +88,7 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
       nbt = new NBTTagCompound();
       stack.func_77982_d(nbt);
     } 
-    if (!nbt.func_150297_b("display", 10)) {
+    if (!nbt.hasKey("display", 10)) {
       if (!create)
         return null; 
       ret = new NBTTagCompound();
@@ -155,7 +155,7 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
     short hubmode;
     boolean enableQuantumSpeedOnSprint;
     NBTTagCompound nbtData = StackUtil.getOrCreateNbtData(stack);
-    byte toggleTimer = nbtData.func_74771_c("toggleTimer");
+    byte toggleTimer = nbtData.getByte("toggleTimer");
     boolean ret = false;
     switch (this.field_77881_a) {
       case HEAD:
@@ -168,7 +168,7 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
         } else if (air <= 0) {
           IC2.achievements.issueAchievement(player, "starveWithQHelmet");
         } 
-        if (ElectricItem.manager.canUse(stack, 1000.0D) && player.func_71024_bL().func_75121_c()) {
+        if (ElectricItem.manager.canUse(stack, 1000.0D) && player.getFoodStats().func_75121_c()) {
           int slot = -1;
           for (int i = 0; i < player.inventory.field_70462_a.size(); i++) {
             ItemStack playerStack = (ItemStack)player.inventory.field_70462_a.get(i);
@@ -188,7 +188,7 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
               ElectricItem.manager.use(stack, 1000.0D, null); 
             ret = true;
           } 
-        } else if (player.func_71024_bL().func_75116_a() <= 0) {
+        } else if (player.getFoodStats().getFoodLevel() <= 0) {
           IC2.achievements.issueAchievement(player, "starveWithQHelmet");
         } 
         for (PotionEffect effect : new LinkedList(player.func_70651_bq())) {
@@ -203,7 +203,7 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
           } 
         } 
         Nightvision = nbtData.func_74767_n("Nightvision");
-        hubmode = nbtData.func_74765_d("HudMode");
+        hubmode = nbtData.getShort("HudMode");
         if (IC2.keyboard.isAltKeyDown(player) && IC2.keyboard.isModeSwitchKeyDown(player) && toggleTimer == 0) {
           toggleTimer = 10;
           Nightvision = !Nightvision;
@@ -230,7 +230,7 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
         } 
         if (IC2.platform.isSimulating() && toggleTimer > 0) {
           toggleTimer = (byte)(toggleTimer - 1);
-          nbtData.func_74774_a("toggleTimer", toggleTimer);
+          nbtData.setByte("toggleTimer", toggleTimer);
         } 
         if (Nightvision && IC2.platform.isSimulating() && 
           ElectricItem.manager.use(stack, 1.0D, (EntityLivingBase)player)) {
@@ -264,14 +264,14 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
           .isForwardKeyDown(player) && ((enableQuantumSpeedOnSprint && player
           .isSprinting()) || (!enableQuantumSpeedOnSprint && IC2.keyboard
           .isBoostKeyDown(player)))) {
-          byte speedTicker = nbtData.func_74771_c("speedTicker");
+          byte speedTicker = nbtData.getByte("speedTicker");
           speedTicker = (byte)(speedTicker + 1);
           if (speedTicker >= 10) {
             speedTicker = 0;
             ElectricItem.manager.use(stack, 1000.0D, null);
             ret = true;
           } 
-          nbtData.func_74774_a("speedTicker", speedTicker);
+          nbtData.setByte("speedTicker", speedTicker);
           float speed = 0.22F;
           if (player.func_70090_H()) {
             speed = 0.1F;
@@ -355,7 +355,7 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
   }
   
   public HudMode getHudMode(ItemStack stack) {
-    return HudMode.getFromID(StackUtil.getOrCreateNbtData(stack).func_74765_d("HudMode"));
+    return HudMode.getFromID(StackUtil.getOrCreateNbtData(stack).getShort("HudMode"));
   }
   
   protected static final Map<Potion, Integer> potionRemovalCost = new IdentityHashMap<>();

@@ -97,7 +97,7 @@ public class GenericCropCard extends IC2CropCard {
       int roulette = IC2.random.nextInt(this.specialDrops.length * 2 + 2);
       if (roulette < this.specialDrops.length && !StackUtil.isEmpty(this.specialDrops[roulette])) {
         gains = Arrays.<ItemStack>copyOf(gains, gains.length + 1);
-        gains[gains.length - 1] = this.specialDrops[roulette].func_77946_l();
+        gains[gains.length - 1] = this.specialDrops[roulette].copy();
       } 
     } 
     return gains;
@@ -234,7 +234,7 @@ public class GenericCropCard extends IC2CropCard {
   }
   
   public GenericCropCard setDrops(ItemStack drop) {
-    this.drops = new ItemStack[] { drop.func_77946_l() };
+    this.drops = new ItemStack[] { drop.copy() };
     return this;
   }
   
@@ -244,7 +244,7 @@ public class GenericCropCard extends IC2CropCard {
   }
   
   public GenericCropCard setSpecialDrops(ItemStack specialDrop) {
-    this.specialDrops = new ItemStack[] { specialDrop.func_77946_l() };
+    this.specialDrops = new ItemStack[] { specialDrop.copy() };
     return this;
   }
   
@@ -307,7 +307,7 @@ public class GenericCropCard extends IC2CropCard {
     int tracker = 0;
     for (ItemStack element : array) {
       if (!StackUtil.isEmpty(element))
-        optimizedArray[tracker++] = copy ? element.func_77946_l() : element; 
+        optimizedArray[tracker++] = copy ? element.copy() : element; 
     } 
     if (tracker != array.length)
       array = Arrays.<ItemStack>copyOf(optimizedArray, tracker); 

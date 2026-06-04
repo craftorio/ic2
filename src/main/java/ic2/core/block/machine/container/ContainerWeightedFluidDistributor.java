@@ -14,8 +14,8 @@ public class ContainerWeightedFluidDistributor extends ContainerFullInv<TileEnti
   
   public ContainerWeightedFluidDistributor(EntityPlayer player, TileEntityWeightedFluidDistributor te) {
     super(player, (IInventory)te, 211);
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)te.inputSlot, 0, 8, 108));
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)te.OutputSlot, 0, 152, 108));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)te.inputSlot, 0, 8, 108));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)te.outputSlot, 0, 152, 108));
   }
   
   public List<String> getNetworkedFields() {

@@ -15,11 +15,11 @@ public class ContainerStandardMachine<T extends TileEntityStandardMachine<?, ?, 
   public ContainerStandardMachine(EntityPlayer player, T tileEntity1, int height, int dischargeX, int dischargeY, int inputX, int inputY, int outputX, int outputY, int upgradeX, int upgradeY) {
     super(player, tileEntity1, height, dischargeX, dischargeY);
     if (((TileEntityStandardMachine)tileEntity1).inputSlot != null)
-      func_75146_a((Slot)new SlotInvSlot((InvSlot)((TileEntityStandardMachine)tileEntity1).inputSlot, 0, inputX, inputY)); 
+      addSlotToContainer((Slot)new SlotInvSlot((InvSlot)((TileEntityStandardMachine)tileEntity1).inputSlot, 0, inputX, inputY)); 
     if (((TileEntityStandardMachine)tileEntity1).outputSlot != null)
-      func_75146_a((Slot)new SlotInvSlot((InvSlot)((TileEntityStandardMachine)tileEntity1).outputSlot, 0, outputX, outputY)); 
+      addSlotToContainer((Slot)new SlotInvSlot((InvSlot)((TileEntityStandardMachine)tileEntity1).outputSlot, 0, outputX, outputY)); 
     for (int i = 0; i < 4; i++)
-      func_75146_a((Slot)new SlotInvSlot((InvSlot)((TileEntityStandardMachine)tileEntity1).upgradeSlot, i, upgradeX, upgradeY + i * 18)); 
+      addSlotToContainer((Slot)new SlotInvSlot((InvSlot)((TileEntityStandardMachine)tileEntity1).upgradeSlot, i, upgradeX, upgradeY + i * 18)); 
   }
   
   public List<String> getNetworkedFields() {

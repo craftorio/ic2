@@ -35,8 +35,8 @@ public class TileEntityMagnetizer extends TileEntityElectricMachine implements I
     this.redstone = (Redstone)addComponent((TileEntityComponent)new Redstone((TileEntityBlock)this));
   }
   
-  public void func_70296_d() {
-    super.func_70296_d();
+  public void markDirty() {
+    super.markDirty();
     if (!(getWorld()).isRemote)
       setOverclockRates(); 
   }

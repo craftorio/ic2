@@ -119,7 +119,7 @@ public class EntityDynamite extends Entity implements IProjectile {
         this.motionX = 0.0D;
         this.motionY = 0.0D;
         this.motionZ = 0.0D;
-        if (!world.func_175623_d(this.stickPos))
+        if (!world.isAirBlock(this.stickPos))
           return; 
       } 
     } 
@@ -175,11 +175,11 @@ public class EntityDynamite extends Entity implements IProjectile {
   }
   
   public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
-    nbttagcompound.func_74774_a("inGround", (byte)(this.inGround ? 1 : 0));
+    nbttagcompound.setByte("inGround", (byte)(this.inGround ? 1 : 0));
   }
   
   public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
-    this.inGround = (nbttagcompound.func_74771_c("inGround") == 1);
+    this.inGround = (nbttagcompound.getByte("inGround") == 1);
   }
   
   public void explode() {

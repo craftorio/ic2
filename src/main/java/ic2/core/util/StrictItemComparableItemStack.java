@@ -18,7 +18,7 @@ public class StrictItemComparableItemStack {
     this.meta = StackUtil.getRawMeta(stack);
     NBTTagCompound nbt = stack.func_77978_p();
     if (nbt != null)
-      if (nbt.func_82582_d()) {
+      if (nbt.hasNoTags()) {
         nbt = null;
       } else if (copyNbt) {
         nbt = nbt.func_74737_b();

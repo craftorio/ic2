@@ -72,7 +72,7 @@ public class ContainerIndustrialWorkbench extends ContainerFullInv<TileEntityInd
     super(player, (IInventory)tileEntity, 228);
     this.player = player;
     this.indexOutput = this.field_75151_b.size();
-    this.outputs[0] = func_75146_a((Slot)new SlotCrafting(player, this.craftMatrix, this.craftResult, 0, 124, 61) {
+    this.outputs[0] = addSlotToContainer((Slot)new SlotCrafting(player, this.craftMatrix, this.craftResult, 0, 124, 61) {
           protected void func_75208_c(ItemStack stack) {
             if (IC2.platform.isRendering()) {
               ((NetworkManager)IC2.network.get(false)).sendContainerEvent((ContainerBase)ContainerIndustrialWorkbench.this, "craft");
@@ -94,7 +94,7 @@ public class ContainerIndustrialWorkbench extends ContainerFullInv<TileEntityInd
     int y;
     for (y = 0; y < 3; y++) {
       for (int x = 0; x < 3; x++) {
-        func_75146_a((Slot)new SlotInvSlot(tileEntity.craftingGrid, x + y * 3, 30 + x * 18, 43 + y * 18) {
+        addSlotToContainer((Slot)new SlotInvSlot(tileEntity.craftingGrid, x + y * 3, 30 + x * 18, 43 + y * 18) {
               public void func_75218_e() {
                 super.func_75218_e();
                 ContainerIndustrialWorkbench.this.func_75130_a((IInventory)ContainerIndustrialWorkbench.this.craftMatrix);
@@ -106,17 +106,17 @@ public class ContainerIndustrialWorkbench extends ContainerFullInv<TileEntityInd
     this.indexBufferStart = this.field_75151_b.size();
     for (y = 0; y < 2; y++) {
       for (int x = 0; x < 9; x++)
-        func_75146_a((Slot)new SlotInvSlot(tileEntity.craftingStorage, x + y * 9, 8 + x * 18, 106 + y * 18)); 
+        addSlotToContainer((Slot)new SlotInvSlot(tileEntity.craftingStorage, x + y * 9, 8 + x * 18, 106 + y * 18)); 
     } 
     this.indexBufferEnd = this.field_75151_b.size();
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)tileEntity.leftCrafting.tool, 0, 7, 17));
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)tileEntity.leftCrafting.input, 0, 25, 17));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)tileEntity.leftCrafting.tool, 0, 7, 17));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)tileEntity.leftCrafting.input, 0, 25, 17));
     this.indexOutputHammer = this.field_75151_b.size();
-    this.outputs[1] = func_75146_a((Slot)new SlotCrafting(player, tileEntity.leftCrafting.crafting, (IInventory)tileEntity.leftCrafting.resultInv, 0, 69, 17));
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)tileEntity.rightCrafting.tool, 0, 91, 17));
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)tileEntity.rightCrafting.input, 0, 109, 17));
+    this.outputs[1] = addSlotToContainer((Slot)new SlotCrafting(player, tileEntity.leftCrafting.crafting, (IInventory)tileEntity.leftCrafting.resultInv, 0, 69, 17));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)tileEntity.rightCrafting.tool, 0, 91, 17));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)tileEntity.rightCrafting.input, 0, 109, 17));
     this.indexOutputCutter = this.field_75151_b.size();
-    this.outputs[2] = func_75146_a((Slot)new SlotCrafting(player, tileEntity.rightCrafting.crafting, (IInventory)tileEntity.rightCrafting.resultInv, 0, 153, 17));
+    this.outputs[2] = addSlotToContainer((Slot)new SlotCrafting(player, tileEntity.rightCrafting.crafting, (IInventory)tileEntity.rightCrafting.resultInv, 0, 153, 17));
     func_75130_a((IInventory)this.craftMatrix);
   }
   
@@ -157,7 +157,7 @@ public class ContainerIndustrialWorkbench extends ContainerFullInv<TileEntityInd
   }
   
   protected ItemStack handleGUISlotShiftClick(EntityPlayer player, ItemStack sourceItemStack) {
-    ItemStack start = sourceItemStack.func_77946_l();
+    ItemStack start = sourceItemStack.copy();
     Slot craftingSlot = null;
     for (Slot slot : this.outputs) {
       if (slot.func_75211_c() == sourceItemStack) {
@@ -186,7 +186,7 @@ public class ContainerIndustrialWorkbench extends ContainerFullInv<TileEntityInd
               craftingSlot.func_190901_a(player, start);
               if (craftingSlot.func_75216_d() && StackUtil.checkItemEquality(craftingSlot.func_75211_c(), start)) {
                 sourceItemStack = craftingSlot.func_75211_c();
-                start = sourceItemStack.func_77946_l();
+                start = sourceItemStack.copy();
                 assert it.hasNext();
                 it.next();
                 continue;

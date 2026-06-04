@@ -140,12 +140,12 @@ public class TileEntityIndustrialWorkbench extends TileEntityInventory implement
         } 
       } 
       if (changed)
-        func_70296_d(); 
+        markDirty(); 
     } 
   }
   
   private static int getPossible(int max, ItemStack existing, ItemStack in) {
-    int amount = Math.min(max, in.func_77985_e() ? in.func_77976_d() : 1);
+    int amount = Math.min(max, in.func_77985_e() ? in.getMaxStackSize() : 1);
     if (!StackUtil.isEmpty(existing)) {
       if (!StackUtil.checkItemEqualityStrict(existing, in))
         return 0; 

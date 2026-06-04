@@ -126,7 +126,7 @@ public class ItemObscurator extends BaseElectricItem implements IPlayerItemDataL
   }
   
   public static IBlockState getState(NBTTagCompound nbt) {
-    String blockName = nbt.func_74779_i("refBlock");
+    String blockName = nbt.getString("refBlock");
     if (blockName.isEmpty())
       return null; 
     Block block = Util.getBlock(blockName);
@@ -137,34 +137,34 @@ public class ItemObscurator extends BaseElectricItem implements IPlayerItemDataL
   }
   
   public static String getVariant(NBTTagCompound nbt) {
-    return nbt.func_74779_i("refVariant");
+    return nbt.getString("refVariant");
   }
   
   private static void setState(NBTTagCompound nbt, Block block, String variant) {
-    nbt.func_74778_a("refBlock", Util.getName(block).toString());
-    nbt.func_74778_a("refVariant", variant);
+    nbt.setString("refBlock", Util.getName(block).toString());
+    nbt.setString("refVariant", variant);
   }
   
   public static EnumFacing getSide(NBTTagCompound nbt) {
-    int ordinal = nbt.func_74771_c("refSide");
-    if (ordinal < 0 || ordinal >= EnumFacing.field_82609_l.length)
+    int ordinal = nbt.getByte("refSide");
+    if (ordinal < 0 || ordinal >= EnumFacing.VALUES.length)
       return null; 
-    return EnumFacing.field_82609_l[ordinal];
+    return EnumFacing.VALUES[ordinal];
   }
   
   private static void setSide(NBTTagCompound nbt, int side) {
-    nbt.func_74774_a("refSide", (byte)side);
+    nbt.setByte("refSide", (byte)side);
   }
   
   public static int[] getColorMultipliers(NBTTagCompound nbt) {
-    int[] ret = nbt.func_74759_k("refColorMuls");
+    int[] ret = nbt.getIntArray("refColorMuls");
     return (ret.length == 0) ? null : internColorMultipliers(ret);
   }
   
   public static void setColorMultipliers(NBTTagCompound nbt, int[] colorMultipliers) {
     if (colorMultipliers.length == 0)
       throw new IllegalArgumentException(); 
-    nbt.func_74783_a("refColorMuls", colorMultipliers);
+    nbt.setIntArray("refColorMuls", colorMultipliers);
   }
   
   private static void clear(NBTTagCompound nbt) {

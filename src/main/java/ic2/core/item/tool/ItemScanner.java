@@ -99,14 +99,14 @@ public class ItemScanner extends BaseElectricItem implements IBoxable, IHandHeld
   
   private Map<ItemComparableItemStack, Integer> scan(World world, BlockPos center, int range) {
     Map<ItemComparableItemStack, Integer> ret = new HashMap<>();
-    ChunkCache cache = new ChunkCache(world, center.func_177982_a(-range, -range, -range), center.func_177982_a(range, range, range), 0);
+    ChunkCache cache = new ChunkCache(world, center.add(-range, -range, -range), center.add(range, range, range), 0);
     EntityPlayer player = Ic2Player.get(world);
     BlockPos.MutableBlockPos tmpPos = new BlockPos.MutableBlockPos();
     for (int y = center.getY() - range; y <= center.getY() + range; y++) {
       for (int z = center.getZ() - range; z <= center.getZ() + range; z++) {
         for (int x = center.getX() - range; x <= center.getX() + range; x++) {
           List<ItemStack> drops;
-          tmpPos.func_181079_c(x, y, z);
+          tmpPos.setPos(x, y, z);
           IBlockState state = cache.getBlockState((BlockPos)tmpPos);
           if (state.getBlock().isAir(state, (IBlockAccess)cache, (BlockPos)tmpPos))
             continue; 

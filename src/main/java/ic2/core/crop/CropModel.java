@@ -91,7 +91,7 @@ public class CropModel extends AbstractModel {
       float zS = (offsetZ == 0) ? 0.0F : z;
       float zE = (offsetZ == 0) ? 1.0F : z;
       VdUtil.addFlippedCuboidWithYOffset(xS, 0.001F, zS, xE, 1.0F, zE, -1, EnumSet.of(facing), cropSprite, arrayOfList, generalQuads, -0.0625F);
-      VdUtil.addFlippedCuboidWithYOffset(xS, 0.001F, zS, xE, 1.0F, zE, -1, EnumSet.of(facing.func_176734_d()), cropSprite, arrayOfList, generalQuads, -0.0625F);
+      VdUtil.addFlippedCuboidWithYOffset(xS, 0.001F, zS, xE, 1.0F, zE, -1, EnumSet.of(facing.getOpposite()), cropSprite, arrayOfList, generalQuads, -0.0625F);
     } 
     int used = 0;
     for (int i = 0; i < arrayOfList.length; i++) {
@@ -128,10 +128,10 @@ public class CropModel extends AbstractModel {
       float zE = (offsetZ == 0) ? 1.0F : z;
       if (!crosscrop) {
         VdUtil.addFlippedCuboidWithYOffset(xS, 0.001F, zS, xE, 1.0F, zE, -1, EnumSet.of(facing), stickSprite, arrayOfList, generalQuads, -0.0625F);
-        VdUtil.addFlippedCuboidWithYOffset(xS, 0.001F, zS, xE, 1.0F, zE, -1, EnumSet.of(facing.func_176734_d()), stickSprite, arrayOfList, generalQuads, -0.0625F);
+        VdUtil.addFlippedCuboidWithYOffset(xS, 0.001F, zS, xE, 1.0F, zE, -1, EnumSet.of(facing.getOpposite()), stickSprite, arrayOfList, generalQuads, -0.0625F);
       } else {
         VdUtil.addFlippedCuboidWithYOffset(xS, 0.001F, zS, xE, 1.0F, zE, -1, EnumSet.of(facing), upgradedStickSprite, arrayOfList, generalQuads, -0.0625F);
-        VdUtil.addFlippedCuboidWithYOffset(xS, 0.001F, zS, xE, 1.0F, zE, -1, EnumSet.of(facing.func_176734_d()), upgradedStickSprite, arrayOfList, generalQuads, -0.0625F);
+        VdUtil.addFlippedCuboidWithYOffset(xS, 0.001F, zS, xE, 1.0F, zE, -1, EnumSet.of(facing.getOpposite()), upgradedStickSprite, arrayOfList, generalQuads, -0.0625F);
       } 
     } 
     int used = 0;

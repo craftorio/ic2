@@ -35,17 +35,17 @@ public class TradingMarket {
     if (Util.inDev())
       this.watchers.add(new MarketWatcher() {
             public void onAdd(BlockPos pos) {
-              IC2.log.info(LogCategory.Block, "Market registration at " + Util.formatPosition(world.func_175625_s(pos)));
+              IC2.log.info(LogCategory.Block, "Market registration at " + Util.formatPosition(world.getTileEntity(pos)));
             }
             
             public void onRemove(BlockPos pos) {
-              IC2.log.info(LogCategory.Block, "Market removal at " + Util.formatPosition(world.func_175625_s(pos)));
+              IC2.log.info(LogCategory.Block, "Market removal at " + Util.formatPosition(world.getTileEntity(pos)));
             }
           }); 
   }
   
   public void registerTradeOMat(TileEntityTradeOMat tradeOMat) {
-    assert tradeOMat.func_145830_o() && !(tradeOMat.getWorld()).isRemote;
+    assert tradeOMat.hasWorld() && !(tradeOMat.getWorld()).isRemote;
     assert tradeOMat.getWorld() == this.world;
     assert !this.traders.contains(tradeOMat.getPos());
     for (MarketWatcher watcher : this.watchers)
@@ -53,7 +53,7 @@ public class TradingMarket {
   }
   
   public void unregisterTradeOMat(TileEntityTradeOMat tradeOMat) {
-    assert tradeOMat.func_145830_o() && !(tradeOMat.getWorld()).isRemote;
+    assert tradeOMat.hasWorld() && !(tradeOMat.getWorld()).isRemote;
     assert this.traders.contains(tradeOMat.getPos());
     for (MarketWatcher watcher : this.watchers)
       watcher.onRemove(tradeOMat.getPos()); 

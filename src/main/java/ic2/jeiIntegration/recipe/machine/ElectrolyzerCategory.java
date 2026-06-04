@@ -81,7 +81,7 @@ public final class ElectrolyzerCategory extends IORecipeCategory<IElectrolyzerRe
     return this.inputSlots;
   }
   
-  protected List<SlotPosition> getOutputSlotPos() {
+  protected List<SlotPosition> getoutputSlotPos() {
     return this.outputSlots;
   }
   
@@ -103,7 +103,7 @@ public final class ElectrolyzerCategory extends IORecipeCategory<IElectrolyzerRe
     FluidStack fluid = ((List<FluidStack>)inputStacks.get(0)).get(0);
     fluidStacks.init(ID, false, pos.getX() + 1, pos.getY() + 1, 16, 16, fluid.amount, false, null);
     fluidStacks.set(ID++, fluid);
-    List<SlotPosition> outputSlots = getOutputSlotPos();
+    List<SlotPosition> outputSlots = getoutputSlotPos();
     List<FluidStack> outputStacks = unpack(ingredients.getOutputs(FluidStack.class));
     int length = outputStacks.size();
     if (ElectrolyzerTankController.ONE_THREE_FIVE.contains(length)) {

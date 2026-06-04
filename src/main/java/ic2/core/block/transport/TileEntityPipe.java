@@ -82,14 +82,14 @@ public abstract class TileEntityPipe extends TileEntityBlock implements IPipe, I
   
   public void readFromNBT(NBTTagCompound nbt) {
     super.readFromNBT(nbt);
-    this.connectivity = nbt.func_74771_c("connectivity");
-    this.covers = nbt.func_74771_c("covers");
+    this.connectivity = nbt.getByte("connectivity");
+    this.covers = nbt.getByte("covers");
   }
   
   public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
     super.writeToNBT(nbt);
-    nbt.func_74774_a("connectivity", this.connectivity);
-    nbt.func_74774_a("covers", this.covers);
+    nbt.setByte("connectivity", this.connectivity);
+    nbt.setByte("covers", this.covers);
     return nbt;
   }
   
@@ -102,7 +102,7 @@ public abstract class TileEntityPipe extends TileEntityBlock implements IPipe, I
   }
   
   public void onPlaced(ItemStack stack, EntityLivingBase placer, EnumFacing facing) {
-    if (this.field_145850_b.isRemote)
+    if (this.world.isRemote)
       updateRenderState(); 
     super.onPlaced(stack, placer, facing);
   }
@@ -156,7 +156,7 @@ public abstract class TileEntityPipe extends TileEntityBlock implements IPipe, I
   
   protected List<ItemStack> getAuxDrops(int fortune) {
     List<ItemStack> ret = new ArrayList<>();
-    for (EnumFacing facing : EnumFacing.field_82609_l) {
+    for (EnumFacing facing : EnumFacing.VALUES) {
       if (this.coversComponent.hasCover(facing))
         ret.add(this.coversComponent.removeCover(facing)); 
     } 

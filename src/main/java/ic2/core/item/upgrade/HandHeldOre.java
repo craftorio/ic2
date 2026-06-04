@@ -26,7 +26,7 @@ public class HandHeldOre extends HandHeldUpgradeOption {
       super(HandHeldOre.this);
       addPlayerInventorySlots(HandHeldOre.this.player, 200);
       for (byte slot = 0; slot < 9; slot = (byte)(slot + 1))
-        func_75146_a((Slot)new SlotHologramSlot(HandHeldOre.this.inventory, slot, 8 + 18 * slot, 8, 1, HandHeldOre.this.makeSaveCallback())); 
+        addSlotToContainer((Slot)new SlotHologramSlot(HandHeldOre.this.inventory, slot, 8 + 18 * slot, 8, 1, HandHeldOre.this.makeSaveCallback())); 
     }
     
     public void func_75134_a(EntityPlayer player) {
@@ -47,7 +47,7 @@ public class HandHeldOre extends HandHeldUpgradeOption {
         System.out.println(this.number + " clicked with " + button);
       }
       
-      public String func_176610_l() {
+      public String getName() {
         return "Thing " + this.number;
       }
     }

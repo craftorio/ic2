@@ -441,23 +441,23 @@ public class Rezepte {
             continue;
           } 
           if (part.startsWith("@hardness:") && type == MachineType.BlockCutter) {
-            metadata.func_74768_a("hardness", Integer.parseInt(part.substring(10)));
+            metadata.setInteger("hardness", Integer.parseInt(part.substring(10)));
             continue;
           } 
           if (part.startsWith("@heat:") && type == MachineType.ThermalCentrifuge) {
-            metadata.func_74768_a("minHeat", Integer.parseInt(part.substring(6)));
+            metadata.setInteger("minHeat", Integer.parseInt(part.substring(6)));
             continue;
           } 
           if (part.startsWith("@fluid:") && type == MachineType.OreWashingPlant) {
-            metadata.func_74768_a("amount", Integer.parseInt(part.substring(7)));
+            metadata.setInteger("amount", Integer.parseInt(part.substring(7)));
             continue;
           } 
           if (part.startsWith("@fluid:") && type == MachineType.BlastFurnace) {
-            metadata.func_74768_a("fluid", Integer.parseInt(part.substring(7)));
+            metadata.setInteger("fluid", Integer.parseInt(part.substring(7)));
             continue;
           } 
           if (part.startsWith("@duration:") && type == MachineType.BlastFurnace) {
-            metadata.func_74768_a("duration", Integer.parseInt(part.substring(10)));
+            metadata.setInteger("duration", Integer.parseInt(part.substring(10)));
             continue;
           } 
           throw new Config.ParseException("invalid attribute: " + part, value);
@@ -477,11 +477,11 @@ public class Rezepte {
         } 
         outputs.add(cOutput);
       } 
-      if (!type.tagsRequired.isEmpty() && (metadata.func_82582_d() || !type.hasRequiredTags(metadata))) {
+      if (!type.tagsRequired.isEmpty() && (metadata.hasNoTags() || !type.hasRequiredTags(metadata))) {
         IC2.log.warn(LogCategory.Recipe, "Could not add machine recipe: " + value.name + " missing tag.");
         return false;
       } 
-      if (metadata.func_82582_d())
+      if (metadata.hasNoTags())
         metadata = null; 
       if (machine.addRecipe(input, outputs, metadata, false))
         return true; 

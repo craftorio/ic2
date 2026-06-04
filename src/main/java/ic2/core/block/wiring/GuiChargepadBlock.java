@@ -23,7 +23,7 @@ public class GuiChargepadBlock extends GuiIC2<ContainerChargepadBlock> {
     addElement(((VanillaButton)(new VanillaButton(this, 152, 4, 20, 20, createEventSender(0)))
         .withIcon(new Supplier<ItemStack>() {
             public ItemStack get() {
-              return new ItemStack(Items.field_151137_ax);
+              return new ItemStack(Items.REDSTONE);
             }
           })).withTooltip(new Supplier<String>() {
             public String get() {

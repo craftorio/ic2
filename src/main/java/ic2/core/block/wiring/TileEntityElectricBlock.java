@@ -56,12 +56,12 @@ public abstract class TileEntityElectricBlock extends TileEntityInventory implem
   
   protected final void superReadFromNBT(NBTTagCompound nbt) {
     super.readFromNBT(nbt);
-    this.redstoneMode = nbt.func_74771_c("redstoneMode");
+    this.redstoneMode = nbt.getByte("redstoneMode");
   }
   
   public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
     super.writeToNBT(nbt);
-    nbt.func_74774_a("redstoneMode", this.redstoneMode);
+    nbt.setByte("redstoneMode", this.redstoneMode);
     return nbt;
   }
   

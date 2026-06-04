@@ -18,7 +18,7 @@ public class RecipeInputItemStack extends RecipeInputBase implements IRecipeInpu
   RecipeInputItemStack(ItemStack input, int amount) {
     if (StackUtil.isEmpty(input))
       throw new IllegalArgumentException("invalid input stack"); 
-    this.input = input.func_77946_l();
+    this.input = input.copy();
     this.amount = amount;
   }
   

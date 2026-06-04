@@ -68,7 +68,7 @@ public class TileEntityOreWashing extends TileEntityStandardMachine<IRecipeInput
   
   public void operateOnce(MachineRecipeResult<IRecipeInput, Collection<ItemStack>, ItemStack> output, Collection<ItemStack> processResult) {
     super.operateOnce(output, processResult);
-    this.fluidTank.drainInternal(output.getRecipe().getMetaData().func_74762_e("amount"), true);
+    this.fluidTank.drainInternal(output.getRecipe().getMetaData().getInteger("amount"), true);
   }
   
   public MachineRecipeResult<IRecipeInput, Collection<ItemStack>, ItemStack> getOutput() {
@@ -76,7 +76,7 @@ public class TileEntityOreWashing extends TileEntityStandardMachine<IRecipeInput
     if (ret != null) {
       if (ret.getRecipe().getMetaData() == null)
         return null; 
-      if (ret.getRecipe().getMetaData().func_74762_e("amount") > this.fluidTank.getFluidAmount())
+      if (ret.getRecipe().getMetaData().getInteger("amount") > this.fluidTank.getFluidAmount())
         return null; 
     } 
     return ret;

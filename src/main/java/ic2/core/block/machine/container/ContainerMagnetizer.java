@@ -15,7 +15,7 @@ public class ContainerMagnetizer extends ContainerElectricMachine<TileEntityMagn
     super(player, base1, 166, 8, 44);
     this.player = player;
     for (int i = 0; i < 4; i++)
-      func_75146_a((Slot)new SlotInvSlot((InvSlot)base1.upgradeSlot, i, 152, 8 + i * 18)); 
-    func_75146_a((Slot)new SlotArmor(player.inventory, EntityEquipmentSlot.FEET, 45, 26));
+      addSlotToContainer((Slot)new SlotInvSlot((InvSlot)base1.upgradeSlot, i, 152, 8 + i * 18)); 
+    addSlotToContainer((Slot)new SlotArmor(player.inventory, EntityEquipmentSlot.FEET, 45, 26));
   }
 }

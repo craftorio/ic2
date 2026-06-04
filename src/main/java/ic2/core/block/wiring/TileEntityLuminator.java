@@ -57,7 +57,7 @@ public class TileEntityLuminator extends TileEntityBlock {
   }
   
   public void onLoaded() {
-    this.energy.setDirections(Collections.singleton(getFacing().func_176734_d()), Collections.emptySet());
+    this.energy.setDirections(Collections.singleton(getFacing().getOpposite()), Collections.emptySet());
     super.onLoaded();
     IC2.tickHandler.requestSingleWorldTick(getWorld(), new IWorldTickCallback() {
           public void onTick(World world) {
@@ -106,9 +106,9 @@ public class TileEntityLuminator extends TileEntityBlock {
   
   private void checkPlacement() {
     World world = getWorld();
-    if (!isValidPosition(world, this.field_174879_c.func_177972_a(getFacing().func_176734_d()), getFacing())) {
-      getBlockType().func_180657_a(world, Ic2Player.get(world), this.field_174879_c, world.getBlockState(this.field_174879_c), (TileEntity)this, StackUtil.emptyStack);
-      world.func_175698_g(this.field_174879_c);
+    if (!isValidPosition(world, this.pos.offset(getFacing().getOpposite()), getFacing())) {
+      getBlockType().func_180657_a(world, Ic2Player.get(world), this.pos, world.getBlockState(this.pos), (TileEntity)this, StackUtil.emptyStack);
+      world.func_175698_g(this.pos);
     } 
   }
   
@@ -157,14 +157,14 @@ public class TileEntityLuminator extends TileEntityBlock {
   }
   
   private void updateLight() {
-    getWorld().func_180500_c(EnumSkyBlock.BLOCK, this.field_174879_c);
+    getWorld().func_180500_c(EnumSkyBlock.BLOCK, this.pos);
   }
   
   private static Map<EnumFacing, List<AxisAlignedBB>> getAabbMap() {
     Map<EnumFacing, List<AxisAlignedBB>> ret = new EnumMap<>(EnumFacing.class);
     double height = 0.0625D;
     double remHeight = 0.9375D;
-    for (EnumFacing side : EnumFacing.field_82609_l) {
+    for (EnumFacing side : EnumFacing.VALUES) {
       int dx = side.getFrontOffsetX();
       int dy = side.getFrontOffsetY();
       int dz = side.getFrontOffsetZ();
@@ -174,7 +174,7 @@ public class TileEntityLuminator extends TileEntityBlock {
       double xE = 0.0625D + ((dx + 2) / 2) * 0.9375D;
       double yE = 0.0625D + ((dy + 2) / 2) * 0.9375D;
       double zE = 0.0625D + ((dz + 2) / 2) * 0.9375D;
-      ret.put(side.func_176734_d(), Arrays.asList(new AxisAlignedBB[] { new AxisAlignedBB(xS, yS, zS, xE, yE, zE) }));
+      ret.put(side.getOpposite(), Arrays.asList(new AxisAlignedBB[] { new AxisAlignedBB(xS, yS, zS, xE, yE, zE) }));
     } 
     return ret;
   }

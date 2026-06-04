@@ -63,9 +63,9 @@ public class TileEntityPatternStorage extends TileEntityInventory implements IHa
   }
   
   public void readContents(NBTTagCompound nbt) {
-    NBTTagList patternList = nbt.func_150295_c("patterns", 10);
-    for (int i = 0; i < patternList.func_74745_c(); i++) {
-      NBTTagCompound contentTag = patternList.func_150305_b(i);
+    NBTTagList patternList = nbt.getTagList("patterns", 10);
+    for (int i = 0; i < patternList.tagCount(); i++) {
+      NBTTagCompound contentTag = patternList.getCompoundTagAt(i);
       ItemStack Item = new ItemStack(contentTag);
       addPattern(Item);
     } 
@@ -76,8 +76,8 @@ public class TileEntityPatternStorage extends TileEntityInventory implements IHa
     NBTTagList list = new NBTTagList();
     for (ItemStack stack : this.patterns) {
       NBTTagCompound contentTag = new NBTTagCompound();
-      stack.func_77955_b(contentTag);
-      list.func_74742_a((NBTBase)contentTag);
+      stack.writeToNBT(contentTag);
+      list.appendTag((NBTBase)contentTag);
     } 
     nbt.setTag("patterns", (NBTBase)list);
   }

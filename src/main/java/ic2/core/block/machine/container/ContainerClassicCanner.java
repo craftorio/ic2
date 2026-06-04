@@ -10,9 +10,9 @@ import net.minecraft.inventory.Slot;
 public class ContainerClassicCanner extends ContainerElectricMachine<TileEntityClassicCanner> {
   public ContainerClassicCanner(EntityPlayer player, TileEntityClassicCanner base) {
     super(player, base, 166, 30, 45);
-    func_75146_a((Slot)new SlotInvSlot(base.resInputSlot, 0, 69, 17));
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)base.outputSlot, 0, 119, 35));
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)base.inputSlot, 0, 69, 53));
+    addSlotToContainer((Slot)new SlotInvSlot(base.resInputSlot, 0, 69, 17));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)base.outputSlot, 0, 119, 35));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)base.inputSlot, 0, 69, 53));
   }
   
   public List<String> getNetworkedFields() {

@@ -88,10 +88,10 @@ public class DropScan {
     } 
     IC2.log.info(LogCategory.Uu, "Using %s for temporary data.", new Object[] { this.tmpDir });
     do {
-      id = parentWorld.field_73012_v.nextInt();
+      id = parentWorld.rand.nextInt();
     } while (DimensionManager.getWorld(id) != null);
     this.dimensionId = id;
-    DimensionManager.registerDimension(this.dimensionId, parentWorld.field_73011_w.func_186058_p());
+    DimensionManager.registerDimension(this.dimensionId, parentWorld.provider.func_186058_p());
     this.world = new DummyWorld();
     this.player = Ic2Player.get((World)this.world);
     updateCollectionsToClear();
@@ -244,7 +244,7 @@ public class DropScan {
     for (int y = 0; y < yMax; y++) {
       for (int z = chunk.field_76647_h * 16; z < zMax; z++) {
         for (int x = chunk.field_76635_g * 16; x < xMax; x++) {
-          pos.func_181079_c(x, y, z);
+          pos.setPos(x, y, z);
           IBlockState state = chunk.func_177435_g((BlockPos)pos);
           Block block = state.getBlock();
           if (!block.isAir(state, (IBlockAccess)world, (BlockPos)pos))
@@ -319,7 +319,7 @@ public class DropScan {
     }
     
     protected IChunkProvider func_72970_h() {
-      return (IChunkProvider)new DropScan.DummyChunkProvider(this, this.field_73011_w.func_186060_c());
+      return (IChunkProvider)new DropScan.DummyChunkProvider(this, this.provider.func_186060_c());
     }
     
     public DropScan.DummyChunkProvider func_72863_F() {
@@ -351,7 +351,7 @@ public class DropScan {
     
     public void func_72835_b() {}
     
-    public boolean func_72838_d(Entity entity) {
+    public boolean spawnEntity(Entity entity) {
       this.spawnedEntities.add(entity);
       return true;
     }

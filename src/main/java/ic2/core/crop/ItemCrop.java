@@ -29,7 +29,7 @@ public class ItemCrop extends ItemIC2 implements IBoxable {
   
   public EnumActionResult func_180614_a(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
     if (!world.getBlockState(pos).getBlock().func_176200_f((IBlockAccess)world, pos))
-      pos = pos.func_177972_a(side); 
+      pos = pos.offset(side); 
     ItemStack cropStickStack = StackUtil.get(player, hand);
     if (StackUtil.isEmpty(cropStickStack))
       return EnumActionResult.PASS; 

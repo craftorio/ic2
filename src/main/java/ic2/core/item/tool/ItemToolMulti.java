@@ -130,7 +130,7 @@ public class ItemToolMulti<T extends Enum<T> & IIdProvider> extends ItemToolIC2 
     return getCustomDamage(stack) / getMaxCustomDamage(stack);
   }
   
-  public boolean func_77645_m() {
+  public boolean isDamageable() {
     return true;
   }
   
@@ -191,7 +191,7 @@ public class ItemToolMulti<T extends Enum<T> & IIdProvider> extends ItemToolIC2 
       return 0; 
     NBTTagCompound data = stack.func_77978_p();
     assert data != null;
-    return data.func_74764_b("durability") ? data.func_74762_e("durability") : 0;
+    return data.func_74764_b("durability") ? data.getInteger("durability") : 0;
   }
   
   public int getMaxCustomDamage(ItemStack stack) {
@@ -199,12 +199,12 @@ public class ItemToolMulti<T extends Enum<T> & IIdProvider> extends ItemToolIC2 
       return 0; 
     NBTTagCompound data = stack.func_77978_p();
     assert data != null;
-    return data.func_74764_b("maxDurability") ? data.func_74762_e("maxDurability") : 0;
+    return data.func_74764_b("maxDurability") ? data.getInteger("maxDurability") : 0;
   }
   
   public void setCustomDamage(ItemStack stack, int damage) {
     NBTTagCompound data = StackUtil.getOrCreateNbtData(stack);
-    data.func_74768_a("durability", damage);
+    data.setInteger("durability", damage);
   }
   
   public boolean applyCustomDamage(ItemStack stack, int damage, EntityLivingBase source) {

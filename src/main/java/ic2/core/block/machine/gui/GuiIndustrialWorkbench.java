@@ -49,12 +49,12 @@ public class GuiIndustrialWorkbench extends GuiIC2<ContainerIndustrialWorkbench>
             return false;
           }
         }).withTooltip("ic2.IndustrialWorkbench.gui.adjacent"));
-    for (EnumFacing side : EnumFacing.field_82609_l) {
+    for (EnumFacing side : EnumFacing.VALUES) {
       addElement(((CustomButton)((CustomButton)(new CustomButton(this, 173, 3 + (side.func_176745_a() + 5) % 6 * 18, 18, 18, new IClickHandler() {
               public void onClick(MouseButton button) {
                 TileEntityIndustrialWorkbench base = (TileEntityIndustrialWorkbench)((ContainerIndustrialWorkbench)GuiIndustrialWorkbench.this.container).base;
-                assert base.func_145830_o();
-                TileEntity neighbour = base.getWorld().func_175625_s(base.getPos().func_177972_a(side));
+                assert base.hasWorld();
+                TileEntity neighbour = base.getWorld().getTileEntity(base.getPos().offset(side));
                 assert neighbour instanceof IHasGui;
                 if (!(neighbour instanceof IPersonalBlock) || ((IPersonalBlock)neighbour).permitsAccess(((ContainerIndustrialWorkbench)GuiIndustrialWorkbench.this.container).player.func_146103_bH())) {
                   ((NetworkManager)IC2.network.get(false)).requestGUI((IHasGui)neighbour);
@@ -97,13 +97,13 @@ public class GuiIndustrialWorkbench extends GuiIC2<ContainerIndustrialWorkbench>
             })).withEnableHandler(new IEnableHandler() {
               public boolean isEnabled() {
                 TileEntityIndustrialWorkbench base = (TileEntityIndustrialWorkbench)((ContainerIndustrialWorkbench)GuiIndustrialWorkbench.this.container).base;
-                return (base.func_145830_o() && base.getWorld().func_175625_s(base.getPos().func_177972_a(side)) instanceof IHasGui);
+                return (base.hasWorld() && base.getWorld().getTileEntity(base.getPos().offset(side)) instanceof IHasGui);
               }
             })).withIcon(new Supplier<ItemStack>() {
               public ItemStack get() {
                 TileEntityIndustrialWorkbench base = (TileEntityIndustrialWorkbench)((ContainerIndustrialWorkbench)GuiIndustrialWorkbench.this.container).base;
-                assert base.func_145830_o();
-                BlockPos pos = base.getPos().func_177972_a(side);
+                assert base.hasWorld();
+                BlockPos pos = base.getPos().offset(side);
                 IBlockState state = base.getWorld().getBlockState(pos);
                 return state.getBlock().getPickBlock(state, null, base.getWorld(), pos, ((ContainerIndustrialWorkbench)GuiIndustrialWorkbench.this.container).player);
               }
@@ -128,8 +128,8 @@ public class GuiIndustrialWorkbench extends GuiIC2<ContainerIndustrialWorkbench>
               
               public String get() {
                 TileEntityIndustrialWorkbench base = (TileEntityIndustrialWorkbench)((ContainerIndustrialWorkbench)GuiIndustrialWorkbench.this.container).base;
-                assert base.func_145830_o();
-                TileEntity neighbour = base.getWorld().func_175625_s(base.getPos().func_177972_a(side));
+                assert base.hasWorld();
+                TileEntity neighbour = base.getWorld().getTileEntity(base.getPos().offset(side));
                 assert neighbour instanceof IHasGui;
                 return Localization.translate(((IHasGui)neighbour).func_70005_c_()) + '\n' + TextFormatting.DARK_GRAY + Localization.translate(getSideName());
               }

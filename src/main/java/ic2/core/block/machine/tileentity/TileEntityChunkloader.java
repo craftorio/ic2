@@ -76,9 +76,9 @@ public class TileEntityChunkloader extends TileEntityInventory implements INetwo
   
   public void readFromNBT(NBTTagCompound nbt) {
     super.readFromNBT(nbt);
-    NBTTagList list = nbt.func_150295_c("loadedChunks", 4);
+    NBTTagList list = nbt.getTagList("loadedChunks", 4);
     this.loadedChunks.clear();
-    for (int i = 0; i < list.func_74745_c(); i++) {
+    for (int i = 0; i < list.tagCount(); i++) {
       NBTTagLong currentNBT = (NBTTagLong)list.func_179238_g(i);
       long value = currentNBT.func_150291_c();
       this.loadedChunks.add(ChunkLoaderLogic.deserialize(value));
@@ -90,7 +90,7 @@ public class TileEntityChunkloader extends TileEntityInventory implements INetwo
     NBTTagList list = new NBTTagList();
     nbt.setTag("loadedChunks", (NBTBase)list);
     for (ChunkPos chunk : this.loadedChunks)
-      list.func_74742_a((NBTBase)new NBTTagLong(ChunkLoaderLogic.serialize(chunk))); 
+      list.appendTag((NBTBase)new NBTTagLong(ChunkLoaderLogic.serialize(chunk))); 
     return nbt;
   }
   
@@ -99,13 +99,13 @@ public class TileEntityChunkloader extends TileEntityInventory implements INetwo
     if (!world.isRemote && getActive() != active)
       if (active) {
         if (this.ticket != null)
-          throw new IllegalStateException("Cannot activate ChunkLoader: " + this.field_174879_c + " " + this.ticket); 
-        this.ticket = ChunkLoaderLogic.getInstance().createTicket(world, this.field_174879_c);
+          throw new IllegalStateException("Cannot activate ChunkLoader: " + this.pos + " " + this.ticket); 
+        this.ticket = ChunkLoaderLogic.getInstance().createTicket(world, this.pos);
         for (ChunkPos coords : this.loadedChunks)
           ChunkLoaderLogic.getInstance().addChunkToTicket(this.ticket, coords); 
       } else {
         if (this.ticket == null)
-          throw new IllegalStateException("Cannot deactivate ChunkLoader: " + this.field_174879_c + " " + this.ticket); 
+          throw new IllegalStateException("Cannot deactivate ChunkLoader: " + this.pos + " " + this.ticket); 
         ChunkLoaderLogic.getInstance().removeTicket(this.ticket);
         this.ticket = null;
       }  
@@ -116,7 +116,7 @@ public class TileEntityChunkloader extends TileEntityInventory implements INetwo
     super.onLoaded();
     World world = getWorld();
     if (!world.isRemote) {
-      this.ticket = ChunkLoaderLogic.getInstance().getTicket(world, this.field_174879_c, false);
+      this.ticket = ChunkLoaderLogic.getInstance().getTicket(world, this.pos, false);
       if (this.ticket != null) {
         this.loadedChunks.clear();
         this.loadedChunks.addAll((Collection<? extends ChunkPos>)this.ticket.getChunkList());
@@ -133,7 +133,7 @@ public class TileEntityChunkloader extends TileEntityInventory implements INetwo
   
   public void onPlaced(ItemStack stack, EntityLivingBase placer, EnumFacing facing) {
     super.onPlaced(stack, placer, facing);
-    this.loadedChunks.add(ChunkLoaderLogic.getChunkCoords(this.field_174879_c));
+    this.loadedChunks.add(ChunkLoaderLogic.getChunkCoords(this.pos));
   }
   
   protected boolean onActivated(EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
@@ -166,7 +166,7 @@ public class TileEntityChunkloader extends TileEntityInventory implements INetwo
       if (this.ticket != null)
         ChunkLoaderLogic.getInstance().addChunkToTicket(this.ticket, chunk); 
       this.loadedChunks.add(chunk);
-      func_70296_d();
+      markDirty();
     } 
   }
   
@@ -175,12 +175,12 @@ public class TileEntityChunkloader extends TileEntityInventory implements INetwo
       (new RuntimeException("Something tried to change the ChunkLoaderState on the client.")).printStackTrace();
       return;
     } 
-    if (ChunkLoaderLogic.getChunkCoords(this.field_174879_c).equals(chunk))
+    if (ChunkLoaderLogic.getChunkCoords(this.pos).equals(chunk))
       return; 
     if (this.ticket != null)
       ChunkLoaderLogic.getInstance().removeChunkFromTicket(this.ticket, chunk); 
     this.loadedChunks.remove(chunk);
-    func_70296_d();
+    markDirty();
   }
   
   public ImmutableSet<ChunkPos> getLoadedChunks() {
@@ -188,14 +188,14 @@ public class TileEntityChunkloader extends TileEntityInventory implements INetwo
   }
   
   public boolean isChunkInRange(ChunkPos chunk) {
-    ChunkPos mainChunk = ChunkLoaderLogic.getChunkCoords(this.field_174879_c);
+    ChunkPos mainChunk = ChunkLoaderLogic.getChunkCoords(this.pos);
     return (Math.abs(chunk.field_77276_a - mainChunk.field_77276_a) <= 4 && Math.abs(chunk.field_77275_b - mainChunk.field_77275_b) <= 4);
   }
   
   public void onNetworkEvent(EntityPlayer player, int event) {
     int x = (event & 0xF) - 8;
     int z = (event >> 4 & 0xF) - 8;
-    ChunkPos mainChunk = ChunkLoaderLogic.getChunkCoords(this.field_174879_c);
+    ChunkPos mainChunk = ChunkLoaderLogic.getChunkCoords(this.pos);
     ChunkPos chunk = new ChunkPos(mainChunk.field_77276_a + x, mainChunk.field_77275_b + z);
     if (isChunkInRange(chunk)) {
       if (getLoadedChunks().contains(chunk)) {
@@ -236,8 +236,8 @@ public class TileEntityChunkloader extends TileEntityInventory implements INetwo
     this.energy.setCapacity(this.upgradeSlot.getEnergyStorage(2500, 0, 0));
   }
   
-  public void func_70296_d() {
-    super.func_70296_d();
+  public void markDirty() {
+    super.markDirty();
     if (IC2.platform.isSimulating())
       setOverclockRates(); 
   }

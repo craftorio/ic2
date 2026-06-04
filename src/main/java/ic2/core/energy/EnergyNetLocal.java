@@ -87,11 +87,11 @@ public final class EnergyNetLocal implements IEnergyCalculator {
             .getWorld(mainTile).func_175726_f(EnergyNet.instance.getPos(mainTile)), this }); 
     if (EnergyNetGlobal.checkApi && !Util.checkInterfaces(mainTile.getClass()))
       IC2.log.warn(LogCategory.EnergyNet, "EnergyNet.addTile: %s doesn't implement its advertised interfaces completely.", new Object[] { mainTile }); 
-    if (mainTile instanceof TileEntity && ((TileEntity)mainTile).func_145837_r()) {
+    if (mainTile instanceof TileEntity && ((TileEntity)mainTile).isInvalid()) {
       logWarn("EnergyNet.addTile: " + mainTile + " is invalid (TileEntity.isInvalid()), aborting");
       return;
     } 
-    if (this.world != DimensionManager.getWorld(this.world.field_73011_w.getDimension())) {
+    if (this.world != DimensionManager.getWorld(this.world.provider.getDimension())) {
       logDebug("EnergyNet.addTile: " + mainTile + " is in an unloaded world, aborting");
       return;
     } 
@@ -118,8 +118,8 @@ public final class EnergyNetLocal implements IEnergyCalculator {
           logDebug("EnergyNet.addTileEntity: " + subTile + " (" + mainTile + ") is already added using the same position, aborting");
         } else if (retry < 2) {
           this.pendingAdds.put(mainTile, Integer.valueOf(retry + 1));
-        } else if ((conflicting.mainTile instanceof TileEntity && ((TileEntity)mainTile).func_145837_r()) || EnergyNetGlobal.replaceConflicting) {
-          logDebug("EnergyNet.addTileEntity: " + subTile + " (" + mainTile + ") is conflicting with " + conflicting.mainTile + " (invalid=" + ((conflicting.mainTile instanceof TileEntity && ((TileEntity)conflicting.mainTile).func_145837_r()) ? 1 : 0) + ") using the same position, which is abandoned (prev. te not removed), replacing");
+        } else if ((conflicting.mainTile instanceof TileEntity && ((TileEntity)mainTile).isInvalid()) || EnergyNetGlobal.replaceConflicting) {
+          logDebug("EnergyNet.addTileEntity: " + subTile + " (" + mainTile + ") is conflicting with " + conflicting.mainTile + " (invalid=" + ((conflicting.mainTile instanceof TileEntity && ((TileEntity)conflicting.mainTile).isInvalid()) ? 1 : 0) + ") using the same position, which is abandoned (prev. te not removed), replacing");
           removeTile(conflicting.mainTile);
           conflicting = null;
         } else {
@@ -161,12 +161,12 @@ public final class EnergyNetLocal implements IEnergyCalculator {
     Block block = this.world.getBlockState(pos).getBlock();
     int ocx = pos.getX() >> 4;
     int ocz = pos.getZ() >> 4;
-    for (EnumFacing dir : EnumFacing.field_82609_l) {
-      BlockPos cPos = pos.func_177972_a(dir);
+    for (EnumFacing dir : EnumFacing.VALUES) {
+      BlockPos cPos = pos.offset(dir);
       if (!excludedPositions.contains(cPos)) {
         int ccx = cPos.getX() >> 4;
         int ccz = cPos.getZ() >> 4;
-        if (dir.func_176740_k().func_176720_b() || (ccx == ocx && ccz == ocz) || this.world
+        if (dir.getAxis().func_176720_b() || (ccx == ocx && ccz == ocz) || this.world
           
           .func_175667_e(cPos))
           this.world.getBlockState(cPos).func_189546_a(this.world, cPos, block, pos); 
@@ -354,8 +354,8 @@ public final class EnergyNetLocal implements IEnergyCalculator {
         IC2.log.debug(LogCategory.EnergyNet, "Adding node %s.", new Object[] { node }); 
       List<Node> neighbors = new ArrayList<>();
       for (IEnergyTile subTile : tile.subTiles) {
-        for (EnumFacing dir : EnumFacing.field_82609_l) {
-          BlockPos coords = EnergyNet.instance.getPos(subTile).func_177972_a(dir);
+        for (EnumFacing dir : EnumFacing.VALUES) {
+          BlockPos coords = EnergyNet.instance.getPos(subTile).offset(dir);
           Tile neighborTile = this.registeredTiles.get(coords);
           if (neighborTile != null && neighborTile != node.tile)
             for (Node neighbor : neighborTile.nodes) {
@@ -366,14 +366,14 @@ public final class EnergyNetLocal implements IEnergyCalculator {
                 IEnergyEmitter emitter = (subTile instanceof IEnergyEmitter) ? (IEnergyEmitter)subTile : (IEnergyEmitter)node.tile.mainTile;
                 IEnergyTile neighborSubTe = neighborTile.getSubTileAt(coords);
                 IEnergyAcceptor acceptor = (neighborSubTe instanceof IEnergyAcceptor) ? (IEnergyAcceptor)neighborSubTe : (IEnergyAcceptor)neighbor.tile.mainTile;
-                canEmit = (emitter.emitsEnergyTo((IEnergyAcceptor)neighbor.tile.mainTile, dir) && acceptor.acceptsEnergyFrom((IEnergyEmitter)node.tile.mainTile, dir.func_176734_d()));
+                canEmit = (emitter.emitsEnergyTo((IEnergyAcceptor)neighbor.tile.mainTile, dir) && acceptor.acceptsEnergyFrom((IEnergyEmitter)node.tile.mainTile, dir.getOpposite()));
               } 
               boolean canAccept = false;
               if (!canEmit && (node.nodeType == NodeType.Sink || node.nodeType == NodeType.Conductor) && neighbor.nodeType != NodeType.Sink) {
                 IEnergyAcceptor acceptor = (subTile instanceof IEnergyAcceptor) ? (IEnergyAcceptor)subTile : (IEnergyAcceptor)node.tile.mainTile;
                 IEnergyTile neighborSubTe = neighborTile.getSubTileAt(coords);
                 IEnergyEmitter emitter = (neighborSubTe instanceof IEnergyEmitter) ? (IEnergyEmitter)neighborSubTe : (IEnergyEmitter)neighbor.tile.mainTile;
-                canAccept = (acceptor.acceptsEnergyFrom((IEnergyEmitter)neighbor.tile.mainTile, dir) && emitter.emitsEnergyTo((IEnergyAcceptor)node.tile.mainTile, dir.func_176734_d()));
+                canAccept = (acceptor.acceptsEnergyFrom((IEnergyEmitter)neighbor.tile.mainTile, dir) && emitter.emitsEnergyTo((IEnergyAcceptor)node.tile.mainTile, dir.getOpposite()));
               } 
               if (canEmit || canAccept)
                 neighbors.add(neighbor); 

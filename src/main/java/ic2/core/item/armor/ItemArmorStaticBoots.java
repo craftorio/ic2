@@ -21,13 +21,13 @@ public class ItemArmorStaticBoots extends ItemArmorUtility {
     NBTTagCompound compound = StackUtil.getOrCreateNbtData(stack);
     boolean isNotWalking = (player.func_184187_bx() != null || player.func_70090_H());
     if (!compound.func_74764_b("x") || isNotWalking)
-      compound.func_74768_a("x", (int)player.posX); 
+      compound.setInteger("x", (int)player.posX); 
     if (!compound.func_74764_b("z") || isNotWalking)
-      compound.func_74768_a("z", (int)player.posZ); 
-    double distance = Math.sqrt(((compound.func_74762_e("x") - (int)player.posX) * (compound.func_74762_e("x") - (int)player.posX) + (compound.func_74762_e("z") - (int)player.posZ) * (compound.func_74762_e("z") - (int)player.posZ)));
+      compound.setInteger("z", (int)player.posZ); 
+    double distance = Math.sqrt(((compound.getInteger("x") - (int)player.posX) * (compound.getInteger("x") - (int)player.posX) + (compound.getInteger("z") - (int)player.posZ) * (compound.getInteger("z") - (int)player.posZ)));
     if (distance >= 5.0D) {
-      compound.func_74768_a("x", (int)player.posX);
-      compound.func_74768_a("z", (int)player.posZ);
+      compound.setInteger("x", (int)player.posX);
+      compound.setInteger("z", (int)player.posZ);
       ret = (ElectricItem.manager.charge((ItemStack)player.inventory.field_70460_b.get(2), Math.min(3.0D, distance / 5.0D), 2147483647, true, false) > 0.0D);
     } 
     if (ret)

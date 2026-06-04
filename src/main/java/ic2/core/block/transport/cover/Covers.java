@@ -23,9 +23,9 @@ public class Covers extends TileEntityComponent {
   
   public void addCover(EnumFacing side, ItemStack cover) {
     if (StackUtil.isEmpty(this.covers[side.ordinal()])) {
-      ItemStack ret = cover.func_77946_l();
+      ItemStack ret = cover.copy();
       NBTTagCompound nbtTagCompound = StackUtil.getOrCreateNbtData(ret);
-      nbtTagCompound.func_74774_a("side", (byte)side.ordinal());
+      nbtTagCompound.setByte("side", (byte)side.ordinal());
       this.covers[side.ordinal()] = ret;
     } 
   }
@@ -49,16 +49,16 @@ public class Covers extends TileEntityComponent {
   }
   
   public void readFromNbt(NBTTagCompound nbt) {
-    NBTTagList coversTag = nbt.func_150295_c("covers", 10);
-    for (int i = 0; i < coversTag.func_74745_c(); i++) {
-      NBTTagCompound coverTag = coversTag.func_150305_b(i);
-      int index = coverTag.func_74771_c("facing") & 0xFF;
+    NBTTagList coversTag = nbt.getTagList("covers", 10);
+    for (int i = 0; i < coversTag.tagCount(); i++) {
+      NBTTagCompound coverTag = coversTag.getCompoundTagAt(i);
+      int index = coverTag.getByte("facing") & 0xFF;
       if (index >= this.covers.length) {
         IC2.log.error(LogCategory.Block, "Can't load cover for %s, index %d is out of bounds.", new Object[] { Util.toString((TileEntity)this.parent), Integer.valueOf(index) });
       } else {
         ItemStack cover = new ItemStack(coverTag);
         if (StackUtil.isEmpty(cover)) {
-          IC2.log.warn(LogCategory.Block, "Can't load cover %s for %s, index %d, no matching item for %d:%d.", new Object[] { StackUtil.toStringSafe(cover), Util.toString((TileEntity)this.parent), Integer.valueOf(index), Short.valueOf(coverTag.func_74765_d("id")), Short.valueOf(coverTag.func_74765_d("Damage")) });
+          IC2.log.warn(LogCategory.Block, "Can't load cover %s for %s, index %d, no matching item for %d:%d.", new Object[] { StackUtil.toStringSafe(cover), Util.toString((TileEntity)this.parent), Integer.valueOf(index), Short.valueOf(coverTag.getShort("id")), Short.valueOf(coverTag.getShort("Damage")) });
         } else {
           if (!StackUtil.isEmpty(this.covers[index]))
             IC2.log.error(LogCategory.Block, "Loading cover to non-empty cover for %s, index %d, replacing %s with %s.", new Object[] { Util.toString((TileEntity)this.parent), Integer.valueOf(index), this.covers[index], cover }); 
@@ -71,13 +71,13 @@ public class Covers extends TileEntityComponent {
   public NBTTagCompound writeToNbt() {
     NBTTagCompound ret = new NBTTagCompound();
     NBTTagList coversTag = new NBTTagList();
-    for (EnumFacing facing : EnumFacing.field_82609_l) {
+    for (EnumFacing facing : EnumFacing.VALUES) {
       ItemStack cover = this.covers[facing.ordinal()];
       if (!StackUtil.isEmpty(cover)) {
         NBTTagCompound coverTag = new NBTTagCompound();
-        coverTag.func_74774_a("facing", (byte)facing.ordinal());
-        cover.func_77955_b(coverTag);
-        coversTag.func_74742_a((NBTBase)coverTag);
+        coverTag.setByte("facing", (byte)facing.ordinal());
+        cover.writeToNBT(coverTag);
+        coversTag.appendTag((NBTBase)coverTag);
       } 
     } 
     ret.setTag("covers", (NBTBase)coversTag);
@@ -89,7 +89,7 @@ public class Covers extends TileEntityComponent {
   }
   
   public void onWorldTick() {
-    for (EnumFacing facing : EnumFacing.field_82609_l) {
+    for (EnumFacing facing : EnumFacing.VALUES) {
       if (!StackUtil.isEmpty(this.covers[facing.ordinal()]))
         ((ICoverItem)this.covers[facing.ordinal()].getItem()).onTick(this.covers[facing.ordinal()], (ICoverHolder)this.parent); 
     } 

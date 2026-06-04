@@ -10,12 +10,12 @@ import net.minecraft.inventory.Slot;
 public class ContainerCondenser extends ContainerElectricMachine<TileEntityCondenser> {
   public ContainerCondenser(EntityPlayer player, TileEntityCondenser te) {
     super(player, te, 184, 8, 44);
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)te.waterInputSlot, 0, 26, 73));
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)te.waterOutputSlot, 0, 134, 73));
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)te.upgradeSlot, 0, 152, 73));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)te.waterInputSlot, 0, 26, 73));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)te.wateroutputSlot, 0, 134, 73));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)te.upgradeSlot, 0, 152, 73));
     for (int i = 0; i < 2; i++) {
-      func_75146_a((Slot)new SlotInvSlot((InvSlot)te.ventSlots, i, 26 + i * 108, 26));
-      func_75146_a((Slot)new SlotInvSlot((InvSlot)te.ventSlots, i + 2, 26 + i * 108, 44));
+      addSlotToContainer((Slot)new SlotInvSlot((InvSlot)te.ventSlots, i, 26 + i * 108, 26));
+      addSlotToContainer((Slot)new SlotInvSlot((InvSlot)te.ventSlots, i + 2, 26 + i * 108, 44));
     } 
   }
   

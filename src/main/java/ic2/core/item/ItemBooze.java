@@ -68,7 +68,7 @@ public class ItemBooze extends ItemIC2 {
   }
   
   public String func_77653_i(ItemStack itemstack) {
-    int meta = itemstack.func_77952_i();
+    int meta = itemstack.getItemDamage();
     int type = getTypeOfValue(meta);
     if (type == 1) {
       int timeRatio = Math.min(getTimeRatioOfBeerValue(meta), this.timeRatioNames.length - 1);
@@ -82,7 +82,7 @@ public class ItemBooze extends ItemIC2 {
   }
   
   public ItemStack func_77654_b(ItemStack stack, World world, EntityLivingBase living) {
-    int meta = stack.func_77952_i();
+    int meta = stack.getItemDamage();
     int type = getTypeOfValue(meta);
     if (type == 0)
       return ItemName.mug.getItemStack(ItemMug.MugType.empty); 
@@ -94,7 +94,7 @@ public class ItemBooze extends ItemIC2 {
       int duration = this.baseDuration[solidRatio];
       float intensity = this.baseIntensity[getTimeRatioOfBeerValue(meta)];
       if (living instanceof EntityPlayer)
-        ((EntityPlayer)living).func_71024_bL().func_75122_a(6 - alc, solidRatio * 0.15F); 
+        ((EntityPlayer)living).getFoodStats().func_75122_a(6 - alc, solidRatio * 0.15F); 
       int max = (int)(intensity * alc * 0.5F);
       PotionEffect slow = living.func_70660_b(MobEffects.field_76419_f);
       int level = -1;
@@ -110,7 +110,7 @@ public class ItemBooze extends ItemIC2 {
             if (level > 2) {
               amplifyEffect(living, MobEffects.field_76431_k, 0, intensity, duration);
               if (level > 3)
-                living.func_70690_d(new PotionEffect(MobEffects.field_76433_i, 1, (living.getEntityWorld()).field_73012_v.nextInt(3))); 
+                living.func_70690_d(new PotionEffect(MobEffects.field_76433_i, 1, (living.getEntityWorld()).rand.nextInt(3))); 
             } 
           } 
         } 
@@ -158,7 +158,7 @@ public class ItemBooze extends ItemIC2 {
   }
   
   public ItemStack drinkBlackStuff(EntityLivingBase living) {
-    switch ((living.getEntityWorld()).field_73012_v.nextInt(6)) {
+    switch ((living.getEntityWorld()).rand.nextInt(6)) {
       case 1:
         living.func_70690_d(new PotionEffect(MobEffects.field_76431_k, 1200, 0));
         break;
@@ -172,7 +172,7 @@ public class ItemBooze extends ItemIC2 {
         living.func_70690_d(new PotionEffect(MobEffects.field_76436_u, 200, 2));
         break;
       case 5:
-        living.func_70690_d(new PotionEffect(MobEffects.field_76433_i, 1, (living.getEntityWorld()).field_73012_v.nextInt(4)));
+        living.func_70690_d(new PotionEffect(MobEffects.field_76433_i, 1, (living.getEntityWorld()).rand.nextInt(4)));
         break;
     } 
     return ItemName.mug.getItemStack(ItemMug.MugType.empty);

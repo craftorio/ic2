@@ -113,7 +113,7 @@ public class BlockScaffold extends BlockMultiID<BlockScaffold.ScaffoldType> {
   }
   
   public boolean isSideSolid(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
-    return (side.func_176740_k() == EnumFacing.Axis.Y);
+    return (side.getAxis() == EnumFacing.Axis.Y);
   }
   
   public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
@@ -190,7 +190,7 @@ public class BlockScaffold extends BlockMultiID<BlockScaffold.ScaffoldType> {
       return; 
     if (StackUtil.checkItemEquality(stack, Item.getItemFromBlock(this))) {
       while (world.getBlockState(pos).getBlock() == this)
-        pos = pos.func_177984_a(); 
+        pos = pos.up(); 
       if (func_176196_c(world, pos) && pos.getY() < IC2.getWorldHeight(world)) {
         boolean isCreative = player.field_71075_bZ.field_75098_d;
         ItemStack prev = isCreative ? StackUtil.copy(stack) : null;
@@ -284,8 +284,8 @@ public class BlockScaffold extends BlockMultiID<BlockScaffold.ScaffoldType> {
     results.put(start, support);
     queue.add(support);
     while ((support = queue.poll()) != null) {
-      for (EnumFacing dir : EnumFacing.field_82609_l) {
-        BlockPos pos = support.pos.func_177972_a(dir);
+      for (EnumFacing dir : EnumFacing.VALUES) {
+        BlockPos pos = support.pos.offset(dir);
         if (!results.containsKey(pos)) {
           IBlockState state = world.getBlockState(pos);
           Block block = state.getBlock();
@@ -301,7 +301,7 @@ public class BlockScaffold extends BlockMultiID<BlockScaffold.ScaffoldType> {
       } 
     } 
     label63: for (BlockPos groundPos : groundSupports) {
-      BlockPos pos = groundPos.func_177984_a();
+      BlockPos pos = groundPos.up();
       int propagatedStrength = 0;
       while (true) {
         int strength;
@@ -318,7 +318,7 @@ public class BlockScaffold extends BlockMultiID<BlockScaffold.ScaffoldType> {
         if (support.strength < strength) {
           support.strength = strength;
           for (EnumFacing dir : EnumFacing.field_176754_o) {
-            BlockPos nPos = pos.func_177972_a(dir);
+            BlockPos nPos = pos.offset(dir);
             Support nSupport = results.get(nPos);
             if (nSupport != null && nSupport.strength < strength) {
               nSupport.strength = strength - 1;
@@ -326,12 +326,12 @@ public class BlockScaffold extends BlockMultiID<BlockScaffold.ScaffoldType> {
             } 
           } 
         } 
-        pos = pos.func_177984_a();
+        pos = pos.up();
       } 
     } 
     while ((support = queue.poll()) != null) {
       for (EnumFacing dir : supportedFacings) {
-        BlockPos pos = support.pos.func_177972_a(dir);
+        BlockPos pos = support.pos.offset(dir);
         Support nSupport = results.get(pos);
         if (nSupport != null && nSupport.strength < support.strength) {
           support.strength--;

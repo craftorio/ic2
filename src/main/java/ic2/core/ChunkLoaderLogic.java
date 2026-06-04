@@ -48,8 +48,8 @@ public final class ChunkLoaderLogic implements ForgeChunkManager.LoadingCallback
     List<ForgeChunkManager.Ticket> worldTickets = getTicketsForWorld(world);
     for (ForgeChunkManager.Ticket ticket : tickets) {
       worldTickets.add(ticket);
-      NBTTagList list = ticket.getModData().func_150295_c("loadedChunks", 4);
-      for (int i = 0; i < list.func_74745_c(); i++) {
+      NBTTagList list = ticket.getModData().getTagList("loadedChunks", 4);
+      for (int i = 0; i < list.tagCount(); i++) {
         NBTTagLong value = (NBTTagLong)list.func_179238_g(i);
         ForgeChunkManager.forceChunk(ticket, deserialize(value.func_150291_c()));
       } 
@@ -77,9 +77,9 @@ public final class ChunkLoaderLogic implements ForgeChunkManager.LoadingCallback
   public ForgeChunkManager.Ticket createTicket(World world, BlockPos pos) {
     assert getTicket(world, pos, false) == null;
     ForgeChunkManager.Ticket ticket = ForgeChunkManager.requestTicket(IC2.getInstance(), world, ForgeChunkManager.Type.NORMAL);
-    ticket.getModData().func_74768_a("x", pos.getX());
-    ticket.getModData().func_74768_a("y", pos.getY());
-    ticket.getModData().func_74768_a("z", pos.getZ());
+    ticket.getModData().setInteger("x", pos.getX());
+    ticket.getModData().setInteger("y", pos.getY());
+    ticket.getModData().setInteger("z", pos.getZ());
     getTicketsForWorld(world).add(ticket);
     addChunkToTicket(ticket, getChunkCoords(pos));
     return ticket;
@@ -90,20 +90,20 @@ public final class ChunkLoaderLogic implements ForgeChunkManager.LoadingCallback
       return; 
     ForgeChunkManager.forceChunk(ticket, chunk);
     ForgeChunkManager.reorderChunk(ticket, getChunkCoords(getPosFromTicket(ticket)));
-    NBTTagList list = ticket.getModData().func_150295_c("loadedChunks", 4);
-    if (!ticket.getModData().func_150297_b("loadedChunks", 9))
+    NBTTagList list = ticket.getModData().getTagList("loadedChunks", 4);
+    if (!ticket.getModData().hasKey("loadedChunks", 9))
       ticket.getModData().setTag("loadedChunks", (NBTBase)list); 
     ticket.getModData().setTag("loadedChunks", (NBTBase)list);
-    list.func_74742_a((NBTBase)new NBTTagLong(chunk.field_77276_a & 0xFFFFFFFFL | (chunk.field_77275_b & 0xFFFFFFFFL) << 32L));
+    list.appendTag((NBTBase)new NBTTagLong(chunk.field_77276_a & 0xFFFFFFFFL | (chunk.field_77275_b & 0xFFFFFFFFL) << 32L));
   }
   
   public void removeChunkFromTicket(ForgeChunkManager.Ticket ticket, ChunkPos chunk) {
     if (getChunkCoords(getPosFromTicket(ticket)).equals(chunk))
       return; 
     ForgeChunkManager.unforceChunk(ticket, chunk);
-    NBTTagList list = ticket.getModData().func_150295_c("loadedChunks", 4);
+    NBTTagList list = ticket.getModData().getTagList("loadedChunks", 4);
     long serializedChunk = serialize(chunk);
-    for (int i = 0; i < list.func_74745_c(); i++) {
+    for (int i = 0; i < list.tagCount(); i++) {
       NBTTagLong pos = (NBTTagLong)list.func_179238_g(i);
       if (pos.func_150291_c() == serializedChunk)
         list.func_74744_a(i--); 
@@ -124,7 +124,7 @@ public final class ChunkLoaderLogic implements ForgeChunkManager.LoadingCallback
   }
   
   private BlockPos getPosFromTicket(ForgeChunkManager.Ticket ticket) {
-    return new BlockPos(ticket.getModData().func_74762_e("x"), ticket.getModData().func_74762_e("y"), ticket.getModData().func_74762_e("z"));
+    return new BlockPos(ticket.getModData().getInteger("x"), ticket.getModData().getInteger("y"), ticket.getModData().getInteger("z"));
   }
   
   public static ChunkLoaderLogic getInstance() {

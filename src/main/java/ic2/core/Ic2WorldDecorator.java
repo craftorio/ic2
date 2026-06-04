@@ -94,7 +94,7 @@ public class Ic2WorldDecorator implements IWorldGenerator {
     assert !(event.getWorld()).isRemote;
     Chunk chunk = event.getChunk();
     NBTTagCompound nbt = (WorldData.get(event.getWorld())).worldGenData.get(chunk);
-    if (nbt != null && !nbt.func_82582_d()) {
+    if (nbt != null && !nbt.hasNoTags()) {
       nbt = nbt.func_74737_b();
       event.getData().setTag("ic2WorldGen", (NBTBase)nbt);
     } 
@@ -296,7 +296,7 @@ public class Ic2WorldDecorator implements IWorldGenerator {
         default:
           throw new IllegalStateException();
       } 
-      pos.func_181079_c(x, y, z);
+      pos.setPos(x, y, z);
       worldGenMinable.func_180709_b(chunk.func_177412_p(), rnd, (BlockPos)pos);
     } 
     updateScale(chunk, oreScaleKey, baseScale);
@@ -309,7 +309,7 @@ public class Ic2WorldDecorator implements IWorldGenerator {
   }
   
   private static boolean rubberTreeGenEnabled(Config config, World world) {
-    return (ConfigUtil.getBool(config, "rubberTree") && !rubberTreeBlacklist.contains(world.field_73011_w.getDimension()));
+    return (ConfigUtil.getBool(config, "rubberTree") && !rubberTreeBlacklist.contains(world.provider.getDimension()));
   }
   
   private static float getTreeScale(Config config) {

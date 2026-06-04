@@ -65,7 +65,7 @@ public class HandHeldValueConfig extends HandHeldUpgradeOption {
       this.extraSetting = HandHeldValueConfig.this.initialExtraSetting;
       addPlayerInventorySlots(HandHeldValueConfig.this.player, 166);
       for (byte slot = 0; slot < 9; slot = (byte)(slot + 1))
-        func_75146_a((Slot)new SlotHologramSlot(HandHeldValueConfig.this.inventory, slot, 8 + 18 * slot, 8, 1, HandHeldValueConfig.this.makeSaveCallback())); 
+        addSlotToContainer((Slot)new SlotHologramSlot(HandHeldValueConfig.this.inventory, slot, 8 + 18 * slot, 8, 1, HandHeldValueConfig.this.makeSaveCallback())); 
     }
     
     public void func_75134_a(EntityPlayer player) {
@@ -77,8 +77,8 @@ public class HandHeldValueConfig extends HandHeldUpgradeOption {
           if (this.normalBox.isEmpty()) {
             saveType = ComparisonType.DIRECT;
           } else {
-            nbt.func_74778_a("normal", this.normalBox);
-            nbt.func_74774_a("normalComp", this.normalSetting.getForNBT());
+            nbt.setString("normal", this.normalBox);
+            nbt.setByte("normalComp", this.normalSetting.getForNBT());
           } 
         case LESS_OR_EQUAL:
           if (this.normalBox.isEmpty()) {
@@ -87,21 +87,21 @@ public class HandHeldValueConfig extends HandHeldUpgradeOption {
               break;
             } 
             saveType = ComparisonType.COMPARISON;
-            nbt.func_74778_a("normal", this.extraBox);
-            nbt.func_74774_a("normalComp", this.extraSetting.getForNBT());
+            nbt.setString("normal", this.extraBox);
+            nbt.setByte("normalComp", this.extraSetting.getForNBT());
             break;
           } 
-          nbt.func_74778_a("normal", this.normalBox);
-          nbt.func_74774_a("normalComp", this.normalSetting.getForNBT());
+          nbt.setString("normal", this.normalBox);
+          nbt.setByte("normalComp", this.normalSetting.getForNBT());
           if (this.extraBox.isEmpty()) {
             saveType = ComparisonType.COMPARISON;
             break;
           } 
-          nbt.func_74778_a("extra", this.extraBox);
-          nbt.func_74774_a("extraComp", this.extraSetting.getForNBT());
+          nbt.setString("extra", this.extraBox);
+          nbt.setByte("extraComp", this.extraSetting.getForNBT());
           break;
       } 
-      nbt.func_74774_a("type", saveType.getForNBT());
+      nbt.setByte("type", saveType.getForNBT());
       super.func_75134_a(player);
     }
   }

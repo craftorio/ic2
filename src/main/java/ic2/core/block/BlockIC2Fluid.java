@@ -49,7 +49,7 @@ public class BlockIC2Fluid extends BlockFluidClassic implements IBlockModelProvi
     this.fluid = fluid;
     this.color = color;
     if (this.density <= FluidRegistry.WATER.getDensity()) {
-      this.displacements.put(Blocks.field_150355_j, Boolean.valueOf(false));
+      this.displacements.put(Blocks.WATER, Boolean.valueOf(false));
       this.displacements.put(Blocks.field_150358_i, Boolean.valueOf(false));
     } 
     if (this.density <= FluidRegistry.LAVA.getDensity()) {
@@ -81,13 +81,13 @@ public class BlockIC2Fluid extends BlockFluidClassic implements IBlockModelProvi
     if (!world.isRemote)
       if (this.fluid == FluidName.pahoehoe_lava.getInstance()) {
         if (isSourceBlock((IBlockAccess)world, pos) && world
-          .func_175671_l(pos) >= world.field_73012_v.nextInt(120)) {
+          .func_175671_l(pos) >= world.rand.nextInt(120)) {
           world.func_175656_a(pos, BlockName.resource.getBlockState((IIdProvider)ResourceBlock.basalt));
         } else if (!hardenFromNeighbors(world, pos)) {
           world.func_175684_a(pos, (Block)this, func_149738_a(world));
         } 
       } else if (this.fluid == FluidName.hot_water.getInstance()) {
-        if (isSourceBlock((IBlockAccess)world, pos) && !isLavaBlock(world.getBlockState(pos.func_177979_c(2)).getBlock()) && world.getBlockState(pos.func_177977_b()).getBlock() != this && world.field_73012_v.nextInt(60) == 0) {
+        if (isSourceBlock((IBlockAccess)world, pos) && !isLavaBlock(world.getBlockState(pos.func_177979_c(2)).getBlock()) && world.getBlockState(pos.func_177977_b()).getBlock() != this && world.rand.nextInt(60) == 0) {
           world.func_175656_a(pos, Blocks.field_150358_i.getDefaultState());
         } else {
           world.func_175684_a(pos, (Block)this, func_149738_a(world));
@@ -168,8 +168,8 @@ public class BlockIC2Fluid extends BlockFluidClassic implements IBlockModelProvi
     if (world.isRemote)
       return false; 
     if (this.fluid == FluidName.pahoehoe_lava.getInstance())
-      for (EnumFacing dir : EnumFacing.field_82609_l) {
-        LiquidUtil.LiquidData data = LiquidUtil.getLiquid(world, pos.func_177972_a(dir));
+      for (EnumFacing dir : EnumFacing.VALUES) {
+        LiquidUtil.LiquidData data = LiquidUtil.getLiquid(world, pos.offset(dir));
         if (data != null && data.liquid
           .getTemperature() <= this.fluid.getTemperature() / 4) {
           if (isSourceBlock((IBlockAccess)world, pos)) {

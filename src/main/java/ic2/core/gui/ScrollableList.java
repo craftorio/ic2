@@ -87,7 +87,7 @@ public class ScrollableList extends GuiElement<ScrollableList> {
     int currentX = this.x - left;
     int currentY = -this.scroll + this.y + 2 - top;
     for (IListItem item : this.items) {
-      this.gui.drawString(currentX + 3, currentY, item.func_176610_l(), 16777215, false);
+      this.gui.drawString(currentX + 3, currentY, item.getName(), 16777215, false);
       currentY += 11;
       this.gui.drawColoredRect(currentX, currentY - 2, this.width - 7, 1, -16777216);
     } 

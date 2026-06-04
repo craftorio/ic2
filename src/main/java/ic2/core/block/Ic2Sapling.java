@@ -54,7 +54,7 @@ public class Ic2Sapling extends BlockBush implements IBlockModelProvider, IGrowa
       world.func_175698_g(pos);
       return;
     } 
-    if (world.func_175671_l(pos.func_177984_a()) >= 9 && random.nextInt(30) == 0)
+    if (world.func_175671_l(pos.up()) >= 9 && random.nextInt(30) == 0)
       func_176474_b(world, random, pos, state); 
   }
   

@@ -305,7 +305,7 @@ public class NetworkManagerClient extends NetworkManager {
                 if (world != null)
                   switch (type) {
                     case LargePacket:
-                      world.func_184133_a(player, new BlockPos(pos), SoundEvents.field_187539_bB, SoundCategory.BLOCKS, 4.0F, (1.0F + (world.field_73012_v.nextFloat() - world.field_73012_v.nextFloat()) * 0.2F) * 0.7F);
+                      world.func_184133_a(player, new BlockPos(pos), SoundEvents.field_187539_bB, SoundCategory.BLOCKS, 4.0F, (1.0F + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.2F) * 0.7F);
                       world.func_175688_a(EnumParticleTypes.EXPLOSION_HUGE, pos.field_72450_a, pos.field_72448_b, pos.field_72449_c, 0.0D, 0.0D, 0.0D, new int[0]);
                       break;
                     case TileEntityEvent:
@@ -313,7 +313,7 @@ public class NetworkManagerClient extends NetworkManager {
                       world.func_175688_a(EnumParticleTypes.EXPLOSION_HUGE, pos.field_72450_a, pos.field_72448_b, pos.field_72449_c, 0.0D, 0.0D, 0.0D, new int[0]);
                       break;
                     case ItemEvent:
-                      world.func_184133_a(player, new BlockPos(pos), SoundEvents.field_187646_bt, SoundCategory.BLOCKS, 4.0F, (1.0F + (world.field_73012_v.nextFloat() - world.field_73012_v.nextFloat()) * 0.2F) * 0.7F);
+                      world.func_184133_a(player, new BlockPos(pos), SoundEvents.field_187646_bt, SoundCategory.BLOCKS, 4.0F, (1.0F + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.2F) * 0.7F);
                       world.func_175688_a(EnumParticleTypes.EXPLOSION_HUGE, pos.field_72450_a, pos.field_72448_b, pos.field_72449_c, 0.0D, 0.0D, 0.0D, new int[0]);
                       break;
                     case GuiDisplay:
@@ -341,9 +341,9 @@ public class NetworkManagerClient extends NetworkManager {
         IC2.platform.requestTick(false, new Runnable() {
               public void run() {
                 WorldClient worldClient = (Minecraft.getMinecraft()).field_71441_e;
-                if (((World)worldClient).field_73011_w.getDimension() != dimensionId)
+                if (((World)worldClient).provider.getDimension() != dimensionId)
                   return; 
-                TileEntity teRaw = worldClient.func_175625_s(pos);
+                TileEntity teRaw = worldClient.getTileEntity(pos);
                 if (!(teRaw instanceof TileEntityBlock))
                   return; 
                 TileEntityComponent component = ((TileEntityBlock)teRaw).getComponent(componentCls);

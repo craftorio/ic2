@@ -110,7 +110,7 @@ public class Tile {
     if (server != null && server.func_152345_ab()) {
       BlockPos pos = EnergyNet.instance.getPos(this.mainTile);
       if (world.func_175667_e(pos)) {
-        TileEntity te = world.func_175625_s(pos);
+        TileEntity te = world.getTileEntity(pos);
         if (te != null) {
           ret = ret + "|" + getTeClassName(te);
         } else {

@@ -82,8 +82,8 @@ public class TileEntityFluidPipe extends TileEntityPipe implements IFluidPipe {
     if (!world.isRemote) {
       this.connectivity = (byte)(this.connectivity ^ 1 << facing.ordinal());
       ((NetworkManager)IC2.network.get(true)).updateTileEntityField((TileEntity)this, "connectivity");
-      world.func_175685_c(pos, (Block)getBlockType(), true);
-      func_70296_d();
+      world.notifyNeighborsOfStateChange(pos, (Block)getBlockType(), true);
+      markDirty();
     } 
   }
   
@@ -93,7 +93,7 @@ public class TileEntityFluidPipe extends TileEntityPipe implements IFluidPipe {
       int availableFluidAmount = this.tank.getFluidAmount();
       int cPipes = 1;
       List<LiquidUtil.AdjacentFluidHandler> adjacentFluidHandlers = new ArrayList<>();
-      for (EnumFacing facing : EnumFacing.field_82609_l) {
+      for (EnumFacing facing : EnumFacing.VALUES) {
         if (LiquidUtil.drainTile((TileEntity)this, facing, 2147483647, true) != null) {
           LiquidUtil.AdjacentFluidHandler target = LiquidUtil.getAdjacentHandler((TileEntity)this, facing);
           if (target != null)
@@ -104,7 +104,7 @@ public class TileEntityFluidPipe extends TileEntityPipe implements IFluidPipe {
                 cPipes++;
                 adjacentFluidHandlers.add(target);
               } 
-            } else if (LiquidUtil.fillTile(target.handler, facing.func_176734_d(), this.tank.getFluid(), true) > 0) {
+            } else if (LiquidUtil.fillTile(target.handler, facing.getOpposite(), this.tank.getFluid(), true) > 0) {
               adjacentFluidHandlers.add(target);
             }  
         } 
@@ -166,16 +166,16 @@ public class TileEntityFluidPipe extends TileEntityPipe implements IFluidPipe {
   
   public void readFromNBT(NBTTagCompound nbt) {
     super.readFromNBT(nbt);
-    this.type = PipeType.values[nbt.func_74771_c("type") & 0xFF];
-    this.size = PipeSize.values()[nbt.func_74771_c("size") & 0xFF];
+    this.type = PipeType.values[nbt.getByte("type") & 0xFF];
+    this.size = PipeSize.values()[nbt.getByte("size") & 0xFF];
     this.tank = new PipeFluidTank(Util.allFacings, Util.allFacings, fluid -> true, (int)(this.type.transferRate * this.size.multiplier));
     this.tank.readFromNBT(nbt);
   }
   
   public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
     super.writeToNBT(nbt);
-    nbt.func_74774_a("type", (byte)this.type.ordinal());
-    nbt.func_74774_a("size", (byte)this.size.ordinal());
+    nbt.setByte("type", (byte)this.type.ordinal());
+    nbt.setByte("size", (byte)this.size.ordinal());
     this.tank.writeToNBT(nbt);
     return nbt;
   }
@@ -197,13 +197,13 @@ public class TileEntityFluidPipe extends TileEntityPipe implements IFluidPipe {
   
   protected void updateConnectivity() {
     byte newConnectivity = this.connectivity;
-    for (EnumFacing direction : EnumFacing.field_82609_l) {
-      TileEntity tile = this.field_145850_b.func_175625_s(this.field_174879_c.func_177972_a(direction));
+    for (EnumFacing direction : EnumFacing.VALUES) {
+      TileEntity tile = this.world.getTileEntity(this.pos.offset(direction));
       if (tile != null)
         if (tile instanceof IFluidPipe) {
-          if (((IFluidPipe)tile).isConnected(direction.func_176734_d()))
+          if (((IFluidPipe)tile).isConnected(direction.getOpposite()))
             newConnectivity = (byte)(newConnectivity | 1 << direction.ordinal()); 
-        } else if (LiquidUtil.isFluidTile(tile, direction.func_176734_d())) {
+        } else if (LiquidUtil.isFluidTile(tile, direction.getOpposite())) {
           newConnectivity = (byte)(newConnectivity | this.connectivity & 1 << direction.ordinal());
         }  
     } 
@@ -215,11 +215,11 @@ public class TileEntityFluidPipe extends TileEntityPipe implements IFluidPipe {
   
   public void onPlaced(ItemStack stack, EntityLivingBase placer, EnumFacing facing) {
     super.onPlaced(stack, placer, facing);
-    if (!this.field_145850_b.isRemote) {
-      TileEntity tile = this.field_145850_b.func_175625_s(this.field_174879_c.func_177972_a(facing.func_176734_d()));
+    if (!this.world.isRemote) {
+      TileEntity tile = this.world.getTileEntity(this.pos.offset(facing.getOpposite()));
       if (tile != null && (
         tile instanceof IFluidPipe || LiquidUtil.isFluidTile(tile, facing))) {
-        flipConnection(facing.func_176734_d());
+        flipConnection(facing.getOpposite());
         if (tile instanceof IFluidPipe) {
           IFluidPipe other = (IFluidPipe)tile;
           if (!other.isConnected(facing))
@@ -232,8 +232,8 @@ public class TileEntityFluidPipe extends TileEntityPipe implements IFluidPipe {
   protected void onBlockBreak() {
     super.onBlockBreak();
     if (this.tank.getFluidAmount() > 1000 && 
-      LiquidUtil.fillBlock(this.tank.getFluid(), this.field_145850_b, this.field_174879_c, true))
-      LiquidUtil.fillBlock(this.tank.getFluid(), this.field_145850_b, this.field_174879_c, false); 
+      LiquidUtil.fillBlock(this.tank.getFluid(), this.world, this.pos, true))
+      LiquidUtil.fillBlock(this.tank.getFluid(), this.world, this.pos, false); 
   }
   
   public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
@@ -369,7 +369,7 @@ public class TileEntityFluidPipe extends TileEntityPipe implements IFluidPipe {
     float sp = (1.0F - th) / 2.0F;
     List<AxisAlignedBB> ret = new ArrayList<>(7);
     ret.add(new AxisAlignedBB(sp, sp, sp, (sp + th), (sp + th), (sp + th)));
-    for (EnumFacing facing : EnumFacing.field_82609_l) {
+    for (EnumFacing facing : EnumFacing.VALUES) {
       boolean hasConnection = ((this.connectivity & 1 << facing.ordinal()) != 0);
       if (hasConnection) {
         float zS = sp, yS = zS, xS = yS;
@@ -465,7 +465,7 @@ public class TileEntityFluidPipe extends TileEntityPipe implements IFluidPipe {
     BlockPos pos = rayTrace.getBlockPos();
     if (!world.func_175723_af().func_177746_a(pos))
       return; 
-    TileEntity te = world.func_175625_s(pos);
+    TileEntity te = world.getTileEntity(pos);
     if (!(te instanceof TileEntityFluidPipe))
       return; 
     GlStateManager.func_179147_l();

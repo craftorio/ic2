@@ -12,12 +12,12 @@ import net.minecraft.inventory.Slot;
 public class ContainerSolarDestiller extends ContainerFullInv<TileEntitySolarDestiller> {
   public ContainerSolarDestiller(EntityPlayer player, TileEntitySolarDestiller tileEntite) {
     super(player, (IInventory)tileEntite, 184);
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)tileEntite.waterinputSlot, 0, 17, 27));
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)tileEntite.destiwaterinputSlot, 0, 136, 64));
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)tileEntite.wateroutputSlot, 0, 17, 45));
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)tileEntite.destiwateroutputSlott, 0, 136, 82));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)tileEntite.waterinputSlot, 0, 17, 27));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)tileEntite.destiwaterinputSlot, 0, 136, 64));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)tileEntite.wateroutputSlot, 0, 17, 45));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)tileEntite.destiwateroutputSlott, 0, 136, 82));
     for (int i = 0; i < 2; i++)
-      func_75146_a((Slot)new SlotInvSlot((InvSlot)tileEntite.upgradeSlot, i, 152, 8 + i * 18)); 
+      addSlotToContainer((Slot)new SlotInvSlot((InvSlot)tileEntite.upgradeSlot, i, 152, 8 + i * 18)); 
   }
   
   public List<String> getNetworkedFields() {

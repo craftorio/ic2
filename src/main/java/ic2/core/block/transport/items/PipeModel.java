@@ -98,7 +98,7 @@ public class PipeModel extends AbstractModel implements ISpecialParticleModel {
     float th = prop.size.thickness;
     float sp = (1.0F - th) / 2.0F;
     EnumFacing pFacing = EnumFacing.values()[prop.facing];
-    List[] arrayOfList = new List[EnumFacing.field_82609_l.length];
+    List[] arrayOfList = new List[EnumFacing.VALUES.length];
     for (int i = 0; i < arrayOfList.length; i++)
       arrayOfList[i] = new ArrayList(); 
     List<BakedQuad> generalQuads = new ArrayList<>();
@@ -110,8 +110,8 @@ public class PipeModel extends AbstractModel implements ISpecialParticleModel {
       float zE = sp + th, yE = zE, xE = yE;
       VdUtil.addCuboid(xS, yS, zS, xE, yE, zE, color, Util.allFacings, sizeSprite, arrayOfList, generalQuads);
     } else if (totalConnections == 1) {
-      EnumFacing connected = EnumFacing.field_82609_l[Integer.numberOfTrailingZeros(prop.connectivity)];
-      for (EnumFacing facing : EnumFacing.field_82609_l) {
+      EnumFacing connected = EnumFacing.VALUES[Integer.numberOfTrailingZeros(prop.connectivity)];
+      for (EnumFacing facing : EnumFacing.VALUES) {
         float zS = sp, yS = zS, xS = yS;
         float zE = sp + th, yE = zE, xE = yE;
         if (facing == connected) {
@@ -144,15 +144,15 @@ public class PipeModel extends AbstractModel implements ISpecialParticleModel {
               throw new RuntimeException();
           } 
           VdUtil.addCuboid(xS, yS, zS, xE, yE, zE, color, EnumSet.of(facing), sizeSprite, arrayOfList, generalQuads);
-          VdUtil.addCuboid(xS, yS, zS, xE, yE, zE, color, EnumSet.complementOf((EnumSet)EnumSet.of(facing, facing.func_176734_d())), sideSprite, arrayOfList, generalQuads);
-        } else if (facing == connected.func_176734_d()) {
+          VdUtil.addCuboid(xS, yS, zS, xE, yE, zE, color, EnumSet.complementOf((EnumSet)EnumSet.of(facing, facing.getOpposite())), sideSprite, arrayOfList, generalQuads);
+        } else if (facing == connected.getOpposite()) {
           VdUtil.addCuboid(xS, yS, zS, xE, yE, zE, color, EnumSet.of(facing), sizeSprite, arrayOfList, generalQuads);
         } else {
           VdUtil.addCuboid(xS, yS, zS, xE, yE, zE, color, EnumSet.of(facing), sideSprite, arrayOfList, generalQuads);
         } 
       } 
     } else {
-      for (EnumFacing facing : EnumFacing.field_82609_l) {
+      for (EnumFacing facing : EnumFacing.VALUES) {
         boolean hasConnection = ((prop.connectivity & 1 << facing.ordinal()) != 0);
         float zS = sp, yS = zS, xS = yS;
         float zE = sp + th, yE = zE, xE = yE;
@@ -186,7 +186,7 @@ public class PipeModel extends AbstractModel implements ISpecialParticleModel {
               throw new RuntimeException();
           } 
           VdUtil.addCuboid(xS, yS, zS, xE, yE, zE, color, EnumSet.of(facing), sizeSprite, arrayOfList, generalQuads);
-          VdUtil.addCuboid(xS, yS, zS, xE, yE, zE, color, EnumSet.complementOf((EnumSet)EnumSet.of(facing, facing.func_176734_d())), sideSprite, arrayOfList, generalQuads);
+          VdUtil.addCuboid(xS, yS, zS, xE, yE, zE, color, EnumSet.complementOf((EnumSet)EnumSet.of(facing, facing.getOpposite())), sideSprite, arrayOfList, generalQuads);
         } else {
           VdUtil.addCuboid(xS, yS, zS, xE, yE, zE, color, EnumSet.of(facing), sideSprite, arrayOfList, generalQuads);
         } 
@@ -194,7 +194,7 @@ public class PipeModel extends AbstractModel implements ISpecialParticleModel {
     } 
     float cs = 1.0F;
     float ch = 0.1F;
-    for (EnumFacing facing : EnumFacing.field_82609_l) {
+    for (EnumFacing facing : EnumFacing.VALUES) {
       boolean hasCover = ((prop.covers & 1 << facing.ordinal()) != 0);
       float zS = 0.0F, yS = zS, xS = yS;
       float zE = 1.0F, yE = zE, xE = yE;

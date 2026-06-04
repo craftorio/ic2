@@ -13,6 +13,6 @@ public class ContainerWeightedItemDistributor extends ContainerFullInv<TileEntit
   public ContainerWeightedItemDistributor(EntityPlayer player, TileEntityWeightedItemDistributor te) {
     super(player, (IInventory)te, 211);
     for (int i = 0; i < te.buffer.size(); i++)
-      func_75146_a((Slot)new SlotInvSlot(te.buffer, i, 8 + i * 18, 108)); 
+      addSlotToContainer((Slot)new SlotInvSlot(te.buffer, i, 8 + i * 18, 108)); 
   }
 }

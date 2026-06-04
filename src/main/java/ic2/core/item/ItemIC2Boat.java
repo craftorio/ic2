@@ -64,7 +64,7 @@ public class ItemIC2Boat extends ItemMulti<ItemIC2Boat.BoatType> {
       if (!world.func_184144_a((Entity)boat, boat.func_70046_E().func_72321_a(-0.1D, -0.1D, -0.1D)).isEmpty())
         return new ActionResult(EnumActionResult.PASS, stack); 
       if (!world.isRemote)
-        world.func_72838_d((Entity)boat); 
+        world.spawnEntity((Entity)boat); 
       if (!player.field_71075_bZ.field_75098_d)
         stack = StackUtil.decSize(stack); 
     } 

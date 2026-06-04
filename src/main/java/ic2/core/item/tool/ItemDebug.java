@@ -69,20 +69,20 @@ public class ItemDebug extends ItemIC2 implements ISpecialElectricItem, IBoxable
     String plat;
     int count;
     NBTTagCompound nbtData = StackUtil.getOrCreateNbtData(StackUtil.get(player, hand));
-    int modeIdx = nbtData.func_74762_e("mode");
+    int modeIdx = nbtData.getInteger("mode");
     if (modeIdx < 0 || modeIdx >= Mode.modes.length)
       modeIdx = 0; 
     Mode mode = Mode.modes[modeIdx];
     if (IC2.keyboard.isModeSwitchKeyDown(player)) {
       if (!world.isRemote) {
         mode = Mode.modes[(mode.ordinal() + 1) % Mode.modes.length];
-        nbtData.func_74768_a("mode", mode.ordinal());
+        nbtData.setInteger("mode", mode.ordinal());
         IC2.platform.messagePlayer(player, "Debug Item Mode: " + mode.getName(), new Object[0]);
         return EnumActionResult.SUCCESS;
       } 
       return EnumActionResult.PASS;
     } 
-    TileEntity tileentity = world.func_175625_s(pos);
+    TileEntity tileentity = world.getTileEntity(pos);
     if (tileentity instanceof IDebuggable) {
       if (world.isRemote)
         return EnumActionResult.PASS; 
@@ -124,7 +124,7 @@ public class ItemDebug extends ItemIC2 implements ISpecialElectricItem, IBoxable
           pos = position.getBlockPos();
           IBlockState state = world.getBlockState(pos);
           Block block = state.getBlock();
-          TileEntity tileEntity1 = world.func_175625_s(pos);
+          TileEntity tileEntity1 = world.getTileEntity(pos);
           String message = String.format("[%s] block state: %s%nname: %s%ncls: %s%nte: %s", new Object[] { plat, state
                 .func_185899_b((IBlockAccess)world, pos), block.func_149739_a(), block.getClass().getName(), tileEntity1 });
           chat.println(message);
@@ -156,7 +156,7 @@ public class ItemDebug extends ItemIC2 implements ISpecialElectricItem, IBoxable
           if (position.field_72308_g instanceof EntityItem) {
             ItemStack entStack = ((EntityItem)position.field_72308_g).func_92059_d();
             String name = Util.getName(entStack.getItem()).toString();
-            message = "[" + plat + "] item id: " + name + " meta: " + entStack.func_77952_i() + " size: " + StackUtil.getSize(entStack) + " name: " + entStack.func_77977_a();
+            message = "[" + plat + "] item id: " + name + " meta: " + entStack.getItemDamage() + " size: " + StackUtil.getSize(entStack) + " name: " + entStack.func_77977_a();
             chat.println(message);
             console.println(message);
             console.println("NBT: " + entStack.func_77978_p());
@@ -167,7 +167,7 @@ public class ItemDebug extends ItemIC2 implements ISpecialElectricItem, IBoxable
       case TileData:
         if (world.isRemote)
           return EnumActionResult.PASS; 
-        tileEntity = world.func_175625_s(pos);
+        tileEntity = world.getTileEntity(pos);
         if (tileEntity instanceof TileEntityBlock) {
           TileEntityBlock tileEntityBlock = (TileEntityBlock)tileEntity;
           chat.println("Block: Active=" + tileEntityBlock.getActive() + " Facing=" + tileEntityBlock.getFacing());
@@ -222,7 +222,7 @@ public class ItemDebug extends ItemIC2 implements ISpecialElectricItem, IBoxable
       case AccelerateX100:
         if (world.isRemote)
           return EnumActionResult.PASS; 
-        te = world.func_175625_s(pos);
+        te = world.getTileEntity(pos);
         count = (mode == Mode.Accelerate) ? 1000 : 100000;
         if (te == null) {
           IBlockState state = world.getBlockState(pos);
@@ -242,10 +242,10 @@ public class ItemDebug extends ItemIC2 implements ISpecialElectricItem, IBoxable
           int changes = 0;
           int interruptCount = -1;
           for (int i = 0; i < count; i++) {
-            if (te.func_145837_r()) {
+            if (te.isInvalid()) {
               changes++;
-              te = world.func_175625_s(pos);
-              if (!(te instanceof ITickable) || te.func_145837_r()) {
+              te = world.getTileEntity(pos);
+              if (!(te instanceof ITickable) || te.isInvalid()) {
                 interruptCount = i;
                 break;
               } 
@@ -366,7 +366,7 @@ public class ItemDebug extends ItemIC2 implements ISpecialElectricItem, IBoxable
       .getClass().isPrimitive() || o instanceof Iterable || o instanceof Class || o instanceof String)
       return; 
     if (o instanceof World) {
-      out.println(prefix + " dim: " + ((World)o).field_73011_w.getDimension());
+      out.println(prefix + " dim: " + ((World)o).provider.getDimension());
     } else if (!(o instanceof net.minecraft.block.state.BlockStateContainer) && !(o instanceof Block) && !(o instanceof TileEntity) && !(o instanceof net.minecraft.item.Item) && !(o instanceof ItemStack) && !(o instanceof net.minecraft.util.math.Vec3i) && !(o instanceof Vec3d) && !(o instanceof net.minecraft.nbt.NBTBase) && 
       !o.getClass().getName().startsWith("java.")) {
       Class<?> fieldDeclaringClass = o.getClass();

@@ -99,11 +99,11 @@ public class EntityIC2Explosive extends Entity {
   }
   
   protected void writeEntityToNBT(NBTTagCompound nbttagcompound) {
-    nbttagcompound.func_74774_a("Fuse", (byte)this.fuse);
+    nbttagcompound.setByte("Fuse", (byte)this.fuse);
   }
   
   protected void readEntityFromNBT(NBTTagCompound nbttagcompound) {
-    this.fuse = nbttagcompound.func_74771_c("Fuse");
+    this.fuse = nbttagcompound.getByte("Fuse");
   }
   
   public EntityIC2Explosive setIgniter(EntityLivingBase igniter1) {

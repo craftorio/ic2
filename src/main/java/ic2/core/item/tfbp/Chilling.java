@@ -17,14 +17,14 @@ class Chilling extends TerraformerBase {
       return false; 
     IBlockState state = world.getBlockState(pos);
     Block block = state.getBlock();
-    if (block == Blocks.field_150355_j || block == Blocks.field_150358_i) {
+    if (block == Blocks.WATER || block == Blocks.field_150358_i) {
       world.func_175656_a(pos, Blocks.field_150432_aD.getDefaultState());
       return true;
     } 
     if (block == Blocks.field_150432_aD) {
       BlockPos below = pos.func_177977_b();
       Block blockBelow = world.getBlockState(below).getBlock();
-      if (blockBelow == Blocks.field_150355_j || blockBelow == Blocks.field_150358_i) {
+      if (blockBelow == Blocks.WATER || blockBelow == Blocks.field_150358_i) {
         world.func_175656_a(below, Blocks.field_150432_aD.getDefaultState());
         return true;
       } 
@@ -39,7 +39,7 @@ class Chilling extends TerraformerBase {
         return true;
       } 
     } 
-    pos = pos.func_177984_a();
+    pos = pos.up();
     if (Blocks.field_150431_aC.func_176196_c(world, pos) || block == Blocks.field_150432_aD) {
       world.func_175656_a(pos, Blocks.field_150431_aC.getDefaultState());
       return true;
@@ -49,7 +49,7 @@ class Chilling extends TerraformerBase {
   
   private static boolean isSurroundedBySnow(World world, BlockPos pos) {
     for (EnumFacing dir : EnumFacing.field_176754_o) {
-      if (!isSnowHere(world, pos.func_177972_a(dir)))
+      if (!isSnowHere(world, pos.offset(dir)))
         return false; 
     } 
     return true;
@@ -63,7 +63,7 @@ class Chilling extends TerraformerBase {
     Block block = world.getBlockState(pos).getBlock();
     if (block == Blocks.field_150433_aE || block == Blocks.field_150431_aC)
       return true; 
-    pos = pos.func_177984_a();
+    pos = pos.up();
     if (Blocks.field_150431_aC.func_176196_c(world, pos) || block == Blocks.field_150432_aD)
       world.func_175656_a(pos, Blocks.field_150431_aC.getDefaultState()); 
     return false;

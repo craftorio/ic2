@@ -45,7 +45,7 @@ class ChangeHandler {
         IC2.log.warn(LogCategory.EnergyNet, "Tile %s was unloaded in grid update (%s)", new Object[] { Util.toString(ioTile, (IBlockAccess)enet.getWorld(), pos), type }); 
       return false;
     } 
-    if (type != GridChange.Type.REMOVAL && ioTile instanceof TileEntity && ((TileEntity)ioTile).func_145837_r()) {
+    if (type != GridChange.Type.REMOVAL && ioTile instanceof TileEntity && ((TileEntity)ioTile).isInvalid()) {
       if (EnergyNetSettings.logGridUpdateIssues)
         IC2.log.warn(LogCategory.EnergyNet, "Tile %s was invalidated in grid update (%s)", new Object[] { Util.toString(ioTile, (IBlockAccess)enet.getWorld(), pos), type }); 
       return false;
@@ -125,8 +125,8 @@ class ChangeHandler {
         IC2.log.debug(LogCategory.EnergyNet, "Adding node %s.", new Object[] { node }); 
       List<Node> neighbors = new ArrayList<>();
       for (IEnergyTile subTile : tile.subTiles) {
-        for (EnumFacing dir : EnumFacing.field_82609_l) {
-          BlockPos coords = EnergyNet.instance.getPos(subTile).func_177972_a(dir);
+        for (EnumFacing dir : EnumFacing.VALUES) {
+          BlockPos coords = EnergyNet.instance.getPos(subTile).offset(dir);
           Tile neighborTile = enet.registeredTiles.get(coords);
           if (neighborTile != null && neighborTile != node.tile)
             for (Node neighbor : neighborTile.nodes) {
@@ -138,14 +138,14 @@ class ChangeHandler {
                 IEnergyEmitter emitter = (subTile instanceof IEnergyEmitter) ? (IEnergyEmitter)subTile : (IEnergyEmitter)ioTile;
                 IEnergyTile neighborSubTe = neighborTile.getSubTileAt(coords);
                 IEnergyAcceptor acceptor = (neighborSubTe instanceof IEnergyAcceptor) ? (IEnergyAcceptor)neighborSubTe : (IEnergyAcceptor)neighborIoTile;
-                canEmit = (emitter.emitsEnergyTo((IEnergyAcceptor)neighborIoTile, dir) && acceptor.acceptsEnergyFrom((IEnergyEmitter)ioTile, dir.func_176734_d()));
+                canEmit = (emitter.emitsEnergyTo((IEnergyAcceptor)neighborIoTile, dir) && acceptor.acceptsEnergyFrom((IEnergyEmitter)ioTile, dir.getOpposite()));
               } 
               boolean canAccept = false;
               if (!canEmit && (node.nodeType == NodeType.Sink || node.nodeType == NodeType.Conductor) && neighbor.nodeType != NodeType.Sink) {
                 IEnergyAcceptor acceptor = (subTile instanceof IEnergyAcceptor) ? (IEnergyAcceptor)subTile : (IEnergyAcceptor)ioTile;
                 IEnergyTile neighborSubTe = neighborTile.getSubTileAt(coords);
                 IEnergyEmitter emitter = (neighborSubTe instanceof IEnergyEmitter) ? (IEnergyEmitter)neighborSubTe : (IEnergyEmitter)neighborIoTile;
-                canAccept = (acceptor.acceptsEnergyFrom((IEnergyEmitter)neighborIoTile, dir) && emitter.emitsEnergyTo((IEnergyAcceptor)ioTile, dir.func_176734_d()));
+                canAccept = (acceptor.acceptsEnergyFrom((IEnergyEmitter)neighborIoTile, dir) && emitter.emitsEnergyTo((IEnergyAcceptor)ioTile, dir.getOpposite()));
               } 
               if (canEmit || canAccept)
                 neighbors.add(neighbor); 

@@ -5,18 +5,18 @@ import net.minecraft.util.EnumFacing;
 public interface IKineticSource
 {
 	@Deprecated
-	int maxrequestkineticenergyTick(EnumFacing paramEnumFacing);
+	int maxrequestKineticEnergyTick(EnumFacing paramEnumFacing);
 
 	default int getConnectionBandwidth(EnumFacing side)
 	{
-		return maxrequestkineticenergyTick(side);
+		return maxrequestKineticEnergyTick(side);
 	}
 
 	@Deprecated
-	int requestkineticenergy(EnumFacing paramEnumFacing, int paramInt);
+	int requestKineticEnergy(EnumFacing paramEnumFacing, int paramInt);
 
 	default int drawKineticEnergy(EnumFacing side, int request, boolean simulate)
 	{
-		return !simulate ? requestkineticenergy(side, request) : maxrequestkineticenergyTick(side);
+		return !simulate ? requestKineticEnergy(side, request) : maxrequestKineticEnergyTick(side);
 	}
 }

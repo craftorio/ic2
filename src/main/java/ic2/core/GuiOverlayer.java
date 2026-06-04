@@ -50,13 +50,13 @@ public class GuiOverlayer extends Gui {
     this.mc.func_110434_K().func_110577_a(background);
     drawTexturedModalRect(0, 0, 0, 0, 71, 69);
     renderItem.func_175042_a(helm, 5, 4);
-    this.mc.field_71466_p.func_78276_b(mapCharge(helm) + "%", 25, 9, 16777215);
+    this.mc.field_71466_p.drawString(mapCharge(helm) + "%", 25, 9, 16777215);
     if (StackUtil.getOrCreateNbtData(helm).func_74767_n("Nightvision"))
       renderItem.func_175042_a(ItemName.nightvision_goggles.getItemStack(), 50, 4); 
     if (!StackUtil.isEmpty(chestplate)) {
       int charge = getCharge(chestplate);
       if (charge >= 0) {
-        this.mc.field_71466_p.func_78276_b(charge + "%", 25, 25, 16777215);
+        this.mc.field_71466_p.drawString(charge + "%", 25, 25, 16777215);
         renderItem.func_175042_a(chestplate, 5, 20);
         NBTTagCompound nbtDatachestplate = StackUtil.getOrCreateNbtData(chestplate);
         if (nbtDatachestplate.func_74767_n("jetpack")) {
@@ -73,14 +73,14 @@ public class GuiOverlayer extends Gui {
     if (!StackUtil.isEmpty(legs)) {
       int charge = getCharge(legs);
       if (charge >= 0) {
-        this.mc.field_71466_p.func_78276_b(charge + "%", 25, 41, 16777215);
+        this.mc.field_71466_p.drawString(charge + "%", 25, 41, 16777215);
         renderItem.func_175042_a(legs, 5, 36);
       } 
     } 
     if (!StackUtil.isEmpty(boots)) {
       int charge = getCharge(boots);
       if (charge >= 0) {
-        this.mc.field_71466_p.func_78276_b(charge + "%", 25, 56, 16777215);
+        this.mc.field_71466_p.drawString(charge + "%", 25, 56, 16777215);
         renderItem.func_175042_a(boots, 5, 52);
       } 
     } 
@@ -90,37 +90,37 @@ public class GuiOverlayer extends Gui {
       int nextLine = 83;
       if (!StackUtil.isEmpty(rightItem)) {
         renderItem.func_175042_a(rightItem, 5, 74);
-        this.mc.field_71466_p.func_78276_b(rightItem.func_82833_r(), 30, 78, 16777215);
+        this.mc.field_71466_p.drawString(rightItem.func_82833_r(), 30, 78, 16777215);
         List<String> info = new LinkedList<>();
         if (rightItem.getItem() instanceof IItemHudInfo) {
           info.addAll(((IItemHudInfo)rightItem.getItem()).getHudInfo(rightItem, (hudMode == HudMode.ADVANCED)));
           if (info.size() > 0)
             for (int l = 0; l < info.size(); l++)
-              this.mc.field_71466_p.func_78276_b(info.get(l), 8, 83 + (l + 1) * 14, 16777215);  
+              this.mc.field_71466_p.drawString(info.get(l), 8, 83 + (l + 1) * 14, 16777215);  
           nextLine += (info.size() + 1) * 14;
         } else {
           info.addAll(rightItem.func_82840_a((EntityPlayer)this.mc.player, () -> (hudMode == HudMode.ADVANCED)));
           if (info.size() > 1)
             for (int l = 1; l < info.size(); l++)
-              this.mc.field_71466_p.func_78276_b(info.get(l), 8, 83 + l * 14, 16777215);  
+              this.mc.field_71466_p.drawString(info.get(l), 8, 83 + l * 14, 16777215);  
           nextLine += info.size() * 14;
         } 
         nextLine += 8;
       } 
       if (!StackUtil.isEmpty(leftItem)) {
         renderItem.func_175042_a(leftItem, 5, nextLine - 9);
-        this.mc.field_71466_p.func_78276_b(leftItem.func_82833_r(), 30, nextLine - 5, 16777215);
+        this.mc.field_71466_p.drawString(leftItem.func_82833_r(), 30, nextLine - 5, 16777215);
         List<String> info = new LinkedList<>();
         if (leftItem.getItem() instanceof IItemHudInfo) {
           info.addAll(((IItemHudInfo)leftItem.getItem()).getHudInfo(leftItem, (hudMode == HudMode.ADVANCED)));
           if (info.size() > 0)
             for (int l = 0; l < info.size(); l++)
-              this.mc.field_71466_p.func_78276_b(info.get(l), 8, nextLine + (l + 1) * 14, 16777215);  
+              this.mc.field_71466_p.drawString(info.get(l), 8, nextLine + (l + 1) * 14, 16777215);  
         } else {
           info.addAll(leftItem.func_82840_a((EntityPlayer)this.mc.player, () -> (hudMode == HudMode.ADVANCED)));
           if (info.size() > 1)
             for (int l = 1; l < info.size(); l++)
-              this.mc.field_71466_p.func_78276_b(info.get(l), 8, nextLine + l * 14, 16777215);  
+              this.mc.field_71466_p.drawString(info.get(l), 8, nextLine + l * 14, 16777215);  
         } 
       } 
     } 
@@ -134,7 +134,7 @@ public class GuiOverlayer extends Gui {
       return ((IItemHudProvider.IItemHudBarProvider)item).getBarPercent(stack); 
     if (item instanceof ic2.api.item.IElectricItem)
       return mapCharge(stack); 
-    if (item.func_77645_m())
+    if (item.isDamageable())
       return (int)Util.map(1.0D - item.getDurabilityForDisplay(stack), 1.0D, 100.0D); 
     return -1;
   }

@@ -122,14 +122,14 @@ public class ItemFluidPipe extends ItemIC2 implements IMultiItem<PipeType>, IBox
   public static ItemStack getPipe(PipeType type, PipeSize size) {
     ItemStack ret = new ItemStack(ItemName.pipe.getInstance(), 1, type.getId());
     NBTTagCompound nbt = StackUtil.getOrCreateNbtData(ret);
-    nbt.func_74774_a("type", (byte)type.ordinal());
-    nbt.func_74774_a("size", (byte)size.ordinal());
+    nbt.setByte("type", (byte)type.ordinal());
+    nbt.setByte("size", (byte)size.ordinal());
     return ret;
   }
   
   public static PipeType getPipeType(ItemStack stack) {
     NBTTagCompound nbt = StackUtil.getOrCreateNbtData(stack);
-    int type = nbt.func_74771_c("type") & 0xFF;
+    int type = nbt.getByte("type") & 0xFF;
     if (type < PipeType.values.length)
       return PipeType.values[type]; 
     return PipeType.bronze;
@@ -137,7 +137,7 @@ public class ItemFluidPipe extends ItemIC2 implements IMultiItem<PipeType>, IBox
   
   private static PipeSize getSize(ItemStack stack) {
     NBTTagCompound nbt = StackUtil.getOrCreateNbtData(stack);
-    int size = nbt.func_74771_c("size") & 0xFF;
+    int size = nbt.getByte("size") & 0xFF;
     if (size < PipeSize.values.length)
       return PipeSize.values[size]; 
     return PipeSize.small;
@@ -161,7 +161,7 @@ public class ItemFluidPipe extends ItemIC2 implements IMultiItem<PipeType>, IBox
     IBlockState oldState = world.getBlockState(pos);
     Block oldBlock = oldState.getBlock();
     if (!oldBlock.func_176200_f((IBlockAccess)world, pos))
-      pos = pos.func_177972_a(side); 
+      pos = pos.offset(side); 
     Block newBlock = BlockName.te.getInstance();
     if (StackUtil.isEmpty(itemStack) || !player.func_175151_a(pos, side, itemStack) || !world.func_190527_a(newBlock, pos, false, side, (Entity)player) || !((BlockTileEntity)newBlock).canReplace(world, pos, side, BlockName.te.getItemStack((Enum)TeBlock.fluid_pipe)))
       return EnumActionResult.PASS; 

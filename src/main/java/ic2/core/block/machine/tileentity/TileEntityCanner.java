@@ -138,12 +138,12 @@ public class TileEntityCanner extends TileEntityStandardMachine<Object, Object, 
   
   public void readFromNBT(NBTTagCompound nbt) {
     super.readFromNBT(nbt);
-    setMode(Mode.values[nbt.func_74762_e("mode")]);
+    setMode(Mode.values[nbt.getInteger("mode")]);
   }
   
   public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
     super.writeToNBT(nbt);
-    nbt.func_74768_a("mode", this.mode.ordinal());
+    nbt.setInteger("mode", this.mode.ordinal());
     return nbt;
   }
   

@@ -95,9 +95,9 @@ public class Ic2BlockPos extends BlockPos {
   public Ic2BlockPos move(EnumFacing facing, int count) {
     if (count == 0)
       return this; 
-    if (facing.func_176740_k() == EnumFacing.Axis.X) {
+    if (facing.getAxis() == EnumFacing.Axis.X) {
       this.x += facing.func_176743_c().func_179524_a() * count;
-    } else if (facing.func_176740_k() == EnumFacing.Axis.Y) {
+    } else if (facing.getAxis() == EnumFacing.Axis.Y) {
       this.y += facing.func_176743_c().func_179524_a() * count;
     } else {
       this.z += facing.func_176743_c().func_179524_a() * count;
@@ -173,7 +173,7 @@ public class Ic2BlockPos extends BlockPos {
   }
   
   public TileEntity getTe(IBlockAccess world) {
-    return world.func_175625_s(this);
+    return world.getTileEntity(this);
   }
   
   public Iterable<Ic2BlockPos> visitNeighbors() {

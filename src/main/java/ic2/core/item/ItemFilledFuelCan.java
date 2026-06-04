@@ -20,6 +20,6 @@ public class ItemFilledFuelCan extends ItemIC2 {
   }
   
   public int getItemBurnTime(ItemStack stack) {
-    return StackUtil.getOrCreateNbtData(stack).func_74762_e("value") * 2;
+    return StackUtil.getOrCreateNbtData(stack).getInteger("value") * 2;
   }
 }

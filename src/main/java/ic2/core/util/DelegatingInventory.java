@@ -52,8 +52,8 @@ public class DelegatingInventory implements IInventory {
     return this.parent.func_70297_j_();
   }
   
-  public void func_70296_d() {
-    this.parent.func_70296_d();
+  public void markDirty() {
+    this.parent.markDirty();
   }
   
   public boolean func_70300_a(EntityPlayer player) {

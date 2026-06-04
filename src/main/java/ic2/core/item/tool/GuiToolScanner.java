@@ -18,12 +18,12 @@ public class GuiToolScanner extends GuiIC2<ContainerToolScanner> {
   
   protected void drawForegroundLayer(int mouseX, int mouseY) {
     super.drawForegroundLayer(mouseX, mouseY);
-    this.field_146289_q.func_78276_b(Localization.translate("ic2.itemScanner.found"), 10, 20, 2157374);
+    this.fontRenderer.drawString(Localization.translate("ic2.itemScanner.found"), 10, 20, 2157374);
     if (((ContainerToolScanner)this.container).scanResults != null) {
       int count = 0;
       for (Tuple.T2<ItemStack, Integer> result : ((ContainerToolScanner)this.container).scanResults) {
         String name = ((ItemStack)result.a).getItem().func_77653_i((ItemStack)result.a);
-        this.field_146289_q.func_78276_b(result.b + "x " + name, 10, 34 + count * 11, 5752026);
+        this.fontRenderer.drawString(result.b + "x " + name, 10, 34 + count * 11, 5752026);
         count++;
         if (count == 10)
           break; 

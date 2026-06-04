@@ -93,19 +93,19 @@ public class TileEntityClassicMassFabricator extends TileEntityElectricMachine i
   
   public void readFromNBT(NBTTagCompound nbt) {
     super.readFromNBT(nbt);
-    this.scrap = nbt.func_74762_e("scrap");
+    this.scrap = nbt.getInteger("scrap");
     this.lastEnergy = nbt.getDouble("lastEnergy");
   }
   
   public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
     super.writeToNBT(nbt);
-    nbt.func_74768_a("scrap", this.scrap);
+    nbt.setInteger("scrap", this.scrap);
     nbt.setDouble("lastEnergy", this.lastEnergy);
     return nbt;
   }
   
   protected void onUnloaded() {
-    if (this.field_145850_b.isRemote && (this.audioSource != null || this.audioSourceScrap != null)) {
+    if (this.world.isRemote && (this.audioSource != null || this.audioSourceScrap != null)) {
       IC2.audioManager.removeSources(this);
       this.audioSource = null;
       this.audioSourceScrap = null;
@@ -142,7 +142,7 @@ public class TileEntityClassicMassFabricator extends TileEntityElectricMachine i
         needsInvUpdate = attemptGeneration(); 
       this.lastEnergy = this.energy.getEnergy();
       if (needsInvUpdate)
-        func_70296_d(); 
+        markDirty(); 
     } 
   }
   

@@ -59,19 +59,19 @@ class Cultivation extends TerraformerBase {
   }
   
   private static boolean growPlantsOn(World world, BlockPos pos) {
-    BlockPos above = pos.func_177984_a();
+    BlockPos above = pos.up();
     IBlockState state = world.getBlockState(above);
     Block block = state.getBlock();
-    if (block.isAir(state, (IBlockAccess)world, above) || (block == Blocks.field_150329_H && world.field_73012_v.nextInt(4) == 0)) {
-      IBlockState plant = pickRandomPlant(world.field_73012_v);
+    if (block.isAir(state, (IBlockAccess)world, above) || (block == Blocks.field_150329_H && world.rand.nextInt(4) == 0)) {
+      IBlockState plant = pickRandomPlant(world.rand);
       if (plant.func_177228_b().containsKey(BlockDirectional.field_176387_N))
-        plant = plant.func_177226_a((IProperty)BlockDirectional.field_176387_N, (Comparable)EnumFacing.field_176754_o[world.field_73012_v.nextInt(EnumFacing.field_176754_o.length)]); 
+        plant = plant.func_177226_a((IProperty)BlockDirectional.field_176387_N, (Comparable)EnumFacing.field_176754_o[world.rand.nextInt(EnumFacing.field_176754_o.length)]); 
       if (plant.getBlock() instanceof net.minecraft.block.BlockCrops) {
         world.func_175656_a(pos, Blocks.FARMLAND.getDefaultState());
       } else if (plant.getBlock() == Blocks.field_150398_cm) {
         plant = plant.func_177226_a((IProperty)BlockDoublePlant.field_176492_b, (Comparable)BlockDoublePlant.EnumBlockHalf.LOWER);
         world.func_175656_a(above, plant.func_177226_a((IProperty)BlockDoublePlant.field_176492_b, (Comparable)BlockDoublePlant.EnumBlockHalf.LOWER));
-        world.func_175656_a(above.func_177984_a(), plant.func_177226_a((IProperty)BlockDoublePlant.field_176492_b, (Comparable)BlockDoublePlant.EnumBlockHalf.UPPER));
+        world.func_175656_a(above.up(), plant.func_177226_a((IProperty)BlockDoublePlant.field_176492_b, (Comparable)BlockDoublePlant.EnumBlockHalf.UPPER));
         return true;
       } 
       world.func_175656_a(above, plant);

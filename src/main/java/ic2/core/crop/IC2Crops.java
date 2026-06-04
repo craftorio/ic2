@@ -386,7 +386,7 @@ public class IC2Crops extends Crops {
       return null; 
     NBTTagCompound nbt = stack.func_77978_p();
     if (nbt.func_74764_b("owner") && nbt.func_74764_b("id"))
-      return getCropCard(nbt.func_74779_i("owner"), nbt.func_74779_i("id")); 
+      return getCropCard(nbt.getString("owner"), nbt.getString("id")); 
     return null;
   }
   
@@ -459,7 +459,7 @@ public class IC2Crops extends Crops {
     if (crop != weed && disabledCrops.contains(owner + ":" + id))
       return false; 
     for (ItemStack key : this.baseSeeds.keySet()) {
-      if (key.getItem() == stack.getItem() && key.func_77952_i() == stack.func_77952_i())
+      if (key.getItem() == stack.getItem() && key.getItemDamage() == stack.getItemDamage())
         return false; 
     } 
     this.baseSeeds.put(stack, new BaseSeed(crop, size, growth, gain, resistance));
@@ -476,7 +476,7 @@ public class IC2Crops extends Crops {
       return null; 
     return this.baseSeeds.keySet()
       .stream()
-      .filter(key -> (key.getItem() == stack.getItem() && (key.func_77952_i() == 32767 || key.func_77952_i() == stack.func_77952_i())))
+      .filter(key -> (key.getItem() == stack.getItem() && (key.getItemDamage() == 32767 || key.getItemDamage() == stack.getItemDamage())))
       
       .findFirst()
       .map(this.baseSeeds::get)

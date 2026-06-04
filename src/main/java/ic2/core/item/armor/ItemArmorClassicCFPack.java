@@ -12,8 +12,8 @@ public class ItemArmorClassicCFPack extends ItemArmorUtility {
   }
   
   public boolean getCFPellet(EntityPlayer player, ItemStack pack) {
-    if (pack.func_77952_i() > 0) {
-      pack.func_77964_b(pack.func_77952_i() - 1);
+    if (pack.getItemDamage() > 0) {
+      pack.func_77964_b(pack.getItemDamage() - 1);
       return true;
     } 
     return false;

@@ -23,7 +23,7 @@ public class PlasmaLauncher extends ItemElectricTool {
     if (!IC2.platform.isSimulating())
       return new ActionResult(EnumActionResult.PASS, StackUtil.get(player, hand)); 
     EntityParticle particle = new EntityParticle(world, (EntityLivingBase)player, 8.0F, 1.0D, 2.0D);
-    world.func_72838_d(particle);
+    world.spawnEntity(particle);
     return super.func_77659_a(world, player, hand);
   }
 }

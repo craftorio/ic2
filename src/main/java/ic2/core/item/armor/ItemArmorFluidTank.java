@@ -78,7 +78,7 @@ public abstract class ItemArmorFluidTank extends ItemArmorUtility implements IIt
   }
   
   protected void Updatedamage(ItemStack stack) {
-    stack.func_77964_b(stack.func_77958_k() - 1 - (int)Util.map(getCharge(stack), getMaxCharge(stack), (stack.func_77958_k() - 2)));
+    stack.func_77964_b(stack.getMaxDamage() - 1 - (int)Util.map(getCharge(stack), getMaxCharge(stack), (stack.getMaxDamage() - 2)));
   }
   
   public boolean isEmpty(ItemStack stack) {

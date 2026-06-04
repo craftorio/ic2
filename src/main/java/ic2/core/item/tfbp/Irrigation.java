@@ -14,7 +14,7 @@ import net.minecraft.world.World;
 
 class Irrigation extends TerraformerBase {
   boolean terraform(World world, BlockPos pos) {
-    if (world.field_73012_v.nextInt(48000) == 0) {
+    if (world.rand.nextInt(48000) == 0) {
       world.func_72912_H().func_76084_b(true);
       return true;
     } 
@@ -28,14 +28,14 @@ class Irrigation extends TerraformerBase {
     IBlockState state = world.getBlockState(pos);
     Block block = state.getBlock();
     if (block instanceof IGrowable && ((IGrowable)block).func_176473_a(world, pos, state, false)) {
-      ((IGrowable)block).func_176474_b(world, world.field_73012_v, pos, state);
+      ((IGrowable)block).func_176474_b(world, world.rand, pos, state);
       return true;
     } 
     if (block == Blocks.field_150329_H)
       return (spreadGrass(world, pos.func_177978_c()) || spreadGrass(world, pos.func_177974_f()) || 
         spreadGrass(world, pos.func_177968_d()) || spreadGrass(world, pos.func_177976_e())); 
     if (block == Blocks.field_150364_r || block == Blocks.field_150363_s) {
-      BlockPos above = pos.func_177984_a();
+      BlockPos above = pos.up();
       world.func_175656_a(above, state);
       IBlockState leaves = getLeaves(world, pos);
       if (leaves != null)
@@ -51,7 +51,7 @@ class Irrigation extends TerraformerBase {
   
   private static IBlockState getLeaves(World world, BlockPos pos) {
     for (EnumFacing facing : EnumFacing.field_176754_o) {
-      BlockPos cPos = pos.func_177972_a(facing);
+      BlockPos cPos = pos.offset(facing);
       IBlockState state = world.getBlockState(cPos);
       if (state.getBlock().isLeaves(state, (IBlockAccess)world, cPos))
         return state; 
@@ -60,18 +60,18 @@ class Irrigation extends TerraformerBase {
   }
   
   private static void createLeaves(World world, BlockPos pos, IBlockState state) {
-    BlockPos above = pos.func_177984_a();
-    if (world.func_175623_d(above))
+    BlockPos above = pos.up();
+    if (world.isAirBlock(above))
       world.func_175656_a(above, state); 
     for (EnumFacing facing : EnumFacing.field_176754_o) {
-      BlockPos cPos = pos.func_177972_a(facing);
-      if (world.func_175623_d(cPos))
+      BlockPos cPos = pos.offset(facing);
+      if (world.isAirBlock(cPos))
         world.func_175656_a(cPos, state); 
     } 
   }
   
   private static boolean spreadGrass(World world, BlockPos pos) {
-    if (world.field_73012_v.nextBoolean())
+    if (world.rand.nextBoolean())
       return false; 
     pos = TileEntityTerra.getFirstBlockFrom(world, pos, 0);
     if (pos == null)
@@ -82,7 +82,7 @@ class Irrigation extends TerraformerBase {
       return true;
     } 
     if (block == Blocks.field_150349_c) {
-      world.func_175656_a(pos.func_177984_a(), Blocks.field_150329_H.getDefaultState().func_177226_a((IProperty)BlockTallGrass.field_176497_a, (Comparable)BlockTallGrass.EnumType.GRASS));
+      world.func_175656_a(pos.up(), Blocks.field_150329_H.getDefaultState().func_177226_a((IProperty)BlockTallGrass.field_176497_a, (Comparable)BlockTallGrass.EnumType.GRASS));
       return true;
     } 
     return false;

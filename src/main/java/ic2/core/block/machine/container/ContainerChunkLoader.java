@@ -12,9 +12,9 @@ import net.minecraft.inventory.Slot;
 public class ContainerChunkLoader extends ContainerFullInv<TileEntityChunkloader> {
   public ContainerChunkLoader(EntityPlayer player, TileEntityChunkloader base1) {
     super(player, (IInventory)base1, 250);
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)base1.dischargeSlot, 0, 8, 143));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)base1.dischargeSlot, 0, 8, 143));
     for (int i = 0; i < base1.upgradeSlot.size(); i++)
-      func_75146_a((Slot)new SlotInvSlot((InvSlot)base1.upgradeSlot, i, 8, 44 + 18 * i)); 
+      addSlotToContainer((Slot)new SlotInvSlot((InvSlot)base1.upgradeSlot, i, 8, 44 + 18 * i)); 
   }
   
   public List<String> getNetworkedFields() {

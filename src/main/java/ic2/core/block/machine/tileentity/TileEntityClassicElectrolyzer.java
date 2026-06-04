@@ -87,7 +87,7 @@ public class TileEntityClassicElectrolyzer extends TileEntityInventory implement
     } 
     setActive(turnActive);
     if (needsInvUpdate)
-      func_70296_d(); 
+      markDirty(); 
   }
   
   protected void updateEntityClient() {
@@ -109,12 +109,12 @@ public class TileEntityClassicElectrolyzer extends TileEntityInventory implement
   
   public boolean canDrain() {
     return (this.waterSlot.consume(1, true, false) != null && (this.hydrogenSlot
-      .isEmpty() || StackUtil.getSize(this.hydrogenSlot.get()) < Math.min(this.hydrogenSlot.getStackSizeLimit(), this.hydrogenSlot.get().func_77976_d())));
+      .isEmpty() || StackUtil.getSize(this.hydrogenSlot.get()) < Math.min(this.hydrogenSlot.getStackSizeLimit(), this.hydrogenSlot.get().getMaxStackSize())));
   }
   
   public boolean canPower() {
     return (this.hydrogenSlot.consume(1, true, false) != null && (this.waterSlot
-      .isEmpty() || StackUtil.getSize(this.waterSlot.get()) < Math.min(this.waterSlot.getStackSizeLimit(), this.waterSlot.get().func_77976_d())));
+      .isEmpty() || StackUtil.getSize(this.waterSlot.get()) < Math.min(this.waterSlot.getStackSizeLimit(), this.waterSlot.get().getMaxStackSize())));
   }
   
   public boolean drain() {
@@ -167,8 +167,8 @@ public class TileEntityClassicElectrolyzer extends TileEntityInventory implement
   
   public TileEntityElectricBlock lookForMFE() {
     World world = getWorld();
-    for (EnumFacing dir : EnumFacing.field_82609_l) {
-      TileEntity te = world.func_175625_s(this.field_174879_c.func_177972_a(dir));
+    for (EnumFacing dir : EnumFacing.VALUES) {
+      TileEntity te = world.getTileEntity(this.pos.offset(dir));
       if (te instanceof TileEntityElectricBlock)
         return (TileEntityElectricBlock)te; 
     } 

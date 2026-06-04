@@ -12,10 +12,10 @@ public class ContainerCropHarvester extends ContainerElectricMachine<TileEntityC
     super(player, base, 166, 16, 53);
     for (int y = 0; y < base.contentSlot.size() / 5; y++) {
       for (int x = 0; x < 5; x++)
-        func_75146_a((Slot)new SlotInvSlot(base.contentSlot, x + y * 5, 48 + x * 18, 17 + y * 18)); 
+        addSlotToContainer((Slot)new SlotInvSlot(base.contentSlot, x + y * 5, 48 + x * 18, 17 + y * 18)); 
     } 
     for (int i = 0; i < 4; i++)
-      func_75146_a((Slot)new SlotInvSlot((InvSlot)base.upgradeSlot, i, 152, 8 + i * 18)); 
+      addSlotToContainer((Slot)new SlotInvSlot((InvSlot)base.upgradeSlot, i, 152, 8 + i * 18)); 
   }
   
   public List<String> getNetworkedFields() {

@@ -68,16 +68,16 @@ public class ItemToolWrench extends ItemIC2 implements IBoxable {
       EnumFacing currentFacing = wrenchable.getFacing(world, pos);
       EnumFacing newFacing = currentFacing;
       if (IC2.keyboard.isAltKeyDown(player)) {
-        EnumFacing.Axis axis = side.func_176740_k();
+        EnumFacing.Axis axis = side.getAxis();
         if ((side.func_176743_c() == EnumFacing.AxisDirection.POSITIVE && !player.func_70093_af()) || (side
           .func_176743_c() == EnumFacing.AxisDirection.NEGATIVE && player.func_70093_af())) {
-          newFacing = newFacing.func_176732_a(axis);
+          newFacing = newFacing.rotateAround(axis);
         } else {
           for (int i = 0; i < 3; i++)
-            newFacing = newFacing.func_176732_a(axis); 
+            newFacing = newFacing.rotateAround(axis); 
         } 
       } else if (player.func_70093_af()) {
-        newFacing = side.func_176734_d();
+        newFacing = side.getOpposite();
       } else {
         newFacing = side;
       } 
@@ -86,7 +86,7 @@ public class ItemToolWrench extends ItemIC2 implements IBoxable {
       if (remove && wrenchable.wrenchCanRemove(world, pos, player)) {
         if (!world.isRemote) {
           int experience;
-          TileEntity te = world.func_175625_s(pos);
+          TileEntity te = world.getTileEntity(pos);
           if (ConfigUtil.getBool(MainConfig.get(), "protection/wrenchLogging")) {
             String playerName = player.func_146103_bH().getName() + "/" + player.func_146103_bH().getId();
             IC2.log.info(LogCategory.PlayerActivity, "Player %s used a wrench to remove the block %s (te %s) at %s.", new Object[] { playerName, state, 

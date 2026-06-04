@@ -27,7 +27,7 @@ public class ModelComparator {
     Byte cacheResult;
     assert stateA != stateB;
     byte renderMask = 0;
-    for (EnumFacing facing : EnumFacing.field_82609_l) {
+    for (EnumFacing facing : EnumFacing.VALUES) {
       boolean renderA = stateA.func_185894_c((IBlockAccess)world, pos, facing);
       boolean renderB = stateB.func_185894_c((IBlockAccess)world, pos, facing);
       if (renderA != renderB)

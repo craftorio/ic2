@@ -41,18 +41,18 @@ public class WorldData {
     if (world == null)
       throw new IllegalArgumentException("world is null"); 
     ConcurrentMap<Integer, WorldData> index = getIndex(!world.isRemote);
-    WorldData ret = index.get(Integer.valueOf(world.field_73011_w.getDimension()));
+    WorldData ret = index.get(Integer.valueOf(world.provider.getDimension()));
     if (ret != null || !load)
       return ret; 
     ret = new WorldData(world);
-    WorldData prev = index.putIfAbsent(Integer.valueOf(world.field_73011_w.getDimension()), ret);
+    WorldData prev = index.putIfAbsent(Integer.valueOf(world.provider.getDimension()), ret);
     if (prev != null)
       ret = prev; 
     return ret;
   }
   
   public static void onWorldUnload(World world) {
-    getIndex(!world.isRemote).remove(Integer.valueOf(world.field_73011_w.getDimension()));
+    getIndex(!world.isRemote).remove(Integer.valueOf(world.provider.getDimension()));
   }
   
   private static ConcurrentMap<Integer, WorldData> getIndex(boolean simulating) {

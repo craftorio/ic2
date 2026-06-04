@@ -11,7 +11,7 @@ public class ContainerElectrolyzer extends ContainerElectricMachine<TileEntityEl
   public ContainerElectrolyzer(EntityPlayer player, TileEntityElectrolyzer tileEntity) {
     super(player, tileEntity, 166, 8, 62);
     for (int i = 0; i < 4; i++)
-      func_75146_a((Slot)new SlotInvSlot((InvSlot)tileEntity.upgradeSlot, i, 152, 8 + i * 18)); 
+      addSlotToContainer((Slot)new SlotInvSlot((InvSlot)tileEntity.upgradeSlot, i, 152, 8 + i * 18)); 
   }
   
   public List<String> getNetworkedFields() {

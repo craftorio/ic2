@@ -13,10 +13,10 @@ public class ContainerClassicCropmatron extends ContainerFullInv<TileEntityClass
     super(player, (IInventory)base, 166);
     int i;
     for (i = 0; i < base.fertilizerSlot.size(); i++)
-      func_75146_a((Slot)new SlotInvSlot((InvSlot)base.fertilizerSlot, i, 62, 20 + i * 18)); 
+      addSlotToContainer((Slot)new SlotInvSlot((InvSlot)base.fertilizerSlot, i, 62, 20 + i * 18)); 
     for (i = 0; i < base.hydrationSlot.size(); i++)
-      func_75146_a((Slot)new SlotInvSlot((InvSlot)base.hydrationSlot, i, 98, 20 + i * 18)); 
+      addSlotToContainer((Slot)new SlotInvSlot((InvSlot)base.hydrationSlot, i, 98, 20 + i * 18)); 
     for (i = 0; i < base.weedExSlot.size(); i++)
-      func_75146_a((Slot)new SlotInvSlot((InvSlot)base.weedExSlot, i, 134, 20 + i * 18)); 
+      addSlotToContainer((Slot)new SlotInvSlot((InvSlot)base.weedExSlot, i, 134, 20 + i * 18)); 
   }
 }

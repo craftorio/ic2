@@ -10,8 +10,8 @@ import net.minecraft.inventory.Slot;
 public class ContainerFluidBottler extends ContainerStandardMachine<TileEntityFluidBottler> {
   public ContainerFluidBottler(EntityPlayer player, TileEntityFluidBottler tileEntity1) {
     super(player, tileEntity1, 184, 8, 53, 0, 0, 117, 53, 152, 26);
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)tileEntity1.drainInputSlot, 0, 44, 35));
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)tileEntity1.fillInputSlot, 0, 44, 72));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)tileEntity1.drainInputSlot, 0, 44, 35));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)tileEntity1.fillInputSlot, 0, 44, 72));
   }
   
   public List<String> getNetworkedFields() {

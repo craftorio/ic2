@@ -12,13 +12,13 @@ import net.minecraft.inventory.Slot;
 public class ContainerFermenter extends ContainerFullInv<TileEntityFermenter> {
   public ContainerFermenter(EntityPlayer player, TileEntityFermenter te) {
     super(player, (IInventory)te, 184);
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)te.fluidInputCellInSlot, 0, 14, 46));
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)te.fluidInputCellOutSlot, 0, 14, 64));
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)te.fluidOutputCellInSlot, 0, 148, 43));
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)te.fluidOutputCellOutSlot, 0, 148, 61));
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)te.fertiliserSlot, 0, 86, 83));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)te.fluidInputCellInSlot, 0, 14, 46));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)te.fluidInputCellOutSlot, 0, 14, 64));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)te.fluidOutputCellInSlot, 0, 148, 43));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)te.fluidOutputCellOutSlot, 0, 148, 61));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)te.fertiliserSlot, 0, 86, 83));
     for (int i = 0; i < 2; i++)
-      func_75146_a((Slot)new SlotInvSlot((InvSlot)te.upgradeSlot, i, 125 + i * 18, 83)); 
+      addSlotToContainer((Slot)new SlotInvSlot((InvSlot)te.upgradeSlot, i, 125 + i * 18, 83)); 
   }
   
   public List<String> getNetworkedFields() {

@@ -48,7 +48,7 @@ public class UpgradeKit extends ItemMulti<UpdateKitType> {
   
   private static boolean upgradeToMfsu(World world, BlockPos pos) {
     TileEntityChargepadMFSU tileEntityChargepadMFSU;
-    TileEntity te = world.func_175625_s(pos);
+    TileEntity te = world.getTileEntity(pos);
     if (!(te instanceof ic2.core.block.TileEntityBlock))
       return false; 
     TileEntityElectricBlock replacement = null;
@@ -63,7 +63,7 @@ public class UpgradeKit extends ItemMulti<UpdateKitType> {
       tileEntityChargepadMFSU.readFromNBT(nbt);
       world.func_175690_a(pos, (TileEntity)tileEntityChargepadMFSU);
       tileEntityChargepadMFSU.onUpgraded();
-      tileEntityChargepadMFSU.func_70296_d();
+      tileEntityChargepadMFSU.markDirty();
       return true;
     } 
     return false;

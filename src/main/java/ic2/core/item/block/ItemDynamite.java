@@ -43,7 +43,7 @@ public class ItemDynamite extends ItemIC2 implements IBoxable {
   public EnumActionResult func_180614_a(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float a, float b, float c) {
     if (this.sticky)
       return EnumActionResult.PASS; 
-    pos = pos.func_177972_a(side);
+    pos = pos.offset(side);
     IBlockState state = world.getBlockState(pos);
     Block dynamite = BlockName.dynamite.getInstance();
     if (state.getBlock().isAir(state, (IBlockAccess)world, pos) && dynamite.func_176198_a(world, pos, side) && dynamite.func_176196_c(world, pos)) {
@@ -61,9 +61,9 @@ public class ItemDynamite extends ItemIC2 implements IBoxable {
     world.func_184133_a(player, player.func_180425_c(), SoundEvents.field_187737_v, SoundCategory.PLAYERS, 0.5F, 0.4F / (field_77697_d.nextFloat() * 0.4F + 0.8F));
     if (IC2.platform.isSimulating())
       if (this.sticky) {
-        world.func_72838_d((Entity)new EntityStickyDynamite(world, (EntityLivingBase)player));
+        world.spawnEntity((Entity)new EntityStickyDynamite(world, (EntityLivingBase)player));
       } else {
-        world.func_72838_d((Entity)new EntityDynamite(world, (EntityLivingBase)player));
+        world.spawnEntity((Entity)new EntityDynamite(world, (EntityLivingBase)player));
       }  
     return new ActionResult(EnumActionResult.SUCCESS, stack);
   }

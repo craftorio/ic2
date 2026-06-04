@@ -52,16 +52,16 @@ public class TileEntityIronFurnace extends TileEntityInventory implements IHasGu
   
   public void readFromNBT(NBTTagCompound nbt) {
     super.readFromNBT(nbt);
-    this.fuel = nbt.func_74762_e("fuel");
-    this.totalFuel = nbt.func_74762_e("totalFuel");
-    this.progress = nbt.func_74765_d("progress");
+    this.fuel = nbt.getInteger("fuel");
+    this.totalFuel = nbt.getInteger("totalFuel");
+    this.progress = nbt.getShort("progress");
     this.xp = nbt.getDouble("xp");
   }
   
   public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
     super.writeToNBT(nbt);
-    nbt.func_74768_a("fuel", this.fuel);
-    nbt.func_74768_a("totalFuel", this.totalFuel);
+    nbt.setInteger("fuel", this.fuel);
+    nbt.setInteger("totalFuel", this.totalFuel);
     nbt.func_74777_a("progress", this.progress);
     nbt.setDouble("xp", this.xp);
     return nbt;
@@ -92,7 +92,7 @@ public class TileEntityIronFurnace extends TileEntityInventory implements IHasGu
       setActive(false);
     } 
     if (needsInvUpdate)
-      func_70296_d(); 
+      markDirty(); 
   }
   
   @SideOnly(Side.CLIENT)
@@ -100,25 +100,25 @@ public class TileEntityIronFurnace extends TileEntityInventory implements IHasGu
     super.updateEntityClient();
     if (getActive()) {
       World world = getWorld();
-      showFlames(world, this.field_174879_c, getFacing());
-      if (world.field_73012_v.nextDouble() < 0.1D)
-        world.func_184134_a(this.field_174879_c.getX() + 0.5D, this.field_174879_c.getY(), this.field_174879_c.getZ() + 0.5D, SoundEvents.field_187652_bv, SoundCategory.BLOCKS, 1.0F, 1.0F, false); 
+      showFlames(world, this.pos, getFacing());
+      if (world.rand.nextDouble() < 0.1D)
+        world.func_184134_a(this.pos.getX() + 0.5D, this.pos.getY(), this.pos.getZ() + 0.5D, SoundEvents.field_187652_bv, SoundCategory.BLOCKS, 1.0F, 1.0F, false); 
     } 
   }
   
   public static void showFlames(World world, BlockPos pos, EnumFacing facing) {
-    if (world.field_73012_v.nextInt(8) != 0)
+    if (world.rand.nextInt(8) != 0)
       return; 
     double width = 0.625D;
     double height = 0.375D;
     double depthOffset = 0.02D;
     double x = pos.getX() + (facing.getFrontOffsetX() * 1.04D + 1.0D) / 2.0D;
-    double y = pos.getY() + world.field_73012_v.nextFloat() * 0.375D;
+    double y = pos.getY() + world.rand.nextFloat() * 0.375D;
     double z = pos.getZ() + (facing.getFrontOffsetZ() * 1.04D + 1.0D) / 2.0D;
-    if (facing.func_176740_k() == EnumFacing.Axis.X) {
-      z += world.field_73012_v.nextFloat() * 0.625D - 0.3125D;
+    if (facing.getAxis() == EnumFacing.Axis.X) {
+      z += world.rand.nextFloat() * 0.625D - 0.3125D;
     } else {
-      x += world.field_73012_v.nextFloat() * 0.625D - 0.3125D;
+      x += world.rand.nextFloat() * 0.625D - 0.3125D;
     } 
     world.func_175688_a(EnumParticleTypes.SMOKE_NORMAL, x, y, z, 0.0D, 0.0D, 0.0D, new int[0]);
     world.func_175688_a(EnumParticleTypes.FLAME, x, y, z, 0.0D, 0.0D, 0.0D, new int[0]);
@@ -135,7 +135,7 @@ public class TileEntityIronFurnace extends TileEntityInventory implements IHasGu
         amount = 2477;
       } 
       balls -= amount;
-      world.func_72838_d((Entity)new EntityXPOrb(world, player.posX, player.posY + 0.5D, player.posZ + 0.5D, amount));
+      world.spawnEntity((Entity)new EntityXPOrb(world, player.posX, player.posY + 0.5D, player.posZ + 0.5D, amount));
     } 
     return xp - Math.floor(xp);
   }

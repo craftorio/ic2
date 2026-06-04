@@ -93,7 +93,7 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
     this.block = TeBlockRegistry.get(this.teBlock.getIdentifier());
   }
   
-  public final BlockTileEntity func_145838_q() {
+  public final BlockTileEntity getBlockType() {
     return this.block;
   }
   
@@ -130,7 +130,7 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
   public final void func_145829_t() {
     super.func_145829_t();
     World world = getWorld();
-    if (world == null || this.field_174879_c == null)
+    if (world == null || this.pos == null)
       throw new IllegalStateException("no world/pos"); 
     if (this.loadState != 0 && this.loadState != 3)
       throw new IllegalStateException("invalid load state: " + this.loadState); 
@@ -138,13 +138,13 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
     IC2.tickHandler.requestSingleWorldTick(world, new IWorldTickCallback() {
           public void onTick(World world) {
             IBlockState state;
-            if (world == TileEntityBlock.this.getWorld() && TileEntityBlock.this.field_174879_c != null && !TileEntityBlock.this.func_145837_r() && TileEntityBlock.this.loadState == 1 && world.func_175667_e(TileEntityBlock.this.field_174879_c) && (state = world.getBlockState(TileEntityBlock.this.field_174879_c)).getBlock() == TileEntityBlock.this.block && world.func_175625_s(TileEntityBlock.this.field_174879_c) == TileEntityBlock.this) {
+            if (world == TileEntityBlock.this.getWorld() && TileEntityBlock.this.pos != null && !TileEntityBlock.this.isInvalid() && TileEntityBlock.this.loadState == 1 && world.func_175667_e(TileEntityBlock.this.pos) && (state = world.getBlockState(TileEntityBlock.this.pos)).getBlock() == TileEntityBlock.this.block && world.getTileEntity(TileEntityBlock.this.pos) == TileEntityBlock.this) {
               Material expectedMaterial = TileEntityBlock.this.teBlock.getMaterial();
               if (((MaterialProperty.WrappedMaterial)state.func_177229_b((IProperty)TileEntityBlock.this.block.materialProperty)).getMaterial() != expectedMaterial) {
                 if (TileEntityBlock.debugLoad)
                   IC2.log.debug(LogCategory.Block, "Adjusting material for %s at %s.", new Object[] { this.this$0, Util.formatPosition(this.this$0) }); 
-                world.func_180501_a(TileEntityBlock.this.field_174879_c, state.func_177226_a((IProperty)TileEntityBlock.this.block.materialProperty, (Comparable)MaterialProperty.WrappedMaterial.get(expectedMaterial)), 0);
-                assert world.func_175625_s(TileEntityBlock.this.field_174879_c) == TileEntityBlock.this;
+                world.func_180501_a(TileEntityBlock.this.pos, state.func_177226_a((IProperty)TileEntityBlock.this.block.materialProperty, (Comparable)MaterialProperty.WrappedMaterial.get(expectedMaterial)), 0);
+                assert world.getTileEntity(TileEntityBlock.this.pos) == TileEntityBlock.this;
               } 
               if (TileEntityBlock.debugLoad)
                 IC2.log.debug(LogCategory.Block, "TE onLoaded for %s at %s.", new Object[] { this.this$0, Util.formatPosition(this.this$0) }); 
@@ -188,8 +188,8 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
   public void readFromNBT(NBTTagCompound nbt) {
     super.readFromNBT(nbt);
     if (!getSupportedFacings().isEmpty()) {
-      byte facingValue = nbt.func_74771_c("facing");
-      if (facingValue >= 0 && facingValue < EnumFacing.field_82609_l.length && getSupportedFacings().contains(EnumFacing.field_82609_l[facingValue])) {
+      byte facingValue = nbt.getByte("facing");
+      if (facingValue >= 0 && facingValue < EnumFacing.VALUES.length && getSupportedFacings().contains(EnumFacing.VALUES[facingValue])) {
         this.facing = facingValue;
       } else if (!getSupportedFacings().isEmpty()) {
         this.facing = (byte)((EnumFacing)getSupportedFacings().iterator().next()).ordinal();
@@ -198,7 +198,7 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
       } 
     } 
     this.active = nbt.func_74767_n("active");
-    if (this.components != null && nbt.func_150297_b("components", 10)) {
+    if (this.components != null && nbt.hasKey("components", 10)) {
       NBTTagCompound componentsNbt = nbt.getCompoundTag("components");
       for (String name : componentsNbt.func_150296_c()) {
         Class<? extends TileEntityComponent> cls = Components.getClass(name);
@@ -216,7 +216,7 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
   public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
     super.writeToNBT(nbt);
     if (!getSupportedFacings().isEmpty())
-      nbt.func_74774_a("facing", this.facing); 
+      nbt.setByte("facing", this.facing); 
     nbt.func_74757_a("active", this.active);
     if (this.components != null) {
       NBTTagCompound componentsNbt = null;
@@ -272,7 +272,7 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
   }
   
   private boolean isOldVersion() {
-    assert func_145830_o() && !(getWorld()).isRemote;
+    assert hasWorld() && !(getWorld()).isRemote;
     return (this.teBlock.getTeClass() != getClass());
   }
   
@@ -305,7 +305,7 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
   }
   
   protected RayTraceResult collisionRayTrace(Vec3d start, Vec3d end) {
-    Vec3d startNormalized = start.func_178786_a(this.field_174879_c.getX(), this.field_174879_c.getY(), this.field_174879_c.getZ());
+    Vec3d startNormalized = start.func_178786_a(this.pos.getX(), this.pos.getY(), this.pos.getZ());
     double lengthSq = Util.square(end.field_72450_a - start.field_72450_a) + Util.square(end.field_72448_b - start.field_72448_b) + Util.square(end.field_72449_c - start.field_72449_c);
     double lengthInv = 1.0D / Math.sqrt(lengthSq);
     Vec3d direction = new Vec3d((end.field_72450_a - start.field_72450_a) * lengthInv, (end.field_72448_b - start.field_72448_b) * lengthInv, (end.field_72449_c - start.field_72449_c) * lengthInv);
@@ -327,7 +327,7 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
     } 
     if (minIntersection == null)
       return null; 
-    return new RayTraceResult(minIntersection.addVector(this.field_174879_c.getX(), this.field_174879_c.getY(), this.field_174879_c.getZ()), minIntersectionSide, this.field_174879_c);
+    return new RayTraceResult(minIntersection.addVector(this.pos.getX(), this.pos.getY(), this.pos.getZ()), minIntersectionSide, this.pos);
   }
   
   public AxisAlignedBB getVisualBoundingBox() {
@@ -343,11 +343,11 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
   }
   
   protected void addCollisionBoxesToList(AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity) {
-    AxisAlignedBB maskNormalized = mask.func_72317_d(-this.field_174879_c.getX(), -this.field_174879_c.getY(), -this.field_174879_c.getZ());
+    AxisAlignedBB maskNormalized = mask.func_72317_d(-this.pos.getX(), -this.pos.getY(), -this.pos.getZ());
     for (AxisAlignedBB aabb : getAabbs(true)) {
       if (!aabb.func_72326_a(maskNormalized))
         continue; 
-      list.add(aabb.func_186670_a(this.field_174879_c));
+      list.add(aabb.func_186670_a(this.pos));
     } 
   }
   
@@ -403,7 +403,7 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
           break;
       }  
     World world = getWorld();
-    return !world.getBlockState(otherPos).doesSideBlockRendering((IBlockAccess)world, otherPos, side.func_176734_d());
+    return !world.getBlockState(otherPos).doesSideBlockRendering((IBlockAccess)world, otherPos, side.getOpposite());
   }
   
   protected boolean doesSideBlockRendering(EnumFacing side) {
@@ -558,7 +558,7 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
   }
   
   public EnumFacing getFacing() {
-    return EnumFacing.field_82609_l[this.facing];
+    return EnumFacing.VALUES[this.facing];
   }
   
   protected boolean canSetFacingWrench(EnumFacing facing, EntityPlayer player) {
@@ -602,12 +602,12 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
     if (supportedFacings.isEmpty())
       return EnumFacing.DOWN; 
     if (placer == null)
-      return (facing != null && supportedFacings.contains(facing.func_176734_d())) ? facing.func_176734_d() : getSupportedFacings().iterator().next(); 
+      return (facing != null && supportedFacings.contains(facing.getOpposite())) ? facing.getOpposite() : getSupportedFacings().iterator().next(); 
     Vec3d dir = placer.func_70040_Z();
     EnumFacing bestFacing = null;
     double maxMatch = Double.NEGATIVE_INFINITY;
     for (EnumFacing cFacing : supportedFacings) {
-      double match = dir.func_72430_b(new Vec3d(cFacing.func_176734_d().func_176730_m()));
+      double match = dir.func_72430_b(new Vec3d(cFacing.getOpposite().func_176730_m()));
       if (match > maxMatch) {
         maxMatch = match;
         bestFacing = cFacing;
@@ -744,7 +744,7 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
   
   protected final void rerender() {
     IBlockState state = getBlockState();
-    getWorld().func_184138_a(this.field_174879_c, state, state, 2);
+    getWorld().func_184138_a(this.pos, state, state, 2);
   }
   
   protected boolean clientNeedsExtraModelInfo() {

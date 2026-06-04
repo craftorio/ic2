@@ -43,37 +43,37 @@ public class GuiScanner extends GuiIC2<ContainerScanner> {
   
   protected void drawForegroundLayer(int mouseX, int mouseY) {
     super.drawForegroundLayer(mouseX, mouseY);
-    this.field_146289_q.func_78276_b(this.info[5] + ":", 105, 6, 4210752);
+    this.fontRenderer.drawString(this.info[5] + ":", 105, 6, 4210752);
     TileEntityScanner te = (TileEntityScanner)((ContainerScanner)this.container).base;
     switch (te.getState()) {
       case IDLE:
-        this.field_146289_q.func_78276_b(Localization.translate("ic2.Scanner.gui.idle"), 10, 69, 15461152);
+        this.fontRenderer.drawString(Localization.translate("ic2.Scanner.gui.idle"), 10, 69, 15461152);
         break;
       case NO_STORAGE:
-        this.field_146289_q.func_78276_b(this.info[2], 10, 69, 15461152);
+        this.fontRenderer.drawString(this.info[2], 10, 69, 15461152);
         break;
       case SCANNING:
-        this.field_146289_q.func_78276_b(this.info[1], 10, 69, 2157374);
-        this.field_146289_q.func_78276_b(te.getPercentageDone() + "%", 125, 69, 2157374);
+        this.fontRenderer.drawString(this.info[1], 10, 69, 2157374);
+        this.fontRenderer.drawString(te.getPercentageDone() + "%", 125, 69, 2157374);
         break;
       case NO_ENERGY:
-        this.field_146289_q.func_78276_b(this.info[3], 10, 69, 14094352);
+        this.fontRenderer.drawString(this.info[3], 10, 69, 14094352);
         break;
       case ALREADY_RECORDED:
-        this.field_146289_q.func_78276_b(this.info[8], 10, 69, 14094352);
+        this.fontRenderer.drawString(this.info[8], 10, 69, 14094352);
         break;
       case FAILED:
-        this.field_146289_q.func_78276_b(this.info[4], 10, 69, 2157374);
-        this.field_146289_q.func_78276_b(this.info[6], 110, 30, 14094352);
+        this.fontRenderer.drawString(this.info[4], 10, 69, 2157374);
+        this.fontRenderer.drawString(this.info[6], 110, 30, 14094352);
         break;
       case COMPLETED:
       case TRANSFER_ERROR:
         if (te.getState() == TileEntityScanner.State.COMPLETED)
-          this.field_146289_q.func_78276_b(this.info[4], 10, 69, 2157374); 
+          this.fontRenderer.drawString(this.info[4], 10, 69, 2157374); 
         if (te.getState() == TileEntityScanner.State.TRANSFER_ERROR)
-          this.field_146289_q.func_78276_b(this.info[7], 10, 69, 14094352); 
-        this.field_146289_q.func_78276_b(Util.toSiString(te.patternUu, 4) + "B UUM", 105, 25, 16777215);
-        this.field_146289_q.func_78276_b(Util.toSiString(te.patternEu, 4) + "EU", 105, 36, 16777215);
+          this.fontRenderer.drawString(this.info[7], 10, 69, 14094352); 
+        this.fontRenderer.drawString(Util.toSiString(te.patternUu, 4) + "B UUM", 105, 25, 16777215);
+        this.fontRenderer.drawString(Util.toSiString(te.patternEu, 4) + "EU", 105, 36, 16777215);
         break;
     } 
   }

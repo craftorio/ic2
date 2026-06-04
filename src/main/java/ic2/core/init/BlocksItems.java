@@ -196,24 +196,24 @@ public class BlocksItems {
   
   private static void initFluids() {
     MaterialLiquid materialLiquid = new MaterialLiquid(MapColor.field_151680_x);
-    registerIC2fluid(FluidName.uu_matter, Material.field_151586_h, 3867955, 3000, 3000, 0, 300, false);
-    registerIC2fluid(FluidName.construction_foam, Material.field_151586_h, 2105376, 10000, 50000, 0, 300, false);
-    registerIC2fluid(FluidName.coolant, Material.field_151586_h, 1333866, 1000, 3000, 0, 300, false);
-    registerIC2fluid(FluidName.creosote, Material.field_151586_h, 4012298, 10000, 50000, 0, 300, false);
-    registerIC2fluid(FluidName.hot_coolant, Material.field_151586_h, 11872308, 1000, 3000, 0, 1200, false);
-    registerIC2fluid(FluidName.pahoehoe_lava, Material.field_151586_h, 8090732, 50000, 250000, 10, 1200, false);
-    registerIC2fluid(FluidName.biomass, Material.field_151586_h, 3632933, 1000, 3000, 0, 300, false);
-    registerIC2fluid(FluidName.biogas, Material.field_151586_h, 10983500, 1000, 3000, 0, 300, true);
-    registerIC2fluid(FluidName.distilled_water, Material.field_151586_h, 4413173, 1000, 1000, 0, 300, false);
+    registerIC2fluid(FluidName.uu_matter, Material.WATER, 3867955, 3000, 3000, 0, 300, false);
+    registerIC2fluid(FluidName.construction_foam, Material.WATER, 2105376, 10000, 50000, 0, 300, false);
+    registerIC2fluid(FluidName.coolant, Material.WATER, 1333866, 1000, 3000, 0, 300, false);
+    registerIC2fluid(FluidName.creosote, Material.WATER, 4012298, 10000, 50000, 0, 300, false);
+    registerIC2fluid(FluidName.hot_coolant, Material.WATER, 11872308, 1000, 3000, 0, 1200, false);
+    registerIC2fluid(FluidName.pahoehoe_lava, Material.WATER, 8090732, 50000, 250000, 10, 1200, false);
+    registerIC2fluid(FluidName.biomass, Material.WATER, 3632933, 1000, 3000, 0, 300, false);
+    registerIC2fluid(FluidName.biogas, Material.WATER, 10983500, 1000, 3000, 0, 300, true);
+    registerIC2fluid(FluidName.distilled_water, Material.WATER, 4413173, 1000, 1000, 0, 300, false);
     registerIC2fluid(FluidName.superheated_steam, (Material)materialLiquid, 13291985, -3000, 100, 0, 600, true);
     registerIC2fluid(FluidName.steam, (Material)materialLiquid, 12369084, -800, 300, 0, 420, true);
-    registerIC2fluid(FluidName.hot_water, Material.field_151586_h, 4644607, 1000, 1000, 0, 350, false);
-    registerIC2fluid(FluidName.weed_ex, Material.field_151586_h, 478996, 1000, 1000, 0, 300, false);
+    registerIC2fluid(FluidName.hot_water, Material.WATER, 4644607, 1000, 1000, 0, 350, false);
+    registerIC2fluid(FluidName.weed_ex, Material.WATER, 478996, 1000, 1000, 0, 300, false);
     registerIC2fluid(FluidName.air, (Material)materialLiquid, 14474460, 0, 500, 0, 300, true);
     registerIC2fluid(FluidName.hydrogen, (Material)materialLiquid, 14474460, 0, 500, 0, 300, true);
     registerIC2fluid(FluidName.oxygen, (Material)materialLiquid, 14474460, 0, 500, 0, 300, true);
-    registerIC2fluid(FluidName.heavy_water, Material.field_151586_h, 4413173, 1000, 1000, 0, 300, false);
-    registerIC2fluid(FluidName.milk, Material.field_151586_h, 16579836, 1050, 1000, 0, 300, false);
+    registerIC2fluid(FluidName.heavy_water, Material.WATER, 4413173, 1000, 1000, 0, 300, false);
+    registerIC2fluid(FluidName.milk, Material.WATER, 16579836, 1050, 1000, 0, 300, false);
   }
   
   private static void initItems() {
@@ -263,7 +263,7 @@ public class BlocksItems {
     miscResource.setRarity((Enum)MiscResourceType.iridium_ore, EnumRarity.RARE);
     miscResource.setRarity((Enum)MiscResourceType.iridium_shard, EnumRarity.UNCOMMON);
     miscResource.setUseHandler((Enum)MiscResourceType.resin, ItemHandlers.resinUse);
-    miscResource.setUseHandler((Enum)MiscResourceType.water_sheet, ItemHandlers.getFluidPlacer((Block)Blocks.field_150355_j));
+    miscResource.setUseHandler((Enum)MiscResourceType.water_sheet, ItemHandlers.getFluidPlacer((Block)Blocks.WATER));
     miscResource.setUseHandler((Enum)MiscResourceType.lava_sheet, ItemHandlers.getFluidPlacer((Block)Blocks.field_150353_l));
     ItemMulti<CraftingItemType> crafting = ItemMulti.create(ItemName.crafting, CraftingItemType.class);
     crafting.setRarity((Enum)CraftingItemType.advanced_circuit, EnumRarity.UNCOMMON);

@@ -35,11 +35,11 @@ public class TileEntityMacerator extends TileEntityStandardMachine<IRecipeInput,
   protected void updateEntityClient() {
     super.updateEntityClient();
     World world = getWorld();
-    if (getActive() && world.field_73012_v.nextInt(8) == 0)
+    if (getActive() && world.rand.nextInt(8) == 0)
       for (int i = 0; i < 4; i++) {
-        double x = this.field_174879_c.getX() + 0.5D + world.field_73012_v.nextFloat() * 0.6D - 0.3D;
-        double y = (this.field_174879_c.getY() + 1) + world.field_73012_v.nextFloat() * 0.2D - 0.1D;
-        double z = this.field_174879_c.getZ() + 0.5D + world.field_73012_v.nextFloat() * 0.6D - 0.3D;
+        double x = this.pos.getX() + 0.5D + world.rand.nextFloat() * 0.6D - 0.3D;
+        double y = (this.pos.getY() + 1) + world.rand.nextFloat() * 0.2D - 0.1D;
+        double z = this.pos.getZ() + 0.5D + world.rand.nextFloat() * 0.6D - 0.3D;
         world.func_175688_a(EnumParticleTypes.SMOKE_NORMAL, x, y, z, 0.0D, 0.0D, 0.0D, new int[0]);
       }  
   }

@@ -60,10 +60,10 @@ public class TileEntityItemPipe extends TileEntityPipe implements IItemTransport
     boolean needsInventoryUpdate = false;
     if (!StackUtil.isEmpty(this.contents)) {
       EnumFacing facing = getFacing();
-      TileEntity target = this.field_145850_b.func_175625_s(this.field_174879_c.func_177972_a(facing));
+      TileEntity target = this.world.getTileEntity(this.pos.offset(facing));
       if (target instanceof IItemTransportTile && (
-        (IItemTransportTile)target).putItems(this.contents, facing.func_176734_d(), true) > 0) {
-        int amount = ((IItemTransportTile)target).putItems(this.contents, facing.func_176734_d(), false);
+        (IItemTransportTile)target).putItems(this.contents, facing.getOpposite(), true) > 0) {
+        int amount = ((IItemTransportTile)target).putItems(this.contents, facing.getOpposite(), false);
         ItemStack newStack = StackUtil.copyShrunk(this.contents, amount);
         assert newStack.func_190926_b();
         this.contents = null;
@@ -71,16 +71,16 @@ public class TileEntityItemPipe extends TileEntityPipe implements IItemTransport
       } 
     } 
     if (needsInventoryUpdate)
-      func_70296_d(); 
+      markDirty(); 
   }
   
   public void readFromNBT(NBTTagCompound nbt) {
     super.readFromNBT(nbt);
-    this.type = PipeType.values[nbt.func_74771_c("type") & 0xFF];
-    this.size = PipeSize.values()[nbt.func_74771_c("size") & 0xFF];
-    NBTTagList contentsTag = nbt.func_150295_c("contents", 10);
-    for (int i = 0; i < contentsTag.func_74745_c(); i++) {
-      NBTTagCompound contentTag = contentsTag.func_150305_b(i);
+    this.type = PipeType.values[nbt.getByte("type") & 0xFF];
+    this.size = PipeSize.values()[nbt.getByte("size") & 0xFF];
+    NBTTagList contentsTag = nbt.getTagList("contents", 10);
+    for (int i = 0; i < contentsTag.tagCount(); i++) {
+      NBTTagCompound contentTag = contentsTag.getCompoundTagAt(i);
       ItemStack stack = new ItemStack(contentTag);
       if (!StackUtil.isEmpty(stack))
         this.contents = stack; 
@@ -89,13 +89,13 @@ public class TileEntityItemPipe extends TileEntityPipe implements IItemTransport
   
   public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
     super.writeToNBT(nbt);
-    nbt.func_74774_a("type", (byte)this.type.ordinal());
-    nbt.func_74774_a("size", (byte)this.size.ordinal());
+    nbt.setByte("type", (byte)this.type.ordinal());
+    nbt.setByte("size", (byte)this.size.ordinal());
     NBTTagList contentsTag = new NBTTagList();
     if (!StackUtil.isEmpty(this.contents)) {
       NBTTagCompound contentTag = new NBTTagCompound();
-      this.contents.func_77955_b(contentTag);
-      contentsTag.func_74742_a((NBTBase)contentTag);
+      this.contents.writeToNBT(contentTag);
+      contentsTag.appendTag((NBTBase)contentTag);
       nbt.setTag("contents", (NBTBase)contentsTag);
     } 
     return nbt;
@@ -119,7 +119,7 @@ public class TileEntityItemPipe extends TileEntityPipe implements IItemTransport
     float sp = (1.0F - th) / 2.0F;
     List<AxisAlignedBB> ret = new ArrayList<>(7);
     ret.add(new AxisAlignedBB(sp, sp, sp, (sp + th), (sp + th), (sp + th)));
-    for (EnumFacing facing : EnumFacing.field_82609_l) {
+    for (EnumFacing facing : EnumFacing.VALUES) {
       boolean hasConnection = ((this.connectivity & 1 << facing.ordinal()) != 0);
       if (hasConnection) {
         float zS = sp, yS = zS, xS = yS;

@@ -49,7 +49,7 @@ public class ItemFluidCell extends ItemIC2FluidContainer {
         return EnumActionResult.FAIL; 
       if (LiquidUtil.drainBlockToContainer(world, pos, player, hand) || 
         LiquidUtil.fillBlockFromContainer(world, pos, player, hand) || 
-        LiquidUtil.fillBlockFromContainer(world, pos.func_177972_a(side), player, hand)) {
+        LiquidUtil.fillBlockFromContainer(world, pos.offset(side), player, hand)) {
         player.field_71069_bz.func_75142_b();
         return EnumActionResult.SUCCESS;
       } 

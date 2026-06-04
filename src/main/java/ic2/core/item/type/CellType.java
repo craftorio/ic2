@@ -71,9 +71,9 @@ public enum CellType implements IIdProvider {
   public int getUsage(ItemStack stack) {
     switch (this) {
       case weed_ex:
-        return stack.func_77942_o() ? stack.func_77978_p().func_74762_e("weedEX") : 0;
+        return stack.func_77942_o() ? stack.func_77978_p().getInteger("weedEX") : 0;
       case hydration:
-        return stack.func_77942_o() ? stack.func_77978_p().func_74762_e("hydration") : 0;
+        return stack.func_77942_o() ? stack.func_77978_p().getInteger("hydration") : 0;
     } 
     return 0;
   }
@@ -186,18 +186,18 @@ public enum CellType implements IIdProvider {
         return null; 
       if (doDrain) {
         NBTTagCompound nbt = StackUtil.getOrCreateNbtData(this.container);
-        int amount = nbt.func_74762_e("weedEX") + 1;
+        int amount = nbt.getInteger("weedEX") + 1;
         if (amount >= 64) {
           this.container = StackUtil.decSize(this.container);
         } else {
-          nbt.func_74768_a("weedEX", amount);
+          nbt.setInteger("weedEX", amount);
         } 
       } 
       return new FluidStack(FluidName.weed_ex.getInstance(), 50);
     }
     
     public IFluidTankProperties[] getTankProperties() {
-      return new IFluidTankProperties[] { (IFluidTankProperties)new FluidTankProperties(new FluidStack(FluidName.weed_ex.getInstance(), (64 - this.container.func_77952_i()) * 50), 3200, false, true) };
+      return new IFluidTankProperties[] { (IFluidTankProperties)new FluidTankProperties(new FluidStack(FluidName.weed_ex.getInstance(), (64 - this.container.getItemDamage()) * 50), 3200, false, true) };
     }
   }
   
@@ -232,7 +232,7 @@ public enum CellType implements IIdProvider {
     public FluidStack drain(int maxDrain, boolean doDrain) {
       int remaining;
       if (this.container.func_77942_o()) {
-        remaining = 10000 - this.container.func_77978_p().func_74762_e("hydration");
+        remaining = 10000 - this.container.func_77978_p().getInteger("hydration");
       } else {
         remaining = 10000;
       } 
@@ -241,18 +241,18 @@ public enum CellType implements IIdProvider {
         target = 180; 
       if (doDrain) {
         NBTTagCompound nbt = StackUtil.getOrCreateNbtData(this.container);
-        int amount = nbt.func_74762_e("hydration") + target;
+        int amount = nbt.getInteger("hydration") + target;
         if (amount >= 10000) {
           this.container = StackUtil.decSize(this.container);
         } else {
-          nbt.func_74768_a("hydration", amount);
+          nbt.setInteger("hydration", amount);
         } 
       } 
       return new FluidStack(FluidRegistry.WATER, target);
     }
     
     public IFluidTankProperties[] getTankProperties() {
-      return new IFluidTankProperties[] { (IFluidTankProperties)new FluidTankProperties(new FluidStack(FluidRegistry.WATER, (10000 - this.container.func_77952_i()) / 200), 50, false, true) };
+      return new IFluidTankProperties[] { (IFluidTankProperties)new FluidTankProperties(new FluidStack(FluidRegistry.WATER, (10000 - this.container.getItemDamage()) / 200), 50, false, true) };
     }
   }
 }

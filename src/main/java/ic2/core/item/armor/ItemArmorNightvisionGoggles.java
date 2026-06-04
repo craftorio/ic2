@@ -55,7 +55,7 @@ public class ItemArmorNightvisionGoggles extends ItemArmorUtility implements IEl
   public void onArmorTick(World world, EntityPlayer player, ItemStack stack) {
     NBTTagCompound nbtData = StackUtil.getOrCreateNbtData(stack);
     boolean active = nbtData.func_74767_n("active");
-    byte toggleTimer = nbtData.func_74771_c("toggleTimer");
+    byte toggleTimer = nbtData.getByte("toggleTimer");
     if (IC2.keyboard.isAltKeyDown(player) && IC2.keyboard.isModeSwitchKeyDown(player) && toggleTimer == 0) {
       toggleTimer = 10;
       active = !active;
@@ -70,7 +70,7 @@ public class ItemArmorNightvisionGoggles extends ItemArmorUtility implements IEl
     } 
     if (IC2.platform.isSimulating() && toggleTimer > 0) {
       toggleTimer = (byte)(toggleTimer - 1);
-      nbtData.func_74774_a("toggleTimer", toggleTimer);
+      nbtData.setByte("toggleTimer", toggleTimer);
     } 
     boolean ret = false;
     if (active && IC2.platform.isSimulating() && 

@@ -46,7 +46,7 @@ public class ItemWindmeter extends ItemElectricTool {
     ItemStack stack = StackUtil.get(player, hand);
     if (!ElectricItem.manager.canUse(stack, this.operationEnergyCost))
       return EnumActionResult.PASS; 
-    TileEntity te = world.func_175625_s(pos);
+    TileEntity te = world.getTileEntity(pos);
     if (te instanceof TileEntityWindKineticGenerator) {
       TileEntityWindKineticGenerator windyTE = (TileEntityWindKineticGenerator)te;
       if (!windyTE.getActive()) {

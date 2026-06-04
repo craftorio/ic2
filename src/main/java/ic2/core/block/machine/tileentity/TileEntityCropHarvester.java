@@ -49,7 +49,7 @@ public class TileEntityCropHarvester extends TileEntityElectricMachine implement
   protected void updateEntityServer() {
     super.updateEntityServer();
     this.upgradeSlot.tick();
-    if (this.field_145850_b.func_82737_E() % 10L == 0L && this.energy.getEnergy() >= 21.0D)
+    if (this.world.getTotalWorldTime() % 10L == 0L && this.energy.getEnergy() >= 21.0D)
       scan(); 
   }
   
@@ -67,7 +67,7 @@ public class TileEntityCropHarvester extends TileEntityElectricMachine implement
     } 
     this.energy.useEnergy(1.0D);
     World world = getWorld();
-    TileEntity tileEntity = world.func_175625_s(this.field_174879_c.func_177982_a(this.scanX, this.scanY, this.scanZ));
+    TileEntity tileEntity = world.getTileEntity(this.pos.add(this.scanX, this.scanY, this.scanZ));
     if (tileEntity instanceof TileEntityCrop && !isInvFull()) {
       TileEntityCrop crop = (TileEntityCrop)tileEntity;
       if (crop.getCrop() != null) {
@@ -80,7 +80,7 @@ public class TileEntityCropHarvester extends TileEntityElectricMachine implement
         if (drops != null)
           drops.forEach(drop -> {
                 if (StackUtil.putInInventory((TileEntity)this, EnumFacing.WEST, drop, true) == 0) {
-                  StackUtil.dropAsEntity(world, this.field_174879_c, drop);
+                  StackUtil.dropAsEntity(world, this.pos, drop);
                 } else {
                   StackUtil.putInInventory((TileEntity)this, EnumFacing.WEST, drop, false);
                 } 
@@ -93,7 +93,7 @@ public class TileEntityCropHarvester extends TileEntityElectricMachine implement
   private boolean isInvFull() {
     for (int i = 0; i < this.contentSlot.size(); i++) {
       ItemStack stack = this.contentSlot.get(i);
-      if (StackUtil.isEmpty(stack) || StackUtil.getSize(stack) < Math.min(stack.func_77976_d(), this.contentSlot.getStackSizeLimit()))
+      if (StackUtil.isEmpty(stack) || StackUtil.getSize(stack) < Math.min(stack.getMaxStackSize(), this.contentSlot.getStackSizeLimit()))
         return false; 
     } 
     return true;

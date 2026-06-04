@@ -47,7 +47,7 @@ public class ItemCropSeed extends ItemIC2 implements ICropSeed {
     return Localization.translate((crop == null) ? "ic2.crop.seeds" : crop.getSeedType(), new Object[] { super.func_77653_i(stack) });
   }
   
-  public boolean func_77645_m() {
+  public boolean isDamageable() {
     return true;
   }
   
@@ -70,7 +70,7 @@ public class ItemCropSeed extends ItemIC2 implements ICropSeed {
   }
   
   public EnumActionResult func_180614_a(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float a, float b, float c) {
-    TileEntity te = world.func_175625_s(pos);
+    TileEntity te = world.getTileEntity(pos);
     if (te instanceof TileEntityCrop) {
       TileEntityCrop crop = (TileEntityCrop)te;
       ItemStack stack = StackUtil.get(player, hand);
@@ -93,12 +93,12 @@ public class ItemCropSeed extends ItemIC2 implements ICropSeed {
   public static ItemStack generateItemStackFromValues(CropCard crop, int statGrowth, int statGain, int statResistance, int scan) {
     ItemStack stack = ItemName.crop_seed_bag.getItemStack();
     NBTTagCompound tag = new NBTTagCompound();
-    tag.func_74778_a("owner", crop.getOwner());
-    tag.func_74778_a("id", crop.getId());
-    tag.func_74774_a("growth", (byte)statGrowth);
-    tag.func_74774_a("gain", (byte)statGain);
-    tag.func_74774_a("resistance", (byte)statResistance);
-    tag.func_74774_a("scan", (byte)scan);
+    tag.setString("owner", crop.getOwner());
+    tag.setString("id", crop.getId());
+    tag.setByte("growth", (byte)statGrowth);
+    tag.setByte("gain", (byte)statGain);
+    tag.setByte("resistance", (byte)statResistance);
+    tag.setByte("scan", (byte)scan);
     stack.func_77982_d(tag);
     return stack;
   }
@@ -106,72 +106,72 @@ public class ItemCropSeed extends ItemIC2 implements ICropSeed {
   public CropCard getCropFromStack(ItemStack is) {
     NBTTagCompound nbt = is.func_77978_p();
     if (nbt == null || 
-      !nbt.func_150297_b("owner", 8) || 
-      !nbt.func_150297_b("id", 8))
+      !nbt.hasKey("owner", 8) || 
+      !nbt.hasKey("id", 8))
       return null; 
-    String owner = nbt.func_74779_i("owner");
-    String id = nbt.func_74779_i("id");
+    String owner = nbt.getString("owner");
+    String id = nbt.getString("id");
     return Crops.instance.getCropCard(owner, id);
   }
   
   public void setCropFromStack(ItemStack is, CropCard crop) {
     if (is.func_77978_p() == null)
       return; 
-    is.func_77978_p().func_74778_a("owner", crop.getOwner());
-    is.func_77978_p().func_74778_a("id", crop.getId());
+    is.func_77978_p().setString("owner", crop.getOwner());
+    is.func_77978_p().setString("id", crop.getId());
   }
   
   public int getGrowthFromStack(ItemStack is) {
     if (is.func_77978_p() == null)
       return -1; 
-    return is.func_77978_p().func_74771_c("growth");
+    return is.func_77978_p().getByte("growth");
   }
   
   public void setGrowthFromStack(ItemStack is, int value) {
     if (is.func_77978_p() == null)
       return; 
-    is.func_77978_p().func_74774_a("growth", (byte)value);
+    is.func_77978_p().setByte("growth", (byte)value);
   }
   
   public int getGainFromStack(ItemStack is) {
     if (is.func_77978_p() == null)
       return -1; 
-    return is.func_77978_p().func_74771_c("gain");
+    return is.func_77978_p().getByte("gain");
   }
   
   public void setGainFromStack(ItemStack is, int value) {
     if (is.func_77978_p() == null)
       return; 
-    is.func_77978_p().func_74774_a("gain", (byte)value);
+    is.func_77978_p().setByte("gain", (byte)value);
   }
   
   public int getResistanceFromStack(ItemStack is) {
     if (is.func_77978_p() == null)
       return -1; 
-    return is.func_77978_p().func_74771_c("resistance");
+    return is.func_77978_p().getByte("resistance");
   }
   
   public void setResistanceFromStack(ItemStack is, int value) {
     if (is.func_77978_p() == null)
       return; 
-    is.func_77978_p().func_74774_a("resistance", (byte)value);
+    is.func_77978_p().setByte("resistance", (byte)value);
   }
   
   public int getScannedFromStack(ItemStack is) {
     if (is.func_77978_p() == null)
       return -1; 
-    return is.func_77978_p().func_74771_c("scan");
+    return is.func_77978_p().getByte("scan");
   }
   
   public void setScannedFromStack(ItemStack is, int value) {
     if (is.func_77978_p() == null)
       return; 
-    is.func_77978_p().func_74774_a("scan", (byte)value);
+    is.func_77978_p().setByte("scan", (byte)value);
   }
   
   public void incrementScannedFromStack(ItemStack is) {
     if (is.func_77978_p() == null)
       return; 
-    is.func_77978_p().func_74774_a("scan", (byte)(getScannedFromStack(is) + 1));
+    is.func_77978_p().setByte("scan", (byte)(getScannedFromStack(is) + 1));
   }
 }

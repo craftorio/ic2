@@ -50,16 +50,16 @@ public class ItemToolWrenchNew extends ItemToolIC2 implements IEnhancedOverlayPr
     Block block = state.getBlock();
     if (block.isAir(state, (IBlockAccess)world, pos))
       return EnumActionResult.FAIL; 
-    if (world.func_175625_s(pos) instanceof IPipe) {
-      IPipe target = (IPipe)world.func_175625_s(pos);
+    if (world.getTileEntity(pos) instanceof IPipe) {
+      IPipe target = (IPipe)world.getTileEntity(pos);
       EnumFacing newFacing = RotationUtil.rotateByHit(side, hitX, hitY, hitZ);
       assert target != null;
       target.flipConnection(newFacing);
-      if (world.func_175625_s(pos.func_177972_a(newFacing)) instanceof IPipe) {
-        IPipe other = (IPipe)world.func_175625_s(pos.func_177972_a(newFacing));
+      if (world.getTileEntity(pos.offset(newFacing)) instanceof IPipe) {
+        IPipe other = (IPipe)world.getTileEntity(pos.offset(newFacing));
         assert other != null;
-        if (target.isConnected(newFacing) != other.isConnected(newFacing.func_176734_d()))
-          other.flipConnection(newFacing.func_176734_d()); 
+        if (target.isConnected(newFacing) != other.isConnected(newFacing.getOpposite()))
+          other.flipConnection(newFacing.getOpposite()); 
       } 
       if (world.isRemote)
         IC2.audioManager.playOnce(player, PositionSpec.Hand, "Tools/wrench.ogg", true, IC2.audioManager
@@ -99,9 +99,9 @@ public class ItemToolWrenchNew extends ItemToolIC2 implements IEnhancedOverlayPr
   public boolean providesEnhancedOverlay(World world, BlockPos pos, EnumFacing side, EntityPlayer player, ItemStack stack) {
     Block block = world.getBlockState(pos).getBlock();
     if (block instanceof IWrenchable) {
-      TileEntity tileEntity = world.func_175625_s(pos);
+      TileEntity tileEntity = world.getTileEntity(pos);
       return (tileEntity instanceof IPipe || 
-        Arrays.<EnumFacing>stream(EnumFacing.field_82609_l).anyMatch(face -> ((IWrenchable)block).canSetFacing(world, pos, face, player)));
+        Arrays.<EnumFacing>stream(EnumFacing.VALUES).anyMatch(face -> ((IWrenchable)block).canSetFacing(world, pos, face, player)));
     } 
     return false;
   }

@@ -13,7 +13,7 @@ public class RecipeOutputItemStack extends RecipeOutputIngredient<ItemStack> {
   }
   
   public RecipeOutputIngredient<ItemStack> copy() {
-    return of(this.ingredient.func_77946_l());
+    return of(this.ingredient.copy());
   }
   
   public boolean isEmpty() {

@@ -27,7 +27,7 @@ public class HandHeldCropnalyzer extends HandHeldInventory implements IWorldTick
   
   public String func_70005_c_() {
     if (func_145818_k_())
-      return this.containerStack.func_77978_p().func_74779_i("display"); 
+      return this.containerStack.func_77978_p().getString("display"); 
     return "Cropnalyzer";
   }
   

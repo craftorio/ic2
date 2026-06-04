@@ -134,7 +134,7 @@ public class TileEntityReplicator extends TileEntityElectricMachine implements I
     setActive(newActive);
     needsInvUpdate |= this.upgradeSlot.tickNoMark();
     if (needsInvUpdate)
-      func_70296_d(); 
+      markDirty(); 
   }
   
   private boolean consumeUu(double amount) {
@@ -187,8 +187,8 @@ public class TileEntityReplicator extends TileEntityElectricMachine implements I
   
   public IPatternStorage getPatternStorage() {
     World world = getWorld();
-    for (EnumFacing dir : EnumFacing.field_82609_l) {
-      TileEntity target = world.func_175625_s(this.field_174879_c.func_177972_a(dir));
+    for (EnumFacing dir : EnumFacing.VALUES) {
+      TileEntity target = world.getTileEntity(this.pos.offset(dir));
       if (target instanceof IPatternStorage)
         return (IPatternStorage)target; 
     } 
@@ -225,8 +225,8 @@ public class TileEntityReplicator extends TileEntityElectricMachine implements I
     } 
   }
   
-  public void func_70296_d() {
-    super.func_70296_d();
+  public void markDirty() {
+    super.markDirty();
     if (IC2.platform.isSimulating())
       setOverclockRates(); 
   }
@@ -239,8 +239,8 @@ public class TileEntityReplicator extends TileEntityElectricMachine implements I
     super.readFromNBT(nbt);
     this.extraUuStored = nbt.getDouble("extraUuStored");
     this.uuProcessed = nbt.getDouble("uuProcessed");
-    this.index = nbt.func_74762_e("index");
-    int modeIdx = nbt.func_74762_e("mode");
+    this.index = nbt.getInteger("index");
+    int modeIdx = nbt.getInteger("mode");
     this.mode = (modeIdx < (Mode.values()).length) ? Mode.values()[modeIdx] : Mode.STOPPED;
     NBTTagCompound contentTag = nbt.getCompoundTag("pattern");
     this.pattern = new ItemStack(contentTag);
@@ -250,11 +250,11 @@ public class TileEntityReplicator extends TileEntityElectricMachine implements I
     super.writeToNBT(nbt);
     nbt.setDouble("extraUuStored", this.extraUuStored);
     nbt.setDouble("uuProcessed", this.uuProcessed);
-    nbt.func_74768_a("index", this.index);
-    nbt.func_74768_a("mode", this.mode.ordinal());
+    nbt.setInteger("index", this.index);
+    nbt.setInteger("mode", this.mode.ordinal());
     if (this.pattern != null) {
       NBTTagCompound contentTag = new NBTTagCompound();
-      this.pattern.func_77955_b(contentTag);
+      this.pattern.writeToNBT(contentTag);
       nbt.setTag("pattern", (NBTBase)contentTag);
     } 
     return nbt;

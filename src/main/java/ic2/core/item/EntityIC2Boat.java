@@ -233,7 +233,7 @@ public abstract class EntityIC2Boat extends EntityBoat {
             break;
           } 
           for (int z = minZ; z < maxZ; z++) {
-            blockPosPool.func_181079_c(x, y, z);
+            blockPosPool.setPos(x, y, z);
             IBlockState block = world.getBlockState((BlockPos)blockPosPool);
             if (isWater(block))
               waterHeight = Math.max(waterHeight, getBlockLiquidHeight(block, (IBlockAccess)world, (BlockPos)blockPosPool)); 
@@ -282,7 +282,7 @@ public abstract class EntityIC2Boat extends EntityBoat {
       for (int x = (int)Math.floor(boundingBox.field_72340_a); x < Math.ceil(boundingBox.field_72336_d); x++) {
         for (int y = (int)Math.floor(boundingBox.field_72338_b); y < Math.ceil(boundingBox.field_72338_b + 0.001D); y++) {
           for (int z = (int)Math.floor(boundingBox.field_72339_c); z < Math.ceil(boundingBox.field_72334_f); z++) {
-            blockPosPool.func_181079_c(x, y, z);
+            blockPosPool.setPos(x, y, z);
             IBlockState block = world.getBlockState((BlockPos)blockPosPool);
             if (isWater(block)) {
               float waterHeight = getLiquidHeight(block, (IBlockAccess)world, (BlockPos)blockPosPool);
@@ -311,7 +311,7 @@ public abstract class EntityIC2Boat extends EntityBoat {
       for (int x = (int)Math.floor(boundingBox.field_72340_a); x < Math.ceil(boundingBox.field_72336_d); x++) {
         for (int y = (int)Math.floor(boundingBox.field_72337_e); y < Math.ceil(boatTop); y++) {
           for (int z = (int)Math.floor(boundingBox.field_72339_c); z < Math.ceil(boundingBox.field_72334_f); z++) {
-            blockPosPool.func_181079_c(x, y, z);
+            blockPosPool.setPos(x, y, z);
             IBlockState block = world.getBlockState((BlockPos)blockPosPool);
             if (isWater(block) && boatTop < getLiquidHeight(block, (IBlockAccess)world, (BlockPos)blockPosPool))
               return (((Integer)block.func_177229_b((IProperty)BlockLiquid.field_176367_b)).intValue() != 0) ? EntityBoat.Status.UNDER_FLOWING_WATER : EntityBoat.Status.UNDER_WATER; 
@@ -330,7 +330,7 @@ public abstract class EntityIC2Boat extends EntityBoat {
   
   public static float getBlockLiquidHeight(IBlockState block, IBlockAccess world, BlockPos pos) {
     int liquidHeight = ((Integer)block.func_177229_b((IProperty)BlockLiquid.field_176367_b)).intValue();
-    return ((liquidHeight & 0x7) == 0 && world.getBlockState(pos.func_177984_a()).func_185904_a() == block.func_185904_a()) ? 1.0F : (1.0F - BlockLiquid.func_149801_b(liquidHeight));
+    return ((liquidHeight & 0x7) == 0 && world.getBlockState(pos.up()).getMaterial() == block.getMaterial()) ? 1.0F : (1.0F - BlockLiquid.func_149801_b(liquidHeight));
   }
   
   private void controlBoat() {
@@ -395,6 +395,6 @@ public abstract class EntityIC2Boat extends EntityBoat {
   }
   
   protected boolean isWater(IBlockState block) {
-    return (block.func_185904_a() == Material.field_151586_h);
+    return (block.getMaterial() == Material.WATER);
   }
 }

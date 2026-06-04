@@ -48,7 +48,7 @@ public class TileEntityTradeOMat extends TileEntityInventory implements IPersona
     super.readFromNBT(nbt);
     if (nbt.func_74764_b("ownerGameProfile"))
       this.owner = NBTUtil.func_152459_a(nbt.getCompoundTag("ownerGameProfile")); 
-    this.totalTradeCount = nbt.func_74762_e("totalTradeCount");
+    this.totalTradeCount = nbt.getInteger("totalTradeCount");
     if (nbt.func_74764_b("infinite"))
       this.infinite = nbt.func_74767_n("infinite"); 
   }
@@ -60,7 +60,7 @@ public class TileEntityTradeOMat extends TileEntityInventory implements IPersona
       NBTUtil.func_180708_a(ownerNbt, this.owner);
       nbt.setTag("ownerGameProfile", (NBTBase)ownerNbt);
     } 
-    nbt.func_74768_a("totalTradeCount", this.totalTradeCount);
+    nbt.setInteger("totalTradeCount", this.totalTradeCount);
     if (this.infinite)
       nbt.func_74757_a("infinite", this.infinite); 
     return nbt;
@@ -81,10 +81,10 @@ public class TileEntityTradeOMat extends TileEntityInventory implements IPersona
       return false; 
     if (wireless) {
       setActive(true);
-      (WorldData.get(this.field_145850_b)).tradeMarket.registerTradeOMat(this);
+      (WorldData.get(this.world)).tradeMarket.registerTradeOMat(this);
     } else {
       setActive(false);
-      (WorldData.get(this.field_145850_b)).tradeMarket.unregisterTradeOMat(this);
+      (WorldData.get(this.world)).tradeMarket.unregisterTradeOMat(this);
     } 
     return true;
   }
@@ -131,7 +131,7 @@ public class TileEntityTradeOMat extends TileEntityInventory implements IPersona
     } 
     this.totalTradeCount++;
     ((NetworkManager)IC2.network.get(true)).initiateTileEntityEvent((TileEntity)this, 0, true);
-    func_70296_d();
+    markDirty();
   }
   
   protected void onLoaded() {
@@ -139,7 +139,7 @@ public class TileEntityTradeOMat extends TileEntityInventory implements IPersona
     if (IC2.platform.isSimulating()) {
       updateStock();
       if (isWireless())
-        (WorldData.get(this.field_145850_b)).tradeMarket.registerTradeOMat(this); 
+        (WorldData.get(this.world)).tradeMarket.registerTradeOMat(this); 
     } 
   }
   
@@ -164,7 +164,7 @@ public class TileEntityTradeOMat extends TileEntityInventory implements IPersona
   protected void onUnloaded() {
     super.onUnloaded();
     if (!(getWorld()).isRemote && isWireless())
-      (WorldData.get(this.field_145850_b)).tradeMarket.unregisterTradeOMat(this); 
+      (WorldData.get(this.world)).tradeMarket.unregisterTradeOMat(this); 
   }
   
   public boolean wrenchCanRemove(EntityPlayer player) {
@@ -219,7 +219,7 @@ public class TileEntityTradeOMat extends TileEntityInventory implements IPersona
         IC2.audioManager.playOnce(this, "Machines/o-mat.ogg");
         return;
     } 
-    IC2.platform.displayError("An unknown event type was received over multiplayer.\nThis could happen due to corrupted data or a bug.\n\n(Technical information: event ID " + event + ", tile entity below)\nT: " + this + " (" + this.field_174879_c + ")", new Object[0]);
+    IC2.platform.displayError("An unknown event type was received over multiplayer.\nThis could happen due to corrupted data or a bug.\n\n(Technical information: event ID " + event + ", tile entity below)\nT: " + this + " (" + this.pos + ")", new Object[0]);
   }
   
   public void onNetworkEvent(EntityPlayer player, int event) {

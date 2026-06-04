@@ -22,10 +22,10 @@ public class Settings {
       this.mainBox = this.extraBox = "";
       this.main = this.extra = ComparisonSettings.DEFAULT;
     } else {
-      if (!nbt.func_150297_b("type", 1)) {
+      if (!nbt.hasKey("type", 1)) {
         this.comparison = ComparisonType.DIRECT;
       } else {
-        this.comparison = ComparisonType.getFromNBT(nbt.func_74771_c("type"));
+        this.comparison = ComparisonType.getFromNBT(nbt.getByte("type"));
       } 
       switch (this.comparison) {
         case DIRECT:
@@ -33,16 +33,16 @@ public class Settings {
           this.main = this.extra = ComparisonSettings.DEFAULT;
           return;
         case COMPARISON:
-          this.mainBox = nbt.func_74779_i("normal");
+          this.mainBox = nbt.getString("normal");
           this.extraBox = "";
-          this.main = ComparisonSettings.getFromNBT(nbt.func_74771_c("normalComp"));
+          this.main = ComparisonSettings.getFromNBT(nbt.getByte("normalComp"));
           this.extra = ComparisonSettings.DEFAULT;
           return;
         case RANGE:
-          this.mainBox = nbt.func_74779_i("normal");
-          this.extraBox = nbt.func_74779_i("extra");
-          this.main = ComparisonSettings.getFromNBT(nbt.func_74771_c("normalComp"));
-          this.extra = ComparisonSettings.getFromNBT(nbt.func_74771_c("extraComp"));
+          this.mainBox = nbt.getString("normal");
+          this.extraBox = nbt.getString("extra");
+          this.main = ComparisonSettings.getFromNBT(nbt.getByte("normalComp"));
+          this.extra = ComparisonSettings.getFromNBT(nbt.getByte("extraComp"));
           return;
       } 
       throw new IllegalStateException("Unexpected comparison type " + this.comparison);

@@ -21,18 +21,18 @@ class Desertification extends TerraformerBase {
       return true;
     } 
     Block block = world.getBlockState(pos).getBlock();
-    if (block == Blocks.field_150355_j || block == Blocks.field_150358_i || block == Blocks.field_150431_aC || block == Blocks.field_150362_t || block == Blocks.field_150361_u || block == BlockName.leaves
+    if (block == Blocks.WATER || block == Blocks.field_150358_i || block == Blocks.field_150431_aC || block == Blocks.field_150362_t || block == Blocks.field_150361_u || block == BlockName.leaves
       .getInstance() || isPlant(block)) {
       world.func_175698_g(pos);
-      if (isPlant(world.getBlockState(pos.func_177984_a()).getBlock()))
-        world.func_175698_g(pos.func_177984_a()); 
+      if (isPlant(world.getBlockState(pos.up()).getBlock()))
+        world.func_175698_g(pos.up()); 
       return true;
     } 
     if (block == Blocks.field_150432_aD || block == Blocks.field_150433_aE) {
       world.func_175656_a(pos, Blocks.field_150358_i.getDefaultState());
       return true;
     } 
-    if ((block == Blocks.field_150344_f || block == Blocks.field_150364_r || block == BlockName.rubber_wood.getInstance()) && world.field_73012_v
+    if ((block == Blocks.field_150344_f || block == Blocks.field_150364_r || block == BlockName.rubber_wood.getInstance()) && world.rand
       .nextInt(15) == 0) {
       world.func_175656_a(pos, Blocks.field_150480_ab.getDefaultState());
       return true;

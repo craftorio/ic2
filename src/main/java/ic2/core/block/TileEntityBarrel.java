@@ -41,35 +41,35 @@ public class TileEntityBarrel extends TileEntityBlock {
   
   public void readFromNBT(NBTTagCompound nbt) {
     super.readFromNBT(nbt);
-    this.type = nbt.func_74771_c("type");
-    this.boozeAmount = nbt.func_74771_c("waterCount");
-    this.age = nbt.func_74762_e("age");
+    this.type = nbt.getByte("type");
+    this.boozeAmount = nbt.getByte("waterCount");
+    this.age = nbt.getInteger("age");
     this.opened = nbt.func_74767_n("opened");
     if (this.type == 1) {
       if (!this.opened) {
-        this.hopsCount = nbt.func_74771_c("hopsCount");
-        this.wheatCount = nbt.func_74771_c("wheatCount");
+        this.hopsCount = nbt.getByte("hopsCount");
+        this.wheatCount = nbt.getByte("wheatCount");
       } 
-      this.solidRatio = nbt.func_74771_c("solidRatio");
-      this.hopsRatio = nbt.func_74771_c("hopsRatio");
-      this.timeRatio = nbt.func_74771_c("timeRatio");
+      this.solidRatio = nbt.getByte("solidRatio");
+      this.hopsRatio = nbt.getByte("hopsRatio");
+      this.timeRatio = nbt.getByte("timeRatio");
     } 
   }
   
   public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
     super.writeToNBT(nbt);
-    nbt.func_74774_a("type", (byte)this.type);
-    nbt.func_74774_a("waterCount", (byte)this.boozeAmount);
-    nbt.func_74768_a("age", this.age);
+    nbt.setByte("type", (byte)this.type);
+    nbt.setByte("waterCount", (byte)this.boozeAmount);
+    nbt.setInteger("age", this.age);
     nbt.func_74757_a("opened", this.opened);
     if (this.type == 1) {
       if (!this.opened) {
-        nbt.func_74774_a("hopsCount", this.hopsCount);
-        nbt.func_74774_a("wheatCount", this.wheatCount);
+        nbt.setByte("hopsCount", this.hopsCount);
+        nbt.setByte("wheatCount", this.wheatCount);
       } 
-      nbt.func_74774_a("solidRatio", this.solidRatio);
-      nbt.func_74774_a("hopsRatio", this.hopsRatio);
-      nbt.func_74774_a("timeRatio", this.timeRatio);
+      nbt.setByte("solidRatio", this.solidRatio);
+      nbt.setByte("hopsRatio", this.hopsRatio);
+      nbt.setByte("timeRatio", this.timeRatio);
     } 
     return nbt;
   }
@@ -98,7 +98,7 @@ public class TileEntityBarrel extends TileEntityBlock {
     ItemStack stack = StackUtil.get(player, hand);
     if (stack == null)
       return false; 
-    if (side.func_176740_k() != EnumFacing.Axis.Y && 
+    if (side.getAxis() != EnumFacing.Axis.Y && 
       !getActive() && 
       StackUtil.consume(player, hand, StackUtil.sameStack(ItemName.treetap.getItemStack()), 1)) {
       if (!(getWorld()).isRemote)
@@ -179,15 +179,15 @@ public class TileEntityBarrel extends TileEntityBlock {
     World world = getWorld();
     if (getActive()) {
       if (!world.isRemote) {
-        StackUtil.dropAsEntity(world, this.field_174879_c, ItemName.treetap.getItemStack());
+        StackUtil.dropAsEntity(world, this.pos, ItemName.treetap.getItemStack());
         setActive(false);
       } 
       drainLiquid(1);
       return;
     } 
     if (!world.isRemote)
-      StackUtil.dropAsEntity(world, this.field_174879_c, new ItemStack(ItemName.barrel.getInstance(), 1, calculateMetaValue())); 
-    world.func_175656_a(this.field_174879_c, BlockName.scaffold.getBlockState(BlockScaffold.ScaffoldType.wood));
+      StackUtil.dropAsEntity(world, this.pos, new ItemStack(ItemName.barrel.getInstance(), 1, calculateMetaValue())); 
+    world.func_175656_a(this.pos, BlockName.scaffold.getBlockState(BlockScaffold.ScaffoldType.wood));
   }
   
   private void alterComposition() {
@@ -195,13 +195,13 @@ public class TileEntityBarrel extends TileEntityBlock {
       this.age = 0;
     } else if (this.timeRatio == 1) {
       World world = getWorld();
-      if (world.field_73012_v.nextBoolean()) {
+      if (world.rand.nextBoolean()) {
         this.timeRatio = 0;
-      } else if (world.field_73012_v.nextBoolean()) {
+      } else if (world.rand.nextBoolean()) {
         this.timeRatio = 5;
       } 
     } else if (this.timeRatio == 2) {
-      if ((getWorld()).field_73012_v.nextBoolean())
+      if ((getWorld()).rand.nextBoolean())
         this.timeRatio = 5; 
     } else {
       this.timeRatio = 5;

@@ -43,7 +43,7 @@ public abstract class ItemToolCrafting extends ItemIC2 implements IBoxable, IIte
   }
   
   public ItemStack getContainerItem(ItemStack stack) {
-    ItemStack ret = stack.func_77946_l();
+    ItemStack ret = stack.copy();
     if (ret.func_96631_a(1, IC2.random, null))
       return StackUtil.emptyStack; 
     return ret;

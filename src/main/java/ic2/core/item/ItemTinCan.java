@@ -18,18 +18,18 @@ public class ItemTinCan extends ItemIC2 {
   
   public ActionResult<ItemStack> func_77659_a(World world, EntityPlayer player, EnumHand hand) {
     ItemStack stack = StackUtil.get(player, hand);
-    if (!world.isRemote && player.func_71024_bL().func_75121_c())
+    if (!world.isRemote && player.getFoodStats().func_75121_c())
       return onEaten(player, stack); 
     return new ActionResult(EnumActionResult.PASS, stack);
   }
   
   public ActionResult<ItemStack> onEaten(EntityPlayer player, ItemStack stack) {
-    int amount = Math.min(StackUtil.getSize(stack), 20 - player.func_71024_bL().func_75116_a());
+    int amount = Math.min(StackUtil.getSize(stack), 20 - player.getFoodStats().getFoodLevel());
     if (amount <= 0)
       return new ActionResult(EnumActionResult.PASS, stack); 
     ItemStack emptyStack = StackUtil.copyWithSize(ItemName.crafting.getItemStack((Enum)CraftingItemType.tin_can), amount);
     if (StackUtil.storeInventoryItem(emptyStack, player, true)) {
-      player.func_71024_bL().func_75122_a(amount, amount);
+      player.getFoodStats().func_75122_a(amount, amount);
       stack = StackUtil.decSize(stack, amount);
       StackUtil.storeInventoryItem(emptyStack, player, false);
       IC2.platform.playSoundSp("Tools/eat.ogg", 1.0F, 1.0F);

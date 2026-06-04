@@ -47,7 +47,7 @@ public class ItemCrystalMemory extends ItemIC2 {
   public void writecontentsTag(ItemStack stack, ItemStack recorded) {
     NBTTagCompound nbt = StackUtil.getOrCreateNbtData(stack);
     NBTTagCompound contentTag = new NBTTagCompound();
-    recorded.func_77955_b(contentTag);
+    recorded.writeToNBT(contentTag);
     nbt.setTag("Pattern", (NBTBase)contentTag);
   }
 }

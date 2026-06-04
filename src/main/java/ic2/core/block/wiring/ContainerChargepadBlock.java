@@ -11,8 +11,8 @@ import net.minecraft.inventory.Slot;
 public class ContainerChargepadBlock extends ContainerFullInv<TileEntityChargepadBlock> {
   public ContainerChargepadBlock(EntityPlayer player, TileEntityChargepadBlock tileEntity1) {
     super(player, (IInventory)tileEntity1, 161);
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)tileEntity1.chargeSlot, 0, 56, 17));
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)tileEntity1.dischargeSlot, 0, 56, 53));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)tileEntity1.chargeSlot, 0, 56, 17));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)tileEntity1.dischargeSlot, 0, 56, 53));
   }
   
   public List<String> getNetworkedFields() {

@@ -41,12 +41,12 @@ public class TileEntitySteamRepressurizer extends TileEntityInventory implements
   
   public void readFromNBT(NBTTagCompound nbt) {
     super.readFromNBT(nbt);
-    this.currentHeat = nbt.func_74762_e("heat");
+    this.currentHeat = nbt.getInteger("heat");
   }
   
   public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
     super.writeToNBT(nbt);
-    nbt.func_74768_a("heat", this.currentHeat);
+    nbt.setInteger("heat", this.currentHeat);
     return nbt;
   }
   
@@ -75,13 +75,13 @@ public class TileEntitySteamRepressurizer extends TileEntityInventory implements
     if (aim > 0) {
       World world = getWorld();
       int targetHeat = aim;
-      for (EnumFacing dir : EnumFacing.field_82609_l) {
-        TileEntity target = world.func_175625_s(this.field_174879_c.func_177972_a(dir));
+      for (EnumFacing dir : EnumFacing.VALUES) {
+        TileEntity target = world.getTileEntity(this.pos.offset(dir));
         if (target instanceof IHeatSource) {
           IHeatSource hs = (IHeatSource)target;
-          int request = hs.drawHeat(dir.func_176734_d(), targetHeat, true);
+          int request = hs.drawHeat(dir.getOpposite(), targetHeat, true);
           if (request > 0) {
-            targetHeat -= hs.drawHeat(dir.func_176734_d(), request, false);
+            targetHeat -= hs.drawHeat(dir.getOpposite(), request, false);
             if (targetHeat <= 0)
               break; 
           } 

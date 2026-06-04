@@ -34,7 +34,7 @@ public class TileEntityItemBuffer extends TileEntityInventory implements IHasGui
   public TileEntityItemBuffer() {
     this.tick = true;
     this.rightcontentSlot = new InvSlot((IInventorySlotHolder)this, "rightcontent", InvSlot.Access.IO, 24, InvSlot.InvSide.SIDE);
-    this.leftcontentSlot = new InvSlot((IInventorySlotHolder)this, "leftcontent", InvSlot.Access.IO, 24, InvSlot.InvSide.NOTSIDE);
+    this.leftcontentSlot = new InvSlot((IInventorySlotHolder)this, "leftcontent", InvSlot.Access.IO, 24, InvSlot.InvSide.NO_SIDE);
     this.upgradeSlot = new InvSlotUpgrade((IInventorySlotHolder)this, "upgrade", 2);
     this.comparator.setUpdate(() -> calcRedstoneFromInvSlots(new InvSlot[] { this.rightcontentSlot, this.leftcontentSlot }));
   }
@@ -46,21 +46,21 @@ public class TileEntityItemBuffer extends TileEntityInventory implements IHasGui
     if (!StackUtil.isEmpty(upgradeleft) && !StackUtil.isEmpty(upgraderight)) {
       if (this.tick) {
         if (((IUpgradeItem)upgradeleft.getItem()).onTick(upgradeleft, this))
-          func_70296_d(); 
+          markDirty(); 
       } else if (((IUpgradeItem)upgraderight.getItem()).onTick(upgraderight, this)) {
-        func_70296_d();
+        markDirty();
       } 
       this.tick = !this.tick;
     } else {
       if (!StackUtil.isEmpty(upgradeleft)) {
         this.tick = true;
         if (((IUpgradeItem)upgradeleft.getItem()).onTick(upgradeleft, this))
-          func_70296_d(); 
+          markDirty(); 
       } 
       if (!StackUtil.isEmpty(upgraderight)) {
         this.tick = false;
         if (((IUpgradeItem)upgraderight.getItem()).onTick(upgraderight, this))
-          func_70296_d(); 
+          markDirty(); 
       } 
     } 
   }

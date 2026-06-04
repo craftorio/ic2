@@ -23,18 +23,18 @@ import net.minecraft.world.World;
 
 public class ParticleUtil {
   public static void showFlames(World world, BlockPos pos, EnumFacing facing) {
-    if (world.field_73012_v.nextInt(8) != 0)
+    if (world.rand.nextInt(8) != 0)
       return; 
     double width = 0.625D;
     double height = 0.625D;
     double depthOffset = 0.02D;
     double x = pos.getX() + (facing.getFrontOffsetX() * 1.04D + 1.0D) / 2.0D;
-    double y = pos.getY() + world.field_73012_v.nextFloat() * 0.625D;
+    double y = pos.getY() + world.rand.nextFloat() * 0.625D;
     double z = pos.getZ() + (facing.getFrontOffsetZ() * 1.04D + 1.0D) / 2.0D;
-    if (facing.func_176740_k() == EnumFacing.Axis.X) {
-      z += world.field_73012_v.nextFloat() * 0.625D - 0.3125D;
+    if (facing.getAxis() == EnumFacing.Axis.X) {
+      z += world.rand.nextFloat() * 0.625D - 0.3125D;
     } else {
-      x += world.field_73012_v.nextFloat() * 0.625D - 0.3125D;
+      x += world.rand.nextFloat() * 0.625D - 0.3125D;
     } 
     world.func_175688_a(EnumParticleTypes.SMOKE_NORMAL, x, y, z, 0.0D, 0.0D, 0.0D, new int[0]);
     world.func_175688_a(EnumParticleTypes.FLAME, x, y, z, 0.0D, 0.0D, 0.0D, new int[0]);
@@ -42,7 +42,7 @@ public class ParticleUtil {
   
   public static void spawnBlockLandParticles(World world, BlockPos pos, double x, double y, double z, int count, ITeBlock teBlock) {
     Minecraft mc = Minecraft.getMinecraft();
-    Random rnd = world.field_73012_v;
+    Random rnd = world.rand;
     if (mc.field_71441_e != world || mc.player == null)
       return; 
     if (mc.field_71474_y.field_74362_aa > 1 || (mc.field_71474_y.field_74362_aa == 1 && rnd
@@ -78,9 +78,9 @@ public class ParticleUtil {
     BlockPos pos = te.getPos();
     double offset = 0.1D;
     AxisAlignedBB aabb = te.getVisualBoundingBox();
-    double x = pos.getX() + world.field_73012_v.nextDouble() * (aabb.field_72336_d - aabb.field_72340_a - offset * 2.0D) + offset + aabb.field_72340_a;
-    double y = pos.getY() + world.field_73012_v.nextDouble() * (aabb.field_72337_e - aabb.field_72338_b - offset * 2.0D) + offset + aabb.field_72338_b;
-    double z = pos.getZ() + world.field_73012_v.nextDouble() * (aabb.field_72334_f - aabb.field_72339_c - offset * 2.0D) + offset + aabb.field_72339_c;
+    double x = pos.getX() + world.rand.nextDouble() * (aabb.field_72336_d - aabb.field_72340_a - offset * 2.0D) + offset + aabb.field_72340_a;
+    double y = pos.getY() + world.rand.nextDouble() * (aabb.field_72337_e - aabb.field_72338_b - offset * 2.0D) + offset + aabb.field_72338_b;
+    double z = pos.getZ() + world.rand.nextDouble() * (aabb.field_72334_f - aabb.field_72339_c - offset * 2.0D) + offset + aabb.field_72339_c;
     switch (side) {
       case DOWN:
         y = pos.getY() + aabb.field_72338_b - offset;

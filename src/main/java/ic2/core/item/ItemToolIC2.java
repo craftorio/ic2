@@ -84,7 +84,7 @@ public abstract class ItemToolIC2 extends ItemTool implements IItemModelProvider
   }
   
   public boolean canHarvestBlock(IBlockState state, ItemStack itemStack) {
-    Material material = state.func_185904_a();
+    Material material = state.getMaterial();
     for (IToolClass toolClass : this.toolClasses) {
       if (toolClass.getBlacklist().contains(state.getBlock()))
         return false; 

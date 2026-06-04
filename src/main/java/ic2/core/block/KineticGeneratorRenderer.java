@@ -27,7 +27,7 @@ public class KineticGeneratorRenderer<T extends TileEntity> extends TileEntitySp
       rotorModels.put(Integer.valueOf(diameter), model);
     } 
     EnumFacing facing = windGen.getFacing();
-    pos = pos.func_177972_a(facing);
+    pos = pos.offset(facing);
     int light = world.func_175626_b(pos, 0);
     int blockLight = light % 65536;
     int skyLight = light / 65536;

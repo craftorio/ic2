@@ -17,9 +17,9 @@ public class ContainerEnergyOMatClosed extends ContainerFullInv<TileEntityEnergy
   public ContainerEnergyOMatClosed(EntityPlayer player, TileEntityEnergyOMat tileEntity1) {
     super(player, (IInventory)tileEntity1, 166);
     this.lastTier = -1;
-    func_75146_a((Slot)new SlotInvSlotReadOnly(tileEntity1.demandSlot, 0, 50, 17));
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)tileEntity1.inputSlot, 0, 143, 17));
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)tileEntity1.chargeSlot, 0, 143, 53));
+    addSlotToContainer((Slot)new SlotInvSlotReadOnly(tileEntity1.demandSlot, 0, 50, 17));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)tileEntity1.inputSlot, 0, 143, 17));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)tileEntity1.chargeSlot, 0, 143, 53));
   }
   
   public List<String> getNetworkedFields() {

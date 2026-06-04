@@ -16,10 +16,10 @@ public class ContainerEnergyOMatOpen extends ContainerFullInv<TileEntityEnergyOM
   public ContainerEnergyOMatOpen(EntityPlayer player, TileEntityEnergyOMat tileEntity1) {
     super(player, (IInventory)tileEntity1, 166);
     this.lastTier = -1;
-    func_75146_a((Slot)new SlotInvSlot(tileEntity1.demandSlot, 0, 24, 17));
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)tileEntity1.upgradeSlot, 0, 24, 53));
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)tileEntity1.inputSlot, 0, 60, 17));
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)tileEntity1.chargeSlot, 0, 60, 53));
+    addSlotToContainer((Slot)new SlotInvSlot(tileEntity1.demandSlot, 0, 24, 17));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)tileEntity1.upgradeSlot, 0, 24, 53));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)tileEntity1.inputSlot, 0, 60, 17));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)tileEntity1.chargeSlot, 0, 60, 53));
   }
   
   public List<String> getNetworkedFields() {

@@ -11,7 +11,7 @@ public abstract class TileEntityHeatSourceInventory extends TileEntityInventory 
   protected int transmitHeat;
   
   @GuiSynced
-  protected int maxHeatEmitpeerTick;
+  protected int maxHeatEmitPerTick;
   
   protected int HeatBuffer;
   
@@ -57,25 +57,25 @@ public abstract class TileEntityHeatSourceInventory extends TileEntityInventory 
   
   public void readFromNBT(NBTTagCompound nbtTagCompound) {
     super.readFromNBT(nbtTagCompound);
-    this.HeatBuffer = nbtTagCompound.func_74762_e("HeatBuffer");
+    this.HeatBuffer = nbtTagCompound.getInteger("HeatBuffer");
   }
   
   public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
     super.writeToNBT(nbt);
-    nbt.func_74768_a("HeatBuffer", this.HeatBuffer);
+    nbt.setInteger("HeatBuffer", this.HeatBuffer);
     return nbt;
   }
   
-  public void func_70296_d() {
-    super.func_70296_d();
+  public void markDirty() {
+    super.markDirty();
     if (IC2.platform.isSimulating())
-      this.maxHeatEmitpeerTick = getMaxHeatEmittedPerTick(); 
+      this.maxHeatEmitPerTick = getMaxHeatEmittedPerTick(); 
   }
   
   protected void onLoaded() {
     super.onLoaded();
     if (IC2.platform.isSimulating())
-      this.maxHeatEmitpeerTick = getMaxHeatEmittedPerTick(); 
+      this.maxHeatEmitPerTick = getMaxHeatEmittedPerTick(); 
   }
   
   public boolean facingMatchesDirection(EnumFacing direction) {

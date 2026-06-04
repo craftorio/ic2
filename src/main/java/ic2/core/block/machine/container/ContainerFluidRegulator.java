@@ -10,8 +10,8 @@ import net.minecraft.inventory.Slot;
 public class ContainerFluidRegulator extends ContainerElectricMachine<TileEntityFluidRegulator> {
   public ContainerFluidRegulator(EntityPlayer player, TileEntityFluidRegulator tileEntite) {
     super(player, tileEntite, 184, 8, 57);
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)tileEntite.wasserinputSlot, 0, 58, 53));
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)tileEntite.wasseroutputSlot, 0, 58, 71));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)tileEntite.wasserinputSlot, 0, 58, 53));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)tileEntite.wasseroutputSlot, 0, 58, 71));
   }
   
   public List<String> getNetworkedFields() {

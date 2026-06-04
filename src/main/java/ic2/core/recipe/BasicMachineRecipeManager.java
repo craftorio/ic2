@@ -53,7 +53,7 @@ public class BasicMachineRecipeManager extends MachineRecipeHelper<IRecipeInput,
           displayError("The output ItemStack " + stack.toString() + " is the same as the recipe input " + input + ".");
           return false;
         }  
-      items.add(stack.func_77946_l());
+      items.add(stack.copy());
     } 
     label31: for (ItemStack is : input.getInputs()) {
       MachineRecipe<IRecipeInput, Collection<ItemStack>> machineRecipe = getRecipe(is);

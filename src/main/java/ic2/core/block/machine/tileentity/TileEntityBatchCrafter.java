@@ -59,7 +59,7 @@ public class TileEntityBatchCrafter extends TileEntityElectricMachine implements
   
   public final InvSlotOutput craftingOutput = new InvSlotOutput((IInventorySlotHolder)this, "output", 1, InvSlot.InvSide.SIDE);
   
-  public final InvSlotOutput containerOutput = new InvSlotOutput((IInventorySlotHolder)this, "containersOut", this.craftingGrid.length, InvSlot.InvSide.NOTSIDE);
+  public final InvSlotOutput containerOutput = new InvSlotOutput((IInventorySlotHolder)this, "containersOut", this.craftingGrid.length, InvSlot.InvSide.NO_SIDE);
   
   public final InvSlotUpgrade upgradeSlot = new InvSlotUpgrade((IInventorySlotHolder)this, "upgrade", 4);
   
@@ -140,14 +140,14 @@ public class TileEntityBatchCrafter extends TileEntityElectricMachine implements
       final int slot = i;
       this.ingredientsRow[slot] = new InvSlot((IInventorySlotHolder)this, "ingredient[" + slot + ']', InvSlot.Access.I, 1) {
           public boolean accepts(ItemStack ingredient) {
-            IRecipe recipe = TileEntityBatchCrafter.this.field_145850_b.isRemote ? TileEntityBatchCrafter.this.findRecipe() : TileEntityBatchCrafter.this.recipe;
+            IRecipe recipe = TileEntityBatchCrafter.this.world.isRemote ? TileEntityBatchCrafter.this.findRecipe() : TileEntityBatchCrafter.this.recipe;
             if (recipe == null)
               return false; 
-            assert recipe.func_77569_a(TileEntityBatchCrafter.this.crafting, TileEntityBatchCrafter.this.field_145850_b);
+            assert recipe.func_77569_a(TileEntityBatchCrafter.this.crafting, TileEntityBatchCrafter.this.world);
             ItemStack recipeStack = TileEntityBatchCrafter.this.craftingGrid[slot];
             try {
               TileEntityBatchCrafter.this.craftingGrid[slot] = ingredient;
-              return recipe.func_77569_a(TileEntityBatchCrafter.this.crafting, TileEntityBatchCrafter.this.field_145850_b);
+              return recipe.func_77569_a(TileEntityBatchCrafter.this.crafting, TileEntityBatchCrafter.this.world);
             } finally {
               TileEntityBatchCrafter.this.craftingGrid[slot] = recipeStack;
             } 
@@ -167,11 +167,11 @@ public class TileEntityBatchCrafter extends TileEntityElectricMachine implements
   
   public void readFromNBT(NBTTagCompound nbt) {
     super.readFromNBT(nbt);
-    this.progress = nbt.func_74765_d("progress");
-    NBTTagList grid = nbt.func_150295_c("grid", 10);
-    for (int i = 0; i < grid.func_74745_c(); i++) {
-      NBTTagCompound contentTag = grid.func_150305_b(i);
-      this.craftingGrid[contentTag.func_74771_c("index")] = new ItemStack(contentTag);
+    this.progress = nbt.getShort("progress");
+    NBTTagList grid = nbt.getTagList("grid", 10);
+    for (int i = 0; i < grid.tagCount(); i++) {
+      NBTTagCompound contentTag = grid.getCompoundTagAt(i);
+      this.craftingGrid[contentTag.getByte("index")] = new ItemStack(contentTag);
     } 
   }
   
@@ -183,9 +183,9 @@ public class TileEntityBatchCrafter extends TileEntityElectricMachine implements
       ItemStack content = this.craftingGrid[i];
       if (!StackUtil.isEmpty(content)) {
         NBTTagCompound contentTag = new NBTTagCompound();
-        contentTag.func_74774_a("index", i);
-        content.func_77955_b(contentTag);
-        grid.func_74742_a((NBTBase)contentTag);
+        contentTag.setByte("index", i);
+        content.writeToNBT(contentTag);
+        grid.appendTag((NBTBase)contentTag);
       } 
     } 
     nbt.setTag("grid", (NBTBase)grid);
@@ -216,8 +216,8 @@ public class TileEntityBatchCrafter extends TileEntityElectricMachine implements
     } 
   }
   
-  public void func_70296_d() {
-    super.func_70296_d();
+  public void markDirty() {
+    super.markDirty();
     if (!(getWorld()).isRemote) {
       setOverclockRates();
       this.attemptToBalance = true;
@@ -251,7 +251,7 @@ public class TileEntityBatchCrafter extends TileEntityElectricMachine implements
     needsInvUpdate |= this.upgradeSlot.tickNoMark();
     this.guiProgress = this.progress / this.operationLength;
     if (needsInvUpdate)
-      super.func_70296_d(); 
+      super.markDirty(); 
   }
   
   public boolean hasRecipe() {
@@ -302,7 +302,7 @@ public class TileEntityBatchCrafter extends TileEntityElectricMachine implements
         } else if (this.containerOutput.canAdd(newStack)) {
           this.containerOutput.add(newStack);
         } else {
-          StackUtil.dropAsEntity(world, this.field_174879_c, newStack);
+          StackUtil.dropAsEntity(world, this.pos, newStack);
         } 
       } 
     } 
@@ -311,7 +311,7 @@ public class TileEntityBatchCrafter extends TileEntityElectricMachine implements
       if (this.containerOutput.canAdd(newStack)) {
         this.containerOutput.add(newStack);
       } else {
-        StackUtil.dropAsEntity(world, this.field_174879_c, newStack);
+        StackUtil.dropAsEntity(world, this.pos, newStack);
       } 
     } 
   }

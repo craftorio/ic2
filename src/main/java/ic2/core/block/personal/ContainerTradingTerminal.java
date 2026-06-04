@@ -9,7 +9,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 
 public class ContainerTradingTerminal extends ContainerFullInv<TileEntityTradingTerminal> {
-  public final Slot rangeSlot = func_75146_a((Slot)new SlotInvSlot((InvSlot)((TileEntityTradingTerminal)this.base).rangeUpgrade, 0, -100, -100));
+  public final Slot rangeSlot = addSlotToContainer((Slot)new SlotInvSlot((InvSlot)((TileEntityTradingTerminal)this.base).rangeUpgrade, 0, -100, -100));
   
   public ContainerTradingTerminal(EntityPlayer player, TileEntityTradingTerminal base) {
     super(player, (IInventory)base, 176, 227);

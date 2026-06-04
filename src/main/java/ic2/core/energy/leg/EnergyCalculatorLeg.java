@@ -344,8 +344,8 @@ public class EnergyCalculatorLeg implements IEnergyCalculator {
     if (activeSources.isEmpty() || activeSinks.isEmpty())
       return false; 
     World world = grid.getEnergyNet().getWorld();
-    Random rand = world.field_73012_v;
-    boolean shufflePaths = ((world.func_82737_E() & 0x3L) != 0L);
+    Random rand = world.rand;
+    boolean shufflePaths = ((world.getTotalWorldTime() & 0x3L) != 0L);
     if (activeSources.size() > 1) {
       sourcesOffset = rand.nextInt(activeSources.size());
     } else {
@@ -570,7 +570,7 @@ public class EnergyCalculatorLeg implements IEnergyCalculator {
     for (IEnergyTile subTile : tile.getSubTiles()) {
       IEnergySink mainTile = (IEnergySink)tile.getMainTile();
       BlockPos pos = EnergyNet.instance.getPos(subTile);
-      TileEntity realTe = world.func_175625_s(pos);
+      TileEntity realTe = world.getTileEntity(pos);
       if ((mainTile instanceof IOverloadHandler && ((IOverloadHandler)mainTile).onOverload(tier)) || (realTe instanceof IOverloadHandler && ((IOverloadHandler)realTe)
         .onOverload(tier)))
         continue; 

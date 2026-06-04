@@ -35,7 +35,7 @@ public abstract class IORecipeCategory<T> implements IRecipeCategory<IRecipeWrap
   
   protected abstract List<SlotPosition> getInputSlotPos();
   
-  protected abstract List<SlotPosition> getOutputSlotPos();
+  protected abstract List<SlotPosition> getoutputSlotPos();
   
   protected List<List<ItemStack>> getInputStacks(IIngredients ingredients) {
     return ingredients.getInputs(ItemStack.class);
@@ -56,7 +56,7 @@ public abstract class IORecipeCategory<T> implements IRecipeCategory<IRecipeWrap
       if (idx < inputStacks.size())
         itemStacks.set(idx, inputStacks.get(idx)); 
     } 
-    List<SlotPosition> outputSlots = getOutputSlotPos();
+    List<SlotPosition> outputSlots = getoutputSlotPos();
     List<List<ItemStack>> outputStacks = getOutputStacks(ingredients);
     for (int i = 0; i < outputSlots.size(); i++, idx++) {
       SlotPosition pos = outputSlots.get(i);

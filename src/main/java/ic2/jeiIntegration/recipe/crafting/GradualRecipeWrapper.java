@@ -34,7 +34,7 @@ public class GradualRecipeWrapper extends BlankRecipeWrapper {
     if (143 - width < 55) {
       minecraft.field_71466_p.func_78279_b(effectiveness, 55, 88, 90, Color.darkGray.getRGB());
     } else {
-      minecraft.field_71466_p.func_78276_b(effectiveness, (55 + 143 - width) / 2, 42, Color.darkGray.getRGB());
+      minecraft.field_71466_p.drawString(effectiveness, (55 + 143 - width) / 2, 42, Color.darkGray.getRGB());
     } 
   }
   

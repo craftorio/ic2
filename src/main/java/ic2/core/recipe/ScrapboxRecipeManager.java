@@ -78,7 +78,7 @@ public final class ScrapboxRecipeManager implements IScrapboxManager {
       } 
       low = mid + 1;
     } 
-    ItemStack drop = ((Drop)this.drops.get(low)).item.func_77946_l();
+    ItemStack drop = ((Drop)this.drops.get(low)).item.copy();
     return (new MachineRecipe(Recipes.inputFactory.forStack(ItemName.crafting.getItemStack((Enum)CraftingItemType.scrap_box)), Collections.singletonList(drop))).getResult(StackUtil.copyShrunk(input, 1));
   }
   
@@ -161,7 +161,7 @@ public final class ScrapboxRecipeManager implements IScrapboxManager {
     addDrop(Blocks.field_150423_aK, 0.9F);
     addDrop(Items.field_151077_bg, 0.9F);
     addDrop(Items.field_151143_au, 0.01F);
-    addDrop(Items.field_151137_ax, 0.9F);
+    addDrop(Items.REDSTONE, 0.9F);
     addDrop(ItemName.crafting.getItemStack((Enum)CraftingItemType.rubber), 0.8F);
     addDrop(Items.field_151114_aO, 0.8F);
     addDrop(ItemName.dust.getItemStack((Enum)DustResourceType.coal), 0.8F);

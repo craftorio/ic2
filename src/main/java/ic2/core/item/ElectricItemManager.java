@@ -32,7 +32,7 @@ public class ElectricItemManager implements IElectricItemManager {
         tNBT.setDouble("charge", newCharge);
       } else {
         tNBT.func_82580_o("charge");
-        if (tNBT.func_82582_d())
+        if (tNBT.hasNoTags())
           stack.func_77982_d(null); 
       } 
       if (stack.getItem() instanceof IElectricItem) {
@@ -71,7 +71,7 @@ public class ElectricItemManager implements IElectricItemManager {
         tNBT.setDouble("charge", newCharge);
       } else {
         tNBT.func_82580_o("charge");
-        if (tNBT.func_82582_d())
+        if (tNBT.hasNoTags())
           stack.func_77982_d(null); 
       } 
       if (stack.getItem() instanceof IElectricItem) {

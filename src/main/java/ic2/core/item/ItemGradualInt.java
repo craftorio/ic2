@@ -32,7 +32,7 @@ public class ItemGradualInt extends ItemIC2 implements ICustomDamageItem {
     return getCustomDamage(stack) / getMaxCustomDamage(stack);
   }
   
-  public boolean func_77645_m() {
+  public boolean isDamageable() {
     return true;
   }
   
@@ -47,7 +47,7 @@ public class ItemGradualInt extends ItemIC2 implements ICustomDamageItem {
   public int getCustomDamage(ItemStack stack) {
     if (!stack.func_77942_o())
       return 0; 
-    return stack.func_77978_p().func_74762_e("advDmg");
+    return stack.func_77978_p().getInteger("advDmg");
   }
   
   public int getMaxDamage(ItemStack stack) {
@@ -66,7 +66,7 @@ public class ItemGradualInt extends ItemIC2 implements ICustomDamageItem {
   
   public void setCustomDamage(ItemStack stack, int damage) {
     NBTTagCompound nbt = StackUtil.getOrCreateNbtData(stack);
-    nbt.func_74768_a("advDmg", damage);
+    nbt.setInteger("advDmg", damage);
   }
   
   public boolean applyCustomDamage(ItemStack stack, int damage, EntityLivingBase src) {

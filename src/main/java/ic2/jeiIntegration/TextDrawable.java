@@ -33,7 +33,7 @@ public class TextDrawable implements IDrawable {
       default:
         throw new IllegalArgumentException("invalid alignment: " + this.alignment);
     } 
-    arg0.field_71466_p.func_78276_b(Localization.translate(this.text), x, 0, this.color);
+    arg0.field_71466_p.drawString(Localization.translate(this.text), x, 0, this.color);
   }
   
   public void draw(Minecraft arg0, int arg1, int arg2) {}

@@ -102,20 +102,20 @@ public class TileEntityCable extends TileEntityBlock implements IEnergyConductor
   
   public void readFromNBT(NBTTagCompound nbt) {
     super.readFromNBT(nbt);
-    this.cableType = CableType.values[nbt.func_74771_c("cableType") & 0xFF];
-    this.insulation = nbt.func_74771_c("insulation") & 0xFF;
-    this.color = Ic2Color.values[nbt.func_74771_c("color") & 0xFF];
-    this.foam = CableFoam.values[nbt.func_74771_c("foam") & 0xFF];
-    this.foamColor = Ic2Color.values[nbt.func_74771_c("foamColor") & 0xFF];
+    this.cableType = CableType.values[nbt.getByte("cableType") & 0xFF];
+    this.insulation = nbt.getByte("insulation") & 0xFF;
+    this.color = Ic2Color.values[nbt.getByte("color") & 0xFF];
+    this.foam = CableFoam.values[nbt.getByte("foam") & 0xFF];
+    this.foamColor = Ic2Color.values[nbt.getByte("foamColor") & 0xFF];
   }
   
   public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
     super.writeToNBT(nbt);
-    nbt.func_74774_a("cableType", (byte)this.cableType.ordinal());
-    nbt.func_74774_a("insulation", (byte)this.insulation);
-    nbt.func_74774_a("color", (byte)this.color.ordinal());
-    nbt.func_74774_a("foam", (byte)this.foam.ordinal());
-    nbt.func_74774_a("foamColor", (byte)this.foamColor.ordinal());
+    nbt.setByte("cableType", (byte)this.cableType.ordinal());
+    nbt.setByte("insulation", (byte)this.insulation);
+    nbt.setByte("color", (byte)this.color.ordinal());
+    nbt.setByte("foam", (byte)this.foam.ordinal());
+    nbt.setByte("foamColor", (byte)this.foamColor.ordinal());
     return nbt;
   }
   
@@ -129,7 +129,7 @@ public class TileEntityCable extends TileEntityBlock implements IEnergyConductor
         TileEntityCable newTe = (this.cableType == CableType.detector) ? new TileEntityCableDetector() : new TileEntityCableSplitter();
         NBTTagCompound nbt = new NBTTagCompound();
         writeToNBT(nbt);
-        this.field_145850_b.func_175690_a(getPos(), (TileEntity)newTe);
+        this.world.func_175690_a(getPos(), (TileEntity)newTe);
         newTe.readFromNBT(nbt);
         return;
       } 
@@ -173,7 +173,7 @@ public class TileEntityCable extends TileEntityBlock implements IEnergyConductor
     float sp = (1.0F - th) / 2.0F;
     List<AxisAlignedBB> ret = new ArrayList<>(7);
     ret.add(new AxisAlignedBB(sp, sp, sp, (sp + th), (sp + th), (sp + th)));
-    for (EnumFacing facing : EnumFacing.field_82609_l) {
+    for (EnumFacing facing : EnumFacing.VALUES) {
       boolean hasConnection = ((this.connectivity & 1 << facing.ordinal()) != 0);
       if (hasConnection) {
         float zS = sp, yS = zS, xS = yS;
@@ -245,9 +245,9 @@ public class TileEntityCable extends TileEntityBlock implements IEnergyConductor
     World world = getWorld();
     byte newConnectivity = 0;
     int mask = 1;
-    for (EnumFacing dir : EnumFacing.field_82609_l) {
-      IEnergyTile tile = EnergyNet.instance.getSubTile(world, this.field_174879_c.func_177972_a(dir));
-      if (((tile instanceof IEnergyAcceptor && ((IEnergyAcceptor)tile).acceptsEnergyFrom((IEnergyEmitter)this, dir.func_176734_d())) || (tile instanceof IEnergyEmitter && ((IEnergyEmitter)tile).emitsEnergyTo((IEnergyAcceptor)this, dir.func_176734_d()))) && canInteractWith(tile, dir))
+    for (EnumFacing dir : EnumFacing.VALUES) {
+      IEnergyTile tile = EnergyNet.instance.getSubTile(world, this.pos.offset(dir));
+      if (((tile instanceof IEnergyAcceptor && ((IEnergyAcceptor)tile).acceptsEnergyFrom((IEnergyEmitter)this, dir.getOpposite())) || (tile instanceof IEnergyEmitter && ((IEnergyEmitter)tile).emitsEnergyTo((IEnergyAcceptor)this, dir.getOpposite()))) && canInteractWith(tile, dir))
         newConnectivity = (byte)(newConnectivity | mask); 
       mask *= 2;
     } 
@@ -289,7 +289,7 @@ public class TileEntityCable extends TileEntityBlock implements IEnergyConductor
   protected float getExplosionResistance(Entity exploder, Explosion explosion) {
     switch (this.foam) {
       case Hardened:
-        return BlockName.wall.getInstance().getExplosionResistance(getWorld(), this.field_174879_c, exploder, explosion);
+        return BlockName.wall.getInstance().getExplosionResistance(getWorld(), this.pos, exploder, explosion);
     } 
     return super.getHardness();
   }
@@ -329,7 +329,7 @@ public class TileEntityCable extends TileEntityBlock implements IEnergyConductor
         ((NetworkManager)IC2.network.get(true)).updateTileEntityField((TileEntity)this, "foamColor");
         this.obscuration.clear();
       } 
-      func_70296_d();
+      markDirty();
     } 
     return true;
   }
@@ -390,7 +390,7 @@ public class TileEntityCable extends TileEntityBlock implements IEnergyConductor
     if (tile instanceof IColoredEnergyTile) {
       IColoredEnergyTile other = (IColoredEnergyTile)tile;
       EnumDyeColor thisColor = getColor(side);
-      EnumDyeColor otherColor = other.getColor(side.func_176734_d());
+      EnumDyeColor otherColor = other.getColor(side.getOpposite());
       return (thisColor == null || otherColor == null || thisColor == otherColor);
     } 
     return true;
@@ -421,7 +421,7 @@ public class TileEntityCable extends TileEntityBlock implements IEnergyConductor
   }
   
   public void removeConductor() {
-    getWorld().func_175698_g(this.field_174879_c);
+    getWorld().func_175698_g(this.pos);
     ((NetworkManager)IC2.network.get(true)).initiateTileEntityEvent((TileEntity)this, 0, true);
   }
   
@@ -456,12 +456,12 @@ public class TileEntityCable extends TileEntityBlock implements IEnergyConductor
     World world = getWorld();
     switch (event) {
       case 0:
-        world.func_184133_a(null, this.field_174879_c, SoundEvents.field_187658_bx, SoundCategory.BLOCKS, 0.5F, 2.6F + (world.field_73012_v.nextFloat() - world.field_73012_v.nextFloat()) * 0.8F);
+        world.func_184133_a(null, this.pos, SoundEvents.field_187658_bx, SoundCategory.BLOCKS, 0.5F, 2.6F + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.8F);
         for (l = 0; l < 8; l++)
-          world.func_175688_a(EnumParticleTypes.SMOKE_LARGE, this.field_174879_c.getX() + Math.random(), this.field_174879_c.getY() + 1.2D, this.field_174879_c.getZ() + Math.random(), 0.0D, 0.0D, 0.0D, new int[0]); 
+          world.func_175688_a(EnumParticleTypes.SMOKE_LARGE, this.pos.getX() + Math.random(), this.pos.getY() + 1.2D, this.pos.getZ() + Math.random(), 0.0D, 0.0D, 0.0D, new int[0]); 
         return;
     } 
-    IC2.platform.displayError("An unknown event type was received over multiplayer.\nThis could happen due to corrupted data or a bug.\n\n(Technical information: event ID " + event + ", tile entity below)\nT: " + this + " (" + this.field_174879_c + ")", new Object[0]);
+    IC2.platform.displayError("An unknown event type was received over multiplayer.\nThis could happen due to corrupted data or a bug.\n\n(Technical information: event ID " + event + ", tile entity below)\nT: " + this + " (" + this.pos + ")", new Object[0]);
   }
   
   private boolean changeFoam(CableFoam foam, boolean duringLoad) {
@@ -486,7 +486,7 @@ public class TileEntityCable extends TileEntityBlock implements IEnergyConductor
     if (foam == CableFoam.Soft) {
       this.continuousUpdate = new IWorldTickCallback() {
           public void onTick(World world) {
-            if (world.field_73012_v.nextFloat() < BlockFoam.getHardenChance(world, TileEntityCable.this.field_174879_c, TileEntityCable.this.func_145838_q().getState((ITeBlock)TeBlock.cable), BlockFoam.FoamType.normal))
+            if (world.rand.nextFloat() < BlockFoam.getHardenChance(world, TileEntityCable.this.pos, TileEntityCable.this.getBlockType().getState((ITeBlock)TeBlock.cable), BlockFoam.FoamType.normal))
               TileEntityCable.this.changeFoam(CableFoam.Hardened, false); 
           }
         };
@@ -494,8 +494,8 @@ public class TileEntityCable extends TileEntityBlock implements IEnergyConductor
     } 
     if (!duringLoad) {
       ((NetworkManager)IC2.network.get(true)).updateTileEntityField((TileEntity)this, "foam");
-      world.func_175685_c(this.field_174879_c, (Block) func_145838_q(), true);
-      func_70296_d();
+      world.notifyNeighborsOfStateChange(this.pos, (Block) getBlockType(), true);
+      markDirty();
     } 
     return true;
   }

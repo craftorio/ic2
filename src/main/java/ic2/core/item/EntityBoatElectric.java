@@ -35,7 +35,7 @@ public class EntityBoatElectric extends EntityIC2Boat {
   }
   
   protected boolean isWater(IBlockState block) {
-    return (block.func_185904_a() == Material.field_151586_h || block.func_185904_a() == Material.field_151587_i);
+    return (block.getMaterial() == Material.WATER || block.getMaterial() == Material.field_151587_i);
   }
   
   public String getTexture() {

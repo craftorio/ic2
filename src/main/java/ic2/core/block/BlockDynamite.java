@@ -62,16 +62,16 @@ public class BlockDynamite extends BlockBase {
   
   public boolean func_176196_c(World world, BlockPos pos) {
     for (EnumFacing dir : BlockTorch.field_176596_a.func_177700_c()) {
-      if (world.func_175677_d(pos.func_177972_a(dir.func_176734_d()), false))
+      if (world.func_175677_d(pos.offset(dir.getOpposite()), false))
         return true; 
     } 
     return false;
   }
   
   public IBlockState func_180642_a(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
-    if (facing == EnumFacing.DOWN || !world.func_175677_d(pos.func_177972_a(facing.func_176734_d()), false))
+    if (facing == EnumFacing.DOWN || !world.func_175677_d(pos.offset(facing.getOpposite()), false))
       for (EnumFacing facing2 : BlockTorch.field_176596_a.func_177700_c()) {
-        if (world.func_175677_d(pos.func_177972_a(facing2.func_176734_d()), false)) {
+        if (world.func_175677_d(pos.offset(facing2.getOpposite()), false)) {
           facing = facing2;
           break;
         } 
@@ -84,7 +84,7 @@ public class BlockDynamite extends BlockBase {
   }
   
   public IBlockState func_176203_a(int meta) {
-    return getDefaultState().func_177226_a(linked, Boolean.valueOf(((meta & 0x1) != 0))).func_177226_a((IProperty)BlockTorch.field_176596_a, (Comparable)EnumFacing.field_82609_l[meta >> 1]);
+    return getDefaultState().func_177226_a(linked, Boolean.valueOf(((meta & 0x1) != 0))).func_177226_a((IProperty)BlockTorch.field_176596_a, (Comparable)EnumFacing.VALUES[meta >> 1]);
   }
   
   public void func_180633_a(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
@@ -120,9 +120,9 @@ public class BlockDynamite extends BlockBase {
   private void checkPlacement(World world, BlockPos pos, IBlockState state) {
     if (world.isRemote)
       return; 
-    if (world.func_175640_z(pos)) {
+    if (world.isBlockPowered(pos)) {
       explode(world, pos, (EntityLivingBase)null, false);
-    } else if (!world.func_175677_d(pos.func_177972_a(((EnumFacing)state.func_177229_b((IProperty)BlockTorch.field_176596_a)).func_176734_d()), false)) {
+    } else if (!world.func_175677_d(pos.offset(((EnumFacing)state.func_177229_b((IProperty)BlockTorch.field_176596_a)).getOpposite()), false)) {
       world.func_175698_g(pos);
       func_176226_b(world, pos, state, 0);
     } 
@@ -133,7 +133,7 @@ public class BlockDynamite extends BlockBase {
     EntityDynamite entity = new EntityStickyDynamite(world, pos.getX() + 0.5D, pos.getY() + 0.5D, (pos.getZ() + 0.5F));
     entity.owner = player;
     entity.fuse = byExplosion ? 5 : 40;
-    world.func_72838_d(entity);
+    world.spawnEntity(entity);
     world.func_184133_a(null, pos, SoundEvents.field_187904_gd, SoundCategory.BLOCKS, 1.0F, 1.0F);
   }
   

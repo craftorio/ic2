@@ -11,10 +11,10 @@ import net.minecraft.inventory.Slot;
 public class ContainerTradeOMatOpen extends ContainerFullInv<TileEntityTradeOMat> {
   public ContainerTradeOMatOpen(EntityPlayer player, TileEntityTradeOMat tileEntity1) {
     super(player, (IInventory)tileEntity1, 166);
-    func_75146_a((Slot)new SlotInvSlot(tileEntity1.demandSlot, 0, 50, 19));
-    func_75146_a((Slot)new SlotInvSlot(tileEntity1.offerSlot, 0, 50, 53));
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)tileEntity1.inputSlot, 0, 80, 19));
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)tileEntity1.outputSlot, 0, 80, 53));
+    addSlotToContainer((Slot)new SlotInvSlot(tileEntity1.demandSlot, 0, 50, 19));
+    addSlotToContainer((Slot)new SlotInvSlot(tileEntity1.offerSlot, 0, 50, 53));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)tileEntity1.inputSlot, 0, 80, 19));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)tileEntity1.outputSlot, 0, 80, 53));
   }
   
   public List<String> getNetworkedFields() {

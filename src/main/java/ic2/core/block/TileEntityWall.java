@@ -35,12 +35,12 @@ public class TileEntityWall extends TileEntityBlock {
   
   public void readFromNBT(NBTTagCompound nbt) {
     super.readFromNBT(nbt);
-    this.color = Ic2Color.values[nbt.func_74771_c("color") & 0xFF];
+    this.color = Ic2Color.values[nbt.getByte("color") & 0xFF];
   }
   
   public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
     super.writeToNBT(nbt);
-    nbt.func_74774_a("color", (byte)this.color.ordinal());
+    nbt.setByte("color", (byte)this.color.ordinal());
     return nbt;
   }
   
@@ -79,7 +79,7 @@ public class TileEntityWall extends TileEntityBlock {
     this.color = color;
     if (!(getWorld()).isRemote) {
       ((NetworkManager)IC2.network.get(true)).updateTileEntityField(this, "obscuration");
-      func_70296_d();
+      markDirty();
     } else if (updateRenderState()) {
       rerender();
     } 

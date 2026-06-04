@@ -74,12 +74,12 @@ public class TileEntityEnergyOMat extends TileEntityInventory implements IPerson
     super.readFromNBT(nbttagcompound);
     if (nbttagcompound.func_74764_b("ownerGameProfile"))
       this.owner = NBTUtil.func_152459_a(nbttagcompound.getCompoundTag("ownerGameProfile")); 
-    this.euOffer = nbttagcompound.func_74762_e("euOffer");
-    this.paidFor = nbttagcompound.func_74762_e("paidFor");
+    this.euOffer = nbttagcompound.getInteger("euOffer");
+    this.paidFor = nbttagcompound.getInteger("paidFor");
     try {
       this.euBuffer = nbttagcompound.getDouble("euBuffer");
     } catch (Exception e) {
-      this.euBuffer = nbttagcompound.func_74762_e("euBuffer");
+      this.euBuffer = nbttagcompound.getInteger("euBuffer");
     } 
   }
   
@@ -90,8 +90,8 @@ public class TileEntityEnergyOMat extends TileEntityInventory implements IPerson
       NBTUtil.func_180708_a(ownerNbt, this.owner);
       nbt.setTag("ownerGameProfile", (NBTBase)ownerNbt);
     } 
-    nbt.func_74768_a("euOffer", this.euOffer);
-    nbt.func_74768_a("paidFor", this.paidFor);
+    nbt.setInteger("euOffer", this.euOffer);
+    nbt.setInteger("paidFor", this.paidFor);
     nbt.setDouble("euBuffer", this.euBuffer);
     return nbt;
   }
@@ -144,7 +144,7 @@ public class TileEntityEnergyOMat extends TileEntityInventory implements IPerson
       } 
     } 
     if (invChanged)
-      func_70296_d(); 
+      markDirty(); 
   }
   
   public boolean permitsAccess(GameProfile profile) {

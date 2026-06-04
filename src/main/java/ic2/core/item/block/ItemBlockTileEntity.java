@@ -87,6 +87,6 @@ public class ItemBlockTileEntity extends ItemBlockIC2 {
   private ITeBlock getTeBlock(ItemStack stack) {
     if (stack == null)
       return null; 
-    return TeBlockRegistry.get(this.identifier, stack.func_77952_i());
+    return TeBlockRegistry.get(this.identifier, stack.getItemDamage());
   }
 }

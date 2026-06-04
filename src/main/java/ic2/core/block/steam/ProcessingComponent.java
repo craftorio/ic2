@@ -61,12 +61,12 @@ public class ProcessingComponent extends TileEntityComponent {
   }
   
   public void readFromNbt(NBTTagCompound nbt) {
-    this.progress = nbt.func_74762_e("progress");
+    this.progress = nbt.getInteger("progress");
   }
   
   public NBTTagCompound writeToNbt() {
     NBTTagCompound ret = new NBTTagCompound();
-    ret.func_74768_a("progress", this.progress);
+    ret.setInteger("progress", this.progress);
     return ret;
   }
   
@@ -124,7 +124,7 @@ public class ProcessingComponent extends TileEntityComponent {
       this.parent.setActive(false);
     } 
     if (needsInventoryUpdate)
-      this.parent.func_70296_d(); 
+      this.parent.markDirty(); 
   }
   
   public boolean canOperate() {

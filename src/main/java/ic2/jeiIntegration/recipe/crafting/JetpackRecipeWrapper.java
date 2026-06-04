@@ -29,7 +29,7 @@ public class JetpackRecipeWrapper extends BlankRecipeWrapper {
   
   private JetpackRecipeWrapper(ItemStack in) {
     this.in = in;
-    ItemStack out = in.func_77946_l();
+    ItemStack out = in.copy();
     JetpackHandler.setJetpackAttached(out, true);
     this.out = out;
   }

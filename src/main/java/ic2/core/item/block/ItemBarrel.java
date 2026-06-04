@@ -44,7 +44,7 @@ public class ItemBarrel extends ItemIC2 {
   }
   
   public String func_77653_i(ItemStack itemstack) {
-    int v = ItemBooze.getAmountOfValue(itemstack.func_77952_i());
+    int v = ItemBooze.getAmountOfValue(itemstack.getItemDamage());
     if (v > 0)
       return "" + v + Localization.translate("ic2.item.LBoozeBarrel"); 
     return Localization.translate("ic2.item.EmptyBoozeBarrel");
@@ -53,7 +53,7 @@ public class ItemBarrel extends ItemIC2 {
   public EnumActionResult func_180614_a(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float a, float b, float c) {
     ItemStack stack = StackUtil.get(player, hand);
     if (world.getBlockState(pos) == BlockName.scaffold.getBlockState((IIdProvider)BlockScaffold.ScaffoldType.wood) && 
-      ItemBlockTileEntity.placeTeBlock(stack, (EntityLivingBase)player, world, pos, side, (TileEntityBlock)new TileEntityBarrel(stack.func_77952_i()))) {
+      ItemBlockTileEntity.placeTeBlock(stack, (EntityLivingBase)player, world, pos, side, (TileEntityBlock)new TileEntityBarrel(stack.getItemDamage()))) {
       StackUtil.consumeOrError(player, hand, 1);
       return EnumActionResult.SUCCESS;
     } 

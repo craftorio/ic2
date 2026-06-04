@@ -37,12 +37,12 @@ public class RecipeInputOreDict extends RecipeInputBase implements IRecipeInput 
     List<ItemStack> inputs = getOres();
     boolean useOreStackMeta = (this.meta == null);
     Item subjectItem = subject.getItem();
-    int subjectMeta = subject.func_77952_i();
+    int subjectMeta = subject.getItemDamage();
     for (ItemStack oreStack : inputs) {
       Item oreItem = oreStack.getItem();
       if (oreItem == null)
         continue; 
-      int metaRequired = useOreStackMeta ? oreStack.func_77952_i() : this.meta.intValue();
+      int metaRequired = useOreStackMeta ? oreStack.getItemDamage() : this.meta.intValue();
       if (subjectItem == oreItem && (subjectMeta == metaRequired || metaRequired == 32767))
         return true; 
     } 

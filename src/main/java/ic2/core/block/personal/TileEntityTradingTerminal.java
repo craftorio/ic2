@@ -29,8 +29,8 @@ public class TileEntityTradingTerminal extends TileEntityInventory implements IH
     this.range = this.rangeUpgrade.getRemoteRange(512);
   }
   
-  public void func_70296_d() {
-    super.func_70296_d();
+  public void markDirty() {
+    super.markDirty();
     if (!(getWorld()).isRemote)
       this.range = this.rangeUpgrade.getRemoteRange(512); 
   }

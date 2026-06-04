@@ -21,13 +21,13 @@ public class ContainerNuclearReactor extends ContainerBase<TileEntityNuclearReac
     for (int i = 0; i < slotCount; i++) {
       int x = i % this.size;
       int y = i / this.size;
-      func_75146_a((Slot)new SlotInvSlot((InvSlot)te.reactorSlot, i, startX + 18 * x, startY + 18 * y));
+      addSlotToContainer((Slot)new SlotInvSlot((InvSlot)te.reactorSlot, i, startX + 18 * x, startY + 18 * y));
     } 
     addPlayerInventorySlots(player, 214, 243);
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)te.coolantinputSlot, 0, 8, 25));
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)te.hotcoolinputSlot, 0, 188, 25));
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)te.coolantoutputSlot, 0, 8, 115));
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)te.hotcoolantoutputSlot, 0, 188, 115));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)te.coolantinputSlot, 0, 8, 25));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)te.hotcoolinputSlot, 0, 188, 25));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)te.coolantoutputSlot, 0, 8, 115));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)te.hotcoolantoutputSlot, 0, 188, 115));
   }
   
   public List<String> getNetworkedFields() {

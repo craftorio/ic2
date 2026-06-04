@@ -31,7 +31,7 @@ public class GuiTradingTerminal extends GuiIC2<ContainerTradingTerminal> {
                         System.out.println(this.item + " clicked with " + button);
                       }
                       
-                      public String func_176610_l() {
+                      public String getName() {
                         return "Trader " + this.item;
                       }
                     });

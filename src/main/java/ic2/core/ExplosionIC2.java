@@ -181,8 +181,8 @@ public class ExplosionIC2 extends Explosion {
       return; 
     int range = this.areaSize / 2;
     BlockPos pos = new BlockPos(getPosition());
-    BlockPos start = pos.func_177982_a(-range, -range, -range);
-    BlockPos end = pos.func_177982_a(range, range, range);
+    BlockPos start = pos.add(-range, -range, -range);
+    BlockPos end = pos.add(range, range, range);
     this.chunkCache = new ChunkCache(this.worldObj, start, end, 0);
     List<Entity> entities = this.worldObj.func_72839_b(null, new AxisAlignedBB(start, end));
     for (Entity entity : entities) {
@@ -237,7 +237,7 @@ public class ExplosionIC2 extends Explosion {
       } 
     } 
     ((NetworkManager)IC2.network.get(true)).initiateExplosionEffect(this.worldObj, getPosition(), this.type);
-    Random rng = this.worldObj.field_73012_v;
+    Random rng = this.worldObj.rand;
     boolean doDrops = this.worldObj.func_82736_K().func_82766_b("doTileDrops");
     Map<XZposition, Map<ItemComparableItemStack, DropData>> blocksToDrop = new HashMap<>();
     for (int y = 0; y < this.destroyedBlockPositions.length; y++) {
@@ -250,7 +250,7 @@ public class ExplosionIC2 extends Explosion {
           int x = realIndex - z * this.areaSize;
           x += this.areaX;
           z += this.areaZ;
-          tmpPos.func_181079_c(x, y, z);
+          tmpPos.setPos(x, y, z);
           IBlockState state = this.chunkCache.getBlockState((BlockPos)tmpPos);
           Block block = state.getBlock();
           if (this.power < 20.0F);
@@ -284,9 +284,9 @@ public class ExplosionIC2 extends Explosion {
         int count = ((DropData)entry2.getValue()).n;
         while (count > 0) {
           int stackSize = Math.min(count, 64);
-          EntityItem entityitem = new EntityItem(this.worldObj, ((xZposition.x + this.worldObj.field_73012_v.nextFloat()) * 2.0F), ((DropData)entry2.getValue()).maxY + 0.5D, ((xZposition.z + this.worldObj.field_73012_v.nextFloat()) * 2.0F), isw.toStack(stackSize));
+          EntityItem entityitem = new EntityItem(this.worldObj, ((xZposition.x + this.worldObj.rand.nextFloat()) * 2.0F), ((DropData)entry2.getValue()).maxY + 0.5D, ((xZposition.z + this.worldObj.rand.nextFloat()) * 2.0F), isw.toStack(stackSize));
           entityitem.func_174869_p();
-          this.worldObj.func_72838_d((Entity)entityitem);
+          this.worldObj.spawnEntity((Entity)entityitem);
           count -= stackSize;
         } 
       } 
@@ -322,7 +322,7 @@ public class ExplosionIC2 extends Explosion {
         break; 
       int blockX = Util.roundToNegInf(x);
       int blockZ = Util.roundToNegInf(z);
-      tmpPos.func_181079_c(blockX, blockY, blockZ);
+      tmpPos.setPos(blockX, blockY, blockZ);
       IBlockState state = this.chunkCache.getBlockState((BlockPos)tmpPos);
       Block block = state.getBlock();
       double absorption = getAbsorption(block, (BlockPos)tmpPos);
@@ -352,7 +352,7 @@ public class ExplosionIC2 extends Explosion {
     double ret = 0.5D;
     if (block == Blocks.AIR || block.isAir(block.getDefaultState(), (IBlockAccess)this.worldObj, pos))
       return ret; 
-    if ((block == Blocks.field_150355_j || block == Blocks.field_150358_i) && this.type != Type.Normal) {
+    if ((block == Blocks.WATER || block == Blocks.field_150358_i) && this.type != Type.Normal) {
       ret++;
     } else {
       float resistance = block.getExplosionResistance(this.worldObj, pos, this.exploder, this);

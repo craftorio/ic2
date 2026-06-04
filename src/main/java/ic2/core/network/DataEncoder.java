@@ -247,7 +247,7 @@ public final class DataEncoder {
         } else {
           os.writeByte(StackUtil.getSize(stack));
           encode(os, stack.getItem(), false);
-          os.writeShort(stack.func_77952_i());
+          os.writeShort(stack.getItemDamage());
           encode(os, stack.func_77978_p(), true);
         } 
         return;
@@ -305,7 +305,7 @@ public final class DataEncoder {
         os.writeDouble(v.field_72449_c);
         return;
       case World:
-        os.writeInt(((World)o).field_73011_w.getDimension());
+        os.writeInt(((World)o).provider.getDimension());
         return;
     } 
     throw new IllegalArgumentException("unhandled type: " + type);
@@ -538,7 +538,7 @@ public final class DataEncoder {
               World world = deferredWorld.get();
               if (world == null)
                 return null; 
-              return world.func_175625_s(pos);
+              return world.getTileEntity(pos);
             }
           };
       case TupleT2:

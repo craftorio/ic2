@@ -26,9 +26,9 @@ public class GuiMagnetizer extends GuiIC2<ContainerMagnetizer> {
   protected void drawForegroundLayer(int mouseX, int mouseY) {
     super.drawForegroundLayer(mouseX, mouseY);
     if (BlockIC2Fence.hasMetalShoes(((ContainerMagnetizer)this.container).player)) {
-      this.field_146289_q.func_78276_b(Localization.translate("ic2.Magnetizer.gui.hasMetalShoes"), 18, 66, 4259648);
+      this.fontRenderer.drawString(Localization.translate("ic2.Magnetizer.gui.hasMetalShoes"), 18, 66, 4259648);
     } else {
-      this.field_146289_q.func_78276_b(Localization.translate("ic2.Magnetizer.gui.noMetalShoes"), 18, 66, 16728128);
+      this.fontRenderer.drawString(Localization.translate("ic2.Magnetizer.gui.noMetalShoes"), 18, 66, 16728128);
     } 
   }
 }

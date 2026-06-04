@@ -15,14 +15,14 @@ public class ContainerSortingMachine extends ContainerElectricMachine<TileEntity
     super(player, tileEntity, 243, 188, 219);
     int i;
     for (i = 0; i < 3; i++)
-      func_75146_a((Slot)new SlotInvSlot((InvSlot)tileEntity.upgradeSlot, i, 188, 161 + i * 18)); 
+      addSlotToContainer((Slot)new SlotInvSlot((InvSlot)tileEntity.upgradeSlot, i, 188, 161 + i * 18)); 
     for (i = 0; i < 11; i++)
-      func_75146_a((Slot)new SlotInvSlot(tileEntity.buffer, i, 8 + i * 18, 141)); 
-    for (i = 0; i < EnumFacing.field_82609_l.length; i++) {
-      EnumFacing dir = EnumFacing.field_82609_l[i];
+      addSlotToContainer((Slot)new SlotInvSlot(tileEntity.buffer, i, 8 + i * 18, 141)); 
+    for (i = 0; i < EnumFacing.VALUES.length; i++) {
+      EnumFacing dir = EnumFacing.VALUES[i];
       ItemStack[] filterSlots = tileEntity.getFilterSlots(dir);
       for (int j = 0; j < filterSlots.length; j++)
-        func_75146_a((Slot)new SlotHologramSlot(filterSlots, j, 80 + j * 18, 19 + i * 20, 64, null)); 
+        addSlotToContainer((Slot)new SlotHologramSlot(filterSlots, j, 80 + j * 18, 19 + i * 20, 64, null)); 
     } 
   }
   

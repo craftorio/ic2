@@ -24,12 +24,12 @@ public class ContainerToolbox extends ContainerHandHeldInventory<HandHeldToolbox
   public ContainerToolbox(EntityPlayer player, HandHeldToolbox Toolbox1) {
     super(Toolbox1);
     for (int i = 0; i < 9; i++)
-      func_75146_a((Slot)new SlotBoxable((IInventory)Toolbox1, i, 8 + i * 18, 41)); 
+      addSlotToContainer((Slot)new SlotBoxable((IInventory)Toolbox1, i, 8 + i * 18, 41)); 
     for (int row = 0; row < 3; row++) {
       for (int j = 0; j < 9; j++)
-        func_75146_a(new Slot((IInventory)player.inventory, j + row * 9 + 9, 8 + j * 18, 84 + row * 18)); 
+        addSlotToContainer(new Slot((IInventory)player.inventory, j + row * 9 + 9, 8 + j * 18, 84 + row * 18)); 
     } 
     for (int col = 0; col < 9; col++)
-      func_75146_a(new Slot((IInventory)player.inventory, col, 8 + col * 18, 142)); 
+      addSlotToContainer(new Slot((IInventory)player.inventory, col, 8 + col * 18, 142)); 
   }
 }

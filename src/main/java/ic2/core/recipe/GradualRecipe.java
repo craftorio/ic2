@@ -87,7 +87,7 @@ public class GradualRecipe implements IRecipe {
         }  
     } 
     if (gridItem != null && chargeMats > 0) {
-      ItemStack stack = gridItem.func_77946_l();
+      ItemStack stack = gridItem.copy();
       int damage = this.item.getCustomDamage(stack) - this.amount * chargeMats;
       if (damage > this.item.getMaxCustomDamage(stack)) {
         damage = this.item.getMaxCustomDamage(stack);

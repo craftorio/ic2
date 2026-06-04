@@ -42,7 +42,7 @@ public class ItemPumpCover extends ItemMulti<PumpCoverType> implements IFluidCon
     PumpCoverType type = (PumpCoverType)getType(stack);
     if (type == null)
       return EnumActionResult.PASS; 
-    TileEntity tileEntity = world.func_175625_s(pos);
+    TileEntity tileEntity = world.getTileEntity(pos);
     if (!(tileEntity instanceof ICoverHolder))
       return EnumActionResult.PASS; 
     EnumFacing selectedFacing = RotationUtil.rotateByHit(side, xOffset, yOffset, zOffset);
@@ -77,13 +77,13 @@ public class ItemPumpCover extends ItemMulti<PumpCoverType> implements IFluidCon
     if (type == null)
       return false; 
     NBTTagCompound nbtTagCompound = StackUtil.getOrCreateNbtData(stack);
-    EnumFacing side = EnumFacing.field_82609_l[nbtTagCompound.func_74771_c("side") & 0xFF];
+    EnumFacing side = EnumFacing.VALUES[nbtTagCompound.getByte("side") & 0xFF];
     boolean ret = false;
     TileEntity holder = (TileEntity)parent;
     LiquidUtil.AdjacentFluidHandler target = LiquidUtil.getAdjacentHandler(holder, side);
     if (target != null) {
       int amount = type.transferRate / 20;
-      LiquidUtil.transfer(target.handler, target.dir.func_176734_d(), holder, amount);
+      LiquidUtil.transfer(target.handler, target.dir.getOpposite(), holder, amount);
     } 
     return ret;
   }
@@ -105,7 +105,7 @@ public class ItemPumpCover extends ItemMulti<PumpCoverType> implements IFluidCon
   }
   
   public boolean providesEnhancedOverlay(World world, BlockPos pos, EnumFacing side, EntityPlayer player, ItemStack stack) {
-    TileEntity tileEntity = world.func_175625_s(pos);
+    TileEntity tileEntity = world.getTileEntity(pos);
     if (tileEntity instanceof ICoverHolder)
       return true; 
     return false;

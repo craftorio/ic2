@@ -64,7 +64,7 @@ public class TileEntityPersonalChest extends TileEntityInventory implements IPer
     this.prevLidAngle = this.lidAngle;
     if (this.usingPlayerCount > 0 && this.lidAngle <= 0) {
       World world = getWorld();
-      world.func_184133_a(null, this.field_174879_c, SoundEvents.field_187657_V, SoundCategory.BLOCKS, 0.5F, world.field_73012_v.nextFloat() * 0.1F + 0.9F);
+      world.func_184133_a(null, this.pos, SoundEvents.field_187657_V, SoundCategory.BLOCKS, 0.5F, world.rand.nextFloat() * 0.1F + 0.9F);
     } 
     if ((this.usingPlayerCount == 0 && this.lidAngle > 0) || (this.usingPlayerCount > 0 && this.lidAngle < 10)) {
       if (this.usingPlayerCount > 0) {
@@ -75,7 +75,7 @@ public class TileEntityPersonalChest extends TileEntityInventory implements IPer
       int closeThreshold = 5;
       if (this.lidAngle < closeThreshold && this.prevLidAngle >= closeThreshold) {
         World world = getWorld();
-        world.func_184133_a(null, this.field_174879_c, SoundEvents.field_187651_T, SoundCategory.BLOCKS, 0.5F, world.field_73012_v.nextFloat() * 0.1F + 0.9F);
+        world.func_184133_a(null, this.pos, SoundEvents.field_187651_T, SoundCategory.BLOCKS, 0.5F, world.rand.nextFloat() * 0.1F + 0.9F);
       } 
     } 
   }
@@ -148,7 +148,7 @@ public class TileEntityPersonalChest extends TileEntityInventory implements IPer
           } 
           if (amount != 0) {
             if (amount < 0) {
-              int space = Math.min(TileEntityPersonalChest.this.contentSlot.getStackSizeLimit(), stack.func_77976_d()) - StackUtil.getSize(stack);
+              int space = Math.min(TileEntityPersonalChest.this.contentSlot.getStackSizeLimit(), stack.getMaxStackSize()) - StackUtil.getSize(stack);
               amount = Math.max(amount, -space);
             } 
             stack = StackUtil.decSize(stack, amount);
@@ -167,7 +167,7 @@ public class TileEntityPersonalChest extends TileEntityInventory implements IPer
         
         public void func_70299_a(int index, ItemStack stack) {
           TileEntityPersonalChest.this.contentSlot.put(index, stack);
-          func_70296_d();
+          markDirty();
         }
         
         public int func_70297_j_() {

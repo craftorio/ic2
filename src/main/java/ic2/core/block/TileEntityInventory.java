@@ -30,7 +30,7 @@ public abstract class TileEntityInventory extends TileEntityBlock implements ISi
   
   public TileEntityInventory() {
     this.invSlots = new ArrayList<>();
-    this.itemHandler = new IItemHandler[EnumFacing.field_82609_l.length + 1];
+    this.itemHandler = new IItemHandler[EnumFacing.VALUES.length + 1];
     this.comparator = addComponent(new ComparatorEmitter(this));
     this.comparator.setUpdate(this::calcRedstoneFromInvSlots);
   }
@@ -89,12 +89,12 @@ public abstract class TileEntityInventory extends TileEntityBlock implements ISi
     } 
     if (amount != 0) {
       if (amount < 0) {
-        int space = Math.min(getAt(loc).getStackSizeLimit(), stack.func_77976_d()) - StackUtil.getSize(stack);
+        int space = Math.min(getAt(loc).getStackSizeLimit(), stack.getMaxStackSize()) - StackUtil.getSize(stack);
         amount = Math.max(amount, -space);
       } 
       putStackAt(loc, StackUtil.decSize(stack, amount));
     } 
-    ItemStack ret = stack.func_77946_l();
+    ItemStack ret = stack.copy();
     ret = StackUtil.setSize(ret, amount);
     return ret;
   }
@@ -120,8 +120,8 @@ public abstract class TileEntityInventory extends TileEntityBlock implements ISi
     putStackAt(loc, stack);
   }
   
-  public void func_70296_d() {
-    super.func_70296_d();
+  public void markDirty() {
+    super.markDirty();
     for (InvSlot invSlot : this.invSlots)
       invSlot.onChanged(); 
   }
@@ -148,7 +148,7 @@ public abstract class TileEntityInventory extends TileEntityBlock implements ISi
   }
   
   public boolean func_70300_a(EntityPlayer player) {
-    return (!func_145837_r() && player.func_174818_b(this.field_174879_c) <= 64.0D);
+    return (!isInvalid() && player.func_174818_b(this.pos) <= 64.0D);
   }
   
   public void func_174889_b(EntityPlayer player) {}
@@ -273,7 +273,7 @@ public abstract class TileEntityInventory extends TileEntityBlock implements ISi
   
   private void putStackAt(int loc, ItemStack stack) {
     getAt(loc).put(getOffset(loc), stack);
-    super.func_70296_d();
+    super.markDirty();
   }
   
   private InvSlot getInventorySlot(int extIndex) {
@@ -333,7 +333,7 @@ public abstract class TileEntityInventory extends TileEntityBlock implements ISi
       for (int i = 0; i < size; i++) {
         ItemStack stack = slot.get(i);
         if (!StackUtil.isEmpty(stack))
-          used += Math.min(limit, stack.func_190916_E() * limit / stack.func_77976_d()); 
+          used += Math.min(limit, stack.func_190916_E() * limit / stack.getMaxStackSize()); 
       } 
     } 
     if (used == 0 || space == 0)

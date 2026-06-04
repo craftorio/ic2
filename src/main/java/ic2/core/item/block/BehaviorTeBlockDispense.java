@@ -21,11 +21,11 @@ public class BehaviorTeBlockDispense extends BehaviorDefaultDispenseItem {
   protected ItemStack func_82487_b(IBlockSource source, ItemStack stack) {
     if (StackUtil.checkItemEquality(stack, BlockName.te.getItemStack((Enum)TeBlock.itnt))) {
       World world = source.func_82618_k();
-      BlockPos pos = source.func_180699_d().func_177972_a((EnumFacing)source.func_189992_e().func_177229_b((IProperty)BlockDispenser.field_176441_a));
+      BlockPos pos = source.func_180699_d().offset((EnumFacing)source.func_189992_e().func_177229_b((IProperty)BlockDispenser.field_176441_a));
       assert !world.isRemote;
       EntityItnt entityItnt = new EntityItnt(world, pos.getX() + 0.5D, pos.getY(), pos.getZ() + 0.5D);
       world.func_175698_g(pos);
-      world.func_72838_d((Entity)entityItnt);
+      world.spawnEntity((Entity)entityItnt);
       world.func_184148_a(null, ((EntityIC2Explosive)entityItnt).posX, ((EntityIC2Explosive)entityItnt).posY, ((EntityIC2Explosive)entityItnt).posZ, SoundEvents.field_187904_gd, SoundCategory.BLOCKS, 1.0F, 1.0F);
       return StackUtil.decSize(stack);
     } 

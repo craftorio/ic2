@@ -104,7 +104,7 @@ public class GuiElectrolyzer extends GuiIC2<ContainerElectrolyzer> {
                 if (liquid != null) {
                   ret.add(liquid.getLocalizedName(fluid));
                   ret.add("Amount: " + fluid.amount + ' ' + Localization.translate("ic2.generic.text.mb"));
-                  ret.add("Output Tank: " + StringUtils.capitalize(tank.getSide().func_176610_l()));
+                  ret.add("Output Tank: " + StringUtils.capitalize(tank.getSide().getName()));
                 } else {
                   ret.add("Invalid FluidStack instance.");
                 } 

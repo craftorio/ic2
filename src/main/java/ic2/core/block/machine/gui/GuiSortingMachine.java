@@ -21,7 +21,7 @@ public class GuiSortingMachine extends GuiIC2<ContainerSortingMachine> {
   public GuiSortingMachine(final ContainerSortingMachine container) {
     super((ContainerBase)container, 212, 243);
     addElement((GuiElement)EnergyGauge.asBolt(this, 174, 220, (TileEntityBlock)container.base));
-    for (EnumFacing dir : EnumFacing.field_82609_l) {
+    for (EnumFacing dir : EnumFacing.VALUES) {
       final EnumFacing cDir = dir;
       addElement((GuiElement)Image.create(this, 60, 18 + dir.ordinal() * 20, 18, 18, texture, 256, 256, (IOverlaySupplier)new FixedSizeOverlaySupplier(18) {
               public int getUS() {

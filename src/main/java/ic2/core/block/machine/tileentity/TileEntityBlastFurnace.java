@@ -60,7 +60,7 @@ public class TileEntityBlastFurnace extends TileEntityInventory implements IUpgr
   
   public final InvSlotConsumableLiquidByList tankInputSlot = new InvSlotConsumableLiquidByList((IInventorySlotHolder)this, "cellInput", 1, new Fluid[] { FluidName.air.getInstance() });
   
-  public final InvSlotOutput tankOutputSlot = new InvSlotOutput((IInventorySlotHolder)this, "cellOutput", 1);
+  public final InvSlotOutput tankoutputSlot = new InvSlotOutput((IInventorySlotHolder)this, "cellOutput", 1);
   
   public final InvSlotUpgrade upgradeSlot = new InvSlotUpgrade((IInventorySlotHolder)this, "upgrade", 2);
   
@@ -82,12 +82,12 @@ public class TileEntityBlastFurnace extends TileEntityInventory implements IUpgr
     MachineRecipeResult<IRecipeInput, Collection<ItemStack>, ItemStack> result = getOutput();
     if (result != null && isHot()) {
       setActive(true);
-      if (result.getRecipe().getMetaData().func_74762_e("fluid") <= this.fluidTank.getFluidAmount()) {
+      if (result.getRecipe().getMetaData().getInteger("fluid") <= this.fluidTank.getFluidAmount()) {
         this.progress++;
-        this.fluidTank.drainInternal(result.getRecipe().getMetaData().func_74762_e("fluid"), true);
+        this.fluidTank.drainInternal(result.getRecipe().getMetaData().getInteger("fluid"), true);
       } 
-      this.progressNeeded = result.getRecipe().getMetaData().func_74762_e("duration");
-      if (this.progress >= result.getRecipe().getMetaData().func_74762_e("duration")) {
+      this.progressNeeded = result.getRecipe().getMetaData().getInteger("duration");
+      if (this.progress >= result.getRecipe().getMetaData().getInteger("duration")) {
         operateOnce(result, (Collection<ItemStack>)result.getOutput());
         needsInvUpdate = true;
         this.progress = 0;
@@ -103,7 +103,7 @@ public class TileEntityBlastFurnace extends TileEntityInventory implements IUpgr
     this.guiProgress = this.progress / this.progressNeeded;
     this.guiHeat = this.heat / maxHeat;
     if (needsInvUpdate)
-      func_70296_d(); 
+      markDirty(); 
   }
   
   public void operateOnce(MachineRecipeResult<IRecipeInput, Collection<ItemStack>, ItemStack> result, Collection<ItemStack> processResult) {
@@ -123,19 +123,19 @@ public class TileEntityBlastFurnace extends TileEntityInventory implements IUpgr
   }
   
   public boolean gainFluid() {
-    return this.tankInputSlot.processIntoTank((IFluidTank)this.fluidTank, this.tankOutputSlot);
+    return this.tankInputSlot.processIntoTank((IFluidTank)this.fluidTank, this.tankoutputSlot);
   }
   
   public void readFromNBT(NBTTagCompound nbt) {
     super.readFromNBT(nbt);
-    this.heat = nbt.func_74762_e("heat");
-    this.progress = nbt.func_74762_e("progress");
+    this.heat = nbt.getInteger("heat");
+    this.progress = nbt.getInteger("progress");
   }
   
   public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
     super.writeToNBT(nbt);
-    nbt.func_74768_a("heat", this.heat);
-    nbt.func_74768_a("progress", this.progress);
+    nbt.setInteger("heat", this.heat);
+    nbt.setInteger("progress", this.progress);
     return nbt;
   }
   
@@ -150,9 +150,9 @@ public class TileEntityBlastFurnace extends TileEntityInventory implements IUpgr
     } 
     if (heatRequested > 0) {
       EnumFacing dir = getFacing();
-      TileEntity te = getWorld().func_175625_s(this.field_174879_c.func_177972_a(dir));
+      TileEntity te = getWorld().getTileEntity(this.pos.offset(dir));
       if (te instanceof IHeatSource) {
-        gainhU = ((IHeatSource)te).drawHeat(dir.func_176734_d(), heatRequested, false);
+        gainhU = ((IHeatSource)te).drawHeat(dir.getOpposite(), heatRequested, false);
         this.heat += gainhU;
       } 
       if (gainhU == 0)

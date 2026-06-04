@@ -363,7 +363,7 @@ public class AdvRecipe implements IShapedRecipe {
           return StackUtil.emptyStack;
         }  
     } 
-    ItemStack ret = this.output.func_77946_l();
+    ItemStack ret = this.output.copy();
     ElectricItem.manager.charge(ret, outputCharge, 2147483647, true, false);
     return ret;
   }

@@ -48,16 +48,16 @@ public class TileEntitySortingMachine extends TileEntityElectricMachine implemen
   
   public void readFromNBT(NBTTagCompound nbt) {
     super.readFromNBT(nbt);
-    NBTTagList filtersTag = nbt.func_150295_c("filters", 10);
-    for (int i = 0; i < filtersTag.func_74745_c(); i++) {
-      NBTTagCompound filterTag = filtersTag.func_150305_b(i);
-      int index = filterTag.func_74771_c("index") & 0xFF;
+    NBTTagList filtersTag = nbt.getTagList("filters", 10);
+    for (int i = 0; i < filtersTag.tagCount(); i++) {
+      NBTTagCompound filterTag = filtersTag.getCompoundTagAt(i);
+      int index = filterTag.getByte("index") & 0xFF;
       ItemStack stack = new ItemStack(filterTag);
       this.filters[index / 7][index % 7] = stack;
     } 
-    int defaultRouteIdx = nbt.func_74771_c("defaultroute");
-    if (defaultRouteIdx >= 0 && defaultRouteIdx < EnumFacing.field_82609_l.length)
-      this.defaultRoute = EnumFacing.field_82609_l[defaultRouteIdx]; 
+    int defaultRouteIdx = nbt.getByte("defaultroute");
+    if (defaultRouteIdx >= 0 && defaultRouteIdx < EnumFacing.VALUES.length)
+      this.defaultRoute = EnumFacing.VALUES[defaultRouteIdx]; 
   }
   
   public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
@@ -67,13 +67,13 @@ public class TileEntitySortingMachine extends TileEntityElectricMachine implemen
       ItemStack stack = this.filters[i / 7][i % 7];
       if (stack != null) {
         NBTTagCompound contentTag = new NBTTagCompound();
-        contentTag.func_74774_a("index", (byte)i);
-        stack.func_77955_b(contentTag);
-        filtersTag.func_74742_a((NBTBase)contentTag);
+        contentTag.setByte("index", (byte)i);
+        stack.writeToNBT(contentTag);
+        filtersTag.appendTag((NBTBase)contentTag);
       } 
     } 
     nbt.setTag("filters", (NBTBase)filtersTag);
-    nbt.func_74774_a("defaultroute", (byte)this.defaultRoute.ordinal());
+    nbt.setByte("defaultroute", (byte)this.defaultRoute.ordinal());
     return nbt;
   }
   
@@ -138,7 +138,7 @@ public class TileEntitySortingMachine extends TileEntityElectricMachine implemen
   
   public void onNetworkEvent(EntityPlayer player, int event) {
     if (event >= 0 && event <= 5)
-      this.defaultRoute = EnumFacing.field_82609_l[event]; 
+      this.defaultRoute = EnumFacing.VALUES[event]; 
   }
   
   public ContainerBase<TileEntitySortingMachine> getGuiContainer(EntityPlayer player) {
@@ -156,8 +156,8 @@ public class TileEntitySortingMachine extends TileEntityElectricMachine implemen
     return EnumSet.of(UpgradableProperty.Transformer);
   }
   
-  public void func_70296_d() {
-    super.func_70296_d();
+  public void markDirty() {
+    super.markDirty();
     if (IC2.platform.isSimulating())
       setUpgradableBlock(); 
   }

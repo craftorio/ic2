@@ -58,12 +58,12 @@ public class TileEntityTerra extends TileEntityElectricMachine {
         World world = getWorld();
         if (this.lastPos != null) {
           int range = tfbp.getRange(stack) / 10;
-          nextPos = new BlockPos(this.lastPos.getX() - world.field_73012_v.nextInt(range + 1) + world.field_73012_v.nextInt(range + 1), this.field_174879_c.getY(), this.lastPos.getZ() - world.field_73012_v.nextInt(range + 1) + world.field_73012_v.nextInt(range + 1));
+          nextPos = new BlockPos(this.lastPos.getX() - world.rand.nextInt(range + 1) + world.rand.nextInt(range + 1), this.pos.getY(), this.lastPos.getZ() - world.rand.nextInt(range + 1) + world.rand.nextInt(range + 1));
         } else {
           if (this.failedAttempts > 4)
             this.failedAttempts = 4; 
           int range = tfbp.getRange(stack) * (this.failedAttempts + 1) / 5;
-          nextPos = new BlockPos(this.field_174879_c.getX() - world.field_73012_v.nextInt(range + 1) + world.field_73012_v.nextInt(range + 1), this.field_174879_c.getY(), this.field_174879_c.getZ() - world.field_73012_v.nextInt(range + 1) + world.field_73012_v.nextInt(range + 1));
+          nextPos = new BlockPos(this.pos.getX() - world.rand.nextInt(range + 1) + world.rand.nextInt(range + 1), this.pos.getY(), this.pos.getZ() - world.rand.nextInt(range + 1) + world.rand.nextInt(range + 1));
         } 
         if (tfbp.terraform(stack, world, nextPos)) {
           this.energy.useEnergy(tfbp.getConsume(stack));
@@ -92,7 +92,7 @@ public class TileEntityTerra extends TileEntityElectricMachine {
       ItemStack stack = StackUtil.consumeAndGet(player, hand, new Predicate<ItemStack>() {
             public boolean apply(ItemStack input) {
               Item item = input.getItem();
-              return (item instanceof ITerraformingBP && ((ITerraformingBP)item).canInsert(input, player, world, TileEntityTerra.this.field_174879_c));
+              return (item instanceof ITerraformingBP && ((ITerraformingBP)item).canInsert(input, player, world, TileEntityTerra.this.pos));
             }
           }1);
       if (!StackUtil.isEmpty(stack)) {
@@ -107,7 +107,7 @@ public class TileEntityTerra extends TileEntityElectricMachine {
     ItemStack stack = this.tfbpSlot.get();
     if (StackUtil.isEmpty(stack))
       return false; 
-    StackUtil.dropAsEntity(getWorld(), this.field_174879_c, stack);
+    StackUtil.dropAsEntity(getWorld(), this.pos, stack);
     this.tfbpSlot.clear();
     return true;
   }
@@ -131,9 +131,9 @@ public class TileEntityTerra extends TileEntityElectricMachine {
   public static BlockPos getFirstBlockFrom(World world, BlockPos pos, int yOffset) {
     BlockPos.MutableBlockPos ret = new BlockPos.MutableBlockPos(pos.getX(), pos.getY() + yOffset, pos.getZ());
     while (ret.getY() >= 0) {
-      if (!world.func_175623_d((BlockPos)ret))
+      if (!world.isAirBlock((BlockPos)ret))
         return new BlockPos((Vec3i)ret); 
-      ret.func_181079_c(ret.getX(), ret.getY() - 1, ret.getZ());
+      ret.setPos(ret.getX(), ret.getY() - 1, ret.getZ());
     } 
     return null;
   }
@@ -144,11 +144,11 @@ public class TileEntityTerra extends TileEntityElectricMachine {
       Block block = world.getBlockState((BlockPos)cPos).getBlock();
       if ((upwards && block != from) || (!upwards && block == from))
         break; 
-      cPos.func_181079_c(cPos.getX(), cPos.getY() - 1, cPos.getZ());
+      cPos.setPos(cPos.getX(), cPos.getY() - 1, cPos.getZ());
     } 
     if ((upwards && cPos.getY() == pos.getY()) || (!upwards && cPos.getY() < 0))
       return false; 
-    world.func_175656_a(upwards ? cPos.func_177984_a() : new BlockPos((Vec3i)cPos), to);
+    world.func_175656_a(upwards ? cPos.up() : new BlockPos((Vec3i)cPos), to);
     return true;
   }
   

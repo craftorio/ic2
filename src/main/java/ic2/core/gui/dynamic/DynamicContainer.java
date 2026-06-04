@@ -58,10 +58,10 @@ public class DynamicContainer<T extends IInventory> extends ContainerBase<T> {
           height = playerInventoryNode.style.height + playerInventoryNode.spacing;
           for (row = 0; row < 3; row++) {
             for (int k = 0; k < 9; k++)
-              func_75146_a(new Slot((IInventory)player.inventory, k + row * 9 + 9, playerInventoryNode.x + k * width + xOffset, playerInventoryNode.y + row * height + yOffset)); 
+              addSlotToContainer(new Slot((IInventory)player.inventory, k + row * 9 + 9, playerInventoryNode.x + k * width + xOffset, playerInventoryNode.y + row * height + yOffset)); 
           } 
           for (col = 0; col < 9; col++)
-            func_75146_a(new Slot((IInventory)player.inventory, col, playerInventoryNode.x + col * width + xOffset, playerInventoryNode.y + playerInventoryNode.hotbarOffset + yOffset)); 
+            addSlotToContainer(new Slot((IInventory)player.inventory, col, playerInventoryNode.x + col * width + xOffset, playerInventoryNode.y + playerInventoryNode.hotbarOffset + yOffset)); 
           break;
         case slot:
           if (!(this.base instanceof IInventorySlotHolder))
@@ -72,7 +72,7 @@ public class DynamicContainer<T extends IInventory> extends ContainerBase<T> {
             throw new RuntimeException("Invalid InvSlot name " + slotNode.name + " for base " + this.base); 
           i = slotNode.x + (slotNode.style.width - 16) / 2;
           j = slotNode.y + (slotNode.style.height - 16) / 2;
-          func_75146_a((Slot)new SlotInvSlot(slot, slotNode.index, i, j));
+          addSlotToContainer((Slot)new SlotInvSlot(slot, slotNode.index, i, j));
           break;
         case slotgrid:
           if (!(this.base instanceof IInventorySlotHolder))
@@ -96,7 +96,7 @@ public class DynamicContainer<T extends IInventory> extends ContainerBase<T> {
               for (int i3 = 0; i3 < rows && idx < size; i3++) {
                 int i4 = x0;
                 for (int i5 = 0; i5 < cols && idx < size; i5++) {
-                  func_75146_a((Slot)new SlotInvSlot(slot, idx, i4, i2));
+                  addSlotToContainer((Slot)new SlotInvSlot(slot, idx, i4, i2));
                   idx++;
                   i4 += k;
                 } 
@@ -108,7 +108,7 @@ public class DynamicContainer<T extends IInventory> extends ContainerBase<T> {
             for (int i1 = 0; i1 < cols && idx < size; i1++) {
               int i2 = y0;
               for (int i3 = 0; i3 < rows && idx < size; i3++) {
-                func_75146_a((Slot)new SlotInvSlot(slot, idx, n, i2));
+                addSlotToContainer((Slot)new SlotInvSlot(slot, idx, n, i2));
                 idx++;
                 i2 += m;
               } 
@@ -122,7 +122,7 @@ public class DynamicContainer<T extends IInventory> extends ContainerBase<T> {
           node = (GuiParser.SlotHologramNode)rawNode;
           x = node.x + (node.style.width - 16) / 2;
           y = node.y + (node.style.height - 16) / 2;
-          func_75146_a((Slot)new SlotHologramSlot(((IHolographicSlotProvider)this.base).getStacksForName(node.name), node.index, x, y, node.stackSizeLimit, getCallback()));
+          addSlotToContainer((Slot)new SlotHologramSlot(((IHolographicSlotProvider)this.base).getStacksForName(node.name), node.index, x, y, node.stackSizeLimit, getCallback()));
           break;
       } 
       if (rawNode instanceof GuiParser.ParentNode)

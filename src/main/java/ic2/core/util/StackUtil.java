@@ -98,7 +98,7 @@ public final class StackUtil {
       return null; 
     BlockChest.Type type = chest.func_145980_j();
     for (EnumFacing facing : EnumFacing.field_176754_o) {
-      TileEntity te = world.func_175625_s(pos.func_177972_a(facing));
+      TileEntity te = world.getTileEntity(pos.offset(facing));
       if (te instanceof TileEntityChest && ((TileEntityChest)te).func_145980_j() == type) {
         TileEntityChest tileEntityChest1;
         TileEntityChest tileEntityChest2;
@@ -116,7 +116,7 @@ public final class StackUtil {
   }
   
   public static AdjacentInv getAdjacentInventory(TileEntity source, EnumFacing dir) {
-    TileEntity target = source.getWorld().func_175625_s(source.getPos().func_177972_a(dir));
+    TileEntity target = source.getWorld().getTileEntity(source.getPos().offset(dir));
     if (!isInventoryTile(target, dir))
       return null; 
     GameProfile srcOwner;
@@ -131,7 +131,7 @@ public final class StackUtil {
   
   public static List<AdjacentInv> getAdjacentInventories(TileEntity source) {
     List<AdjacentInv> inventories = new ArrayList<>();
-    for (EnumFacing dir : EnumFacing.field_82609_l) {
+    for (EnumFacing dir : EnumFacing.VALUES) {
       AdjacentInv inventory = getAdjacentInventory(source, dir);
       if (inventory != null)
         inventories.add(inventory); 
@@ -142,7 +142,7 @@ public final class StackUtil {
               return -1; 
             if (b.te instanceof IPersonalBlock || !(a.te instanceof IPersonalBlock))
               return 1; 
-            return StackUtil.getInventorySize(b.te, b.dir.func_176734_d(), b.getAccessor()) - StackUtil.getInventorySize(a.te, a.dir.func_176734_d(), a.getAccessor());
+            return StackUtil.getInventorySize(b.te, b.dir.getOpposite(), b.getAccessor()) - StackUtil.getInventorySize(a.te, a.dir.getOpposite(), a.getAccessor());
           }
         });
     return inventories;
@@ -215,7 +215,7 @@ public final class StackUtil {
       return 0; 
     GameProfile srcOwner = getOwner(src);
     GameProfile dstOwner = getOwner(dst);
-    EnumFacing reverseDir = dir.func_176734_d();
+    EnumFacing reverseDir = dir.getOpposite();
     int[] srcSlots = getInventorySlots(src, dir, false, true, dstOwner);
     if (srcSlots.length == 0)
       return 0; 
@@ -232,8 +232,8 @@ public final class StackUtil {
           return 0; 
         return transfer(srcInv, srcSlots, dstInv, dstSlots, dir, reverseDir, amount, checker, skipChecker);
       } 
-      if (dst.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, dir.func_176734_d())) {
-        IItemHandler dstHandler = (IItemHandler)dst.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, dir.func_176734_d());
+      if (dst.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, dir.getOpposite())) {
+        IItemHandler dstHandler = (IItemHandler)dst.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, dir.getOpposite());
         if (dstHandler == null)
           return 0; 
         return transfer(srcInv, srcSlots, dstHandler, dstSlots, reverseDir, amount, checker, skipChecker);
@@ -250,8 +250,8 @@ public final class StackUtil {
           return 0; 
         return transfer(srcHandler, srcSlots, dstInv, dstSlots, reverseDir, amount, checker, skipChecker);
       } 
-      if (dst.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, dir.func_176734_d())) {
-        IItemHandler dstHandler = (IItemHandler)dst.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, dir.func_176734_d());
+      if (dst.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, dir.getOpposite())) {
+        IItemHandler dstHandler = (IItemHandler)dst.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, dir.getOpposite());
         if (dstHandler == null)
           return 0; 
         return transfer(srcHandler, srcSlots, dstHandler, dstSlots, amount, checker, skipChecker);
@@ -279,8 +279,8 @@ public final class StackUtil {
     amount = total - amount;
     assert amount >= 0;
     if (amount > 0) {
-      src.func_70296_d();
-      dst.func_70296_d();
+      src.markDirty();
+      dst.markDirty();
     } 
     return amount;
   }
@@ -303,12 +303,12 @@ public final class StackUtil {
     amount = total - amount;
     assert amount >= 0;
     if (amount > 0)
-      dst.func_70296_d(); 
+      dst.markDirty(); 
     return amount;
   }
   
   private static int insert(ItemStack stack, int maxAmount, IInventory dst, ISidedInventory dstSided, EnumFacing side, int[] dstSlots) {
-    int sizeLimit = Math.min(stack.func_77976_d(), dst.func_70297_j_());
+    int sizeLimit = Math.min(stack.getMaxStackSize(), dst.func_70297_j_());
     int total = Math.min(maxAmount, getSize(stack));
     int remaining = total;
     for (int pass = 0; pass < 2; pass++) {
@@ -383,7 +383,7 @@ public final class StackUtil {
     amount = total - amount;
     assert amount >= 0;
     if (amount > 0)
-      src.func_70296_d(); 
+      src.markDirty(); 
     return amount;
   }
   
@@ -425,7 +425,7 @@ public final class StackUtil {
   }
   
   private static ItemStack getFromInventory(TileEntity source, AdjacentInv inventory, ItemStack stack, boolean ignoreMaxStackSize, boolean simulate) {
-    return getFromInventory(inventory.te, inventory.dir.func_176734_d(), stack, getSize(stack), ignoreMaxStackSize, inventory.getAccessor(), simulate);
+    return getFromInventory(inventory.te, inventory.dir.getOpposite(), stack, getSize(stack), ignoreMaxStackSize, inventory.getAccessor(), simulate);
   }
   
   public static ItemStack getFromInventory(TileEntity te, EnumFacing side, ItemStack stackDestination, int max, boolean ignoreMaxStackSize, boolean simulate) {
@@ -434,7 +434,7 @@ public final class StackUtil {
   
   public static ItemStack getFromInventory(TileEntity te, EnumFacing side, ItemStack stackDestination, int max, boolean ignoreMaxStackSize, GameProfile accessor, boolean simulate) {
     if (!isEmpty(stackDestination) && !ignoreMaxStackSize)
-      max = Math.min(max, stackDestination.func_77976_d() - getSize(stackDestination)); 
+      max = Math.min(max, stackDestination.getMaxStackSize() - getSize(stackDestination)); 
     int[] slots = getInventorySlots(te, side, false, true, accessor);
     if (slots.length == 0)
       return emptyStack; 
@@ -454,7 +454,7 @@ public final class StackUtil {
               ret = copyWithSize(stack, 1);
               if (isEmpty(stackDestination)) {
                 if (!ignoreMaxStackSize)
-                  max = Math.min(max, ret.func_77976_d()); 
+                  max = Math.min(max, ret.getMaxStackSize()); 
                 stackDestination = ret;
               } 
             } 
@@ -468,7 +468,7 @@ public final class StackUtil {
           }  
       } 
       if (!simulate && !isEmpty(ret))
-        inv.func_70296_d(); 
+        inv.markDirty(); 
     } else if (te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side)) {
       IItemHandler handler = (IItemHandler)te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side);
       if (handler == null)
@@ -488,7 +488,7 @@ public final class StackUtil {
             ret = copyWithSize(stack, 1);
             if (isEmpty(stackDestination)) {
               if (!ignoreMaxStackSize)
-                max = Math.min(max, ret.func_77976_d()); 
+                max = Math.min(max, ret.getMaxStackSize()); 
               stackDestination = ret;
             } 
           } else {
@@ -505,7 +505,7 @@ public final class StackUtil {
   }
   
   private static int putInInventory(TileEntity source, AdjacentInv inventory, ItemStack stackSource, boolean simulate) {
-    return putInInventory(inventory.te, inventory.dir.func_176734_d(), stackSource, inventory.getAccessor(), simulate);
+    return putInInventory(inventory.te, inventory.dir.getOpposite(), stackSource, inventory.getAccessor(), simulate);
   }
   
   public static int putInInventory(TileEntity te, EnumFacing side, ItemStack stackSource, boolean simulate) {
@@ -530,7 +530,7 @@ public final class StackUtil {
           !(inv instanceof ISidedInventory) || ((ISidedInventory)inv).func_180462_a(slot, stackSource, side))) {
           ItemStack stack = inv.func_70301_a(slot);
           if (!isEmpty(stack) && checkItemEqualityStrict(stack, stackSource)) {
-            int transfer = Math.min(toTransfer, Math.min(inv.func_70297_j_(), stack.func_77976_d()) - getSize(stack));
+            int transfer = Math.min(toTransfer, Math.min(inv.func_70297_j_(), stack.getMaxStackSize()) - getSize(stack));
             if (!simulate)
               inv.func_70299_a(slot, incSize(stack, transfer)); 
             toTransfer -= transfer;
@@ -544,7 +544,7 @@ public final class StackUtil {
           !(inv instanceof ISidedInventory) || ((ISidedInventory)inv).func_180462_a(slot, stackSource, side))) {
           ItemStack stack = inv.func_70301_a(slot);
           if (isEmpty(stack)) {
-            int transfer = Math.min(toTransfer, Math.min(inv.func_70297_j_(), stackSource.func_77976_d()));
+            int transfer = Math.min(toTransfer, Math.min(inv.func_70297_j_(), stackSource.getMaxStackSize()));
             if (!simulate) {
               ItemStack dest = copyWithSize(stackSource, transfer);
               inv.func_70299_a(slot, dest);
@@ -554,20 +554,20 @@ public final class StackUtil {
         } 
       } 
       if (!simulate && toTransfer != getSize(stackSource))
-        inv.func_70296_d(); 
+        inv.markDirty(); 
       return getSize(stackSource) - toTransfer;
     } 
     if (te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side)) {
       IItemHandler handler = (IItemHandler)te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side);
       if (handler == null)
         return 0; 
-      ItemStack src = stackSource.func_77946_l();
+      ItemStack src = stackSource.copy();
       for (int slot : slots) {
         if (isEmpty(src))
           break; 
         ItemStack stack = handler.getStackInSlot(slot);
         if (!isEmpty(stack)) {
-          ItemStack remaining = handler.insertItem(slot, src.func_77946_l(), simulate);
+          ItemStack remaining = handler.insertItem(slot, src.copy(), simulate);
           if (isEmpty(remaining)) {
             src = emptyStack;
           } else if (getSize(remaining) < getSize(src)) {
@@ -580,7 +580,7 @@ public final class StackUtil {
           break; 
         ItemStack stack = handler.getStackInSlot(slot);
         if (isEmpty(stack)) {
-          ItemStack remaining = handler.insertItem(slot, src.func_77946_l(), simulate);
+          ItemStack remaining = handler.insertItem(slot, src.copy(), simulate);
           if (isEmpty(remaining)) {
             src = emptyStack;
           } else if (getSize(remaining) < getSize(src)) {
@@ -623,7 +623,7 @@ public final class StackUtil {
           ItemStack stack = inv.func_70301_a(slot);
           if ((!checkExtract || (!isEmpty(stack) && (sidedInv == null || sidedInv
             .func_180461_b(slot, stack, side)))) && (!checkInsert || 
-            isEmpty(stack) || (getSize(stack) < stack.func_77976_d() && getSize(stack) < inv.func_70297_j_() && (sidedInv == null || sidedInv
+            isEmpty(stack) || (getSize(stack) < stack.getMaxStackSize() && getSize(stack) < inv.func_70297_j_() && (sidedInv == null || sidedInv
             .func_180462_a(slot, stack, side))))) {
             ret[writeIdx] = slot;
             writeIdx++;
@@ -665,7 +665,7 @@ public final class StackUtil {
   }
   
   private static boolean checkInsert(IItemHandler handler, int slot, ItemStack stack) {
-    if (isEmpty(stack) || getSize(stack) >= stack.func_77976_d())
+    if (isEmpty(stack) || getSize(stack) >= stack.getMaxStackSize())
       return true; 
     int testSize = Integer.MAX_VALUE;
     ItemStack result = handler.insertItem(slot, copyWithSize(stack, 2147483647), true);
@@ -819,12 +819,12 @@ public final class StackUtil {
     ItemStack stack = get(player, hand);
     if (isEmpty(stack))
       return emptyStack; 
-    int maxDamage = stack.func_77958_k();
+    int maxDamage = stack.getMaxDamage();
     if (maxDamage <= 0)
       return emptyStack; 
     if (!request.apply(stack))
       return emptyStack; 
-    if (player.field_71075_bZ.field_75098_d || !stack.func_77984_f())
+    if (player.field_71075_bZ.field_75098_d || !stack.isItemStackDamageable())
       return copyOutput ? copy(stack) : stack; 
     stack.func_77972_a(amount, (EntityLivingBase)player);
     if (isEmpty(stack)) {
@@ -867,16 +867,16 @@ public final class StackUtil {
     if (isEmpty(stack))
       return; 
     double f = 0.7D;
-    double dx = world.field_73012_v.nextFloat() * f + (1.0D - f) * 0.5D;
-    double dy = world.field_73012_v.nextFloat() * f + (1.0D - f) * 0.5D;
-    double dz = world.field_73012_v.nextFloat() * f + (1.0D - f) * 0.5D;
-    EntityItem entityItem = new EntityItem(world, pos.getX() + dx, pos.getY() + dy, pos.getZ() + dz, stack.func_77946_l());
+    double dx = world.rand.nextFloat() * f + (1.0D - f) * 0.5D;
+    double dy = world.rand.nextFloat() * f + (1.0D - f) * 0.5D;
+    double dz = world.rand.nextFloat() * f + (1.0D - f) * 0.5D;
+    EntityItem entityItem = new EntityItem(world, pos.getX() + dx, pos.getY() + dy, pos.getZ() + dz, stack.copy());
     entityItem.func_174869_p();
-    world.func_72838_d((Entity)entityItem);
+    world.spawnEntity((Entity)entityItem);
   }
   
   public static ItemStack copy(ItemStack stack) {
-    return stack.func_77946_l();
+    return stack.copy();
   }
   
   public static ItemStack copyWithSize(ItemStack stack, int newSize) {
@@ -1128,7 +1128,7 @@ public final class StackUtil {
   public static boolean storeInventoryItem(ItemStack stack, EntityPlayer player, boolean simulate) {
     if (simulate) {
       int sizeLeft = getSize(stack);
-      int maxStackSize = Math.min(player.inventory.func_70297_j_(), stack.func_77976_d());
+      int maxStackSize = Math.min(player.inventory.func_70297_j_(), stack.getMaxStackSize());
       for (int i = 0; i < player.inventory.field_70462_a.size() && sizeLeft > 0; i++) {
         ItemStack invStack = (ItemStack)player.inventory.field_70462_a.get(i);
         if (isEmpty(invStack)) {
@@ -1197,7 +1197,7 @@ public final class StackUtil {
           } 
           amount = distributeStackToSlots(inv, stack, (TIntSet)tIntHashSet, canInsert, amount);
           while (amount > 0) {
-            int size = Math.min(stack.func_77976_d(), amount);
+            int size = Math.min(stack.getMaxStackSize(), amount);
             amount -= size;
             leftOvers.add(copyWithSize(stack, size));
           } 
@@ -1225,7 +1225,7 @@ public final class StackUtil {
       } 
     } 
     tIntArrayList.sort();
-    int maxStackSize = Math.min(stack.func_77976_d(), inv.func_70297_j_());
+    int maxStackSize = Math.min(stack.getMaxStackSize(), inv.func_70297_j_());
     int slotsLeft = tIntArrayList.size();
     for (TIntIterator tIntIterator1 = tIntArrayList.iterator(); tIntIterator1.hasNext() && amount > 0; slotsLeft--, tIntIterator1.remove()) {
       int currentSlot = tIntIterator1.next();
@@ -1257,7 +1257,7 @@ public final class StackUtil {
   
   public static boolean matchesNBT(NBTTagCompound subject, NBTTagCompound target) {
     if (subject == null)
-      return (target == null || target.func_82582_d()); 
+      return (target == null || target.hasNoTags()); 
     if (target == null)
       return true; 
     for (String key : target.func_150296_c()) {

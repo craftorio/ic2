@@ -80,12 +80,12 @@ public class TileEntityClassicCanner extends TileEntityElectricMachine implement
   
   public void readFromNBT(NBTTagCompound nbt) {
     super.readFromNBT(nbt);
-    this.fuelQuality = nbt.func_74762_e("fuelQuality");
+    this.fuelQuality = nbt.getInteger("fuelQuality");
   }
   
   public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
     super.writeToNBT(nbt);
-    nbt.func_74768_a("fuelQuality", this.fuelQuality);
+    nbt.setInteger("fuelQuality", this.fuelQuality);
     return nbt;
   }
   
@@ -145,7 +145,7 @@ public class TileEntityClassicCanner extends TileEntityElectricMachine implement
       setActive(false);
     } 
     if (needsInvUpdate)
-      func_70296_d(); 
+      markDirty(); 
   }
   
   public void operate(boolean incremental) {
@@ -170,10 +170,10 @@ public class TileEntityClassicCanner extends TileEntityElectricMachine implement
             this.inputSlot.consume(1);
             ItemStack itemStack = ItemName.filled_fuel_can.getItemStack();
             NBTTagCompound data = StackUtil.getOrCreateNbtData(itemStack);
-            data.func_74768_a("value", this.fuelQuality);
+            data.setInteger("value", this.fuelQuality);
             this.outputSlot.add(itemStack);
           } else {
-            int damage = this.inputSlot.get().func_77952_i();
+            int damage = this.inputSlot.get().getItemDamage();
             damage -= this.fuelQuality;
             if (damage < 1)
               damage = 1; 
@@ -184,8 +184,8 @@ public class TileEntityClassicCanner extends TileEntityElectricMachine implement
       case CF:
         this.resInputSlot.put(StackUtil.decSize(this.resInputSlot.get()));
         cfPack = this.inputSlot.get();
-        cfPack.func_77964_b(cfPack.func_77952_i() + 2);
-        if (this.resInputSlot.isEmpty() || cfPack.func_77952_i() > cfPack.func_77958_k() - 2) {
+        cfPack.func_77964_b(cfPack.getItemDamage() + 2);
+        if (this.resInputSlot.isEmpty() || cfPack.getItemDamage() > cfPack.getMaxDamage() - 2) {
           this.outputSlot.add(cfPack);
           this.inputSlot.clear();
         } else {
@@ -209,7 +209,7 @@ public class TileEntityClassicCanner extends TileEntityElectricMachine implement
         return (fuel > 0 && this.outputSlot.canAdd(ItemName.jetpack.getItemStack()));
       case CF:
         cfPack = this.inputSlot.get();
-        return (cfPack.func_77952_i() <= cfPack.func_77958_k() - 2 && getPelletValue(this.resInputSlot.get()) > 0 && this.outputSlot.canAdd(cfPack));
+        return (cfPack.getItemDamage() <= cfPack.getMaxDamage() - 2 && getPelletValue(this.resInputSlot.get()) > 0 && this.outputSlot.canAdd(cfPack));
     } 
     assert false;
     return false;
@@ -240,7 +240,7 @@ public class TileEntityClassicCanner extends TileEntityElectricMachine implement
       return 2548; 
     if (StackUtil.checkItemEquality(stack, ItemName.cell.getItemStack((Enum)CellType.biofuel)))
       return 868; 
-    if (stack.getItem() == Items.field_151137_ax && this.fuelQuality > 0)
+    if (stack.getItem() == Items.REDSTONE && this.fuelQuality > 0)
       return (int)(this.fuelQuality * 0.2D); 
     if (stack.getItem() == Items.field_151114_aO && this.fuelQuality > 0)
       return (int)(this.fuelQuality * 0.3D); 

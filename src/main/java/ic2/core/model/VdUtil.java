@@ -304,9 +304,9 @@ public class VdUtil {
   }
   
   private static int[] getFaceShades() {
-    int[] ret = new int[EnumFacing.field_82609_l.length];
+    int[] ret = new int[EnumFacing.VALUES.length];
     double[] faceBrightness = { 0.5D, 1.0D, 0.8D, 0.8D, 0.6D, 0.6D };
-    for (EnumFacing facing : EnumFacing.field_82609_l) {
+    for (EnumFacing facing : EnumFacing.VALUES) {
       int brightness = Util.limit((int)(faceBrightness[facing.ordinal()] * 255.0D), 0, 255);
       ret[facing.ordinal()] = 0xFF000000 | brightness << 16 | brightness << 8 | brightness;
     } 

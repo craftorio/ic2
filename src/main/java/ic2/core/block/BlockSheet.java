@@ -63,7 +63,7 @@ public class BlockSheet extends BlockMultiID<BlockSheet.SheetType> {
   }
   
   public boolean canReplace(World world, BlockPos pos, EnumFacing side, ItemStack stack) {
-    return isValidPosition(world, pos, func_176203_a(stack.func_77952_i()));
+    return isValidPosition(world, pos, func_176203_a(stack.getItemDamage()));
   }
   
   private boolean isValidPosition(World world, BlockPos pos, IBlockState state) {
@@ -72,7 +72,7 @@ public class BlockSheet extends BlockMultiID<BlockSheet.SheetType> {
         return isNormalCubeBelow(world, pos);
       case rubber:
         for (EnumFacing facing : EnumFacing.field_176754_o) {
-          state = world.getBlockState(pos.func_177972_a(facing));
+          state = world.getBlockState(pos.offset(facing));
           if (state == BlockName.sheet.getBlockState(SheetType.rubber) || state
             .getBlock().isNormalCube(state, (IBlockAccess)world, pos))
             return true; 

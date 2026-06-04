@@ -28,7 +28,7 @@ class Mushroom extends TerraformerBase {
     for (int xm = pos.getX() - 1; dependancy != null && xm < pos.getX() + 1; xm++) {
       for (int zm = pos.getZ() - 1; zm < pos.getZ() + 1; zm++) {
         for (int ym = pos.getY() + 5; ym > pos.getY() - 2; ym--) {
-          cPos.func_181079_c(xm, ym, zm);
+          cPos.setPos(xm, ym, zm);
           IBlockState state = world.getBlockState((BlockPos)cPos);
           Block block = state.getBlock();
           if (dependancy == Blocks.field_150391_bh) {
@@ -59,25 +59,25 @@ class Mushroom extends TerraformerBase {
         } else {
           return false;
         }  
-      BlockPos above = pos.func_177984_a();
+      BlockPos above = pos.up();
       IBlockState state = world.getBlockState(above);
       Block block = state.getBlock();
       if (!block.isAir(state, (IBlockAccess)world, above) && block != Blocks.field_150329_H)
         return false; 
-      BlockBush blockBush = world.field_73012_v.nextBoolean() ? Blocks.field_150338_P : Blocks.field_150337_Q;
+      BlockBush blockBush = world.rand.nextBoolean() ? Blocks.field_150338_P : Blocks.field_150337_Q;
       world.func_175656_a(above, blockBush.getDefaultState());
       return true;
     } 
     if (target == Blocks.field_150420_aW) {
-      BlockPos above = pos.func_177984_a();
+      BlockPos above = pos.up();
       IBlockState state = world.getBlockState(above);
       Block base = state.getBlock();
       if (base != Blocks.field_150338_P && base != Blocks.field_150337_Q)
         return false; 
-      if (((BlockMushroom)base).func_176485_d(world, above, state, world.field_73012_v)) {
+      if (((BlockMushroom)base).func_176485_d(world, above, state, world.rand)) {
         for (int i = pos.getX() - 1; i < pos.getX() + 1; i++) {
           for (int zm = pos.getZ() - 1; zm < pos.getZ() + 1; zm++) {
-            cPos.func_181079_c(i, above.getY(), zm);
+            cPos.setPos(i, above.getY(), zm);
             Block block = world.getBlockState((BlockPos)cPos).getBlock();
             if (block == Blocks.field_150338_P || block == Blocks.field_150337_Q)
               world.func_175698_g(new BlockPos((Vec3i)cPos)); 

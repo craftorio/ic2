@@ -176,7 +176,7 @@ public class CannerCategory<T> extends IORecipeCategory<T> implements IDrawable 
     return this.inputs;
   }
   
-  protected List<SlotPosition> getOutputSlotPos() {
+  protected List<SlotPosition> getoutputSlotPos() {
     return this.outputs;
   }
   

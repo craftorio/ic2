@@ -47,7 +47,7 @@ public class BlockRubWood extends BlockBase {
   
   public IBlockState func_180642_a(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
     IBlockState state = super.func_180642_a(world, pos, facing, hitX, hitY, hitZ, meta, placer);
-    return state.func_177226_a((IProperty)stateProperty, getPlainAxisState(facing.func_176740_k()));
+    return state.func_177226_a((IProperty)stateProperty, getPlainAxisState(facing.getAxis()));
   }
   
   private static RubberWoodState getPlainAxisState(EnumFacing.Axis axis) {
@@ -65,13 +65,13 @@ public class BlockRubWood extends BlockBase {
   public void func_180653_a(World world, BlockPos pos, IBlockState state, float chance, int fortune) {
     if (world.isRemote)
       return; 
-    int count = func_149745_a(world.field_73012_v);
+    int count = func_149745_a(world.rand);
     for (int j1 = 0; j1 < count; j1++) {
-      if (world.field_73012_v.nextFloat() <= chance) {
-        Item item = func_180660_a(state, world.field_73012_v, fortune);
+      if (world.rand.nextFloat() <= chance) {
+        Item item = func_180660_a(state, world.rand, fortune);
         if (item != null)
           func_180635_a(world, pos, new ItemStack(item, 1, 0)); 
-        if (!((RubberWoodState)state.func_177229_b((IProperty)stateProperty)).isPlain() && world.field_73012_v.nextInt(6) == 0)
+        if (!((RubberWoodState)state.func_177229_b((IProperty)stateProperty)).isPlain() && world.rand.nextInt(6) == 0)
           func_180635_a(world, pos, ItemName.misc_resource.getItemStack((Enum)MiscResourceType.resin)); 
       } 
     } 
@@ -83,7 +83,7 @@ public class BlockRubWood extends BlockBase {
     for (int y = -range; y <= range; y++) {
       for (int z = -range; z <= range; z++) {
         for (int x = -range; x <= range; x++) {
-          cPos.func_181079_c(pos.getX() + x, pos.getY() + y, pos.getZ() + z);
+          cPos.setPos(pos.getX() + x, pos.getY() + y, pos.getZ() + z);
           IBlockState cState = world.getBlockState((BlockPos)cPos);
           Block cBlock = cState.getBlock();
           if (cBlock.isLeaves(cState, (IBlockAccess)world, (BlockPos)cPos))
@@ -152,7 +152,7 @@ public class BlockRubWood extends BlockBase {
       this.wet = wet;
     }
     
-    public String func_176610_l() {
+    public String getName() {
       return name();
     }
     

@@ -24,7 +24,7 @@ public class ItemToolCutter extends ItemToolCrafting implements IEnhancedOverlay
   }
   
   public EnumActionResult func_180614_a(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-    TileEntity te = world.func_175625_s(pos);
+    TileEntity te = world.getTileEntity(pos);
     if (te instanceof TileEntityCable) {
       TileEntityCable cable = (TileEntityCable)te;
       Predicate<ItemStack> request = StackUtil.sameStack(ItemName.crafting.getItemStack((Enum)CraftingItemType.rubber));

@@ -49,7 +49,7 @@ public class UuGraph {
   }
   
   public static void set(ItemStack stack, double value) {
-    if (stack.func_77952_i() == 32767)
+    if (stack.getItemDamage() == 32767)
       throw new IllegalArgumentException("setting values for wilcard meta stacks isn't supported."); 
     if (calculation != null)
       throw new IllegalStateException("setting values isn't allowed while the calculation is running, set them earlier."); 

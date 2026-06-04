@@ -38,7 +38,7 @@ public class Tfbp extends ItemMulti<Tfbp.TfbpType> implements ITerraformingBP {
     TfbpType type = (TfbpType)getType(stack);
     if (type == null)
       return false; 
-    if (type == TfbpType.cultivation && world.field_73011_w
+    if (type == TfbpType.cultivation && world.provider
       .func_186058_p() == DimensionType.THE_END)
       IC2.achievements.issueAchievement(player, "terraformEndCultivation"); 
     return true;

@@ -15,11 +15,11 @@ public class GuiTradeOMatClosed extends GuiIC2<ContainerTradeOMatClosed> {
   
   protected void drawForegroundLayer(int mouseX, int mouseY) {
     super.drawForegroundLayer(mouseX, mouseY);
-    this.field_146289_q.func_78276_b(Localization.translate("container.inventory"), 8, this.field_147000_g - 96 + 2, 4210752);
-    this.field_146289_q.func_78276_b(Localization.translate("ic2.container.personalTrader.want"), 12, 23, 4210752);
-    this.field_146289_q.func_78276_b(Localization.translate("ic2.container.personalTrader.offer"), 12, 42, 4210752);
-    this.field_146289_q.func_78276_b(Localization.translate("ic2.container.personalTrader.stock"), 12, 60, 4210752);
-    this.field_146289_q.func_78276_b((((TileEntityTradeOMat)((ContainerTradeOMatClosed)this.container).base).stock < 0) ? "∞" : ("" + ((TileEntityTradeOMat)((ContainerTradeOMatClosed)this.container).base).stock), 50, 60, (((TileEntityTradeOMat)((ContainerTradeOMatClosed)this.container).base).stock != 0) ? 4210752 : 16733525);
+    this.fontRenderer.drawString(Localization.translate("container.inventory"), 8, this.field_147000_g - 96 + 2, 4210752);
+    this.fontRenderer.drawString(Localization.translate("ic2.container.personalTrader.want"), 12, 23, 4210752);
+    this.fontRenderer.drawString(Localization.translate("ic2.container.personalTrader.offer"), 12, 42, 4210752);
+    this.fontRenderer.drawString(Localization.translate("ic2.container.personalTrader.stock"), 12, 60, 4210752);
+    this.fontRenderer.drawString((((TileEntityTradeOMat)((ContainerTradeOMatClosed)this.container).base).stock < 0) ? "∞" : ("" + ((TileEntityTradeOMat)((ContainerTradeOMatClosed)this.container).base).stock), 50, 60, (((TileEntityTradeOMat)((ContainerTradeOMatClosed)this.container).base).stock != 0) ? 4210752 : 16733525);
   }
   
   protected ResourceLocation getTexture() {

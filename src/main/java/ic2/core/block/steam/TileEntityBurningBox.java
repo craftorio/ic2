@@ -34,16 +34,16 @@ public class TileEntityBurningBox extends TileEntityInventory implements IHasGui
   
   public void readFromNBT(NBTTagCompound nbt) {
     super.readFromNBT(nbt);
-    this.delta = nbt.func_74762_e("delta");
-    this.fuel = nbt.func_74762_e("fuel");
-    this.remainingFuel = nbt.func_74762_e("remainingFuel");
+    this.delta = nbt.getInteger("delta");
+    this.fuel = nbt.getInteger("fuel");
+    this.remainingFuel = nbt.getInteger("remainingFuel");
   }
   
   public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
     super.writeToNBT(nbt);
-    nbt.func_74768_a("delta", this.delta);
-    nbt.func_74768_a("fuel", this.fuel);
-    nbt.func_74768_a("remainingFuel", this.remainingFuel);
+    nbt.setInteger("delta", this.delta);
+    nbt.setInteger("fuel", this.fuel);
+    nbt.setInteger("remainingFuel", this.remainingFuel);
     return nbt;
   }
   
@@ -54,7 +54,7 @@ public class TileEntityBurningBox extends TileEntityInventory implements IHasGui
       needsInventoryUpdate = gainFuel(); 
     boolean newActive = work();
     if (needsInventoryUpdate)
-      func_70296_d(); 
+      markDirty(); 
     if (!delayActiveUpdate()) {
       setActive(newActive);
     } else {

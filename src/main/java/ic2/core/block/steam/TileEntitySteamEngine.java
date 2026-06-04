@@ -20,12 +20,12 @@ public class TileEntitySteamEngine extends TileEntityInventory implements IKinet
   
   public void readFromNBT(NBTTagCompound nbt) {
     super.readFromNBT(nbt);
-    this.delta = nbt.func_74762_e("delta");
+    this.delta = nbt.getInteger("delta");
   }
   
   public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
     super.writeToNBT(nbt);
-    nbt.func_74768_a("delta", this.delta);
+    nbt.setInteger("delta", this.delta);
     return nbt;
   }
   
@@ -34,7 +34,7 @@ public class TileEntitySteamEngine extends TileEntityInventory implements IKinet
     boolean needsInventoryUpdate = false;
     boolean newActive = work();
     if (needsInventoryUpdate)
-      func_70296_d(); 
+      markDirty(); 
     if (!delayActiveUpdate()) {
       setActive(newActive);
     } else {

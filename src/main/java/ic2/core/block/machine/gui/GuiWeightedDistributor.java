@@ -85,7 +85,7 @@ public abstract class GuiWeightedDistributor<T extends ContainerBase<? extends I
                 public boolean isEnabled() {
                   return (((IWeightedDistributor)(GuiWeightedDistributor.this.getContainer()).base).getFacing() != facing);
                 }
-              }).withText(facing.func_176610_l().substring(0, 1).toUpperCase(Locale.ENGLISH)).withTooltip(getNameForFacing(facing))));
+              }).withText(facing.getName().substring(0, 1).toUpperCase(Locale.ENGLISH)).withTooltip(getNameForFacing(facing))));
       } 
       switch (y) {
         case 0:

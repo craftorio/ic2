@@ -41,10 +41,10 @@ public class GuiTransformer extends GuiIC2<ContainerTransformer> {
   
   protected void drawForegroundLayer(int mouseX, int mouseY) {
     super.drawForegroundLayer(mouseX, mouseY);
-    this.field_146289_q.func_78276_b(Localization.translate("ic2.Transformer.gui.Output"), 6, 30, 4210752);
-    this.field_146289_q.func_78276_b(Localization.translate("ic2.Transformer.gui.Input"), 6, 43, 4210752);
-    this.field_146289_q.func_78276_b(((TileEntityTransformer)((ContainerTransformer)this.container).base).getoutputflow() + " " + Localization.translate("ic2.generic.text.EUt"), 52, 30, 2157374);
-    this.field_146289_q.func_78276_b(((TileEntityTransformer)((ContainerTransformer)this.container).base).getinputflow() + " " + Localization.translate("ic2.generic.text.EUt"), 52, 45, 2157374);
+    this.fontRenderer.drawString(Localization.translate("ic2.Transformer.gui.Output"), 6, 30, 4210752);
+    this.fontRenderer.drawString(Localization.translate("ic2.Transformer.gui.Input"), 6, 43, 4210752);
+    this.fontRenderer.drawString(((TileEntityTransformer)((ContainerTransformer)this.container).base).getoutputflow() + " " + Localization.translate("ic2.generic.text.EUt"), 52, 30, 2157374);
+    this.fontRenderer.drawString(((TileEntityTransformer)((ContainerTransformer)this.container).base).getinputflow() + " " + Localization.translate("ic2.generic.text.EUt"), 52, 45, 2157374);
     RenderItem renderItem = this.mc.func_175599_af();
     RenderHelper.func_74520_c();
     switch (((TileEntityTransformer)((ContainerTransformer)this.container).base).getMode()) {

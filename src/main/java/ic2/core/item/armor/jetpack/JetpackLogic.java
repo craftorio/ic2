@@ -82,7 +82,7 @@ public class JetpackLogic {
       return; 
     NBTTagCompound nbtData = getJetpackCompound(stack);
     boolean hoverMode = getHoverMode(nbtData);
-    byte toggleTimer = nbtData.func_74771_c("toggleTimer");
+    byte toggleTimer = nbtData.getByte("toggleTimer");
     boolean jetpackUsed = false;
     if (IC2.keyboard.isJumpKeyDown(player) && IC2.keyboard.isModeSwitchKeyDown(player) && toggleTimer == 0) {
       toggleTimer = 10;
@@ -105,7 +105,7 @@ public class JetpackLogic {
     } 
     if (IC2.platform.isSimulating() && toggleTimer > 0) {
       toggleTimer = (byte)(toggleTimer - 1);
-      nbtData.func_74774_a("toggleTimer", toggleTimer);
+      nbtData.setByte("toggleTimer", toggleTimer);
     } 
     if (IC2.platform.isRendering() && player == IC2.platform.getPlayerInstance()) {
       if (lastJetpackUsed != jetpackUsed) {

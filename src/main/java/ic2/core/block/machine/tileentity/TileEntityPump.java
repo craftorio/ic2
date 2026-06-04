@@ -109,7 +109,7 @@ public class TileEntityPump extends TileEntityElectricMachine implements IHasGui
   
   public void readFromNBT(NBTTagCompound nbt) {
     super.readFromNBT(nbt);
-    this.progress = nbt.func_74765_d("progress");
+    this.progress = nbt.getShort("progress");
   }
   
   public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
@@ -137,7 +137,7 @@ public class TileEntityPump extends TileEntityElectricMachine implements IHasGui
     needsInvUpdate |= this.upgradeSlot.tickNoMark();
     this.guiProgress = this.progress / this.operationLength;
     if (needsInvUpdate)
-      super.func_70296_d(); 
+      super.markDirty(); 
   }
   
   public boolean canoperate() {
@@ -145,11 +145,11 @@ public class TileEntityPump extends TileEntityElectricMachine implements IHasGui
   }
   
   public boolean operate(boolean sim) {
-    if (this.miner == null || this.miner.func_145837_r()) {
+    if (this.miner == null || this.miner.isInvalid()) {
       this.miner = null;
       World world = getWorld();
       for (EnumFacing dir : Util.downSideFacings) {
-        TileEntity te = world.func_175625_s(this.field_174879_c.func_177972_a(dir));
+        TileEntity te = world.getTileEntity(this.pos.offset(dir));
         if (te instanceof TileEntityMiner) {
           this.miner = (TileEntityMiner)te;
           break;
@@ -162,7 +162,7 @@ public class TileEntityPump extends TileEntityElectricMachine implements IHasGui
         liquid = pump(this.miner.liquidPos, sim, this.miner); 
     } else {
       EnumFacing dir = getFacing();
-      liquid = pump(this.field_174879_c.func_177972_a(dir), sim, this.miner);
+      liquid = pump(this.pos.offset(dir), sim, this.miner);
     } 
     if (liquid != null && this.fluidTank.fillInternal(liquid, false) > 0) {
       if (!sim)
@@ -176,8 +176,8 @@ public class TileEntityPump extends TileEntityElectricMachine implements IHasGui
     World world = getWorld();
     int freeSpace = this.fluidTank.getCapacity() - this.fluidTank.getFluidAmount();
     if (miner == null && freeSpace > 0) {
-      TileEntity te = world.func_175625_s(startPos);
-      EnumFacing side = getFacing().func_176734_d();
+      TileEntity te = world.getTileEntity(startPos);
+      EnumFacing side = getFacing().getOpposite();
       if (te != null && LiquidUtil.isFluidTile(te, side)) {
         if (freeSpace > 1000)
           freeSpace = 1000; 
@@ -198,8 +198,8 @@ public class TileEntityPump extends TileEntityElectricMachine implements IHasGui
     return null;
   }
   
-  public void func_70296_d() {
-    super.func_70296_d();
+  public void markDirty() {
+    super.markDirty();
     if (IC2.platform.isSimulating())
       setUpgradestat(); 
   }

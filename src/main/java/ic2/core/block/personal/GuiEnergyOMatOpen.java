@@ -30,9 +30,9 @@ public class GuiEnergyOMatOpen extends GuiIC2<ContainerEnergyOMatOpen> {
   
   protected void drawForegroundLayer(int mouseX, int mouseY) {
     super.drawForegroundLayer(mouseX, mouseY);
-    this.field_146289_q.func_78276_b(Localization.translate("container.inventory"), 8, this.field_147000_g - 96 + 2, 4210752);
-    this.field_146289_q.func_78276_b(Localization.translate("ic2.container.personalTrader.offer"), 100, 60, 4210752);
-    this.field_146289_q.func_78276_b(((TileEntityEnergyOMat)((ContainerEnergyOMatOpen)this.container).base).euOffer + " EU", 100, 68, 4210752);
+    this.fontRenderer.drawString(Localization.translate("container.inventory"), 8, this.field_147000_g - 96 + 2, 4210752);
+    this.fontRenderer.drawString(Localization.translate("ic2.container.personalTrader.offer"), 100, 60, 4210752);
+    this.fontRenderer.drawString(((TileEntityEnergyOMat)((ContainerEnergyOMatOpen)this.container).base).euOffer + " EU", 100, 68, 4210752);
   }
   
   protected ResourceLocation getTexture() {

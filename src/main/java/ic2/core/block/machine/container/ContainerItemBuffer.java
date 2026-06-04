@@ -14,13 +14,13 @@ public class ContainerItemBuffer extends ContainerFullInv<TileEntityItemBuffer> 
     int y;
     for (y = 0; y < tileEntite.leftcontentSlot.size() / 4; y++) {
       for (int x = 0; x < 4; x++)
-        func_75146_a((Slot)new SlotInvSlot(tileEntite.leftcontentSlot, x + y * 4, 8 + x * 18, 18 + y * 18)); 
+        addSlotToContainer((Slot)new SlotInvSlot(tileEntite.leftcontentSlot, x + y * 4, 8 + x * 18, 18 + y * 18)); 
     } 
     for (y = 0; y < tileEntite.rightcontentSlot.size() / 4; y++) {
       for (int x = 0; x < 4; x++)
-        func_75146_a((Slot)new SlotInvSlot(tileEntite.rightcontentSlot, x + y * 4, 98 + x * 18, 18 + y * 18)); 
+        addSlotToContainer((Slot)new SlotInvSlot(tileEntite.rightcontentSlot, x + y * 4, 98 + x * 18, 18 + y * 18)); 
     } 
     for (int i = 0; i < 2; i++)
-      func_75146_a((Slot)new SlotInvSlot((InvSlot)tileEntite.upgradeSlot, i, 35 + i * 90, 128)); 
+      addSlotToContainer((Slot)new SlotInvSlot((InvSlot)tileEntite.upgradeSlot, i, 35 + i * 90, 128)); 
   }
 }

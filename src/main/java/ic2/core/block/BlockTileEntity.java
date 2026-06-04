@@ -145,7 +145,7 @@ public final class BlockTileEntity extends BlockBase implements IMultiBlock<ITeB
         });
     ModelLoader.setCustomMeshDefinition((Item)this.item, new ItemMeshDefinition() {
           public ModelResourceLocation func_178113_a(ItemStack stack) {
-            ITeBlock teBlock = TeBlockRegistry.get(BlockTileEntity.this.item.identifier, stack.func_77952_i());
+            ITeBlock teBlock = TeBlockRegistry.get(BlockTileEntity.this.item.identifier, stack.getItemDamage());
             if (teBlock == null)
               return invalidLocation; 
             if (teBlock instanceof ITeBlockSpecialItem && ((ITeBlockSpecialItem)teBlock).doesOverrideDefault(stack)) {
@@ -472,7 +472,7 @@ public final class BlockTileEntity extends BlockBase implements IMultiBlock<ITeB
     TileEntityBlock te = getTe(world, pos);
     if (te == null)
       return super.func_176225_a(state, world, pos, side); 
-    return te.shouldSideBeRendered(side, pos.func_177972_a(side));
+    return te.shouldSideBeRendered(side, pos.offset(side));
   }
   
   public boolean doesSideBlockRendering(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing face) {
@@ -767,7 +767,7 @@ public final class BlockTileEntity extends BlockBase implements IMultiBlock<ITeB
   }
   
   private static TileEntityBlock getTe(IBlockAccess world, BlockPos pos) {
-    TileEntity te = world.func_175625_s(pos);
+    TileEntity te = world.getTileEntity(pos);
     if (te instanceof TileEntityBlock)
       return (TileEntityBlock)te; 
     return null;
@@ -780,7 +780,7 @@ public final class BlockTileEntity extends BlockBase implements IMultiBlock<ITeB
   public boolean rotateBlock(World world, BlockPos pos, EnumFacing axis) {
     TileEntityBlock te = getTe((IBlockAccess)world, pos);
     if (te != null) {
-      EnumFacing target = te.getFacing().func_176732_a(axis.func_176740_k());
+      EnumFacing target = te.getFacing().rotateAround(axis.getAxis());
       if (te.getSupportedFacings().contains(target) && te.getFacing() != target) {
         te.setFacing(target);
         return true;

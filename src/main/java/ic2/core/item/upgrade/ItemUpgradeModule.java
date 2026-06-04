@@ -66,15 +66,15 @@ public class ItemUpgradeModule extends ItemMulti<ItemUpgradeModule.UpgradeType> 
               return new ModelResourceLocation("builtin/missing", "missing"); 
             EnumFacing dir;
             if (type.directional && (dir = ItemUpgradeModule.getDirection(stack)) != null)
-              return ItemIC2.getModelLocation(name, type.getName() + '_' + dir.func_176610_l()); 
+              return ItemIC2.getModelLocation(name, type.getName() + '_' + dir.getName()); 
             return ItemIC2.getModelLocation(name, type.getName());
           }
         });
     for (UpgradeType type : this.typeProperty.func_177700_c()) {
       ModelBakery.registerItemVariants((Item)this, new ResourceLocation[] { (ResourceLocation)getModelLocation(name, type.getName()) });
       if (type.directional)
-        for (EnumFacing dir : EnumFacing.field_82609_l) {
-          ModelBakery.registerItemVariants((Item)this, new ResourceLocation[] { (ResourceLocation)getModelLocation(name, type.getName() + '_' + dir.func_176610_l()) });
+        for (EnumFacing dir : EnumFacing.VALUES) {
+          ModelBakery.registerItemVariants((Item)this, new ResourceLocation[] { (ResourceLocation)getModelLocation(name, type.getName() + '_' + dir.getName()) });
         }  
     } 
   }
@@ -161,10 +161,10 @@ public class ItemUpgradeModule extends ItemMulti<ItemUpgradeModule.UpgradeType> 
     if (type.directional) {
       int dir = 1 + side.ordinal();
       NBTTagCompound nbtData = StackUtil.getOrCreateNbtData(stack);
-      if (nbtData.func_74771_c("dir") == dir) {
-        nbtData.func_74774_a("dir", (byte)0);
+      if (nbtData.getByte("dir") == dir) {
+        nbtData.setByte("dir", (byte)0);
       } else {
-        nbtData.func_74774_a("dir", (byte)dir);
+        nbtData.setByte("dir", (byte)dir);
       } 
       if (IC2.platform.isRendering())
         switch (type) {
@@ -357,12 +357,12 @@ public class ItemUpgradeModule extends ItemMulti<ItemUpgradeModule.UpgradeType> 
       case null:
         amount = (int)Math.pow(4.0D, Math.min(4, size - 1));
         for (StackUtil.AdjacentInv inv : getTargetInventories(stack, te))
-          StackUtil.transfer(inv.te, te, inv.dir.func_176734_d(), amount); 
+          StackUtil.transfer(inv.te, te, inv.dir.getOpposite(), amount); 
         return ret;
       case null:
         amount = (int)Math.pow(4.0D, Math.min(4, size - 1));
         for (StackUtil.AdjacentInv inv : getTargetInventories(stack, te))
-          StackUtil.transfer(inv.te, te, inv.dir.func_176734_d(), amount, stackChecker(stack)); 
+          StackUtil.transfer(inv.te, te, inv.dir.getOpposite(), amount, stackChecker(stack)); 
         return ret;
       case null:
         if (!LiquidUtil.isFluidTile(te, null))
@@ -376,7 +376,7 @@ public class ItemUpgradeModule extends ItemMulti<ItemUpgradeModule.UpgradeType> 
           return false; 
         amount = (int)(50.0D * Math.pow(4.0D, Math.min(4, size - 1)));
         for (LiquidUtil.AdjacentFluidHandler fh : getTargetFluidHandlers(stack, te))
-          LiquidUtil.transfer(fh.handler, fh.dir.func_176734_d(), te, amount); 
+          LiquidUtil.transfer(fh.handler, fh.dir.getOpposite(), te, amount); 
         return ret;
     } 
     return false;
@@ -402,17 +402,17 @@ public class ItemUpgradeModule extends ItemMulti<ItemUpgradeModule.UpgradeType> 
           this.filters = getFilterStacks(tag);
           this.meta = new Settings(HandHeldAdvancedUpgrade.getTag(tag, "meta"));
           this.damage = null;
-          this.nbt = NbtSettings.getFromNBT(HandHeldAdvancedUpgrade.getTag(tag, "nbt").func_74771_c("type"));
+          this.nbt = NbtSettings.getFromNBT(HandHeldAdvancedUpgrade.getTag(tag, "nbt").getByte("type"));
           this.energy = new Settings(HandHeldAdvancedUpgrade.getTag(tag, "energy"));
           this.hasInitialised = true;
         }
         
         private Set<ItemStack> getFilterStacks(NBTTagCompound nbt) {
           Set<ItemStack> ret = new HashSet<>();
-          NBTTagList contentList = nbt.func_150295_c("Items", 10);
-          for (int tag = 0; tag < contentList.func_74745_c(); tag++) {
-            NBTTagCompound slotNbt = contentList.func_150305_b(tag);
-            int slot = slotNbt.func_74771_c("Slot");
+          NBTTagList contentList = nbt.getTagList("Items", 10);
+          for (int tag = 0; tag < contentList.tagCount(); tag++) {
+            NBTTagCompound slotNbt = contentList.getCompoundTagAt(tag);
+            int slot = slotNbt.getByte("Slot");
             if (slot >= 0 && slot < 9) {
               ItemStack filter = new ItemStack(slotNbt);
               if (!StackUtil.isEmpty(filter))
@@ -435,7 +435,7 @@ public class ItemUpgradeModule extends ItemMulti<ItemUpgradeModule.UpgradeType> 
             
             (((ICustomDamageItem)stack.getItem()).getCustomDamage(stack) == ((ICustomDamageItem)filter.getItem()).getCustomDamage(filter))) : (
             
-            (filter.func_77952_i() == stack.func_77952_i()));
+            (filter.getItemDamage() == stack.getItemDamage()));
         }
         
         private boolean checkNBT(ItemStack stack, ItemStack filter) {
@@ -545,10 +545,10 @@ public class ItemUpgradeModule extends ItemMulti<ItemUpgradeModule.UpgradeType> 
   }
   
   private static EnumFacing getDirection(ItemStack stack) {
-    int rawDir = StackUtil.getOrCreateNbtData(stack).func_74771_c("dir");
+    int rawDir = StackUtil.getOrCreateNbtData(stack).getByte("dir");
     if (rawDir < 1 || rawDir > 6)
       return null; 
-    return EnumFacing.field_82609_l[rawDir - 1];
+    return EnumFacing.VALUES[rawDir - 1];
   }
   
   public enum UpgradeType implements IIdProvider {

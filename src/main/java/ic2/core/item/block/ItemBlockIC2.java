@@ -34,7 +34,7 @@ public class ItemBlockIC2 extends ItemBlock {
     if (this.field_150939_a == BlockName.scaffold.getInstance()) {
       BlockScaffold scaffold = (BlockScaffold)this.field_150939_a;
       IBlockState state = scaffold.getState(scaffold.getVariant(stack));
-      return (state.func_185904_a() == Material.field_151575_d) ? 300 : 0;
+      return (state.getMaterial() == Material.field_151575_d) ? 300 : 0;
     } 
     return -1;
   }

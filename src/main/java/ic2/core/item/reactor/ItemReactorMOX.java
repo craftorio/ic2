@@ -26,13 +26,13 @@ public class ItemReactorMOX extends ItemReactorUranium {
     switch (this.numberOfCells) {
       case 1:
         ret = ItemName.nuclear.getItemStack((Enum)NuclearResourceType.depleted_mox);
-        return ret.func_77946_l();
+        return ret.copy();
       case 2:
         ret = ItemName.nuclear.getItemStack((Enum)NuclearResourceType.depleted_dual_mox);
-        return ret.func_77946_l();
+        return ret.copy();
       case 4:
         ret = ItemName.nuclear.getItemStack((Enum)NuclearResourceType.depleted_quad_mox);
-        return ret.func_77946_l();
+        return ret.copy();
     } 
     throw new RuntimeException("invalid cell count: " + this.numberOfCells);
   }

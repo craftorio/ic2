@@ -199,8 +199,8 @@ public final class Util {
   
   public static String formatPosition(IBlockAccess world, int x, int y, int z) {
     int dimId;
-    if (world instanceof World && ((World)world).field_73011_w != null) {
-      dimId = ((World)world).field_73011_w.getDimension();
+    if (world instanceof World && ((World)world).provider != null) {
+      dimId = ((World)world).provider.getDimension();
     } else {
       dimId = Integer.MIN_VALUE;
     } 
@@ -550,7 +550,7 @@ public final class Util {
       return false; 
     IBlockState state = world.getBlockState(pos);
     Block block = state.getBlock();
-    TileEntity te = world.func_175625_s(pos);
+    TileEntity te = world.getTileEntity(pos);
     EntityPlayer player = Ic2Player.get(world);
     boolean canHarvest = block.canHarvestBlock((IBlockAccess)world, pos, player);
     block.func_176208_a(world, pos, state, player);

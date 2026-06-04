@@ -118,12 +118,12 @@ public class CableModel extends AbstractModel implements ISpecialParticleModel {
   private IBakedModel generateModel(TileEntityCable.CableRenderState prop) {
     float th = prop.type.thickness + (prop.insulation * 2) * 0.0625F;
     float sp = (1.0F - th) / 2.0F;
-    List[] arrayOfList = new List[EnumFacing.field_82609_l.length];
+    List[] arrayOfList = new List[EnumFacing.VALUES.length];
     for (int i = 0; i < arrayOfList.length; i++)
       arrayOfList[i] = new ArrayList(); 
     List<BakedQuad> generalQuads = new ArrayList<>();
     TextureAtlasSprite sprite = this.textures.get(getTextureLocation(prop.type, prop.insulation, prop.color, prop.active));
-    for (EnumFacing facing : EnumFacing.field_82609_l) {
+    for (EnumFacing facing : EnumFacing.VALUES) {
       boolean hasConnection = ((prop.connectivity & 1 << facing.ordinal()) != 0);
       float zS = sp, yS = zS, xS = yS;
       float zE = sp + th, yE = zE, xE = yE;
@@ -156,7 +156,7 @@ public class CableModel extends AbstractModel implements ISpecialParticleModel {
           default:
             throw new RuntimeException();
         } 
-        VdUtil.addCuboid(xS, yS, zS, xE, yE, zE, EnumSet.complementOf((EnumSet)EnumSet.of(facing.func_176734_d())), sprite, arrayOfList, generalQuads);
+        VdUtil.addCuboid(xS, yS, zS, xE, yE, zE, EnumSet.complementOf((EnumSet)EnumSet.of(facing.getOpposite())), sprite, arrayOfList, generalQuads);
       } else {
         VdUtil.addCuboid(xS, yS, zS, xE, yE, zE, EnumSet.of(facing), sprite, arrayOfList, generalQuads);
       } 

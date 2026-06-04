@@ -26,7 +26,7 @@ public class ItemWeedingTrowel extends ItemIC2 {
   public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
     if (!IC2.platform.isSimulating())
       return EnumActionResult.PASS; 
-    TileEntity tileEntity = world.func_175625_s(pos);
+    TileEntity tileEntity = world.getTileEntity(pos);
     if (tileEntity instanceof TileEntityCrop) {
       TileEntityCrop tileEntityCrop = (TileEntityCrop)tileEntity;
       if (tileEntityCrop.getCrop() == IC2Crops.weed) {

@@ -12,8 +12,8 @@ import net.minecraft.inventory.Slot;
 public class ContainerFluidDistributor extends ContainerFullInv<TileEntityFluidDistributor> {
   public ContainerFluidDistributor(EntityPlayer player, TileEntityFluidDistributor tileEntite) {
     super(player, (IInventory)tileEntite, 184);
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)tileEntite.inputSlot, 0, 9, 54));
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)tileEntite.OutputSlot, 0, 9, 72));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)tileEntite.inputSlot, 0, 9, 54));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)tileEntite.outputSlot, 0, 9, 72));
   }
   
   public List<String> getNetworkedFields() {

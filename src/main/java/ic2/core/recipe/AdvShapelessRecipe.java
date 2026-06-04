@@ -42,7 +42,7 @@ public class AdvShapelessRecipe implements IRecipe {
     if (result == null) {
       AdvRecipe.displayError("null result", null, null, true);
     } else {
-      result = result.func_77946_l();
+      result = result.copy();
     } 
     this.input = new IRecipeInput[args.length - Util.countInArray(args, new Class[] { Boolean.class, ICraftingRecipeManager.AttributeContainer.class })];
     int inputIndex = 0;
@@ -98,7 +98,7 @@ public class AdvShapelessRecipe implements IRecipe {
     } 
     if (!unmatched.isEmpty())
       return StackUtil.emptyStack; 
-    ItemStack ret = this.output.func_77946_l();
+    ItemStack ret = this.output.copy();
     ElectricItem.manager.charge(ret, outputCharge, 2147483647, true, false);
     return ret;
   }

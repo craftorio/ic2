@@ -73,7 +73,7 @@ public interface IRecipeWrapperGenerator<T> {
       private int getHardness(NBTTagCompound metadata) {
         if (metadata == null)
           return Integer.MAX_VALUE; 
-        return metadata.func_74762_e("hardness");
+        return metadata.getInteger("hardness");
       }
       
       private IRecipeInput getInput(final int hardness) {

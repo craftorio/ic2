@@ -51,7 +51,7 @@ public class TileEntityCondenser extends TileEntityElectricMachine implements IH
   
   public final InvSlotConsumableLiquidByTank waterInputSlot;
   
-  public final InvSlotOutput waterOutputSlot;
+  public final InvSlotOutput wateroutputSlot;
   
   public final InvSlotConsumableId ventSlots;
   
@@ -70,7 +70,7 @@ public class TileEntityCondenser extends TileEntityElectricMachine implements IH
     this.inputTank = (FluidTank)this.fluids.addTankInsert("inputTank", 100000, Fluids.fluidPredicate(new Fluid[] { FluidName.steam.getInstance(), FluidName.superheated_steam.getInstance() }));
     this.outputTank = (FluidTank)this.fluids.addTankExtract("outputTank", 1000);
     this.waterInputSlot = new InvSlotConsumableLiquidByTank((IInventorySlotHolder)this, "waterInputSlot", InvSlot.Access.I, 1, InvSlot.InvSide.BOTTOM, InvSlotConsumableLiquid.OpType.Fill, (IFluidTank)this.outputTank);
-    this.waterOutputSlot = new InvSlotOutput((IInventorySlotHolder)this, "waterOutputSlot", 1);
+    this.wateroutputSlot = new InvSlotOutput((IInventorySlotHolder)this, "wateroutputSlot", 1);
     this.ventSlots = new InvSlotConsumableId((IInventorySlotHolder)this, "ventSlots", 4, new Item[] { ItemName.heat_vent.getInstance() });
     this.ventSlots.setStackSizeLimit(1);
     this.upgradeSlot = new InvSlotUpgrade((IInventorySlotHolder)this, "upgradeSlot", 1);
@@ -78,12 +78,12 @@ public class TileEntityCondenser extends TileEntityElectricMachine implements IH
   
   public void readFromNBT(NBTTagCompound nbttagcompound) {
     super.readFromNBT(nbttagcompound);
-    this.progress = nbttagcompound.func_74762_e("progress");
+    this.progress = nbttagcompound.getInteger("progress");
   }
   
   public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
     super.writeToNBT(nbt);
-    nbt.func_74768_a("progress", this.progress);
+    nbt.setInteger("progress", this.progress);
     return nbt;
   }
   
@@ -102,19 +102,19 @@ public class TileEntityCondenser extends TileEntityElectricMachine implements IH
     return vents;
   }
   
-  public void func_70296_d() {
-    super.func_70296_d();
+  public void markDirty() {
+    super.markDirty();
     if (!(getWorld()).isRemote)
       updateTier(); 
   }
   
   protected void updateEntityServer() {
     super.updateEntityServer();
-    this.waterInputSlot.processFromTank((IFluidTank)this.outputTank, this.waterOutputSlot);
+    this.waterInputSlot.processFromTank((IFluidTank)this.outputTank, this.wateroutputSlot);
     setActive((this.inputTank.getFluidAmount() > 0));
     work();
     if (this.upgradeSlot.tickNoMark())
-      super.func_70296_d(); 
+      super.markDirty(); 
   }
   
   private void work() {

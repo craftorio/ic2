@@ -152,7 +152,7 @@ public class DynamicCategory<T> extends IORecipeCategory<T> implements IDrawable
     return this.inputSlots;
   }
   
-  protected List<SlotPosition> getOutputSlotPos() {
+  protected List<SlotPosition> getoutputSlotPos() {
     return this.outputSlots;
   }
   

@@ -13,11 +13,11 @@ public class ContainerContainmentbox extends ContainerHandHeldInventory<HandHeld
     super(box);
     int i;
     for (i = 0; i < 4; i++)
-      func_75146_a((Slot)new SlotRadioactive((IInventory)box, i, 53 + i * 18, 19)); 
+      addSlotToContainer((Slot)new SlotRadioactive((IInventory)box, i, 53 + i * 18, 19)); 
     for (i = 4; i < 8; i++)
-      func_75146_a((Slot)new SlotRadioactive((IInventory)box, i, 53 + (i - 4) * 18, 37)); 
+      addSlotToContainer((Slot)new SlotRadioactive((IInventory)box, i, 53 + (i - 4) * 18, 37)); 
     for (i = 8; i < 12; i++)
-      func_75146_a((Slot)new SlotRadioactive((IInventory)box, i, 53 + (i - 8) * 18, 55)); 
+      addSlotToContainer((Slot)new SlotRadioactive((IInventory)box, i, 53 + (i - 8) * 18, 55)); 
     addPlayerInventorySlots(player, 166);
   }
 }

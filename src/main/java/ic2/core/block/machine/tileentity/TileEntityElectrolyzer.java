@@ -66,12 +66,12 @@ public class TileEntityElectrolyzer extends TileEntityElectricMachine implements
   
   public void readFromNBT(NBTTagCompound nbt) {
     super.readFromNBT(nbt);
-    this.progress = nbt.func_74762_e("progress");
+    this.progress = nbt.getInteger("progress");
   }
   
   public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
     super.writeToNBT(nbt);
-    nbt.func_74768_a("progress", this.progress);
+    nbt.setInteger("progress", this.progress);
     return nbt;
   }
   
@@ -94,7 +94,7 @@ public class TileEntityElectrolyzer extends TileEntityElectricMachine implements
     } 
     needsInvUpdate |= this.upgradeSlot.tickNoMark();
     if (needsInvUpdate)
-      func_70296_d(); 
+      markDirty(); 
   }
   
   protected boolean canOperate() {
@@ -118,14 +118,14 @@ public class TileEntityElectrolyzer extends TileEntityElectricMachine implements
   }
   
   protected boolean canFillTank(EnumFacing facing, FluidStack fluid) {
-    TileEntity te = getWorld().func_175625_s(this.field_174879_c.func_177972_a(facing));
+    TileEntity te = getWorld().getTileEntity(this.pos.offset(facing));
     if (te instanceof TileEntityTank)
       return (LiquidUtil.fillTile(te, facing, fluid, true) == fluid.amount); 
     return false;
   }
   
   protected void fillTank(EnumFacing facing, FluidStack fluid) {
-    TileEntity te = getWorld().func_175625_s(this.field_174879_c.func_177972_a(facing));
+    TileEntity te = getWorld().getTileEntity(this.pos.offset(facing));
     if (te instanceof TileEntityTank)
       LiquidUtil.fillTile(te, facing, fluid, false); 
   }

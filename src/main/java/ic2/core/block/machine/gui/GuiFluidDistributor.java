@@ -22,11 +22,11 @@ public class GuiFluidDistributor extends GuiIC2<ContainerFluidDistributor> {
   
   protected void drawForegroundLayer(int mouseX, int mouseY) {
     super.drawForegroundLayer(mouseX, mouseY);
-    this.field_146289_q.func_78276_b(Localization.translate("ic2.FluidDistributor.gui.mode.info"), 112, 47, 5752026);
+    this.fontRenderer.drawString(Localization.translate("ic2.FluidDistributor.gui.mode.info"), 112, 47, 5752026);
     if (((TileEntityFluidDistributor)((ContainerFluidDistributor)this.container).base).getActive()) {
-      this.field_146289_q.func_78276_b(Localization.translate("ic2.FluidDistributor.gui.mode.concentrate"), 95, 71, 5752026);
+      this.fontRenderer.drawString(Localization.translate("ic2.FluidDistributor.gui.mode.concentrate"), 95, 71, 5752026);
     } else {
-      this.field_146289_q.func_78276_b(Localization.translate("ic2.FluidDistributor.gui.mode.distribute"), 95, 71, 5752026);
+      this.fontRenderer.drawString(Localization.translate("ic2.FluidDistributor.gui.mode.distribute"), 95, 71, 5752026);
     } 
   }
   

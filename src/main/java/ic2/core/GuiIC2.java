@@ -361,7 +361,7 @@ public abstract class GuiIC2<T extends ContainerBase<? extends IInventory>> exte
   
   public void drawItemStack(int x, int y, ItemStack stack) {
     drawItem(x, y, stack);
-    this.field_146296_j.func_180453_a(this.field_146289_q, stack, this.field_147003_i + x, this.field_147009_r + y, null);
+    this.field_146296_j.func_180453_a(this.fontRenderer, stack, this.field_147003_i + x, this.field_147009_r + y, null);
   }
   
   public void drawColoredRect(int x, int y, int width, int height, int color) {
@@ -371,7 +371,7 @@ public abstract class GuiIC2<T extends ContainerBase<? extends IInventory>> exte
   }
   
   public int drawString(int x, int y, String text, int color, boolean shadow) {
-    return this.field_146289_q.func_175065_a(text, (this.field_147003_i + x), (this.field_147009_r + y), color, shadow) - this.field_147003_i;
+    return this.fontRenderer.func_175065_a(text, (this.field_147003_i + x), (this.field_147009_r + y), color, shadow) - this.field_147003_i;
   }
   
   public void drawXCenteredString(int x, int y, String text, int color, boolean shadow) {
@@ -387,19 +387,19 @@ public abstract class GuiIC2<T extends ContainerBase<? extends IInventory>> exte
       x -= getStringWidth(text) / 2; 
     if (centerY)
       y -= 4; 
-    this.field_146289_q.func_78276_b(text, this.field_147003_i + x, this.field_147009_r + y, color);
+    this.fontRenderer.drawString(text, this.field_147003_i + x, this.field_147009_r + y, color);
   }
   
   public int getStringWidth(String text) {
-    return this.field_146289_q.func_78256_a(text);
+    return this.fontRenderer.func_78256_a(text);
   }
   
   public String trimStringToWidth(String text, int width) {
-    return this.field_146289_q.func_78262_a(text, width, false);
+    return this.fontRenderer.func_78262_a(text, width, false);
   }
   
   public String trimStringToWidthReverse(String text, int width) {
-    return this.field_146289_q.func_78262_a(text, width, true);
+    return this.fontRenderer.func_78262_a(text, width, true);
   }
   
   public void drawTooltip(int x, int y, List<String> text) {

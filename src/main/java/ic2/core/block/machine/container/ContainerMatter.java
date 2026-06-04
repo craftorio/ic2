@@ -12,11 +12,11 @@ import net.minecraft.inventory.Slot;
 public class ContainerMatter extends ContainerFullInv<TileEntityMatter> {
   public ContainerMatter(EntityPlayer player, TileEntityMatter tileEntity1) {
     super(player, (IInventory)tileEntity1, 166);
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)tileEntity1.amplifierSlot, 0, 72, 40));
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)tileEntity1.outputSlot, 0, 125, 59));
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)tileEntity1.containerslot, 0, 125, 23));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)tileEntity1.amplifierSlot, 0, 72, 40));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)tileEntity1.outputSlot, 0, 125, 59));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)tileEntity1.containerslot, 0, 125, 23));
     for (int i = 0; i < 4; i++)
-      func_75146_a((Slot)new SlotInvSlot((InvSlot)tileEntity1.upgradeSlot, i, 152, 8 + i * 18)); 
+      addSlotToContainer((Slot)new SlotInvSlot((InvSlot)tileEntity1.upgradeSlot, i, 152, 8 + i * 18)); 
   }
   
   public List<String> getNetworkedFields() {

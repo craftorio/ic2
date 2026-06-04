@@ -199,7 +199,7 @@ public class PlatformClient extends Platform {
     if (isSimulating())
       return super.getWorld(dimId); 
     WorldClient worldClient = this.mc.field_71441_e;
-    return (((World)worldClient).field_73011_w.getDimension() == dimId) ? (World)worldClient : null;
+    return (((World)worldClient).provider.getDimension() == dimId) ? (World)worldClient : null;
   }
   
   public World getPlayerWorld() {

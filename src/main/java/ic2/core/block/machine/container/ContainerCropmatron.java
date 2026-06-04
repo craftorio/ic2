@@ -12,13 +12,13 @@ public class ContainerCropmatron extends ContainerElectricMachine<TileEntityCrop
     super(player, base, 192, 134, 80);
     int i;
     for (i = 0; i < base.fertilizerSlot.size(); i++)
-      func_75146_a((Slot)new SlotInvSlot((InvSlot)base.fertilizerSlot, i, 8 + i * 18, 80)); 
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)base.exInputSlot, 0, 49, 27));
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)base.exOutputSlot, 0, 67, 27));
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)base.wasserinputSlot, 0, 57, 56));
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)base.wasseroutputSlot, 0, 75, 56));
+      addSlotToContainer((Slot)new SlotInvSlot((InvSlot)base.fertilizerSlot, i, 8 + i * 18, 80)); 
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)base.exInputSlot, 0, 49, 27));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)base.exoutputSlot, 0, 67, 27));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)base.wasserinputSlot, 0, 57, 56));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)base.wasseroutputSlot, 0, 75, 56));
     for (i = 0; i < 4; i++)
-      func_75146_a((Slot)new SlotInvSlot((InvSlot)base.upgradeSlot, i, 152, 26 + i * 18)); 
+      addSlotToContainer((Slot)new SlotInvSlot((InvSlot)base.upgradeSlot, i, 152, 26 + i * 18)); 
   }
   
   public List<String> getNetworkedFields() {

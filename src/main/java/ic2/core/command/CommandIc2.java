@@ -339,7 +339,7 @@ public class CommandIc2 extends CommandBase {
               .getItem().getRegistryName(), 
               Integer.valueOf(StackUtil.getRawMeta(stack)), 
               Integer.valueOf(stack.func_77960_j()), 
-              Integer.valueOf(stack.func_77952_i()), stack
+              Integer.valueOf(stack.getItemDamage()), stack
               .func_77978_p() }));
       msg(sender, "Current Item excluding amount: " + 
           ConfigUtil.fromStack(stack));

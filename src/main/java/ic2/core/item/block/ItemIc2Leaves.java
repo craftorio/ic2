@@ -19,7 +19,7 @@ public class ItemIc2Leaves extends ItemLeaves {
   }
   
   public String func_77667_c(ItemStack stack) {
-    return func_77658_a() + "." + ((Ic2Leaves.LeavesType)this.field_150939_a.func_176203_a(stack.func_77960_j()).func_177229_b((IProperty)Ic2Leaves.typeProperty)).func_176610_l();
+    return func_77658_a() + "." + ((Ic2Leaves.LeavesType)this.field_150939_a.func_176203_a(stack.func_77960_j()).func_177229_b((IProperty)Ic2Leaves.typeProperty)).getName();
   }
   
   public String func_77653_i(ItemStack stack) {

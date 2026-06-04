@@ -10,12 +10,12 @@ import net.minecraft.inventory.Slot;
 public class ContainerAdvMiner extends ContainerElectricMachine<TileEntityAdvMiner> {
   public ContainerAdvMiner(EntityPlayer player, TileEntityAdvMiner tileEntity1) {
     super(player, tileEntity1, 203, 8, 80);
-    func_75146_a((Slot)new SlotInvSlot((InvSlot)tileEntity1.scannerSlot, 0, 8, 26));
+    addSlotToContainer((Slot)new SlotInvSlot((InvSlot)tileEntity1.scannerSlot, 0, 8, 26));
     for (int i = 0; i < 4; i++)
-      func_75146_a((Slot)new SlotInvSlot((InvSlot)tileEntity1.upgradeSlot, i, 152, 26 + i * 18)); 
+      addSlotToContainer((Slot)new SlotInvSlot((InvSlot)tileEntity1.upgradeSlot, i, 152, 26 + i * 18)); 
     for (int row = 0; row < 3; row++) {
       for (int col = 0; col < 5; col++)
-        func_75146_a((Slot)new SlotInvSlot(tileEntity1.filterSlot, col + row * 5, 36 + col * 18, 44 + row * 18)); 
+        addSlotToContainer((Slot)new SlotInvSlot(tileEntity1.filterSlot, col + row * 5, 36 + col * 18, 44 + row * 18)); 
     } 
   }
   

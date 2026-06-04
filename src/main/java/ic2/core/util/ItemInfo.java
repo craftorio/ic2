@@ -18,7 +18,7 @@ public class ItemInfo implements IInfoProvider {
       return 0.0D; 
     if (StackUtil.checkItemEquality(stack, ItemName.single_use_battery.getItemStack()))
       return 1200.0D; 
-    if (StackUtil.checkItemEquality(stack, Items.field_151137_ax))
+    if (StackUtil.checkItemEquality(stack, Items.REDSTONE))
       return 800.0D; 
     if (StackUtil.checkItemEquality(stack, ItemName.dust.getItemStack((Enum)DustResourceType.energium)))
       return 16000.0D; 

@@ -60,7 +60,7 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
     String mode;
     super.func_77624_a(stack, world, list, par4);
     NBTTagCompound nbtData = StackUtil.getOrCreateNbtData(stack);
-    switch (nbtData.func_74762_e("laserSetting")) {
+    switch (nbtData.getInteger("laserSetting")) {
       case 0:
         mode = Localization.translate("ic2.tooltip.mode.mining");
         break;
@@ -94,7 +94,7 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
   public List<String> getHudInfo(ItemStack stack, boolean advanced) {
     List<String> info = new LinkedList<>();
     NBTTagCompound nbtData = StackUtil.getOrCreateNbtData(stack);
-    String mode = Localization.translate(getModeString(nbtData.func_74762_e("laserSetting")));
+    String mode = Localization.translate(getModeString(nbtData.getInteger("laserSetting")));
     info.addAll(super.getHudInfo(stack, advanced));
     info.add(Localization.translate("ic2.tooltip.mode", new Object[] { mode }));
     return info;
@@ -105,10 +105,10 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
     if (!IC2.platform.isSimulating())
       return new ActionResult(EnumActionResult.PASS, stack); 
     NBTTagCompound nbtData = StackUtil.getOrCreateNbtData(stack);
-    int laserSetting = nbtData.func_74762_e("laserSetting");
+    int laserSetting = nbtData.getInteger("laserSetting");
     if (IC2.keyboard.isModeSwitchKeyDown(player)) {
       laserSetting = (laserSetting + 1) % 8;
-      nbtData.func_74768_a("laserSetting", laserSetting);
+      nbtData.setInteger("laserSetting", laserSetting);
       IC2.platform.messagePlayer(player, "ic2.tooltip.mode", new Object[] { getModeString(laserSetting) });
     } else {
       Vector3 look, right, up;
@@ -179,7 +179,7 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
     ItemStack stack = StackUtil.get(player, hand);
     NBTTagCompound nbtData = StackUtil.getOrCreateNbtData(stack);
     if (!IC2.keyboard.isModeSwitchKeyDown(player) && (nbtData
-      .func_74762_e("laserSetting") == 3 || nbtData.func_74762_e("laserSetting") == 7)) {
+      .getInteger("laserSetting") == 3 || nbtData.getInteger("laserSetting") == 7)) {
       Vector3 dir = Util.getLook((Entity)player);
       double angle = dir.dot(Vector3.UP);
       if (Math.abs(angle) < 1.0D / Math.sqrt(2.0D)) {
@@ -189,10 +189,10 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
           Vector3 start = Util.getEyePosition((Entity)player);
           start.y = pos.getY() + 0.5D;
           start = adjustStartPos(start, dir);
-          if (nbtData.func_74762_e("laserSetting") == 3) {
+          if (nbtData.getInteger("laserSetting") == 3) {
             if (shootLaser(stack, world, start, dir, (EntityLivingBase)player, Float.POSITIVE_INFINITY, 5.0F, 2147483647, false, false))
               ((NetworkManager)IC2.network.get(true)).initiateItemEvent(player, stack, 3, true); 
-          } else if (nbtData.func_74762_e("laserSetting") == 7 && 
+          } else if (nbtData.getInteger("laserSetting") == 7 && 
             shootLaser(stack, world, start, dir, (EntityLivingBase)player, Float.POSITIVE_INFINITY, 5.0F, 2147483647, false, false)) {
             shootLaser(stack, world, new Vector3(start.x, start.y - 1.0D, start.z), dir, (EntityLivingBase)player, Float.POSITIVE_INFINITY, 5.0F, 2147483647, false, false);
             shootLaser(stack, world, new Vector3(start.x, start.y + 1.0D, start.z), dir, (EntityLivingBase)player, Float.POSITIVE_INFINITY, 5.0F, 2147483647, false, false);
@@ -215,7 +215,7 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
             ((NetworkManager)IC2.network.get(true)).initiateItemEvent(player, stack, 7, true);
           } 
         } 
-      } else if (nbtData.func_74762_e("laserSetting") == 7) {
+      } else if (nbtData.getInteger("laserSetting") == 7) {
         if (ElectricItem.manager.use(stack, 3000.0D, (EntityLivingBase)player)) {
           dir.x = 0.0D;
           dir.z = 0.0D;
@@ -264,7 +264,7 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
     if (event.isCanceled())
       return false; 
     entity.copyDataFromEvent((LaserEvent)event);
-    world.func_72838_d(entity);
+    world.spawnEntity(entity);
     return true;
   }
   

@@ -66,7 +66,7 @@ public class HandHeldAdvancedUpgrade extends HandHeldInventory implements IHolog
     super(player, checkContainerStack(player, containerStack), 9);
     NBTTagCompound nbt = StackUtil.getOrCreateNbtData(containerStack);
     this.meta = readTag(nbt, "meta");
-    this.nbt = NbtSettings.getFromNBT(getTag(nbt, "nbt").func_74771_c("type"));
+    this.nbt = NbtSettings.getFromNBT(getTag(nbt, "nbt").getByte("type"));
     this.energy = readTag(nbt, "energy");
   }
   
@@ -78,7 +78,7 @@ public class HandHeldAdvancedUpgrade extends HandHeldInventory implements IHolog
       writeTag(nbt, "meta", this.meta);
       NBTTagCompound tag = getTag(nbt, "nbt");
       tag.func_74757_a("active", this.nbt.enabled());
-      tag.func_74774_a("type", this.nbt.getForNBT());
+      tag.setByte("type", this.nbt.getForNBT());
       nbt.setTag("nbtSettings", (NBTBase)tag);
       writeTag(nbt, "energy", this.energy);
     } 

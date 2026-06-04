@@ -124,7 +124,7 @@ public class ItemIC2 extends Item implements IItemModelProvider {
   }
   
   protected static int getRemainingUses(ItemStack stack) {
-    return stack.func_77958_k() - stack.func_77952_i() + 1;
+    return stack.getMaxDamage() - stack.getItemDamage() + 1;
   }
   
   public <T> void addCapability(Capability<T> cap, Function<ItemStack, T> lookup) {

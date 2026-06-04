@@ -36,12 +36,12 @@ public abstract class HandHeldInventory implements IHasGui {
     this.player = player;
     if (IC2.platform.isSimulating()) {
       NBTTagCompound nbt = StackUtil.getOrCreateNbtData(containerStack);
-      if (!nbt.func_150297_b("uid", 3))
-        nbt.func_74768_a("uid", IC2.random.nextInt()); 
-      NBTTagList contentList = nbt.func_150295_c("Items", 10);
-      for (int i = 0; i < contentList.func_74745_c(); i++) {
-        NBTTagCompound slotNbt = contentList.func_150305_b(i);
-        int slot = slotNbt.func_74771_c("Slot");
+      if (!nbt.hasKey("uid", 3))
+        nbt.setInteger("uid", IC2.random.nextInt()); 
+      NBTTagList contentList = nbt.getTagList("Items", 10);
+      for (int i = 0; i < contentList.tagCount(); i++) {
+        NBTTagCompound slotNbt = contentList.getCompoundTagAt(i);
+        int slot = slotNbt.getByte("Slot");
         if (slot >= 0 && slot < this.inventory.length)
           this.inventory[slot] = new ItemStack(slotNbt); 
       } 
@@ -100,7 +100,7 @@ public abstract class HandHeldInventory implements IHasGui {
     return false;
   }
   
-  public void func_70296_d() {
+  public void markDirty() {
     save();
   }
   
@@ -147,12 +147,12 @@ public abstract class HandHeldInventory implements IHasGui {
     if (StackUtil.isEmpty(stack) || stack.getItem() != this.containerStack.getItem())
       return false; 
     NBTTagCompound nbt = stack.func_77978_p();
-    return (nbt != null && nbt.func_74762_e("uid") == getUid());
+    return (nbt != null && nbt.getInteger("uid") == getUid());
   }
   
   protected int getUid() {
     NBTTagCompound nbt = StackUtil.getOrCreateNbtData(this.containerStack);
-    return nbt.func_74762_e("uid");
+    return nbt.getInteger("uid");
   }
   
   protected int getPlayerInventoryIndex() {
@@ -180,9 +180,9 @@ public abstract class HandHeldInventory implements IHasGui {
     for (int j = 0; j < this.inventory.length; j++) {
       if (!StackUtil.isEmpty(this.inventory[j])) {
         NBTTagCompound nbt = new NBTTagCompound();
-        nbt.func_74774_a("Slot", (byte)j);
-        this.inventory[j].func_77955_b(nbt);
-        contentList.func_74742_a((NBTBase)nbt);
+        nbt.setByte("Slot", (byte)j);
+        this.inventory[j].writeToNBT(nbt);
+        contentList.appendTag((NBTBase)nbt);
       } 
     } 
     StackUtil.getOrCreateNbtData(this.containerStack).setTag("Items", (NBTBase)contentList);
@@ -230,13 +230,13 @@ public abstract class HandHeldInventory implements IHasGui {
     for (int i = 0; i < this.inventory.length; i++) {
       if (!StackUtil.isEmpty(this.inventory[i]) && !isThisContainer(this.inventory[i])) {
         NBTTagCompound nbt = new NBTTagCompound();
-        nbt.func_74774_a("Slot", (byte)i);
-        this.inventory[i].func_77955_b(nbt);
-        contentList.func_74742_a((NBTBase)nbt);
+        nbt.setByte("Slot", (byte)i);
+        this.inventory[i].writeToNBT(nbt);
+        contentList.appendTag((NBTBase)nbt);
       } 
     } 
     StackUtil.getOrCreateNbtData(stack).setTag("Items", (NBTBase)contentList);
-    assert StackUtil.getOrCreateNbtData(stack).func_74762_e("uid") == 0;
+    assert StackUtil.getOrCreateNbtData(stack).getInteger("uid") == 0;
     func_174888_l();
   }
   

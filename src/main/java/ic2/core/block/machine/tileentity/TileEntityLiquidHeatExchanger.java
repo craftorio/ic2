@@ -69,7 +69,7 @@ public class TileEntityLiquidHeatExchanger extends TileEntityHeatSourceInventory
     this.outputTank = (FluidTank)this.fluids.addTankExtract("outputTank", 2000);
     this.heatexchangerslots = (InvSlotConsumable)new InvSlotConsumableItemStack((IInventorySlotHolder)this, "heatExchanger", 10, new ItemStack[] { ItemName.crafting.getItemStack((Enum)CraftingItemType.heat_conductor) });
     this.heatexchangerslots.setStackSizeLimit(1);
-    this.hotoutputSlot = new InvSlotOutput((IInventorySlotHolder)this, "hotOutputSlot", 1);
+    this.hotoutputSlot = new InvSlotOutput((IInventorySlotHolder)this, "hotoutputSlot", 1);
     this.cooloutputSlot = new InvSlotOutput((IInventorySlotHolder)this, "outputSlot", 1);
     this.hotfluidinputSlot = (InvSlotConsumableLiquid)new InvSlotConsumableLiquidByManager((IInventorySlotHolder)this, "hotFluidInput", InvSlot.Access.I, 1, InvSlot.InvSide.TOP, InvSlotConsumableLiquid.OpType.Drain, (ILiquidAcceptManager)Recipes.liquidCooldownManager);
     this.coolfluidinputSlot = (InvSlotConsumableLiquid)new InvSlotConsumableLiquidByTank((IInventorySlotHolder)this, "coolFluidOutput", InvSlot.Access.I, 1, InvSlot.InvSide.BOTTOM, InvSlotConsumableLiquid.OpType.Fill, (IFluidTank)this.outputTank);

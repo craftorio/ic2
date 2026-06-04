@@ -45,7 +45,7 @@ class Flatification extends TerraformerBase {
     if (pos.getY() == workPos.getY())
       return false; 
     if (workPos.getY() < pos.getY()) {
-      world.func_175656_a(workPos.func_177984_a(), Blocks.field_150346_d.getDefaultState());
+      world.func_175656_a(workPos.up(), Blocks.field_150346_d.getDefaultState());
       return true;
     } 
     if (canRemove(world.getBlockState(workPos).getBlock())) {

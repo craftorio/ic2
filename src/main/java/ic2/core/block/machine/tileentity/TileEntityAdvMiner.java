@@ -102,7 +102,7 @@ public class TileEntityAdvMiner extends TileEntityElectricMachine implements IHa
   public void readFromNBT(NBTTagCompound nbt) {
     super.readFromNBT(nbt);
     if (nbt.func_74764_b("mineTargetX"))
-      this.mineTarget = new BlockPos(nbt.func_74762_e("mineTargetX"), nbt.func_74762_e("mineTargetY"), nbt.func_74762_e("mineTargetZ")); 
+      this.mineTarget = new BlockPos(nbt.getInteger("mineTargetX"), nbt.getInteger("mineTargetY"), nbt.getInteger("mineTargetZ")); 
     this.blacklist = nbt.func_74767_n("blacklist");
     this.silkTouch = nbt.func_74767_n("silkTouch");
   }
@@ -110,17 +110,17 @@ public class TileEntityAdvMiner extends TileEntityElectricMachine implements IHa
   public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
     super.writeToNBT(nbt);
     if (this.mineTarget != null) {
-      nbt.func_74768_a("mineTargetX", this.mineTarget.getX());
-      nbt.func_74768_a("mineTargetY", this.mineTarget.getY());
-      nbt.func_74768_a("mineTargetZ", this.mineTarget.getZ());
+      nbt.setInteger("mineTargetX", this.mineTarget.getX());
+      nbt.setInteger("mineTargetY", this.mineTarget.getY());
+      nbt.setInteger("mineTargetZ", this.mineTarget.getZ());
     } 
     nbt.func_74757_a("blacklist", this.blacklist);
     nbt.func_74757_a("silkTouch", this.silkTouch);
     return nbt;
   }
   
-  public void func_70296_d() {
-    super.func_70296_d();
+  public void markDirty() {
+    super.markDirty();
     if (!(getWorld()).isRemote)
       setUpgradestat(); 
   }
@@ -129,7 +129,7 @@ public class TileEntityAdvMiner extends TileEntityElectricMachine implements IHa
     super.updateEntityServer();
     chargeTool();
     if (work()) {
-      super.func_70296_d();
+      super.markDirty();
       setActive(true);
     } else {
       setActive(false);
@@ -158,7 +158,7 @@ public class TileEntityAdvMiner extends TileEntityElectricMachine implements IHa
       range = 0;
     } 
     if (this.mineTarget == null) {
-      this.mineTarget = new BlockPos(this.field_174879_c.getX() - range - 1, this.field_174879_c.getY() - 1, this.field_174879_c.getZ() - range);
+      this.mineTarget = new BlockPos(this.pos.getX() - range - 1, this.pos.getY() - 1, this.pos.getZ() - range);
       if (this.mineTarget.getY() < 0)
         return false; 
     } 
@@ -166,12 +166,12 @@ public class TileEntityAdvMiner extends TileEntityElectricMachine implements IHa
     World world = getWorld();
     BlockPos.MutableBlockPos scanPos = new BlockPos.MutableBlockPos(this.mineTarget.getX(), this.mineTarget.getY(), this.mineTarget.getZ());
     do {
-      if (scanPos.getX() < this.field_174879_c.getX() + range) {
+      if (scanPos.getX() < this.pos.getX() + range) {
         scanPos = new BlockPos.MutableBlockPos(scanPos.getX() + 1, scanPos.getY(), scanPos.getZ());
-      } else if (scanPos.getZ() < this.field_174879_c.getZ() + range) {
-        scanPos = new BlockPos.MutableBlockPos(this.field_174879_c.getX() - range, scanPos.getY(), scanPos.getZ() + 1);
+      } else if (scanPos.getZ() < this.pos.getZ() + range) {
+        scanPos = new BlockPos.MutableBlockPos(this.pos.getX() - range, scanPos.getY(), scanPos.getZ() + 1);
       } else {
-        scanPos = new BlockPos.MutableBlockPos(this.field_174879_c.getX() - range, scanPos.getY() - 1, this.field_174879_c.getZ() - range);
+        scanPos = new BlockPos.MutableBlockPos(this.pos.getX() - range, scanPos.getY() - 1, this.pos.getZ() - range);
         if (scanPos.getY() < 0) {
           this.mineTarget = new BlockPos((Vec3i)scanPos);
           return true;

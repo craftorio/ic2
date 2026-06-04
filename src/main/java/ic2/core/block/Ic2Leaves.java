@@ -96,9 +96,9 @@ public class Ic2Leaves extends BlockLeaves implements IBlockModelProvider {
   }
   
   public boolean func_176225_a(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
-    BlockPos nPos = pos.func_177972_a(side);
+    BlockPos nPos = pos.offset(side);
     return ((!func_149662_c(state) || world.getBlockState(nPos) != state) && 
-      !world.getBlockState(nPos).doesSideBlockRendering(world, nPos, side.func_176734_d()));
+      !world.getBlockState(nPos).doesSideBlockRendering(world, nPos, side.getOpposite()));
   }
   
   public Item func_180660_a(IBlockState state, Random rand, int fortune) {
@@ -159,7 +159,7 @@ public class Ic2Leaves extends BlockLeaves implements IBlockModelProvider {
       this.saplingDropChance = saplingDropChance;
     }
     
-    public String func_176610_l() {
+    public String getName() {
       return name();
     }
     

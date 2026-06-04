@@ -92,7 +92,7 @@ public class TileEntityScanner extends TileEntityElectricMachine implements IHas
             if (this.patternUu != Double.POSITIVE_INFINITY) {
               this.state = State.COMPLETED;
               this.inputSlot.consume(1, false, true);
-              func_70296_d();
+              markDirty();
             } else {
               this.state = State.FAILED;
             } 
@@ -152,30 +152,30 @@ public class TileEntityScanner extends TileEntityElectricMachine implements IHas
   
   public void readFromNBT(NBTTagCompound nbttagcompound) {
     super.readFromNBT(nbttagcompound);
-    this.progress = nbttagcompound.func_74762_e("progress");
+    this.progress = nbttagcompound.getInteger("progress");
     NBTTagCompound contentTag = nbttagcompound.getCompoundTag("currentStack");
     this.currentStack = new ItemStack(contentTag);
     contentTag = nbttagcompound.getCompoundTag("pattern");
     this.pattern = new ItemStack(contentTag);
-    int stateIdx = nbttagcompound.func_74762_e("state");
+    int stateIdx = nbttagcompound.getInteger("state");
     this.state = (stateIdx < (State.values()).length) ? State.values()[stateIdx] : State.IDLE;
     refreshInfo();
   }
   
   public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
     super.writeToNBT(nbt);
-    nbt.func_74768_a("progress", this.progress);
+    nbt.setInteger("progress", this.progress);
     if (!StackUtil.isEmpty(this.currentStack)) {
       NBTTagCompound contentTag = new NBTTagCompound();
-      this.currentStack.func_77955_b(contentTag);
+      this.currentStack.writeToNBT(contentTag);
       nbt.setTag("currentStack", (NBTBase)contentTag);
     } 
     if (!StackUtil.isEmpty(this.pattern)) {
       NBTTagCompound contentTag = new NBTTagCompound();
-      this.pattern.func_77955_b(contentTag);
+      this.pattern.writeToNBT(contentTag);
       nbt.setTag("pattern", (NBTBase)contentTag);
     } 
-    nbt.func_74768_a("state", this.state.ordinal());
+    nbt.setInteger("state", this.state.ordinal());
     return nbt;
   }
   
@@ -192,8 +192,8 @@ public class TileEntityScanner extends TileEntityElectricMachine implements IHas
   
   public IPatternStorage getPatternStorage() {
     World world = getWorld();
-    for (EnumFacing dir : EnumFacing.field_82609_l) {
-      TileEntity target = world.func_175625_s(this.field_174879_c.func_177972_a(dir));
+    for (EnumFacing dir : EnumFacing.VALUES) {
+      TileEntity target = world.getTileEntity(this.pos.offset(dir));
       if (target instanceof IPatternStorage)
         return (IPatternStorage)target; 
     } 

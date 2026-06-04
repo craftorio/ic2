@@ -58,9 +58,9 @@ public class ItemSprayer extends ItemIC2FluidContainer implements IBoxable {
       IC2.keyboard.isModeSwitchKeyDown(player)) {
       ItemStack stack = StackUtil.get(player, hand);
       NBTTagCompound nbtData = StackUtil.getOrCreateNbtData(stack);
-      int mode = nbtData.func_74762_e("mode");
+      int mode = nbtData.getInteger("mode");
       mode = (mode == 0) ? 1 : 0;
-      nbtData.func_74768_a("mode", mode);
+      nbtData.setInteger("mode", mode);
       String sMode = (mode == 0) ? "ic2.tooltip.mode.normal" : "ic2.tooltip.mode.single";
       IC2.platform.messagePlayer(player, "ic2.tooltip.mode", new Object[] { sMode });
     } 
@@ -105,12 +105,12 @@ public class ItemSprayer extends ItemIC2FluidContainer implements IBoxable {
     } else if (canPlaceFoam(world, pos, Target.Cable)) {
       target = Target.Cable;
     } else {
-      pos = pos.func_177972_a(side);
+      pos = pos.offset(side);
       target = Target.Any;
     } 
     Vec3d viewVec = player.func_70040_Z();
     EnumFacing playerViewFacing = EnumFacing.func_176737_a((float)viewVec.field_72450_a, (float)viewVec.field_72448_b, (float)viewVec.field_72449_c);
-    int amount = sprayFoam(world, pos, playerViewFacing.func_176734_d(), target, maxFoamBlocks);
+    int amount = sprayFoam(world, pos, playerViewFacing.getOpposite(), target, maxFoamBlocks);
     amount *= getFluidPerFoam();
     if (amount > 0) {
       if (pack != null) {
@@ -142,9 +142,9 @@ public class ItemSprayer extends ItemIC2FluidContainer implements IBoxable {
       if (!canPlaceFoam(world, cPos, target))
         continue; 
       if (positions.add(cPos))
-        for (EnumFacing dir : EnumFacing.field_82609_l) {
+        for (EnumFacing dir : EnumFacing.VALUES) {
           if (dir != excludedDir)
-            toCheck.add(cPos.func_177972_a(dir)); 
+            toCheck.add(cPos.offset(dir)); 
         }  
     } 
     toCheck.clear();
@@ -169,7 +169,7 @@ public class ItemSprayer extends ItemIC2FluidContainer implements IBoxable {
         continue;
       } 
       if (targetBlock == BlockName.te.getInstance()) {
-        TileEntity te = world.func_175625_s(targetPos);
+        TileEntity te = world.getTileEntity(targetPos);
         if (te instanceof TileEntityCable && 
           !((TileEntityCable)te).foam())
           failedPlacements++; 
@@ -183,7 +183,7 @@ public class ItemSprayer extends ItemIC2FluidContainer implements IBoxable {
   
   protected int getMaxFoamBlocks(ItemStack stack) {
     NBTTagCompound nbtData = StackUtil.getOrCreateNbtData(stack);
-    if (nbtData.func_74762_e("mode") == 0)
+    if (nbtData.getInteger("mode") == 0)
       return 10; 
     return 1;
   }
@@ -210,7 +210,7 @@ public class ItemSprayer extends ItemIC2FluidContainer implements IBoxable {
       case Cable:
         if (world.getBlockState(pos).getBlock() != BlockName.te.getInstance())
           return false; 
-        te = world.func_175625_s(pos);
+        te = world.getTileEntity(pos);
         if (te instanceof TileEntityCable)
           return !((TileEntityCable)te).isFoamed(); 
         return false;

@@ -197,10 +197,10 @@ public class ConfigUtil {
       String variant = ((IMultiBlock)((ItemBlock)stack.getItem()).func_179223_d()).getVariant(stack);
       if (variant != null)
         ret = ret + "#" + variant; 
-    } else if (stack.func_77952_i() == 32767) {
+    } else if (stack.getItemDamage() == 32767) {
       ret = ret + "@*";
-    } else if (stack.func_77952_i() != 0) {
-      ret = ret + "@" + stack.func_77952_i();
+    } else if (stack.getItemDamage() != 0) {
+      ret = ret + "@" + stack.getItemDamage();
     } 
     return ret;
   }

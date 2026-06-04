@@ -83,13 +83,13 @@ public class BlockIC2Fence extends BlockMultiID<BlockIC2Fence.IC2FenceType> {
     boolean magnetizerConnected = false;
     IBlockState ret = state;
     for (EnumFacing facing : EnumFacing.field_176754_o) {
-      IBlockState neighborState = world.getBlockState(pos.func_177972_a(facing));
+      IBlockState neighborState = world.getBlockState(pos.offset(facing));
       if (isFence(neighborState)) {
         isPole = false;
         if (magnetizerConnected)
           break; 
         ret = ret.func_177226_a(connectProperties.get(facing), Boolean.valueOf(true));
-      } else if (isPole && getMagnetizer(world, pos.func_177972_a(facing), facing, world.getBlockState(pos.func_177972_a(facing)), false) != null) {
+      } else if (isPole && getMagnetizer(world, pos.offset(facing), facing, world.getBlockState(pos.offset(facing)), false) != null) {
         magnetizerConnected = true;
         ret = ret.func_177226_a(connectProperties.get(facing), Boolean.valueOf(true));
       } 
@@ -97,7 +97,7 @@ public class BlockIC2Fence extends BlockMultiID<BlockIC2Fence.IC2FenceType> {
     if (!isPole && magnetizerConnected) {
       ret = state;
       for (EnumFacing facing : EnumFacing.field_176754_o) {
-        IBlockState neighborState = world.getBlockState(pos.func_177972_a(facing));
+        IBlockState neighborState = world.getBlockState(pos.offset(facing));
         if (isFence(neighborState))
           ret = ret.func_177226_a(connectProperties.get(facing), Boolean.valueOf(true)); 
       } 
@@ -114,7 +114,7 @@ public class BlockIC2Fence extends BlockMultiID<BlockIC2Fence.IC2FenceType> {
   }
   
   public boolean isSideSolid(IBlockState state, IBlockAccess world, BlockPos blockPos, EnumFacing side) {
-    return (side.func_176740_k() == EnumFacing.Axis.Y);
+    return (side.getAxis() == EnumFacing.Axis.Y);
   }
   
   public boolean canPlaceTorchOnTop(IBlockState state, IBlockAccess world, BlockPos pos) {
@@ -122,7 +122,7 @@ public class BlockIC2Fence extends BlockMultiID<BlockIC2Fence.IC2FenceType> {
   }
   
   public BlockFaceShape func_193383_a(IBlockAccess world, IBlockState state, BlockPos pos, EnumFacing face) {
-    return (face.func_176740_k() != EnumFacing.Axis.Y) ? BlockFaceShape.MIDDLE_POLE : BlockFaceShape.CENTER;
+    return (face.getAxis() != EnumFacing.Axis.Y) ? BlockFaceShape.MIDDLE_POLE : BlockFaceShape.CENTER;
   }
   
   public void func_180634_a(World world, BlockPos pos, IBlockState state, Entity rawEntity) {
@@ -193,10 +193,10 @@ public class BlockIC2Fence extends BlockMultiID<BlockIC2Fence.IC2FenceType> {
   private static TileEntityMagnetizer getMagnetizer(IBlockAccess world, BlockPos pos, EnumFacing side, IBlockState state, boolean checkPower) {
     if (state.getBlock() != BlockName.te.getInstance())
       return null; 
-    TileEntity te = world.func_175625_s(pos);
+    TileEntity te = world.getTileEntity(pos);
     if (te instanceof TileEntityMagnetizer) {
       TileEntityMagnetizer ret = (TileEntityMagnetizer)te;
-      if (side != null && !side.func_176734_d().equals(ret.getFacing()))
+      if (side != null && !side.getOpposite().equals(ret.getFacing()))
         return null; 
       if (!checkPower || ret.canBoost())
         return ret; 
@@ -294,7 +294,7 @@ public class BlockIC2Fence extends BlockMultiID<BlockIC2Fence.IC2FenceType> {
   private static Map<EnumFacing, IProperty<Boolean>> getConnectProperties() {
     Map<EnumFacing, IProperty<Boolean>> ret = new EnumMap<>(EnumFacing.class);
     for (EnumFacing facing : EnumFacing.field_176754_o)
-      ret.put(facing, PropertyBool.func_177716_a(facing.func_176610_l())); 
+      ret.put(facing, PropertyBool.func_177716_a(facing.getName())); 
     return ret;
   }
   
@@ -313,7 +313,7 @@ public class BlockIC2Fence extends BlockMultiID<BlockIC2Fence.IC2FenceType> {
         start = 0.625D;
         end = 1.0D;
       } 
-      if (facing.func_176740_k() == EnumFacing.Axis.X) {
+      if (facing.getAxis() == EnumFacing.Axis.X) {
         aabb = new AxisAlignedBB(start, 0.0D, 0.375D, end, 1.5D, 0.625D);
       } else {
         aabb = new AxisAlignedBB(0.375D, 0.0D, start, 0.625D, 1.5D, end);

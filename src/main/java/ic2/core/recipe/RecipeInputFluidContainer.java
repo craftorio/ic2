@@ -76,7 +76,7 @@ public class RecipeInputFluidContainer extends RecipeInputBase implements IRecip
       return info.items; 
     List<ItemStack> ret = new ArrayList<>();
     for (ItemStack stack : info.items) {
-      IFluidHandlerItem handler = FluidUtil.getFluidHandler(stack.func_77946_l());
+      IFluidHandlerItem handler = FluidUtil.getFluidHandler(stack.copy());
       if (handler != null && handler
         .fill(new FluidStack(fluid, 2147483647), true) > 0) {
         ItemStack container = handler.getContainer();

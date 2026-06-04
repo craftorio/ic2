@@ -48,26 +48,26 @@ public class GuiToolMeter extends GuiIC2<ContainerMeter> {
     super.drawForegroundLayer(mouseX, mouseY);
     String unit = (((ContainerMeter)this.container).getMode() == ContainerMeter.Mode.Voltage) ? "ic2.generic.text.v" : "ic2.generic.text.EUt";
     unit = Localization.translate(unit);
-    this.field_146289_q.func_78276_b(Localization.translate("ic2.itemToolMEter.mode"), 115, 43, 2157374);
-    this.field_146289_q.func_78276_b(Localization.translate("ic2.itemToolMEter.avg"), 15, 41, 2157374);
-    this.field_146289_q.func_78276_b("" + Util.toSiString(((ContainerMeter)this.container).getResultAvg(), 6) + unit, 15, 51, 2157374);
-    this.field_146289_q.func_78276_b(Localization.translate("ic2.itemToolMEter.max/min"), 15, 64, 2157374);
-    this.field_146289_q.func_78276_b("" + Util.toSiString(((ContainerMeter)this.container).getResultMax(), 6) + unit, 15, 74, 2157374);
-    this.field_146289_q.func_78276_b("" + Util.toSiString(((ContainerMeter)this.container).getResultMin(), 6) + unit, 15, 84, 2157374);
-    this.field_146289_q.func_78276_b(Localization.translate("ic2.itemToolMEter.cycle", new Object[] { Integer.valueOf(((ContainerMeter)this.container).getResultCount() / 20) }), 15, 100, 2157374);
-    this.field_146289_q.func_78276_b(Localization.translate("ic2.itemToolMEter.mode.reset"), 39, 114, 2157374);
+    this.fontRenderer.drawString(Localization.translate("ic2.itemToolMEter.mode"), 115, 43, 2157374);
+    this.fontRenderer.drawString(Localization.translate("ic2.itemToolMEter.avg"), 15, 41, 2157374);
+    this.fontRenderer.drawString("" + Util.toSiString(((ContainerMeter)this.container).getResultAvg(), 6) + unit, 15, 51, 2157374);
+    this.fontRenderer.drawString(Localization.translate("ic2.itemToolMEter.max/min"), 15, 64, 2157374);
+    this.fontRenderer.drawString("" + Util.toSiString(((ContainerMeter)this.container).getResultMax(), 6) + unit, 15, 74, 2157374);
+    this.fontRenderer.drawString("" + Util.toSiString(((ContainerMeter)this.container).getResultMin(), 6) + unit, 15, 84, 2157374);
+    this.fontRenderer.drawString(Localization.translate("ic2.itemToolMEter.cycle", new Object[] { Integer.valueOf(((ContainerMeter)this.container).getResultCount() / 20) }), 15, 100, 2157374);
+    this.fontRenderer.drawString(Localization.translate("ic2.itemToolMEter.mode.reset"), 39, 114, 2157374);
     switch (((ContainerMeter)this.container).getMode()) {
       case EnergyIn:
-        this.field_146289_q.func_78276_b(Localization.translate("ic2.itemToolMEter.mode.EnergyIn"), 105, 100, 2157374);
+        this.fontRenderer.drawString(Localization.translate("ic2.itemToolMEter.mode.EnergyIn"), 105, 100, 2157374);
         break;
       case EnergyOut:
-        this.field_146289_q.func_78276_b(Localization.translate("ic2.itemToolMEter.mode.EnergyOut"), 105, 100, 2157374);
+        this.fontRenderer.drawString(Localization.translate("ic2.itemToolMEter.mode.EnergyOut"), 105, 100, 2157374);
         break;
       case EnergyGain:
-        this.field_146289_q.func_78276_b(Localization.translate("ic2.itemToolMEter.mode.EnergyGain"), 105, 100, 2157374);
+        this.fontRenderer.drawString(Localization.translate("ic2.itemToolMEter.mode.EnergyGain"), 105, 100, 2157374);
         break;
       case Voltage:
-        this.field_146289_q.func_78276_b(Localization.translate("ic2.itemToolMEter.mode.Voltage"), 105, 100, 2157374);
+        this.fontRenderer.drawString(Localization.translate("ic2.itemToolMEter.mode.Voltage"), 105, 100, 2157374);
         break;
     } 
   }

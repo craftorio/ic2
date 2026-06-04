@@ -70,7 +70,7 @@ public class ItemUpgradeModule extends ItemMulti<ItemUpgradeModule.UpgradeType> 
             return ItemIC2.getModelLocation(name, type.getName());
           }
         });
-    for (UpgradeType type : this.typeProperty.getAllowedValues()) {
+    for (UpgradeType type : this.typeProperty.func_177700_c()) {
       ModelBakery.registerItemVariants((Item)this, new ResourceLocation[] { (ResourceLocation)getModelLocation(name, type.getName()) });
       if (type.directional)
         for (EnumFacing dir : EnumFacing.field_82609_l) {
@@ -194,7 +194,7 @@ public class ItemUpgradeModule extends ItemMulti<ItemUpgradeModule.UpgradeType> 
       switch (type) {
         case null:
         case null:
-          if (!(player.func_130014_f_()).field_72995_K && !StackUtil.isEmpty(stack) && player.field_71070_bA instanceof DynamicHandHeldContainer) {
+          if (!(player.func_130014_f_()).isRemote && !StackUtil.isEmpty(stack) && player.field_71070_bA instanceof DynamicHandHeldContainer) {
             HandHeldInventory base = (HandHeldInventory)((DynamicHandHeldContainer)player.field_71070_bA).base;
             if (base instanceof HandHeldAdvancedUpgrade && base.isThisContainer(stack)) {
               base.saveAsThrown(stack);
@@ -431,9 +431,9 @@ public class ItemUpgradeModule extends ItemMulti<ItemUpgradeModule.UpgradeType> 
         private boolean checkDamage(ItemStack stack, ItemStack filter, boolean customStack) {
           assert this.damage.active;
           assert this.damage.comparison == ComparisonType.DIRECT;
-          return (customStack && filter.func_77973_b() instanceof ICustomDamageItem) ? (
+          return (customStack && filter.getItem() instanceof ICustomDamageItem) ? (
             
-            (((ICustomDamageItem)stack.func_77973_b()).getCustomDamage(stack) == ((ICustomDamageItem)filter.func_77973_b()).getCustomDamage(filter))) : (
+            (((ICustomDamageItem)stack.getItem()).getCustomDamage(stack) == ((ICustomDamageItem)filter.getItem()).getCustomDamage(filter))) : (
             
             (filter.func_77952_i() == stack.func_77952_i()));
         }
@@ -453,7 +453,7 @@ public class ItemUpgradeModule extends ItemMulti<ItemUpgradeModule.UpgradeType> 
         private boolean checkEnergy(ItemStack stack, ItemStack filter) {
           assert this.energy.active;
           assert this.energy.comparison == ComparisonType.DIRECT;
-          return (filter.func_77973_b() instanceof ic2.api.item.IElectricItem && 
+          return (filter.getItem() instanceof ic2.api.item.IElectricItem && 
             Util.isSimilar(ElectricItem.manager.getCharge(stack), ElectricItem.manager.getCharge(filter)));
         }
         
@@ -470,21 +470,21 @@ public class ItemUpgradeModule extends ItemMulti<ItemUpgradeModule.UpgradeType> 
           } else {
             checkMeta = this.meta.active;
           } 
-          boolean customStack = stack.func_77973_b() instanceof ICustomDamageItem;
+          boolean customStack = stack.getItem() instanceof ICustomDamageItem;
           boolean checkDamage = false;
           if (!this.energy.comparison.ignoreFilters()) {
-            if (stack.func_77973_b() instanceof ic2.api.item.IElectricItem && this.energy.doComparison((int)ElectricItem.manager.getCharge(stack))) {
+            if (stack.getItem() instanceof ic2.api.item.IElectricItem && this.energy.doComparison((int)ElectricItem.manager.getCharge(stack))) {
               checkEnergy = false;
             } else {
               return false;
             } 
           } else {
             checkEnergy = this.energy.active;
-            if (checkEnergy && !(stack.func_77973_b() instanceof ic2.api.item.IElectricItem))
+            if (checkEnergy && !(stack.getItem() instanceof ic2.api.item.IElectricItem))
               return false; 
           } 
           for (ItemStack filter : this.filters) {
-            if (filter.func_77973_b() == stack.func_77973_b() && (!checkMeta || 
+            if (filter.getItem() == stack.getItem() && (!checkMeta || 
               checkMeta(stack, filter)) && (!checkDamage || 
               checkDamage(stack, filter, customStack)) && 
               checkNBT(stack, filter) && (!checkEnergy || 

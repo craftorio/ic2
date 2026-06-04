@@ -21,6 +21,6 @@ public class InvSlotConsumableId extends InvSlotConsumable {
   }
   
   public boolean accepts(ItemStack stack) {
-    return this.items.contains(stack.func_77973_b());
+    return this.items.contains(stack.getItem());
   }
 }

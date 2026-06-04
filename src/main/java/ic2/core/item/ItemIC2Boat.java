@@ -63,7 +63,7 @@ public class ItemIC2Boat extends ItemMulti<ItemIC2Boat.BoatType> {
       boat.field_70177_z = (((MathHelper.func_76128_c((player.field_70177_z * 4.0F / 360.0F) + 0.5D) & 0x3) - 1) * 90);
       if (!world.func_184144_a((Entity)boat, boat.func_70046_E().func_72321_a(-0.1D, -0.1D, -0.1D)).isEmpty())
         return new ActionResult(EnumActionResult.PASS, stack); 
-      if (!world.field_72995_K)
+      if (!world.isRemote)
         world.func_72838_d((Entity)boat); 
       if (!player.field_71075_bZ.field_75098_d)
         stack = StackUtil.decSize(stack); 
@@ -92,7 +92,7 @@ public class ItemIC2Boat extends ItemMulti<ItemIC2Boat.BoatType> {
   
   public Entity createEntity(World world, Entity location, ItemStack stack) {
     assert hasCustomEntity(stack);
-    assert !world.field_72995_K;
+    assert !world.isRemote;
     EntityItem item = new FireproofItem(world, location.field_70165_t, location.field_70163_u, location.field_70161_v, stack);
     item.func_174869_p();
     item.field_70159_w = location.field_70159_w;

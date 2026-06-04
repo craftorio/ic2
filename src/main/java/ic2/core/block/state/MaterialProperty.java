@@ -97,7 +97,7 @@ public class MaterialProperty extends PropertyHelper<MaterialProperty.WrappedMat
     return Optional.absent();
   }
   
-  public String getName(WrappedMaterial value) {
+  public String func_177702_a(WrappedMaterial value) {
     return value.getName();
   }
   

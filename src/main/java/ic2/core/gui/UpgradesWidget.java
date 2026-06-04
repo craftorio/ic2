@@ -44,7 +44,7 @@ public class UpgradesWidget extends GuiElement<UpgradesWidget> {
     List<ItemStack> ret = new ArrayList<>();
     Set<UpgradableProperty> properties = block.getUpgradableProperties();
     for (ItemStack stack : UpgradeRegistry.getUpgrades()) {
-      IUpgradeItem item = (IUpgradeItem)stack.func_77973_b();
+      IUpgradeItem item = (IUpgradeItem)stack.getItem();
       if (item.isSuitableFor(stack, properties))
         ret.add(stack); 
     } 

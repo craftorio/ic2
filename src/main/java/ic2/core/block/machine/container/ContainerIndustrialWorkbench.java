@@ -134,7 +134,7 @@ public class ContainerIndustrialWorkbench extends ContainerFullInv<TileEntityInd
   }
   
   public void func_75130_a(IInventory inventory) {
-    this.craftResult.func_70299_a(0, CraftingManager.func_82787_a(this.craftMatrix, ((TileEntityIndustrialWorkbench)this.base).func_145831_w()));
+    this.craftResult.func_70299_a(0, CraftingManager.func_82787_a(this.craftMatrix, ((TileEntityIndustrialWorkbench)this.base).getWorld()));
   }
   
   public boolean func_94530_a(ItemStack stack, Slot slot) {

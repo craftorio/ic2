@@ -34,8 +34,8 @@ public class ItemReactorHeatpack extends AbstractReactorComponent {
     if (reactor.getHeat() >= want)
       return; 
     ItemStack stack = reactor.getItemAt(x, y);
-    if (!StackUtil.isEmpty(stack) && stack.func_77973_b() instanceof IReactorComponent) {
-      IReactorComponent comp = (IReactorComponent)stack.func_77973_b();
+    if (!StackUtil.isEmpty(stack) && stack.getItem() instanceof IReactorComponent) {
+      IReactorComponent comp = (IReactorComponent)stack.getItem();
       if (comp.canStoreHeat(stack, reactor, x, y)) {
         int add = this.heatPer * size;
         int curr = comp.getCurrentHeat(stack, reactor, x, y);

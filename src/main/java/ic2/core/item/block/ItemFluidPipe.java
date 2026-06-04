@@ -112,7 +112,7 @@ public class ItemFluidPipe extends ItemIC2 implements IMultiItem<PipeType>, IBox
   public String getVariant(ItemStack itemStack) {
     if (itemStack == null)
       throw new NullPointerException("null stack"); 
-    if (itemStack.func_77973_b() != this)
+    if (itemStack.getItem() != this)
       throw new IllegalArgumentException("The stack " + itemStack + " doesn't match " + this); 
     PipeType type = getPipeType(itemStack);
     PipeSize size = getSize(itemStack);

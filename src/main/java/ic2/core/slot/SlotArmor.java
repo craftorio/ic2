@@ -20,7 +20,7 @@ public class SlotArmor extends Slot {
   }
   
   public boolean func_75214_a(ItemStack stack) {
-    Item item = stack.func_77973_b();
+    Item item = stack.getItem();
     if (item == null)
       return false; 
     return item.isValidArmor(stack, this.armorType, (Entity)((InventoryPlayer)this.field_75224_c).field_70458_d);

@@ -18,7 +18,7 @@ public class GuiToolbox extends GuiIC2<ContainerToolbox> {
   
   protected void drawBackgroundAndTitle(float partialTicks, int mouseX, int mouseY) {
     bindTexture();
-    func_73729_b(this.field_147003_i, this.field_147009_r, 0, 0, this.field_146999_f, this.field_147000_g);
+    drawTexturedModalRect(this.field_147003_i, this.field_147009_r, 0, 0, this.field_146999_f, this.field_147000_g);
   }
   
   protected ResourceLocation getTexture() {

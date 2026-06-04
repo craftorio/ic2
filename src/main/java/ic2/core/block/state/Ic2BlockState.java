@@ -68,7 +68,7 @@ public class Ic2BlockState extends BlockStateContainer {
       this.extraProperties = extraProperties;
     }
     
-    public <T extends Comparable<T>, V extends T> Ic2BlockStateInstance withProperty(IProperty<T> property, V value) {
+    public <T extends Comparable<T>, V extends T> Ic2BlockStateInstance func_177226_a(IProperty<T> property, V value) {
       Comparable<?> comparable = (Comparable)func_177228_b().get(property);
       if (comparable == value)
         return this; 

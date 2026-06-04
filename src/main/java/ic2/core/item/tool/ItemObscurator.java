@@ -58,7 +58,7 @@ public class ItemObscurator extends BaseElectricItem implements IPlayerItemDataL
   
   public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
     ItemStack stack = StackUtil.get(player, hand);
-    if (!player.func_70093_af() && !world.field_72995_K && ElectricItem.manager.canUse(stack, 5000.0D)) {
+    if (!player.func_70093_af() && !world.isRemote && ElectricItem.manager.canUse(stack, 5000.0D)) {
       NBTTagCompound nbt = StackUtil.getOrCreateNbtData(stack);
       IBlockState refState;
       EnumFacing refSide;
@@ -78,13 +78,13 @@ public class ItemObscurator extends BaseElectricItem implements IPlayerItemDataL
       } 
       return EnumActionResult.PASS;
     } 
-    if (player.func_70093_af() && world.field_72995_K && ElectricItem.manager.canUse(stack, 20000.0D))
+    if (player.func_70093_af() && world.isRemote && ElectricItem.manager.canUse(stack, 20000.0D))
       return scanBlock(stack, player, world, pos, side) ? EnumActionResult.SUCCESS : EnumActionResult.PASS; 
     return EnumActionResult.PASS;
   }
   
   private boolean scanBlock(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side) {
-    assert world.field_72995_K;
+    assert world.isRemote;
     IBlockState state = Util.getBlockState((IBlockAccess)world, pos);
     if (state.func_177230_c().isAir(state, (IBlockAccess)world, pos))
       return false; 

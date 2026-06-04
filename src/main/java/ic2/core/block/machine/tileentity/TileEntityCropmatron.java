@@ -113,7 +113,7 @@ public class TileEntityCropmatron extends TileEntityElectricMachine implements I
     } 
     this.energy.useEnergy(1.0D);
     BlockPos scan = this.field_174879_c.func_177982_a(this.scanX, this.scanY, this.scanZ);
-    TileEntity te = func_145831_w().func_175625_s(scan);
+    TileEntity te = getWorld().func_175625_s(scan);
     if (te instanceof TileEntityCrop) {
       TileEntityCrop crop = (TileEntityCrop)te;
       if (!this.fertilizerSlot.isEmpty() && this.fertilizerSlot.consume(1, true, false) != null && crop.applyFertilizer(false)) {
@@ -130,10 +130,10 @@ public class TileEntityCropmatron extends TileEntityElectricMachine implements I
   }
   
   private boolean tryHydrateFarmland(BlockPos pos) {
-    World world = func_145831_w();
+    World world = getWorld();
     IBlockState state = world.func_180495_p(pos);
     int hydration;
-    if (state.func_177230_c() == Blocks.field_150458_ak && (hydration = ((Integer)state.func_177229_b((IProperty)BlockFarmland.field_176531_a)).intValue()) < 7) {
+    if (state.func_177230_c() == Blocks.FARMLAND && (hydration = ((Integer)state.func_177229_b((IProperty)BlockFarmland.field_176531_a)).intValue()) < 7) {
       int drainAmount = Math.min(this.waterTank.getFluidAmount(), 7 - hydration);
       assert drainAmount > 0;
       assert drainAmount <= 7;

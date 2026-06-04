@@ -56,7 +56,7 @@ public class ItemScanner extends BaseElectricItem implements IBoxable, IHandHeld
     if ((this.tier == 1 && !ElectricItem.manager.use(stack, 50.0D, (EntityLivingBase)player)) || (this.tier == 2 && 
       !ElectricItem.manager.use(stack, 250.0D, (EntityLivingBase)player)))
       return new ActionResult(EnumActionResult.FAIL, stack); 
-    if (!world.field_72995_K) {
+    if (!world.isRemote) {
       if (IC2.platform.launchGui(player, getInventory(player, stack)) && player.field_71070_bA instanceof ContainerToolScanner) {
         ContainerToolScanner container = (ContainerToolScanner)player.field_71070_bA;
         Map<ItemComparableItemStack, Integer> scanResult = scan(player.func_130014_f_(), player
@@ -71,7 +71,7 @@ public class ItemScanner extends BaseElectricItem implements IBoxable, IHandHeld
   }
   
   public boolean onDroppedByPlayer(ItemStack stack, EntityPlayer player) {
-    if (!(player.func_130014_f_()).field_72995_K && !StackUtil.isEmpty(stack) && player.field_71070_bA instanceof ContainerToolScanner) {
+    if (!(player.func_130014_f_()).isRemote && !StackUtil.isEmpty(stack) && player.field_71070_bA instanceof ContainerToolScanner) {
       HandHeldScanner scanner = (HandHeldScanner)((ContainerToolScanner)player.field_71070_bA).base;
       if (scanner.isThisContainer(stack)) {
         scanner.saveAsThrown(stack);

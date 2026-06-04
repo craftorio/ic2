@@ -31,7 +31,7 @@ public class Obscuration extends TileEntityComponent {
       return; 
     for (EnumFacing facing : EnumFacing.field_82609_l) {
       if (nbt.func_150297_b(facing.func_176610_l(), 10)) {
-        NBTTagCompound cNbt = nbt.func_74775_l(facing.func_176610_l());
+        NBTTagCompound cNbt = nbt.getCompoundTag(facing.func_176610_l());
         Block block = Util.getBlock(cNbt.func_74779_i("block"));
         if (block != null) {
           String variant = cNbt.func_74779_i("variant");
@@ -64,7 +64,7 @@ public class Obscuration extends TileEntityComponent {
         nbt.func_74778_a("variant", data.variant);
         nbt.func_74774_a("side", (byte)data.side.ordinal());
         nbt.func_74783_a("colorMuls", data.colorMultipliers);
-        ret.func_74782_a(facing.func_176610_l(), (NBTBase)nbt);
+        ret.setTag(facing.func_176610_l(), (NBTBase)nbt);
       } 
     } 
     return ret;

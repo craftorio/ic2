@@ -97,7 +97,7 @@ public abstract class EntityIC2Boat extends EntityBoat {
       } else {
         field_outOfControlTicks.setFloat(this, field_outOfControlTicks.getFloat(this) + 1.0F);
       } 
-      if (!world.field_72995_K && field_outOfControlTicks.getFloat(this) >= 60.0F)
+      if (!world.isRemote && field_outOfControlTicks.getFloat(this) >= 60.0F)
         func_184226_ay(); 
       if (func_70268_h() > 0)
         func_70265_b(func_70268_h() - 1); 
@@ -112,7 +112,7 @@ public abstract class EntityIC2Boat extends EntityBoat {
         if (func_184188_bt().isEmpty() || !(func_184188_bt().get(0) instanceof net.minecraft.entity.player.EntityPlayer))
           func_184445_a(false, false); 
         updateMotion();
-        if (world.field_72995_K) {
+        if (world.isRemote) {
           controlBoat();
           world.func_184135_a((Packet)new CPacketSteerBoat(func_184457_a(0), func_184457_a(1)));
         } 
@@ -144,7 +144,7 @@ public abstract class EntityIC2Boat extends EntityBoat {
     func_145775_I();
     List<Entity> list = world.func_175674_a((Entity)this, func_174813_aQ().func_72314_b(0.2D, -0.01D, 0.2D), EntitySelectors.func_188442_a((Entity)this));
     if (!list.isEmpty()) {
-      boolean flag = (!world.field_72995_K && !(func_184179_bs() instanceof net.minecraft.entity.player.EntityPlayer));
+      boolean flag = (!world.isRemote && !(func_184179_bs() instanceof net.minecraft.entity.player.EntityPlayer));
       for (Entity entity : list) {
         if (!entity.func_184196_w((Entity)this)) {
           if (flag && func_184188_bt().size() < 2 && !entity.func_184218_aH() && entity.field_70130_N < this.field_70130_N && entity instanceof net.minecraft.entity.EntityLivingBase && !(entity instanceof net.minecraft.entity.passive.EntityWaterMob) && !(entity instanceof net.minecraft.entity.player.EntityPlayer)) {
@@ -158,7 +158,7 @@ public abstract class EntityIC2Boat extends EntityBoat {
   }
   
   private void doEntityUpdate(World world) {
-    if (!world.field_72995_K)
+    if (!world.isRemote)
       func_70052_a(6, func_184202_aL()); 
     func_70030_z();
   }
@@ -369,7 +369,7 @@ public abstract class EntityIC2Boat extends EntityBoat {
   }
   
   public EntityItem func_70099_a(ItemStack stack, float offsetY) {
-    if (stack.func_77973_b() == Items.field_151124_az)
+    if (stack.getItem() == Items.field_151124_az)
       return super.func_70099_a(getItem(), offsetY); 
     return null;
   }

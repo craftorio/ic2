@@ -60,11 +60,11 @@ public class Ic2WorldDecorator implements IWorldGenerator {
   
   @SubscribeEvent
   public void onChunkLoad(ChunkDataEvent.Load event) {
-    assert !(event.getWorld()).field_72995_K;
+    assert !(event.getWorld()).isRemote;
     Chunk chunk = event.getChunk();
     WorldData worldData = WorldData.get(event.getWorld());
     if (!worldData.pendingUnloadChunks.remove(chunk)) {
-      NBTTagCompound nbt = event.getData().func_74775_l("ic2WorldGen");
+      NBTTagCompound nbt = event.getData().getCompoundTag("ic2WorldGen");
       worldData.worldGenData.put(chunk, nbt);
       checkRetroGen(chunk, nbt);
     } 
@@ -91,18 +91,18 @@ public class Ic2WorldDecorator implements IWorldGenerator {
   
   @SubscribeEvent
   public void onChunkSave(ChunkDataEvent.Save event) {
-    assert !(event.getWorld()).field_72995_K;
+    assert !(event.getWorld()).isRemote;
     Chunk chunk = event.getChunk();
     NBTTagCompound nbt = (WorldData.get(event.getWorld())).worldGenData.get(chunk);
     if (nbt != null && !nbt.func_82582_d()) {
       nbt = nbt.func_74737_b();
-      event.getData().func_74782_a("ic2WorldGen", (NBTBase)nbt);
+      event.getData().setTag("ic2WorldGen", (NBTBase)nbt);
     } 
   }
   
   @SubscribeEvent(priority = EventPriority.LOWEST)
   public void onChunkUnload(ChunkEvent.Unload event) {
-    if ((event.getWorld()).field_72995_K)
+    if ((event.getWorld()).isRemote)
       return; 
     Chunk chunk = event.getChunk();
     WorldData worldData = WorldData.get(event.getWorld(), false);

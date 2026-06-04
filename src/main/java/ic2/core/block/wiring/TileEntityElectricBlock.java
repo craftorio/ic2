@@ -49,18 +49,18 @@ public abstract class TileEntityElectricBlock extends TileEntityInventory implem
     this.comparator.setUpdate(this.energy::getComparatorValue);
   }
   
-  public void func_145839_a(NBTTagCompound nbt) {
+  public void readFromNBT(NBTTagCompound nbt) {
     superReadFromNBT(nbt);
     this.energy.setDirections(EnumSet.complementOf((EnumSet)EnumSet.of(getFacing())), EnumSet.of(getFacing()));
   }
   
   protected final void superReadFromNBT(NBTTagCompound nbt) {
-    super.func_145839_a(nbt);
+    super.readFromNBT(nbt);
     this.redstoneMode = nbt.func_74771_c("redstoneMode");
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     nbt.func_74774_a("redstoneMode", this.redstoneMode);
     return nbt;
   }
@@ -129,9 +129,9 @@ public abstract class TileEntityElectricBlock extends TileEntityInventory implem
   
   public void onPlaced(ItemStack stack, EntityLivingBase placer, EnumFacing facing) {
     super.onPlaced(stack, placer, facing);
-    if (!(func_145831_w()).field_72995_K) {
+    if (!(getWorld()).isRemote) {
       NBTTagCompound nbt = StackUtil.getOrCreateNbtData(stack);
-      this.energy.addEnergy(nbt.func_74769_h("energy"));
+      this.energy.addEnergy(nbt.getDouble("energy"));
     } 
   }
   
@@ -146,7 +146,7 @@ public abstract class TileEntityElectricBlock extends TileEntityInventory implem
       double totalEnergy = this.energy.getEnergy();
       if (retainedRatio > 0.0D && totalEnergy > 0.0D) {
         NBTTagCompound nbt = StackUtil.getOrCreateNbtData(drop);
-        nbt.func_74780_a("energy", totalEnergy * retainedRatio);
+        nbt.setDouble("energy", totalEnergy * retainedRatio);
       } 
     } 
     return drop;
@@ -183,7 +183,7 @@ public abstract class TileEntityElectricBlock extends TileEntityInventory implem
   public void addInformation(ItemStack stack, List<String> tooltip, ITooltipFlag advanced) {
     super.addInformation(stack, tooltip, advanced);
     tooltip.add(String.format("%s %.0f %s %s %d %s", new Object[] { Localization.translate("ic2.item.tooltip.Output"), Double.valueOf(EnergyNet.instance.getPowerFromTier(this.energy.getSourceTier())), Localization.translate("ic2.generic.text.EUt"), Localization.translate("ic2.item.tooltip.Capacity"), Integer.valueOf(getCapacity()), Localization.translate("ic2.generic.text.EU") }));
-    tooltip.add(Localization.translate("ic2.item.tooltip.Store") + " " + (long)StackUtil.getOrCreateNbtData(stack).func_74769_h("energy") + " " + Localization.translate("ic2.generic.text.EU"));
+    tooltip.add(Localization.translate("ic2.item.tooltip.Store") + " " + (long)StackUtil.getOrCreateNbtData(stack).getDouble("energy") + " " + Localization.translate("ic2.generic.text.EU"));
   }
   
   public static byte redstoneModes = 7;

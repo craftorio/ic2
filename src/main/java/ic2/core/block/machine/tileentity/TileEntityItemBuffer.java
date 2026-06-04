@@ -45,21 +45,21 @@ public class TileEntityItemBuffer extends TileEntityInventory implements IHasGui
     ItemStack upgraderight = this.upgradeSlot.get(1);
     if (!StackUtil.isEmpty(upgradeleft) && !StackUtil.isEmpty(upgraderight)) {
       if (this.tick) {
-        if (((IUpgradeItem)upgradeleft.func_77973_b()).onTick(upgradeleft, this))
+        if (((IUpgradeItem)upgradeleft.getItem()).onTick(upgradeleft, this))
           func_70296_d(); 
-      } else if (((IUpgradeItem)upgraderight.func_77973_b()).onTick(upgraderight, this)) {
+      } else if (((IUpgradeItem)upgraderight.getItem()).onTick(upgraderight, this)) {
         func_70296_d();
       } 
       this.tick = !this.tick;
     } else {
       if (!StackUtil.isEmpty(upgradeleft)) {
         this.tick = true;
-        if (((IUpgradeItem)upgradeleft.func_77973_b()).onTick(upgradeleft, this))
+        if (((IUpgradeItem)upgradeleft.getItem()).onTick(upgradeleft, this))
           func_70296_d(); 
       } 
       if (!StackUtil.isEmpty(upgraderight)) {
         this.tick = false;
-        if (((IUpgradeItem)upgraderight.func_77973_b()).onTick(upgraderight, this))
+        if (((IUpgradeItem)upgraderight.getItem()).onTick(upgraderight, this))
           func_70296_d(); 
       } 
     } 

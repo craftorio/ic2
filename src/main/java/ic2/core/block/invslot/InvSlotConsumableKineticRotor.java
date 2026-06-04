@@ -24,12 +24,12 @@ public class InvSlotConsumableKineticRotor extends InvSlotConsumableClass {
   
   public boolean accepts(ItemStack stack) {
     if (super.accepts(stack))
-      return ((IKineticRotor)stack.func_77973_b()).isAcceptedType(stack, this.type); 
+      return ((IKineticRotor)stack.getItem()).isAcceptedType(stack, this.type); 
     return false;
   }
   
   public void onChanged() {
-    if (this.updateName != null && this.base.getParent().func_145830_o() && !(this.base.getParent().func_145831_w()).field_72995_K)
+    if (this.updateName != null && this.base.getParent().func_145830_o() && !(this.base.getParent().getWorld()).isRemote)
       ((NetworkManager)IC2.network.get(true)).updateTileEntityField((TileEntity)this.base.getParent(), this.updateName); 
   }
 }

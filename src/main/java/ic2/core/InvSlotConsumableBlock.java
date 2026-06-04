@@ -16,6 +16,6 @@ public class InvSlotConsumableBlock extends InvSlotConsumable {
   }
   
   public boolean accepts(ItemStack stack) {
-    return stack.func_77973_b() instanceof net.minecraft.item.ItemBlock;
+    return stack.getItem() instanceof net.minecraft.item.ItemBlock;
   }
 }

@@ -33,7 +33,7 @@ public abstract class TileEntityChargepadBlock extends TileEntityElectricBlock {
     this.updateTicker = IC2.random.nextInt(getTickRate());
   }
   
-  public void func_145839_a(NBTTagCompound nbt) {
+  public void readFromNBT(NBTTagCompound nbt) {
     superReadFromNBT(nbt);
     this.energy.setDirections(EnumSet.complementOf((EnumSet)EnumSet.of(getFacing(), EnumFacing.UP)), EnumSet.of(getFacing()));
   }
@@ -44,7 +44,7 @@ public abstract class TileEntityChargepadBlock extends TileEntityElectricBlock {
   
   protected void onEntityCollision(Entity entity) {
     super.onEntityCollision(entity);
-    if (!(func_145831_w()).field_72995_K && entity instanceof EntityPlayer)
+    if (!(getWorld()).isRemote && entity instanceof EntityPlayer)
       updatePlayer((EntityPlayer)entity); 
   }
   
@@ -78,16 +78,16 @@ public abstract class TileEntityChargepadBlock extends TileEntityElectricBlock {
   @SideOnly(Side.CLIENT)
   protected void updateEntityClient() {
     super.updateEntityClient();
-    World world = func_145831_w();
+    World world = getWorld();
     Random rnd = world.field_73012_v;
     if (rnd.nextInt(8) != 0)
       return; 
     if (getActive()) {
       ParticleManager effect = (FMLClientHandler.instance().getClient()).field_71452_i;
       for (int particles = 20; particles > 0; particles--) {
-        double x = (this.field_174879_c.func_177958_n() + 0.0F + rnd.nextFloat());
-        double y = (this.field_174879_c.func_177956_o() + 0.9F + rnd.nextFloat());
-        double z = (this.field_174879_c.func_177952_p() + 0.0F + rnd.nextFloat());
+        double x = (this.field_174879_c.getX() + 0.0F + rnd.nextFloat());
+        double y = (this.field_174879_c.getY() + 0.9F + rnd.nextFloat());
+        double z = (this.field_174879_c.getZ() + 0.0F + rnd.nextFloat());
         effect.func_78873_a((Particle)new EntityIC2FX(world, x, y, z, 60, new double[] { 0.0D, 0.1D, 0.0D }, new float[] { 0.2F, 0.2F, 1.0F }));
       } 
     } 
@@ -129,7 +129,7 @@ public abstract class TileEntityChargepadBlock extends TileEntityElectricBlock {
   }
   
   protected void chargeItem(ItemStack stack, int chargeFactor) {
-    if (stack.func_77973_b() == ItemName.debug_item.getInstance())
+    if (stack.getItem() == ItemName.debug_item.getInstance())
       return; 
     double freeAmount = ElectricItem.manager.charge(stack, Double.POSITIVE_INFINITY, this.energy.getSourceTier(), true, true);
     double charge = 0.0D;

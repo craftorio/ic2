@@ -29,7 +29,7 @@ public class ContainerBatchCrafter extends ContainerElectricMachine<TileEntityBa
       for (int x = 0; x < 3; x++) {
         func_75146_a((Slot)new SlotHologramSlot(tileEntity.craftingGrid, x + y * 3, 30 + x * 18, 17 + y * 18, 1, new SlotHologramSlot.ChangeCallback() {
                 public void onChanged(int index) {
-                  if (((TileEntityBatchCrafter)ContainerBatchCrafter.this.base).func_145830_o() && !(((TileEntityBatchCrafter)ContainerBatchCrafter.this.base).func_145831_w()).field_72995_K)
+                  if (((TileEntityBatchCrafter)ContainerBatchCrafter.this.base).func_145830_o() && !(((TileEntityBatchCrafter)ContainerBatchCrafter.this.base).getWorld()).isRemote)
                     ((TileEntityBatchCrafter)ContainerBatchCrafter.this.base).matrixChange(index); 
                 }
               }));

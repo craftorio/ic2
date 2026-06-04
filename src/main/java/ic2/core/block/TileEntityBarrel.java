@@ -39,8 +39,8 @@ public class TileEntityBarrel extends TileEntityBlock {
     } 
   }
   
-  public void func_145839_a(NBTTagCompound nbt) {
-    super.func_145839_a(nbt);
+  public void readFromNBT(NBTTagCompound nbt) {
+    super.readFromNBT(nbt);
     this.type = nbt.func_74771_c("type");
     this.boozeAmount = nbt.func_74771_c("waterCount");
     this.age = nbt.func_74762_e("age");
@@ -56,8 +56,8 @@ public class TileEntityBarrel extends TileEntityBlock {
     } 
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     nbt.func_74774_a("type", (byte)this.type);
     nbt.func_74774_a("waterCount", (byte)this.boozeAmount);
     nbt.func_74768_a("age", this.age);
@@ -101,7 +101,7 @@ public class TileEntityBarrel extends TileEntityBlock {
     if (side.func_176740_k() != EnumFacing.Axis.Y && 
       !getActive() && 
       StackUtil.consume(player, hand, StackUtil.sameStack(ItemName.treetap.getItemStack()), 1)) {
-      if (!(func_145831_w()).field_72995_K)
+      if (!(getWorld()).isRemote)
         setActive(true); 
       if (getFacing() != side)
         setFacing(side); 
@@ -125,7 +125,7 @@ public class TileEntityBarrel extends TileEntityBlock {
           this.boozeAmount += amount / 1000;
           return true;
         } 
-        if (stack.func_77973_b() == Items.field_151015_O) {
+        if (stack.getItem() == Items.field_151015_O) {
           this.type = 1;
           int amount = StackUtil.getSize(stack);
           if (player.func_70093_af())
@@ -155,7 +155,7 @@ public class TileEntityBarrel extends TileEntityBlock {
         } 
       } 
       if ((this.type == 0 || this.type == 2) && 
-        stack.func_77973_b() == Items.field_151120_aE) {
+        stack.getItem() == Items.field_151120_aE) {
         if (this.age > 600)
           return false; 
         this.type = 2;
@@ -176,16 +176,16 @@ public class TileEntityBarrel extends TileEntityBlock {
   
   protected void onClicked(EntityPlayer player) {
     super.onClicked(player);
-    World world = func_145831_w();
+    World world = getWorld();
     if (getActive()) {
-      if (!world.field_72995_K) {
+      if (!world.isRemote) {
         StackUtil.dropAsEntity(world, this.field_174879_c, ItemName.treetap.getItemStack());
         setActive(false);
       } 
       drainLiquid(1);
       return;
     } 
-    if (!world.field_72995_K)
+    if (!world.isRemote)
       StackUtil.dropAsEntity(world, this.field_174879_c, new ItemStack(ItemName.barrel.getInstance(), 1, calculateMetaValue())); 
     world.func_175656_a(this.field_174879_c, BlockName.scaffold.getBlockState(BlockScaffold.ScaffoldType.wood));
   }
@@ -194,14 +194,14 @@ public class TileEntityBarrel extends TileEntityBlock {
     if (this.timeRatio <= 0) {
       this.age = 0;
     } else if (this.timeRatio == 1) {
-      World world = func_145831_w();
+      World world = getWorld();
       if (world.field_73012_v.nextBoolean()) {
         this.timeRatio = 0;
       } else if (world.field_73012_v.nextBoolean()) {
         this.timeRatio = 5;
       } 
     } else if (this.timeRatio == 2) {
-      if ((func_145831_w()).field_73012_v.nextBoolean())
+      if ((getWorld()).field_73012_v.nextBoolean())
         this.timeRatio = 5; 
     } else {
       this.timeRatio = 5;

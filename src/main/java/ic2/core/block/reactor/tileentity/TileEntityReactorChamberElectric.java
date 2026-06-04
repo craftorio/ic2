@@ -56,7 +56,7 @@ public class TileEntityReactorChamberElectric extends TileEntityBlock implements
   }
   
   private void updateRedstoneLink() {
-    if ((func_145831_w()).field_72995_K)
+    if ((getWorld()).isRemote)
       return; 
     TileEntityNuclearReactorElectric reactor = getReactor();
     if (reactor != null)
@@ -68,14 +68,14 @@ public class TileEntityReactorChamberElectric extends TileEntityBlock implements
     super.updateEntityClient();
     TileEntityNuclearReactorElectric reactor = getReactor();
     if (reactor != null)
-      TileEntityNuclearReactorElectric.showHeatEffects(func_145831_w(), this.field_174879_c, reactor.getHeat()); 
+      TileEntityNuclearReactorElectric.showHeatEffects(getWorld(), this.field_174879_c, reactor.getHeat()); 
   }
   
   protected boolean onActivated(EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
     TileEntityNuclearReactorElectric reactor = getReactor();
     if (reactor != null) {
-      World world = func_145831_w();
-      return reactor.getBlockType().func_180639_a(world, reactor.func_174877_v(), world.func_180495_p(reactor.func_174877_v()), player, hand, side, hitX, hitY, hitZ);
+      World world = getWorld();
+      return reactor.getBlockType().func_180639_a(world, reactor.getPos(), world.func_180495_p(reactor.getPos()), player, hand, side, hitX, hitY, hitZ);
     } 
     return false;
   }
@@ -88,7 +88,7 @@ public class TileEntityReactorChamberElectric extends TileEntityBlock implements
   }
   
   public void destoryChamber(boolean wrench) {
-    World world = func_145831_w();
+    World world = getWorld();
     world.func_175698_g(this.field_174879_c);
     for (ItemStack drop : getSelfDrops(0, wrench))
       StackUtil.dropAsEntity(world, this.field_174879_c, drop); 
@@ -214,7 +214,7 @@ public class TileEntityReactorChamberElectric extends TileEntityBlock implements
   }
   
   private TileEntityNuclearReactorElectric getReactor() {
-    long time = func_145831_w().func_82737_E();
+    long time = getWorld().func_82737_E();
     if (time != this.lastReactorUpdate) {
       updateReactor();
       this.lastReactorUpdate = time;
@@ -225,7 +225,7 @@ public class TileEntityReactorChamberElectric extends TileEntityBlock implements
   }
   
   private void updateReactor() {
-    World world = func_145831_w();
+    World world = getWorld();
     this.reactor = null;
     for (EnumFacing facing : EnumFacing.field_82609_l) {
       TileEntity te = world.func_175625_s(this.field_174879_c.func_177972_a(facing));

@@ -93,7 +93,7 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
     this.block = TeBlockRegistry.get(this.teBlock.getIdentifier());
   }
   
-  public final BlockTileEntity getBlockType() {
+  public final BlockTileEntity func_145838_q() {
     return this.block;
   }
   
@@ -101,7 +101,7 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
     return this.block.func_176223_P().func_177226_a((IProperty)this.block.materialProperty, (Comparable)MaterialProperty.WrappedMaterial.get(this.teBlock.getMaterial())).func_177226_a(this.block.typeProperty, (Comparable)MetaTeBlockProperty.getState(this.teBlock, getActive())).func_177226_a(BlockTileEntity.facingProperty, (Comparable)getFacing()).func_177226_a(BlockTileEntity.transparentProperty, Boolean.valueOf(this.teBlock.isTransparent()));
   }
   
-  public final void func_145843_s() {
+  public final void invalidate() {
     if (this.loadState == 2) {
       if (debugLoad)
         IC2.log.debug(LogCategory.Block, "TE onUnloaded (invalidate) for %s at %s.", new Object[] { this, Util.formatPosition(this) }); 
@@ -111,7 +111,7 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
         IC2.log.debug(LogCategory.Block, "Skipping TE onUnloaded (invalidate) for %s at %s, state: %d.", new Object[] { this, Util.formatPosition(this), Byte.valueOf(this.loadState) }); 
       this.loadState = 3;
     } 
-    super.func_145843_s();
+    super.invalidate();
   }
   
   public final void onChunkUnload() {
@@ -129,7 +129,7 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
   
   public final void func_145829_t() {
     super.func_145829_t();
-    World world = func_145831_w();
+    World world = getWorld();
     if (world == null || this.field_174879_c == null)
       throw new IllegalStateException("no world/pos"); 
     if (this.loadState != 0 && this.loadState != 3)
@@ -138,7 +138,7 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
     IC2.tickHandler.requestSingleWorldTick(world, new IWorldTickCallback() {
           public void onTick(World world) {
             IBlockState state;
-            if (world == TileEntityBlock.this.func_145831_w() && TileEntityBlock.this.field_174879_c != null && !TileEntityBlock.this.func_145837_r() && TileEntityBlock.this.loadState == 1 && world.func_175667_e(TileEntityBlock.this.field_174879_c) && (state = world.func_180495_p(TileEntityBlock.this.field_174879_c)).func_177230_c() == TileEntityBlock.this.block && world.func_175625_s(TileEntityBlock.this.field_174879_c) == TileEntityBlock.this) {
+            if (world == TileEntityBlock.this.getWorld() && TileEntityBlock.this.field_174879_c != null && !TileEntityBlock.this.func_145837_r() && TileEntityBlock.this.loadState == 1 && world.func_175667_e(TileEntityBlock.this.field_174879_c) && (state = world.func_180495_p(TileEntityBlock.this.field_174879_c)).func_177230_c() == TileEntityBlock.this.block && world.func_175625_s(TileEntityBlock.this.field_174879_c) == TileEntityBlock.this) {
               Material expectedMaterial = TileEntityBlock.this.teBlock.getMaterial();
               if (((MaterialProperty.WrappedMaterial)state.func_177229_b((IProperty)TileEntityBlock.this.block.materialProperty)).getMaterial() != expectedMaterial) {
                 if (TileEntityBlock.debugLoad)
@@ -173,7 +173,7 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
         } 
       }  
     if (!this.enableWorldTick && this.updatableComponents == null)
-      (func_145831_w()).field_175730_i.remove(this); 
+      (getWorld()).field_175730_i.remove(this); 
   }
   
   protected void onUnloaded() {
@@ -185,8 +185,8 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
         component.onUnloaded();  
   }
   
-  public void func_145839_a(NBTTagCompound nbt) {
-    super.func_145839_a(nbt);
+  public void readFromNBT(NBTTagCompound nbt) {
+    super.readFromNBT(nbt);
     if (!getSupportedFacings().isEmpty()) {
       byte facingValue = nbt.func_74771_c("facing");
       if (facingValue >= 0 && facingValue < EnumFacing.field_82609_l.length && getSupportedFacings().contains(EnumFacing.field_82609_l[facingValue])) {
@@ -199,7 +199,7 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
     } 
     this.active = nbt.func_74767_n("active");
     if (this.components != null && nbt.func_150297_b("components", 10)) {
-      NBTTagCompound componentsNbt = nbt.func_74775_l("components");
+      NBTTagCompound componentsNbt = nbt.getCompoundTag("components");
       for (String name : componentsNbt.func_150296_c()) {
         Class<? extends TileEntityComponent> cls = Components.getClass(name);
         TileEntityComponent component;
@@ -207,14 +207,14 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
           IC2.log.warn(LogCategory.Block, "Can't find component %s while loading %s.", new Object[] { name, this });
           continue;
         } 
-        NBTTagCompound componentNbt = componentsNbt.func_74775_l(name);
+        NBTTagCompound componentNbt = componentsNbt.getCompoundTag(name);
         component.readFromNbt(componentNbt);
       } 
     } 
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     if (!getSupportedFacings().isEmpty())
       nbt.func_74774_a("facing", this.facing); 
     nbt.func_74757_a("active", this.active);
@@ -226,9 +226,9 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
           continue; 
         if (componentsNbt == null) {
           componentsNbt = new NBTTagCompound();
-          nbt.func_74782_a("components", (NBTBase)componentsNbt);
+          nbt.setTag("components", (NBTBase)componentsNbt);
         } 
-        componentsNbt.func_74782_a(Components.getId(component.getClass()), (NBTBase)componentNbt);
+        componentsNbt.setTag(Components.getId(component.getClass()), (NBTBase)componentNbt);
       } 
     } 
     return nbt;
@@ -251,7 +251,7 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
       for (TileEntityComponent component : this.updatableComponents)
         component.onWorldTick();  
     if (this.enableWorldTick)
-      if ((func_145831_w()).field_72995_K) {
+      if ((getWorld()).isRemote) {
         updateEntityClient();
       } else {
         updateEntityServer();
@@ -272,7 +272,7 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
   }
   
   private boolean isOldVersion() {
-    assert func_145830_o() && !(func_145831_w()).field_72995_K;
+    assert func_145830_o() && !(getWorld()).isRemote;
     return (this.teBlock.getTeClass() != getClass());
   }
   
@@ -287,7 +287,7 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
       return false; 
     IBlockState stateA = getBlockState();
     IBlockState stateB = stateA.func_177226_a(this.block.typeProperty, (Comparable)MetaTeBlockProperty.getState(this.teBlock, !((MetaTeBlock)stateA.func_177229_b(this.block.typeProperty)).active));
-    return !ModelComparator.isEqual(stateA, stateB, func_145831_w(), func_174877_v());
+    return !ModelComparator.isEqual(stateA, stateB, getWorld(), getPos());
   }
   
   protected Ic2BlockState.Ic2BlockStateInstance getExtendedState(Ic2BlockState.Ic2BlockStateInstance state) {
@@ -295,17 +295,17 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
   }
   
   public void onPlaced(ItemStack stack, EntityLivingBase placer, EnumFacing facing) {
-    World world = func_145831_w();
-    if (!world.field_72995_K);
+    World world = getWorld();
+    if (!world.isRemote);
     facing = getPlacementFacing(placer, facing);
     if (facing != getFacing())
       setFacing(facing); 
-    if (world.field_72995_K)
+    if (world.isRemote)
       rerender(); 
   }
   
   protected RayTraceResult collisionRayTrace(Vec3d start, Vec3d end) {
-    Vec3d startNormalized = start.func_178786_a(this.field_174879_c.func_177958_n(), this.field_174879_c.func_177956_o(), this.field_174879_c.func_177952_p());
+    Vec3d startNormalized = start.func_178786_a(this.field_174879_c.getX(), this.field_174879_c.getY(), this.field_174879_c.getZ());
     double lengthSq = Util.square(end.field_72450_a - start.field_72450_a) + Util.square(end.field_72448_b - start.field_72448_b) + Util.square(end.field_72449_c - start.field_72449_c);
     double lengthInv = 1.0D / Math.sqrt(lengthSq);
     Vec3d direction = new Vec3d((end.field_72450_a - start.field_72450_a) * lengthInv, (end.field_72448_b - start.field_72448_b) * lengthInv, (end.field_72449_c - start.field_72449_c) * lengthInv);
@@ -327,7 +327,7 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
     } 
     if (minIntersection == null)
       return null; 
-    return new RayTraceResult(minIntersection.func_72441_c(this.field_174879_c.func_177958_n(), this.field_174879_c.func_177956_o(), this.field_174879_c.func_177952_p()), minIntersectionSide, this.field_174879_c);
+    return new RayTraceResult(minIntersection.func_72441_c(this.field_174879_c.getX(), this.field_174879_c.getY(), this.field_174879_c.getZ()), minIntersectionSide, this.field_174879_c);
   }
   
   public AxisAlignedBB getVisualBoundingBox() {
@@ -343,7 +343,7 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
   }
   
   protected void addCollisionBoxesToList(AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity) {
-    AxisAlignedBB maskNormalized = mask.func_72317_d(-this.field_174879_c.func_177958_n(), -this.field_174879_c.func_177956_o(), -this.field_174879_c.func_177952_p());
+    AxisAlignedBB maskNormalized = mask.func_72317_d(-this.field_174879_c.getX(), -this.field_174879_c.getY(), -this.field_174879_c.getZ());
     for (AxisAlignedBB aabb : getAabbs(true)) {
       if (!aabb.func_72326_a(maskNormalized))
         continue; 
@@ -402,7 +402,7 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
             return true; 
           break;
       }  
-    World world = func_145831_w();
+    World world = getWorld();
     return !world.func_180495_p(otherPos).doesSideBlockRendering((IBlockAccess)world, otherPos, side.func_176734_d());
   }
   
@@ -480,7 +480,7 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
   
   protected boolean onActivated(EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
     if (this instanceof IHasGui) {
-      if (!(func_145831_w()).field_72995_K)
+      if (!(getWorld()).isRemote)
         return IC2.platform.launchGui(player, (IHasGui)this); 
       return true;
     } 
@@ -651,7 +651,7 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
     if (!getSupportedFacings().contains(facing))
       throw new IllegalArgumentException("invalid facing: " + facing + ", supported: " + getSupportedFacings()); 
     this.facing = (byte)facing.ordinal();
-    if (!(func_145831_w()).field_72995_K)
+    if (!(getWorld()).isRemote)
       ((NetworkManager)IC2.network.get(true)).updateTileEntityField(this, "facing"); 
   }
   
@@ -744,7 +744,7 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
   
   protected final void rerender() {
     IBlockState state = getBlockState();
-    func_145831_w().func_184138_a(this.field_174879_c, state, state, 2);
+    getWorld().func_184138_a(this.field_174879_c, state, state, 2);
   }
   
   protected boolean clientNeedsExtraModelInfo() {
@@ -798,7 +798,7 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
       } 
       tickSubscriptions.put(getClass(), subscription);
     } 
-    if ((func_145831_w()).field_72995_K)
+    if ((getWorld()).isRemote)
       return (subscription == TickSubscription.Both || subscription == TickSubscription.Client); 
     return (subscription == TickSubscription.Both || subscription == TickSubscription.Server);
   }

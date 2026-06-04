@@ -27,7 +27,7 @@ public class TileEntityKineticGenerator extends TileEntityConversionGenerator {
   
   protected void onNeighborChange(Block neighbor, BlockPos neighborPos) {
     super.onNeighborChange(neighbor, neighborPos);
-    if (func_174877_v().func_177972_a(getFacing()).equals(neighborPos))
+    if (getPos().func_177972_a(getFacing()).equals(neighborPos))
       updateSource(); 
   }
   

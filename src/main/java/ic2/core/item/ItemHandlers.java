@@ -61,7 +61,7 @@ public class ItemHandlers {
   
   public static ItemMulti.IItemRightClickHandler scrapBoxUnpack = new ItemMulti.IItemRightClickHandler() {
       public ActionResult<ItemStack> onRightClick(ItemStack stack, EntityPlayer player, EnumHand hand) {
-        if (!(player.func_130014_f_()).field_72995_K) {
+        if (!(player.func_130014_f_()).isRemote) {
           ItemStack drop = Recipes.scrapboxDrops.getDrop(stack, false);
           if (drop != null && player
             .func_71019_a(drop, false) != null && !player.field_71075_bZ.field_75098_d) {
@@ -78,7 +78,7 @@ public class ItemHandlers {
         World world = player.func_130014_f_();
         IBlockState state = world.func_180495_p(pos);
         if (state.func_177230_c() == Blocks.field_150331_J && state.func_177229_b((IProperty)BlockPistonBase.field_176387_N) == side) {
-          IBlockState newState = Blocks.field_150320_F.func_176223_P().func_177226_a((IProperty)BlockPistonBase.field_176387_N, (Comparable)side).func_177226_a((IProperty)BlockPistonBase.field_176320_b, state.func_177229_b((IProperty)BlockPistonBase.field_176320_b));
+          IBlockState newState = Blocks.field_150320_F.getDefaultState().func_177226_a((IProperty)BlockPistonBase.field_176387_N, (Comparable)side).func_177226_a((IProperty)BlockPistonBase.field_176320_b, state.func_177229_b((IProperty)BlockPistonBase.field_176320_b));
           world.func_180501_a(pos, newState, 3);
           if (!player.field_71075_bZ.field_75098_d)
             StackUtil.consumeOrError(player, hand, 1); 
@@ -99,7 +99,7 @@ public class ItemHandlers {
   
   public static ItemMulti.IItemUpdateHandler radioactiveUpdate = new ItemMulti.IItemUpdateHandler() {
       public void onUpdate(ItemStack stack, World world, Entity rawEntity, int slotIndex, boolean isCurrentItem) {
-        Item item = stack.func_77973_b();
+        Item item = stack.getItem();
         if (item == null || !(item instanceof ItemMulti))
           return; 
         Object rawType = ((ItemMulti)item).getType(stack);
@@ -129,9 +129,9 @@ public class ItemHandlers {
   
   public static ItemMulti.IItemRightClickHandler openAdvancedUpgradeGUI = new ItemMulti.IItemRightClickHandler() {
       public ActionResult<ItemStack> onRightClick(ItemStack stack, EntityPlayer player, EnumHand hand) {
-        assert stack.func_77973_b() == ItemName.upgrade.getInstance();
+        assert stack.getItem() == ItemName.upgrade.getInstance();
         if (IC2.platform.isSimulating())
-          IC2.platform.launchGui(player, ((ItemUpgradeModule)stack.func_77973_b()).getInventory(player, stack)); 
+          IC2.platform.launchGui(player, ((ItemUpgradeModule)stack.getItem()).getInventory(player, stack)); 
         return new ActionResult(EnumActionResult.SUCCESS, stack);
       }
     };
@@ -139,7 +139,7 @@ public class ItemHandlers {
   public static ItemMulti.IItemUseHandler getFluidPlacer(final Block type) {
     return new ItemMulti.IItemUseHandler() {
         public EnumActionResult onUse(ItemStack stack, EntityPlayer player, BlockPos pos, EnumHand hand, EnumFacing side) {
-          assert stack.func_77973_b() == ItemName.misc_resource.getInstance();
+          assert stack.getItem() == ItemName.misc_resource.getInstance();
           World world = player.func_130014_f_();
           if (!world.func_180495_p(pos).func_177230_c().func_176200_f((IBlockAccess)world, pos))
             pos = pos.func_177972_a(side); 
@@ -158,7 +158,7 @@ public class ItemHandlers {
   
   public static ItemMulti.IItemUseHandler emptyCellFill = new ItemMulti.IItemUseHandler() {
       public EnumActionResult onUse(ItemStack stack, EntityPlayer player, BlockPos pos, EnumHand hand, EnumFacing side) {
-        assert stack.func_77973_b() == ItemName.cell.getInstance();
+        assert stack.getItem() == ItemName.cell.getInstance();
         World world = player.func_130014_f_();
         RayTraceResult position = Util.traceBlocks(player, true);
         if (position == null)

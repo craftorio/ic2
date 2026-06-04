@@ -74,8 +74,8 @@ public class ParticleUtil {
   }
   
   public static void spawnBlockHitParticles(TileEntityBlock te, EnumFacing side, boolean checkTexture) {
-    World world = te.func_145831_w();
-    BlockPos pos = te.func_174877_v();
+    World world = te.getWorld();
+    BlockPos pos = te.getPos();
     double offset = 0.1D;
     AxisAlignedBB aabb = te.getVisualBoundingBox();
     double x = pos.func_177958_n() + world.field_73012_v.nextDouble() * (aabb.field_72336_d - aabb.field_72340_a - offset * 2.0D) + offset + aabb.field_72340_a;
@@ -113,8 +113,8 @@ public class ParticleUtil {
   }
   
   public static void spawnBlockBreakParticles(TileEntityBlock te) {
-    World world = te.func_145831_w();
-    BlockPos pos = te.func_174877_v();
+    World world = te.getWorld();
+    BlockPos pos = te.getPos();
     IBlockState state = te.getBlockState();
     Minecraft mc = Minecraft.func_71410_x();
     for (int x = 0; x < 4; x++) {

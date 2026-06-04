@@ -48,12 +48,12 @@ public class ItemToolWrench extends ItemIC2 implements IBoxable {
       return EnumActionResult.FAIL; 
     WrenchResult result = wrenchBlock(world, pos, side, player, canTakeDamage(stack, 10));
     if (result != WrenchResult.Nothing) {
-      if (!world.field_72995_K) {
+      if (!world.isRemote) {
         damage(stack, (result == WrenchResult.Rotated) ? 1 : 10, player);
       } else {
         IC2.audioManager.playOnce(player, PositionSpec.Hand, "Tools/wrench.ogg", true, IC2.audioManager.getDefaultVolume());
       } 
-      return world.field_72995_K ? EnumActionResult.PASS : EnumActionResult.SUCCESS;
+      return world.isRemote ? EnumActionResult.PASS : EnumActionResult.SUCCESS;
     } 
     return EnumActionResult.FAIL;
   }
@@ -84,7 +84,7 @@ public class ItemToolWrench extends ItemIC2 implements IBoxable {
       if (newFacing != currentFacing && wrenchable.setFacing(world, pos, newFacing, player))
         return WrenchResult.Rotated; 
       if (remove && wrenchable.wrenchCanRemove(world, pos, player)) {
-        if (!world.field_72995_K) {
+        if (!world.isRemote) {
           int experience;
           TileEntity te = world.func_175625_s(pos);
           if (ConfigUtil.getBool(MainConfig.get(), "protection/wrenchLogging")) {

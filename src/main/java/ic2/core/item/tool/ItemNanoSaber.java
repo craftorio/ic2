@@ -92,9 +92,9 @@ public class ItemNanoSaber extends ItemElectricTool {
           if (armor == null)
             continue; 
           double amount = 0.0D;
-          if (armor.func_77973_b() instanceof ic2.core.item.armor.ItemArmorNanoSuit) {
+          if (armor.getItem() instanceof ic2.core.item.armor.ItemArmorNanoSuit) {
             amount = 48000.0D;
-          } else if (armor.func_77973_b() instanceof ic2.core.item.armor.ItemArmorQuantumSuit) {
+          } else if (armor.getItem() instanceof ic2.core.item.armor.ItemArmorQuantumSuit) {
             amount = 300000.0D;
           } 
           if (amount > 0.0D) {
@@ -145,7 +145,7 @@ public class ItemNanoSaber extends ItemElectricTool {
   
   public ActionResult<ItemStack> func_77659_a(World world, EntityPlayer player, EnumHand hand) {
     ItemStack stack = StackUtil.get(player, hand);
-    if (world.field_72995_K)
+    if (world.isRemote)
       return new ActionResult(EnumActionResult.PASS, stack); 
     NBTTagCompound nbt = StackUtil.getOrCreateNbtData(stack);
     if (isActive(nbt)) {

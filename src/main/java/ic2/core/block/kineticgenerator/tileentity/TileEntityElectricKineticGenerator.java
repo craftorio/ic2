@@ -52,8 +52,8 @@ public class TileEntityElectricKineticGenerator extends TileEntityInventory impl
     this.energy = (Energy)addComponent((TileEntityComponent)Energy.asBasicSink((TileEntityBlock)this, 10000.0D, 4).addManagedSlot((InvSlot)this.dischargeSlot));
   }
   
-  public void func_145839_a(NBTTagCompound nbt) {
-    super.func_145839_a(nbt);
+  public void readFromNBT(NBTTagCompound nbt) {
+    super.readFromNBT(nbt);
     updateDirections();
   }
   

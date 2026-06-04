@@ -44,7 +44,7 @@ public class ItemReactorHeatSwitch extends ItemReactorHeatStorage {
     } 
     if (this.switchSide > 0)
       for (ItemStackCoord stackcoord : heatAcceptors) {
-        IReactorComponent heatable = (IReactorComponent)stackcoord.stack.func_77973_b();
+        IReactorComponent heatable = (IReactorComponent)stackcoord.stack.getItem();
         double mymed = getCurrentHeat(stack, reactor, x, y) * 100.0D / getMaxHeat(stack, reactor, x, y);
         double heatablemed = heatable.getCurrentHeat(stackcoord.stack, reactor, stackcoord.x, stackcoord.y) * 100.0D / heatable.getMaxHeat(stackcoord.stack, reactor, stackcoord.x, stackcoord.y);
         int add = (int)(heatable.getMaxHeat(stackcoord.stack, reactor, stackcoord.x, stackcoord.y) / 100.0D * (heatablemed + mymed / 2.0D));
@@ -94,8 +94,8 @@ public class ItemReactorHeatSwitch extends ItemReactorHeatStorage {
   
   private void checkHeatAcceptor(IReactor reactor, int x, int y, ArrayList<ItemStackCoord> heatAcceptors) {
     ItemStack stack = reactor.getItemAt(x, y);
-    if (stack != null && stack.func_77973_b() instanceof IReactorComponent) {
-      IReactorComponent comp = (IReactorComponent)stack.func_77973_b();
+    if (stack != null && stack.getItem() instanceof IReactorComponent) {
+      IReactorComponent comp = (IReactorComponent)stack.getItem();
       if (comp.canStoreHeat(stack, reactor, x, y))
         heatAcceptors.add(new ItemStackCoord(stack, x, y)); 
     } 

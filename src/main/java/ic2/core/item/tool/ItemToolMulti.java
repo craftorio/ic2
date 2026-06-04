@@ -46,7 +46,7 @@ public class ItemToolMulti<T extends Enum<T> & IIdProvider> extends ItemToolIC2 
   
   public static <T extends Enum<T> & IIdProvider> ItemToolMulti<T> create(ItemName name, Class<T> typeClass, float damage, float speed, HarvestLevel harvestLevel, Set<? extends IToolClass> toolClasses, Set<Block> mineableBlocks) {
     EnumProperty<T> typeProperty = new EnumProperty("type", typeClass);
-    if (typeProperty.getAllowedValues().size() > 32767)
+    if (typeProperty.func_177700_c().size() > 32767)
       throw new IllegalArgumentException("Too many values to fit in a short for " + typeClass); 
     return new ItemToolMulti<>(name, typeProperty, damage, speed, harvestLevel, toolClasses, mineableBlocks);
   }
@@ -148,7 +148,7 @@ public class ItemToolMulti<T extends Enum<T> & IIdProvider> extends ItemToolIC2 
   
   @SideOnly(Side.CLIENT)
   public void registerModels(ItemName name) {
-    for (Enum enum_ : this.typeProperty.getAllowedValues())
+    for (Enum enum_ : this.typeProperty.func_177700_c())
       ItemIC2.registerModel((Item)this, ((IIdProvider)enum_).getId(), name, ((IIdProvider)enum_).getModelName()); 
   }
   
@@ -159,7 +159,7 @@ public class ItemToolMulti<T extends Enum<T> & IIdProvider> extends ItemToolIC2 
   }
   
   public ItemStack getItemStack(T type) {
-    if (!this.typeProperty.getAllowedValues().contains(type))
+    if (!this.typeProperty.func_177700_c().contains(type))
       throw new IllegalArgumentException("Invalid property value " + type + " for property " + this.typeProperty); 
     return getItemStackUnchecked(type);
   }
@@ -174,7 +174,7 @@ public class ItemToolMulti<T extends Enum<T> & IIdProvider> extends ItemToolIC2 
   public String getVariant(ItemStack stack) {
     if (stack == null)
       throw new NullPointerException("The stack cannot be null"); 
-    if (stack.func_77973_b() != this)
+    if (stack.getItem() != this)
       throw new IllegalArgumentException("The stack " + stack + " does not match " + this); 
     T type = getType(stack);
     if (type == null)
@@ -218,7 +218,7 @@ public class ItemToolMulti<T extends Enum<T> & IIdProvider> extends ItemToolIC2 
   
   public void setRightClickHandler(T type, ItemMulti.IItemRightClickHandler handler) {
     if (type == null) {
-      for (Enum enum_ : this.typeProperty.getAllowedValues())
+      for (Enum enum_ : this.typeProperty.func_177700_c())
         setRightClickHandler((T)enum_, handler); 
     } else {
       this.rightClickHandlers.put(type, handler);
@@ -227,7 +227,7 @@ public class ItemToolMulti<T extends Enum<T> & IIdProvider> extends ItemToolIC2 
   
   public void setUseHandler(T type, ItemMulti.IItemUseHandler handler) {
     if (type == null) {
-      for (Enum enum_ : this.typeProperty.getAllowedValues())
+      for (Enum enum_ : this.typeProperty.func_177700_c())
         setUseHandler((T)enum_, handler); 
     } else {
       this.useHandlers.put(type, handler);
@@ -236,7 +236,7 @@ public class ItemToolMulti<T extends Enum<T> & IIdProvider> extends ItemToolIC2 
   
   public void setUpdateHandler(T type, ItemMulti.IItemUpdateHandler handler) {
     if (type == null) {
-      for (Enum enum_ : this.typeProperty.getAllowedValues())
+      for (Enum enum_ : this.typeProperty.func_177700_c())
         setUpdateHandler((T)enum_, handler); 
     } else {
       this.updateHandlers.put(type, handler);

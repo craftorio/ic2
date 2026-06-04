@@ -84,14 +84,14 @@ public class TileEntityMassFabricator extends TileEntityElectricMachine implemen
         });
   }
   
-  public void func_145839_a(NBTTagCompound nbt) {
-    super.func_145839_a(nbt);
+  public void readFromNBT(NBTTagCompound nbt) {
+    super.readFromNBT(nbt);
     this.scrap = nbt.func_74762_e("scrap");
     this.consumedScrap = nbt.func_74762_e("consumedScrap");
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     nbt.func_74768_a("scrap", this.scrap);
     nbt.func_74768_a("consumedScrap", this.consumedScrap);
     return nbt;
@@ -99,13 +99,13 @@ public class TileEntityMassFabricator extends TileEntityElectricMachine implemen
   
   protected void onLoaded() {
     super.onLoaded();
-    if (!(func_145831_w()).field_72995_K)
+    if (!(getWorld()).isRemote)
       updateUpgrades(); 
   }
   
   public void func_70296_d() {
     super.func_70296_d();
-    if (!(func_145831_w()).field_72995_K)
+    if (!(getWorld()).isRemote)
       updateUpgrades(); 
   }
   
@@ -118,7 +118,7 @@ public class TileEntityMassFabricator extends TileEntityElectricMachine implemen
   }
   
   protected void onUnloaded() {
-    if (this.field_145850_b.field_72995_K && (this.audioSource != null || this.audioSourceScrap != null)) {
+    if (this.field_145850_b.isRemote && (this.audioSource != null || this.audioSourceScrap != null)) {
       IC2.audioManager.removeSources(this);
       this.audioSource = null;
       this.audioSourceScrap = null;
@@ -228,7 +228,7 @@ public class TileEntityMassFabricator extends TileEntityElectricMachine implemen
   
   @SideOnly(Side.CLIENT)
   public void addInformation(ItemStack stack, List<String> tooltip, ITooltipFlag advanced) {
-    tooltip.add("You probably want the " + Localization.translate(getBlockType().func_149739_a() + '.' + TeBlock.matter_generator.getName()));
+    tooltip.add("You probably want the " + Localization.translate(func_145838_q().func_149739_a() + '.' + TeBlock.matter_generator.getName()));
   }
   
   public double getEnergy() {

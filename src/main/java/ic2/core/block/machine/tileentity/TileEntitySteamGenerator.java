@@ -35,16 +35,16 @@ public class TileEntitySteamGenerator extends TileEntityInventory implements IHa
   
   public final FluidTank waterTank = (FluidTank)this.fluids.addTankInsert("waterTank", 10000, Fluids.fluidPredicate(new Fluid[] { FluidRegistry.WATER, FluidName.distilled_water.getInstance() }));
   
-  public void func_145839_a(NBTTagCompound nbttagcompound) {
-    super.func_145839_a(nbttagcompound);
+  public void readFromNBT(NBTTagCompound nbttagcompound) {
+    super.readFromNBT(nbttagcompound);
     this.inputMB = nbttagcompound.func_74762_e("inputmb");
     this.pressure = nbttagcompound.func_74762_e("pressurevalve");
     this.systemHeat = nbttagcompound.func_74760_g("systemheat");
     this.calcification = nbttagcompound.func_74762_e("calcification");
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     nbt.func_74768_a("inputmb", this.inputMB);
     nbt.func_74768_a("pressurevalve", this.pressure);
     nbt.func_74776_a("systemheat", this.systemHeat);
@@ -54,7 +54,7 @@ public class TileEntitySteamGenerator extends TileEntityInventory implements IHa
   
   protected void updateEntityServer() {
     super.updateEntityServer();
-    this.systemHeat = Math.max(this.systemHeat, BiomeUtil.getBiomeTemperature(func_145831_w(), this.field_174879_c));
+    this.systemHeat = Math.max(this.systemHeat, BiomeUtil.getBiomeTemperature(getWorld(), this.field_174879_c));
     if (isCalcified()) {
       if (getActive())
         setActive(false); 
@@ -140,7 +140,7 @@ public class TileEntitySteamGenerator extends TileEntityInventory implements IHa
     int transferred = LiquidUtil.distribute((TileEntity)this, new FluidStack(output, this.outputMB), false);
     int remaining = this.outputMB - transferred;
     if (remaining > 0) {
-      World world = func_145831_w();
+      World world = getWorld();
       if (world.field_73012_v.nextInt(10) == 0) {
         (new ExplosionIC2(world, null, this.field_174879_c, 1, 1.0F, ExplosionIC2.Type.Heat)).doExplosion();
       } else if (remaining >= 100) {
@@ -154,7 +154,7 @@ public class TileEntitySteamGenerator extends TileEntityInventory implements IHa
     assert heatinput >= -1.0E-4F;
     this.systemHeat += heatinput * 5.0E-4F;
     if (this.systemHeat > 500.0F) {
-      World world = func_145831_w();
+      World world = getWorld();
       world.func_175698_g(this.field_174879_c);
       (new ExplosionIC2(world, null, this.field_174879_c, 10, 0.01F, ExplosionIC2.Type.Heat)).doExplosion();
     } 
@@ -162,11 +162,11 @@ public class TileEntitySteamGenerator extends TileEntityInventory implements IHa
   
   private void cooldown(float cool) {
     assert cool >= -1.0E-4F;
-    this.systemHeat = Math.max(this.systemHeat - cool, BiomeUtil.getBiomeTemperature(func_145831_w(), this.field_174879_c));
+    this.systemHeat = Math.max(this.systemHeat - cool, BiomeUtil.getBiomeTemperature(getWorld(), this.field_174879_c));
   }
   
   private int requestHeat(int requestHeat) {
-    World world = func_145831_w();
+    World world = getWorld();
     int targetHeat = requestHeat;
     for (EnumFacing dir : EnumFacing.field_82609_l) {
       TileEntity target = world.func_175625_s(this.field_174879_c.func_177972_a(dir));

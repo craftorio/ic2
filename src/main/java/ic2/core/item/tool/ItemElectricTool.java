@@ -163,7 +163,7 @@ public abstract class ItemElectricTool extends ItemToolIC2 implements IPseudoDam
         if (entity instanceof EntityLivingBase) {
           EntityLivingBase theEntity = (EntityLivingBase)entity;
           ItemStack stack = theEntity.func_184582_a(EntityEquipmentSlot.MAINHAND);
-          if (stack == null || stack.func_77973_b() != this || stack == itemstack) {
+          if (stack == null || stack.getItem() != this || stack == itemstack) {
             removeAudioSource();
             String sound = getStopSound(theEntity, itemstack);
             if (sound != null)

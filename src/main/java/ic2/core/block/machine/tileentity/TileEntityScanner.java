@@ -115,9 +115,9 @@ public class TileEntityScanner extends TileEntityElectricMachine implements IHas
   }
   
   private boolean isPatternRecorded(ItemStack stack) {
-    if (!this.diskSlot.isEmpty() && this.diskSlot.get().func_77973_b() instanceof ItemCrystalMemory) {
+    if (!this.diskSlot.isEmpty() && this.diskSlot.get().getItem() instanceof ItemCrystalMemory) {
       ItemStack crystalMemory = this.diskSlot.get();
-      if (StackUtil.checkItemEquality(((ItemCrystalMemory)crystalMemory.func_77973_b()).readItemStack(crystalMemory), stack))
+      if (StackUtil.checkItemEquality(((ItemCrystalMemory)crystalMemory.getItem()).readItemStack(crystalMemory), stack))
         return true; 
     } 
     IPatternStorage storage = getPatternStorage();
@@ -150,30 +150,30 @@ public class TileEntityScanner extends TileEntityElectricMachine implements IHas
     reset();
   }
   
-  public void func_145839_a(NBTTagCompound nbttagcompound) {
-    super.func_145839_a(nbttagcompound);
+  public void readFromNBT(NBTTagCompound nbttagcompound) {
+    super.readFromNBT(nbttagcompound);
     this.progress = nbttagcompound.func_74762_e("progress");
-    NBTTagCompound contentTag = nbttagcompound.func_74775_l("currentStack");
+    NBTTagCompound contentTag = nbttagcompound.getCompoundTag("currentStack");
     this.currentStack = new ItemStack(contentTag);
-    contentTag = nbttagcompound.func_74775_l("pattern");
+    contentTag = nbttagcompound.getCompoundTag("pattern");
     this.pattern = new ItemStack(contentTag);
     int stateIdx = nbttagcompound.func_74762_e("state");
     this.state = (stateIdx < (State.values()).length) ? State.values()[stateIdx] : State.IDLE;
     refreshInfo();
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     nbt.func_74768_a("progress", this.progress);
     if (!StackUtil.isEmpty(this.currentStack)) {
       NBTTagCompound contentTag = new NBTTagCompound();
       this.currentStack.func_77955_b(contentTag);
-      nbt.func_74782_a("currentStack", (NBTBase)contentTag);
+      nbt.setTag("currentStack", (NBTBase)contentTag);
     } 
     if (!StackUtil.isEmpty(this.pattern)) {
       NBTTagCompound contentTag = new NBTTagCompound();
       this.pattern.func_77955_b(contentTag);
-      nbt.func_74782_a("pattern", (NBTBase)contentTag);
+      nbt.setTag("pattern", (NBTBase)contentTag);
     } 
     nbt.func_74768_a("state", this.state.ordinal());
     return nbt;
@@ -191,7 +191,7 @@ public class TileEntityScanner extends TileEntityElectricMachine implements IHas
   public void onGuiClosed(EntityPlayer player) {}
   
   public IPatternStorage getPatternStorage() {
-    World world = func_145831_w();
+    World world = getWorld();
     for (EnumFacing dir : EnumFacing.field_82609_l) {
       TileEntity target = world.func_175625_s(this.field_174879_c.func_177972_a(dir));
       if (target instanceof IPatternStorage)
@@ -203,9 +203,9 @@ public class TileEntityScanner extends TileEntityElectricMachine implements IHas
   public boolean savetoDisk(ItemStack stack) {
     if (this.diskSlot.isEmpty() || stack == null)
       return false; 
-    if (this.diskSlot.get().func_77973_b() instanceof ItemCrystalMemory) {
+    if (this.diskSlot.get().getItem() instanceof ItemCrystalMemory) {
       ItemStack crystalMemory = this.diskSlot.get();
-      ((ItemCrystalMemory)crystalMemory.func_77973_b()).writecontentsTag(crystalMemory, stack);
+      ((ItemCrystalMemory)crystalMemory.getItem()).writecontentsTag(crystalMemory, stack);
       return true;
     } 
     return false;

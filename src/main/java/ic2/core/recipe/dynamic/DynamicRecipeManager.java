@@ -424,7 +424,7 @@ public class DynamicRecipeManager implements IDynamicRecipeManager {
       return null; 
     Set<Item> ret = Collections.newSetFromMap(new IdentityHashMap<>(inputs.size()));
     for (ItemStack stack : inputs)
-      ret.add(stack.func_77973_b()); 
+      ret.add(stack.getItem()); 
     return ret;
   }
   
@@ -490,7 +490,7 @@ public class DynamicRecipeManager implements IDynamicRecipeManager {
   
   @SubscribeEvent
   public static void onOreRegister(OreDictionary.OreRegisterEvent event) {
-    Item item = event.getOre().func_77973_b();
+    Item item = event.getOre().getItem();
     if (item == null) {
       IC2.log.warn(LogCategory.Recipe, "Found null item ore dict registration.", new Object[] { new Throwable() });
       return;

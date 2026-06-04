@@ -26,13 +26,13 @@ public class ItemContainmentbox extends ItemIC2 implements IHandHeldInventory {
   
   public ActionResult<ItemStack> func_77659_a(World world, EntityPlayer player, EnumHand hand) {
     ItemStack stack = StackUtil.get(player, hand);
-    if (!world.field_72995_K)
+    if (!world.isRemote)
       IC2.platform.launchGui(player, getInventory(player, stack)); 
     return new ActionResult(EnumActionResult.SUCCESS, stack);
   }
   
   public boolean onDroppedByPlayer(ItemStack stack, EntityPlayer player) {
-    if (!(player.func_130014_f_()).field_72995_K && !StackUtil.isEmpty(stack) && player.field_71070_bA instanceof ContainerContainmentbox) {
+    if (!(player.func_130014_f_()).isRemote && !StackUtil.isEmpty(stack) && player.field_71070_bA instanceof ContainerContainmentbox) {
       HandHeldContainmentbox containmentBox = (HandHeldContainmentbox)((ContainerContainmentbox)player.field_71070_bA).base;
       if (containmentBox.isThisContainer(stack)) {
         containmentBox.saveAsThrown(stack);

@@ -102,22 +102,22 @@ public class TileEntityMatter extends TileEntityElectricMachine implements IHasG
     Recipes.matterAmplifier.addRecipe(input, Integer.valueOf(amplification), null, false);
   }
   
-  public void func_145839_a(NBTTagCompound nbt) {
-    super.func_145839_a(nbt);
+  public void readFromNBT(NBTTagCompound nbt) {
+    super.readFromNBT(nbt);
     this.scrap = nbt.func_74762_e("scrap");
-    this.lastEnergy = nbt.func_74769_h("lastEnergy");
+    this.lastEnergy = nbt.getDouble("lastEnergy");
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     nbt.func_74768_a("scrap", this.scrap);
-    nbt.func_74780_a("lastEnergy", this.lastEnergy);
+    nbt.setDouble("lastEnergy", this.lastEnergy);
     return nbt;
   }
   
   protected void onLoaded() {
     super.onLoaded();
-    if (!(func_145831_w()).field_72995_K)
+    if (!(getWorld()).isRemote)
       setUpgradestat(); 
   }
   

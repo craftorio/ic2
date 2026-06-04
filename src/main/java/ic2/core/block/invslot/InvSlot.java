@@ -91,7 +91,7 @@ public class InvSlot implements Iterable<ItemStack> {
         contentsTag.func_74742_a((NBTBase)contentTag);
       } 
     } 
-    nbt.func_74782_a("Contents", (NBTBase)contentsTag);
+    nbt.setTag("Contents", (NBTBase)contentsTag);
   }
   
   public int size() {

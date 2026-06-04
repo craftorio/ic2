@@ -55,7 +55,7 @@ public class ContainerHandHeldInventory<T extends HandHeldInventory> extends Con
         throw new RuntimeException("Unexpected ClickType: " + type);
     } 
     ItemStack stack = super.func_184996_a(slot, button, type, player);
-    if (closeGUI && !(player.func_130014_f_()).field_72995_K) {
+    if (closeGUI && !(player.func_130014_f_()).isRemote) {
       ((HandHeldInventory)this.base).saveAsThrown(stack);
       player.func_71053_j();
     } else if (type == ClickType.CLONE) {

@@ -140,7 +140,7 @@ public class TileEntityBatchCrafter extends TileEntityElectricMachine implements
       final int slot = i;
       this.ingredientsRow[slot] = new InvSlot((IInventorySlotHolder)this, "ingredient[" + slot + ']', InvSlot.Access.I, 1) {
           public boolean accepts(ItemStack ingredient) {
-            IRecipe recipe = TileEntityBatchCrafter.this.field_145850_b.field_72995_K ? TileEntityBatchCrafter.this.findRecipe() : TileEntityBatchCrafter.this.recipe;
+            IRecipe recipe = TileEntityBatchCrafter.this.field_145850_b.isRemote ? TileEntityBatchCrafter.this.findRecipe() : TileEntityBatchCrafter.this.recipe;
             if (recipe == null)
               return false; 
             assert recipe.func_77569_a(TileEntityBatchCrafter.this.crafting, TileEntityBatchCrafter.this.field_145850_b);
@@ -165,8 +165,8 @@ public class TileEntityBatchCrafter extends TileEntityElectricMachine implements
     this.comparator.setUpdate(() -> this.progress * 15 / this.operationLength);
   }
   
-  public void func_145839_a(NBTTagCompound nbt) {
-    super.func_145839_a(nbt);
+  public void readFromNBT(NBTTagCompound nbt) {
+    super.readFromNBT(nbt);
     this.progress = nbt.func_74765_d("progress");
     NBTTagList grid = nbt.func_150295_c("grid", 10);
     for (int i = 0; i < grid.func_74745_c(); i++) {
@@ -175,8 +175,8 @@ public class TileEntityBatchCrafter extends TileEntityElectricMachine implements
     } 
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     nbt.func_74777_a("progress", this.progress);
     NBTTagList grid = new NBTTagList();
     for (byte i = 0; i < this.craftingGrid.length; i = (byte)(i + 1)) {
@@ -188,17 +188,17 @@ public class TileEntityBatchCrafter extends TileEntityElectricMachine implements
         grid.func_74742_a((NBTBase)contentTag);
       } 
     } 
-    nbt.func_74782_a("grid", (NBTBase)grid);
+    nbt.setTag("grid", (NBTBase)grid);
     return nbt;
   }
   
   protected IRecipe findRecipe() {
-    World world = func_145831_w();
+    World world = getWorld();
     return CraftingManager.func_192413_b(this.crafting, world);
   }
   
   public void matrixChange(int slot) {
-    if (this.recipe == null || !this.recipe.func_77569_a(this.crafting, func_145831_w()))
+    if (this.recipe == null || !this.recipe.func_77569_a(this.crafting, getWorld()))
       this.recipe = findRecipe(); 
     this.recipeOutput = (this.recipe != null) ? this.recipe.func_77572_b(this.crafting) : StackUtil.emptyStack;
     this.newChange = true;
@@ -210,7 +210,7 @@ public class TileEntityBatchCrafter extends TileEntityElectricMachine implements
   
   protected void onLoaded() {
     super.onLoaded();
-    if (!(func_145831_w()).field_72995_K) {
+    if (!(getWorld()).isRemote) {
       setOverclockRates();
       matrixChange(-1);
     } 
@@ -218,7 +218,7 @@ public class TileEntityBatchCrafter extends TileEntityElectricMachine implements
   
   public void func_70296_d() {
     super.func_70296_d();
-    if (!(func_145831_w()).field_72995_K) {
+    if (!(getWorld()).isRemote) {
       setOverclockRates();
       this.attemptToBalance = true;
     } 
@@ -272,8 +272,8 @@ public class TileEntityBatchCrafter extends TileEntityElectricMachine implements
     for (int operation = 0; operation < this.operationsPerTick; operation++) {
       List<ItemStack> outputs = Collections.singletonList(this.recipeOutput);
       for (ItemStack stack : this.upgradeSlot) {
-        if (stack != null && stack.func_77973_b() instanceof IUpgradeItem)
-          ((IUpgradeItem)stack.func_77973_b()).onProcessEnd(stack, this, outputs); 
+        if (stack != null && stack.getItem() instanceof IUpgradeItem)
+          ((IUpgradeItem)stack.getItem()).onProcessEnd(stack, this, outputs); 
       } 
       craft();
       if (!hasRecipe() || !this.craftingOutput.canAdd(this.recipeOutput))
@@ -286,7 +286,7 @@ public class TileEntityBatchCrafter extends TileEntityElectricMachine implements
     assert this.craftingOutput.canAdd(this.recipeOutput);
     this.craftingOutput.add(this.recipeOutput);
     NonNullList<ItemStack> nonNullList = this.recipe.func_179532_b(this.ingredients);
-    World world = func_145831_w();
+    World world = getWorld();
     for (int slot = 0; slot < this.ingredientsRow.length; slot++) {
       ItemStack oldStack = this.ingredientsRow[slot].get();
       if (!StackUtil.isEmpty(oldStack) && !StackUtil.isEmpty(this.craftingGrid[slot])) {

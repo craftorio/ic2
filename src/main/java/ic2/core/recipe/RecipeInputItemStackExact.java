@@ -22,7 +22,7 @@ public class RecipeInputItemStackExact extends RecipeInputBase {
   }
   
   public boolean matches(ItemStack subject) {
-    return (subject.func_77973_b() == this.input.func_77973_b() && subject
+    return (subject.getItem() == this.input.getItem() && subject
       .func_77960_j() == this.input.func_77960_j() && 
       StackUtil.checkNbtEqualityStrict(subject, this.input));
   }

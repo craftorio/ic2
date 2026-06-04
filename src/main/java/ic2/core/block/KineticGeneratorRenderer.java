@@ -59,7 +59,7 @@ public class KineticGeneratorRenderer<T extends TileEntity> extends TileEntitySp
     GL11.glPushMatrix();
     GL11.glTranslatef((float)x, (float)y, (float)z);
     if (te instanceof IRotorProvider)
-      renderBlockRotor((IRotorProvider)te, te.func_145831_w(), te.func_174877_v()); 
+      renderBlockRotor((IRotorProvider)te, te.getWorld(), te.getPos()); 
     GL11.glPopMatrix();
   }
   

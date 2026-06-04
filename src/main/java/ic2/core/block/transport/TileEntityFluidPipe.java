@@ -77,9 +77,9 @@ public class TileEntityFluidPipe extends TileEntityPipe implements IFluidPipe {
   }
   
   public void flipConnection(EnumFacing facing) {
-    World world = func_145831_w();
-    BlockPos pos = func_174877_v();
-    if (!world.field_72995_K) {
+    World world = getWorld();
+    BlockPos pos = getPos();
+    if (!world.isRemote) {
       this.connectivity = (byte)(this.connectivity ^ 1 << facing.ordinal());
       ((NetworkManager)IC2.network.get(true)).updateTileEntityField((TileEntity)this, "connectivity");
       world.func_175685_c(pos, (Block)getBlockType(), true);
@@ -164,16 +164,16 @@ public class TileEntityFluidPipe extends TileEntityPipe implements IFluidPipe {
     } 
   }
   
-  public void func_145839_a(NBTTagCompound nbt) {
-    super.func_145839_a(nbt);
+  public void readFromNBT(NBTTagCompound nbt) {
+    super.readFromNBT(nbt);
     this.type = PipeType.values[nbt.func_74771_c("type") & 0xFF];
     this.size = PipeSize.values()[nbt.func_74771_c("size") & 0xFF];
     this.tank = new PipeFluidTank(Util.allFacings, Util.allFacings, fluid -> true, (int)(this.type.transferRate * this.size.multiplier));
     this.tank.readFromNBT(nbt);
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     nbt.func_74774_a("type", (byte)this.type.ordinal());
     nbt.func_74774_a("size", (byte)this.size.ordinal());
     this.tank.writeToNBT(nbt);
@@ -215,7 +215,7 @@ public class TileEntityFluidPipe extends TileEntityPipe implements IFluidPipe {
   
   public void onPlaced(ItemStack stack, EntityLivingBase placer, EnumFacing facing) {
     super.onPlaced(stack, placer, facing);
-    if (!this.field_145850_b.field_72995_K) {
+    if (!this.field_145850_b.isRemote) {
       TileEntity tile = this.field_145850_b.func_175625_s(this.field_174879_c.func_177972_a(facing.func_176734_d()));
       if (tile != null && (
         tile instanceof IFluidPipe || LiquidUtil.isFluidTile(tile, facing))) {

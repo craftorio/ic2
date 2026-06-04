@@ -59,10 +59,10 @@ public abstract class ItemArmorFluidTank extends ItemArmorUtility implements IIt
   
   public void filltank(ItemStack stack) {
     NBTTagCompound nbtTagCompound = StackUtil.getOrCreateNbtData(stack);
-    NBTTagCompound fluidTag = nbtTagCompound.func_74775_l("Fluid");
+    NBTTagCompound fluidTag = nbtTagCompound.getCompoundTag("Fluid");
     FluidStack fs = new FluidStack(this.allowfluid, this.capacity);
     fs.writeToNBT(fluidTag);
-    nbtTagCompound.func_74782_a("Fluid", (NBTBase)fluidTag);
+    nbtTagCompound.setTag("Fluid", (NBTBase)fluidTag);
   }
   
   public double getCharge(ItemStack stack) {

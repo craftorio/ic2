@@ -29,11 +29,11 @@ class TeUpdate {
     GrowingBuffer commonBuffer = new GrowingBuffer();
     for (Map.Entry<TileEntity, TeUpdateDataServer> entry : (Iterable<Map.Entry<TileEntity, TeUpdateDataServer>>)worldData.tesToUpdate.entrySet()) {
       TileEntity te = entry.getKey();
-      NetworkManager.getPlayersInRange(te.func_145831_w(), te.func_174877_v(), playersInRange);
+      NetworkManager.getPlayersInRange(te.getWorld(), te.getPos(), playersInRange);
       if (playersInRange.isEmpty())
         continue; 
       TeUpdateDataServer updateData = entry.getValue();
-      DataEncoder.encode(commonBuffer, te.func_174877_v(), false);
+      DataEncoder.encode(commonBuffer, te.getPos(), false);
       commonBuffer.mark();
       commonBuffer.writeShort(0);
       for (String field : updateData.getGlobalFields())
@@ -164,20 +164,20 @@ class TeUpdate {
       return;
     } 
     TileEntity te = world.func_175625_s(update.pos);
-    if (update.teClass != null && (te == null || te.getClass() != update.teClass || te.func_145837_r() || te.func_145831_w() != world)) {
+    if (update.teClass != null && (te == null || te.getClass() != update.teClass || te.func_145837_r() || te.getWorld() != world)) {
       if (debug)
         IC2.log.info(LogCategory.Network, "Instantiating %s with %s.", new Object[] { Util.formatPosition((IBlockAccess)world, update.pos), update.teClass.getName() }); 
       tileEntityBlock = TileEntityBlock.instantiate(update.teClass);
       world.func_175690_a(update.pos, (TileEntity)tileEntityBlock);
       assert !tileEntityBlock.func_145837_r();
-      assert tileEntityBlock.func_145831_w() == world;
+      assert tileEntityBlock.getWorld() == world;
     } else {
       if (tileEntityBlock == null) {
         if (debug)
           IC2.log.info(LogCategory.Network, "Can't apply update at %s, no te and no teClass.", new Object[] { Util.formatPosition((IBlockAccess)world, update.pos) }); 
         return;
       } 
-      if (tileEntityBlock.func_145837_r() || tileEntityBlock.func_145831_w() != world) {
+      if (tileEntityBlock.func_145837_r() || tileEntityBlock.getWorld() != world) {
         if (debug)
           IC2.log.warn(LogCategory.Network, "Can't apply update at %s, invalid te and no teClass.", new Object[] { Util.formatPosition((IBlockAccess)world, update.pos) }); 
         return;

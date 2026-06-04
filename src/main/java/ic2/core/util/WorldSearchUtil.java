@@ -21,7 +21,7 @@ public class WorldSearchUtil {
       for (int z = zS; z <= zE; z++) {
         Chunk chunk = world.func_72964_e(x, z);
         for (TileEntity te : chunk.func_177434_r().values()) {
-          BlockPos pos = te.func_174877_v();
+          BlockPos pos = te.getPos();
           if (pos.func_177956_o() >= minY && pos.func_177956_o() <= maxY && pos
             .func_177958_n() >= minX && pos.func_177958_n() <= maxX && pos
             .func_177952_p() >= minZ && pos.func_177952_p() <= maxZ && 

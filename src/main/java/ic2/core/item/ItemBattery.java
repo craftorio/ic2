@@ -49,7 +49,7 @@ public class ItemBattery extends BaseElectricItem {
   
   public ActionResult<ItemStack> func_77659_a(World world, EntityPlayer player, EnumHand hand) {
     ItemStack stack = StackUtil.get(player, hand);
-    if (world.field_72995_K || StackUtil.getSize(stack) != 1)
+    if (world.isRemote || StackUtil.getSize(stack) != 1)
       return new ActionResult(EnumActionResult.PASS, stack); 
     if (ElectricItem.manager.getCharge(stack) > 0.0D) {
       boolean transferred = false;
@@ -67,7 +67,7 @@ public class ItemBattery extends BaseElectricItem {
             } 
           }  
       } 
-      if (transferred && !world.field_72995_K)
+      if (transferred && !world.isRemote)
         player.field_71070_bA.func_75142_b(); 
     } 
     return new ActionResult(EnumActionResult.SUCCESS, stack);

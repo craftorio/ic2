@@ -186,15 +186,15 @@ public class ConfigUtil {
   }
   
   private static String fromStack(ItemStack stack, boolean amount) {
-    String ret = Util.getName(stack.func_77973_b()).toString();
+    String ret = Util.getName(stack.getItem()).toString();
     if (amount)
       ret = ret + "*" + StackUtil.getSize(stack); 
-    if (stack.func_77973_b() instanceof IMultiItem) {
-      String variant = ((IMultiItem)stack.func_77973_b()).getVariant(stack);
+    if (stack.getItem() instanceof IMultiItem) {
+      String variant = ((IMultiItem)stack.getItem()).getVariant(stack);
       if (variant != null)
         ret = ret + "#" + variant; 
-    } else if (stack.func_77973_b() instanceof ItemBlock && ((ItemBlock)stack.func_77973_b()).func_179223_d() instanceof IMultiBlock) {
-      String variant = ((IMultiBlock)((ItemBlock)stack.func_77973_b()).func_179223_d()).getVariant(stack);
+    } else if (stack.getItem() instanceof ItemBlock && ((ItemBlock)stack.getItem()).func_179223_d() instanceof IMultiBlock) {
+      String variant = ((IMultiBlock)((ItemBlock)stack.getItem()).func_179223_d()).getVariant(stack);
       if (variant != null)
         ret = ret + "#" + variant; 
     } else if (stack.func_77952_i() == 32767) {

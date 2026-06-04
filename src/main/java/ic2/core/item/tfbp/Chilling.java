@@ -18,19 +18,19 @@ class Chilling extends TerraformerBase {
     IBlockState state = world.func_180495_p(pos);
     Block block = state.func_177230_c();
     if (block == Blocks.field_150355_j || block == Blocks.field_150358_i) {
-      world.func_175656_a(pos, Blocks.field_150432_aD.func_176223_P());
+      world.func_175656_a(pos, Blocks.field_150432_aD.getDefaultState());
       return true;
     } 
     if (block == Blocks.field_150432_aD) {
       BlockPos below = pos.func_177977_b();
       Block blockBelow = world.func_180495_p(below).func_177230_c();
       if (blockBelow == Blocks.field_150355_j || blockBelow == Blocks.field_150358_i) {
-        world.func_175656_a(below, Blocks.field_150432_aD.func_176223_P());
+        world.func_175656_a(below, Blocks.field_150432_aD.getDefaultState());
         return true;
       } 
     } else if (block == Blocks.field_150431_aC) {
       if (isSurroundedBySnow(world, pos)) {
-        world.func_175656_a(pos, Blocks.field_150433_aE.func_176223_P());
+        world.func_175656_a(pos, Blocks.field_150433_aE.getDefaultState());
         return true;
       } 
       int size = ((Integer)state.func_177229_b((IProperty)BlockSnow.field_176315_a)).intValue();
@@ -41,7 +41,7 @@ class Chilling extends TerraformerBase {
     } 
     pos = pos.func_177984_a();
     if (Blocks.field_150431_aC.func_176196_c(world, pos) || block == Blocks.field_150432_aD) {
-      world.func_175656_a(pos, Blocks.field_150431_aC.func_176223_P());
+      world.func_175656_a(pos, Blocks.field_150431_aC.getDefaultState());
       return true;
     } 
     return false;
@@ -65,7 +65,7 @@ class Chilling extends TerraformerBase {
       return true; 
     pos = pos.func_177984_a();
     if (Blocks.field_150431_aC.func_176196_c(world, pos) || block == Blocks.field_150432_aD)
-      world.func_175656_a(pos, Blocks.field_150431_aC.func_176223_P()); 
+      world.func_175656_a(pos, Blocks.field_150431_aC.getDefaultState()); 
     return false;
   }
 }

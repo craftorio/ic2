@@ -37,7 +37,7 @@ public class JetpackAttachmentRecipe implements IRecipe {
   
   public static void init() {
     for (ItemStack stack : ConfigUtil.asStackList(MainConfig.get(), "recipes/jetpackAttachmentBlacklist"))
-      blacklistedItems.add(stack.func_77973_b()); 
+      blacklistedItems.add(stack.getItem()); 
   }
   
   public boolean func_77569_a(InventoryCrafting inv, World worldIn) {
@@ -51,7 +51,7 @@ public class JetpackAttachmentRecipe implements IRecipe {
     for (int i = 0; i < inv.func_70302_i_(); i++) {
       ItemStack currentStack = inv.func_70301_a(i);
       if (!StackUtil.isEmpty(currentStack)) {
-        Item item = currentStack.func_77973_b();
+        Item item = currentStack.getItem();
         if (item == ItemName.jetpack_electric.getInstance()) {
           if (jetpack != null)
             return StackUtil.emptyStack; 

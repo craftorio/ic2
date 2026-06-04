@@ -25,7 +25,7 @@ public class BasicMachineRecipeManager extends MachineRecipeHelper<IRecipeInput,
     for (ItemStack output : recipe.getOutput()) {
       if (StackUtil.checkItemEqualityStrict(inContainer, output))
         return true; 
-      if (output.func_77973_b().hasContainerItem(output) && StackUtil.checkItemEqualityStrict(input, output.func_77973_b().getContainerItem(output)))
+      if (output.getItem().hasContainerItem(output) && StackUtil.checkItemEqualityStrict(input, output.getItem().getContainerItem(output)))
         return true; 
     } 
     return false;
@@ -81,9 +81,9 @@ public class BasicMachineRecipeManager extends MachineRecipeHelper<IRecipeInput,
     if (recipe == null)
       return null; 
     if (StackUtil.getSize(input) >= ((IRecipeInput)recipe.getInput()).getAmount() && (
-      !input.func_77973_b().hasContainerItem(input) || StackUtil.getSize(input) == ((IRecipeInput)recipe.getInput()).getAmount())) {
+      !input.getItem().hasContainerItem(input) || StackUtil.getSize(input) == ((IRecipeInput)recipe.getInput()).getAmount())) {
       if (adjustInput) {
-        if (input.func_77973_b().hasContainerItem(input))
+        if (input.getItem().hasContainerItem(input))
           throw new UnsupportedOperationException("can't adjust input item, use apply() instead"); 
         input.func_190918_g(((IRecipeInput)recipe.getInput()).getAmount());
       } 

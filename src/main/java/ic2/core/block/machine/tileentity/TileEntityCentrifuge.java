@@ -45,13 +45,13 @@ public class TileEntityCentrifuge extends TileEntityStandardMachine<IRecipeInput
     Recipes.centrifuge = (IBasicMachineRecipeManager)new BasicMachineRecipeManager();
   }
   
-  public void func_145839_a(NBTTagCompound nbt) {
-    super.func_145839_a(nbt);
+  public void readFromNBT(NBTTagCompound nbt) {
+    super.readFromNBT(nbt);
     this.heat = nbt.func_74765_d("heat");
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     nbt.func_74777_a("heat", this.heat);
     return nbt;
   }

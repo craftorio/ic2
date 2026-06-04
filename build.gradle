@@ -57,6 +57,7 @@ minecraft {
 
 repositories {
     maven { url = "https://mod-buildcraft.com/maven" }
+    maven { url = "https://maven.blamejared.com/" }
 }
 
 dependencies {
@@ -69,7 +70,9 @@ dependencies {
     // compile "some.group:artifact:version:classifier"
     // compile "some.group:artifact:version"
     // Real examples
-    compile 'com.mod-buildcraft:buildcraft-all:8.0.0'  // adds buildcraft to the dev env
+    compile 'com.mod-buildcraft:buildcraft-all:8.0.0'
+    compile 'mezz.jei:jei_1.12.2:4.16.1.1013'
+    
     // compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env
 
     // The 'provided' configuration is for optional dependencies that exist at compile-time but might not at runtime.

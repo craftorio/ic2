@@ -92,8 +92,8 @@ public final class StackUtil {
   }
   
   public static IInventory findDoubleChest(TileEntityChest chest) {
-    World world = chest.func_145831_w();
-    BlockPos pos = chest.func_174877_v();
+    World world = chest.getWorld();
+    BlockPos pos = chest.getPos();
     if (world == null || pos == null || !world.func_175667_e(pos))
       return null; 
     BlockChest.Type type = chest.func_145980_j();
@@ -116,7 +116,7 @@ public final class StackUtil {
   }
   
   public static AdjacentInv getAdjacentInventory(TileEntity source, EnumFacing dir) {
-    TileEntity target = source.func_145831_w().func_175625_s(source.func_174877_v().func_177972_a(dir));
+    TileEntity target = source.getWorld().func_175625_s(source.getPos().func_177972_a(dir));
     if (!isInventoryTile(target, dir))
       return null; 
     GameProfile srcOwner;
@@ -420,7 +420,7 @@ public final class StackUtil {
       it.set(decSize(stack, amount));
     } 
     for (ItemStack stack : stacks)
-      dropAsEntity(source.func_145831_w(), source.func_174877_v(), stack); 
+      dropAsEntity(source.getWorld(), source.getPos(), stack); 
     stacks.clear();
   }
   
@@ -719,7 +719,7 @@ public final class StackUtil {
       throw new NullPointerException("null item"); 
     return new Predicate<ItemStack>() {
         public boolean apply(ItemStack input) {
-          return (input.func_77973_b() == item);
+          return (input.getItem() == item);
         }
         
         public String toString() {
@@ -916,7 +916,7 @@ public final class StackUtil {
   public static boolean checkItemEquality(ItemStack a, ItemStack b) {
     return ((isEmpty(a) && isEmpty(b)) || (
       !isEmpty(a) && !isEmpty(b) && a
-      .func_77973_b() == b.func_77973_b() && (
+      .getItem() == b.getItem() && (
       !a.func_77981_g() || a.func_77960_j() == b.func_77960_j()) && 
       checkNbtEquality(a, b)));
   }
@@ -924,7 +924,7 @@ public final class StackUtil {
   public static boolean checkItemEquality(ItemStack a, Item b) {
     return ((isEmpty(a) && b == null) || (
       !isEmpty(a) && b != null && a
-      .func_77973_b() == b));
+      .getItem() == b));
   }
   
   public static boolean checkItemEqualityStrict(ItemStack a, ItemStack b) {
@@ -1017,7 +1017,7 @@ public final class StackUtil {
   public static boolean placeBlock(ItemStack stack, World world, BlockPos pos) {
     if (isEmpty(stack))
       return false; 
-    Item item = stack.func_77973_b();
+    Item item = stack.getItem();
     if (item instanceof net.minecraft.item.ItemBlock || item instanceof net.minecraft.item.ItemBlockSpecial) {
       int oldSize = getSize(stack);
       EntityPlayer player = Ic2Player.get(world);
@@ -1033,7 +1033,7 @@ public final class StackUtil {
   }
   
   public static boolean isEmpty(ItemStack stack) {
-    return (stack == emptyStack || stack == null || stack.func_77973_b() == null || stack.func_190916_E() <= 0);
+    return (stack == emptyStack || stack == null || stack.getItem() == null || stack.func_190916_E() <= 0);
   }
   
   public static boolean isEmpty(EntityPlayer player, EnumHand hand) {
@@ -1090,7 +1090,7 @@ public final class StackUtil {
   }
   
   public static boolean check(ItemStack stack) {
-    return (stack.func_77973_b() != null);
+    return (stack.getItem() != null);
   }
   
   public static String toStringSafe2(Iterable<List<ItemStack>> list) {
@@ -1120,7 +1120,7 @@ public final class StackUtil {
   public static String toStringSafe(ItemStack stack) {
     if (stack == null)
       return "(null)"; 
-    if (stack.func_77973_b() == null)
+    if (stack.getItem() == null)
       return getSize(stack) + "x(null)@(unknown)"; 
     return stack.toString();
   }
@@ -1275,7 +1275,7 @@ public final class StackUtil {
     return (stack == null) ? emptyStack : stack;
   }
   
-  public static final ItemStack emptyStack = ItemStack.field_190927_a;
+  public static final ItemStack emptyStack = ItemStack.EMPTY;
   
   private static final int[] emptySlotArray = new int[0];
 }

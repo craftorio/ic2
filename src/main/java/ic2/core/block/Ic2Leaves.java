@@ -102,7 +102,7 @@ public class Ic2Leaves extends BlockLeaves implements IBlockModelProvider {
   }
   
   public Item func_180660_a(IBlockState state, Random rand, int fortune) {
-    return ((LeavesType)state.func_177229_b((IProperty)typeProperty)).getSapling().func_77973_b();
+    return ((LeavesType)state.func_177229_b((IProperty)typeProperty)).getSapling().getItem();
   }
   
   public int func_180651_a(IBlockState state) {

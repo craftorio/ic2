@@ -49,7 +49,7 @@ public class ItemArmorNanoSuit extends ItemArmorElectric implements IItemHudProv
     if (IC2.platform.isSimulating() && event.getEntity() instanceof EntityLivingBase) {
       EntityLivingBase entity = (EntityLivingBase)event.getEntity();
       ItemStack armor = entity.func_184582_a(EntityEquipmentSlot.FEET);
-      if (armor != null && armor.func_77973_b() == this) {
+      if (armor != null && armor.getItem() == this) {
         int fallDamage = (int)event.getDistance() - 3;
         if (fallDamage >= 8)
           return; 

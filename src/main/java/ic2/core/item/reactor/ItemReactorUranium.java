@@ -68,7 +68,7 @@ public class ItemReactorUranium extends AbstractDamageableReactorComponent {
           int dheat = heat / heatAcceptors.size();
           heat -= dheat;
           ItemStackCoord acceptor = heatAcceptors.remove();
-          IReactorComponent acceptorComp = (IReactorComponent)acceptor.stack.func_77973_b();
+          IReactorComponent acceptorComp = (IReactorComponent)acceptor.stack.getItem();
           dheat = acceptorComp.alterHeat(acceptor.stack, reactor, acceptor.x, acceptor.y, dheat);
           heat += dheat;
         } 
@@ -105,8 +105,8 @@ public class ItemReactorUranium extends AbstractDamageableReactorComponent {
   
   protected static int checkPulseable(IReactor reactor, int x, int y, ItemStack stack, int mex, int mey, boolean heatrun) {
     ItemStack other = reactor.getItemAt(x, y);
-    if (other != null && other.func_77973_b() instanceof IReactorComponent && (
-      (IReactorComponent)other.func_77973_b()).acceptUraniumPulse(other, reactor, stack, x, y, mex, mey, heatrun))
+    if (other != null && other.getItem() instanceof IReactorComponent && (
+      (IReactorComponent)other.getItem()).acceptUraniumPulse(other, reactor, stack, x, y, mex, mey, heatrun))
       return 1; 
     return 0;
   }
@@ -117,8 +117,8 @@ public class ItemReactorUranium extends AbstractDamageableReactorComponent {
   
   protected void checkHeatAcceptor(IReactor reactor, int x, int y, Collection<ItemStackCoord> heatAcceptors) {
     ItemStack stack = reactor.getItemAt(x, y);
-    if (stack != null && stack.func_77973_b() instanceof IReactorComponent && (
-      (IReactorComponent)stack.func_77973_b()).canStoreHeat(stack, reactor, x, y))
+    if (stack != null && stack.getItem() instanceof IReactorComponent && (
+      (IReactorComponent)stack.getItem()).canStoreHeat(stack, reactor, x, y))
       heatAcceptors.add(new ItemStackCoord(stack, x, y)); 
   }
   

@@ -31,7 +31,7 @@ public class InvSlotDischarge extends InvSlot implements IDischargingSlot {
   public boolean accepts(ItemStack stack) {
     if (stack == null)
       return false; 
-    if (stack.func_77973_b() == Items.field_151137_ax && !this.allowRedstoneDust)
+    if (stack.getItem() == Items.field_151137_ax && !this.allowRedstoneDust)
       return false; 
     return (Info.itemInfo.getEnergyValue(stack) > 0.0D || ElectricItem.manager.discharge(stack, Double.POSITIVE_INFINITY, this.tier, true, true, true) > 0.0D);
   }

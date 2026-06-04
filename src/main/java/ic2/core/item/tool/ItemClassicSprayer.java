@@ -39,7 +39,7 @@ public class ItemClassicSprayer extends ItemGradualInt {
       return EnumActionResult.SUCCESS; 
     ItemStack stack = StackUtil.get(player, hand);
     ItemStack pack = (ItemStack)player.field_71071_by.field_70460_b.get(2);
-    boolean pulledFromCFPack = (StackUtil.check(pack) && pack.func_77973_b() == ItemName.cf_pack.getInstance() && ((ItemArmorClassicCFPack)pack.func_77973_b()).getCFPellet(player, pack));
+    boolean pulledFromCFPack = (StackUtil.check(pack) && pack.getItem() == ItemName.cf_pack.getInstance() && ((ItemArmorClassicCFPack)pack.getItem()).getCFPellet(player, pack));
     if (!pulledFromCFPack && getCustomDamage(stack) < 100)
       return EnumActionResult.FAIL; 
     if (world.func_180495_p(pos).func_177230_c() == BlockName.scaffold.getInstance()) {

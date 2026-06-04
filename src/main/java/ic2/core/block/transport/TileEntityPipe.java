@@ -49,7 +49,7 @@ public abstract class TileEntityPipe extends TileEntityBlock implements IPipe, I
   }
   
   public boolean canPlaceCover(World world, BlockPos pos, EnumFacing side, ItemStack stack) {
-    Item rawItem = stack.func_77973_b();
+    Item rawItem = stack.getItem();
     if (!(rawItem instanceof ICoverItem))
       return false; 
     ICoverItem item = (ICoverItem)rawItem;
@@ -71,23 +71,23 @@ public abstract class TileEntityPipe extends TileEntityBlock implements IPipe, I
     ItemStack ret = this.coversComponent.removeCover(side);
     this.covers = (byte)(this.covers ^ 1 << side.ordinal());
     ((NetworkManager)IC2.network.get(true)).updateTileEntityField((TileEntity)this, "covers");
-    StackUtil.dropAsEntity(func_145831_w(), func_174877_v(), StackUtil.copyWithSize(ret, 1));
+    StackUtil.dropAsEntity(getWorld(), getPos(), StackUtil.copyWithSize(ret, 1));
   }
   
   protected void onLoaded() {
     super.onLoaded();
-    if ((func_145831_w()).field_72995_K)
+    if ((getWorld()).isRemote)
       updateRenderState(); 
   }
   
-  public void func_145839_a(NBTTagCompound nbt) {
-    super.func_145839_a(nbt);
+  public void readFromNBT(NBTTagCompound nbt) {
+    super.readFromNBT(nbt);
     this.connectivity = nbt.func_74771_c("connectivity");
     this.covers = nbt.func_74771_c("covers");
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     nbt.func_74774_a("connectivity", this.connectivity);
     nbt.func_74774_a("covers", this.covers);
     return nbt;
@@ -102,7 +102,7 @@ public abstract class TileEntityPipe extends TileEntityBlock implements IPipe, I
   }
   
   public void onPlaced(ItemStack stack, EntityLivingBase placer, EnumFacing facing) {
-    if (this.field_145850_b.field_72995_K)
+    if (this.field_145850_b.isRemote)
       updateRenderState(); 
     super.onPlaced(stack, placer, facing);
   }

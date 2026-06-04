@@ -74,7 +74,7 @@ public class ItemBlockTileEntity extends ItemBlockIC2 {
     world.func_175690_a(pos, (TileEntity)te);
     te.onPlaced(stack, placer, side);
     world.markAndNotifyBlock(pos, world.func_175726_f(pos), oldState, newState, 3);
-    if (!world.field_72995_K)
+    if (!world.isRemote)
       ((NetworkManager)IC2.network.get(true)).sendInitialData((TileEntity)te); 
     return true;
   }

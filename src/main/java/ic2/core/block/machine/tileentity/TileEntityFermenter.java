@@ -68,18 +68,18 @@ public class TileEntityFermenter extends TileEntityInventory implements IHasGui,
         ConfigUtil.getInt(MainConfig.get(), "balance/fermenter/hU_per_run"), FluidName.biogas.getName(), ConfigUtil.getInt(MainConfig.get(), "balance/fermenter/output_amount_biogas_per_run"));
   }
   
-  public void func_145839_a(NBTTagCompound nbttagcompound) {
-    super.func_145839_a(nbttagcompound);
-    this.inputTank.readFromNBT(nbttagcompound.func_74775_l("inputTank"));
-    this.outputTank.readFromNBT(nbttagcompound.func_74775_l("outputTank"));
+  public void readFromNBT(NBTTagCompound nbttagcompound) {
+    super.readFromNBT(nbttagcompound);
+    this.inputTank.readFromNBT(nbttagcompound.getCompoundTag("inputTank"));
+    this.outputTank.readFromNBT(nbttagcompound.getCompoundTag("outputTank"));
     this.progress = nbttagcompound.func_74762_e("progress");
     this.heatBuffer = nbttagcompound.func_74762_e("heatBuffer");
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
-    nbt.func_74782_a("inputTank", (NBTBase)this.inputTank.writeToNBT(new NBTTagCompound()));
-    nbt.func_74782_a("outputTank", (NBTBase)this.outputTank.writeToNBT(new NBTTagCompound()));
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
+    nbt.setTag("inputTank", (NBTBase)this.inputTank.writeToNBT(new NBTTagCompound()));
+    nbt.setTag("outputTank", (NBTBase)this.outputTank.writeToNBT(new NBTTagCompound()));
     nbt.func_74768_a("progress", this.progress);
     nbt.func_74768_a("heatBuffer", this.heatBuffer);
     return nbt;
@@ -101,7 +101,7 @@ public class TileEntityFermenter extends TileEntityInventory implements IHasGui,
       this.progress = 0;
     } 
     EnumFacing dir = getFacing();
-    TileEntity te = func_145831_w().func_175625_s(this.field_174879_c.func_177972_a(dir));
+    TileEntity te = getWorld().func_175625_s(this.field_174879_c.func_177972_a(dir));
     if (te instanceof IHeatSource && this.inputTank.getFluid() != null) {
       IFermenterRecipeManager.FermentationProperty fp = Recipes.fermenter.getFermentationInformation(this.inputTank.getFluid().getFluid());
       if (fp != null && this.inputTank.getFluidAmount() >= fp.inputAmount && fp.outputAmount <= this.outputTank.getCapacity() - this.outputTank.getFluidAmount()) {

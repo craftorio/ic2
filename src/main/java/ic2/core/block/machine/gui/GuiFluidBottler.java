@@ -26,9 +26,9 @@ public class GuiFluidBottler extends GuiIC2<ContainerFluidBottler> {
     bindTexture();
     int progressSize = Math.round(((TileEntityFluidBottler)((ContainerFluidBottler)this.container).base).getProgress() * 16.0F);
     if (progressSize > 0) {
-      func_73729_b(this.field_147003_i + 61, this.field_147009_r + 36, 198, 0, progressSize, 13);
-      func_73729_b(this.field_147003_i + 61, this.field_147009_r + 73, 198, 0, progressSize, 13);
-      func_73729_b(this.field_147003_i + 99, this.field_147009_r + 55, 198, 0, progressSize, 13);
+      drawTexturedModalRect(this.field_147003_i + 61, this.field_147009_r + 36, 198, 0, progressSize, 13);
+      drawTexturedModalRect(this.field_147003_i + 61, this.field_147009_r + 73, 198, 0, progressSize, 13);
+      drawTexturedModalRect(this.field_147003_i + 99, this.field_147009_r + 55, 198, 0, progressSize, 13);
     } 
   }
   

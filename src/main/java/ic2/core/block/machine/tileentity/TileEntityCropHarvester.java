@@ -66,7 +66,7 @@ public class TileEntityCropHarvester extends TileEntityElectricMachine implement
       } 
     } 
     this.energy.useEnergy(1.0D);
-    World world = func_145831_w();
+    World world = getWorld();
     TileEntity tileEntity = world.func_175625_s(this.field_174879_c.func_177982_a(this.scanX, this.scanY, this.scanZ));
     if (tileEntity instanceof TileEntityCrop && !isInvFull()) {
       TileEntityCrop crop = (TileEntityCrop)tileEntity;

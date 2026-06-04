@@ -61,14 +61,14 @@ public class TileEntityFluidRegulator extends TileEntityElectricMachine implemen
     this.updateTicker = IC2.random.nextInt(getTickRate());
   }
   
-  public void func_145839_a(NBTTagCompound nbt) {
-    super.func_145839_a(nbt);
+  public void readFromNBT(NBTTagCompound nbt) {
+    super.readFromNBT(nbt);
     this.outputmb = nbt.func_74762_e("outputmb");
     this.mode = nbt.func_74762_e("mode");
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     nbt.func_74768_a("outputmb", this.outputmb);
     nbt.func_74768_a("mode", this.mode);
     return nbt;
@@ -106,7 +106,7 @@ public class TileEntityFluidRegulator extends TileEntityElectricMachine implemen
     if (this.fluidTank.getFluidAmount() <= 0)
       return false; 
     EnumFacing dir = getFacing();
-    TileEntity te = func_145831_w().func_175625_s(this.field_174879_c.func_177972_a(dir));
+    TileEntity te = getWorld().func_175625_s(this.field_174879_c.func_177972_a(dir));
     EnumFacing side = dir.func_176734_d();
     if (LiquidUtil.isFluidTile(te, side)) {
       int amount = LiquidUtil.fillTile(te, side, this.fluidTank.drainInternal(this.outputmb, false), false);

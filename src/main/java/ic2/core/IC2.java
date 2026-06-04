@@ -1,3 +1,9 @@
+// TODO(Ravel): Failed to fully resolve file: null cannot be cast to non-null type com.intellij.psi.PsiJavaCodeReferenceElement
+// TODO(Ravel): Failed to fully resolve file: null cannot be cast to non-null type com.intellij.psi.PsiJavaCodeReferenceElement
+// TODO(Ravel): Failed to fully resolve file: null cannot be cast to non-null type com.intellij.psi.PsiJavaCodeReferenceElement
+// TODO(Ravel): Failed to fully resolve file: null cannot be cast to non-null type com.intellij.psi.PsiJavaCodeReferenceElement
+// TODO(Ravel): Failed to fully resolve file: null cannot be cast to non-null type com.intellij.psi.PsiJavaCodeReferenceElement
+// TODO(Ravel): Failed to fully resolve file: null cannot be cast to non-null type com.intellij.psi.PsiJavaCodeReferenceElement
 package ic2.core;
 
 import ic2.api.energy.EnergyNet;
@@ -320,7 +326,7 @@ public class IC2 implements IFuelHandler {
         for (int oreId : OreDictionary.getOreIDs(output)) {
           String oreName = OreDictionary.getOreName(oreId);
           for (ItemStack ore : OreDictionary.getOres(oreName)) {
-            if (ore.func_77973_b() != null && Util.getName(ore.func_77973_b()).func_110624_b().equals("ic2")) {
+            if (ore.getItem() != null && Util.getName(ore.getItem()).func_110624_b().equals("ic2")) {
               entry.setValue(StackUtil.copyWithSize(ore, StackUtil.getSize(output)));
               found = true;
               break;
@@ -364,7 +370,7 @@ public class IC2 implements IFuelHandler {
     if (!BlockName.sapling.hasItemStack())
       return 0; 
     if (stack != null) {
-      Item item = stack.func_77973_b();
+      Item item = stack.getItem();
       if (StackUtil.checkItemEquality(stack, BlockName.sapling.getItemStack()))
         return 80; 
       if (item == Items.field_151120_aE)
@@ -422,7 +428,7 @@ public class IC2 implements IFuelHandler {
   public void registerOre(OreDictionary.OreRegisterEvent event) {
     String oreClass = event.getName();
     ItemStack ore = event.getOre();
-    if (!(ore.func_77973_b() instanceof net.minecraft.item.ItemBlock))
+    if (!(ore.getItem() instanceof net.minecraft.item.ItemBlock))
       return; 
     int multiplier = 1;
     if (oreClass.startsWith("dense")) {
@@ -455,7 +461,7 @@ public class IC2 implements IFuelHandler {
         entity.func_184642_a(slot, Float.NEGATIVE_INFINITY); 
       if (entity instanceof net.minecraft.entity.monster.EntityZombie)
         entity.func_184201_a(EntityEquipmentSlot.MAINHAND, ItemName.nano_saber.getItemStack()); 
-      if ((entity.func_130014_f_()).field_73012_v.nextFloat() < 0.1F) {
+      if ((entity.getEntityWorld()).field_73012_v.nextFloat() < 0.1F) {
         entity.func_184201_a(EntityEquipmentSlot.HEAD, ItemName.quantum_helmet.getItemStack());
         entity.func_184201_a(EntityEquipmentSlot.CHEST, ItemName.quantum_chestplate.getItemStack());
         entity.func_184201_a(EntityEquipmentSlot.LEGS, ItemName.quantum_leggings.getItemStack());
@@ -472,10 +478,10 @@ public class IC2 implements IFuelHandler {
   @SubscribeEvent
   @SideOnly(Side.CLIENT)
   public void onViewRenderFogDensity(EntityViewRenderEvent.FogDensity event) {
-    if (!(event.getState().func_177230_c() instanceof BlockIC2Fluid))
+    if (!(event.getState().getBlock() instanceof BlockIC2Fluid))
       return; 
     event.setCanceled(true);
-    Fluid fluid = ((BlockIC2Fluid)event.getState().func_177230_c()).getFluid();
+    Fluid fluid = ((BlockIC2Fluid)event.getState().getBlock()).getFluid();
     GlStateManager.func_187430_a(GlStateManager.FogMode.EXP);
     event.setDensity((float)Util.map(Math.abs(fluid.getDensity()), 20000.0D, 2.0D));
   }
@@ -483,9 +489,9 @@ public class IC2 implements IFuelHandler {
   @SubscribeEvent
   @SideOnly(Side.CLIENT)
   public void onViewRenderFogColors(EntityViewRenderEvent.FogColors event) {
-    if (!(event.getState().func_177230_c() instanceof BlockIC2Fluid))
+    if (!(event.getState().getBlock() instanceof BlockIC2Fluid))
       return; 
-    int color = ((BlockIC2Fluid)event.getState().func_177230_c()).getColor();
+    int color = ((BlockIC2Fluid)event.getState().getBlock()).getColor();
     event.setRed((color >>> 16 & 0xFF) / 255.0F);
     event.setGreen((color >>> 8 & 0xFF) / 255.0F);
     event.setBlue((color & 0xFF) / 255.0F);
@@ -495,11 +501,11 @@ public class IC2 implements IFuelHandler {
   @SideOnly(Side.CLIENT)
   public void renderEnhancedOverlay(DrawBlockHighlightEvent event) {
     ItemStack inHand = StackUtil.get(event.getPlayer(), EnumHand.MAIN_HAND);
-    if (event.getSubID() == 0 && (event.getTarget()).field_72313_a == RayTraceResult.Type.BLOCK && inHand.func_77973_b() instanceof IEnhancedOverlayProvider) {
+    if (event.getSubID() == 0 && (event.getTarget()).typeOfHit == RayTraceResult.Type.BLOCK && inHand.getItem() instanceof IEnhancedOverlayProvider) {
       World world = (event.getPlayer()).field_70170_p;
-      BlockPos blockPos = event.getTarget().func_178782_a();
+      BlockPos blockPos = event.getTarget().getBlockPos();
       EnumFacing side = (event.getTarget()).field_178784_b;
-      if (((IEnhancedOverlayProvider)inHand.func_77973_b()).providesEnhancedOverlay(world, blockPos, side, event.getPlayer(), inHand)) {
+      if (((IEnhancedOverlayProvider)inHand.getItem()).providesEnhancedOverlay(world, blockPos, side, event.getPlayer(), inHand)) {
         GL11.glPushMatrix();
         EnhancedOverlay.transformToFace((Entity)event.getPlayer(), blockPos, side, event.getPartialTicks());
         GL11.glLineWidth(2.0F);
@@ -522,14 +528,14 @@ public class IC2 implements IFuelHandler {
         GL11.glVertex3d(-0.5D, 0.0D, -0.5D);
         GL11.glVertex3d(-0.5D, 0.0D, 0.5D);
         GL11.glEnd();
-        GlStateManager.func_179147_l();
+        GlStateManager.enableBlend();
         GlStateManager.func_187428_a(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         GlStateManager.func_179090_x();
-        GlStateManager.func_179132_a(false);
+        GlStateManager.depthMask(false);
         Map<EnumFacing, Runnable> additionalRenders = new EnumMap<>(EnumFacing.class);
-        if (world.func_180495_p(blockPos).func_177230_c() instanceof IWrenchable) {
+        if (world.getBlockState(blockPos).getBlock() instanceof IWrenchable) {
           EnumFacing hoveredSpin = RotationUtil.rotateByRay(event.getTarget());
-          IWrenchable block = (IWrenchable)world.func_180495_p(blockPos).func_177230_c();
+          IWrenchable block = (IWrenchable)world.getBlockState(blockPos).getBlock();
           List<EnhancedOverlay.Segment> skippedSegments = new ArrayList<>();
           for (EnhancedOverlay.Segment segment : EnhancedOverlay.Segment.values()) {
             EnumFacing spin;
@@ -583,7 +589,7 @@ public class IC2 implements IFuelHandler {
                 red = green = 0;
                 blue = 255;
               } 
-              EnhancedOverlay.forFace(side).drawArea(segment, Tessellator.func_178181_a().func_178180_c(), red, green, blue);
+              EnhancedOverlay.forFace(side).drawArea(segment, Tessellator.getInstance().getBuffer(), red, green, blue);
               if (hoveredSpin == spin)
                 if (side.func_176734_d() == spin) {
                   EnumFacing[] edges = null, sides = null;
@@ -602,31 +608,31 @@ public class IC2 implements IFuelHandler {
                   if (edges != null)
                     for (EnumFacing face : edges) {
                       additionalRenders.put(face, () -> {
-                            GlStateManager.func_179131_c(red / 255.0F, green / 255.0F, blue / 255.0F, 0.5F);
+                            GlStateManager.color(red / 255.0F, green / 255.0F, blue / 255.0F, 0.5F);
                             EnhancedOverlay.drawArea(face, new EnhancedOverlay.Segment[] { EnhancedOverlay.Segment.TOP_LEFT, EnhancedOverlay.Segment.TOP, EnhancedOverlay.Segment.TOP_RIGHT, EnhancedOverlay.Segment.BOTTOM_LEFT, EnhancedOverlay.Segment.BOTTOM, EnhancedOverlay.Segment.BOTTOM_RIGHT });
                           });
                     }  
                   if (sides != null)
                     for (EnumFacing face : sides) {
                       additionalRenders.put(face, () -> {
-                            GlStateManager.func_179131_c(red / 255.0F, green / 255.0F, blue / 255.0F, 0.5F);
+                            GlStateManager.color(red / 255.0F, green / 255.0F, blue / 255.0F, 0.5F);
                             EnhancedOverlay.drawArea(face, new EnhancedOverlay.Segment[] { EnhancedOverlay.Segment.TOP_LEFT, EnhancedOverlay.Segment.LEFT, EnhancedOverlay.Segment.BOTTOM_LEFT, EnhancedOverlay.Segment.TOP_RIGHT, EnhancedOverlay.Segment.RIGHT, EnhancedOverlay.Segment.BOTTOM_RIGHT });
                           });
                     }  
                 } else if (segment == EnhancedOverlay.Segment.CENTRE) {
                   additionalRenders.put(spin, () -> {
-                        GlStateManager.func_179131_c(red / 255.0F, green / 255.0F, blue / 255.0F, 0.5F);
+                        GlStateManager.color(red / 255.0F, green / 255.0F, blue / 255.0F, 0.5F);
                         EnhancedOverlay.drawArea(spin, (EnhancedOverlay.Segment[])skippedSegments.toArray((Object[])new EnhancedOverlay.Segment[skippedSegments.size()]));
                       });
                 } else {
-                  additionalRenders.put(spin, () -> EnhancedOverlay.forFace(spin).drawSide(Tessellator.func_178181_a().func_178180_c(), red, green, blue));
+                  additionalRenders.put(spin, () -> EnhancedOverlay.forFace(spin).drawSide(Tessellator.getInstance().getBuffer(), red, green, blue));
                 }  
             } else {
               skippedSegments.add(segment);
             } 
           } 
         } else {
-          EnhancedOverlay.forFace(side).drawArea(EnhancedOverlay.Segment.forRayTrace(event.getTarget()), Tessellator.func_178181_a().func_178180_c(), 0, 0, 0);
+          EnhancedOverlay.forFace(side).drawArea(EnhancedOverlay.Segment.forRayTrace(event.getTarget()), Tessellator.getInstance().getBuffer(), 0, 0, 0);
         } 
         Runnable r = additionalRenders.remove(side);
         if (r != null)
@@ -638,7 +644,7 @@ public class IC2 implements IFuelHandler {
           ((Runnable)entry.getValue()).run();
           GlStateManager.func_179121_F();
         } 
-        GlStateManager.func_179132_a(true);
+        GlStateManager.depthMask(true);
         GlStateManager.func_179098_w();
         GlStateManager.func_179084_k();
       } 

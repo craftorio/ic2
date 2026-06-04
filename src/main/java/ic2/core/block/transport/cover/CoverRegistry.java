@@ -7,7 +7,7 @@ import net.minecraft.item.ItemStack;
 
 public class CoverRegistry {
   public static ItemStack register(ItemStack stack) {
-    if (!(stack.func_77973_b() instanceof ICoverItem))
+    if (!(stack.getItem() instanceof ICoverItem))
       throw new IllegalArgumentException("The stack must represent an ICoverItem."); 
     covers.add(stack);
     return stack;

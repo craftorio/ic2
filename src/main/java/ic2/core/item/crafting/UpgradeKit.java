@@ -59,8 +59,8 @@ public class UpgradeKit extends ItemMulti<UpdateKitType> {
     } 
     if (tileEntityChargepadMFSU != null) {
       NBTTagCompound nbt = new NBTTagCompound();
-      te.func_189515_b(nbt);
-      tileEntityChargepadMFSU.func_145839_a(nbt);
+      te.writeToNBT(nbt);
+      tileEntityChargepadMFSU.readFromNBT(nbt);
       world.func_175690_a(pos, (TileEntity)tileEntityChargepadMFSU);
       tileEntityChargepadMFSU.onUpgraded();
       tileEntityChargepadMFSU.func_70296_d();

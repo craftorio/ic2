@@ -14,7 +14,7 @@ public class ItemReactorIridiumReflector extends AbstractReactorComponent {
   
   public boolean acceptUraniumPulse(ItemStack stack, IReactor reactor, ItemStack pulsingStack, int youX, int youY, int pulseX, int pulseY, boolean heatrun) {
     if (!heatrun) {
-      IReactorComponent source = (IReactorComponent)pulsingStack.func_77973_b();
+      IReactorComponent source = (IReactorComponent)pulsingStack.getItem();
       source.acceptUraniumPulse(pulsingStack, reactor, stack, pulseX, pulseY, youX, youY, heatrun);
     } 
     return true;

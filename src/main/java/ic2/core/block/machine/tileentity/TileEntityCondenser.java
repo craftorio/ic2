@@ -76,20 +76,20 @@ public class TileEntityCondenser extends TileEntityElectricMachine implements IH
     this.upgradeSlot = new InvSlotUpgrade((IInventorySlotHolder)this, "upgradeSlot", 1);
   }
   
-  public void func_145839_a(NBTTagCompound nbttagcompound) {
-    super.func_145839_a(nbttagcompound);
+  public void readFromNBT(NBTTagCompound nbttagcompound) {
+    super.readFromNBT(nbttagcompound);
     this.progress = nbttagcompound.func_74762_e("progress");
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     nbt.func_74768_a("progress", this.progress);
     return nbt;
   }
   
   protected void onLoaded() {
     super.onLoaded();
-    if (!(func_145831_w()).field_72995_K)
+    if (!(getWorld()).isRemote)
       updateTier(); 
   }
   
@@ -104,7 +104,7 @@ public class TileEntityCondenser extends TileEntityElectricMachine implements IH
   
   public void func_70296_d() {
     super.func_70296_d();
-    if (!(func_145831_w()).field_72995_K)
+    if (!(getWorld()).isRemote)
       updateTier(); 
   }
   

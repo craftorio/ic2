@@ -73,7 +73,7 @@ public class TileEntityFluidDistributor extends TileEntityInventory implements I
   }
   
   protected void moveFluid() {
-    World world = func_145831_w();
+    World world = getWorld();
     if (getActive()) {
       TileEntity target = world.func_175625_s(this.field_174879_c.func_177972_a(getFacing()));
       EnumFacing side = getFacing().func_176734_d();

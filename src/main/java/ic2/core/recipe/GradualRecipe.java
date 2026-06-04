@@ -29,9 +29,9 @@ public class GradualRecipe implements IRecipe {
       if (itemToFill == null) {
         AdvRecipe.displayError("Null item to fill", null, null, true);
       } else {
-        if (!(itemToFill.func_77973_b() instanceof ICustomDamageItem))
+        if (!(itemToFill.getItem() instanceof ICustomDamageItem))
           AdvRecipe.displayError("Filling item must extends ItemGradualInt", null, itemToFill, true); 
-        ICustomDamageItem fillingItem = (ICustomDamageItem)itemToFill.func_77973_b();
+        ICustomDamageItem fillingItem = (ICustomDamageItem)itemToFill.getItem();
         Boolean hidden = Boolean.valueOf(false);
         ItemStack filler = null;
         for (Object o : args) {
@@ -78,7 +78,7 @@ public class GradualRecipe implements IRecipe {
     for (int slot = 0; slot < ic.func_70302_i_(); slot++) {
       ItemStack stack = ic.func_70301_a(slot);
       if (!StackUtil.isEmpty(stack))
-        if (gridItem == null && stack.func_77973_b() == this.item) {
+        if (gridItem == null && stack.getItem() == this.item) {
           gridItem = stack;
         } else if (StackUtil.checkItemEquality(stack, this.chargeMaterial)) {
           chargeMats++;

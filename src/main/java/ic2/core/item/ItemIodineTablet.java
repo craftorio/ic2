@@ -22,7 +22,7 @@ public class ItemIodineTablet extends ItemIC2 {
   
   public ActionResult<ItemStack> func_77659_a(World world, EntityPlayer player, EnumHand hand) {
     ItemStack stack = StackUtil.get(player, hand);
-    if (!world.field_72995_K)
+    if (!world.isRemote)
       return onEaten(player, stack); 
     return new ActionResult(EnumActionResult.PASS, stack);
   }

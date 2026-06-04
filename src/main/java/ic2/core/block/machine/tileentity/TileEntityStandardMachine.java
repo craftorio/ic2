@@ -82,13 +82,13 @@ public abstract class TileEntityStandardMachine<RI, RO, I> extends TileEntityEle
     this.comparator.setUpdate(() -> this.progress * 15 / this.operationLength);
   }
   
-  public void func_145839_a(NBTTagCompound nbttagcompound) {
-    super.func_145839_a(nbttagcompound);
+  public void readFromNBT(NBTTagCompound nbttagcompound) {
+    super.readFromNBT(nbttagcompound);
     this.progress = nbttagcompound.func_74765_d("progress");
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     nbt.func_74777_a("progress", this.progress);
     return nbt;
   }
@@ -167,8 +167,8 @@ public abstract class TileEntityStandardMachine<RI, RO, I> extends TileEntityEle
       Collection<ItemStack> processResult = getOutput((RO)result.getOutput());
       for (int j = 0; j < this.upgradeSlot.size(); j++) {
         ItemStack stack = this.upgradeSlot.get(j);
-        if (!StackUtil.isEmpty(stack) && stack.func_77973_b() instanceof IUpgradeItem)
-          processResult = ((IUpgradeItem)stack.func_77973_b()).onProcessEnd(stack, this, processResult); 
+        if (!StackUtil.isEmpty(stack) && stack.getItem() instanceof IUpgradeItem)
+          processResult = ((IUpgradeItem)stack.getItem()).onProcessEnd(stack, this, processResult); 
       } 
       operateOnce(result, processResult);
       result = getOutput();

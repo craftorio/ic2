@@ -268,7 +268,7 @@ public class PlatformClient extends Platform {
         },  new Block[] { leaves });
     this.mc.getItemColors().func_186730_a(new IItemColor() {
           public int func_186726_a(ItemStack stack, int tintIndex) {
-            return (tintIndex > 0) ? -1 : ((ItemArmor)stack.func_77973_b()).func_82814_b(stack);
+            return (tintIndex > 0) ? -1 : ((ItemArmor)stack.getItem()).func_82814_b(stack);
           }
         },  new Item[] { ItemName.quantum_helmet.getInstance(), ItemName.quantum_chestplate.getInstance(), ItemName.quantum_leggings.getInstance(), ItemName.quantum_boots.getInstance() });
     this.mc.getItemColors().func_186730_a(new IItemColor() {
@@ -316,7 +316,7 @@ public class PlatformClient extends Platform {
           }
         },  new Block[] { BlockName.te.getInstance() });
     this.mc.getItemColors().func_186730_a((stack, tintIndex) -> {
-          PumpCoverType type = (PumpCoverType)((ItemPumpCover)stack.func_77973_b()).getType(stack);
+          PumpCoverType type = (PumpCoverType)((ItemPumpCover)stack.getItem()).getType(stack);
           return (tintIndex == 1) ? type.color : 16777215;
         }new Item[] { ItemName.cover
           

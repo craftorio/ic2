@@ -74,7 +74,7 @@ public class ItemDebug extends ItemIC2 implements ISpecialElectricItem, IBoxable
       modeIdx = 0; 
     Mode mode = Mode.modes[modeIdx];
     if (IC2.keyboard.isModeSwitchKeyDown(player)) {
-      if (!world.field_72995_K) {
+      if (!world.isRemote) {
         mode = Mode.modes[(mode.ordinal() + 1) % Mode.modes.length];
         nbtData.func_74768_a("mode", mode.ordinal());
         IC2.platform.messagePlayer(player, "Debug Item Mode: " + mode.getName(), new Object[0]);
@@ -84,13 +84,13 @@ public class ItemDebug extends ItemIC2 implements ISpecialElectricItem, IBoxable
     } 
     TileEntity tileentity = world.func_175625_s(pos);
     if (tileentity instanceof IDebuggable) {
-      if (world.field_72995_K)
+      if (world.isRemote)
         return EnumActionResult.PASS; 
       IDebuggable dbg = (IDebuggable)tileentity;
       if (dbg.isDebuggable() && 
-        !world.field_72995_K)
+        !world.isRemote)
         IC2.platform.messagePlayer(player, dbg.getDebugText(), new Object[0]); 
-      return world.field_72995_K ? EnumActionResult.PASS : EnumActionResult.SUCCESS;
+      return world.isRemote ? EnumActionResult.PASS : EnumActionResult.SUCCESS;
     } 
     ByteArrayOutputStream consoleBuffer = new ByteArrayOutputStream();
     PrintStream console = new PrintStream(consoleBuffer);
@@ -110,7 +110,7 @@ public class ItemDebug extends ItemIC2 implements ISpecialElectricItem, IBoxable
             position = entityPosition; 
         } 
         if (FMLCommonHandler.instance().getSide().isClient()) {
-          if (!world.field_72995_K) {
+          if (!world.isRemote) {
             plat = "sp server";
           } else if (player.func_184102_h() == null) {
             plat = "mp client";
@@ -155,7 +155,7 @@ public class ItemDebug extends ItemIC2 implements ISpecialElectricItem, IBoxable
           console.println(message);
           if (position.field_72308_g instanceof EntityItem) {
             ItemStack entStack = ((EntityItem)position.field_72308_g).func_92059_d();
-            String name = Util.getName(entStack.func_77973_b()).toString();
+            String name = Util.getName(entStack.getItem()).toString();
             message = "[" + plat + "] item id: " + name + " meta: " + entStack.func_77952_i() + " size: " + StackUtil.getSize(entStack) + " name: " + entStack.func_77977_a();
             chat.println(message);
             console.println(message);
@@ -165,7 +165,7 @@ public class ItemDebug extends ItemIC2 implements ISpecialElectricItem, IBoxable
         } 
         return EnumActionResult.PASS;
       case TileData:
-        if (world.field_72995_K)
+        if (world.isRemote)
           return EnumActionResult.PASS; 
         tileEntity = world.func_175625_s(pos);
         if (tileEntity instanceof TileEntityBlock) {
@@ -213,14 +213,14 @@ public class ItemDebug extends ItemIC2 implements ISpecialElectricItem, IBoxable
         } 
         break;
       case EnergyNet:
-        if (world.field_72995_K)
+        if (world.isRemote)
           return EnumActionResult.PASS; 
         if (!EnergyNet.instance.dumpDebugInfo(world, pos, console, chat))
           return EnumActionResult.PASS; 
         break;
       case Accelerate:
       case AccelerateX100:
-        if (world.field_72995_K)
+        if (world.isRemote)
           return EnumActionResult.PASS; 
         te = world.func_175625_s(pos);
         count = (mode == Mode.Accelerate) ? 1000 : 100000;
@@ -265,7 +265,7 @@ public class ItemDebug extends ItemIC2 implements ISpecialElectricItem, IBoxable
     } 
     console.flush();
     chat.flush();
-    if (world.field_72995_K) {
+    if (world.isRemote) {
       try {
         consoleBuffer.writeTo(new FileOutputStream(FileDescriptor.out));
       } catch (IOException e) {
@@ -281,7 +281,7 @@ public class ItemDebug extends ItemIC2 implements ISpecialElectricItem, IBoxable
         IC2.log.warn(LogCategory.Item, e, "String encoding failed.");
       } 
     } 
-    return world.field_72995_K ? EnumActionResult.PASS : EnumActionResult.SUCCESS;
+    return world.isRemote ? EnumActionResult.PASS : EnumActionResult.SUCCESS;
   }
   
   private static void dumpObjectFields(PrintStream ps, Object o) {

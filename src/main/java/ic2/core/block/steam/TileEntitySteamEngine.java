@@ -18,13 +18,13 @@ public class TileEntitySteamEngine extends TileEntityInventory implements IKinet
   
   protected final Fluids.InternalFluidTank fluidTank = this.fluids.addTankInsert("steam", 1000, InvSlot.InvSide.ANY, Fluids.fluidPredicate(new Fluid[] { FluidName.biomass.getInstance() }));
   
-  public void func_145839_a(NBTTagCompound nbt) {
-    super.func_145839_a(nbt);
+  public void readFromNBT(NBTTagCompound nbt) {
+    super.readFromNBT(nbt);
     this.delta = nbt.func_74762_e("delta");
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     nbt.func_74768_a("delta", this.delta);
     return nbt;
   }

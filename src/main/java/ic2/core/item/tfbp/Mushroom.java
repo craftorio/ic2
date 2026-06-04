@@ -55,7 +55,7 @@ class Mushroom extends TerraformerBase {
       Block base = world.func_180495_p(pos).func_177230_c();
       if (base != Blocks.field_150391_bh)
         if (base == Blocks.field_150420_aW || base == Blocks.field_150419_aX) {
-          world.func_175656_a(pos, Blocks.field_150391_bh.func_176223_P());
+          world.func_175656_a(pos, Blocks.field_150391_bh.getDefaultState());
         } else {
           return false;
         }  

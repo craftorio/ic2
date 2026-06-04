@@ -28,8 +28,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class TileEntityWeightedItemDistributor extends TileEntityInventory implements IHasGui, IWeightedDistributor {
   public final InvSlot buffer = new InvSlot((IInventorySlotHolder)this, "buffer", InvSlot.Access.I, 9);
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     if (!this.priority.isEmpty()) {
       int[] indexes = new int[this.priority.size()];
       for (int i = 0; i < indexes.length; i++)
@@ -39,8 +39,8 @@ public class TileEntityWeightedItemDistributor extends TileEntityInventory imple
     return nbt;
   }
   
-  public void func_145839_a(NBTTagCompound nbt) {
-    super.func_145839_a(nbt);
+  public void readFromNBT(NBTTagCompound nbt) {
+    super.readFromNBT(nbt);
     int[] indexes = nbt.func_74759_k("priority");
     if (indexes.length > 0)
       for (int index : indexes)
@@ -64,14 +64,14 @@ public class TileEntityWeightedItemDistributor extends TileEntityInventory imple
   }
   
   protected void updateConnectivity() {
-    if (!(func_145831_w()).field_72995_K && !this.priority.isEmpty() && this.priority.remove(getFacing()))
+    if (!(getWorld()).isRemote && !this.priority.isEmpty() && this.priority.remove(getFacing()))
       updatePriority(true); 
   }
   
   protected void updateEntityServer() {
     super.updateEntityServer();
     if (!this.priority.isEmpty() && !this.buffer.isEmpty()) {
-      World world = func_145831_w();
+      World world = getWorld();
       boolean hasChanged = false;
       for (EnumFacing facing : this.priority) {
         TileEntity te = world.func_175625_s(this.field_174879_c.func_177972_a(facing));

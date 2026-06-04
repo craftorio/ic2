@@ -15,7 +15,7 @@ public abstract class InvSlotProcessable<RI, RO, I> extends InvSlotConsumable {
   }
   
   public boolean accepts(ItemStack stack) {
-    if (stack.func_77973_b() instanceof ic2.core.item.upgrade.ItemUpgradeModule)
+    if (stack.getItem() instanceof ic2.core.item.upgrade.ItemUpgradeModule)
       return false; 
     ItemStack tmp = StackUtil.copyWithSize(stack, 2147483647);
     return (getOutputFor(getInput(tmp), true) != null);

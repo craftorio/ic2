@@ -37,12 +37,12 @@ public class TileEntityCreativeGenerator extends TileEntityBlock implements IMul
   
   protected void onLoaded() {
     super.onLoaded();
-    if (!(func_145831_w()).field_72995_K)
+    if (!(getWorld()).isRemote)
       MinecraftForge.EVENT_BUS.post((Event)new EnergyTileLoadEvent((IEnergyTile)this)); 
   }
   
   protected void onUnloaded() {
-    if (!(func_145831_w()).field_72995_K)
+    if (!(getWorld()).isRemote)
       MinecraftForge.EVENT_BUS.post((Event)new EnergyTileUnloadEvent((IEnergyTile)this)); 
     super.onUnloaded();
   }

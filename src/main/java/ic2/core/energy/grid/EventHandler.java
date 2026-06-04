@@ -25,7 +25,7 @@ public class EventHandler {
   
   @SubscribeEvent
   public void onEnergyTileLoad(EnergyTileLoadEvent event) {
-    if ((event.getWorld()).field_72995_K) {
+    if ((event.getWorld()).isRemote) {
       IC2.log.warn(LogCategory.EnergyNet, "EnergyTileLoadEvent: posted for %s client-side, aborting", new Object[] { Util.toString(event.tile, (IBlockAccess)event.getWorld(), EnergyNet.instance.getPos(event.tile)) });
       return;
     } 
@@ -40,7 +40,7 @@ public class EventHandler {
   
   @SubscribeEvent
   public void onEnergyTileUnload(EnergyTileUnloadEvent event) {
-    if ((event.getWorld()).field_72995_K) {
+    if ((event.getWorld()).isRemote) {
       IC2.log.warn(LogCategory.EnergyNet, "EnergyTileUnloadEvent: posted for %s client-side, aborting", new Object[] { Util.toString(event.tile, (IBlockAccess)event.getWorld(), EnergyNet.instance.getPos(event.tile)) });
       return;
     } 

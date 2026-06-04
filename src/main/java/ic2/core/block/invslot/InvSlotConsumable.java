@@ -34,13 +34,13 @@ public abstract class InvSlotConsumable extends InvSlot {
       if (StackUtil.getSize(stack) >= 1 && 
         accepts(stack) && (ret == null || 
         StackUtil.checkItemEqualityStrict(stack, ret)) && (
-        StackUtil.getSize(stack) == 1 || consumeContainers || !stack.func_77973_b().hasContainerItem(stack))) {
+        StackUtil.getSize(stack) == 1 || consumeContainers || !stack.getItem().hasContainerItem(stack))) {
         int currentAmount = Math.min(amount, StackUtil.getSize(stack));
         amount -= currentAmount;
         if (!simulate)
           if (StackUtil.getSize(stack) == currentAmount) {
-            if (!consumeContainers && stack.func_77973_b().hasContainerItem(stack)) {
-              ItemStack container = stack.func_77973_b().getContainerItem(stack);
+            if (!consumeContainers && stack.getItem().hasContainerItem(stack)) {
+              ItemStack container = stack.getItem().getContainerItem(stack);
               if (container != null && container.func_77984_f() && DamageHandler.getDamage(container) > DamageHandler.getMaxDamage(container))
                 container = null; 
               put(i, container);
@@ -72,9 +72,9 @@ public abstract class InvSlotConsumable extends InvSlot {
     for (int i = 0; i < size() && amount > 0; i++) {
       ItemStack stack = get(i);
       if (!StackUtil.isEmpty(stack)) {
-        Item item = stack.func_77973_b();
+        Item item = stack.getItem();
         if (accepts(stack) && item.func_77645_m() && (target == null || (item == target
-          .func_77973_b() && ItemStack.func_77970_a(stack, target)))) {
+          .getItem() && ItemStack.func_77970_a(stack, target)))) {
           if (target == null)
             target = stack.func_77946_l(); 
           if (simulate)

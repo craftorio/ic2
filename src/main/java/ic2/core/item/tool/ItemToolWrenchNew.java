@@ -61,7 +61,7 @@ public class ItemToolWrenchNew extends ItemToolIC2 implements IEnhancedOverlayPr
         if (target.isConnected(newFacing) != other.isConnected(newFacing.func_176734_d()))
           other.flipConnection(newFacing.func_176734_d()); 
       } 
-      if (world.field_72995_K)
+      if (world.isRemote)
         IC2.audioManager.playOnce(player, PositionSpec.Hand, "Tools/wrench.ogg", true, IC2.audioManager
             .getDefaultVolume()); 
       return EnumActionResult.SUCCESS;
@@ -70,7 +70,7 @@ public class ItemToolWrenchNew extends ItemToolIC2 implements IEnhancedOverlayPr
       IWrenchable wrenchable = (IWrenchable)block;
       EnumFacing newFacing = RotationUtil.rotateByHit(side, hitX, hitY, hitZ);
       wrenchable.setFacing(world, pos, newFacing, player);
-      if (world.field_72995_K)
+      if (world.isRemote)
         IC2.audioManager.playOnce(player, PositionSpec.Hand, "Tools/wrench.ogg", true, IC2.audioManager
             .getDefaultVolume()); 
       return EnumActionResult.SUCCESS;

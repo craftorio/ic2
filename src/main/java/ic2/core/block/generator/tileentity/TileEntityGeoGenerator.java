@@ -62,6 +62,6 @@ public class TileEntityGeoGenerator extends TileEntityBaseGenerator {
   
   protected void onBlockBreak() {
     super.onBlockBreak();
-    FluidEvent.fireEvent((FluidEvent)new FluidEvent.FluidSpilledEvent(new FluidStack(FluidRegistry.LAVA, 1000), func_145831_w(), this.field_174879_c));
+    FluidEvent.fireEvent((FluidEvent)new FluidEvent.FluidSpilledEvent(new FluidStack(FluidRegistry.LAVA, 1000), getWorld(), this.field_174879_c));
   }
 }

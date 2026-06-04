@@ -222,7 +222,7 @@ public final class EnergyNetLocal implements IEnergyCalculator {
   }
   
   protected double getTotalEnergyEmitted(TileEntity tileEntity) {
-    BlockPos coords = new BlockPos((Vec3i)tileEntity.func_174877_v());
+    BlockPos coords = new BlockPos((Vec3i)tileEntity.getPos());
     Tile tile = this.registeredTiles.get(coords);
     if (tile == null) {
       logWarn("EnergyNet.getTotalEnergyEmitted: " + tileEntity + " is not added to the enet, aborting");
@@ -236,7 +236,7 @@ public final class EnergyNetLocal implements IEnergyCalculator {
   }
   
   protected double getTotalEnergySunken(TileEntity tileEntity) {
-    BlockPos coords = new BlockPos((Vec3i)tileEntity.func_174877_v());
+    BlockPos coords = new BlockPos((Vec3i)tileEntity.getPos());
     Tile tile = this.registeredTiles.get(coords);
     if (tile == null) {
       logWarn("EnergyNet.getTotalEnergySunken: " + tileEntity + " is not added to the enet, aborting");

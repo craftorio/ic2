@@ -59,7 +59,7 @@ public class ItemCropnalyzer extends BaseElectricItem implements IHandHeldInvent
   }
   
   public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
-    if (world.field_72995_K || player.func_70093_af())
+    if (world.isRemote || player.func_70093_af())
       return EnumActionResult.PASS; 
     TileEntity te = world.func_175625_s(pos);
     if (te instanceof TileEntityCrop) {

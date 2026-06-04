@@ -55,7 +55,7 @@ public abstract class TileEntityKineticMachine extends TileEntityInventory imple
   
   protected void onUnloaded() {
     super.onUnloaded();
-    if ((func_145831_w()).field_72995_K && this.audioSource != null) {
+    if ((getWorld()).isRemote && this.audioSource != null) {
       IC2.audioManager.removeSources(this);
       this.audioSource = null;
     } 

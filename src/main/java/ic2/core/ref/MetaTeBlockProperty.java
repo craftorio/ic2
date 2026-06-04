@@ -81,13 +81,13 @@ public class MetaTeBlockProperty implements IProperty<MetaTeBlock> {
   
   public Optional<MetaTeBlock> func_185929_b(String value) {
     for (MetaTeBlock block : this.allowedValues) {
-      if (getName(block).equals(value))
+      if (func_177702_a(block).equals(value))
         return Optional.of(block); 
     } 
     return Optional.absent();
   }
   
-  public String getName(MetaTeBlock value) {
+  public String func_177702_a(MetaTeBlock value) {
     if (value.active)
       return value.teBlock.getName() + "_active"; 
     return value.teBlock.getName();

@@ -27,7 +27,7 @@ public class TileEntityGenerator extends TileEntityBaseGenerator implements IGui
   protected void updateEntityClient() {
     super.updateEntityClient();
     if (getActive())
-      TileEntityIronFurnace.showFlames(func_145831_w(), this.field_174879_c, getFacing()); 
+      TileEntityIronFurnace.showFlames(getWorld(), this.field_174879_c, getFacing()); 
   }
   
   public double getFuelRatio() {
@@ -59,13 +59,13 @@ public class TileEntityGenerator extends TileEntityBaseGenerator implements IGui
     throw new IllegalArgumentException();
   }
   
-  public void func_145839_a(NBTTagCompound nbt) {
-    super.func_145839_a(nbt);
+  public void readFromNBT(NBTTagCompound nbt) {
+    super.readFromNBT(nbt);
     this.totalFuel = nbt.func_74762_e("totalFuel");
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     nbt.func_74768_a("totalFuel", this.totalFuel);
     return nbt;
   }

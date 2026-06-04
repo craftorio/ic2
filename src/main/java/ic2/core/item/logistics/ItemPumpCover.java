@@ -47,13 +47,13 @@ public class ItemPumpCover extends ItemMulti<PumpCoverType> implements IFluidCon
       return EnumActionResult.PASS; 
     EnumFacing selectedFacing = RotationUtil.rotateByHit(side, xOffset, yOffset, zOffset);
     if (((ICoverHolder)tileEntity).canPlaceCover(world, pos, selectedFacing, stack))
-      if (!world.field_72995_K) {
+      if (!world.isRemote) {
         ((ICoverHolder)tileEntity).placeCover(world, pos, selectedFacing, StackUtil.copyWithSize(stack, 1));
         stack.func_190918_g(1);
       } else {
         IC2.platform.messagePlayer(player, Localization.translate("Attachment placed"), new Object[0]);
       }  
-    return world.field_72995_K ? EnumActionResult.PASS : EnumActionResult.SUCCESS;
+    return world.isRemote ? EnumActionResult.PASS : EnumActionResult.SUCCESS;
   }
   
   @SideOnly(Side.CLIENT)

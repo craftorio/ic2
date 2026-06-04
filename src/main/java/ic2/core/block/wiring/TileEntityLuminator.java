@@ -45,13 +45,13 @@ public class TileEntityLuminator extends TileEntityBlock {
     this.comparator.setUpdate(this.energy::getComparatorValue);
   }
   
-  public void func_145839_a(NBTTagCompound nbt) {
-    super.func_145839_a(nbt);
+  public void readFromNBT(NBTTagCompound nbt) {
+    super.readFromNBT(nbt);
     this.invertRedstone = nbt.func_74767_n("invert");
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     nbt.func_74757_a("invert", this.invertRedstone);
     return nbt;
   }
@@ -59,7 +59,7 @@ public class TileEntityLuminator extends TileEntityBlock {
   public void onLoaded() {
     this.energy.setDirections(Collections.singleton(getFacing().func_176734_d()), Collections.emptySet());
     super.onLoaded();
-    IC2.tickHandler.requestSingleWorldTick(func_145831_w(), new IWorldTickCallback() {
+    IC2.tickHandler.requestSingleWorldTick(getWorld(), new IWorldTickCallback() {
           public void onTick(World world) {
             TileEntityLuminator.this.checkPlacement();
           }
@@ -84,7 +84,7 @@ public class TileEntityLuminator extends TileEntityBlock {
   }
   
   protected boolean onActivated(EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-    if (!(func_145831_w()).field_72995_K) {
+    if (!(getWorld()).isRemote) {
       ItemStack stack = StackUtil.get(player, hand);
       double amount = 10000.0D - this.energy.getEnergy();
       if (stack != null && amount > 0.0D && (
@@ -105,7 +105,7 @@ public class TileEntityLuminator extends TileEntityBlock {
   }
   
   private void checkPlacement() {
-    World world = func_145831_w();
+    World world = getWorld();
     if (!isValidPosition(world, this.field_174879_c.func_177972_a(getFacing().func_176734_d()), getFacing())) {
       getBlockType().func_180657_a(world, Ic2Player.get(world), this.field_174879_c, world.func_180495_p(this.field_174879_c), (TileEntity)this, StackUtil.emptyStack);
       world.func_175698_g(this.field_174879_c);
@@ -113,7 +113,7 @@ public class TileEntityLuminator extends TileEntityBlock {
   }
   
   public static boolean isValidPosition(World world, BlockPos pos, EnumFacing side) {
-    if (world.field_72995_K || ignoreBlockStay)
+    if (world.isRemote || ignoreBlockStay)
       return true; 
     if (world.func_180495_p(pos).func_193401_d((IBlockAccess)world, pos, side) == BlockFaceShape.SOLID)
       return true; 
@@ -157,7 +157,7 @@ public class TileEntityLuminator extends TileEntityBlock {
   }
   
   private void updateLight() {
-    func_145831_w().func_180500_c(EnumSkyBlock.BLOCK, this.field_174879_c);
+    getWorld().func_180500_c(EnumSkyBlock.BLOCK, this.field_174879_c);
   }
   
   private static Map<EnumFacing, List<AxisAlignedBB>> getAabbMap() {

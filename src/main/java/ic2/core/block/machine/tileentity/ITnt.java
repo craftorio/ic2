@@ -10,6 +10,6 @@ public class ITnt extends Explosive {
   }
   
   protected EntityIC2Explosive getEntity(EntityLivingBase igniter) {
-    return (EntityIC2Explosive)new EntityItnt(func_145831_w(), this.field_174879_c.func_177958_n() + 0.5D, this.field_174879_c.func_177956_o() + 0.5D, this.field_174879_c.func_177952_p() + 0.5D);
+    return (EntityIC2Explosive)new EntityItnt(getWorld(), this.field_174879_c.getX() + 0.5D, this.field_174879_c.getY() + 0.5D, this.field_174879_c.getZ() + 0.5D);
   }
 }

@@ -44,7 +44,7 @@ public class TileEntitySolarGenerator extends TileEntityBaseGenerator {
   }
   
   public void updateSunVisibility() {
-    this.skyLight = getSkyLight(func_145831_w(), this.field_174879_c.func_177984_a());
+    this.skyLight = getSkyLight(getWorld(), this.field_174879_c.func_177984_a());
   }
   
   public static float getSkyLight(World world, BlockPos pos) {

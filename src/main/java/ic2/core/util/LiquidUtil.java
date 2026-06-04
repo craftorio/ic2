@@ -301,7 +301,7 @@ public class LiquidUtil {
   public static List<AdjacentFluidHandler> getAdjacentHandlers(TileEntity source) {
     List<AdjacentFluidHandler> ret = new ArrayList<>();
     for (EnumFacing dir : EnumFacing.field_82609_l) {
-      TileEntity te = source.func_145831_w().func_175625_s(source.func_174877_v().func_177972_a(dir));
+      TileEntity te = source.getWorld().func_175625_s(source.getPos().func_177972_a(dir));
       if (isFluidTile(te, dir.func_176734_d()))
         ret.add(new AdjacentFluidHandler(te, dir)); 
     } 
@@ -309,7 +309,7 @@ public class LiquidUtil {
   }
   
   public static AdjacentFluidHandler getAdjacentHandler(TileEntity source, EnumFacing dir) {
-    TileEntity te = source.func_145831_w().func_175625_s(source.func_174877_v().func_177972_a(dir));
+    TileEntity te = source.getWorld().func_175625_s(source.getPos().func_177972_a(dir));
     if (!isFluidTile(te, dir.func_176734_d()))
       return null; 
     return new AdjacentFluidHandler(te, dir);
@@ -345,7 +345,7 @@ public class LiquidUtil {
     TileEntity srcTe = source;
     int transferred = 0;
     for (EnumFacing dir : EnumFacing.field_82609_l) {
-      TileEntity te = srcTe.func_145831_w().func_175625_s(srcTe.func_174877_v().func_177972_a(dir));
+      TileEntity te = srcTe.getWorld().func_175625_s(srcTe.getPos().func_177972_a(dir));
       if (isFluidTile(te, dir.func_176734_d())) {
         FluidStack stack = transfer(source, dir, te, amount);
         if (stack != null) {
@@ -450,7 +450,7 @@ public class LiquidUtil {
       for (int i = 0; i < 8; i++)
         world.func_175688_a(EnumParticleTypes.SMOKE_LARGE, pos.func_177958_n() + Math.random(), pos.func_177956_o() + Math.random(), pos.func_177952_p() + Math.random(), 0.0D, 0.0D, 0.0D, new int[0]); 
     } else {
-      if (!world.field_72995_K && !state.func_185904_a().func_76220_a() && !state.func_185904_a().func_76224_d())
+      if (!world.isRemote && !state.func_185904_a().func_76220_a() && !state.func_185904_a().func_76224_d())
         world.func_175655_b(pos, true); 
       if (fluid == FluidRegistry.WATER) {
         BlockDynamicLiquid blockDynamicLiquid = Blocks.field_150358_i;

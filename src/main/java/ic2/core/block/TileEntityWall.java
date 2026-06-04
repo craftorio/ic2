@@ -33,20 +33,20 @@ public class TileEntityWall extends TileEntityBlock {
     this.color = color;
   }
   
-  public void func_145839_a(NBTTagCompound nbt) {
-    super.func_145839_a(nbt);
+  public void readFromNBT(NBTTagCompound nbt) {
+    super.readFromNBT(nbt);
     this.color = Ic2Color.values[nbt.func_74771_c("color") & 0xFF];
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     nbt.func_74774_a("color", (byte)this.color.ordinal());
     return nbt;
   }
   
   protected void onLoaded() {
     super.onLoaded();
-    if ((func_145831_w()).field_72995_K)
+    if ((getWorld()).isRemote)
       updateRenderState(); 
   }
   
@@ -77,7 +77,7 @@ public class TileEntityWall extends TileEntityBlock {
     if (color == this.color)
       return false; 
     this.color = color;
-    if (!(func_145831_w()).field_72995_K) {
+    if (!(getWorld()).isRemote) {
       ((NetworkManager)IC2.network.get(true)).updateTileEntityField(this, "obscuration");
       func_70296_d();
     } else if (updateRenderState()) {

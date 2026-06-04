@@ -37,7 +37,7 @@ public class ItemMulti<T extends Enum<T> & IIdProvider> extends ItemIC2 implemen
   
   public static <T extends Enum<T> & IIdProvider> ItemMulti<T> create(ItemName name, Class<T> typeClass) {
     EnumProperty<T> typeProperty = new EnumProperty("type", typeClass);
-    if (typeProperty.getAllowedValues().size() > 32767)
+    if (typeProperty.func_177700_c().size() > 32767)
       throw new IllegalArgumentException("Too many values to fit in a short for " + typeClass); 
     return new ItemMulti<>(name, typeProperty);
   }
@@ -58,7 +58,7 @@ public class ItemMulti<T extends Enum<T> & IIdProvider> extends ItemIC2 implemen
   
   @SideOnly(Side.CLIENT)
   public void registerModels(ItemName name) {
-    for (Enum enum_ : this.typeProperty.getAllowedValues())
+    for (Enum enum_ : this.typeProperty.func_177700_c())
       registerModel(((IIdProvider)enum_).getId(), name, ((IIdProvider)enum_).getModelName()); 
   }
   
@@ -78,7 +78,7 @@ public class ItemMulti<T extends Enum<T> & IIdProvider> extends ItemIC2 implemen
   }
   
   public ItemStack getItemStack(T type) {
-    if (!this.typeProperty.getAllowedValues().contains(type))
+    if (!this.typeProperty.func_177700_c().contains(type))
       throw new IllegalArgumentException("invalid property value " + type + " for property " + this.typeProperty); 
     return getItemStackUnchecked(type);
   }
@@ -97,7 +97,7 @@ public class ItemMulti<T extends Enum<T> & IIdProvider> extends ItemIC2 implemen
   public String getVariant(ItemStack stack) {
     if (stack == null)
       throw new NullPointerException("null stack"); 
-    if (stack.func_77973_b() != this)
+    if (stack.getItem() != this)
       throw new IllegalArgumentException("The stack " + stack + " doesn't match " + this); 
     T type = getType(stack);
     if (type == null)
@@ -159,7 +159,7 @@ public class ItemMulti<T extends Enum<T> & IIdProvider> extends ItemIC2 implemen
   
   public void setRightClickHandler(T type, IItemRightClickHandler handler) {
     if (type == null) {
-      for (Enum enum_ : this.typeProperty.getAllowedValues())
+      for (Enum enum_ : this.typeProperty.func_177700_c())
         setRightClickHandler((T)enum_, handler); 
     } else {
       this.rightClickHandlers.put(type, handler);
@@ -168,7 +168,7 @@ public class ItemMulti<T extends Enum<T> & IIdProvider> extends ItemIC2 implemen
   
   public void setUseHandler(T type, IItemUseHandler handler) {
     if (type == null) {
-      for (Enum enum_ : this.typeProperty.getAllowedValues())
+      for (Enum enum_ : this.typeProperty.func_177700_c())
         setUseHandler((T)enum_, handler); 
     } else {
       this.useHandlers.put(type, handler);
@@ -177,7 +177,7 @@ public class ItemMulti<T extends Enum<T> & IIdProvider> extends ItemIC2 implemen
   
   public void setUpdateHandler(T type, IItemUpdateHandler handler) {
     if (type == null) {
-      for (Enum enum_ : this.typeProperty.getAllowedValues())
+      for (Enum enum_ : this.typeProperty.func_177700_c())
         setUpdateHandler((T)enum_, handler); 
     } else {
       this.updateHandlers.put(type, handler);

@@ -169,10 +169,10 @@ public class EntityParticle extends Entity implements IThrowableEntity {
         if (drops.size() == 1 && StackUtil.getSize(drops.get(0)) == 1) {
           ItemStack existing = drops.get(0);
           ItemStack smelted = FurnaceRecipes.func_77602_a().func_151395_a(existing);
-          if (smelted != null && smelted.func_77973_b() instanceof ItemBlock) {
-            world.func_175656_a(hit.func_178782_a(), ((ItemBlock)smelted.func_77973_b()).func_179223_d().func_176223_P());
+          if (smelted != null && smelted.getItem() instanceof ItemBlock) {
+            world.func_175656_a(hit.func_178782_a(), ((ItemBlock)smelted.getItem()).func_179223_d().getDefaultState());
           } else if (block.isFlammable((IBlockAccess)world, hit.func_178782_a(), hit.field_178784_b)) {
-            world.func_175656_a(hit.func_178782_a().func_177972_a(hit.field_178784_b.func_176734_d()), Blocks.field_150480_ab.func_176223_P());
+            world.func_175656_a(hit.func_178782_a().func_177972_a(hit.field_178784_b.func_176734_d()), Blocks.field_150480_ab.getDefaultState());
           } 
         } 
       } 

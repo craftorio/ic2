@@ -52,14 +52,14 @@ public class ItemToolCrowbar extends ItemToolIC2 implements IEnhancedOverlayProv
       ICoverHolder target = (ICoverHolder)world.func_175625_s(pos);
       EnumFacing selectedFacing = RotationUtil.rotateByHit(side, hitX, hitY, hitZ);
       if (target.canRemoveCover(world, pos, selectedFacing))
-        if (!world.field_72995_K) {
+        if (!world.isRemote) {
           target.removeCover(world, pos, selectedFacing);
           stack.func_77972_a(1, (EntityLivingBase)player);
         } else {
           IC2.audioManager.playOnce(player, PositionSpec.Hand, "Tools/Crowbar.ogg", true, IC2.audioManager.getDefaultVolume());
           IC2.platform.messagePlayer(player, Localization.translate("Attachment removed"), new Object[0]);
         }  
-      return world.field_72995_K ? EnumActionResult.PASS : EnumActionResult.SUCCESS;
+      return world.isRemote ? EnumActionResult.PASS : EnumActionResult.SUCCESS;
     } 
     return EnumActionResult.FAIL;
   }

@@ -63,7 +63,7 @@ public class BlockRubWood extends BlockBase {
   }
   
   public void func_180653_a(World world, BlockPos pos, IBlockState state, float chance, int fortune) {
-    if (world.field_72995_K)
+    if (world.isRemote)
       return; 
     int count = func_149745_a(world.field_73012_v);
     for (int j1 = 0; j1 < count; j1++) {

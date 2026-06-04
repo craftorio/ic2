@@ -85,18 +85,18 @@ public class Energy extends TileEntityComponent {
   }
   
   public void readFromNbt(NBTTagCompound nbt) {
-    this.storage = nbt.func_74769_h("storage");
+    this.storage = nbt.getDouble("storage");
   }
   
   public NBTTagCompound writeToNbt() {
     NBTTagCompound ret = new NBTTagCompound();
-    ret.func_74780_a("storage", this.storage);
+    ret.setDouble("storage", this.storage);
     return ret;
   }
   
   public void onLoaded() {
     assert this.delegate == null;
-    if (!(this.parent.func_145831_w()).field_72995_K) {
+    if (!(this.parent.getWorld()).isRemote) {
       if (!this.sinkDirections.isEmpty() || !this.sourceDirections.isEmpty()) {
         if (debugLoad)
           IC2.log.debug(LogCategory.Component, "Energy onLoaded for %s at %s.", new Object[] { this.parent, Util.formatPosition((TileEntity)this.parent) }); 
@@ -120,8 +120,8 @@ public class Energy extends TileEntityComponent {
     } else {
       this.delegate = new EnergyNetDelegateDual();
     } 
-    this.delegate.func_145834_a(this.parent.func_145831_w());
-    this.delegate.func_174878_a(this.parent.func_174877_v());
+    this.delegate.func_145834_a(this.parent.getWorld());
+    this.delegate.func_174878_a(this.parent.getPos());
   }
   
   public void onUnloaded() {
@@ -150,7 +150,7 @@ public class Energy extends TileEntityComponent {
   }
   
   public boolean enableWorldTick() {
-    return (!(this.parent.func_145831_w()).field_72995_K && this.managedSlots != null);
+    return (!(this.parent.getWorld()).isRemote && this.managedSlots != null);
   }
   
   public void onWorldTick() {
@@ -272,7 +272,7 @@ public class Energy extends TileEntityComponent {
     if (this.delegate != null) {
       if (debugLoad)
         IC2.log.debug(LogCategory.Component, "Energy setDirections unload for %s at %s.", new Object[] { this.parent, Util.formatPosition((TileEntity)this.parent) }); 
-      assert !(this.parent.func_145831_w()).field_72995_K;
+      assert !(this.parent.getWorld()).isRemote;
       MinecraftForge.EVENT_BUS.post((Event)new EnergyTileUnloadEvent(this.delegate));
     } 
     this.sinkDirections = sinkDirections;
@@ -285,7 +285,7 @@ public class Energy extends TileEntityComponent {
     if (this.delegate != null) {
       if (debugLoad)
         IC2.log.debug(LogCategory.Component, "Energy setDirections load for %s at %s, sink: %s, source: %s.", new Object[] { this.parent, Util.formatPosition((TileEntity)this.parent), sinkDirections, sourceDirections }); 
-      assert !(this.parent.func_145831_w()).field_72995_K;
+      assert !(this.parent.getWorld()).isRemote;
       MinecraftForge.EVENT_BUS.post((Event)new EnergyTileLoadEvent(this.delegate));
     } else if (debugLoad) {
       IC2.log.debug(LogCategory.Component, "Skipping Energy setDirections load for %s at %s, sink: %s, source: %s, loaded: %b.", new Object[] { this.parent, Util.formatPosition((TileEntity)this.parent), sinkDirections, sourceDirections, Boolean.valueOf(this.loaded) });

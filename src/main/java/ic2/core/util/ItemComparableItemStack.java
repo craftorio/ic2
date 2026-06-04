@@ -14,7 +14,7 @@ public class ItemComparableItemStack {
   private final int hashCode;
   
   public ItemComparableItemStack(ItemStack stack, boolean copyNbt) {
-    this.item = stack.func_77973_b();
+    this.item = stack.getItem();
     this.meta = stack.func_77981_g() ? stack.func_77960_j() : 0;
     NBTTagCompound nbt = stack.func_77978_p();
     if (nbt != null)

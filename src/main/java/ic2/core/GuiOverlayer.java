@@ -35,9 +35,9 @@ public class GuiOverlayer extends Gui {
     if (event.getType() != RenderGameOverlayEvent.ElementType.HOTBAR)
       return; 
     ItemStack helm = this.mc.field_71439_g.func_184582_a(EntityEquipmentSlot.HEAD);
-    if (StackUtil.isEmpty(helm) || !(helm.func_77973_b() instanceof IItemHudProvider) || !((IItemHudProvider)helm.func_77973_b()).doesProvideHUD(helm))
+    if (StackUtil.isEmpty(helm) || !(helm.getItem() instanceof IItemHudProvider) || !((IItemHudProvider)helm.getItem()).doesProvideHUD(helm))
       return; 
-    HudMode hudMode = ((IItemHudProvider)helm.func_77973_b()).getHudMode(helm);
+    HudMode hudMode = ((IItemHudProvider)helm.getItem()).getHudMode(helm);
     if (!hudMode.shouldDisplay())
       return; 
     ItemStack boots = this.mc.field_71439_g.func_184582_a(EntityEquipmentSlot.FEET);
@@ -92,8 +92,8 @@ public class GuiOverlayer extends Gui {
         renderItem.func_175042_a(rightItem, 5, 74);
         this.mc.field_71466_p.func_78276_b(rightItem.func_82833_r(), 30, 78, 16777215);
         List<String> info = new LinkedList<>();
-        if (rightItem.func_77973_b() instanceof IItemHudInfo) {
-          info.addAll(((IItemHudInfo)rightItem.func_77973_b()).getHudInfo(rightItem, (hudMode == HudMode.ADVANCED)));
+        if (rightItem.getItem() instanceof IItemHudInfo) {
+          info.addAll(((IItemHudInfo)rightItem.getItem()).getHudInfo(rightItem, (hudMode == HudMode.ADVANCED)));
           if (info.size() > 0)
             for (int l = 0; l < info.size(); l++)
               this.mc.field_71466_p.func_78276_b(info.get(l), 8, 83 + (l + 1) * 14, 16777215);  
@@ -111,8 +111,8 @@ public class GuiOverlayer extends Gui {
         renderItem.func_175042_a(leftItem, 5, nextLine - 9);
         this.mc.field_71466_p.func_78276_b(leftItem.func_82833_r(), 30, nextLine - 5, 16777215);
         List<String> info = new LinkedList<>();
-        if (leftItem.func_77973_b() instanceof IItemHudInfo) {
-          info.addAll(((IItemHudInfo)leftItem.func_77973_b()).getHudInfo(leftItem, (hudMode == HudMode.ADVANCED)));
+        if (leftItem.getItem() instanceof IItemHudInfo) {
+          info.addAll(((IItemHudInfo)leftItem.getItem()).getHudInfo(leftItem, (hudMode == HudMode.ADVANCED)));
           if (info.size() > 0)
             for (int l = 0; l < info.size(); l++)
               this.mc.field_71466_p.func_78276_b(info.get(l), 8, nextLine + (l + 1) * 14, 16777215);  
@@ -128,7 +128,7 @@ public class GuiOverlayer extends Gui {
   }
   
   private static final int getCharge(ItemStack stack) {
-    Item item = stack.func_77973_b();
+    Item item = stack.getItem();
     assert item != null;
     if (item instanceof IItemHudProvider.IItemHudBarProvider)
       return ((IItemHudProvider.IItemHudBarProvider)item).getBarPercent(stack); 
@@ -140,7 +140,7 @@ public class GuiOverlayer extends Gui {
   }
   
   private static final int mapCharge(ItemStack stack) {
-    assert stack.func_77973_b() instanceof ic2.api.item.IElectricItem;
+    assert stack.getItem() instanceof ic2.api.item.IElectricItem;
     double charge = ElectricItem.manager.getCharge(stack);
     double maxCharge = charge + ElectricItem.manager.charge(stack, Double.POSITIVE_INFINITY, 2147483647, true, true);
     return (int)Util.map(charge, maxCharge, 100.0D);

@@ -97,8 +97,8 @@ public class TileEntityIndustrialWorkbench extends TileEntityInventory implement
     
     protected boolean canProcess() {
       if (!this.crafting.func_191420_l()) {
-        if (this.recipe == null || !this.recipe.func_77569_a(this.crafting, this.tool.base.getParent().func_145831_w())) {
-          this.recipe = CraftingManager.func_192413_b(this.crafting, this.tool.base.getParent().func_145831_w());
+        if (this.recipe == null || !this.recipe.func_77569_a(this.crafting, this.tool.base.getParent().getWorld())) {
+          this.recipe = CraftingManager.func_192413_b(this.crafting, this.tool.base.getParent().getWorld());
           return (this.recipe != null);
         } 
         return true;

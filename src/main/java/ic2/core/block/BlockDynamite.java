@@ -44,7 +44,7 @@ public class BlockDynamite extends BlockBase {
   }
   
   public AxisAlignedBB func_185496_a(IBlockState state, IBlockAccess source, BlockPos pos) {
-    return Blocks.field_150478_aa.func_176223_P().func_177226_a((IProperty)BlockTorch.field_176596_a, state.func_177229_b((IProperty)BlockTorch.field_176596_a)).func_185900_c(source, pos);
+    return Blocks.field_150478_aa.getDefaultState().func_177226_a((IProperty)BlockTorch.field_176596_a, state.func_177229_b((IProperty)BlockTorch.field_176596_a)).func_185900_c(source, pos);
   }
   
   public boolean func_149662_c(IBlockState state) {
@@ -112,13 +112,13 @@ public class BlockDynamite extends BlockBase {
   }
   
   public boolean removedByPlayer(IBlockState state, World world, BlockPos pos, EntityPlayer player, boolean willHarvest) {
-    if (!world.field_72995_K)
+    if (!world.isRemote)
       explode(world, pos, (EntityLivingBase)player, false); 
     return false;
   }
   
   private void checkPlacement(World world, BlockPos pos, IBlockState state) {
-    if (world.field_72995_K)
+    if (world.isRemote)
       return; 
     if (world.func_175640_z(pos)) {
       explode(world, pos, (EntityLivingBase)null, false);

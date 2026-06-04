@@ -9,6 +9,6 @@ public class RedstoneEmitter extends BasicRedstoneComponent {
   }
   
   public void onChange() {
-    this.parent.func_145831_w().func_175685_c(this.parent.func_174877_v(), (Block)this.parent.getBlockType(), false);
+    this.parent.getWorld().func_175685_c(this.parent.getPos(), (Block)this.parent.func_145838_q(), false);
   }
 }

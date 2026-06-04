@@ -53,7 +53,7 @@ public class ItemFrequencyTransmitter extends ItemIC2 {
   }
   
   public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
-    if (world.field_72995_K)
+    if (world.isRemote)
       return EnumActionResult.PASS; 
     TileEntity te = world.func_175625_s(pos);
     if (!(te instanceof TileEntityTeleporter))
@@ -65,9 +65,9 @@ public class ItemFrequencyTransmitter extends ItemIC2 {
     BlockPos target = new BlockPos(nbtData.func_74762_e("targetX"), nbtData.func_74762_e("targetY"), nbtData.func_74762_e("targetZ"));
     if (!targetSet) {
       targetSet = true;
-      target = tp.func_174877_v();
+      target = tp.getPos();
       IC2.platform.messagePlayer(player, "Frequency Transmitter linked to Teleporter.", new Object[0]);
-    } else if (tp.func_174877_v().equals(target)) {
+    } else if (tp.getPos().equals(target)) {
       IC2.platform.messagePlayer(player, "Can't link Teleporter to itself.", new Object[0]);
     } else if (tp.hasTarget() && tp.getTarget().equals(target)) {
       IC2.platform.messagePlayer(player, "Teleportation link unchanged.", new Object[0]);

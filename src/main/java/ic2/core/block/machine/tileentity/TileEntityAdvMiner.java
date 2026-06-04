@@ -95,20 +95,20 @@ public class TileEntityAdvMiner extends TileEntityElectricMachine implements IHa
   
   protected void onLoaded() {
     super.onLoaded();
-    if (!(func_145831_w()).field_72995_K)
+    if (!(getWorld()).isRemote)
       setUpgradestat(); 
   }
   
-  public void func_145839_a(NBTTagCompound nbt) {
-    super.func_145839_a(nbt);
+  public void readFromNBT(NBTTagCompound nbt) {
+    super.readFromNBT(nbt);
     if (nbt.func_74764_b("mineTargetX"))
       this.mineTarget = new BlockPos(nbt.func_74762_e("mineTargetX"), nbt.func_74762_e("mineTargetY"), nbt.func_74762_e("mineTargetZ")); 
     this.blacklist = nbt.func_74767_n("blacklist");
     this.silkTouch = nbt.func_74767_n("silkTouch");
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     if (this.mineTarget != null) {
       nbt.func_74768_a("mineTargetX", this.mineTarget.func_177958_n());
       nbt.func_74768_a("mineTargetY", this.mineTarget.func_177956_o());
@@ -121,7 +121,7 @@ public class TileEntityAdvMiner extends TileEntityElectricMachine implements IHa
   
   public void func_70296_d() {
     super.func_70296_d();
-    if (!(func_145831_w()).field_72995_K)
+    if (!(getWorld()).isRemote)
       setUpgradestat(); 
   }
   
@@ -150,28 +150,28 @@ public class TileEntityAdvMiner extends TileEntityElectricMachine implements IHa
     if ((this.ticker = (short)(this.ticker + 1)) != this.workTick)
       return true; 
     this.ticker = 0;
-    if (scanner.func_77973_b() instanceof ic2.core.item.tool.ItemScannerAdv) {
+    if (scanner.getItem() instanceof ic2.core.item.tool.ItemScannerAdv) {
       range = 32;
-    } else if (scanner.func_77973_b() instanceof ic2.core.item.tool.ItemScanner) {
+    } else if (scanner.getItem() instanceof ic2.core.item.tool.ItemScanner) {
       range = 16;
     } else {
       range = 0;
     } 
     if (this.mineTarget == null) {
-      this.mineTarget = new BlockPos(this.field_174879_c.func_177958_n() - range - 1, this.field_174879_c.func_177956_o() - 1, this.field_174879_c.func_177952_p() - range);
+      this.mineTarget = new BlockPos(this.field_174879_c.getX() - range - 1, this.field_174879_c.getY() - 1, this.field_174879_c.getZ() - range);
       if (this.mineTarget.func_177956_o() < 0)
         return false; 
     } 
     int blockScanCount = this.maxBlockScanCount;
-    World world = func_145831_w();
+    World world = getWorld();
     BlockPos.MutableBlockPos scanPos = new BlockPos.MutableBlockPos(this.mineTarget.func_177958_n(), this.mineTarget.func_177956_o(), this.mineTarget.func_177952_p());
     do {
-      if (scanPos.func_177958_n() < this.field_174879_c.func_177958_n() + range) {
+      if (scanPos.func_177958_n() < this.field_174879_c.getX() + range) {
         scanPos = new BlockPos.MutableBlockPos(scanPos.func_177958_n() + 1, scanPos.func_177956_o(), scanPos.func_177952_p());
-      } else if (scanPos.func_177952_p() < this.field_174879_c.func_177952_p() + range) {
-        scanPos = new BlockPos.MutableBlockPos(this.field_174879_c.func_177958_n() - range, scanPos.func_177956_o(), scanPos.func_177952_p() + 1);
+      } else if (scanPos.func_177952_p() < this.field_174879_c.getZ() + range) {
+        scanPos = new BlockPos.MutableBlockPos(this.field_174879_c.getX() - range, scanPos.func_177956_o(), scanPos.func_177952_p() + 1);
       } else {
-        scanPos = new BlockPos.MutableBlockPos(this.field_174879_c.func_177958_n() - range, scanPos.func_177956_o() - 1, this.field_174879_c.func_177952_p() - range);
+        scanPos = new BlockPos.MutableBlockPos(this.field_174879_c.getX() - range, scanPos.func_177956_o() - 1, this.field_174879_c.getZ() - range);
         if (scanPos.func_177956_o() < 0) {
           this.mineTarget = new BlockPos((Vec3i)scanPos);
           return true;
@@ -196,7 +196,7 @@ public class TileEntityAdvMiner extends TileEntityElectricMachine implements IHa
   }
   
   public void doMine(BlockPos pos, Block block, IBlockState state) {
-    World world = func_145831_w();
+    World world = getWorld();
     StackUtil.distributeDrops((TileEntity)this, new ArrayList(StackUtil.getDrops((IBlockAccess)world, pos, state, null, 0, this.silkTouch)));
     world.func_175698_g(pos);
     this.energy.useEnergy(512.0D);
@@ -205,7 +205,7 @@ public class TileEntityAdvMiner extends TileEntityElectricMachine implements IHa
   public boolean canMine(BlockPos pos, Block block, IBlockState state) {
     if (block instanceof net.minecraftforge.fluids.IFluidBlock || block instanceof net.minecraft.block.BlockStaticLiquid || block instanceof net.minecraft.block.BlockDynamicLiquid)
       return false; 
-    World world = func_145831_w();
+    World world = getWorld();
     if (state.func_185887_b(world, pos) < 0.0F)
       return false; 
     List<ItemStack> drops = StackUtil.getDrops((IBlockAccess)world, pos, state, null, 0, this.silkTouch);
@@ -280,9 +280,9 @@ public class TileEntityAdvMiner extends TileEntityElectricMachine implements IHa
   
   public void onPlaced(ItemStack stack, EntityLivingBase placer, EnumFacing facing) {
     super.onPlaced(stack, placer, facing);
-    if (!(func_145831_w()).field_72995_K) {
+    if (!(getWorld()).isRemote) {
       NBTTagCompound nbt = StackUtil.getOrCreateNbtData(stack);
-      this.energy.addEnergy(nbt.func_74769_h("energy"));
+      this.energy.addEnergy(nbt.getDouble("energy"));
     } 
   }
   
@@ -292,7 +292,7 @@ public class TileEntityAdvMiner extends TileEntityElectricMachine implements IHa
       double retainedRatio = ConfigUtil.getDouble(MainConfig.get(), "balance/energyRetainedInStorageBlockDrops");
       if (retainedRatio > 0.0D) {
         NBTTagCompound nbt = StackUtil.getOrCreateNbtData(drop);
-        nbt.func_74780_a("energy", this.energy.getEnergy() * retainedRatio);
+        nbt.setDouble("energy", this.energy.getEnergy() * retainedRatio);
       } 
     } 
     return drop;

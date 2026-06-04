@@ -21,8 +21,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 @NotClassic
 public class TileEntityWeightedFluidDistributor extends TileEntityFluidDistributor implements IWeightedDistributor {
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     if (!this.priority.isEmpty()) {
       int[] indexes = new int[this.priority.size()];
       for (int i = 0; i < indexes.length; i++)
@@ -32,8 +32,8 @@ public class TileEntityWeightedFluidDistributor extends TileEntityFluidDistribut
     return nbt;
   }
   
-  public void func_145839_a(NBTTagCompound nbt) {
-    super.func_145839_a(nbt);
+  public void readFromNBT(NBTTagCompound nbt) {
+    super.readFromNBT(nbt);
     int[] indexes = nbt.func_74759_k("priority");
     if (indexes.length > 0)
       for (int index : indexes)
@@ -47,7 +47,7 @@ public class TileEntityWeightedFluidDistributor extends TileEntityFluidDistribut
   }
   
   protected void updateConnectivity() {
-    if (!(func_145831_w()).field_72995_K && !this.priority.isEmpty() && this.priority.remove(getFacing()))
+    if (!(getWorld()).isRemote && !this.priority.isEmpty() && this.priority.remove(getFacing()))
       updatePriority(true); 
     this.fluids.changeConnectivity(this.fluidTank, Collections.singleton(getFacing()), Collections.emptySet());
   }

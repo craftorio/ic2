@@ -21,8 +21,8 @@ public class InvSlotConsumableClass extends InvSlotConsumable {
   public boolean accepts(ItemStack stack) {
     if (StackUtil.isEmpty(stack))
       return false; 
-    if (stack.func_77973_b() instanceof net.minecraft.item.ItemBlock)
-      return this.clazz.isInstance(Block.func_149634_a(stack.func_77973_b())); 
-    return this.clazz.isInstance(stack.func_77973_b());
+    if (stack.getItem() instanceof net.minecraft.item.ItemBlock)
+      return this.clazz.isInstance(Block.func_149634_a(stack.getItem())); 
+    return this.clazz.isInstance(stack.getItem());
   }
 }

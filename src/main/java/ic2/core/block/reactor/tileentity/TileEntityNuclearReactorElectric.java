@@ -104,7 +104,7 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
   
   protected void onLoaded() {
     super.onLoaded();
-    if (!(func_145831_w()).field_72995_K && !isFluidCooled()) {
+    if (!(getWorld()).isRemote && !isFluidCooled()) {
       refreshChambers();
       MinecraftForge.EVENT_BUS.post((Event)new EnergyTileLoadEvent((IEnergyTile)this));
       this.addedToEnergyNet = true;
@@ -133,14 +133,14 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
     return i * this.heat / this.maxHeat / 100 * 85;
   }
   
-  public void func_145839_a(NBTTagCompound nbt) {
-    super.func_145839_a(nbt);
+  public void readFromNBT(NBTTagCompound nbt) {
+    super.readFromNBT(nbt);
     this.heat = nbt.func_74762_e("heat");
     this.output = nbt.func_74765_d("output");
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    nbt = super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    nbt = super.writeToNBT(nbt);
     nbt.func_74768_a("heat", this.heat);
     nbt.func_74777_a("output", (short)(int)getReactorEnergyOutput());
     return nbt;
@@ -180,7 +180,7 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
   }
   
   public void refreshChambers() {
-    World world = func_145831_w();
+    World world = getWorld();
     List<IEnergyTile> newSubTiles = new ArrayList<>();
     newSubTiles.add(this);
     for (EnumFacing dir : EnumFacing.field_82609_l) {
@@ -202,7 +202,7 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
     super.updateEntityServer();
     if (this.updateTicker++ % getTickRate() != 0)
       return; 
-    if (!func_145831_w().func_175697_a(this.field_174879_c, 8)) {
+    if (!getWorld().func_175697_a(this.field_174879_c, 8)) {
       this.output = 0.0F;
     } else {
       boolean toFluidCooled = isFluidReactor();
@@ -264,7 +264,7 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
   @SideOnly(Side.CLIENT)
   protected void updateEntityClient() {
     super.updateEntityClient();
-    showHeatEffects(func_145831_w(), this.field_174879_c, this.heat);
+    showHeatEffects(getWorld(), this.field_174879_c, this.heat);
   }
   
   public static void showHeatEffects(World world, BlockPos pos, int heat) {
@@ -300,7 +300,7 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
   }
   
   public boolean isUsefulItem(ItemStack stack, boolean forInsertion) {
-    Item item = stack.func_77973_b();
+    Item item = stack.getItem();
     if (item == null)
       return false; 
     if (forInsertion && this.fluidCooled && 
@@ -313,7 +313,7 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
   public void eject(ItemStack drop) {
     if (!IC2.platform.isSimulating() || drop == null)
       return; 
-    StackUtil.dropAsEntity(func_145831_w(), this.field_174879_c, drop);
+    StackUtil.dropAsEntity(getWorld(), this.field_174879_c, drop);
   }
   
   public boolean calculateHeatEffects() {
@@ -324,26 +324,26 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
       explode();
       return true;
     } 
-    World world = func_145831_w();
+    World world = getWorld();
     if (power >= 0.85F && world.field_73012_v.nextFloat() <= 0.2F * this.hem) {
       BlockPos coord = getRandCoord(2);
       IBlockState state = world.func_180495_p(coord);
       Block block = state.func_177230_c();
       if (block.isAir(state, (IBlockAccess)world, coord)) {
-        world.func_175656_a(coord, Blocks.field_150480_ab.func_176223_P());
+        world.func_175656_a(coord, Blocks.field_150480_ab.getDefaultState());
       } else if (state.func_185887_b(world, coord) >= 0.0F && world
         .func_175625_s(coord) == null) {
         Material mat = state.func_185904_a();
         if (mat == Material.field_151576_e || mat == Material.field_151573_f || mat == Material.field_151587_i || mat == Material.field_151578_c || mat == Material.field_151571_B) {
-          world.func_175656_a(coord, Blocks.field_150356_k.func_176223_P());
+          world.func_175656_a(coord, Blocks.field_150356_k.getDefaultState());
         } else {
-          world.func_175656_a(coord, Blocks.field_150480_ab.func_176223_P());
+          world.func_175656_a(coord, Blocks.field_150480_ab.getDefaultState());
         } 
       } 
     } 
     if (power >= 0.7F) {
-      List<EntityLivingBase> nearByEntities = world.func_72872_a(EntityLivingBase.class, new AxisAlignedBB((this.field_174879_c.func_177958_n() - 3), (this.field_174879_c.func_177956_o() - 3), (this.field_174879_c.func_177952_p() - 3), (this.field_174879_c
-            .func_177958_n() + 4), (this.field_174879_c.func_177956_o() + 4), (this.field_174879_c.func_177952_p() + 4)));
+      List<EntityLivingBase> nearByEntities = world.func_72872_a(EntityLivingBase.class, new AxisAlignedBB((this.field_174879_c.getX() - 3), (this.field_174879_c.getY() - 3), (this.field_174879_c.getZ() - 3), (this.field_174879_c
+            .getX() + 4), (this.field_174879_c.getY() + 4), (this.field_174879_c.getZ() + 4)));
       for (EntityLivingBase entity : nearByEntities)
         entity.func_70097_a((DamageSource)IC2DamageSource.radiation, (int)(world.field_73012_v.nextInt(4) * this.hem)); 
     } 
@@ -359,7 +359,7 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
         IBlockState state = world.func_180495_p(coord);
         Material mat = state.func_185904_a();
         if (mat == Material.field_151575_d || mat == Material.field_151584_j || mat == Material.field_151580_n)
-          world.func_175656_a(coord, Blocks.field_150480_ab.func_176223_P()); 
+          world.func_175656_a(coord, Blocks.field_150480_ab.getDefaultState()); 
       } 
     } 
     return false;
@@ -369,7 +369,7 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
     BlockPos ret;
     if (radius <= 0)
       return null; 
-    World world = func_145831_w();
+    World world = getWorld();
     do {
       ret = this.field_174879_c.func_177982_a(world.field_73012_v.nextInt(2 * radius + 1) - radius, world.field_73012_v
           .nextInt(2 * radius + 1) - radius, world.field_73012_v
@@ -384,8 +384,8 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
       for (int y = 0; y < 6; y++) {
         for (int x = 0; x < size; x++) {
           ItemStack stack = this.reactorSlot.get(x, y);
-          if (stack != null && stack.func_77973_b() instanceof IReactorComponent) {
-            IReactorComponent comp = (IReactorComponent)stack.func_77973_b();
+          if (stack != null && stack.getItem() instanceof IReactorComponent) {
+            IReactorComponent comp = (IReactorComponent)stack.getItem();
             comp.processChamber(stack, this, x, y, (pass == 0));
           } 
         } 
@@ -398,7 +398,7 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
   }
   
   public int getReactorSize() {
-    World world = func_145831_w();
+    World world = getWorld();
     if (world == null)
       return 9; 
     int cols = 3;
@@ -490,7 +490,7 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
   }
   
   public World getWorldObj() {
-    return func_145831_w();
+    return getWorld();
   }
   
   public int getHeat() {
@@ -523,8 +523,8 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
     float boomMod = 1.0F;
     for (int i = 0; i < this.reactorSlot.size(); i++) {
       ItemStack stack = this.reactorSlot.get(i);
-      if (stack != null && stack.func_77973_b() instanceof IReactorComponent) {
-        float f = ((IReactorComponent)stack.func_77973_b()).influenceExplosion(stack, this);
+      if (stack != null && stack.getItem() instanceof IReactorComponent) {
+        float f = ((IReactorComponent)stack.getItem()).influenceExplosion(stack, this);
         if (f > 0.0F && f < 1.0F) {
           boomMod *= f;
         } else {
@@ -536,11 +536,11 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
     boomPower *= this.hem * boomMod;
     IC2.log.log(LogCategory.PlayerActivity, Level.INFO, "Nuclear Reactor at %s melted (raw explosion power %f)", new Object[] { Util.formatPosition((TileEntity)this), Float.valueOf(boomPower) });
     boomPower = Math.min(boomPower, ConfigUtil.getFloat(MainConfig.get(), "protection/reactorExplosionPowerLimit"));
-    World world = func_145831_w();
+    World world = getWorld();
     for (EnumFacing dir : EnumFacing.field_82609_l) {
       TileEntity target = world.func_175625_s(this.field_174879_c.func_177972_a(dir));
       if (target instanceof TileEntityReactorChamberElectric)
-        world.func_175698_g(target.func_174877_v()); 
+        world.func_175698_g(target.getPos()); 
     } 
     world.func_175698_g(this.field_174879_c);
     ExplosionIC2 explosion = new ExplosionIC2(world, null, this.field_174879_c, boomPower, 0.01F, ExplosionIC2.Type.Nuclear);
@@ -580,7 +580,7 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
   }
   
   private void createChamberRedstoneLinks() {
-    World world = func_145831_w();
+    World world = getWorld();
     for (EnumFacing facing : EnumFacing.field_82609_l) {
       BlockPos cPos = this.field_174879_c.func_177972_a(facing);
       TileEntity te = world.func_175625_s(cPos);
@@ -596,7 +596,7 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
   }
   
   private void createCasingRedstoneLinks() {
-    WorldSearchUtil.findTileEntities(func_145831_w(), this.field_174879_c, 2, new WorldSearchUtil.ITileEntityResultHandler() {
+    WorldSearchUtil.findTileEntities(getWorld(), this.field_174879_c, 2, new WorldSearchUtil.ITileEntityResultHandler() {
           public boolean onMatch(TileEntity te) {
             if (te instanceof TileEntityReactorRedstonePort)
               ((TileEntityReactorRedstonePort)te).redstone.linkTo(TileEntityNuclearReactorElectric.this.redstone); 
@@ -648,7 +648,7 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
       return false; 
     int range = 2;
     final MutableBoolean foundConflict = new MutableBoolean();
-    WorldSearchUtil.findTileEntities(func_145831_w(), this.field_174879_c, 4, new WorldSearchUtil.ITileEntityResultHandler() {
+    WorldSearchUtil.findTileEntities(getWorld(), this.field_174879_c, 4, new WorldSearchUtil.ITileEntityResultHandler() {
           public boolean onMatch(TileEntity te) {
             if (!(te instanceof TileEntityNuclearReactorElectric))
               return false; 
@@ -667,13 +667,13 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
   
   private boolean hasFluidChamber() {
     int range = 2;
-    ChunkCache cache = new ChunkCache(func_145831_w(), this.field_174879_c.func_177982_a(-2, -2, -2), this.field_174879_c.func_177982_a(2, 2, 2), 0);
+    ChunkCache cache = new ChunkCache(getWorld(), this.field_174879_c.func_177982_a(-2, -2, -2), this.field_174879_c.func_177982_a(2, 2, 2), 0);
     BlockPos.MutableBlockPos cPos = new BlockPos.MutableBlockPos();
     int i;
     for (i = 0; i < 2; i++) {
-      int y = this.field_174879_c.func_177956_o() + 2 * (i * 2 - 1);
-      for (int z = this.field_174879_c.func_177952_p() - 2; z <= this.field_174879_c.func_177952_p() + 2; z++) {
-        for (int x = this.field_174879_c.func_177958_n() - 2; x <= this.field_174879_c.func_177958_n() + 2; x++) {
+      int y = this.field_174879_c.getY() + 2 * (i * 2 - 1);
+      for (int z = this.field_174879_c.getZ() - 2; z <= this.field_174879_c.getZ() + 2; z++) {
+        for (int x = this.field_174879_c.getX() - 2; x <= this.field_174879_c.getX() + 2; x++) {
           cPos.func_181079_c(x, y, z);
           if (!isFluidChamberBlock((IBlockAccess)cache, (BlockPos)cPos))
             return false; 
@@ -681,9 +681,9 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
       } 
     } 
     for (i = 0; i < 2; i++) {
-      int z = this.field_174879_c.func_177952_p() + 2 * (i * 2 - 1);
-      for (int y = this.field_174879_c.func_177956_o() - 2 + 1; y <= this.field_174879_c.func_177956_o() + 2 - 1; y++) {
-        for (int x = this.field_174879_c.func_177958_n() - 2; x <= this.field_174879_c.func_177958_n() + 2; x++) {
+      int z = this.field_174879_c.getZ() + 2 * (i * 2 - 1);
+      for (int y = this.field_174879_c.getY() - 2 + 1; y <= this.field_174879_c.getY() + 2 - 1; y++) {
+        for (int x = this.field_174879_c.getX() - 2; x <= this.field_174879_c.getX() + 2; x++) {
           cPos.func_181079_c(x, y, z);
           if (!isFluidChamberBlock((IBlockAccess)cache, (BlockPos)cPos))
             return false; 
@@ -691,9 +691,9 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
       } 
     } 
     for (i = 0; i < 2; i++) {
-      int x = this.field_174879_c.func_177958_n() + 2 * (i * 2 - 1);
-      for (int y = this.field_174879_c.func_177956_o() - 2 + 1; y <= this.field_174879_c.func_177956_o() + 2 - 1; y++) {
-        for (int z = this.field_174879_c.func_177952_p() - 2 + 1; z <= this.field_174879_c.func_177952_p() + 2 - 1; z++) {
+      int x = this.field_174879_c.getX() + 2 * (i * 2 - 1);
+      for (int y = this.field_174879_c.getY() - 2 + 1; y <= this.field_174879_c.getY() + 2 - 1; y++) {
+        for (int z = this.field_174879_c.getZ() - 2 + 1; z <= this.field_174879_c.getZ() + 2 - 1; z++) {
           cPos.func_181079_c(x, y, z);
           if (!isFluidChamberBlock((IBlockAccess)cache, (BlockPos)cPos))
             return false; 

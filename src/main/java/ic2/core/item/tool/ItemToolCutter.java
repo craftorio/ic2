@@ -40,10 +40,10 @@ public class ItemToolCutter extends ItemToolCrafting implements IEnhancedOverlay
   public boolean removeInsulation(EntityPlayer player, EnumHand hand, TileEntityCable cable) {
     if (cable.tryRemoveInsulation(true) && StackUtil.damage(player, hand, StackUtil.sameItem((Item)this), 3)) {
       cable.tryRemoveInsulation(false);
-      if ((cable.func_145831_w()).field_72995_K) {
-        IC2.audioManager.playOnce(new AudioPosition(cable.func_145831_w(), cable.func_174877_v()), "Tools/InsulationCutters.ogg");
+      if ((cable.getWorld()).isRemote) {
+        IC2.audioManager.playOnce(new AudioPosition(cable.getWorld(), cable.getPos()), "Tools/InsulationCutters.ogg");
       } else {
-        StackUtil.dropAsEntity(cable.func_145831_w(), cable.func_174877_v(), ItemName.crafting.getItemStack((Enum)CraftingItemType.rubber));
+        StackUtil.dropAsEntity(cable.getWorld(), cable.getPos(), ItemName.crafting.getItemStack((Enum)CraftingItemType.rubber));
       } 
       return true;
     } 

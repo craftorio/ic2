@@ -30,14 +30,14 @@ public class TileEntityElectricFurnace extends TileEntityStandardMachine<ItemSta
     this.inputSlot = (InvSlotProcessable<ItemStack, ItemStack, ItemStack>)new InvSlotProcessableSmelting((IInventorySlotHolder)this, "input", 1);
   }
   
-  public void func_145839_a(NBTTagCompound nbt) {
-    super.func_145839_a(nbt);
-    this.xp = nbt.func_74769_h("xp");
+  public void readFromNBT(NBTTagCompound nbt) {
+    super.readFromNBT(nbt);
+    this.xp = nbt.getDouble("xp");
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
-    nbt.func_74780_a("xp", this.xp);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
+    nbt.setDouble("xp", this.xp);
     return nbt;
   }
   
@@ -67,7 +67,7 @@ public class TileEntityElectricFurnace extends TileEntityStandardMachine<ItemSta
   
   public void onNetworkEvent(EntityPlayer player, int event) {
     if (event == 0) {
-      assert !(func_145831_w()).field_72995_K;
+      assert !(getWorld()).isRemote;
       this.xp = TileEntityIronFurnace.spawnXP(player, this.xp);
     } 
   }

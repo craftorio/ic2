@@ -52,7 +52,7 @@ public class AdvRecipeWrapper extends BlankRecipeWrapper implements IShapedCraft
       List<ItemStack> replace = new ArrayList<>(recipe.getInputs());
       for (ListIterator<ItemStack> it = replace.listIterator(); it.hasNext(); ) {
         ItemStack stack = it.next();
-        if (stack != null && stack.func_77973_b() instanceof ic2.api.item.IElectricItem)
+        if (stack != null && stack.getItem() instanceof ic2.api.item.IElectricItem)
           it.set(StackUtil.copyWithWildCard(stack)); 
       } 
       out.add(replace);

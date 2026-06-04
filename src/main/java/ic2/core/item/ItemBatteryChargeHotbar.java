@@ -49,7 +49,7 @@ public class ItemBatteryChargeHotbar extends ItemBattery implements IBoxable {
       for (int i = 0; i < 9 && limit > 0.0D; i++) {
         ItemStack toCharge = nonNullList.get(i);
         if (!StackUtil.isEmpty(toCharge) && (mode != Mode.NOT_IN_HAND || i != thePlayer.field_71071_by.field_70461_c))
-          if (!(toCharge.func_77973_b() instanceof ItemBatteryChargeHotbar)) {
+          if (!(toCharge.getItem() instanceof ItemBatteryChargeHotbar)) {
             double charge = ElectricItem.manager.charge(toCharge, limit, tier, false, true);
             charge = ElectricItem.manager.discharge(stack, charge, tier, true, false, false);
             ElectricItem.manager.charge(toCharge, charge, tier, true, false);
@@ -61,7 +61,7 @@ public class ItemBatteryChargeHotbar extends ItemBattery implements IBoxable {
   
   public ActionResult<ItemStack> func_77659_a(World world, EntityPlayer player, EnumHand hand) {
     ItemStack stack = StackUtil.get(player, hand);
-    if (world.field_72995_K)
+    if (world.isRemote)
       return new ActionResult(EnumActionResult.PASS, stack); 
     Mode mode = getMode(stack);
     mode = Mode.values[(mode.ordinal() + 1) % Mode.values.length];

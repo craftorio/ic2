@@ -84,7 +84,7 @@ public class GuiScanner extends GuiIC2<ContainerScanner> {
     TileEntityScanner te = (TileEntityScanner)((ContainerScanner)this.container).base;
     int scanningloop = te.getSubPercentageDoneScaled(66);
     if (scanningloop > 0)
-      func_73729_b(this.field_147003_i + 30, this.field_147009_r + 20, 176, 14, scanningloop, 43); 
+      drawTexturedModalRect(this.field_147003_i + 30, this.field_147009_r + 20, 176, 14, scanningloop, 43); 
   }
   
   protected ResourceLocation getTexture() {

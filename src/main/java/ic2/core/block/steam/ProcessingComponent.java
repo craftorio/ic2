@@ -44,7 +44,7 @@ public class ProcessingComponent extends TileEntityComponent {
   protected static final int EventStop = 3;
   
   public static ProcessingComponent asKineticMachine(TileEntityBlock parent, DynamicRecipeManager recipeManager) {
-    return new ProcessingComponent(parent, recipeManager, () -> (parent.func_145831_w()).field_72995_K);
+    return new ProcessingComponent(parent, recipeManager, () -> (parent.getWorld()).isRemote);
   }
   
   public ProcessingComponent(TileEntityBlock parent, DynamicRecipeManager recipeManager, BooleanSupplier canOperateCallable) {
@@ -72,7 +72,7 @@ public class ProcessingComponent extends TileEntityComponent {
   
   public void onUnloaded() {
     super.onUnloaded();
-    if ((this.parent.func_145831_w()).field_72995_K && this.audioSource != null) {
+    if ((this.parent.getWorld()).isRemote && this.audioSource != null) {
       IC2.audioManager.removeSources(this.parent);
       this.audioSource = null;
     } 
@@ -90,7 +90,7 @@ public class ProcessingComponent extends TileEntityComponent {
   }
   
   public boolean enableWorldTick() {
-    return !(this.parent.func_145831_w()).field_72995_K;
+    return !(this.parent.getWorld()).isRemote;
   }
   
   public void onWorldTick() {

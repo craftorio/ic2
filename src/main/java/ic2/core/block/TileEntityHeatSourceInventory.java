@@ -55,13 +55,13 @@ public abstract class TileEntityHeatSourceInventory extends TileEntityInventory 
     return 0;
   }
   
-  public void func_145839_a(NBTTagCompound nbtTagCompound) {
-    super.func_145839_a(nbtTagCompound);
+  public void readFromNBT(NBTTagCompound nbtTagCompound) {
+    super.readFromNBT(nbtTagCompound);
     this.HeatBuffer = nbtTagCompound.func_74762_e("HeatBuffer");
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     nbt.func_74768_a("HeatBuffer", this.HeatBuffer);
     return nbt;
   }

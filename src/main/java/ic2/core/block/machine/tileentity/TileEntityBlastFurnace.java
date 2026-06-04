@@ -126,14 +126,14 @@ public class TileEntityBlastFurnace extends TileEntityInventory implements IUpgr
     return this.tankInputSlot.processIntoTank((IFluidTank)this.fluidTank, this.tankOutputSlot);
   }
   
-  public void func_145839_a(NBTTagCompound nbt) {
-    super.func_145839_a(nbt);
+  public void readFromNBT(NBTTagCompound nbt) {
+    super.readFromNBT(nbt);
     this.heat = nbt.func_74762_e("heat");
     this.progress = nbt.func_74762_e("progress");
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     nbt.func_74768_a("heat", this.heat);
     nbt.func_74768_a("progress", this.progress);
     return nbt;
@@ -150,7 +150,7 @@ public class TileEntityBlastFurnace extends TileEntityInventory implements IUpgr
     } 
     if (heatRequested > 0) {
       EnumFacing dir = getFacing();
-      TileEntity te = func_145831_w().func_175625_s(this.field_174879_c.func_177972_a(dir));
+      TileEntity te = getWorld().func_175625_s(this.field_174879_c.func_177972_a(dir));
       if (te instanceof IHeatSource) {
         gainhU = ((IHeatSource)te).drawHeat(dir.func_176734_d(), heatRequested, false);
         this.heat += gainhU;

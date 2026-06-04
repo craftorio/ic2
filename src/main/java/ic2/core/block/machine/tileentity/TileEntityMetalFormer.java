@@ -52,13 +52,13 @@ public class TileEntityMetalFormer extends TileEntityStandardMachine<IRecipeInpu
     Recipes.metalformerCutting.addRecipe(input, null, false, new ItemStack[] { output });
   }
   
-  public void func_145839_a(NBTTagCompound nbt) {
-    super.func_145839_a(nbt);
+  public void readFromNBT(NBTTagCompound nbt) {
+    super.readFromNBT(nbt);
     setMode(nbt.func_74762_e("mode"));
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     nbt.func_74768_a("mode", this.mode);
     return nbt;
   }

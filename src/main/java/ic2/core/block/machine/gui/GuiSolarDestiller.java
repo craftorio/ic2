@@ -23,7 +23,7 @@ public class GuiSolarDestiller extends GuiIC2<ContainerSolarDestiller> {
     super.func_146976_a(f, x, y);
     bindTexture();
     if (((TileEntitySolarDestiller)((ContainerSolarDestiller)this.container).base).canWork())
-      func_73729_b(this.field_147003_i + 36, this.field_147009_r + 26, 0, 184, 97, 29); 
+      drawTexturedModalRect(this.field_147003_i + 36, this.field_147009_r + 26, 0, 184, 97, 29); 
   }
   
   protected ResourceLocation getTexture() {

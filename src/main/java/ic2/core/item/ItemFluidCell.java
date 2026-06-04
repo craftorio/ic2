@@ -32,7 +32,7 @@ public class ItemFluidCell extends ItemIC2FluidContainer {
   }
   
   public EnumActionResult func_180614_a(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float xOffset, float yOffset, float zOffset) {
-    if (world.field_72995_K)
+    if (world.isRemote)
       return EnumActionResult.SUCCESS; 
     if (interactWithTank(player, hand, world, pos, side)) {
       player.field_71069_bz.func_75142_b();
@@ -76,7 +76,7 @@ public class ItemFluidCell extends ItemIC2FluidContainer {
   }
   
   private boolean interactWithTank(EntityPlayer player, EnumHand hand, World world, BlockPos pos, EnumFacing side) {
-    assert !world.field_72995_K;
+    assert !world.isRemote;
     IFluidHandler tileHandler = FluidUtil.getFluidHandler(world, pos, side);
     if (tileHandler == null)
       return false; 

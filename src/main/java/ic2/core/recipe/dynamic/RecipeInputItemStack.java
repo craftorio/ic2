@@ -21,7 +21,7 @@ public class RecipeInputItemStack extends RecipeInputIngredient<ItemStack> {
   }
   
   public Object getUnspecific() {
-    return this.ingredient.func_77973_b();
+    return this.ingredient.getItem();
   }
   
   public RecipeInputIngredient<ItemStack> copy() {

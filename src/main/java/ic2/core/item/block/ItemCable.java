@@ -127,7 +127,7 @@ public class ItemCable extends ItemIC2 implements IMultiItem<CableType>, IBoxabl
   public String getVariant(ItemStack stack) {
     if (stack == null)
       throw new NullPointerException("null stack"); 
-    if (stack.func_77973_b() != this)
+    if (stack.getItem() != this)
       throw new IllegalArgumentException("The stack " + stack + " doesn't match " + this); 
     CableType type = getCableType(stack);
     int insulation = getInsulation(stack);
@@ -207,8 +207,8 @@ public class ItemCable extends ItemIC2 implements IMultiItem<CableType>, IBoxabl
       default:
         if (hand == EnumHand.MAIN_HAND) {
           ItemStack offStack = StackUtil.get(player, EnumHand.OFF_HAND);
-          if (!StackUtil.isEmpty(offStack) && offStack.func_77973_b() == ItemName.painter.getInstance()) {
-            ItemToolPainter painter = (ItemToolPainter)offStack.func_77973_b();
+          if (!StackUtil.isEmpty(offStack) && offStack.getItem() == ItemName.painter.getInstance()) {
+            ItemToolPainter painter = (ItemToolPainter)offStack.getItem();
             Ic2Color color = painter.getColor(offStack);
             if (color != null) {
               damage = (() -> painter.damagePainter(player, EnumHand.OFF_HAND, color));

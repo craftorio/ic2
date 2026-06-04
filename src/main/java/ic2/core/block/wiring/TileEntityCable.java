@@ -100,8 +100,8 @@ public class TileEntityCable extends TileEntityBlock implements IEnergyConductor
           }));
   }
   
-  public void func_145839_a(NBTTagCompound nbt) {
-    super.func_145839_a(nbt);
+  public void readFromNBT(NBTTagCompound nbt) {
+    super.readFromNBT(nbt);
     this.cableType = CableType.values[nbt.func_74771_c("cableType") & 0xFF];
     this.insulation = nbt.func_74771_c("insulation") & 0xFF;
     this.color = Ic2Color.values[nbt.func_74771_c("color") & 0xFF];
@@ -109,8 +109,8 @@ public class TileEntityCable extends TileEntityBlock implements IEnergyConductor
     this.foamColor = Ic2Color.values[nbt.func_74771_c("foamColor") & 0xFF];
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     nbt.func_74774_a("cableType", (byte)this.cableType.ordinal());
     nbt.func_74774_a("insulation", (byte)this.insulation);
     nbt.func_74774_a("color", (byte)this.color.ordinal());
@@ -121,16 +121,16 @@ public class TileEntityCable extends TileEntityBlock implements IEnergyConductor
   
   protected void onLoaded() {
     super.onLoaded();
-    if ((func_145831_w()).field_72995_K) {
+    if ((getWorld()).isRemote) {
       updateRenderState();
     } else {
       if (getClass() == TileEntityCable.class && (this.cableType == CableType.detector || this.cableType == CableType.splitter)) {
         IC2.log.debug(LogCategory.Block, "Fixing incorrect cable TE %s.", new Object[] { Util.toString((TileEntity)this) });
         TileEntityCable newTe = (this.cableType == CableType.detector) ? new TileEntityCableDetector() : new TileEntityCableSplitter();
         NBTTagCompound nbt = new NBTTagCompound();
-        func_189515_b(nbt);
-        this.field_145850_b.func_175690_a(func_174877_v(), (TileEntity)newTe);
-        newTe.func_145839_a(nbt);
+        writeToNBT(nbt);
+        this.field_145850_b.func_175690_a(getPos(), (TileEntity)newTe);
+        newTe.readFromNBT(nbt);
         return;
       } 
       MinecraftForge.EVENT_BUS.post((Event)new EnergyTileLoadEvent((IEnergyTile)this));
@@ -147,7 +147,7 @@ public class TileEntityCable extends TileEntityBlock implements IEnergyConductor
       this.addedToEnergyNet = false;
     } 
     if (this.continuousUpdate != null) {
-      IC2.tickHandler.removeContinuousWorldTick(func_145831_w(), this.continuousUpdate);
+      IC2.tickHandler.removeContinuousWorldTick(getWorld(), this.continuousUpdate);
       this.continuousUpdate = null;
     } 
     super.onUnloaded();
@@ -237,12 +237,12 @@ public class TileEntityCable extends TileEntityBlock implements IEnergyConductor
   
   public void onNeighborChange(Block neighbor, BlockPos neighborPos) {
     super.onNeighborChange(neighbor, neighborPos);
-    if (!(func_145831_w()).field_72995_K)
+    if (!(getWorld()).isRemote)
       updateConnectivity(); 
   }
   
   private void updateConnectivity() {
-    World world = func_145831_w();
+    World world = getWorld();
     byte newConnectivity = 0;
     int mask = 1;
     for (EnumFacing dir : EnumFacing.field_82609_l) {
@@ -258,7 +258,7 @@ public class TileEntityCable extends TileEntityBlock implements IEnergyConductor
   }
   
   protected boolean onActivated(EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-    if (this.foam == CableFoam.Soft && StackUtil.consume(player, hand, StackUtil.sameItem((Block)Blocks.field_150354_m), 1)) {
+    if (this.foam == CableFoam.Soft && StackUtil.consume(player, hand, StackUtil.sameItem((Block)Blocks.SAND), 1)) {
       changeFoam(CableFoam.Hardened, false);
       return true;
     } 
@@ -289,7 +289,7 @@ public class TileEntityCable extends TileEntityBlock implements IEnergyConductor
   protected float getExplosionResistance(Entity exploder, Explosion explosion) {
     switch (this.foam) {
       case Hardened:
-        return BlockName.wall.getInstance().getExplosionResistance(func_145831_w(), this.field_174879_c, exploder, explosion);
+        return BlockName.wall.getInstance().getExplosionResistance(getWorld(), this.field_174879_c, exploder, explosion);
     } 
     return super.getHardness();
   }
@@ -314,7 +314,7 @@ public class TileEntityCable extends TileEntityBlock implements IEnergyConductor
     Ic2Color newColor = Ic2Color.get(mcColor);
     if (!canBeColored(newColor))
       return false; 
-    if (!(func_145831_w()).field_72995_K) {
+    if (!(getWorld()).isRemote) {
       if (this.foam == CableFoam.None) {
         if (this.addedToEnergyNet)
           MinecraftForge.EVENT_BUS.post((Event)new EnergyTileUnloadEvent((IEnergyTile)this)); 
@@ -352,7 +352,7 @@ public class TileEntityCable extends TileEntityBlock implements IEnergyConductor
     if (this.insulation >= this.cableType.maxInsulation)
       return false; 
     this.insulation++;
-    if (!(func_145831_w()).field_72995_K)
+    if (!(getWorld()).isRemote)
       ((NetworkManager)IC2.network.get(true)).updateTileEntityField((TileEntity)this, "insulation"); 
     return true;
   }
@@ -369,7 +369,7 @@ public class TileEntityCable extends TileEntityBlock implements IEnergyConductor
       this.foam = foam;
     } 
     this.insulation--;
-    if (!(func_145831_w()).field_72995_K)
+    if (!(getWorld()).isRemote)
       ((NetworkManager)IC2.network.get(true)).updateTileEntityField((TileEntity)this, "insulation"); 
     return true;
   }
@@ -421,7 +421,7 @@ public class TileEntityCable extends TileEntityBlock implements IEnergyConductor
   }
   
   public void removeConductor() {
-    func_145831_w().func_175698_g(this.field_174879_c);
+    getWorld().func_175698_g(this.field_174879_c);
     ((NetworkManager)IC2.network.get(true)).initiateTileEntityEvent((TileEntity)this, 0, true);
   }
   
@@ -453,12 +453,12 @@ public class TileEntityCable extends TileEntityBlock implements IEnergyConductor
   
   public void onNetworkEvent(int event) {
     int l;
-    World world = func_145831_w();
+    World world = getWorld();
     switch (event) {
       case 0:
         world.func_184133_a(null, this.field_174879_c, SoundEvents.field_187658_bx, SoundCategory.BLOCKS, 0.5F, 2.6F + (world.field_73012_v.nextFloat() - world.field_73012_v.nextFloat()) * 0.8F);
         for (l = 0; l < 8; l++)
-          world.func_175688_a(EnumParticleTypes.SMOKE_LARGE, this.field_174879_c.func_177958_n() + Math.random(), this.field_174879_c.func_177956_o() + 1.2D, this.field_174879_c.func_177952_p() + Math.random(), 0.0D, 0.0D, 0.0D, new int[0]); 
+          world.func_175688_a(EnumParticleTypes.SMOKE_LARGE, this.field_174879_c.getX() + Math.random(), this.field_174879_c.getY() + 1.2D, this.field_174879_c.getZ() + Math.random(), 0.0D, 0.0D, 0.0D, new int[0]); 
         return;
     } 
     IC2.platform.displayError("An unknown event type was received over multiplayer.\nThis could happen due to corrupted data or a bug.\n\n(Technical information: event ID " + event + ", tile entity below)\nT: " + this + " (" + this.field_174879_c + ")", new Object[0]);
@@ -467,8 +467,8 @@ public class TileEntityCable extends TileEntityBlock implements IEnergyConductor
   private boolean changeFoam(CableFoam foam, boolean duringLoad) {
     if (this.foam == foam && !duringLoad)
       return false; 
-    World world = func_145831_w();
-    if (world.field_72995_K)
+    World world = getWorld();
+    if (world.isRemote)
       return true; 
     this.foam = foam;
     if (this.continuousUpdate != null) {
@@ -486,7 +486,7 @@ public class TileEntityCable extends TileEntityBlock implements IEnergyConductor
     if (foam == CableFoam.Soft) {
       this.continuousUpdate = new IWorldTickCallback() {
           public void onTick(World world) {
-            if (world.field_73012_v.nextFloat() < BlockFoam.getHardenChance(world, TileEntityCable.this.field_174879_c, TileEntityCable.this.getBlockType().getState((ITeBlock)TeBlock.cable), BlockFoam.FoamType.normal))
+            if (world.field_73012_v.nextFloat() < BlockFoam.getHardenChance(world, TileEntityCable.this.field_174879_c, TileEntityCable.this.func_145838_q().getState((ITeBlock)TeBlock.cable), BlockFoam.FoamType.normal))
               TileEntityCable.this.changeFoam(CableFoam.Hardened, false); 
           }
         };
@@ -494,7 +494,7 @@ public class TileEntityCable extends TileEntityBlock implements IEnergyConductor
     } 
     if (!duringLoad) {
       ((NetworkManager)IC2.network.get(true)).updateTileEntityField((TileEntity)this, "foam");
-      world.func_175685_c(this.field_174879_c, (Block)getBlockType(), true);
+      world.func_175685_c(this.field_174879_c, (Block) func_145838_q(), true);
       func_70296_d();
     } 
     return true;

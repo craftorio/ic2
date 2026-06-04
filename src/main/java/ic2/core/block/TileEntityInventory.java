@@ -35,22 +35,22 @@ public abstract class TileEntityInventory extends TileEntityBlock implements ISi
     this.comparator.setUpdate(this::calcRedstoneFromInvSlots);
   }
   
-  public void func_145839_a(NBTTagCompound nbtTagCompound) {
-    super.func_145839_a(nbtTagCompound);
-    NBTTagCompound invSlotsTag = nbtTagCompound.func_74775_l("InvSlots");
+  public void readFromNBT(NBTTagCompound nbtTagCompound) {
+    super.readFromNBT(nbtTagCompound);
+    NBTTagCompound invSlotsTag = nbtTagCompound.getCompoundTag("InvSlots");
     for (InvSlot invSlot : this.invSlots)
-      invSlot.readFromNbt(invSlotsTag.func_74775_l(invSlot.name)); 
+      invSlot.readFromNbt(invSlotsTag.getCompoundTag(invSlot.name)); 
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     NBTTagCompound invSlotsTag = new NBTTagCompound();
     for (InvSlot invSlot : this.invSlots) {
       NBTTagCompound invSlotTag = new NBTTagCompound();
       invSlot.writeToNbt(invSlotTag);
-      invSlotsTag.func_74782_a(invSlot.name, (NBTBase)invSlotTag);
+      invSlotsTag.setTag(invSlot.name, (NBTBase)invSlotTag);
     } 
-    nbt.func_74782_a("InvSlots", (NBTBase)invSlotsTag);
+    nbt.setTag("InvSlots", (NBTBase)invSlotsTag);
     return nbt;
   }
   

@@ -17,26 +17,26 @@ import net.minecraft.nbt.NBTTagCompound;
 
 public class ElectricItemManager implements IElectricItemManager {
   public double charge(ItemStack stack, double amount, int tier, boolean ignoreTransferLimit, boolean simulate) {
-    IElectricItem item = (IElectricItem)stack.func_77973_b();
+    IElectricItem item = (IElectricItem)stack.getItem();
     assert item.getMaxCharge(stack) > 0.0D;
     if (amount < 0.0D || StackUtil.getSize(stack) > 1 || item.getTier(stack) > tier)
       return 0.0D; 
     if (!ignoreTransferLimit && amount > item.getTransferLimit(stack))
       amount = item.getTransferLimit(stack); 
     NBTTagCompound tNBT = StackUtil.getOrCreateNbtData(stack);
-    double newCharge = tNBT.func_74769_h("charge");
+    double newCharge = tNBT.getDouble("charge");
     amount = Math.min(amount, item.getMaxCharge(stack) - newCharge);
     if (!simulate) {
       newCharge += amount;
       if (newCharge > 0.0D) {
-        tNBT.func_74780_a("charge", newCharge);
+        tNBT.setDouble("charge", newCharge);
       } else {
         tNBT.func_82580_o("charge");
         if (tNBT.func_82582_d())
           stack.func_77982_d(null); 
       } 
-      if (stack.func_77973_b() instanceof IElectricItem) {
-        item = (IElectricItem)stack.func_77973_b();
+      if (stack.getItem() instanceof IElectricItem) {
+        item = (IElectricItem)stack.getItem();
         int maxDamage = DamageHandler.getMaxDamage(stack);
         DamageHandler.setDamage(stack, mapChargeLevelToDamage(newCharge, item.getMaxCharge(stack), maxDamage), true);
       } else {
@@ -54,7 +54,7 @@ public class ElectricItemManager implements IElectricItemManager {
   }
   
   public double discharge(ItemStack stack, double amount, int tier, boolean ignoreTransferLimit, boolean externally, boolean simulate) {
-    IElectricItem item = (IElectricItem)stack.func_77973_b();
+    IElectricItem item = (IElectricItem)stack.getItem();
     assert item.getMaxCharge(stack) > 0.0D;
     if (amount < 0.0D || StackUtil.getSize(stack) > 1 || item.getTier(stack) > tier)
       return 0.0D; 
@@ -63,19 +63,19 @@ public class ElectricItemManager implements IElectricItemManager {
     if (!ignoreTransferLimit && amount > item.getTransferLimit(stack))
       amount = item.getTransferLimit(stack); 
     NBTTagCompound tNBT = StackUtil.getOrCreateNbtData(stack);
-    double newCharge = tNBT.func_74769_h("charge");
+    double newCharge = tNBT.getDouble("charge");
     amount = Math.min(amount, newCharge);
     if (!simulate) {
       newCharge -= amount;
       if (newCharge > 0.0D) {
-        tNBT.func_74780_a("charge", newCharge);
+        tNBT.setDouble("charge", newCharge);
       } else {
         tNBT.func_82580_o("charge");
         if (tNBT.func_82582_d())
           stack.func_77982_d(null); 
       } 
-      if (stack.func_77973_b() instanceof IElectricItem) {
-        item = (IElectricItem)stack.func_77973_b();
+      if (stack.getItem() instanceof IElectricItem) {
+        item = (IElectricItem)stack.getItem();
         int maxDamage = DamageHandler.getMaxDamage(stack);
         DamageHandler.setDamage(stack, mapChargeLevelToDamage(newCharge, item.getMaxCharge(stack), maxDamage), true);
       } else {
@@ -118,8 +118,8 @@ public class ElectricItemManager implements IElectricItemManager {
       ItemStack source = entity.func_184582_a(slot);
       if (source == null)
         continue; 
-      if (source.func_77973_b() instanceof IElectricItem) {
-        tier = ((IElectricItem)source.func_77973_b()).getTier(target);
+      if (source.getItem() instanceof IElectricItem) {
+        tier = ((IElectricItem)source.getItem()).getTier(target);
       } else {
         tier = Integer.MAX_VALUE;
       } 
@@ -156,8 +156,8 @@ public class ElectricItemManager implements IElectricItemManager {
   }
   
   public int getTier(ItemStack stack) {
-    if (stack == null || !(stack.func_77973_b() instanceof IElectricItem))
+    if (stack == null || !(stack.getItem() instanceof IElectricItem))
       return 0; 
-    return ((IElectricItem)stack.func_77973_b()).getTier(stack);
+    return ((IElectricItem)stack.getItem()).getTier(stack);
   }
 }

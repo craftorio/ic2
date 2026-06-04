@@ -74,14 +74,14 @@ public class TileEntityInduction extends TileEntityElectricMachine implements IH
     this.comparator.setUpdate(() -> this.heat * 15 / 10000);
   }
   
-  public void func_145839_a(NBTTagCompound nbt) {
-    super.func_145839_a(nbt);
+  public void readFromNBT(NBTTagCompound nbt) {
+    super.readFromNBT(nbt);
     this.heat = nbt.func_74765_d("heat");
     this.progress = nbt.func_74765_d("progress");
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     nbt.func_74777_a("heat", this.heat);
     nbt.func_74777_a("progress", this.progress);
     return nbt;

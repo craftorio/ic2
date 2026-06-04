@@ -129,7 +129,7 @@ public abstract class GuiIC2<T extends ContainerBase<? extends IInventory>> exte
   
   protected void drawBackgroundAndTitle(float partialTicks, int mouseX, int mouseY) {
     bindTexture();
-    func_73729_b(this.field_147003_i, this.field_147009_r, 0, 0, this.field_146999_f, this.field_147000_g);
+    drawTexturedModalRect(this.field_147003_i, this.field_147009_r, 0, 0, this.field_146999_f, this.field_147000_g);
     String name = Localization.translate(((ContainerBase)this.container).base.func_70005_c_());
     drawXCenteredString(this.field_146999_f / 2, 6, name, 4210752, false);
   }
@@ -163,7 +163,7 @@ public abstract class GuiIC2<T extends ContainerBase<? extends IInventory>> exte
     List<ItemStack> ret = new ArrayList<>();
     Set<UpgradableProperty> properties = block.getUpgradableProperties();
     for (ItemStack stack : UpgradeRegistry.getUpgrades()) {
-      IUpgradeItem item = (IUpgradeItem)stack.func_77973_b();
+      IUpgradeItem item = (IUpgradeItem)stack.getItem();
       if (item.isSuitableFor(stack, properties))
         ret.add(stack); 
     } 

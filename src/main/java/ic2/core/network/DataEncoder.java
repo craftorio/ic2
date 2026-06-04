@@ -246,7 +246,7 @@ public final class DataEncoder {
           os.writeByte(0);
         } else {
           os.writeByte(StackUtil.getSize(stack));
-          encode(os, stack.func_77973_b(), false);
+          encode(os, stack.getItem(), false);
           os.writeShort(stack.func_77952_i());
           encode(os, stack.func_77978_p(), true);
         } 
@@ -279,8 +279,8 @@ public final class DataEncoder {
         return;
       case TileEntity:
         te = (TileEntity)o;
-        encode(os, te.func_145831_w(), false);
-        encode(os, te.func_174877_v(), false);
+        encode(os, te.getWorld(), false);
+        encode(os, te.getPos(), false);
         return;
       case TupleT2:
         t2 = (Tuple.T2<?, ?>)o;
@@ -572,7 +572,7 @@ public final class DataEncoder {
     if (dst instanceof ItemStack) {
       ItemStack srcT = (ItemStack)src;
       ItemStack dstT = (ItemStack)dst;
-      if (srcT.func_77973_b() == dstT.func_77973_b()) {
+      if (srcT.getItem() == dstT.getItem()) {
         dstT.func_190920_e(srcT.func_190916_E());
         StackUtil.setRawMeta(dstT, StackUtil.getRawMeta(srcT));
         dstT.func_77982_d(srcT.func_77978_p());

@@ -92,9 +92,9 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
       if (!create)
         return null; 
       ret = new NBTTagCompound();
-      nbt.func_74782_a("display", (NBTBase)ret);
+      nbt.setTag("display", (NBTBase)ret);
     } else {
-      ret = nbt.func_74775_l("display");
+      ret = nbt.getCompoundTag("display");
     } 
     return ret;
   }
@@ -123,7 +123,7 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
     if (IC2.platform.isSimulating() && event.getEntity() instanceof EntityLivingBase) {
       EntityLivingBase entity = (EntityLivingBase)event.getEntity();
       ItemStack armor = entity.func_184582_a(EntityEquipmentSlot.FEET);
-      if (armor != null && armor.func_77973_b() == this) {
+      if (armor != null && armor.getItem() == this) {
         int fallDamage = Math.max((int)event.getDistance() - 10, 0);
         double energyCost = (getEnergyPerDamage() * fallDamage);
         if (energyCost <= ElectricItem.manager.getCharge(armor)) {
@@ -172,14 +172,14 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
           int slot = -1;
           for (int i = 0; i < player.field_71071_by.field_70462_a.size(); i++) {
             ItemStack playerStack = (ItemStack)player.field_71071_by.field_70462_a.get(i);
-            if (!StackUtil.isEmpty(playerStack) && playerStack.func_77973_b() == ItemName.filled_tin_can.getInstance()) {
+            if (!StackUtil.isEmpty(playerStack) && playerStack.getItem() == ItemName.filled_tin_can.getInstance()) {
               slot = i;
               break;
             } 
           } 
           if (slot > -1) {
             ItemStack playerStack = (ItemStack)player.field_71071_by.field_70462_a.get(slot);
-            ItemTinCan can = (ItemTinCan)playerStack.func_77973_b();
+            ItemTinCan can = (ItemTinCan)playerStack.getItem();
             ActionResult<ItemStack> result = can.onEaten(player, playerStack);
             playerStack = (ItemStack)result.func_188398_b();
             if (StackUtil.isEmpty(playerStack))
@@ -262,7 +262,7 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
         if (ElectricItem.manager.canUse(stack, 1000.0D) && (player.field_70122_E || player
           .func_70090_H()) && IC2.keyboard
           .isForwardKeyDown(player) && ((enableQuantumSpeedOnSprint && player
-          .func_70051_ag()) || (!enableQuantumSpeedOnSprint && IC2.keyboard
+          .isSprinting()) || (!enableQuantumSpeedOnSprint && IC2.keyboard
           .isBoostKeyDown(player)))) {
           byte speedTicker = nbtData.func_74771_c("speedTicker");
           speedTicker = (byte)(speedTicker + 1);

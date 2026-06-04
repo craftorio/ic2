@@ -62,8 +62,8 @@ public class TileEntityCrop extends TileEntityBlock implements ICropTile {
       IC2.log.info(LogCategory.Crop, "Debug mode is running"); 
   }
   
-  public void func_145839_a(NBTTagCompound nbt) {
-    super.func_145839_a(nbt);
+  public void readFromNBT(NBTTagCompound nbt) {
+    super.readFromNBT(nbt);
     this.crossingBase = nbt.func_74767_n("crossingBase");
     if (nbt.func_74764_b("cropOwner") && nbt.func_74764_b("cropId")) {
       this.crop = Crops.instance.getCropCard(nbt.func_74779_i("cropOwner"), nbt.func_74779_i("cropId"));
@@ -79,12 +79,12 @@ public class TileEntityCrop extends TileEntityBlock implements ICropTile {
       this.currentSize = nbt.func_74771_c("currentSize");
       this.growthPoints = nbt.func_74765_d("growthPoints");
       this.scanLevel = nbt.func_74771_c("scanLevel");
-      this.customData = nbt.func_74775_l("customData");
+      this.customData = nbt.getCompoundTag("customData");
     } 
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     nbt.func_74757_a("crossingBase", this.crossingBase);
     if (this.crop != null) {
       nbt.func_74778_a("cropOwner", this.crop.getOwner());
@@ -101,7 +101,7 @@ public class TileEntityCrop extends TileEntityBlock implements ICropTile {
       nbt.func_74774_a("currentSize", this.currentSize);
       nbt.func_74777_a("growthPoints", this.growthPoints);
       nbt.func_74774_a("scanLevel", this.scanLevel);
-      nbt.func_74782_a("customData", (NBTBase)this.customData.func_74737_b());
+      nbt.setTag("customData", (NBTBase)this.customData.func_74737_b());
     } 
     return nbt;
   }
@@ -143,7 +143,7 @@ public class TileEntityCrop extends TileEntityBlock implements ICropTile {
     if (!func_145837_r())
       this.ticker = IC2.random.nextInt(256); 
     updateBiomeHumidityBonus();
-    if ((func_145831_w()).field_72995_K)
+    if ((getWorld()).isRemote)
       updateRenderState(); 
   }
   
@@ -155,18 +155,18 @@ public class TileEntityCrop extends TileEntityBlock implements ICropTile {
       performTick(); 
     if (this.dirty) {
       this.dirty = false;
-      IBlockState state = this.field_145850_b.func_180495_p(this.field_174879_c);
+      IBlockState state = this.field_145850_b.getBlockState(this.field_174879_c);
       this.field_145850_b.func_184138_a(this.field_174879_c, state, state, 3);
-      this.field_145850_b.func_190522_c(this.field_174879_c, (Block)getBlockType());
+      this.field_145850_b.func_190522_c(this.field_174879_c, (Block) func_145838_q());
       this.field_145850_b.func_180500_c(EnumSkyBlock.BLOCK, this.field_174879_c);
-      if (!this.field_145850_b.field_72995_K)
+      if (!this.field_145850_b.isRemote)
         for (String field : getNetworkedFields())
           ((NetworkManager)IC2.network.get(true)).updateTileEntityField((TileEntity)this, field);  
     } 
   }
   
   public void performTick() {
-    assert !this.field_145850_b.field_72995_K;
+    assert !this.field_145850_b.isRemote;
     if (this.ticker % (tickrate * 10 << 2) == 0L) {
       updateBiomeHumidityBonus();
       if (debug)
@@ -253,7 +253,7 @@ public class TileEntityCrop extends TileEntityBlock implements ICropTile {
   }
   
   public void performWeedWork() {
-    World world = func_145831_w();
+    World world = getWorld();
     BlockPos dstPos = this.field_174879_c.func_177972_a(EnumFacing.field_176754_o[IC2.random.nextInt(4)]);
     TileEntity dstRaw = world.func_175625_s(dstPos);
     if (dstRaw instanceof TileEntityCrop) {
@@ -279,8 +279,8 @@ public class TileEntityCrop extends TileEntityBlock implements ICropTile {
         IC2.log.info(LogCategory.Crop, "Block at %s - trying to generate grass", new Object[] { dstPos }); 
       BlockPos soilPos = dstPos.func_177977_b();
       Block block = world.func_180495_p(soilPos).func_177230_c();
-      if (block == Blocks.field_150346_d || block == Blocks.field_150349_c || block == Blocks.field_150458_ak) {
-        world.func_180501_a(soilPos, Blocks.field_150349_c.func_176223_P(), 7);
+      if (block == Blocks.field_150346_d || block == Blocks.field_150349_c || block == Blocks.FARMLAND) {
+        world.func_180501_a(soilPos, Blocks.field_150349_c.getDefaultState(), 7);
         world.func_180501_a(dstPos, Blocks.field_150329_H.func_176203_a(1), 7);
       } 
     } 
@@ -295,7 +295,7 @@ public class TileEntityCrop extends TileEntityBlock implements ICropTile {
   }
   
   protected boolean onActivated(EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-    if ((func_145831_w()).field_72995_K)
+    if ((getWorld()).isRemote)
       return true; 
     return rightClick(player, hand);
   }
@@ -304,10 +304,10 @@ public class TileEntityCrop extends TileEntityBlock implements ICropTile {
     if (this.crop != null) {
       this.crop.onLeftClick(this, player);
     } else if (this.crossingBase && 
-      !(func_145831_w()).field_72995_K) {
+      !(getWorld()).isRemote) {
       this.crossingBase = false;
       this.dirty = true;
-      StackUtil.dropAsEntity(func_145831_w(), this.field_174879_c, ItemName.crop_stick.getItemStack());
+      StackUtil.dropAsEntity(getWorld(), this.field_174879_c, ItemName.crop_stick.getItemStack());
     } 
   }
   
@@ -316,7 +316,7 @@ public class TileEntityCrop extends TileEntityBlock implements ICropTile {
   }
   
   protected void onBlockBreak() {
-    if (!(func_145831_w()).field_72995_K)
+    if (!(getWorld()).isRemote)
       pick(); 
   }
   
@@ -334,7 +334,7 @@ public class TileEntityCrop extends TileEntityBlock implements ICropTile {
     ItemStack heldItem = StackUtil.get(player, hand);
     boolean creative = player.field_71075_bZ.field_75098_d;
     if (!StackUtil.isEmpty(heldItem)) {
-      if (this.crop == null && !this.crossingBase && heldItem.func_77973_b() == ItemName.crop_stick.getInstance()) {
+      if (this.crop == null && !this.crossingBase && heldItem.getItem() == ItemName.crop_stick.getInstance()) {
         if (!creative)
           StackUtil.consumeOrError(player, hand, 1); 
         this.crossingBase = true;
@@ -392,11 +392,11 @@ public class TileEntityCrop extends TileEntityBlock implements ICropTile {
     if (this.crop == null)
       return; 
     if (this.crop.onEntityCollision(this, entity)) {
-      if (this.field_145850_b.field_72995_K)
+      if (this.field_145850_b.isRemote)
         return; 
       if (IC2.random.nextInt(100) == 0 && IC2.random.nextInt(40) > this.statResistance) {
         reset();
-        this.field_145850_b.func_180501_a(this.field_174879_c.func_177977_b(), Blocks.field_150346_d.func_176223_P(), 7);
+        this.field_145850_b.func_180501_a(this.field_174879_c.func_177977_b(), Blocks.field_150346_d.getDefaultState(), 7);
         if (debugCollision)
           IC2.log.info(LogCategory.Crop, "Crop at %s - crop was trampled", new Object[] { this.field_174879_c }); 
       } 
@@ -405,17 +405,17 @@ public class TileEntityCrop extends TileEntityBlock implements ICropTile {
   
   public void updateTerrainAirQuality() {
     int value = 0;
-    int height = (int)Math.floor((this.field_174879_c.func_177956_o() - 40) / 15.0D);
+    int height = (int)Math.floor((this.field_174879_c.getY() - 40) / 15.0D);
     if (height > 2)
       height = 2; 
     if (height < 0)
       height = 0; 
     value += height;
     int fresh = 9;
-    for (int x = this.field_174879_c.func_177958_n() - 1; x < this.field_174879_c.func_177958_n() + 1 && fresh > 0; x++) {
-      for (int z = this.field_174879_c.func_177952_p() - 1; z < this.field_174879_c.func_177952_p() + 1 && fresh > 0; z++) {
-        if (this.field_145850_b.func_175677_d(new BlockPos(x, this.field_174879_c.func_177956_o(), z), false) || this.field_145850_b
-          .func_175625_s(new BlockPos(x, this.field_174879_c.func_177956_o(), z)) instanceof TileEntityCrop)
+    for (int x = this.field_174879_c.getX() - 1; x < this.field_174879_c.getX() + 1 && fresh > 0; x++) {
+      for (int z = this.field_174879_c.getZ() - 1; z < this.field_174879_c.getZ() + 1 && fresh > 0; z++) {
+        if (this.field_145850_b.func_175677_d(new BlockPos(x, this.field_174879_c.getY(), z), false) || this.field_145850_b
+          .func_175625_s(new BlockPos(x, this.field_174879_c.getY(), z)) instanceof TileEntityCrop)
           fresh--; 
       } 
     } 
@@ -427,7 +427,7 @@ public class TileEntityCrop extends TileEntityBlock implements ICropTile {
   
   public void updateTerrainHumidity() {
     int humidity = this.biomeHumidityBonus;
-    if (((Integer)this.field_145850_b.func_180495_p(this.field_174879_c.func_177977_b()).func_177229_b((IProperty)BlockFarmland.field_176531_a)).intValue() >= 7)
+    if (((Integer)this.field_145850_b.getBlockState(this.field_174879_c.func_177977_b()).func_177229_b((IProperty)BlockFarmland.field_176531_a)).intValue() >= 7)
       humidity += 2; 
     if (this.storageWater >= 5)
       humidity += 2; 
@@ -438,7 +438,7 @@ public class TileEntityCrop extends TileEntityBlock implements ICropTile {
   public void updateTerrainNutrients() {
     int nutrients = Crops.instance.getNutrientBiomeBonus(BiomeUtil.getBiome(this.field_145850_b, this.field_174879_c));
     for (int i = 1; i < 5 && 
-      this.field_145850_b.func_180495_p(this.field_174879_c.func_177979_c(i)).func_177230_c() == Blocks.field_150346_d; i++)
+      this.field_145850_b.getBlockState(this.field_174879_c.func_177979_c(i)).getBlock() == Blocks.field_150346_d; i++)
       nutrients++; 
     nutrients += (this.storageNutrients + 19) / 20;
     setTerrainNutrients(nutrients);
@@ -608,9 +608,9 @@ public class TileEntityCrop extends TileEntityBlock implements ICropTile {
       index++;
     } 
     reset();
-    if (!this.field_145850_b.field_72995_K && drops.length > 0)
+    if (!this.field_145850_b.isRemote && drops.length > 0)
       for (ItemStack drop : drops) {
-        if (drop.func_77973_b() != ItemName.crop_seed_bag.getInstance())
+        if (drop.getItem() != ItemName.crop_seed_bag.getInstance())
           drop.func_77982_d(null); 
         StackUtil.dropAsEntity(this.field_145850_b, this.field_174879_c, drop);
       }  
@@ -678,7 +678,7 @@ public class TileEntityCrop extends TileEntityBlock implements ICropTile {
       return false; 
     for (int index = 1; index < this.crop.getRootsLength(this); index++) {
       BlockPos blockPos = this.field_174879_c.func_177979_c(index);
-      IBlockState state = this.field_145850_b.func_180495_p(blockPos);
+      IBlockState state = this.field_145850_b.getBlockState(blockPos);
       Block block = state.func_177230_c();
       if (block.isAir(state, (IBlockAccess)this.field_145850_b, blockPos))
         return false; 
@@ -693,7 +693,7 @@ public class TileEntityCrop extends TileEntityBlock implements ICropTile {
       return false; 
     for (int index = 1; index < this.crop.getRootsLength(this); index++) {
       BlockPos blockPos = this.field_174879_c.func_177979_c(index);
-      IBlockState state = this.field_145850_b.func_180495_p(blockPos);
+      IBlockState state = this.field_145850_b.getBlockState(blockPos);
       Block block = state.func_177230_c();
       if (block.isAir(state, (IBlockAccess)this.field_145850_b, blockPos))
         return false; 
@@ -854,7 +854,7 @@ public class TileEntityCrop extends TileEntityBlock implements ICropTile {
   private boolean attemptSpreading() {
     List<TileEntityCrop> neighbours = new ArrayList<>(4);
     for (EnumFacing direction : EnumFacing.field_176754_o) {
-      TileEntity tileEntity = func_145831_w().func_175625_s(this.field_174879_c.func_177972_a(direction));
+      TileEntity tileEntity = getWorld().func_175625_s(this.field_174879_c.func_177972_a(direction));
       if (tileEntity instanceof TileEntityCrop) {
         TileEntityCrop tileEntityCrop = (TileEntityCrop)tileEntity;
         neighbours.add(tileEntityCrop);
@@ -918,7 +918,7 @@ public class TileEntityCrop extends TileEntityBlock implements ICropTile {
   }
   
   private void checkCrossingAvailability(BlockPos pos, List<TileEntityCrop> crops) {
-    TileEntity tile = func_145831_w().func_175625_s(pos);
+    TileEntity tile = getWorld().func_175625_s(pos);
     if (!(tile instanceof TileEntityCrop))
       return; 
     TileEntityCrop sideCrop = (TileEntityCrop)tile;
@@ -939,7 +939,7 @@ public class TileEntityCrop extends TileEntityBlock implements ICropTile {
   }
   
   private void checkSpreadingAvailability(BlockPos pos, TileEntityCrop crop) {
-    TileEntity tile = func_145831_w().func_175625_s(pos);
+    TileEntity tile = getWorld().func_175625_s(pos);
     if (!(tile instanceof TileEntityCrop))
       return; 
     TileEntityCrop sideCrop = (TileEntityCrop)tile;
@@ -961,7 +961,7 @@ public class TileEntityCrop extends TileEntityBlock implements ICropTile {
   
   protected void onNeighborChange(Block neighbor, BlockPos neighborPos) {
     super.onNeighborChange(neighbor, neighborPos);
-    if (this.field_145850_b.func_180495_p(this.field_174879_c.func_177977_b()).func_177230_c() != Blocks.field_150458_ak) {
+    if (this.field_145850_b.getBlockState(this.field_174879_c.func_177977_b()).getBlock() != Blocks.FARMLAND) {
       pick();
       this.field_145850_b.func_175698_g(this.field_174879_c);
     } 

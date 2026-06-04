@@ -21,8 +21,8 @@ public class TileEntityReactorAccessHatch extends TileEntityReactorVessel implem
   protected boolean onActivated(EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
     TileEntityNuclearReactorElectric reactor = getReactorInstance();
     if (reactor != null) {
-      World world = func_145831_w();
-      return reactor.getBlockType().func_180639_a(world, reactor.func_174877_v(), world.func_180495_p(reactor.func_174877_v()), player, hand, side, hitX, hitY, hitZ);
+      World world = getWorld();
+      return reactor.getBlockType().func_180639_a(world, reactor.getPos(), world.func_180495_p(reactor.getPos()), player, hand, side, hitX, hitY, hitZ);
     } 
     return false;
   }

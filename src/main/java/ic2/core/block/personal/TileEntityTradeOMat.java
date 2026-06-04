@@ -44,21 +44,21 @@ public class TileEntityTradeOMat extends TileEntityInventory implements IPersona
   
   public final InvSlotOutput outputSlot = new InvSlotOutput((IInventorySlotHolder)this, "output", 1);
   
-  public void func_145839_a(NBTTagCompound nbt) {
-    super.func_145839_a(nbt);
+  public void readFromNBT(NBTTagCompound nbt) {
+    super.readFromNBT(nbt);
     if (nbt.func_74764_b("ownerGameProfile"))
-      this.owner = NBTUtil.func_152459_a(nbt.func_74775_l("ownerGameProfile")); 
+      this.owner = NBTUtil.func_152459_a(nbt.getCompoundTag("ownerGameProfile")); 
     this.totalTradeCount = nbt.func_74762_e("totalTradeCount");
     if (nbt.func_74764_b("infinite"))
       this.infinite = nbt.func_74767_n("infinite"); 
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     if (this.owner != null) {
       NBTTagCompound ownerNbt = new NBTTagCompound();
       NBTUtil.func_180708_a(ownerNbt, this.owner);
-      nbt.func_74782_a("ownerGameProfile", (NBTBase)ownerNbt);
+      nbt.setTag("ownerGameProfile", (NBTBase)ownerNbt);
     } 
     nbt.func_74768_a("totalTradeCount", this.totalTradeCount);
     if (this.infinite)
@@ -145,7 +145,7 @@ public class TileEntityTradeOMat extends TileEntityInventory implements IPersona
   
   protected boolean onActivated(EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
     if (!isWireless() && StackUtil.consume(player, hand, StackUtil.sameStack(ItemName.upgrade.getItemStack((Enum)ItemUpgradeModule.UpgradeType.remote_interface)), 1)) {
-      if (!(func_145831_w()).field_72995_K)
+      if (!(getWorld()).isRemote)
         setWireless(true); 
       return true;
     } 
@@ -163,7 +163,7 @@ public class TileEntityTradeOMat extends TileEntityInventory implements IPersona
   
   protected void onUnloaded() {
     super.onUnloaded();
-    if (!(func_145831_w()).field_72995_K && isWireless())
+    if (!(getWorld()).isRemote && isWireless())
       (WorldData.get(this.field_145850_b)).tradeMarket.unregisterTradeOMat(this); 
   }
   
@@ -224,7 +224,7 @@ public class TileEntityTradeOMat extends TileEntityInventory implements IPersona
   
   public void onNetworkEvent(EntityPlayer player, int event) {
     if (event == 0 && 
-      func_145831_w().func_73046_m().func_184103_al().func_152596_g(player.func_146103_bH())) {
+      getWorld().func_73046_m().func_184103_al().func_152596_g(player.func_146103_bH())) {
       this.infinite = !this.infinite;
       if (!this.infinite)
         updateStock(); 

@@ -244,7 +244,7 @@ public class IC2Crops extends Crops {
       .setProperties(new CropProperties(12, 5, 0, 10, 2, 10))
       .setAttributes(new String[] { "Fire", "Shiny", "Reed", "Coal", "Diamond", "Crystal" }).setMaxSize(4)
       .setDrops(ItemName.dust.getItemStack((Enum)DustResourceType.small_diamond))
-      .setSpecialDrops(new ItemStack[] { new ItemStack(Items.field_151045_i) }).setAfterHarvestSize(1)
+      .setSpecialDrops(new ItemStack[] { new ItemStack(Items.DIAMOND) }).setAfterHarvestSize(1)
       .register();
     GenericCropCard.create("egg_plant")
       .setDiscoveredBy("Link")
@@ -459,7 +459,7 @@ public class IC2Crops extends Crops {
     if (crop != weed && disabledCrops.contains(owner + ":" + id))
       return false; 
     for (ItemStack key : this.baseSeeds.keySet()) {
-      if (key.func_77973_b() == stack.func_77973_b() && key.func_77952_i() == stack.func_77952_i())
+      if (key.getItem() == stack.getItem() && key.func_77952_i() == stack.func_77952_i())
         return false; 
     } 
     this.baseSeeds.put(stack, new BaseSeed(crop, size, growth, gain, resistance));
@@ -476,7 +476,7 @@ public class IC2Crops extends Crops {
       return null; 
     return this.baseSeeds.keySet()
       .stream()
-      .filter(key -> (key.func_77973_b() == stack.func_77973_b() && (key.func_77952_i() == 32767 || key.func_77952_i() == stack.func_77952_i())))
+      .filter(key -> (key.getItem() == stack.getItem() && (key.func_77952_i() == 32767 || key.func_77952_i() == stack.func_77952_i())))
       
       .findFirst()
       .map(this.baseSeeds::get)

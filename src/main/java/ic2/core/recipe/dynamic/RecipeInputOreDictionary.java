@@ -64,10 +64,10 @@ public class RecipeInputOreDictionary extends RecipeInputIngredient<String> {
       return false; 
     List<ItemStack> inputs = getEquivalents();
     boolean useOreStackMeta = (this.meta == null);
-    Item subjectItem = ((ItemStack)other).func_77973_b();
+    Item subjectItem = ((ItemStack)other).getItem();
     int subjectMeta = ((ItemStack)other).func_77952_i();
     for (ItemStack oreStack : inputs) {
-      Item oreItem = oreStack.func_77973_b();
+      Item oreItem = oreStack.getItem();
       if (oreItem == null)
         continue; 
       int metaRequired = useOreStackMeta ? oreStack.func_77952_i() : this.meta.intValue();

@@ -49,7 +49,7 @@ public class ItemElectricToolHoe extends ItemElectricTool {
     Block block = state.func_177230_c();
     if (side != EnumFacing.DOWN && world
       .func_175623_d(pos.func_177984_a()) && (block == Blocks.field_150391_bh || block == Blocks.field_150349_c || block == Blocks.field_150346_d)) {
-      block = Blocks.field_150458_ak;
+      block = Blocks.FARMLAND;
       SoundType stepSound = block.getSoundType(state, world, pos, (Entity)player);
       world.func_184148_a(null, pos.func_177958_n() + 0.5D, pos.func_177956_o() + 0.5D, pos.func_177952_p() + 0.5D, stepSound.func_185844_d(), SoundCategory.BLOCKS, (stepSound.func_185843_a() + 1.0F) / 2.0F, stepSound.func_185847_b() * 0.8F);
       if (IC2.platform.isSimulating()) {

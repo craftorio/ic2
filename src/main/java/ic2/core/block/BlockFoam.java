@@ -75,7 +75,7 @@ public class BlockFoam extends BlockMultiID<BlockFoam.FoamType> {
   }
   
   public boolean func_180639_a(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-    if (StackUtil.consume(player, hand, StackUtil.sameItem((Block)Blocks.field_150354_m), 1)) {
+    if (StackUtil.consume(player, hand, StackUtil.sameItem((Block)Blocks.SAND), 1)) {
       world.func_175656_a(pos, ((FoamType)state.func_177229_b((IProperty)this.typeProperty)).getResult());
       return true;
     } 

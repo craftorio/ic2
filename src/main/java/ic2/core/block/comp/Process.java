@@ -188,8 +188,8 @@ public class Process extends TileEntityComponent {
       if (this.parent instanceof IUpgradableBlock)
         for (int j = 0; j < this.upgradeSlot.size(); j++) {
           ItemStack stack = this.upgradeSlot.get(j);
-          if (!StackUtil.isEmpty(stack) && stack.func_77973_b() instanceof IUpgradeItem)
-            ((IUpgradeItem)stack.func_77973_b()).onProcessEnd(stack, (IUpgradableBlock)this.parent, processResult); 
+          if (!StackUtil.isEmpty(stack) && stack.getItem() instanceof IUpgradeItem)
+            ((IUpgradeItem)stack.getItem()).onProcessEnd(stack, (IUpgradableBlock)this.parent, processResult); 
         }  
       operateOnce(result, processResult);
       result = getOutput();

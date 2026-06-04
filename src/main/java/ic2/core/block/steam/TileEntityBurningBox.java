@@ -32,15 +32,15 @@ public class TileEntityBurningBox extends TileEntityInventory implements IHasGui
   
   public final InvSlotOutput ashesSlot = new InvSlotOutput((IInventorySlotHolder)this, "ashes", 1);
   
-  public void func_145839_a(NBTTagCompound nbt) {
-    super.func_145839_a(nbt);
+  public void readFromNBT(NBTTagCompound nbt) {
+    super.readFromNBT(nbt);
     this.delta = nbt.func_74762_e("delta");
     this.fuel = nbt.func_74762_e("fuel");
     this.remainingFuel = nbt.func_74762_e("remainingFuel");
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     nbt.func_74768_a("delta", this.delta);
     nbt.func_74768_a("fuel", this.fuel);
     nbt.func_74768_a("remainingFuel", this.remainingFuel);

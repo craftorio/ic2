@@ -42,18 +42,18 @@ public class TileEntityPersonalChest extends TileEntityInventory implements IPer
   
   private GameProfile owner = null;
   
-  public void func_145839_a(NBTTagCompound nbt) {
-    super.func_145839_a(nbt);
+  public void readFromNBT(NBTTagCompound nbt) {
+    super.readFromNBT(nbt);
     if (nbt.func_74764_b("ownerGameProfile"))
-      this.owner = NBTUtil.func_152459_a(nbt.func_74775_l("ownerGameProfile")); 
+      this.owner = NBTUtil.func_152459_a(nbt.getCompoundTag("ownerGameProfile")); 
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     if (this.owner != null) {
       NBTTagCompound ownerNbt = new NBTTagCompound();
       NBTUtil.func_180708_a(ownerNbt, this.owner);
-      nbt.func_74782_a("ownerGameProfile", (NBTBase)ownerNbt);
+      nbt.setTag("ownerGameProfile", (NBTBase)ownerNbt);
     } 
     return nbt;
   }
@@ -63,7 +63,7 @@ public class TileEntityPersonalChest extends TileEntityInventory implements IPer
     super.updateEntityClient();
     this.prevLidAngle = this.lidAngle;
     if (this.usingPlayerCount > 0 && this.lidAngle <= 0) {
-      World world = func_145831_w();
+      World world = getWorld();
       world.func_184133_a(null, this.field_174879_c, SoundEvents.field_187657_V, SoundCategory.BLOCKS, 0.5F, world.field_73012_v.nextFloat() * 0.1F + 0.9F);
     } 
     if ((this.usingPlayerCount == 0 && this.lidAngle > 0) || (this.usingPlayerCount > 0 && this.lidAngle < 10)) {
@@ -74,7 +74,7 @@ public class TileEntityPersonalChest extends TileEntityInventory implements IPer
       } 
       int closeThreshold = 5;
       if (this.lidAngle < closeThreshold && this.prevLidAngle >= closeThreshold) {
-        World world = func_145831_w();
+        World world = getWorld();
         world.func_184133_a(null, this.field_174879_c, SoundEvents.field_187651_T, SoundCategory.BLOCKS, 0.5F, world.field_73012_v.nextFloat() * 0.1F + 0.9F);
       } 
     } 
@@ -85,14 +85,14 @@ public class TileEntityPersonalChest extends TileEntityInventory implements IPer
   }
   
   public void func_174889_b(EntityPlayer player) {
-    if (!(func_145831_w()).field_72995_K) {
+    if (!(getWorld()).isRemote) {
       this.usingPlayers.add(player);
       updateUsingPlayerCount();
     } 
   }
   
   public void func_174886_c(EntityPlayer player) {
-    if (!(func_145831_w()).field_72995_K) {
+    if (!(getWorld()).isRemote) {
       this.usingPlayers.remove(player);
       updateUsingPlayerCount();
     } 
@@ -184,13 +184,13 @@ public class TileEntityPersonalChest extends TileEntityInventory implements IPer
     if (profile == null)
       return (((IPersonalBlock)te).getOwner() == null); 
     GameProfile teOwner = ((IPersonalBlock)te).getOwner();
-    if (!(te.func_145831_w()).field_72995_K) {
+    if (!(te.getWorld()).isRemote) {
       if (teOwner == null) {
         ((IPersonalBlock)te).setOwner(profile);
         ((NetworkManager)IC2.network.get(true)).updateTileEntityField((TileEntity)te, "owner");
         return true;
       } 
-      if (te.func_145831_w().func_73046_m().func_184103_al().func_152596_g(profile))
+      if (te.getWorld().func_73046_m().func_184103_al().func_152596_g(profile))
         return true; 
     } else if (teOwner == null) {
       return true;
@@ -211,7 +211,7 @@ public class TileEntityPersonalChest extends TileEntityInventory implements IPer
   }
   
   protected boolean onActivated(EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-    if (!(func_145831_w()).field_72995_K && !permitsAccess(player.func_146103_bH())) {
+    if (!(getWorld()).isRemote && !permitsAccess(player.func_146103_bH())) {
       IC2.platform.messagePlayer(player, "This safe is owned by " + getOwner().getName(), new Object[0]);
       return false;
     } 

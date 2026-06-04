@@ -17,7 +17,7 @@ public class FluidReactorLookup extends TileEntityComponent {
   }
   
   public TileEntityNuclearReactorElectric getReactor() {
-    long time = this.parent.func_145831_w().func_82737_E();
+    long time = this.parent.getWorld().func_82737_E();
     if (time != this.lastReactorUpdate) {
       updateReactor();
       this.lastReactorUpdate = time;
@@ -29,8 +29,8 @@ public class FluidReactorLookup extends TileEntityComponent {
   
   private void updateReactor() {
     int dist = 2;
-    World world = this.parent.func_145831_w();
-    BlockPos pos = this.parent.func_174877_v();
+    World world = this.parent.getWorld();
+    BlockPos pos = this.parent.getPos();
     if (!world.func_175697_a(pos, 2)) {
       this.reactor = null;
       return;
@@ -38,9 +38,9 @@ public class FluidReactorLookup extends TileEntityComponent {
     if (this.reactor != null && 
       !this.reactor.func_145837_r() && this.reactor
       .isFluidCooled() && this.reactor
-      .func_145831_w() == world && world
-      .func_175625_s(this.reactor.func_174877_v()) == this.reactor) {
-      BlockPos reactorPos = this.reactor.func_174877_v();
+      .getWorld() == world && world
+      .func_175625_s(this.reactor.getPos()) == this.reactor) {
+      BlockPos reactorPos = this.reactor.getPos();
       int dx = Math.abs(pos.func_177958_n() - reactorPos.func_177958_n());
       int dy = Math.abs(pos.func_177956_o() - reactorPos.func_177956_o());
       int dz = Math.abs(pos.func_177952_p() - reactorPos.func_177952_p());

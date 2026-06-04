@@ -34,7 +34,7 @@ public class BasicMachineRecipeManagerTest implements IBasicMachineRecipeManager
     if (recipe == null)
       return null; 
     if (adjustInput) {
-      if (input.func_77973_b().hasContainerItem(input))
+      if (input.getItem().hasContainerItem(input))
         throw new UnsupportedOperationException("can't adjust input item, use apply() instead"); 
       input.func_190918_g(((IRecipeInput)recipe.getInput()).getAmount());
     } 
@@ -48,8 +48,8 @@ public class BasicMachineRecipeManagerTest implements IBasicMachineRecipeManager
     if (recipe == null)
       return null; 
     ItemStack adjustedInput;
-    if (input.func_77973_b().hasContainerItem(input) && 
-      !StackUtil.isEmpty(adjustedInput = input.func_77973_b().getContainerItem(input))) {
+    if (input.getItem().hasContainerItem(input) && 
+      !StackUtil.isEmpty(adjustedInput = input.getItem().getContainerItem(input))) {
       if (StackUtil.getSize(input) != ((IRecipeInput)recipe.getInput()).getAmount())
         return null; 
       adjustedInput = StackUtil.copy(input);
@@ -74,7 +74,7 @@ public class BasicMachineRecipeManagerTest implements IBasicMachineRecipeManager
         if (!checkAmount)
           return container; 
         if (StackUtil.getSize(stack) >= ((IRecipeInput)container.getInput()).getAmount() && (
-          !stack.func_77973_b().hasContainerItem(stack) || StackUtil.getSize(stack) == ((IRecipeInput)container.getInput()).getAmount()))
+          !stack.getItem().hasContainerItem(stack) || StackUtil.getSize(stack) == ((IRecipeInput)container.getInput()).getAmount()))
           return container; 
       } 
     } 

@@ -67,14 +67,14 @@ public class HandHeldCropnalyzer extends HandHeldInventory implements IWorldTick
           ElectricItem.manager.charge(this.containerStack, get, 3, true, false); 
       } 
     } 
-    if (StackUtil.isEmpty(output) && !StackUtil.isEmpty(input) && input.func_77973_b() instanceof ICropSeed) {
-      int level = ((ICropSeed)input.func_77973_b()).getScannedFromStack(this.inventory[0]);
+    if (StackUtil.isEmpty(output) && !StackUtil.isEmpty(input) && input.getItem() instanceof ICropSeed) {
+      int level = ((ICropSeed)input.getItem()).getScannedFromStack(this.inventory[0]);
       if (level < 4) {
         double ned = energyForLevel(level);
         double got = ElectricItem.manager.discharge(this.containerStack, ned, 2, true, false, false);
         if (!Util.isSimilar(got, ned))
           return; 
-        ((ICropSeed)input.func_77973_b()).incrementScannedFromStack(this.inventory[0]);
+        ((ICropSeed)input.getItem()).incrementScannedFromStack(this.inventory[0]);
       } 
       this.inventory[1] = input;
       this.inventory[0] = null;
@@ -101,9 +101,9 @@ public class HandHeldCropnalyzer extends HandHeldInventory implements IWorldTick
   
   public int getScannedLevel() {
     ItemStack output = this.inventory[1];
-    if (output == null || !(output.func_77973_b() instanceof ICropSeed))
+    if (output == null || !(output.getItem() instanceof ICropSeed))
       return -1; 
-    return ((ICropSeed)output.func_77973_b()).getScannedFromStack(output);
+    return ((ICropSeed)output.getItem()).getScannedFromStack(output);
   }
   
   public String getSeedName() {
@@ -159,14 +159,14 @@ public class HandHeldCropnalyzer extends HandHeldInventory implements IWorldTick
   }
   
   public int getSeedGrowth() {
-    return ((ICropSeed)this.inventory[1].func_77973_b()).getGrowthFromStack(this.inventory[1]);
+    return ((ICropSeed)this.inventory[1].getItem()).getGrowthFromStack(this.inventory[1]);
   }
   
   public int getSeedGain() {
-    return ((ICropSeed)this.inventory[1].func_77973_b()).getGainFromStack(this.inventory[1]);
+    return ((ICropSeed)this.inventory[1].getItem()).getGainFromStack(this.inventory[1]);
   }
   
   public int getSeedResistence() {
-    return ((ICropSeed)this.inventory[1].func_77973_b()).getResistanceFromStack(this.inventory[1]);
+    return ((ICropSeed)this.inventory[1].getItem()).getResistanceFromStack(this.inventory[1]);
   }
 }

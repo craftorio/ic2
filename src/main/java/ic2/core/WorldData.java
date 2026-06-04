@@ -22,7 +22,7 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 
 public class WorldData {
   private WorldData(World world) {
-    if (!world.field_72995_K) {
+    if (!world.isRemote) {
       this.energyNet = EnergyNetLocal.create(world);
       this.tradeMarket = new TradingMarket(world);
       this.windSim = new WindSim(world);
@@ -40,7 +40,7 @@ public class WorldData {
   public static WorldData get(World world, boolean load) {
     if (world == null)
       throw new IllegalArgumentException("world is null"); 
-    ConcurrentMap<Integer, WorldData> index = getIndex(!world.field_72995_K);
+    ConcurrentMap<Integer, WorldData> index = getIndex(!world.isRemote);
     WorldData ret = index.get(Integer.valueOf(world.field_73011_w.getDimension()));
     if (ret != null || !load)
       return ret; 
@@ -52,7 +52,7 @@ public class WorldData {
   }
   
   public static void onWorldUnload(World world) {
-    getIndex(!world.field_72995_K).remove(Integer.valueOf(world.field_73011_w.getDimension()));
+    getIndex(!world.isRemote).remove(Integer.valueOf(world.field_73011_w.getDimension()));
   }
   
   private static ConcurrentMap<Integer, WorldData> getIndex(boolean simulating) {

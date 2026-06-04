@@ -41,7 +41,7 @@ public class GuiChunkLoader extends GuiIC2<ContainerChunkLoader> {
   }
   
   protected void drawForegroundLayer(int mouseX, int mouseY) {
-    ChunkPos mainChunk = ChunkLoaderLogic.getChunkCoords(((TileEntityChunkloader)((ContainerChunkLoader)this.container).base).func_174877_v());
+    ChunkPos mainChunk = ChunkLoaderLogic.getChunkCoords(((TileEntityChunkloader)((ContainerChunkLoader)this.container).base).getPos());
     ImmutableSet immutableSet = ((TileEntityChunkloader)((ContainerChunkLoader)this.container).base).getLoadedChunks();
     int amountLoadedChunks = 0;
     for (int i = -4; i <= 4; i++) {
@@ -64,7 +64,7 @@ public class GuiChunkLoader extends GuiIC2<ContainerChunkLoader> {
   }
   
   private void drawChunkAt(int x, int y, ChunkPos chunkPos) {
-    World world = ((TileEntityChunkloader)((ContainerChunkLoader)this.container).base).func_145831_w();
+    World world = ((TileEntityChunkloader)((ContainerChunkLoader)this.container).base).getWorld();
     Chunk chunk = world.func_72964_e(chunkPos.field_77276_a, chunkPos.field_77275_b);
     Ic2BlockPos worldPos = new Ic2BlockPos();
     for (int cx = 0; cx < 16; cx++) {
@@ -93,7 +93,7 @@ public class GuiChunkLoader extends GuiIC2<ContainerChunkLoader> {
   
   protected void func_73864_a(int mouseX, int mouseY, int mouseButton) throws IOException {
     if (mouseButton == 0) {
-      ChunkPos mainChunk = ChunkLoaderLogic.getChunkCoords(((TileEntityChunkloader)((ContainerChunkLoader)this.container).base).func_174877_v());
+      ChunkPos mainChunk = ChunkLoaderLogic.getChunkCoords(((TileEntityChunkloader)((ContainerChunkLoader)this.container).base).getPos());
       for (int i = -4; i <= 4; i++) {
         for (int j = -4; j <= 4; j++) {
           if (mouseX - this.field_147003_i > 89 + 16 * i && mouseX - this.field_147003_i <= 89 + 16 * i + 16 && mouseY - this.field_147009_r > 80 + 16 * j && mouseY - this.field_147009_r <= 80 + 16 * j + 16) {
@@ -107,7 +107,7 @@ public class GuiChunkLoader extends GuiIC2<ContainerChunkLoader> {
   }
   
   private void changeChunk(ChunkPos chunk) {
-    ChunkPos mainChunk = ChunkLoaderLogic.getChunkCoords(((TileEntityChunkloader)((ContainerChunkLoader)this.container).base).func_174877_v());
+    ChunkPos mainChunk = ChunkLoaderLogic.getChunkCoords(((TileEntityChunkloader)((ContainerChunkLoader)this.container).base).getPos());
     ((NetworkManager)IC2.network.get(false)).initiateClientTileEntityEvent((TileEntity)((ContainerChunkLoader)this.container).base, chunk.field_77276_a - mainChunk.field_77276_a + 8 & 0xF | (chunk.field_77275_b - mainChunk.field_77275_b + 8 & 0xF) << 4);
   }
 }

@@ -16,6 +16,6 @@ public class SlotCustom extends Slot {
   public boolean func_75214_a(ItemStack itemstack) {
     if (itemstack == null)
       return false; 
-    return (this.item != null && itemstack.func_77973_b() == this.item);
+    return (this.item != null && itemstack.getItem() == this.item);
   }
 }

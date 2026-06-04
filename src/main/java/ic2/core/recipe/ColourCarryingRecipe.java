@@ -24,17 +24,17 @@ public class ColourCarryingRecipe extends AdvRecipe {
   
   public ItemStack func_77572_b(InventoryCrafting craftingInv) {
     ItemStack initialResult = super.func_77572_b(craftingInv);
-    if (!StackUtil.isEmpty(initialResult) && initialResult.func_77973_b() instanceof ItemArmor) {
+    if (!StackUtil.isEmpty(initialResult) && initialResult.getItem() instanceof ItemArmor) {
       int colour = -1;
       for (int slot = 0; slot < craftingInv.func_70302_i_(); slot++) {
         ItemStack offer = craftingInv.func_70301_a(slot);
-        if (!StackUtil.isEmpty(initialResult) && offer.func_77973_b() instanceof ItemArmor) {
-          colour = ((ItemArmor)offer.func_77973_b()).func_82814_b(offer);
+        if (!StackUtil.isEmpty(initialResult) && offer.getItem() instanceof ItemArmor) {
+          colour = ((ItemArmor)offer.getItem()).func_82814_b(offer);
           break;
         } 
       } 
       if (colour != -1)
-        ((ItemArmor)initialResult.func_77973_b()).func_82813_b(initialResult, colour); 
+        ((ItemArmor)initialResult.getItem()).func_82813_b(initialResult, colour); 
     } 
     return initialResult;
   }

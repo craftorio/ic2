@@ -47,7 +47,7 @@ public class Ic2Sapling extends BlockBush implements IBlockModelProvider, IGrowa
   }
   
   public void func_180650_b(World world, BlockPos pos, IBlockState state, Random random) {
-    if (world.field_72995_K)
+    if (world.isRemote)
       return; 
     if (!func_180671_f(world, pos, state)) {
       func_176226_b(world, pos, state, 0);

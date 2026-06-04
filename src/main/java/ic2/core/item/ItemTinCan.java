@@ -18,7 +18,7 @@ public class ItemTinCan extends ItemIC2 {
   
   public ActionResult<ItemStack> func_77659_a(World world, EntityPlayer player, EnumHand hand) {
     ItemStack stack = StackUtil.get(player, hand);
-    if (!world.field_72995_K && player.func_71024_bL().func_75121_c())
+    if (!world.isRemote && player.func_71024_bL().func_75121_c())
       return onEaten(player, stack); 
     return new ActionResult(EnumActionResult.PASS, stack);
   }

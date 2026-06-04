@@ -64,13 +64,13 @@ public class TileEntityElectrolyzer extends TileEntityElectricMachine implements
     Recipes.electrolyzer.addRecipe(FluidRegistry.WATER.getName(), 40, 32, new IElectrolyzerRecipeManager.ElectrolyzerOutput[] { new IElectrolyzerRecipeManager.ElectrolyzerOutput(FluidName.hydrogen.getName(), 26, EnumFacing.DOWN), new IElectrolyzerRecipeManager.ElectrolyzerOutput(FluidName.oxygen.getName(), 13, EnumFacing.UP) });
   }
   
-  public void func_145839_a(NBTTagCompound nbt) {
-    super.func_145839_a(nbt);
+  public void readFromNBT(NBTTagCompound nbt) {
+    super.readFromNBT(nbt);
     this.progress = nbt.func_74762_e("progress");
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     nbt.func_74768_a("progress", this.progress);
     return nbt;
   }
@@ -118,14 +118,14 @@ public class TileEntityElectrolyzer extends TileEntityElectricMachine implements
   }
   
   protected boolean canFillTank(EnumFacing facing, FluidStack fluid) {
-    TileEntity te = func_145831_w().func_175625_s(this.field_174879_c.func_177972_a(facing));
+    TileEntity te = getWorld().func_175625_s(this.field_174879_c.func_177972_a(facing));
     if (te instanceof TileEntityTank)
       return (LiquidUtil.fillTile(te, facing, fluid, true) == fluid.amount); 
     return false;
   }
   
   protected void fillTank(EnumFacing facing, FluidStack fluid) {
-    TileEntity te = func_145831_w().func_175625_s(this.field_174879_c.func_177972_a(facing));
+    TileEntity te = getWorld().func_175625_s(this.field_174879_c.func_177972_a(facing));
     if (te instanceof TileEntityTank)
       LiquidUtil.fillTile(te, facing, fluid, false); 
   }

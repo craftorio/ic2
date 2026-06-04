@@ -25,7 +25,7 @@ public class AdvShapelessRecipeWrapper extends BlankRecipeWrapper {
       ret.add(input.getInputs()); 
     if (ret.size() == 1 && ((List)ret.get(0)).size() == 1) {
       ItemStack stack = ((List<ItemStack>)ret.get(0)).get(0);
-      if (stack.func_77973_b() == ItemName.painter.getInstance() && stack.func_77960_j() == 32767)
+      if (stack.getItem() == ItemName.painter.getInstance() && stack.func_77960_j() == 32767)
         ret.set(0, (List<ItemStack>)Arrays.<Ic2Color>stream(Ic2Color.values).map(ItemName.painter::getItemStack).collect(Collectors.toList())); 
     } 
     return ret;

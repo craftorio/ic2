@@ -9,6 +9,6 @@ public class ComparatorEmitter extends BasicRedstoneComponent {
   }
   
   public void onChange() {
-    this.parent.func_145831_w().func_175666_e(this.parent.func_174877_v(), (Block)this.parent.getBlockType());
+    this.parent.getWorld().func_175666_e(this.parent.getPos(), (Block)this.parent.func_145838_q());
   }
 }

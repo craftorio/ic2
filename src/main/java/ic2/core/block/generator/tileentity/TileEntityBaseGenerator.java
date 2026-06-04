@@ -48,13 +48,13 @@ public abstract class TileEntityBaseGenerator extends TileEntityInventory implem
     this.energy = (Energy)addComponent((TileEntityComponent)Energy.asBasicSource((TileEntityBlock)this, maxStorage, tier).addManagedSlot((InvSlot)this.chargeSlot));
   }
   
-  public void func_145839_a(NBTTagCompound nbttagcompound) {
-    super.func_145839_a(nbttagcompound);
+  public void readFromNBT(NBTTagCompound nbttagcompound) {
+    super.readFromNBT(nbttagcompound);
     this.fuel = nbttagcompound.func_74762_e("fuel");
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     nbt.func_74768_a("fuel", this.fuel);
     return nbt;
   }

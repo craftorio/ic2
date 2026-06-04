@@ -167,7 +167,7 @@ public final class Util {
   public static String toString(TileEntity te) {
     if (te == null)
       return "null"; 
-    return toString(te, (IBlockAccess)te.func_145831_w(), te.func_174877_v());
+    return toString(te, (IBlockAccess)te.getWorld(), te.getPos());
   }
   
   public static String toString(Object o, IBlockAccess world, BlockPos pos) {
@@ -190,7 +190,7 @@ public final class Util {
   }
   
   public static String formatPosition(TileEntity te) {
-    return formatPosition((IBlockAccess)te.func_145831_w(), te.func_174877_v());
+    return formatPosition((IBlockAccess)te.getWorld(), te.getPos());
   }
   
   public static String formatPosition(IBlockAccess world, BlockPos pos) {
@@ -546,7 +546,7 @@ public final class Util {
   }
   
   public static boolean harvestBlock(World world, BlockPos pos) {
-    if (world.field_72995_K)
+    if (world.isRemote)
       return false; 
     IBlockState state = world.func_180495_p(pos);
     Block block = state.func_177230_c();

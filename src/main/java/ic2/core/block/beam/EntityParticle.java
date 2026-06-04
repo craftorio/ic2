@@ -17,11 +17,11 @@ public class EntityParticle extends Entity {
   }
   
   public EntityParticle(TileEmitter emitter) {
-    this(emitter.func_145831_w());
+    this(emitter.getWorld());
     EnumFacing dir = emitter.getFacing();
-    double x = emitter.func_174877_v().func_177958_n() + 0.5D + dir.func_82601_c() * 0.5D;
-    double y = emitter.func_174877_v().func_177956_o() + 0.5D + dir.func_96559_d() * 0.5D;
-    double z = emitter.func_174877_v().func_177952_p() + 0.5D + dir.func_82599_e() * 0.5D;
+    double x = emitter.getPos().func_177958_n() + 0.5D + dir.func_82601_c() * 0.5D;
+    double y = emitter.getPos().func_177956_o() + 0.5D + dir.func_96559_d() * 0.5D;
+    double z = emitter.getPos().func_177952_p() + 0.5D + dir.func_82599_e() * 0.5D;
     func_70107_b(x, y, z);
     this.field_70159_w = dir.func_82601_c() * 0.5D;
     this.field_70181_x = dir.func_96559_d() * 0.5D;

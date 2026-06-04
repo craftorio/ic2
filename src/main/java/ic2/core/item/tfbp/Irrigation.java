@@ -21,8 +21,8 @@ class Irrigation extends TerraformerBase {
     pos = TileEntityTerra.getFirstBlockFrom(world, pos, 10);
     if (pos == null)
       return false; 
-    if (TileEntityTerra.switchGround(world, pos, (Block)Blocks.field_150354_m, Blocks.field_150346_d.func_176223_P(), true)) {
-      TileEntityTerra.switchGround(world, pos, (Block)Blocks.field_150354_m, Blocks.field_150346_d.func_176223_P(), true);
+    if (TileEntityTerra.switchGround(world, pos, (Block)Blocks.SAND, Blocks.field_150346_d.getDefaultState(), true)) {
+      TileEntityTerra.switchGround(world, pos, (Block)Blocks.SAND, Blocks.field_150346_d.getDefaultState(), true);
       return true;
     } 
     IBlockState state = world.func_180495_p(pos);
@@ -78,11 +78,11 @@ class Irrigation extends TerraformerBase {
       return false; 
     Block block = world.func_180495_p(pos).func_177230_c();
     if (block == Blocks.field_150346_d) {
-      world.func_175656_a(pos, Blocks.field_150349_c.func_176223_P());
+      world.func_175656_a(pos, Blocks.field_150349_c.getDefaultState());
       return true;
     } 
     if (block == Blocks.field_150349_c) {
-      world.func_175656_a(pos.func_177984_a(), Blocks.field_150329_H.func_176223_P().func_177226_a((IProperty)BlockTallGrass.field_176497_a, (Comparable)BlockTallGrass.EnumType.GRASS));
+      world.func_175656_a(pos.func_177984_a(), Blocks.field_150329_H.getDefaultState().func_177226_a((IProperty)BlockTallGrass.field_176497_a, (Comparable)BlockTallGrass.EnumType.GRASS));
       return true;
     } 
     return false;

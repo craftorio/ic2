@@ -22,7 +22,7 @@ public class BehaviorTeBlockDispense extends BehaviorDefaultDispenseItem {
     if (StackUtil.checkItemEquality(stack, BlockName.te.getItemStack((Enum)TeBlock.itnt))) {
       World world = source.func_82618_k();
       BlockPos pos = source.func_180699_d().func_177972_a((EnumFacing)source.func_189992_e().func_177229_b((IProperty)BlockDispenser.field_176441_a));
-      assert !world.field_72995_K;
+      assert !world.isRemote;
       EntityItnt entityItnt = new EntityItnt(world, pos.func_177958_n() + 0.5D, pos.func_177956_o(), pos.func_177952_p() + 0.5D);
       world.func_175698_g(pos);
       world.func_72838_d((Entity)entityItnt);

@@ -33,7 +33,7 @@ public class ItemCrop extends ItemIC2 implements IBoxable {
     ItemStack cropStickStack = StackUtil.get(player, hand);
     if (StackUtil.isEmpty(cropStickStack))
       return EnumActionResult.PASS; 
-    if (world.func_180495_p(pos.func_177977_b()).func_177230_c() != Blocks.field_150458_ak)
+    if (world.func_180495_p(pos.func_177977_b()).func_177230_c() != Blocks.FARMLAND)
       return EnumActionResult.PASS; 
     if (!player.func_175151_a(pos, side, cropStickStack))
       return EnumActionResult.PASS; 

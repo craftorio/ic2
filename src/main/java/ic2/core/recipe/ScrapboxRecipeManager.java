@@ -151,7 +151,7 @@ public final class ScrapboxRecipeManager implements IScrapboxManager {
     addDrop(Items.field_151041_m, 1.0F);
     addDrop(Items.field_151038_n, 1.0F);
     addDrop(Items.field_151039_o, 1.0F);
-    addDrop(Blocks.field_150425_aM, 1.0F);
+    addDrop(Blocks.SOUL_SAND, 1.0F);
     addDrop(Items.field_151155_ap, 1.0F);
     addDrop(Items.field_151116_aA, 1.0F);
     addDrop(Items.field_151008_G, 1.0F);
@@ -175,7 +175,7 @@ public final class ScrapboxRecipeManager implements IScrapboxManager {
     addDrop((Item)Items.field_151169_ag, 0.01F);
     addDrop(Blocks.field_150352_o, 0.5F);
     addDrop(Items.field_151105_aU, 0.5F);
-    addDrop(Items.field_151045_i, 0.1F);
+    addDrop(Items.DIAMOND, 0.1F);
     addDrop(Items.field_151166_bC, 0.05F);
     addDrop(Items.field_151079_bi, 0.08F);
     addDrop(Items.field_151072_bj, 0.04F);

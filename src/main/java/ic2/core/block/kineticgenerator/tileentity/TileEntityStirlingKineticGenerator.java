@@ -86,23 +86,23 @@ public class TileEntityStirlingKineticGenerator extends TileEntityInventory impl
     this.maxkUBuffer = 2000;
   }
   
-  public void func_145839_a(NBTTagCompound nbt) {
-    super.func_145839_a(nbt);
-    this.inputTank.readFromNBT(nbt.func_74775_l("inputTank"));
-    this.outputTank.readFromNBT(nbt.func_74775_l("outputTank"));
+  public void readFromNBT(NBTTagCompound nbt) {
+    super.readFromNBT(nbt);
+    this.inputTank.readFromNBT(nbt.getCompoundTag("inputTank"));
+    this.outputTank.readFromNBT(nbt.getCompoundTag("outputTank"));
     this.heatbuffer = nbt.func_74762_e("heatbuffer");
     this.kUBuffer = nbt.func_74762_e("kubuffer");
     this.liquidHeatStored = nbt.func_74762_e("liquidHeatStored");
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     NBTTagCompound inputTankTag = new NBTTagCompound();
     this.inputTank.writeToNBT(inputTankTag);
-    nbt.func_74782_a("inputTank", (NBTBase)inputTankTag);
+    nbt.setTag("inputTank", (NBTBase)inputTankTag);
     NBTTagCompound outputTankTag = new NBTTagCompound();
     this.outputTank.writeToNBT(outputTankTag);
-    nbt.func_74782_a("outputTank", (NBTBase)outputTankTag);
+    nbt.setTag("outputTank", (NBTBase)outputTankTag);
     nbt.func_74768_a("heatbuffer", this.heatbuffer);
     nbt.func_74768_a("kUBuffer", this.kUBuffer);
     nbt.func_74768_a("liquidHeatStored", this.liquidHeatStored);
@@ -146,7 +146,7 @@ public class TileEntityStirlingKineticGenerator extends TileEntityInventory impl
   private int drawHu(int amount) {
     if (amount <= 0)
       return 0; 
-    World world = func_145831_w();
+    World world = getWorld();
     int tmpAmount = amount;
     for (EnumFacing dir : EnumFacing.field_82609_l) {
       if (dir != getFacing()) {

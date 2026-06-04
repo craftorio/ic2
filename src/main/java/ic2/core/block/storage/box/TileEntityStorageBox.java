@@ -37,7 +37,7 @@ public abstract class TileEntityStorageBox extends TileEntityInventory implement
   
   public void onPlaced(ItemStack stack, EntityLivingBase placer, EnumFacing facing) {
     super.onPlaced(stack, placer, facing);
-    if (!(func_145831_w()).field_72995_K) {
+    if (!(getWorld()).isRemote) {
       NBTTagCompound nbt = StackUtil.getOrCreateNbtData(stack);
       this.inventory.readFromNbt(nbt);
     } 

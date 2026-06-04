@@ -186,7 +186,7 @@ public class TileEntityReplicator extends TileEntityElectricMachine implements I
   }
   
   public IPatternStorage getPatternStorage() {
-    World world = func_145831_w();
+    World world = getWorld();
     for (EnumFacing dir : EnumFacing.field_82609_l) {
       TileEntity target = world.func_175625_s(this.field_174879_c.func_177972_a(dir));
       if (target instanceof IPatternStorage)
@@ -235,27 +235,27 @@ public class TileEntityReplicator extends TileEntityElectricMachine implements I
     return this.fluidSlot.processIntoTank((IFluidTank)this.fluidTank, this.cellSlot);
   }
   
-  public void func_145839_a(NBTTagCompound nbt) {
-    super.func_145839_a(nbt);
-    this.extraUuStored = nbt.func_74769_h("extraUuStored");
-    this.uuProcessed = nbt.func_74769_h("uuProcessed");
+  public void readFromNBT(NBTTagCompound nbt) {
+    super.readFromNBT(nbt);
+    this.extraUuStored = nbt.getDouble("extraUuStored");
+    this.uuProcessed = nbt.getDouble("uuProcessed");
     this.index = nbt.func_74762_e("index");
     int modeIdx = nbt.func_74762_e("mode");
     this.mode = (modeIdx < (Mode.values()).length) ? Mode.values()[modeIdx] : Mode.STOPPED;
-    NBTTagCompound contentTag = nbt.func_74775_l("pattern");
+    NBTTagCompound contentTag = nbt.getCompoundTag("pattern");
     this.pattern = new ItemStack(contentTag);
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
-    nbt.func_74780_a("extraUuStored", this.extraUuStored);
-    nbt.func_74780_a("uuProcessed", this.uuProcessed);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
+    nbt.setDouble("extraUuStored", this.extraUuStored);
+    nbt.setDouble("uuProcessed", this.uuProcessed);
     nbt.func_74768_a("index", this.index);
     nbt.func_74768_a("mode", this.mode.ordinal());
     if (this.pattern != null) {
       NBTTagCompound contentTag = new NBTTagCompound();
       this.pattern.func_77955_b(contentTag);
-      nbt.func_74782_a("pattern", (NBTBase)contentTag);
+      nbt.setTag("pattern", (NBTBase)contentTag);
     } 
     return nbt;
   }

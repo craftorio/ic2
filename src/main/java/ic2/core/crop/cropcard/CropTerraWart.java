@@ -37,7 +37,7 @@ public class CropTerraWart extends IC2CropCard {
     if (crop.isBlockBelow(Blocks.field_150433_aE)) {
       if (canGrow(crop))
         crop.setGrowthPoints(crop.getGrowthPoints() + 100); 
-    } else if (crop.isBlockBelow(Blocks.field_150425_aM) && (crop.getWorldObj()).field_73012_v.nextInt(300) == 0) {
+    } else if (crop.isBlockBelow(Blocks.SOUL_SAND) && (crop.getWorldObj()).field_73012_v.nextInt(300) == 0) {
       crop.setCrop(IC2Crops.cropNetherWart);
     } 
   }

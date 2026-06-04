@@ -78,18 +78,18 @@ public class JetpackHandler implements IBackupElectricItemManager {
   }
   
   public static boolean hasJetpack(ItemStack stack) {
-    return (stack != null && (hasJetpackAttached(stack) || stack.func_77973_b() instanceof IJetpack));
+    return (stack != null && (hasJetpackAttached(stack) || stack.getItem() instanceof IJetpack));
   }
   
   public static IJetpack getJetpack(ItemStack stack) {
     assert hasJetpack(stack);
-    if (stack.func_77973_b() instanceof IJetpack)
-      return (IJetpack)stack.func_77973_b(); 
-    return (IJetpack)jetpack.func_77973_b();
+    if (stack.getItem() instanceof IJetpack)
+      return (IJetpack)stack.getItem(); 
+    return (IJetpack)jetpack.getItem();
   }
   
   public static double getTransferLimit() {
-    return ((IElectricItem)jetpack.func_77973_b()).getTransferLimit(jetpack);
+    return ((IElectricItem)jetpack.getItem()).getTransferLimit(jetpack);
   }
   
   public double charge(ItemStack stack, double amount, int tier, boolean ignoreTransferLimit, boolean simulate) {
@@ -97,10 +97,10 @@ public class JetpackHandler implements IBackupElectricItemManager {
       return 0.0D; 
     if (!ignoreTransferLimit)
       amount = Math.min(amount, getTransferLimit()); 
-    double charge = stack.func_77942_o() ? stack.func_77978_p().func_74769_h("charge") : 0.0D;
+    double charge = stack.func_77942_o() ? stack.func_77978_p().getDouble("charge") : 0.0D;
     amount = Math.min(amount, getMaxCharge(stack) - charge);
     if (!simulate)
-      StackUtil.getOrCreateNbtData(stack).func_74780_a("charge", charge + amount); 
+      StackUtil.getOrCreateNbtData(stack).setDouble("charge", charge + amount); 
     return amount;
   }
   
@@ -109,7 +109,7 @@ public class JetpackHandler implements IBackupElectricItemManager {
       return 0.0D; 
     if (!ignoreTransferLimit)
       amount = Math.min(amount, getTransferLimit()); 
-    double charge = stack.func_77978_p().func_74769_h("charge");
+    double charge = stack.func_77978_p().getDouble("charge");
     amount = Math.min(amount, charge);
     if (!simulate) {
       charge -= amount;
@@ -118,7 +118,7 @@ public class JetpackHandler implements IBackupElectricItemManager {
         if (stack.func_77978_p().func_82582_d())
           stack.func_77982_d(null); 
       } else {
-        stack.func_77978_p().func_74780_a("charge", charge);
+        stack.func_77978_p().setDouble("charge", charge);
       } 
     } 
     return amount;

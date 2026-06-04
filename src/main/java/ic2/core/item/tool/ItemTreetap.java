@@ -35,7 +35,7 @@ public class ItemTreetap extends ItemIC2 implements IBoxable {
     Block block = state.func_177230_c();
     if (block == BlockName.rubber_wood.getInstance()) {
       if (attemptExtract(player, world, pos, side, state, (List<ItemStack>)null)) {
-        if (!world.field_72995_K)
+        if (!world.isRemote)
           StackUtil.damage(player, hand, StackUtil.anyStack, 1); 
         return EnumActionResult.SUCCESS;
       } 
@@ -50,7 +50,7 @@ public class ItemTreetap extends ItemIC2 implements IBoxable {
     if (rwState.isPlain() || rwState.facing != side)
       return false; 
     if (rwState.wet) {
-      if (!world.field_72995_K) {
+      if (!world.isRemote) {
         world.func_175656_a(pos, state.func_177226_a((IProperty)BlockRubWood.stateProperty, (Comparable)rwState.getDry()));
         if (stacks != null) {
           stacks.add(StackUtil.copyWithSize(ItemName.misc_resource.getItemStack((Enum)MiscResourceType.resin), world.field_73012_v.nextInt(3) + 1));
@@ -60,14 +60,14 @@ public class ItemTreetap extends ItemIC2 implements IBoxable {
         if (player != null)
           IC2.achievements.issueAchievement(player, "acquireResin"); 
       } 
-      if (world.field_72995_K && player != null)
+      if (world.isRemote && player != null)
         IC2.audioManager.playOnce(player, PositionSpec.Hand, "Tools/Treetap.ogg", true, IC2.audioManager.getDefaultVolume()); 
       return true;
     } 
-    if (!world.field_72995_K && world.field_73012_v.nextInt(5) == 0)
+    if (!world.isRemote && world.field_73012_v.nextInt(5) == 0)
       world.func_175656_a(pos, state.func_177226_a((IProperty)BlockRubWood.stateProperty, (Comparable)BlockRubWood.RubberWoodState.plain_y)); 
     if (world.field_73012_v.nextInt(5) == 0) {
-      if (!world.field_72995_K) {
+      if (!world.isRemote) {
         ejectResin(world, pos, side, 1);
         if (stacks != null) {
           stacks.add(ItemName.misc_resource.getItemStack((Enum)MiscResourceType.resin));
@@ -75,7 +75,7 @@ public class ItemTreetap extends ItemIC2 implements IBoxable {
           ejectResin(world, pos, side, 1);
         } 
       } 
-      if (world.field_72995_K && player != null)
+      if (world.isRemote && player != null)
         IC2.audioManager.playOnce(player, PositionSpec.Hand, "Tools/Treetap.ogg", true, IC2.audioManager.getDefaultVolume()); 
       return true;
     } 

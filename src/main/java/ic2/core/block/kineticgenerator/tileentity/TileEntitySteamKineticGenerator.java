@@ -127,7 +127,7 @@ public class TileEntitySteamKineticGenerator extends TileEntityInventory impleme
   }
   
   private void outputSteam(int amount, boolean hotSteam) {
-    World world = func_145831_w();
+    World world = getWorld();
     for (EnumFacing dir : EnumFacing.field_82609_l) {
       TileEntity te = world.func_175625_s(this.field_174879_c.func_177972_a(dir));
       if (te instanceof ic2.core.block.machine.tileentity.TileEntityCondenser || (hotSteam && te instanceof TileEntitySteamKineticGenerator)) {
@@ -152,13 +152,13 @@ public class TileEntitySteamKineticGenerator extends TileEntityInventory impleme
     return this.kUoutput;
   }
   
-  public void func_145839_a(NBTTagCompound nbt) {
-    super.func_145839_a(nbt);
+  public void readFromNBT(NBTTagCompound nbt) {
+    super.readFromNBT(nbt);
     this.condensationProgress = nbt.func_74762_e("condensationprogress");
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     nbt.func_74768_a("condensationprogress", this.condensationProgress);
     return nbt;
   }

@@ -75,16 +75,16 @@ public class TileEntityFluidHeatGenerator extends TileEntityHeatSourceInventory 
     Recipes.fluidHeatGenerator.addFluid(fluidName, amount, heat);
   }
   
-  public void func_145839_a(NBTTagCompound nbttagcompound) {
-    super.func_145839_a(nbttagcompound);
-    this.fluidTank.readFromNBT(nbttagcompound.func_74775_l("fluidTank"));
+  public void readFromNBT(NBTTagCompound nbttagcompound) {
+    super.readFromNBT(nbttagcompound);
+    this.fluidTank.readFromNBT(nbttagcompound.getCompoundTag("fluidTank"));
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     NBTTagCompound fluidTankTag = new NBTTagCompound();
     this.fluidTank.writeToNBT(fluidTankTag);
-    nbt.func_74782_a("fluidTank", (NBTBase)fluidTankTag);
+    nbt.setTag("fluidTank", (NBTBase)fluidTankTag);
     return nbt;
   }
   

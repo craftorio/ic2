@@ -34,10 +34,10 @@ public class TileEntityTesla extends TileEntityBlock {
   
   protected boolean shock(int damage) {
     int r = 4;
-    World world = func_145831_w();
+    World world = getWorld();
     List<EntityLivingBase> entities = world.func_72872_a(EntityLivingBase.class, new AxisAlignedBB((this.field_174879_c
-          .func_177958_n() - 4), (this.field_174879_c.func_177956_o() - 4), (this.field_174879_c.func_177952_p() - 4), (this.field_174879_c
-          .func_177958_n() + 4 + 1), (this.field_174879_c.func_177956_o() + 4 + 1), (this.field_174879_c.func_177952_p() + 4 + 1)));
+          .getX() - 4), (this.field_174879_c.getY() - 4), (this.field_174879_c.getZ() - 4), (this.field_174879_c
+          .getX() + 4 + 1), (this.field_174879_c.getY() + 4 + 1), (this.field_174879_c.getZ() + 4 + 1)));
     for (EntityLivingBase entity : entities) {
       if (ItemArmorHazmat.hasCompleteHazmat(entity))
         continue; 

@@ -35,7 +35,7 @@ public class GuiAdvMiner extends GuiIC2<ContainerAdvMiner> {
   protected void drawForegroundLayer(int mouseX, int mouseY) {
     BlockPos target = ((TileEntityAdvMiner)((ContainerAdvMiner)this.container).base).getMineTarget();
     if (target != null) {
-      BlockPos pos = ((TileEntityAdvMiner)((ContainerAdvMiner)this.container).base).func_174877_v();
+      BlockPos pos = ((TileEntityAdvMiner)((ContainerAdvMiner)this.container).base).getPos();
       this.field_146289_q.func_78276_b(Localization.translate("ic2.AdvMiner.gui.info.minelevel", new Object[] { Integer.valueOf(target.func_177958_n() - pos.func_177958_n()), Integer.valueOf(target.func_177952_p() - pos.func_177952_p()), Integer.valueOf(target.func_177956_o() - pos.func_177956_o()) }), 28, 105, 2157374);
     } 
     if (((TileEntityAdvMiner)((ContainerAdvMiner)this.container).base).blacklist) {

@@ -50,7 +50,7 @@ public class InvSlotUpgrade extends InvSlot {
   }
   
   public boolean accepts(ItemStack stack) {
-    Item rawItem = stack.func_77973_b();
+    Item rawItem = stack.getItem();
     if (!(rawItem instanceof IUpgradeItem))
       return false; 
     IUpgradeItem item = (IUpgradeItem)rawItem;
@@ -64,7 +64,7 @@ public class InvSlotUpgrade extends InvSlot {
     for (int i = 0; i < size(); i++) {
       ItemStack stack = get(i);
       if (!StackUtil.isEmpty(stack) && accepts(stack)) {
-        IUpgradeItem upgrade = (IUpgradeItem)stack.func_77973_b();
+        IUpgradeItem upgrade = (IUpgradeItem)stack.getItem();
         boolean all = upgrade instanceof ic2.api.upgrade.IFullUpgrade;
         int size = StackUtil.getSize(stack);
         if (all || upgrade instanceof IAugmentationUpgrade)
@@ -152,7 +152,7 @@ public class InvSlotUpgrade extends InvSlot {
     for (ItemStack stack : this) {
       if (StackUtil.isEmpty(stack) || !accepts(stack))
         continue; 
-      IUpgradeItem upgrade = (IUpgradeItem)stack.func_77973_b();
+      IUpgradeItem upgrade = (IUpgradeItem)stack.getItem();
       if (upgrade instanceof IRemoteAccessUpgrade)
         existingRange = ((IRemoteAccessUpgrade)upgrade).getRangeAmplification(stack, (IUpgradableBlock)this.base, existingRange); 
     } 
@@ -169,8 +169,8 @@ public class InvSlotUpgrade extends InvSlot {
     boolean ret = false;
     for (int i = 0; i < size(); i++) {
       ItemStack stack = get(i);
-      if (!StackUtil.isEmpty(stack) && stack.func_77973_b() instanceof IUpgradeItem)
-        if (((IUpgradeItem)stack.func_77973_b()).onTick(stack, block))
+      if (!StackUtil.isEmpty(stack) && stack.getItem() instanceof IUpgradeItem)
+        if (((IUpgradeItem)stack.getItem()).onTick(stack, block))
           ret = true;  
     } 
     return ret;

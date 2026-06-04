@@ -77,7 +77,7 @@ public abstract class ItemIC2FluidContainer extends ItemIC2 implements IMultiIte
   public String getVariant(ItemStack stack) {
     if (stack == null)
       throw new NullPointerException("null stack"); 
-    if (stack.func_77973_b() != this)
+    if (stack.getItem() != this)
       throw new IllegalArgumentException("The stack " + stack + " doesn't match " + this); 
     FluidStack fs = FluidUtil.getFluidContained(stack);
     if (fs == null || fs.getFluid() == null)

@@ -57,7 +57,7 @@ public class TileEntityClassicElectrolyzer extends TileEntityInventory implement
   
   protected void onLoaded() {
     super.onLoaded();
-    if ((func_145831_w()).field_72995_K)
+    if ((getWorld()).isRemote)
       this.audio = IC2.audioManager.createSource(this, "Machines/ElectrolyzerLoop.ogg"); 
   }
   
@@ -166,7 +166,7 @@ public class TileEntityClassicElectrolyzer extends TileEntityInventory implement
   }
   
   public TileEntityElectricBlock lookForMFE() {
-    World world = func_145831_w();
+    World world = getWorld();
     for (EnumFacing dir : EnumFacing.field_82609_l) {
       TileEntity te = world.func_175625_s(this.field_174879_c.func_177972_a(dir));
       if (te instanceof TileEntityElectricBlock)

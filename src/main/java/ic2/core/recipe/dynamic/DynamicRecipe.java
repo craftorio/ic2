@@ -134,7 +134,7 @@ public class DynamicRecipe {
   public DynamicRecipe withMetadata(String key, double value) {
     if (this.metadata == null)
       this.metadata = new NBTTagCompound(); 
-    this.metadata.func_74780_a(key, value);
+    this.metadata.setDouble(key, value);
     return this;
   }
   

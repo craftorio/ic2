@@ -305,7 +305,7 @@ public final class BlockTileEntity extends BlockBase implements IMultiBlock<ITeB
   public String getVariant(ItemStack stack) {
     if (stack == null)
       throw new NullPointerException("null stack"); 
-    if (stack.func_77973_b() != this.item)
+    if (stack.getItem() != this.item)
       throw new IllegalArgumentException("The stack " + stack + " doesn't match " + this.item + " (" + this + ")"); 
     ITeBlock type = TeBlockRegistry.get(this.item.identifier, stack.func_77960_j());
     if (type == null)
@@ -324,7 +324,7 @@ public final class BlockTileEntity extends BlockBase implements IMultiBlock<ITeB
   public boolean canReplace(World world, BlockPos pos, EnumFacing side, ItemStack stack) {
     if (StackUtil.isEmpty(stack))
       return true; 
-    if (stack.func_77973_b() != this.item)
+    if (stack.getItem() != this.item)
       return false; 
     ITeBlock type = TeBlockRegistry.get(this.item.identifier, stack.func_77960_j());
     if (type == null)
@@ -334,7 +334,7 @@ public final class BlockTileEntity extends BlockBase implements IMultiBlock<ITeB
   }
   
   public boolean addLandingEffects(IBlockState state, WorldServer world, BlockPos pos, IBlockState state2, EntityLivingBase entity, int numberOfParticles) {
-    if (world.field_72995_K)
+    if (world.isRemote)
       throw new IllegalStateException(); 
     TileEntityBlock te = getTe((IBlockAccess)world, pos);
     if (te == null)
@@ -348,7 +348,7 @@ public final class BlockTileEntity extends BlockBase implements IMultiBlock<ITeB
   }
   
   public boolean addRunningEffects(IBlockState state, World world, BlockPos pos, Entity entity) {
-    if (world.field_72995_K)
+    if (world.isRemote)
       return true; 
     TileEntityBlock te = getTe((IBlockAccess)world, pos);
     if (te == null)
@@ -591,7 +591,7 @@ public final class BlockTileEntity extends BlockBase implements IMultiBlock<ITeB
     if (te != null) {
       if (!te.onRemovedByPlayer(player, willHarvest))
         return false; 
-      if (willHarvest && !world.field_72995_K) {
+      if (willHarvest && !world.isRemote) {
         removedTes[nextRemovedTeIndex] = new WeakReference<>(te);
         nextRemovedTeIndex = (nextRemovedTeIndex + 1) % 4;
       } 
@@ -631,7 +631,7 @@ public final class BlockTileEntity extends BlockBase implements IMultiBlock<ITeB
         stack = player.func_184614_ca();
         if (!stack.func_190926_b()) {
           String tool = TeBlock.HarvestTool.Pickaxe.toolClass;
-          return (stack.func_77973_b().getHarvestLevel(stack, tool, player, world.func_180495_p(pos)) >= TeBlock.HarvestTool.Pickaxe.level);
+          return (stack.getItem().getHarvestLevel(stack, tool, player, world.func_180495_p(pos)) >= TeBlock.HarvestTool.Pickaxe.level);
         } 
         break;
     } 
@@ -659,7 +659,7 @@ public final class BlockTileEntity extends BlockBase implements IMultiBlock<ITeB
     TileEntityBlock te = getTe(world, pos);
     if (te == null) {
       World realWorld = Util.getWorld(world);
-      if ((realWorld != null && realWorld.field_72995_K) || (realWorld == null && 
+      if ((realWorld != null && realWorld.isRemote) || (realWorld == null && 
         !IC2.platform.isSimulating()))
         return new ArrayList<>(); 
       i = nextRemovedTeIndex;
@@ -669,8 +669,8 @@ public final class BlockTileEntity extends BlockBase implements IMultiBlock<ITeB
         TileEntityBlock cTe;
         if (ref != null && (
           cTe = ref.get()) != null && (realWorld == null || cTe
-          .func_145831_w() == realWorld) && cTe
-          .func_174877_v().equals(pos)) {
+          .getWorld() == realWorld) && cTe
+          .getPos().equals(pos)) {
           te = cTe;
           removedTes[checkIdx] = null;
           break;
@@ -688,7 +688,7 @@ public final class BlockTileEntity extends BlockBase implements IMultiBlock<ITeB
         ItemStack stack = player.func_184614_ca();
         if (!stack.func_190926_b()) {
           String tool = TeBlock.HarvestTool.Wrench.toolClass;
-          i = wasWrench | ((stack.func_77973_b().getHarvestLevel(stack, tool, player, state) >= TeBlock.HarvestTool.Wrench.level) ? 1 : 0);
+          i = wasWrench | ((stack.getItem().getHarvestLevel(stack, tool, player, state) >= TeBlock.HarvestTool.Wrench.level) ? 1 : 0);
         } 
       } 
     } 

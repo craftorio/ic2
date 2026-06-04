@@ -19,7 +19,7 @@ public class RenderExplosiveBlock extends Render<EntityIC2Explosive> {
     this.field_76989_e = 0.5F;
   }
   
-  public void doRender(EntityIC2Explosive entity, double x, double y, double z, float entityYaw, float partialTicks) {
+  public void func_76986_a(EntityIC2Explosive entity, double x, double y, double z, float entityYaw, float partialTicks) {
     BlockRendererDispatcher blockRenderer = Minecraft.func_71410_x().func_175602_ab();
     GlStateManager.func_179094_E();
     GlStateManager.func_179109_b((float)x, (float)y + 0.5F, (float)z);
@@ -56,7 +56,7 @@ public class RenderExplosiveBlock extends Render<EntityIC2Explosive> {
     super.func_76986_a(entity, x, y, z, entityYaw, partialTicks);
   }
   
-  protected ResourceLocation getEntityTexture(EntityIC2Explosive entity) {
+  protected ResourceLocation func_110775_a(EntityIC2Explosive entity) {
     return TextureMap.field_110575_b;
   }
 }

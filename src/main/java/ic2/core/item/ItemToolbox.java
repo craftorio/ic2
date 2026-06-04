@@ -33,7 +33,7 @@ public class ItemToolbox extends ItemIC2 implements IHandHeldInventory {
           public ModelResourceLocation func_178113_a(ItemStack stack) {
             EntityPlayer player = IC2.platform.getPlayerInstance();
             ItemStack mainHandItem;
-            boolean open = (player != null && player.field_71070_bA instanceof ContainerToolbox && (StackUtil.checkItemEquality(mainHandItem = player.func_184614_ca(), stack) || (StackUtil.checkItemEquality(player.func_184592_cb(), stack) && (mainHandItem == null || !(mainHandItem.func_77973_b() instanceof IHandHeldInventory)))));
+            boolean open = (player != null && player.field_71070_bA instanceof ContainerToolbox && (StackUtil.checkItemEquality(mainHandItem = player.func_184614_ca(), stack) || (StackUtil.checkItemEquality(player.func_184592_cb(), stack) && (mainHandItem == null || !(mainHandItem.getItem() instanceof IHandHeldInventory)))));
             return ItemIC2.getModelLocation(name, open ? "open" : null);
           }
         });
@@ -49,7 +49,7 @@ public class ItemToolbox extends ItemIC2 implements IHandHeldInventory {
   }
   
   public boolean onDroppedByPlayer(ItemStack stack, EntityPlayer player) {
-    if (!(player.func_130014_f_()).field_72995_K && !StackUtil.isEmpty(stack) && player.field_71070_bA instanceof ContainerToolbox) {
+    if (!(player.func_130014_f_()).isRemote && !StackUtil.isEmpty(stack) && player.field_71070_bA instanceof ContainerToolbox) {
       HandHeldToolbox toolbox = (HandHeldToolbox)((ContainerToolbox)player.field_71070_bA).base;
       if (toolbox.isThisContainer(stack)) {
         toolbox.saveAsThrown(stack);

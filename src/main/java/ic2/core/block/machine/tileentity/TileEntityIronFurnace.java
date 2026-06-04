@@ -50,20 +50,20 @@ public class TileEntityIronFurnace extends TileEntityInventory implements IHasGu
     super.onUnloaded();
   }
   
-  public void func_145839_a(NBTTagCompound nbt) {
-    super.func_145839_a(nbt);
+  public void readFromNBT(NBTTagCompound nbt) {
+    super.readFromNBT(nbt);
     this.fuel = nbt.func_74762_e("fuel");
     this.totalFuel = nbt.func_74762_e("totalFuel");
     this.progress = nbt.func_74765_d("progress");
-    this.xp = nbt.func_74769_h("xp");
+    this.xp = nbt.getDouble("xp");
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     nbt.func_74768_a("fuel", this.fuel);
     nbt.func_74768_a("totalFuel", this.totalFuel);
     nbt.func_74777_a("progress", this.progress);
-    nbt.func_74780_a("xp", this.xp);
+    nbt.setDouble("xp", this.xp);
     return nbt;
   }
   
@@ -99,10 +99,10 @@ public class TileEntityIronFurnace extends TileEntityInventory implements IHasGu
   protected void updateEntityClient() {
     super.updateEntityClient();
     if (getActive()) {
-      World world = func_145831_w();
+      World world = getWorld();
       showFlames(world, this.field_174879_c, getFacing());
       if (world.field_73012_v.nextDouble() < 0.1D)
-        world.func_184134_a(this.field_174879_c.func_177958_n() + 0.5D, this.field_174879_c.func_177956_o(), this.field_174879_c.func_177952_p() + 0.5D, SoundEvents.field_187652_bv, SoundCategory.BLOCKS, 1.0F, 1.0F, false); 
+        world.func_184134_a(this.field_174879_c.getX() + 0.5D, this.field_174879_c.getY(), this.field_174879_c.getZ() + 0.5D, SoundEvents.field_187652_bv, SoundCategory.BLOCKS, 1.0F, 1.0F, false); 
     } 
   }
   
@@ -186,7 +186,7 @@ public class TileEntityIronFurnace extends TileEntityInventory implements IHasGu
   
   public void onNetworkEvent(EntityPlayer player, int event) {
     if (event == 0) {
-      assert !(func_145831_w()).field_72995_K;
+      assert !(getWorld()).isRemote;
       this.xp = spawnXP(player, this.xp);
     } 
   }

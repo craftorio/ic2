@@ -39,7 +39,7 @@ public class TileEntityWaterGenerator extends TileEntityBaseRotorGenerator imple
       if (liquid == null)
         return false; 
       this.fuel += 500;
-      if (liquid.func_77973_b().hasContainerItem(liquid)) {
+      if (liquid.getItem().hasContainerItem(liquid)) {
         this.production = 1.0D;
       } else {
         this.production = 2.0D;
@@ -76,7 +76,7 @@ public class TileEntityWaterGenerator extends TileEntityBaseRotorGenerator imple
   }
   
   public void updateWaterCount() {
-    World world = func_145831_w();
+    World world = getWorld();
     int count = 0;
     for (int x = -1; x < 2; x++) {
       for (int y = -1; y < 2; y++) {

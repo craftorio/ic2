@@ -23,7 +23,7 @@ public class RecipeInputItemStack extends RecipeInputBase implements IRecipeInpu
   }
   
   public boolean matches(ItemStack subject) {
-    return (subject.func_77973_b() == this.input.func_77973_b() && (subject
+    return (subject.getItem() == this.input.getItem() && (subject
       .func_77960_j() == this.input.func_77960_j() || this.input.func_77960_j() == 32767) && (this.input
       .func_77960_j() == 32767 || StackUtil.matchesNBT(subject.func_77978_p(), this.input.func_77978_p())));
   }

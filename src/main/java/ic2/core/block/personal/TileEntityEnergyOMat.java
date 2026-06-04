@@ -70,29 +70,29 @@ public class TileEntityEnergyOMat extends TileEntityInventory implements IPerson
     this.upgradeSlot = new InvSlotUpgrade((IInventorySlotHolder)this, "upgrade", 1);
   }
   
-  public void func_145839_a(NBTTagCompound nbttagcompound) {
-    super.func_145839_a(nbttagcompound);
+  public void readFromNBT(NBTTagCompound nbttagcompound) {
+    super.readFromNBT(nbttagcompound);
     if (nbttagcompound.func_74764_b("ownerGameProfile"))
-      this.owner = NBTUtil.func_152459_a(nbttagcompound.func_74775_l("ownerGameProfile")); 
+      this.owner = NBTUtil.func_152459_a(nbttagcompound.getCompoundTag("ownerGameProfile")); 
     this.euOffer = nbttagcompound.func_74762_e("euOffer");
     this.paidFor = nbttagcompound.func_74762_e("paidFor");
     try {
-      this.euBuffer = nbttagcompound.func_74769_h("euBuffer");
+      this.euBuffer = nbttagcompound.getDouble("euBuffer");
     } catch (Exception e) {
       this.euBuffer = nbttagcompound.func_74762_e("euBuffer");
     } 
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     if (this.owner != null) {
       NBTTagCompound ownerNbt = new NBTTagCompound();
       NBTUtil.func_180708_a(ownerNbt, this.owner);
-      nbt.func_74782_a("ownerGameProfile", (NBTBase)ownerNbt);
+      nbt.setTag("ownerGameProfile", (NBTBase)ownerNbt);
     } 
     nbt.func_74768_a("euOffer", this.euOffer);
     nbt.func_74768_a("paidFor", this.paidFor);
-    nbt.func_74780_a("euBuffer", this.euBuffer);
+    nbt.setDouble("euBuffer", this.euBuffer);
     return nbt;
   }
   
@@ -102,7 +102,7 @@ public class TileEntityEnergyOMat extends TileEntityInventory implements IPerson
   
   protected void onLoaded() {
     super.onLoaded();
-    if (!(func_145831_w()).field_72995_K) {
+    if (!(getWorld()).isRemote) {
       MinecraftForge.EVENT_BUS.post((Event)new EnergyTileLoadEvent((IEnergyTile)this));
       this.addedToEnergyNet = true;
     } 

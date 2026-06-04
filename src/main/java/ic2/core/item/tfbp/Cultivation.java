@@ -20,21 +20,21 @@ import net.minecraft.world.World;
 
 class Cultivation extends TerraformerBase {
   void init() {
-    plants.add(Blocks.field_150329_H.func_176223_P().func_177226_a((IProperty)BlockTallGrass.field_176497_a, (Comparable)BlockTallGrass.EnumType.GRASS));
-    plants.add(Blocks.field_150329_H.func_176223_P().func_177226_a((IProperty)BlockTallGrass.field_176497_a, (Comparable)BlockTallGrass.EnumType.GRASS));
-    plants.add(Blocks.field_150329_H.func_176223_P().func_177226_a((IProperty)BlockTallGrass.field_176497_a, (Comparable)BlockTallGrass.EnumType.FERN));
-    plants.add(Blocks.field_150328_O.func_176223_P());
-    plants.add(Blocks.field_150327_N.func_176223_P());
-    plants.add(Blocks.field_150398_cm.func_176223_P().func_177226_a((IProperty)BlockDoublePlant.field_176493_a, (Comparable)BlockDoublePlant.EnumPlantType.GRASS));
-    plants.add(Blocks.field_150398_cm.func_176223_P().func_177226_a((IProperty)BlockDoublePlant.field_176493_a, (Comparable)BlockDoublePlant.EnumPlantType.ROSE));
-    plants.add(Blocks.field_150398_cm.func_176223_P().func_177226_a((IProperty)BlockDoublePlant.field_176493_a, (Comparable)BlockDoublePlant.EnumPlantType.SUNFLOWER));
+    plants.add(Blocks.field_150329_H.getDefaultState().func_177226_a((IProperty)BlockTallGrass.field_176497_a, (Comparable)BlockTallGrass.EnumType.GRASS));
+    plants.add(Blocks.field_150329_H.getDefaultState().func_177226_a((IProperty)BlockTallGrass.field_176497_a, (Comparable)BlockTallGrass.EnumType.GRASS));
+    plants.add(Blocks.field_150329_H.getDefaultState().func_177226_a((IProperty)BlockTallGrass.field_176497_a, (Comparable)BlockTallGrass.EnumType.FERN));
+    plants.add(Blocks.field_150328_O.getDefaultState());
+    plants.add(Blocks.field_150327_N.getDefaultState());
+    plants.add(Blocks.field_150398_cm.getDefaultState().func_177226_a((IProperty)BlockDoublePlant.field_176493_a, (Comparable)BlockDoublePlant.EnumPlantType.GRASS));
+    plants.add(Blocks.field_150398_cm.getDefaultState().func_177226_a((IProperty)BlockDoublePlant.field_176493_a, (Comparable)BlockDoublePlant.EnumPlantType.ROSE));
+    plants.add(Blocks.field_150398_cm.getDefaultState().func_177226_a((IProperty)BlockDoublePlant.field_176493_a, (Comparable)BlockDoublePlant.EnumPlantType.SUNFLOWER));
     for (BlockPlanks.EnumType type : BlockSapling.field_176480_a.func_177700_c())
-      plants.add(Blocks.field_150345_g.func_176223_P().func_177226_a((IProperty)BlockSapling.field_176480_a, (Comparable)type)); 
-    plants.add(Blocks.field_150464_aj.func_176223_P());
-    plants.add(Blocks.field_150337_Q.func_176223_P());
-    plants.add(Blocks.field_150338_P.func_176223_P());
-    plants.add(Blocks.field_150423_aK.func_176223_P());
-    plants.add(Blocks.field_150440_ba.func_176223_P());
+      plants.add(Blocks.field_150345_g.getDefaultState().func_177226_a((IProperty)BlockSapling.field_176480_a, (Comparable)type)); 
+    plants.add(Blocks.field_150464_aj.getDefaultState());
+    plants.add(Blocks.field_150337_Q.getDefaultState());
+    plants.add(Blocks.field_150338_P.getDefaultState());
+    plants.add(Blocks.field_150423_aK.getDefaultState());
+    plants.add(Blocks.field_150440_ba.getDefaultState());
     plants.add(BlockName.sapling.getInstance().func_176223_P());
   }
   
@@ -42,15 +42,15 @@ class Cultivation extends TerraformerBase {
     pos = TileEntityTerra.getFirstSolidBlockFrom(world, pos, 10);
     if (pos == null)
       return false; 
-    if (TileEntityTerra.switchGround(world, pos, (Block)Blocks.field_150354_m, Blocks.field_150346_d.func_176223_P(), true))
+    if (TileEntityTerra.switchGround(world, pos, (Block)Blocks.SAND, Blocks.field_150346_d.getDefaultState(), true))
       return true; 
-    if (TileEntityTerra.switchGround(world, pos, Blocks.field_150377_bs, Blocks.field_150346_d.func_176223_P(), true)) {
+    if (TileEntityTerra.switchGround(world, pos, Blocks.field_150377_bs, Blocks.field_150346_d.getDefaultState(), true)) {
       int i = 4;
-      while (--i > 0 && TileEntityTerra.switchGround(world, pos, Blocks.field_150377_bs, Blocks.field_150346_d.func_176223_P(), true));
+      while (--i > 0 && TileEntityTerra.switchGround(world, pos, Blocks.field_150377_bs, Blocks.field_150346_d.getDefaultState(), true));
     } 
     Block block = world.func_180495_p(pos).func_177230_c();
     if (block == Blocks.field_150346_d) {
-      world.func_175656_a(pos, Blocks.field_150349_c.func_176223_P());
+      world.func_175656_a(pos, Blocks.field_150349_c.getDefaultState());
       return true;
     } 
     if (block == Blocks.field_150349_c)
@@ -67,7 +67,7 @@ class Cultivation extends TerraformerBase {
       if (plant.func_177228_b().containsKey(BlockDirectional.field_176387_N))
         plant = plant.func_177226_a((IProperty)BlockDirectional.field_176387_N, (Comparable)EnumFacing.field_176754_o[world.field_73012_v.nextInt(EnumFacing.field_176754_o.length)]); 
       if (plant.func_177230_c() instanceof net.minecraft.block.BlockCrops) {
-        world.func_175656_a(pos, Blocks.field_150458_ak.func_176223_P());
+        world.func_175656_a(pos, Blocks.FARMLAND.getDefaultState());
       } else if (plant.func_177230_c() == Blocks.field_150398_cm) {
         plant = plant.func_177226_a((IProperty)BlockDoublePlant.field_176492_b, (Comparable)BlockDoublePlant.EnumBlockHalf.LOWER);
         world.func_175656_a(above, plant.func_177226_a((IProperty)BlockDoublePlant.field_176492_b, (Comparable)BlockDoublePlant.EnumBlockHalf.LOWER));

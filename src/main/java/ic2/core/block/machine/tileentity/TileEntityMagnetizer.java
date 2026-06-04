@@ -37,7 +37,7 @@ public class TileEntityMagnetizer extends TileEntityElectricMachine implements I
   
   public void func_70296_d() {
     super.func_70296_d();
-    if (!(func_145831_w()).field_72995_K)
+    if (!(getWorld()).isRemote)
       setOverclockRates(); 
   }
   

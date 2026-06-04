@@ -43,7 +43,7 @@ public abstract class TileEntityConversionGenerator extends TileEntityInventory 
   
   protected void onUnloaded() {
     super.onUnloaded();
-    if (this.registeredToEnet && !this.field_145850_b.field_72995_K) {
+    if (this.registeredToEnet && !this.field_145850_b.isRemote) {
       EnergyNet.instance.removeTile((IEnergyTile)this);
       this.registeredToEnet = false;
     } 
@@ -51,7 +51,7 @@ public abstract class TileEntityConversionGenerator extends TileEntityInventory 
   
   protected void onLoaded() {
     super.onLoaded();
-    if (!this.registeredToEnet && !this.field_145850_b.field_72995_K) {
+    if (!this.registeredToEnet && !this.field_145850_b.isRemote) {
       EnergyNet.instance.addTile((TileEntity)this);
       this.registeredToEnet = true;
     } 

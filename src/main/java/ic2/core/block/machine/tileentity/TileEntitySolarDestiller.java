@@ -82,7 +82,7 @@ public class TileEntitySolarDestiller extends TileEntityInventory implements IHa
   }
   
   public void updateSunVisibility() {
-    this.skyLight = TileEntitySolarGenerator.getSkyLight(func_145831_w(), this.field_174879_c.func_177984_a());
+    this.skyLight = TileEntitySolarGenerator.getSkyLight(getWorld(), this.field_174879_c.func_177984_a());
   }
   
   public ContainerBase<TileEntitySolarDestiller> getGuiContainer(EntityPlayer player) {
@@ -97,7 +97,7 @@ public class TileEntitySolarDestiller extends TileEntityInventory implements IHa
   public void onGuiClosed(EntityPlayer player) {}
   
   public int getTickRate() {
-    Biome biome = BiomeUtil.getBiome(func_145831_w(), this.field_174879_c);
+    Biome biome = BiomeUtil.getBiome(getWorld(), this.field_174879_c);
     if (BiomeDictionary.hasType(biome, BiomeDictionary.Type.HOT) == true)
       return 36; 
     if (BiomeDictionary.hasType(biome, BiomeDictionary.Type.COLD) == true)

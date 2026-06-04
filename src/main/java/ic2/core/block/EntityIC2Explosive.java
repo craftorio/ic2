@@ -37,7 +37,7 @@ public class EntityIC2Explosive extends Entity {
     this.radiationRange = 0;
     this.dropRate = 0.3F;
     this.damageVsEntitys = 1.0F;
-    this.renderBlockState = Blocks.field_150346_d.func_176223_P();
+    this.renderBlockState = Blocks.field_150346_d.getDefaultState();
     this.field_70156_m = true;
     func_70105_a(0.98F, 0.98F);
   }

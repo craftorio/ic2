@@ -105,7 +105,7 @@ public class EntityDynamite extends Entity implements IProjectile {
     World world = func_130014_f_();
     if (this.fuse-- <= 0) {
       func_70106_y();
-      if (!world.field_72995_K)
+      if (!world.isRemote)
         explode(); 
     } else if (this.fuse < 100 && this.fuse % 2 == 0) {
       world.func_175688_a(EnumParticleTypes.SMOKE_NORMAL, this.field_70165_t, this.field_70163_u + 0.5D, this.field_70161_v, 0.0D, 0.0D, 0.0D, new int[0]);

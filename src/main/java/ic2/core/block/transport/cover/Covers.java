@@ -45,7 +45,7 @@ public class Covers extends TileEntityComponent {
     ItemStack stack = this.covers[side.ordinal()];
     if (StackUtil.isEmpty(stack))
       return null; 
-    return (ICoverItem)stack.func_77973_b();
+    return (ICoverItem)stack.getItem();
   }
   
   public void readFromNbt(NBTTagCompound nbt) {
@@ -80,18 +80,18 @@ public class Covers extends TileEntityComponent {
         coversTag.func_74742_a((NBTBase)coverTag);
       } 
     } 
-    ret.func_74782_a("covers", (NBTBase)coversTag);
+    ret.setTag("covers", (NBTBase)coversTag);
     return ret;
   }
   
   public boolean enableWorldTick() {
-    return !(this.parent.func_145831_w()).field_72995_K;
+    return !(this.parent.getWorld()).isRemote;
   }
   
   public void onWorldTick() {
     for (EnumFacing facing : EnumFacing.field_82609_l) {
       if (!StackUtil.isEmpty(this.covers[facing.ordinal()]))
-        ((ICoverItem)this.covers[facing.ordinal()].func_77973_b()).onTick(this.covers[facing.ordinal()], (ICoverHolder)this.parent); 
+        ((ICoverItem)this.covers[facing.ordinal()].getItem()).onTick(this.covers[facing.ordinal()], (ICoverHolder)this.parent); 
     } 
   }
 }

@@ -382,7 +382,7 @@ public enum TeBlock implements ITeBlock, ITeBlock.ITeBlockCreativeRegisterer {
           list.add(block.getItemStack(type));
           if (type.getDummyTe() instanceof IEnergyStorage) {
             ItemStack filled = block.getItemStack(type);
-            StackUtil.getOrCreateNbtData(filled).func_74780_a("energy", ((IEnergyStorage)type.getDummyTe()).getCapacity());
+            StackUtil.getOrCreateNbtData(filled).setDouble("energy", ((IEnergyStorage)type.getDummyTe()).getCapacity());
             list.add(filled);
           } 
         } 

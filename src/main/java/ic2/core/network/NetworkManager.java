@@ -70,7 +70,7 @@ public class NetworkManager implements INetworkManager {
     try {
       SubPacketType.PlayerItemData.writeTo(buffer);
       buffer.writeByte(slot);
-      DataEncoder.encode(buffer, ((ItemStack)player.field_71071_by.field_70462_a.get(slot)).func_77973_b(), false);
+      DataEncoder.encode(buffer, ((ItemStack)player.field_71071_by.field_70462_a.get(slot)).getItem(), false);
       buffer.writeVarInt(data.length);
       for (Object o : data)
         DataEncoder.encode(buffer, o); 
@@ -121,7 +121,7 @@ public class NetworkManager implements INetworkManager {
     assert IC2.platform.isSimulating();
     if (te == null)
       throw new NullPointerException(); 
-    WorldData worldData = WorldData.get(te.func_145831_w());
+    WorldData worldData = WorldData.get(te.getWorld());
     TeUpdateDataServer ret = (TeUpdateDataServer)worldData.tesToUpdate.get(te);
     if (ret == null) {
       ret = new TeUpdateDataServer();
@@ -137,8 +137,8 @@ public class NetworkManager implements INetworkManager {
   
   public final void sendComponentUpdate(TileEntityBlock te, String componentName, EntityPlayerMP player, GrowingBuffer data) {
     assert !isClient();
-    if (player.func_130014_f_() != te.func_145831_w())
-      throw new IllegalArgumentException("mismatched world (te " + te.func_145831_w() + ", player " + player.func_130014_f_() + ")"); 
+    if (player.func_130014_f_() != te.getWorld())
+      throw new IllegalArgumentException("mismatched world (te " + te.getWorld() + ", player " + player.func_130014_f_() + ")"); 
     GrowingBuffer buffer = new GrowingBuffer(64);
     try {
       SubPacketType.TileEntityBlockComponent.writeTo(buffer);
@@ -155,7 +155,7 @@ public class NetworkManager implements INetworkManager {
   
   public final void initiateTileEntityEvent(TileEntity te, int event, boolean limitRange) {
     assert !isClient();
-    if ((te.func_145831_w()).field_73010_i.isEmpty())
+    if ((te.getWorld()).field_73010_i.isEmpty())
       return; 
     GrowingBuffer buffer = new GrowingBuffer(32);
     try {
@@ -166,10 +166,10 @@ public class NetworkManager implements INetworkManager {
       throw new RuntimeException(e);
     } 
     buffer.flip();
-    for (EntityPlayerMP target : getPlayersInRange(te.func_145831_w(), te.func_174877_v(), new ArrayList())) {
+    for (EntityPlayerMP target : getPlayersInRange(te.getWorld(), te.getPos(), new ArrayList())) {
       if (limitRange) {
-        int dX = (int)(te.func_174877_v().func_177958_n() + 0.5D - target.field_70165_t);
-        int dZ = (int)(te.func_174877_v().func_177952_p() + 0.5D - target.field_70161_v);
+        int dX = (int)(te.getPos().func_177958_n() + 0.5D - target.field_70165_t);
+        int dZ = (int)(te.getPos().func_177952_p() + 0.5D - target.field_70161_v);
         if (dX * dX + dZ * dZ > 400)
           continue; 
       } 
@@ -234,11 +234,11 @@ public class NetworkManager implements INetworkManager {
         TileEntity te = (TileEntity)inventory;
         buffer.writeByte(0);
         DataEncoder.encode(buffer, te, false);
-      } else if (player.field_71071_by.func_70448_g() != null && player.field_71071_by.func_70448_g().func_77973_b() instanceof IHandHeldInventory) {
+      } else if (player.field_71071_by.func_70448_g() != null && player.field_71071_by.func_70448_g().getItem() instanceof IHandHeldInventory) {
         buffer.writeByte(1);
         buffer.writeInt(player.field_71071_by.field_70461_c);
         handleSubData(buffer, player.field_71071_by.func_70448_g(), ID);
-      } else if (player.func_184592_cb() != null && player.func_184592_cb().func_77973_b() instanceof IHandHeldInventory) {
+      } else if (player.func_184592_cb() != null && player.func_184592_cb().getItem() instanceof IHandHeldInventory) {
         buffer.writeByte(1);
         buffer.writeInt(-1);
         handleSubData(buffer, player.func_184592_cb(), ID);
@@ -254,7 +254,7 @@ public class NetworkManager implements INetworkManager {
   }
   
   private final void handleSubData(GrowingBuffer buffer, ItemStack stack, Integer ID) {
-    boolean subInv = (ID != null && stack.func_77973_b() instanceof ic2.core.item.IHandHeldSubInventory);
+    boolean subInv = (ID != null && stack.getItem() instanceof ic2.core.item.IHandHeldSubInventory);
     buffer.writeBoolean(subInv);
     if (subInv)
       buffer.writeShort(ID.intValue()); 
@@ -506,10 +506,10 @@ public class NetworkManager implements INetworkManager {
       case ItemEvent:
         stack = DataEncoder.<ItemStack>decode(is, ItemStack.class);
         event = is.readInt();
-        if (stack.func_77973_b() instanceof INetworkItemEventListener)
+        if (stack.getItem() instanceof INetworkItemEventListener)
           IC2.platform.requestTick(true, new Runnable() {
                 public void run() {
-                  ((INetworkItemEventListener)stack.func_77973_b()).onNetworkEvent(stack, player, event);
+                  ((INetworkItemEventListener)stack.getItem()).onNetworkEvent(stack, player, event);
                 }
               }); 
         return;
@@ -537,8 +537,8 @@ public class NetworkManager implements INetworkManager {
         object1 = hand ? null : DataEncoder.decodeDeferred(is, TileEntity.class);
         IC2.platform.requestTick(true, new Runnable() {
               private IHasGui tryFindGUI(ItemStack stack) {
-                if (!StackUtil.isEmpty(stack) && stack.func_77973_b() instanceof IHandHeldInventory)
-                  return ((IHandHeldInventory)stack.func_77973_b()).getInventory(player, stack); 
+                if (!StackUtil.isEmpty(stack) && stack.getItem() instanceof IHandHeldInventory)
+                  return ((IHandHeldInventory)stack.getItem()).getInventory(player, stack); 
                 return null;
               }
               
@@ -588,7 +588,7 @@ public class NetworkManager implements INetworkManager {
                   for (int i = 0; i < subData.length; i++)
                     subData[i] = DataEncoder.getValue(subData[i]); 
                   ItemStack stack = (ItemStack)player.field_71071_by.field_70462_a.get(slot);
-                  if (!StackUtil.isEmpty(stack) && stack.func_77973_b() == item && 
+                  if (!StackUtil.isEmpty(stack) && stack.getItem() == item && 
                     item instanceof IPlayerItemDataListener)
                     ((IPlayerItemDataListener)item).onPlayerItemNetworkData(player, slot, subData); 
                 }

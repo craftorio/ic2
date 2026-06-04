@@ -22,8 +22,8 @@ public class EntityNuke extends EntityIC2Explosive {
   
   public boolean func_184230_a(EntityPlayer player, EnumHand hand) {
     ItemStack stack = StackUtil.get(player, hand);
-    if (IC2.platform.isSimulating() && !StackUtil.isEmpty(stack) && stack.func_77973_b() instanceof ItemToolWrench) {
-      ItemToolWrench wrench = (ItemToolWrench)stack.func_77973_b();
+    if (IC2.platform.isSimulating() && !StackUtil.isEmpty(stack) && stack.getItem() instanceof ItemToolWrench) {
+      ItemToolWrench wrench = (ItemToolWrench)stack.getItem();
       if (wrench.canTakeDamage(stack, 1)) {
         wrench.damage(stack, 1, player);
         func_70106_y();

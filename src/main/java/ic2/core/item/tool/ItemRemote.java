@@ -32,7 +32,7 @@ public class ItemRemote extends ItemIC2 {
   }
   
   public EnumActionResult func_180614_a(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-    if (world.field_72995_K)
+    if (world.isRemote)
       return EnumActionResult.SUCCESS; 
     IBlockState state = world.func_180495_p(pos);
     Block block = state.func_177230_c();
@@ -56,7 +56,7 @@ public class ItemRemote extends ItemIC2 {
   
   public ActionResult<ItemStack> func_77659_a(World world, EntityPlayer player, EnumHand hand) {
     ItemStack stack = StackUtil.get(player, hand);
-    if (world.field_72995_K)
+    if (world.isRemote)
       return new ActionResult(EnumActionResult.SUCCESS, stack); 
     IC2.audioManager.playOnce(player, PositionSpec.Hand, "Tools/dynamiteomote.ogg", true, IC2.audioManager.getDefaultVolume());
     launchRemotes(world, stack, player);
@@ -66,14 +66,14 @@ public class ItemRemote extends ItemIC2 {
   public static void addRemote(BlockPos pos, ItemStack freq) {
     NBTTagCompound compound = StackUtil.getOrCreateNbtData(freq);
     if (!compound.func_74764_b("coords"))
-      compound.func_74782_a("coords", (NBTBase)new NBTTagList()); 
+      compound.setTag("coords", (NBTBase)new NBTTagList()); 
     NBTTagList coords = compound.func_150295_c("coords", 10);
     NBTTagCompound coord = new NBTTagCompound();
     coord.func_74768_a("x", pos.func_177958_n());
     coord.func_74768_a("y", pos.func_177956_o());
     coord.func_74768_a("z", pos.func_177952_p());
     coords.func_74742_a((NBTBase)coord);
-    compound.func_74782_a("coords", (NBTBase)coords);
+    compound.setTag("coords", (NBTBase)coords);
     freq.func_77964_b(coords.func_74745_c());
   }
   
@@ -131,7 +131,7 @@ public class ItemRemote extends ItemIC2 {
       if (i != index)
         newCoords.func_74742_a((NBTBase)coords.func_150305_b(i)); 
     } 
-    compound.func_74782_a("coords", (NBTBase)newCoords);
+    compound.setTag("coords", (NBTBase)newCoords);
     freq.func_77964_b(newCoords.func_74745_c());
   }
 }

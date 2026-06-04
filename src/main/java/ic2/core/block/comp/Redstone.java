@@ -41,10 +41,10 @@ public class Redstone extends TileEntityComponent {
   }
   
   public void update() {
-    World world = this.parent.func_145831_w();
+    World world = this.parent.getWorld();
     if (world == null)
       return; 
-    int input = world.func_175687_A(this.parent.func_174877_v());
+    int input = world.func_175687_A(this.parent.getPos());
     if (this.modifiers != null)
       for (IRedstoneModifier modifier : this.modifiers)
         input = modifier.getRedstoneInput(input);  

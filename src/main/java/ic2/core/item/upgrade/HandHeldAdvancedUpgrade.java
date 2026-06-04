@@ -55,7 +55,7 @@ public class HandHeldAdvancedUpgrade extends HandHeldInventory implements IHolog
   private static final byte ORE_GUI = 3;
   
   private static ItemStack checkContainerStack(EntityPlayer player, ItemStack containerStack) {
-    if (!(player.func_130014_f_()).field_72995_K && player.field_71070_bA instanceof ContainerHandHeldInventory && ((ContainerHandHeldInventory)player.field_71070_bA).base instanceof HandHeldUpgradeOption) {
+    if (!(player.func_130014_f_()).isRemote && player.field_71070_bA instanceof ContainerHandHeldInventory && ((ContainerHandHeldInventory)player.field_71070_bA).base instanceof HandHeldUpgradeOption) {
       addMaintainedPlayer(player);
       return (ItemStack)ReflectionUtil.getFieldValue(ReflectionUtil.getField(HandHeldInventory.class, ItemStack.class), ((ContainerHandHeldInventory)player.field_71070_bA).base);
     } 
@@ -79,13 +79,13 @@ public class HandHeldAdvancedUpgrade extends HandHeldInventory implements IHolog
       NBTTagCompound tag = getTag(nbt, "nbt");
       tag.func_74757_a("active", this.nbt.enabled());
       tag.func_74774_a("type", this.nbt.getForNBT());
-      nbt.func_74782_a("nbtSettings", (NBTBase)tag);
+      nbt.setTag("nbtSettings", (NBTBase)tag);
       writeTag(nbt, "energy", this.energy);
     } 
   }
   
   public static NBTTagCompound getTag(NBTTagCompound nbt, String name) {
-    return nbt.func_74775_l(name + "Settings");
+    return nbt.getCompoundTag(name + "Settings");
   }
   
   protected static boolean readTag(NBTTagCompound nbt, String name) {
@@ -95,7 +95,7 @@ public class HandHeldAdvancedUpgrade extends HandHeldInventory implements IHolog
   protected static void writeTag(NBTTagCompound nbt, String name, boolean active) {
     NBTTagCompound tag = getTag(nbt, name);
     tag.func_74757_a("active", active);
-    nbt.func_74782_a(name + "Settings", (NBTBase)tag);
+    nbt.setTag(name + "Settings", (NBTBase)tag);
   }
   
   static IHasGui delegate(EntityPlayer player, ItemStack stack, int ID) {
@@ -209,7 +209,7 @@ public class HandHeldAdvancedUpgrade extends HandHeldInventory implements IHolog
   }
   
   protected void launchGUI(IHasGui gui, int ID) {
-    if (!(this.player.func_130014_f_()).field_72995_K) {
+    if (!(this.player.func_130014_f_()).isRemote) {
       HandHeldInventory.addMaintainedPlayer(this.player);
       IC2.platform.launchSubGui(this.player, gui, ID);
     } 

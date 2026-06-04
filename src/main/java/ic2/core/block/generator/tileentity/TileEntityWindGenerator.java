@@ -34,9 +34,9 @@ public class TileEntityWindGenerator extends TileEntityBaseRotorGenerator implem
       this.overheatRatio = 0.0D;
       if (windToEnergy <= 0.0D)
         return false; 
-      World world = func_145831_w();
+      World world = getWorld();
       WindSim windSim = (WorldData.get(world)).windSim;
-      double wind = windSim.getWindAt(this.field_174879_c.func_177956_o()) * (1.0D - this.obstructedBlockCount / 567.0D);
+      double wind = windSim.getWindAt(this.field_174879_c.getY()) * (1.0D - this.obstructedBlockCount / 567.0D);
       if (wind <= 0.0D)
         return false; 
       double windRatio = wind / windSim.getMaxWind();
@@ -57,7 +57,7 @@ public class TileEntityWindGenerator extends TileEntityBaseRotorGenerator implem
   }
   
   public void updateObscuratedBlockCount() {
-    World world = func_145831_w();
+    World world = getWorld();
     int count = -1;
     for (int x = -4; x < 5; x++) {
       for (int y = -2; y < 5; y++) {

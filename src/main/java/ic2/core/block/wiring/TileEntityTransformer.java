@@ -45,8 +45,8 @@ public abstract class TileEntityTransformer extends TileEntityInventory implemen
     return "";
   }
   
-  public void func_145839_a(NBTTagCompound nbt) {
-    super.func_145839_a(nbt);
+  public void readFromNBT(NBTTagCompound nbt) {
+    super.readFromNBT(nbt);
     int mode = nbt.func_74762_e("mode");
     if (mode >= 0 && mode < Mode.VALUES.length) {
       this.configuredMode = Mode.VALUES[mode];
@@ -55,15 +55,15 @@ public abstract class TileEntityTransformer extends TileEntityInventory implemen
     } 
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     nbt.func_74768_a("mode", this.configuredMode.ordinal());
     return nbt;
   }
   
   protected void onLoaded() {
     super.onLoaded();
-    if (!(func_145831_w()).field_72995_K)
+    if (!(getWorld()).isRemote)
       updateRedstone(true); 
   }
   
@@ -87,10 +87,10 @@ public abstract class TileEntityTransformer extends TileEntityInventory implemen
   
   private void updateRedstone(boolean force) {
     Mode newMode;
-    assert !(func_145831_w()).field_72995_K;
+    assert !(getWorld()).isRemote;
     switch (this.configuredMode) {
       case redstone:
-        newMode = func_145831_w().func_175640_z(this.field_174879_c) ? Mode.stepup : Mode.stepdown;
+        newMode = getWorld().func_175640_z(this.field_174879_c) ? Mode.stepup : Mode.stepdown;
         break;
       case stepdown:
       case stepup:
@@ -123,7 +123,7 @@ public abstract class TileEntityTransformer extends TileEntityInventory implemen
   
   public void setFacing(EnumFacing facing) {
     super.setFacing(facing);
-    if (!(func_145831_w()).field_72995_K)
+    if (!(getWorld()).isRemote)
       updateRedstone(true); 
   }
   

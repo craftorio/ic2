@@ -27,11 +27,11 @@ public class PlayerHead extends ItemImage {
   private PlayerHead(GuiIC2<?> gui, int x, int y, GameProfile player, Void skip) {
     super(gui, x, y, IMAGE_MAKER.computeIfAbsent(player, profile -> {
             ItemStack skull = new ItemStack(Items.field_151144_bL, 1, 3);
-            StackUtil.getOrCreateNbtData(skull).func_74782_a("SkullOwner", (NBTBase)NBTUtil.func_180708_a(new NBTTagCompound(), profile));
+            StackUtil.getOrCreateNbtData(skull).setTag("SkullOwner", (NBTBase)NBTUtil.func_180708_a(new NBTTagCompound(), profile));
             return ();
           }));
     this.player = player;
-    assert player.equals(NBTUtil.func_152459_a(((ItemStack)((Supplier)IMAGE_MAKER.get(player)).get()).func_77978_p().func_74775_l("SkullOwner")));
+    assert player.equals(NBTUtil.func_152459_a(((ItemStack)((Supplier)IMAGE_MAKER.get(player)).get()).func_77978_p().getCompoundTag("SkullOwner")));
   }
   
   protected List<String> getToolTip() {

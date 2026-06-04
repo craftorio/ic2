@@ -41,7 +41,7 @@ public class ItemWindmeter extends ItemElectricTool {
   }
   
   public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
-    if (world.field_72995_K || player.func_70093_af())
+    if (world.isRemote || player.func_70093_af())
       return EnumActionResult.PASS; 
     ItemStack stack = StackUtil.get(player, hand);
     if (!ElectricItem.manager.canUse(stack, this.operationEnergyCost))

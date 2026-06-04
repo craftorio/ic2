@@ -110,8 +110,8 @@ public class NetworkManagerClient extends NetworkManager {
         DataEncoder.encode(buffer, te, false);
       } else {
         EntityPlayerSP entityPlayerSP = (Minecraft.func_71410_x()).field_71439_g;
-        if ((!StackUtil.isEmpty(((EntityPlayer)entityPlayerSP).field_71071_by.func_70448_g()) && ((EntityPlayer)entityPlayerSP).field_71071_by.func_70448_g().func_77973_b() instanceof IHandHeldInventory) || (
-          !StackUtil.isEmpty(entityPlayerSP.func_184592_cb()) && entityPlayerSP.func_184592_cb().func_77973_b() instanceof IHandHeldInventory)) {
+        if ((!StackUtil.isEmpty(((EntityPlayer)entityPlayerSP).field_71071_by.func_70448_g()) && ((EntityPlayer)entityPlayerSP).field_71071_by.func_70448_g().getItem() instanceof IHandHeldInventory) || (
+          !StackUtil.isEmpty(entityPlayerSP.func_184592_cb()) && entityPlayerSP.func_184592_cb().getItem() instanceof IHandHeldInventory)) {
           buffer.writeBoolean(true);
         } else {
           IC2.platform.displayError("An unknown GUI type was attempted to be displayed.\nThis could happen due to corrupted data from a player or a bug.\n\n(Technical information: " + inventory + ")", new Object[0]);
@@ -234,8 +234,8 @@ public class NetworkManagerClient extends NetworkManager {
                   EntityPlayer player = (EntityPlayer)obj;
                   if ((profile.getId() != null && profile.getId().equals(player.func_146103_bH().getId())) || (profile
                     .getId() == null && profile.getName().equals(player.func_146103_bH().getName()))) {
-                    if (stack.func_77973_b() instanceof INetworkItemEventListener)
-                      ((INetworkItemEventListener)stack.func_77973_b()).onNetworkEvent(stack, player, event); 
+                    if (stack.getItem() instanceof INetworkItemEventListener)
+                      ((INetworkItemEventListener)stack.getItem()).onNetworkEvent(stack, player, event); 
                     break;
                   } 
                 } 
@@ -280,11 +280,11 @@ public class NetworkManagerClient extends NetworkManager {
                         return; 
                       currentItem = player.field_71071_by.func_70448_g();
                     } 
-                    if (currentItem != null && currentItem.func_77973_b() instanceof IHandHeldInventory) {
-                      if (subGUI && currentItem.func_77973_b() instanceof IHandHeldSubInventory) {
-                        IC2.platform.launchGuiClient(player, ((IHandHeldSubInventory)currentItem.func_77973_b()).getSubInventory(player, currentItem, ID), isAdmin);
+                    if (currentItem != null && currentItem.getItem() instanceof IHandHeldInventory) {
+                      if (subGUI && currentItem.getItem() instanceof IHandHeldSubInventory) {
+                        IC2.platform.launchGuiClient(player, ((IHandHeldSubInventory)currentItem.getItem()).getSubInventory(player, currentItem, ID), isAdmin);
                       } else {
-                        IC2.platform.launchGuiClient(player, ((IHandHeldInventory)currentItem.func_77973_b()).getInventory(player, currentItem), isAdmin);
+                        IC2.platform.launchGuiClient(player, ((IHandHeldInventory)currentItem.getItem()).getInventory(player, currentItem), isAdmin);
                       } 
                     } else if (player instanceof EntityPlayerSP) {
                       ((EntityPlayerSP)player).field_71174_a.func_147297_a((Packet)new CPacketCloseWindow(windowId));

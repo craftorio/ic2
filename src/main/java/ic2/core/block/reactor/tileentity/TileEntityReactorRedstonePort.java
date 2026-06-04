@@ -14,7 +14,7 @@ public class TileEntityReactorRedstonePort extends TileEntityReactorVessel {
   }
   
   private void updateRedstoneLink() {
-    if ((func_145831_w()).field_72995_K)
+    if ((getWorld()).isRemote)
       return; 
     TileEntityNuclearReactorElectric reactor = this.lookup.getReactor();
     if (reactor != null)

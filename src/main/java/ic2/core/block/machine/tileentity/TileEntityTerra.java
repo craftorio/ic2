@@ -51,19 +51,19 @@ public class TileEntityTerra extends TileEntityElectricMachine {
     boolean newActive = false;
     ItemStack stack = this.tfbpSlot.get();
     if (!StackUtil.isEmpty(stack)) {
-      ITerraformingBP tfbp = (ITerraformingBP)stack.func_77973_b();
+      ITerraformingBP tfbp = (ITerraformingBP)stack.getItem();
       if (this.energy.getEnergy() >= tfbp.getConsume(stack)) {
         BlockPos nextPos;
         newActive = true;
-        World world = func_145831_w();
+        World world = getWorld();
         if (this.lastPos != null) {
           int range = tfbp.getRange(stack) / 10;
-          nextPos = new BlockPos(this.lastPos.func_177958_n() - world.field_73012_v.nextInt(range + 1) + world.field_73012_v.nextInt(range + 1), this.field_174879_c.func_177956_o(), this.lastPos.func_177952_p() - world.field_73012_v.nextInt(range + 1) + world.field_73012_v.nextInt(range + 1));
+          nextPos = new BlockPos(this.lastPos.func_177958_n() - world.field_73012_v.nextInt(range + 1) + world.field_73012_v.nextInt(range + 1), this.field_174879_c.getY(), this.lastPos.func_177952_p() - world.field_73012_v.nextInt(range + 1) + world.field_73012_v.nextInt(range + 1));
         } else {
           if (this.failedAttempts > 4)
             this.failedAttempts = 4; 
           int range = tfbp.getRange(stack) * (this.failedAttempts + 1) / 5;
-          nextPos = new BlockPos(this.field_174879_c.func_177958_n() - world.field_73012_v.nextInt(range + 1) + world.field_73012_v.nextInt(range + 1), this.field_174879_c.func_177956_o(), this.field_174879_c.func_177952_p() - world.field_73012_v.nextInt(range + 1) + world.field_73012_v.nextInt(range + 1));
+          nextPos = new BlockPos(this.field_174879_c.getX() - world.field_73012_v.nextInt(range + 1) + world.field_73012_v.nextInt(range + 1), this.field_174879_c.getY(), this.field_174879_c.getZ() - world.field_73012_v.nextInt(range + 1) + world.field_73012_v.nextInt(range + 1));
         } 
         if (tfbp.terraform(stack, world, nextPos)) {
           this.energy.useEnergy(tfbp.getConsume(stack));
@@ -85,13 +85,13 @@ public class TileEntityTerra extends TileEntityElectricMachine {
   }
   
   public boolean onActivated(final EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-    final World world = func_145831_w();
-    if (!player.func_70093_af() && !world.field_72995_K) {
+    final World world = getWorld();
+    if (!player.func_70093_af() && !world.isRemote) {
       if (ejectBlueprint())
         return true; 
       ItemStack stack = StackUtil.consumeAndGet(player, hand, new Predicate<ItemStack>() {
             public boolean apply(ItemStack input) {
-              Item item = input.func_77973_b();
+              Item item = input.getItem();
               return (item instanceof ITerraformingBP && ((ITerraformingBP)item).canInsert(input, player, world, TileEntityTerra.this.field_174879_c));
             }
           }1);
@@ -107,7 +107,7 @@ public class TileEntityTerra extends TileEntityElectricMachine {
     ItemStack stack = this.tfbpSlot.get();
     if (StackUtil.isEmpty(stack))
       return false; 
-    StackUtil.dropAsEntity(func_145831_w(), this.field_174879_c, stack);
+    StackUtil.dropAsEntity(getWorld(), this.field_174879_c, stack);
     this.tfbpSlot.clear();
     return true;
   }

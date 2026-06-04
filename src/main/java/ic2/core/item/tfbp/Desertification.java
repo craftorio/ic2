@@ -13,10 +13,10 @@ class Desertification extends TerraformerBase {
     pos = TileEntityTerra.getFirstBlockFrom(world, pos, 10);
     if (pos == null)
       return false; 
-    IBlockState sand = Blocks.field_150354_m.func_176223_P();
+    IBlockState sand = Blocks.SAND.getDefaultState();
     if (TileEntityTerra.switchGround(world, pos, Blocks.field_150346_d, sand, false) || 
       TileEntityTerra.switchGround(world, pos, (Block)Blocks.field_150349_c, sand, false) || 
-      TileEntityTerra.switchGround(world, pos, Blocks.field_150458_ak, sand, false)) {
+      TileEntityTerra.switchGround(world, pos, Blocks.FARMLAND, sand, false)) {
       TileEntityTerra.switchGround(world, pos, Blocks.field_150346_d, sand, false);
       return true;
     } 
@@ -29,12 +29,12 @@ class Desertification extends TerraformerBase {
       return true;
     } 
     if (block == Blocks.field_150432_aD || block == Blocks.field_150433_aE) {
-      world.func_175656_a(pos, Blocks.field_150358_i.func_176223_P());
+      world.func_175656_a(pos, Blocks.field_150358_i.getDefaultState());
       return true;
     } 
     if ((block == Blocks.field_150344_f || block == Blocks.field_150364_r || block == BlockName.rubber_wood.getInstance()) && world.field_73012_v
       .nextInt(15) == 0) {
-      world.func_175656_a(pos, Blocks.field_150480_ab.func_176223_P());
+      world.func_175656_a(pos, Blocks.field_150480_ab.getDefaultState());
       return true;
     } 
     return false;

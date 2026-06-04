@@ -39,7 +39,7 @@ public class EnumProperty<T extends Enum<T> & IIdProvider> extends PropertyHelpe
     } 
   }
   
-  public List<T> getAllowedValues() {
+  public List<T> func_177700_c() {
     return this.values;
   }
   
@@ -55,7 +55,7 @@ public class EnumProperty<T extends Enum<T> & IIdProvider> extends PropertyHelpe
         }).collect(Collectors.toList());
   }
   
-  public String getName(T value) {
+  public String func_177702_a(T value) {
     return ((IIdProvider)value).getName();
   }
   

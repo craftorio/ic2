@@ -25,7 +25,7 @@ public class ItemToolMeter extends ItemIC2 implements IBoxable, IHandHeldInvento
   }
   
   public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
-    if (world.field_72995_K)
+    if (world.isRemote)
       return EnumActionResult.PASS; 
     IEnergyTile tile = EnergyNet.instance.getTile(world, pos);
     if (tile instanceof ic2.api.energy.tile.IEnergySource || tile instanceof ic2.api.energy.tile.IEnergyConductor || tile instanceof ic2.api.energy.tile.IEnergySink) {
@@ -41,7 +41,7 @@ public class ItemToolMeter extends ItemIC2 implements IBoxable, IHandHeldInvento
   }
   
   public boolean onDroppedByPlayer(ItemStack stack, EntityPlayer player) {
-    if (!(player.func_130014_f_()).field_72995_K && !StackUtil.isEmpty(stack) && player.field_71070_bA instanceof ContainerMeter) {
+    if (!(player.func_130014_f_()).isRemote && !StackUtil.isEmpty(stack) && player.field_71070_bA instanceof ContainerMeter) {
       HandHeldMeter euReader = (HandHeldMeter)((ContainerMeter)player.field_71070_bA).base;
       if (euReader.isThisContainer(stack)) {
         euReader.saveAsThrown(stack);

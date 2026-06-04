@@ -63,7 +63,7 @@ public class SlotHologramSlot extends Slot {
   }
   
   public ItemStack slotClick(int dragType, ClickType clickType, EntityPlayer player) {
-    if (Util.inDev() && (player.func_130014_f_()).field_72995_K)
+    if (Util.inDev() && (player.func_130014_f_()).isRemote)
       System.out.printf("dragType=%d clickType=%s stack=%s%n", new Object[] { Integer.valueOf(dragType), clickType, player.field_71071_by.func_70445_o() }); 
     if (clickType == ClickType.PICKUP && (dragType == 0 || dragType == 1)) {
       ItemStack playerStack = player.field_71071_by.func_70445_o();

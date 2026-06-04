@@ -17,7 +17,7 @@ class Flatification extends TerraformerBase {
     removable.add(Blocks.field_150349_c);
     removable.add(Blocks.field_150348_b);
     removable.add(Blocks.field_150351_n);
-    removable.add(Blocks.field_150354_m);
+    removable.add(Blocks.SAND);
     removable.add(Blocks.field_150346_d);
     removable.add(Blocks.field_150362_t);
     removable.add(Blocks.field_150361_u);
@@ -45,7 +45,7 @@ class Flatification extends TerraformerBase {
     if (pos.func_177956_o() == workPos.func_177956_o())
       return false; 
     if (workPos.func_177956_o() < pos.func_177956_o()) {
-      world.func_175656_a(workPos.func_177984_a(), Blocks.field_150346_d.func_176223_P());
+      world.func_175656_a(workPos.func_177984_a(), Blocks.field_150346_d.getDefaultState());
       return true;
     } 
     if (canRemove(world.func_180495_p(workPos).func_177230_c())) {

@@ -50,7 +50,7 @@ public abstract class TileEntityTank extends TileEntityInventory implements IHas
   
   public void onPlaced(ItemStack stack, EntityLivingBase placer, EnumFacing facing) {
     super.onPlaced(stack, placer, facing);
-    if (!this.field_145850_b.field_72995_K) {
+    if (!this.field_145850_b.isRemote) {
       NBTTagCompound tag = StackUtil.getOrCreateNbtData(stack);
       this.contents.readFromNBT(tag);
     } 
@@ -65,7 +65,7 @@ public abstract class TileEntityTank extends TileEntityInventory implements IHas
   
   protected boolean onActivated(EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
     ItemStack stack = StackUtil.get(player, hand);
-    if (!this.field_145850_b.field_72995_K && 
+    if (!this.field_145850_b.isRemote && 
       LiquidUtil.isFluidContainer(stack)) {
       boolean changed = FluidUtil.interactWithFluidHandler(player, hand, (IFluidHandler)this.fluidsComponent.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side));
       if (changed)

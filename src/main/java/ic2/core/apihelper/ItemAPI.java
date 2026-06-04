@@ -71,7 +71,7 @@ public class ItemAPI implements IItemAPI {
     if (blockName != null) {
       Block block = blockName.getInstance();
       if (block instanceof IMultiBlock)
-        return ((IMultiBlock)block).getState(variant); 
+        return ((IMultiBlock<?>)block).getState(variant); 
       assert variant == null;
       return block.func_176223_P();
     } 

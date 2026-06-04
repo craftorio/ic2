@@ -17,14 +17,14 @@ class LeanItemStack {
   private int hashCode;
   
   public LeanItemStack(ItemStack stack) {
-    this(stack.func_77973_b(), 
+    this(stack.getItem(), 
         StackUtil.getRawMeta(stack), stack
         .func_77978_p(), 
         StackUtil.getSize(stack));
   }
   
   public LeanItemStack(ItemStack stack, int size) {
-    this(stack.func_77973_b(), 
+    this(stack.getItem(), 
         StackUtil.getRawMeta(stack), stack
         .func_77978_p(), size);
   }

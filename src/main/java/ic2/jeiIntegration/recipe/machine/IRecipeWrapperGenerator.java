@@ -79,13 +79,13 @@ public interface IRecipeWrapperGenerator<T> {
       private IRecipeInput getInput(final int hardness) {
         return new IRecipeInput() {
             public boolean matches(ItemStack subject) {
-              return (subject != null && subject.func_77973_b() instanceof IBlockCuttingBlade && ((IBlockCuttingBlade)subject.func_77973_b()).getHardness(subject) > hardness);
+              return (subject != null && subject.getItem() instanceof IBlockCuttingBlade && ((IBlockCuttingBlade)subject.getItem()).getHardness(subject) > hardness);
             }
             
             public List<ItemStack> getInputs() {
               List<ItemStack> list = new ArrayList<>(IRecipeWrapperGenerator.null.this.candidates.size());
               for (ItemStack stack : IRecipeWrapperGenerator.null.this.candidates) {
-                if (((IBlockCuttingBlade)stack.func_77973_b()).getHardness(stack) >= hardness)
+                if (((IBlockCuttingBlade)stack.getItem()).getHardness(stack) >= hardness)
                   list.add(stack); 
               } 
               return list;

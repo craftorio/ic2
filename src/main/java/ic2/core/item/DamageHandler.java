@@ -9,7 +9,7 @@ import net.minecraft.item.ItemStack;
 
 public class DamageHandler {
   public static int getDamage(ItemStack stack) {
-    Item item = stack.func_77973_b();
+    Item item = stack.getItem();
     if (item == null)
       return 0; 
     if (item instanceof ICustomDamageItem)
@@ -18,7 +18,7 @@ public class DamageHandler {
   }
   
   public static void setDamage(ItemStack stack, int damage, boolean displayOnly) {
-    Item item = stack.func_77973_b();
+    Item item = stack.getItem();
     if (item == null)
       return; 
     if (item instanceof ICustomDamageItem) {
@@ -33,7 +33,7 @@ public class DamageHandler {
   }
   
   public static int getMaxDamage(ItemStack stack) {
-    Item item = stack.func_77973_b();
+    Item item = stack.getItem();
     if (item == null)
       return 0; 
     if (item instanceof ICustomDamageItem)
@@ -42,7 +42,7 @@ public class DamageHandler {
   }
   
   public static boolean damage(ItemStack stack, int damage, EntityLivingBase src) {
-    Item item = stack.func_77973_b();
+    Item item = stack.getItem();
     if (item == null)
       return false; 
     if (item instanceof ICustomDamageItem)

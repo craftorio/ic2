@@ -174,7 +174,7 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
   }
   
   public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
-    if (world.field_72995_K)
+    if (world.isRemote)
       return EnumActionResult.PASS; 
     ItemStack stack = StackUtil.get(player, hand);
     NBTTagCompound nbtData = StackUtil.getOrCreateNbtData(stack);

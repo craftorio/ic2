@@ -41,8 +41,8 @@ public abstract class MachineRecipeHelper<RI, RO> implements IMachineRecipeManag
     if (StackUtil.getSize(input) < recipeInput.getAmount())
       return null; 
     ItemStack adjustedInput;
-    if (input.func_77973_b().hasContainerItem(input) && 
-      !StackUtil.isEmpty(adjustedInput = input.func_77973_b().getContainerItem(input)) && !acceptTest && 
+    if (input.getItem().hasContainerItem(input) && 
+      !StackUtil.isEmpty(adjustedInput = input.getItem().getContainerItem(input)) && !acceptTest && 
       !consumeContainer(input, adjustedInput, recipe)) {
       if (!acceptTest && StackUtil.getSize(input) != recipeInput.getAmount())
         return null; 
@@ -87,7 +87,7 @@ public abstract class MachineRecipeHelper<RI, RO> implements IMachineRecipeManag
   protected MachineRecipe<RI, RO> getRecipe(ItemStack input) {
     if (StackUtil.isEmpty(input))
       return null; 
-    List<MachineRecipe<RI, RO>> recipes = this.recipeCache.get(input.func_77973_b());
+    List<MachineRecipe<RI, RO>> recipes = this.recipeCache.get(input.getItem());
     if (recipes != null)
       for (MachineRecipe<RI, RO> recipe : recipes) {
         if (getForRecipe(recipe).matches(input))
@@ -163,7 +163,7 @@ public abstract class MachineRecipeHelper<RI, RO> implements IMachineRecipeManag
       List<ItemStack> inputs = recipe.getInputs();
       Set<Item> ret = Collections.newSetFromMap(new IdentityHashMap<>(inputs.size()));
       for (ItemStack stack : inputs)
-        ret.add(stack.func_77973_b()); 
+        ret.add(stack.getItem()); 
       return ret;
     } 
     return null;
@@ -189,7 +189,7 @@ public abstract class MachineRecipeHelper<RI, RO> implements IMachineRecipeManag
   
   @SubscribeEvent
   public static void onOreRegister(OreDictionary.OreRegisterEvent event) {
-    Item item = event.getOre().func_77973_b();
+    Item item = event.getOre().getItem();
     if (item == null) {
       IC2.log.warn(LogCategory.Recipe, "Found null item ore dict registration.", new Object[] { new Throwable() });
       return;

@@ -52,7 +52,7 @@ public abstract class TileEntityAbstractRCI extends TileEntityElectricMachine im
   
   protected void onLoaded() {
     super.onLoaded();
-    if (!(func_145831_w()).field_72995_K)
+    if (!(getWorld()).isRemote)
       updateEnergyFacings(); 
     updateReactor();
   }
@@ -71,7 +71,7 @@ public abstract class TileEntityAbstractRCI extends TileEntityElectricMachine im
         if (comp == null)
           continue; 
         if (StackUtil.checkItemEquality(comp, this.target)) {
-          ItemReactorCondensator cond = (ItemReactorCondensator)comp.func_77973_b();
+          ItemReactorCondensator cond = (ItemReactorCondensator)comp.getItem();
           if (cond.getDurabilityForDisplay(comp) > 0.85D && this.inputSlot.consume(1) != null && this.energy.useEnergy(1000.0D)) {
             cond.setCustomDamage(comp, 0);
             needsInvUpdate = true;
@@ -96,7 +96,7 @@ public abstract class TileEntityAbstractRCI extends TileEntityElectricMachine im
   }
   
   public void updateEnergyFacings() {
-    World world = func_145831_w();
+    World world = getWorld();
     Set<EnumFacing> ret = new HashSet<>();
     for (EnumFacing facing : EnumFacing.field_82609_l) {
       TileEntity te = world.func_175625_s(this.field_174879_c.func_177972_a(facing));
@@ -130,7 +130,7 @@ public abstract class TileEntityAbstractRCI extends TileEntityElectricMachine im
   public void onGuiClosed(EntityPlayer player) {}
   
   private void updateReactor() {
-    World world = func_145831_w();
+    World world = getWorld();
     if (!world.func_175697_a(this.field_174879_c, 2)) {
       this.reactor = null;
       return;

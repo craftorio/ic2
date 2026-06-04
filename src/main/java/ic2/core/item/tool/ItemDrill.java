@@ -69,31 +69,31 @@ public class ItemDrill extends ItemElectricTool implements IMiningDrill, IHitSou
   }
   
   public int energyUse(ItemStack stack, World world, BlockPos pos, IBlockState state) {
-    if (stack.func_77973_b() == ItemName.drill.getInstance())
+    if (stack.getItem() == ItemName.drill.getInstance())
       return 6; 
-    if (stack.func_77973_b() == ItemName.diamond_drill.getInstance())
+    if (stack.getItem() == ItemName.diamond_drill.getInstance())
       return 20; 
-    if (stack.func_77973_b() == ItemName.iridium_drill.getInstance())
+    if (stack.getItem() == ItemName.iridium_drill.getInstance())
       return 200; 
     throw new IllegalArgumentException("Invalid drill: " + StackUtil.toStringSafe(stack));
   }
   
   public int breakTime(ItemStack stack, World world, BlockPos pos, IBlockState state) {
-    if (stack.func_77973_b() == ItemName.drill.getInstance())
+    if (stack.getItem() == ItemName.drill.getInstance())
       return 200; 
-    if (stack.func_77973_b() == ItemName.diamond_drill.getInstance())
+    if (stack.getItem() == ItemName.diamond_drill.getInstance())
       return 50; 
-    if (stack.func_77973_b() == ItemName.iridium_drill.getInstance())
+    if (stack.getItem() == ItemName.iridium_drill.getInstance())
       return 20; 
     throw new IllegalArgumentException("Invalid drill: " + StackUtil.toStringSafe(stack));
   }
   
   public boolean breakBlock(ItemStack stack, World world, BlockPos pos, IBlockState state) {
-    if (stack.func_77973_b() == ItemName.drill.getInstance())
+    if (stack.getItem() == ItemName.drill.getInstance())
       return tryUsePower(stack, 50.0D); 
-    if (stack.func_77973_b() == ItemName.diamond_drill.getInstance())
+    if (stack.getItem() == ItemName.diamond_drill.getInstance())
       return tryUsePower(stack, 80.0D); 
-    if (stack.func_77973_b() == ItemName.iridium_drill.getInstance())
+    if (stack.getItem() == ItemName.iridium_drill.getInstance())
       return tryUsePower(stack, 800.0D); 
     throw new IllegalArgumentException("Invalid drill: " + StackUtil.toStringSafe(stack));
   }

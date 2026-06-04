@@ -155,15 +155,15 @@ public class CommandIc2 extends CommandBase {
       ItemStack stack = player.field_71071_by.func_70448_g();
       if (StackUtil.isEmpty(stack)) {
         msg(sender, "empty: " + StackUtil.toStringSafe(stack));
-      } else if (!stack.func_77973_b().getClass().getCanonicalName().startsWith("ic2.core")) {
+      } else if (!stack.getItem().getClass().getCanonicalName().startsWith("ic2.core")) {
         msg(sender, "Not an IC2 Item.");
       } else {
-        String name = Util.getName(stack.func_77973_b()).func_110623_a();
+        String name = Util.getName(stack.getItem()).func_110623_a();
         String variant = null;
-        if (stack.func_77973_b() instanceof IMultiItem) {
-          variant = ((IMultiItem)stack.func_77973_b()).getVariant(stack);
-        } else if (stack.func_77973_b() instanceof ItemBlock && ((ItemBlock)stack.func_77973_b()).func_179223_d() instanceof IMultiBlock) {
-          variant = ((IMultiBlock)((ItemBlock)stack.func_77973_b()).func_179223_d()).getVariant(stack);
+        if (stack.getItem() instanceof IMultiItem) {
+          variant = ((IMultiItem)stack.getItem()).getVariant(stack);
+        } else if (stack.getItem() instanceof ItemBlock && ((ItemBlock)stack.getItem()).func_179223_d() instanceof IMultiBlock) {
+          variant = ((IMultiBlock)((ItemBlock)stack.getItem()).func_179223_d()).getVariant(stack);
         } 
         msg(sender, "Name: " + name + ((variant == null) ? "" : (" Variant: " + variant)));
       } 
@@ -215,10 +215,10 @@ public class CommandIc2 extends CommandBase {
     Collections.sort(list, new Comparator<Map.Entry<ItemStack, Double>>() {
           public int compare(Map.Entry<ItemStack, Double> a, Map.Entry<ItemStack, Double> b) {
             return ((ItemStack)a.getKey())
-              .func_77973_b()
+              .getItem()
               .func_77653_i(a.getKey())
               .compareTo(((ItemStack)b
-                .getKey()).func_77973_b()
+                .getKey()).getItem()
                 .func_77653_i(b.getKey()));
           }
         });
@@ -226,7 +226,7 @@ public class CommandIc2 extends CommandBase {
     for (it = list.iterator(); it.hasNext(); ) {
       Map.Entry<ItemStack, Double> entry = it.next();
       msg(sender, String.format("  %s: %s", new Object[] { ((ItemStack)entry
-              .getKey()).func_77973_b()
+              .getKey()).getItem()
               .func_77653_i(entry.getKey()), entry
               .getValue() }));
     } 
@@ -248,7 +248,7 @@ public class CommandIc2 extends CommandBase {
           } 
           msg(sender, 
               String.format(" %s (%s, od: %s, name: %s / %s)", new Object[] { StackUtil.toStringSafe(stack), 
-                  Util.getName(stack.func_77973_b()), 
+                  Util.getName(stack.getItem()), 
                   getOreDictNames(stack), stack
                   .func_77977_a(), stack
                   .func_82833_r() }));
@@ -336,7 +336,7 @@ public class CommandIc2 extends CommandBase {
       msg(sender, "empty: " + StackUtil.toStringSafe(stack));
     } else {
       msg(sender, String.format("ID: %s, Raw Meta: %d, Meta: %d, Damage: %d, NBT: %s", new Object[] { stack
-              .func_77973_b().getRegistryName(), 
+              .getItem().getRegistryName(), 
               Integer.valueOf(StackUtil.getRawMeta(stack)), 
               Integer.valueOf(stack.func_77960_j()), 
               Integer.valueOf(stack.func_77952_i()), stack

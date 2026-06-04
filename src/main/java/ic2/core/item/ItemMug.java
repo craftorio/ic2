@@ -29,7 +29,7 @@ public class ItemMug extends ItemMulti<ItemMug.MugType> {
     ItemStack stack = StackUtil.get(player, hand);
     MugType type = getType(stack);
     if (type == MugType.empty) {
-      if (world.field_72995_K)
+      if (world.isRemote)
         return EnumActionResult.FAIL; 
       TileEntity te = world.func_175625_s(pos);
       if (!(te instanceof TileEntityBarrel))

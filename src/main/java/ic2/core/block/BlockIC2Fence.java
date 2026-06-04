@@ -148,7 +148,7 @@ public class BlockIC2Fence extends BlockMultiID<BlockIC2Fence.IC2FenceType> {
       double maxSpeed = IC2.keyboard.isAltKeyDown(player) ? 0.1D : (metalShoes ? 1.5D : 0.5D);
       player.field_70181_x = Math.min(player.field_70181_x, maxSpeed);
     } 
-    if (!world.field_72995_K) {
+    if (!world.isRemote) {
       List<TileEntityMagnetizer> magnetizers = getMagnetizers((IBlockAccess)world, pos, false);
       for (TileEntityMagnetizer magnetizer : magnetizers)
         ((NetworkManager)IC2.network.get(true)).updateTileEntityField((TileEntity)magnetizer, "energy"); 
@@ -207,7 +207,7 @@ public class BlockIC2Fence extends BlockMultiID<BlockIC2Fence.IC2FenceType> {
   public static boolean hasMetalShoes(EntityPlayer player) {
     ItemStack shoes = (ItemStack)player.field_71071_by.field_70460_b.get(0);
     if (shoes != null) {
-      Item item = shoes.func_77973_b();
+      Item item = shoes.getItem();
       if (item == Items.field_151167_ab || item == Items.field_151151_aj || item == Items.field_151029_X || 
         
         ItemWrapper.isMetalArmor(shoes, player))

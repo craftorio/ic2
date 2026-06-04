@@ -87,7 +87,7 @@ public class GatewayElectricItemManager implements IElectricItemManager {
   }
   
   private IElectricItemManager getManager(ItemStack stack) {
-    Item item = stack.func_77973_b();
+    Item item = stack.getItem();
     if (item == null)
       return null; 
     if (item instanceof ISpecialElectricItem)

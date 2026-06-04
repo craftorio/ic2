@@ -49,7 +49,7 @@ public class ItemElectricToolChainsaw extends ItemElectricTool implements IHitSo
   }
   
   public ActionResult<ItemStack> func_77659_a(World world, EntityPlayer player, EnumHand hand) {
-    if (world.field_72995_K)
+    if (world.isRemote)
       return super.func_77659_a(world, player, hand); 
     if (IC2.keyboard.isModeSwitchKeyDown(player)) {
       NBTTagCompound compoundTag = StackUtil.getOrCreateNbtData(StackUtil.get(player, hand));
@@ -89,7 +89,7 @@ public class ItemElectricToolChainsaw extends ItemElectricTool implements IHitSo
     Entity entity = event.getTarget();
     EntityPlayer player = event.getEntityPlayer();
     ItemStack itemstack = player.field_71071_by.func_70301_a(player.field_71071_by.field_70461_c);
-    if (itemstack != null && itemstack.func_77973_b() == this && entity instanceof IShearable && 
+    if (itemstack != null && itemstack.getItem() == this && entity instanceof IShearable && 
       !StackUtil.getOrCreateNbtData(itemstack).func_74767_n("disableShear") && ElectricItem.manager
       .use(itemstack, this.operationEnergyCost, (EntityLivingBase)player)) {
       IShearable target = (IShearable)entity;

@@ -139,11 +139,11 @@ public class TileEntityWindKineticGenerator extends TileEntityInventory implemen
     EnumFacing rightDir = fwdDir.func_176732_a(EnumFacing.DOWN.func_176740_k());
     int xMaxDist = Math.abs(length * fwdDir.func_82601_c() + box * rightDir.func_82601_c());
     int zMaxDist = Math.abs(length * fwdDir.func_82599_e() + box * rightDir.func_82599_e());
-    ChunkCache chunkCache = new ChunkCache(func_145831_w(), this.field_174879_c.func_177982_a(-xMaxDist, -box, -zMaxDist), this.field_174879_c.func_177982_a(xMaxDist, box, zMaxDist), 0);
+    ChunkCache chunkCache = new ChunkCache(getWorld(), this.field_174879_c.func_177982_a(-xMaxDist, -box, -zMaxDist), this.field_174879_c.func_177982_a(xMaxDist, box, zMaxDist), 0);
     int ret = 0;
-    int xCoord = this.field_174879_c.func_177958_n();
-    int yCoord = this.field_174879_c.func_177956_o();
-    int zCoord = this.field_174879_c.func_177952_p();
+    int xCoord = this.field_174879_c.getX();
+    int yCoord = this.field_174879_c.getY();
+    int zCoord = this.field_174879_c.getZ();
     BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
     for (int up = -box; up <= box; up++) {
       int y = yCoord + up;
@@ -190,7 +190,7 @@ public class TileEntityWindKineticGenerator extends TileEntityInventory implemen
   }
   
   public double calcWindStrength() {
-    double windStr = (WorldData.get(func_145831_w())).windSim.getWindAt(this.field_174879_c.func_177956_o());
+    double windStr = (WorldData.get(getWorld())).windSim.getWindAt(this.field_174879_c.getY());
     windStr *= 1.0D - Math.pow(this.obstructedCrossSection / this.crossSection, 2.0D);
     return Math.max(0.0D, windStr);
   }
@@ -206,36 +206,36 @@ public class TileEntityWindKineticGenerator extends TileEntityInventory implemen
   
   public float getEfficiency() {
     ItemStack stack = this.rotorSlot.get();
-    if (!StackUtil.isEmpty(stack) && stack.func_77973_b() instanceof IKineticRotor)
-      return ((IKineticRotor)stack.func_77973_b()).getEfficiency(stack); 
+    if (!StackUtil.isEmpty(stack) && stack.getItem() instanceof IKineticRotor)
+      return ((IKineticRotor)stack.getItem()).getEfficiency(stack); 
     return 0.0F;
   }
   
   public int getMinWindStrength() {
     ItemStack stack = this.rotorSlot.get();
-    if (!StackUtil.isEmpty(stack) && stack.func_77973_b() instanceof IKineticRotor)
-      return ((IKineticRotor)stack.func_77973_b()).getMinWindStrength(stack); 
+    if (!StackUtil.isEmpty(stack) && stack.getItem() instanceof IKineticRotor)
+      return ((IKineticRotor)stack.getItem()).getMinWindStrength(stack); 
     return 0;
   }
   
   public int getMaxWindStrength() {
     ItemStack stack = this.rotorSlot.get();
-    if (!StackUtil.isEmpty(stack) && stack.func_77973_b() instanceof IKineticRotor)
-      return ((IKineticRotor)stack.func_77973_b()).getMaxWindStrength(stack); 
+    if (!StackUtil.isEmpty(stack) && stack.getItem() instanceof IKineticRotor)
+      return ((IKineticRotor)stack.getItem()).getMaxWindStrength(stack); 
     return 0;
   }
   
   public int getRotorDiameter() {
     ItemStack stack = this.rotorSlot.get();
-    if (!StackUtil.isEmpty(stack) && stack.func_77973_b() instanceof IKineticRotor)
-      return ((IKineticRotor)stack.func_77973_b()).getDiameter(stack); 
+    if (!StackUtil.isEmpty(stack) && stack.getItem() instanceof IKineticRotor)
+      return ((IKineticRotor)stack.getItem()).getDiameter(stack); 
     return 0;
   }
   
   public ResourceLocation getRotorRenderTexture() {
     ItemStack stack = this.rotorSlot.get();
-    if (!StackUtil.isEmpty(stack) && stack.func_77973_b() instanceof IKineticRotor)
-      return ((IKineticRotor)stack.func_77973_b()).getRotorRenderTexture(stack); 
+    if (!StackUtil.isEmpty(stack) && stack.getItem() instanceof IKineticRotor)
+      return ((IKineticRotor)stack.getItem()).getRotorRenderTexture(stack); 
     return woodenRotorTexture;
   }
   

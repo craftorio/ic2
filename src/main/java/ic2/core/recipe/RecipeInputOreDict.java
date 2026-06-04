@@ -36,10 +36,10 @@ public class RecipeInputOreDict extends RecipeInputBase implements IRecipeInput 
   public boolean matches(ItemStack subject) {
     List<ItemStack> inputs = getOres();
     boolean useOreStackMeta = (this.meta == null);
-    Item subjectItem = subject.func_77973_b();
+    Item subjectItem = subject.getItem();
     int subjectMeta = subject.func_77952_i();
     for (ItemStack oreStack : inputs) {
-      Item oreItem = oreStack.func_77973_b();
+      Item oreItem = oreStack.getItem();
       if (oreItem == null)
         continue; 
       int metaRequired = useOreStackMeta ? oreStack.func_77952_i() : this.meta.intValue();
@@ -66,7 +66,7 @@ public class RecipeInputOreDict extends RecipeInputBase implements IRecipeInput 
       return ores; 
     List<ItemStack> ret = new ArrayList<>(ores.size());
     for (ItemStack stack : ores) {
-      if (stack.func_77973_b() != null) {
+      if (stack.getItem() != null) {
         if (StackUtil.getSize(stack) != getAmount())
           stack = StackUtil.copyWithSize(stack, getAmount()); 
         ret.add(stack);

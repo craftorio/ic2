@@ -74,8 +74,8 @@ public class TileEntityChunkloader extends TileEntityInventory implements INetwo
     this.upgradeSlot.tick();
   }
   
-  public void func_145839_a(NBTTagCompound nbt) {
-    super.func_145839_a(nbt);
+  public void readFromNBT(NBTTagCompound nbt) {
+    super.readFromNBT(nbt);
     NBTTagList list = nbt.func_150295_c("loadedChunks", 4);
     this.loadedChunks.clear();
     for (int i = 0; i < list.func_74745_c(); i++) {
@@ -85,18 +85,18 @@ public class TileEntityChunkloader extends TileEntityInventory implements INetwo
     } 
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     NBTTagList list = new NBTTagList();
-    nbt.func_74782_a("loadedChunks", (NBTBase)list);
+    nbt.setTag("loadedChunks", (NBTBase)list);
     for (ChunkPos chunk : this.loadedChunks)
       list.func_74742_a((NBTBase)new NBTTagLong(ChunkLoaderLogic.serialize(chunk))); 
     return nbt;
   }
   
   public void setActive(boolean active) {
-    World world = func_145831_w();
-    if (!world.field_72995_K && getActive() != active)
+    World world = getWorld();
+    if (!world.isRemote && getActive() != active)
       if (active) {
         if (this.ticket != null)
           throw new IllegalStateException("Cannot activate ChunkLoader: " + this.field_174879_c + " " + this.ticket); 
@@ -114,8 +114,8 @@ public class TileEntityChunkloader extends TileEntityInventory implements INetwo
   
   public void onLoaded() {
     super.onLoaded();
-    World world = func_145831_w();
-    if (!world.field_72995_K) {
+    World world = getWorld();
+    if (!world.isRemote) {
       this.ticket = ChunkLoaderLogic.getInstance().getTicket(world, this.field_174879_c, false);
       if (this.ticket != null) {
         this.loadedChunks.clear();
@@ -137,7 +137,7 @@ public class TileEntityChunkloader extends TileEntityInventory implements INetwo
   }
   
   protected boolean onActivated(EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-    if ((func_145831_w()).field_72995_K)
+    if ((getWorld()).isRemote)
       return true; 
     return IC2.platform.launchGui(player, this);
   }
@@ -154,7 +154,7 @@ public class TileEntityChunkloader extends TileEntityInventory implements INetwo
   public void onGuiClosed(EntityPlayer player) {}
   
   public void addChunkToLoaded(ChunkPos chunk) {
-    if ((func_145831_w()).field_72995_K) {
+    if ((getWorld()).isRemote) {
       (new RuntimeException("Something tried to change the ChunkLoaderState on the client.")).printStackTrace();
       return;
     } 
@@ -171,7 +171,7 @@ public class TileEntityChunkloader extends TileEntityInventory implements INetwo
   }
   
   public void removeChunkFromLoaded(ChunkPos chunk) {
-    if ((func_145831_w()).field_72995_K) {
+    if ((getWorld()).isRemote) {
       (new RuntimeException("Something tried to change the ChunkLoaderState on the client.")).printStackTrace();
       return;
     } 

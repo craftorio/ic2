@@ -42,7 +42,7 @@ public class BlockMultiID<T extends Enum<T> & IIdProvider> extends BlockBase imp
   
   private static <T extends Enum<T> & IIdProvider> EnumProperty<T> createTypeProperty(Class<T> typeClass) {
     EnumProperty<T> ret = new EnumProperty("type", typeClass);
-    if (ret.getAllowedValues().size() > 16)
+    if (ret.func_177700_c().size() > 16)
       throw new IllegalArgumentException("Too many values to fit in 16 meta values for " + typeClass); 
     return ret;
   }
@@ -101,8 +101,8 @@ public class BlockMultiID<T extends Enum<T> & IIdProvider> extends BlockBase imp
   }
   
   protected final List<IBlockState> getTypeStates() {
-    List<IBlockState> ret = new ArrayList<>(this.typeProperty.getAllowedValues().size());
-    for (Enum enum_ : this.typeProperty.getAllowedValues())
+    List<IBlockState> ret = new ArrayList<>(this.typeProperty.func_177700_c().size());
+    for (Enum enum_ : this.typeProperty.func_177700_c())
       ret.add(func_176223_P().func_177226_a((IProperty)this.typeProperty, enum_)); 
     return ret;
   }
@@ -139,7 +139,7 @@ public class BlockMultiID<T extends Enum<T> & IIdProvider> extends BlockBase imp
   public IBlockState getState(String variant) {
     if (variant == null)
       return func_176223_P(); 
-    for (Enum enum_ : this.typeProperty.getAllowedValues()) {
+    for (Enum enum_ : this.typeProperty.func_177700_c()) {
       if (enum_.name().equals(variant))
         return getState((T)enum_); 
     } 
@@ -163,7 +163,7 @@ public class BlockMultiID<T extends Enum<T> & IIdProvider> extends BlockBase imp
     if (stack == null)
       throw new NullPointerException("null stack"); 
     Item item = Item.func_150898_a(this);
-    if (stack.func_77973_b() != item)
+    if (stack.getItem() != item)
       throw new IllegalArgumentException("The stack " + stack + " doesn't match " + item + " (" + this + ")"); 
     IBlockState state = func_176203_a(stack.func_77960_j());
     T type = getType(state);

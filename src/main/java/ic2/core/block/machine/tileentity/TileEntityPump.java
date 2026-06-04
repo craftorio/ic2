@@ -94,7 +94,7 @@ public class TileEntityPump extends TileEntityElectricMachine implements IHasGui
   
   protected void onLoaded() {
     super.onLoaded();
-    if (!(func_145831_w()).field_72995_K)
+    if (!(getWorld()).isRemote)
       setUpgradestat(); 
   }
   
@@ -107,13 +107,13 @@ public class TileEntityPump extends TileEntityElectricMachine implements IHasGui
     super.onUnloaded();
   }
   
-  public void func_145839_a(NBTTagCompound nbt) {
-    super.func_145839_a(nbt);
+  public void readFromNBT(NBTTagCompound nbt) {
+    super.readFromNBT(nbt);
     this.progress = nbt.func_74765_d("progress");
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     nbt.func_74777_a("progress", this.progress);
     return nbt;
   }
@@ -147,7 +147,7 @@ public class TileEntityPump extends TileEntityElectricMachine implements IHasGui
   public boolean operate(boolean sim) {
     if (this.miner == null || this.miner.func_145837_r()) {
       this.miner = null;
-      World world = func_145831_w();
+      World world = getWorld();
       for (EnumFacing dir : Util.downSideFacings) {
         TileEntity te = world.func_175625_s(this.field_174879_c.func_177972_a(dir));
         if (te instanceof TileEntityMiner) {
@@ -173,7 +173,7 @@ public class TileEntityPump extends TileEntityElectricMachine implements IHasGui
   }
   
   public FluidStack pump(BlockPos startPos, boolean sim, TileEntityMiner miner) {
-    World world = func_145831_w();
+    World world = getWorld();
     int freeSpace = this.fluidTank.getCapacity() - this.fluidTank.getFluidAmount();
     if (miner == null && freeSpace > 0) {
       TileEntity te = world.func_175625_s(startPos);

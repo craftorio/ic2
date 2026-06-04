@@ -39,7 +39,7 @@ public class ItemCrystalMemory extends ItemIC2 {
   
   public ItemStack readItemStack(ItemStack stack) {
     NBTTagCompound nbt = StackUtil.getOrCreateNbtData(stack);
-    NBTTagCompound contentTag = nbt.func_74775_l("Pattern");
+    NBTTagCompound contentTag = nbt.getCompoundTag("Pattern");
     ItemStack Item = new ItemStack(contentTag);
     return Item;
   }
@@ -48,6 +48,6 @@ public class ItemCrystalMemory extends ItemIC2 {
     NBTTagCompound nbt = StackUtil.getOrCreateNbtData(stack);
     NBTTagCompound contentTag = new NBTTagCompound();
     recorded.func_77955_b(contentTag);
-    nbt.func_74782_a("Pattern", (NBTBase)contentTag);
+    nbt.setTag("Pattern", (NBTBase)contentTag);
   }
 }

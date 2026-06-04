@@ -87,7 +87,7 @@ public class ItemSprayer extends ItemIC2FluidContainer implements IBoxable {
     if (fluid != null && fluid.amount > 0)
       maxFoamBlocks += fluid.amount / getFluidPerFoam(); 
     ItemStack pack = (ItemStack)player.field_71071_by.field_70460_b.get(2);
-    if (pack != null && pack.func_77973_b() == ItemName.cf_pack.getInstance()) {
+    if (pack != null && pack.getItem() == ItemName.cf_pack.getInstance()) {
       fluid = FluidUtil.getFluidContained(pack);
       if (fluid != null && fluid.amount > 0) {
         maxFoamBlocks += fluid.amount / getFluidPerFoam();

@@ -25,10 +25,10 @@ public class TextDrawable implements IDrawable {
         x = 0;
         break;
       case Center:
-        x = arg0.field_71462_r.field_146294_l / 2;
+        x = arg0.field_71462_r.width / 2;
         break;
       case End:
-        x = arg0.field_71462_r.field_146294_l - getWidth();
+        x = arg0.field_71462_r.width - getWidth();
         break;
       default:
         throw new IllegalArgumentException("invalid alignment: " + this.alignment);

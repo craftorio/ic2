@@ -135,7 +135,7 @@ public abstract class HandHeldInventory implements IHasGui {
   
   public void onGuiClosed(EntityPlayer player) {
     save();
-    if (!(player.func_130014_f_()).field_72995_K)
+    if (!(player.func_130014_f_()).isRemote)
       if (PLAYERS_IN_GUI.contains(player)) {
         PLAYERS_IN_GUI.remove(player);
       } else {
@@ -144,7 +144,7 @@ public abstract class HandHeldInventory implements IHasGui {
   }
   
   public boolean isThisContainer(ItemStack stack) {
-    if (StackUtil.isEmpty(stack) || stack.func_77973_b() != this.containerStack.func_77973_b())
+    if (StackUtil.isEmpty(stack) || stack.getItem() != this.containerStack.getItem())
       return false; 
     NBTTagCompound nbt = stack.func_77978_p();
     return (nbt != null && nbt.func_74762_e("uid") == getUid());
@@ -185,7 +185,7 @@ public abstract class HandHeldInventory implements IHasGui {
         contentList.func_74742_a((NBTBase)nbt);
       } 
     } 
-    StackUtil.getOrCreateNbtData(this.containerStack).func_74782_a("Items", (NBTBase)contentList);
+    StackUtil.getOrCreateNbtData(this.containerStack).setTag("Items", (NBTBase)contentList);
     try {
       this.containerStack = StackUtil.copyWithSize(this.containerStack, 1);
     } catch (IllegalArgumentException e) {
@@ -198,7 +198,7 @@ public abstract class HandHeldInventory implements IHasGui {
       category = crash.func_85058_a("Container info");
       category.func_71507_a("Type", getClass().getName());
       category.func_71507_a("Container", (this.player.field_71070_bA == null) ? null : this.player.field_71070_bA.getClass().getName());
-      if (this.player.field_70170_p.field_72995_K)
+      if (this.player.field_70170_p.isRemote)
         category.func_189529_a("GUI", new ICrashReportDetail<String>() {
               public String call() throws Exception {
                 GuiScreen gui = (Minecraft.func_71410_x()).field_71462_r;
@@ -235,7 +235,7 @@ public abstract class HandHeldInventory implements IHasGui {
         contentList.func_74742_a((NBTBase)nbt);
       } 
     } 
-    StackUtil.getOrCreateNbtData(stack).func_74782_a("Items", (NBTBase)contentList);
+    StackUtil.getOrCreateNbtData(stack).setTag("Items", (NBTBase)contentList);
     assert StackUtil.getOrCreateNbtData(stack).func_74762_e("uid") == 0;
     func_174888_l();
   }

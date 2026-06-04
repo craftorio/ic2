@@ -73,7 +73,7 @@ public abstract class ContainerBase<T extends IInventory> extends Container {
       if (StackUtil.isEmpty(resultStack) || StackUtil.getSize(resultStack) != oldSourceItemStackSize) {
         sourceSlot.func_75215_d(resultStack);
         sourceSlot.func_190901_a(player, sourceItemStack);
-        if (!(player.func_130014_f_()).field_72995_K)
+        if (!(player.func_130014_f_()).isRemote)
           func_75142_b(); 
       } 
     } 

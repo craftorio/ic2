@@ -117,8 +117,8 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
   protected void onLoaded() {
     super.onLoaded();
     this.scannedLevel = -1;
-    this.lastX = this.field_174879_c.func_177958_n();
-    this.lastZ = this.field_174879_c.func_177952_p();
+    this.lastX = this.field_174879_c.getX();
+    this.lastZ = this.field_174879_c.getZ();
     this.canProvideLiquid = false;
   }
   
@@ -130,14 +130,14 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
     super.onUnloaded();
   }
   
-  public void func_145839_a(NBTTagCompound nbtTagCompound) {
-    super.func_145839_a(nbtTagCompound);
+  public void readFromNBT(NBTTagCompound nbtTagCompound) {
+    super.readFromNBT(nbtTagCompound);
     this.lastMode = Mode.values()[nbtTagCompound.func_74762_e("lastMode")];
     this.progress = nbtTagCompound.func_74762_e("progress");
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     nbt.func_74768_a("lastMode", this.lastMode.ordinal());
     nbt.func_74768_a("progress", this.progress);
     return nbt;
@@ -169,7 +169,7 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
     if (this.drillSlot.isEmpty())
       return withDrawPipe(operatingPos); 
     if (!operatingPos.isBelowMap()) {
-      World world = func_145831_w();
+      World world = getWorld();
       IBlockState state = world.func_180495_p((BlockPos)operatingPos);
       if (state != BlockName.mining_pipe.getBlockState((IIdProvider)BlockMiningPipe.MiningPipeType.tip)) {
         if (operatingPos.func_177956_o() > 0)
@@ -191,7 +191,7 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
   
   private Ic2BlockPos getOperationPos() {
     Ic2BlockPos ret = (new Ic2BlockPos((Vec3i)this.field_174879_c)).moveDown();
-    World world = func_145831_w();
+    World world = getWorld();
     IBlockState pipeState = BlockName.mining_pipe.getBlockState((IIdProvider)BlockMiningPipe.MiningPipeType.pipe);
     while (!ret.isBelowMap()) {
       IBlockState state = ret.getBlockState((IBlockAccess)world);
@@ -207,9 +207,9 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
       this.lastMode = Mode.Withdraw;
       this.progress = 0;
     } 
-    if (operatingPos.isBelowMap() || func_145831_w().func_180495_p((BlockPos)operatingPos) != BlockName.mining_pipe.getBlockState((IIdProvider)BlockMiningPipe.MiningPipeType.tip))
+    if (operatingPos.isBelowMap() || getWorld().func_180495_p((BlockPos)operatingPos) != BlockName.mining_pipe.getBlockState((IIdProvider)BlockMiningPipe.MiningPipeType.tip))
       operatingPos.moveUp(); 
-    if (operatingPos.func_177956_o() != this.field_174879_c.func_177956_o() && this.energy.getEnergy() >= 3.0D) {
+    if (operatingPos.func_177956_o() != this.field_174879_c.getY() && this.energy.getEnergy() >= 3.0D) {
       if (this.progress < 20) {
         this.energy.useEnergy(3.0D);
         this.progress++;
@@ -223,13 +223,13 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
   }
   
   private void removePipe(Ic2BlockPos operatingPos) {
-    World world = func_145831_w();
+    World world = getWorld();
     world.func_175698_g((BlockPos)operatingPos);
     storeDrop(BlockName.mining_pipe.getItemStack((Enum)BlockMiningPipe.MiningPipeType.pipe));
     ItemStack pipe = this.pipeSlot.consume(1, true, false);
     if (pipe != null && !StackUtil.checkItemEquality(pipe, BlockName.mining_pipe.getItemStack((Enum)BlockMiningPipe.MiningPipeType.pipe))) {
       ItemStack filler = this.pipeSlot.consume(1);
-      Item fillerItem = filler.func_77973_b();
+      Item fillerItem = filler.getItem();
       EntityPlayer player = Ic2Player.get(world);
       player.func_184611_a(EnumHand.MAIN_HAND, filler);
       try {
@@ -247,20 +247,20 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
       return false; 
     if (operatingPos.isBelowMap()) {
       if (removeTipAbove)
-        func_145831_w().func_175656_a((BlockPos)operatingPos.setY(0), BlockName.mining_pipe.getBlockState((IIdProvider)BlockMiningPipe.MiningPipeType.pipe)); 
+        getWorld().func_175656_a((BlockPos)operatingPos.setY(0), BlockName.mining_pipe.getBlockState((IIdProvider)BlockMiningPipe.MiningPipeType.pipe)); 
       return false;
     } 
     MineResult result = mineBlock((BlockPos)operatingPos, state);
     if (result == MineResult.Failed_Temp || result == MineResult.Failed_Perm) {
       if (removeTipAbove)
-        func_145831_w().func_175656_a((BlockPos)operatingPos.moveUp(), BlockName.mining_pipe.getBlockState((IIdProvider)BlockMiningPipe.MiningPipeType.pipe)); 
+        getWorld().func_175656_a((BlockPos)operatingPos.moveUp(), BlockName.mining_pipe.getBlockState((IIdProvider)BlockMiningPipe.MiningPipeType.pipe)); 
       return false;
     } 
     if (result == MineResult.Done) {
       if (removeTipAbove)
-        func_145831_w().func_175656_a(operatingPos.func_177984_a(), BlockName.mining_pipe.getBlockState((IIdProvider)BlockMiningPipe.MiningPipeType.pipe)); 
+        getWorld().func_175656_a(operatingPos.func_177984_a(), BlockName.mining_pipe.getBlockState((IIdProvider)BlockMiningPipe.MiningPipeType.pipe)); 
       this.pipeSlot.consume(1);
-      func_145831_w().func_175656_a((BlockPos)operatingPos, BlockName.mining_pipe.getBlockState((IIdProvider)BlockMiningPipe.MiningPipeType.tip));
+      getWorld().func_175656_a((BlockPos)operatingPos, BlockName.mining_pipe.getBlockState((IIdProvider)BlockMiningPipe.MiningPipeType.tip));
     } 
     return true;
   }
@@ -269,14 +269,14 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
     if (this.scannerSlot.isEmpty())
       return MineResult.Done; 
     if (this.scannedLevel != y)
-      this.scanRange = ((ItemScanner)this.scannerSlot.get().func_77973_b()).startLayerScan(this.scannerSlot.get()); 
+      this.scanRange = ((ItemScanner)this.scannerSlot.get().getItem()).startLayerScan(this.scannerSlot.get()); 
     if (this.scanRange > 0) {
       this.scannedLevel = y;
       BlockPos.MutableBlockPos target = new BlockPos.MutableBlockPos();
-      World world = func_145831_w();
+      World world = getWorld();
       EntityPlayer player = Ic2Player.get(world);
-      for (int x = this.field_174879_c.func_177958_n() - this.scanRange; x <= this.field_174879_c.func_177958_n() + this.scanRange; x++) {
-        for (int z = this.field_174879_c.func_177952_p() - this.scanRange; z <= this.field_174879_c.func_177952_p() + this.scanRange; z++) {
+      for (int x = this.field_174879_c.getX() - this.scanRange; x <= this.field_174879_c.getX() + this.scanRange; x++) {
+        for (int z = this.field_174879_c.getZ() - this.scanRange; z <= this.field_174879_c.getZ() + this.scanRange; z++) {
           target.func_181079_c(x, y, z);
           IBlockState state = world.func_180495_p((BlockPos)target);
           boolean isValidTarget = false;
@@ -302,11 +302,11 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
   }
   
   private MineResult mineTowards(BlockPos dst) {
-    int dx = Math.abs(dst.func_177958_n() - this.field_174879_c.func_177958_n()), sx = (this.field_174879_c.func_177958_n() < dst.func_177958_n()) ? 1 : -1;
-    int dz = -Math.abs(dst.func_177952_p() - this.field_174879_c.func_177952_p()), sz = (this.field_174879_c.func_177952_p() < dst.func_177952_p()) ? 1 : -1;
+    int dx = Math.abs(dst.func_177958_n() - this.field_174879_c.getX()), sx = (this.field_174879_c.getX() < dst.func_177958_n()) ? 1 : -1;
+    int dz = -Math.abs(dst.func_177952_p() - this.field_174879_c.getZ()), sz = (this.field_174879_c.getZ() < dst.func_177952_p()) ? 1 : -1;
     int err = dx + dz;
     BlockPos.MutableBlockPos target = new BlockPos.MutableBlockPos();
-    for (int cx = this.field_174879_c.func_177958_n(), cz = this.field_174879_c.func_177952_p(); cx != dst.func_177958_n() || cz != dst.func_177952_p(); ) {
+    for (int cx = this.field_174879_c.getX(), cz = this.field_174879_c.getZ(); cx != dst.func_177958_n() || cz != dst.func_177952_p(); ) {
       boolean isCurrentPos = (cx == this.lastX && cz == this.lastZ);
       int e2 = 2 * err;
       if (e2 > dz) {
@@ -317,7 +317,7 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
         cz += sz;
       } 
       target.func_181079_c(cx, dst.func_177956_o(), cz);
-      World world = func_145831_w();
+      World world = getWorld();
       IBlockState state = world.func_180495_p((BlockPos)target);
       boolean isBlocking = false;
       if (isCurrentPos) {
@@ -336,15 +336,15 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
         return result;
       } 
     } 
-    this.lastX = this.field_174879_c.func_177958_n();
-    this.lastZ = this.field_174879_c.func_177952_p();
+    this.lastX = this.field_174879_c.getX();
+    this.lastZ = this.field_174879_c.getZ();
     return MineResult.Done;
   }
   
   private MineResult mineBlock(BlockPos target, IBlockState state) {
     Mode mode;
     int energyPerTick, duration;
-    World world = func_145831_w();
+    World world = getWorld();
     Block block = state.func_177230_c();
     boolean isAirBlock = true;
     if (!block.isAir(state, (IBlockAccess)world, target)) {
@@ -365,21 +365,21 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
       mode = Mode.MineAir;
       energyPerTick = 3;
       duration = 20;
-    } else if (this.drillSlot.get().func_77973_b() == ItemName.drill.getInstance()) {
+    } else if (this.drillSlot.get().getItem() == ItemName.drill.getInstance()) {
       mode = Mode.MineDrill;
       energyPerTick = 6;
       duration = 200;
-    } else if (this.drillSlot.get().func_77973_b() == ItemName.diamond_drill.getInstance()) {
+    } else if (this.drillSlot.get().getItem() == ItemName.diamond_drill.getInstance()) {
       mode = Mode.MineDDrill;
       energyPerTick = 20;
       duration = 50;
-    } else if (this.drillSlot.get().func_77973_b() == ItemName.iridium_drill.getInstance()) {
+    } else if (this.drillSlot.get().getItem() == ItemName.iridium_drill.getInstance()) {
       mode = Mode.MineIDrill;
       energyPerTick = 200;
       duration = 20;
-    } else if (this.drillSlot.get().func_77973_b() instanceof IMiningDrill) {
+    } else if (this.drillSlot.get().getItem() instanceof IMiningDrill) {
       mode = Mode.MineCustomDrill;
-      IMiningDrill drill = (IMiningDrill)this.drillSlot.get().func_77973_b();
+      IMiningDrill drill = (IMiningDrill)this.drillSlot.get().getItem();
       energyPerTick = drill.energyUse(this.drillSlot.get(), world, target, state);
       duration = drill.breakTime(this.drillSlot.get(), world, target, state);
     } else {
@@ -402,10 +402,10 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
   }
   
   private boolean harvestBlock(BlockPos target, IBlockState state) {
-    int energyCost = 2 * (this.field_174879_c.func_177956_o() - target.func_177956_o());
+    int energyCost = 2 * (this.field_174879_c.getY() - target.func_177956_o());
     if (this.energy.getEnergy() < energyCost)
       return false; 
-    World world = func_145831_w();
+    World world = getWorld();
     switch (this.lastMode) {
       case MineDrill:
         if (!ElectricItem.manager.use(this.drillSlot.get(), 50.0D, null))
@@ -420,7 +420,7 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
           return false; 
         break;
       case MineCustomDrill:
-        if (!((IMiningDrill)this.drillSlot.get().func_77973_b()).breakBlock(this.drillSlot.get(), world, target, state))
+        if (!((IMiningDrill)this.drillSlot.get().getItem()).breakBlock(this.drillSlot.get(), world, target, state))
           return false; 
         break;
       default:
@@ -435,7 +435,7 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
   
   private void storeDrop(ItemStack stack) {
     if (StackUtil.putInInventory((TileEntity)this, EnumFacing.WEST, stack, true) == 0) {
-      StackUtil.dropAsEntity(func_145831_w(), this.field_174879_c, stack);
+      StackUtil.dropAsEntity(getWorld(), this.field_174879_c, stack);
     } else {
       StackUtil.putInInventory((TileEntity)this, EnumFacing.WEST, stack, false);
     } 
@@ -447,7 +447,7 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
   
   public boolean canMine(BlockPos target, IBlockState state) {
     Block block = state.func_177230_c();
-    if (block.isAir(state, (IBlockAccess)func_145831_w(), target))
+    if (block.isAir(state, (IBlockAccess) getWorld(), target))
       return true; 
     if (block == BlockName.mining_pipe.getInstance() || block == Blocks.field_150486_ae)
       return false; 
@@ -455,7 +455,7 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
       return true; 
     if ((block == Blocks.field_150355_j || block == Blocks.field_150358_i || block == Blocks.field_150353_l || block == Blocks.field_150356_k) && isPumpConnected(target))
       return true; 
-    World world = func_145831_w();
+    World world = getWorld();
     if (state.func_185887_b(world, target) < 0.0F)
       return false; 
     if (block.func_176209_a(state, false) && state.func_185904_a().func_76229_l())
@@ -468,7 +468,7 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
   }
   
   public boolean isPumpConnected(BlockPos target) {
-    World world = func_145831_w();
+    World world = getWorld();
     for (EnumFacing dir : EnumFacing.field_82609_l) {
       TileEntity te = world.func_175625_s(this.field_174879_c.func_177972_a(dir));
       if (te instanceof TileEntityPump && ((TileEntityPump)te).pump(target, true, this) != null)
@@ -478,7 +478,7 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
   }
   
   public boolean isAnyPumpConnected() {
-    World world = func_145831_w();
+    World world = getWorld();
     for (EnumFacing dir : EnumFacing.field_82609_l) {
       TileEntity te = world.func_175625_s(this.field_174879_c.func_177972_a(dir));
       if (te instanceof TileEntityPump)

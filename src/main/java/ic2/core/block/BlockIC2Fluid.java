@@ -78,7 +78,7 @@ public class BlockIC2Fluid extends BlockFluidClassic implements IBlockModelProvi
   
   public void func_180650_b(World world, BlockPos pos, IBlockState state, Random random) {
     super.func_180650_b(world, pos, state, random);
-    if (!world.field_72995_K)
+    if (!world.isRemote)
       if (this.fluid == FluidName.pahoehoe_lava.getInstance()) {
         if (isSourceBlock((IBlockAccess)world, pos) && world
           .func_175671_l(pos) >= world.field_73012_v.nextInt(120)) {
@@ -88,7 +88,7 @@ public class BlockIC2Fluid extends BlockFluidClassic implements IBlockModelProvi
         } 
       } else if (this.fluid == FluidName.hot_water.getInstance()) {
         if (isSourceBlock((IBlockAccess)world, pos) && !isLavaBlock(world.func_180495_p(pos.func_177979_c(2)).func_177230_c()) && world.func_180495_p(pos.func_177977_b()).func_177230_c() != this && world.field_73012_v.nextInt(60) == 0) {
-          world.func_175656_a(pos, Blocks.field_150358_i.func_176223_P());
+          world.func_175656_a(pos, Blocks.field_150358_i.getDefaultState());
         } else {
           world.func_175684_a(pos, (Block)this, func_149738_a(world));
         } 
@@ -110,7 +110,7 @@ public class BlockIC2Fluid extends BlockFluidClassic implements IBlockModelProvi
   }
   
   public void func_180633_a(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
-    if (world.field_72995_K)
+    if (world.isRemote)
       return; 
     if (this.fluid == FluidName.biogas.getInstance() || this.fluid == FluidName.air.getInstance()) {
       world.func_175698_g(pos);
@@ -123,7 +123,7 @@ public class BlockIC2Fluid extends BlockFluidClassic implements IBlockModelProvi
   }
   
   public void func_176199_a(World world, BlockPos pos, Entity entity) {
-    if (world.field_72995_K)
+    if (world.isRemote)
       return; 
     if (this.fluid == FluidName.pahoehoe_lava.getInstance()) {
       entity.func_70015_d(10);
@@ -165,7 +165,7 @@ public class BlockIC2Fluid extends BlockFluidClassic implements IBlockModelProvi
   }
   
   private boolean hardenFromNeighbors(World world, BlockPos pos) {
-    if (world.field_72995_K)
+    if (world.isRemote)
       return false; 
     if (this.fluid == FluidName.pahoehoe_lava.getInstance())
       for (EnumFacing dir : EnumFacing.field_82609_l) {

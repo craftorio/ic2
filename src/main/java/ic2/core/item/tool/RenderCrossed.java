@@ -21,10 +21,10 @@ public class RenderCrossed extends Render<EntityMiningLaser> {
     this.texture = texture;
   }
   
-  public void doRender(EntityMiningLaser entity, double x, double y, double z, float entityYaw, float partialTicks) {
+  public void func_76986_a(EntityMiningLaser entity, double x, double y, double z, float entityYaw, float partialTicks) {
     if (entity.field_70126_B == 0.0F && entity.field_70127_C == 0.0F)
       return; 
-    func_110776_a(getEntityTexture(entity));
+    func_110776_a(func_110775_a(entity));
     GlStateManager.func_179094_E();
     GlStateManager.func_179109_b((float)x, (float)y, (float)z);
     GlStateManager.func_179114_b(entity.field_70126_B + (entity.field_70177_z - entity.field_70126_B) * partialTicks - 90.0F, 0.0F, 1.0F, 0.0F);
@@ -72,7 +72,7 @@ public class RenderCrossed extends Render<EntityMiningLaser> {
     GlStateManager.func_179121_F();
   }
   
-  protected ResourceLocation getEntityTexture(EntityMiningLaser entity) {
+  protected ResourceLocation func_110775_a(EntityMiningLaser entity) {
     return this.texture;
   }
 }

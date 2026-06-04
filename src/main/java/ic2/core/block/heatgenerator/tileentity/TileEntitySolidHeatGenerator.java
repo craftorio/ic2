@@ -72,13 +72,13 @@ public class TileEntitySolidHeatGenerator extends TileEntityHeatSourceInventory 
     return (this.fuel <= 0 && getHeatBuffer() == 0);
   }
   
-  public void func_145839_a(NBTTagCompound nbt) {
-    super.func_145839_a(nbt);
+  public void readFromNBT(NBTTagCompound nbt) {
+    super.readFromNBT(nbt);
     this.fuel = nbt.func_74762_e("fuel");
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     nbt.func_74768_a("fuel", this.fuel);
     return nbt;
   }

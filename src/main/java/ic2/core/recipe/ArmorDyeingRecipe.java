@@ -33,7 +33,7 @@ public class ArmorDyeingRecipe extends RecipesArmorDyes {
   
   public ArmorDyeingRecipe(ItemStack armour) {
     this(Recipes.inputFactory.forStack(armour));
-    if (StackUtil.isEmpty(armour) || !(armour.func_77973_b() instanceof ItemArmor))
+    if (StackUtil.isEmpty(armour) || !(armour.getItem() instanceof ItemArmor))
       throw new IllegalArgumentException("Invalid input stack: " + StackUtil.toStringSafe(armour)); 
   }
   
@@ -89,7 +89,7 @@ public class ArmorDyeingRecipe extends RecipesArmorDyes {
       ItemStack stack = craftingInv.func_70301_a(slot);
       if (!StackUtil.isEmpty(stack))
         if (this.armour.matches(stack)) {
-          Qsuit = (ItemArmor)stack.func_77973_b();
+          Qsuit = (ItemArmor)stack.getItem();
           if (!StackUtil.isEmpty(armourStack))
             return StackUtil.emptyStack; 
           armourStack = StackUtil.copyWithSize(stack, 1);
@@ -153,7 +153,7 @@ public class ArmorDyeingRecipe extends RecipesArmorDyes {
     }
     
     public boolean matches(ItemStack subject) {
-      return matches(subject.func_77973_b());
+      return matches(subject.getItem());
     }
     
     protected boolean matches(Item item) {

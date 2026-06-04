@@ -38,14 +38,14 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class TileEntityTeleporter extends TileEntityBlock implements INetworkTileEntityEventListener {
   protected final ComparatorEmitter comparator = (ComparatorEmitter)addComponent((TileEntityComponent)new ComparatorEmitter(this));
   
-  public void func_145839_a(NBTTagCompound nbt) {
-    super.func_145839_a(nbt);
+  public void readFromNBT(NBTTagCompound nbt) {
+    super.readFromNBT(nbt);
     if (nbt.func_74764_b("targetX"))
       this.target = new BlockPos(nbt.func_74762_e("targetX"), nbt.func_74762_e("targetY"), nbt.func_74762_e("targetZ")); 
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     if (this.target != null) {
       nbt.func_74768_a("targetX", this.target.func_177958_n());
       nbt.func_74768_a("targetY", this.target.func_177956_o());
@@ -74,7 +74,7 @@ public class TileEntityTeleporter extends TileEntityBlock implements INetworkTil
       this.cooldown--;
       ((NetworkManager)IC2.network.get(true)).updateTileEntityField((TileEntity)this, "cooldown");
     } 
-    World world = func_145831_w();
+    World world = getWorld();
     if (world.func_175640_z(this.field_174879_c) && this.target != null) {
       List<Entity> entitiesNearby;
       setActive(true);
@@ -82,7 +82,7 @@ public class TileEntityTeleporter extends TileEntityBlock implements INetworkTil
         entitiesNearby = Collections.emptyList();
       } else {
         entitiesNearby = world.func_72872_a(Entity.class, new AxisAlignedBB((this.field_174879_c
-              .func_177958_n() - 1), this.field_174879_c.func_177956_o(), (this.field_174879_c.func_177952_p() - 1), (this.field_174879_c.func_177958_n() + 2), (this.field_174879_c.func_177956_o() + 3), (this.field_174879_c.func_177952_p() + 2)));
+              .getX() - 1), this.field_174879_c.getY(), (this.field_174879_c.getZ() - 1), (this.field_174879_c.getX() + 2), (this.field_174879_c.getY() + 3), (this.field_174879_c.getZ() + 2)));
       } 
       if (!entitiesNearby.isEmpty() && verifyTarget()) {
         double minDistanceSquared = Double.MAX_VALUE;
@@ -107,7 +107,7 @@ public class TileEntityTeleporter extends TileEntityBlock implements INetworkTil
   }
   
   private boolean verifyTarget() {
-    if (func_145831_w().func_175625_s(this.target) instanceof TileEntityTeleporter)
+    if (getWorld().func_175625_s(this.target) instanceof TileEntityTeleporter)
       return true; 
     this.target = null;
     updateComparatorLevel();
@@ -144,7 +144,7 @@ public class TileEntityTeleporter extends TileEntityBlock implements INetworkTil
     } else {
       user.func_70080_a(this.target.func_177958_n() + 0.5D, this.target.func_177956_o() + 1.5D + user.func_70033_W(), this.target.func_177952_p() + 0.5D, user.field_70177_z, user.field_70125_A);
     } 
-    TileEntity te = func_145831_w().func_175625_s(this.target);
+    TileEntity te = getWorld().func_175625_s(this.target);
     assert te instanceof TileEntityTeleporter;
     ((TileEntityTeleporter)te).onTeleportTo(this, user);
     ((NetworkManager)IC2.network.get(true)).initiateTileEntityEvent((TileEntity)this, 0, true);
@@ -161,7 +161,7 @@ public class TileEntityTeleporter extends TileEntityBlock implements INetworkTil
   }
   
   private void spawnParticles(int n, BlockPos pos, int red, int green, int blue) {
-    World world = func_145831_w();
+    World world = getWorld();
     Random rnd = world.field_73012_v;
     for (int i = 0; i < n; i++) {
       world.func_175688_a(EnumParticleTypes.REDSTONE, (pos
@@ -176,7 +176,7 @@ public class TileEntityTeleporter extends TileEntityBlock implements INetworkTil
   }
   
   public void consumeEnergy(int energy) {
-    World world = func_145831_w();
+    World world = getWorld();
     List<IEnergyStorage> energySources = new LinkedList<>();
     for (EnumFacing dir : EnumFacing.field_82609_l) {
       TileEntity target = world.func_175625_s(this.field_174879_c.func_177972_a(dir));
@@ -205,7 +205,7 @@ public class TileEntityTeleporter extends TileEntityBlock implements INetworkTil
   }
   
   public int getAvailableEnergy() {
-    World world = func_145831_w();
+    World world = getWorld();
     int energy = 0;
     for (EnumFacing dir : EnumFacing.field_82609_l) {
       TileEntity target = world.func_175625_s(this.field_174879_c.func_177972_a(dir));
@@ -308,7 +308,7 @@ public class TileEntityTeleporter extends TileEntityBlock implements INetworkTil
     switch (event) {
       case 0:
         IC2.audioManager.playOnce(this, "Machines/Teleporter/TeleUse.ogg");
-        IC2.audioManager.playOnce(new AudioPosition(func_145831_w(), this.field_174879_c), "Machines/Teleporter/TeleUse.ogg");
+        IC2.audioManager.playOnce(new AudioPosition(getWorld(), this.field_174879_c), "Machines/Teleporter/TeleUse.ogg");
         spawnBlueParticles(20, this.field_174879_c);
         spawnBlueParticles(20, this.target);
         return;

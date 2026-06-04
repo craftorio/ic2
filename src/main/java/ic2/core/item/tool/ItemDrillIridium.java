@@ -33,7 +33,7 @@ public class ItemDrillIridium extends ItemDrill {
   }
   
   public ActionResult<ItemStack> func_77659_a(World world, EntityPlayer player, EnumHand hand) {
-    if (!world.field_72995_K && IC2.keyboard.isModeSwitchKeyDown(player)) {
+    if (!world.isRemote && IC2.keyboard.isModeSwitchKeyDown(player)) {
       Map<Enchantment, Integer> enchantmentMap = new IdentityHashMap<>();
       enchantmentMap.put(Enchantments.field_185308_t, Integer.valueOf(3));
       ItemStack stack = StackUtil.get(player, hand);

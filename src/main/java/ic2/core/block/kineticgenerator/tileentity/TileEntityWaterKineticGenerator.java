@@ -88,7 +88,7 @@ public class TileEntityWaterKineticGenerator extends TileEntityInventory impleme
     super.updateEntityServer();
     if (this.updateTicker++ % getTickRate() != 0)
       return; 
-    World world = func_145831_w();
+    World world = getWorld();
     if (this.type == BiomeState.UNKNOWN) {
       Biome biome = BiomeUtil.getBiome(world, this.field_174879_c);
       if (BiomeDictionary.hasType(biome, BiomeDictionary.Type.OCEAN)) {
@@ -167,10 +167,10 @@ public class TileEntityWaterKineticGenerator extends TileEntityInventory impleme
   
   public int getRotorDiameter() {
     ItemStack stack = this.rotorSlot.get();
-    if (!StackUtil.isEmpty(stack) && stack.func_77973_b() instanceof IKineticRotor) {
+    if (!StackUtil.isEmpty(stack) && stack.getItem() instanceof IKineticRotor) {
       if (this.type == BiomeState.OCEAN)
-        return ((IKineticRotor)stack.func_77973_b()).getDiameter(stack); 
-      return (((IKineticRotor)stack.func_77973_b()).getDiameter(stack) + 1) * 2 / 3;
+        return ((IKineticRotor)stack.getItem()).getDiameter(stack); 
+      return (((IKineticRotor)stack.getItem()).getDiameter(stack) + 1) * 2 / 3;
     } 
     return 0;
   }
@@ -187,10 +187,10 @@ public class TileEntityWaterKineticGenerator extends TileEntityInventory impleme
     EnumFacing fwdDir = getFacing();
     EnumFacing rightDir = fwdDir.func_176732_a(EnumFacing.DOWN.func_176740_k());
     int ret = 0;
-    int xCoord = this.field_174879_c.func_177958_n();
-    int yCoord = this.field_174879_c.func_177956_o();
-    int zCoord = this.field_174879_c.func_177952_p();
-    World world = func_145831_w();
+    int xCoord = this.field_174879_c.getX();
+    int yCoord = this.field_174879_c.getY();
+    int zCoord = this.field_174879_c.getZ();
+    World world = getWorld();
     BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
     for (int up = -box; up <= box; up++) {
       int y = yCoord + up;
@@ -214,7 +214,7 @@ public class TileEntityWaterKineticGenerator extends TileEntityInventory impleme
   }
   
   public void updateSeaInfo() {
-    World world = func_145831_w();
+    World world = getWorld();
     EnumFacing facing = getFacing();
     for (int distance = 1; distance < 200; distance++) {
       Biome biomeTemp = BiomeUtil.getBiome(world, this.field_174879_c.func_177967_a(facing, distance));
@@ -264,8 +264,8 @@ public class TileEntityWaterKineticGenerator extends TileEntityInventory impleme
   
   public float getEfficiency() {
     ItemStack stack = this.rotorSlot.get();
-    if (!StackUtil.isEmpty(stack) && stack.func_77973_b() instanceof IKineticRotor)
-      return ((IKineticRotor)stack.func_77973_b()).getEfficiency(stack); 
+    if (!StackUtil.isEmpty(stack) && stack.getItem() instanceof IKineticRotor)
+      return ((IKineticRotor)stack.getItem()).getEfficiency(stack); 
     return 0.0F;
   }
   
@@ -288,8 +288,8 @@ public class TileEntityWaterKineticGenerator extends TileEntityInventory impleme
   
   public ResourceLocation getRotorRenderTexture() {
     ItemStack stack = this.rotorSlot.get();
-    if (!StackUtil.isEmpty(stack) && stack.func_77973_b() instanceof IKineticRotor)
-      return ((IKineticRotor)stack.func_77973_b()).getRotorRenderTexture(stack); 
+    if (!StackUtil.isEmpty(stack) && stack.getItem() instanceof IKineticRotor)
+      return ((IKineticRotor)stack.getItem()).getRotorRenderTexture(stack); 
     return woodenRotorTexture;
   }
   

@@ -74,8 +74,8 @@ public class TileEntityItemPipe extends TileEntityPipe implements IItemTransport
       func_70296_d(); 
   }
   
-  public void func_145839_a(NBTTagCompound nbt) {
-    super.func_145839_a(nbt);
+  public void readFromNBT(NBTTagCompound nbt) {
+    super.readFromNBT(nbt);
     this.type = PipeType.values[nbt.func_74771_c("type") & 0xFF];
     this.size = PipeSize.values()[nbt.func_74771_c("size") & 0xFF];
     NBTTagList contentsTag = nbt.func_150295_c("contents", 10);
@@ -87,8 +87,8 @@ public class TileEntityItemPipe extends TileEntityPipe implements IItemTransport
     } 
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     nbt.func_74774_a("type", (byte)this.type.ordinal());
     nbt.func_74774_a("size", (byte)this.size.ordinal());
     NBTTagList contentsTag = new NBTTagList();
@@ -96,7 +96,7 @@ public class TileEntityItemPipe extends TileEntityPipe implements IItemTransport
       NBTTagCompound contentTag = new NBTTagCompound();
       this.contents.func_77955_b(contentTag);
       contentsTag.func_74742_a((NBTBase)contentTag);
-      nbt.func_74782_a("contents", (NBTBase)contentsTag);
+      nbt.setTag("contents", (NBTBase)contentsTag);
     } 
     return nbt;
   }

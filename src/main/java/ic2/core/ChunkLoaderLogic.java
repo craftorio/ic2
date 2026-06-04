@@ -29,7 +29,7 @@ public final class ChunkLoaderLogic implements ForgeChunkManager.LoadingCallback
   }
   
   private List<ForgeChunkManager.Ticket> getTicketsForWorld(World world) {
-    if (world.field_72995_K)
+    if (world.isRemote)
       return null; 
     if (!this.tickets.containsKey(world))
       this.tickets.put(world, new ArrayList<>()); 
@@ -38,7 +38,7 @@ public final class ChunkLoaderLogic implements ForgeChunkManager.LoadingCallback
   
   @SubscribeEvent
   public void unloadWorld(WorldEvent.Unload event) {
-    if ((event.getWorld()).field_72995_K)
+    if ((event.getWorld()).isRemote)
       return; 
     if (this.tickets.containsKey(event.getWorld()))
       this.tickets.remove(event.getWorld()); 
@@ -60,7 +60,7 @@ public final class ChunkLoaderLogic implements ForgeChunkManager.LoadingCallback
   }
   
   public ForgeChunkManager.Ticket getTicket(World world, BlockPos pos, boolean create) {
-    if (world.field_72995_K)
+    if (world.isRemote)
       return null; 
     List<ForgeChunkManager.Ticket> ticketList = getTicketsForWorld(world);
     if (ticketList == null)
@@ -92,8 +92,8 @@ public final class ChunkLoaderLogic implements ForgeChunkManager.LoadingCallback
     ForgeChunkManager.reorderChunk(ticket, getChunkCoords(getPosFromTicket(ticket)));
     NBTTagList list = ticket.getModData().func_150295_c("loadedChunks", 4);
     if (!ticket.getModData().func_150297_b("loadedChunks", 9))
-      ticket.getModData().func_74782_a("loadedChunks", (NBTBase)list); 
-    ticket.getModData().func_74782_a("loadedChunks", (NBTBase)list);
+      ticket.getModData().setTag("loadedChunks", (NBTBase)list); 
+    ticket.getModData().setTag("loadedChunks", (NBTBase)list);
     list.func_74742_a((NBTBase)new NBTTagLong(chunk.field_77276_a & 0xFFFFFFFFL | (chunk.field_77275_b & 0xFFFFFFFFL) << 32L));
   }
   

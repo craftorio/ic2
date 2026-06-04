@@ -28,7 +28,7 @@ public class TickHandler {
     if (event.phase == TickEvent.Phase.START) {
       IC2.platform.profilerStartSection("updates");
       processUpdates(world, worldData);
-      if (!world.field_72995_K) {
+      if (!world.isRemote) {
         IC2.platform.profilerEndStartSection("retrogen");
         Ic2WorldDecorator.onTick(world, worldData);
         IC2.platform.profilerEndStartSection("Wind");
@@ -37,8 +37,8 @@ public class TickHandler {
           IC2.platform.profilerEndStartSection("EnderChestCheck");
           for (int i = 0; i < world.field_175730_i.size(); i++) {
             TileEntity te = world.field_175730_i.get(i);
-            if (te instanceof net.minecraft.tileentity.TileEntityEnderChest && !te.func_145837_r() && !world.func_175623_d(te.func_174877_v())) {
-              world.func_175698_g(te.func_174877_v());
+            if (te instanceof net.minecraft.tileentity.TileEntityEnderChest && !te.func_145837_r() && !world.func_175623_d(te.getPos())) {
+              world.func_175698_g(te.getPos());
               IC2.log.info(LogCategory.General, "Removed vanilla ender chest at %s.", new Object[] { Util.formatPosition(te) });
             } 
           } 
@@ -47,7 +47,7 @@ public class TickHandler {
       IC2.platform.profilerEndSection();
     } else {
       IC2.platform.profilerStartSection("Networking");
-      ((NetworkManager)IC2.network.get(!world.field_72995_K)).onTickEnd(worldData);
+      ((NetworkManager)IC2.network.get(!world.isRemote)).onTickEnd(worldData);
       IC2.platform.profilerEndSection();
     } 
   }

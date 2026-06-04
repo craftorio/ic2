@@ -140,7 +140,7 @@ public class EntityMiningLaser extends Entity implements IThrowableEntity {
     RayTraceResult blockHit = result;
     if (hitEntity != null)
       result = new RayTraceResult(hitEntity); 
-    if (result != null && result.field_72313_a != RayTraceResult.Type.MISS && !world.field_72995_K) {
+    if (result != null && result.field_72313_a != RayTraceResult.Type.MISS && !world.isRemote) {
       if (this.explosive) {
         explode();
         func_70106_y();
@@ -220,7 +220,7 @@ public class EntityMiningLaser extends Entity implements IThrowableEntity {
     } 
     if (block.isAir(state, (IBlockAccess)world, event.pos) || block == Blocks.field_150359_w || block == Blocks.field_150410_aZ || block == BlockName.glass.getInstance())
       return false; 
-    if (world.field_72995_K)
+    if (world.isRemote)
       return true; 
     float hardness = state.func_185887_b(world, event.pos);
     if (hardness < 0.0F) {
@@ -255,7 +255,7 @@ public class EntityMiningLaser extends Entity implements IThrowableEntity {
         this.power = 0.0F;
       } 
       if (world.field_73012_v.nextInt(10) == 0 && state.func_185904_a().func_76217_h())
-        world.func_175656_a(event.pos, Blocks.field_150480_ab.func_176223_P()); 
+        world.func_175656_a(event.pos, Blocks.field_150480_ab.getDefaultState()); 
     } 
     this.blockBreaks--;
     return true;

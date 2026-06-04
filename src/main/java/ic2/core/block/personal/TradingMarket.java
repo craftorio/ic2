@@ -45,18 +45,18 @@ public class TradingMarket {
   }
   
   public void registerTradeOMat(TileEntityTradeOMat tradeOMat) {
-    assert tradeOMat.func_145830_o() && !(tradeOMat.func_145831_w()).field_72995_K;
-    assert tradeOMat.func_145831_w() == this.world;
-    assert !this.traders.contains(tradeOMat.func_174877_v());
+    assert tradeOMat.func_145830_o() && !(tradeOMat.getWorld()).isRemote;
+    assert tradeOMat.getWorld() == this.world;
+    assert !this.traders.contains(tradeOMat.getPos());
     for (MarketWatcher watcher : this.watchers)
-      watcher.onAdd(tradeOMat.func_174877_v()); 
+      watcher.onAdd(tradeOMat.getPos()); 
   }
   
   public void unregisterTradeOMat(TileEntityTradeOMat tradeOMat) {
-    assert tradeOMat.func_145830_o() && !(tradeOMat.func_145831_w()).field_72995_K;
-    assert this.traders.contains(tradeOMat.func_174877_v());
+    assert tradeOMat.func_145830_o() && !(tradeOMat.getWorld()).isRemote;
+    assert this.traders.contains(tradeOMat.getPos());
     for (MarketWatcher watcher : this.watchers)
-      watcher.onRemove(tradeOMat.func_174877_v()); 
+      watcher.onRemove(tradeOMat.getPos()); 
   }
   
   public void registerWatcher(MarketWatcher watcher) {

@@ -33,8 +33,8 @@ public class HandHeldContainmentbox extends HandHeldInventory {
   public boolean func_94041_b(int index, ItemStack stack) {
     if (stack == null)
       return false; 
-    return (stack.func_77973_b() == ItemName.nuclear.getInstance() || stack
-      .func_77973_b() instanceof ic2.core.item.reactor.ItemReactorMOX || stack
-      .func_77973_b() instanceof ic2.core.item.reactor.ItemReactorUranium);
+    return (stack.getItem() == ItemName.nuclear.getInstance() || stack
+      .getItem() instanceof ic2.core.item.reactor.ItemReactorMOX || stack
+      .getItem() instanceof ic2.core.item.reactor.ItemReactorUranium);
   }
 }

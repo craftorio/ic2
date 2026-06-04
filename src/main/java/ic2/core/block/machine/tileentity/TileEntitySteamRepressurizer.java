@@ -39,13 +39,13 @@ public class TileEntitySteamRepressurizer extends TileEntityInventory implements
   @GuiSynced
   protected final FluidTank output = (FluidTank)this.fluids.addTankExtract("output", 10000);
   
-  public void func_145839_a(NBTTagCompound nbt) {
-    super.func_145839_a(nbt);
+  public void readFromNBT(NBTTagCompound nbt) {
+    super.readFromNBT(nbt);
     this.currentHeat = nbt.func_74762_e("heat");
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     nbt.func_74768_a("heat", this.currentHeat);
     return nbt;
   }
@@ -73,7 +73,7 @@ public class TileEntitySteamRepressurizer extends TileEntityInventory implements
   protected void getHeat() {
     int aim = this.input.getFluidAmount() / 10;
     if (aim > 0) {
-      World world = func_145831_w();
+      World world = getWorld();
       int targetHeat = aim;
       for (EnumFacing dir : EnumFacing.field_82609_l) {
         TileEntity target = world.func_175625_s(this.field_174879_c.func_177972_a(dir));

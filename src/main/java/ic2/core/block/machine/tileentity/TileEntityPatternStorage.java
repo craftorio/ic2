@@ -34,20 +34,20 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class TileEntityPatternStorage extends TileEntityInventory implements IHasGui, INetworkClientTileEntityEventListener, IPatternStorage {
   public final InvSlotConsumableId diskSlot = new InvSlotConsumableId((IInventorySlotHolder)this, "SaveSlot", InvSlot.Access.IO, 1, InvSlot.InvSide.ANY, new Item[] { ItemName.crystal_memory.getInstance() });
   
-  public void func_145839_a(NBTTagCompound nbttagcompound) {
-    super.func_145839_a(nbttagcompound);
+  public void readFromNBT(NBTTagCompound nbttagcompound) {
+    super.readFromNBT(nbttagcompound);
     readContents(nbttagcompound);
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     writeContentsAsNbtList(nbt);
     return nbt;
   }
   
   public void onPlaced(ItemStack stack, EntityLivingBase placer, EnumFacing facing) {
     super.onPlaced(stack, placer, facing);
-    if (!(func_145831_w()).field_72995_K) {
+    if (!(getWorld()).isRemote) {
       NBTTagCompound nbt = StackUtil.getOrCreateNbtData(stack);
       readContents(nbt);
     } 
@@ -79,7 +79,7 @@ public class TileEntityPatternStorage extends TileEntityInventory implements IHa
       stack.func_77955_b(contentTag);
       list.func_74742_a((NBTBase)contentTag);
     } 
-    nbt.func_74782_a("patterns", (NBTBase)list);
+    nbt.setTag("patterns", (NBTBase)list);
   }
   
   public ContainerBase<TileEntityPatternStorage> getGuiContainer(EntityPlayer player) {
@@ -117,15 +117,15 @@ public class TileEntityPatternStorage extends TileEntityInventory implements IHa
         if (this.index >= 0 && this.index < this.patterns.size() && 
           !this.diskSlot.isEmpty()) {
           ItemStack crystalMemory = this.diskSlot.get();
-          if (crystalMemory.func_77973_b() instanceof ItemCrystalMemory)
-            ((ItemCrystalMemory)crystalMemory.func_77973_b()).writecontentsTag(crystalMemory, this.patterns.get(this.index)); 
+          if (crystalMemory.getItem() instanceof ItemCrystalMemory)
+            ((ItemCrystalMemory)crystalMemory.getItem()).writecontentsTag(crystalMemory, this.patterns.get(this.index)); 
         } 
         break;
       case 3:
         if (!this.diskSlot.isEmpty()) {
           ItemStack crystalMemory = this.diskSlot.get();
-          if (crystalMemory.func_77973_b() instanceof ItemCrystalMemory) {
-            ItemStack record = ((ItemCrystalMemory)crystalMemory.func_77973_b()).readItemStack(crystalMemory);
+          if (crystalMemory.getItem() instanceof ItemCrystalMemory) {
+            ItemStack record = ((ItemCrystalMemory)crystalMemory.getItem()).readItemStack(crystalMemory);
             if (record != null)
               addPattern(record); 
           } 

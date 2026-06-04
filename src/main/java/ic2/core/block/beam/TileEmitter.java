@@ -13,9 +13,9 @@ public class TileEmitter extends TileEntityElectricMachine {
     super.updateEntityServer();
     if (this.progress < 100)
       this.progress++; 
-    if (this.progress == 100 && func_145831_w().func_175640_z(this.field_174879_c)) {
+    if (this.progress == 100 && getWorld().func_175640_z(this.field_174879_c)) {
       this.progress = 0;
-      func_145831_w().func_72838_d(new EntityParticle(this));
+      getWorld().func_72838_d(new EntityParticle(this));
     } 
   }
 }

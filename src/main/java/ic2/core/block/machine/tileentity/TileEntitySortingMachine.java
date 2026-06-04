@@ -46,8 +46,8 @@ public class TileEntitySortingMachine extends TileEntityElectricMachine implemen
     this.filters = new ItemStack[6][7];
   }
   
-  public void func_145839_a(NBTTagCompound nbt) {
-    super.func_145839_a(nbt);
+  public void readFromNBT(NBTTagCompound nbt) {
+    super.readFromNBT(nbt);
     NBTTagList filtersTag = nbt.func_150295_c("filters", 10);
     for (int i = 0; i < filtersTag.func_74745_c(); i++) {
       NBTTagCompound filterTag = filtersTag.func_150305_b(i);
@@ -60,8 +60,8 @@ public class TileEntitySortingMachine extends TileEntityElectricMachine implemen
       this.defaultRoute = EnumFacing.field_82609_l[defaultRouteIdx]; 
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     NBTTagList filtersTag = new NBTTagList();
     for (int i = 0; i < 42; i++) {
       ItemStack stack = this.filters[i / 7][i % 7];
@@ -72,7 +72,7 @@ public class TileEntitySortingMachine extends TileEntityElectricMachine implemen
         filtersTag.func_74742_a((NBTBase)contentTag);
       } 
     } 
-    nbt.func_74782_a("filters", (NBTBase)filtersTag);
+    nbt.setTag("filters", (NBTBase)filtersTag);
     nbt.func_74774_a("defaultroute", (byte)this.defaultRoute.ordinal());
     return nbt;
   }

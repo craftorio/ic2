@@ -13,9 +13,9 @@ public class RenderBillboardEntity extends Render<EntityParticle> {
     this.texture = new ResourceLocation("ic2", "textures/models/beam.png");
   }
   
-  public void doRender(EntityParticle entity, double x, double y, double z, float yaw, float partialTickTime) {}
+  public void func_76986_a(EntityParticle entity, double x, double y, double z, float yaw, float partialTickTime) {}
   
-  protected ResourceLocation getEntityTexture(EntityParticle entity) {
+  protected ResourceLocation func_110775_a(EntityParticle entity) {
     return this.texture;
   }
 }

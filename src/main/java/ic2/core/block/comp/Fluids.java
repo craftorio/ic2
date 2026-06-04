@@ -119,7 +119,7 @@ public class Fluids extends TileEntityComponent {
   public void readFromNbt(NBTTagCompound nbt) {
     for (InternalFluidTank tank : this.managedTanks) {
       if (nbt.func_150297_b(tank.identifier, 10))
-        tank.readFromNBT(nbt.func_74775_l(tank.identifier)); 
+        tank.readFromNBT(nbt.getCompoundTag(tank.identifier)); 
     } 
   }
   
@@ -128,7 +128,7 @@ public class Fluids extends TileEntityComponent {
     for (InternalFluidTank tank : this.managedTanks) {
       NBTTagCompound subTag = new NBTTagCompound();
       subTag = tank.writeToNBT(subTag);
-      nbt.func_74782_a(tank.identifier, (NBTBase)subTag);
+      nbt.setTag(tank.identifier, (NBTBase)subTag);
     } 
     return nbt;
   }

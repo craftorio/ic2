@@ -45,7 +45,7 @@ public class EnergyNetGlobal implements IEnergyNet {
   public <T extends TileEntity & IEnergyTile> void addTile(T tile) {
     if (tile == null)
       throw new NullPointerException("null tile"); 
-    addTile((IEnergyTile)tile, tile.func_145831_w(), tile.func_174877_v());
+    addTile((IEnergyTile)tile, tile.getWorld(), tile.getPos());
   }
   
   public <T extends ILocatable & IEnergyTile> void addTile(T tile) {
@@ -82,7 +82,7 @@ public class EnergyNetGlobal implements IEnergyNet {
     if (tile instanceof ILocatable)
       return ((ILocatable)tile).getWorldObj(); 
     if (tile instanceof TileEntity)
-      return ((TileEntity)tile).func_145831_w(); 
+      return ((TileEntity)tile).getWorld(); 
     throw new UnsupportedOperationException("unlocatable tile type: " + tile.getClass().getName());
   }
   
@@ -92,7 +92,7 @@ public class EnergyNetGlobal implements IEnergyNet {
     if (tile instanceof ILocatable)
       return ((ILocatable)tile).getPosition(); 
     if (tile instanceof TileEntity)
-      return ((TileEntity)tile).func_174877_v(); 
+      return ((TileEntity)tile).getPos(); 
     throw new UnsupportedOperationException("unlocatable tile type: " + tile.getClass().getName());
   }
   
@@ -137,7 +137,7 @@ public class EnergyNetGlobal implements IEnergyNet {
   }
   
   public static EnergyNetLocal getLocal(World world) {
-    if (world.field_72995_K)
+    if (world.isRemote)
       throw new IllegalStateException("not applicable clientside"); 
     assert world.func_73046_m().func_152345_ab();
     return (WorldData.get(world)).energyNet;

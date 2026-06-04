@@ -64,7 +64,7 @@ public class TileEntityClassicCanner extends TileEntityElectricMachine implement
         public boolean accepts(ItemStack stack) {
           if (StackUtil.isEmpty(stack))
             return false; 
-          Item item = stack.func_77973_b();
+          Item item = stack.getItem();
           if (item == ItemName.jetpack.getInstance() || item == ItemName.cf_pack.getInstance())
             return true; 
           return super.accepts(stack);
@@ -78,13 +78,13 @@ public class TileEntityClassicCanner extends TileEntityElectricMachine implement
     this.outputSlot = new InvSlotOutput((IInventorySlotHolder)this, "output", 1);
   }
   
-  public void func_145839_a(NBTTagCompound nbt) {
-    super.func_145839_a(nbt);
+  public void readFromNBT(NBTTagCompound nbt) {
+    super.readFromNBT(nbt);
     this.fuelQuality = nbt.func_74762_e("fuelQuality");
   }
   
-  public NBTTagCompound func_189515_b(NBTTagCompound nbt) {
-    super.func_189515_b(nbt);
+  public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    super.writeToNBT(nbt);
     nbt.func_74768_a("fuelQuality", this.fuelQuality);
     return nbt;
   }
@@ -220,9 +220,9 @@ public class TileEntityClassicCanner extends TileEntityElectricMachine implement
       ItemStack input = this.inputSlot.get();
       if (StackUtil.checkItemEquality(input, ItemName.crafting.getItemStack((Enum)CraftingItemType.tin_can)))
         return Mode.FOOD; 
-      if (StackUtil.checkItemEquality(input, ItemName.crafting.getItemStack((Enum)CraftingItemType.empty_fuel_can)) || input.func_77973_b() == ItemName.jetpack.getInstance())
+      if (StackUtil.checkItemEquality(input, ItemName.crafting.getItemStack((Enum)CraftingItemType.empty_fuel_can)) || input.getItem() == ItemName.jetpack.getInstance())
         return Mode.FUEL; 
-      if (input.func_77973_b() == ItemName.cf_pack.getInstance())
+      if (input.getItem() == ItemName.cf_pack.getInstance())
         return Mode.CF; 
     } 
     return Mode.NONE;
@@ -240,11 +240,11 @@ public class TileEntityClassicCanner extends TileEntityElectricMachine implement
       return 2548; 
     if (StackUtil.checkItemEquality(stack, ItemName.cell.getItemStack((Enum)CellType.biofuel)))
       return 868; 
-    if (stack.func_77973_b() == Items.field_151137_ax && this.fuelQuality > 0)
+    if (stack.getItem() == Items.field_151137_ax && this.fuelQuality > 0)
       return (int)(this.fuelQuality * 0.2D); 
-    if (stack.func_77973_b() == Items.field_151114_aO && this.fuelQuality > 0)
+    if (stack.getItem() == Items.field_151114_aO && this.fuelQuality > 0)
       return (int)(this.fuelQuality * 0.3D); 
-    if (stack.func_77973_b() == Items.field_151016_H && this.fuelQuality > 0)
+    if (stack.getItem() == Items.field_151016_H && this.fuelQuality > 0)
       return (int)(this.fuelQuality * 0.4D); 
     return 0;
   }

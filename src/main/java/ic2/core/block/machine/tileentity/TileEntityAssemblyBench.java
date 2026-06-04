@@ -110,7 +110,7 @@ public class TileEntityAssemblyBench extends TileEntityBatchCrafter implements I
   
   protected IRecipe findRecipe() {
     for (IRecipe recipe : RECIPES) {
-      if (recipe.func_77569_a(this.crafting, func_145831_w()))
+      if (recipe.func_77569_a(this.crafting, getWorld()))
         return recipe; 
     } 
     return null;
@@ -118,7 +118,7 @@ public class TileEntityAssemblyBench extends TileEntityBatchCrafter implements I
   
   @SideOnly(Side.CLIENT)
   public void addInformation(ItemStack stack, List<String> tooltip, ITooltipFlag advanced) {
-    tooltip.add("You probably want the " + Localization.translate(getBlockType().func_149739_a() + '.' + TeBlock.replicator.getName()));
+    tooltip.add("You probably want the " + Localization.translate(func_145838_q().func_149739_a() + '.' + TeBlock.replicator.getName()));
   }
   
   public Set<UpgradableProperty> getUpgradableProperties() {

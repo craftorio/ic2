@@ -61,7 +61,7 @@ public class ItemArmorHazmat extends ItemArmorUtility implements IHazmatLike {
     if (IC2.platform.isSimulating() && event.getEntity() instanceof EntityPlayer) {
       EntityPlayer player = (EntityPlayer)event.getEntity();
       ItemStack armor = (ItemStack)player.field_71071_by.field_70460_b.get(0);
-      if (armor != null && armor.func_77973_b() == this) {
+      if (armor != null && armor.getItem() == this) {
         int fallDamage = (int)event.getDistance() - 3;
         if (fallDamage >= 8)
           return; 
@@ -83,7 +83,7 @@ public class ItemArmorHazmat extends ItemArmorUtility implements IHazmatLike {
   }
   
   public void onArmorTick(World world, EntityPlayer player, ItemStack stack) {
-    if (!world.field_72995_K && this.field_77881_a == EntityEquipmentSlot.HEAD) {
+    if (!world.isRemote && this.field_77881_a == EntityEquipmentSlot.HEAD) {
       if (player.func_70027_ad() && hasCompleteHazmat((EntityLivingBase)player)) {
         if (isInLava(player))
           player.func_70690_d(new PotionEffect(MobEffects.field_76426_n, 20, 0, true, true)); 
@@ -136,9 +136,9 @@ public class ItemArmorHazmat extends ItemArmorUtility implements IHazmatLike {
   public static boolean hasCompleteHazmat(EntityLivingBase living) {
     for (EntityEquipmentSlot slot : ArmorSlot.getAll()) {
       ItemStack stack = living.func_184582_a(slot);
-      if (stack == null || !(stack.func_77973_b() instanceof IHazmatLike))
+      if (stack == null || !(stack.getItem() instanceof IHazmatLike))
         return false; 
-      IHazmatLike hazmat = (IHazmatLike)stack.func_77973_b();
+      IHazmatLike hazmat = (IHazmatLike)stack.getItem();
       if (!hazmat.addsProtection(living, slot, stack))
         return false; 
       if (hazmat.fullyProtects(living, slot, stack))

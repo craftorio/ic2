@@ -62,7 +62,7 @@ public abstract class Explosive extends TileEntityInventory implements Redstone.
   }
   
   protected void onEntityCollision(Entity entity) {
-    if (!(func_145831_w()).field_72995_K && entity instanceof EntityArrow && entity.func_70027_ad()) {
+    if (!(getWorld()).isRemote && entity instanceof EntityArrow && entity.func_70027_ad()) {
       EntityArrow arrow = (EntityArrow)entity;
       explode((arrow.field_70250_c instanceof EntityLivingBase) ? (EntityLivingBase)arrow.field_70250_c : null, false);
     } 
@@ -78,8 +78,8 @@ public abstract class Explosive extends TileEntityInventory implements Redstone.
     EntityIC2Explosive entity = getEntity(igniter);
     if (entity == null)
       return false; 
-    World world = func_145831_w();
-    if (world.field_72995_K)
+    World world = getWorld();
+    if (world.isRemote)
       return true; 
     entity.setIgniter(igniter);
     onIgnite(igniter);

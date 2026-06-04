@@ -199,14 +199,14 @@ public class DropScan {
     for (Map.Entry<ItemComparableItemStack, MutableLong> entry : sorted) {
       ItemStack stack = ((ItemComparableItemStack)entry.getKey()).toStack();
       long count = ((MutableLong)entry.getValue()).getValue().longValue();
-      IC2.log.info(LogCategory.Uu, "%d %s", new Object[] { Long.valueOf(count), stack.func_77973_b().func_77653_i(stack) });
+      IC2.log.info(LogCategory.Uu, "%d %s", new Object[] { Long.valueOf(count), stack.getItem().func_77653_i(stack) });
       config.set(ConfigUtil.fromStack(stack), Double.valueOf(normalizeBy / count));
     } 
     MainConfig.save();
   }
   
   private void scanArea(int xStart, int zStart) {
-    DummyChunkProvider provider = this.world.getChunkProvider();
+    DummyChunkProvider provider = this.world.func_72863_F();
     List<Chunk> chunks = new ArrayList<>(Util.square(this.range));
     List<Chunk> toDecorate = new ArrayList<>(Util.square(this.range - 1));
     List<Chunk> toScan = new ArrayList<>(Util.square(this.range - 3));
@@ -281,7 +281,7 @@ public class DropScan {
           for (Iterator<ItemStack> it = drops.iterator(), it2 = typicalDrop.drops.iterator(); it.hasNext(); ) {
             ItemStack a = it.next();
             ItemStack b = it2.next();
-            if (!ItemStack.func_77989_b(a, b)) {
+            if (!ItemStack.areItemStacksEqual(a, b)) {
               equal = false;
               break;
             } 
@@ -322,7 +322,7 @@ public class DropScan {
       return (IChunkProvider)new DropScan.DummyChunkProvider(this, this.field_73011_w.func_186060_c());
     }
     
-    public DropScan.DummyChunkProvider getChunkProvider() {
+    public DropScan.DummyChunkProvider func_72863_F() {
       return (DropScan.DummyChunkProvider)super.func_72863_F();
     }
     
@@ -331,7 +331,7 @@ public class DropScan {
     }
     
     protected boolean func_175680_a(int x, int z, boolean allowEmpty) {
-      return (getChunkProvider().func_186026_b(x, z) != null);
+      return (func_72863_F().func_186026_b(x, z) != null);
     }
     
     public Entity func_73045_a(int i) {
@@ -357,7 +357,7 @@ public class DropScan {
     }
     
     public void clear() {
-      getChunkProvider().clear();
+      func_72863_F().clear();
       for (Collection<?> c : (Iterable<Collection<?>>)DropScan.this.collectionsToClear)
         c.clear(); 
     }

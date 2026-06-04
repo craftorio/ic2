@@ -1,9 +1,16 @@
+// 
+// Decompiled by Procyon v0.6.0
+// 
+
 package ic2.shades.org.ejml.interfaces.decomposition;
 
-public interface TridiagonalSimilarDecomposition<MatrixType extends ic2.shades.org.ejml.data.ReshapeMatrix64F> extends DecompositionInterface<MatrixType> {
-  MatrixType getT(MatrixType paramMatrixType);
-  
-  MatrixType getQ(MatrixType paramMatrixType, boolean paramBoolean);
-  
-  void getDiagonal(double[] paramArrayOfdouble1, double[] paramArrayOfdouble2);
+import ic2.shades.org.ejml.data.ReshapeMatrix64F;
+
+public interface TridiagonalSimilarDecomposition<MatrixType extends ReshapeMatrix64F> extends DecompositionInterface<MatrixType>
+{
+    MatrixType getT(final MatrixType p0);
+    
+    MatrixType getQ(final MatrixType p0, final boolean p1);
+    
+    void getDiagonal(final double[] p0, final double[] p1);
 }

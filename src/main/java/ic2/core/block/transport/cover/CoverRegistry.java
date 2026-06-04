@@ -1,21 +1,32 @@
+// 
+// Decompiled by Procyon v0.6.0
+// 
+
 package ic2.core.block.transport.cover;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import net.minecraft.item.ItemStack;
+import java.util.List;
 
-public class CoverRegistry {
-  public static ItemStack register(ItemStack stack) {
-    if (!(stack.getItem() instanceof ICoverItem))
-      throw new IllegalArgumentException("The stack must represent an ICoverItem."); 
-    covers.add(stack);
-    return stack;
-  }
-  
-  public static Iterable<ItemStack> getCovers() {
-    return Collections.unmodifiableCollection(covers);
-  }
-  
-  private static final List<ItemStack> covers = new ArrayList<>();
+public class CoverRegistry
+{
+    private static final List<ItemStack> covers;
+    
+    public static ItemStack register(final ItemStack stack) {
+        if (!(stack.getItem() instanceof ICoverItem)) {
+            throw new IllegalArgumentException("The stack must represent an ICoverItem.");
+        }
+        CoverRegistry.covers.add(stack);
+        return stack;
+    }
+    
+    public static Iterable<ItemStack> getCovers() {
+        return (Iterable<ItemStack>)Collections.unmodifiableCollection((Collection<?>)CoverRegistry.covers);
+    }
+    
+    static {
+        covers = new ArrayList<ItemStack>();
+    }
 }

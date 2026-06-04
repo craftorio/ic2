@@ -1,17 +1,20 @@
+// 
+// Decompiled by Procyon v0.6.0
+// 
+
 package ic2.core.block.comp;
 
-import ic2.core.block.TileEntityBlock;
 import net.minecraft.block.Block;
+import ic2.core.block.TileEntityBlock;
 
 public class ComparatorEmitter extends BasicRedstoneComponent
 {
-	public ComparatorEmitter(TileEntityBlock parent)
-	{
-		super(parent);
-	}
-
-	public void onChange()
-	{
-		this.parent.getWorld().updateComparatorOutputLevel(this.parent.getPos(), this.parent.getBlockType());
-	}
+    public ComparatorEmitter(final TileEntityBlock parent) {
+        super(parent);
+    }
+    
+    @Override
+    public void onChange() {
+        this.parent.getWorld().updateComparatorOutputLevel(this.parent.getPos(), (Block)this.parent.getBlockType());
+    }
 }

@@ -1,244 +1,275 @@
+// 
+// Decompiled by Procyon v0.6.0
+// 
+
 package ic2.core.gui.dynamic;
 
-import com.google.common.base.Suppliers;
-import ic2.core.ContainerBase;
-import ic2.core.GuiIC2;
+import ic2.core.network.NetworkManager;
+import ic2.core.gui.MouseButton;
+import ic2.core.util.LogCategory;
 import ic2.core.IC2;
-import ic2.core.block.IInventorySlotHolder;
-import ic2.core.block.TileEntityBlock;
-import ic2.core.block.comp.Energy;
-import ic2.core.block.comp.Fluids;
+import ic2.core.gui.IClickHandler;
 import ic2.core.block.invslot.InvSlot;
 import ic2.core.gui.Button;
-import ic2.core.gui.CustomButton;
-import ic2.core.gui.EnergyGauge;
+import java.util.Iterator;
 import ic2.core.gui.FluidSlot;
-import ic2.core.gui.Gauge;
-import ic2.core.gui.GuiDefaultBackground;
-import ic2.core.gui.GuiElement;
-import ic2.core.gui.IClickHandler;
-import ic2.core.gui.Image;
-import ic2.core.gui.LinkedGauge;
-import ic2.core.gui.MouseButton;
-import ic2.core.gui.RecipeButton;
-import ic2.core.gui.SlotGrid;
-import ic2.core.gui.TankGauge;
-import ic2.core.gui.Text;
-import ic2.core.gui.VanillaButton;
-import ic2.core.item.tool.HandHeldInventory;
-import ic2.core.network.NetworkManager;
-import ic2.core.util.LogCategory;
-import java.util.Collections;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
 import net.minecraftforge.fluids.IFluidTank;
+import ic2.core.gui.TankGauge;
+import ic2.core.block.comp.Fluids;
+import ic2.core.block.IInventorySlotHolder;
+import ic2.core.gui.Text;
+import ic2.core.gui.SlotGrid;
+import ic2.core.gui.Image;
+import ic2.core.gui.Gauge;
+import ic2.core.gui.LinkedGauge;
+import ic2.core.gui.EnergyGauge;
+import ic2.core.block.comp.TileEntityComponent;
+import ic2.core.block.comp.Energy;
+import ic2.core.block.TileEntityBlock;
+import ic2.core.gui.GuiElement;
+import net.minecraft.item.ItemStack;
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
+import java.util.Collections;
+import ic2.core.gui.RecipeButton;
+import ic2.core.gui.CustomButton;
+import ic2.core.GuiIC2;
+import ic2.core.gui.VanillaButton;
+import ic2.api.network.INetworkClientTileEntityEventListener;
+import ic2.core.item.tool.HandHeldInventory;
+import net.minecraft.entity.player.EntityPlayer;
+import ic2.core.gui.GuiDefaultBackground;
+import net.minecraft.inventory.IInventory;
+import ic2.core.ContainerBase;
 
-public class DynamicGui<T extends ContainerBase<? extends IInventory>> extends GuiDefaultBackground<T> {
-  public static <T extends IInventory> DynamicGui<ContainerBase<T>> create(T base, EntityPlayer player, GuiParser.GuiNode guiNode) {
-    DynamicContainer<T> container = DynamicContainer.create(base, player, guiNode);
-    return new DynamicGui<>(player, container, guiNode);
-  }
-  
-  public static <T extends HandHeldInventory> DynamicGui<ContainerBase<T>> create(T base, EntityPlayer player, GuiParser.GuiNode guiNode) {
-    DynamicHandHeldContainer<T> container = DynamicHandHeldContainer.create(base, player, guiNode);
-    return new DynamicGui<>(player, container, guiNode);
-  }
-  
-  protected DynamicGui(EntityPlayer player, T container, GuiParser.GuiNode guiNode) {
-    super((ContainerBase)container, guiNode.width, guiNode.height);
-    initializeWidgets(player, guiNode);
-  }
-  
-  private void initializeWidgets(EntityPlayer player, GuiParser.ParentNode parentNode) {
-    for (GuiParser.Node rawNode : parentNode.getNodes()) {
-      GuiParser.ButtonNode buttonNode;
-      GuiParser.EnergyGaugeNode energyGaugeNode;
-      GuiParser.GaugeNode gaugeNode;
-      GuiParser.ImageNode imageNode;
-      GuiParser.PlayerInventoryNode playerInventoryNode;
-      GuiParser.SlotNode slotNode;
-      GuiParser.SlotGridNode slotGridNode;
-      GuiParser.TextNode textNode;
-      GuiParser.FluidTankNode fluidTankNode;
-      GuiParser.FluidSlotNode node;
-      Button<?> button;
-      VanillaButton vanillaButton;
-      CustomButton customButton;
-      RecipeButton recipeButton;
-      final boolean isActiveLinked;
-      InvSlot slot;
-      int x;
-      Fluids fluids;
-      int size;
-      Text text;
-      TankGauge tankGauge;
-      switch (rawNode.getType()) {
-        case environment:
-          if (((GuiParser.EnvironmentNode)rawNode).environment != GuiEnvironment.GAME)
-            continue; 
-          break;
-        case button:
-          buttonNode = (GuiParser.ButtonNode)rawNode;
-          if (buttonNode.type != GuiParser.ButtonNode.ButtonType.RECIPE && !(this.container.base instanceof ic2.api.network.INetworkClientTileEntityEventListener) && !isHandHeldGUI())
-            throw new RuntimeException("Invalid base " + this.container.base + " for button elements"); 
-          button = null;
-          switch (buttonNode.type) {
-            case environment:
-              vanillaButton = new VanillaButton((GuiIC2)this, buttonNode.x, buttonNode.y, buttonNode.width, buttonNode.height, createEventSender(buttonNode.eventID, buttonNode.eventName));
-              break;
-            case key:
-              customButton = new CustomButton((GuiIC2)this, buttonNode.x, buttonNode.y, buttonNode.width, buttonNode.height, createEventSender(buttonNode.eventID, buttonNode.eventName));
-              break;
-            case only:
-              if (RecipeButton.canUse() && buttonNode.eventName != null) {
-                recipeButton = new RecipeButton((GuiIC2)this, buttonNode.x, buttonNode.y, buttonNode.width, buttonNode.height, buttonNode.eventName.split(",[ ]*"));
-                buttonNode.text = TextProvider.of("");
-              } 
-              break;
-          } 
-          if (recipeButton != null) {
-            Button button1;
-            String str = buttonNode.text.get(this.container.base, Collections.singletonMap("name", TextProvider.ofTranslated(this.container.base.getName())));
-            if (buttonNode.icon == null) {
-              button1 = recipeButton.withText(str);
-            } else {
-              button1.withIcon(Suppliers.ofInstance(buttonNode.icon));
-              button1.withTooltip(str);
-            } 
-            parentNode.addElement(this, (GuiElement<?>)button1);
-          } 
-          break;
-        case energygauge:
-          if (!(this.container.base instanceof TileEntityBlock) || 
-            !((TileEntityBlock)this.container.base).hasComponent(Energy.class))
-            throw new RuntimeException("invalid base " + this.container.base + " for energygauge elements"); 
-          energyGaugeNode = (GuiParser.EnergyGaugeNode)rawNode;
-          parentNode.addElement(this, (GuiElement<?>)new EnergyGauge((GuiIC2)this, energyGaugeNode.x, energyGaugeNode.y, (TileEntityBlock)this.container.base, energyGaugeNode.style));
-          break;
-        case gauge:
-          if (!(this.container.base instanceof IGuiValueProvider))
-            throw new RuntimeException("invalid base " + this.container.base + " for gauge elements"); 
-          gaugeNode = (GuiParser.GaugeNode)rawNode;
-          isActiveLinked = gaugeNode.activeLinked;
-          if (isActiveLinked && !(this.container.base instanceof IGuiValueProvider.IActiveGuiValueProvider))
-            throw new RuntimeException("Invalid base " + this.container.base + " for active linked gauge elements"); 
-          parentNode.addElement(this, (GuiElement<?>)new LinkedGauge((GuiIC2)this, gaugeNode.x, gaugeNode.y, (IGuiValueProvider)this.container.base, gaugeNode.name, gaugeNode.style) {
-                protected boolean isActive(double ratio) {
-                  return isActiveLinked ? ((IGuiValueProvider.IActiveGuiValueProvider)DynamicGui.this.container.base).isGuiValueActive(this.name) : super.isActive(ratio);
+public class DynamicGui<T extends ContainerBase<? extends IInventory>> extends GuiDefaultBackground<T>
+{
+    public static <T extends IInventory> DynamicGui<ContainerBase<T>> create(final T base, final EntityPlayer player, final GuiParser.GuiNode guiNode) {
+        final DynamicContainer<T> container = DynamicContainer.create(base, player, guiNode);
+        return new DynamicGui<ContainerBase<T>>(player, container, guiNode);
+    }
+    
+    public static <T extends HandHeldInventory> DynamicGui<ContainerBase<T>> create(final T base, final EntityPlayer player, final GuiParser.GuiNode guiNode) {
+        final DynamicHandHeldContainer<T> container = DynamicHandHeldContainer.create(base, player, guiNode);
+        return new DynamicGui<ContainerBase<T>>(player, container, guiNode);
+    }
+    
+    protected DynamicGui(final EntityPlayer player, final T container, final GuiParser.GuiNode guiNode) {
+        super(container, guiNode.width, guiNode.height);
+        this.initializeWidgets(player, guiNode);
+    }
+    
+    private void initializeWidgets(final EntityPlayer player, final GuiParser.ParentNode parentNode) {
+        for (final GuiParser.Node rawNode : parentNode.getNodes()) {
+            Button<?> button;
+            String text;
+            final InvSlot slot;
+            switch (rawNode.getType()) {
+                case environment: {
+                    if (((GuiParser.EnvironmentNode)rawNode).environment != GuiEnvironment.GAME) {
+                        continue;
+                    }
+                    break;
                 }
-              });
-          break;
-        case image:
-          imageNode = (GuiParser.ImageNode)rawNode;
-          parentNode.addElement(this, (GuiElement<?>)Image.create((GuiIC2)this, imageNode.x, imageNode.y, imageNode.width, imageNode.height, imageNode.src, imageNode.baseWidth, imageNode.baseHeight, imageNode.u1, imageNode.v1, imageNode.u2, imageNode.v2));
-          break;
-        case playerinventory:
-          playerInventoryNode = (GuiParser.PlayerInventoryNode)rawNode;
-          parentNode.addElement(this, (GuiElement<?>)new SlotGrid((GuiIC2)this, playerInventoryNode.x, playerInventoryNode.y, 9, 3, playerInventoryNode.style, 0, playerInventoryNode.spacing));
-          parentNode.addElement(this, (GuiElement<?>)new SlotGrid((GuiIC2)this, playerInventoryNode.x, playerInventoryNode.y + playerInventoryNode.hotbarOffset, 9, 1, playerInventoryNode.style, 0, playerInventoryNode.spacing));
-          if (playerInventoryNode.showTitle)
-            parentNode.addElement(this, (GuiElement<?>)Text.create((GuiIC2)this, playerInventoryNode.x + 1, playerInventoryNode.y - 10, 
-                  TextProvider.ofTranslated(player.inventory.getName()), 4210752, false)); 
-          break;
-        case slot:
-        case slothologram:
-          slotNode = (GuiParser.SlotNode)rawNode;
-          parentNode.addElement(this, (GuiElement<?>)new SlotGrid((GuiIC2)this, slotNode.x, slotNode.y, 1, 1, slotNode.style));
-          break;
-        case slotgrid:
-          if (!(this.container.base instanceof IInventorySlotHolder))
-            throw new RuntimeException("Invalid base " + this.container.base + " for slot elements"); 
-          slotGridNode = (GuiParser.SlotGridNode)rawNode;
-          slot = ((IInventorySlotHolder)this.container.base).getInventorySlot(slotGridNode.name);
-          if (slot == null)
-            throw new RuntimeException("Invalid InvSlot name " + slotGridNode.name + " for base " + this.container.base); 
-          size = slot.size();
-          if (size > slotGridNode.offset) {
-            GuiParser.SlotGridNode.SlotGridDimension dim = slotGridNode.getDimension(size);
-            parentNode.addElement(this, (GuiElement<?>)new SlotGrid((GuiIC2)this, slotGridNode.x, slotGridNode.y, dim.cols, dim.rows, slotGridNode.style, 0, slotGridNode.spacing));
-          } 
-          break;
-        case text:
-          textNode = (GuiParser.TextNode)rawNode;
-          switch (textNode.align) {
-            case environment:
-              x = textNode.x;
-              break;
-            case gui:
-              x = textNode.x + this.xSize / 2;
-              break;
-            case key:
-              x = textNode.x + this.xSize;
-              break;
-            default:
-              throw new IllegalArgumentException("invalid alignment: " + textNode.align);
-          } 
-          if (textNode.rightAligned) {
-            text = Text.createRightAligned((GuiIC2)this, x, textNode.y, textNode.width, textNode.height, textNode.text, textNode.color, textNode.shadow, textNode.xOffset, textNode.yOffset, textNode.centerX, textNode.centerY);
-          } else {
-            text = Text.create((GuiIC2)this, x, textNode.y, textNode.width, textNode.height, textNode.text, textNode.color, textNode.shadow, textNode.xOffset, textNode.yOffset, textNode.centerX, textNode.centerY);
-          } 
-          parentNode.addElement(this, (GuiElement<?>)text);
-          break;
-        case fluidtank:
-          if (!(this.container.base instanceof TileEntityBlock) || 
-            !((TileEntityBlock)this.container.base).hasComponent(Fluids.class))
-            throw new RuntimeException("invalid base " + this.container.base + " for tank elements"); 
-          fluidTankNode = (GuiParser.FluidTankNode)rawNode;
-          fluids = (Fluids)((TileEntityBlock)this.container.base).getComponent(Fluids.class);
-          switch (fluidTankNode.type) {
-            case environment:
-              tankGauge = TankGauge.createNormal((GuiIC2)this, fluidTankNode.x, fluidTankNode.y, (IFluidTank)fluids.getFluidTank(fluidTankNode.name));
-              break;
-            case gui:
-              tankGauge = TankGauge.createPlain((GuiIC2)this, fluidTankNode.x, fluidTankNode.y, fluidTankNode.width, fluidTankNode.height, (IFluidTank)fluids.getFluidTank(fluidTankNode.name));
-              break;
-            case key:
-              tankGauge = TankGauge.createBorderless((GuiIC2)this, fluidTankNode.x, fluidTankNode.y, (IFluidTank)fluids.getFluidTank(fluidTankNode.name), fluidTankNode.mirrored);
-              break;
-            default:
-              throw new IllegalStateException("Unexpected type " + fluidTankNode.type);
-          } 
-          parentNode.addElement(this, (GuiElement<?>)tankGauge);
-          break;
-        case fluidslot:
-          if (!(this.container.base instanceof TileEntityBlock) || 
-            !((TileEntityBlock)this.container.base).hasComponent(Fluids.class))
-            throw new RuntimeException("invalid base " + this.container.base + " for tank elements"); 
-          node = (GuiParser.FluidSlotNode)rawNode;
-          parentNode.addElement(this, (GuiElement<?>)FluidSlot.createFluidSlot((GuiIC2)this, node.x, node.y, (IFluidTank)((Fluids)((TileEntityBlock)this.container.base).getComponent(Fluids.class)).getFluidTank(node.name)));
-          break;
-      } 
-      if (rawNode instanceof GuiParser.ParentNode)
-        initializeWidgets(player, (GuiParser.ParentNode)rawNode); 
-    } 
-  }
-  
-  protected IClickHandler createEventSender(int event, String eventString) {
-    if (isHandHeldGUI()) {
-      final String eventName;
-      if (eventString == null) {
-        IC2.log.warn(LogCategory.General, "HandHand inventory given numeric event rather than string");
-        eventName = Integer.toString(event);
-      } else {
-        eventName = eventString;
-      } 
-      return new IClickHandler() {
-          public void onClick(MouseButton button) {
-            ((NetworkManager)IC2.network.get(false)).sendContainerEvent(DynamicGui.this.container, eventName);
-            ((HandHeldInventory)DynamicGui.this.container.base).onEvent(eventName);
-          }
-        };
-    } 
-    assert eventString == null;
-    return createEventSender(event);
-  }
-  
-  protected boolean isHandHeldGUI() {
-    return this.container.base instanceof HandHeldInventory;
-  }
-  
-  public void addElement(GuiElement<?> element) {
-    super.addElement(element);
-  }
+                case button: {
+                    final GuiParser.ButtonNode node = (GuiParser.ButtonNode)rawNode;
+                    if (node.type != GuiParser.ButtonNode.ButtonType.RECIPE && !(this.container.base instanceof INetworkClientTileEntityEventListener) && !this.isHandHeldGUI()) {
+                        throw new RuntimeException("Invalid base " + this.container.base + " for button elements");
+                    }
+                    button = null;
+                    switch (node.type) {
+                        case VANILLA: {
+                            button = new VanillaButton(this, node.x, node.y, node.width, node.height, this.createEventSender(node.eventID, node.eventName));
+                        }
+                        case TRANSPARENT: {
+                            button = new CustomButton(this, node.x, node.y, node.width, node.height, this.createEventSender(node.eventID, node.eventName));
+                            break;
+                        }
+                        case RECIPE: {
+                            if (RecipeButton.canUse() && node.eventName != null) {
+                                button = new RecipeButton(this, node.x, node.y, node.width, node.height, node.eventName.split(",[ ]*"));
+                                node.text = TextProvider.of("");
+                                break;
+                            }
+                            break;
+                        }
+                    }
+                    if (button != null) {
+                        text = node.text.get(this.container.base, Collections.singletonMap("name", TextProvider.ofTranslated(this.container.base.getName())));
+                        if (node.icon == null) {
+                            button = (Button<?>)button.withText(text);
+                        }
+                        else {
+                            button.withIcon((Supplier<ItemStack>)Suppliers.ofInstance((Object)node.icon));
+                            button.withTooltip(text);
+                        }
+                        parentNode.addElement(this, button);
+                        break;
+                    }
+                    break;
+                }
+                case energygauge: {
+                    if (!(this.container.base instanceof TileEntityBlock) || !((TileEntityBlock)this.container.base).hasComponent(Energy.class)) {
+                        throw new RuntimeException("invalid base " + this.container.base + " for energygauge elements");
+                    }
+                    final GuiParser.EnergyGaugeNode node2 = (GuiParser.EnergyGaugeNode)rawNode;
+                    parentNode.addElement(this, new EnergyGauge(this, node2.x, node2.y, (TileEntityBlock)this.container.base, node2.style));
+                    break;
+                }
+                case gauge: {
+                    if (!(this.container.base instanceof IGuiValueProvider)) {
+                        throw new RuntimeException("invalid base " + this.container.base + " for gauge elements");
+                    }
+                    final GuiParser.GaugeNode node3 = (GuiParser.GaugeNode)rawNode;
+                    final boolean isActiveLinked = node3.activeLinked;
+                    if (isActiveLinked && !(this.container.base instanceof IGuiValueProvider.IActiveGuiValueProvider)) {
+                        throw new RuntimeException("Invalid base " + this.container.base + " for active linked gauge elements");
+                    }
+                    parentNode.addElement(this, new LinkedGauge(this, node3.x, node3.y, (IGuiValueProvider)this.container.base, node3.name, node3.style) {
+                        @Override
+                        protected boolean isActive(final double ratio) {
+                            return isActiveLinked ? ((IGuiValueProvider.IActiveGuiValueProvider)DynamicGui.this.container.base).isGuiValueActive(this.name) : super.isActive(ratio);
+                        }
+                    });
+                    break;
+                }
+                case image: {
+                    final GuiParser.ImageNode node4 = (GuiParser.ImageNode)rawNode;
+                    parentNode.addElement(this, Image.create(this, node4.x, node4.y, node4.width, node4.height, node4.src, node4.baseWidth, node4.baseHeight, node4.u1, node4.v1, node4.u2, node4.v2));
+                    break;
+                }
+                case playerinventory: {
+                    final GuiParser.PlayerInventoryNode node5 = (GuiParser.PlayerInventoryNode)rawNode;
+                    parentNode.addElement(this, new SlotGrid(this, node5.x, node5.y, 9, 3, node5.style, 0, node5.spacing));
+                    parentNode.addElement(this, new SlotGrid(this, node5.x, node5.y + node5.hotbarOffset, 9, 1, node5.style, 0, node5.spacing));
+                    if (node5.showTitle) {
+                        parentNode.addElement(this, Text.create(this, node5.x + 1, node5.y - 10, TextProvider.ofTranslated(player.inventory.getName()), 4210752, false));
+                        break;
+                    }
+                    break;
+                }
+                case slot:
+                case slothologram: {
+                    final GuiParser.SlotNode node6 = (GuiParser.SlotNode)rawNode;
+                    parentNode.addElement(this, new SlotGrid(this, node6.x, node6.y, 1, 1, node6.style));
+                    break;
+                }
+                case slotgrid: {
+                    if (!(this.container.base instanceof IInventorySlotHolder)) {
+                        throw new RuntimeException("Invalid base " + this.container.base + " for slot elements");
+                    }
+                    final GuiParser.SlotGridNode node7 = (GuiParser.SlotGridNode)rawNode;
+                    slot = ((IInventorySlotHolder)this.container.base).getInventorySlot(node7.name);
+                    if (slot == null) {
+                        throw new RuntimeException("Invalid InvSlot name " + node7.name + " for base " + this.container.base);
+                    }
+                    final int size = slot.size();
+                    if (size > node7.offset) {
+                        final GuiParser.SlotGridNode.SlotGridDimension dim = node7.getDimension(size);
+                        parentNode.addElement(this, new SlotGrid(this, node7.x, node7.y, dim.cols, dim.rows, node7.style, 0, node7.spacing));
+                        break;
+                    }
+                    break;
+                }
+                case text: {
+                    final GuiParser.TextNode node8 = (GuiParser.TextNode)rawNode;
+                    int x = 0;
+                    switch (node8.align) {
+                        case Start: {
+                            x = node8.x;
+                            break;
+                        }
+                        case Center: {
+                            x = node8.x + this.xSize / 2;
+                            break;
+                        }
+                        case End: {
+                            x = node8.x + this.xSize;
+                            break;
+                        }
+                        default: {
+                            throw new IllegalArgumentException("invalid alignment: " + node8.align);
+                        }
+                    }
+                    Text text2;
+                    if (node8.rightAligned) {
+                        text2 = Text.createRightAligned(this, x, node8.y, node8.width, node8.height, node8.text, node8.color, node8.shadow, node8.xOffset, node8.yOffset, node8.centerX, node8.centerY);
+                    }
+                    else {
+                        text2 = Text.create(this, x, node8.y, node8.width, node8.height, node8.text, node8.color, node8.shadow, node8.xOffset, node8.yOffset, node8.centerX, node8.centerY);
+                    }
+                    parentNode.addElement(this, text2);
+                    break;
+                }
+                case fluidtank: {
+                    if (!(this.container.base instanceof TileEntityBlock) || !((TileEntityBlock)this.container.base).hasComponent(Fluids.class)) {
+                        throw new RuntimeException("invalid base " + this.container.base + " for tank elements");
+                    }
+                    final GuiParser.FluidTankNode node9 = (GuiParser.FluidTankNode)rawNode;
+                    final Fluids fluids = ((TileEntityBlock)this.container.base).getComponent(Fluids.class);
+                    TankGauge tankGauge = null;
+                    switch (node9.type) {
+                        case NORMAL: {
+                            tankGauge = TankGauge.createNormal(this, node9.x, node9.y, (IFluidTank)fluids.getFluidTank(node9.name));
+                            break;
+                        }
+                        case PLAIN: {
+                            tankGauge = TankGauge.createPlain(this, node9.x, node9.y, node9.width, node9.height, (IFluidTank)fluids.getFluidTank(node9.name));
+                            break;
+                        }
+                        case BORDERLESS: {
+                            tankGauge = TankGauge.createBorderless(this, node9.x, node9.y, (IFluidTank)fluids.getFluidTank(node9.name), node9.mirrored);
+                            break;
+                        }
+                        default: {
+                            throw new IllegalStateException("Unexpected type " + node9.type);
+                        }
+                    }
+                    parentNode.addElement(this, tankGauge);
+                    break;
+                }
+                case fluidslot: {
+                    if (!(this.container.base instanceof TileEntityBlock) || !((TileEntityBlock)this.container.base).hasComponent(Fluids.class)) {
+                        throw new RuntimeException("invalid base " + this.container.base + " for tank elements");
+                    }
+                    final GuiParser.FluidSlotNode node10 = (GuiParser.FluidSlotNode)rawNode;
+                    parentNode.addElement(this, FluidSlot.createFluidSlot(this, node10.x, node10.y, (IFluidTank)((TileEntityBlock)this.container.base).getComponent(Fluids.class).getFluidTank(node10.name)));
+                    break;
+                }
+            }
+            if (rawNode instanceof GuiParser.ParentNode) {
+                this.initializeWidgets(player, (GuiParser.ParentNode)rawNode);
+            }
+        }
+    }
+    
+    protected IClickHandler createEventSender(final int event, final String eventString) {
+        if (this.isHandHeldGUI()) {
+            String eventName;
+            if (eventString == null) {
+                IC2.log.warn(LogCategory.General, "HandHand inventory given numeric event rather than string");
+                eventName = Integer.toString(event);
+            }
+            else {
+                eventName = eventString;
+            }
+            return new IClickHandler() {
+                @Override
+                public void onClick(final MouseButton button) {
+                    IC2.network.get(false).sendContainerEvent(DynamicGui.this.container, eventName);
+                    ((HandHeldInventory)DynamicGui.this.container.base).onEvent(eventName);
+                }
+            };
+        }
+        assert eventString == null;
+        return this.createEventSender(event);
+    }
+    
+    protected boolean isHandHeldGUI() {
+        return this.container.base instanceof HandHeldInventory;
+    }
+    
+    public void addElement(final GuiElement<?> element) {
+        super.addElement(element);
+    }
 }

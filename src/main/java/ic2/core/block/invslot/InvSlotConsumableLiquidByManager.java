@@ -1,32 +1,34 @@
+// 
+// Decompiled by Procyon v0.6.0
+// 
+
 package ic2.core.block.invslot;
 
-import ic2.api.recipe.ILiquidAcceptManager;
-import ic2.core.block.IInventorySlotHolder;
 import net.minecraftforge.fluids.Fluid;
+import ic2.core.block.IInventorySlotHolder;
+import ic2.api.recipe.ILiquidAcceptManager;
 
 public class InvSlotConsumableLiquidByManager extends InvSlotConsumableLiquid
 {
-	private final ILiquidAcceptManager manager;
-
-	public InvSlotConsumableLiquidByManager(IInventorySlotHolder<?> base1, String name1, int count, ILiquidAcceptManager manager1)
-	{
-		super(base1, name1, count);
-		this.manager = manager1;
-	}
-
-	public InvSlotConsumableLiquidByManager(IInventorySlotHolder<?> base1, String name1, InvSlot.Access access1, int count, InvSlot.InvSide preferredSide1, InvSlotConsumableLiquid.OpType opType, ILiquidAcceptManager manager1)
-	{
-		super(base1, name1, access1, count, preferredSide1, opType);
-		this.manager = manager1;
-	}
-
-	protected boolean acceptsLiquid(Fluid fluid)
-	{
-		return this.manager.acceptsFluid(fluid);
-	}
-
-	protected Iterable<Fluid> getPossibleFluids()
-	{
-		return this.manager.getAcceptedFluids();
-	}
+    private final ILiquidAcceptManager manager;
+    
+    public InvSlotConsumableLiquidByManager(final IInventorySlotHolder<?> base1, final String name1, final int count, final ILiquidAcceptManager manager1) {
+        super(base1, name1, count);
+        this.manager = manager1;
+    }
+    
+    public InvSlotConsumableLiquidByManager(final IInventorySlotHolder<?> base1, final String name1, final Access access1, final int count, final InvSide preferredSide1, final OpType opType, final ILiquidAcceptManager manager1) {
+        super(base1, name1, access1, count, preferredSide1, opType);
+        this.manager = manager1;
+    }
+    
+    @Override
+    protected boolean acceptsLiquid(final Fluid fluid) {
+        return this.manager.acceptsFluid(fluid);
+    }
+    
+    @Override
+    protected Iterable<Fluid> getPossibleFluids() {
+        return this.manager.getAcceptedFluids();
+    }
 }

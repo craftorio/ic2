@@ -1,835 +1,875 @@
+// 
+// Decompiled by Procyon v0.6.0
+// 
+
 package ic2.core.block;
 
-import com.google.common.base.Function;
-import com.google.common.collect.UnmodifiableIterator;
-import ic2.api.item.ITeBlockSpecialItem;
-import ic2.api.tile.IWrenchable;
-import ic2.core.IC2;
-import ic2.core.block.state.IIdProvider;
-import ic2.core.block.state.Ic2BlockState;
-import ic2.core.block.state.MaterialProperty;
 import ic2.core.block.state.SkippedBooleanProperty;
-import ic2.core.init.MainConfig;
-import ic2.core.item.block.ItemBlockTileEntity;
-import ic2.core.model.ModelUtil;
-import ic2.core.network.NetworkManager;
-import ic2.core.ref.BlockName;
-import ic2.core.ref.IMultiBlock;
-import ic2.core.ref.MetaTeBlock;
-import ic2.core.ref.MetaTeBlockProperty;
-import ic2.core.ref.TeBlock;
-import ic2.core.util.ConfigUtil;
-import ic2.core.util.LogCategory;
-import ic2.core.util.ParticleUtil;
-import ic2.core.util.StackUtil;
-import ic2.core.util.Util;
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
-import net.minecraft.block.Block;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.EnumPushReaction;
-import net.minecraft.block.material.MapColor;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyDirection;
-import net.minecraft.block.state.BlockFaceShape;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.particle.ParticleManager;
-import net.minecraft.client.renderer.ItemMeshDefinition;
-import net.minecraft.client.renderer.block.model.ModelBakery;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.client.renderer.block.statemap.IStateMapper;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.EnumDyeColor;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.Explosion;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
-import net.minecraftforge.client.model.ModelLoader;
+import ic2.core.block.state.IIdProvider;
+import net.minecraft.block.SoundType;
 import net.minecraftforge.common.EnumPlantType;
-import net.minecraftforge.common.IPlantable;
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.ModContainer;
+import net.minecraft.tileentity.TileEntity;
+import ic2.core.util.ConfigUtil;
+import ic2.core.init.MainConfig;
+import java.util.ArrayList;
+import net.minecraft.world.Explosion;
+import net.minecraft.item.EnumDyeColor;
+import net.minecraft.util.EnumHand;
+import net.minecraft.block.state.BlockFaceShape;
+import java.util.List;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.block.material.MapColor;
+import net.minecraft.block.material.EnumPushReaction;
+import ic2.core.util.ParticleUtil;
+import net.minecraft.client.particle.ParticleManager;
+import net.minecraft.entity.Entity;
+import ic2.core.network.NetworkManager;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.world.WorldServer;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.entity.player.EntityPlayer;
+import ic2.core.util.StackUtil;
+import net.minecraft.world.World;
+import java.util.Collections;
+import net.minecraft.util.NonNullList;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
+import ic2.core.block.state.Ic2BlockState;
+import net.minecraft.block.state.BlockStateContainer;
+import net.minecraft.util.BlockRenderLayer;
+import java.util.Set;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import java.util.Iterator;
+import net.minecraft.client.renderer.block.model.ModelBakery;
+import ic2.api.item.ITeBlockSpecialItem;
+import net.minecraft.item.ItemStack;
+import net.minecraft.client.renderer.ItemMeshDefinition;
+import net.minecraftforge.client.model.ModelLoader;
+import com.google.common.collect.UnmodifiableIterator;
+import java.util.IdentityHashMap;
+import net.minecraft.block.state.IBlockState;
+import java.util.Map;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.renderer.block.statemap.IStateMapper;
+import ic2.core.model.ModelUtil;
+import ic2.core.util.Util;
+import net.minecraftforge.fml.common.ModContainer;
+import ic2.core.util.LogCategory;
+import ic2.core.IC2;
+import net.minecraft.item.Item;
+import net.minecraft.block.Block;
+import com.google.common.base.Function;
+import java.util.function.Consumer;
+import net.minecraftforge.fml.common.Loader;
+import ic2.core.ref.MetaTeBlockProperty;
+import net.minecraft.util.ResourceLocation;
+import ic2.core.ref.TeBlock;
+import net.minecraft.block.material.Material;
+import java.util.Collection;
+import ic2.core.ref.BlockName;
+import java.lang.ref.WeakReference;
+import ic2.core.item.block.ItemBlockTileEntity;
+import net.minecraft.util.EnumFacing;
+import ic2.core.block.state.MaterialProperty;
+import ic2.core.ref.MetaTeBlock;
+import net.minecraft.block.properties.IProperty;
+import net.minecraftforge.common.IPlantable;
+import ic2.api.tile.IWrenchable;
+import ic2.core.ref.IMultiBlock;
 
-public final class BlockTileEntity extends BlockBase implements IMultiBlock<ITeBlock>, IWrenchable, IPlantable {
-  public final IProperty<MetaTeBlock> typeProperty;
-  
-  public final MaterialProperty materialProperty;
-  
-  static BlockTileEntity create(BlockName name, Collection<Material> materials) {
-    BlockTileEntity ret = create(name.name(), TeBlock.invalid.getIdentifier(), materials);
-    name.setInstance(ret);
-    return ret;
-  }
-  
-  static BlockTileEntity create(String name, ResourceLocation identifier, Collection<Material> materials) {
-    currentTypeProperty.set(new MetaTeBlockProperty(identifier));
-    currentMaterialProperty.set(new MaterialProperty(materials));
-    BlockTileEntity ret = new BlockTileEntity(name, identifier);
-    currentMaterialProperty.remove();
-    currentTypeProperty.remove();
-    return ret;
-  }
-  
-  private BlockTileEntity(String name, final ResourceLocation identifier) {
-    super((BlockName)null, TeBlockRegistry.getInfo(identifier).getDefaultMaterial());
-    this.typeProperty = getTypeProperty();
-    this.materialProperty = getMaterialProperty();
-    ModContainer ic2 = Loader.instance().activeModContainer();
-    Loader.instance().getActiveModList().stream().filter(mod -> identifier.getResourceDomain().equals(mod.getModId())).findFirst().ifPresent(Loader.instance()::setActiveModContainer);
-    register(name, identifier, (Function<Block, Item>)new Function<Block, Item>() {
-          public Item apply(Block input) {
-            return (Item)new ItemBlockTileEntity(input, identifier);
-          }
+public final class BlockTileEntity extends BlockBase implements IMultiBlock<ITeBlock>, IWrenchable, IPlantable
+{
+    public final IProperty<MetaTeBlock> typeProperty;
+    public final MaterialProperty materialProperty;
+    public static final IProperty<EnumFacing> facingProperty;
+    private static final ThreadLocal<IProperty<MetaTeBlock>> currentTypeProperty;
+    private static final ThreadLocal<MaterialProperty> currentMaterialProperty;
+    public static final IProperty<Boolean> transparentProperty;
+    private final ItemBlockTileEntity item;
+    private static final int removedTesToKeep = 4;
+    private static final WeakReference<TileEntityBlock>[] removedTes;
+    private static int nextRemovedTeIndex;
+    
+    static BlockTileEntity create(final BlockName name, final Collection<Material> materials) {
+        final BlockTileEntity ret = create(name.name(), TeBlock.invalid.getIdentifier(), materials);
+        name.setInstance(ret);
+        return ret;
+    }
+    
+    static BlockTileEntity create(final String name, final ResourceLocation identifier, final Collection<Material> materials) {
+        BlockTileEntity.currentTypeProperty.set((IProperty<MetaTeBlock>)new MetaTeBlockProperty(identifier));
+        BlockTileEntity.currentMaterialProperty.set(new MaterialProperty(materials));
+        final BlockTileEntity ret = new BlockTileEntity(name, identifier);
+        BlockTileEntity.currentMaterialProperty.remove();
+        BlockTileEntity.currentTypeProperty.remove();
+        return ret;
+    }
+    
+    private BlockTileEntity(final String name, final ResourceLocation identifier) {
+        super(null, TeBlockRegistry.getInfo(identifier).getDefaultMaterial());
+        this.typeProperty = this.getTypeProperty();
+        this.materialProperty = this.getMaterialProperty();
+        final ModContainer ic2 = Loader.instance().activeModContainer();
+        Loader.instance().getActiveModList().stream().filter(mod -> identifier.getResourceDomain().equals(mod.getModId())).findFirst().ifPresent(Loader.instance()::setActiveModContainer);
+        this.register(name, identifier, (java.util.function.Function<Block, Item>)new Function<Block, Item>() {
+            public Item apply(final Block input) {
+                return (Item)new ItemBlockTileEntity(input, identifier);
+            }
         });
-    Loader.instance().setActiveModContainer(ic2);
-    setDefaultState(this.blockState.getBaseState()
-        .withProperty((IProperty)this.materialProperty, (Comparable)MaterialProperty.WrappedMaterial.get(this.blockMaterial))
-        .withProperty(this.typeProperty, (Comparable)MetaTeBlockProperty.invalid)
-        .withProperty(facingProperty, (Comparable)EnumFacing.DOWN)
-        .withProperty(transparentProperty, Boolean.FALSE));
-    this.item = (ItemBlockTileEntity)Item.getItemFromBlock(this);
-    IC2.log.debug(LogCategory.Block, "Successfully built BlockTileEntity for identity " + identifier + '.');
-  }
-  
-  @SideOnly(Side.CLIENT)
-  public void registerModels(BlockName name) {
-    final ModelResourceLocation invalidLocation = ModelUtil.getTEBlockModelLocation(Util.getName(BlockName.te.getInstance()), this.blockState.getBaseState()
-        .withProperty((IProperty)this.materialProperty, (Comparable)MaterialProperty.WrappedMaterial.get(this.blockMaterial))
-        .withProperty(this.typeProperty, (Comparable)MetaTeBlockProperty.invalid)
-        .withProperty(facingProperty, (Comparable)EnumFacing.NORTH)
-        .withProperty(transparentProperty, Boolean.FALSE));
-    IC2.log.debug(LogCategory.Block, "Preparing to set models for " + this.item.identifier + '.');
-    IC2.log.debug(LogCategory.Block, "Mapping " + getBlockState().getValidStates().size() + " states.");
-    ModelLoader.setCustomStateMapper(this, new IStateMapper() {
-          public Map<IBlockState, ModelResourceLocation> putStateModelLocations(Block block) {
-            Map<IBlockState, ModelResourceLocation> ret = new IdentityHashMap<>();
-            for (UnmodifiableIterator<IBlockState> unmodifiableIterator = block.getBlockState().getValidStates().iterator(); unmodifiableIterator.hasNext(); ) {
-              IBlockState state = unmodifiableIterator.next();
-              MetaTeBlock metaTeBlock = (MetaTeBlock)state.getValue(BlockTileEntity.this.typeProperty);
-              EnumFacing facing = (EnumFacing)state.getValue(BlockTileEntity.facingProperty);
-              if (metaTeBlock.teBlock.getSupportedFacings().contains(facing) || (facing == EnumFacing.DOWN && metaTeBlock.teBlock
-                .getSupportedFacings().isEmpty())) {
-                ret.put(state, ModelUtil.getTEBlockModelLocation(metaTeBlock.teBlock.getIdentifier(), state));
-                continue;
-              } 
-              ret.put(state, invalidLocation);
-            } 
+        Loader.instance().setActiveModContainer(ic2);
+        this.setDefaultState(this.blockState.getBaseState().withProperty((IProperty)this.materialProperty, (Comparable)MaterialProperty.WrappedMaterial.get(this.blockMaterial)).withProperty((IProperty)this.typeProperty, (Comparable)MetaTeBlockProperty.invalid).withProperty((IProperty)BlockTileEntity.facingProperty, (Comparable)EnumFacing.DOWN).withProperty((IProperty)BlockTileEntity.transparentProperty, (Comparable)Boolean.FALSE));
+        this.item = (ItemBlockTileEntity)Item.getItemFromBlock((Block)this);
+        IC2.log.debug(LogCategory.Block, "Successfully built BlockTileEntity for identity " + identifier + '.');
+    }
+    
+    @SideOnly(Side.CLIENT)
+    @Override
+    public void registerModels(final BlockName name) {
+        final ModelResourceLocation invalidLocation = ModelUtil.getTEBlockModelLocation(Util.getName(BlockName.te.getInstance()), this.blockState.getBaseState().withProperty((IProperty)this.materialProperty, (Comparable)MaterialProperty.WrappedMaterial.get(this.blockMaterial)).withProperty((IProperty)this.typeProperty, (Comparable)MetaTeBlockProperty.invalid).withProperty((IProperty)BlockTileEntity.facingProperty, (Comparable)EnumFacing.NORTH).withProperty((IProperty)BlockTileEntity.transparentProperty, (Comparable)Boolean.FALSE));
+        IC2.log.debug(LogCategory.Block, "Preparing to set models for " + this.item.identifier + '.');
+        IC2.log.debug(LogCategory.Block, "Mapping " + this.getBlockState().getValidStates().size() + " states.");
+        ModelLoader.setCustomStateMapper((Block)this, (IStateMapper)new IStateMapper() {
+            public Map<IBlockState, ModelResourceLocation> putStateModelLocations(final Block block) {
+                final Map<IBlockState, ModelResourceLocation> ret = new IdentityHashMap<IBlockState, ModelResourceLocation>();
+                for (final IBlockState state : block.getBlockState().getValidStates()) {
+                    final MetaTeBlock metaTeBlock = (MetaTeBlock)state.getValue((IProperty)BlockTileEntity.this.typeProperty);
+                    final EnumFacing facing = (EnumFacing)state.getValue((IProperty)BlockTileEntity.facingProperty);
+                    if (metaTeBlock.teBlock.getSupportedFacings().contains(facing) || (facing == EnumFacing.DOWN && metaTeBlock.teBlock.getSupportedFacings().isEmpty())) {
+                        ret.put(state, ModelUtil.getTEBlockModelLocation(metaTeBlock.teBlock.getIdentifier(), state));
+                    }
+                    else {
+                        ret.put(state, invalidLocation);
+                    }
+                }
+                return ret;
+            }
+        });
+        ModelLoader.setCustomMeshDefinition((Item)this.item, (ItemMeshDefinition)new ItemMeshDefinition() {
+            public ModelResourceLocation getModelLocation(final ItemStack stack) {
+                final ITeBlock teBlock = TeBlockRegistry.get(BlockTileEntity.this.item.identifier, stack.getItemDamage());
+                if (teBlock == null) {
+                    return invalidLocation;
+                }
+                if (teBlock instanceof ITeBlockSpecialItem && ((ITeBlockSpecialItem)teBlock).doesOverrideDefault(stack)) {
+                    final ModelResourceLocation location = ((ITeBlockSpecialItem)teBlock).getModelLocation(stack);
+                    return (location == null) ? invalidLocation : location;
+                }
+                final IBlockState state = BlockTileEntity.this.getDefaultState().withProperty((IProperty)BlockTileEntity.this.typeProperty, (Comparable)MetaTeBlockProperty.getState(teBlock)).withProperty((IProperty)BlockTileEntity.facingProperty, (Comparable)getItemFacing(teBlock));
+                return ModelUtil.getTEBlockModelLocation(teBlock.getIdentifier(), state);
+            }
+        });
+        final boolean checkSpecialModels = TeBlockRegistry.getInfo(this.item.identifier).hasSpecialModels();
+        for (final MetaTeBlockProperty.MetaTePair block : MetaTeBlockProperty.getAllStates(this.item.identifier)) {
+            if (block.hasItem()) {
+                ModelResourceLocation model = checkSpecialModels ? this.getSpecialModel(block) : null;
+                if (model == null) {
+                    final IBlockState state = this.blockState.getBaseState().withProperty((IProperty)this.typeProperty, (Comparable)block.inactive).withProperty((IProperty)BlockTileEntity.facingProperty, (Comparable)getItemFacing(block.getBlock()));
+                    model = ModelUtil.getTEBlockModelLocation(block.getIdentifier(), state);
+                }
+                assert model != null;
+                ModelBakery.registerItemVariants((Item)this.item, new ResourceLocation[] { (ResourceLocation)model });
+            }
+            IC2.log.debug(LogCategory.Block, "Done item for " + this.item.identifier + ':' + block.getName() + '.');
+        }
+    }
+    
+    private static EnumFacing getItemFacing(final ITeBlock teBlock) {
+        final Set<EnumFacing> supported = teBlock.getSupportedFacings();
+        if (supported.contains(EnumFacing.NORTH)) {
+            return EnumFacing.NORTH;
+        }
+        if (!supported.isEmpty()) {
+            return supported.iterator().next();
+        }
+        return EnumFacing.DOWN;
+    }
+    
+    @SideOnly(Side.CLIENT)
+    private ModelResourceLocation getSpecialModel(final MetaTeBlockProperty.MetaTePair blockTextures) {
+        assert blockTextures.getBlock() instanceof ITeBlockSpecialItem;
+        final ITeBlockSpecialItem block = (ITeBlockSpecialItem)blockTextures.getBlock();
+        final ItemStack stack = new ItemStack((Item)this.item, 1, blockTextures.getBlock().getId());
+        return block.doesOverrideDefault(stack) ? block.getModelLocation(stack) : null;
+    }
+    
+    public boolean canRenderInLayer(final IBlockState state, final BlockRenderLayer layer) {
+        return state.getValue((IProperty)BlockTileEntity.transparentProperty) ? (layer == BlockRenderLayer.CUTOUT) : (layer == BlockRenderLayer.SOLID);
+    }
+    
+    public boolean hasTileEntity() {
+        return true;
+    }
+    
+    public boolean hasTileEntity(final IBlockState state) {
+        return true;
+    }
+    
+    protected BlockStateContainer createBlockState() {
+        return new Ic2BlockState(this, (IProperty<?>[])new IProperty[] { this.getTypeProperty(), (IProperty)this.getMaterialProperty(), BlockTileEntity.facingProperty, BlockTileEntity.transparentProperty });
+    }
+    
+    public int getMetaFromState(final IBlockState state) {
+        int ret = this.materialProperty.getId((MaterialProperty.WrappedMaterial)state.getValue((IProperty)this.materialProperty));
+        if (ret < 0 || ret >= 8) {
+            throw new IllegalStateException("invalid material id: " + ret);
+        }
+        ret |= (state.getValue((IProperty)BlockTileEntity.transparentProperty) ? 8 : 0);
+        return ret;
+    }
+    
+    public IBlockState getStateFromMeta(final int meta) {
+        final boolean isTransparent = (meta & 0x8) != 0x0;
+        final int materialId = meta & 0x7;
+        return this.getDefaultState().withProperty((IProperty)this.materialProperty, (Comparable)this.materialProperty.getMaterial(materialId)).withProperty((IProperty)BlockTileEntity.transparentProperty, (Comparable)isTransparent);
+    }
+    
+    public IBlockState getActualState(final IBlockState state, final IBlockAccess world, final BlockPos pos) {
+        final TileEntityBlock te = getTe(world, pos);
+        if (te == null) {
+            return state;
+        }
+        return te.getBlockState();
+    }
+    
+    @Override
+    public String getUnlocalizedName() {
+        if (!this.isIC2()) {
+            return this.item.identifier.getResourceDomain() + '.' + this.item.identifier.getResourcePath();
+        }
+        return super.getUnlocalizedName();
+    }
+    
+    public void getSubBlocks(final CreativeTabs tabs, final NonNullList<ItemStack> list) {
+        final TeBlockRegistry.TeBlockInfo<?> info = TeBlockRegistry.getInfo(this.item.identifier);
+        if (info.hasCreativeRegisterer()) {
+            info.getCreativeRegisterer().addSubBlocks(list, this, this.item, tabs);
+        }
+        else if (tabs == IC2.tabIC2 || tabs == CreativeTabs.SEARCH) {
+            for (final ITeBlock type : info.getTeBlocks()) {
+                if (type.hasItem()) {
+                    list.add((Object)this.getItemStack(type));
+                }
+            }
+        }
+    }
+    
+    public Set<ITeBlock> getAllTypes() {
+        return Collections.unmodifiableSet(TeBlockRegistry.getAll(this.item.identifier));
+    }
+    
+    public ItemStack getItem(final World world, final BlockPos pos, final IBlockState state) {
+        final TileEntityBlock te = getTe((IBlockAccess)world, pos);
+        if (te == null) {
+            return StackUtil.emptyStack;
+        }
+        return te.getPickBlock(null, null);
+    }
+    
+    public ItemStack getPickBlock(final IBlockState state, final RayTraceResult target, final World world, final BlockPos pos, final EntityPlayer player) {
+        final TileEntityBlock te = getTe((IBlockAccess)world, pos);
+        if (te == null) {
+            return StackUtil.emptyStack;
+        }
+        return te.getPickBlock(player, target);
+    }
+    
+    @Override
+    public IBlockState getState(final ITeBlock variant) {
+        if (variant == null) {
+            throw new IllegalArgumentException("invalid type: " + variant);
+        }
+        final Set<EnumFacing> supportedFacings = variant.getSupportedFacings();
+        EnumFacing facing;
+        if (supportedFacings.isEmpty()) {
+            facing = EnumFacing.DOWN;
+        }
+        else if (supportedFacings.contains(EnumFacing.NORTH)) {
+            facing = EnumFacing.NORTH;
+        }
+        else {
+            facing = supportedFacings.iterator().next();
+        }
+        return this.getDefaultState().withProperty((IProperty)this.materialProperty, (Comparable)MaterialProperty.WrappedMaterial.get(variant.getMaterial())).withProperty((IProperty)this.typeProperty, (Comparable)MetaTeBlockProperty.getState(variant)).withProperty((IProperty)BlockTileEntity.facingProperty, (Comparable)facing).withProperty((IProperty)BlockTileEntity.transparentProperty, (Comparable)variant.isTransparent());
+    }
+    
+    @Override
+    public IBlockState getState(final String variant) {
+        return this.getState(TeBlockRegistry.get(variant));
+    }
+    
+    public ItemStack getItemStack(final ITeBlock type) {
+        if (type == null) {
+            throw new IllegalArgumentException("invalid type: null");
+        }
+        final int id = type.getId();
+        if (id != -1) {
+            return new ItemStack((Item)this.item, 1, id);
+        }
+        return null;
+    }
+    
+    public ItemStack getItemStack(final String variant) {
+        if (variant == null) {
+            throw new IllegalArgumentException("Invalid ITeBlock type: null");
+        }
+        final ITeBlock type = TeBlockRegistry.get(variant);
+        if (type == null) {
+            throw new IllegalArgumentException("Invalid ITeBlock type: " + variant);
+        }
+        return this.getItemStack(type);
+    }
+    
+    public String getVariant(final ItemStack stack) {
+        if (stack == null) {
+            throw new NullPointerException("null stack");
+        }
+        if (stack.getItem() != this.item) {
+            throw new IllegalArgumentException("The stack " + stack + " doesn't match " + this.item + " (" + this + ")");
+        }
+        final ITeBlock type = TeBlockRegistry.get(this.item.identifier, stack.getMetadata());
+        if (type == null) {
+            throw new IllegalArgumentException("The stack " + stack + " doesn't reference any valid subtype");
+        }
+        return type.getName();
+    }
+    
+    public boolean isFullCube(final IBlockState state) {
+        return false;
+    }
+    
+    public boolean isOpaqueCube(final IBlockState state) {
+        return !(boolean)state.getValue((IProperty)BlockTileEntity.transparentProperty);
+    }
+    
+    public boolean canReplace(final World world, final BlockPos pos, final EnumFacing side, final ItemStack stack) {
+        if (StackUtil.isEmpty(stack)) {
+            return true;
+        }
+        if (stack.getItem() != this.item) {
+            return false;
+        }
+        final ITeBlock type = TeBlockRegistry.get(this.item.identifier, stack.getMetadata());
+        if (type == null) {
+            return false;
+        }
+        final TeBlock.ITePlaceHandler handler = type.getPlaceHandler();
+        return handler == null || handler.canReplace(world, pos, side, stack);
+    }
+    
+    public boolean addLandingEffects(final IBlockState state, final WorldServer world, final BlockPos pos, final IBlockState state2, final EntityLivingBase entity, final int numberOfParticles) {
+        if (world.isRemote) {
+            throw new IllegalStateException();
+        }
+        final TileEntityBlock te = getTe((IBlockAccess)world, pos);
+        if (te == null) {
+            return super.addLandingEffects(state, world, pos, state2, entity, numberOfParticles);
+        }
+        if (te.clientNeedsExtraModelInfo()) {
+            IC2.network.get(true).initiateTeblockLandEffect((World)world, pos, entity.posX, entity.posY, entity.posZ, numberOfParticles, te.teBlock);
+        }
+        else {
+            IC2.network.get(true).initiateTeblockLandEffect((World)world, entity.posX, entity.posY, entity.posZ, numberOfParticles, te.teBlock);
+        }
+        return true;
+    }
+    
+    public boolean addRunningEffects(final IBlockState state, final World world, final BlockPos pos, final Entity entity) {
+        if (world.isRemote) {
+            return true;
+        }
+        final TileEntityBlock te = getTe((IBlockAccess)world, pos);
+        if (te == null) {
+            return super.addRunningEffects(state, world, pos, entity);
+        }
+        if (te.clientNeedsExtraModelInfo()) {
+            IC2.network.get(true).initiateTeblockRunEffect(world, pos, entity, te.teBlock);
+        }
+        else {
+            IC2.network.get(true).initiateTeblockRunEffect(world, entity, te.teBlock);
+        }
+        return true;
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public boolean addHitEffects(final IBlockState state, final World world, final RayTraceResult target, final ParticleManager manager) {
+        final BlockPos pos = target.getBlockPos();
+        final TileEntityBlock te = getTe((IBlockAccess)world, pos);
+        if (te == null) {
+            return super.addHitEffects(state, world, target, manager);
+        }
+        ParticleUtil.spawnBlockHitParticles(te, target.sideHit, te.clientNeedsExtraModelInfo());
+        return true;
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public boolean addDestroyEffects(final World world, final BlockPos pos, final ParticleManager manager) {
+        final TileEntityBlock te = getTe((IBlockAccess)world, pos);
+        if (te != null && te.clientNeedsExtraModelInfo()) {
+            ParticleUtil.spawnBlockBreakParticles(te);
+            return true;
+        }
+        return super.addDestroyEffects(world, pos, manager);
+    }
+    
+    public Material getMaterial(final IBlockState state) {
+        return ((MaterialProperty.WrappedMaterial)state.getValue((IProperty)this.materialProperty)).getMaterial();
+    }
+    
+    public boolean causesSuffocation(final IBlockState state) {
+        return this.getMaterial(state).blocksMovement() && this.getDefaultState().isFullCube();
+    }
+    
+    public boolean isPassable(final IBlockAccess world, final BlockPos pos) {
+        return !this.getMaterial(world.getBlockState(pos)).blocksMovement();
+    }
+    
+    public boolean canSpawnInBlock() {
+        return super.canSpawnInBlock();
+    }
+    
+    public EnumPushReaction getMobilityFlag(final IBlockState state) {
+        return this.getMaterial(state).getMobilityFlag();
+    }
+    
+    public boolean isTranslucent(final IBlockState state) {
+        return !this.getMaterial(state).blocksLight();
+    }
+    
+    public MapColor getMapColor(final IBlockState state, final IBlockAccess world, final BlockPos pos) {
+        return this.getMaterial(state).getMaterialMapColor();
+    }
+    
+    public IBlockState getExtendedState(final IBlockState state, final IBlockAccess world, final BlockPos pos) {
+        final TileEntityBlock te = getTe(world, pos);
+        if (te == null) {
+            return state;
+        }
+        return (IBlockState)te.getExtendedState((Ic2BlockState.Ic2BlockStateInstance)state);
+    }
+    
+    public void onBlockPlacedBy(final World world, final BlockPos pos, final IBlockState state, final EntityLivingBase placer, final ItemStack stack) {
+        final TileEntityBlock te = getTe((IBlockAccess)world, pos);
+        if (te == null) {
+            return;
+        }
+        te.onPlaced(stack, placer, EnumFacing.UP);
+    }
+    
+    public RayTraceResult collisionRayTrace(final IBlockState state, final World world, final BlockPos pos, final Vec3d start, final Vec3d end) {
+        final TileEntityBlock te = getTe((IBlockAccess)world, pos);
+        if (te == null) {
+            return super.collisionRayTrace(state, world, pos, start, end);
+        }
+        return te.collisionRayTrace(start, end);
+    }
+    
+    public AxisAlignedBB getBoundingBox(final IBlockState state, final IBlockAccess world, final BlockPos pos) {
+        final TileEntityBlock te = getTe(world, pos);
+        if (te == null) {
+            return super.getBoundingBox(state, world, pos);
+        }
+        return te.getVisualBoundingBox();
+    }
+    
+    public AxisAlignedBB getSelectedBoundingBox(final IBlockState state, final World world, final BlockPos pos) {
+        final TileEntityBlock te = getTe((IBlockAccess)world, pos);
+        if (te == null) {
+            return super.getSelectedBoundingBox(state, world, pos);
+        }
+        return te.getOutlineBoundingBox().offset(pos);
+    }
+    
+    public AxisAlignedBB getCollisionBoundingBox(final IBlockState state, final IBlockAccess world, final BlockPos pos) {
+        final TileEntityBlock te = getTe(world, pos);
+        if (te == null) {
+            return super.getCollisionBoundingBox(state, world, pos);
+        }
+        return te.getPhysicsBoundingBox();
+    }
+    
+    public void addCollisionBoxToList(final IBlockState state, final World world, final BlockPos pos, final AxisAlignedBB mask, final List<AxisAlignedBB> list, final Entity collidingEntity, final boolean isActualState) {
+        final TileEntityBlock te = getTe((IBlockAccess)world, pos);
+        if (te == null) {
+            super.addCollisionBoxToList(state, world, pos, mask, (List)list, collidingEntity, isActualState);
+        }
+        else {
+            te.addCollisionBoxesToList(mask, list, collidingEntity);
+        }
+    }
+    
+    public void onEntityCollidedWithBlock(final World world, final BlockPos pos, final IBlockState state, final Entity entity) {
+        final TileEntityBlock te = getTe((IBlockAccess)world, pos);
+        if (te == null) {
+            return;
+        }
+        te.onEntityCollision(entity);
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public boolean shouldSideBeRendered(final IBlockState state, final IBlockAccess world, final BlockPos pos, final EnumFacing side) {
+        final TileEntityBlock te = getTe(world, pos);
+        if (te == null) {
+            return super.shouldSideBeRendered(state, world, pos, side);
+        }
+        return te.shouldSideBeRendered(side, pos.offset(side));
+    }
+    
+    public boolean doesSideBlockRendering(final IBlockState state, final IBlockAccess world, final BlockPos pos, final EnumFacing face) {
+        final TileEntityBlock te = getTe(world, pos);
+        return te != null && te.doesSideBlockRendering(face);
+    }
+    
+    public boolean isNormalCube(final IBlockState state, final IBlockAccess world, final BlockPos pos) {
+        final TileEntityBlock te = getTe(world, pos);
+        return te != null && te.isNormalCube();
+    }
+    
+    public boolean isSideSolid(final IBlockState state, final IBlockAccess world, final BlockPos pos, final EnumFacing side) {
+        final TileEntityBlock te = getTe(world, pos);
+        return te != null && te.isSideSolid(side);
+    }
+    
+    public BlockFaceShape getBlockFaceShape(final IBlockAccess world, final IBlockState state, final BlockPos pos, final EnumFacing face) {
+        final TileEntityBlock te = getTe(world, pos);
+        if (te == null) {
+            return super.getBlockFaceShape(world, state, pos, face);
+        }
+        return te.getFaceShape(face);
+    }
+    
+    public int getLightOpacity(final IBlockState state, final IBlockAccess world, final BlockPos pos) {
+        final TileEntityBlock te = getTe(world, pos);
+        if (te == null) {
+            return this.getLightOpacity(state);
+        }
+        return te.getLightOpacity();
+    }
+    
+    public int getLightValue(final IBlockState state, final IBlockAccess world, final BlockPos pos) {
+        final TileEntityBlock te = getTe(world, pos);
+        if (te == null) {
+            return 0;
+        }
+        return te.getLightValue();
+    }
+    
+    public boolean onBlockActivated(final World world, final BlockPos pos, final IBlockState state, final EntityPlayer player, final EnumHand hand, final EnumFacing side, final float hitX, final float hitY, final float hitZ) {
+        if (player.isSneaking()) {
+            return false;
+        }
+        final TileEntityBlock te = getTe((IBlockAccess)world, pos);
+        return te != null && te.onActivated(player, hand, side, hitX, hitY, hitZ);
+    }
+    
+    public void onBlockClicked(final World world, final BlockPos pos, final EntityPlayer player) {
+        final TileEntityBlock te = getTe((IBlockAccess)world, pos);
+        if (te == null) {
+            return;
+        }
+        te.onClicked(player);
+    }
+    
+    public void neighborChanged(final IBlockState state, final World world, final BlockPos pos, final Block neighborBlock, final BlockPos neighborPos) {
+        final TileEntityBlock te = getTe((IBlockAccess)world, pos);
+        if (te == null) {
+            return;
+        }
+        te.onNeighborChange(neighborBlock, neighborPos);
+    }
+    
+    public int getWeakPower(final IBlockState state, final IBlockAccess world, final BlockPos pos, final EnumFacing side) {
+        final TileEntityBlock te = getTe(world, pos);
+        if (te == null) {
+            return 0;
+        }
+        return te.getWeakPower(side);
+    }
+    
+    public boolean canConnectRedstone(final IBlockState state, final IBlockAccess world, final BlockPos pos, final EnumFacing side) {
+        final TileEntityBlock te = getTe(world, pos);
+        return te != null && te.canConnectRedstone(side);
+    }
+    
+    public boolean hasComparatorInputOverride(final IBlockState state) {
+        return true;
+    }
+    
+    public int getComparatorInputOverride(final IBlockState state, final World world, final BlockPos pos) {
+        final TileEntityBlock te = getTe((IBlockAccess)world, pos);
+        if (te == null) {
+            return 0;
+        }
+        return te.getComparatorInputOverride();
+    }
+    
+    public boolean recolorBlock(final World world, final BlockPos pos, final EnumFacing side, final EnumDyeColor color) {
+        final TileEntityBlock te = getTe((IBlockAccess)world, pos);
+        return te != null && te.recolor(side, color);
+    }
+    
+    public void onBlockExploded(final World world, final BlockPos pos, final Explosion explosion) {
+        final TileEntityBlock te = getTe((IBlockAccess)world, pos);
+        if (te != null) {
+            te.onExploded(explosion);
+        }
+        super.onBlockExploded(world, pos, explosion);
+    }
+    
+    public void breakBlock(final World world, final BlockPos pos, final IBlockState state) {
+        final TileEntityBlock te = getTe((IBlockAccess)world, pos);
+        if (te != null) {
+            te.onBlockBreak();
+        }
+        super.breakBlock(world, pos, state);
+    }
+    
+    public boolean removedByPlayer(final IBlockState state, final World world, final BlockPos pos, final EntityPlayer player, final boolean willHarvest) {
+        final TileEntityBlock te = getTe((IBlockAccess)world, pos);
+        if (te != null) {
+            if (!te.onRemovedByPlayer(player, willHarvest)) {
+                return false;
+            }
+            if (willHarvest && !world.isRemote) {
+                BlockTileEntity.removedTes[BlockTileEntity.nextRemovedTeIndex] = new WeakReference<TileEntityBlock>(te);
+                BlockTileEntity.nextRemovedTeIndex = (BlockTileEntity.nextRemovedTeIndex + 1) % 4;
+            }
+        }
+        return super.removedByPlayer(state, world, pos, player, willHarvest);
+    }
+    
+    public boolean isFlammable(final IBlockAccess world, final BlockPos pos, final EnumFacing face) {
+        final TileEntityBlock tile = getTe(world, pos);
+        return tile != null && tile.isFlammable(face);
+    }
+    
+    public float getPlayerRelativeBlockHardness(final IBlockState state, final EntityPlayer player, final World world, final BlockPos pos) {
+        float ret = super.getPlayerRelativeBlockHardness(state, player, world, pos);
+        if (!player.canHarvestBlock(state)) {
+            final TileEntityBlock te = getTe((IBlockAccess)world, pos);
+            if (te != null && te.teBlock.getHarvestTool() == TeBlock.HarvestTool.None) {
+                ret *= 3.3333333f;
+            }
+        }
+        return ret;
+    }
+    
+    public boolean canHarvestBlock(final IBlockAccess world, final BlockPos pos, final EntityPlayer player) {
+        final boolean ret = super.canHarvestBlock(world, pos, player);
+        if (ret) {
             return ret;
-          }
-        });
-    ModelLoader.setCustomMeshDefinition((Item)this.item, new ItemMeshDefinition() {
-          public ModelResourceLocation getModelLocation(ItemStack stack) {
-            ITeBlock teBlock = TeBlockRegistry.get(BlockTileEntity.this.item.identifier, stack.getItemDamage());
-            if (teBlock == null)
-              return invalidLocation; 
-            if (teBlock instanceof ITeBlockSpecialItem && ((ITeBlockSpecialItem)teBlock).doesOverrideDefault(stack)) {
-              ModelResourceLocation location = ((ITeBlockSpecialItem)teBlock).getModelLocation(stack);
-              return (location == null) ? invalidLocation : location;
-            } 
-            IBlockState state = BlockTileEntity.this.getDefaultState().withProperty(BlockTileEntity.this.typeProperty, (Comparable)MetaTeBlockProperty.getState(teBlock)).withProperty(BlockTileEntity.facingProperty, (Comparable)BlockTileEntity.getItemFacing(teBlock));
-            return ModelUtil.getTEBlockModelLocation(teBlock.getIdentifier(), state);
-          }
-        });
-    boolean checkSpecialModels = TeBlockRegistry.getInfo(this.item.identifier).hasSpecialModels();
-    for (MetaTeBlockProperty.MetaTePair block : MetaTeBlockProperty.getAllStates(this.item.identifier)) {
-      if (block.hasItem()) {
-        ModelResourceLocation model = checkSpecialModels ? getSpecialModel(block) : null;
-        if (model == null) {
-          IBlockState state = this.blockState.getBaseState().withProperty(this.typeProperty, (Comparable)block.inactive).withProperty(facingProperty, (Comparable)getItemFacing(block.getBlock()));
-          model = ModelUtil.getTEBlockModelLocation(block.getIdentifier(), state);
-        } 
-        assert model != null;
-        ModelBakery.registerItemVariants((Item)this.item, new ResourceLocation[] { (ResourceLocation)model });
-      } 
-      IC2.log.debug(LogCategory.Block, "Done item for " + this.item.identifier + ':' + block.getName() + '.');
-    } 
-  }
-  
-  private static EnumFacing getItemFacing(ITeBlock teBlock) {
-    Set<EnumFacing> supported = teBlock.getSupportedFacings();
-    if (supported.contains(EnumFacing.NORTH))
-      return EnumFacing.NORTH; 
-    if (!supported.isEmpty())
-      return supported.iterator().next(); 
-    return EnumFacing.DOWN;
-  }
-  
-  @SideOnly(Side.CLIENT)
-  private ModelResourceLocation getSpecialModel(MetaTeBlockProperty.MetaTePair blockTextures) {
-    assert blockTextures.getBlock() instanceof ITeBlockSpecialItem;
-    ITeBlockSpecialItem block = (ITeBlockSpecialItem)blockTextures.getBlock();
-    ItemStack stack = new ItemStack((Item)this.item, 1, blockTextures.getBlock().getId());
-    return block.doesOverrideDefault(stack) ? block.getModelLocation(stack) : null;
-  }
-  
-  public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer) {
-    return ((Boolean)state.getValue(transparentProperty)).booleanValue() ? ((layer == BlockRenderLayer.CUTOUT)) : ((layer == BlockRenderLayer.SOLID));
-  }
-  
-  public boolean hasTileEntity() {
-    return true;
-  }
-  
-  public boolean hasTileEntity(IBlockState state) {
-    return true;
-  }
-  
-  protected BlockStateContainer createBlockState() {
-    return (BlockStateContainer)new Ic2BlockState(this, new IProperty[] { getTypeProperty(), (IProperty)getMaterialProperty(), facingProperty, transparentProperty });
-  }
-  
-  public int getMetaFromState(IBlockState state) {
-    int ret = this.materialProperty.getId((MaterialProperty.WrappedMaterial)state.getValue((IProperty)this.materialProperty));
-    if (ret < 0 || ret >= 8)
-      throw new IllegalStateException("invalid material id: " + ret); 
-    ret |= ((Boolean)state.getValue(transparentProperty)).booleanValue() ? 8 : 0;
-    return ret;
-  }
-  
-  public IBlockState getStateFromMeta(int meta) {
-    boolean isTransparent = ((meta & 0x8) != 0);
-    int materialId = meta & 0x7;
-    return getDefaultState().withProperty((IProperty)this.materialProperty, (Comparable)this.materialProperty.getMaterial(materialId)).withProperty(transparentProperty, Boolean.valueOf(isTransparent));
-  }
-  
-  public IBlockState getActualState(IBlockState state, IBlockAccess world, BlockPos pos) {
-    TileEntityBlock te = getTe(world, pos);
-    if (te == null)
-      return state; 
-    return te.getBlockState();
-  }
-  
-  public String getUnlocalizedName() {
-    if (!isIC2())
-      return this.item.identifier.getResourceDomain() + '.' + this.item.identifier.getResourcePath(); 
-    return super.getUnlocalizedName();
-  }
-  
-  public void getSubBlocks(CreativeTabs tabs, NonNullList<ItemStack> list) {
-    TeBlockRegistry.TeBlockInfo<?> info = TeBlockRegistry.getInfo(this.item.identifier);
-    if (info.hasCreativeRegisterer()) {
-      info.getCreativeRegisterer().addSubBlocks(list, this, this.item, tabs);
-    } else if (tabs == IC2.tabIC2 || tabs == CreativeTabs.SEARCH) {
-      for (ITeBlock type : info.getTeBlocks()) {
-        if (type.hasItem())
-          list.add(getItemStack(type)); 
-      } 
-    } 
-  }
-  
-  public Set<ITeBlock> getAllTypes() {
-    return Collections.unmodifiableSet(TeBlockRegistry.getAll(this.item.identifier));
-  }
-  
-  public ItemStack getItem(World world, BlockPos pos, IBlockState state) {
-    TileEntityBlock te = getTe((IBlockAccess)world, pos);
-    if (te == null)
-      return StackUtil.emptyStack; 
-    return te.getPickBlock((EntityPlayer)null, (RayTraceResult)null);
-  }
-  
-  public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
-    TileEntityBlock te = getTe((IBlockAccess)world, pos);
-    if (te == null)
-      return StackUtil.emptyStack; 
-    return te.getPickBlock(player, target);
-  }
-  
-  public IBlockState getState(ITeBlock variant) {
-    EnumFacing facing;
-    if (variant == null)
-      throw new IllegalArgumentException("invalid type: " + variant); 
-    Set<EnumFacing> supportedFacings = variant.getSupportedFacings();
-    if (supportedFacings.isEmpty()) {
-      facing = EnumFacing.DOWN;
-    } else if (supportedFacings.contains(EnumFacing.NORTH)) {
-      facing = EnumFacing.NORTH;
-    } else {
-      facing = supportedFacings.iterator().next();
-    } 
-    return getDefaultState()
-      .withProperty((IProperty)this.materialProperty, (Comparable)MaterialProperty.WrappedMaterial.get(variant.getMaterial()))
-      .withProperty(this.typeProperty, (Comparable)MetaTeBlockProperty.getState(variant))
-      .withProperty(facingProperty, (Comparable)facing)
-      .withProperty(transparentProperty, Boolean.valueOf(variant.isTransparent()));
-  }
-  
-  public IBlockState getState(String variant) {
-    return getState(TeBlockRegistry.get(variant));
-  }
-  
-  public ItemStack getItemStack(ITeBlock type) {
-    if (type == null)
-      throw new IllegalArgumentException("invalid type: null"); 
-    int id = type.getId();
-    if (id != -1)
-      return new ItemStack((Item)this.item, 1, id); 
-    return null;
-  }
-  
-  public ItemStack getItemStack(String variant) {
-    if (variant == null)
-      throw new IllegalArgumentException("Invalid ITeBlock type: null"); 
-    ITeBlock type = TeBlockRegistry.get(variant);
-    if (type == null)
-      throw new IllegalArgumentException("Invalid ITeBlock type: " + variant); 
-    return getItemStack(type);
-  }
-  
-  public String getVariant(ItemStack stack) {
-    if (stack == null)
-      throw new NullPointerException("null stack"); 
-    if (stack.getItem() != this.item)
-      throw new IllegalArgumentException("The stack " + stack + " doesn't match " + this.item + " (" + this + ")"); 
-    ITeBlock type = TeBlockRegistry.get(this.item.identifier, stack.getMetadata());
-    if (type == null)
-      throw new IllegalArgumentException("The stack " + stack + " doesn't reference any valid subtype"); 
-    return type.getName();
-  }
-  
-  public boolean isFullCube(IBlockState state) {
-    return false;
-  }
-  
-  public boolean isOpaqueCube(IBlockState state) {
-    return !((Boolean)state.getValue(transparentProperty)).booleanValue();
-  }
-  
-  public boolean canReplace(World world, BlockPos pos, EnumFacing side, ItemStack stack) {
-    if (StackUtil.isEmpty(stack))
-      return true; 
-    if (stack.getItem() != this.item)
-      return false; 
-    ITeBlock type = TeBlockRegistry.get(this.item.identifier, stack.getMetadata());
-    if (type == null)
-      return false; 
-    TeBlock.ITePlaceHandler handler = type.getPlaceHandler();
-    return (handler == null || handler.canReplace(world, pos, side, stack));
-  }
-  
-  public boolean addLandingEffects(IBlockState state, WorldServer world, BlockPos pos, IBlockState state2, EntityLivingBase entity, int numberOfParticles) {
-    if (world.isRemote)
-      throw new IllegalStateException(); 
-    TileEntityBlock te = getTe((IBlockAccess)world, pos);
-    if (te == null)
-      return super.addLandingEffects(state, world, pos, state2, entity, numberOfParticles); 
-    if (te.clientNeedsExtraModelInfo()) {
-      ((NetworkManager)IC2.network.get(true)).initiateTeblockLandEffect((World)world, pos, entity.posX, entity.posY, entity.posZ, numberOfParticles, te.teBlock);
-    } else {
-      ((NetworkManager)IC2.network.get(true)).initiateTeblockLandEffect((World)world, entity.posX, entity.posY, entity.posZ, numberOfParticles, te.teBlock);
-    } 
-    return true;
-  }
-  
-  public boolean addRunningEffects(IBlockState state, World world, BlockPos pos, Entity entity) {
-    if (world.isRemote)
-      return true; 
-    TileEntityBlock te = getTe((IBlockAccess)world, pos);
-    if (te == null)
-      return super.addRunningEffects(state, world, pos, entity); 
-    if (te.clientNeedsExtraModelInfo()) {
-      ((NetworkManager)IC2.network.get(true)).initiateTeblockRunEffect(world, pos, entity, te.teBlock);
-    } else {
-      ((NetworkManager)IC2.network.get(true)).initiateTeblockRunEffect(world, entity, te.teBlock);
-    } 
-    return true;
-  }
-  
-  @SideOnly(Side.CLIENT)
-  public boolean addHitEffects(IBlockState state, World world, RayTraceResult target, ParticleManager manager) {
-    BlockPos pos = target.getBlockPos();
-    TileEntityBlock te = getTe((IBlockAccess)world, pos);
-    if (te == null)
-      return super.addHitEffects(state, world, target, manager); 
-    ParticleUtil.spawnBlockHitParticles(te, target.sideHit, te.clientNeedsExtraModelInfo());
-    return true;
-  }
-  
-  @SideOnly(Side.CLIENT)
-  public boolean addDestroyEffects(World world, BlockPos pos, ParticleManager manager) {
-    TileEntityBlock te = getTe((IBlockAccess)world, pos);
-    if (te != null && te.clientNeedsExtraModelInfo()) {
-      ParticleUtil.spawnBlockBreakParticles(te);
-      return true;
-    } 
-    return super.addDestroyEffects(world, pos, manager);
-  }
-  
-  public Material getMaterial(IBlockState state) {
-    return ((MaterialProperty.WrappedMaterial)state.getValue((IProperty)this.materialProperty)).getMaterial();
-  }
-  
-  public boolean causesSuffocation(IBlockState state) {
-    return (getMaterial(state).blocksMovement() && getDefaultState().isFullCube());
-  }
-  
-  public boolean isPassable(IBlockAccess world, BlockPos pos) {
-    return !getMaterial(world.getBlockState(pos)).blocksMovement();
-  }
-  
-  public boolean canSpawnInBlock() {
-    return super.canSpawnInBlock();
-  }
-  
-  public EnumPushReaction getMobilityFlag(IBlockState state) {
-    return getMaterial(state).getMobilityFlag();
-  }
-  
-  public boolean isTranslucent(IBlockState state) {
-    return !getMaterial(state).blocksLight();
-  }
-  
-  public MapColor getMapColor(IBlockState state, IBlockAccess world, BlockPos pos) {
-    return getMaterial(state).getMaterialMapColor();
-  }
-  
-  public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
-    TileEntityBlock te = getTe(world, pos);
-    if (te == null)
-      return state; 
-    return (IBlockState)te.getExtendedState((Ic2BlockState.Ic2BlockStateInstance)state);
-  }
-  
-  public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
-    TileEntityBlock te = getTe((IBlockAccess)world, pos);
-    if (te == null)
-      return; 
-    te.onPlaced(stack, placer, EnumFacing.UP);
-  }
-  
-  public RayTraceResult collisionRayTrace(IBlockState state, World world, BlockPos pos, Vec3d start, Vec3d end) {
-    TileEntityBlock te = getTe((IBlockAccess)world, pos);
-    if (te == null)
-      return super.collisionRayTrace(state, world, pos, start, end); 
-    return te.collisionRayTrace(start, end);
-  }
-  
-  public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
-    TileEntityBlock te = getTe(world, pos);
-    if (te == null)
-      return super.getBoundingBox(state, world, pos); 
-    return te.getVisualBoundingBox();
-  }
-  
-  public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World world, BlockPos pos) {
-    TileEntityBlock te = getTe((IBlockAccess)world, pos);
-    if (te == null)
-      return super.getSelectedBoundingBox(state, world, pos); 
-    return te.getOutlineBoundingBox().offset(pos);
-  }
-  
-  public AxisAlignedBB getCollisionBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
-    TileEntityBlock te = getTe(world, pos);
-    if (te == null)
-      return super.getCollisionBoundingBox(state, world, pos); 
-    return te.getPhysicsBoundingBox();
-  }
-  
-  public void addCollisionBoxToList(IBlockState state, World world, BlockPos pos, AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity, boolean isActualState) {
-    TileEntityBlock te = getTe((IBlockAccess)world, pos);
-    if (te == null) {
-      super.addCollisionBoxToList(state, world, pos, mask, list, collidingEntity, isActualState);
-    } else {
-      te.addCollisionBoxesToList(mask, list, collidingEntity);
-    } 
-  }
-  
-  public void onEntityCollidedWithBlock(World world, BlockPos pos, IBlockState state, Entity entity) {
-    TileEntityBlock te = getTe((IBlockAccess)world, pos);
-    if (te == null)
-      return; 
-    te.onEntityCollision(entity);
-  }
-  
-  @SideOnly(Side.CLIENT)
-  public boolean shouldSideBeRendered(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
-    TileEntityBlock te = getTe(world, pos);
-    if (te == null)
-      return super.shouldSideBeRendered(state, world, pos, side); 
-    return te.shouldSideBeRendered(side, pos.offset(side));
-  }
-  
-  public boolean doesSideBlockRendering(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing face) {
-    TileEntityBlock te = getTe(world, pos);
-    if (te == null)
-      return false; 
-    return te.doesSideBlockRendering(face);
-  }
-  
-  public boolean isNormalCube(IBlockState state, IBlockAccess world, BlockPos pos) {
-    TileEntityBlock te = getTe(world, pos);
-    if (te == null)
-      return false; 
-    return te.isNormalCube();
-  }
-  
-  public boolean isSideSolid(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
-    TileEntityBlock te = getTe(world, pos);
-    if (te == null)
-      return false; 
-    return te.isSideSolid(side);
-  }
-  
-  public BlockFaceShape getBlockFaceShape(IBlockAccess world, IBlockState state, BlockPos pos, EnumFacing face) {
-    TileEntityBlock te = getTe(world, pos);
-    if (te == null)
-      return super.getBlockFaceShape(world, state, pos, face); 
-    return te.getFaceShape(face);
-  }
-  
-  public int getLightOpacity(IBlockState state, IBlockAccess world, BlockPos pos) {
-    TileEntityBlock te = getTe(world, pos);
-    if (te == null)
-      return getLightOpacity(state); 
-    return te.getLightOpacity();
-  }
-  
-  public int getLightValue(IBlockState state, IBlockAccess world, BlockPos pos) {
-    TileEntityBlock te = getTe(world, pos);
-    if (te == null)
-      return 0; 
-    return te.getLightValue();
-  }
-  
-  public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-    if (player.isSneaking())
-      return false; 
-    TileEntityBlock te = getTe((IBlockAccess)world, pos);
-    if (te == null)
-      return false; 
-    return te.onActivated(player, hand, side, hitX, hitY, hitZ);
-  }
-  
-  public void onBlockClicked(World world, BlockPos pos, EntityPlayer player) {
-    TileEntityBlock te = getTe((IBlockAccess)world, pos);
-    if (te == null)
-      return; 
-    te.onClicked(player);
-  }
-  
-  public void neighborChanged(IBlockState state, World world, BlockPos pos, Block neighborBlock, BlockPos neighborPos) {
-    TileEntityBlock te = getTe((IBlockAccess)world, pos);
-    if (te == null)
-      return; 
-    te.onNeighborChange(neighborBlock, neighborPos);
-  }
-  
-  public int getWeakPower(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
-    TileEntityBlock te = getTe(world, pos);
-    if (te == null)
-      return 0; 
-    return te.getWeakPower(side);
-  }
-  
-  public boolean canConnectRedstone(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
-    TileEntityBlock te = getTe(world, pos);
-    if (te == null)
-      return false; 
-    return te.canConnectRedstone(side);
-  }
-  
-  public boolean hasComparatorInputOverride(IBlockState state) {
-    return true;
-  }
-  
-  public int getComparatorInputOverride(IBlockState state, World world, BlockPos pos) {
-    TileEntityBlock te = getTe((IBlockAccess)world, pos);
-    if (te == null)
-      return 0; 
-    return te.getComparatorInputOverride();
-  }
-  
-  public boolean recolorBlock(World world, BlockPos pos, EnumFacing side, EnumDyeColor color) {
-    TileEntityBlock te = getTe((IBlockAccess)world, pos);
-    if (te == null)
-      return false; 
-    return te.recolor(side, color);
-  }
-  
-  public void onBlockExploded(World world, BlockPos pos, Explosion explosion) {
-    TileEntityBlock te = getTe((IBlockAccess)world, pos);
-    if (te != null)
-      te.onExploded(explosion); 
-    super.onBlockExploded(world, pos, explosion);
-  }
-  
-  public void breakBlock(World world, BlockPos pos, IBlockState state) {
-    TileEntityBlock te = getTe((IBlockAccess)world, pos);
-    if (te != null)
-      te.onBlockBreak(); 
-    super.breakBlock(world, pos, state);
-  }
-  
-  public boolean removedByPlayer(IBlockState state, World world, BlockPos pos, EntityPlayer player, boolean willHarvest) {
-    TileEntityBlock te = getTe((IBlockAccess)world, pos);
-    if (te != null) {
-      if (!te.onRemovedByPlayer(player, willHarvest))
-        return false; 
-      if (willHarvest && !world.isRemote) {
-        removedTes[nextRemovedTeIndex] = new WeakReference<>(te);
-        nextRemovedTeIndex = (nextRemovedTeIndex + 1) % 4;
-      } 
-    } 
-    return super.removedByPlayer(state, world, pos, player, willHarvest);
-  }
-  
-  public boolean isFlammable(IBlockAccess world, BlockPos pos, EnumFacing face) {
-    TileEntityBlock tile = getTe(world, pos);
-    if (tile == null)
-      return false; 
-    return tile.isFlammable(face);
-  }
-  
-  public float getPlayerRelativeBlockHardness(IBlockState state, EntityPlayer player, World world, BlockPos pos) {
-    float ret = super.getPlayerRelativeBlockHardness(state, player, world, pos);
-    if (!player.canHarvestBlock(state)) {
-      TileEntityBlock te = getTe((IBlockAccess)world, pos);
-      if (te != null && te.teBlock.getHarvestTool() == TeBlock.HarvestTool.None)
-        ret *= 3.3333333F; 
-    } 
-    return ret;
-  }
-  
-  public boolean canHarvestBlock(IBlockAccess world, BlockPos pos, EntityPlayer player) {
-    ItemStack stack;
-    boolean ret = super.canHarvestBlock(world, pos, player);
-    if (ret)
-      return ret; 
-    TileEntityBlock te = getTe(world, pos);
-    if (te == null)
-      return false; 
-    switch (te.teBlock.getHarvestTool()) {
-      case None:
-        return true;
-      case Wrench:
-        stack = player.getHeldItemMainhand();
-        if (!stack.isEmpty()) {
-          String tool = TeBlock.HarvestTool.Pickaxe.toolClass;
-          return (stack.getItem().getHarvestLevel(stack, tool, player, world.getBlockState(pos)) >= TeBlock.HarvestTool.Pickaxe.level);
-        } 
-        break;
-    } 
-    return false;
-  }
-  
-  public String getHarvestTool(IBlockState state) {
-    if (state.getBlock() != this)
-      return null; 
-    return (((MetaTeBlock)state.getValue(this.typeProperty)).teBlock.getHarvestTool()).toolClass;
-  }
-  
-  public int getHarvestLevel(IBlockState state) {
-    if (state.getBlock() != this)
-      return 0; 
-    return (((MetaTeBlock)state.getValue(this.typeProperty)).teBlock.getHarvestTool()).level;
-  }
-  
-  public void getDrops(NonNullList<ItemStack> list, IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
-    list.addAll(getDrops(world, pos, state, fortune));
-  }
-  
-  public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
-    int i;
-    TileEntityBlock te = getTe(world, pos);
-    if (te == null) {
-      World realWorld = Util.getWorld(world);
-      if ((realWorld != null && realWorld.isRemote) || (realWorld == null && 
-        !IC2.platform.isSimulating()))
-        return new ArrayList<>(); 
-      i = nextRemovedTeIndex;
-      do {
-        int checkIdx = (i + 4 - 1) % 4;
-        WeakReference<TileEntityBlock> ref = removedTes[checkIdx];
-        TileEntityBlock cTe;
-        if (ref != null && (
-          cTe = ref.get()) != null && (realWorld == null || cTe
-          .getWorld() == realWorld) && cTe
-          .getPos().equals(pos)) {
-          te = cTe;
-          removedTes[checkIdx] = null;
-          break;
-        } 
-        i = checkIdx;
-      } while (i != nextRemovedTeIndex);
-      if (te == null)
-        return new ArrayList<>(); 
-    } 
-    List<ItemStack> ret = new ArrayList<>();
-    boolean wasWrench = ConfigUtil.getBool(MainConfig.get(), "balance/ignoreWrenchRequirement");
-    if (!wasWrench) {
-      EntityPlayer player = this.harvesters.get();
-      if (player != null) {
-        ItemStack stack = player.getHeldItemMainhand();
-        if (!stack.isEmpty()) {
-          String tool = TeBlock.HarvestTool.Wrench.toolClass;
-          i = wasWrench | ((stack.getItem().getHarvestLevel(stack, tool, player, state) >= TeBlock.HarvestTool.Wrench.level) ? 1 : 0);
-        } 
-      } 
-    } 
-    ret.addAll(te.getSelfDrops(fortune, i));
-    ret.addAll(te.getAuxDrops(fortune));
-    return ret;
-  }
-  
-  public float getBlockHardness(IBlockState state, World world, BlockPos pos) {
-    TileEntityBlock te = getTe((IBlockAccess)world, pos);
-    if (te == null)
-      return 5.0F; 
-    return te.getHardness();
-  }
-  
-  public float getExplosionResistance(World world, BlockPos pos, Entity exploder, Explosion explosion) {
-    TileEntityBlock te = getTe((IBlockAccess)world, pos);
-    if (te == null)
-      return 10.0F; 
-    return te.getExplosionResistance(exploder, explosion);
-  }
-  
-  public boolean canEntityDestroy(IBlockState state, IBlockAccess world, BlockPos pos, Entity entity) {
-    TileEntityBlock te = getTe(world, pos);
-    if (te == null)
-      return true; 
-    return te.canEntityDestroy(entity);
-  }
-  
-  public EnumFacing getFacing(World world, BlockPos pos) {
-    TileEntityBlock te = getTe((IBlockAccess)world, pos);
-    if (te == null)
-      return EnumFacing.DOWN; 
-    return te.getFacing();
-  }
-  
-  public boolean canSetFacing(World world, BlockPos pos, EnumFacing newDirection, EntityPlayer player) {
-    TileEntityBlock te = getTe((IBlockAccess)world, pos);
-    if (te == null)
-      return false; 
-    return te.canSetFacingWrench(newDirection, player);
-  }
-  
-  public boolean setFacing(World world, BlockPos pos, EnumFacing newDirection, EntityPlayer player) {
-    TileEntityBlock te = getTe((IBlockAccess)world, pos);
-    if (te == null)
-      return false; 
-    return te.setFacingWrench(newDirection, player);
-  }
-  
-  public boolean wrenchCanRemove(World world, BlockPos pos, EntityPlayer player) {
-    TileEntityBlock te = getTe((IBlockAccess)world, pos);
-    if (te == null)
-      return false; 
-    return te.wrenchCanRemove(player);
-  }
-  
-  public List<ItemStack> getWrenchDrops(World world, BlockPos pos, IBlockState state, TileEntity te, EntityPlayer player, int fortune) {
-    if (!(te instanceof TileEntityBlock))
-      return Collections.emptyList(); 
-    return ((TileEntityBlock)te).getWrenchDrops(player, fortune);
-  }
-  
-  public EnumPlantType getPlantType(IBlockAccess world, BlockPos pos) {
-    TileEntityBlock te = getTe(world, pos);
-    if (te == null)
-      return TileEntityBlock.noCrop; 
-    return te.getPlantType();
-  }
-  
-  public SoundType getSoundType(IBlockState state, World world, BlockPos pos, Entity entity) {
-    TileEntityBlock te = getTe((IBlockAccess)world, pos);
-    if (te == null)
-      return super.getSoundType(state, world, pos, entity); 
-    return te.getBlockSound(entity);
-  }
-  
-  private static TileEntityBlock getTe(IBlockAccess world, BlockPos pos) {
-    TileEntity te = world.getTileEntity(pos);
-    if (te instanceof TileEntityBlock)
-      return (TileEntityBlock)te; 
-    return null;
-  }
-  
-  public IBlockState getPlant(IBlockAccess world, BlockPos pos) {
-    return world.getBlockState(pos);
-  }
-  
-  public boolean rotateBlock(World world, BlockPos pos, EnumFacing axis) {
-    TileEntityBlock te = getTe((IBlockAccess)world, pos);
-    if (te != null) {
-      EnumFacing target = te.getFacing().rotateAround(axis.getAxis());
-      if (te.getSupportedFacings().contains(target) && te.getFacing() != target) {
-        te.setFacing(target);
-        return true;
-      } 
-    } 
-    return false;
-  }
-  
-  public EnumFacing[] getValidRotations(World world, BlockPos pos) {
-    TileEntityBlock te = getTe((IBlockAccess)world, pos);
-    if (te == null)
-      return null; 
-    Set<EnumFacing> facings = te.getSupportedFacings();
-    return !facings.isEmpty() ? facings.<EnumFacing>toArray(new EnumFacing[facings.size()]) : null;
-  }
-  
-  public boolean isIC2() {
-    return (this.item.identifier == TeBlock.invalid.getIdentifier());
-  }
-  
-  public ItemBlockTileEntity getItem() {
-    return this.item;
-  }
-  
-  public final IProperty<MetaTeBlock> getTypeProperty() {
-    IProperty<MetaTeBlock> ret = (this.typeProperty != null) ? this.typeProperty : currentTypeProperty.get();
-    assert ret != null : "The type property can't be obtained.";
-    return ret;
-  }
-  
-  public final MaterialProperty getMaterialProperty() {
-    MaterialProperty ret = (this.materialProperty != null) ? this.materialProperty : currentMaterialProperty.get();
-    assert ret != null : "The matieral property can't be obtained.";
-    return ret;
-  }
-  
-  public static final IProperty<EnumFacing> facingProperty = (IProperty<EnumFacing>)PropertyDirection.create("facing");
-  
-  private static final ThreadLocal<IProperty<MetaTeBlock>> currentTypeProperty = new UnstartingThreadLocal<>();
-  
-  private static final ThreadLocal<MaterialProperty> currentMaterialProperty = new UnstartingThreadLocal<>();
-  
-  public static final IProperty<Boolean> transparentProperty = (IProperty<Boolean>)new SkippedBooleanProperty("transparent");
-  
-  private final ItemBlockTileEntity item;
-  
-  private static final int removedTesToKeep = 4;
-  
-  private static final WeakReference<TileEntityBlock>[] removedTes = (WeakReference<TileEntityBlock>[])new WeakReference[4];
-  
-  private static int nextRemovedTeIndex;
+        }
+        final TileEntityBlock te = getTe(world, pos);
+        if (te == null) {
+            return false;
+        }
+        switch (te.teBlock.getHarvestTool()) {
+            case None: {
+                return true;
+            }
+            case Wrench: {
+                final ItemStack stack = player.getHeldItemMainhand();
+                if (!stack.isEmpty()) {
+                    final String tool = TeBlock.HarvestTool.Pickaxe.toolClass;
+                    return stack.getItem().getHarvestLevel(stack, tool, player, world.getBlockState(pos)) >= TeBlock.HarvestTool.Pickaxe.level;
+                }
+                break;
+            }
+        }
+        return false;
+    }
+    
+    public String getHarvestTool(final IBlockState state) {
+        if (state.getBlock() != this) {
+            return null;
+        }
+        return ((MetaTeBlock)state.getValue((IProperty)this.typeProperty)).teBlock.getHarvestTool().toolClass;
+    }
+    
+    public int getHarvestLevel(final IBlockState state) {
+        if (state.getBlock() != this) {
+            return 0;
+        }
+        return ((MetaTeBlock)state.getValue((IProperty)this.typeProperty)).teBlock.getHarvestTool().level;
+    }
+    
+    public void getDrops(final NonNullList<ItemStack> list, final IBlockAccess world, final BlockPos pos, final IBlockState state, final int fortune) {
+        list.addAll((Collection)this.getDrops(world, pos, state, fortune));
+    }
+    
+    public List<ItemStack> getDrops(final IBlockAccess world, final BlockPos pos, final IBlockState state, final int fortune) {
+        TileEntityBlock te = getTe(world, pos);
+        if (te == null) {
+            final World realWorld = Util.getWorld(world);
+            if ((realWorld != null && realWorld.isRemote) || (realWorld == null && !IC2.platform.isSimulating())) {
+                return new ArrayList<ItemStack>();
+            }
+            int idx = BlockTileEntity.nextRemovedTeIndex;
+            do {
+                final int checkIdx = (idx + 4 - 1) % 4;
+                final WeakReference<TileEntityBlock> ref = BlockTileEntity.removedTes[checkIdx];
+                final TileEntityBlock cTe;
+                if (ref != null && (cTe = ref.get()) != null && (realWorld == null || cTe.getWorld() == realWorld) && cTe.getPos().equals((Object)pos)) {
+                    te = cTe;
+                    BlockTileEntity.removedTes[checkIdx] = null;
+                    break;
+                }
+                idx = checkIdx;
+            } while (idx != BlockTileEntity.nextRemovedTeIndex);
+            if (te == null) {
+                return new ArrayList<ItemStack>();
+            }
+        }
+        final List<ItemStack> ret = new ArrayList<ItemStack>();
+        boolean wasWrench = ConfigUtil.getBool(MainConfig.get(), "balance/ignoreWrenchRequirement");
+        if (!wasWrench) {
+            final EntityPlayer player = this.harvesters.get();
+            if (player != null) {
+                final ItemStack stack = player.getHeldItemMainhand();
+                if (!stack.isEmpty()) {
+                    final String tool = TeBlock.HarvestTool.Wrench.toolClass;
+                    wasWrench |= (stack.getItem().getHarvestLevel(stack, tool, player, state) >= TeBlock.HarvestTool.Wrench.level);
+                }
+            }
+        }
+        ret.addAll(te.getSelfDrops(fortune, wasWrench));
+        ret.addAll(te.getAuxDrops(fortune));
+        return ret;
+    }
+    
+    public float getBlockHardness(final IBlockState state, final World world, final BlockPos pos) {
+        final TileEntityBlock te = getTe((IBlockAccess)world, pos);
+        if (te == null) {
+            return 5.0f;
+        }
+        return te.getHardness();
+    }
+    
+    public float getExplosionResistance(final World world, final BlockPos pos, final Entity exploder, final Explosion explosion) {
+        final TileEntityBlock te = getTe((IBlockAccess)world, pos);
+        if (te == null) {
+            return 10.0f;
+        }
+        return te.getExplosionResistance(exploder, explosion);
+    }
+    
+    public boolean canEntityDestroy(final IBlockState state, final IBlockAccess world, final BlockPos pos, final Entity entity) {
+        final TileEntityBlock te = getTe(world, pos);
+        return te == null || te.canEntityDestroy(entity);
+    }
+    
+    @Override
+    public EnumFacing getFacing(final World world, final BlockPos pos) {
+        final TileEntityBlock te = getTe((IBlockAccess)world, pos);
+        if (te == null) {
+            return EnumFacing.DOWN;
+        }
+        return te.getFacing();
+    }
+    
+    @Override
+    public boolean canSetFacing(final World world, final BlockPos pos, final EnumFacing newDirection, final EntityPlayer player) {
+        final TileEntityBlock te = getTe((IBlockAccess)world, pos);
+        return te != null && te.canSetFacingWrench(newDirection, player);
+    }
+    
+    @Override
+    public boolean setFacing(final World world, final BlockPos pos, final EnumFacing newDirection, final EntityPlayer player) {
+        final TileEntityBlock te = getTe((IBlockAccess)world, pos);
+        return te != null && te.setFacingWrench(newDirection, player);
+    }
+    
+    @Override
+    public boolean wrenchCanRemove(final World world, final BlockPos pos, final EntityPlayer player) {
+        final TileEntityBlock te = getTe((IBlockAccess)world, pos);
+        return te != null && te.wrenchCanRemove(player);
+    }
+    
+    @Override
+    public List<ItemStack> getWrenchDrops(final World world, final BlockPos pos, final IBlockState state, final TileEntity te, final EntityPlayer player, final int fortune) {
+        if (!(te instanceof TileEntityBlock)) {
+            return Collections.emptyList();
+        }
+        return ((TileEntityBlock)te).getWrenchDrops(player, fortune);
+    }
+    
+    public EnumPlantType getPlantType(final IBlockAccess world, final BlockPos pos) {
+        final TileEntityBlock te = getTe(world, pos);
+        if (te == null) {
+            return TileEntityBlock.noCrop;
+        }
+        return te.getPlantType();
+    }
+    
+    public SoundType getSoundType(final IBlockState state, final World world, final BlockPos pos, final Entity entity) {
+        final TileEntityBlock te = getTe((IBlockAccess)world, pos);
+        if (te == null) {
+            return super.getSoundType(state, world, pos, entity);
+        }
+        return te.getBlockSound(entity);
+    }
+    
+    private static TileEntityBlock getTe(final IBlockAccess world, final BlockPos pos) {
+        final TileEntity te = world.getTileEntity(pos);
+        if (te instanceof TileEntityBlock) {
+            return (TileEntityBlock)te;
+        }
+        return null;
+    }
+    
+    public IBlockState getPlant(final IBlockAccess world, final BlockPos pos) {
+        return world.getBlockState(pos);
+    }
+    
+    public boolean rotateBlock(final World world, final BlockPos pos, final EnumFacing axis) {
+        final TileEntityBlock te = getTe((IBlockAccess)world, pos);
+        if (te != null) {
+            final EnumFacing target = te.getFacing().rotateAround(axis.getAxis());
+            if (te.getSupportedFacings().contains(target) && te.getFacing() != target) {
+                te.setFacing(target);
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public EnumFacing[] getValidRotations(final World world, final BlockPos pos) {
+        final TileEntityBlock te = getTe((IBlockAccess)world, pos);
+        if (te == null) {
+            return null;
+        }
+        final Set<EnumFacing> facings = te.getSupportedFacings();
+        return (EnumFacing[])(facings.isEmpty() ? null : ((EnumFacing[])facings.toArray(new EnumFacing[facings.size()])));
+    }
+    
+    public boolean isIC2() {
+        return this.item.identifier == TeBlock.invalid.getIdentifier();
+    }
+    
+    public ItemBlockTileEntity getItem() {
+        return this.item;
+    }
+    
+    public final IProperty<MetaTeBlock> getTypeProperty() {
+        final IProperty<MetaTeBlock> ret = (IProperty<MetaTeBlock>)((this.typeProperty != null) ? this.typeProperty : ((IProperty)BlockTileEntity.currentTypeProperty.get()));
+        assert ret != null : "The type property can't be obtained.";
+        return ret;
+    }
+    
+    public final MaterialProperty getMaterialProperty() {
+        final MaterialProperty ret = (this.materialProperty != null) ? this.materialProperty : BlockTileEntity.currentMaterialProperty.get();
+        assert ret != null : "The matieral property can't be obtained.";
+        return ret;
+    }
+    
+    static {
+        facingProperty = (IProperty)PropertyDirection.create("facing");
+        currentTypeProperty = new UnstartingThreadLocal<IProperty<MetaTeBlock>>();
+        currentMaterialProperty = new UnstartingThreadLocal<MaterialProperty>();
+        transparentProperty = (IProperty)new SkippedBooleanProperty("transparent");
+        removedTes = new WeakReference[4];
+    }
 }

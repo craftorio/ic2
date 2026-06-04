@@ -1,23 +1,35 @@
+// 
+// Decompiled by Procyon v0.6.0
+// 
+
 package ic2.core.block.reactor.tileentity;
 
+import ic2.core.block.TileEntityBlock;
 import ic2.core.block.comp.Redstone;
-import ic2.core.block.comp.TileEntityComponent;
 import ic2.core.profile.NotClassic;
 
 @NotClassic
-public class TileEntityReactorRedstonePort extends TileEntityReactorVessel {
-  public final Redstone redstone = (Redstone)addComponent((TileEntityComponent)new Redstone(this));
-  
-  protected void onLoaded() {
-    super.onLoaded();
-    updateRedstoneLink();
-  }
-  
-  private void updateRedstoneLink() {
-    if ((getWorld()).isRemote)
-      return; 
-    TileEntityNuclearReactorElectric reactor = this.lookup.getReactor();
-    if (reactor != null)
-      this.redstone.linkTo(reactor.redstone); 
-  }
+public class TileEntityReactorRedstonePort extends TileEntityReactorVessel
+{
+    public final Redstone redstone;
+    
+    public TileEntityReactorRedstonePort() {
+        this.redstone = this.addComponent(new Redstone(this));
+    }
+    
+    @Override
+    protected void onLoaded() {
+        super.onLoaded();
+        this.updateRedstoneLink();
+    }
+    
+    private void updateRedstoneLink() {
+        if (this.getWorld().isRemote) {
+            return;
+        }
+        final TileEntityNuclearReactorElectric reactor = this.lookup.getReactor();
+        if (reactor != null) {
+            this.redstone.linkTo(reactor.redstone);
+        }
+    }
 }

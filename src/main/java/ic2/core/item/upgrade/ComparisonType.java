@@ -1,35 +1,42 @@
+// 
+// Decompiled by Procyon v0.6.0
+// 
+
 package ic2.core.item.upgrade;
 
 import java.util.Locale;
 
-public enum ComparisonType {
-  IGNORED, DIRECT, COMPARISON, RANGE;
-  
-  public static final ComparisonType[] VALUES;
-  
-  final String name;
-  
-  ComparisonType() {
-    this.name = "ic2.upgrade.advancedGUI." + name().toLowerCase(Locale.ENGLISH);
-  }
-  
-  public boolean enabled() {
-    return (this != IGNORED);
-  }
-  
-  public boolean ignoreFilters() {
-    return (this == IGNORED || this == DIRECT);
-  }
-  
-  public byte getForNBT() {
-    return (byte)ordinal();
-  }
-  
-  public static ComparisonType getFromNBT(byte type) {
-    return VALUES[type];
-  }
-  
-  static {
-    VALUES = values();
-  }
+public enum ComparisonType
+{
+    IGNORED, 
+    DIRECT, 
+    COMPARISON, 
+    RANGE;
+    
+    final String name;
+    public static final ComparisonType[] VALUES;
+    
+    private ComparisonType() {
+        this.name = "ic2.upgrade.advancedGUI." + this.name().toLowerCase(Locale.ENGLISH);
+    }
+    
+    public boolean enabled() {
+        return this != ComparisonType.IGNORED;
+    }
+    
+    public boolean ignoreFilters() {
+        return this == ComparisonType.IGNORED || this == ComparisonType.DIRECT;
+    }
+    
+    public byte getForNBT() {
+        return (byte)this.ordinal();
+    }
+    
+    public static ComparisonType getFromNBT(final byte type) {
+        return ComparisonType.VALUES[type];
+    }
+    
+    static {
+        VALUES = values();
+    }
 }

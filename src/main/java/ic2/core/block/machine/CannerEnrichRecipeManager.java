@@ -1,94 +1,123 @@
+// 
+// Decompiled by Procyon v0.6.0
+// 
+
 package ic2.core.block.machine;
 
-import ic2.api.recipe.ICannerEnrichRecipeManager;
-import ic2.api.recipe.IRecipeInput;
-import ic2.api.recipe.MachineRecipe;
-import ic2.api.recipe.MachineRecipeResult;
 import ic2.api.recipe.RecipeOutput;
-import ic2.core.util.LiquidUtil;
 import ic2.core.util.StackUtil;
-import java.util.ArrayList;
-import java.util.List;
+import ic2.api.recipe.MachineRecipeResult;
+import ic2.api.recipe.IRecipeInput;
+import java.util.Iterator;
 import net.minecraft.item.ItemStack;
+import ic2.core.util.LiquidUtil;
 import net.minecraft.nbt.NBTTagCompound;
+import java.util.ArrayList;
 import net.minecraftforge.fluids.FluidStack;
+import ic2.api.recipe.MachineRecipe;
+import java.util.List;
+import ic2.api.recipe.ICannerEnrichRecipeManager;
 
-public class CannerEnrichRecipeManager implements ICannerEnrichRecipeManager {
-  public boolean addRecipe(ICannerEnrichRecipeManager.Input input, FluidStack output, NBTTagCompound metadata, boolean replace) {
-    if (input.fluid == null)
-      throw new NullPointerException("The fluid recipe input is null."); 
-    if (input.additive == null)
-      throw new NullPointerException("The additive recipe input is null."); 
-    if (output == null)
-      throw new NullPointerException("The recipe output is null."); 
-    if (!LiquidUtil.check(input.fluid))
-      throw new IllegalArgumentException("The fluid recipe input is invalid."); 
-    if (!LiquidUtil.check(output))
-      throw new IllegalArgumentException("The fluid recipe output is invalid."); 
-    for (ItemStack stack : input.additive.getInputs()) {
-      MachineRecipe<ICannerEnrichRecipeManager.Input, FluidStack> recipe = getRecipe(input.fluid, stack, true);
-      if (recipe != null) {
-        if (!replace)
-          return false; 
-        this.recipes.remove(recipe);
-      } 
-    } 
-    this.recipes.add(new MachineRecipe(input, output));
-    return true;
-  }
-  
-  public void addRecipe(FluidStack fluid, IRecipeInput additive, FluidStack output) {
-    if (!addRecipe(new ICannerEnrichRecipeManager.Input(fluid, additive), output, (NBTTagCompound)null, false))
-      throw new RuntimeException("ambiguous recipe: [" + fluid + "+" + additive.getInputs() + " -> " + output + "]"); 
-  }
-  
-  public MachineRecipeResult<ICannerEnrichRecipeManager.Input, FluidStack, ICannerEnrichRecipeManager.RawInput> apply(ICannerEnrichRecipeManager.RawInput input, boolean acceptTest) {
-    FluidStack remainingFluid;
-    MachineRecipe<ICannerEnrichRecipeManager.Input, FluidStack> recipe = getRecipe(input.fluid, input.additive, acceptTest);
-    if (recipe == null)
-      return null; 
-    if (input.fluid == null) {
-      remainingFluid = null;
-    } else {
-      remainingFluid = input.fluid.copy();
-      remainingFluid.amount -= ((ICannerEnrichRecipeManager.Input)recipe.getInput()).fluid.amount;
-      if (remainingFluid.amount <= 0)
-        remainingFluid = null; 
-    } 
-    return recipe.getResult(new ICannerEnrichRecipeManager.RawInput(remainingFluid, StackUtil.copyShrunk(input.additive, ((ICannerEnrichRecipeManager.Input)recipe.getInput()).additive.getAmount())));
-  }
-  
-  private MachineRecipe<ICannerEnrichRecipeManager.Input, FluidStack> getRecipe(FluidStack fluid, ItemStack additive, boolean acceptTest) {
-    if (!acceptTest && (fluid == null || StackUtil.isEmpty(additive)))
-      return null; 
-    for (MachineRecipe<ICannerEnrichRecipeManager.Input, FluidStack> recipe : this.recipes) {
-      if ((fluid == null || (fluid.isFluidEqual(((ICannerEnrichRecipeManager.Input)recipe.getInput()).fluid) && (acceptTest || ((ICannerEnrichRecipeManager.Input)recipe.getInput()).fluid.amount <= fluid.amount))) && (additive == null || (((ICannerEnrichRecipeManager.Input)recipe
-        .getInput()).additive.matches(additive) && (acceptTest || ((ICannerEnrichRecipeManager.Input)recipe.getInput()).additive.getAmount() <= StackUtil.getSize(additive)))))
-        return recipe; 
-    } 
-    return null;
-  }
-  
-  public RecipeOutput getOutputFor(FluidStack fluid, ItemStack additive, boolean adjustInput, boolean acceptTest) {
-    MachineRecipeResult<ICannerEnrichRecipeManager.Input, FluidStack, ICannerEnrichRecipeManager.RawInput> result = apply(new ICannerEnrichRecipeManager.RawInput(fluid, additive), acceptTest);
-    if (result == null)
-      return null; 
-    if (adjustInput) {
-      fluid.amount = (((ICannerEnrichRecipeManager.RawInput)result.getAdjustedInput()).fluid == null) ? 0 : ((ICannerEnrichRecipeManager.RawInput)result.getAdjustedInput()).fluid.amount;
-      additive.setCount(StackUtil.isEmpty(((ICannerEnrichRecipeManager.RawInput)result.getAdjustedInput()).additive) ? 0 : StackUtil.getSize(((ICannerEnrichRecipeManager.RawInput)result.getAdjustedInput()).additive));
-    } 
-    NBTTagCompound output = new NBTTagCompound();
-    ((FluidStack)result.getOutput()).writeToNBT(output);
-    return new RecipeOutput(output, new ItemStack[0]);
-  }
-  
-  public Iterable<? extends MachineRecipe<ICannerEnrichRecipeManager.Input, FluidStack>> getRecipes() {
-    return this.recipes;
-  }
-  
-  public boolean isIterable() {
-    return true;
-  }
-  
-  private final List<MachineRecipe<ICannerEnrichRecipeManager.Input, FluidStack>> recipes = new ArrayList<>();
+public class CannerEnrichRecipeManager implements ICannerEnrichRecipeManager
+{
+    private final List<MachineRecipe<Input, FluidStack>> recipes;
+    
+    public CannerEnrichRecipeManager() {
+        this.recipes = new ArrayList<MachineRecipe<Input, FluidStack>>();
+    }
+    
+    @Override
+    public boolean addRecipe(final Input input, final FluidStack output, final NBTTagCompound metadata, final boolean replace) {
+        if (input.fluid == null) {
+            throw new NullPointerException("The fluid recipe input is null.");
+        }
+        if (input.additive == null) {
+            throw new NullPointerException("The additive recipe input is null.");
+        }
+        if (output == null) {
+            throw new NullPointerException("The recipe output is null.");
+        }
+        if (!LiquidUtil.check(input.fluid)) {
+            throw new IllegalArgumentException("The fluid recipe input is invalid.");
+        }
+        if (!LiquidUtil.check(output)) {
+            throw new IllegalArgumentException("The fluid recipe output is invalid.");
+        }
+        for (final ItemStack stack : input.additive.getInputs()) {
+            final MachineRecipe<Input, FluidStack> recipe = this.getRecipe(input.fluid, stack, true);
+            if (recipe != null) {
+                if (!replace) {
+                    return false;
+                }
+                this.recipes.remove(recipe);
+            }
+        }
+        this.recipes.add(new MachineRecipe<Input, FluidStack>(input, output));
+        return true;
+    }
+    
+    @Override
+    public void addRecipe(final FluidStack fluid, final IRecipeInput additive, final FluidStack output) {
+        if (!this.addRecipe(new Input(fluid, additive), output, (NBTTagCompound)null, false)) {
+            throw new RuntimeException("ambiguous recipe: [" + fluid + "+" + additive.getInputs() + " -> " + output + "]");
+        }
+    }
+    
+    @Override
+    public MachineRecipeResult<Input, FluidStack, RawInput> apply(final RawInput input, final boolean acceptTest) {
+        final MachineRecipe<Input, FluidStack> recipe = this.getRecipe(input.fluid, input.additive, acceptTest);
+        if (recipe == null) {
+            return null;
+        }
+        FluidStack remainingFluid;
+        if (input.fluid == null) {
+            remainingFluid = null;
+        }
+        else {
+            final FluidStack copy;
+            remainingFluid = (copy = input.fluid.copy());
+            copy.amount -= recipe.getInput().fluid.amount;
+            if (remainingFluid.amount <= 0) {
+                remainingFluid = null;
+            }
+        }
+        return recipe.getResult(new RawInput(remainingFluid, StackUtil.copyShrunk(input.additive, recipe.getInput().additive.getAmount())));
+    }
+    
+    private MachineRecipe<Input, FluidStack> getRecipe(final FluidStack fluid, final ItemStack additive, final boolean acceptTest) {
+        if (!acceptTest && (fluid == null || StackUtil.isEmpty(additive))) {
+            return null;
+        }
+        for (final MachineRecipe<Input, FluidStack> recipe : this.recipes) {
+            if ((fluid == null || (fluid.isFluidEqual(recipe.getInput().fluid) && (acceptTest || recipe.getInput().fluid.amount <= fluid.amount))) && (additive == null || (recipe.getInput().additive.matches(additive) && (acceptTest || recipe.getInput().additive.getAmount() <= StackUtil.getSize(additive))))) {
+                return recipe;
+            }
+        }
+        return null;
+    }
+    
+    @Override
+    public RecipeOutput getOutputFor(final FluidStack fluid, final ItemStack additive, final boolean adjustInput, final boolean acceptTest) {
+        final MachineRecipeResult<Input, FluidStack, RawInput> result = this.apply(new RawInput(fluid, additive), acceptTest);
+        if (result == null) {
+            return null;
+        }
+        if (adjustInput) {
+            fluid.amount = ((result.getAdjustedInput().fluid == null) ? 0 : result.getAdjustedInput().fluid.amount);
+            additive.setCount(StackUtil.isEmpty(result.getAdjustedInput().additive) ? 0 : StackUtil.getSize(result.getAdjustedInput().additive));
+        }
+        final NBTTagCompound output = new NBTTagCompound();
+        result.getOutput().writeToNBT(output);
+        return new RecipeOutput(output, new ItemStack[0]);
+    }
+    
+    @Override
+    public Iterable<? extends MachineRecipe<Input, FluidStack>> getRecipes() {
+        return this.recipes;
+    }
+    
+    @Override
+    public boolean isIterable() {
+        return true;
+    }
 }

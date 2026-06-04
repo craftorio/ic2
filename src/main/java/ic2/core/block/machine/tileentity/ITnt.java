@@ -1,18 +1,22 @@
+// 
+// Decompiled by Procyon v0.6.0
+// 
+
 package ic2.core.block.machine.tileentity;
 
-import ic2.core.block.EntityIC2Explosive;
 import ic2.core.block.EntityItnt;
+import ic2.core.block.EntityIC2Explosive;
 import net.minecraft.entity.EntityLivingBase;
 
 public class ITnt extends Explosive
 {
-	protected boolean explodeOnRemoval()
-	{
-		return true;
-	}
-
-	protected EntityIC2Explosive getEntity(EntityLivingBase igniter)
-	{
-		return new EntityItnt(getWorld(), this.pos.getX() + 0.5D, this.pos.getY() + 0.5D, this.pos.getZ() + 0.5D);
-	}
+    @Override
+    protected boolean explodeOnRemoval() {
+        return true;
+    }
+    
+    @Override
+    protected EntityIC2Explosive getEntity(final EntityLivingBase igniter) {
+        return new EntityItnt(this.getWorld(), this.pos.getX() + 0.5, this.pos.getY() + 0.5, this.pos.getZ() + 0.5);
+    }
 }

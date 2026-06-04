@@ -1,37 +1,41 @@
+// 
+// Decompiled by Procyon v0.6.0
+// 
+
 package ic2.api.energy;
 
-import ic2.api.energy.tile.IEnergyTile;
-
 import java.io.PrintStream;
-
+import ic2.api.info.ILocatable;
+import net.minecraft.tileentity.TileEntity;
+import ic2.api.energy.tile.IEnergyTile;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public interface IEnergyNet
 {
-	IEnergyTile getTile(World paramWorld, BlockPos paramBlockPos);
-
-	IEnergyTile getSubTile(World paramWorld, BlockPos paramBlockPos);
-
-	<T extends net.minecraft.tileentity.TileEntity & IEnergyTile> void addTile(T paramT);
-
-	<T extends ic2.api.info.ILocatable & IEnergyTile> void addTile(T paramT);
-
-	void removeTile(IEnergyTile paramIEnergyTile);
-
-	World getWorld(IEnergyTile paramIEnergyTile);
-
-	BlockPos getPos(IEnergyTile paramIEnergyTile);
-
-	NodeStats getNodeStats(IEnergyTile paramIEnergyTile);
-
-	boolean dumpDebugInfo(World paramWorld, BlockPos paramBlockPos, PrintStream paramPrintStream1, PrintStream paramPrintStream2);
-
-	double getPowerFromTier(int paramInt);
-
-	int getTierFromPower(double paramDouble);
-
-	void registerEventReceiver(IEnergyNetEventReceiver paramIEnergyNetEventReceiver);
-
-	void unregisterEventReceiver(IEnergyNetEventReceiver paramIEnergyNetEventReceiver);
+    IEnergyTile getTile(final World p0, final BlockPos p1);
+    
+    IEnergyTile getSubTile(final World p0, final BlockPos p1);
+    
+     <T extends TileEntity & IEnergyTile> void addTile(final T p0);
+    
+     <T extends ILocatable & IEnergyTile> void addTile(final T p0);
+    
+    void removeTile(final IEnergyTile p0);
+    
+    World getWorld(final IEnergyTile p0);
+    
+    BlockPos getPos(final IEnergyTile p0);
+    
+    NodeStats getNodeStats(final IEnergyTile p0);
+    
+    boolean dumpDebugInfo(final World p0, final BlockPos p1, final PrintStream p2, final PrintStream p3);
+    
+    double getPowerFromTier(final int p0);
+    
+    int getTierFromPower(final double p0);
+    
+    void registerEventReceiver(final IEnergyNetEventReceiver p0);
+    
+    void unregisterEventReceiver(final IEnergyNetEventReceiver p0);
 }

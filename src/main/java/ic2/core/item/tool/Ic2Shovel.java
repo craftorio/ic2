@@ -1,54 +1,59 @@
+// 
+// Decompiled by Procyon v0.6.0
+// 
+
 package ic2.core.item.tool;
 
-import ic2.core.IC2;
-import ic2.core.init.BlocksItems;
-import ic2.core.init.Localization;
-import ic2.core.item.ItemIC2;
-import ic2.core.ref.IItemModelProvider;
-import ic2.core.ref.ItemName;
 import ic2.core.util.Util;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemSpade;
+import ic2.core.init.Localization;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import ic2.core.item.ItemIC2;
+import ic2.core.init.BlocksItems;
+import net.minecraft.creativetab.CreativeTabs;
+import ic2.core.IC2;
+import ic2.core.ref.ItemName;
+import net.minecraft.item.Item;
+import ic2.core.ref.IItemModelProvider;
+import net.minecraft.item.ItemSpade;
 
-public class Ic2Shovel extends ItemSpade implements IItemModelProvider {
-  private final Object repairMaterial;
-  
-  public Ic2Shovel(Item.ToolMaterial material) {
-    super(material);
-    this.efficiency = 5.0F;
-    this.repairMaterial = "ingotBronze";
-    setUnlocalizedName(ItemName.bronze_shovel.name());
-    setCreativeTab((CreativeTabs)IC2.tabIC2);
-    BlocksItems.registerItem((Item)this, IC2.getIdentifier(ItemName.bronze_shovel.name()));
-    ItemName.bronze_shovel.setInstance((Item)this);
-  }
-  
-  @SideOnly(Side.CLIENT)
-  public void registerModels(ItemName name) {
-    ItemIC2.registerModel((Item)this, 0, name, null);
-  }
-  
-  public String getUnlocalizedName() {
-    return "ic2." + super.getUnlocalizedName().substring(5);
-  }
-  
-  public String getUnlocalizedName(ItemStack stack) {
-    return getUnlocalizedName();
-  }
-  
-  public String getUnlocalizedNameInefficiently(ItemStack stack) {
-    return getUnlocalizedName(stack);
-  }
-  
-  public String getItemStackDisplayName(ItemStack stack) {
-    return Localization.translate(getUnlocalizedName(stack));
-  }
-  
-  public boolean getIsRepairable(ItemStack stack1, ItemStack stack2) {
-    return (stack2 != null && Util.matchesOD(stack2, this.repairMaterial));
-  }
+public class Ic2Shovel extends ItemSpade implements IItemModelProvider
+{
+    private final Object repairMaterial;
+    
+    public Ic2Shovel(final Item.ToolMaterial material) {
+        super(material);
+        this.efficiency = 5.0f;
+        this.repairMaterial = "ingotBronze";
+        this.setUnlocalizedName(ItemName.bronze_shovel.name());
+        this.setCreativeTab((CreativeTabs)IC2.tabIC2);
+        BlocksItems.registerItem(this, IC2.getIdentifier(ItemName.bronze_shovel.name()));
+        ItemName.bronze_shovel.setInstance(this);
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public void registerModels(final ItemName name) {
+        ItemIC2.registerModel((Item)this, 0, name, null);
+    }
+    
+    public String getUnlocalizedName() {
+        return "ic2." + super.getUnlocalizedName().substring(5);
+    }
+    
+    public String getUnlocalizedName(final ItemStack stack) {
+        return this.getUnlocalizedName();
+    }
+    
+    public String getUnlocalizedNameInefficiently(final ItemStack stack) {
+        return this.getUnlocalizedName(stack);
+    }
+    
+    public String getItemStackDisplayName(final ItemStack stack) {
+        return Localization.translate(this.getUnlocalizedName(stack));
+    }
+    
+    public boolean getIsRepairable(final ItemStack stack1, final ItemStack stack2) {
+        return stack2 != null && Util.matchesOD(stack2, this.repairMaterial);
+    }
 }

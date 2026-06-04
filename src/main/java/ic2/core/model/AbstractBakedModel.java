@@ -1,32 +1,37 @@
+// 
+// Decompiled by Procyon v0.6.0
+// 
+
 package ic2.core.model;
 
-import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.block.model.ItemOverrideList;
+import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.block.model.IBakedModel;
 
-public abstract class AbstractBakedModel implements IBakedModel {
-  public boolean isAmbientOcclusion() {
-    return true;
-  }
-  
-  public boolean isGui3d() {
-    return false;
-  }
-  
-  public boolean isBuiltInRenderer() {
-    return false;
-  }
-  
-  public TextureAtlasSprite getParticleTexture() {
-    return null;
-  }
-  
-  public ItemCameraTransforms getItemCameraTransforms() {
-    return null;
-  }
-  
-  public ItemOverrideList getOverrides() {
-    return null;
-  }
+public abstract class AbstractBakedModel implements IBakedModel
+{
+    public boolean isAmbientOcclusion() {
+        return true;
+    }
+    
+    public boolean isGui3d() {
+        return false;
+    }
+    
+    public boolean isBuiltInRenderer() {
+        return false;
+    }
+    
+    public TextureAtlasSprite getParticleTexture() {
+        return null;
+    }
+    
+    public ItemCameraTransforms getItemCameraTransforms() {
+        return null;
+    }
+    
+    public ItemOverrideList getOverrides() {
+        return null;
+    }
 }

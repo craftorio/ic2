@@ -1,93 +1,121 @@
+// 
+// Decompiled by Procyon v0.6.0
+// 
+
 package ic2.core.block.machine.gui;
 
-import ic2.core.GuiIC2;
-import ic2.core.IC2;
-import ic2.core.block.machine.container.ContainerCanner;
-import ic2.core.block.machine.tileentity.TileEntityCanner;
+import ic2.core.ContainerBase;
+import ic2.core.gui.IEnableHandler;
+import ic2.core.gui.RecipeButton;
+import net.minecraftforge.fluids.IFluidTank;
+import ic2.core.gui.TankGauge;
+import com.google.common.base.Supplier;
+import ic2.core.gui.IClickHandler;
+import ic2.core.gui.IOverlaySupplier;
 import ic2.core.gui.CustomButton;
 import ic2.core.gui.CycleHandler;
-import ic2.core.gui.EnergyGauge;
+import net.minecraft.tileentity.TileEntity;
+import ic2.core.IC2;
+import ic2.core.network.NetworkManager;
+import ic2.core.block.machine.tileentity.TileEntityCanner;
 import ic2.core.gui.INumericValueHandler;
-import ic2.core.gui.RecipeButton;
-import ic2.core.gui.TankGauge;
+import ic2.core.gui.GuiElement;
+import ic2.core.gui.EnergyGauge;
+import ic2.core.block.TileEntityBlock;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import ic2.core.block.machine.container.ContainerCanner;
+import ic2.core.GuiIC2;
 
 @SideOnly(Side.CLIENT)
 public class GuiCanner extends GuiIC2<ContainerCanner>
 {
-	public GuiCanner(ContainerCanner container)
-	{
-		super(container, 184);
-		addElement(EnergyGauge.asBolt(this, 12, 62, container.base));
-		CycleHandler cycleHandler = new CycleHandler(176, 18, 226, 32, 14, true, 4, new INumericValueHandler()
-		{
-			public int getValue()
-			{
-				return GuiCanner.this.container.base.getMode().ordinal();
-			}
-
-			public void onChange(int value)
-			{
-				IC2.network.get(false).initiateClientTileEntityEvent(GuiCanner.this.container.base, value);
-			}
-		});
-		addElement((new CustomButton(this, 63, 81, 50, 14, cycleHandler, texture, cycleHandler))
-			.withTooltip(() ->
-			{
-				switch (GuiCanner.this.container.base.getMode())
-				{
-					case BottleSolid:
-						return "ic2.Canner.gui.switch.BottleSolid";
-					case EmptyLiquid:
-						return "ic2.Canner.gui.switch.EmptyLiquid";
-					case BottleLiquid:
-						return "ic2.Canner.gui.switch.BottleLiquid";
-					case EnrichLiquid:
-						return "ic2.Canner.gui.switch.EnrichLiquid";
-				}
-				return null;
-			}));
-		addElement((new CustomButton(this, 77, 64, 22, 13, createEventSender(TileEntityCanner.eventSwapTanks)))
-			.withTooltip("ic2.Canner.gui.switchTanks"));
-		addElement(TankGauge.createNormal(this, 39, 42, container.base.getInputTank()));
-		addElement(TankGauge.createNormal(this, 117, 42, container.base.getOutputTank()));
-		if (RecipeButton.canUse())
-			for (TileEntityCanner.Mode mode : TileEntityCanner.Mode.values)
-			{
-				addElement((new RecipeButton(this, 74, 22, 23, 14, new String[] { "canner_" + mode })).withEnableHandler(() -> (GuiCanner.this.container.base.getMode() == mode)));
-			}
-	}
-
-	protected void drawGuiContainerBackgroundLayer(float f, int x, int y)
-	{
-		super.drawGuiContainerBackgroundLayer(f, x, y);
-		bindTexture();
-		switch (this.container.base.getMode())
-		{
-			case BottleSolid:
-				drawTexturedRect(59.0D, 53.0D, 9.0D, 18.0D, 3.0D, 4.0D);
-				drawTexturedRect(99.0D, 53.0D, 18.0D, 23.0D, 3.0D, 4.0D);
-				break;
-			case EmptyLiquid:
-				drawTexturedRect(71.0D, 43.0D, 26.0D, 18.0D, 196.0D, 0.0D);
-				drawTexturedRect(59.0D, 53.0D, 9.0D, 18.0D, 3.0D, 4.0D);
-				break;
-			case BottleLiquid:
-				drawTexturedRect(99.0D, 53.0D, 18.0D, 23.0D, 3.0D, 4.0D);
-				drawTexturedRect(71.0D, 43.0D, 26.0D, 18.0D, 196.0D, 0.0D);
-				break;
-		}
-		int progressSize = Math.round(this.container.base.getProgress() * 23.0F);
-		if (progressSize > 0)
-			drawTexturedRect(74.0D, 22.0D, progressSize, 14.0D, 233.0D, 0.0D);
-	}
-
-	protected ResourceLocation getTexture()
-	{
-		return texture;
-	}
-
-	public static final ResourceLocation texture = new ResourceLocation("ic2", "textures/gui/GUICanner.png");
+    public static final ResourceLocation texture;
+    
+    public GuiCanner(final ContainerCanner container) {
+        super(container, 184);
+        this.addElement(EnergyGauge.asBolt(this, 12, 62, (TileEntityBlock)container.base));
+        final CycleHandler cycleHandler = new CycleHandler(176, 18, 226, 32, 14, true, 4, new INumericValueHandler() {
+            @Override
+            public int getValue() {
+                return ((TileEntityCanner)((ContainerCanner)GuiCanner.this.container).base).getMode().ordinal();
+            }
+            
+            @Override
+            public void onChange(final int value) {
+                IC2.network.get(false).initiateClientTileEntityEvent((TileEntity)((ContainerCanner)GuiCanner.this.container).base, 0 + value);
+            }
+        });
+        this.addElement(((GuiElement<GuiElement<?>>)new CustomButton(this, 63, 81, 50, 14, cycleHandler, GuiCanner.texture, cycleHandler)).withTooltip((Supplier<String>)new Supplier<String>() {
+            public String get() {
+                switch (((TileEntityCanner)((ContainerCanner)GuiCanner.this.container).base).getMode()) {
+                    case BottleSolid: {
+                        return "ic2.Canner.gui.switch.BottleSolid";
+                    }
+                    case EmptyLiquid: {
+                        return "ic2.Canner.gui.switch.EmptyLiquid";
+                    }
+                    case BottleLiquid: {
+                        return "ic2.Canner.gui.switch.BottleLiquid";
+                    }
+                    case EnrichLiquid: {
+                        return "ic2.Canner.gui.switch.EnrichLiquid";
+                    }
+                    default: {
+                        return null;
+                    }
+                }
+            }
+        }));
+        this.addElement(((GuiElement<GuiElement<?>>)new CustomButton(this, 77, 64, 22, 13, this.createEventSender(TileEntityCanner.eventSwapTanks))).withTooltip("ic2.Canner.gui.switchTanks"));
+        this.addElement(TankGauge.createNormal(this, 39, 42, (IFluidTank)((TileEntityCanner)container.base).getInputTank()));
+        this.addElement(TankGauge.createNormal(this, 117, 42, (IFluidTank)((TileEntityCanner)container.base).getOutputTank()));
+        if (RecipeButton.canUse()) {
+            for (final TileEntityCanner.Mode mode : TileEntityCanner.Mode.values) {
+                this.addElement(((GuiElement<GuiElement<?>>)new RecipeButton(this, 74, 22, 23, 14, new String[] { "canner_" + mode })).withEnableHandler(new IEnableHandler() {
+                    @Override
+                    public boolean isEnabled() {
+                        return ((TileEntityCanner)((ContainerCanner)GuiCanner.this.container).base).getMode() == mode;
+                    }
+                }));
+            }
+        }
+    }
+    
+    @Override
+    protected void drawGuiContainerBackgroundLayer(final float f, final int x, final int y) {
+        super.drawGuiContainerBackgroundLayer(f, x, y);
+        this.bindTexture();
+        switch (((TileEntityCanner)((ContainerCanner)this.container).base).getMode()) {
+            case BottleSolid: {
+                this.drawTexturedRect(59.0, 53.0, 9.0, 18.0, 3.0, 4.0);
+                this.drawTexturedRect(99.0, 53.0, 18.0, 23.0, 3.0, 4.0);
+                break;
+            }
+            case EmptyLiquid: {
+                this.drawTexturedRect(71.0, 43.0, 26.0, 18.0, 196.0, 0.0);
+                this.drawTexturedRect(59.0, 53.0, 9.0, 18.0, 3.0, 4.0);
+                break;
+            }
+            case BottleLiquid: {
+                this.drawTexturedRect(99.0, 53.0, 18.0, 23.0, 3.0, 4.0);
+                this.drawTexturedRect(71.0, 43.0, 26.0, 18.0, 196.0, 0.0);
+                break;
+            }
+        }
+        final int progressSize = Math.round(((TileEntityCanner)((ContainerCanner)this.container).base).getProgress() * 23.0f);
+        if (progressSize > 0) {
+            this.drawTexturedRect(74.0, 22.0, progressSize, 14.0, 233.0, 0.0);
+        }
+    }
+    
+    @Override
+    protected ResourceLocation getTexture() {
+        return GuiCanner.texture;
+    }
+    
+    static {
+        texture = new ResourceLocation("ic2", "textures/gui/GUICanner.png");
+    }
 }

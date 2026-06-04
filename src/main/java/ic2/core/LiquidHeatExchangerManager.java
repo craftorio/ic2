@@ -1,107 +1,126 @@
+// 
+// Decompiled by Procyon v0.6.0
+// 
+
 package ic2.core;
 
-import ic2.api.recipe.ILiquidAcceptManager;
-import ic2.api.recipe.ILiquidHeatExchangerManager;
 import ic2.api.recipe.Recipes;
-import ic2.core.init.MainConfig;
+import ic2.api.recipe.ILiquidAcceptManager;
 import ic2.core.util.LogCategory;
-import java.util.HashMap;
+import ic2.core.init.MainConfig;
+import java.util.Iterator;
+import net.minecraftforge.fluids.FluidRegistry;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidRegistry;
+import java.util.HashMap;
+import java.util.Map;
+import ic2.api.recipe.ILiquidHeatExchangerManager;
 
-public class LiquidHeatExchangerManager implements ILiquidHeatExchangerManager {
-  private final boolean heatup;
-  
-  private final SingleDirectionManager singleDirectionManager;
-  
-  private Map<String, ILiquidHeatExchangerManager.HeatExchangeProperty> map;
-  
-  public LiquidHeatExchangerManager(boolean heatup) {
-    this.map = new HashMap<>();
-    this.heatup = heatup;
-    this.singleDirectionManager = new SingleDirectionManager();
-  }
-  
-  public boolean acceptsFluid(Fluid fluid) {
-    return this.map.containsKey(fluid.getName());
-  }
-  
-  public Set<Fluid> getAcceptedFluids() {
-    Set<Fluid> fluidSet = new HashSet<>();
-    for (String fluidName : this.map.keySet())
-      fluidSet.add(FluidRegistry.getFluid(fluidName)); 
-    return fluidSet;
-  }
-  
-  public void addFluid(String fluidName, String fluidOutput, int huPerMB) {
-    if (this.map.containsKey(fluidName)) {
-      displayError("The fluid " + fluidName + " does already have a HeatExchangerProperty assigned.");
-      return;
-    } 
-    if (huPerMB == 0) {
-      displayError("A mod tried to register a Fluid for the HeatExchanging recipe, without having an Energy value. Ignoring...");
-      return;
-    } 
-    Fluid liquid1 = FluidRegistry.getFluid(fluidName);
-    Fluid liquid2 = FluidRegistry.getFluid(fluidOutput);
-    if (liquid1 == null || liquid2 == null) {
-      displayError("Could not get both fluids for " + fluidName + " and " + fluidOutput + ".");
-      return;
-    } 
-    if (this.heatup) {
-      if (liquid1.getTemperature() >= liquid2.getTemperature())
-        displayError("Cannot heat up a warm liquid into a cold one. " + fluidName + " -> " + fluidOutput); 
-    } else if (liquid1.getTemperature() <= liquid2.getTemperature()) {
-      displayError("Cannot cool down a cold liquid into a warm one. " + fluidName + " -> " + fluidOutput);
-    } 
-    this.map.put(fluidName, new ILiquidHeatExchangerManager.HeatExchangeProperty(FluidRegistry.getFluid(fluidOutput), Math.abs(huPerMB)));
-  }
-  
-  public ILiquidHeatExchangerManager.HeatExchangeProperty getHeatExchangeProperty(Fluid fluid) {
-    if (this.map.containsKey(fluid.getName()))
-      return this.map.get(fluid.getName()); 
-    return null;
-  }
-  
-  public Map<String, ILiquidHeatExchangerManager.HeatExchangeProperty> getHeatExchangeProperties() {
-    return this.map;
-  }
-  
-  private void displayError(String msg) {
-    if (MainConfig.ignoreInvalidRecipes) {
-      IC2.log.warn(LogCategory.Recipe, msg);
-    } else {
-      throw new RuntimeException(msg);
-    } 
-  }
-  
-  public ILiquidAcceptManager getSingleDirectionLiquidManager() {
-    return this.singleDirectionManager;
-  }
-  
-  public ILiquidHeatExchangerManager getOpposite() {
-    return this.heatup ? Recipes.liquidCooldownManager : Recipes.liquidHeatupManager;
-  }
-  
-  public class SingleDirectionManager implements ILiquidAcceptManager {
-    public boolean acceptsFluid(Fluid fluid) {
-      if (!LiquidHeatExchangerManager.this.acceptsFluid(fluid))
-        return false; 
-      ILiquidHeatExchangerManager.HeatExchangeProperty property = LiquidHeatExchangerManager.this.getHeatExchangeProperty(fluid);
-      return !LiquidHeatExchangerManager.this.getOpposite().acceptsFluid(property.outputFluid);
+public class LiquidHeatExchangerManager implements ILiquidHeatExchangerManager
+{
+    private final boolean heatup;
+    private final SingleDirectionManager singleDirectionManager;
+    private Map<String, HeatExchangeProperty> map;
+    
+    public LiquidHeatExchangerManager(final boolean heatup) {
+        this.map = new HashMap<String, HeatExchangeProperty>();
+        this.heatup = heatup;
+        this.singleDirectionManager = new SingleDirectionManager();
     }
     
-    public Set<Fluid> getAcceptedFluids() {
-      Set<Fluid> ret = new HashSet<>();
-      ILiquidHeatExchangerManager opposite = LiquidHeatExchangerManager.this.getOpposite();
-      for (Map.Entry<String, ILiquidHeatExchangerManager.HeatExchangeProperty> e : (Iterable<Map.Entry<String, ILiquidHeatExchangerManager.HeatExchangeProperty>>)LiquidHeatExchangerManager.this.map.entrySet()) {
-        if (!opposite.acceptsFluid(((ILiquidHeatExchangerManager.HeatExchangeProperty)e.getValue()).outputFluid))
-          ret.add(FluidRegistry.getFluid(e.getKey())); 
-      } 
-      return ret;
+    @Override
+    public boolean acceptsFluid(final Fluid fluid) {
+        return this.map.containsKey(fluid.getName());
     }
-  }
+    
+    @Override
+    public Set<Fluid> getAcceptedFluids() {
+        final Set<Fluid> fluidSet = new HashSet<Fluid>();
+        for (final String fluidName : this.map.keySet()) {
+            fluidSet.add(FluidRegistry.getFluid(fluidName));
+        }
+        return fluidSet;
+    }
+    
+    @Override
+    public void addFluid(final String fluidName, final String fluidOutput, final int huPerMB) {
+        if (this.map.containsKey(fluidName)) {
+            this.displayError("The fluid " + fluidName + " does already have a HeatExchangerProperty assigned.");
+            return;
+        }
+        if (huPerMB == 0) {
+            this.displayError("A mod tried to register a Fluid for the HeatExchanging recipe, without having an Energy value. Ignoring...");
+            return;
+        }
+        final Fluid liquid1 = FluidRegistry.getFluid(fluidName);
+        final Fluid liquid2 = FluidRegistry.getFluid(fluidOutput);
+        if (liquid1 == null || liquid2 == null) {
+            this.displayError("Could not get both fluids for " + fluidName + " and " + fluidOutput + ".");
+            return;
+        }
+        if (this.heatup) {
+            if (liquid1.getTemperature() >= liquid2.getTemperature()) {
+                this.displayError("Cannot heat up a warm liquid into a cold one. " + fluidName + " -> " + fluidOutput);
+            }
+        }
+        else if (liquid1.getTemperature() <= liquid2.getTemperature()) {
+            this.displayError("Cannot cool down a cold liquid into a warm one. " + fluidName + " -> " + fluidOutput);
+        }
+        this.map.put(fluidName, new HeatExchangeProperty(FluidRegistry.getFluid(fluidOutput), Math.abs(huPerMB)));
+    }
+    
+    @Override
+    public HeatExchangeProperty getHeatExchangeProperty(final Fluid fluid) {
+        if (this.map.containsKey(fluid.getName())) {
+            return this.map.get(fluid.getName());
+        }
+        return null;
+    }
+    
+    @Override
+    public Map<String, HeatExchangeProperty> getHeatExchangeProperties() {
+        return this.map;
+    }
+    
+    private void displayError(final String msg) {
+        if (MainConfig.ignoreInvalidRecipes) {
+            IC2.log.warn(LogCategory.Recipe, msg);
+            return;
+        }
+        throw new RuntimeException(msg);
+    }
+    
+    @Override
+    public ILiquidAcceptManager getSingleDirectionLiquidManager() {
+        return this.singleDirectionManager;
+    }
+    
+    public ILiquidHeatExchangerManager getOpposite() {
+        return this.heatup ? Recipes.liquidCooldownManager : Recipes.liquidHeatupManager;
+    }
+    
+    public class SingleDirectionManager implements ILiquidAcceptManager
+    {
+        @Override
+        public boolean acceptsFluid(final Fluid fluid) {
+            if (!LiquidHeatExchangerManager.this.acceptsFluid(fluid)) {
+                return false;
+            }
+            final HeatExchangeProperty property = LiquidHeatExchangerManager.this.getHeatExchangeProperty(fluid);
+            return !LiquidHeatExchangerManager.this.getOpposite().acceptsFluid(property.outputFluid);
+        }
+        
+        @Override
+        public Set<Fluid> getAcceptedFluids() {
+            final Set<Fluid> ret = new HashSet<Fluid>();
+            final ILiquidHeatExchangerManager opposite = LiquidHeatExchangerManager.this.getOpposite();
+            for (final Map.Entry<String, HeatExchangeProperty> e : LiquidHeatExchangerManager.this.map.entrySet()) {
+                if (!opposite.acceptsFluid(e.getValue().outputFluid)) {
+                    ret.add(FluidRegistry.getFluid((String)e.getKey()));
+                }
+            }
+            return ret;
+        }
+    }
 }

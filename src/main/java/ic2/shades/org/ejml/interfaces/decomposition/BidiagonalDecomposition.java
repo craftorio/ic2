@@ -1,11 +1,18 @@
+// 
+// Decompiled by Procyon v0.6.0
+// 
+
 package ic2.shades.org.ejml.interfaces.decomposition;
 
-public interface BidiagonalDecomposition<T extends ic2.shades.org.ejml.data.ReshapeMatrix64F> extends DecompositionInterface<T> {
-  T getB(T paramT, boolean paramBoolean);
-  
-  T getU(T paramT, boolean paramBoolean1, boolean paramBoolean2);
-  
-  T getV(T paramT, boolean paramBoolean1, boolean paramBoolean2);
-  
-  void getDiagonal(double[] paramArrayOfdouble1, double[] paramArrayOfdouble2);
+import ic2.shades.org.ejml.data.ReshapeMatrix64F;
+
+public interface BidiagonalDecomposition<T extends ReshapeMatrix64F> extends DecompositionInterface<T>
+{
+    T getB(final T p0, final boolean p1);
+    
+    T getU(final T p0, final boolean p1, final boolean p2);
+    
+    T getV(final T p0, final boolean p1, final boolean p2);
+    
+    void getDiagonal(final double[] p0, final double[] p1);
 }

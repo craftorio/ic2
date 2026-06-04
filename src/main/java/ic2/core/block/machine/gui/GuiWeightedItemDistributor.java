@@ -1,19 +1,26 @@
+// 
+// Decompiled by Procyon v0.6.0
+// 
+
 package ic2.core.block.machine.gui;
 
-import ic2.core.block.machine.container.ContainerWeightedItemDistributor;
 import net.minecraft.util.ResourceLocation;
+import ic2.core.block.machine.container.ContainerWeightedItemDistributor;
 
 public class GuiWeightedItemDistributor extends GuiWeightedDistributor<ContainerWeightedItemDistributor>
 {
-	public GuiWeightedItemDistributor(ContainerWeightedItemDistributor container)
-	{
-		super(container, 211);
-	}
-
-	protected ResourceLocation getTexture()
-	{
-		return TEXTURE;
-	}
-
-	private static final ResourceLocation TEXTURE = new ResourceLocation("ic2", "textures/gui/GUIWeightedItemDistributor.png");
+    private static final ResourceLocation TEXTURE;
+    
+    public GuiWeightedItemDistributor(final ContainerWeightedItemDistributor container) {
+        super(container, 211);
+    }
+    
+    @Override
+    protected ResourceLocation getTexture() {
+        return GuiWeightedItemDistributor.TEXTURE;
+    }
+    
+    static {
+        TEXTURE = new ResourceLocation("ic2", "textures/gui/GUIWeightedItemDistributor.png");
+    }
 }

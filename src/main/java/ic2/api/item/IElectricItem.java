@@ -1,14 +1,18 @@
+// 
+// Decompiled by Procyon v0.6.0
+// 
+
 package ic2.api.item;
 
 import net.minecraft.item.ItemStack;
 
 public interface IElectricItem
 {
-	boolean canProvideEnergy(ItemStack paramItemStack);
-
-	double getMaxCharge(ItemStack paramItemStack);
-
-	int getTier(ItemStack paramItemStack);
-
-	double getTransferLimit(ItemStack paramItemStack);
+    boolean canProvideEnergy(final ItemStack p0);
+    
+    double getMaxCharge(final ItemStack p0);
+    
+    int getTier(final ItemStack p0);
+    
+    double getTransferLimit(final ItemStack p0);
 }

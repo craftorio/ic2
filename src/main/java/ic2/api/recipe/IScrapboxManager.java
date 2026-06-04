@@ -1,14 +1,17 @@
+// 
+// Decompiled by Procyon v0.6.0
+// 
+
 package ic2.api.recipe;
 
 import java.util.Map;
-
 import net.minecraft.item.ItemStack;
 
 public interface IScrapboxManager extends IBasicMachineRecipeManager
 {
-	void addDrop(ItemStack paramItemStack, float paramFloat);
-
-	ItemStack getDrop(ItemStack paramItemStack, boolean paramBoolean);
-
-	Map<ItemStack, Float> getDrops();
+    void addDrop(final ItemStack p0, final float p1);
+    
+    ItemStack getDrop(final ItemStack p0, final boolean p1);
+    
+    Map<ItemStack, Float> getDrops();
 }

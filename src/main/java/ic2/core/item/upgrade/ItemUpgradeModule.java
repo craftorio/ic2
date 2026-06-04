@@ -1,587 +1,720 @@
+// 
+// Decompiled by Procyon v0.6.0
+// 
+
 package ic2.core.item.upgrade;
 
-import com.google.common.base.Predicate;
-import ic2.api.item.ElectricItem;
-import ic2.api.item.ICustomDamageItem;
-import ic2.api.item.IItemHudInfo;
-import ic2.api.upgrade.IFullUpgrade;
-import ic2.api.upgrade.IUpgradableBlock;
-import ic2.api.upgrade.UpgradableProperty;
-import ic2.api.upgrade.UpgradeRegistry;
-import ic2.core.IC2;
-import ic2.core.IHasGui;
-import ic2.core.block.state.IIdProvider;
-import ic2.core.gui.dynamic.DynamicHandHeldContainer;
-import ic2.core.init.Localization;
-import ic2.core.item.IHandHeldSubInventory;
-import ic2.core.item.ItemIC2;
-import ic2.core.item.ItemMulti;
-import ic2.core.item.tool.HandHeldInventory;
 import ic2.core.profile.NotClassic;
+import ic2.core.block.state.IIdProvider;
+import ic2.core.IHasGui;
+import java.util.Collection;
+import java.util.Collections;
+import ic2.core.util.Util;
+import ic2.api.item.ElectricItem;
+import ic2.api.item.IElectricItem;
+import ic2.api.item.ICustomDamageItem;
+import net.minecraft.nbt.NBTTagList;
+import java.util.HashSet;
+import com.google.common.base.Predicate;
+import net.minecraft.tileentity.TileEntity;
+import ic2.api.upgrade.UpgradableProperty;
+import java.util.Set;
+import ic2.core.item.tool.HandHeldInventory;
+import ic2.core.gui.dynamic.DynamicHandHeldContainer;
+import net.minecraft.nbt.NBTTagCompound;
+import ic2.core.IC2;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.entity.player.EntityPlayer;
+import ic2.core.init.Localization;
+import ic2.api.upgrade.IUpgradableBlock;
+import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.world.World;
+import java.util.LinkedList;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import java.util.Iterator;
+import net.minecraft.client.renderer.block.model.ModelBakery;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.model.ModelLoader;
+import net.minecraft.util.EnumFacing;
+import ic2.core.item.ItemIC2;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.renderer.ItemMeshDefinition;
+import ic2.api.upgrade.UpgradeRegistry;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import ic2.core.ref.ItemName;
 import ic2.core.util.LiquidUtil;
 import ic2.core.util.StackUtil;
-import ic2.core.util.Util;
-import java.text.DecimalFormat;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
-import net.minecraft.client.renderer.ItemMeshDefinition;
-import net.minecraft.client.renderer.block.model.ModelBakery;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import java.text.DecimalFormat;
+import ic2.api.item.IItemHudInfo;
+import ic2.core.item.IHandHeldSubInventory;
+import ic2.api.upgrade.IFullUpgrade;
+import ic2.core.item.ItemMulti;
 
-public class ItemUpgradeModule extends ItemMulti<ItemUpgradeModule.UpgradeType> implements IFullUpgrade, IHandHeldSubInventory, IItemHudInfo {
-  public ItemUpgradeModule() {
-    super(ItemName.upgrade, UpgradeType.class);
-    setHasSubtypes(true);
-    for (UpgradeType type : UpgradeType.values())
-      UpgradeRegistry.register(new ItemStack((Item)this, 1, type.getId())); 
-  }
-  
-  @SideOnly(Side.CLIENT)
-  public void registerModels(final ItemName name) {
-    ModelLoader.setCustomMeshDefinition((Item)this, new ItemMeshDefinition() {
-          public ModelResourceLocation getModelLocation(ItemStack stack) {
-            ItemUpgradeModule.UpgradeType type = (ItemUpgradeModule.UpgradeType)ItemUpgradeModule.this.getType(stack);
-            if (type == null)
-              return new ModelResourceLocation("builtin/missing", "missing"); 
-            EnumFacing dir;
-            if (type.directional && (dir = ItemUpgradeModule.getDirection(stack)) != null)
-              return ItemIC2.getModelLocation(name, type.getName() + '_' + dir.getName()); 
-            return ItemIC2.getModelLocation(name, type.getName());
-          }
+public class ItemUpgradeModule extends ItemMulti<UpgradeType> implements IFullUpgrade, IHandHeldSubInventory, IItemHudInfo
+{
+    private static final DecimalFormat decimalformat;
+    private static final List<StackUtil.AdjacentInv> emptyInvList;
+    private static final List<LiquidUtil.AdjacentFluidHandler> emptyFhList;
+    
+    public ItemUpgradeModule() {
+        super(ItemName.upgrade, UpgradeType.class);
+        this.setHasSubtypes(true);
+        for (final UpgradeType type : UpgradeType.values()) {
+            UpgradeRegistry.register(new ItemStack((Item)this, 1, type.getId()));
+        }
+    }
+    
+    @SideOnly(Side.CLIENT)
+    @Override
+    public void registerModels(final ItemName name) {
+        ModelLoader.setCustomMeshDefinition((Item)this, (ItemMeshDefinition)new ItemMeshDefinition() {
+            public ModelResourceLocation getModelLocation(final ItemStack stack) {
+                final UpgradeType type = ItemUpgradeModule.this.getType(stack);
+                if (type == null) {
+                    return new ModelResourceLocation("builtin/missing", "missing");
+                }
+                final EnumFacing dir;
+                if (type.directional && (dir = getDirection(stack)) != null) {
+                    return ItemIC2.getModelLocation(name, type.getName() + '_' + dir.getName());
+                }
+                return ItemIC2.getModelLocation(name, type.getName());
+            }
         });
-    for (UpgradeType type : this.typeProperty.getAllowedValues()) {
-      ModelBakery.registerItemVariants((Item)this, new ResourceLocation[] { (ResourceLocation)getModelLocation(name, type.getName()) });
-      if (type.directional)
-        for (EnumFacing dir : EnumFacing.VALUES) {
-          ModelBakery.registerItemVariants((Item)this, new ResourceLocation[] { (ResourceLocation)getModelLocation(name, type.getName() + '_' + dir.getName()) });
-        }  
-    } 
-  }
-  
-  public List<String> getHudInfo(ItemStack stack, boolean advanced) {
-    List<String> info = new LinkedList<>();
-    info.add("Machine Upgrade");
-    return info;
-  }
-  
-  @SideOnly(Side.CLIENT)
-  public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
-    String side;
-    super.addInformation(stack, world, tooltip, advanced);
-    UpgradeType type = (UpgradeType)getType(stack);
-    if (type == null)
-      return; 
-    switch (type) {
-      case IGNORED:
-        tooltip.add(Localization.translate("ic2.tooltip.upgrade.overclocker.time", new Object[] { decimalformat
-                .format(100.0D * Math.pow(getProcessTimeMultiplier(stack, (IUpgradableBlock)null), StackUtil.getSize(stack))) }));
-        tooltip.add(Localization.translate("ic2.tooltip.upgrade.overclocker.power", new Object[] { decimalformat
-                .format(100.0D * Math.pow(getEnergyDemandMultiplier(stack, (IUpgradableBlock)null), StackUtil.getSize(stack))) }));
-        break;
-      case FUZZY:
-        tooltip.add(Localization.translate("ic2.tooltip.upgrade.transformer", new Object[] { Integer.valueOf(getExtraTier(stack, (IUpgradableBlock)null) * StackUtil.getSize(stack)) }));
-        break;
-      case EXACT:
-        tooltip.add(Localization.translate("ic2.tooltip.upgrade.storage", new Object[] { Integer.valueOf(getExtraEnergyStorage(stack, (IUpgradableBlock)null) * StackUtil.getSize(stack)) }));
-        break;
-      case null:
-      case null:
-        side = getSideName(stack);
-        tooltip.add(Localization.translate("ic2.tooltip.upgrade.ejector", new Object[] { Localization.translate(side) }));
-        break;
-      case null:
-      case null:
-        side = getSideName(stack);
-        tooltip.add(Localization.translate("ic2.tooltip.upgrade.pulling", new Object[] { Localization.translate(side) }));
-        break;
-      case null:
-        side = getSideName(stack);
-        tooltip.add(Localization.translate("ic2.tooltip.upgrade.ejector", new Object[] { Localization.translate(side) }));
-        break;
-      case null:
-        side = getSideName(stack);
-        tooltip.add(Localization.translate("ic2.tooltip.upgrade.pulling", new Object[] { Localization.translate(side) }));
-        break;
-      case null:
-        tooltip.add(Localization.translate("ic2.tooltip.upgrade.redstone"));
-        break;
-      case null:
-        tooltip.add(Localization.translate("ic2.tooltip.upgrade.remote_interface", new Object[] { Integer.valueOf(StackUtil.getSize(stack)) }));
-        break;
-    } 
-  }
-  
-  private static String getSideName(ItemStack stack) {
-    EnumFacing dir = getDirection(stack);
-    if (dir == null)
-      return "ic2.tooltip.upgrade.ejector.anyside"; 
-    switch (dir) {
-      case IGNORED:
-        return "ic2.dir.west";
-      case FUZZY:
-        return "ic2.dir.east";
-      case EXACT:
-        return "ic2.dir.bottom";
-      case null:
-        return "ic2.dir.top";
-      case null:
-        return "ic2.dir.north";
-      case null:
-        return "ic2.dir.south";
-    } 
-    throw new RuntimeException("invalid dir: " + dir);
-  }
-  
-  public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float xOffset, float yOffset, float zOffset) {
-    ItemStack stack = StackUtil.get(player, hand);
-    UpgradeType type = (UpgradeType)getType(stack);
-    if (type == null)
-      return EnumActionResult.PASS; 
-    if (type.directional) {
-      int dir = 1 + side.ordinal();
-      NBTTagCompound nbtData = StackUtil.getOrCreateNbtData(stack);
-      if (nbtData.getByte("dir") == dir) {
-        nbtData.setByte("dir", (byte)0);
-      } else {
-        nbtData.setByte("dir", (byte)dir);
-      } 
-      if (IC2.platform.isRendering())
+        for (final UpgradeType type : this.typeProperty.getAllowedValues()) {
+            ModelBakery.registerItemVariants((Item)this, new ResourceLocation[] { (ResourceLocation)ItemIC2.getModelLocation(name, type.getName()) });
+            if (type.directional) {
+                for (final EnumFacing dir : EnumFacing.VALUES) {
+                    ModelBakery.registerItemVariants((Item)this, new ResourceLocation[] { (ResourceLocation)ItemIC2.getModelLocation(name, type.getName() + '_' + dir.getName()) });
+                }
+            }
+        }
+    }
+    
+    @Override
+    public List<String> getHudInfo(final ItemStack stack, final boolean advanced) {
+        final List<String> info = new LinkedList<String>();
+        info.add("Machine Upgrade");
+        return info;
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public void addInformation(final ItemStack stack, final World world, final List<String> tooltip, final ITooltipFlag advanced) {
+        super.addInformation(stack, world, (List)tooltip, advanced);
+        final UpgradeType type = this.getType(stack);
+        if (type == null) {
+            return;
+        }
         switch (type) {
-          case null:
-          case null:
-            IC2.platform.messagePlayer(player, Localization.translate("ic2.tooltip.upgrade.ejector", new Object[] { Localization.translate(getSideName(stack)) }), new Object[0]);
-            break;
-          case null:
-          case null:
-            IC2.platform.messagePlayer(player, Localization.translate("ic2.tooltip.upgrade.pulling", new Object[] { Localization.translate(getSideName(stack)) }), new Object[0]);
-            break;
-          case null:
-            IC2.platform.messagePlayer(player, Localization.translate("ic2.tooltip.upgrade.ejector", new Object[] { Localization.translate(getSideName(stack)) }), new Object[0]);
-            break;
-          case null:
-            IC2.platform.messagePlayer(player, Localization.translate("ic2.tooltip.upgrade.pulling", new Object[] { Localization.translate(getSideName(stack)) }), new Object[0]);
-            break;
-        }  
-      return EnumActionResult.SUCCESS;
-    } 
-    return EnumActionResult.PASS;
-  }
-  
-  public boolean onDroppedByPlayer(ItemStack stack, EntityPlayer player) {
-    UpgradeType type = (UpgradeType)getType(stack);
-    if (type != null)
-      switch (type) {
-        case null:
-        case null:
-          if (!(player.getEntityWorld()).isRemote && !StackUtil.isEmpty(stack) && player.openContainer instanceof DynamicHandHeldContainer) {
-            HandHeldInventory base = (HandHeldInventory)((DynamicHandHeldContainer)player.openContainer).base;
-            if (base instanceof HandHeldAdvancedUpgrade && base.isThisContainer(stack)) {
-              base.saveAsThrown(stack);
-              player.closeScreen();
-            } 
-          } 
-          break;
-      }  
-    return true;
-  }
-  
-  public boolean isSuitableFor(ItemStack stack, Set<UpgradableProperty> types) {
-    UpgradeType type = (UpgradeType)getType(stack);
-    if (type == null)
-      return false; 
-    switch (type) {
-      case null:
-      case null:
-        return types.contains(UpgradableProperty.ItemProducing);
-      case null:
-      case null:
-        return types.contains(UpgradableProperty.ItemConsuming);
-      case null:
-        return types.contains(UpgradableProperty.FluidProducing);
-      case null:
-        return types.contains(UpgradableProperty.FluidConsuming);
-      case EXACT:
-        return types.contains(UpgradableProperty.EnergyStorage);
-      case IGNORED:
-        return (types.contains(UpgradableProperty.Processing) || types.contains(UpgradableProperty.Augmentable));
-      case null:
-        return types.contains(UpgradableProperty.RedstoneSensitive);
-      case FUZZY:
-        return types.contains(UpgradableProperty.Transformer);
-      case null:
-        return types.contains(UpgradableProperty.RemotelyAccessible);
-    } 
-    return false;
-  }
-  
-  public int getAugmentation(ItemStack stack, IUpgradableBlock parent) {
-    UpgradeType type = (UpgradeType)getType(stack);
-    if (type == null)
-      return 0; 
-    switch (type) {
-      case IGNORED:
-        return 1;
-    } 
-    return 0;
-  }
-  
-  public int getExtraProcessTime(ItemStack stack, IUpgradableBlock parent) {
-    return 0;
-  }
-  
-  public double getProcessTimeMultiplier(ItemStack stack, IUpgradableBlock parent) {
-    UpgradeType type = (UpgradeType)getType(stack);
-    if (type == null)
-      return 1.0D; 
-    switch (type) {
-      case IGNORED:
-        return 0.7D;
-    } 
-    return 1.0D;
-  }
-  
-  public int getExtraEnergyDemand(ItemStack stack, IUpgradableBlock parent) {
-    return 0;
-  }
-  
-  public double getEnergyDemandMultiplier(ItemStack stack, IUpgradableBlock parent) {
-    UpgradeType type = (UpgradeType)getType(stack);
-    if (type == null)
-      return 1.0D; 
-    switch (type) {
-      case IGNORED:
-        return 1.6D;
-    } 
-    return 1.0D;
-  }
-  
-  public int getExtraEnergyStorage(ItemStack stack, IUpgradableBlock parent) {
-    UpgradeType type = (UpgradeType)getType(stack);
-    if (type == null)
-      return 0; 
-    switch (type) {
-      case EXACT:
-        return 10000;
-    } 
-    return 0;
-  }
-  
-  public double getEnergyStorageMultiplier(ItemStack stack, IUpgradableBlock parent) {
-    return 1.0D;
-  }
-  
-  public int getExtraTier(ItemStack stack, IUpgradableBlock parent) {
-    UpgradeType type = (UpgradeType)getType(stack);
-    if (type == null)
-      return 0; 
-    switch (type) {
-      case FUZZY:
-        return 1;
-    } 
-    return 0;
-  }
-  
-  public boolean modifiesRedstoneInput(ItemStack stack, IUpgradableBlock parent) {
-    UpgradeType type = (UpgradeType)getType(stack);
-    if (type == null)
-      return false; 
-    switch (type) {
-      case null:
+            case overclocker: {
+                tooltip.add(Localization.translate("ic2.tooltip.upgrade.overclocker.time", ItemUpgradeModule.decimalformat.format(100.0 * Math.pow(this.getProcessTimeMultiplier(stack, null), StackUtil.getSize(stack)))));
+                tooltip.add(Localization.translate("ic2.tooltip.upgrade.overclocker.power", ItemUpgradeModule.decimalformat.format(100.0 * Math.pow(this.getEnergyDemandMultiplier(stack, null), StackUtil.getSize(stack)))));
+                break;
+            }
+            case transformer: {
+                tooltip.add(Localization.translate("ic2.tooltip.upgrade.transformer", this.getExtraTier(stack, null) * StackUtil.getSize(stack)));
+                break;
+            }
+            case energy_storage: {
+                tooltip.add(Localization.translate("ic2.tooltip.upgrade.storage", this.getExtraEnergyStorage(stack, null) * StackUtil.getSize(stack)));
+                break;
+            }
+            case ejector:
+            case advanced_ejector: {
+                final String side = getSideName(stack);
+                tooltip.add(Localization.translate("ic2.tooltip.upgrade.ejector", Localization.translate(side)));
+                break;
+            }
+            case pulling:
+            case advanced_pulling: {
+                final String side = getSideName(stack);
+                tooltip.add(Localization.translate("ic2.tooltip.upgrade.pulling", Localization.translate(side)));
+                break;
+            }
+            case fluid_ejector: {
+                final String side = getSideName(stack);
+                tooltip.add(Localization.translate("ic2.tooltip.upgrade.ejector", Localization.translate(side)));
+                break;
+            }
+            case fluid_pulling: {
+                final String side = getSideName(stack);
+                tooltip.add(Localization.translate("ic2.tooltip.upgrade.pulling", Localization.translate(side)));
+                break;
+            }
+            case redstone_inverter: {
+                tooltip.add(Localization.translate("ic2.tooltip.upgrade.redstone"));
+                break;
+            }
+            case remote_interface: {
+                tooltip.add(Localization.translate("ic2.tooltip.upgrade.remote_interface", StackUtil.getSize(stack)));
+                break;
+            }
+        }
+    }
+    
+    private static String getSideName(final ItemStack stack) {
+        final EnumFacing dir = getDirection(stack);
+        if (dir == null) {
+            return "ic2.tooltip.upgrade.ejector.anyside";
+        }
+        switch (dir) {
+            case WEST: {
+                return "ic2.dir.west";
+            }
+            case EAST: {
+                return "ic2.dir.east";
+            }
+            case DOWN: {
+                return "ic2.dir.bottom";
+            }
+            case UP: {
+                return "ic2.dir.top";
+            }
+            case NORTH: {
+                return "ic2.dir.north";
+            }
+            case SOUTH: {
+                return "ic2.dir.south";
+            }
+            default: {
+                throw new RuntimeException("invalid dir: " + dir);
+            }
+        }
+    }
+    
+    @Override
+    public EnumActionResult onItemUse(final EntityPlayer player, final World world, final BlockPos pos, final EnumHand hand, final EnumFacing side, final float xOffset, final float yOffset, final float zOffset) {
+        final ItemStack stack = StackUtil.get(player, hand);
+        final UpgradeType type = this.getType(stack);
+        if (type == null) {
+            return EnumActionResult.PASS;
+        }
+        if (type.directional) {
+            final int dir = 1 + side.ordinal();
+            final NBTTagCompound nbtData = StackUtil.getOrCreateNbtData(stack);
+            if (nbtData.getByte("dir") == dir) {
+                nbtData.setByte("dir", (byte)0);
+            }
+            else {
+                nbtData.setByte("dir", (byte)dir);
+            }
+            if (IC2.platform.isRendering()) {
+                switch (type) {
+                    case ejector:
+                    case advanced_ejector: {
+                        IC2.platform.messagePlayer(player, Localization.translate("ic2.tooltip.upgrade.ejector", Localization.translate(getSideName(stack))), new Object[0]);
+                        break;
+                    }
+                    case pulling:
+                    case advanced_pulling: {
+                        IC2.platform.messagePlayer(player, Localization.translate("ic2.tooltip.upgrade.pulling", Localization.translate(getSideName(stack))), new Object[0]);
+                        break;
+                    }
+                    case fluid_ejector: {
+                        IC2.platform.messagePlayer(player, Localization.translate("ic2.tooltip.upgrade.ejector", Localization.translate(getSideName(stack))), new Object[0]);
+                        break;
+                    }
+                    case fluid_pulling: {
+                        IC2.platform.messagePlayer(player, Localization.translate("ic2.tooltip.upgrade.pulling", Localization.translate(getSideName(stack))), new Object[0]);
+                        break;
+                    }
+                }
+            }
+            return EnumActionResult.SUCCESS;
+        }
+        return EnumActionResult.PASS;
+    }
+    
+    public boolean onDroppedByPlayer(final ItemStack stack, final EntityPlayer player) {
+        final UpgradeType type = this.getType(stack);
+        if (type != null) {
+            switch (type) {
+                case advanced_ejector:
+                case advanced_pulling: {
+                    if (!player.getEntityWorld().isRemote && !StackUtil.isEmpty(stack) && player.openContainer instanceof DynamicHandHeldContainer) {
+                        final HandHeldInventory base = (HandHeldInventory)((DynamicHandHeldContainer)player.openContainer).base;
+                        if (base instanceof HandHeldAdvancedUpgrade && base.isThisContainer(stack)) {
+                            base.saveAsThrown(stack);
+                            player.closeScreen();
+                        }
+                        break;
+                    }
+                    break;
+                }
+            }
+        }
         return true;
-    } 
-    return false;
-  }
-  
-  public int getRedstoneInput(ItemStack stack, IUpgradableBlock parent, int externalInput) {
-    UpgradeType type = (UpgradeType)getType(stack);
-    if (type == null)
-      return externalInput; 
-    switch (type) {
-      case null:
-        return 15 - externalInput;
-    } 
-    return externalInput;
-  }
-  
-  public int getRangeAmplification(ItemStack stack, IUpgradableBlock parent, int existingRange) {
-    UpgradeType type = (UpgradeType)getType(stack);
-    if (type == null)
-      return existingRange; 
-    switch (type) {
-      case null:
-        return existingRange << 1;
-    } 
-    return existingRange;
-  }
-  
-  public boolean onTick(ItemStack stack, IUpgradableBlock parent) {
-    int amount;
-    UpgradeType type = (UpgradeType)getType(stack);
-    if (type == null)
-      return false; 
-    int size = StackUtil.getSize(stack);
-    TileEntity te = (TileEntity)parent;
-    boolean ret = false;
-    switch (type) {
-      case null:
-        amount = (int)Math.pow(4.0D, Math.min(4, size - 1));
-        for (StackUtil.AdjacentInv inv : getTargetInventories(stack, te))
-          StackUtil.transfer(te, inv.te, inv.dir, amount); 
-        return ret;
-      case null:
-        amount = (int)Math.pow(4.0D, Math.min(4, size - 1));
-        for (StackUtil.AdjacentInv inv : getTargetInventories(stack, te))
-          StackUtil.transfer(te, inv.te, inv.dir, amount, stackChecker(stack)); 
-        return ret;
-      case null:
-        amount = (int)Math.pow(4.0D, Math.min(4, size - 1));
-        for (StackUtil.AdjacentInv inv : getTargetInventories(stack, te))
-          StackUtil.transfer(inv.te, te, inv.dir.getOpposite(), amount); 
-        return ret;
-      case null:
-        amount = (int)Math.pow(4.0D, Math.min(4, size - 1));
-        for (StackUtil.AdjacentInv inv : getTargetInventories(stack, te))
-          StackUtil.transfer(inv.te, te, inv.dir.getOpposite(), amount, stackChecker(stack)); 
-        return ret;
-      case null:
-        if (!LiquidUtil.isFluidTile(te, null))
-          return false; 
-        amount = (int)(50.0D * Math.pow(4.0D, Math.min(4, size - 1)));
-        for (LiquidUtil.AdjacentFluidHandler fh : getTargetFluidHandlers(stack, te))
-          LiquidUtil.transfer(te, fh.dir, fh.handler, amount); 
-        return ret;
-      case null:
-        if (!LiquidUtil.isFluidTile(te, null))
-          return false; 
-        amount = (int)(50.0D * Math.pow(4.0D, Math.min(4, size - 1)));
-        for (LiquidUtil.AdjacentFluidHandler fh : getTargetFluidHandlers(stack, te))
-          LiquidUtil.transfer(fh.handler, fh.dir.getOpposite(), te, amount); 
-        return ret;
-    } 
-    return false;
-  }
-  
-  private static Predicate<ItemStack> stackChecker(final ItemStack stack) {
-    return new Predicate<ItemStack>() {
-        private boolean hasInitialised = false;
-        
-        private Set<ItemStack> filters;
-        
-        private Settings meta;
-        
-        private Settings damage;
-        
-        private Settings energy;
-        
-        private NbtSettings nbt;
-        
-        private void initalise() {
-          assert !this.hasInitialised;
-          NBTTagCompound tag = StackUtil.getOrCreateNbtData(stack);
-          this.filters = getFilterStacks(tag);
-          this.meta = new Settings(HandHeldAdvancedUpgrade.getTag(tag, "meta"));
-          this.damage = null;
-          this.nbt = NbtSettings.getFromNBT(HandHeldAdvancedUpgrade.getTag(tag, "nbt").getByte("type"));
-          this.energy = new Settings(HandHeldAdvancedUpgrade.getTag(tag, "energy"));
-          this.hasInitialised = true;
+    }
+    
+    public boolean isSuitableFor(final ItemStack stack, final Set<UpgradableProperty> types) {
+        final UpgradeType type = this.getType(stack);
+        if (type == null) {
+            return false;
         }
-        
-        private Set<ItemStack> getFilterStacks(NBTTagCompound nbt) {
-          Set<ItemStack> ret = new HashSet<>();
-          NBTTagList contentList = nbt.getTagList("Items", 10);
-          for (int tag = 0; tag < contentList.tagCount(); tag++) {
-            NBTTagCompound slotNbt = contentList.getCompoundTagAt(tag);
-            int slot = slotNbt.getByte("Slot");
-            if (slot >= 0 && slot < 9) {
-              ItemStack filter = new ItemStack(slotNbt);
-              if (!StackUtil.isEmpty(filter))
-                ret.add(filter); 
-            } 
-          } 
-          return ret;
+        switch (type) {
+            case ejector:
+            case advanced_ejector: {
+                return types.contains(UpgradableProperty.ItemProducing);
+            }
+            case pulling:
+            case advanced_pulling: {
+                return types.contains(UpgradableProperty.ItemConsuming);
+            }
+            case fluid_ejector: {
+                return types.contains(UpgradableProperty.FluidProducing);
+            }
+            case fluid_pulling: {
+                return types.contains(UpgradableProperty.FluidConsuming);
+            }
+            case energy_storage: {
+                return types.contains(UpgradableProperty.EnergyStorage);
+            }
+            case overclocker: {
+                return types.contains(UpgradableProperty.Processing) || types.contains(UpgradableProperty.Augmentable);
+            }
+            case redstone_inverter: {
+                return types.contains(UpgradableProperty.RedstoneSensitive);
+            }
+            case transformer: {
+                return types.contains(UpgradableProperty.Transformer);
+            }
+            case remote_interface: {
+                return types.contains(UpgradableProperty.RemotelyAccessible);
+            }
+            default: {
+                return false;
+            }
         }
-        
-        private boolean checkMeta(ItemStack stack, ItemStack filter) {
-          assert this.meta.active;
-          assert this.meta.comparison == ComparisonType.DIRECT;
-          return (stack.getMetadata() == filter.getMetadata());
+    }
+    
+    @Override
+    public int getAugmentation(final ItemStack stack, final IUpgradableBlock parent) {
+        final UpgradeType type = this.getType(stack);
+        if (type == null) {
+            return 0;
         }
-        
-        private boolean checkDamage(ItemStack stack, ItemStack filter, boolean customStack) {
-          assert this.damage.active;
-          assert this.damage.comparison == ComparisonType.DIRECT;
-          return (customStack && filter.getItem() instanceof ICustomDamageItem) ? (
+        switch (type) {
+            case overclocker: {
+                return 1;
+            }
+            default: {
+                return 0;
+            }
+        }
+    }
+    
+    @Override
+    public int getExtraProcessTime(final ItemStack stack, final IUpgradableBlock parent) {
+        return 0;
+    }
+    
+    @Override
+    public double getProcessTimeMultiplier(final ItemStack stack, final IUpgradableBlock parent) {
+        final UpgradeType type = this.getType(stack);
+        if (type == null) {
+            return 1.0;
+        }
+        switch (type) {
+            case overclocker: {
+                return 0.7;
+            }
+            default: {
+                return 1.0;
+            }
+        }
+    }
+    
+    @Override
+    public int getExtraEnergyDemand(final ItemStack stack, final IUpgradableBlock parent) {
+        return 0;
+    }
+    
+    @Override
+    public double getEnergyDemandMultiplier(final ItemStack stack, final IUpgradableBlock parent) {
+        final UpgradeType type = this.getType(stack);
+        if (type == null) {
+            return 1.0;
+        }
+        switch (type) {
+            case overclocker: {
+                return 1.6;
+            }
+            default: {
+                return 1.0;
+            }
+        }
+    }
+    
+    @Override
+    public int getExtraEnergyStorage(final ItemStack stack, final IUpgradableBlock parent) {
+        final UpgradeType type = this.getType(stack);
+        if (type == null) {
+            return 0;
+        }
+        switch (type) {
+            case energy_storage: {
+                return 10000;
+            }
+            default: {
+                return 0;
+            }
+        }
+    }
+    
+    @Override
+    public double getEnergyStorageMultiplier(final ItemStack stack, final IUpgradableBlock parent) {
+        return 1.0;
+    }
+    
+    @Override
+    public int getExtraTier(final ItemStack stack, final IUpgradableBlock parent) {
+        final UpgradeType type = this.getType(stack);
+        if (type == null) {
+            return 0;
+        }
+        switch (type) {
+            case transformer: {
+                return 1;
+            }
+            default: {
+                return 0;
+            }
+        }
+    }
+    
+    @Override
+    public boolean modifiesRedstoneInput(final ItemStack stack, final IUpgradableBlock parent) {
+        final UpgradeType type = this.getType(stack);
+        if (type == null) {
+            return false;
+        }
+        switch (type) {
+            case redstone_inverter: {
+                return true;
+            }
+            default: {
+                return false;
+            }
+        }
+    }
+    
+    @Override
+    public int getRedstoneInput(final ItemStack stack, final IUpgradableBlock parent, final int externalInput) {
+        final UpgradeType type = this.getType(stack);
+        if (type == null) {
+            return externalInput;
+        }
+        switch (type) {
+            case redstone_inverter: {
+                return 15 - externalInput;
+            }
+            default: {
+                return externalInput;
+            }
+        }
+    }
+    
+    @Override
+    public int getRangeAmplification(final ItemStack stack, final IUpgradableBlock parent, final int existingRange) {
+        final UpgradeType type = this.getType(stack);
+        if (type == null) {
+            return existingRange;
+        }
+        switch (type) {
+            case remote_interface: {
+                return existingRange << 1;
+            }
+            default: {
+                return existingRange;
+            }
+        }
+    }
+    
+    public boolean onTick(final ItemStack stack, final IUpgradableBlock parent) {
+        final UpgradeType type = this.getType(stack);
+        if (type == null) {
+            return false;
+        }
+        final int size = StackUtil.getSize(stack);
+        final TileEntity te = (TileEntity)parent;
+        final boolean ret = false;
+        switch (type) {
+            case ejector: {
+                final int amount = (int)Math.pow(4.0, Math.min(4, size - 1));
+                for (final StackUtil.AdjacentInv inv : getTargetInventories(stack, te)) {
+                    StackUtil.transfer(te, inv.te, inv.dir, amount);
+                }
+                break;
+            }
+            case advanced_ejector: {
+                final int amount = (int)Math.pow(4.0, Math.min(4, size - 1));
+                for (final StackUtil.AdjacentInv inv : getTargetInventories(stack, te)) {
+                    StackUtil.transfer(te, inv.te, inv.dir, amount, stackChecker(stack));
+                }
+                break;
+            }
+            case pulling: {
+                final int amount = (int)Math.pow(4.0, Math.min(4, size - 1));
+                for (final StackUtil.AdjacentInv inv : getTargetInventories(stack, te)) {
+                    StackUtil.transfer(inv.te, te, inv.dir.getOpposite(), amount);
+                }
+                break;
+            }
+            case advanced_pulling: {
+                final int amount = (int)Math.pow(4.0, Math.min(4, size - 1));
+                for (final StackUtil.AdjacentInv inv : getTargetInventories(stack, te)) {
+                    StackUtil.transfer(inv.te, te, inv.dir.getOpposite(), amount, stackChecker(stack));
+                }
+                break;
+            }
+            case fluid_ejector: {
+                if (!LiquidUtil.isFluidTile(te, null)) {
+                    return false;
+                }
+                final int amount = (int)(50.0 * Math.pow(4.0, Math.min(4, size - 1)));
+                for (final LiquidUtil.AdjacentFluidHandler fh : getTargetFluidHandlers(stack, te)) {
+                    LiquidUtil.transfer(te, fh.dir, fh.handler, amount);
+                }
+                break;
+            }
+            case fluid_pulling: {
+                if (!LiquidUtil.isFluidTile(te, null)) {
+                    return false;
+                }
+                final int amount = (int)(50.0 * Math.pow(4.0, Math.min(4, size - 1)));
+                for (final LiquidUtil.AdjacentFluidHandler fh : getTargetFluidHandlers(stack, te)) {
+                    LiquidUtil.transfer(fh.handler, fh.dir.getOpposite(), te, amount);
+                }
+                break;
+            }
+            default: {
+                return false;
+            }
+        }
+        return ret;
+    }
+    
+    private static Predicate<ItemStack> stackChecker(final ItemStack stack) {
+        return (Predicate<ItemStack>)new Predicate<ItemStack>() {
+            private boolean hasInitialised = false;
+            private Set<ItemStack> filters;
+            private Settings meta;
+            private Settings damage;
+            private Settings energy;
+            private NbtSettings nbt;
             
-            (((ICustomDamageItem)stack.getItem()).getCustomDamage(stack) == ((ICustomDamageItem)filter.getItem()).getCustomDamage(filter))) : (
+            private void initalise() {
+                assert !this.hasInitialised;
+                final NBTTagCompound tag = StackUtil.getOrCreateNbtData(stack);
+                this.filters = this.getFilterStacks(tag);
+                this.meta = new Settings(HandHeldAdvancedUpgrade.getTag(tag, "meta"));
+                this.damage = null;
+                this.nbt = NbtSettings.getFromNBT(HandHeldAdvancedUpgrade.getTag(tag, "nbt").getByte("type"));
+                this.energy = new Settings(HandHeldAdvancedUpgrade.getTag(tag, "energy"));
+                this.hasInitialised = true;
+            }
             
-            (filter.getItemDamage() == stack.getItemDamage()));
-        }
-        
-        private boolean checkNBT(ItemStack stack, ItemStack filter) {
-          switch (this.nbt) {
-            case IGNORED:
-              return true;
-            case FUZZY:
-              return StackUtil.checkNbtEquality(stack.getTagCompound(), filter.getTagCompound());
-            case EXACT:
-              return StackUtil.checkNbtEqualityStrict(stack, filter);
-          } 
-          throw new IllegalStateException("Unexpected NBT state: " + this.nbt);
-        }
-        
-        private boolean checkEnergy(ItemStack stack, ItemStack filter) {
-          assert this.energy.active;
-          assert this.energy.comparison == ComparisonType.DIRECT;
-          return (filter.getItem() instanceof ic2.api.item.IElectricItem && 
-            Util.isSimilar(ElectricItem.manager.getCharge(stack), ElectricItem.manager.getCharge(filter)));
-        }
-        
-        public boolean apply(ItemStack stack) {
-          boolean checkMeta, checkEnergy;
-          if (!this.hasInitialised)
-            initalise(); 
-          if (!this.meta.comparison.ignoreFilters()) {
-            if (this.meta.doComparison(stack.getMetadata())) {
-              checkMeta = false;
-            } else {
-              return false;
-            } 
-          } else {
-            checkMeta = this.meta.active;
-          } 
-          boolean customStack = stack.getItem() instanceof ICustomDamageItem;
-          boolean checkDamage = false;
-          if (!this.energy.comparison.ignoreFilters()) {
-            if (stack.getItem() instanceof ic2.api.item.IElectricItem && this.energy.doComparison((int)ElectricItem.manager.getCharge(stack))) {
-              checkEnergy = false;
-            } else {
-              return false;
-            } 
-          } else {
-            checkEnergy = this.energy.active;
-            if (checkEnergy && !(stack.getItem() instanceof ic2.api.item.IElectricItem))
-              return false; 
-          } 
-          for (ItemStack filter : this.filters) {
-            if (filter.getItem() == stack.getItem() && (!checkMeta || 
-              checkMeta(stack, filter)) && (!checkDamage || 
-              checkDamage(stack, filter, customStack)) && 
-              checkNBT(stack, filter) && (!checkEnergy || 
-              checkEnergy(stack, filter)))
-              return true; 
-          } 
-          return (this.filters.isEmpty() && this.meta.active && !checkMeta && this.energy.active && !checkEnergy);
-        }
-      };
-  }
-  
-  private static List<StackUtil.AdjacentInv> getTargetInventories(ItemStack stack, TileEntity parent) {
-    EnumFacing dir = getDirection(stack);
-    if (dir == null)
-      return StackUtil.getAdjacentInventories(parent); 
-    StackUtil.AdjacentInv inv = StackUtil.getAdjacentInventory(parent, dir);
-    if (inv == null)
-      return emptyInvList; 
-    return Collections.singletonList(inv);
-  }
-  
-  private static List<LiquidUtil.AdjacentFluidHandler> getTargetFluidHandlers(ItemStack stack, TileEntity parent) {
-    EnumFacing dir = getDirection(stack);
-    if (dir == null)
-      return LiquidUtil.getAdjacentHandlers(parent); 
-    LiquidUtil.AdjacentFluidHandler fh = LiquidUtil.getAdjacentHandler(parent, dir);
-    if (fh == null)
-      return emptyFhList; 
-    return Collections.singletonList(fh);
-  }
-  
-  public Collection<ItemStack> onProcessEnd(ItemStack stack, IUpgradableBlock parent, Collection<ItemStack> output) {
-    return output;
-  }
-  
-  public IHasGui getInventory(EntityPlayer player, ItemStack stack) {
-    UpgradeType type = (UpgradeType)getType(stack);
-    if (type == null)
-      return null; 
-    switch (type) {
-      case null:
-      case null:
-        return (IHasGui)new HandHeldAdvancedUpgrade(player, stack);
-    } 
-    return null;
-  }
-  
-  public IHasGui getSubInventory(EntityPlayer player, ItemStack stack, int ID) {
-    UpgradeType type = (UpgradeType)getType(stack);
-    if (type == null)
-      return null; 
-    switch (type) {
-      case null:
-      case null:
-        return HandHeldAdvancedUpgrade.delegate(player, stack, ID);
-    } 
-    return null;
-  }
-  
-  private static EnumFacing getDirection(ItemStack stack) {
-    int rawDir = StackUtil.getOrCreateNbtData(stack).getByte("dir");
-    if (rawDir < 1 || rawDir > 6)
-      return null; 
-    return EnumFacing.VALUES[rawDir - 1];
-  }
-  
-  public enum UpgradeType implements IIdProvider {
-    overclocker(false),
-    transformer(false),
-    energy_storage(false),
-    redstone_inverter(false),
-    ejector(true),
-    advanced_ejector(true),
-    pulling(true),
-    advanced_pulling(true),
-    fluid_ejector(true),
-    fluid_pulling(true),
-    remote_interface(false);
-    
-    public final boolean directional;
-    
-    UpgradeType(boolean directional) {
-      this.directional = directional;
+            private Set<ItemStack> getFilterStacks(final NBTTagCompound nbt) {
+                final Set<ItemStack> ret = new HashSet<ItemStack>();
+                final NBTTagList contentList = nbt.getTagList("Items", 10);
+                for (int tag = 0; tag < contentList.tagCount(); ++tag) {
+                    final NBTTagCompound slotNbt = contentList.getCompoundTagAt(tag);
+                    final int slot = slotNbt.getByte("Slot");
+                    if (slot >= 0 && slot < 9) {
+                        final ItemStack filter = new ItemStack(slotNbt);
+                        if (!StackUtil.isEmpty(filter)) {
+                            ret.add(filter);
+                        }
+                    }
+                }
+                return ret;
+            }
+            
+            private boolean checkMeta(final ItemStack stack, final ItemStack filter) {
+                assert this.meta.active;
+                assert this.meta.comparison == ComparisonType.DIRECT;
+                return stack.getMetadata() == filter.getMetadata();
+            }
+            
+            private boolean checkDamage(final ItemStack stack, final ItemStack filter, final boolean customStack) {
+                assert this.damage.active;
+                assert this.damage.comparison == ComparisonType.DIRECT;
+                return (customStack && filter.getItem() instanceof ICustomDamageItem) ? (((ICustomDamageItem)stack.getItem()).getCustomDamage(stack) == ((ICustomDamageItem)filter.getItem()).getCustomDamage(filter)) : (filter.getItemDamage() == stack.getItemDamage());
+            }
+            
+            private boolean checkNBT(final ItemStack stack, final ItemStack filter) {
+                switch (this.nbt) {
+                    case IGNORED: {
+                        return true;
+                    }
+                    case FUZZY: {
+                        return StackUtil.checkNbtEquality(stack.getTagCompound(), filter.getTagCompound());
+                    }
+                    case EXACT: {
+                        return StackUtil.checkNbtEqualityStrict(stack, filter);
+                    }
+                    default: {
+                        throw new IllegalStateException("Unexpected NBT state: " + this.nbt);
+                    }
+                }
+            }
+            
+            private boolean checkEnergy(final ItemStack stack, final ItemStack filter) {
+                assert this.energy.active;
+                assert this.energy.comparison == ComparisonType.DIRECT;
+                return filter.getItem() instanceof IElectricItem && Util.isSimilar(ElectricItem.manager.getCharge(stack), ElectricItem.manager.getCharge(filter));
+            }
+            
+            public boolean apply(final ItemStack stack) {
+                if (!this.hasInitialised) {
+                    this.initalise();
+                }
+                boolean checkMeta;
+                if (!this.meta.comparison.ignoreFilters()) {
+                    if (!this.meta.doComparison(stack.getMetadata())) {
+                        return false;
+                    }
+                    checkMeta = false;
+                }
+                else {
+                    checkMeta = this.meta.active;
+                }
+                final boolean customStack = stack.getItem() instanceof ICustomDamageItem;
+                final boolean checkDamage = false;
+                boolean checkEnergy;
+                if (!this.energy.comparison.ignoreFilters()) {
+                    if (!(stack.getItem() instanceof IElectricItem) || !this.energy.doComparison((int)ElectricItem.manager.getCharge(stack))) {
+                        return false;
+                    }
+                    checkEnergy = false;
+                }
+                else {
+                    checkEnergy = this.energy.active;
+                    if (checkEnergy && !(stack.getItem() instanceof IElectricItem)) {
+                        return false;
+                    }
+                }
+                for (final ItemStack filter : this.filters) {
+                    if (filter.getItem() == stack.getItem() && (!checkMeta || this.checkMeta(stack, filter)) && (!checkDamage || this.checkDamage(stack, filter, customStack)) && this.checkNBT(stack, filter) && (!checkEnergy || this.checkEnergy(stack, filter))) {
+                        return true;
+                    }
+                }
+                return this.filters.isEmpty() && this.meta.active && !checkMeta && this.energy.active && !checkEnergy;
+            }
+        };
     }
     
-    public String getName() {
-      return name();
+    private static List<StackUtil.AdjacentInv> getTargetInventories(final ItemStack stack, final TileEntity parent) {
+        final EnumFacing dir = getDirection(stack);
+        if (dir == null) {
+            return StackUtil.getAdjacentInventories(parent);
+        }
+        final StackUtil.AdjacentInv inv = StackUtil.getAdjacentInventory(parent, dir);
+        if (inv == null) {
+            return ItemUpgradeModule.emptyInvList;
+        }
+        return Collections.singletonList(inv);
     }
     
-    public int getId() {
-      return ordinal();
+    private static List<LiquidUtil.AdjacentFluidHandler> getTargetFluidHandlers(final ItemStack stack, final TileEntity parent) {
+        final EnumFacing dir = getDirection(stack);
+        if (dir == null) {
+            return LiquidUtil.getAdjacentHandlers(parent);
+        }
+        final LiquidUtil.AdjacentFluidHandler fh = LiquidUtil.getAdjacentHandler(parent, dir);
+        if (fh == null) {
+            return ItemUpgradeModule.emptyFhList;
+        }
+        return Collections.singletonList(fh);
     }
-  }
-  
-  private static final DecimalFormat decimalformat = new DecimalFormat("0.##");
-  
-  private static final List<StackUtil.AdjacentInv> emptyInvList = Collections.emptyList();
-  
-  private static final List<LiquidUtil.AdjacentFluidHandler> emptyFhList = Collections.emptyList();
+    
+    public Collection<ItemStack> onProcessEnd(final ItemStack stack, final IUpgradableBlock parent, final Collection<ItemStack> output) {
+        return output;
+    }
+    
+    @Override
+    public IHasGui getInventory(final EntityPlayer player, final ItemStack stack) {
+        final UpgradeType type = this.getType(stack);
+        if (type == null) {
+            return null;
+        }
+        switch (type) {
+            case advanced_ejector:
+            case advanced_pulling: {
+                return new HandHeldAdvancedUpgrade(player, stack);
+            }
+            default: {
+                return null;
+            }
+        }
+    }
+    
+    @Override
+    public IHasGui getSubInventory(final EntityPlayer player, final ItemStack stack, final int ID) {
+        final UpgradeType type = this.getType(stack);
+        if (type == null) {
+            return null;
+        }
+        switch (type) {
+            case advanced_ejector:
+            case advanced_pulling: {
+                return HandHeldAdvancedUpgrade.delegate(player, stack, ID);
+            }
+            default: {
+                return null;
+            }
+        }
+    }
+    
+    private static EnumFacing getDirection(final ItemStack stack) {
+        final int rawDir = StackUtil.getOrCreateNbtData(stack).getByte("dir");
+        if (rawDir < 1 || rawDir > 6) {
+            return null;
+        }
+        return EnumFacing.VALUES[rawDir - 1];
+    }
+    
+    static {
+        decimalformat = new DecimalFormat("0.##");
+        emptyInvList = Collections.emptyList();
+        emptyFhList = Collections.emptyList();
+    }
+    
+    public enum UpgradeType implements IIdProvider
+    {
+        overclocker(false), 
+        transformer(false), 
+        energy_storage(false), 
+        redstone_inverter(false), 
+        ejector(true), 
+        @NotClassic
+        advanced_ejector(true), 
+        pulling(true), 
+        @NotClassic
+        advanced_pulling(true), 
+        fluid_ejector(true), 
+        fluid_pulling(true), 
+        @NotClassic
+        remote_interface(false);
+        
+        public final boolean directional;
+        
+        private UpgradeType(final boolean directional) {
+            this.directional = directional;
+        }
+        
+        @Override
+        public String getName() {
+            return this.name();
+        }
+        
+        @Override
+        public int getId() {
+            return this.ordinal();
+        }
+    }
 }

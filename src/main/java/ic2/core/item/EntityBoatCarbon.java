@@ -1,19 +1,26 @@
+// 
+// Decompiled by Procyon v0.6.0
+// 
+
 package ic2.core.item;
 
 import ic2.core.ref.ItemName;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
-public class EntityBoatCarbon extends EntityIC2Boat {
-  public EntityBoatCarbon(World world) {
-    super(world);
-  }
-  
-  protected ItemStack getItem() {
-    return ItemName.boat.getItemStack(ItemIC2Boat.BoatType.carbon);
-  }
-  
-  public String getTexture() {
-    return "textures/models/boat_carbon.png";
-  }
+public class EntityBoatCarbon extends EntityIC2Boat
+{
+    public EntityBoatCarbon(final World world) {
+        super(world);
+    }
+    
+    @Override
+    protected ItemStack getItem() {
+        return ItemName.boat.getItemStack(ItemIC2Boat.BoatType.carbon);
+    }
+    
+    @Override
+    public String getTexture() {
+        return "textures/models/boat_carbon.png";
+    }
 }

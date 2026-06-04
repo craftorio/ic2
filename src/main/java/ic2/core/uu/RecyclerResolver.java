@@ -1,29 +1,44 @@
+// 
+// Decompiled by Procyon v0.6.0
+// 
+
 package ic2.core.uu;
 
-import ic2.api.recipe.Recipes;
-import ic2.core.block.machine.tileentity.TileEntityRecycler;
+import ic2.api.recipe.IMachineRecipeManager;
+import net.minecraft.item.ItemStack;
+import java.util.Iterator;
+import java.util.Arrays;
 import ic2.core.item.type.CraftingItemType;
 import ic2.core.ref.ItemName;
+import java.util.Collections;
+import ic2.core.block.machine.tileentity.TileEntityRecycler;
+import ic2.api.recipe.Recipes;
+import java.util.Collection;
 import ic2.core.util.StackUtil;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import net.minecraft.item.ItemStack;
 
-public class RecyclerResolver implements ILateRecipeResolver {
-  public List<RecipeTransformation> getTransformations(Iterable<LeanItemStack> obtainableStacks) {
-    List<LeanItemStack> input = new ArrayList<>();
-    for (LeanItemStack obtainableStack : obtainableStacks) {
-      ItemStack stack = obtainableStack.toMcStack();
-      if (StackUtil.isEmpty(stack))
-        continue; 
-      if (!((Collection)Recipes.recycler.apply(stack, false).getOutput()).isEmpty())
-        input.add(new LeanItemStack(stack, TileEntityRecycler.recycleChance())); 
-    } 
-    return Arrays.asList(new RecipeTransformation[] { new RecipeTransformation(transformCost, Collections.singletonList(input), new LeanItemStack[] { new LeanItemStack(ItemName.crafting.getItemStack((Enum)CraftingItemType.scrap)) }) });
-  }
-  
-  private static final double transformCost = 55.0D * TileEntityRecycler.recycleChance() / 4000.0D * 107.0D;
+public class RecyclerResolver implements ILateRecipeResolver
+{
+    private static final double transformCost;
+    
+    @Override
+    public List<RecipeTransformation> getTransformations(final Iterable<LeanItemStack> obtainableStacks) {
+        final List<LeanItemStack> input = new ArrayList<LeanItemStack>();
+        for (final LeanItemStack obtainableStack : obtainableStacks) {
+            final ItemStack stack = obtainableStack.toMcStack();
+            if (StackUtil.isEmpty(stack)) {
+                continue;
+            }
+            if (((IMachineRecipeManager<Object, Collection, ItemStack>)Recipes.recycler).apply(stack, false).getOutput().isEmpty()) {
+                continue;
+            }
+            input.add(new LeanItemStack(stack, TileEntityRecycler.recycleChance()));
+        }
+        return Arrays.asList(new RecipeTransformation(RecyclerResolver.transformCost, Collections.singletonList(input), new LeanItemStack[] { new LeanItemStack(ItemName.crafting.getItemStack(CraftingItemType.scrap)) }));
+    }
+    
+    static {
+        transformCost = 55.0 * TileEntityRecycler.recycleChance() / 4000.0 * 107.0;
+    }
 }

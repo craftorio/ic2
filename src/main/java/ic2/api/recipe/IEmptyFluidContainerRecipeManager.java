@@ -1,27 +1,27 @@
+// 
+// Decompiled by Procyon v0.6.0
+// 
+
 package ic2.api.recipe;
 
-import ic2.api.util.FluidContainerOutputMode;
-
-import java.util.Collection;
-
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
+import java.util.Collection;
+import ic2.api.util.FluidContainerOutputMode;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraft.item.ItemStack;
 
-public interface IEmptyFluidContainerRecipeManager extends IMachineRecipeManager<Void, IEmptyFluidContainerRecipeManager.Output, ItemStack>
+public interface IEmptyFluidContainerRecipeManager extends IMachineRecipeManager<Void, Output, ItemStack>
 {
-	MachineRecipeResult<Void, Output, ItemStack> apply(ItemStack paramItemStack, Fluid paramFluid, FluidContainerOutputMode paramFluidContainerOutputMode, boolean paramBoolean);
-
-	public static class Output
-	{
-		public final Collection<ItemStack> container;
-
-		public final FluidStack fluid;
-
-		public Output(Collection<ItemStack> container, FluidStack fluid)
-		{
-			this.container = container;
-			this.fluid = fluid;
-		}
-	}
+    MachineRecipeResult<Void, Output, ItemStack> apply(final ItemStack p0, final Fluid p1, final FluidContainerOutputMode p2, final boolean p3);
+    
+    public static class Output
+    {
+        public final Collection<ItemStack> container;
+        public final FluidStack fluid;
+        
+        public Output(final Collection<ItemStack> container, final FluidStack fluid) {
+            this.container = container;
+            this.fluid = fluid;
+        }
+    }
 }

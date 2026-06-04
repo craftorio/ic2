@@ -1,3 +1,7 @@
+// 
+// Decompiled by Procyon v0.6.0
+// 
+
 package ic2.api.energy.event;
 
 import ic2.api.energy.EnergyNet;
@@ -6,13 +10,13 @@ import net.minecraftforge.event.world.WorldEvent;
 
 public class EnergyTileEvent extends WorldEvent
 {
-	public final IEnergyTile tile;
-
-	public EnergyTileEvent(IEnergyTile tile)
-	{
-		super(EnergyNet.instance.getWorld(tile));
-		if (getWorld() == null)
-			throw new NullPointerException("world is null");
-		this.tile = tile;
-	}
+    public final IEnergyTile tile;
+    
+    public EnergyTileEvent(final IEnergyTile tile) {
+        super(EnergyNet.instance.getWorld(tile));
+        if (this.getWorld() == null) {
+            throw new NullPointerException("world is null");
+        }
+        this.tile = tile;
+    }
 }

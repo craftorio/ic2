@@ -49,7 +49,7 @@ public class ItemToolbox extends ItemIC2 implements IHandHeldInventory {
   }
   
   public boolean onDroppedByPlayer(ItemStack stack, EntityPlayer player) {
-    if (!(player.func_130014_f_()).isRemote && !StackUtil.isEmpty(stack) && player.field_71070_bA instanceof ContainerToolbox) {
+    if (!(player.getEntityWorld()).isRemote && !StackUtil.isEmpty(stack) && player.field_71070_bA instanceof ContainerToolbox) {
       HandHeldToolbox toolbox = (HandHeldToolbox)((ContainerToolbox)player.field_71070_bA).base;
       if (toolbox.isThisContainer(stack)) {
         toolbox.saveAsThrown(stack);

@@ -25,8 +25,8 @@ class Irrigation extends TerraformerBase {
       TileEntityTerra.switchGround(world, pos, (Block)Blocks.SAND, Blocks.field_150346_d.getDefaultState(), true);
       return true;
     } 
-    IBlockState state = world.func_180495_p(pos);
-    Block block = state.func_177230_c();
+    IBlockState state = world.getBlockState(pos);
+    Block block = state.getBlock();
     if (block instanceof IGrowable && ((IGrowable)block).func_176473_a(world, pos, state, false)) {
       ((IGrowable)block).func_176474_b(world, world.field_73012_v, pos, state);
       return true;
@@ -52,8 +52,8 @@ class Irrigation extends TerraformerBase {
   private static IBlockState getLeaves(World world, BlockPos pos) {
     for (EnumFacing facing : EnumFacing.field_176754_o) {
       BlockPos cPos = pos.func_177972_a(facing);
-      IBlockState state = world.func_180495_p(cPos);
-      if (state.func_177230_c().isLeaves(state, (IBlockAccess)world, cPos))
+      IBlockState state = world.getBlockState(cPos);
+      if (state.getBlock().isLeaves(state, (IBlockAccess)world, cPos))
         return state; 
     } 
     return null;
@@ -76,7 +76,7 @@ class Irrigation extends TerraformerBase {
     pos = TileEntityTerra.getFirstBlockFrom(world, pos, 0);
     if (pos == null)
       return false; 
-    Block block = world.func_180495_p(pos).func_177230_c();
+    Block block = world.getBlockState(pos).getBlock();
     if (block == Blocks.field_150346_d) {
       world.func_175656_a(pos, Blocks.field_150349_c.getDefaultState());
       return true;

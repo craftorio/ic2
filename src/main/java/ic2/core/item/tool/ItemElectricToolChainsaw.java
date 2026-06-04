@@ -88,21 +88,21 @@ public class ItemElectricToolChainsaw extends ItemElectricTool implements IHitSo
       return; 
     Entity entity = event.getTarget();
     EntityPlayer player = event.getEntityPlayer();
-    ItemStack itemstack = player.field_71071_by.func_70301_a(player.field_71071_by.field_70461_c);
+    ItemStack itemstack = player.inventory.func_70301_a(player.inventory.field_70461_c);
     if (itemstack != null && itemstack.getItem() == this && entity instanceof IShearable && 
       !StackUtil.getOrCreateNbtData(itemstack).func_74767_n("disableShear") && ElectricItem.manager
       .use(itemstack, this.operationEnergyCost, (EntityLivingBase)player)) {
       IShearable target = (IShearable)entity;
-      World world = entity.func_130014_f_();
-      BlockPos pos = new BlockPos(entity.field_70165_t, entity.field_70163_u, entity.field_70161_v);
+      World world = entity.getEntityWorld();
+      BlockPos pos = new BlockPos(entity.posX, entity.posY, entity.posZ);
       if (target.isShearable(itemstack, (IBlockAccess)world, pos)) {
         List<ItemStack> drops = target.onSheared(itemstack, (IBlockAccess)world, pos, 
             EnchantmentHelper.func_77506_a(Enchantments.field_185308_t, itemstack));
         for (ItemStack stack : drops) {
           EntityItem ent = entity.func_70099_a(stack, 1.0F);
-          ent.field_70181_x += (field_77697_d.nextFloat() * 0.05F);
-          ent.field_70159_w += ((field_77697_d.nextFloat() - field_77697_d.nextFloat()) * 0.1F);
-          ent.field_70179_y += ((field_77697_d.nextFloat() - field_77697_d.nextFloat()) * 0.1F);
+          ent.motionY += (field_77697_d.nextFloat() * 0.05F);
+          ent.motionX += ((field_77697_d.nextFloat() - field_77697_d.nextFloat()) * 0.1F);
+          ent.motionZ += ((field_77697_d.nextFloat() - field_77697_d.nextFloat()) * 0.1F);
         } 
       } 
     } 
@@ -113,9 +113,9 @@ public class ItemElectricToolChainsaw extends ItemElectricTool implements IHitSo
       return false; 
     if (StackUtil.getOrCreateNbtData(itemstack).func_74767_n("disableShear"))
       return false; 
-    World world = player.func_130014_f_();
-    IBlockState state = world.func_180495_p(pos);
-    Block block = state.func_177230_c();
+    World world = player.getEntityWorld();
+    IBlockState state = world.getBlockState(pos);
+    Block block = state.getBlock();
     if (block instanceof IShearable) {
       IShearable target = (IShearable)block;
       if (target.isShearable(itemstack, (IBlockAccess)world, pos) && ElectricItem.manager
@@ -125,7 +125,7 @@ public class ItemElectricToolChainsaw extends ItemElectricTool implements IHitSo
         for (ItemStack stack : drops)
           StackUtil.dropAsEntity(world, pos, stack); 
         player.func_71064_a(StatList.func_188055_a(block), 1);
-        world.func_180501_a(pos, Blocks.field_150350_a.func_176223_P(), 11);
+        world.func_180501_a(pos, Blocks.AIR.getDefaultState(), 11);
         return true;
       } 
     } 

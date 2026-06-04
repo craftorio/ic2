@@ -158,8 +158,8 @@ public class ItemFluidPipe extends ItemIC2 implements IMultiItem<PipeType>, IBox
   
   public EnumActionResult func_180614_a(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
     ItemStack itemStack = StackUtil.get(player, hand);
-    IBlockState oldState = world.func_180495_p(pos);
-    Block oldBlock = oldState.func_177230_c();
+    IBlockState oldState = world.getBlockState(pos);
+    Block oldBlock = oldState.getBlock();
     if (!oldBlock.func_176200_f((IBlockAccess)world, pos))
       pos = pos.func_177972_a(side); 
     Block newBlock = BlockName.te.getInstance();
@@ -170,7 +170,7 @@ public class ItemFluidPipe extends ItemIC2 implements IMultiItem<PipeType>, IBox
     PipeSize size = getSize(itemStack);
     TileEntityFluidPipe tileEntity = new TileEntityFluidPipe(type, size);
     if (ItemBlockTileEntity.placeTeBlock(itemStack, (EntityLivingBase)player, world, pos, side, (TileEntityBlock)tileEntity)) {
-      SoundType soundtype = newBlock.getSoundType(world.func_180495_p(pos), world, pos, (Entity)player);
+      SoundType soundtype = newBlock.getSoundType(world.getBlockState(pos), world, pos, (Entity)player);
       world.func_184133_a(player, pos, soundtype.func_185841_e(), SoundCategory.BLOCKS, (soundtype.func_185843_a() + 1.0F) / 2.0F, soundtype.func_185847_b() * 0.8F);
       StackUtil.consumeOrError(player, hand, 1);
     } 

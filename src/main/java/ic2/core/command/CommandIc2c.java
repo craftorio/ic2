@@ -55,9 +55,9 @@ public class CommandIc2c extends CommandBase {
     } else {
       side = ClickSide.YP;
     } 
-    Minecraft mc = Minecraft.func_71410_x();
-    EntityPlayerSP player = mc.field_71439_g;
-    mc.field_71442_b.func_187099_a(player, (WorldClient)player.func_130014_f_(), pos, side.facing, new Vec3d((Vec3i)pos), EnumHand.MAIN_HAND);
+    Minecraft mc = Minecraft.getMinecraft();
+    EntityPlayerSP player = mc.player;
+    mc.field_71442_b.func_187099_a(player, (WorldClient)player.getEntityWorld(), pos, side.facing, new Vec3d((Vec3i)pos), EnumHand.MAIN_HAND);
     CommandIc2.msg(sender, "Right click executed.");
   }
   

@@ -70,7 +70,7 @@ public class NetworkManager implements INetworkManager {
     try {
       SubPacketType.PlayerItemData.writeTo(buffer);
       buffer.writeByte(slot);
-      DataEncoder.encode(buffer, ((ItemStack)player.field_71071_by.field_70462_a.get(slot)).getItem(), false);
+      DataEncoder.encode(buffer, ((ItemStack)player.inventory.field_70462_a.get(slot)).getItem(), false);
       buffer.writeVarInt(data.length);
       for (Object o : data)
         DataEncoder.encode(buffer, o); 
@@ -137,8 +137,8 @@ public class NetworkManager implements INetworkManager {
   
   public final void sendComponentUpdate(TileEntityBlock te, String componentName, EntityPlayerMP player, GrowingBuffer data) {
     assert !isClient();
-    if (player.func_130014_f_() != te.getWorld())
-      throw new IllegalArgumentException("mismatched world (te " + te.getWorld() + ", player " + player.func_130014_f_() + ")"); 
+    if (player.getEntityWorld() != te.getWorld())
+      throw new IllegalArgumentException("mismatched world (te " + te.getWorld() + ", player " + player.getEntityWorld() + ")"); 
     GrowingBuffer buffer = new GrowingBuffer(64);
     try {
       SubPacketType.TileEntityBlockComponent.writeTo(buffer);
@@ -168,8 +168,8 @@ public class NetworkManager implements INetworkManager {
     buffer.flip();
     for (EntityPlayerMP target : getPlayersInRange(te.getWorld(), te.getPos(), new ArrayList())) {
       if (limitRange) {
-        int dX = (int)(te.getPos().func_177958_n() + 0.5D - target.field_70165_t);
-        int dZ = (int)(te.getPos().func_177952_p() + 0.5D - target.field_70161_v);
+        int dX = (int)(te.getPos().getX() + 0.5D - target.posX);
+        int dZ = (int)(te.getPos().getZ() + 0.5D - target.posZ);
         if (dX * dX + dZ * dZ > 400)
           continue; 
       } 
@@ -191,10 +191,10 @@ public class NetworkManager implements INetworkManager {
       throw new RuntimeException(e);
     } 
     buffer.flip();
-    for (EntityPlayerMP target : getPlayersInRange(player.func_130014_f_(), player.func_180425_c(), new ArrayList())) {
+    for (EntityPlayerMP target : getPlayersInRange(player.getEntityWorld(), player.func_180425_c(), new ArrayList())) {
       if (limitRange) {
-        int dX = (int)(player.field_70165_t - target.field_70165_t);
-        int dZ = (int)(player.field_70161_v - target.field_70161_v);
+        int dX = (int)(player.posX - target.posX);
+        int dZ = (int)(player.posZ - target.posZ);
         if (dX * dX + dZ * dZ > 400)
           continue; 
       } 
@@ -234,10 +234,10 @@ public class NetworkManager implements INetworkManager {
         TileEntity te = (TileEntity)inventory;
         buffer.writeByte(0);
         DataEncoder.encode(buffer, te, false);
-      } else if (player.field_71071_by.func_70448_g() != null && player.field_71071_by.func_70448_g().getItem() instanceof IHandHeldInventory) {
+      } else if (player.inventory.getCurrentItem() != null && player.inventory.getCurrentItem().getItem() instanceof IHandHeldInventory) {
         buffer.writeByte(1);
-        buffer.writeInt(player.field_71071_by.field_70461_c);
-        handleSubData(buffer, player.field_71071_by.func_70448_g(), ID);
+        buffer.writeInt(player.inventory.field_70461_c);
+        handleSubData(buffer, player.inventory.getCurrentItem(), ID);
       } else if (player.func_184592_cb() != null && player.func_184592_cb().getItem() instanceof IHandHeldInventory) {
         buffer.writeByte(1);
         buffer.writeInt(-1);
@@ -421,11 +421,11 @@ public class NetworkManager implements INetworkManager {
       } else {
         buffer.writeBoolean(false);
       } 
-      buffer.writeDouble(entity.field_70165_t + (IC2.random.nextFloat() - 0.5D) * entity.field_70130_N);
+      buffer.writeDouble(entity.posX + (IC2.random.nextFloat() - 0.5D) * entity.field_70130_N);
       buffer.writeDouble((entity.func_174813_aQ()).field_72338_b + 0.1D);
-      buffer.writeDouble(entity.field_70161_v + (IC2.random.nextFloat() - 0.5D) * entity.field_70130_N);
-      buffer.writeDouble(-entity.field_70159_w * 4.0D);
-      buffer.writeDouble(-entity.field_70179_y * 4.0D);
+      buffer.writeDouble(entity.posZ + (IC2.random.nextFloat() - 0.5D) * entity.field_70130_N);
+      buffer.writeDouble(-entity.motionX * 4.0D);
+      buffer.writeDouble(-entity.motionZ * 4.0D);
       buffer.writeString(teBlock.getName());
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -434,7 +434,7 @@ public class NetworkManager implements INetworkManager {
     for (EntityPlayer player : world.field_73010_i) {
       if (!(player instanceof EntityPlayerMP))
         continue; 
-      double distance = player.func_70092_e(entity.field_70165_t, entity.field_70163_u, entity.field_70161_v);
+      double distance = player.func_70092_e(entity.posX, entity.posY, entity.posZ);
       if (distance <= 1024.0D)
         sendPacket(buffer, false, (EntityPlayerMP)player); 
     } 
@@ -587,7 +587,7 @@ public class NetworkManager implements INetworkManager {
                 public void run() {
                   for (int i = 0; i < subData.length; i++)
                     subData[i] = DataEncoder.getValue(subData[i]); 
-                  ItemStack stack = (ItemStack)player.field_71071_by.field_70462_a.get(slot);
+                  ItemStack stack = (ItemStack)player.inventory.field_70462_a.get(slot);
                   if (!StackUtil.isEmpty(stack) && stack.getItem() == item && 
                     item instanceof IPlayerItemDataListener)
                     ((IPlayerItemDataListener)item).onPlayerItemNetworkData(player, slot, subData); 
@@ -691,7 +691,7 @@ public class NetworkManager implements INetworkManager {
     if (!(world instanceof WorldServer))
       return result; 
     PlayerChunkMap playerManager = ((WorldServer)world).func_184164_w();
-    PlayerChunkMapEntry instance = playerManager.func_187301_b(pos.func_177958_n() >> 4, pos.func_177952_p() >> 4);
+    PlayerChunkMapEntry instance = playerManager.func_187301_b(pos.getX() >> 4, pos.getZ() >> 4);
     if (instance == null)
       return result; 
     result.addAll((Collection)ReflectionUtil.getFieldValue(playerInstancePlayers, instance));

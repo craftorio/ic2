@@ -52,7 +52,7 @@ public class ItemBarrel extends ItemIC2 {
   
   public EnumActionResult func_180614_a(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float a, float b, float c) {
     ItemStack stack = StackUtil.get(player, hand);
-    if (world.func_180495_p(pos) == BlockName.scaffold.getBlockState((IIdProvider)BlockScaffold.ScaffoldType.wood) && 
+    if (world.getBlockState(pos) == BlockName.scaffold.getBlockState((IIdProvider)BlockScaffold.ScaffoldType.wood) && 
       ItemBlockTileEntity.placeTeBlock(stack, (EntityLivingBase)player, world, pos, side, (TileEntityBlock)new TileEntityBarrel(stack.func_77952_i()))) {
       StackUtil.consumeOrError(player, hand, 1);
       return EnumActionResult.SUCCESS;

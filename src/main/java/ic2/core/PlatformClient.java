@@ -91,7 +91,7 @@ import org.lwjgl.opengl.Display;
 @SideOnly(Side.CLIENT)
 public class PlatformClient extends Platform {
   public boolean isRendering() {
-    return Minecraft.func_71410_x().func_152345_ab();
+    return Minecraft.getMinecraft().func_152345_ab();
   }
   
   public void preInit() {
@@ -192,7 +192,7 @@ public class PlatformClient extends Platform {
   }
   
   public EntityPlayer getPlayerInstance() {
-    return (EntityPlayer)this.mc.field_71439_g;
+    return (EntityPlayer)this.mc.player;
   }
   
   public World getWorld(int dimId) {
@@ -279,7 +279,7 @@ public class PlatformClient extends Platform {
         },  new Item[] { ItemName.pipe.getInstance() });
     this.mc.func_184125_al().func_186722_a(new IBlockColor() {
           public int func_186720_a(IBlockState state, IBlockAccess worldIn, BlockPos pos, int tintIndex) {
-            String variant = ((MetaTeBlock)state.func_177229_b(((BlockTileEntity)state.func_177230_c()).typeProperty)).teBlock.getName();
+            String variant = ((MetaTeBlock)state.func_177229_b(((BlockTileEntity)state.getBlock()).typeProperty)).teBlock.getName();
             if (variant.endsWith("_storage_box")) {
               switch (variant) {
                 case "wooden_storage_box":
@@ -335,5 +335,5 @@ public class PlatformClient extends Platform {
     return this.mc.func_184125_al().func_186724_a(state, world, pos, tint);
   }
   
-  private final Minecraft mc = Minecraft.func_71410_x();
+  private final Minecraft mc = Minecraft.getMinecraft();
 }

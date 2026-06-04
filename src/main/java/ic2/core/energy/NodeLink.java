@@ -85,9 +85,9 @@ class NodeLink {
       for (IEnergyTile posB : this.nodeB.tile.subTiles) {
         BlockPos delta = EnergyNet.instance.getPos(posA).func_177973_b((Vec3i)EnergyNet.instance.getPos(posB));
         for (EnumFacing dir : EnumFacing.field_82609_l) {
-          if (dir.func_82601_c() == delta.func_177958_n() && dir
-            .func_96559_d() == delta.func_177956_o() && dir
-            .func_82599_e() == delta.func_177952_p()) {
+          if (dir.getFrontOffsetX() == delta.getX() && dir
+            .getFrontOffsetY() == delta.getY() && dir
+            .getFrontOffsetZ() == delta.getZ()) {
             this.dirFromA = dir;
             this.dirFromB = dir.func_176734_d();
             return;

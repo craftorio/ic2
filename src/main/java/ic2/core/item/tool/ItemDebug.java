@@ -120,10 +120,10 @@ public class ItemDebug extends ItemIC2 implements ISpecialElectricItem, IBoxable
         } else {
           plat = "mp server";
         } 
-        if (position.field_72313_a == RayTraceResult.Type.BLOCK) {
-          pos = position.func_178782_a();
-          IBlockState state = world.func_180495_p(pos);
-          Block block = state.func_177230_c();
+        if (position.typeOfHit == RayTraceResult.Type.BLOCK) {
+          pos = position.getBlockPos();
+          IBlockState state = world.getBlockState(pos);
+          Block block = state.getBlock();
           TileEntity tileEntity1 = world.func_175625_s(pos);
           String message = String.format("[%s] block state: %s%nname: %s%ncls: %s%nte: %s", new Object[] { plat, state
                 .func_185899_b((IBlockAccess)world, pos), block.func_149739_a(), block.getClass().getName(), tileEntity1 });
@@ -149,7 +149,7 @@ public class ItemDebug extends ItemIC2 implements ISpecialElectricItem, IBoxable
           } 
           break;
         } 
-        if (position.field_72313_a == RayTraceResult.Type.ENTITY) {
+        if (position.typeOfHit == RayTraceResult.Type.ENTITY) {
           String message = "[" + plat + "] entity: " + position.field_72308_g;
           chat.println(message);
           console.println(message);
@@ -225,12 +225,12 @@ public class ItemDebug extends ItemIC2 implements ISpecialElectricItem, IBoxable
         te = world.func_175625_s(pos);
         count = (mode == Mode.Accelerate) ? 1000 : 100000;
         if (te == null) {
-          IBlockState state = world.func_180495_p(pos);
-          if (state.func_177230_c().func_149653_t()) {
-            chat.println("Running" + count + " ticks on " + state.func_177230_c() + "(" + pos + ").");
+          IBlockState state = world.getBlockState(pos);
+          if (state.getBlock().func_149653_t()) {
+            chat.println("Running" + count + " ticks on " + state.getBlock() + "(" + pos + ").");
             int i;
-            for (i = 0; i < count && world.func_180495_p(pos) == state; i++)
-              state.func_177230_c().func_180645_a(world, pos, state, field_77697_d); 
+            for (i = 0; i < count && world.getBlockState(pos) == state; i++)
+              state.getBlock().func_180645_a(world, pos, state, field_77697_d); 
             if (i != count)
               chat.println("Ran " + i + " ticks before a state change."); 
           } 

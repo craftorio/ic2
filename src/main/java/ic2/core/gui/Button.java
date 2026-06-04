@@ -63,7 +63,7 @@ public abstract class Button<T extends Button<T>> extends GuiElement<T> {
   }
   
   protected boolean onMouseClick(int mouseX, int mouseY, MouseButton button) {
-    this.gui.field_146297_k.func_147118_V().func_147682_a((ISound)PositionedSoundRecord.func_184371_a(SoundEvents.field_187909_gi, 1.0F));
+    this.gui.mc.getSoundHandler().playSound((ISound)PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F));
     this.handler.onClick(button);
     return false;
   }

@@ -17,10 +17,10 @@ public class EnhancedOverlay {
     TOP_LEFT, TOP, TOP_RIGHT, LEFT, CENTRE, RIGHT, BOTTOM_LEFT, BOTTOM, BOTTOM_RIGHT;
     
     public static Segment forRayTrace(RayTraceResult ray) {
-      assert ray.field_72313_a == RayTraceResult.Type.BLOCK;
-      BlockPos blockPos = ray.func_178782_a();
+      assert ray.typeOfHit == RayTraceResult.Type.BLOCK;
+      BlockPos blockPos = ray.getBlockPos();
       Vec3d hit = ray.field_72307_f;
-      return forHit(ray.field_178784_b, hit.field_72450_a - blockPos.func_177958_n(), hit.field_72448_b - blockPos.func_177956_o(), hit.field_72449_c - blockPos.func_177952_p());
+      return forHit(ray.field_178784_b, hit.field_72450_a - blockPos.getX(), hit.field_72448_b - blockPos.getY(), hit.field_72449_c - blockPos.getZ());
     }
     
     public static Segment forHit(EnumFacing face, double x, double y, double z) {
@@ -310,8 +310,8 @@ public class EnhancedOverlay {
   }
   
   public static void transformToFace(Entity entity, BlockPos pos, EnumFacing face, float partialTicks) {
-    GlStateManager.func_179137_b(-(entity.field_70142_S + (entity.field_70165_t - entity.field_70142_S) * partialTicks), -(entity.field_70137_T + (entity.field_70163_u - entity.field_70137_T) * partialTicks), -(entity.field_70136_U + (entity.field_70161_v - entity.field_70136_U) * partialTicks));
-    GlStateManager.func_179109_b(pos.func_177958_n() + 0.5F, pos.func_177956_o() + 0.5F, pos.func_177952_p() + 0.5F);
+    GlStateManager.func_179137_b(-(entity.field_70142_S + (entity.posX - entity.field_70142_S) * partialTicks), -(entity.field_70137_T + (entity.posY - entity.field_70137_T) * partialTicks), -(entity.field_70136_U + (entity.posZ - entity.field_70136_U) * partialTicks));
+    GlStateManager.func_179109_b(pos.getX() + 0.5F, pos.getY() + 0.5F, pos.getZ() + 0.5F);
     switch (face) {
       case UP:
         GlStateManager.func_179114_b(180.0F, 1.0F, 0.0F, 0.0F);

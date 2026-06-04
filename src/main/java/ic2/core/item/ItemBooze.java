@@ -110,7 +110,7 @@ public class ItemBooze extends ItemIC2 {
             if (level > 2) {
               amplifyEffect(living, MobEffects.field_76431_k, 0, intensity, duration);
               if (level > 3)
-                living.func_70690_d(new PotionEffect(MobEffects.field_76433_i, 1, (living.func_130014_f_()).field_73012_v.nextInt(3))); 
+                living.func_70690_d(new PotionEffect(MobEffects.field_76433_i, 1, (living.getEntityWorld()).field_73012_v.nextInt(3))); 
             } 
           } 
         } 
@@ -158,7 +158,7 @@ public class ItemBooze extends ItemIC2 {
   }
   
   public ItemStack drinkBlackStuff(EntityLivingBase living) {
-    switch ((living.func_130014_f_()).field_73012_v.nextInt(6)) {
+    switch ((living.getEntityWorld()).field_73012_v.nextInt(6)) {
       case 1:
         living.func_70690_d(new PotionEffect(MobEffects.field_76431_k, 1200, 0));
         break;
@@ -172,7 +172,7 @@ public class ItemBooze extends ItemIC2 {
         living.func_70690_d(new PotionEffect(MobEffects.field_76436_u, 200, 2));
         break;
       case 5:
-        living.func_70690_d(new PotionEffect(MobEffects.field_76433_i, 1, (living.func_130014_f_()).field_73012_v.nextInt(4)));
+        living.func_70690_d(new PotionEffect(MobEffects.field_76433_i, 1, (living.getEntityWorld()).field_73012_v.nextInt(4)));
         break;
     } 
     return ItemName.mug.getItemStack(ItemMug.MugType.empty);

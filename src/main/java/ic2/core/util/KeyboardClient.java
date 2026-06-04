@@ -29,7 +29,7 @@ public class KeyboardClient extends Keyboard {
   
   public void sendKeyUpdate() {
     Set<Keyboard.Key> keys = EnumSet.noneOf(Keyboard.Key.class);
-    GuiScreen currentScreen = (Minecraft.func_71410_x()).field_71462_r;
+    GuiScreen currentScreen = (Minecraft.getMinecraft()).field_71462_r;
     if (currentScreen == null || currentScreen.field_146291_p) {
       if (GameSettings.func_100015_a(this.altKey))
         keys.add(Keyboard.Key.alt); 
@@ -56,7 +56,7 @@ public class KeyboardClient extends Keyboard {
     } 
   }
   
-  private final Minecraft mc = Minecraft.func_71410_x();
+  private final Minecraft mc = Minecraft.getMinecraft();
   
   private final KeyBinding altKey = new KeyBinding("ALT Key", 56, "IC2");
   

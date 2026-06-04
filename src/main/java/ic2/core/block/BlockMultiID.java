@@ -103,7 +103,7 @@ public class BlockMultiID<T extends Enum<T> & IIdProvider> extends BlockBase imp
   protected final List<IBlockState> getTypeStates() {
     List<IBlockState> ret = new ArrayList<>(this.typeProperty.func_177700_c().size());
     for (Enum enum_ : this.typeProperty.func_177700_c())
-      ret.add(func_176223_P().func_177226_a((IProperty)this.typeProperty, enum_)); 
+      ret.add(getDefaultState().func_177226_a((IProperty)this.typeProperty, enum_)); 
     return ret;
   }
   
@@ -113,7 +113,7 @@ public class BlockMultiID<T extends Enum<T> & IIdProvider> extends BlockBase imp
   
   public IBlockState func_176203_a(int meta) {
     EnumProperty<T> typeProperty = getTypeProperty();
-    return func_176223_P().func_177226_a((IProperty)typeProperty, typeProperty.getValueOrDefault(meta));
+    return getDefaultState().func_177226_a((IProperty)typeProperty, typeProperty.getValueOrDefault(meta));
   }
   
   public int func_176201_c(IBlockState state) {
@@ -121,11 +121,11 @@ public class BlockMultiID<T extends Enum<T> & IIdProvider> extends BlockBase imp
   }
   
   public T getType(IBlockAccess world, BlockPos pos) {
-    return getType(world.func_180495_p(pos));
+    return getType(world.getBlockState(pos));
   }
   
   public final T getType(IBlockState state) {
-    if (state.func_177230_c() != this)
+    if (state.getBlock() != this)
       return null; 
     return (T)state.func_177229_b((IProperty)this.typeProperty);
   }
@@ -133,12 +133,12 @@ public class BlockMultiID<T extends Enum<T> & IIdProvider> extends BlockBase imp
   public IBlockState getState(T type) {
     if (type == null)
       throw new IllegalArgumentException("invalid type: " + type); 
-    return func_176223_P().func_177226_a((IProperty)this.typeProperty, (Comparable)type);
+    return getDefaultState().func_177226_a((IProperty)this.typeProperty, (Comparable)type);
   }
   
   public IBlockState getState(String variant) {
     if (variant == null)
-      return func_176223_P(); 
+      return getDefaultState(); 
     for (Enum enum_ : this.typeProperty.func_177700_c()) {
       if (enum_.name().equals(variant))
         return getState((T)enum_); 
@@ -162,7 +162,7 @@ public class BlockMultiID<T extends Enum<T> & IIdProvider> extends BlockBase imp
   public String getVariant(ItemStack stack) {
     if (stack == null)
       throw new NullPointerException("null stack"); 
-    Item item = Item.func_150898_a(this);
+    Item item = Item.getItemFromBlock(this);
     if (stack.getItem() != item)
       throw new IllegalArgumentException("The stack " + stack + " doesn't match " + item + " (" + this + ")"); 
     IBlockState state = func_176203_a(stack.func_77960_j());
@@ -171,10 +171,10 @@ public class BlockMultiID<T extends Enum<T> & IIdProvider> extends BlockBase imp
   }
   
   public ItemStack getItemStack(IBlockState state) {
-    if (state.func_177230_c() != this)
+    if (state.getBlock() != this)
       return null; 
-    Item item = Item.func_150898_a(this);
-    if (item == null || item == Items.field_190931_a)
+    Item item = Item.getItemFromBlock(this);
+    if (item == null || item == Items.AIR)
       throw new RuntimeException("no matching item for " + this); 
     int meta = func_176201_c(state);
     return new ItemStack(item, 1, meta);

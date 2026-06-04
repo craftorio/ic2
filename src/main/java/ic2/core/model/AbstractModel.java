@@ -51,7 +51,7 @@ public abstract class AbstractModel implements IReloadableModel, IBakedModel {
   }
   
   public TextureAtlasSprite func_177554_e() {
-    return Minecraft.func_71410_x().func_147117_R().func_174944_f();
+    return Minecraft.getMinecraft().func_147117_R().func_174944_f();
   }
   
   public ItemCameraTransforms func_177552_f() {

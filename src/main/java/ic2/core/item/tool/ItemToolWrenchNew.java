@@ -47,7 +47,7 @@ public class ItemToolWrenchNew extends ItemToolIC2 implements IEnhancedOverlayPr
     if (!canTakeDamage(stack, 1))
       return EnumActionResult.FAIL; 
     IBlockState state = Util.getBlockState((IBlockAccess)world, pos);
-    Block block = state.func_177230_c();
+    Block block = state.getBlock();
     if (block.isAir(state, (IBlockAccess)world, pos))
       return EnumActionResult.FAIL; 
     if (world.func_175625_s(pos) instanceof IPipe) {
@@ -88,16 +88,16 @@ public class ItemToolWrenchNew extends ItemToolIC2 implements IEnhancedOverlayPr
   
   @SideOnly(Side.CLIENT)
   public void func_77624_a(ItemStack stack, @Nullable World worldIn, List<String> info, ITooltipFlag flagIn) {
-    info.add((Minecraft.func_71410_x()).field_71474_y.field_74312_F.getDisplayName() + ":");
+    info.add((Minecraft.getMinecraft()).field_71474_y.field_74312_F.getDisplayName() + ":");
     info.add(" Safely mine IC2 machines (Yes you will get the machine and not the machine block)");
     info.add("");
-    info.add((Minecraft.func_71410_x()).field_71474_y.field_74313_G.getDisplayName() + ":");
+    info.add((Minecraft.getMinecraft()).field_71474_y.field_74313_G.getDisplayName() + ":");
     info.add(" Set the machine facing (rotate)");
     info.add(" Connect pipes together and to covers");
   }
   
   public boolean providesEnhancedOverlay(World world, BlockPos pos, EnumFacing side, EntityPlayer player, ItemStack stack) {
-    Block block = world.func_180495_p(pos).func_177230_c();
+    Block block = world.getBlockState(pos).getBlock();
     if (block instanceof IWrenchable) {
       TileEntity tileEntity = world.func_175625_s(pos);
       return (tileEntity instanceof IPipe || 
@@ -115,7 +115,7 @@ public class ItemToolWrenchNew extends ItemToolIC2 implements IEnhancedOverlayPr
   public String getBreakSoundForBlock(EntityPlayerSP player, World world, BlockPos pos, ItemStack stack) {
     if (player.field_71075_bZ.field_75098_d)
       return null; 
-    IBlockState state = world.func_180495_p(pos);
-    return (state.func_177230_c() instanceof IWrenchable) ? "Tools/wrench.ogg" : null;
+    IBlockState state = world.getBlockState(pos);
+    return (state.getBlock() instanceof IWrenchable) ? "Tools/wrench.ogg" : null;
   }
 }

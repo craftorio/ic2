@@ -60,7 +60,7 @@ public class ItemArmorHazmat extends ItemArmorUtility implements IHazmatLike {
   public void onEntityLivingFallEvent(LivingFallEvent event) {
     if (IC2.platform.isSimulating() && event.getEntity() instanceof EntityPlayer) {
       EntityPlayer player = (EntityPlayer)event.getEntity();
-      ItemStack armor = (ItemStack)player.field_71071_by.field_70460_b.get(0);
+      ItemStack armor = (ItemStack)player.inventory.field_70460_b.get(0);
       if (armor != null && armor.getItem() == this) {
         int fallDamage = (int)event.getDistance() - 3;
         if (fallDamage >= 8)
@@ -98,14 +98,14 @@ public class ItemArmorHazmat extends ItemArmorUtility implements IHazmatLike {
       if (air <= 100) {
         int needed = (300 - air) * 1000 / 150;
         int supplied = 0;
-        for (int i = 0; i < player.field_71071_by.field_70462_a.size() && needed > 0; i++) {
-          ItemStack cStack = (ItemStack)player.field_71071_by.field_70462_a.get(i);
+        for (int i = 0; i < player.inventory.field_70462_a.size() && needed > 0; i++) {
+          ItemStack cStack = (ItemStack)player.inventory.field_70462_a.get(i);
           if (cStack != null) {
             LiquidUtil.FluidOperationResult result = LiquidUtil.drainContainer(cStack, FluidName.air.getInstance(), needed, FluidContainerOutputMode.InPlacePreferred);
             if (result != null && result.fluidChange.amount >= 7)
               if (result.extraOutput == null || 
                 StackUtil.storeInventoryItem(result.extraOutput, player, false)) {
-                player.field_71071_by.field_70462_a.set(i, result.inPlaceOutput);
+                player.inventory.field_70462_a.set(i, result.inPlaceOutput);
                 int amount = result.fluidChange.amount;
                 supplied += amount;
                 needed -= amount;
@@ -118,13 +118,13 @@ public class ItemArmorHazmat extends ItemArmorUtility implements IHazmatLike {
   }
   
   public boolean isInLava(EntityPlayer player) {
-    int x = (int)Math.floor(player.field_70165_t);
-    int y = (int)Math.floor(player.field_70163_u + 0.02D);
-    int z = (int)Math.floor(player.field_70161_v);
-    IBlockState state = player.func_130014_f_().func_180495_p(new BlockPos(x, y, z));
-    if (state.func_177230_c() instanceof BlockLiquid && (state.func_185904_a() == Material.field_151587_i || state.func_185904_a() == Material.field_151581_o)) {
+    int x = (int)Math.floor(player.posX);
+    int y = (int)Math.floor(player.posY + 0.02D);
+    int z = (int)Math.floor(player.posZ);
+    IBlockState state = player.getEntityWorld().getBlockState(new BlockPos(x, y, z));
+    if (state.getBlock() instanceof BlockLiquid && (state.func_185904_a() == Material.field_151587_i || state.func_185904_a() == Material.field_151581_o)) {
       float height = (y + 1) - BlockLiquid.func_149801_b(((Integer)state.func_177229_b((IProperty)BlockLiquid.field_176367_b)).intValue());
-      return (player.field_70163_u < height);
+      return (player.posY < height);
     } 
     return false;
   }

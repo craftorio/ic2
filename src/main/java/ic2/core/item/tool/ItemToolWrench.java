@@ -60,7 +60,7 @@ public class ItemToolWrench extends ItemIC2 implements IBoxable {
   
   public static WrenchResult wrenchBlock(World world, BlockPos pos, EnumFacing side, EntityPlayer player, boolean remove) {
     IBlockState state = Util.getBlockState((IBlockAccess)world, pos);
-    Block block = state.func_177230_c();
+    Block block = state.getBlock();
     if (block.isAir(state, (IBlockAccess)world, pos))
       return WrenchResult.Nothing; 
     if (block instanceof IWrenchable) {

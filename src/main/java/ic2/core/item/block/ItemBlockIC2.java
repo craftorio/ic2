@@ -27,7 +27,7 @@ public class ItemBlockIC2 extends ItemBlock {
   }
   
   public boolean canHarvestBlock(IBlockState block, ItemStack stack) {
-    return (block.func_177230_c() == BlockName.scaffold.getInstance());
+    return (block.getBlock() == BlockName.scaffold.getInstance());
   }
   
   public int getItemBurnTime(ItemStack stack) {

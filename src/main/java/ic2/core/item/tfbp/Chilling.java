@@ -15,15 +15,15 @@ class Chilling extends TerraformerBase {
     pos = TileEntityTerra.getFirstBlockFrom(world, pos, 10);
     if (pos == null)
       return false; 
-    IBlockState state = world.func_180495_p(pos);
-    Block block = state.func_177230_c();
+    IBlockState state = world.getBlockState(pos);
+    Block block = state.getBlock();
     if (block == Blocks.field_150355_j || block == Blocks.field_150358_i) {
       world.func_175656_a(pos, Blocks.field_150432_aD.getDefaultState());
       return true;
     } 
     if (block == Blocks.field_150432_aD) {
       BlockPos below = pos.func_177977_b();
-      Block blockBelow = world.func_180495_p(below).func_177230_c();
+      Block blockBelow = world.getBlockState(below).getBlock();
       if (blockBelow == Blocks.field_150355_j || blockBelow == Blocks.field_150358_i) {
         world.func_175656_a(below, Blocks.field_150432_aD.getDefaultState());
         return true;
@@ -56,11 +56,11 @@ class Chilling extends TerraformerBase {
   }
   
   private static boolean isSnowHere(World world, BlockPos pos) {
-    int prevY = pos.func_177956_o();
+    int prevY = pos.getY();
     pos = TileEntityTerra.getFirstBlockFrom(world, pos, 16);
-    if (pos == null || prevY > pos.func_177956_o())
+    if (pos == null || prevY > pos.getY())
       return false; 
-    Block block = world.func_180495_p(pos).func_177230_c();
+    Block block = world.getBlockState(pos).getBlock();
     if (block == Blocks.field_150433_aE || block == Blocks.field_150431_aC)
       return true; 
     pos = pos.func_177984_a();

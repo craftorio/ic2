@@ -36,7 +36,7 @@ public class BlockDynamite extends BlockBase {
     func_149711_c(0.0F);
     func_149672_a(SoundType.field_185850_c);
     func_149647_a(null);
-    func_180632_j(func_176223_P().func_177226_a(linked, Boolean.valueOf(false)).func_177226_a((IProperty)BlockTorch.field_176596_a, (Comparable)EnumFacing.UP));
+    func_180632_j(getDefaultState().func_177226_a(linked, Boolean.valueOf(false)).func_177226_a((IProperty)BlockTorch.field_176596_a, (Comparable)EnumFacing.UP));
   }
   
   protected BlockStateContainer func_180661_e() {
@@ -76,7 +76,7 @@ public class BlockDynamite extends BlockBase {
           break;
         } 
       }  
-    return func_176223_P().func_177226_a((IProperty)BlockTorch.field_176596_a, (Comparable)facing);
+    return getDefaultState().func_177226_a((IProperty)BlockTorch.field_176596_a, (Comparable)facing);
   }
   
   public int func_176201_c(IBlockState state) {
@@ -84,7 +84,7 @@ public class BlockDynamite extends BlockBase {
   }
   
   public IBlockState func_176203_a(int meta) {
-    return func_176223_P().func_177226_a(linked, Boolean.valueOf(((meta & 0x1) != 0))).func_177226_a((IProperty)BlockTorch.field_176596_a, (Comparable)EnumFacing.field_82609_l[meta >> 1]);
+    return getDefaultState().func_177226_a(linked, Boolean.valueOf(((meta & 0x1) != 0))).func_177226_a((IProperty)BlockTorch.field_176596_a, (Comparable)EnumFacing.field_82609_l[meta >> 1]);
   }
   
   public void func_180633_a(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
@@ -130,7 +130,7 @@ public class BlockDynamite extends BlockBase {
   
   private void explode(World world, BlockPos pos, EntityLivingBase player, boolean byExplosion) {
     world.func_175698_g(pos);
-    EntityDynamite entity = new EntityStickyDynamite(world, pos.func_177958_n() + 0.5D, pos.func_177956_o() + 0.5D, (pos.func_177952_p() + 0.5F));
+    EntityDynamite entity = new EntityStickyDynamite(world, pos.getX() + 0.5D, pos.getY() + 0.5D, (pos.getZ() + 0.5F));
     entity.owner = player;
     entity.fuse = byExplosion ? 5 : 40;
     world.func_72838_d(entity);

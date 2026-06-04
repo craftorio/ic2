@@ -55,12 +55,12 @@ public class ItemIC2Boat extends ItemMulti<ItemIC2Boat.BoatType> {
     } 
     if (inEntity)
       return new ActionResult(EnumActionResult.PASS, stack); 
-    if (hitPos.field_72313_a == RayTraceResult.Type.BLOCK) {
-      BlockPos pos = hitPos.func_178782_a();
-      if (world.func_180495_p(pos).func_177230_c() == Blocks.field_150431_aC)
+    if (hitPos.typeOfHit == RayTraceResult.Type.BLOCK) {
+      BlockPos pos = hitPos.getBlockPos();
+      if (world.getBlockState(pos).getBlock() == Blocks.field_150431_aC)
         pos = pos.func_177977_b(); 
-      boat.func_70107_b(pos.func_177958_n() + 0.5D, (pos.func_177956_o() + 1), pos.func_177952_p() + 0.5D);
-      boat.field_70177_z = (((MathHelper.func_76128_c((player.field_70177_z * 4.0F / 360.0F) + 0.5D) & 0x3) - 1) * 90);
+      boat.setPosition(pos.getX() + 0.5D, (pos.getY() + 1), pos.getZ() + 0.5D);
+      boat.rotationYaw = (((MathHelper.func_76128_c((player.rotationYaw * 4.0F / 360.0F) + 0.5D) & 0x3) - 1) * 90);
       if (!world.func_184144_a((Entity)boat, boat.func_70046_E().func_72321_a(-0.1D, -0.1D, -0.1D)).isEmpty())
         return new ActionResult(EnumActionResult.PASS, stack); 
       if (!world.isRemote)
@@ -93,11 +93,11 @@ public class ItemIC2Boat extends ItemMulti<ItemIC2Boat.BoatType> {
   public Entity createEntity(World world, Entity location, ItemStack stack) {
     assert hasCustomEntity(stack);
     assert !world.isRemote;
-    EntityItem item = new FireproofItem(world, location.field_70165_t, location.field_70163_u, location.field_70161_v, stack);
+    EntityItem item = new FireproofItem(world, location.posX, location.posY, location.posZ, stack);
     item.func_174869_p();
-    item.field_70159_w = location.field_70159_w;
-    item.field_70181_x = location.field_70181_x;
-    item.field_70179_y = location.field_70179_y;
+    item.motionX = location.motionX;
+    item.motionY = location.motionY;
+    item.motionZ = location.motionZ;
     return (Entity)item;
   }
   
@@ -129,8 +129,8 @@ public class ItemIC2Boat extends ItemMulti<ItemIC2Boat.BoatType> {
       this.field_70178_ae = true;
     }
     
-    public void func_70071_h_() {
-      super.func_70071_h_();
+    public void onUpdate() {
+      super.onUpdate();
       func_70066_B();
     }
     

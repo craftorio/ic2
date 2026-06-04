@@ -34,21 +34,21 @@ public class GuiOverlayer extends Gui {
   public void onRenderHotBar(RenderGameOverlayEvent.Post event) {
     if (event.getType() != RenderGameOverlayEvent.ElementType.HOTBAR)
       return; 
-    ItemStack helm = this.mc.field_71439_g.func_184582_a(EntityEquipmentSlot.HEAD);
+    ItemStack helm = this.mc.player.func_184582_a(EntityEquipmentSlot.HEAD);
     if (StackUtil.isEmpty(helm) || !(helm.getItem() instanceof IItemHudProvider) || !((IItemHudProvider)helm.getItem()).doesProvideHUD(helm))
       return; 
     HudMode hudMode = ((IItemHudProvider)helm.getItem()).getHudMode(helm);
     if (!hudMode.shouldDisplay())
       return; 
-    ItemStack boots = this.mc.field_71439_g.func_184582_a(EntityEquipmentSlot.FEET);
-    ItemStack legs = this.mc.field_71439_g.func_184582_a(EntityEquipmentSlot.LEGS);
-    ItemStack chestplate = this.mc.field_71439_g.func_184582_a(EntityEquipmentSlot.CHEST);
+    ItemStack boots = this.mc.player.func_184582_a(EntityEquipmentSlot.FEET);
+    ItemStack legs = this.mc.player.func_184582_a(EntityEquipmentSlot.LEGS);
+    ItemStack chestplate = this.mc.player.func_184582_a(EntityEquipmentSlot.CHEST);
     GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
     GL11.glDisable(2896);
     RenderItem renderItem = this.mc.func_175599_af();
     RenderHelper.func_74520_c();
     this.mc.func_110434_K().func_110577_a(background);
-    func_73729_b(0, 0, 0, 0, 71, 69);
+    drawTexturedModalRect(0, 0, 0, 0, 71, 69);
     renderItem.func_175042_a(helm, 5, 4);
     this.mc.field_71466_p.func_78276_b(mapCharge(helm) + "%", 25, 9, 16777215);
     if (StackUtil.getOrCreateNbtData(helm).func_74767_n("Nightvision"))
@@ -85,8 +85,8 @@ public class GuiOverlayer extends Gui {
       } 
     } 
     if (hudMode.hasTooltip()) {
-      ItemStack rightItem = this.mc.field_71439_g.func_184614_ca();
-      ItemStack leftItem = this.mc.field_71439_g.func_184592_cb();
+      ItemStack rightItem = this.mc.player.func_184614_ca();
+      ItemStack leftItem = this.mc.player.func_184592_cb();
       int nextLine = 83;
       if (!StackUtil.isEmpty(rightItem)) {
         renderItem.func_175042_a(rightItem, 5, 74);
@@ -99,7 +99,7 @@ public class GuiOverlayer extends Gui {
               this.mc.field_71466_p.func_78276_b(info.get(l), 8, 83 + (l + 1) * 14, 16777215);  
           nextLine += (info.size() + 1) * 14;
         } else {
-          info.addAll(rightItem.func_82840_a((EntityPlayer)this.mc.field_71439_g, () -> (hudMode == HudMode.ADVANCED)));
+          info.addAll(rightItem.func_82840_a((EntityPlayer)this.mc.player, () -> (hudMode == HudMode.ADVANCED)));
           if (info.size() > 1)
             for (int l = 1; l < info.size(); l++)
               this.mc.field_71466_p.func_78276_b(info.get(l), 8, 83 + l * 14, 16777215);  
@@ -117,7 +117,7 @@ public class GuiOverlayer extends Gui {
             for (int l = 0; l < info.size(); l++)
               this.mc.field_71466_p.func_78276_b(info.get(l), 8, nextLine + (l + 1) * 14, 16777215);  
         } else {
-          info.addAll(leftItem.func_82840_a((EntityPlayer)this.mc.field_71439_g, () -> (hudMode == HudMode.ADVANCED)));
+          info.addAll(leftItem.func_82840_a((EntityPlayer)this.mc.player, () -> (hudMode == HudMode.ADVANCED)));
           if (info.size() > 1)
             for (int l = 1; l < info.size(); l++)
               this.mc.field_71466_p.func_78276_b(info.get(l), 8, nextLine + l * 14, 16777215);  

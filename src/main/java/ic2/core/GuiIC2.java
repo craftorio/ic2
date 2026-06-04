@@ -114,10 +114,10 @@ public abstract class GuiIC2<T extends ContainerBase<? extends IInventory>> exte
   protected void func_146976_a(float partialTicks, int mouseX, int mouseY) {
     mouseX -= this.field_147003_i;
     mouseY -= this.field_147009_r;
-    GlStateManager.func_179131_c(1.0F, 1.0F, 1.0F, 1.0F);
+    GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
     drawBackgroundAndTitle(partialTicks, mouseX, mouseY);
     if (((ContainerBase)this.container).base instanceof IUpgradableBlock) {
-      this.field_146297_k.func_110434_K().func_110577_a(new ResourceLocation("ic2", "textures/gui/infobutton.png"));
+      this.mc.func_110434_K().func_110577_a(new ResourceLocation("ic2", "textures/gui/infobutton.png"));
       drawTexturedRect(3.0D, 3.0D, 10.0D, 10.0D, 0.0D, 0.0D);
     } 
     if (this.background)
@@ -174,8 +174,8 @@ public abstract class GuiIC2<T extends ContainerBase<? extends IInventory>> exte
     super.func_146274_d();
     if (this.mouseScroll) {
       ScrollDirection direction;
-      int mouseX = Mouse.getEventX() * this.field_146294_l / this.field_146297_k.field_71443_c - this.field_147003_i;
-      int mouseY = this.field_146295_m - Mouse.getEventY() * this.field_146295_m / this.field_146297_k.field_71440_d - 1 - this.field_147009_r;
+      int mouseX = Mouse.getEventX() * this.width / this.mc.field_71443_c - this.field_147003_i;
+      int mouseY = this.height - Mouse.getEventY() * this.height / this.mc.field_71440_d - 1 - this.field_147009_r;
       int scrollDelta = Mouse.getEventDWheel();
       if (scrollDelta != 0) {
         direction = (scrollDelta < 0) ? ScrollDirection.down : ScrollDirection.up;
@@ -295,7 +295,7 @@ public abstract class GuiIC2<T extends ContainerBase<? extends IInventory>> exte
       uS = uE;
       uE = tmp;
     } 
-    GlStateManager.func_179131_c(1.0F, 1.0F, 1.0F, 1.0F);
+    GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
     Tessellator tessellator = Tessellator.func_178181_a();
     BufferBuilder worldrenderer = tessellator.func_178180_c();
     worldrenderer.func_181668_a(7, DefaultVertexFormats.field_181707_g);
@@ -308,7 +308,7 @@ public abstract class GuiIC2<T extends ContainerBase<? extends IInventory>> exte
   
   public void drawSprite(double x, double y, double width, double height, TextureAtlasSprite sprite, int color, double scale, boolean fixRight, boolean fixBottom) {
     if (sprite == null)
-      sprite = this.field_146297_k.func_147117_R().func_174944_f(); 
+      sprite = this.mc.func_147117_R().func_174944_f(); 
     x += this.field_147003_i;
     y += this.field_147009_r;
     scale *= 16.0D;
@@ -320,7 +320,7 @@ public abstract class GuiIC2<T extends ContainerBase<? extends IInventory>> exte
     int r = color >>> 16 & 0xFF;
     int g = color >>> 8 & 0xFF;
     int b = color & 0xFF;
-    GlStateManager.func_179131_c(1.0F, 1.0F, 1.0F, 1.0F);
+    GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
     Tessellator tessellator = Tessellator.func_178181_a();
     BufferBuilder buffer = tessellator.func_178180_c();
     buffer.func_181668_a(7, DefaultVertexFormats.field_181709_i);
@@ -413,7 +413,7 @@ public abstract class GuiIC2<T extends ContainerBase<? extends IInventory>> exte
   
   protected void flushTooltips() {
     for (Tooltip tooltip : this.queuedTooltips) {
-      GlStateManager.func_179131_c(1.0F, 1.0F, 1.0F, 1.0F);
+      GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
       func_146283_a(tooltip.text, tooltip.x, tooltip.y);
       GlStateManager.func_179140_f();
     } 
@@ -442,7 +442,7 @@ public abstract class GuiIC2<T extends ContainerBase<? extends IInventory>> exte
   }
   
   protected final void bindTexture() {
-    this.field_146297_k.func_110434_K().func_110577_a(getTexture());
+    this.mc.func_110434_K().func_110577_a(getTexture());
   }
   
   protected IClickHandler createEventSender(final int event) {

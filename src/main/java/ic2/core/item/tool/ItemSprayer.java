@@ -76,8 +76,8 @@ public class ItemSprayer extends ItemIC2FluidContainer implements IBoxable {
     RayTraceResult rtResult = func_77621_a(world, player, true);
     if (rtResult == null)
       return EnumActionResult.PASS; 
-    if (rtResult.field_72313_a == RayTraceResult.Type.BLOCK && !pos.equals(rtResult.func_178782_a())) {
-      BlockPos fluidPos = rtResult.func_178782_a();
+    if (rtResult.typeOfHit == RayTraceResult.Type.BLOCK && !pos.equals(rtResult.getBlockPos())) {
+      BlockPos fluidPos = rtResult.getBlockPos();
       if (LiquidUtil.drainBlockToContainer(world, fluidPos, player, hand))
         return EnumActionResult.SUCCESS; 
     } 
@@ -86,7 +86,7 @@ public class ItemSprayer extends ItemIC2FluidContainer implements IBoxable {
     FluidStack fluid = FluidUtil.getFluidContained(stack);
     if (fluid != null && fluid.amount > 0)
       maxFoamBlocks += fluid.amount / getFluidPerFoam(); 
-    ItemStack pack = (ItemStack)player.field_71071_by.field_70460_b.get(2);
+    ItemStack pack = (ItemStack)player.inventory.field_70460_b.get(2);
     if (pack != null && pack.getItem() == ItemName.cf_pack.getInstance()) {
       fluid = FluidUtil.getFluidContained(pack);
       if (fluid != null && fluid.amount > 0) {
@@ -118,7 +118,7 @@ public class ItemSprayer extends ItemIC2FluidContainer implements IBoxable {
         assert packHandler != null;
         fluid = packHandler.drain(amount, true);
         amount -= fluid.amount;
-        player.field_71071_by.field_70460_b.set(2, packHandler.getContainer());
+        player.inventory.field_70460_b.set(2, packHandler.getContainer());
       } 
       if (amount > 0) {
         IFluidHandlerItem handler = FluidUtil.getFluidHandler(stack);
@@ -150,8 +150,8 @@ public class ItemSprayer extends ItemIC2FluidContainer implements IBoxable {
     toCheck.clear();
     int failedPlacements = 0;
     for (BlockPos targetPos : positions) {
-      IBlockState state = world.func_180495_p(targetPos);
-      Block targetBlock = state.func_177230_c();
+      IBlockState state = world.getBlockState(targetPos);
+      Block targetBlock = state.getBlock();
       if (targetBlock == BlockName.scaffold.getInstance()) {
         BlockScaffold scaffold = (BlockScaffold)targetBlock;
         switch ((BlockScaffold.ScaffoldType)state.func_177229_b((IProperty)scaffold.getTypeProperty())) {
@@ -206,9 +206,9 @@ public class ItemSprayer extends ItemIC2FluidContainer implements IBoxable {
       case Any:
         return BlockName.foam.getInstance().func_176198_a(world, pos, EnumFacing.DOWN);
       case Scaffold:
-        return (world.func_180495_p(pos).func_177230_c() == BlockName.scaffold.getInstance());
+        return (world.getBlockState(pos).getBlock() == BlockName.scaffold.getInstance());
       case Cable:
-        if (world.func_180495_p(pos).func_177230_c() != BlockName.te.getInstance())
+        if (world.getBlockState(pos).getBlock() != BlockName.te.getInstance())
           return false; 
         te = world.func_175625_s(pos);
         if (te instanceof TileEntityCable)

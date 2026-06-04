@@ -43,9 +43,9 @@ public class ItemWindRotor extends ItemGradualInt implements IKineticRotor {
   public void func_77624_a(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
     tooltip.add(Localization.translate("ic2.itemrotor.wind.info", new Object[] { Integer.valueOf(this.minWindStrength), Integer.valueOf(this.maxWindStrength) }));
     IKineticRotor.GearboxType type = null;
-    if ((Minecraft.func_71410_x()).field_71462_r instanceof ic2.core.block.kineticgenerator.gui.GuiWaterKineticGenerator) {
+    if ((Minecraft.getMinecraft()).field_71462_r instanceof ic2.core.block.kineticgenerator.gui.GuiWaterKineticGenerator) {
       type = IKineticRotor.GearboxType.WATER;
-    } else if ((Minecraft.func_71410_x()).field_71462_r instanceof ic2.core.block.kineticgenerator.gui.GuiWindKineticGenerator) {
+    } else if ((Minecraft.getMinecraft()).field_71462_r instanceof ic2.core.block.kineticgenerator.gui.GuiWindKineticGenerator) {
       type = IKineticRotor.GearboxType.WIND;
     } 
     if (type != null)

@@ -375,7 +375,7 @@ public class IC2 implements IFuelHandler {
         return 80; 
       if (item == Items.field_151120_aE)
         return 50; 
-      if (item == Item.func_150898_a((Block)Blocks.field_150434_aF))
+      if (item == Item.getItemFromBlock((Block)Blocks.field_150434_aF))
         return 50; 
       if (StackUtil.checkItemEquality(stack, ItemName.crafting.getItemStack((Enum)CraftingItemType.scrap)))
         return 350; 
@@ -455,7 +455,7 @@ public class IC2 implements IFuelHandler {
   
   @SubscribeEvent
   public void onLivingSpecialSpawn(LivingSpawnEvent.SpecialSpawn event) {
-    if (seasonal && (event.getEntityLiving() instanceof net.minecraft.entity.monster.EntityZombie || event.getEntityLiving() instanceof net.minecraft.entity.monster.EntitySkeleton) && (event.getEntityLiving().func_130014_f_()).field_73012_v.nextFloat() < 0.1F) {
+    if (seasonal && (event.getEntityLiving() instanceof net.minecraft.entity.monster.EntityZombie || event.getEntityLiving() instanceof net.minecraft.entity.monster.EntitySkeleton) && (event.getEntityLiving().getEntityWorld()).field_73012_v.nextFloat() < 0.1F) {
       EntityLiving entity = (EntityLiving)event.getEntityLiving();
       for (EntityEquipmentSlot slot : EntityEquipmentSlot.values())
         entity.func_184642_a(slot, Float.NEGATIVE_INFINITY); 

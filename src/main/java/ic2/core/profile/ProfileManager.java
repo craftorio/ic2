@@ -169,7 +169,7 @@ public class ProfileManager {
     if (textureChanges == null)
       textureChanges = Collections.emptyList(); 
     List<IResourcePack> packs = new ArrayList<>();
-    Map<String, FallbackResourceManager> domainManagers = (Map<String, FallbackResourceManager>)ReflectionUtil.getValue(Minecraft.func_71410_x().func_110442_L(), Map.class);
+    Map<String, FallbackResourceManager> domainManagers = (Map<String, FallbackResourceManager>)ReflectionUtil.getValue(Minecraft.getMinecraft().func_110442_L(), Map.class);
     for (TextureStyle texture : selected.textures) {
       FallbackResourceManager manager = domainManagers.get(texture.mod);
       if (manager == null)

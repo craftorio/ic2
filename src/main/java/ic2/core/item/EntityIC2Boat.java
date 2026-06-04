@@ -86,8 +86,8 @@ public abstract class EntityIC2Boat extends EntityBoat {
     super(world);
   }
   
-  public void func_70071_h_() {
-    World world = func_130014_f_();
+  public void onUpdate() {
+    World world = getEntityWorld();
     try {
       field_previousStatus.set(this, field_status.get(this));
       EntityBoat.Status status = getBoatStatus();
@@ -103,9 +103,9 @@ public abstract class EntityIC2Boat extends EntityBoat {
         func_70265_b(func_70268_h() - 1); 
       if (func_70271_g() > 0.0F)
         func_70266_a(func_70271_g() - 1.0F); 
-      this.field_70169_q = this.field_70165_t;
-      this.field_70167_r = this.field_70163_u;
-      this.field_70166_s = this.field_70161_v;
+      this.prevPosX = this.posX;
+      this.prevPosY = this.posY;
+      this.prevPosZ = this.posZ;
       doEntityUpdate(world);
       method_tickLerp.invoke(this, new Object[0]);
       if (func_184186_bw()) {
@@ -116,11 +116,11 @@ public abstract class EntityIC2Boat extends EntityBoat {
           controlBoat();
           world.func_184135_a((Packet)new CPacketSteerBoat(func_184457_a(0), func_184457_a(1)));
         } 
-        func_70091_d(MoverType.SELF, this.field_70159_w, this.field_70181_x, this.field_70179_y);
+        move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
       } else {
-        this.field_70159_w = 0.0D;
-        this.field_70181_x = 0.0D;
-        this.field_70179_y = 0.0D;
+        this.motionX = 0.0D;
+        this.motionY = 0.0D;
+        this.motionZ = 0.0D;
       } 
       for (int i = 0; i <= 1; i++) {
         if (func_184457_a(i)) {
@@ -129,7 +129,7 @@ public abstract class EntityIC2Boat extends EntityBoat {
             SoundEvent soundevent = func_193047_k();
             if (soundevent != null) {
               Vec3d look = func_70676_i(1.0F);
-              world.func_184148_a(null, this.field_70165_t + ((i == 1) ? -look.field_72449_c : look.field_72449_c), this.field_70163_u, this.field_70161_v + ((i == 1) ? look.field_72450_a : -look.field_72450_a), soundevent, 
+              world.func_184148_a(null, this.posX + ((i == 1) ? -look.field_72449_c : look.field_72449_c), this.posY, this.posZ + ((i == 1) ? look.field_72450_a : -look.field_72450_a), soundevent, 
                   func_184176_by(), 1.0F, 0.8F + 0.4F * this.field_70146_Z.nextFloat());
             } 
           } 
@@ -171,8 +171,8 @@ public abstract class EntityIC2Boat extends EntityBoat {
       EntityBoat.Status status = (EntityBoat.Status)field_status.get(this);
       if (field_previousStatus.get(this) == EntityBoat.Status.IN_AIR && status != EntityBoat.Status.IN_AIR && status != EntityBoat.Status.ON_LAND) {
         field_waterLevel.setDouble(this, (func_174813_aQ()).field_72338_b + this.field_70131_O);
-        func_70107_b(this.field_70165_t, (func_184451_k() - this.field_70131_O) + 0.101D, this.field_70161_v);
-        this.field_70181_x = 0.0D;
+        setPosition(this.posX, (func_184451_k() - this.field_70131_O) + 0.101D, this.posZ);
+        this.motionY = 0.0D;
         field_lastYd.setDouble(this, 0.0D);
         field_status.set(this, EntityBoat.Status.IN_WATER);
       } else {
@@ -198,13 +198,13 @@ public abstract class EntityIC2Boat extends EntityBoat {
             momentum = 0.45F;
             break;
         } 
-        this.field_70159_w *= momentum;
-        this.field_70179_y *= momentum;
+        this.motionX *= momentum;
+        this.motionZ *= momentum;
         field_deltaRotation.setFloat(this, field_deltaRotation.getFloat(this) * momentum);
-        this.field_70181_x += generalHeightChangingValue;
+        this.motionY += generalHeightChangingValue;
         if (heightChange > 0.0D) {
-          this.field_70181_x += heightChange * 0.061538461538461535D;
-          this.field_70181_x *= 0.75D;
+          this.motionY += heightChange * 0.061538461538461535D;
+          this.motionY *= 0.75D;
         } 
       } 
       field_momentum.setFloat(this, momentum);
@@ -221,7 +221,7 @@ public abstract class EntityIC2Boat extends EntityBoat {
     int maxZ = (int)Math.ceil(boundingBox.field_72334_f);
     BlockPos.PooledMutableBlockPos blockPosPool = BlockPos.PooledMutableBlockPos.func_185346_s();
     try {
-      World world = func_130014_f_();
+      World world = getEntityWorld();
       int maxY = (int)Math.ceil(boundingBox.field_72337_e - field_lastYd.getDouble(this));
       for (int y = (int)Math.floor(boundingBox.field_72337_e); y < maxY; y++) {
         float waterHeight = 0.0F;
@@ -229,12 +229,12 @@ public abstract class EntityIC2Boat extends EntityBoat {
         label29: while (true) {
           if (x >= maxX) {
             if (waterHeight < 1.0F)
-              return blockPosPool.func_177956_o() + waterHeight; 
+              return blockPosPool.getY() + waterHeight; 
             break;
           } 
           for (int z = minZ; z < maxZ; z++) {
             blockPosPool.func_181079_c(x, y, z);
-            IBlockState block = world.func_180495_p((BlockPos)blockPosPool);
+            IBlockState block = world.getBlockState((BlockPos)blockPosPool);
             if (isWater(block))
               waterHeight = Math.max(waterHeight, getBlockLiquidHeight(block, (IBlockAccess)world, (BlockPos)blockPosPool)); 
             if (waterHeight >= 1.0F)
@@ -273,7 +273,7 @@ public abstract class EntityIC2Boat extends EntityBoat {
   
   private boolean checkInWater() {
     int i;
-    World world = func_130014_f_();
+    World world = getEntityWorld();
     AxisAlignedBB boundingBox = func_174813_aQ();
     boolean isInWater = false;
     BlockPos.PooledMutableBlockPos blockPosPool = BlockPos.PooledMutableBlockPos.func_185346_s();
@@ -283,7 +283,7 @@ public abstract class EntityIC2Boat extends EntityBoat {
         for (int y = (int)Math.floor(boundingBox.field_72338_b); y < Math.ceil(boundingBox.field_72338_b + 0.001D); y++) {
           for (int z = (int)Math.floor(boundingBox.field_72339_c); z < Math.ceil(boundingBox.field_72334_f); z++) {
             blockPosPool.func_181079_c(x, y, z);
-            IBlockState block = world.func_180495_p((BlockPos)blockPosPool);
+            IBlockState block = world.getBlockState((BlockPos)blockPosPool);
             if (isWater(block)) {
               float waterHeight = getLiquidHeight(block, (IBlockAccess)world, (BlockPos)blockPosPool);
               waterLevel = Math.max(waterHeight, waterLevel);
@@ -303,7 +303,7 @@ public abstract class EntityIC2Boat extends EntityBoat {
   
   @Nullable
   private EntityBoat.Status getUnderwaterStatus() {
-    World world = func_130014_f_();
+    World world = getEntityWorld();
     AxisAlignedBB boundingBox = func_174813_aQ();
     double boatTop = boundingBox.field_72337_e + 0.001D;
     BlockPos.PooledMutableBlockPos blockPosPool = BlockPos.PooledMutableBlockPos.func_185346_s();
@@ -312,7 +312,7 @@ public abstract class EntityIC2Boat extends EntityBoat {
         for (int y = (int)Math.floor(boundingBox.field_72337_e); y < Math.ceil(boatTop); y++) {
           for (int z = (int)Math.floor(boundingBox.field_72339_c); z < Math.ceil(boundingBox.field_72334_f); z++) {
             blockPosPool.func_181079_c(x, y, z);
-            IBlockState block = world.func_180495_p((BlockPos)blockPosPool);
+            IBlockState block = world.getBlockState((BlockPos)blockPosPool);
             if (isWater(block) && boatTop < getLiquidHeight(block, (IBlockAccess)world, (BlockPos)blockPosPool))
               return (((Integer)block.func_177229_b((IProperty)BlockLiquid.field_176367_b)).intValue() != 0) ? EntityBoat.Status.UNDER_FLOWING_WATER : EntityBoat.Status.UNDER_WATER; 
           } 
@@ -325,12 +325,12 @@ public abstract class EntityIC2Boat extends EntityBoat {
   }
   
   public static float getLiquidHeight(IBlockState block, IBlockAccess world, BlockPos pos) {
-    return pos.func_177956_o() + getBlockLiquidHeight(block, world, pos);
+    return pos.getY() + getBlockLiquidHeight(block, world, pos);
   }
   
   public static float getBlockLiquidHeight(IBlockState block, IBlockAccess world, BlockPos pos) {
     int liquidHeight = ((Integer)block.func_177229_b((IProperty)BlockLiquid.field_176367_b)).intValue();
-    return ((liquidHeight & 0x7) == 0 && world.func_180495_p(pos.func_177984_a()).func_185904_a() == block.func_185904_a()) ? 1.0F : (1.0F - BlockLiquid.func_149801_b(liquidHeight));
+    return ((liquidHeight & 0x7) == 0 && world.getBlockState(pos.func_177984_a()).func_185904_a() == block.func_185904_a()) ? 1.0F : (1.0F - BlockLiquid.func_149801_b(liquidHeight));
   }
   
   private void controlBoat() {
@@ -347,13 +347,13 @@ public abstract class EntityIC2Boat extends EntityBoat {
           field_deltaRotation.setFloat(this, field_deltaRotation.getFloat(this) + 1.0F); 
         if (right != left && !forward && !backward)
           speed += 0.005F; 
-        this.field_70177_z += field_deltaRotation.getFloat(this);
+        this.rotationYaw += field_deltaRotation.getFloat(this);
         if (forward)
           speed += 0.04F; 
         if (backward)
           speed -= 0.005F; 
-        this.field_70159_w += (MathHelper.func_76126_a(-this.field_70177_z * 3.1415927F / 180.0F) * speed) * getAccelerationFactor();
-        this.field_70179_y += (MathHelper.func_76134_b(this.field_70177_z * 3.1415927F / 180.0F) * speed) * getAccelerationFactor();
+        this.motionX += (MathHelper.sin(-this.rotationYaw * 3.1415927F / 180.0F) * speed) * getAccelerationFactor();
+        this.motionZ += (MathHelper.cos(this.rotationYaw * 3.1415927F / 180.0F) * speed) * getAccelerationFactor();
         func_184445_a(((right && !left) || forward), ((left && !right) || forward));
       } catch (Exception e) {
         throw new RuntimeException("Error reflecting boat in controlBoat", e);
@@ -364,7 +364,7 @@ public abstract class EntityIC2Boat extends EntityBoat {
   protected void func_184231_a(double y, boolean onGround, IBlockState state, BlockPos pos) {
     boolean expectDeath = (this.field_70143_R > 3.0F && !this.field_70128_L);
     super.func_184231_a(y, onGround, state, pos);
-    if (expectDeath && this.field_70128_L && func_130014_f_().func_82736_K().func_82766_b("doEntityDrops"))
+    if (expectDeath && this.field_70128_L && getEntityWorld().func_82736_K().func_82766_b("doEntityDrops"))
       super.func_70099_a(getBrokenItem(), 0.0F); 
   }
   

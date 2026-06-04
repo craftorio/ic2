@@ -138,7 +138,7 @@ public class ExplosionIC2 extends Explosion {
   }
   
   public ExplosionIC2(World world, Entity entity, BlockPos pos, float power, float drop, Type type) {
-    this(world, entity, pos.func_177958_n() + 0.5D, pos.func_177956_o() + 0.5D, pos.func_177952_p() + 0.5D, power, drop, type);
+    this(world, entity, pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, power, drop, type);
   }
   
   public ExplosionIC2(World world, Entity entity, double x, double y, double z, float power1, float drop, Type type1, EntityLivingBase igniter1, int radiationRange1) {
@@ -170,7 +170,7 @@ public class ExplosionIC2 extends Explosion {
   }
   
   public ExplosionIC2(World world, Entity entity, BlockPos pos, int i, float f, Type heat) {
-    this(world, entity, pos.func_177958_n() + 0.5D, pos.func_177956_o() + 0.5D, pos.func_177952_p() + 0.5D, i, f, heat);
+    this(world, entity, pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, i, f, heat);
   }
   
   public void doExplosion() {
@@ -187,7 +187,7 @@ public class ExplosionIC2 extends Explosion {
     List<Entity> entities = this.worldObj.func_72839_b(null, new AxisAlignedBB(start, end));
     for (Entity entity : entities) {
       if (entity instanceof EntityLivingBase || entity instanceof EntityItem) {
-        int distance = (int)(Util.square(entity.field_70165_t - this.explosionX) + Util.square(entity.field_70163_u - this.explosionY) + Util.square(entity.field_70161_v - this.explosionZ));
+        int distance = (int)(Util.square(entity.posX - this.explosionX) + Util.square(entity.posY - this.explosionY) + Util.square(entity.posZ - this.explosionZ));
         double health = getEntityHealth(entity);
         this.entitiesInRange.add(new EntityDamage(entity, distance, health));
       } 
@@ -216,11 +216,11 @@ public class ExplosionIC2 extends Explosion {
         if (isNuclear() && this.igniter != null && player == this.igniter && player.func_110143_aJ() <= 0.0F)
           IC2.achievements.issueAchievement(player, "dieFromOwnNuke"); 
       } 
-      double motionSq = Util.square(entry.motionX) + Util.square(entity.field_70181_x) + Util.square(entity.field_70179_y);
+      double motionSq = Util.square(entry.motionX) + Util.square(entity.motionY) + Util.square(entity.motionZ);
       double reduction = (motionSq > 3600.0D) ? Math.sqrt(3600.0D / motionSq) : 1.0D;
-      entity.field_70159_w += entry.motionX * reduction;
-      entity.field_70181_x += entry.motionY * reduction;
-      entity.field_70179_y += entry.motionZ * reduction;
+      entity.motionX += entry.motionX * reduction;
+      entity.motionY += entry.motionY * reduction;
+      entity.motionZ += entry.motionZ * reduction;
     } 
     if (isNuclear() && this.radiationRange >= 1) {
       List<EntityLiving> entitiesInRange = this.worldObj.func_72872_a(EntityLiving.class, new AxisAlignedBB(this.explosionX - this.radiationRange, this.explosionY - this.radiationRange, this.explosionZ - this.radiationRange, this.explosionX + this.radiationRange, this.explosionY + this.radiationRange, this.explosionZ + this.radiationRange));
@@ -251,8 +251,8 @@ public class ExplosionIC2 extends Explosion {
           x += this.areaX;
           z += this.areaZ;
           tmpPos.func_181079_c(x, y, z);
-          IBlockState state = this.chunkCache.func_180495_p((BlockPos)tmpPos);
-          Block block = state.func_177230_c();
+          IBlockState state = this.chunkCache.getBlockState((BlockPos)tmpPos);
+          Block block = state.getBlock();
           if (this.power < 20.0F);
           if (doDrops && block.func_149659_a(this) && getAtIndex(index, bitSet, 2) == 1)
             for (ItemStack stack : StackUtil.getDrops((IBlockAccess)this.worldObj, (BlockPos)tmpPos, state, block, 0)) {
@@ -323,8 +323,8 @@ public class ExplosionIC2 extends Explosion {
       int blockX = Util.roundToNegInf(x);
       int blockZ = Util.roundToNegInf(z);
       tmpPos.func_181079_c(blockX, blockY, blockZ);
-      IBlockState state = this.chunkCache.func_180495_p((BlockPos)tmpPos);
-      Block block = state.func_177230_c();
+      IBlockState state = this.chunkCache.getBlockState((BlockPos)tmpPos);
+      Block block = state.getBlock();
       double absorption = getAbsorption(block, (BlockPos)tmpPos);
       if (absorption < 0.0D)
         break; 
@@ -333,7 +333,7 @@ public class ExplosionIC2 extends Explosion {
       } else {
         if (absorption > power1)
           break; 
-        if (block == Blocks.field_150348_b || (block != Blocks.field_150350_a && !block.isAir(state, (IBlockAccess)this.worldObj, (BlockPos)tmpPos)))
+        if (block == Blocks.field_150348_b || (block != Blocks.AIR && !block.isAir(state, (IBlockAccess)this.worldObj, (BlockPos)tmpPos)))
           destroyUnchecked(blockX, blockY, blockZ, (power1 > 8.0D)); 
       } 
       if (killEntities && (step + 4) % 8 == 0 && !this.entitiesInRange.isEmpty() && power1 >= 0.25D)
@@ -350,7 +350,7 @@ public class ExplosionIC2 extends Explosion {
   
   private double getAbsorption(Block block, BlockPos pos) {
     double ret = 0.5D;
-    if (block == Blocks.field_150350_a || block.isAir(block.func_176223_P(), (IBlockAccess)this.worldObj, pos))
+    if (block == Blocks.AIR || block.isAir(block.getDefaultState(), (IBlockAccess)this.worldObj, pos))
       return ret; 
     if ((block == Blocks.field_150355_j || block == Blocks.field_150358_i) && this.type != Type.Normal) {
       ret++;
@@ -394,13 +394,13 @@ public class ExplosionIC2 extends Explosion {
       if (entry.distance >= distanceMax)
         break; 
       Entity entity = entry.entity;
-      if (Util.square(entity.field_70165_t - x) + Util.square(entity.field_70163_u - y) + Util.square(entity.field_70161_v - z) <= 25.0D) {
+      if (Util.square(entity.posX - x) + Util.square(entity.posY - y) + Util.square(entity.posZ - z) <= 25.0D) {
         double damage = 4.0D * power;
         entry.damage += damage;
         entry.health -= damage;
-        double dx = entity.field_70165_t - this.explosionX;
-        double dy = entity.field_70163_u - this.explosionY;
-        double dz = entity.field_70161_v - this.explosionZ;
+        double dx = entity.posX - this.explosionX;
+        double dy = entity.posY - this.explosionY;
+        double dz = entity.posZ - this.explosionZ;
         double distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
         entry.motionX += dx / distance * 0.0875D * power;
         entry.motionY += dy / distance * 0.0875D * power;

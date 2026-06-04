@@ -276,10 +276,10 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
       puffs = rnd.nextInt(puffs);
       int n;
       for (n = 0; n < puffs; n++)
-        world.func_175688_a(EnumParticleTypes.SMOKE_NORMAL, (pos.func_177958_n() + rnd.nextFloat()), (pos.func_177956_o() + 0.95F), (pos.func_177952_p() + rnd.nextFloat()), 0.0D, 0.0D, 0.0D, new int[0]); 
+        world.func_175688_a(EnumParticleTypes.SMOKE_NORMAL, (pos.getX() + rnd.nextFloat()), (pos.getY() + 0.95F), (pos.getZ() + rnd.nextFloat()), 0.0D, 0.0D, 0.0D, new int[0]); 
       puffs -= rnd.nextInt(4) + 3;
       for (n = 0; n < puffs; n++)
-        world.func_175688_a(EnumParticleTypes.FLAME, (pos.func_177958_n() + rnd.nextFloat()), (pos.func_177956_o() + 1), (pos.func_177952_p() + rnd.nextFloat()), 0.0D, 0.0D, 0.0D, new int[0]); 
+        world.func_175688_a(EnumParticleTypes.FLAME, (pos.getX() + rnd.nextFloat()), (pos.getY() + 1), (pos.getZ() + rnd.nextFloat()), 0.0D, 0.0D, 0.0D, new int[0]); 
     } 
   }
   
@@ -327,8 +327,8 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
     World world = getWorld();
     if (power >= 0.85F && world.field_73012_v.nextFloat() <= 0.2F * this.hem) {
       BlockPos coord = getRandCoord(2);
-      IBlockState state = world.func_180495_p(coord);
-      Block block = state.func_177230_c();
+      IBlockState state = world.getBlockState(coord);
+      Block block = state.getBlock();
       if (block.isAir(state, (IBlockAccess)world, coord)) {
         world.func_175656_a(coord, Blocks.field_150480_ab.getDefaultState());
       } else if (state.func_185887_b(world, coord) >= 0.0F && world
@@ -349,14 +349,14 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
     } 
     if (power >= 0.5F && world.field_73012_v.nextFloat() <= this.hem) {
       BlockPos coord = getRandCoord(2);
-      IBlockState state = world.func_180495_p(coord);
+      IBlockState state = world.getBlockState(coord);
       if (state.func_185904_a() == Material.field_151586_h)
         world.func_175698_g(coord); 
     } 
     if (power >= 0.4F && world.field_73012_v.nextFloat() <= this.hem) {
       BlockPos coord = getRandCoord(2);
       if (world.func_175625_s(coord) == null) {
-        IBlockState state = world.func_180495_p(coord);
+        IBlockState state = world.getBlockState(coord);
         Material mat = state.func_185904_a();
         if (mat == Material.field_151575_d || mat == Material.field_151584_j || mat == Material.field_151580_n)
           world.func_175656_a(coord, Blocks.field_150480_ab.getDefaultState()); 
@@ -704,7 +704,7 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
   }
   
   private static boolean isFluidChamberBlock(IBlockAccess world, BlockPos pos) {
-    IBlockState state = world.func_180495_p(pos);
+    IBlockState state = world.getBlockState(pos);
     if (state == BlockName.resource.getBlockState((IIdProvider)ResourceBlock.reactor_vessel))
       return true; 
     TileEntity te = world.func_175625_s(pos);

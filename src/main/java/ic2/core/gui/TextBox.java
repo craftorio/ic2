@@ -189,7 +189,7 @@ public class TextBox extends GuiElement<TextBox> {
       startX = this.x + this.width; 
     Tessellator tessellator = Tessellator.func_178181_a();
     BufferBuilder vertexbuffer = tessellator.func_178180_c();
-    GlStateManager.func_179131_c(0.0F, 0.0F, 255.0F, 255.0F);
+    GlStateManager.color(0.0F, 0.0F, 255.0F, 255.0F);
     GlStateManager.func_179090_x();
     GlStateManager.func_179115_u();
     GlStateManager.func_187422_a(GlStateManager.LogicOp.OR_REVERSE);

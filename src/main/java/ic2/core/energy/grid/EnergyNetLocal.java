@@ -165,7 +165,7 @@ public class EnergyNetLocal {
         for (BlockPos pos : this.positionsToNotify) {
           if (!this.world.func_175667_e(pos))
             continue; 
-          this.world.func_180495_p(pos).func_189546_a(this.world, pos, block, pos);
+          this.world.getBlockState(pos).func_189546_a(this.world, pos, block, pos);
         } 
         this.positionsToNotify.clear();
       } 

@@ -24,12 +24,12 @@ public class AudioPosition
 		if (obj instanceof Entity)
 		{
 			Entity e = (Entity) obj;
-			return new AudioPosition(e.func_130014_f_(), (float) e.field_70165_t, (float) e.field_70163_u, (float) e.field_70161_v);
+			return new AudioPosition(e.getEntityWorld(), (float) e.posX, (float) e.posY, (float) e.posZ);
 		}
 		if (obj instanceof TileEntity)
 		{
 			TileEntity te = (TileEntity) obj;
-			return new AudioPosition(te.getWorld(), te.getPos().func_177958_n() + 0.5F, te.getPos().func_177956_o() + 0.5F, te.getPos().func_177952_p() + 0.5F);
+			return new AudioPosition(te.getWorld(), te.getPos().getX() + 0.5F, te.getPos().getY() + 0.5F, te.getPos().getZ() + 0.5F);
 		}
 		return null;
 	}
@@ -44,7 +44,7 @@ public class AudioPosition
 
 	public AudioPosition(World world, BlockPos pos)
 	{
-		this(world, pos.func_177958_n() + 0.5F, pos.func_177956_o() + 0.5F, pos.func_177952_p() + 0.5F);
+		this(world, pos.getX() + 0.5F, pos.getY() + 0.5F, pos.getZ() + 0.5F);
 	}
 
 	public World getWorld()

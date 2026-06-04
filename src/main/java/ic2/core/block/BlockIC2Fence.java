@@ -54,8 +54,8 @@ public class BlockIC2Fence extends BlockMultiID<BlockIC2Fence.IC2FenceType> {
   
   @SideOnly(Side.CLIENT)
   public void registerModels(BlockName name) {
-    Item item = Item.func_150898_a(this);
-    if (item == null || item == Items.field_190931_a)
+    Item item = Item.getItemFromBlock(this);
+    if (item == null || item == Items.AIR)
       return; 
     ResourceLocation loc = Util.getName(item);
     if (loc == null)
@@ -83,13 +83,13 @@ public class BlockIC2Fence extends BlockMultiID<BlockIC2Fence.IC2FenceType> {
     boolean magnetizerConnected = false;
     IBlockState ret = state;
     for (EnumFacing facing : EnumFacing.field_176754_o) {
-      IBlockState neighborState = world.func_180495_p(pos.func_177972_a(facing));
+      IBlockState neighborState = world.getBlockState(pos.func_177972_a(facing));
       if (isFence(neighborState)) {
         isPole = false;
         if (magnetizerConnected)
           break; 
         ret = ret.func_177226_a(connectProperties.get(facing), Boolean.valueOf(true));
-      } else if (isPole && getMagnetizer(world, pos.func_177972_a(facing), facing, world.func_180495_p(pos.func_177972_a(facing)), false) != null) {
+      } else if (isPole && getMagnetizer(world, pos.func_177972_a(facing), facing, world.getBlockState(pos.func_177972_a(facing)), false) != null) {
         magnetizerConnected = true;
         ret = ret.func_177226_a(connectProperties.get(facing), Boolean.valueOf(true));
       } 
@@ -97,7 +97,7 @@ public class BlockIC2Fence extends BlockMultiID<BlockIC2Fence.IC2FenceType> {
     if (!isPole && magnetizerConnected) {
       ret = state;
       for (EnumFacing facing : EnumFacing.field_176754_o) {
-        IBlockState neighborState = world.func_180495_p(pos.func_177972_a(facing));
+        IBlockState neighborState = world.getBlockState(pos.func_177972_a(facing));
         if (isFence(neighborState))
           ret = ret.func_177226_a(connectProperties.get(facing), Boolean.valueOf(true)); 
       } 
@@ -132,21 +132,21 @@ public class BlockIC2Fence extends BlockMultiID<BlockIC2Fence.IC2FenceType> {
     EntityPlayer player = (EntityPlayer)rawEntity;
     boolean metalShoes = hasMetalShoes(player);
     boolean descending = player.func_70093_af();
-    boolean slow = (player.field_70181_x >= -0.25D || player.field_70181_x < 1.6D);
+    boolean slow = (player.motionY >= -0.25D || player.motionY < 1.6D);
     if (slow)
       player.field_70143_R = 0.0F; 
     if (!powered) {
       if (descending && !slow && metalShoes)
-        player.field_70181_x *= 0.9D; 
+        player.motionY *= 0.9D; 
     } else if (descending) {
       if (!slow)
-        player.field_70181_x *= 0.8D; 
+        player.motionY *= 0.8D; 
     } else {
-      player.field_70181_x += 0.075D;
-      if (player.field_70181_x > 0.0D)
-        player.field_70181_x *= 1.03D; 
+      player.motionY += 0.075D;
+      if (player.motionY > 0.0D)
+        player.motionY *= 1.03D; 
       double maxSpeed = IC2.keyboard.isAltKeyDown(player) ? 0.1D : (metalShoes ? 1.5D : 0.5D);
-      player.field_70181_x = Math.min(player.field_70181_x, maxSpeed);
+      player.motionY = Math.min(player.motionY, maxSpeed);
     } 
     if (!world.isRemote) {
       List<TileEntityMagnetizer> magnetizers = getMagnetizers((IBlockAccess)world, pos, false);
@@ -187,11 +187,11 @@ public class BlockIC2Fence extends BlockMultiID<BlockIC2Fence.IC2FenceType> {
   }
   
   private static boolean isFence(IBlockState state) {
-    return (state.func_177230_c() instanceof BlockIC2Fence || state.func_177230_c() instanceof net.minecraft.block.BlockFence);
+    return (state.getBlock() instanceof BlockIC2Fence || state.getBlock() instanceof net.minecraft.block.BlockFence);
   }
   
   private static TileEntityMagnetizer getMagnetizer(IBlockAccess world, BlockPos pos, EnumFacing side, IBlockState state, boolean checkPower) {
-    if (state.func_177230_c() != BlockName.te.getInstance())
+    if (state.getBlock() != BlockName.te.getInstance())
       return null; 
     TileEntity te = world.func_175625_s(pos);
     if (te instanceof TileEntityMagnetizer) {
@@ -205,7 +205,7 @@ public class BlockIC2Fence extends BlockMultiID<BlockIC2Fence.IC2FenceType> {
   }
   
   public static boolean hasMetalShoes(EntityPlayer player) {
-    ItemStack shoes = (ItemStack)player.field_71071_by.field_70460_b.get(0);
+    ItemStack shoes = (ItemStack)player.inventory.field_70460_b.get(0);
     if (shoes != null) {
       Item item = shoes.getItem();
       if (item == Items.field_151167_ab || item == Items.field_151151_aj || item == Items.field_151029_X || 
@@ -250,9 +250,9 @@ public class BlockIC2Fence extends BlockMultiID<BlockIC2Fence.IC2FenceType> {
       boolean abort = false;
       for (int dir = minDir; dir < maxDir; dir++) {
         int offset = dir * 2 - 1;
-        center.setY(start.func_177956_o() + offset * dy);
+        center.setY(start.getY() + offset * dy);
         IBlockState centerState = center.getBlockState(world);
-        if (!(centerState.func_177230_c() instanceof BlockIC2Fence) || 
+        if (!(centerState.getBlock() instanceof BlockIC2Fence) || 
           !((IC2FenceType)centerState.func_177229_b((IProperty)this.typeProperty)).canBoost) {
           if (dir == 0) {
             minDir = 1;

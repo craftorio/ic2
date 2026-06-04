@@ -165,7 +165,7 @@ public class JetpackHandler implements IBackupElectricItemManager {
       return; 
     ItemStack stack = event.player.func_184582_a(EntityEquipmentSlot.CHEST);
     if (hasJetpack(stack))
-      JetpackLogic.onArmorTick(event.player.func_130014_f_(), event.player, stack, getJetpack(stack)); 
+      JetpackLogic.onArmorTick(event.player.getEntityWorld(), event.player, stack, getJetpack(stack)); 
     if (playerArmorBuffer.containsKey(event.player)) {
       ItemStack lastStack = playerArmorBuffer.get(event.player);
       if (StackUtil.isEmpty(lastStack) && hasJetpackAttached(lastStack) && StackUtil.isEmpty(stack)) {

@@ -46,10 +46,10 @@ public class TileEntityTesla extends TileEntityBlock {
           WorldServer worldServer = (WorldServer)world;
           Random rnd = world.field_73012_v;
           for (int i = 0; i < damage; i++)
-            worldServer.func_180505_a(EnumParticleTypes.REDSTONE, true, entity.field_70165_t + rnd
+            worldServer.func_180505_a(EnumParticleTypes.REDSTONE, true, entity.posX + rnd
                 
-                .nextFloat() - 0.5D, entity.field_70163_u + (rnd
-                .nextFloat() * 2.0F) - 1.0D, entity.field_70161_v + rnd
+                .nextFloat() - 0.5D, entity.posY + (rnd
+                .nextFloat() * 2.0F) - 1.0D, entity.posZ + rnd
                 .nextFloat() - 0.5D, 0, 0.1D, 0.1D, 1.0D, 1.0D, new int[0]); 
         } 
         return true;

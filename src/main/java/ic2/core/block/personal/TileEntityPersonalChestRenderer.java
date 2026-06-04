@@ -15,7 +15,7 @@ public class TileEntityPersonalChestRenderer extends TileEntitySpecialRenderer<T
     float doorHingeX = 0.84375F;
     float doorHingeZ = 0.15625F;
     GlStateManager.func_179094_E();
-    GlStateManager.func_179131_c(1.0F, 1.0F, 1.0F, 1.0F);
+    GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
     GlStateManager.func_179137_b(x, y, z);
     GlStateManager.func_179109_b(0.5F, 0.5F, 0.5F);
     switch (te.getFacing()) {

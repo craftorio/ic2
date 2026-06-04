@@ -139,19 +139,19 @@ public abstract class GuiElement<T extends GuiElement<T>> {
   }
   
   protected static void bindTexture(ResourceLocation texture) {
-    (Minecraft.func_71410_x()).field_71446_o.func_110577_a(texture);
+    (Minecraft.getMinecraft()).field_71446_o.func_110577_a(texture);
   }
   
   public static void bindCommonTexture() {
-    (Minecraft.func_71410_x()).field_71446_o.func_110577_a(commonTexture);
+    (Minecraft.getMinecraft()).field_71446_o.func_110577_a(commonTexture);
   }
   
   protected static void bindBlockTexture() {
-    (Minecraft.func_71410_x()).field_71446_o.func_110577_a(TextureMap.field_110575_b);
+    (Minecraft.getMinecraft()).field_71446_o.func_110577_a(TextureMap.field_110575_b);
   }
   
   protected static TextureMap getBlockTextureMap() {
-    return Minecraft.func_71410_x().func_147117_R();
+    return Minecraft.getMinecraft().func_147117_R();
   }
   
   private static final Method hasMethod(Class<?> cls, String name, Class<?>... params) {

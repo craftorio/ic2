@@ -37,7 +37,7 @@ public enum BlockName {
       return block.getState(variant);
     } 
     if (variant == null)
-      return this.instance.func_176223_P(); 
+      return this.instance.getDefaultState(); 
     throw new IllegalArgumentException("not applicable");
   }
   
@@ -46,8 +46,8 @@ public enum BlockName {
       return false; 
     if (this.instance instanceof IMultiItem)
       return true; 
-    Item item = Item.func_150898_a(this.instance);
-    return (item != null && item != Items.field_190931_a);
+    Item item = Item.getItemFromBlock(this.instance);
+    return (item != null && item != Items.AIR);
   }
   
   public <T extends Enum<T> & ic2.core.block.state.IIdProvider> ItemStack getItemStack() {
@@ -74,8 +74,8 @@ public enum BlockName {
       return multiItem.getItemStack(variant);
     } 
     if (variant == null) {
-      Item item = Item.func_150898_a(this.instance);
-      if (item == null || item == Items.field_190931_a)
+      Item item = Item.getItemFromBlock(this.instance);
+      if (item == null || item == Items.AIR)
         throw new IllegalArgumentException("No item found for " + this.instance); 
       return new ItemStack(item);
     } 

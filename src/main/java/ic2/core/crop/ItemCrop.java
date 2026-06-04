@@ -28,12 +28,12 @@ public class ItemCrop extends ItemIC2 implements IBoxable {
   }
   
   public EnumActionResult func_180614_a(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-    if (!world.func_180495_p(pos).func_177230_c().func_176200_f((IBlockAccess)world, pos))
+    if (!world.getBlockState(pos).getBlock().func_176200_f((IBlockAccess)world, pos))
       pos = pos.func_177972_a(side); 
     ItemStack cropStickStack = StackUtil.get(player, hand);
     if (StackUtil.isEmpty(cropStickStack))
       return EnumActionResult.PASS; 
-    if (world.func_180495_p(pos.func_177977_b()).func_177230_c() != Blocks.FARMLAND)
+    if (world.getBlockState(pos.func_177977_b()).getBlock() != Blocks.FARMLAND)
       return EnumActionResult.PASS; 
     if (!player.func_175151_a(pos, side, cropStickStack))
       return EnumActionResult.PASS; 
@@ -42,7 +42,7 @@ public class ItemCrop extends ItemIC2 implements IBoxable {
     TileEntityBlock tile = TileEntityBlock.instantiate(TeBlock.crop.getTeClass());
     if (ItemBlockTileEntity.placeTeBlock(cropStickStack, (EntityLivingBase)player, world, pos, side, tile)) {
       SoundType stepSound = SoundType.field_185850_c;
-      world.func_184148_a(null, pos.func_177958_n() + 0.5D, pos.func_177956_o() + 0.5D, pos.func_177952_p() + 0.5D, stepSound
+      world.func_184148_a(null, pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, stepSound
           .func_185841_e(), SoundCategory.BLOCKS, (stepSound
           
           .func_185843_a() + 1.0F) / 2.0F, stepSound

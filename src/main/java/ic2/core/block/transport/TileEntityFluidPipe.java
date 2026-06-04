@@ -458,11 +458,11 @@ public class TileEntityFluidPipe extends TileEntityPipe implements IFluidPipe {
     if (event.getSubID() != 0)
       return; 
     RayTraceResult rayTrace = event.getTarget();
-    if (rayTrace.field_72313_a != RayTraceResult.Type.BLOCK)
+    if (rayTrace.typeOfHit != RayTraceResult.Type.BLOCK)
       return; 
     EntityPlayer player = event.getPlayer();
-    World world = player.func_130014_f_();
-    BlockPos pos = rayTrace.func_178782_a();
+    World world = player.getEntityWorld();
+    BlockPos pos = rayTrace.getBlockPos();
     if (!world.func_175723_af().func_177746_a(pos))
       return; 
     TileEntity te = world.func_175625_s(pos);
@@ -473,9 +473,9 @@ public class TileEntityFluidPipe extends TileEntityPipe implements IFluidPipe {
     GlStateManager.func_187441_d(2.0F);
     GlStateManager.func_179090_x();
     GlStateManager.func_179132_a(false);
-    double xOffset = player.field_70142_S + (player.field_70165_t - player.field_70142_S) * event.getPartialTicks();
-    double yOffset = player.field_70137_T + (player.field_70163_u - player.field_70137_T) * event.getPartialTicks();
-    double zOffset = player.field_70136_U + (player.field_70161_v - player.field_70136_U) * event.getPartialTicks();
+    double xOffset = player.field_70142_S + (player.posX - player.field_70142_S) * event.getPartialTicks();
+    double yOffset = player.field_70137_T + (player.posY - player.field_70137_T) * event.getPartialTicks();
+    double zOffset = player.field_70136_U + (player.posZ - player.field_70136_U) * event.getPartialTicks();
     RenderGlobal.func_189697_a(((TileEntityFluidPipe)te).getVisualBoundingBox().func_186670_a(pos).func_186662_g(0.002D).func_72317_d(-xOffset, -yOffset, -zOffset), 0.0F, 0.0F, 0.0F, 0.4F);
     GlStateManager.func_179132_a(true);
     GlStateManager.func_179098_w();

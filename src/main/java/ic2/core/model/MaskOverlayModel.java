@@ -61,7 +61,7 @@ public abstract class MaskOverlayModel extends AbstractModel {
     BufferedImage img;
     try {
       baseModel = ModelLoaderRegistry.getModel(this.baseModelLocation);
-      IResource resource = Minecraft.func_71410_x().func_110442_L().func_110536_a(this.maskTextureLocation);
+      IResource resource = Minecraft.getMinecraft().func_110442_L().func_110536_a(this.maskTextureLocation);
       img = TextureUtil.func_177053_a(resource.func_110527_b());
     } catch (Exception e) {
       throw new RuntimeException(e);

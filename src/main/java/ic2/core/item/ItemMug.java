@@ -42,7 +42,7 @@ public class ItemMug extends ItemMulti<ItemMug.MugType> {
         ItemStack is = new ItemStack(ItemName.booze_mug.getInstance(), 1, value);
         stack = StackUtil.decSize(stack);
         if (!StackUtil.isEmpty(stack)) {
-          if (!player.field_71071_by.func_70441_a(is))
+          if (!player.inventory.func_70441_a(is))
             player.func_71019_a(is, false); 
         } else {
           StackUtil.set(player, hand, is);

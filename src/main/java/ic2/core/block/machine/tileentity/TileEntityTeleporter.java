@@ -47,9 +47,9 @@ public class TileEntityTeleporter extends TileEntityBlock implements INetworkTil
   public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
     super.writeToNBT(nbt);
     if (this.target != null) {
-      nbt.func_74768_a("targetX", this.target.func_177958_n());
-      nbt.func_74768_a("targetY", this.target.func_177956_o());
-      nbt.func_74768_a("targetZ", this.target.func_177952_p());
+      nbt.func_74768_a("targetX", this.target.getX());
+      nbt.func_74768_a("targetY", this.target.getY());
+      nbt.func_74768_a("targetZ", this.target.getZ());
     } 
     return nbt;
   }
@@ -90,7 +90,7 @@ public class TileEntityTeleporter extends TileEntityBlock implements INetworkTil
         for (Entity entity : entitiesNearby) {
           if (entity.func_184187_bx() != null)
             continue; 
-          double distSquared = this.field_174879_c.func_177957_d(entity.field_70165_t, entity.field_70163_u, entity.field_70161_v);
+          double distSquared = this.field_174879_c.func_177957_d(entity.posX, entity.posY, entity.posZ);
           if (distSquared < minDistanceSquared) {
             minDistanceSquared = distSquared;
             closestEntity = entity;
@@ -140,9 +140,9 @@ public class TileEntityTeleporter extends TileEntityBlock implements INetworkTil
       return; 
     consumeEnergy(energyCost);
     if (user instanceof EntityPlayerMP) {
-      ((EntityPlayerMP)user).func_70634_a(this.target.func_177958_n() + 0.5D, this.target.func_177956_o() + 1.5D + user.func_70033_W(), this.target.func_177952_p() + 0.5D);
+      ((EntityPlayerMP)user).func_70634_a(this.target.getX() + 0.5D, this.target.getY() + 1.5D + user.func_70033_W(), this.target.getZ() + 0.5D);
     } else {
-      user.func_70080_a(this.target.func_177958_n() + 0.5D, this.target.func_177956_o() + 1.5D + user.func_70033_W(), this.target.func_177952_p() + 0.5D, user.field_70177_z, user.field_70125_A);
+      user.func_70080_a(this.target.getX() + 0.5D, this.target.getY() + 1.5D + user.func_70033_W(), this.target.getZ() + 0.5D, user.rotationYaw, user.rotationPitch);
     } 
     TileEntity te = getWorld().func_175625_s(this.target);
     assert te instanceof TileEntityTeleporter;
@@ -165,13 +165,13 @@ public class TileEntityTeleporter extends TileEntityBlock implements INetworkTil
     Random rnd = world.field_73012_v;
     for (int i = 0; i < n; i++) {
       world.func_175688_a(EnumParticleTypes.REDSTONE, (pos
-          .func_177958_n() + rnd.nextFloat()), ((pos
-          .func_177956_o() + 1) + rnd.nextFloat()), (pos
-          .func_177952_p() + rnd.nextFloat()), red, green, blue, new int[0]);
+          .getX() + rnd.nextFloat()), ((pos
+          .getY() + 1) + rnd.nextFloat()), (pos
+          .getZ() + rnd.nextFloat()), red, green, blue, new int[0]);
       world.func_175688_a(EnumParticleTypes.REDSTONE, (pos
-          .func_177958_n() + rnd.nextFloat()), ((pos
-          .func_177956_o() + 2) + rnd.nextFloat()), (pos
-          .func_177952_p() + rnd.nextFloat()), red, green, blue, new int[0]);
+          .getX() + rnd.nextFloat()), ((pos
+          .getY() + 2) + rnd.nextFloat()), (pos
+          .getZ() + rnd.nextFloat()), red, green, blue, new int[0]);
     } 
   }
   
@@ -229,7 +229,7 @@ public class TileEntityTeleporter extends TileEntityBlock implements INetworkTil
     } else if (user instanceof EntityPlayer) {
       weight += 1000;
       if (teleporterUseInventoryWeight)
-        for (ItemStack stack : ((EntityPlayer)user).field_71071_by.field_70462_a)
+        for (ItemStack stack : ((EntityPlayer)user).inventory.field_70462_a)
           weight += getStackCost(stack);  
     } else if (user instanceof net.minecraft.entity.monster.EntityGhast) {
       weight += 2500;

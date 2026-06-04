@@ -12,12 +12,12 @@ public class TileEntityChargepadCESU extends TileEntityChargepadBlock {
   
   protected void getItems(EntityPlayer player) {
     if (player != null) {
-      for (ItemStack current : player.field_71071_by.field_70460_b) {
+      for (ItemStack current : player.inventory.field_70460_b) {
         if (current == null)
           continue; 
         chargeItem(current, 128);
       } 
-      for (ItemStack current : player.field_71071_by.field_70462_a) {
+      for (ItemStack current : player.inventory.field_70462_a) {
         if (current == null)
           continue; 
         chargeItem(current, 128);

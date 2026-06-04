@@ -45,13 +45,13 @@ public class ItemHandlers {
         RayTraceResult position = Util.traceBlocks(player, true);
         if (position == null)
           return new ActionResult(EnumActionResult.PASS, stack); 
-        if (position.field_72313_a == RayTraceResult.Type.BLOCK) {
-          World world = player.func_130014_f_();
-          if (!world.canMineBlockBody(player, position.func_178782_a()))
+        if (position.typeOfHit == RayTraceResult.Type.BLOCK) {
+          World world = player.getEntityWorld();
+          if (!world.canMineBlockBody(player, position.getBlockPos()))
             return new ActionResult(EnumActionResult.FAIL, stack); 
-          if (world.func_180495_p(position.func_178782_a()).func_177230_c() == Blocks.field_150355_j) {
+          if (world.getBlockState(position.getBlockPos()).getBlock() == Blocks.field_150355_j) {
             stack = StackUtil.decSize(stack);
-            world.func_175656_a(position.func_178782_a(), FluidName.construction_foam.getInstance().getBlock().func_176223_P());
+            world.func_175656_a(position.getBlockPos(), FluidName.construction_foam.getInstance().getBlock().getDefaultState());
             new ActionResult(EnumActionResult.SUCCESS, stack);
           } 
         } 
@@ -61,7 +61,7 @@ public class ItemHandlers {
   
   public static ItemMulti.IItemRightClickHandler scrapBoxUnpack = new ItemMulti.IItemRightClickHandler() {
       public ActionResult<ItemStack> onRightClick(ItemStack stack, EntityPlayer player, EnumHand hand) {
-        if (!(player.func_130014_f_()).isRemote) {
+        if (!(player.getEntityWorld()).isRemote) {
           ItemStack drop = Recipes.scrapboxDrops.getDrop(stack, false);
           if (drop != null && player
             .func_71019_a(drop, false) != null && !player.field_71075_bZ.field_75098_d) {
@@ -75,9 +75,9 @@ public class ItemHandlers {
   
   public static ItemMulti.IItemUseHandler resinUse = new ItemMulti.IItemUseHandler() {
       public EnumActionResult onUse(ItemStack stack, EntityPlayer player, BlockPos pos, EnumHand hand, EnumFacing side) {
-        World world = player.func_130014_f_();
-        IBlockState state = world.func_180495_p(pos);
-        if (state.func_177230_c() == Blocks.field_150331_J && state.func_177229_b((IProperty)BlockPistonBase.field_176387_N) == side) {
+        World world = player.getEntityWorld();
+        IBlockState state = world.getBlockState(pos);
+        if (state.getBlock() == Blocks.field_150331_J && state.func_177229_b((IProperty)BlockPistonBase.field_176387_N) == side) {
           IBlockState newState = Blocks.field_150320_F.getDefaultState().func_177226_a((IProperty)BlockPistonBase.field_176387_N, (Comparable)side).func_177226_a((IProperty)BlockPistonBase.field_176320_b, state.func_177229_b((IProperty)BlockPistonBase.field_176320_b));
           world.func_180501_a(pos, newState, 3);
           if (!player.field_71075_bZ.field_75098_d)
@@ -87,7 +87,7 @@ public class ItemHandlers {
         if (side != EnumFacing.UP)
           return EnumActionResult.PASS; 
         pos = pos.func_177984_a();
-        if (!state.func_177230_c().isAir(state, (IBlockAccess)world, pos) || 
+        if (!state.getBlock().isAir(state, (IBlockAccess)world, pos) || 
           !BlockName.sheet.getInstance().func_176198_a(world, pos, side))
           return EnumActionResult.PASS; 
         world.func_175656_a(pos, BlockName.sheet.getBlockState((IIdProvider)BlockSheet.SheetType.resin));
@@ -140,13 +140,13 @@ public class ItemHandlers {
     return new ItemMulti.IItemUseHandler() {
         public EnumActionResult onUse(ItemStack stack, EntityPlayer player, BlockPos pos, EnumHand hand, EnumFacing side) {
           assert stack.getItem() == ItemName.misc_resource.getInstance();
-          World world = player.func_130014_f_();
-          if (!world.func_180495_p(pos).func_177230_c().func_176200_f((IBlockAccess)world, pos))
+          World world = player.getEntityWorld();
+          if (!world.getBlockState(pos).getBlock().func_176200_f((IBlockAccess)world, pos))
             pos = pos.func_177972_a(side); 
           if (player.func_175151_a(pos, side, stack) && world.func_190527_a(type, pos, false, side, null)) {
             IBlockState placedState = type.getStateForPlacement(world, pos, side, 0.0F, 0.0F, 0.0F, 0, (EntityLivingBase)player, hand);
             world.func_175656_a(pos, placedState);
-            SoundType sound = placedState.func_177230_c().getSoundType(placedState, world, pos, (Entity)player);
+            SoundType sound = placedState.getBlock().getSoundType(placedState, world, pos, (Entity)player);
             world.func_184133_a(player, pos, sound.func_185841_e(), SoundCategory.BLOCKS, (sound.func_185843_a() + 1.0F) / 2.0F, sound.func_185847_b() * 0.8F);
             StackUtil.consumeOrError(player, hand, 1);
             return EnumActionResult.SUCCESS;
@@ -159,12 +159,12 @@ public class ItemHandlers {
   public static ItemMulti.IItemUseHandler emptyCellFill = new ItemMulti.IItemUseHandler() {
       public EnumActionResult onUse(ItemStack stack, EntityPlayer player, BlockPos pos, EnumHand hand, EnumFacing side) {
         assert stack.getItem() == ItemName.cell.getInstance();
-        World world = player.func_130014_f_();
+        World world = player.getEntityWorld();
         RayTraceResult position = Util.traceBlocks(player, true);
         if (position == null)
           return EnumActionResult.FAIL; 
-        if (position.field_72313_a == RayTraceResult.Type.BLOCK) {
-          pos = position.func_178782_a();
+        if (position.typeOfHit == RayTraceResult.Type.BLOCK) {
+          pos = position.getBlockPos();
           if (!world.canMineBlockBody(player, pos))
             return EnumActionResult.FAIL; 
           if (!player.func_175151_a(pos, position.field_178784_b, player.func_184586_b(hand)))

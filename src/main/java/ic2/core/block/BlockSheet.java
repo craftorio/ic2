@@ -48,7 +48,7 @@ public class BlockSheet extends BlockMultiID<BlockSheet.SheetType> {
   
   public void func_185477_a(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
     if (getType(state) == SheetType.wool && 
-      entityIn instanceof EntityPlayer && (entityIn.func_70093_af() || entityIn.field_70163_u < pos.func_177956_o() + aabb.field_72337_e - entityIn.field_70138_W))
+      entityIn instanceof EntityPlayer && (entityIn.func_70093_af() || entityIn.posY < pos.getY() + aabb.field_72337_e - entityIn.field_70138_W))
       return; 
     super.func_185477_a(state, worldIn, pos, entityBox, collidingBoxes, entityIn, isActualState);
   }
@@ -72,9 +72,9 @@ public class BlockSheet extends BlockMultiID<BlockSheet.SheetType> {
         return isNormalCubeBelow(world, pos);
       case rubber:
         for (EnumFacing facing : EnumFacing.field_176754_o) {
-          state = world.func_180495_p(pos.func_177972_a(facing));
+          state = world.getBlockState(pos.func_177972_a(facing));
           if (state == BlockName.sheet.getBlockState(SheetType.rubber) || state
-            .func_177230_c().isNormalCube(state, (IBlockAccess)world, pos))
+            .getBlock().isNormalCube(state, (IBlockAccess)world, pos))
             return true; 
         } 
         return isNormalCubeBelow(world, pos);
@@ -86,8 +86,8 @@ public class BlockSheet extends BlockMultiID<BlockSheet.SheetType> {
   
   private boolean isNormalCubeBelow(World world, BlockPos pos) {
     pos = pos.func_177977_b();
-    IBlockState state = world.func_180495_p(pos);
-    return state.func_177230_c().isNormalCube(state, (IBlockAccess)world, pos);
+    IBlockState state = world.getBlockState(pos);
+    return state.getBlock().isNormalCube(state, (IBlockAccess)world, pos);
   }
   
   public void func_189540_a(IBlockState state, World world, BlockPos pos, Block neighborBlock, BlockPos neighborPos) {
@@ -101,9 +101,9 @@ public class BlockSheet extends BlockMultiID<BlockSheet.SheetType> {
     switch (getType(state)) {
       case resin:
         entity.field_70143_R = (float)(entity.field_70143_R * 0.75D);
-        entity.field_70159_w *= 0.6D;
-        entity.field_70181_x *= 0.85D;
-        entity.field_70179_y *= 0.6D;
+        entity.motionX *= 0.6D;
+        entity.motionY *= 0.85D;
+        entity.motionZ *= 0.6D;
         break;
       case rubber:
         if (world.func_175677_d(pos.func_177977_b(), false))
@@ -112,23 +112,23 @@ public class BlockSheet extends BlockMultiID<BlockSheet.SheetType> {
           world.func_175698_g(pos);
           return;
         } 
-        if (entity.field_70181_x <= -0.4D) {
+        if (entity.motionY <= -0.4D) {
           entity.field_70143_R = 0.0F;
-          entity.field_70159_w *= 1.1D;
-          entity.field_70179_y *= 1.1D;
+          entity.motionX *= 1.1D;
+          entity.motionZ *= 1.1D;
           if (entity instanceof net.minecraft.entity.EntityLivingBase) {
             if (entity instanceof EntityPlayer && IC2.keyboard.isJumpKeyDown((EntityPlayer)entity)) {
-              entity.field_70181_x *= -1.3D;
+              entity.motionY *= -1.3D;
               break;
             } 
             if (entity instanceof EntityPlayer && ((EntityPlayer)entity).func_70093_af()) {
-              entity.field_70181_x *= -0.1D;
+              entity.motionY *= -0.1D;
               break;
             } 
-            entity.field_70181_x *= -0.8D;
+            entity.motionY *= -0.8D;
             break;
           } 
-          entity.field_70181_x *= -0.8D;
+          entity.motionY *= -0.8D;
         } 
         break;
       case wool:
@@ -147,7 +147,7 @@ public class BlockSheet extends BlockMultiID<BlockSheet.SheetType> {
         for (int i = 0; i < 16; i++) {
           cPos.move(axis, dir);
           IBlockState state = cPos.getBlockState((IBlockAccess)world);
-          if (state.func_177230_c().isNormalCube(state, (IBlockAccess)world, (BlockPos)cPos)) {
+          if (state.getBlock().isNormalCube(state, (IBlockAccess)world, (BlockPos)cPos)) {
             supported = true;
             break;
           } 
@@ -155,7 +155,7 @@ public class BlockSheet extends BlockMultiID<BlockSheet.SheetType> {
             break; 
           cPos.moveDown();
           IBlockState baseState = cPos.getBlockState((IBlockAccess)world);
-          if (baseState.func_177230_c().isNormalCube(baseState, (IBlockAccess)world, (BlockPos)cPos)) {
+          if (baseState.getBlock().isNormalCube(baseState, (IBlockAccess)world, (BlockPos)cPos)) {
             supported = true;
             break;
           } 

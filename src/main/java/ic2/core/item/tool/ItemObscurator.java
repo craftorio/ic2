@@ -69,7 +69,7 @@ public class ItemObscurator extends BaseElectricItem implements IPlayerItemDataL
         clear(nbt);
         return EnumActionResult.PASS;
       } 
-      IBlockState state = world.func_180495_p(pos);
+      IBlockState state = world.getBlockState(pos);
       RetextureEvent event = new RetextureEvent(world, pos, state, side, player, refState, getVariant(nbt), refSide, colorMultipliers);
       MinecraftForge.EVENT_BUS.post((Event)event);
       if (event.applied) {
@@ -86,7 +86,7 @@ public class ItemObscurator extends BaseElectricItem implements IPlayerItemDataL
   private boolean scanBlock(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side) {
     assert world.isRemote;
     IBlockState state = Util.getBlockState((IBlockAccess)world, pos);
-    if (state.func_177230_c().isAir(state, (IBlockAccess)world, pos))
+    if (state.getBlock().isAir(state, (IBlockAccess)world, pos))
       return false; 
     ObscuredRenderInfo renderInfo = getRenderInfo(state, side);
     if (renderInfo == null)
@@ -100,8 +100,8 @@ public class ItemObscurator extends BaseElectricItem implements IPlayerItemDataL
       !variant.equals(getVariant(nbt)) || 
       getSide(nbt) != side || 
       !Arrays.equals(getColorMultipliers(nbt), colorMultipliers)) {
-      ((NetworkManager)IC2.network.get(false)).sendPlayerItemData(player, player.field_71071_by.field_70461_c, new Object[] { state
-            .func_177230_c(), variant, side, colorMultipliers });
+      ((NetworkManager)IC2.network.get(false)).sendPlayerItemData(player, player.inventory.field_70461_c, new Object[] { state
+            .getBlock(), variant, side, colorMultipliers });
       return true;
     } 
     return false;
@@ -116,7 +116,7 @@ public class ItemObscurator extends BaseElectricItem implements IPlayerItemDataL
       return; 
     if (!(data[3] instanceof int[]))
       return; 
-    ItemStack stack = (ItemStack)player.field_71071_by.field_70462_a.get(slot);
+    ItemStack stack = (ItemStack)player.inventory.field_70462_a.get(slot);
     if (!ElectricItem.manager.use(stack, 20000.0D, (EntityLivingBase)player))
       return; 
     NBTTagCompound nbt = StackUtil.getOrCreateNbtData(stack);
@@ -175,7 +175,7 @@ public class ItemObscurator extends BaseElectricItem implements IPlayerItemDataL
   }
   
   public static ObscuredRenderInfo getRenderInfo(IBlockState state, EnumFacing side) {
-    Block block = state.func_177230_c();
+    Block block = state.getBlock();
     if (block.func_180664_k() == BlockRenderLayer.TRANSLUCENT)
       return null; 
     IBakedModel model = ModelUtil.getBlockModel(state);
@@ -200,9 +200,9 @@ public class ItemObscurator extends BaseElectricItem implements IPlayerItemDataL
         testConsumer.reset();
       } 
       float[] positions = testConsumer.positions;
-      int dx = side.func_82601_c();
-      int dy = side.func_96559_d();
-      int dz = side.func_82599_e();
+      int dx = side.getFrontOffsetX();
+      int dy = side.getFrontOffsetY();
+      int dz = side.getFrontOffsetZ();
       int xS = (dx + 1) / 2;
       int yS = (dy + 1) / 2;
       int zS = (dz + 1) / 2;

@@ -59,7 +59,7 @@ public class ItemScanner extends BaseElectricItem implements IBoxable, IHandHeld
     if (!world.isRemote) {
       if (IC2.platform.launchGui(player, getInventory(player, stack)) && player.field_71070_bA instanceof ContainerToolScanner) {
         ContainerToolScanner container = (ContainerToolScanner)player.field_71070_bA;
-        Map<ItemComparableItemStack, Integer> scanResult = scan(player.func_130014_f_(), player
+        Map<ItemComparableItemStack, Integer> scanResult = scan(player.getEntityWorld(), player
             .func_180425_c(), 
             getScanRange());
         container.setResults(scanMapToSortedList(scanResult));
@@ -71,7 +71,7 @@ public class ItemScanner extends BaseElectricItem implements IBoxable, IHandHeld
   }
   
   public boolean onDroppedByPlayer(ItemStack stack, EntityPlayer player) {
-    if (!(player.func_130014_f_()).isRemote && !StackUtil.isEmpty(stack) && player.field_71070_bA instanceof ContainerToolScanner) {
+    if (!(player.getEntityWorld()).isRemote && !StackUtil.isEmpty(stack) && player.field_71070_bA instanceof ContainerToolScanner) {
       HandHeldScanner scanner = (HandHeldScanner)((ContainerToolScanner)player.field_71070_bA).base;
       if (scanner.isThisContainer(stack)) {
         scanner.saveAsThrown(stack);
@@ -102,13 +102,13 @@ public class ItemScanner extends BaseElectricItem implements IBoxable, IHandHeld
     ChunkCache cache = new ChunkCache(world, center.func_177982_a(-range, -range, -range), center.func_177982_a(range, range, range), 0);
     EntityPlayer player = Ic2Player.get(world);
     BlockPos.MutableBlockPos tmpPos = new BlockPos.MutableBlockPos();
-    for (int y = center.func_177956_o() - range; y <= center.func_177956_o() + range; y++) {
-      for (int z = center.func_177952_p() - range; z <= center.func_177952_p() + range; z++) {
-        for (int x = center.func_177958_n() - range; x <= center.func_177958_n() + range; x++) {
+    for (int y = center.getY() - range; y <= center.getY() + range; y++) {
+      for (int z = center.getZ() - range; z <= center.getZ() + range; z++) {
+        for (int x = center.getX() - range; x <= center.getX() + range; x++) {
           List<ItemStack> drops;
           tmpPos.func_181079_c(x, y, z);
-          IBlockState state = cache.func_180495_p((BlockPos)tmpPos);
-          if (state.func_177230_c().isAir(state, (IBlockAccess)cache, (BlockPos)tmpPos))
+          IBlockState state = cache.getBlockState((BlockPos)tmpPos);
+          if (state.getBlock().isAir(state, (IBlockAccess)cache, (BlockPos)tmpPos))
             continue; 
           ItemStack pickStack = StackUtil.getPickStack(world, (BlockPos)tmpPos, state, player);
           if (pickStack != null && OreValues.get(pickStack) > 0) {

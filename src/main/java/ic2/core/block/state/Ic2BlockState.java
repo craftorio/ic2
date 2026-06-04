@@ -59,7 +59,7 @@ public class Ic2BlockState extends BlockStateContainer {
     }
     
     private Ic2BlockStateInstance(Ic2BlockStateInstance parent, Map<IUnlistedProperty<?>, Object> extraProperties) {
-      super(parent.func_177230_c(), parent.func_177228_b(), parent.field_177238_c);
+      super(parent.getBlock(), parent.func_177228_b(), parent.field_177238_c);
       this.tlProperties = new ThreadLocal<Map<IProperty<?>, Comparable<?>>>() {
           protected Map<IProperty<?>, Comparable<?>> initialValue() {
             return Ic2BlockState.createMap((Map<IProperty<?>, Comparable<?>>)Ic2BlockState.Ic2BlockStateInstance.this.func_177228_b());

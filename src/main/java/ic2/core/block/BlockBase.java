@@ -75,7 +75,7 @@ public abstract class BlockBase extends Block implements IBlockModelProvider {
   
   @SideOnly(Side.CLIENT)
   public static void registerDefaultItemModel(Block block) {
-    registerItemModels(block, Arrays.asList(new IBlockState[] { block.func_176223_P() }));
+    registerItemModels(block, Arrays.asList(new IBlockState[] { block.getDefaultState() }));
   }
   
   @SideOnly(Side.CLIENT)
@@ -85,8 +85,8 @@ public abstract class BlockBase extends Block implements IBlockModelProvider {
   
   @SideOnly(Side.CLIENT)
   public static void registerItemModels(Block block, Iterable<IBlockState> states, IStateMapper mapper) {
-    Item item = Item.func_150898_a(block);
-    if (item == null || item == Items.field_190931_a)
+    Item item = Item.getItemFromBlock(block);
+    if (item == null || item == Items.AIR)
       return; 
     ResourceLocation loc = Util.getName(item);
     if (loc == null)
@@ -103,8 +103,8 @@ public abstract class BlockBase extends Block implements IBlockModelProvider {
   
   @SideOnly(Side.CLIENT)
   public static void registerDefaultVanillaItemModel(Block block, String path) {
-    Item item = Item.func_150898_a(block);
-    if (item == null || item == Items.field_190931_a)
+    Item item = Item.getItemFromBlock(block);
+    if (item == null || item == Items.AIR)
       return; 
     ResourceLocation loc = Util.getName(item);
     if (loc == null)

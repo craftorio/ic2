@@ -152,7 +152,7 @@ public class CommandIc2 extends CommandBase {
       cmdCurrentItem(sender);
     } else if (args.length == 1 && args[0].equals("itemNameWithVariant") && sender instanceof EntityPlayer) {
       EntityPlayer player = (EntityPlayer)sender;
-      ItemStack stack = player.field_71071_by.func_70448_g();
+      ItemStack stack = player.inventory.getCurrentItem();
       if (StackUtil.isEmpty(stack)) {
         msg(sender, "empty: " + StackUtil.toStringSafe(stack));
       } else if (!stack.getItem().getClass().getCanonicalName().startsWith("ic2.core")) {
@@ -331,7 +331,7 @@ public class CommandIc2 extends CommandBase {
     if (!(sender.func_174793_f() instanceof EntityPlayer))
       msg(sender, "Not applicable for non-player"); 
     EntityPlayer player = (EntityPlayer)sender.func_174793_f();
-    ItemStack stack = player.field_71071_by.func_70448_g();
+    ItemStack stack = player.inventory.getCurrentItem();
     if (StackUtil.isEmpty(stack)) {
       msg(sender, "empty: " + StackUtil.toStringSafe(stack));
     } else {
@@ -350,7 +350,7 @@ public class CommandIc2 extends CommandBase {
   
   private void cmdGiveCrop(ICommandSender sender, String[] args) throws CommandException {
     EntityPlayer player = (EntityPlayer)sender;
-    if (!StackUtil.isEmpty(player.field_71071_by.func_70448_g())) {
+    if (!StackUtil.isEmpty(player.inventory.getCurrentItem())) {
       msg(sender, "The currently selected slot needs to be empty.");
     } else {
       CropCard crop = Crops.instance.getCropCard(args[1], args[2]);
@@ -367,7 +367,7 @@ public class CommandIc2 extends CommandBase {
         } 
         if (growth < 1 || growth > 31 || gain < 1 || gain > 31 || resistance < 1 || resistance > 31)
           throw new WrongUsageException(func_71518_a(sender), new Object[0]); 
-        player.field_71071_by.func_70441_a(
+        player.inventory.func_70441_a(
             ItemCropSeed.generateItemStackFromValues(crop, growth, gain, resistance, 4));
       } 
     } 
@@ -439,7 +439,7 @@ public class CommandIc2 extends CommandBase {
     
     @SideOnly(Side.CLIENT)
     private void dump(ItemStack stack, String name) {
-      Minecraft mc = Minecraft.func_71410_x();
+      Minecraft mc = Minecraft.getMinecraft();
       GL11.glClear(16640);
       GL11.glMatrixMode(5889);
       GL11.glPushMatrix();

@@ -60,10 +60,10 @@ public class BlockIC2Door extends BlockDoor implements IBlockModelProvider {
   public Item func_180660_a(IBlockState state, Random rand, int fortune) {
     if (state.func_177229_b((IProperty)field_176523_O) == BlockDoor.EnumDoorHalf.UPPER)
       return null; 
-    return Item.func_150898_a((Block)this);
+    return Item.getItemFromBlock((Block)this);
   }
   
   public ItemStack func_185473_a(World world, BlockPos pos, IBlockState state) {
-    return new ItemStack(Item.func_150898_a((Block)this));
+    return new ItemStack(Item.getItemFromBlock((Block)this));
   }
 }

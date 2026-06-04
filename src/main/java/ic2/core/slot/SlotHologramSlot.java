@@ -63,10 +63,10 @@ public class SlotHologramSlot extends Slot {
   }
   
   public ItemStack slotClick(int dragType, ClickType clickType, EntityPlayer player) {
-    if (Util.inDev() && (player.func_130014_f_()).isRemote)
-      System.out.printf("dragType=%d clickType=%s stack=%s%n", new Object[] { Integer.valueOf(dragType), clickType, player.field_71071_by.func_70445_o() }); 
+    if (Util.inDev() && (player.getEntityWorld()).isRemote)
+      System.out.printf("dragType=%d clickType=%s stack=%s%n", new Object[] { Integer.valueOf(dragType), clickType, player.inventory.func_70445_o() }); 
     if (clickType == ClickType.PICKUP && (dragType == 0 || dragType == 1)) {
-      ItemStack playerStack = player.field_71071_by.func_70445_o();
+      ItemStack playerStack = player.inventory.func_70445_o();
       ItemStack slotStack = this.stacks[this.index];
       if (!StackUtil.isEmpty(playerStack)) {
         int curSize = StackUtil.getSize(slotStack);

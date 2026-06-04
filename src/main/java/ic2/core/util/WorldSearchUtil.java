@@ -7,12 +7,12 @@ import net.minecraft.world.chunk.Chunk;
 
 public class WorldSearchUtil {
   public static void findTileEntities(World world, BlockPos center, int range, ITileEntityResultHandler handler) {
-    int minX = center.func_177958_n() - range;
-    int minY = center.func_177956_o() - range;
-    int minZ = center.func_177952_p() - range;
-    int maxX = center.func_177958_n() + range;
-    int maxY = center.func_177956_o() + range;
-    int maxZ = center.func_177952_p() + range;
+    int minX = center.getX() - range;
+    int minY = center.getY() - range;
+    int minZ = center.getZ() - range;
+    int maxX = center.getX() + range;
+    int maxY = center.getY() + range;
+    int maxZ = center.getZ() + range;
     int xS = minX >> 4;
     int zS = minZ >> 4;
     int xE = maxX >> 4;
@@ -22,9 +22,9 @@ public class WorldSearchUtil {
         Chunk chunk = world.func_72964_e(x, z);
         for (TileEntity te : chunk.func_177434_r().values()) {
           BlockPos pos = te.getPos();
-          if (pos.func_177956_o() >= minY && pos.func_177956_o() <= maxY && pos
-            .func_177958_n() >= minX && pos.func_177958_n() <= maxX && pos
-            .func_177952_p() >= minZ && pos.func_177952_p() <= maxZ && 
+          if (pos.getY() >= minY && pos.getY() <= maxY && pos
+            .getX() >= minX && pos.getX() <= maxX && pos
+            .getZ() >= minZ && pos.getZ() <= maxZ && 
             handler.onMatch(te))
             return; 
         } 

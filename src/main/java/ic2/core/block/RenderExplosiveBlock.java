@@ -20,7 +20,7 @@ public class RenderExplosiveBlock extends Render<EntityIC2Explosive> {
   }
   
   public void func_76986_a(EntityIC2Explosive entity, double x, double y, double z, float entityYaw, float partialTicks) {
-    BlockRendererDispatcher blockRenderer = Minecraft.func_71410_x().func_175602_ab();
+    BlockRendererDispatcher blockRenderer = Minecraft.getMinecraft().func_175602_ab();
     GlStateManager.func_179094_E();
     GlStateManager.func_179109_b((float)x, (float)y + 0.5F, (float)z);
     if (entity.fuse - partialTicks + 1.0F < 10.0F) {
@@ -41,13 +41,13 @@ public class RenderExplosiveBlock extends Render<EntityIC2Explosive> {
       GlStateManager.func_179140_f();
       GlStateManager.func_179147_l();
       GlStateManager.func_179112_b(770, 772);
-      GlStateManager.func_179131_c(1.0F, 1.0F, 1.0F, alpha);
+      GlStateManager.color(1.0F, 1.0F, 1.0F, alpha);
       GlStateManager.func_179136_a(-3.0F, -3.0F);
       GlStateManager.func_179088_q();
       blockRenderer.func_175016_a(entity.renderBlockState, 1.0F);
       GlStateManager.func_179136_a(0.0F, 0.0F);
       GlStateManager.func_179113_r();
-      GlStateManager.func_179131_c(1.0F, 1.0F, 1.0F, 1.0F);
+      GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
       GlStateManager.func_179084_k();
       GlStateManager.func_179145_e();
       GlStateManager.func_179098_w();

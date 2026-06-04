@@ -27,9 +27,9 @@ public class ContainerToolbox extends ContainerHandHeldInventory<HandHeldToolbox
       func_75146_a((Slot)new SlotBoxable((IInventory)Toolbox1, i, 8 + i * 18, 41)); 
     for (int row = 0; row < 3; row++) {
       for (int j = 0; j < 9; j++)
-        func_75146_a(new Slot((IInventory)player.field_71071_by, j + row * 9 + 9, 8 + j * 18, 84 + row * 18)); 
+        func_75146_a(new Slot((IInventory)player.inventory, j + row * 9 + 9, 8 + j * 18, 84 + row * 18)); 
     } 
     for (int col = 0; col < 9; col++)
-      func_75146_a(new Slot((IInventory)player.field_71071_by, col, 8 + col * 18, 142)); 
+      func_75146_a(new Slot((IInventory)player.inventory, col, 8 + col * 18, 142)); 
   }
 }

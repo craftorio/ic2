@@ -45,7 +45,7 @@ public class ItemToolCrowbar extends ItemToolIC2 implements IEnhancedOverlayProv
     if (!canTakeDamage(stack, 1))
       return EnumActionResult.FAIL; 
     IBlockState state = Util.getBlockState((IBlockAccess)world, pos);
-    Block block = state.func_177230_c();
+    Block block = state.getBlock();
     if (block.isAir(state, (IBlockAccess)world, pos))
       return EnumActionResult.FAIL; 
     if (world.func_175625_s(pos) instanceof ICoverHolder) {
@@ -74,7 +74,7 @@ public class ItemToolCrowbar extends ItemToolIC2 implements IEnhancedOverlayProv
   
   @SideOnly(Side.CLIENT)
   public void func_77624_a(ItemStack stack, @Nullable World worldIn, List<String> info, ITooltipFlag flagIn) {
-    info.add((Minecraft.func_71410_x()).field_71474_y.field_74313_G.getDisplayName() + ":");
+    info.add((Minecraft.getMinecraft()).field_71474_y.field_74313_G.getDisplayName() + ":");
     info.add(" Remove attachments from blocks");
   }
   

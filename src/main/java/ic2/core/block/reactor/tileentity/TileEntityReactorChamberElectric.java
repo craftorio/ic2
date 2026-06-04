@@ -75,7 +75,7 @@ public class TileEntityReactorChamberElectric extends TileEntityBlock implements
     TileEntityNuclearReactorElectric reactor = getReactor();
     if (reactor != null) {
       World world = getWorld();
-      return reactor.getBlockType().func_180639_a(world, reactor.getPos(), world.func_180495_p(reactor.getPos()), player, hand, side, hitX, hitY, hitZ);
+      return reactor.getBlockType().func_180639_a(world, reactor.getPos(), world.getBlockState(reactor.getPos()), player, hand, side, hitX, hitY, hitZ);
     } 
     return false;
   }

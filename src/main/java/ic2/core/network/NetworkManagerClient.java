@@ -109,8 +109,8 @@ public class NetworkManagerClient extends NetworkManager {
         buffer.writeBoolean(false);
         DataEncoder.encode(buffer, te, false);
       } else {
-        EntityPlayerSP entityPlayerSP = (Minecraft.func_71410_x()).field_71439_g;
-        if ((!StackUtil.isEmpty(((EntityPlayer)entityPlayerSP).field_71071_by.func_70448_g()) && ((EntityPlayer)entityPlayerSP).field_71071_by.func_70448_g().getItem() instanceof IHandHeldInventory) || (
+        EntityPlayerSP entityPlayerSP = (Minecraft.getMinecraft()).player;
+        if ((!StackUtil.isEmpty(((EntityPlayer)entityPlayerSP).inventory.getCurrentItem()) && ((EntityPlayer)entityPlayerSP).inventory.getCurrentItem().getItem() instanceof IHandHeldInventory) || (
           !StackUtil.isEmpty(entityPlayerSP.func_184592_cb()) && entityPlayerSP.func_184592_cb().getItem() instanceof IHandHeldInventory)) {
           buffer.writeBoolean(true);
         } else {
@@ -128,7 +128,7 @@ public class NetworkManagerClient extends NetworkManager {
   public void onPacket(FMLNetworkEvent.ClientCustomPacketEvent event) {
     assert !getClass().getName().equals(NetworkManager.class.getName());
     try {
-      onPacketData(GrowingBuffer.wrap(event.getPacket().payload()), (EntityPlayer)(Minecraft.func_71410_x()).field_71439_g);
+      onPacketData(GrowingBuffer.wrap(event.getPacket().payload()), (EntityPlayer)(Minecraft.getMinecraft()).player);
     } catch (Throwable t) {
       IC2.log.warn(LogCategory.Network, t, "Network read failed");
       throw new RuntimeException(t);
@@ -229,7 +229,7 @@ public class NetworkManagerClient extends NetworkManager {
         i = is.readInt();
         IC2.platform.requestTick(false, new Runnable() {
               public void run() {
-                WorldClient worldClient = (Minecraft.func_71410_x()).field_71441_e;
+                WorldClient worldClient = (Minecraft.getMinecraft()).field_71441_e;
                 for (Object obj : ((World)worldClient).field_73010_i) {
                   EntityPlayer player = (EntityPlayer)obj;
                   if ((profile.getId() != null && profile.getId().equals(player.func_146103_bH().getId())) || (profile
@@ -272,13 +272,13 @@ public class NetworkManagerClient extends NetworkManager {
                     EntityPlayer player = IC2.platform.getPlayerInstance();
                     if (currentItemPosition < 0) {
                       int actualItemPosition = currentItemPosition ^ 0xFFFFFFFF;
-                      if (actualItemPosition > player.field_71071_by.field_184439_c.size() - 1)
+                      if (actualItemPosition > player.inventory.field_184439_c.size() - 1)
                         return; 
-                      currentItem = (ItemStack)player.field_71071_by.field_184439_c.get(actualItemPosition);
+                      currentItem = (ItemStack)player.inventory.field_184439_c.get(actualItemPosition);
                     } else {
-                      if (currentItemPosition != player.field_71071_by.field_70461_c)
+                      if (currentItemPosition != player.inventory.field_70461_c)
                         return; 
-                      currentItem = player.field_71071_by.func_70448_g();
+                      currentItem = player.inventory.getCurrentItem();
                     } 
                     if (currentItem != null && currentItem.getItem() instanceof IHandHeldInventory) {
                       if (subGUI && currentItem.getItem() instanceof IHandHeldSubInventory) {
@@ -340,7 +340,7 @@ public class NetworkManagerClient extends NetworkManager {
         is.readFully(data);
         IC2.platform.requestTick(false, new Runnable() {
               public void run() {
-                WorldClient worldClient = (Minecraft.func_71410_x()).field_71441_e;
+                WorldClient worldClient = (Minecraft.getMinecraft()).field_71441_e;
                 if (((World)worldClient).field_73011_w.getDimension() != dimensionId)
                   return; 
                 TileEntity teRaw = worldClient.func_175625_s(pos);

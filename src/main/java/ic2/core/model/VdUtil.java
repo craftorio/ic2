@@ -271,7 +271,7 @@ public class VdUtil {
   }
   
   public static void generateVertex(float x, float y, float z, int color, float u, float v, EnumFacing facing, IntBuffer out) {
-    generateVertex(x, y, z, color, u, v, facing.func_82601_c(), facing.func_96559_d(), facing.func_82599_e(), out);
+    generateVertex(x, y, z, color, u, v, facing.getFrontOffsetX(), facing.getFrontOffsetY(), facing.getFrontOffsetZ(), out);
   }
   
   public static void generateVertex(float x, float y, float z, int color, float u, float v, float nx, float ny, float nz, IntBuffer out) {
@@ -285,11 +285,11 @@ public class VdUtil {
   }
   
   public static void generateBlockVertex(float x, float y, float z, int color, float u, float v, EnumFacing facing, IntBuffer out) {
-    generateVertex(x, y, z, color, u, v, facing.func_82601_c(), facing.func_96559_d(), facing.func_82599_e(), out);
+    generateVertex(x, y, z, color, u, v, facing.getFrontOffsetX(), facing.getFrontOffsetY(), facing.getFrontOffsetZ(), out);
   }
   
   public static void generateBlockVertex(float x, float y, float z, float u, float v, EnumFacing facing, IntBuffer out) {
-    generateVertex(x, y, z, faceShades[facing.ordinal()], u, v, facing.func_82601_c(), facing.func_96559_d(), facing.func_82599_e(), out);
+    generateVertex(x, y, z, faceShades[facing.ordinal()], u, v, facing.getFrontOffsetX(), facing.getFrontOffsetY(), facing.getFrontOffsetZ(), out);
   }
   
   private static int packNormals(float nx, float ny, float nz) {

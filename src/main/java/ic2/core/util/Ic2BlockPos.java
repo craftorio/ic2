@@ -32,7 +32,7 @@ public class Ic2BlockPos extends BlockPos {
   }
   
   public Ic2BlockPos(Vec3i v) {
-    this(v.func_177958_n(), v.func_177956_o(), v.func_177952_p());
+    this(v.getX(), v.getY(), v.getZ());
   }
   
   public Ic2BlockPos(Vec3d v) {
@@ -43,7 +43,7 @@ public class Ic2BlockPos extends BlockPos {
     return new Ic2BlockPos((Vec3i)this);
   }
   
-  public int func_177958_n() {
+  public int getX() {
     return this.x;
   }
   
@@ -52,7 +52,7 @@ public class Ic2BlockPos extends BlockPos {
     return this;
   }
   
-  public int func_177956_o() {
+  public int getY() {
     return this.y;
   }
   
@@ -61,7 +61,7 @@ public class Ic2BlockPos extends BlockPos {
     return this;
   }
   
-  public int func_177952_p() {
+  public int getZ() {
     return this.z;
   }
   
@@ -78,9 +78,9 @@ public class Ic2BlockPos extends BlockPos {
   }
   
   public Ic2BlockPos set(Vec3i v) {
-    this.x = v.func_177958_n();
-    this.y = v.func_177956_o();
-    this.z = v.func_177952_p();
+    this.x = v.getX();
+    this.y = v.getY();
+    this.z = v.getZ();
     return this;
   }
   
@@ -169,7 +169,7 @@ public class Ic2BlockPos extends BlockPos {
   }
   
   public IBlockState getBlockState(IBlockAccess world) {
-    return world.func_180495_p(this);
+    return world.getBlockState(this);
   }
   
   public TileEntity getTe(IBlockAccess world) {

@@ -37,7 +37,7 @@ public class ItemDrill extends ItemElectricTool implements IMiningDrill, IHitSou
   public String getBreakSoundForBlock(EntityPlayerSP player, World world, BlockPos pos, ItemStack stack) {
     if (player.field_71075_bZ.field_75098_d)
       return null; 
-    IBlockState state = world.func_180495_p(pos);
+    IBlockState state = world.getBlockState(pos);
     float hardness = state.func_185887_b(world, pos);
     return (hardness > 1.0F || hardness < 0.0F) ? "Tools/Drill/DrillHard.ogg" : "Tools/Drill/DrillSoft.ogg";
   }
@@ -57,11 +57,11 @@ public class ItemDrill extends ItemElectricTool implements IMiningDrill, IHitSou
   private static EntityPlayer getPlayerHoldingItem(ItemStack stack) {
     if (IC2.platform.isRendering()) {
       EntityPlayer player = IC2.platform.getPlayerInstance();
-      if (player != null && player.field_71071_by.func_70448_g() == stack)
+      if (player != null && player.inventory.getCurrentItem() == stack)
         return player; 
     } else {
       for (EntityPlayer player : FMLCommonHandler.instance().getMinecraftServerInstance().func_184103_al().func_181057_v()) {
-        if (player.field_71071_by.func_70448_g() == stack)
+        if (player.inventory.getCurrentItem() == stack)
           return player; 
       } 
     } 

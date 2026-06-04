@@ -44,9 +44,9 @@ public class ItemDynamite extends ItemIC2 implements IBoxable {
     if (this.sticky)
       return EnumActionResult.PASS; 
     pos = pos.func_177972_a(side);
-    IBlockState state = world.func_180495_p(pos);
+    IBlockState state = world.getBlockState(pos);
     Block dynamite = BlockName.dynamite.getInstance();
-    if (state.func_177230_c().isAir(state, (IBlockAccess)world, pos) && dynamite.func_176198_a(world, pos, side) && dynamite.func_176196_c(world, pos)) {
+    if (state.getBlock().isAir(state, (IBlockAccess)world, pos) && dynamite.func_176198_a(world, pos, side) && dynamite.func_176196_c(world, pos)) {
       world.func_180501_a(pos, dynamite.getStateForPlacement(world, pos, side, a, b, c, 0, (EntityLivingBase)player, hand), 3);
       StackUtil.consumeOrError(player, hand, 1);
       return EnumActionResult.SUCCESS;

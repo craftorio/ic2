@@ -73,7 +73,7 @@ public class GuiChunkLoader extends GuiIC2<ContainerChunkLoader> {
         worldPos.setZ(chunkPos.field_77275_b << 4 | cz);
         worldPos.setY(chunk.func_76611_b(cx, cz));
         IBlockState state = chunk.func_177435_g((BlockPos)worldPos);
-        if (state.func_177230_c().isAir(state, (IBlockAccess)world, (BlockPos)worldPos)) {
+        if (state.getBlock().isAir(state, (IBlockAccess)world, (BlockPos)worldPos)) {
           worldPos.moveDown();
           state = chunk.func_177435_g((BlockPos)worldPos);
         } 

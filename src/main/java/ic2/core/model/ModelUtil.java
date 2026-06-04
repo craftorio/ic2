@@ -57,10 +57,10 @@ public class ModelUtil {
   }
   
   public static IBakedModel getBlockModel(IBlockState state) {
-    return Minecraft.func_71410_x().func_175602_ab().func_175023_a().func_178125_b(state);
+    return Minecraft.getMinecraft().func_175602_ab().func_175023_a().func_178125_b(state);
   }
   
   private static ModelManager getModelManager() {
-    return Minecraft.func_71410_x().func_175599_af().func_175037_a().func_178083_a();
+    return Minecraft.getMinecraft().func_175599_af().func_175037_a().func_178083_a();
   }
 }

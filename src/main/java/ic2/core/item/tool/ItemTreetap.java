@@ -31,8 +31,8 @@ public class ItemTreetap extends ItemIC2 implements IBoxable {
   }
   
   public EnumActionResult func_180614_a(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float xOffset, float yOffset, float zOffset) {
-    IBlockState state = world.func_180495_p(pos);
-    Block block = state.func_177230_c();
+    IBlockState state = world.getBlockState(pos);
+    Block block = state.getBlock();
     if (block == BlockName.rubber_wood.getInstance()) {
       if (attemptExtract(player, world, pos, side, state, (List<ItemStack>)null)) {
         if (!world.isRemote)
@@ -45,7 +45,7 @@ public class ItemTreetap extends ItemIC2 implements IBoxable {
   }
   
   public static boolean attemptExtract(EntityPlayer player, World world, BlockPos pos, EnumFacing side, IBlockState state, List<ItemStack> stacks) {
-    assert state.func_177230_c() == BlockName.rubber_wood.getInstance();
+    assert state.getBlock() == BlockName.rubber_wood.getInstance();
     BlockRubWood.RubberWoodState rwState = (BlockRubWood.RubberWoodState)state.func_177229_b((IProperty)BlockRubWood.stateProperty);
     if (rwState.isPlain() || rwState.facing != side)
       return false; 
@@ -84,9 +84,9 @@ public class ItemTreetap extends ItemIC2 implements IBoxable {
   
   private static void ejectResin(World world, BlockPos pos, EnumFacing side, int quantity) {
     double ejectBias = 0.3D;
-    double ejectX = pos.func_177958_n() + 0.5D + side.func_82601_c() * 0.3D;
-    double ejectY = pos.func_177956_o() + 0.5D + side.func_96559_d() * 0.3D;
-    double ejectZ = pos.func_177952_p() + 0.5D + side.func_82599_e() * 0.3D;
+    double ejectX = pos.getX() + 0.5D + side.getFrontOffsetX() * 0.3D;
+    double ejectY = pos.getY() + 0.5D + side.getFrontOffsetY() * 0.3D;
+    double ejectZ = pos.getZ() + 0.5D + side.getFrontOffsetZ() * 0.3D;
     for (int i = 0; i < quantity; i++) {
       EntityItem entityitem = new EntityItem(world, ejectX, ejectY, ejectZ, ItemName.misc_resource.getItemStack((Enum)MiscResourceType.resin));
       entityitem.func_174869_p();

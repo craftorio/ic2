@@ -31,8 +31,8 @@ public class GuiFluidRegulator extends GuiIC2<ContainerFluidRegulator> {
   
   protected void func_73864_a(int i, int j, int k) throws IOException {
     super.func_73864_a(i, j, k);
-    int xMin = (this.field_146294_l - this.field_146999_f) / 2;
-    int yMin = (this.field_146295_m - this.field_147000_g) / 2;
+    int xMin = (this.width - this.field_146999_f) / 2;
+    int yMin = (this.height - this.field_147000_g) / 2;
     int x = i - xMin;
     int y = j - yMin;
     TileEntityFluidRegulator te = (TileEntityFluidRegulator)((ContainerFluidRegulator)this.container).base;

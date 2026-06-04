@@ -81,7 +81,7 @@ public class TileEntityWaterGenerator extends TileEntityBaseRotorGenerator imple
     for (int x = -1; x < 2; x++) {
       for (int y = -1; y < 2; y++) {
         for (int z = -1; z < 2; z++) {
-          if (world.func_180495_p(this.field_174879_c.func_177982_a(x, y, z)).func_185904_a() == Material.field_151586_h)
+          if (world.getBlockState(this.field_174879_c.func_177982_a(x, y, z)).func_185904_a() == Material.field_151586_h)
             count++; 
         } 
       } 

@@ -88,18 +88,18 @@ public class BlockScaffold extends BlockMultiID<BlockScaffold.ScaffoldType> {
       EntityLivingBase entity = (EntityLivingBase)rawEntity;
       entity.field_70143_R = 0.0F;
       double limit = 0.15D;
-      entity.field_70159_w = Util.limit(entity.field_70159_w, -limit, limit);
-      entity.field_70179_y = Util.limit(entity.field_70179_y, -limit, limit);
+      entity.motionX = Util.limit(entity.motionX, -limit, limit);
+      entity.motionZ = Util.limit(entity.motionZ, -limit, limit);
       if (entity.func_70093_af() && entity instanceof EntityPlayer) {
         if (entity.func_70090_H()) {
-          entity.field_70181_x = 0.02D;
+          entity.motionY = 0.02D;
         } else {
-          entity.field_70181_x = 0.08D;
+          entity.motionY = 0.08D;
         } 
       } else if (entity.field_70123_F) {
-        entity.field_70181_x = 0.2D;
+        entity.motionY = 0.2D;
       } else {
-        entity.field_70181_x = Math.max(entity.field_70181_x, -0.07D);
+        entity.motionY = Math.max(entity.motionY, -0.07D);
       } 
     } 
   }
@@ -117,7 +117,7 @@ public class BlockScaffold extends BlockMultiID<BlockScaffold.ScaffoldType> {
   }
   
   public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
-    if (state.func_177230_c() != this)
+    if (state.getBlock() != this)
       return Collections.emptyList(); 
     List<ItemStack> ret = new ArrayList<>();
     ScaffoldType type = (ScaffoldType)state.func_177229_b((IProperty)this.typeProperty);
@@ -188,10 +188,10 @@ public class BlockScaffold extends BlockMultiID<BlockScaffold.ScaffoldType> {
     ItemStack stack = player.func_184586_b(hand);
     if (StackUtil.isEmpty(stack))
       return; 
-    if (StackUtil.checkItemEquality(stack, Item.func_150898_a(this))) {
-      while (world.func_180495_p(pos).func_177230_c() == this)
+    if (StackUtil.checkItemEquality(stack, Item.getItemFromBlock(this))) {
+      while (world.getBlockState(pos).getBlock() == this)
         pos = pos.func_177984_a(); 
-      if (func_176196_c(world, pos) && pos.func_177956_o() < IC2.getWorldHeight(world)) {
+      if (func_176196_c(world, pos) && pos.getY() < IC2.getWorldHeight(world)) {
         boolean isCreative = player.field_71075_bZ.field_75098_d;
         ItemStack prev = isCreative ? StackUtil.copy(stack) : null;
         stack.func_179546_a(player, world, pos.func_177977_b(), hand, EnumFacing.UP, 0.5F, 1.0F, 0.5F);
@@ -218,7 +218,7 @@ public class BlockScaffold extends BlockMultiID<BlockScaffold.ScaffoldType> {
   }
   
   private boolean isPillar(World world, BlockPos pos) {
-    for (; world.func_180495_p(pos).func_177230_c() == this; pos = pos.func_177977_b());
+    for (; world.getBlockState(pos).getBlock() == this; pos = pos.func_177977_b());
     return world.func_175677_d(pos, false);
   }
   
@@ -257,16 +257,16 @@ public class BlockScaffold extends BlockMultiID<BlockScaffold.ScaffoldType> {
   }
   
   private void checkSupport(World world, BlockPos start) {
-    IBlockState state = world.func_180495_p(start);
-    if (state.func_177230_c() != this)
+    IBlockState state = world.getBlockState(start);
+    if (state.getBlock() != this)
       return; 
     Map<BlockPos, Support> results = calculateSupport((IBlockAccess)world, start, (ScaffoldType)state.func_177229_b((IProperty)this.typeProperty));
     boolean droppedAny = false;
     for (Support support : results.values()) {
       if (support.strength >= 0)
         continue; 
-      world.func_180501_a(support.pos, Blocks.field_150350_a.func_176223_P(), 2);
-      func_176226_b(world, support.pos, func_176223_P().func_177226_a((IProperty)this.typeProperty, support.type), 0);
+      world.func_180501_a(support.pos, Blocks.AIR.getDefaultState(), 2);
+      func_176226_b(world, support.pos, getDefaultState().func_177226_a((IProperty)this.typeProperty, support.type), 0);
       droppedAny = true;
     } 
     if (droppedAny)
@@ -287,8 +287,8 @@ public class BlockScaffold extends BlockMultiID<BlockScaffold.ScaffoldType> {
       for (EnumFacing dir : EnumFacing.field_82609_l) {
         BlockPos pos = support.pos.func_177972_a(dir);
         if (!results.containsKey(pos)) {
-          IBlockState state = world.func_180495_p(pos);
-          Block block = state.func_177230_c();
+          IBlockState state = world.getBlockState(pos);
+          Block block = state.getBlock();
           if (block == this) {
             type = (ScaffoldType)state.func_177229_b((IProperty)this.typeProperty);
             Support cSupport = new Support(pos, type, -1);

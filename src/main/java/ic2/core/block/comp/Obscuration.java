@@ -60,7 +60,7 @@ public class Obscuration extends TileEntityComponent {
       ObscurationData data = this.dataMap[facing.ordinal()];
       if (data != null) {
         NBTTagCompound nbt = new NBTTagCompound();
-        nbt.func_74778_a("block", Util.getName(data.state.func_177230_c()).toString());
+        nbt.func_74778_a("block", Util.getName(data.state.getBlock()).toString());
         nbt.func_74778_a("variant", data.variant);
         nbt.func_74774_a("side", (byte)data.side.ordinal());
         nbt.func_74783_a("colorMuls", data.colorMultipliers);
@@ -106,7 +106,7 @@ public class Obscuration extends TileEntityComponent {
     
     @SubscribeEvent
     public void onObscuration(RetextureEvent event) {
-      if (event.state.func_177230_c() != BlockName.te.getInstance())
+      if (event.state.getBlock() != BlockName.te.getInstance())
         return; 
       TileEntity teRaw = event.getWorld().func_175625_s(event.pos);
       if (!(teRaw instanceof TileEntityBlock))

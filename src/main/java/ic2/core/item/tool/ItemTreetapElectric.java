@@ -24,8 +24,8 @@ public class ItemTreetapElectric extends ItemElectricTool {
   }
   
   public EnumActionResult func_180614_a(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-    IBlockState state = world.func_180495_p(pos);
-    Block block = state.func_177230_c();
+    IBlockState state = world.getBlockState(pos);
+    Block block = state.getBlock();
     ItemStack stack = StackUtil.get(player, hand);
     if (block != BlockName.rubber_wood.getInstance() || 
       !ElectricItem.manager.canUse(stack, this.operationEnergyCost))

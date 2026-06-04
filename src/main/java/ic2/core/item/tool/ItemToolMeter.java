@@ -41,7 +41,7 @@ public class ItemToolMeter extends ItemIC2 implements IBoxable, IHandHeldInvento
   }
   
   public boolean onDroppedByPlayer(ItemStack stack, EntityPlayer player) {
-    if (!(player.func_130014_f_()).isRemote && !StackUtil.isEmpty(stack) && player.field_71070_bA instanceof ContainerMeter) {
+    if (!(player.getEntityWorld()).isRemote && !StackUtil.isEmpty(stack) && player.field_71070_bA instanceof ContainerMeter) {
       HandHeldMeter euReader = (HandHeldMeter)((ContainerMeter)player.field_71070_bA).base;
       if (euReader.isThisContainer(stack)) {
         euReader.saveAsThrown(stack);

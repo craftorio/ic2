@@ -673,7 +673,7 @@ public final class StackUtil {
   }
   
   public static boolean consumeFromPlayerInventory(EntityPlayer player, Predicate<ItemStack> request, int amount, boolean simulate) {
-    NonNullList<ItemStack> contents = player.field_71071_by.field_70462_a;
+    NonNullList<ItemStack> contents = player.inventory.field_70462_a;
     for (int pass = 0; pass < 2; pass++) {
       int amountNeeded = amount;
       for (int i = 0; i < contents.size(); i++) {
@@ -731,8 +731,8 @@ public final class StackUtil {
   public static Predicate<ItemStack> sameItem(Block block) {
     if (block == null)
       throw new NullPointerException("null block"); 
-    Item item = Item.func_150898_a(block);
-    if (item == null || (item == Items.field_190931_a && block != Blocks.field_150350_a))
+    Item item = Item.getItemFromBlock(block);
+    if (item == null || (item == Items.AIR && block != Blocks.AIR))
       throw new IllegalArgumentException("block " + block + " doesn't have an associated item"); 
     return sameItem(item);
   }
@@ -844,7 +844,7 @@ public final class StackUtil {
   public static void set(EntityPlayer player, EnumHand hand, ItemStack stack) {
     if (isEmpty(stack))
       stack = emptyStack; 
-    InventoryPlayer inv = player.field_71071_by;
+    InventoryPlayer inv = player.inventory;
     if (hand == EnumHand.MAIN_HAND) {
       inv.field_70462_a.set(inv.field_70461_c, stack);
     } else if (hand == EnumHand.OFF_HAND) {
@@ -870,7 +870,7 @@ public final class StackUtil {
     double dx = world.field_73012_v.nextFloat() * f + (1.0D - f) * 0.5D;
     double dy = world.field_73012_v.nextFloat() * f + (1.0D - f) * 0.5D;
     double dz = world.field_73012_v.nextFloat() * f + (1.0D - f) * 0.5D;
-    EntityItem entityItem = new EntityItem(world, pos.func_177958_n() + dx, pos.func_177956_o() + dy, pos.func_177952_p() + dz, stack.func_77946_l());
+    EntityItem entityItem = new EntityItem(world, pos.getX() + dx, pos.getY() + dy, pos.getZ() + dz, stack.func_77946_l());
     entityItem.func_174869_p();
     world.func_72838_d((Entity)entityItem);
   }
@@ -977,25 +977,25 @@ public final class StackUtil {
   
   public static ItemStack getPickStack(World world, BlockPos pos, IBlockState state, EntityPlayer player) {
     RayTraceResult target = new RayTraceResult(RayTraceResult.Type.BLOCK, new Vec3d((Vec3i)pos), EnumFacing.DOWN, pos);
-    ItemStack ret = state.func_177230_c().getPickBlock(state, target, world, pos, player);
+    ItemStack ret = state.getBlock().getPickBlock(state, target, world, pos, player);
     if (isEmpty(ret))
       return emptyStack; 
     return ret;
   }
   
   public static List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
-    return getDrops(world, pos, state, state.func_177230_c(), fortune);
+    return getDrops(world, pos, state, state.getBlock(), fortune);
   }
   
   public static List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, Block block, int fortune) {
     NonNullList<ItemStack> drops = NonNullList.func_191196_a();
-    assert world.func_180495_p(pos).func_177230_c() == block;
+    assert world.getBlockState(pos).getBlock() == block;
     block.getDrops(drops, world, pos, state, fortune);
     return (List<ItemStack>)drops;
   }
   
   public static List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, EntityPlayer player, int fortune, boolean silkTouch) {
-    Block block = state.func_177230_c();
+    Block block = state.getBlock();
     if (block.isAir(state, world, pos))
       return Collections.emptyList(); 
     World rawWorld = null;
@@ -1128,9 +1128,9 @@ public final class StackUtil {
   public static boolean storeInventoryItem(ItemStack stack, EntityPlayer player, boolean simulate) {
     if (simulate) {
       int sizeLeft = getSize(stack);
-      int maxStackSize = Math.min(player.field_71071_by.func_70297_j_(), stack.func_77976_d());
-      for (int i = 0; i < player.field_71071_by.field_70462_a.size() && sizeLeft > 0; i++) {
-        ItemStack invStack = (ItemStack)player.field_71071_by.field_70462_a.get(i);
+      int maxStackSize = Math.min(player.inventory.func_70297_j_(), stack.func_77976_d());
+      for (int i = 0; i < player.inventory.field_70462_a.size() && sizeLeft > 0; i++) {
+        ItemStack invStack = (ItemStack)player.inventory.field_70462_a.get(i);
         if (isEmpty(invStack)) {
           sizeLeft -= maxStackSize;
         } else if (checkItemEqualityStrict(stack, invStack) && getSize(invStack) < maxStackSize) {
@@ -1139,7 +1139,7 @@ public final class StackUtil {
       } 
       return (sizeLeft <= 0);
     } 
-    return player.field_71071_by.func_70441_a(stack);
+    return player.inventory.func_70441_a(stack);
   }
   
   public static int getRawMeta(ItemStack stack) {

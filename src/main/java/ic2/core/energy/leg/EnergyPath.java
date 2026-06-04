@@ -70,12 +70,12 @@ class EnergyPath {
       minConductorBreakdownEnergy = Math.min(minConductorBreakdownEnergy, conductor.getConductorBreakdownEnergy());
       for (IEnergyTile tile : node.getTile().getSubTiles()) {
         BlockPos pos = EnergyNet.instance.getPos(tile);
-        minX = Math.min(minX, pos.func_177958_n());
-        minY = Math.min(minY, pos.func_177956_o());
-        minZ = Math.min(minZ, pos.func_177952_p());
-        maxX = Math.max(maxX, pos.func_177958_n());
-        maxY = Math.max(maxY, pos.func_177956_o());
-        maxZ = Math.max(maxZ, pos.func_177952_p());
+        minX = Math.min(minX, pos.getX());
+        minY = Math.min(minY, pos.getY());
+        minZ = Math.min(minZ, pos.getZ());
+        maxX = Math.max(maxX, pos.getX());
+        maxY = Math.max(maxY, pos.getY());
+        maxZ = Math.max(maxZ, pos.getZ());
       } 
     } 
     this.minEffectEnergy = Math.min(Math.min(minInsulationEnergyAbsorption, minInsulationBreakdownEnergy), minConductorBreakdownEnergy);

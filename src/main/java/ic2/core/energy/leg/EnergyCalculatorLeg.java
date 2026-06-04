@@ -484,12 +484,12 @@ public class EnergyCalculatorLeg implements IEnergyCalculator {
                 if (prev != null && prev.doubleValue() >= shockEnergy)
                   continue; 
                 if (!entity.func_174813_aQ().func_72326_a(new AxisAlignedBB((pos
-                      .func_177958_n() - 1), (pos
-                      .func_177956_o() - 1), (pos
-                      .func_177952_p() - 1), (pos
-                      .func_177958_n() + 2), (pos
-                      .func_177956_o() + 2), (pos
-                      .func_177952_p() + 2))))
+                      .getX() - 1), (pos
+                      .getY() - 1), (pos
+                      .getZ() - 1), (pos
+                      .getX() + 2), (pos
+                      .getY() + 2), (pos
+                      .getZ() + 2))))
                   continue; 
                 if (prev == null) {
                   localShockEnergyMap.put(entity, new MutableDouble(shockEnergy));
@@ -586,11 +586,11 @@ public class EnergyCalculatorLeg implements IEnergyCalculator {
           continue; 
         power = override.getExplosionPower(tier, power);
       } 
-      EntityPlayer closestPlayer = world.func_184137_a(pos.func_177958_n() + 0.5D, pos.func_177956_o() + 0.5D, pos.func_177952_p() + 0.5D, 20.0D, false);
+      EntityPlayer closestPlayer = world.func_184137_a(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, 20.0D, false);
       if (closestPlayer != null)
         IC2.achievements.issueAchievement(closestPlayer, "explodeMachine"); 
       world.func_175698_g(pos);
-      ExplosionIC2 explosion = new ExplosionIC2(world, null, pos.func_177958_n() + 0.5D, pos.func_177956_o() + 0.5D, pos.func_177952_p() + 0.5D, power, 0.75F, ExplosionIC2.Type.Electrical);
+      ExplosionIC2 explosion = new ExplosionIC2(world, null, pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, power, 0.75F, ExplosionIC2.Type.Electrical);
       explosion.doExplosion();
     } 
   }

@@ -114,8 +114,8 @@ public class ItemToolPainter extends ItemIC2 implements IMultiItem<Ic2Color>, IB
     Ic2Color color = getColor(stack);
     if (color == null)
       return EnumActionResult.PASS; 
-    IBlockState state = world.func_180495_p(pos);
-    Block block = state.func_177230_c();
+    IBlockState state = world.getBlockState(pos);
+    Block block = state.getBlock();
     if (block.recolorBlock(world, pos, side, color.mcColor) || 
       colorBlock(world, pos, block, state, color.mcColor)) {
       damagePainter(player, hand, color);
@@ -156,7 +156,7 @@ public class ItemToolPainter extends ItemIC2 implements IMultiItem<Ic2Color>, IB
   @SubscribeEvent
   public void onEntityInteract(PlayerInteractEvent.EntityInteract event) {
     EntityPlayer player = event.getEntityPlayer();
-    if ((player.func_130014_f_()).isRemote)
+    if ((player.getEntityWorld()).isRemote)
       return; 
     Entity entity = event.getEntity();
     ItemStack stack = player.func_184607_cu();

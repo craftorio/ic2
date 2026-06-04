@@ -43,6 +43,6 @@ public class TextDrawable implements IDrawable {
   }
   
   public int getWidth() {
-    return (Minecraft.func_71410_x()).field_71466_p.func_78256_a(Localization.translate(this.text));
+    return (Minecraft.getMinecraft()).field_71466_p.func_78256_a(Localization.translate(this.text));
   }
 }

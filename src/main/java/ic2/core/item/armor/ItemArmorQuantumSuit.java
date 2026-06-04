@@ -170,20 +170,20 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
         } 
         if (ElectricItem.manager.canUse(stack, 1000.0D) && player.func_71024_bL().func_75121_c()) {
           int slot = -1;
-          for (int i = 0; i < player.field_71071_by.field_70462_a.size(); i++) {
-            ItemStack playerStack = (ItemStack)player.field_71071_by.field_70462_a.get(i);
+          for (int i = 0; i < player.inventory.field_70462_a.size(); i++) {
+            ItemStack playerStack = (ItemStack)player.inventory.field_70462_a.get(i);
             if (!StackUtil.isEmpty(playerStack) && playerStack.getItem() == ItemName.filled_tin_can.getInstance()) {
               slot = i;
               break;
             } 
           } 
           if (slot > -1) {
-            ItemStack playerStack = (ItemStack)player.field_71071_by.field_70462_a.get(slot);
+            ItemStack playerStack = (ItemStack)player.inventory.field_70462_a.get(slot);
             ItemTinCan can = (ItemTinCan)playerStack.getItem();
             ActionResult<ItemStack> result = can.onEaten(player, playerStack);
             playerStack = (ItemStack)result.func_188398_b();
             if (StackUtil.isEmpty(playerStack))
-              player.field_71071_by.field_70462_a.set(slot, StackUtil.emptyStack); 
+              player.inventory.field_70462_a.set(slot, StackUtil.emptyStack); 
             if (result.func_188397_a() == EnumActionResult.SUCCESS)
               ElectricItem.manager.use(stack, 1000.0D, null); 
             ret = true;
@@ -234,8 +234,8 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
         } 
         if (Nightvision && IC2.platform.isSimulating() && 
           ElectricItem.manager.use(stack, 1.0D, (EntityLivingBase)player)) {
-          BlockPos pos = new BlockPos((int)Math.floor(player.field_70165_t), (int)Math.floor(player.field_70163_u), (int)Math.floor(player.field_70161_v));
-          int skylight = player.func_130014_f_().func_175671_l(pos);
+          BlockPos pos = new BlockPos((int)Math.floor(player.posX), (int)Math.floor(player.posY), (int)Math.floor(player.posZ));
+          int skylight = player.getEntityWorld().func_175671_l(pos);
           if (skylight > 8) {
             IC2.platform.removePotion((EntityLivingBase)player, MobEffects.field_76439_r);
             player.func_70690_d(new PotionEffect(MobEffects.field_76440_q, 100, 0, true, true));
@@ -276,7 +276,7 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
           if (player.func_70090_H()) {
             speed = 0.1F;
             if (IC2.keyboard.isJumpKeyDown(player))
-              player.field_70181_x += 0.10000000149011612D; 
+              player.motionY += 0.10000000149011612D; 
           } 
           if (speed > 0.0F)
             player.func_191958_b(0.0F, 0.0F, 1.0F, speed); 
@@ -299,13 +299,13 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
         } else {
           if (ElectricItem.manager.canUse(stack, 4000.0D) && player.field_70122_E)
             this.jumpCharge = 1.0F; 
-          if (player.field_70181_x >= 0.0D && this.jumpCharge > 0.0F && !player.func_70090_H())
+          if (player.motionY >= 0.0D && this.jumpCharge > 0.0F && !player.func_70090_H())
             if (IC2.keyboard.isJumpKeyDown(player) && IC2.keyboard.isBoostKeyDown(player)) {
               if (this.jumpCharge == 1.0F) {
-                player.field_70159_w *= 3.5D;
-                player.field_70179_y *= 3.5D;
+                player.motionX *= 3.5D;
+                player.motionZ *= 3.5D;
               } 
-              player.field_70181_x += (this.jumpCharge * 0.3F);
+              player.motionY += (this.jumpCharge * 0.3F);
               this.jumpCharge = (float)(this.jumpCharge * 0.75D);
             } else if (this.jumpCharge < 1.0F) {
               this.jumpCharge = 0.0F;

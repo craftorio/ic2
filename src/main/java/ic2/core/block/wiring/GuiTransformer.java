@@ -45,7 +45,7 @@ public class GuiTransformer extends GuiIC2<ContainerTransformer> {
     this.field_146289_q.func_78276_b(Localization.translate("ic2.Transformer.gui.Input"), 6, 43, 4210752);
     this.field_146289_q.func_78276_b(((TileEntityTransformer)((ContainerTransformer)this.container).base).getoutputflow() + " " + Localization.translate("ic2.generic.text.EUt"), 52, 30, 2157374);
     this.field_146289_q.func_78276_b(((TileEntityTransformer)((ContainerTransformer)this.container).base).getinputflow() + " " + Localization.translate("ic2.generic.text.EUt"), 52, 45, 2157374);
-    RenderItem renderItem = this.field_146297_k.func_175599_af();
+    RenderItem renderItem = this.mc.func_175599_af();
     RenderHelper.func_74520_c();
     switch (((TileEntityTransformer)((ContainerTransformer)this.container).base).getMode()) {
       case redstone:
@@ -63,9 +63,9 @@ public class GuiTransformer extends GuiIC2<ContainerTransformer> {
   
   public void func_73866_w_() {
     super.func_73866_w_();
-    this.field_146292_n.add(new GuiButton(0, (this.field_146294_l - this.field_146999_f) / 2 + 7, (this.field_146295_m - this.field_147000_g) / 2 + 65, 144, 20, this.mode[1]));
-    this.field_146292_n.add(new GuiButton(1, (this.field_146294_l - this.field_146999_f) / 2 + 7, (this.field_146295_m - this.field_147000_g) / 2 + 85, 144, 20, this.mode[2]));
-    this.field_146292_n.add(new GuiButton(2, (this.field_146294_l - this.field_146999_f) / 2 + 7, (this.field_146295_m - this.field_147000_g) / 2 + 105, 144, 20, this.mode[3]));
+    this.field_146292_n.add(new GuiButton(0, (this.width - this.field_146999_f) / 2 + 7, (this.height - this.field_147000_g) / 2 + 65, 144, 20, this.mode[1]));
+    this.field_146292_n.add(new GuiButton(1, (this.width - this.field_146999_f) / 2 + 7, (this.height - this.field_147000_g) / 2 + 85, 144, 20, this.mode[2]));
+    this.field_146292_n.add(new GuiButton(2, (this.width - this.field_146999_f) / 2 + 7, (this.height - this.field_147000_g) / 2 + 105, 144, 20, this.mode[3]));
   }
   
   protected ResourceLocation getTexture() {

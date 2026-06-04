@@ -75,28 +75,28 @@ public class CropEating extends IC2CropCard {
     if (crop.getCurrentSize() == 1)
       return; 
     BlockPos coords = crop.getPosition();
-    double xcentered = coords.func_177958_n() + 0.5D;
-    double ycentered = coords.func_177956_o() + 0.5D;
-    double zcentered = coords.func_177952_p() + 0.5D;
+    double xcentered = coords.getX() + 0.5D;
+    double ycentered = coords.getY() + 0.5D;
+    double zcentered = coords.getZ() + 0.5D;
     if (crop.getCustomData().func_74767_n("eaten")) {
       StackUtil.dropAsEntity(crop.getWorldObj(), coords, new ItemStack(Items.field_151078_bh));
       crop.getCustomData().func_74757_a("eaten", false);
     } 
     List<EntityLivingBase> list = crop.getWorldObj().func_72872_a(EntityLivingBase.class, new AxisAlignedBB(xcentered - 1.0D, coords
           
-          .func_177956_o(), zcentered - 1.0D, xcentered + 1.0D, coords
+          .getY(), zcentered - 1.0D, xcentered + 1.0D, coords
           
-          .func_177956_o() + 1.0D + 1.0D, zcentered + 1.0D));
+          .getY() + 1.0D + 1.0D, zcentered + 1.0D));
     if (list.isEmpty())
       return; 
     Collections.shuffle(list);
     for (EntityLivingBase entity : list) {
       if (entity instanceof EntityPlayer && ((EntityPlayer)entity).field_71075_bZ.field_75098_d)
         continue; 
-      entity.field_70159_w = (xcentered - entity.field_70165_t) * 0.5D;
-      entity.field_70179_y = (zcentered - entity.field_70161_v) * 0.5D;
-      if (entity.field_70181_x > -0.05D)
-        entity.field_70181_x = -0.05D; 
+      entity.motionX = (xcentered - entity.posX) * 0.5D;
+      entity.motionZ = (zcentered - entity.posZ) * 0.5D;
+      if (entity.motionY > -0.05D)
+        entity.motionY = -0.05D; 
       entity.func_70097_a((DamageSource)damage, crop.getCurrentSize() * 2.0F);
       if (!hasMetalAromor(entity)) {
         entity.func_70690_d(new PotionEffect(MobEffects.field_76421_d, 64, 50));
@@ -128,7 +128,7 @@ public class CropEating extends IC2CropCard {
     if (!(entity instanceof EntityPlayer))
       return false; 
     EntityPlayer player = (EntityPlayer)entity;
-    for (ItemStack stack : player.field_71071_by.field_70460_b) {
+    for (ItemStack stack : player.inventory.field_70460_b) {
       if (stack != null && ItemWrapper.isMetalArmor(stack, player))
         return true; 
     } 

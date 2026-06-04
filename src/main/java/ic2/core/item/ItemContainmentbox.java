@@ -32,7 +32,7 @@ public class ItemContainmentbox extends ItemIC2 implements IHandHeldInventory {
   }
   
   public boolean onDroppedByPlayer(ItemStack stack, EntityPlayer player) {
-    if (!(player.func_130014_f_()).isRemote && !StackUtil.isEmpty(stack) && player.field_71070_bA instanceof ContainerContainmentbox) {
+    if (!(player.getEntityWorld()).isRemote && !StackUtil.isEmpty(stack) && player.field_71070_bA instanceof ContainerContainmentbox) {
       HandHeldContainmentbox containmentBox = (HandHeldContainmentbox)((ContainerContainmentbox)player.field_71070_bA).base;
       if (containmentBox.isThisContainer(stack)) {
         containmentBox.saveAsThrown(stack);

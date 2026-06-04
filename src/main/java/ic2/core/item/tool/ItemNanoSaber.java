@@ -62,7 +62,7 @@ public class ItemNanoSaber extends ItemElectricTool {
       this.soundTicker++;
       if (IC2.platform.isRendering() && this.soundTicker % 4 == 0)
         IC2.platform.playSoundSp(getRandomSwingSound(), 1.0F, 1.0F); 
-      return (state.func_177230_c() == Blocks.field_150321_G) ? 50.0F : 4.0F;
+      return (state.getBlock() == Blocks.field_150321_G) ? 50.0F : 4.0F;
     } 
     return 1.0F;
   }

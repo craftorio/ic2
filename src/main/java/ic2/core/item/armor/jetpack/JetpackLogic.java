@@ -38,16 +38,16 @@ public class JetpackLogic {
           bjetpack.useBoostPower(stack, boost); 
       } 
     } 
-    int worldHeight = IC2.getWorldHeight(player.func_130014_f_());
+    int worldHeight = IC2.getWorldHeight(player.getEntityWorld());
     int maxFlightHeight = (int)(worldHeight / jetpack.getWorldHeightDivisor(stack));
-    double y = player.field_70163_u;
+    double y = player.posY;
     if (y > (maxFlightHeight - 25)) {
       if (y > maxFlightHeight)
         y = maxFlightHeight; 
       power = (float)(power * (maxFlightHeight - y) / 25.0D);
     } 
-    double prevmotion = player.field_70181_x;
-    player.field_70181_x = Math.min(player.field_70181_x + (power * 0.2F), 0.6000000238418579D);
+    double prevmotion = player.motionY;
+    player.motionY = Math.min(player.motionY + (power * 0.2F), 0.6000000238418579D);
     if (hoverMode) {
       float maxHoverY = 0.0F;
       if (IC2.keyboard.isJumpKeyDown(player)) {
@@ -60,10 +60,10 @@ public class JetpackLogic {
         if (bjetpack != null)
           maxHoverY *= bjetpack.getHoverBoost(player, stack, false); 
       } 
-      if (player.field_70181_x > maxHoverY) {
-        player.field_70181_x = maxHoverY;
-        if (prevmotion > player.field_70181_x)
-          player.field_70181_x = prevmotion; 
+      if (player.motionY > maxHoverY) {
+        player.motionY = maxHoverY;
+        if (prevmotion > player.motionY)
+          player.motionY = prevmotion; 
       } 
     } 
     int consume = 2;

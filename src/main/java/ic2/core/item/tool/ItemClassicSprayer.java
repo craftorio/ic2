@@ -38,11 +38,11 @@ public class ItemClassicSprayer extends ItemGradualInt {
     if (!IC2.platform.isSimulating())
       return EnumActionResult.SUCCESS; 
     ItemStack stack = StackUtil.get(player, hand);
-    ItemStack pack = (ItemStack)player.field_71071_by.field_70460_b.get(2);
+    ItemStack pack = (ItemStack)player.inventory.field_70460_b.get(2);
     boolean pulledFromCFPack = (StackUtil.check(pack) && pack.getItem() == ItemName.cf_pack.getInstance() && ((ItemArmorClassicCFPack)pack.getItem()).getCFPellet(player, pack));
     if (!pulledFromCFPack && getCustomDamage(stack) < 100)
       return EnumActionResult.FAIL; 
-    if (world.func_180495_p(pos).func_177230_c() == BlockName.scaffold.getInstance()) {
+    if (world.getBlockState(pos).getBlock() == BlockName.scaffold.getInstance()) {
       sprayFoam(world, pos, calculateDirectionsFromPlayer(player), true);
       if (!pulledFromCFPack)
         applyCustomDamage(stack, 100, (EntityLivingBase)player); 
@@ -57,8 +57,8 @@ public class ItemClassicSprayer extends ItemGradualInt {
   }
   
   private static boolean[] calculateDirectionsFromPlayer(EntityPlayer player) {
-    float yaw = player.field_70177_z % 360.0F;
-    float pitch = player.field_70125_A;
+    float yaw = player.rotationYaw % 360.0F;
+    float pitch = player.rotationPitch;
     boolean[] r = { true, true, true, true, true, true };
     if (pitch >= -65.0F && pitch <= 65.0F) {
       if ((yaw >= 300.0F && yaw <= 360.0F) || (yaw >= 0.0F && yaw <= 60.0F))
@@ -95,8 +95,8 @@ public class ItemClassicSprayer extends ItemGradualInt {
       } 
     } 
     for (BlockPos pos : place) {
-      IBlockState state = world.func_180495_p(pos);
-      Block targetBlock = state.func_177230_c();
+      IBlockState state = world.getBlockState(pos);
+      Block targetBlock = state.getBlock();
       if (targetBlock == BlockName.scaffold.getInstance()) {
         BlockScaffold block = (BlockScaffold)targetBlock;
         switch ((BlockScaffold.ScaffoldType)state.func_177229_b((IProperty)block.getTypeProperty())) {
@@ -123,12 +123,12 @@ public class ItemClassicSprayer extends ItemGradualInt {
     if (!scaffold) {
       if (BlockName.foam.getInstance().func_176198_a(world, pos, EnumFacing.DOWN))
         return true; 
-      if (world.func_180495_p(pos).func_177230_c() != BlockName.te.getInstance())
+      if (world.getBlockState(pos).getBlock() != BlockName.te.getInstance())
         return false; 
       TileEntity te = world.func_175625_s(pos);
       return (te instanceof TileEntityCable && !((TileEntityCable)te).isFoamed());
     } 
-    return (world.func_180495_p(pos).func_177230_c() == BlockName.scaffold.getInstance());
+    return (world.getBlockState(pos).getBlock() == BlockName.scaffold.getInstance());
   }
   
   private static int[] generateRngSpread(Random random) {

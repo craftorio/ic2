@@ -37,8 +37,8 @@ public class BlockRubWood extends BlockBase {
   
   public IBlockState func_176203_a(int meta) {
     if (meta >= 0 && meta < RubberWoodState.values.length)
-      return func_176223_P().func_177226_a((IProperty)stateProperty, RubberWoodState.values[meta]); 
-    return func_176223_P();
+      return getDefaultState().func_177226_a((IProperty)stateProperty, RubberWoodState.values[meta]); 
+    return getDefaultState();
   }
   
   public int func_176201_c(IBlockState state) {
@@ -83,9 +83,9 @@ public class BlockRubWood extends BlockBase {
     for (int y = -range; y <= range; y++) {
       for (int z = -range; z <= range; z++) {
         for (int x = -range; x <= range; x++) {
-          cPos.func_181079_c(pos.func_177958_n() + x, pos.func_177956_o() + y, pos.func_177952_p() + z);
-          IBlockState cState = world.func_180495_p((BlockPos)cPos);
-          Block cBlock = cState.func_177230_c();
+          cPos.func_181079_c(pos.getX() + x, pos.getY() + y, pos.getZ() + z);
+          IBlockState cState = world.getBlockState((BlockPos)cPos);
+          Block cBlock = cState.getBlock();
           if (cBlock.isLeaves(cState, (IBlockAccess)world, (BlockPos)cPos))
             cBlock.beginLeavesDecay(cState, world, new BlockPos((Vec3i)cPos)); 
         } 

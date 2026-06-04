@@ -165,7 +165,7 @@ public final class AudioManagerClient extends AudioManager
 
 	private static SoundManager getSoundManager()
 	{
-		SoundHandler handler = Minecraft.func_71410_x().func_147118_V();
+		SoundHandler handler = Minecraft.getMinecraft().getSoundHandler();
 		return ReflectionUtil.getValue(handler, SoundManager.class);
 	}
 
@@ -195,7 +195,7 @@ public final class AudioManagerClient extends AudioManager
 			this.singleSoundQueue.clear();
 		} else
 		{
-			boolean isPaused = Minecraft.func_71410_x().func_147113_T();
+			boolean isPaused = Minecraft.getMinecraft().isGamePaused();
 			if (!isPaused && !this.singleSoundQueue.isEmpty())
 			{
 				IC2.platform.profilerStartSection("SoundQueuing");
@@ -264,7 +264,7 @@ public final class AudioManagerClient extends AudioManager
 			{
 				this.wasPaused = true;
 				while (!this.validAudioSources.isEmpty())
-					((AudioSource) this.validAudioSources.poll()).pause();
+					this.validAudioSources.poll().pause();
 			} else
 			{
 				assert isPaused;
@@ -353,7 +353,7 @@ public final class AudioManagerClient extends AudioManager
 		URL url = getSourceURL(soundFile);
 		if (url == null)
 		{
-			IC2.log.warn(LogCategory.Audio, "Invalid sound file: %s.", new Object[] { soundFile });
+			IC2.log.warn(LogCategory.Audio, "Invalid sound file: %s.", soundFile);
 			return null;
 		}
 		String sourceName = this.soundSystem.quickPlay(priorized, url, soundFile, false, position.x, position.y, position.z, 2, this.fadingDistance * Math.max(volume, 1.0F));
@@ -399,21 +399,21 @@ public final class AudioManagerClient extends AudioManager
 	@SubscribeEvent
 	public void onSoundPlayed(PlaySoundEvent event)
 	{
-		SoundCategory category = event.getSound().func_184365_d();
+		SoundCategory category = event.getSound().getCategory();
 		if ((category == SoundCategory.NEUTRAL && event.getName().endsWith(".hit")) || (category == SoundCategory.BLOCKS && event
 			.getName().endsWith(".break")))
 		{
-			EntityPlayerSP player = (Minecraft.func_71410_x()).field_71439_g;
-			ItemStack stack = player.field_71071_by.func_70448_g();
+			EntityPlayerSP player = Minecraft.getMinecraft().player;
+			ItemStack stack = player.inventory.getCurrentItem();
 			if (stack != null && stack.getItem() instanceof IHitSoundOverride)
 			{
-				World world = player.func_130014_f_();
+				World world = player.getEntityWorld();
 				RayTraceResult mop = getMovingObjectPositionFromPlayer(world, player, false);
-				BlockPos pos = new BlockPos(event.getSound().func_147649_g(), event.getSound().func_147654_h(), event.getSound().func_147651_i());
-				if (mop != null && mop.field_72313_a == RayTraceResult.Type.BLOCK && pos.equals(mop.func_178782_a()))
+				BlockPos pos = new BlockPos(event.getSound().getXPosF(), event.getSound().getYPosF(), event.getSound().getZPosF());
+				if (mop != null && mop.typeOfHit == RayTraceResult.Type.BLOCK && pos.equals(mop.getBlockPos()))
 				{
 					String replace;
-					if (event.getSound().func_184365_d() == SoundCategory.NEUTRAL)
+					if (event.getSound().getCategory() == SoundCategory.NEUTRAL)
 					{
 						replace = ((IHitSoundOverride) stack.getItem()).getHitSoundForBlock(player, world, pos, stack);
 					} else
@@ -433,21 +433,21 @@ public final class AudioManagerClient extends AudioManager
 
 	private static RayTraceResult getMovingObjectPositionFromPlayer(World worldIn, EntityPlayer playerIn, boolean useLiquids)
 	{
-		float f = playerIn.field_70125_A;
-		float f1 = playerIn.field_70177_z;
-		double d0 = playerIn.field_70165_t;
-		double d1 = playerIn.field_70163_u + playerIn.func_70047_e();
-		double d2 = playerIn.field_70161_v;
+		float f = playerIn.rotationPitch;
+		float f1 = playerIn.rotationYaw;
+		double d0 = playerIn.posX;
+		double d1 = playerIn.posY + playerIn.getEyeHeight();
+		double d2 = playerIn.posZ;
 		Vec3d vec3 = new Vec3d(d0, d1, d2);
-		float f2 = MathHelper.func_76134_b(-f1 * 0.017453292F - 3.1415927F);
-		float f3 = MathHelper.func_76126_a(-f1 * 0.017453292F - 3.1415927F);
-		float f4 = -MathHelper.func_76134_b(-f * 0.017453292F);
-		float f5 = MathHelper.func_76126_a(-f * 0.017453292F);
+		float f2 = MathHelper.cos(-f1 * 0.017453292F - 3.1415927F);
+		float f3 = MathHelper.sin(-f1 * 0.017453292F - 3.1415927F);
+		float f4 = -MathHelper.cos(-f * 0.017453292F);
+		float f5 = MathHelper.sin(-f * 0.017453292F);
 		float f6 = f3 * f4;
 		float f7 = f2 * f4;
 		double d3 = 5.0D;
-		Vec3d vec31 = vec3.func_72441_c(f6 * d3, f5 * d3, f7 * d3);
-		return worldIn.func_147447_a(vec3, vec31, useLiquids, !useLiquids, false);
+		Vec3d vec31 = vec3.addVector(f6 * d3, f5 * d3, f7 * d3);
+		return worldIn.rayTraceBlocks(vec3, vec31, useLiquids, !useLiquids, false);
 	}
 
 	private static String getSourceName(int id)

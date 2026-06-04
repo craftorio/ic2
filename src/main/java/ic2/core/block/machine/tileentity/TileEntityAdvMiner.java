@@ -110,9 +110,9 @@ public class TileEntityAdvMiner extends TileEntityElectricMachine implements IHa
   public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
     super.writeToNBT(nbt);
     if (this.mineTarget != null) {
-      nbt.func_74768_a("mineTargetX", this.mineTarget.func_177958_n());
-      nbt.func_74768_a("mineTargetY", this.mineTarget.func_177956_o());
-      nbt.func_74768_a("mineTargetZ", this.mineTarget.func_177952_p());
+      nbt.func_74768_a("mineTargetX", this.mineTarget.getX());
+      nbt.func_74768_a("mineTargetY", this.mineTarget.getY());
+      nbt.func_74768_a("mineTargetZ", this.mineTarget.getZ());
     } 
     nbt.func_74757_a("blacklist", this.blacklist);
     nbt.func_74757_a("silkTouch", this.silkTouch);
@@ -142,7 +142,7 @@ public class TileEntityAdvMiner extends TileEntityElectricMachine implements IHa
       return false; 
     if (this.redstone.hasRedstoneInput())
       return false; 
-    if (this.mineTarget != null && this.mineTarget.func_177956_o() < 0)
+    if (this.mineTarget != null && this.mineTarget.getY() < 0)
       return false; 
     ItemStack scanner = this.scannerSlot.get();
     if (StackUtil.isEmpty(scanner) || !ElectricItem.manager.canUse(scanner, 64.0D))
@@ -159,27 +159,27 @@ public class TileEntityAdvMiner extends TileEntityElectricMachine implements IHa
     } 
     if (this.mineTarget == null) {
       this.mineTarget = new BlockPos(this.field_174879_c.getX() - range - 1, this.field_174879_c.getY() - 1, this.field_174879_c.getZ() - range);
-      if (this.mineTarget.func_177956_o() < 0)
+      if (this.mineTarget.getY() < 0)
         return false; 
     } 
     int blockScanCount = this.maxBlockScanCount;
     World world = getWorld();
-    BlockPos.MutableBlockPos scanPos = new BlockPos.MutableBlockPos(this.mineTarget.func_177958_n(), this.mineTarget.func_177956_o(), this.mineTarget.func_177952_p());
+    BlockPos.MutableBlockPos scanPos = new BlockPos.MutableBlockPos(this.mineTarget.getX(), this.mineTarget.getY(), this.mineTarget.getZ());
     do {
-      if (scanPos.func_177958_n() < this.field_174879_c.getX() + range) {
-        scanPos = new BlockPos.MutableBlockPos(scanPos.func_177958_n() + 1, scanPos.func_177956_o(), scanPos.func_177952_p());
-      } else if (scanPos.func_177952_p() < this.field_174879_c.getZ() + range) {
-        scanPos = new BlockPos.MutableBlockPos(this.field_174879_c.getX() - range, scanPos.func_177956_o(), scanPos.func_177952_p() + 1);
+      if (scanPos.getX() < this.field_174879_c.getX() + range) {
+        scanPos = new BlockPos.MutableBlockPos(scanPos.getX() + 1, scanPos.getY(), scanPos.getZ());
+      } else if (scanPos.getZ() < this.field_174879_c.getZ() + range) {
+        scanPos = new BlockPos.MutableBlockPos(this.field_174879_c.getX() - range, scanPos.getY(), scanPos.getZ() + 1);
       } else {
-        scanPos = new BlockPos.MutableBlockPos(this.field_174879_c.getX() - range, scanPos.func_177956_o() - 1, this.field_174879_c.getZ() - range);
-        if (scanPos.func_177956_o() < 0) {
+        scanPos = new BlockPos.MutableBlockPos(this.field_174879_c.getX() - range, scanPos.getY() - 1, this.field_174879_c.getZ() - range);
+        if (scanPos.getY() < 0) {
           this.mineTarget = new BlockPos((Vec3i)scanPos);
           return true;
         } 
       } 
       ElectricItem.manager.discharge(scanner, 64.0D, 2147483647, true, false, false);
-      IBlockState state = world.func_180495_p((BlockPos)scanPos);
-      Block block = state.func_177230_c();
+      IBlockState state = world.getBlockState((BlockPos)scanPos);
+      Block block = state.getBlock();
       if (!block.isAir(state, (IBlockAccess)world, (BlockPos)scanPos) && canMine((BlockPos)scanPos, block, state)) {
         this.mineTarget = new BlockPos((Vec3i)scanPos);
         doMine(this.mineTarget, block, state);

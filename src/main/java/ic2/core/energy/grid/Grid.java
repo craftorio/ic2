@@ -282,18 +282,18 @@ public class Grid {
         complexNodes++; 
       for (IEnergyTile tile : node.tile.subTiles) {
         BlockPos pos = EnergyNet.instance.getPos(tile);
-        if (pos.func_177958_n() < minX)
-          minX = pos.func_177958_n(); 
-        if (pos.func_177956_o() < minY)
-          minY = pos.func_177956_o(); 
-        if (pos.func_177952_p() < minZ)
-          minZ = pos.func_177952_p(); 
-        if (pos.func_177958_n() > maxX)
-          maxX = pos.func_177958_n(); 
-        if (pos.func_177956_o() > maxY)
-          maxY = pos.func_177956_o(); 
-        if (pos.func_177952_p() > maxZ)
-          maxZ = pos.func_177952_p(); 
+        if (pos.getX() < minX)
+          minX = pos.getX(); 
+        if (pos.getY() < minY)
+          minY = pos.getY(); 
+        if (pos.getZ() < minZ)
+          minZ = pos.getZ(); 
+        if (pos.getX() > maxX)
+          maxX = pos.getX(); 
+        if (pos.getY() > maxY)
+          maxY = pos.getY(); 
+        if (pos.getZ() > maxZ)
+          maxZ = pos.getZ(); 
       } 
     } 
     return new GridInfo(this.uid, this.nodes.size(), complexNodes, minX, minY, minZ, maxX, maxY, maxZ);

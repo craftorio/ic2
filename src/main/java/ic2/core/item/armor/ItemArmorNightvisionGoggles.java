@@ -75,7 +75,7 @@ public class ItemArmorNightvisionGoggles extends ItemArmorUtility implements IEl
     boolean ret = false;
     if (active && IC2.platform.isSimulating() && 
       ElectricItem.manager.use(stack, 1.0D, (EntityLivingBase)player)) {
-      int skylight = player.func_130014_f_().func_175671_l(new BlockPos((Entity)player));
+      int skylight = player.getEntityWorld().func_175671_l(new BlockPos((Entity)player));
       if (skylight > 8) {
         IC2.platform.removePotion((EntityLivingBase)player, MobEffects.field_76439_r);
         player.func_70690_d(new PotionEffect(MobEffects.field_76440_q, 100, 0, true, true));

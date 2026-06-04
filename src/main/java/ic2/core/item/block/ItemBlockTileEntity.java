@@ -51,7 +51,7 @@ public class ItemBlockTileEntity extends ItemBlockIC2 {
   }
   
   public boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, IBlockState newState) {
-    assert newState.func_177230_c() == this.field_150939_a;
+    assert newState.getBlock() == this.field_150939_a;
     if (!((BlockTileEntity)this.field_150939_a).canReplace(world, pos, side, stack))
       return false; 
     ITeBlock teBlock = getTeBlock(stack);
@@ -67,7 +67,7 @@ public class ItemBlockTileEntity extends ItemBlockIC2 {
   }
   
   public static boolean placeTeBlock(ItemStack stack, EntityLivingBase placer, World world, BlockPos pos, EnumFacing side, TileEntityBlock te) {
-    IBlockState oldState = world.func_180495_p(pos);
+    IBlockState oldState = world.getBlockState(pos);
     IBlockState newState = te.getBlockState();
     if (!world.func_180501_a(pos, newState, 0))
       return false; 

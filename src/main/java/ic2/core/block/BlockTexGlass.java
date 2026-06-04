@@ -56,7 +56,7 @@ public class BlockTexGlass extends BlockMultiID<BlockTexGlass.GlassType> {
   }
   
   public boolean func_176225_a(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
-    if (world.func_180495_p(pos.func_177972_a(side)).func_177230_c() == this)
+    if (world.getBlockState(pos.func_177972_a(side)).getBlock() == this)
       return false; 
     return super.func_176225_a(state, world, pos, side);
   }

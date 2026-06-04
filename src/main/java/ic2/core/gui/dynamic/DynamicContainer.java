@@ -58,10 +58,10 @@ public class DynamicContainer<T extends IInventory> extends ContainerBase<T> {
           height = playerInventoryNode.style.height + playerInventoryNode.spacing;
           for (row = 0; row < 3; row++) {
             for (int k = 0; k < 9; k++)
-              func_75146_a(new Slot((IInventory)player.field_71071_by, k + row * 9 + 9, playerInventoryNode.x + k * width + xOffset, playerInventoryNode.y + row * height + yOffset)); 
+              func_75146_a(new Slot((IInventory)player.inventory, k + row * 9 + 9, playerInventoryNode.x + k * width + xOffset, playerInventoryNode.y + row * height + yOffset)); 
           } 
           for (col = 0; col < 9; col++)
-            func_75146_a(new Slot((IInventory)player.field_71071_by, col, playerInventoryNode.x + col * width + xOffset, playerInventoryNode.y + playerInventoryNode.hotbarOffset + yOffset)); 
+            func_75146_a(new Slot((IInventory)player.inventory, col, playerInventoryNode.x + col * width + xOffset, playerInventoryNode.y + playerInventoryNode.hotbarOffset + yOffset)); 
           break;
         case slot:
           if (!(this.base instanceof IInventorySlotHolder))

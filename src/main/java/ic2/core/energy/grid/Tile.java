@@ -114,7 +114,7 @@ public class Tile {
         if (te != null) {
           ret = ret + "|" + getTeClassName(te);
         } else {
-          ret = ret + "|" + world.func_180495_p(pos);
+          ret = ret + "|" + world.getBlockState(pos);
         } 
       } 
     } 

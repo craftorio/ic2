@@ -53,7 +53,7 @@ class TeUpdate {
         if (playerBuffer == null) {
           playerBuffer = new GrowingBuffer(0);
           buffers.put(player, playerBuffer);
-          playerBuffer.writeInt((player.func_130014_f_()).field_73011_w.getDimension());
+          playerBuffer.writeInt((player.getEntityWorld()).field_73011_w.getDimension());
         } 
         commonBuffer.writeTo(playerBuffer);
         commonBuffer.rewind();
@@ -124,11 +124,11 @@ class TeUpdate {
     out.append(" tes:\n");
     for (TeUpdateDataClient.TeData te : data.getTes()) {
       out.append("  pos: ");
-      out.append(te.pos.func_177958_n());
+      out.append(te.pos.getX());
       out.append('/');
-      out.append(te.pos.func_177956_o());
+      out.append(te.pos.getY());
       out.append('/');
-      out.append(te.pos.func_177952_p());
+      out.append(te.pos.getZ());
       out.append(", ");
       out.append(te.getFields().size());
       out.append(" fields:\n");

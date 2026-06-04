@@ -61,8 +61,8 @@ public class LiquidUtil {
   }
   
   public static LiquidData getLiquid(World world, BlockPos pos) {
-    IBlockState state = world.func_180495_p(pos);
-    Block block = state.func_177230_c();
+    IBlockState state = world.getBlockState(pos);
+    Block block = state.getBlock();
     Fluid liquid = null;
     boolean isSource = false;
     if (block instanceof IFluidBlock) {
@@ -395,8 +395,8 @@ public class LiquidUtil {
   }
   
   public static FluidStack drainBlock(World world, BlockPos pos, boolean simulate) {
-    IBlockState state = world.func_180495_p(pos);
-    Block block = state.func_177230_c();
+    IBlockState state = world.getBlockState(pos);
+    Block block = state.getBlock();
     if (block instanceof IFluidBlock) {
       IFluidBlock liquid = (IFluidBlock)block;
       if (liquid.canDrain(world, pos))
@@ -433,8 +433,8 @@ public class LiquidUtil {
     Fluid fluid = fs.getFluid();
     if (fluid == null || !fluid.canBePlacedInWorld() || fluid.getBlock() == null)
       return false; 
-    IBlockState state = world.func_180495_p(pos);
-    Block block = state.func_177230_c();
+    IBlockState state = world.getBlockState(pos);
+    Block block = state.getBlock();
     if (!block.isAir(state, (IBlockAccess)world, pos) && state.func_185904_a().func_76220_a())
       return false; 
     if (block == fluid.getBlock() && isFullFluidBlock(world, pos, block, state))
@@ -444,11 +444,11 @@ public class LiquidUtil {
     Block fluidBlock;
     if (world.field_73011_w.func_177500_n() && (
       fluidBlock = fluid.getBlock()) != null && fluidBlock
-      .func_176223_P().func_185904_a() == Material.field_151586_h) {
+      .getDefaultState().func_185904_a() == Material.field_151586_h) {
       world.func_184133_a(null, pos, SoundEvents.field_187646_bt, SoundCategory.BLOCKS, 0.5F, 2.6F + (world.field_73012_v
           .nextFloat() - world.field_73012_v.nextFloat()) * 0.8F);
       for (int i = 0; i < 8; i++)
-        world.func_175688_a(EnumParticleTypes.SMOKE_LARGE, pos.func_177958_n() + Math.random(), pos.func_177956_o() + Math.random(), pos.func_177952_p() + Math.random(), 0.0D, 0.0D, 0.0D, new int[0]); 
+        world.func_175688_a(EnumParticleTypes.SMOKE_LARGE, pos.getX() + Math.random(), pos.getY() + Math.random(), pos.getZ() + Math.random(), 0.0D, 0.0D, 0.0D, new int[0]); 
     } else {
       if (!world.isRemote && !state.func_185904_a().func_76220_a() && !state.func_185904_a().func_76224_d())
         world.func_175655_b(pos, true); 
@@ -459,7 +459,7 @@ public class LiquidUtil {
       } else {
         block = fluid.getBlock();
       } 
-      if (!world.func_175656_a(pos, block.func_176223_P()))
+      if (!world.func_175656_a(pos, block.getDefaultState()))
         return false; 
     } 
     fs.amount -= 1000;

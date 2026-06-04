@@ -104,8 +104,8 @@ public class GuiIndustrialWorkbench extends GuiIC2<ContainerIndustrialWorkbench>
                 TileEntityIndustrialWorkbench base = (TileEntityIndustrialWorkbench)((ContainerIndustrialWorkbench)GuiIndustrialWorkbench.this.container).base;
                 assert base.func_145830_o();
                 BlockPos pos = base.getPos().func_177972_a(side);
-                IBlockState state = base.getWorld().func_180495_p(pos);
-                return state.func_177230_c().getPickBlock(state, null, base.getWorld(), pos, ((ContainerIndustrialWorkbench)GuiIndustrialWorkbench.this.container).player);
+                IBlockState state = base.getWorld().getBlockState(pos);
+                return state.getBlock().getPickBlock(state, null, base.getWorld(), pos, ((ContainerIndustrialWorkbench)GuiIndustrialWorkbench.this.container).player);
               }
             })).withTooltip(new Supplier<String>() {
               private String getSideName() {

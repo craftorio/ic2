@@ -24,8 +24,8 @@ public class LayerJetpackOverride extends LayerBipedArmor {
     model.func_178686_a(this.renderer.func_177087_b());
     model.func_78086_a(entity, limbSwing, limbSwingAmount, partialTicks);
     func_188359_a(model, EntityEquipmentSlot.CHEST);
-    this.renderer.func_110776_a(getArmorResource((Entity)entity, JetpackHandler.jetpack, EntityEquipmentSlot.CHEST, null));
-    GlStateManager.func_179131_c(1.0F, 1.0F, 1.0F, 1.0F);
+    this.renderer.bindTexture(getArmorResource((Entity)entity, JetpackHandler.jetpack, EntityEquipmentSlot.CHEST, null));
+    GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
     model.func_78088_a((Entity)entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
   }
 }

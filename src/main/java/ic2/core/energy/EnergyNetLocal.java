@@ -158,18 +158,18 @@ public final class EnergyNetLocal implements IEnergyCalculator {
     Set<BlockPos> excludedPositions = new HashSet<>(excluded.size());
     for (IEnergyTile subTile : excluded)
       excludedPositions.add(EnergyNet.instance.getPos(subTile).func_185334_h()); 
-    Block block = this.world.func_180495_p(pos).func_177230_c();
-    int ocx = pos.func_177958_n() >> 4;
-    int ocz = pos.func_177952_p() >> 4;
+    Block block = this.world.getBlockState(pos).getBlock();
+    int ocx = pos.getX() >> 4;
+    int ocz = pos.getZ() >> 4;
     for (EnumFacing dir : EnumFacing.field_82609_l) {
       BlockPos cPos = pos.func_177972_a(dir);
       if (!excludedPositions.contains(cPos)) {
-        int ccx = cPos.func_177958_n() >> 4;
-        int ccz = cPos.func_177952_p() >> 4;
+        int ccx = cPos.getX() >> 4;
+        int ccz = cPos.getZ() >> 4;
         if (dir.func_176740_k().func_176720_b() || (ccx == ocx && ccz == ocz) || this.world
           
           .func_175667_e(cPos))
-          this.world.func_180495_p(cPos).func_189546_a(this.world, cPos, block, pos); 
+          this.world.getBlockState(cPos).func_189546_a(this.world, cPos, block, pos); 
       } 
     } 
   }

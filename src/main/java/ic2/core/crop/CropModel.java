@@ -82,8 +82,8 @@ public class CropModel extends AbstractModel {
     List<BakedQuad> generalQuads = new ArrayList<>();
     TextureAtlasSprite cropSprite = textures.computeIfAbsent(getTextureLocation(prop.crop, prop.size), MISSING);
     for (EnumFacing facing : EnumFacing.field_176754_o) {
-      int offsetX = facing.func_82601_c();
-      int offsetZ = facing.func_82599_e();
+      int offsetX = facing.getFrontOffsetX();
+      int offsetZ = facing.getFrontOffsetZ();
       float x = Math.abs(offsetX) * (0.5F + offsetX * 0.25F);
       float z = Math.abs(offsetZ) * (0.5F + offsetZ * 0.25F);
       float xS = (offsetX == 0) ? 0.0F : x;
@@ -118,8 +118,8 @@ public class CropModel extends AbstractModel {
     TextureAtlasSprite stickSprite = textures.get(STICK);
     TextureAtlasSprite upgradedStickSprite = textures.get(UPGRADED_STICK);
     for (EnumFacing facing : EnumFacing.field_176754_o) {
-      int offsetX = facing.func_82601_c();
-      int offsetZ = facing.func_82599_e();
+      int offsetX = facing.getFrontOffsetX();
+      int offsetZ = facing.getFrontOffsetZ();
       float x = Math.abs(offsetX) * (0.5F + offsetX * 0.25F);
       float z = Math.abs(offsetZ) * (0.5F + offsetZ * 0.25F);
       float xS = (offsetX == 0) ? 0.0F : x;
@@ -161,7 +161,7 @@ public class CropModel extends AbstractModel {
   
   private static final ResourceLocation UPGRADED_STICK = new ResourceLocation("ic2", "blocks/crop/stick_upgraded");
   
-  private static final Function<ResourceLocation, TextureAtlasSprite> MISSING = location -> Minecraft.func_71410_x().func_147117_R().func_174944_f();
+  private static final Function<ResourceLocation, TextureAtlasSprite> MISSING = location -> Minecraft.getMinecraft().func_147117_R().func_174944_f();
   
   static final Map<ResourceLocation, TextureAtlasSprite> textures = new HashMap<>();
   

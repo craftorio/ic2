@@ -74,7 +74,7 @@ public class ItemWindmeter extends ItemElectricTool {
       ElectricItem.manager.use(stack, this.operationEnergyCost, (EntityLivingBase)player);
       TileEntityWindGenerator windyTE = (TileEntityWindGenerator)te;
       double obstructiveFactor = windyTE.getObstructions() / 567.0D;
-      double wind = (obstructiveFactor >= 1.0D) ? 0.0D : ((WorldData.get(world)).windSim.getWindAt(pos.func_177956_o()) * (1.0D - obstructiveFactor));
+      double wind = (obstructiveFactor >= 1.0D) ? 0.0D : ((WorldData.get(world)).windSim.getWindAt(pos.getY()) * (1.0D - obstructiveFactor));
       float displayWind = roundWind(wind);
       if (displayWind <= 0.0F) {
         IC2.platform.messagePlayer(player, Localization.translate("ic2.wind_meter.info.obstructed", new Object[] { Integer.valueOf(windyTE.getObstructions()) }), new Object[0]);
@@ -93,7 +93,7 @@ public class ItemWindmeter extends ItemElectricTool {
     if (!ElectricItem.manager.canUse(stack, this.operationEnergyCost))
       return new ActionResult(EnumActionResult.PASS, stack); 
     ElectricItem.manager.use(stack, this.operationEnergyCost, (EntityLivingBase)player);
-    double windStrength = (WorldData.get(world)).windSim.getWindAt(player.field_70163_u);
+    double windStrength = (WorldData.get(world)).windSim.getWindAt(player.posY);
     if (windStrength < 0.0D)
       windStrength = 0.0D; 
     IC2.platform.messagePlayer(player, Localization.translate("ic2.wind_meter.info", new Object[] { Float.valueOf(roundWind(windStrength)) }), new Object[0]);

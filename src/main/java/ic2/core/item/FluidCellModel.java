@@ -27,7 +27,7 @@ public class FluidCellModel extends MaskOverlayModel {
           ResourceLocation spriteLoc;
           if (fs == null || (spriteLoc = fs.getFluid().getStill(fs)) == null)
             return FluidCellModel.this.get(); 
-          return FluidCellModel.this.get(Minecraft.func_71410_x().func_147117_R().func_110572_b(spriteLoc.toString()), fs.getFluid().getColor(fs));
+          return FluidCellModel.this.get(Minecraft.getMinecraft().func_147117_R().func_110572_b(spriteLoc.toString()), fs.getFluid().getColor(fs));
         }
       };
   }

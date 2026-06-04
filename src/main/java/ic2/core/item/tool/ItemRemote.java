@@ -34,8 +34,8 @@ public class ItemRemote extends ItemIC2 {
   public EnumActionResult func_180614_a(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
     if (world.isRemote)
       return EnumActionResult.SUCCESS; 
-    IBlockState state = world.func_180495_p(pos);
-    Block block = state.func_177230_c();
+    IBlockState state = world.getBlockState(pos);
+    Block block = state.getBlock();
     if (block != BlockName.dynamite.getInstance())
       return EnumActionResult.SUCCESS; 
     ItemStack stack = StackUtil.get(player, hand);
@@ -69,9 +69,9 @@ public class ItemRemote extends ItemIC2 {
       compound.setTag("coords", (NBTBase)new NBTTagList()); 
     NBTTagList coords = compound.func_150295_c("coords", 10);
     NBTTagCompound coord = new NBTTagCompound();
-    coord.func_74768_a("x", pos.func_177958_n());
-    coord.func_74768_a("y", pos.func_177956_o());
-    coord.func_74768_a("z", pos.func_177952_p());
+    coord.func_74768_a("x", pos.getX());
+    coord.func_74768_a("y", pos.getY());
+    coord.func_74768_a("z", pos.getZ());
     coords.func_74742_a((NBTBase)coord);
     compound.setTag("coords", (NBTBase)coords);
     freq.func_77964_b(coords.func_74745_c());
@@ -92,10 +92,10 @@ public class ItemRemote extends ItemIC2 {
       NBTTagCompound coord = coords.func_150305_b(i);
       BlockPos pos = new BlockPos(coord.func_74762_e("x"), coord.func_74762_e("y"), coord.func_74762_e("z"));
       if (world.func_175667_e(pos)) {
-        IBlockState state = world.func_180495_p(pos);
-        if (state.func_177230_c() == BlockName.dynamite.getInstance() && ((Boolean)state
+        IBlockState state = world.getBlockState(pos);
+        if (state.getBlock() == BlockName.dynamite.getInstance() && ((Boolean)state
           .func_177229_b(BlockDynamite.linked)).booleanValue()) {
-          state.func_177230_c().removedByPlayer(state, world, pos, player, false);
+          state.getBlock().removedByPlayer(state, world, pos, player, false);
           world.func_175698_g(pos);
         } 
         coords.func_74744_a(i);
@@ -113,9 +113,9 @@ public class ItemRemote extends ItemIC2 {
     NBTTagList coords = compound.func_150295_c("coords", 10);
     for (int i = 0; i < coords.func_74745_c(); i++) {
       NBTTagCompound coord = coords.func_150305_b(i);
-      if (coord.func_74762_e("x") == pos.func_177958_n() && coord
-        .func_74762_e("y") == pos.func_177956_o() && coord
-        .func_74762_e("z") == pos.func_177952_p())
+      if (coord.func_74762_e("x") == pos.getX() && coord
+        .func_74762_e("y") == pos.getY() && coord
+        .func_74762_e("z") == pos.getZ())
         return i; 
     } 
     return -1;

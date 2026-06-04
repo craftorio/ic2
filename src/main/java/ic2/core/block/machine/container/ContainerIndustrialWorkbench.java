@@ -177,7 +177,7 @@ public class ContainerIndustrialWorkbench extends ContainerFullInv<TileEntityInd
     for (int run = 0; run < 2 && !StackUtil.isEmpty(sourceItemStack); run++) {
       for (ListIterator<Slot> it = this.field_75151_b.listIterator(this.field_75151_b.size()); it.hasPrevious(); ) {
         Slot targetSlot = it.previous();
-        if ((targetSlot.field_75224_c == player.field_71071_by || (!isBuffer && targetSlot.field_75222_d >= this.indexBufferStart && targetSlot.field_75222_d < this.indexBufferEnd)) && 
+        if ((targetSlot.field_75224_c == player.inventory || (!isBuffer && targetSlot.field_75222_d >= this.indexBufferStart && targetSlot.field_75222_d < this.indexBufferEnd)) && 
           isValidTargetSlot(targetSlot, sourceItemStack, (run == 1), false)) {
           sourceItemStack = transfer(sourceItemStack, targetSlot);
           if (StackUtil.isEmpty(sourceItemStack)) {

@@ -197,10 +197,10 @@ public class TileEntityWaterKineticGenerator extends TileEntityInventory impleme
       for (int right = -box; right <= box; right++) {
         boolean occupied = false;
         for (int fwd = lentemp - length; fwd <= length; fwd++) {
-          int x = xCoord + fwd * fwdDir.func_82601_c() + right * rightDir.func_82601_c();
-          int z = zCoord + fwd * fwdDir.func_82599_e() + right * rightDir.func_82599_e();
+          int x = xCoord + fwd * fwdDir.getFrontOffsetX() + right * rightDir.getFrontOffsetX();
+          int z = zCoord + fwd * fwdDir.getFrontOffsetZ() + right * rightDir.getFrontOffsetZ();
           pos.func_181079_c(x, y, z);
-          if (world.func_180495_p((BlockPos)pos).func_177230_c() != Blocks.field_150355_j) {
+          if (world.getBlockState((BlockPos)pos).getBlock() != Blocks.field_150355_j) {
             occupied = true;
             if ((up != 0 || right != 0 || fwd != 0) && world.func_175625_s((BlockPos)pos) instanceof TileEntityWaterKineticGenerator && !onlyrotor)
               return -1; 

@@ -107,7 +107,7 @@ public class TileEntityLuminator extends TileEntityBlock {
   private void checkPlacement() {
     World world = getWorld();
     if (!isValidPosition(world, this.field_174879_c.func_177972_a(getFacing().func_176734_d()), getFacing())) {
-      getBlockType().func_180657_a(world, Ic2Player.get(world), this.field_174879_c, world.func_180495_p(this.field_174879_c), (TileEntity)this, StackUtil.emptyStack);
+      getBlockType().func_180657_a(world, Ic2Player.get(world), this.field_174879_c, world.getBlockState(this.field_174879_c), (TileEntity)this, StackUtil.emptyStack);
       world.func_175698_g(this.field_174879_c);
     } 
   }
@@ -115,7 +115,7 @@ public class TileEntityLuminator extends TileEntityBlock {
   public static boolean isValidPosition(World world, BlockPos pos, EnumFacing side) {
     if (world.isRemote || ignoreBlockStay)
       return true; 
-    if (world.func_180495_p(pos).func_193401_d((IBlockAccess)world, pos, side) == BlockFaceShape.SOLID)
+    if (world.getBlockState(pos).func_193401_d((IBlockAccess)world, pos, side) == BlockFaceShape.SOLID)
       return true; 
     IEnergyTile tile = EnergyNet.instance.getSubTile(world, pos);
     return tile instanceof ic2.api.energy.tile.IEnergyEmitter;
@@ -165,9 +165,9 @@ public class TileEntityLuminator extends TileEntityBlock {
     double height = 0.0625D;
     double remHeight = 0.9375D;
     for (EnumFacing side : EnumFacing.field_82609_l) {
-      int dx = side.func_82601_c();
-      int dy = side.func_96559_d();
-      int dz = side.func_82599_e();
+      int dx = side.getFrontOffsetX();
+      int dy = side.getFrontOffsetY();
+      int dz = side.getFrontOffsetZ();
       double xS = ((dx + 1) / 2) * 0.9375D;
       double yS = ((dy + 1) / 2) * 0.9375D;
       double zS = ((dz + 1) / 2) * 0.9375D;

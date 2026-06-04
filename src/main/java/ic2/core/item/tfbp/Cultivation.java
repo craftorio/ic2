@@ -35,7 +35,7 @@ class Cultivation extends TerraformerBase {
     plants.add(Blocks.field_150338_P.getDefaultState());
     plants.add(Blocks.field_150423_aK.getDefaultState());
     plants.add(Blocks.field_150440_ba.getDefaultState());
-    plants.add(BlockName.sapling.getInstance().func_176223_P());
+    plants.add(BlockName.sapling.getInstance().getDefaultState());
   }
   
   boolean terraform(World world, BlockPos pos) {
@@ -48,7 +48,7 @@ class Cultivation extends TerraformerBase {
       int i = 4;
       while (--i > 0 && TileEntityTerra.switchGround(world, pos, Blocks.field_150377_bs, Blocks.field_150346_d.getDefaultState(), true));
     } 
-    Block block = world.func_180495_p(pos).func_177230_c();
+    Block block = world.getBlockState(pos).getBlock();
     if (block == Blocks.field_150346_d) {
       world.func_175656_a(pos, Blocks.field_150349_c.getDefaultState());
       return true;
@@ -60,15 +60,15 @@ class Cultivation extends TerraformerBase {
   
   private static boolean growPlantsOn(World world, BlockPos pos) {
     BlockPos above = pos.func_177984_a();
-    IBlockState state = world.func_180495_p(above);
-    Block block = state.func_177230_c();
+    IBlockState state = world.getBlockState(above);
+    Block block = state.getBlock();
     if (block.isAir(state, (IBlockAccess)world, above) || (block == Blocks.field_150329_H && world.field_73012_v.nextInt(4) == 0)) {
       IBlockState plant = pickRandomPlant(world.field_73012_v);
       if (plant.func_177228_b().containsKey(BlockDirectional.field_176387_N))
         plant = plant.func_177226_a((IProperty)BlockDirectional.field_176387_N, (Comparable)EnumFacing.field_176754_o[world.field_73012_v.nextInt(EnumFacing.field_176754_o.length)]); 
-      if (plant.func_177230_c() instanceof net.minecraft.block.BlockCrops) {
+      if (plant.getBlock() instanceof net.minecraft.block.BlockCrops) {
         world.func_175656_a(pos, Blocks.FARMLAND.getDefaultState());
-      } else if (plant.func_177230_c() == Blocks.field_150398_cm) {
+      } else if (plant.getBlock() == Blocks.field_150398_cm) {
         plant = plant.func_177226_a((IProperty)BlockDoublePlant.field_176492_b, (Comparable)BlockDoublePlant.EnumBlockHalf.LOWER);
         world.func_175656_a(above, plant.func_177226_a((IProperty)BlockDoublePlant.field_176492_b, (Comparable)BlockDoublePlant.EnumBlockHalf.LOWER));
         world.func_175656_a(above.func_177984_a(), plant.func_177226_a((IProperty)BlockDoublePlant.field_176492_b, (Comparable)BlockDoublePlant.EnumBlockHalf.UPPER));

@@ -54,7 +54,7 @@ public class SlotGrid extends GuiElement<SlotGrid> {
   }
   
   protected boolean suppressTooltip(int mouseX, int mouseY) {
-    if (!StackUtil.isEmpty(this.gui.field_146297_k.field_71439_g.field_71071_by.func_70445_o()))
+    if (!StackUtil.isEmpty(this.gui.mc.player.inventory.func_70445_o()))
       return false; 
     Slot slot = this.gui.getSlotUnderMouse();
     return (slot != null && slot.func_75216_d());

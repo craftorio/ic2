@@ -54,7 +54,7 @@ public class ItemBattery extends BaseElectricItem {
     if (ElectricItem.manager.getCharge(stack) > 0.0D) {
       boolean transferred = false;
       for (int i = 0; i < 9; i++) {
-        ItemStack target = (ItemStack)player.field_71071_by.field_70462_a.get(i);
+        ItemStack target = (ItemStack)player.inventory.field_70462_a.get(i);
         if (target != null && target != stack)
           if (ElectricItem.manager.discharge(target, Double.POSITIVE_INFINITY, 2147483647, true, true, true) <= 0.0D) {
             double transfer = ElectricItem.manager.discharge(stack, 2.0D * this.transferLimit, 2147483647, true, true, true);

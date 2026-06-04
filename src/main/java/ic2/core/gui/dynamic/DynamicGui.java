@@ -138,7 +138,7 @@ public class DynamicGui<T extends ContainerBase<? extends IInventory>> extends G
           parentNode.addElement(this, (GuiElement<?>)new SlotGrid((GuiIC2)this, playerInventoryNode.x, playerInventoryNode.y + playerInventoryNode.hotbarOffset, 9, 1, playerInventoryNode.style, 0, playerInventoryNode.spacing));
           if (playerInventoryNode.showTitle)
             parentNode.addElement(this, (GuiElement<?>)Text.create((GuiIC2)this, playerInventoryNode.x + 1, playerInventoryNode.y - 10, 
-                  TextProvider.ofTranslated(player.field_71071_by.func_70005_c_()), 4210752, false)); 
+                  TextProvider.ofTranslated(player.inventory.func_70005_c_()), 4210752, false)); 
           break;
         case slot:
         case slothologram:

@@ -23,7 +23,7 @@ public class AudioConfigHandler
 		{
 			final GuiScreen gui = event.getGui();
 			int slot = 11;
-			event.getButtonList().add(new GuiButton(50, gui.field_146294_l / 2 - 155 + slot % 2 * 160, gui.field_146295_m / 6 - 12 + 24 * (slot >> 1), 150, 20, "")
+			event.getButtonList().add(new GuiButton(50, gui.width / 2 - 155 + slot % 2 * 160, gui.height / 6 - 12 + 24 * (slot >> 1), 150, 20, "")
 			{
 				private final String categoryName = "IC2";
 
@@ -31,7 +31,7 @@ public class AudioConfigHandler
 
 				private boolean pressed;
 
-				protected int func_146114_a(boolean mouseOver)
+				protected int getHoverState(boolean mouseOver)
 				{
 					return 0;
 				}
@@ -43,28 +43,28 @@ public class AudioConfigHandler
 
 				private void updateVolume(int mouseX, int mouseY)
 				{
-					((AudioManagerClient) IC2.audioManager).masterVolume = this.volume = Util.limit((float) (mouseX - this.field_146128_h + 4) / (this.field_146120_f - 8), 0.0F, 1.0F);
-					this.field_146126_j = "IC2: " + getVolumeDisplay();
+					((AudioManagerClient) IC2.audioManager).masterVolume = this.volume = Util.limit((float) (mouseX - this.x + 4) / (this.width - 8), 0.0F, 1.0F);
+					this.displayString = "IC2: " + getVolumeDisplay();
 					MainConfig.get().set("audio/volume", String.format("%.2f", this.volume));
 					MainConfig.save();
 				}
 
-				protected void func_146119_b(Minecraft mc, int mouseX, int mouseY)
+				protected void mouseDragged(Minecraft mc, int mouseX, int mouseY)
 				{
-					if (this.field_146125_m)
+					if (this.visible)
 					{
 						if (this.pressed)
 							updateVolume(mouseX, mouseY);
-						GlStateManager.func_179131_c(1.0F, 1.0F, 1.0F, 1.0F);
-						int sliderPos = (int) (this.volume * (this.field_146120_f - 8));
-						func_73729_b(this.field_146128_h + sliderPos, this.field_146129_i, 0, 66, 4, 20);
-						func_73729_b(this.field_146128_h + sliderPos + 4, this.field_146129_i, 196, 66, 4, 20);
+						GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+						int sliderPos = (int) (this.volume * (this.width - 8));
+						drawTexturedModalRect(this.x + sliderPos, this.y, 0, 66, 4, 20);
+						drawTexturedModalRect(this.x + sliderPos + 4, this.y, 196, 66, 4, 20);
 					}
 				}
 
-				public boolean func_146116_c(Minecraft mc, int mouseX, int mouseY)
+				public boolean mousePressed(Minecraft mc, int mouseX, int mouseY)
 				{
-					if (super.func_146116_c(mc, mouseX, mouseY))
+					if (super.mousePressed(mc, mouseX, mouseY))
 					{
 						updateVolume(mouseX, mouseY);
 						this.pressed = true;
@@ -73,14 +73,14 @@ public class AudioConfigHandler
 					return false;
 				}
 
-				public void func_146113_a(SoundHandler handler)
+				public void playPressSound(SoundHandler handler)
 				{
 				}
 
-				public void func_146118_a(int mouseX, int mouseY)
+				public void mouseReleased(int mouseX, int mouseY)
 				{
 					if (this.pressed)
-						gui.field_146297_k.func_147118_V().func_147682_a(PositionedSoundRecord.func_184371_a(SoundEvents.field_187909_gi, 1.0F));
+						gui.mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F));
 					this.pressed = false;
 				}
 			});

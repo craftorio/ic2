@@ -135,7 +135,7 @@ public abstract class HandHeldInventory implements IHasGui {
   
   public void onGuiClosed(EntityPlayer player) {
     save();
-    if (!(player.func_130014_f_()).isRemote)
+    if (!(player.getEntityWorld()).isRemote)
       if (PLAYERS_IN_GUI.contains(player)) {
         PLAYERS_IN_GUI.remove(player);
       } else {
@@ -156,8 +156,8 @@ public abstract class HandHeldInventory implements IHasGui {
   }
   
   protected int getPlayerInventoryIndex() {
-    for (int i = -1; i < this.player.field_71071_by.func_70302_i_(); i++) {
-      ItemStack stack = (i == -1) ? this.player.field_71071_by.func_70445_o() : this.player.field_71071_by.func_70301_a(i);
+    for (int i = -1; i < this.player.inventory.func_70302_i_(); i++) {
+      ItemStack stack = (i == -1) ? this.player.inventory.func_70445_o() : this.player.inventory.func_70301_a(i);
       if (isThisContainer(stack))
         return i; 
     } 
@@ -201,7 +201,7 @@ public abstract class HandHeldInventory implements IHasGui {
       if (this.player.field_70170_p.isRemote)
         category.func_189529_a("GUI", new ICrashReportDetail<String>() {
               public String call() throws Exception {
-                GuiScreen gui = (Minecraft.func_71410_x()).field_71462_r;
+                GuiScreen gui = (Minecraft.getMinecraft()).field_71462_r;
                 return (gui == null) ? null : gui.getClass().getName();
               }
             }); 
@@ -209,7 +209,7 @@ public abstract class HandHeldInventory implements IHasGui {
       throw new ReportedException(crash);
     } 
     if (dropItself) {
-      StackUtil.dropAsEntity(this.player.func_130014_f_(), this.player.func_180425_c(), this.containerStack);
+      StackUtil.dropAsEntity(this.player.getEntityWorld(), this.player.func_180425_c(), this.containerStack);
       func_174888_l();
     } else {
       int idx = getPlayerInventoryIndex();
@@ -217,9 +217,9 @@ public abstract class HandHeldInventory implements IHasGui {
         IC2.log.warn(LogCategory.Item, "Handheld inventory saving failed for player " + this.player.func_145748_c_().func_150260_c() + '.');
         func_174888_l();
       } else if (idx == -1) {
-        this.player.field_71071_by.func_70437_b(this.containerStack);
+        this.player.inventory.func_70437_b(this.containerStack);
       } else {
-        this.player.field_71071_by.func_70299_a(idx, this.containerStack);
+        this.player.inventory.func_70299_a(idx, this.containerStack);
       } 
     } 
   }

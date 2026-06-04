@@ -40,8 +40,8 @@ public class Ic2Fluid extends Fluid implements IFluidModelProvider {
             return ret;
           }
         });
-    Item item = Item.func_150898_a(getBlock());
-    if (item != null && item != Items.field_190931_a)
+    Item item = Item.getItemFromBlock(getBlock());
+    if (item != null && item != Items.AIR)
       ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(fluidLocation, variant)); 
   }
   

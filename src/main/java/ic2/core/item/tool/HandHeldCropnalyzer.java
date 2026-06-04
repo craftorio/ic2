@@ -22,7 +22,7 @@ public class HandHeldCropnalyzer extends HandHeldInventory implements IWorldTick
   public HandHeldCropnalyzer(EntityPlayer player, ItemStack stack) {
     super(player, stack, 3);
     if (IC2.platform.isSimulating())
-      IC2.tickHandler.requestContinuousWorldTick(player.func_130014_f_(), this); 
+      IC2.tickHandler.requestContinuousWorldTick(player.getEntityWorld(), this); 
   }
   
   public String func_70005_c_() {
@@ -47,7 +47,7 @@ public class HandHeldCropnalyzer extends HandHeldInventory implements IWorldTick
   public void onGuiClosed(EntityPlayer player) {
     super.onGuiClosed(player);
     if (IC2.platform.isSimulating())
-      IC2.tickHandler.removeContinuousWorldTick(player.func_130014_f_(), this); 
+      IC2.tickHandler.removeContinuousWorldTick(player.getEntityWorld(), this); 
   }
   
   public void onTick(World world) {

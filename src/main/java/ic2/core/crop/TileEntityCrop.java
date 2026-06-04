@@ -278,7 +278,7 @@ public class TileEntityCrop extends TileEntityBlock implements ICropTile {
       if (debugWeedWork)
         IC2.log.info(LogCategory.Crop, "Block at %s - trying to generate grass", new Object[] { dstPos }); 
       BlockPos soilPos = dstPos.func_177977_b();
-      Block block = world.func_180495_p(soilPos).func_177230_c();
+      Block block = world.getBlockState(soilPos).getBlock();
       if (block == Blocks.field_150346_d || block == Blocks.field_150349_c || block == Blocks.FARMLAND) {
         world.func_180501_a(soilPos, Blocks.field_150349_c.getDefaultState(), 7);
         world.func_180501_a(dstPos, Blocks.field_150329_H.func_176203_a(1), 7);
@@ -679,7 +679,7 @@ public class TileEntityCrop extends TileEntityBlock implements ICropTile {
     for (int index = 1; index < this.crop.getRootsLength(this); index++) {
       BlockPos blockPos = this.field_174879_c.func_177979_c(index);
       IBlockState state = this.field_145850_b.getBlockState(blockPos);
-      Block block = state.func_177230_c();
+      Block block = state.getBlock();
       if (block.isAir(state, (IBlockAccess)this.field_145850_b, blockPos))
         return false; 
       if (block == required)
@@ -694,7 +694,7 @@ public class TileEntityCrop extends TileEntityBlock implements ICropTile {
     for (int index = 1; index < this.crop.getRootsLength(this); index++) {
       BlockPos blockPos = this.field_174879_c.func_177979_c(index);
       IBlockState state = this.field_145850_b.getBlockState(blockPos);
-      Block block = state.func_177230_c();
+      Block block = state.getBlock();
       if (block.isAir(state, (IBlockAccess)this.field_145850_b, blockPos))
         return false; 
       ItemStack stackBelow = StackUtil.getPickStack(this.field_145850_b, blockPos, state, Ic2Player.get(this.field_145850_b));

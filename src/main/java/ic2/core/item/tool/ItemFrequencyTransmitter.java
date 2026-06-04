@@ -83,9 +83,9 @@ public class ItemFrequencyTransmitter extends ItemIC2 {
     } 
     nbtData.func_74757_a("targetSet", targetSet);
     nbtData.func_74757_a("targetJustSet", justSetTarget);
-    nbtData.func_74768_a("targetX", target.func_177958_n());
-    nbtData.func_74768_a("targetY", target.func_177956_o());
-    nbtData.func_74768_a("targetZ", target.func_177952_p());
+    nbtData.func_74768_a("targetX", target.getX());
+    nbtData.func_74768_a("targetY", target.getY());
+    nbtData.func_74768_a("targetZ", target.getZ());
     return EnumActionResult.SUCCESS;
   }
   

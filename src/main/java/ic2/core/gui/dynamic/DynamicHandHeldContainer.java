@@ -28,7 +28,7 @@ public class DynamicHandHeldContainer<T extends HandHeldInventory> extends Dynam
   public ItemStack func_184996_a(int slot, int button, ClickType type, EntityPlayer player) {
     boolean thrown = false;
     Slot realSlot = null;
-    if (!(player.func_130014_f_()).isRemote && slot >= 0 && slot < this.field_75151_b.size()) {
+    if (!(player.getEntityWorld()).isRemote && slot >= 0 && slot < this.field_75151_b.size()) {
       realSlot = this.field_75151_b.get(slot);
       thrown = ((HandHeldInventory)this.base).isThisContainer(realSlot.func_75211_c());
     } 

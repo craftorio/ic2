@@ -45,15 +45,15 @@ public class ItemElectricToolHoe extends ItemElectricTool {
       return EnumActionResult.PASS; 
     if (MinecraftForge.EVENT_BUS.post((Event)new UseHoeEvent(player, stack, world, pos)))
       return EnumActionResult.PASS; 
-    IBlockState state = world.func_180495_p(pos);
-    Block block = state.func_177230_c();
+    IBlockState state = world.getBlockState(pos);
+    Block block = state.getBlock();
     if (side != EnumFacing.DOWN && world
       .func_175623_d(pos.func_177984_a()) && (block == Blocks.field_150391_bh || block == Blocks.field_150349_c || block == Blocks.field_150346_d)) {
       block = Blocks.FARMLAND;
       SoundType stepSound = block.getSoundType(state, world, pos, (Entity)player);
-      world.func_184148_a(null, pos.func_177958_n() + 0.5D, pos.func_177956_o() + 0.5D, pos.func_177952_p() + 0.5D, stepSound.func_185844_d(), SoundCategory.BLOCKS, (stepSound.func_185843_a() + 1.0F) / 2.0F, stepSound.func_185847_b() * 0.8F);
+      world.func_184148_a(null, pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, stepSound.func_185844_d(), SoundCategory.BLOCKS, (stepSound.func_185843_a() + 1.0F) / 2.0F, stepSound.func_185847_b() * 0.8F);
       if (IC2.platform.isSimulating()) {
-        world.func_175656_a(pos, block.func_176223_P());
+        world.func_175656_a(pos, block.getDefaultState());
         ElectricItem.manager.use(stack, this.operationEnergyCost, (EntityLivingBase)player);
       } 
       return EnumActionResult.SUCCESS;

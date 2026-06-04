@@ -131,9 +131,9 @@ public class TileEntityCropmatron extends TileEntityElectricMachine implements I
   
   private boolean tryHydrateFarmland(BlockPos pos) {
     World world = getWorld();
-    IBlockState state = world.func_180495_p(pos);
+    IBlockState state = world.getBlockState(pos);
     int hydration;
-    if (state.func_177230_c() == Blocks.FARMLAND && (hydration = ((Integer)state.func_177229_b((IProperty)BlockFarmland.field_176531_a)).intValue()) < 7) {
+    if (state.getBlock() == Blocks.FARMLAND && (hydration = ((Integer)state.func_177229_b((IProperty)BlockFarmland.field_176531_a)).intValue()) < 7) {
       int drainAmount = Math.min(this.waterTank.getFluidAmount(), 7 - hydration);
       assert drainAmount > 0;
       assert drainAmount <= 7;

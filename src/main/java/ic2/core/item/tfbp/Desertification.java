@@ -20,11 +20,11 @@ class Desertification extends TerraformerBase {
       TileEntityTerra.switchGround(world, pos, Blocks.field_150346_d, sand, false);
       return true;
     } 
-    Block block = world.func_180495_p(pos).func_177230_c();
+    Block block = world.getBlockState(pos).getBlock();
     if (block == Blocks.field_150355_j || block == Blocks.field_150358_i || block == Blocks.field_150431_aC || block == Blocks.field_150362_t || block == Blocks.field_150361_u || block == BlockName.leaves
       .getInstance() || isPlant(block)) {
       world.func_175698_g(pos);
-      if (isPlant(world.func_180495_p(pos.func_177984_a()).func_177230_c()))
+      if (isPlant(world.getBlockState(pos.func_177984_a()).getBlock()))
         world.func_175698_g(pos.func_177984_a()); 
       return true;
     } 
@@ -42,7 +42,7 @@ class Desertification extends TerraformerBase {
   
   private static boolean isPlant(Block block) {
     for (IBlockState state : Cultivation.plants) {
-      if (state.func_177230_c() == block)
+      if (state.getBlock() == block)
         return true; 
     } 
     return false;

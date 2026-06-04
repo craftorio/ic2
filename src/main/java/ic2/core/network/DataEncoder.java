@@ -153,9 +153,9 @@ public final class DataEncoder {
         return;
       case BlockPos:
         blockPos = (BlockPos)o;
-        os.writeInt(blockPos.func_177958_n());
-        os.writeInt(blockPos.func_177956_o());
-        os.writeInt(blockPos.func_177952_p());
+        os.writeInt(blockPos.getX());
+        os.writeInt(blockPos.getY());
+        os.writeInt(blockPos.getZ());
         return;
       case Boolean:
         os.writeBoolean(((Boolean)o).booleanValue());

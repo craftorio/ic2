@@ -22,7 +22,7 @@ import org.lwjgl.opengl.GL11;
 
 public class GlTexture implements Closeable {
   public static void init() {
-    IResourceManager manager = Minecraft.func_71410_x().func_110442_L();
+    IResourceManager manager = Minecraft.getMinecraft().func_110442_L();
     if (manager instanceof IReloadableResourceManager) {
       ((IReloadableResourceManager)manager).func_110542_a(new IResourceManagerReloadListener() {
             public void func_110549_a(IResourceManager manager) {
@@ -47,7 +47,7 @@ public class GlTexture implements Closeable {
   
   public static GlTexture add(ResourceLocation identifier, GlTexture texture) {
     try {
-      texture.load(Minecraft.func_71410_x().func_110442_L());
+      texture.load(Minecraft.getMinecraft().func_110442_L());
     } catch (IOException e) {
       IC2.log.warn(LogCategory.General, "Can't load texture %s", new Object[] { identifier });
       texture.close();

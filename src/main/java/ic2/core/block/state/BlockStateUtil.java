@@ -26,7 +26,7 @@ public class BlockStateUtil {
   }
   
   public static IBlockState getState(Block block, String variant) {
-    IBlockState ret = block.func_176223_P();
+    IBlockState ret = block.getDefaultState();
     if (variant.isEmpty() || variant.equals("normal"))
       return ret; 
     int pos = 0;

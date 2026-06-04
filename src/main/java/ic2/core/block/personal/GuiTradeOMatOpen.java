@@ -22,7 +22,7 @@ public class GuiTradeOMatOpen extends GuiIC2<ContainerTradeOMatOpen> {
   public void func_73866_w_() {
     super.func_73866_w_();
     if (this.isAdmin)
-      this.field_146292_n.add(new GuiButton(0, (this.field_146294_l - this.field_146999_f) / 2 + 152, (this.field_146295_m - this.field_147000_g) / 2 + 4, 20, 20, "∞")); 
+      this.field_146292_n.add(new GuiButton(0, (this.width - this.field_146999_f) / 2 + 152, (this.height - this.field_147000_g) / 2 + 4, 20, 20, "∞")); 
   }
   
   protected void drawForegroundLayer(int mouseX, int mouseY) {

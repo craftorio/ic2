@@ -42,20 +42,20 @@ public class EntityBoatElectric extends EntityIC2Boat {
     return "textures/models/boat_electric.png";
   }
   
-  public void func_70071_h_() {
+  public void onUpdate() {
     func_70066_B();
     for (Entity e : func_184182_bu())
       e.func_70066_B(); 
     this.accelerated = false;
     Entity driver = func_184179_bs();
     if (driver instanceof EntityPlayer && IC2.keyboard.isForwardKeyDown((EntityPlayer)driver))
-      for (ItemStack stack : ((EntityPlayer)driver).field_71071_by.field_70460_b) {
+      for (ItemStack stack : ((EntityPlayer)driver).inventory.field_70460_b) {
         if (!StackUtil.isEmpty(stack) && ElectricItem.manager.discharge(stack, 4.0D, 2147483647, true, true, true) == 4.0D) {
           ElectricItem.manager.discharge(stack, 4.0D, 2147483647, true, true, false);
           this.accelerated = true;
           break;
         } 
       }  
-    super.func_70071_h_();
+    super.onUpdate();
   }
 }

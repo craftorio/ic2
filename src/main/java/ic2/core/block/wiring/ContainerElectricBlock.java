@@ -14,7 +14,7 @@ public class ContainerElectricBlock extends ContainerFullInv<TileEntityElectricB
   public ContainerElectricBlock(EntityPlayer player, TileEntityElectricBlock tileEntity1) {
     super(player, (IInventory)tileEntity1, 196);
     for (int col = 0; col < ArmorSlot.getCount(); col++)
-      func_75146_a((Slot)new SlotArmor(player.field_71071_by, 
+      func_75146_a((Slot)new SlotArmor(player.inventory, 
             ArmorSlot.get(col), 8 + col * 18, 84)); 
     func_75146_a((Slot)new SlotInvSlot((InvSlot)tileEntity1.chargeSlot, 0, 56, 17));
     func_75146_a((Slot)new SlotInvSlot((InvSlot)tileEntity1.dischargeSlot, 0, 56, 53));

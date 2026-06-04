@@ -55,7 +55,7 @@ public class HandHeldAdvancedUpgrade extends HandHeldInventory implements IHolog
   private static final byte ORE_GUI = 3;
   
   private static ItemStack checkContainerStack(EntityPlayer player, ItemStack containerStack) {
-    if (!(player.func_130014_f_()).isRemote && player.field_71070_bA instanceof ContainerHandHeldInventory && ((ContainerHandHeldInventory)player.field_71070_bA).base instanceof HandHeldUpgradeOption) {
+    if (!(player.getEntityWorld()).isRemote && player.field_71070_bA instanceof ContainerHandHeldInventory && ((ContainerHandHeldInventory)player.field_71070_bA).base instanceof HandHeldUpgradeOption) {
       addMaintainedPlayer(player);
       return (ItemStack)ReflectionUtil.getFieldValue(ReflectionUtil.getField(HandHeldInventory.class, ItemStack.class), ((ContainerHandHeldInventory)player.field_71070_bA).base);
     } 
@@ -209,7 +209,7 @@ public class HandHeldAdvancedUpgrade extends HandHeldInventory implements IHolog
   }
   
   protected void launchGUI(IHasGui gui, int ID) {
-    if (!(this.player.func_130014_f_()).isRemote) {
+    if (!(this.player.getEntityWorld()).isRemote) {
       HandHeldInventory.addMaintainedPlayer(this.player);
       IC2.platform.launchSubGui(this.player, gui, ID);
     } 

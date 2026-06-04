@@ -67,7 +67,7 @@ public class BlockFoam extends BlockMultiID<BlockFoam.FoamType> {
   public static float getHardenChance(World world, BlockPos pos, IBlockState state, FoamType type) {
     int light = world.func_175671_l(pos);
     if (!state.func_185916_f() && state
-      .func_177230_c().getLightOpacity(state, (IBlockAccess)world, pos) == 0)
+      .getBlock().getLightOpacity(state, (IBlockAccess)world, pos) == 0)
       for (EnumFacing side : EnumFacing.field_82609_l)
         light = Math.max(light, world.func_175721_c(pos.func_177972_a(side), false));  
     int avgTime = type.hardenTime * (16 - light);

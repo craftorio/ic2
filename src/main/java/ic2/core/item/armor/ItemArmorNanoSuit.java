@@ -100,8 +100,8 @@ public class ItemArmorNanoSuit extends ItemArmorElectric implements IItemHudProv
       } 
       if (Nightvision && IC2.platform.isSimulating() && 
         ElectricItem.manager.use(stack, 1.0D, (EntityLivingBase)player)) {
-        BlockPos pos = new BlockPos((int)Math.floor(player.field_70165_t), (int)Math.floor(player.field_70163_u), (int)Math.floor(player.field_70161_v));
-        int skylight = player.func_130014_f_().func_175671_l(pos);
+        BlockPos pos = new BlockPos((int)Math.floor(player.posX), (int)Math.floor(player.posY), (int)Math.floor(player.posZ));
+        int skylight = player.getEntityWorld().func_175671_l(pos);
         if (skylight > 8) {
           IC2.platform.removePotion((EntityLivingBase)player, MobEffects.field_76439_r);
           player.func_70690_d(new PotionEffect(MobEffects.field_76440_q, 100, 0, true, true));

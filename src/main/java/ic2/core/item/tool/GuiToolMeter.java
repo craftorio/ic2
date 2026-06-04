@@ -36,8 +36,8 @@ public class GuiToolMeter extends GuiIC2<ContainerMeter> {
   
   protected void func_73864_a(int i, int j, int k) throws IOException {
     super.func_73864_a(i, j, k);
-    int xMin = (this.field_146294_l - this.field_146999_f) / 2;
-    int yMin = (this.field_146295_m - this.field_147000_g) / 2;
+    int xMin = (this.width - this.field_146999_f) / 2;
+    int yMin = (this.height - this.field_147000_g) / 2;
     int x = i - xMin;
     int y = j - yMin;
     if (x >= 26 && y >= 111 && x <= 83 && y <= 123)

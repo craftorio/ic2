@@ -40,15 +40,15 @@ class Flatification extends TerraformerBase {
     BlockPos workPos = TileEntityTerra.getFirstBlockFrom(world, pos, 20);
     if (workPos == null)
       return false; 
-    if (world.func_180495_p(workPos).func_177230_c() == Blocks.field_150431_aC)
+    if (world.getBlockState(workPos).getBlock() == Blocks.field_150431_aC)
       workPos = workPos.func_177977_b(); 
-    if (pos.func_177956_o() == workPos.func_177956_o())
+    if (pos.getY() == workPos.getY())
       return false; 
-    if (workPos.func_177956_o() < pos.func_177956_o()) {
+    if (workPos.getY() < pos.getY()) {
       world.func_175656_a(workPos.func_177984_a(), Blocks.field_150346_d.getDefaultState());
       return true;
     } 
-    if (canRemove(world.func_180495_p(workPos).func_177230_c())) {
+    if (canRemove(world.getBlockState(workPos).getBlock())) {
       world.func_175698_g(workPos);
       return true;
     } 

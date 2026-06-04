@@ -16,7 +16,7 @@ import org.lwjgl.opengl.GL11;
 
 public class OverlayTesr extends TileEntitySpecialRenderer<TileEntityBlock> {
   public void func_192841_a(TileEntityBlock te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-    IBlockState state = te.func_145838_q().func_176223_P();
+    IBlockState state = te.func_145838_q().getDefaultState();
     GL11.glPushAttrib(64);
     GL11.glPushMatrix();
     RenderHelper.func_74518_a();
@@ -33,11 +33,11 @@ public class OverlayTesr extends TileEntitySpecialRenderer<TileEntityBlock> {
     GlStateManager.func_179109_b((float)(x + 0.5D), (float)(y + 0.5D), (float)(z + 0.5D));
     GlStateManager.func_179152_a(zScale, zScale, zScale);
     GlStateManager.func_179109_b((float)-(x + 0.5D), (float)-(y + 0.5D), (float)-(z + 0.5D));
-    BlockRendererDispatcher renderer = Minecraft.func_71410_x().func_175602_ab();
+    BlockRendererDispatcher renderer = Minecraft.getMinecraft().func_175602_ab();
     Tessellator tessellator = Tessellator.func_178181_a();
     BufferBuilder wr = tessellator.func_178180_c();
     wr.func_181668_a(7, DefaultVertexFormats.field_176600_a);
-    wr.func_178969_c(x - te.getPos().func_177958_n(), y - te.getPos().func_177956_o(), z - te.getPos().func_177952_p());
+    wr.func_178969_c(x - te.getPos().getX(), y - te.getPos().getY(), z - te.getPos().getZ());
     renderer.func_175019_b().func_178267_a((IBlockAccess)te.getWorld(), renderer
         .func_184389_a(state), state, te
         .getPos(), wr, true);

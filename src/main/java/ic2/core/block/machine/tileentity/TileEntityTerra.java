@@ -58,7 +58,7 @@ public class TileEntityTerra extends TileEntityElectricMachine {
         World world = getWorld();
         if (this.lastPos != null) {
           int range = tfbp.getRange(stack) / 10;
-          nextPos = new BlockPos(this.lastPos.func_177958_n() - world.field_73012_v.nextInt(range + 1) + world.field_73012_v.nextInt(range + 1), this.field_174879_c.getY(), this.lastPos.func_177952_p() - world.field_73012_v.nextInt(range + 1) + world.field_73012_v.nextInt(range + 1));
+          nextPos = new BlockPos(this.lastPos.getX() - world.field_73012_v.nextInt(range + 1) + world.field_73012_v.nextInt(range + 1), this.field_174879_c.getY(), this.lastPos.getZ() - world.field_73012_v.nextInt(range + 1) + world.field_73012_v.nextInt(range + 1));
         } else {
           if (this.failedAttempts > 4)
             this.failedAttempts = 4; 
@@ -119,8 +119,8 @@ public class TileEntityTerra extends TileEntityElectricMachine {
   }
   
   public static BlockPos getFirstSolidBlockFrom(World world, BlockPos pos, int yOffset) {
-    Ic2BlockPos ret = new Ic2BlockPos(pos.func_177958_n(), pos.func_177956_o() + yOffset, pos.func_177952_p());
-    while (ret.func_177956_o() >= 0) {
+    Ic2BlockPos ret = new Ic2BlockPos(pos.getX(), pos.getY() + yOffset, pos.getZ());
+    while (ret.getY() >= 0) {
       if (world.func_175677_d((BlockPos)ret, false))
         return new BlockPos((Vec3i)ret); 
       ret.moveDown();
@@ -129,24 +129,24 @@ public class TileEntityTerra extends TileEntityElectricMachine {
   }
   
   public static BlockPos getFirstBlockFrom(World world, BlockPos pos, int yOffset) {
-    BlockPos.MutableBlockPos ret = new BlockPos.MutableBlockPos(pos.func_177958_n(), pos.func_177956_o() + yOffset, pos.func_177952_p());
-    while (ret.func_177956_o() >= 0) {
+    BlockPos.MutableBlockPos ret = new BlockPos.MutableBlockPos(pos.getX(), pos.getY() + yOffset, pos.getZ());
+    while (ret.getY() >= 0) {
       if (!world.func_175623_d((BlockPos)ret))
         return new BlockPos((Vec3i)ret); 
-      ret.func_181079_c(ret.func_177958_n(), ret.func_177956_o() - 1, ret.func_177952_p());
+      ret.func_181079_c(ret.getX(), ret.getY() - 1, ret.getZ());
     } 
     return null;
   }
   
   public static boolean switchGround(World world, BlockPos pos, Block from, IBlockState to, boolean upwards) {
-    BlockPos.MutableBlockPos cPos = new BlockPos.MutableBlockPos(pos.func_177958_n(), pos.func_177956_o(), pos.func_177952_p());
-    while (cPos.func_177956_o() >= 0) {
-      Block block = world.func_180495_p((BlockPos)cPos).func_177230_c();
+    BlockPos.MutableBlockPos cPos = new BlockPos.MutableBlockPos(pos.getX(), pos.getY(), pos.getZ());
+    while (cPos.getY() >= 0) {
+      Block block = world.getBlockState((BlockPos)cPos).getBlock();
       if ((upwards && block != from) || (!upwards && block == from))
         break; 
-      cPos.func_181079_c(cPos.func_177958_n(), cPos.func_177956_o() - 1, cPos.func_177952_p());
+      cPos.func_181079_c(cPos.getX(), cPos.getY() - 1, cPos.getZ());
     } 
-    if ((upwards && cPos.func_177956_o() == pos.func_177956_o()) || (!upwards && cPos.func_177956_o() < 0))
+    if ((upwards && cPos.getY() == pos.getY()) || (!upwards && cPos.getY() < 0))
       return false; 
     world.func_175656_a(upwards ? cPos.func_177984_a() : new BlockPos((Vec3i)cPos), to);
     return true;

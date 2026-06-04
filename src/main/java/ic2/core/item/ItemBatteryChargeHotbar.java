@@ -35,7 +35,7 @@ public class ItemBatteryChargeHotbar extends ItemBattery implements IBoxable {
     super.func_77624_a(stack, world, list, advanced);
     Mode mode = getMode(stack);
     list.add(getNameOfMode(mode));
-    if ((Minecraft.func_71410_x()).field_71462_r instanceof ic2.core.item.tool.GuiToolbox)
+    if ((Minecraft.getMinecraft()).field_71462_r instanceof ic2.core.item.tool.GuiToolbox)
       list.add((mode.enabled ? (String)TextFormatting.RED : (String)TextFormatting.GREEN) + Localization.translate("ic2.tooltip.mode.boxable")); 
   }
   
@@ -43,12 +43,12 @@ public class ItemBatteryChargeHotbar extends ItemBattery implements IBoxable {
     Mode mode = getMode(stack);
     if (entity instanceof net.minecraft.entity.player.EntityPlayerMP && world.func_82737_E() % 10L < getTier(stack) && mode.enabled) {
       EntityPlayer thePlayer = (EntityPlayer)entity;
-      NonNullList<ItemStack> nonNullList = thePlayer.field_71071_by.field_70462_a;
+      NonNullList<ItemStack> nonNullList = thePlayer.inventory.field_70462_a;
       double limit = getTransferLimit(stack);
       int tier = getTier(stack);
       for (int i = 0; i < 9 && limit > 0.0D; i++) {
         ItemStack toCharge = nonNullList.get(i);
-        if (!StackUtil.isEmpty(toCharge) && (mode != Mode.NOT_IN_HAND || i != thePlayer.field_71071_by.field_70461_c))
+        if (!StackUtil.isEmpty(toCharge) && (mode != Mode.NOT_IN_HAND || i != thePlayer.inventory.field_70461_c))
           if (!(toCharge.getItem() instanceof ItemBatteryChargeHotbar)) {
             double charge = ElectricItem.manager.charge(toCharge, limit, tier, false, true);
             charge = ElectricItem.manager.discharge(stack, charge, tier, true, false, false);

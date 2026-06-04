@@ -111,7 +111,7 @@ public class TileEntityCokeKiln extends TileEntityInventory implements IMultiBlo
   }
   
   protected boolean canWork() {
-    BlockPos hatchPos = new BlockPos(this.field_174879_c.getX() + -getFacing().func_82601_c(), this.field_174879_c.getY() + 1, this.field_174879_c.getZ() + -getFacing().func_82599_e());
+    BlockPos hatchPos = new BlockPos(this.field_174879_c.getX() + -getFacing().getFrontOffsetX(), this.field_174879_c.getY() + 1, this.field_174879_c.getZ() + -getFacing().getFrontOffsetZ());
     TileEntity hatch = this.field_145850_b.func_175625_s(hatchPos);
     if (!(hatch instanceof TileEntityCokeKilnHatch))
       return false; 
@@ -132,7 +132,7 @@ public class TileEntityCokeKiln extends TileEntityInventory implements IMultiBlo
           continue;
         } 
         if (entry instanceof ic2.core.recipe.dynamic.RecipeOutputFluidStack) {
-          BlockPos gratePos = new BlockPos(this.field_174879_c.getX() + -getFacing().func_82601_c(), this.field_174879_c.getY() - 1, this.field_174879_c.getZ() + -getFacing().func_82599_e());
+          BlockPos gratePos = new BlockPos(this.field_174879_c.getX() + -getFacing().getFrontOffsetX(), this.field_174879_c.getY() - 1, this.field_174879_c.getZ() + -getFacing().getFrontOffsetZ());
           TileEntity grate = this.field_145850_b.func_175625_s(gratePos);
           if (!(grate instanceof TileEntityCokeKilnGrate))
             return false; 
@@ -153,7 +153,7 @@ public class TileEntityCokeKiln extends TileEntityInventory implements IMultiBlo
         continue;
       } 
       if (entry instanceof ic2.core.recipe.dynamic.RecipeOutputFluidStack) {
-        BlockPos gratePos = new BlockPos(this.field_174879_c.getX() + -getFacing().func_82601_c(), this.field_174879_c.getY() - 1, this.field_174879_c.getZ() + -getFacing().func_82599_e());
+        BlockPos gratePos = new BlockPos(this.field_174879_c.getX() + -getFacing().getFrontOffsetX(), this.field_174879_c.getY() - 1, this.field_174879_c.getZ() + -getFacing().getFrontOffsetZ());
         TileEntity grate = this.field_145850_b.func_175625_s(gratePos);
         if (!(grate instanceof TileEntityCokeKilnGrate))
           return false; 
@@ -165,7 +165,7 @@ public class TileEntityCokeKiln extends TileEntityInventory implements IMultiBlo
   }
   
   protected void finishWork() {
-    BlockPos hatchPos = new BlockPos(this.field_174879_c.getX() + -getFacing().func_82601_c(), this.field_174879_c.getY() + 1, this.field_174879_c.getZ() + -getFacing().func_82599_e());
+    BlockPos hatchPos = new BlockPos(this.field_174879_c.getX() + -getFacing().getFrontOffsetX(), this.field_174879_c.getY() + 1, this.field_174879_c.getZ() + -getFacing().getFrontOffsetZ());
     TileEntity hatch = this.field_145850_b.func_175625_s(hatchPos);
     if (!(hatch instanceof TileEntityCokeKilnHatch))
       return; 
@@ -188,7 +188,7 @@ public class TileEntityCokeKiln extends TileEntityInventory implements IMultiBlo
       stack.func_190918_g(amount);
     } 
     itemOutputs.clear();
-    BlockPos gratePos = new BlockPos(this.field_174879_c.getX() + -getFacing().func_82601_c(), this.field_174879_c.getY() - 1, this.field_174879_c.getZ() + -getFacing().func_82599_e());
+    BlockPos gratePos = new BlockPos(this.field_174879_c.getX() + -getFacing().getFrontOffsetX(), this.field_174879_c.getY() - 1, this.field_174879_c.getZ() + -getFacing().getFrontOffsetZ());
     TileEntity grate = this.field_145850_b.func_175625_s(gratePos);
     if (grate instanceof TileEntityCokeKilnGrate)
       for (FluidStack stack : fluidOutputs) {
@@ -228,7 +228,7 @@ public class TileEntityCokeKiln extends TileEntityInventory implements IMultiBlo
     int x;
     for (x = -1; x <= 1; x++) {
       for (int z = -1; z <= 1; z++) {
-        cPos.func_181079_c(this.field_174879_c.getX() + x - getFacing().func_82601_c(), this.field_174879_c.getY() - 1, this.field_174879_c.getZ() + z - getFacing().func_82599_e());
+        cPos.func_181079_c(this.field_174879_c.getX() + x - getFacing().getFrontOffsetX(), this.field_174879_c.getY() - 1, this.field_174879_c.getZ() + z - getFacing().getFrontOffsetZ());
         if (x == 0 && z == 0) {
           TileEntity tileEntity = cache.func_175625_s((BlockPos)cPos);
           if (tileEntity == null)
@@ -236,35 +236,35 @@ public class TileEntityCokeKiln extends TileEntityInventory implements IMultiBlo
           if (!(tileEntity instanceof TileEntityCokeKilnGrate))
             return false; 
         } else {
-          IBlockState state = cache.func_180495_p((BlockPos)cPos);
-          if (state.func_177230_c() != BlockName.refractory_bricks.getInstance())
+          IBlockState state = cache.getBlockState((BlockPos)cPos);
+          if (state.getBlock() != BlockName.refractory_bricks.getInstance())
             return false; 
         } 
       } 
     } 
     for (x = -1; x <= 1; x++) {
       for (int z = -1; z <= 1; z++) {
-        cPos.func_181079_c(this.field_174879_c.getX() + x - getFacing().func_82601_c(), this.field_174879_c.getY(), this.field_174879_c.getZ() + z - getFacing().func_82599_e());
+        cPos.func_181079_c(this.field_174879_c.getX() + x - getFacing().getFrontOffsetX(), this.field_174879_c.getY(), this.field_174879_c.getZ() + z - getFacing().getFrontOffsetZ());
         if (x == 0 && z == 0) {
-          IBlockState state = cache.func_180495_p((BlockPos)cPos);
-          if (state.func_177230_c() != Blocks.field_150350_a)
+          IBlockState state = cache.getBlockState((BlockPos)cPos);
+          if (state.getBlock() != Blocks.AIR)
             return false; 
-        } else if (this.field_174879_c.getX() == cPos.func_177958_n() && this.field_174879_c.getZ() == cPos.func_177952_p()) {
+        } else if (this.field_174879_c.getX() == cPos.getX() && this.field_174879_c.getZ() == cPos.getZ()) {
           TileEntity tileEntity = cache.func_175625_s((BlockPos)cPos);
           if (tileEntity == null)
             return false; 
           if (tileEntity != this)
             return false; 
         } else {
-          IBlockState state = cache.func_180495_p((BlockPos)cPos);
-          if (state.func_177230_c() != BlockName.refractory_bricks.getInstance())
+          IBlockState state = cache.getBlockState((BlockPos)cPos);
+          if (state.getBlock() != BlockName.refractory_bricks.getInstance())
             return false; 
         } 
       } 
     } 
     for (x = -1; x <= 1; x++) {
       for (int z = -1; z <= 1; z++) {
-        cPos.func_181079_c(this.field_174879_c.getX() + x - getFacing().func_82601_c(), this.field_174879_c.getY() + 1, this.field_174879_c.getZ() + z - getFacing().func_82599_e());
+        cPos.func_181079_c(this.field_174879_c.getX() + x - getFacing().getFrontOffsetX(), this.field_174879_c.getY() + 1, this.field_174879_c.getZ() + z - getFacing().getFrontOffsetZ());
         if (x == 0 && z == 0) {
           TileEntity tileEntity = cache.func_175625_s((BlockPos)cPos);
           if (tileEntity == null)
@@ -272,8 +272,8 @@ public class TileEntityCokeKiln extends TileEntityInventory implements IMultiBlo
           if (!(tileEntity instanceof TileEntityCokeKilnHatch))
             return false; 
         } else {
-          IBlockState state = cache.func_180495_p((BlockPos)cPos);
-          if (state.func_177230_c() != BlockName.refractory_bricks.getInstance())
+          IBlockState state = cache.getBlockState((BlockPos)cPos);
+          if (state.getBlock() != BlockName.refractory_bricks.getInstance())
             return false; 
         } 
       } 

@@ -76,7 +76,7 @@ public class ItemCropSeed extends ItemIC2 implements ICropSeed {
       ItemStack stack = StackUtil.get(player, hand);
       if (crop.tryPlantIn(Crops.instance.getCropCard(stack), 1, getGrowthFromStack(stack), getGainFromStack(stack), getResistanceFromStack(stack), getScannedFromStack(stack))) {
         if (!player.field_71075_bZ.field_75098_d)
-          player.field_71071_by.field_70462_a.set(player.field_71071_by.field_70461_c, StackUtil.emptyStack); 
+          player.inventory.field_70462_a.set(player.inventory.field_70461_c, StackUtil.emptyStack); 
         return EnumActionResult.SUCCESS;
       } 
     } 

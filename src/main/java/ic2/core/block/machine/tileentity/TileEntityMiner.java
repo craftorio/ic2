@@ -170,16 +170,16 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
       return withDrawPipe(operatingPos); 
     if (!operatingPos.isBelowMap()) {
       World world = getWorld();
-      IBlockState state = world.func_180495_p((BlockPos)operatingPos);
+      IBlockState state = world.getBlockState((BlockPos)operatingPos);
       if (state != BlockName.mining_pipe.getBlockState((IIdProvider)BlockMiningPipe.MiningPipeType.tip)) {
-        if (operatingPos.func_177956_o() > 0)
+        if (operatingPos.getY() > 0)
           return digDown(operatingPos, state, false); 
         return false;
       } 
-      MineResult result = mineLevel(operatingPos.func_177956_o());
+      MineResult result = mineLevel(operatingPos.getY());
       if (result == MineResult.Done) {
         operatingPos.moveDown();
-        state = world.func_180495_p((BlockPos)operatingPos);
+        state = world.getBlockState((BlockPos)operatingPos);
         return digDown(operatingPos, state, true);
       } 
       if (result == MineResult.Working)
@@ -207,9 +207,9 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
       this.lastMode = Mode.Withdraw;
       this.progress = 0;
     } 
-    if (operatingPos.isBelowMap() || getWorld().func_180495_p((BlockPos)operatingPos) != BlockName.mining_pipe.getBlockState((IIdProvider)BlockMiningPipe.MiningPipeType.tip))
+    if (operatingPos.isBelowMap() || getWorld().getBlockState((BlockPos)operatingPos) != BlockName.mining_pipe.getBlockState((IIdProvider)BlockMiningPipe.MiningPipeType.tip))
       operatingPos.moveUp(); 
-    if (operatingPos.func_177956_o() != this.field_174879_c.getY() && this.energy.getEnergy() >= 3.0D) {
+    if (operatingPos.getY() != this.field_174879_c.getY() && this.energy.getEnergy() >= 3.0D) {
       if (this.progress < 20) {
         this.energy.useEnergy(3.0D);
         this.progress++;
@@ -278,7 +278,7 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
       for (int x = this.field_174879_c.getX() - this.scanRange; x <= this.field_174879_c.getX() + this.scanRange; x++) {
         for (int z = this.field_174879_c.getZ() - this.scanRange; z <= this.field_174879_c.getZ() + this.scanRange; z++) {
           target.func_181079_c(x, y, z);
-          IBlockState state = world.func_180495_p((BlockPos)target);
+          IBlockState state = world.getBlockState((BlockPos)target);
           boolean isValidTarget = false;
           if ((OreValues.get(StackUtil.getDrops((IBlockAccess)world, (BlockPos)target, state, 0)) > 0 || OreValues.get(StackUtil.getPickStack(world, (BlockPos)target, state, player)) > 0) && canMine((BlockPos)target, state)) {
             isValidTarget = true;
@@ -302,11 +302,11 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
   }
   
   private MineResult mineTowards(BlockPos dst) {
-    int dx = Math.abs(dst.func_177958_n() - this.field_174879_c.getX()), sx = (this.field_174879_c.getX() < dst.func_177958_n()) ? 1 : -1;
-    int dz = -Math.abs(dst.func_177952_p() - this.field_174879_c.getZ()), sz = (this.field_174879_c.getZ() < dst.func_177952_p()) ? 1 : -1;
+    int dx = Math.abs(dst.getX() - this.field_174879_c.getX()), sx = (this.field_174879_c.getX() < dst.getX()) ? 1 : -1;
+    int dz = -Math.abs(dst.getZ() - this.field_174879_c.getZ()), sz = (this.field_174879_c.getZ() < dst.getZ()) ? 1 : -1;
     int err = dx + dz;
     BlockPos.MutableBlockPos target = new BlockPos.MutableBlockPos();
-    for (int cx = this.field_174879_c.getX(), cz = this.field_174879_c.getZ(); cx != dst.func_177958_n() || cz != dst.func_177952_p(); ) {
+    for (int cx = this.field_174879_c.getX(), cz = this.field_174879_c.getZ(); cx != dst.getX() || cz != dst.getZ(); ) {
       boolean isCurrentPos = (cx == this.lastX && cz == this.lastZ);
       int e2 = 2 * err;
       if (e2 > dz) {
@@ -316,13 +316,13 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
         err += dx;
         cz += sz;
       } 
-      target.func_181079_c(cx, dst.func_177956_o(), cz);
+      target.func_181079_c(cx, dst.getY(), cz);
       World world = getWorld();
-      IBlockState state = world.func_180495_p((BlockPos)target);
+      IBlockState state = world.getBlockState((BlockPos)target);
       boolean isBlocking = false;
       if (isCurrentPos) {
         isBlocking = true;
-      } else if (!state.func_177230_c().isAir(state, (IBlockAccess)world, (BlockPos)target)) {
+      } else if (!state.getBlock().isAir(state, (IBlockAccess)world, (BlockPos)target)) {
         LiquidUtil.LiquidData liquid = LiquidUtil.getLiquid(world, (BlockPos)target);
         if (liquid == null || liquid.isSource || (this.pumpMode && canPump((BlockPos)target)))
           isBlocking = true; 
@@ -345,7 +345,7 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
     Mode mode;
     int energyPerTick, duration;
     World world = getWorld();
-    Block block = state.func_177230_c();
+    Block block = state.getBlock();
     boolean isAirBlock = true;
     if (!block.isAir(state, (IBlockAccess)world, target)) {
       isAirBlock = false;
@@ -402,7 +402,7 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
   }
   
   private boolean harvestBlock(BlockPos target, IBlockState state) {
-    int energyCost = 2 * (this.field_174879_c.getY() - target.func_177956_o());
+    int energyCost = 2 * (this.field_174879_c.getY() - target.getY());
     if (this.energy.getEnergy() < energyCost)
       return false; 
     World world = getWorld();
@@ -446,7 +446,7 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
   }
   
   public boolean canMine(BlockPos target, IBlockState state) {
-    Block block = state.func_177230_c();
+    Block block = state.getBlock();
     if (block.isAir(state, (IBlockAccess) getWorld(), target))
       return true; 
     if (block == BlockName.mining_pipe.getInstance() || block == Blocks.field_150486_ae)

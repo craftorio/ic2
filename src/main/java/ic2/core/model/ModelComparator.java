@@ -48,7 +48,7 @@ public class ModelComparator {
       cacheResult = UNCACHEABLE;
     } 
     assert cacheResult == null || cacheResult == UNCACHEABLE;
-    BlockRendererDispatcher renderer = Minecraft.func_71410_x().func_175602_ab();
+    BlockRendererDispatcher renderer = Minecraft.getMinecraft().func_175602_ab();
     IBakedModel modelA = renderer.func_184389_a(stateA);
     IBakedModel modelB = renderer.func_184389_a(stateB);
     Class<?> modelCls = modelA.getClass();

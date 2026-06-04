@@ -64,7 +64,7 @@ public class EntityMiningLaser extends Entity implements IThrowableEntity {
     this.headingSet = false;
     this.smelt = false;
     this.ticksInAir = 0;
-    func_70105_a(0.8F, 0.8F);
+    setSize(0.8F, 0.8F);
   }
   
   public EntityMiningLaser(World world, Vector3 start, Vector3 dir, EntityLivingBase owner, float range, float power, int blockBreaks, boolean explosive) {
@@ -77,8 +77,8 @@ public class EntityMiningLaser extends Entity implements IThrowableEntity {
     this.smelt = false;
     this.ticksInAir = 0;
     this.owner = owner;
-    func_70105_a(0.8F, 0.8F);
-    func_70107_b(start.x, start.y, start.z);
+    setSize(0.8F, 0.8F);
+    setPosition(start.x, start.y, start.z);
     setLaserHeading(dir.x, dir.y, dir.z, 1.0D);
     this.range = range;
     this.power = power;
@@ -86,15 +86,15 @@ public class EntityMiningLaser extends Entity implements IThrowableEntity {
     this.explosive = explosive;
   }
   
-  protected void func_70088_a() {}
+  protected void entityInit() {}
   
   public void setLaserHeading(double motionX, double motionY, double motionZ, double speed) {
     double currentSpeed = Math.sqrt(motionX * motionX + motionY * motionY + motionZ * motionZ);
-    this.field_70159_w = motionX / currentSpeed * speed;
-    this.field_70181_x = motionY / currentSpeed * speed;
-    this.field_70179_y = motionZ / currentSpeed * speed;
-    this.field_70126_B = this.field_70177_z = (float)Math.toDegrees(Math.atan2(motionX, motionZ));
-    this.field_70127_C = this.field_70125_A = (float)Math.toDegrees(Math.atan2(motionY, Math.sqrt(motionX * motionX + motionZ * motionZ)));
+    this.motionX = motionX / currentSpeed * speed;
+    this.motionY = motionY / currentSpeed * speed;
+    this.motionZ = motionZ / currentSpeed * speed;
+    this.field_70126_B = this.rotationYaw = (float)Math.toDegrees(Math.atan2(motionX, motionZ));
+    this.field_70127_C = this.rotationPitch = (float)Math.toDegrees(Math.atan2(motionY, Math.sqrt(motionX * motionX + motionZ * motionZ)));
     this.headingSet = true;
   }
   
@@ -102,27 +102,27 @@ public class EntityMiningLaser extends Entity implements IThrowableEntity {
     setLaserHeading(motionX, motionY, motionZ, 1.0D);
   }
   
-  public void func_70071_h_() {
-    super.func_70071_h_();
+  public void onUpdate() {
+    super.onUpdate();
     if (IC2.platform.isSimulating() && (this.range < 1.0F || this.power <= 0.0F || this.blockBreaks <= 0)) {
       if (this.explosive)
         explode(); 
-      func_70106_y();
+      setDead();
       return;
     } 
     this.ticksInAir++;
-    Vec3d oldPosition = new Vec3d(this.field_70165_t, this.field_70163_u, this.field_70161_v);
-    Vec3d newPosition = new Vec3d(this.field_70165_t + this.field_70159_w, this.field_70163_u + this.field_70181_x, this.field_70161_v + this.field_70179_y);
-    World world = func_130014_f_();
-    RayTraceResult result = world.func_147447_a(oldPosition, newPosition, false, true, false);
-    oldPosition = new Vec3d(this.field_70165_t, this.field_70163_u, this.field_70161_v);
+    Vec3d oldPosition = new Vec3d(this.posX, this.posY, this.posZ);
+    Vec3d newPosition = new Vec3d(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
+    World world = getEntityWorld();
+    RayTraceResult result = world.rayTraceBlocks(oldPosition, newPosition, false, true, false);
+    oldPosition = new Vec3d(this.posX, this.posY, this.posZ);
     if (result != null) {
       newPosition = new Vec3d(result.field_72307_f.field_72450_a, result.field_72307_f.field_72448_b, result.field_72307_f.field_72449_c);
     } else {
-      newPosition = new Vec3d(this.field_70165_t + this.field_70159_w, this.field_70163_u + this.field_70181_x, this.field_70161_v + this.field_70179_y);
+      newPosition = new Vec3d(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
     } 
     Entity hitEntity = null;
-    List<Entity> list = world.func_72839_b(this, func_174813_aQ().func_72321_a(this.field_70159_w, this.field_70181_x, this.field_70179_y).func_186662_g(1.0D));
+    List<Entity> list = world.func_72839_b(this, func_174813_aQ().func_72321_a(this.motionX, this.motionY, this.motionZ).func_186662_g(1.0D));
     double distance = 0.0D;
     for (Entity entity : list) {
       if (!entity.func_70067_L() || (entity == this.owner && this.ticksInAir < 5))
@@ -140,13 +140,13 @@ public class EntityMiningLaser extends Entity implements IThrowableEntity {
     RayTraceResult blockHit = result;
     if (hitEntity != null)
       result = new RayTraceResult(hitEntity); 
-    if (result != null && result.field_72313_a != RayTraceResult.Type.MISS && !world.isRemote) {
+    if (result != null && result.typeOfHit != RayTraceResult.Type.MISS && !world.isRemote) {
       if (this.explosive) {
         explode();
-        func_70106_y();
+        setDead();
         return;
       } 
-      switch (result.field_72313_a) {
+      switch (result.typeOfHit) {
         case ENTITY:
           if (hitEntity(result.field_72308_g))
             break; 
@@ -156,39 +156,39 @@ public class EntityMiningLaser extends Entity implements IThrowableEntity {
           } 
           result = blockHit;
         case BLOCK:
-          if (!hitBlock(result.func_178782_a(), result.field_178784_b))
+          if (!hitBlock(result.getBlockPos(), result.field_178784_b))
             this.power -= 0.5F; 
           break;
         default:
-          throw new RuntimeException("invalid hit type: " + result.field_72313_a);
+          throw new RuntimeException("invalid hit type: " + result.typeOfHit);
       } 
     } else {
       this.power -= 0.5F;
     } 
-    func_70107_b(this.field_70165_t + this.field_70159_w, this.field_70163_u + this.field_70181_x, this.field_70161_v + this.field_70179_y);
-    this.range = (float)(this.range - Math.sqrt(this.field_70159_w * this.field_70159_w + this.field_70181_x * this.field_70181_x + this.field_70179_y * this.field_70179_y));
+    setPosition(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
+    this.range = (float)(this.range - Math.sqrt(this.motionX * this.motionX + this.motionY * this.motionY + this.motionZ * this.motionZ));
     if (func_70090_H())
-      func_70106_y(); 
+      setDead(); 
   }
   
   private void explode() {
-    World world = func_130014_f_();
+    World world = getEntityWorld();
     LaserEvent.LaserExplodesEvent event = new LaserEvent.LaserExplodesEvent(world, this, this.owner, this.range, this.power, this.blockBreaks, this.explosive, this.smelt, 5.0F, 0.85F, 0.55F);
     if (MinecraftForge.EVENT_BUS.post((Event)event)) {
-      func_70106_y();
+      setDead();
       return;
     } 
     copyDataFromEvent((LaserEvent)event);
-    ExplosionIC2 explosion = new ExplosionIC2(world, this, this.field_70165_t, this.field_70163_u, this.field_70161_v, event.explosionPower, event.explosionDropRate);
+    ExplosionIC2 explosion = new ExplosionIC2(world, this, this.posX, this.posY, this.posZ, event.explosionPower, event.explosionDropRate);
     explosion.doExplosion();
   }
   
   private boolean hitEntity(Entity entity) {
-    LaserEvent.LaserHitsEntityEvent event = new LaserEvent.LaserHitsEntityEvent(func_130014_f_(), this, this.owner, this.range, this.power, this.blockBreaks, this.explosive, this.smelt, entity);
+    LaserEvent.LaserHitsEntityEvent event = new LaserEvent.LaserHitsEntityEvent(getEntityWorld(), this, this.owner, this.range, this.power, this.blockBreaks, this.explosive, this.smelt, entity);
     if (MinecraftForge.EVENT_BUS.post((Event)event)) {
       if (event.passThrough)
         return false; 
-      func_70106_y();
+      setDead();
       return true;
     } 
     copyDataFromEvent((LaserEvent)event);
@@ -199,23 +199,23 @@ public class EntityMiningLaser extends Entity implements IThrowableEntity {
       if (entity.func_70097_a((new EntityDamageSourceIndirect("arrow", this, (Entity)this.owner)).func_76349_b(), damage) && ((this.owner instanceof EntityPlayer && entity instanceof EntityDragon && ((EntityDragon)entity).func_110143_aJ() <= 0.0F) || (entity instanceof MultiPartEntityPart && ((MultiPartEntityPart)entity).field_70259_a instanceof EntityDragon && ((EntityLivingBase)((MultiPartEntityPart)entity).field_70259_a).func_110143_aJ() <= 0.0F)))
         IC2.achievements.issueAchievement((EntityPlayer)this.owner, "killDragonMiningLaser"); 
     } 
-    func_70106_y();
+    setDead();
     return true;
   }
   
   private boolean hitBlock(BlockPos pos, EnumFacing side) {
-    World world = func_130014_f_();
+    World world = getEntityWorld();
     LaserEvent.LaserHitsBlockEvent event = new LaserEvent.LaserHitsBlockEvent(world, this, this.owner, this.range, this.power, this.blockBreaks, this.explosive, this.smelt, pos, side, 0.9F, true, true);
     if (MinecraftForge.EVENT_BUS.post((Event)event)) {
-      func_70106_y();
+      setDead();
       return true;
     } 
     copyDataFromEvent((LaserEvent)event);
-    IBlockState state = world.func_180495_p(event.pos);
-    Block block = state.func_177230_c();
+    IBlockState state = world.getBlockState(event.pos);
+    Block block = state.getBlock();
     EntityPlayer playerOwner = (this.owner instanceof EntityPlayer) ? (EntityPlayer)this.owner : Ic2Player.get(world);
     if (MinecraftForge.EVENT_BUS.post((Event)new BlockEvent.BreakEvent(world, pos, state, playerOwner))) {
-      func_70106_y();
+      setDead();
       return true;
     } 
     if (block.isAir(state, (IBlockAccess)world, event.pos) || block == Blocks.field_150359_w || block == Blocks.field_150410_aZ || block == BlockName.glass.getInstance())
@@ -224,7 +224,7 @@ public class EntityMiningLaser extends Entity implements IThrowableEntity {
       return true; 
     float hardness = state.func_185887_b(world, event.pos);
     if (hardness < 0.0F) {
-      func_70106_y();
+      setDead();
       return true;
     } 
     this.power -= hardness / 1.5F;
@@ -232,7 +232,7 @@ public class EntityMiningLaser extends Entity implements IThrowableEntity {
       return true; 
     List<ItemStack> replacements = new ArrayList<>();
     if (state.func_185904_a() == Material.field_151590_u || state.func_185904_a() == MaterialIC2TNT.instance) {
-      block.func_180652_a(world, event.pos, new Explosion(world, this, event.pos.func_177958_n() + 0.5D, event.pos.func_177956_o() + 0.5D, event.pos.func_177952_p() + 0.5D, 1.0F, false, true));
+      block.func_180652_a(world, event.pos, new Explosion(world, this, event.pos.getX() + 0.5D, event.pos.getY() + 0.5D, event.pos.getZ() + 0.5D, 1.0F, false, true));
     } else if (this.smelt) {
       if (state.func_185904_a() == Material.field_151575_d) {
         event.dropBlock = false;
@@ -261,9 +261,9 @@ public class EntityMiningLaser extends Entity implements IThrowableEntity {
     return true;
   }
   
-  public void func_70014_b(NBTTagCompound nbttagcompound) {}
+  public void writeEntityToNBT(NBTTagCompound nbttagcompound) {}
   
-  public void func_70037_a(NBTTagCompound nbttagcompound) {}
+  public void readEntityFromNBT(NBTTagCompound nbttagcompound) {}
   
   void copyDataFromEvent(LaserEvent event) {
     this.owner = event.owner;

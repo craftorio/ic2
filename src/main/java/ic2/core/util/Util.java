@@ -171,7 +171,7 @@ public final class Util {
   }
   
   public static String toString(Object o, IBlockAccess world, BlockPos pos) {
-    return toString(o, world, pos.func_177958_n(), pos.func_177956_o(), pos.func_177952_p());
+    return toString(o, world, pos.getX(), pos.getY(), pos.getZ());
   }
   
   public static String toString(Object o, IBlockAccess world, int x, int y, int z) {
@@ -194,7 +194,7 @@ public final class Util {
   }
   
   public static String formatPosition(IBlockAccess world, BlockPos pos) {
-    return formatPosition(world, pos.func_177958_n(), pos.func_177956_o(), pos.func_177952_p());
+    return formatPosition(world, pos.getX(), pos.getY(), pos.getZ());
   }
   
   public static String formatPosition(IBlockAccess world, int x, int y, int z) {
@@ -214,7 +214,7 @@ public final class Util {
   }
   
   public static String formatPosition(BlockPos pos) {
-    return formatPosition(pos.func_177958_n(), pos.func_177956_o(), pos.func_177952_p());
+    return formatPosition(pos.getX(), pos.getY(), pos.getZ());
   }
   
   public static String formatPosition(int x, int y, int z) {
@@ -352,7 +352,7 @@ public final class Util {
   }
   
   public static Vector3 getEyePosition(Entity entity) {
-    return new Vector3(entity.field_70165_t, entity.field_70163_u + entity.func_70047_e(), entity.field_70161_v);
+    return new Vector3(entity.posX, entity.posY + entity.getEyeHeight(), entity.posZ);
   }
   
   public static Vector3 getLook(Entity entity) {
@@ -376,16 +376,16 @@ public final class Util {
   public static RayTraceResult traceBlocks(EntityPlayer player, boolean liquid, boolean ignoreBlockWithoutBoundingBox, boolean returnLastUncollidableBlock) {
     Vector3 start = getEyePosition((Entity)player);
     Vector3 end = getLookScaled((Entity)player).add(start);
-    return player.func_130014_f_().func_147447_a(start.toVec3(), end.toVec3(), liquid, ignoreBlockWithoutBoundingBox, returnLastUncollidableBlock);
+    return player.getEntityWorld().rayTraceBlocks(start.toVec3(), end.toVec3(), liquid, ignoreBlockWithoutBoundingBox, returnLastUncollidableBlock);
   }
   
   public static RayTraceResult traceEntities(EntityPlayer player, boolean alwaysCollide) {
     Vector3 start = getEyePosition((Entity)player);
-    return traceEntities(player.func_130014_f_(), start.toVec3(), getLookScaled((Entity)player).add(start).toVec3(), (Entity)player, alwaysCollide);
+    return traceEntities(player.getEntityWorld(), start.toVec3(), getLookScaled((Entity)player).add(start).toVec3(), (Entity)player, alwaysCollide);
   }
   
   public static RayTraceResult traceEntities(EntityPlayer player, Vec3d end, boolean alwaysCollide) {
-    return traceEntities(player.func_130014_f_(), getEyePosition((Entity)player).toVec3(), end, (Entity)player, alwaysCollide);
+    return traceEntities(player.getEntityWorld(), getEyePosition((Entity)player).toVec3(), end, (Entity)player, alwaysCollide);
   }
   
   public static RayTraceResult traceEntities(World world, Vec3d start, Vec3d end, Entity exclude, boolean alwaysCollide) {
@@ -402,7 +402,7 @@ public final class Util {
       double distance = start.func_72436_e(pos.field_72307_f);
       if (distance < minDist) {
         pos.field_72308_g = entity;
-        pos.field_72313_a = RayTraceResult.Type.ENTITY;
+        pos.typeOfHit = RayTraceResult.Type.ENTITY;
         minDist = distance;
         closest = pos;
       } 
@@ -508,7 +508,7 @@ public final class Util {
   }
   
   public static IBlockState getBlockState(IBlockAccess world, BlockPos pos) {
-    IBlockState state = world.func_180495_p(pos);
+    IBlockState state = world.getBlockState(pos);
     return state.func_185899_b(world, pos);
   }
   
@@ -520,7 +520,7 @@ public final class Util {
   
   public static Block getBlock(ResourceLocation loc) {
     Block ret = (Block)Block.field_149771_c.func_82594_a(loc);
-    if (ret != Blocks.field_150350_a)
+    if (ret != Blocks.AIR)
       return ret; 
     if (loc.func_110624_b().equals("minecraft") && loc.func_110623_a().equals("air"))
       return ret; 
@@ -548,8 +548,8 @@ public final class Util {
   public static boolean harvestBlock(World world, BlockPos pos) {
     if (world.isRemote)
       return false; 
-    IBlockState state = world.func_180495_p(pos);
-    Block block = state.func_177230_c();
+    IBlockState state = world.getBlockState(pos);
+    Block block = state.getBlock();
     TileEntity te = world.func_175625_s(pos);
     EntityPlayer player = Ic2Player.get(world);
     boolean canHarvest = block.canHarvestBlock((IBlockAccess)world, pos, player);

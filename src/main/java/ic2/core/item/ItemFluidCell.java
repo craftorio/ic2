@@ -41,8 +41,8 @@ public class ItemFluidCell extends ItemIC2FluidContainer {
     RayTraceResult position = func_77621_a(world, player, true);
     if (position == null)
       return EnumActionResult.FAIL; 
-    if (position.field_72313_a == RayTraceResult.Type.BLOCK) {
-      pos = position.func_178782_a();
+    if (position.typeOfHit == RayTraceResult.Type.BLOCK) {
+      pos = position.getBlockPos();
       if (!world.canMineBlockBody(player, pos))
         return EnumActionResult.FAIL; 
       if (!player.func_175151_a(pos, position.field_178784_b, player.func_184586_b(hand)))

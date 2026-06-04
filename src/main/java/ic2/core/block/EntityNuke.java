@@ -26,7 +26,7 @@ public class EntityNuke extends EntityIC2Explosive {
       ItemToolWrench wrench = (ItemToolWrench)stack.getItem();
       if (wrench.canTakeDamage(stack, 1)) {
         wrench.damage(stack, 1, player);
-        func_70106_y();
+        setDead();
       } 
     } 
     return false;

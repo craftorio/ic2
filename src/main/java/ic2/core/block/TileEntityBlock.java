@@ -98,7 +98,7 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
   }
   
   public final IBlockState getBlockState() {
-    return this.block.func_176223_P().func_177226_a((IProperty)this.block.materialProperty, (Comparable)MaterialProperty.WrappedMaterial.get(this.teBlock.getMaterial())).func_177226_a(this.block.typeProperty, (Comparable)MetaTeBlockProperty.getState(this.teBlock, getActive())).func_177226_a(BlockTileEntity.facingProperty, (Comparable)getFacing()).func_177226_a(BlockTileEntity.transparentProperty, Boolean.valueOf(this.teBlock.isTransparent()));
+    return this.block.getDefaultState().func_177226_a((IProperty)this.block.materialProperty, (Comparable)MaterialProperty.WrappedMaterial.get(this.teBlock.getMaterial())).func_177226_a(this.block.typeProperty, (Comparable)MetaTeBlockProperty.getState(this.teBlock, getActive())).func_177226_a(BlockTileEntity.facingProperty, (Comparable)getFacing()).func_177226_a(BlockTileEntity.transparentProperty, Boolean.valueOf(this.teBlock.isTransparent()));
   }
   
   public final void invalidate() {
@@ -138,7 +138,7 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
     IC2.tickHandler.requestSingleWorldTick(world, new IWorldTickCallback() {
           public void onTick(World world) {
             IBlockState state;
-            if (world == TileEntityBlock.this.getWorld() && TileEntityBlock.this.field_174879_c != null && !TileEntityBlock.this.func_145837_r() && TileEntityBlock.this.loadState == 1 && world.func_175667_e(TileEntityBlock.this.field_174879_c) && (state = world.func_180495_p(TileEntityBlock.this.field_174879_c)).func_177230_c() == TileEntityBlock.this.block && world.func_175625_s(TileEntityBlock.this.field_174879_c) == TileEntityBlock.this) {
+            if (world == TileEntityBlock.this.getWorld() && TileEntityBlock.this.field_174879_c != null && !TileEntityBlock.this.func_145837_r() && TileEntityBlock.this.loadState == 1 && world.func_175667_e(TileEntityBlock.this.field_174879_c) && (state = world.getBlockState(TileEntityBlock.this.field_174879_c)).getBlock() == TileEntityBlock.this.block && world.func_175625_s(TileEntityBlock.this.field_174879_c) == TileEntityBlock.this) {
               Material expectedMaterial = TileEntityBlock.this.teBlock.getMaterial();
               if (((MaterialProperty.WrappedMaterial)state.func_177229_b((IProperty)TileEntityBlock.this.block.materialProperty)).getMaterial() != expectedMaterial) {
                 if (TileEntityBlock.debugLoad)
@@ -327,7 +327,7 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
     } 
     if (minIntersection == null)
       return null; 
-    return new RayTraceResult(minIntersection.func_72441_c(this.field_174879_c.getX(), this.field_174879_c.getY(), this.field_174879_c.getZ()), minIntersectionSide, this.field_174879_c);
+    return new RayTraceResult(minIntersection.addVector(this.field_174879_c.getX(), this.field_174879_c.getY(), this.field_174879_c.getZ()), minIntersectionSide, this.field_174879_c);
   }
   
   public AxisAlignedBB getVisualBoundingBox() {
@@ -403,7 +403,7 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
           break;
       }  
     World world = getWorld();
-    return !world.func_180495_p(otherPos).doesSideBlockRendering((IBlockAccess)world, otherPos, side.func_176734_d());
+    return !world.getBlockState(otherPos).doesSideBlockRendering((IBlockAccess)world, otherPos, side.func_176734_d());
   }
   
   protected boolean doesSideBlockRendering(EnumFacing side) {
@@ -413,9 +413,9 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
   private static boolean checkSide(List<AxisAlignedBB> aabbs, EnumFacing side, boolean strict) {
     if (aabbs == defaultAabbs)
       return true; 
-    int dx = side.func_82601_c();
-    int dy = side.func_96559_d();
-    int dz = side.func_82599_e();
+    int dx = side.getFrontOffsetX();
+    int dy = side.getFrontOffsetY();
+    int dz = side.getFrontOffsetZ();
     int xS = (dx + 1) / 2;
     int yS = (dy + 1) / 2;
     int zS = (dz + 1) / 2;
@@ -752,7 +752,7 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
   }
   
   public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newState) {
-    return (oldState.func_177230_c() != newState.func_177230_c());
+    return (oldState.getBlock() != newState.getBlock());
   }
   
   private final synchronized boolean requiresWorldTick() {

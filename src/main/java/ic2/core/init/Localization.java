@@ -62,7 +62,7 @@ public class Localization {
   
   @SideOnly(Side.CLIENT)
   private static void registerResourceReloadHook() {
-    IResourceManager resManager = Minecraft.func_71410_x().func_110442_L();
+    IResourceManager resManager = Minecraft.getMinecraft().func_110442_L();
     if (resManager instanceof IReloadableResourceManager)
       ((IReloadableResourceManager)resManager).func_110542_a(new IResourceManagerReloadListener() {
             public void func_110549_a(IResourceManager manager) {
@@ -71,7 +71,7 @@ public class Localization {
               Map<String, String> localeMap = Localization.getLocaleMap();
               Set<String> languages = new LinkedHashSet<>();
               languages.add("en_us");
-              languages.add((Minecraft.func_71410_x()).field_71474_y.field_74363_ab);
+              languages.add((Minecraft.getMinecraft()).field_71474_y.field_74363_ab);
               for (String lang : languages) {
                 try {
                   for (IResource res : manager.func_135056_b(new ResourceLocation("ic2", Localization.getLangPath(lang)))) {

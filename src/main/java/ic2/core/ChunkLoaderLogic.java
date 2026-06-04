@@ -77,9 +77,9 @@ public final class ChunkLoaderLogic implements ForgeChunkManager.LoadingCallback
   public ForgeChunkManager.Ticket createTicket(World world, BlockPos pos) {
     assert getTicket(world, pos, false) == null;
     ForgeChunkManager.Ticket ticket = ForgeChunkManager.requestTicket(IC2.getInstance(), world, ForgeChunkManager.Type.NORMAL);
-    ticket.getModData().func_74768_a("x", pos.func_177958_n());
-    ticket.getModData().func_74768_a("y", pos.func_177956_o());
-    ticket.getModData().func_74768_a("z", pos.func_177952_p());
+    ticket.getModData().func_74768_a("x", pos.getX());
+    ticket.getModData().func_74768_a("y", pos.getY());
+    ticket.getModData().func_74768_a("z", pos.getZ());
     getTicketsForWorld(world).add(ticket);
     addChunkToTicket(ticket, getChunkCoords(pos));
     return ticket;
@@ -140,6 +140,6 @@ public final class ChunkLoaderLogic implements ForgeChunkManager.LoadingCallback
   }
   
   public static ChunkPos getChunkCoords(BlockPos pos) {
-    return new ChunkPos(pos.func_177958_n() >> 4, pos.func_177952_p() >> 4);
+    return new ChunkPos(pos.getX() >> 4, pos.getZ() >> 4);
   }
 }

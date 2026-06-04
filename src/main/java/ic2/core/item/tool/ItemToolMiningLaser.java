@@ -147,7 +147,7 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
           look = Util.getLook((Entity)player);
           right = look.copy().cross(Vector3.UP);
           if (right.lengthSquared() < 1.0E-4D) {
-            double angle = Math.toRadians(player.field_70177_z) - 1.5707963267948966D;
+            double angle = Math.toRadians(player.rotationYaw) - 1.5707963267948966D;
             right.set(Math.sin(angle), 0.0D, -Math.cos(angle));
           } else {
             right.normalize();
@@ -187,7 +187,7 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
           dir.y = 0.0D;
           dir.normalize();
           Vector3 start = Util.getEyePosition((Entity)player);
-          start.y = pos.func_177956_o() + 0.5D;
+          start.y = pos.getY() + 0.5D;
           start = adjustStartPos(start, dir);
           if (nbtData.func_74762_e("laserSetting") == 3) {
             if (shootLaser(stack, world, start, dir, (EntityLivingBase)player, Float.POSITIVE_INFINITY, 5.0F, 2147483647, false, false))
@@ -221,8 +221,8 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
           dir.z = 0.0D;
           dir.normalize();
           Vector3 start = Util.getEyePosition((Entity)player);
-          start.x = pos.func_177958_n() + 0.5D;
-          start.z = pos.func_177952_p() + 0.5D;
+          start.x = pos.getX() + 0.5D;
+          start.z = pos.getZ() + 0.5D;
           start = adjustStartPos(start, dir);
           if (shootLaser(stack, world, start, dir, (EntityLivingBase)player, Float.POSITIVE_INFINITY, 5.0F, 2147483647, false, false)) {
             shootLaser(stack, world, new Vector3(start.x + 1.0D, start.y, start.z), dir, (EntityLivingBase)player, Float.POSITIVE_INFINITY, 5.0F, 2147483647, false, false);

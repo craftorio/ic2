@@ -34,7 +34,7 @@ public class BlockWall extends BlockMultiID<Ic2Color> {
   }
   
   public boolean recolorBlock(World world, BlockPos pos, EnumFacing side, EnumDyeColor color) {
-    IBlockState state = world.func_180495_p(pos);
+    IBlockState state = world.getBlockState(pos);
     Ic2Color type = getType(state);
     if (type == null)
       return false; 
@@ -48,13 +48,13 @@ public class BlockWall extends BlockMultiID<Ic2Color> {
   
   @SubscribeEvent
   public void onRetexture(RetextureEvent event) {
-    if (event.state.func_177230_c() != this)
+    if (event.state.getBlock() != this)
       return; 
     World world = event.getWorld();
     Ic2Color color = (Ic2Color)event.state.func_177229_b((IProperty)this.typeProperty);
     if (!ItemBlockTileEntity.placeTeBlock(null, (EntityLivingBase)Ic2Player.get(world), world, event.pos, EnumFacing.DOWN, new TileEntityWall(color)))
       return; 
-    IBlockState newState = BlockName.te.getInstance().func_176223_P();
+    IBlockState newState = BlockName.te.getInstance().getDefaultState();
     RetextureEvent event2 = new RetextureEvent(world, event.pos, newState, event.side, event.player, event.refState, event.refVariant, event.refSide, event.refColorMultipliers);
     MinecraftForge.EVENT_BUS.post((Event)event2);
     if (event2.applied) {

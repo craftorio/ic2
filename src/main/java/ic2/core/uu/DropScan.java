@@ -246,7 +246,7 @@ public class DropScan {
         for (int x = chunk.field_76635_g * 16; x < xMax; x++) {
           pos.func_181079_c(x, y, z);
           IBlockState state = chunk.func_177435_g((BlockPos)pos);
-          Block block = state.func_177230_c();
+          Block block = state.getBlock();
           if (!block.isAir(state, (IBlockAccess)world, (BlockPos)pos))
             for (ItemStack drop : getDrops(world, (BlockPos)pos, block, state))
               addDrop(drop);  
@@ -339,9 +339,9 @@ public class DropScan {
     }
     
     public boolean func_180501_a(BlockPos pos, IBlockState state, int flags) {
-      if (pos.func_177956_o() >= 256 || pos.func_177956_o() < 0)
+      if (pos.getY() >= 256 || pos.getY() < 0)
         return false; 
-      Chunk chunk = func_72964_e(pos.func_177958_n() >> 4, pos.func_177952_p() >> 4);
+      Chunk chunk = func_72964_e(pos.getX() >> 4, pos.getZ() >> 4);
       return (chunk.func_177436_a(pos, state) != null);
     }
     
@@ -381,7 +381,7 @@ public class DropScan {
     public void func_76603_b() {}
     
     public IBlockState func_177435_g(BlockPos pos) {
-      return Blocks.field_150350_a.func_176223_P();
+      return Blocks.AIR.getDefaultState();
     }
     
     public int func_177437_b(BlockPos pos) {

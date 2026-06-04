@@ -46,10 +46,10 @@ public abstract class ContainerBase<T extends IInventory> extends Container {
     int xStart = (width - 162) / 2;
     for (int row = 0; row < 3; row++) {
       for (int i = 0; i < 9; i++)
-        func_75146_a(new Slot((IInventory)player.field_71071_by, i + row * 9 + 9, xStart + i * 18, height + -82 + row * 18)); 
+        func_75146_a(new Slot((IInventory)player.inventory, i + row * 9 + 9, xStart + i * 18, height + -82 + row * 18)); 
     } 
     for (int col = 0; col < 9; col++)
-      func_75146_a(new Slot((IInventory)player.field_71071_by, col, xStart + col * 18, height + -24)); 
+      func_75146_a(new Slot((IInventory)player.inventory, col, xStart + col * 18, height + -24)); 
   }
   
   public ItemStack func_184996_a(int slotId, int dragType, ClickType clickType, EntityPlayer player) {
@@ -65,7 +65,7 @@ public abstract class ContainerBase<T extends IInventory> extends Container {
     if (sourceSlot != null && sourceSlot.func_75216_d()) {
       ItemStack resultStack, sourceItemStack = sourceSlot.func_75211_c();
       int oldSourceItemStackSize = StackUtil.getSize(sourceItemStack);
-      if (sourceSlot.field_75224_c == player.field_71071_by) {
+      if (sourceSlot.field_75224_c == player.inventory) {
         resultStack = handlePlayerSlotShiftClick(player, sourceItemStack);
       } else {
         resultStack = handleGUISlotShiftClick(player, sourceItemStack);
@@ -73,7 +73,7 @@ public abstract class ContainerBase<T extends IInventory> extends Container {
       if (StackUtil.isEmpty(resultStack) || StackUtil.getSize(resultStack) != oldSourceItemStackSize) {
         sourceSlot.func_75215_d(resultStack);
         sourceSlot.func_190901_a(player, sourceItemStack);
-        if (!(player.func_130014_f_()).isRemote)
+        if (!(player.getEntityWorld()).isRemote)
           func_75142_b(); 
       } 
     } 
@@ -83,7 +83,7 @@ public abstract class ContainerBase<T extends IInventory> extends Container {
   protected ItemStack handlePlayerSlotShiftClick(EntityPlayer player, ItemStack sourceItemStack) {
     for (int run = 0; run < 4 && !StackUtil.isEmpty(sourceItemStack); run++) {
       for (Slot targetSlot : this.field_75151_b) {
-        if (targetSlot.field_75224_c != player.field_71071_by)
+        if (targetSlot.field_75224_c != player.inventory)
           if (isValidTargetSlot(targetSlot, sourceItemStack, (run % 2 == 1), (run < 2))) {
             sourceItemStack = transfer(sourceItemStack, targetSlot);
             if (StackUtil.isEmpty(sourceItemStack))
@@ -98,7 +98,7 @@ public abstract class ContainerBase<T extends IInventory> extends Container {
     for (int run = 0; run < 2 && !StackUtil.isEmpty(sourceItemStack); run++) {
       for (ListIterator<Slot> it = this.field_75151_b.listIterator(this.field_75151_b.size()); it.hasPrevious(); ) {
         Slot targetSlot = it.previous();
-        if (targetSlot.field_75224_c == player.field_71071_by && 
+        if (targetSlot.field_75224_c == player.inventory && 
           isValidTargetSlot(targetSlot, sourceItemStack, (run == 1), false)) {
           sourceItemStack = transfer(sourceItemStack, targetSlot);
           if (StackUtil.isEmpty(sourceItemStack))

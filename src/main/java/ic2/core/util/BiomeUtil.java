@@ -17,7 +17,7 @@ public final class BiomeUtil {
   
   public static void setBiome(World world, BlockPos pos, Biome biome) {
     byte[] biomeArray = world.func_175726_f(pos).func_76605_m();
-    int index = (pos.func_177952_p() & 0xF) << 4 | pos.func_177958_n() & 0xF;
+    int index = (pos.getZ() & 0xF) << 4 | pos.getX() & 0xF;
     biomeArray[index] = (byte)Biome.func_185362_a(biome);
   }
   

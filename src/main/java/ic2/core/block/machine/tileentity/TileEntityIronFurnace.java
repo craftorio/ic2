@@ -112,9 +112,9 @@ public class TileEntityIronFurnace extends TileEntityInventory implements IHasGu
     double width = 0.625D;
     double height = 0.375D;
     double depthOffset = 0.02D;
-    double x = pos.func_177958_n() + (facing.func_82601_c() * 1.04D + 1.0D) / 2.0D;
-    double y = pos.func_177956_o() + world.field_73012_v.nextFloat() * 0.375D;
-    double z = pos.func_177952_p() + (facing.func_82599_e() * 1.04D + 1.0D) / 2.0D;
+    double x = pos.getX() + (facing.getFrontOffsetX() * 1.04D + 1.0D) / 2.0D;
+    double y = pos.getY() + world.field_73012_v.nextFloat() * 0.375D;
+    double z = pos.getZ() + (facing.getFrontOffsetZ() * 1.04D + 1.0D) / 2.0D;
     if (facing.func_176740_k() == EnumFacing.Axis.X) {
       z += world.field_73012_v.nextFloat() * 0.625D - 0.3125D;
     } else {
@@ -125,7 +125,7 @@ public class TileEntityIronFurnace extends TileEntityInventory implements IHasGu
   }
   
   public static double spawnXP(EntityPlayer player, double xp) {
-    World world = player.func_130014_f_();
+    World world = player.getEntityWorld();
     long balls = (long)Math.floor(xp);
     while (balls > 0L) {
       int amount;
@@ -135,7 +135,7 @@ public class TileEntityIronFurnace extends TileEntityInventory implements IHasGu
         amount = 2477;
       } 
       balls -= amount;
-      world.func_72838_d((Entity)new EntityXPOrb(world, player.field_70165_t, player.field_70163_u + 0.5D, player.field_70161_v + 0.5D, amount));
+      world.func_72838_d((Entity)new EntityXPOrb(world, player.posX, player.posY + 0.5D, player.posZ + 0.5D, amount));
     } 
     return xp - Math.floor(xp);
   }

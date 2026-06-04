@@ -41,9 +41,9 @@ public class FluidReactorLookup extends TileEntityComponent {
       .getWorld() == world && world
       .func_175625_s(this.reactor.getPos()) == this.reactor) {
       BlockPos reactorPos = this.reactor.getPos();
-      int dx = Math.abs(pos.func_177958_n() - reactorPos.func_177958_n());
-      int dy = Math.abs(pos.func_177956_o() - reactorPos.func_177956_o());
-      int dz = Math.abs(pos.func_177952_p() - reactorPos.func_177952_p());
+      int dx = Math.abs(pos.getX() - reactorPos.getX());
+      int dy = Math.abs(pos.getY() - reactorPos.getY());
+      int dz = Math.abs(pos.getZ() - reactorPos.getZ());
       if (dx <= 2 && dy <= 2 && dz <= 2 && (dx == 2 || dy == 2 || dz == 2))
         return; 
     } 

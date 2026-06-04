@@ -35,12 +35,12 @@ public class ContainerHandHeldInventory<T extends HandHeldInventory> extends Con
         break;
       case SWAP:
         assert slot >= 0 && slot < this.field_75151_b.size();
-        assert func_75147_a((IInventory)player.field_71071_by, button) != null;
-        swapOut = ((HandHeldInventory)this.base).isThisContainer(func_75147_a((IInventory)player.field_71071_by, button).func_75211_c());
+        assert func_75147_a((IInventory)player.inventory, button) != null;
+        swapOut = ((HandHeldInventory)this.base).isThisContainer(func_75147_a((IInventory)player.inventory, button).func_75211_c());
         swapTo = ((HandHeldInventory)this.base).isThisContainer(((Slot)this.field_75151_b.get(slot)).func_75211_c());
         if (swapOut || swapTo)
           for (int i = 0; i < 9; i++) {
-            if ((swapOut && slot == (func_75147_a((IInventory)player.field_71071_by, i)).field_75222_d) || (swapTo && button == i)) {
+            if ((swapOut && slot == (func_75147_a((IInventory)player.inventory, i)).field_75222_d) || (swapTo && button == i)) {
               if (player instanceof EntityPlayerMP)
                 ((EntityPlayerMP)player).field_71135_a.func_147359_a((Packet)new SPacketHeldItemChange(i)); 
               break;
@@ -55,11 +55,11 @@ public class ContainerHandHeldInventory<T extends HandHeldInventory> extends Con
         throw new RuntimeException("Unexpected ClickType: " + type);
     } 
     ItemStack stack = super.func_184996_a(slot, button, type, player);
-    if (closeGUI && !(player.func_130014_f_()).isRemote) {
+    if (closeGUI && !(player.getEntityWorld()).isRemote) {
       ((HandHeldInventory)this.base).saveAsThrown(stack);
       player.func_71053_j();
     } else if (type == ClickType.CLONE) {
-      ItemStack held = player.field_71071_by.func_70445_o();
+      ItemStack held = player.inventory.func_70445_o();
       if (((HandHeldInventory)this.base).isThisContainer(held))
         held.func_77978_p().func_82580_o("uid"); 
     } 

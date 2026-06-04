@@ -8,7 +8,7 @@ public class IC2BucketHandler {
   @SubscribeEvent
   public void onBucketFill(FillBucketEvent event) {
     if (event.getTarget() != null) {
-      Block block = event.getWorld().func_180495_p(event.getTarget().func_178782_a()).func_177230_c();
+      Block block = event.getWorld().getBlockState(event.getTarget().getBlockPos()).getBlock();
       if (block instanceof ic2.core.block.BlockIC2Fluid && event.isCancelable())
         event.setCanceled(true); 
     } 

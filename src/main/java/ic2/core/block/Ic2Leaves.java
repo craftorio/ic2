@@ -53,7 +53,7 @@ public class Ic2Leaves extends BlockLeaves implements IBlockModelProvider {
     ModelLoader.setCustomStateMapper((Block)this, (IStateMapper)stateMap);
     List<IBlockState> states = new ArrayList<>(typeProperty.func_177700_c().size());
     for (LeavesType type : LeavesType.values)
-      states.add(getDropState(func_176223_P().func_177226_a((IProperty)typeProperty, type))); 
+      states.add(getDropState(getDefaultState().func_177226_a((IProperty)typeProperty, type))); 
     BlockBase.registerItemModels((Block)this, states, (IStateMapper)stateMap);
   }
   
@@ -70,7 +70,7 @@ public class Ic2Leaves extends BlockLeaves implements IBlockModelProvider {
     boolean checkDecay = ((meta & 0x8) != 0);
     boolean decayable = ((meta & 0x4) != 0);
     meta &= 0x3;
-    IBlockState ret = func_176223_P().func_177226_a((IProperty)field_176236_b, Boolean.valueOf(checkDecay)).func_177226_a((IProperty)field_176237_a, Boolean.valueOf(decayable));
+    IBlockState ret = getDefaultState().func_177226_a((IProperty)field_176236_b, Boolean.valueOf(checkDecay)).func_177226_a((IProperty)field_176237_a, Boolean.valueOf(decayable));
     if (meta < LeavesType.values.length)
       ret = ret.func_177226_a((IProperty)typeProperty, LeavesType.values[meta]); 
     return ret;
@@ -97,8 +97,8 @@ public class Ic2Leaves extends BlockLeaves implements IBlockModelProvider {
   
   public boolean func_176225_a(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
     BlockPos nPos = pos.func_177972_a(side);
-    return ((!func_149662_c(state) || world.func_180495_p(nPos) != state) && 
-      !world.func_180495_p(nPos).doesSideBlockRendering(world, nPos, side.func_176734_d()));
+    return ((!func_149662_c(state) || world.getBlockState(nPos) != state) && 
+      !world.getBlockState(nPos).doesSideBlockRendering(world, nPos, side.func_176734_d()));
   }
   
   public Item func_180660_a(IBlockState state, Random rand, int fortune) {
@@ -114,12 +114,12 @@ public class Ic2Leaves extends BlockLeaves implements IBlockModelProvider {
   }
   
   public List<ItemStack> onSheared(ItemStack item, IBlockAccess world, BlockPos pos, int fortune) {
-    IBlockState state = getDropState(world.func_180495_p(pos));
+    IBlockState state = getDropState(world.getBlockState(pos));
     return Arrays.asList(new ItemStack[] { new ItemStack((Block)this, 1, func_176201_c(state)) });
   }
   
   public void func_149666_a(CreativeTabs tab, NonNullList<ItemStack> list) {
-    IBlockState state = getDropState(func_176223_P());
+    IBlockState state = getDropState(getDefaultState());
     for (LeavesType type : LeavesType.values)
       list.add(new ItemStack((Block)this, 1, func_176201_c(state.func_177226_a((IProperty)typeProperty, type)))); 
   }

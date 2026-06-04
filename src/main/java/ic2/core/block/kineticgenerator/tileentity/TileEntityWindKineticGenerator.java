@@ -137,8 +137,8 @@ public class TileEntityWindKineticGenerator extends TileEntityInventory implemen
       box *= 2; 
     EnumFacing fwdDir = getFacing();
     EnumFacing rightDir = fwdDir.func_176732_a(EnumFacing.DOWN.func_176740_k());
-    int xMaxDist = Math.abs(length * fwdDir.func_82601_c() + box * rightDir.func_82601_c());
-    int zMaxDist = Math.abs(length * fwdDir.func_82599_e() + box * rightDir.func_82599_e());
+    int xMaxDist = Math.abs(length * fwdDir.getFrontOffsetX() + box * rightDir.getFrontOffsetX());
+    int zMaxDist = Math.abs(length * fwdDir.getFrontOffsetZ() + box * rightDir.getFrontOffsetZ());
     ChunkCache chunkCache = new ChunkCache(getWorld(), this.field_174879_c.func_177982_a(-xMaxDist, -box, -zMaxDist), this.field_174879_c.func_177982_a(xMaxDist, box, zMaxDist), 0);
     int ret = 0;
     int xCoord = this.field_174879_c.getX();
@@ -150,13 +150,13 @@ public class TileEntityWindKineticGenerator extends TileEntityInventory implemen
       for (int right = -box; right <= box; right++) {
         boolean occupied = false;
         for (int fwd = lentemp - length; fwd <= length; fwd++) {
-          int x = xCoord + fwd * fwdDir.func_82601_c() + right * rightDir.func_82601_c();
-          int z = zCoord + fwd * fwdDir.func_82599_e() + right * rightDir.func_82599_e();
+          int x = xCoord + fwd * fwdDir.getFrontOffsetX() + right * rightDir.getFrontOffsetX();
+          int z = zCoord + fwd * fwdDir.getFrontOffsetZ() + right * rightDir.getFrontOffsetZ();
           pos.func_181079_c(x, y, z);
           assert Math.abs(x - xCoord) <= xMaxDist;
           assert Math.abs(z - zCoord) <= zMaxDist;
-          IBlockState state = chunkCache.func_180495_p((BlockPos)pos);
-          Block block = state.func_177230_c();
+          IBlockState state = chunkCache.getBlockState((BlockPos)pos);
+          Block block = state.getBlock();
           if (!block.isAir(state, (IBlockAccess)chunkCache, (BlockPos)pos)) {
             occupied = true;
             if ((up != 0 || right != 0 || fwd != 0) && chunkCache.func_175625_s((BlockPos)pos) instanceof TileEntityWindKineticGenerator && !onlyrotor)

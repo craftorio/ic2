@@ -87,7 +87,7 @@ public class BlockIC2Fluid extends BlockFluidClassic implements IBlockModelProvi
           world.func_175684_a(pos, (Block)this, func_149738_a(world));
         } 
       } else if (this.fluid == FluidName.hot_water.getInstance()) {
-        if (isSourceBlock((IBlockAccess)world, pos) && !isLavaBlock(world.func_180495_p(pos.func_177979_c(2)).func_177230_c()) && world.func_180495_p(pos.func_177977_b()).func_177230_c() != this && world.field_73012_v.nextInt(60) == 0) {
+        if (isSourceBlock((IBlockAccess)world, pos) && !isLavaBlock(world.getBlockState(pos.func_177979_c(2)).getBlock()) && world.getBlockState(pos.func_177977_b()).getBlock() != this && world.field_73012_v.nextInt(60) == 0) {
           world.func_175656_a(pos, Blocks.field_150358_i.getDefaultState());
         } else {
           world.func_175684_a(pos, (Block)this, func_149738_a(world));

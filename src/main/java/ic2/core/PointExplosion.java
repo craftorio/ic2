@@ -45,8 +45,8 @@ public class PointExplosion extends Explosion {
       for (int y = Util.roundToNegInf(explosionY) - 1; y <= Util.roundToNegInf(explosionY) + 1; y++) {
         for (int z = Util.roundToNegInf(explosionZ) - 1; z <= Util.roundToNegInf(explosionZ) + 1; z++) {
           BlockPos pos = new BlockPos(x, y, z);
-          IBlockState block = this.world.func_180495_p(pos);
-          if (block.func_177230_c().getExplosionResistance(this.world, pos, (Entity)func_94613_c(), this) < this.explosionSize * 10.0F)
+          IBlockState block = this.world.getBlockState(pos);
+          if (block.getBlock().getExplosionResistance(this.world, pos, (Entity)func_94613_c(), this) < this.explosionSize * 10.0F)
             func_180343_e().add(pos); 
         } 
       } 

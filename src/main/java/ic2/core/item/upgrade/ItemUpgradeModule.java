@@ -194,7 +194,7 @@ public class ItemUpgradeModule extends ItemMulti<ItemUpgradeModule.UpgradeType> 
       switch (type) {
         case null:
         case null:
-          if (!(player.func_130014_f_()).isRemote && !StackUtil.isEmpty(stack) && player.field_71070_bA instanceof DynamicHandHeldContainer) {
+          if (!(player.getEntityWorld()).isRemote && !StackUtil.isEmpty(stack) && player.field_71070_bA instanceof DynamicHandHeldContainer) {
             HandHeldInventory base = (HandHeldInventory)((DynamicHandHeldContainer)player.field_71070_bA).base;
             if (base instanceof HandHeldAdvancedUpgrade && base.isThisContainer(stack)) {
               base.saveAsThrown(stack);

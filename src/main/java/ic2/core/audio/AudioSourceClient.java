@@ -12,7 +12,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -214,10 +213,10 @@ final class AudioSourceClient extends AudioSource implements Comparable<AudioSou
 		float maxDistance = ((AudioManagerClient) IC2.audioManager).fadingDistance * Math.max(this.configuredVolume, 1.0F);
 		float rolloffFactor = 1.0F;
 		float referenceDistance = 1.0F;
-		World world = player.func_130014_f_();
-		float x = (float) player.field_70165_t;
-		float y = (float) player.field_70163_u;
-		float z = (float) player.field_70161_v;
+		World world = player.getEntityWorld();
+		float x = (float) player.posX;
+		float y = (float) player.posY;
+		float z = (float) player.posZ;
 		if (this.position != null && this.position.getWorld() == world)
 		{
 			float deltaX = this.position.x - x;
@@ -245,8 +244,8 @@ final class AudioSourceClient extends AudioSource implements Comparable<AudioSou
 			for (int i = 0; i < distance; i++)
 			{
 				BlockPos pos = new BlockPos(Util.roundToNegInf(x), Util.roundToNegInf(y), Util.roundToNegInf(z));
-				IBlockState state = world.func_180495_p(pos);
-				Block block = state.func_177230_c();
+				IBlockState state = world.getBlockState(pos);
+				Block block = state.getBlock();
 				if (!block.isAir(state, world, pos))
 					if (block.isNormalCube(state, world, pos))
 					{

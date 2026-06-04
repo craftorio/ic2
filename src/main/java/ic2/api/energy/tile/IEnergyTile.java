@@ -1,3 +1,5 @@
 package ic2.api.energy.tile;
 
-public interface IEnergyTile {}
+public interface IEnergyTile
+{
+}

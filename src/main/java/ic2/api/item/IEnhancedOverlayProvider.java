@@ -6,6 +6,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public interface IEnhancedOverlayProvider {
-  boolean providesEnhancedOverlay(World paramWorld, BlockPos paramBlockPos, EnumFacing paramEnumFacing, EntityPlayer paramEntityPlayer, ItemStack paramItemStack);
+public interface IEnhancedOverlayProvider
+{
+	boolean providesEnhancedOverlay(World paramWorld, BlockPos paramBlockPos, EnumFacing paramEnumFacing, EntityPlayer paramEntityPlayer, ItemStack paramItemStack);
 }

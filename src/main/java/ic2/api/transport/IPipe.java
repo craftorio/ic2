@@ -3,10 +3,11 @@ package ic2.api.transport;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 
-public interface IPipe {
-  TileEntity getTile();
-  
-  boolean isConnected(EnumFacing paramEnumFacing);
-  
-  void flipConnection(EnumFacing paramEnumFacing);
+public interface IPipe
+{
+	TileEntity getTile();
+
+	boolean isConnected(EnumFacing paramEnumFacing);
+
+	void flipConnection(EnumFacing paramEnumFacing);
 }

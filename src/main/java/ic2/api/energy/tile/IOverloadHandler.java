@@ -1,5 +1,6 @@
 package ic2.api.energy.tile;
 
-public interface IOverloadHandler {
-  boolean onOverload(int paramInt);
+public interface IOverloadHandler
+{
+	boolean onOverload(int paramInt);
 }

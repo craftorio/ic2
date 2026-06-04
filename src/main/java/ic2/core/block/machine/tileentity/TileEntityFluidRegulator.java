@@ -58,7 +58,7 @@ public class TileEntityFluidRegulator extends TileEntityElectricMachine implemen
     this.newActive = false;
     this.outputmb = 0;
     this.mode = 0;
-    this.updateTicker = IC2.random.nextInt(getTickRate());
+    this.updateTicker = IC2.random.nextInt(gettickRate());
   }
   
   public void readFromNBT(NBTTagCompound nbt) {
@@ -91,7 +91,7 @@ public class TileEntityFluidRegulator extends TileEntityElectricMachine implemen
   protected void updateEntityServer() {
     super.updateEntityServer();
     this.wasserinputSlot.processIntoTank((IFluidTank)this.fluidTank, this.wasseroutputSlot);
-    if (this.updateTicker++ % getTickRate() != 0 && this.mode == 0)
+    if (this.updateTicker++ % gettickRate() != 0 && this.mode == 0)
       return; 
     this.newActive = work();
     if (getActive() != this.newActive)
@@ -134,7 +134,7 @@ public class TileEntityFluidRegulator extends TileEntityElectricMachine implemen
       this.outputmb = 0; 
   }
   
-  public int getTickRate() {
+  public int gettickRate() {
     return 20;
   }
   

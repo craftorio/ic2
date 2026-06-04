@@ -30,7 +30,7 @@ public abstract class TileEntityChargepadBlock extends TileEntityElectricBlock {
     super(tier1, output1, maxStorage1);
     this.player = null;
     this.energy.setDirections(EnumSet.complementOf(EnumSet.copyOf(Util.verticalFacings)), EnumSet.of(EnumFacing.DOWN));
-    this.updateTicker = IC2.random.nextInt(getTickRate());
+    this.updateTicker = IC2.random.nextInt(gettickRate());
   }
   
   public void readFromNBT(NBTTagCompound nbt) {
@@ -52,14 +52,14 @@ public abstract class TileEntityChargepadBlock extends TileEntityElectricBlock {
     this.player = entity;
   }
   
-  protected int getTickRate() {
+  protected int gettickRate() {
     return 2;
   }
   
   protected void updateEntityServer() {
     super.updateEntityServer();
     boolean needsInvUpdate = false;
-    if (this.updateTicker++ % getTickRate() != 0)
+    if (this.updateTicker++ % gettickRate() != 0)
       return; 
     if (this.player != null && this.energy.getEnergy() >= 1.0D) {
       if (!getActive())
@@ -134,8 +134,8 @@ public abstract class TileEntityChargepadBlock extends TileEntityElectricBlock {
     double freeAmount = ElectricItem.manager.charge(stack, Double.POSITIVE_INFINITY, this.energy.getSourceTier(), true, true);
     double charge = 0.0D;
     if (freeAmount >= 0.0D) {
-      if (freeAmount >= (chargeFactor * getTickRate())) {
-        charge = (chargeFactor * getTickRate());
+      if (freeAmount >= (chargeFactor * gettickRate())) {
+        charge = (chargeFactor * gettickRate());
       } else {
         charge = freeAmount;
       } 

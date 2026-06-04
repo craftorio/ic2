@@ -108,7 +108,7 @@ public class CropModel extends AbstractModel {
     return (IBakedModel)new BasicBakedBlockModel(arrayOfList, generalQuads, cropSprite);
   }
   
-  IBakedModel generateStickModel(boolean crosscrop) {
+  IBakedModel generateStickModel(boolean crossCrop) {
     List[] arrayOfList = new List[EnumFacing.HORIZONTALS.length];
     for (int index = 0; index < arrayOfList.length; ) {
       arrayOfList[index] = new ArrayList();
@@ -126,7 +126,7 @@ public class CropModel extends AbstractModel {
       float xE = (offsetX == 0) ? 1.0F : x;
       float zS = (offsetZ == 0) ? 0.0F : z;
       float zE = (offsetZ == 0) ? 1.0F : z;
-      if (!crosscrop) {
+      if (!crossCrop) {
         VdUtil.addFlippedCuboidWithYOffset(xS, 0.001F, zS, xE, 1.0F, zE, -1, EnumSet.of(facing), stickSprite, arrayOfList, generalQuads, -0.0625F);
         VdUtil.addFlippedCuboidWithYOffset(xS, 0.001F, zS, xE, 1.0F, zE, -1, EnumSet.of(facing.getOpposite()), stickSprite, arrayOfList, generalQuads, -0.0625F);
       } else {
@@ -171,7 +171,7 @@ public class CropModel extends AbstractModel {
     .build(new CacheLoader<TileEntityCrop.CropRenderState, IBakedModel>() {
         public IBakedModel load(TileEntityCrop.CropRenderState key) throws Exception {
           if (key.crop == null || key.size <= 0)
-            return CropModel.this.generateStickModel(key.crosscrop); 
+            return CropModel.this.generateStickModel(key.crossCrop); 
           return CropModel.this.generateModel(key);
         }
       });

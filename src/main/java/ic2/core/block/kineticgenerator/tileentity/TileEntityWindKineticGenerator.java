@@ -37,14 +37,14 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @NotClassic
 public class TileEntityWindKineticGenerator extends TileEntityInventory implements IKineticSource, IRotorProvider, IHasGui
 {
-	private int updateTicker = IC2.random.nextInt(getTickRate());
+	private int updateTicker = IC2.random.nextInt(gettickRate());
 
 	public final InvSlotConsumableClass rotorSlot = new InvSlotConsumableKineticRotor(this, "rotorslot", InvSlot.Access.IO, 1, InvSlot.InvSide.ANY, IKineticRotor.GearboxType.WIND, "rotorSlot");
 
 	protected void updateEntityServer()
 	{
 		super.updateEntityServer();
-		if (this.updateTicker++ % getTickRate() != 0)
+		if (this.updateTicker++ % gettickRate() != 0)
 			return;
 		boolean needsInvUpdate = false;
 		boolean isActive = getActive();
@@ -214,7 +214,7 @@ public class TileEntityWindKineticGenerator extends TileEntityInventory implemen
 		}
 	}
 
-	public int getTickRate()
+	public int gettickRate()
 	{
 		return 32;
 	}

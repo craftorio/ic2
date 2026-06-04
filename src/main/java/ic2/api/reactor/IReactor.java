@@ -36,7 +36,7 @@ public interface IReactor extends ILocatable
 
 	void explode();
 
-	int getTickRate();
+	int gettickRate();
 
 	boolean produceEnergy();
 

@@ -68,11 +68,11 @@ public class TileEntityWaterKineticGenerator extends TileEntityInventory impleme
 	{
 		this.type = BiomeState.UNKNOWN;
 		this.angle = 0.0F;
-		this.updateTicker = IC2.random.nextInt(getTickRate());
+		this.updateTicker = IC2.random.nextInt(gettickRate());
 		this.rotorSlot = new InvSlotConsumableKineticRotor(this, "rotorslot", InvSlot.Access.IO, 1, InvSlot.InvSide.ANY, IKineticRotor.GearboxType.WATER, "rotorSlot");
 	}
 
-	protected int getTickRate()
+	protected int gettickRate()
 	{
 		return 20;
 	}
@@ -86,7 +86,7 @@ public class TileEntityWaterKineticGenerator extends TileEntityInventory impleme
 	protected void updateEntityServer()
 	{
 		super.updateEntityServer();
-		if (this.updateTicker++ % getTickRate() != 0)
+		if (this.updateTicker++ % gettickRate() != 0)
 			return;
 		World world = getWorld();
 		if (this.type == BiomeState.UNKNOWN)

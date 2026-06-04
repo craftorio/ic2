@@ -59,7 +59,7 @@ public class TileEntitySteamKineticGenerator extends TileEntityInventory impleme
 		this.turbineSlot = new InvSlotConsumableItemStack(this, "Turbineslot", 1, ItemName.crafting.getItemStack((Enum) CraftingItemType.steam_turbine));
 		this.isTurbineFilledWithWater = false;
 		this.condensationProgress = 0;
-		this.updateTicker = IC2.random.nextInt(getTickRate());
+		this.updateTicker = IC2.random.nextInt(gettickRate());
 		this.turbineSlot.setStackSizeLimit(1);
 		this.fluids = (Fluids) addComponent((TileEntityComponent) new Fluids(this));
 		this.steamTank = this.fluids.addTankInsert("steamTank", 21000, Fluids.fluidPredicate(FluidName.steam.getInstance(), FluidName.superheated_steam.getInstance()));
@@ -81,7 +81,7 @@ public class TileEntitySteamKineticGenerator extends TileEntityInventory impleme
 			}
 			boolean hotSteam = (this.steamTank.getFluid().getFluid() == FluidName.superheated_steam.getInstance());
 			boolean turbineDoneWork = turbineDoWork(hotSteam);
-			if (this.updateTicker++ >= getTickRate())
+			if (this.updateTicker++ >= gettickRate())
 			{
 				if (turbineDoneWork)
 					this.turbineSlot.damage(hotSteam ? 1 : 2, false);
@@ -271,7 +271,7 @@ public class TileEntitySteamKineticGenerator extends TileEntityInventory impleme
 		return this.isTurbineFilledWithWater;
 	}
 
-	public int getTickRate()
+	public int gettickRate()
 	{
 		return 20;
 	}

@@ -54,7 +54,7 @@ public class TileEntitySolarDestiller extends TileEntityInventory implements IHa
   
   public final InvSlotUpgrade upgradeSlot = new InvSlotUpgrade((IInventorySlotHolder)this, "upgrade", 3);
   
-  private int tickrate;
+  private int tickRate;
   
   private int updateTicker;
   
@@ -62,14 +62,14 @@ public class TileEntitySolarDestiller extends TileEntityInventory implements IHa
   
   protected void onLoaded() {
     super.onLoaded();
-    this.tickrate = getTickRate();
-    this.updateTicker = IC2.random.nextInt(this.tickrate);
+    this.tickRate = gettickRate();
+    this.updateTicker = IC2.random.nextInt(this.tickRate);
   }
   
   protected void updateEntityServer() {
     super.updateEntityServer();
     this.waterinputSlot.processIntoTank((IFluidTank)this.inputTank, this.wateroutputSlot);
-    if (++this.updateTicker >= this.tickrate) {
+    if (++this.updateTicker >= this.tickRate) {
       updateSunVisibility();
       if (canWork()) {
         this.inputTank.drainInternal(1, true);
@@ -96,7 +96,7 @@ public class TileEntitySolarDestiller extends TileEntityInventory implements IHa
   
   public void onGuiClosed(EntityPlayer player) {}
   
-  public int getTickRate() {
+  public int gettickRate() {
     Biome biome = BiomeUtil.getBiome(getWorld(), this.pos);
     if (BiomeDictionary.hasType(biome, BiomeDictionary.Type.HOT) == true)
       return 36; 

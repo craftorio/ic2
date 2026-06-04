@@ -82,7 +82,7 @@ import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.logging.log4j.Level;
 
 public class TileEntityNuclearReactorElectric extends TileEntityInventory implements IHasGui, IReactor, IEnergySource, IMetaDelegate, IGuiValueProvider {
-  public int updateTicker = IC2.random.nextInt(getTickRate());
+  public int updateTicker = IC2.random.nextInt(gettickRate());
   
   protected final Fluids fluids = (Fluids)addComponent((TileEntityComponent)new Fluids((TileEntityBlock)this));
   
@@ -200,7 +200,7 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
   
   protected void updateEntityServer() {
     super.updateEntityServer();
-    if (this.updateTicker++ % getTickRate() != 0)
+    if (this.updateTicker++ % gettickRate() != 0)
       return; 
     if (!getWorld().isAreaLoaded(this.pos, 8)) {
       this.output = 0.0F;
@@ -414,7 +414,7 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
     return (getReactorSize() == 9);
   }
   
-  public int getTickRate() {
+  public int gettickRate() {
     return 20;
   }
   

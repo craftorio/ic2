@@ -2,14 +2,11 @@ package ic2.core.block.machine.tileentity;
 
 import ic2.api.energy.tile.IHeatSource;
 import ic2.api.recipe.IFermenterRecipeManager;
-import ic2.api.recipe.ILiquidAcceptManager;
 import ic2.api.recipe.Recipes;
 import ic2.api.upgrade.IUpgradableBlock;
 import ic2.api.upgrade.UpgradableProperty;
 import ic2.core.ContainerBase;
 import ic2.core.IHasGui;
-import ic2.core.block.IInventorySlotHolder;
-import ic2.core.block.TileEntityBlock;
 import ic2.core.block.TileEntityInventory;
 import ic2.core.block.comp.Fluids;
 import ic2.core.block.comp.TileEntityComponent;
@@ -33,37 +30,35 @@ import java.util.EnumSet;
 import java.util.Set;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fluids.FluidTank;
-import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @NotClassic
 public class TileEntityFermenter extends TileEntityInventory implements IHasGui, IGuiValueProvider, IUpgradableBlock {
-  protected final Fluids fluids = (Fluids)addComponent((TileEntityComponent)new Fluids((TileEntityBlock)this));
+  protected final Fluids fluids = (Fluids)addComponent((TileEntityComponent)new Fluids(this));
   
-  private final FluidTank outputTank = (FluidTank)this.fluids.addTankExtract("output", 2000);
+  private final FluidTank outputTank = this.fluids.addTankExtract("output", 2000);
   
-  private final FluidTank inputTank = (FluidTank)this.fluids.addTankInsert("input", 10000, Fluids.fluidPredicate((ILiquidAcceptManager)Recipes.fermenter));
+  private final FluidTank inputTank = this.fluids.addTankInsert("input", 10000, Fluids.fluidPredicate(Recipes.fermenter));
   
-  public final InvSlotOutput fluidInputCellOutSlot = new InvSlotOutput((IInventorySlotHolder)this, "biomassOutput", 1);
+  public final InvSlotOutput fluidInputCellOutSlot = new InvSlotOutput(this, "biomassOutput", 1);
   
-  public final InvSlotOutput fluidOutputCellOutSlot = new InvSlotOutput((IInventorySlotHolder)this, "biogassOutput", 1);
+  public final InvSlotOutput fluidOutputCellOutSlot = new InvSlotOutput(this, "biogassOutput", 1);
   
-  public final InvSlotOutput fertiliserSlot = new InvSlotOutput((IInventorySlotHolder)this, "output", 1);
+  public final InvSlotOutput fertiliserSlot = new InvSlotOutput(this, "output", 1);
   
-  public final InvSlotUpgrade upgradeSlot = new InvSlotUpgrade((IInventorySlotHolder)this, "upgrade", 2);
+  public final InvSlotUpgrade upgradeSlot = new InvSlotUpgrade(this, "upgrade", 2);
   
-  public final InvSlotConsumableLiquidByTank fluidOutputCellInSlot = new InvSlotConsumableLiquidByTank((IInventorySlotHolder)this, "biogasInput", InvSlot.Access.I, 1, InvSlot.InvSide.BOTTOM, InvSlotConsumableLiquid.OpType.Fill, (IFluidTank)this.outputTank);
+  public final InvSlotConsumableLiquidByTank fluidOutputCellInSlot = new InvSlotConsumableLiquidByTank(this, "biogasInput", InvSlot.Access.I, 1, InvSlot.InvSide.BOTTOM, InvSlotConsumableLiquid.OpType.Fill, this.outputTank);
   
-  public final InvSlotConsumableLiquidByManager fluidInputCellInSlot = new InvSlotConsumableLiquidByManager((IInventorySlotHolder)this, "biomassInput", InvSlot.Access.I, 1, InvSlot.InvSide.TOP, InvSlotConsumableLiquid.OpType.Drain, (ILiquidAcceptManager)Recipes.fermenter);
+  public final InvSlotConsumableLiquidByManager fluidInputCellInSlot = new InvSlotConsumableLiquidByManager(this, "biomassInput", InvSlot.Access.I, 1, InvSlot.InvSide.TOP, InvSlotConsumableLiquid.OpType.Drain, Recipes.fermenter);
   
   public static void init() {
-    Recipes.fermenter = (IFermenterRecipeManager)new FermenterRecipeManager();
+    Recipes.fermenter = new FermenterRecipeManager();
     Recipes.fermenter.addRecipe(FluidName.biomass.getName(), ConfigUtil.getInt(MainConfig.get(), "balance/fermenter/need_amount_biomass_per_run"), 
         ConfigUtil.getInt(MainConfig.get(), "balance/fermenter/hU_per_run"), FluidName.biogas.getName(), ConfigUtil.getInt(MainConfig.get(), "balance/fermenter/output_amount_biogas_per_run"));
   }
@@ -78,8 +73,8 @@ public class TileEntityFermenter extends TileEntityInventory implements IHasGui,
   
   public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
     super.writeToNBT(nbt);
-    nbt.setTag("inputTank", (NBTBase)this.inputTank.writeToNBT(new NBTTagCompound()));
-    nbt.setTag("outputTank", (NBTBase)this.outputTank.writeToNBT(new NBTTagCompound()));
+    nbt.setTag("inputTank", this.inputTank.writeToNBT(new NBTTagCompound()));
+    nbt.setTag("outputTank", this.outputTank.writeToNBT(new NBTTagCompound()));
     nbt.setInteger("progress", this.progress);
     nbt.setInteger("heatBuffer", this.heatBuffer);
     return nbt;
@@ -87,11 +82,11 @@ public class TileEntityFermenter extends TileEntityInventory implements IHasGui,
   
   protected void updateEntityServer() {
     super.updateEntityServer();
-    this.fluidInputCellInSlot.processIntoTank((IFluidTank)this.inputTank, this.fluidInputCellOutSlot);
-    this.fluidOutputCellInSlot.processFromTank((IFluidTank)this.outputTank, this.fluidOutputCellOutSlot);
-    this.newActive = work();
-    if (getActive() != this.newActive)
-      setActive(this.newActive); 
+    this.fluidInputCellInSlot.processIntoTank(this.inputTank, this.fluidInputCellOutSlot);
+    this.fluidOutputCellInSlot.processFromTank(this.outputTank, this.fluidOutputCellOutSlot);
+	  boolean newActive = work();
+    if (getActive() != newActive)
+      setActive(newActive); 
     this.upgradeSlot.tick();
   }
   
@@ -119,12 +114,12 @@ public class TileEntityFermenter extends TileEntityInventory implements IHasGui,
   }
   
   public ContainerBase<TileEntityFermenter> getGuiContainer(EntityPlayer player) {
-    return (ContainerBase<TileEntityFermenter>)new ContainerFermenter(player, this);
+    return new ContainerFermenter(player, this);
   }
   
   @SideOnly(Side.CLIENT)
   public GuiScreen getGui(EntityPlayer player, boolean isAdmin) {
-    return (GuiScreen)new GuiFermenter(new ContainerFermenter(player, this));
+    return new GuiFermenter(new ContainerFermenter(player, this));
   }
   
   public void onGuiClosed(EntityPlayer player) {}
@@ -142,7 +137,7 @@ public class TileEntityFermenter extends TileEntityInventory implements IHasGui,
       return this.heatBuffer / maxHeatBuff;
     } 
     if ("progress".equals(name))
-      return (this.progress == 0) ? 0.0D : (this.progress / this.maxProgress); 
+      return (this.progress == 0) ? 0.0D : ((double) this.progress / this.maxProgress); 
     throw new IllegalArgumentException("Invalid GUI value: " + name);
   }
   
@@ -185,6 +180,5 @@ public class TileEntityFermenter extends TileEntityInventory implements IHasGui,
   public int progress = 0;
   
   private final int maxProgress = ConfigUtil.getInt(MainConfig.get(), "balance/fermenter/biomass_per_fertilizier");
-  
-  private boolean newActive = false;
+
 }

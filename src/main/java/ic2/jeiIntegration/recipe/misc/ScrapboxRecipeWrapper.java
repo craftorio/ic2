@@ -26,7 +26,7 @@ public class ScrapboxRecipeWrapper extends BlankRecipeWrapper {
     } else {
       text = "  " + String.format("%.2f", new Object[] { Float.valueOf(value * 100.0F) });
     } 
-    minecraft.field_71466_p.drawString(text + "%", 86, 9, 4210752);
+    minecraft.fontRenderer.drawString(text + "%", 86, 9, 4210752);
   }
   
   public static List<ScrapboxRecipeWrapper> createRecipes() {

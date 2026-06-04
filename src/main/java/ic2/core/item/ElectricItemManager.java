@@ -31,9 +31,9 @@ public class ElectricItemManager implements IElectricItemManager {
       if (newCharge > 0.0D) {
         tNBT.setDouble("charge", newCharge);
       } else {
-        tNBT.func_82580_o("charge");
+        tNBT.removeTag("charge");
         if (tNBT.hasNoTags())
-          stack.func_77982_d(null); 
+          stack.setTagCompound(null); 
       } 
       if (stack.getItem() instanceof IElectricItem) {
         item = (IElectricItem)stack.getItem();
@@ -70,9 +70,9 @@ public class ElectricItemManager implements IElectricItemManager {
       if (newCharge > 0.0D) {
         tNBT.setDouble("charge", newCharge);
       } else {
-        tNBT.func_82580_o("charge");
+        tNBT.removeTag("charge");
         if (tNBT.hasNoTags())
-          stack.func_77982_d(null); 
+          stack.setTagCompound(null); 
       } 
       if (stack.getItem() instanceof IElectricItem) {
         item = (IElectricItem)stack.getItem();
@@ -115,7 +115,7 @@ public class ElectricItemManager implements IElectricItemManager {
     boolean transferred = false;
     for (EntityEquipmentSlot slot : ArmorSlot.getAll()) {
       int tier;
-      ItemStack source = entity.func_184582_a(slot);
+      ItemStack source = entity.getItemStackFromSlot(slot);
       if (source == null)
         continue; 
       if (source.getItem() instanceof IElectricItem) {
@@ -133,7 +133,7 @@ public class ElectricItemManager implements IElectricItemManager {
       transferred = true;
     } 
     if (transferred && entity instanceof EntityPlayer && IC2.platform.isSimulating())
-      ((EntityPlayer)entity).field_71070_bA.func_75142_b(); 
+      ((EntityPlayer)entity).openContainer.detectAndSendChanges(); 
   }
   
   public String getToolTip(ItemStack stack) {

@@ -75,7 +75,7 @@ public class CannerEnrichRecipeManager implements ICannerEnrichRecipeManager {
       return null; 
     if (adjustInput) {
       fluid.amount = (((ICannerEnrichRecipeManager.RawInput)result.getAdjustedInput()).fluid == null) ? 0 : ((ICannerEnrichRecipeManager.RawInput)result.getAdjustedInput()).fluid.amount;
-      additive.func_190920_e(StackUtil.isEmpty(((ICannerEnrichRecipeManager.RawInput)result.getAdjustedInput()).additive) ? 0 : StackUtil.getSize(((ICannerEnrichRecipeManager.RawInput)result.getAdjustedInput()).additive));
+      additive.setCount(StackUtil.isEmpty(((ICannerEnrichRecipeManager.RawInput)result.getAdjustedInput()).additive) ? 0 : StackUtil.getSize(((ICannerEnrichRecipeManager.RawInput)result.getAdjustedInput()).additive));
     } 
     NBTTagCompound output = new NBTTagCompound();
     ((FluidStack)result.getOutput()).writeToNBT(output);

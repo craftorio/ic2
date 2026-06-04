@@ -12,11 +12,11 @@ import net.minecraft.world.World;
 public class ItemIC2Door extends ItemBlockIC2 {
   public ItemIC2Door(Block block) {
     super(block);
-    func_77625_d(8);
+    setMaxStackSize(8);
   }
   
   public boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, IBlockState newState) {
-    ItemDoor.func_179235_a(world, pos, EnumFacing.func_176733_a(player.rotationYaw), this.field_150939_a, false);
+    ItemDoor.placeDoor(world, pos, EnumFacing.fromAngle(player.rotationYaw), this.block, false);
     return true;
   }
 }

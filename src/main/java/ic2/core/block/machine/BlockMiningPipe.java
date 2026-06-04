@@ -20,12 +20,12 @@ public class BlockMiningPipe extends BlockMultiID<BlockMiningPipe.MiningPipeType
   }
   
   public BlockMiningPipe() {
-    super(BlockName.mining_pipe, Material.field_151573_f);
-    func_149711_c(6.0F);
-    func_149752_b(10.0F);
+    super(BlockName.mining_pipe, Material.IRON);
+    setHardness(6.0F);
+    setResistance(10.0F);
   }
   
-  public boolean func_176196_c(World worldIn, BlockPos pos) {
+  public boolean canPlaceBlockAt(World worldIn, BlockPos pos) {
     return false;
   }
   
@@ -36,10 +36,10 @@ public class BlockMiningPipe extends BlockMultiID<BlockMiningPipe.MiningPipeType
     return (type != MiningPipeType.pipe);
   }
   
-  public AxisAlignedBB func_185496_a(IBlockState state, IBlockAccess world, BlockPos pos) {
+  public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
     MiningPipeType type = (MiningPipeType)getType(state);
     if (type == null)
-      return super.func_185496_a(state, world, pos); 
+      return super.getBoundingBox(state, world, pos); 
     return getAabb(type);
   }
   
@@ -48,17 +48,17 @@ public class BlockMiningPipe extends BlockMultiID<BlockMiningPipe.MiningPipeType
       case pipe:
         return pipeAabb;
     } 
-    return field_185505_j;
+    return FULL_BLOCK_AABB;
   }
   
-  public int func_149717_k(IBlockState state) {
-    return state.func_185917_h() ? 255 : 0;
+  public int getLightOpacity(IBlockState state) {
+    return state.isFullCube() ? 255 : 0;
   }
   
-  public boolean func_149686_d(IBlockState state) {
+  public boolean isFullCube(IBlockState state) {
     MiningPipeType type = (MiningPipeType)getType(state);
     if (type == null)
-      return super.func_149686_d(state); 
+      return super.isFullCube(state); 
     switch (type) {
       case pipe:
         return false;
@@ -86,7 +86,7 @@ public class BlockMiningPipe extends BlockMultiID<BlockMiningPipe.MiningPipeType
     return super.getItemStack(state);
   }
   
-  public void func_149666_a(CreativeTabs tabs, NonNullList<ItemStack> itemList) {
+  public void getSubBlocks(CreativeTabs tabs, NonNullList<ItemStack> itemList) {
     for (MiningPipeType type : this.typeProperty.getShownValues()) {
       if (type == MiningPipeType.tip)
         continue; 

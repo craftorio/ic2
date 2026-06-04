@@ -34,97 +34,97 @@ public class GuiOverlayer extends Gui {
   public void onRenderHotBar(RenderGameOverlayEvent.Post event) {
     if (event.getType() != RenderGameOverlayEvent.ElementType.HOTBAR)
       return; 
-    ItemStack helm = this.mc.player.func_184582_a(EntityEquipmentSlot.HEAD);
+    ItemStack helm = this.mc.player.getItemStackFromSlot(EntityEquipmentSlot.HEAD);
     if (StackUtil.isEmpty(helm) || !(helm.getItem() instanceof IItemHudProvider) || !((IItemHudProvider)helm.getItem()).doesProvideHUD(helm))
       return; 
     HudMode hudMode = ((IItemHudProvider)helm.getItem()).getHudMode(helm);
     if (!hudMode.shouldDisplay())
       return; 
-    ItemStack boots = this.mc.player.func_184582_a(EntityEquipmentSlot.FEET);
-    ItemStack legs = this.mc.player.func_184582_a(EntityEquipmentSlot.LEGS);
-    ItemStack chestplate = this.mc.player.func_184582_a(EntityEquipmentSlot.CHEST);
+    ItemStack boots = this.mc.player.getItemStackFromSlot(EntityEquipmentSlot.FEET);
+    ItemStack legs = this.mc.player.getItemStackFromSlot(EntityEquipmentSlot.LEGS);
+    ItemStack chestplate = this.mc.player.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
     GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
     GL11.glDisable(2896);
-    RenderItem renderItem = this.mc.func_175599_af();
-    RenderHelper.func_74520_c();
-    this.mc.func_110434_K().func_110577_a(background);
+    RenderItem renderItem = this.mc.getRenderItem();
+    RenderHelper.enableGUIStandardItemLighting();
+    this.mc.getTextureManager().bindTexture(background);
     drawTexturedModalRect(0, 0, 0, 0, 71, 69);
-    renderItem.func_175042_a(helm, 5, 4);
-    this.mc.field_71466_p.drawString(mapCharge(helm) + "%", 25, 9, 16777215);
-    if (StackUtil.getOrCreateNbtData(helm).func_74767_n("Nightvision"))
-      renderItem.func_175042_a(ItemName.nightvision_goggles.getItemStack(), 50, 4); 
+    renderItem.renderItemIntoGUI(helm, 5, 4);
+    this.mc.fontRenderer.drawString(mapCharge(helm) + "%", 25, 9, 16777215);
+    if (StackUtil.getOrCreateNbtData(helm).getBoolean("Nightvision"))
+      renderItem.renderItemIntoGUI(ItemName.nightvision_goggles.getItemStack(), 50, 4); 
     if (!StackUtil.isEmpty(chestplate)) {
       int charge = getCharge(chestplate);
       if (charge >= 0) {
-        this.mc.field_71466_p.drawString(charge + "%", 25, 25, 16777215);
-        renderItem.func_175042_a(chestplate, 5, 20);
+        this.mc.fontRenderer.drawString(charge + "%", 25, 25, 16777215);
+        renderItem.renderItemIntoGUI(chestplate, 5, 20);
         NBTTagCompound nbtDatachestplate = StackUtil.getOrCreateNbtData(chestplate);
-        if (nbtDatachestplate.func_74767_n("jetpack")) {
+        if (nbtDatachestplate.getBoolean("jetpack")) {
           ItemStack jetpack;
-          if (nbtDatachestplate.func_74767_n("hoverMode")) {
+          if (nbtDatachestplate.getBoolean("hoverMode")) {
             jetpack = ItemName.jetpack_electric.getItemStack();
           } else {
             jetpack = ItemName.jetpack.getItemStack();
           } 
-          renderItem.func_175042_a(jetpack, 50, 20);
+          renderItem.renderItemIntoGUI(jetpack, 50, 20);
         } 
       } 
     } 
     if (!StackUtil.isEmpty(legs)) {
       int charge = getCharge(legs);
       if (charge >= 0) {
-        this.mc.field_71466_p.drawString(charge + "%", 25, 41, 16777215);
-        renderItem.func_175042_a(legs, 5, 36);
+        this.mc.fontRenderer.drawString(charge + "%", 25, 41, 16777215);
+        renderItem.renderItemIntoGUI(legs, 5, 36);
       } 
     } 
     if (!StackUtil.isEmpty(boots)) {
       int charge = getCharge(boots);
       if (charge >= 0) {
-        this.mc.field_71466_p.drawString(charge + "%", 25, 56, 16777215);
-        renderItem.func_175042_a(boots, 5, 52);
+        this.mc.fontRenderer.drawString(charge + "%", 25, 56, 16777215);
+        renderItem.renderItemIntoGUI(boots, 5, 52);
       } 
     } 
     if (hudMode.hasTooltip()) {
-      ItemStack rightItem = this.mc.player.func_184614_ca();
-      ItemStack leftItem = this.mc.player.func_184592_cb();
+      ItemStack rightItem = this.mc.player.getHeldItemMainhand();
+      ItemStack leftItem = this.mc.player.getHeldItemOffhand();
       int nextLine = 83;
       if (!StackUtil.isEmpty(rightItem)) {
-        renderItem.func_175042_a(rightItem, 5, 74);
-        this.mc.field_71466_p.drawString(rightItem.func_82833_r(), 30, 78, 16777215);
+        renderItem.renderItemIntoGUI(rightItem, 5, 74);
+        this.mc.fontRenderer.drawString(rightItem.getDisplayName(), 30, 78, 16777215);
         List<String> info = new LinkedList<>();
         if (rightItem.getItem() instanceof IItemHudInfo) {
           info.addAll(((IItemHudInfo)rightItem.getItem()).getHudInfo(rightItem, (hudMode == HudMode.ADVANCED)));
           if (info.size() > 0)
             for (int l = 0; l < info.size(); l++)
-              this.mc.field_71466_p.drawString(info.get(l), 8, 83 + (l + 1) * 14, 16777215);  
+              this.mc.fontRenderer.drawString(info.get(l), 8, 83 + (l + 1) * 14, 16777215);  
           nextLine += (info.size() + 1) * 14;
         } else {
-          info.addAll(rightItem.func_82840_a((EntityPlayer)this.mc.player, () -> (hudMode == HudMode.ADVANCED)));
+          info.addAll(rightItem.getTooltip((EntityPlayer)this.mc.player, () -> (hudMode == HudMode.ADVANCED)));
           if (info.size() > 1)
             for (int l = 1; l < info.size(); l++)
-              this.mc.field_71466_p.drawString(info.get(l), 8, 83 + l * 14, 16777215);  
+              this.mc.fontRenderer.drawString(info.get(l), 8, 83 + l * 14, 16777215);  
           nextLine += info.size() * 14;
         } 
         nextLine += 8;
       } 
       if (!StackUtil.isEmpty(leftItem)) {
-        renderItem.func_175042_a(leftItem, 5, nextLine - 9);
-        this.mc.field_71466_p.drawString(leftItem.func_82833_r(), 30, nextLine - 5, 16777215);
+        renderItem.renderItemIntoGUI(leftItem, 5, nextLine - 9);
+        this.mc.fontRenderer.drawString(leftItem.getDisplayName(), 30, nextLine - 5, 16777215);
         List<String> info = new LinkedList<>();
         if (leftItem.getItem() instanceof IItemHudInfo) {
           info.addAll(((IItemHudInfo)leftItem.getItem()).getHudInfo(leftItem, (hudMode == HudMode.ADVANCED)));
           if (info.size() > 0)
             for (int l = 0; l < info.size(); l++)
-              this.mc.field_71466_p.drawString(info.get(l), 8, nextLine + (l + 1) * 14, 16777215);  
+              this.mc.fontRenderer.drawString(info.get(l), 8, nextLine + (l + 1) * 14, 16777215);  
         } else {
-          info.addAll(leftItem.func_82840_a((EntityPlayer)this.mc.player, () -> (hudMode == HudMode.ADVANCED)));
+          info.addAll(leftItem.getTooltip((EntityPlayer)this.mc.player, () -> (hudMode == HudMode.ADVANCED)));
           if (info.size() > 1)
             for (int l = 1; l < info.size(); l++)
-              this.mc.field_71466_p.drawString(info.get(l), 8, nextLine + l * 14, 16777215);  
+              this.mc.fontRenderer.drawString(info.get(l), 8, nextLine + l * 14, 16777215);  
         } 
       } 
     } 
-    RenderHelper.func_74518_a();
+    RenderHelper.disableStandardItemLighting();
   }
   
   private static final int getCharge(ItemStack stack) {

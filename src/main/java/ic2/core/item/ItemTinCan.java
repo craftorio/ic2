@@ -16,9 +16,9 @@ public class ItemTinCan extends ItemIC2 {
     super(ItemName.filled_tin_can);
   }
   
-  public ActionResult<ItemStack> func_77659_a(World world, EntityPlayer player, EnumHand hand) {
+  public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
     ItemStack stack = StackUtil.get(player, hand);
-    if (!world.isRemote && player.getFoodStats().func_75121_c())
+    if (!world.isRemote && player.getFoodStats().needFood())
       return onEaten(player, stack); 
     return new ActionResult(EnumActionResult.PASS, stack);
   }
@@ -29,7 +29,7 @@ public class ItemTinCan extends ItemIC2 {
       return new ActionResult(EnumActionResult.PASS, stack); 
     ItemStack emptyStack = StackUtil.copyWithSize(ItemName.crafting.getItemStack((Enum)CraftingItemType.tin_can), amount);
     if (StackUtil.storeInventoryItem(emptyStack, player, true)) {
-      player.getFoodStats().func_75122_a(amount, amount);
+      player.getFoodStats().addStats(amount, amount);
       stack = StackUtil.decSize(stack, amount);
       StackUtil.storeInventoryItem(emptyStack, player, false);
       IC2.platform.playSoundSp("Tools/eat.ogg", 1.0F, 1.0F);

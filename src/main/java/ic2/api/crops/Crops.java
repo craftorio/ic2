@@ -1,8 +1,5 @@
 package ic2.api.crops;
 
-import java.util.Collection;
-import java.util.Map;
-
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -12,15 +9,18 @@ import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import java.util.Collection;
+import java.util.Map;
+
 public abstract class Crops
 {
 	public static Crops instance;
 
 	public static CropCard weed;
 
-	public abstract void addBiomenutrientsBonus(BiomeDictionary.Type paramType, int paramInt);
+	public abstract void addBiomeNutrientsBonus(BiomeDictionary.Type paramType, int paramInt);
 
-	public abstract void addBiomehumidityBonus(BiomeDictionary.Type paramType, int paramInt);
+	public abstract void addBiomeHumidityBonus(BiomeDictionary.Type paramType, int paramInt);
 
 	public abstract int getHumidityBiomeBonus(Biome paramBiome);
 

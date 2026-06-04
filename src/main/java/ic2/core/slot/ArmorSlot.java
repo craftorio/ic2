@@ -35,7 +35,7 @@ public class ArmorSlot {
     int i;
     for (i = 0; i < ret.length; i++) {
       for (EntityEquipmentSlot slot : values) {
-        if (slot.getSlotType() == EntityEquipmentSlot.Type.ARMOR && slot.func_188454_b() == i) {
+        if (slot.getSlotType() == EntityEquipmentSlot.Type.ARMOR && slot.getIndex() == i) {
           ret[i] = slot;
           break;
         } 

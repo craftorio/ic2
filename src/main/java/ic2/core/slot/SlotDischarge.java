@@ -18,7 +18,7 @@ public class SlotDischarge extends Slot {
     super(par1iInventory, par2, par3, par4);
   }
   
-  public boolean func_75214_a(ItemStack stack) {
+  public boolean isItemValid(ItemStack stack) {
     if (stack == null)
       return false; 
     if (Info.itemInfo.getEnergyValue(stack) > 0.0D)

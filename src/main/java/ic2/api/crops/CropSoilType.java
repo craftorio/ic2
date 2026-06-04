@@ -23,7 +23,7 @@ public enum CropSoilType
 		return this.block;
 	}
 
-	public static boolean contais(Block block)
+	public static boolean contains(Block block)
 	{
 		for (CropSoilType aux : values())
 		{

@@ -168,8 +168,8 @@ public final class DataEncoder {
         return;
       case ChunkPos:
         pos = (ChunkPos)o;
-        os.writeInt(pos.field_77276_a);
-        os.writeInt(pos.field_77275_b);
+        os.writeInt(pos.x);
+        os.writeInt(pos.z);
         return;
       case Collection:
         encode(os, ((Collection)o).toArray(), false);
@@ -196,11 +196,11 @@ public final class DataEncoder {
         for (IElectrolyzerRecipeManager.ElectrolyzerOutput output : outputs) {
           os.writeString(output.fluidName);
           os.writeInt(output.fluidAmount);
-          os.writeByte(output.tankDirection.func_176745_a());
+          os.writeByte(output.tankDirection.getIndex());
         } 
         return;
       case Enchantment:
-        encode(os, Enchantment.field_185264_b.func_177774_c(o), false);
+        encode(os, Enchantment.REGISTRY.getNameForObject(o), false);
         return;
       case Enum:
         os.writeVarInt(((Enum)o).ordinal());
@@ -248,14 +248,14 @@ public final class DataEncoder {
           os.writeByte(StackUtil.getSize(stack));
           encode(os, stack.getItem(), false);
           os.writeShort(stack.getItemDamage());
-          encode(os, stack.func_77978_p(), true);
+          encode(os, stack.getTagCompound(), true);
         } 
         return;
       case Long:
         os.writeLong(((Long)o).longValue());
         return;
       case NBTTagCompound:
-        CompressedStreamTools.func_74800_a((NBTTagCompound)o, (DataOutput)os);
+        CompressedStreamTools.write((NBTTagCompound)o, (DataOutput)os);
         return;
       case Null:
         if (!withType)
@@ -264,12 +264,12 @@ public final class DataEncoder {
       case Object:
         throw new IllegalArgumentException("unhandled class: " + o.getClass());
       case Potion:
-        encode(os, Potion.field_188414_b.func_177774_c(o), false);
+        encode(os, Potion.REGISTRY.getNameForObject(o), false);
         return;
       case ResourceLocation:
         loc = (ResourceLocation)o;
-        os.writeString(loc.func_110624_b());
-        os.writeString(loc.func_110623_a());
+        os.writeString(loc.getResourceDomain());
+        os.writeString(loc.getResourcePath());
         return;
       case Short:
         os.writeShort(((Short)o).shortValue());
@@ -300,9 +300,9 @@ public final class DataEncoder {
         return;
       case Vec3:
         v = (Vec3d)o;
-        os.writeDouble(v.field_72450_a);
-        os.writeDouble(v.field_72448_b);
-        os.writeDouble(v.field_72449_c);
+        os.writeDouble(v.x);
+        os.writeDouble(v.y);
+        os.writeDouble(v.z);
         return;
       case World:
         os.writeInt(((World)o).provider.getDimension());
@@ -476,10 +476,10 @@ public final class DataEncoder {
         max = is.readByte();
         outputs = new IElectrolyzerRecipeManager.ElectrolyzerOutput[max];
         for (b1 = 0; b1 < max; b1 = (byte)(b1 + 1))
-          outputs[b1] = new IElectrolyzerRecipeManager.ElectrolyzerOutput(is.readString(), is.readInt(), EnumFacing.func_82600_a(is.readByte())); 
+          outputs[b1] = new IElectrolyzerRecipeManager.ElectrolyzerOutput(is.readString(), is.readInt(), EnumFacing.getFront(is.readByte())); 
         return new IElectrolyzerRecipeManager.ElectrolyzerRecipe(inputAmount, EUaTick, ticksNeeded, outputs);
       case Enchantment:
-        return Enchantment.field_185264_b.func_82594_a(decode(is, EncodedType.ResourceLocation));
+        return Enchantment.REGISTRY.getObject(decode(is, EncodedType.ResourceLocation));
       case Enum:
         return Integer.valueOf(is.readVarInt());
       case Float:
@@ -512,18 +512,18 @@ public final class DataEncoder {
         meta = is.readShort();
         nbt = (NBTTagCompound)decode(is);
         itemStack = new ItemStack(item, size, meta);
-        itemStack.func_77982_d(nbt);
+        itemStack.setTagCompound(nbt);
         return itemStack;
       case Long:
         return Long.valueOf(is.readLong());
       case NBTTagCompound:
-        return CompressedStreamTools.func_152456_a((DataInput)is, NBTSizeTracker.field_152451_a);
+        return CompressedStreamTools.read((DataInput)is, NBTSizeTracker.INFINITE);
       case Null:
         return null;
       case Object:
         return new Object();
       case Potion:
-        return Potion.field_188414_b.func_82594_a(decode(is, EncodedType.ResourceLocation));
+        return Potion.REGISTRY.getObject(decode(is, EncodedType.ResourceLocation));
       case ResourceLocation:
         return new ResourceLocation(is.readString(), is.readString());
       case Short:
@@ -573,9 +573,9 @@ public final class DataEncoder {
       ItemStack srcT = (ItemStack)src;
       ItemStack dstT = (ItemStack)dst;
       if (srcT.getItem() == dstT.getItem()) {
-        dstT.func_190920_e(srcT.func_190916_E());
+        dstT.setCount(srcT.getCount());
         StackUtil.setRawMeta(dstT, StackUtil.getRawMeta(srcT));
-        dstT.func_77982_d(srcT.func_77978_p());
+        dstT.setTagCompound(srcT.getTagCompound());
         return true;
       } 
       return false;

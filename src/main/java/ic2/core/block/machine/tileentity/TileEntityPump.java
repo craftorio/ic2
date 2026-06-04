@@ -114,7 +114,7 @@ public class TileEntityPump extends TileEntityElectricMachine implements IHasGui
   
   public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
     super.writeToNBT(nbt);
-    nbt.func_74777_a("progress", this.progress);
+    nbt.setShort("progress", this.progress);
     return nbt;
   }
   

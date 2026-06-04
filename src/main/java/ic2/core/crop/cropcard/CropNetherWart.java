@@ -34,14 +34,14 @@ public class CropNetherWart extends IC2CropCard {
   }
   
   public ItemStack getGain(ICropTile crop) {
-    return new ItemStack(Items.field_151075_bm, 1);
+    return new ItemStack(Items.NETHER_WART, 1);
   }
   
   public void tick(ICropTile crop) {
     if (crop.isBlockBelow(Blocks.SOUL_SAND)) {
       if (canGrow(crop))
         crop.setGrowthPoints(crop.getGrowthPoints() + 100); 
-    } else if (crop.isBlockBelow(Blocks.field_150433_aE) && (crop.getWorldObj()).rand.nextInt(300) == 0) {
+    } else if (crop.isBlockBelow(Blocks.SNOW) && (crop.getWorldObj()).rand.nextInt(300) == 0) {
       crop.setCrop(IC2Crops.cropTerraWart);
     } 
   }

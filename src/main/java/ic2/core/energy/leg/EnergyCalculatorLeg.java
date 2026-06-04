@@ -468,7 +468,7 @@ public class EnergyCalculatorLeg implements IEnergyCalculator {
         } 
       } 
       if (amount > path.minInsulationEnergyAbsorption) {
-        List<EntityLivingBase> nearbyEntities = world.func_72872_a(EntityLivingBase.class, new AxisAlignedBB((path.minX - 1), (path.minY - 1), (path.minZ - 1), (path.maxX + 2), (path.maxY + 2), (path.maxZ + 2)));
+        List<EntityLivingBase> nearbyEntities = world.getEntitiesWithinAABB(EntityLivingBase.class, new AxisAlignedBB((path.minX - 1), (path.minY - 1), (path.minZ - 1), (path.maxX + 2), (path.maxY + 2), (path.maxZ + 2)));
         if (!nearbyEntities.isEmpty()) {
           Map<EntityLivingBase, MutableDouble> localShockEnergyMap = new IdentityHashMap<>();
           for (Node node : path.conductors) {
@@ -483,7 +483,7 @@ public class EnergyCalculatorLeg implements IEnergyCalculator {
                 MutableDouble prev = localShockEnergyMap.get(entity);
                 if (prev != null && prev.doubleValue() >= shockEnergy)
                   continue; 
-                if (!entity.func_174813_aQ().func_72326_a(new AxisAlignedBB((pos
+                if (!entity.getEntityBoundingBox().intersects(new AxisAlignedBB((pos
                       .getX() - 1), (pos
                       .getY() - 1), (pos
                       .getZ() - 1), (pos
@@ -531,8 +531,8 @@ public class EnergyCalculatorLeg implements IEnergyCalculator {
     for (Map.Entry<EntityLivingBase, MutableDouble> entry : shockEnergyMap.entrySet()) {
       EntityLivingBase target = entry.getKey();
       int damage = (int)Math.ceil(((MutableDouble)entry.getValue()).doubleValue() / 64.0D);
-      if (target.func_70089_S() && damage > 0)
-        target.func_70097_a((DamageSource)IC2DamageSource.electricity, damage); 
+      if (target.isEntityAlive() && damage > 0)
+        target.attackEntityFrom((DamageSource)IC2DamageSource.electricity, damage); 
     } 
   }
   
@@ -586,10 +586,10 @@ public class EnergyCalculatorLeg implements IEnergyCalculator {
           continue; 
         power = override.getExplosionPower(tier, power);
       } 
-      EntityPlayer closestPlayer = world.func_184137_a(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, 20.0D, false);
+      EntityPlayer closestPlayer = world.getClosestPlayer(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, 20.0D, false);
       if (closestPlayer != null)
         IC2.achievements.issueAchievement(closestPlayer, "explodeMachine"); 
-      world.func_175698_g(pos);
+      world.setBlockToAir(pos);
       ExplosionIC2 explosion = new ExplosionIC2(world, null, pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, power, 0.75F, ExplosionIC2.Type.Electrical);
       explosion.doExplosion();
     } 

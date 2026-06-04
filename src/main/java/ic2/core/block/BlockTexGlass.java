@@ -20,34 +20,34 @@ public class BlockTexGlass extends BlockMultiID<BlockTexGlass.GlassType> {
   }
   
   private BlockTexGlass() {
-    super(BlockName.glass, Material.field_151592_s);
-    func_149711_c(5.0F);
-    func_149752_b(180.0F);
-    func_149672_a(SoundType.field_185853_f);
+    super(BlockName.glass, Material.GLASS);
+    setHardness(5.0F);
+    setResistance(180.0F);
+    setSoundType(SoundType.GLASS);
   }
   
-  public int func_149745_a(Random random) {
+  public int quantityDropped(Random random) {
     return 0;
   }
   
-  public boolean func_149662_c(IBlockState state) {
+  public boolean isOpaqueCube(IBlockState state) {
     return false;
   }
   
-  public boolean func_149730_j(IBlockState state) {
+  public boolean isFullBlock(IBlockState state) {
     return true;
   }
   
-  public boolean func_149686_d(IBlockState state) {
+  public boolean isFullCube(IBlockState state) {
     return false;
   }
   
-  public boolean func_185481_k(IBlockState state) {
+  public boolean isTopSolid(IBlockState state) {
     return false;
   }
   
   @SideOnly(Side.CLIENT)
-  public BlockRenderLayer func_180664_k() {
+  public BlockRenderLayer getBlockLayer() {
     return BlockRenderLayer.CUTOUT;
   }
   
@@ -55,10 +55,10 @@ public class BlockTexGlass extends BlockMultiID<BlockTexGlass.GlassType> {
     return false;
   }
   
-  public boolean func_176225_a(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
+  public boolean shouldSideBeRendered(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
     if (world.getBlockState(pos.offset(side)).getBlock() == this)
       return false; 
-    return super.func_176225_a(state, world, pos, side);
+    return super.shouldSideBeRendered(state, world, pos, side);
   }
   
   public enum GlassType implements IIdProvider {

@@ -27,7 +27,7 @@ public class ItemArmorLappack extends ItemArmorElectric {
   }
   
   @SideOnly(Side.CLIENT)
-  public EnumRarity func_77613_e(ItemStack stack) {
+  public EnumRarity getRarity(ItemStack stack) {
     return EnumRarity.UNCOMMON;
   }
 }

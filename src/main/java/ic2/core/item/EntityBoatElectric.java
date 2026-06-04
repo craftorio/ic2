@@ -19,7 +19,7 @@ public class EntityBoatElectric extends EntityIC2Boat {
   public EntityBoatElectric(World world) {
     super(world);
     this.accelerated = false;
-    this.field_70178_ae = true;
+    this.isImmuneToFire = true;
   }
   
   protected ItemStack getItem() {
@@ -35,7 +35,7 @@ public class EntityBoatElectric extends EntityIC2Boat {
   }
   
   protected boolean isWater(IBlockState block) {
-    return (block.getMaterial() == Material.WATER || block.getMaterial() == Material.field_151587_i);
+    return (block.getMaterial() == Material.WATER || block.getMaterial() == Material.LAVA);
   }
   
   public String getTexture() {
@@ -43,13 +43,13 @@ public class EntityBoatElectric extends EntityIC2Boat {
   }
   
   public void onUpdate() {
-    func_70066_B();
-    for (Entity e : func_184182_bu())
-      e.func_70066_B(); 
+    extinguish();
+    for (Entity e : getRecursivePassengers())
+      e.extinguish(); 
     this.accelerated = false;
-    Entity driver = func_184179_bs();
+    Entity driver = getControllingPassenger();
     if (driver instanceof EntityPlayer && IC2.keyboard.isForwardKeyDown((EntityPlayer)driver))
-      for (ItemStack stack : ((EntityPlayer)driver).inventory.field_70460_b) {
+      for (ItemStack stack : ((EntityPlayer)driver).inventory.armorInventory) {
         if (!StackUtil.isEmpty(stack) && ElectricItem.manager.discharge(stack, 4.0D, 2147483647, true, true, true) == 4.0D) {
           ElectricItem.manager.discharge(stack, 4.0D, 2147483647, true, true, false);
           this.accelerated = true;

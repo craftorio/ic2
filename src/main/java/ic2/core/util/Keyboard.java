@@ -41,7 +41,7 @@ public class Keyboard implements IKeyboard {
   }
   
   public boolean isSneakKeyDown(EntityPlayer player) {
-    return player.func_70093_af();
+    return player.isSneaking();
   }
   
   public void sendKeyUpdate() {}

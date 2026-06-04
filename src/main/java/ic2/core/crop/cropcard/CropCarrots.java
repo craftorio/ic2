@@ -23,10 +23,10 @@ public class CropCarrots extends CropVanilla {
   }
   
   public ItemStack getProduct() {
-    return new ItemStack(Items.field_151172_bF);
+    return new ItemStack(Items.CARROT);
   }
   
   public ItemStack getSeeds() {
-    return new ItemStack(Items.field_151172_bF);
+    return new ItemStack(Items.CARROT);
   }
 }

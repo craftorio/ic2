@@ -29,8 +29,8 @@ public class HandHeldOre extends HandHeldUpgradeOption {
         addSlotToContainer((Slot)new SlotHologramSlot(HandHeldOre.this.inventory, slot, 8 + 18 * slot, 8, 1, HandHeldOre.this.makeSaveCallback())); 
     }
     
-    public void func_75134_a(EntityPlayer player) {
-      super.func_75134_a(player);
+    public void onContainerClosed(EntityPlayer player) {
+      super.onContainerClosed(player);
     }
   }
   

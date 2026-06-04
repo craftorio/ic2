@@ -34,7 +34,7 @@ public class CropTerraWart extends IC2CropCard {
   }
   
   public void tick(ICropTile crop) {
-    if (crop.isBlockBelow(Blocks.field_150433_aE)) {
+    if (crop.isBlockBelow(Blocks.SNOW)) {
       if (canGrow(crop))
         crop.setGrowthPoints(crop.getGrowthPoints() + 100); 
     } else if (crop.isBlockBelow(Blocks.SOUL_SAND) && (crop.getWorldObj()).rand.nextInt(300) == 0) {

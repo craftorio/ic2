@@ -1,7 +1,5 @@
 package ic2.api.crops;
 
-import java.util.List;
-
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -9,6 +7,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.List;
 
 public abstract class CropCard
 {
@@ -147,10 +147,6 @@ public abstract class CropCard
 		return crop.generateSeeds(crop.getCrop(), crop.getStatGrowth(), crop.getStatGain(), crop.getStatResistance(), crop.getScanLevel());
 	}
 
-	public void onNeighbourChange(ICropTile crop)
-	{
-	}
-
 	public boolean isRedstoneSignalEmitter(ICropTile cropTile)
 	{
 		return false;
@@ -159,10 +155,6 @@ public abstract class CropCard
 	public int getEmittedRedstoneSignal(ICropTile cropTile)
 	{
 		return 0;
-	}
-
-	public void onBlockDestroyed(ICropTile crop)
-	{
 	}
 
 	public int getEmittedLight(ICropTile crop)

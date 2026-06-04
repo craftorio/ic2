@@ -17,38 +17,38 @@ class Chilling extends TerraformerBase {
       return false; 
     IBlockState state = world.getBlockState(pos);
     Block block = state.getBlock();
-    if (block == Blocks.WATER || block == Blocks.field_150358_i) {
-      world.func_175656_a(pos, Blocks.field_150432_aD.getDefaultState());
+    if (block == Blocks.WATER || block == Blocks.FLOWING_WATER) {
+      world.setBlockState(pos, Blocks.ICE.getDefaultState());
       return true;
     } 
-    if (block == Blocks.field_150432_aD) {
-      BlockPos below = pos.func_177977_b();
+    if (block == Blocks.ICE) {
+      BlockPos below = pos.down();
       Block blockBelow = world.getBlockState(below).getBlock();
-      if (blockBelow == Blocks.WATER || blockBelow == Blocks.field_150358_i) {
-        world.func_175656_a(below, Blocks.field_150432_aD.getDefaultState());
+      if (blockBelow == Blocks.WATER || blockBelow == Blocks.FLOWING_WATER) {
+        world.setBlockState(below, Blocks.ICE.getDefaultState());
         return true;
       } 
-    } else if (block == Blocks.field_150431_aC) {
+    } else if (block == Blocks.SNOW_LAYER) {
       if (isSurroundedBySnow(world, pos)) {
-        world.func_175656_a(pos, Blocks.field_150433_aE.getDefaultState());
+        world.setBlockState(pos, Blocks.SNOW.getDefaultState());
         return true;
       } 
-      int size = ((Integer)state.func_177229_b((IProperty)BlockSnow.field_176315_a)).intValue();
-      if (BlockSnow.field_176315_a.func_177700_c().contains(Integer.valueOf(size + 1))) {
-        world.func_175656_a(pos, state.func_177226_a((IProperty)BlockSnow.field_176315_a, Integer.valueOf(size + 1)));
+      int size = ((Integer)state.getValue((IProperty)BlockSnow.LAYERS)).intValue();
+      if (BlockSnow.LAYERS.getAllowedValues().contains(Integer.valueOf(size + 1))) {
+        world.setBlockState(pos, state.withProperty((IProperty)BlockSnow.LAYERS, Integer.valueOf(size + 1)));
         return true;
       } 
     } 
     pos = pos.up();
-    if (Blocks.field_150431_aC.func_176196_c(world, pos) || block == Blocks.field_150432_aD) {
-      world.func_175656_a(pos, Blocks.field_150431_aC.getDefaultState());
+    if (Blocks.SNOW_LAYER.canPlaceBlockAt(world, pos) || block == Blocks.ICE) {
+      world.setBlockState(pos, Blocks.SNOW_LAYER.getDefaultState());
       return true;
     } 
     return false;
   }
   
   private static boolean isSurroundedBySnow(World world, BlockPos pos) {
-    for (EnumFacing dir : EnumFacing.field_176754_o) {
+    for (EnumFacing dir : EnumFacing.HORIZONTALS) {
       if (!isSnowHere(world, pos.offset(dir)))
         return false; 
     } 
@@ -61,11 +61,11 @@ class Chilling extends TerraformerBase {
     if (pos == null || prevY > pos.getY())
       return false; 
     Block block = world.getBlockState(pos).getBlock();
-    if (block == Blocks.field_150433_aE || block == Blocks.field_150431_aC)
+    if (block == Blocks.SNOW || block == Blocks.SNOW_LAYER)
       return true; 
     pos = pos.up();
-    if (Blocks.field_150431_aC.func_176196_c(world, pos) || block == Blocks.field_150432_aD)
-      world.func_175656_a(pos, Blocks.field_150431_aC.getDefaultState()); 
+    if (Blocks.SNOW_LAYER.canPlaceBlockAt(world, pos) || block == Blocks.ICE)
+      world.setBlockState(pos, Blocks.SNOW_LAYER.getDefaultState()); 
     return false;
   }
 }

@@ -79,7 +79,7 @@ public abstract class TileEntityTank extends TileEntityInventory implements IHas
   public void addInformation(ItemStack stack, List<String> info, ITooltipFlag advanced) {
     info.add("Capacity: " + this.contents.getCapacity() + " mB");
     NBTTagCompound tag = StackUtil.getOrCreateNbtData(stack);
-    if (!tag.func_74764_b("Empty")) {
+    if (!tag.hasKey("Empty")) {
       FluidStack fluidStack = FluidStack.loadFluidStackFromNBT(tag);
       if (fluidStack == null) {
         info.add("Empty");
@@ -94,7 +94,7 @@ public abstract class TileEntityTank extends TileEntityInventory implements IHas
   }
   
   protected SoundType getBlockSound(Entity entity) {
-    return SoundType.field_185852_e;
+    return SoundType.METAL;
   }
   
   public ContainerBase<? extends TileEntityTank> getGuiContainer(EntityPlayer player) {

@@ -10,7 +10,7 @@ public class SlotBoxable extends Slot {
     super(iinventory, i, j, k);
   }
   
-  public boolean func_75214_a(ItemStack itemstack) {
+  public boolean isItemValid(ItemStack itemstack) {
     if (itemstack == null)
       return false; 
     return ItemWrapper.canBeStoredInToolbox(itemstack);

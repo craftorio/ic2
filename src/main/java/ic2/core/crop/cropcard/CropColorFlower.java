@@ -54,7 +54,7 @@ public class CropColorFlower extends IC2CropCard {
   }
   
   public ItemStack getGain(ICropTile crop) {
-    return new ItemStack(Items.field_151100_aR, 1, this.color);
+    return new ItemStack(Items.DYE, 1, this.color);
   }
   
   public int getSizeAfterHarvest(ICropTile crop) {

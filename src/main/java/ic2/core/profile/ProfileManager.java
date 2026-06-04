@@ -169,7 +169,7 @@ public class ProfileManager {
     if (textureChanges == null)
       textureChanges = Collections.emptyList(); 
     List<IResourcePack> packs = new ArrayList<>();
-    Map<String, FallbackResourceManager> domainManagers = (Map<String, FallbackResourceManager>)ReflectionUtil.getValue(Minecraft.getMinecraft().func_110442_L(), Map.class);
+    Map<String, FallbackResourceManager> domainManagers = (Map<String, FallbackResourceManager>)ReflectionUtil.getValue(Minecraft.getMinecraft().getResourceManager(), Map.class);
     for (TextureStyle texture : selected.textures) {
       FallbackResourceManager manager = domainManagers.get(texture.mod);
       if (manager == null)
@@ -177,13 +177,13 @@ public class ProfileManager {
       ((List)ReflectionUtil.getValue(manager, List.class)).removeAll(textureChanges);
       IResourcePack pack = texture.applyChanges();
       if (pack != null) {
-        manager.func_110538_a(pack);
+        manager.addResourcePack(pack);
         packs.add(pack);
       } 
     } 
     List<IResourcePack> defaultPacks = (List<IResourcePack>)ReflectionUtil.getValue(FMLClientHandler.instance(), List.class);
     defaultPacks.removeAll(textureChanges);
-    assert !defaultPacks.stream().anyMatch(pack -> pack.func_130077_b().startsWith("IC2 Profile Pack for "));
+    assert !defaultPacks.stream().anyMatch(pack -> pack.getPackName().startsWith("IC2 Profile Pack for "));
     packs.forEach(defaultPacks::add);
     textureChanges = packs;
   }

@@ -30,7 +30,7 @@ public class GuiEnergyOMatOpen extends GuiIC2<ContainerEnergyOMatOpen> {
   
   protected void drawForegroundLayer(int mouseX, int mouseY) {
     super.drawForegroundLayer(mouseX, mouseY);
-    this.fontRenderer.drawString(Localization.translate("container.inventory"), 8, this.field_147000_g - 96 + 2, 4210752);
+    this.fontRenderer.drawString(Localization.translate("container.inventory"), 8, this.ySize - 96 + 2, 4210752);
     this.fontRenderer.drawString(Localization.translate("ic2.container.personalTrader.offer"), 100, 60, 4210752);
     this.fontRenderer.drawString(((TileEntityEnergyOMat)((ContainerEnergyOMatOpen)this.container).base).euOffer + " EU", 100, 68, 4210752);
   }

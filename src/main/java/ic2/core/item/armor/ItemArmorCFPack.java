@@ -12,15 +12,15 @@ public class ItemArmorCFPack extends ItemArmorFluidTank {
     super(ItemName.cf_pack, "batpack", FluidName.construction_foam.getInstance(), 80000);
   }
   
-  public void func_150895_a(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-    if (!func_194125_a(tab))
+  public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
+    if (!isInCreativeTab(tab))
       return; 
     ItemStack stack = new ItemStack((Item)this, 1);
     filltank(stack);
-    stack.func_77964_b(1);
+    stack.setItemDamage(1);
     subItems.add(stack);
     stack = new ItemStack((Item)this, 1);
-    stack.func_77964_b(getMaxDamage(stack));
+    stack.setItemDamage(getMaxDamage(stack));
     subItems.add(stack);
   }
 }

@@ -36,7 +36,7 @@ public class UpgradesWidget extends GuiElement<UpgradesWidget> {
     List<String> ret = super.getToolTip();
     ret.add(Localization.translate("ic2.generic.text.upgrade"));
     for (ItemStack itemstack : this.compatibleUpgrades)
-      ret.add(itemstack.func_82833_r()); 
+      ret.add(itemstack.getDisplayName()); 
     return ret;
   }
   

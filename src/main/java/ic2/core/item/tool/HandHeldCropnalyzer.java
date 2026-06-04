@@ -25,14 +25,14 @@ public class HandHeldCropnalyzer extends HandHeldInventory implements IWorldTick
       IC2.tickHandler.requestContinuousWorldTick(player.getEntityWorld(), this); 
   }
   
-  public String func_70005_c_() {
-    if (func_145818_k_())
-      return this.containerStack.func_77978_p().getString("display"); 
+  public String getName() {
+    if (hasCustomName())
+      return this.containerStack.getTagCompound().getString("display"); 
     return "Cropnalyzer";
   }
   
-  public boolean func_145818_k_() {
-    return StackUtil.getOrCreateNbtData(this.containerStack).func_74764_b("display");
+  public boolean hasCustomName() {
+    return StackUtil.getOrCreateNbtData(this.containerStack).hasKey("display");
   }
   
   public ContainerBase<HandHeldCropnalyzer> getGuiContainer(EntityPlayer player) {

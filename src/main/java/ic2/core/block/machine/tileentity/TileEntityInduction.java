@@ -82,8 +82,8 @@ public class TileEntityInduction extends TileEntityElectricMachine implements IH
   
   public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
     super.writeToNBT(nbt);
-    nbt.func_74777_a("heat", this.heat);
-    nbt.func_74777_a("progress", this.progress);
+    nbt.setShort("heat", this.heat);
+    nbt.setShort("progress", this.progress);
     return nbt;
   }
   

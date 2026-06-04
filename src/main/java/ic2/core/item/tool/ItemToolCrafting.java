@@ -18,13 +18,13 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public abstract class ItemToolCrafting extends ItemIC2 implements IBoxable, IItemHudInfo {
   public ItemToolCrafting(ItemName name, int maximumUses) {
     super(name);
-    func_77656_e(maximumUses - 1);
-    func_77625_d(1);
+    setMaxDamage(maximumUses - 1);
+    setMaxStackSize(1);
     this.canRepair = false;
   }
   
   @SideOnly(Side.CLIENT)
-  public void func_77624_a(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
+  public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
     tooltip.add(Localization.translate("ic2.item.ItemTool.tooltip.UsesLeft", new Object[] { Integer.valueOf(getRemainingUses(stack)) }));
   }
   
@@ -44,7 +44,7 @@ public abstract class ItemToolCrafting extends ItemIC2 implements IBoxable, IIte
   
   public ItemStack getContainerItem(ItemStack stack) {
     ItemStack ret = stack.copy();
-    if (ret.func_96631_a(1, IC2.random, null))
+    if (ret.attemptDamageItem(1, IC2.random, null))
       return StackUtil.emptyStack; 
     return ret;
   }

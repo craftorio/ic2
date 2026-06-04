@@ -45,8 +45,8 @@ public class ItemObscurator extends BaseElectricItem implements IPlayerItemDataL
   
   public ItemObscurator() {
     super(ItemName.obscurator, 100000.0D, 250.0D, 2);
-    func_77656_e(27);
-    func_77625_d(1);
+    setMaxDamage(27);
+    setMaxStackSize(1);
     setNoRepair();
   }
   
@@ -58,7 +58,7 @@ public class ItemObscurator extends BaseElectricItem implements IPlayerItemDataL
   
   public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
     ItemStack stack = StackUtil.get(player, hand);
-    if (!player.func_70093_af() && !world.isRemote && ElectricItem.manager.canUse(stack, 5000.0D)) {
+    if (!player.isSneaking() && !world.isRemote && ElectricItem.manager.canUse(stack, 5000.0D)) {
       NBTTagCompound nbt = StackUtil.getOrCreateNbtData(stack);
       IBlockState refState;
       EnumFacing refSide;
@@ -78,7 +78,7 @@ public class ItemObscurator extends BaseElectricItem implements IPlayerItemDataL
       } 
       return EnumActionResult.PASS;
     } 
-    if (player.func_70093_af() && world.isRemote && ElectricItem.manager.canUse(stack, 20000.0D))
+    if (player.isSneaking() && world.isRemote && ElectricItem.manager.canUse(stack, 20000.0D))
       return scanBlock(stack, player, world, pos, side) ? EnumActionResult.SUCCESS : EnumActionResult.PASS; 
     return EnumActionResult.PASS;
   }
@@ -100,7 +100,7 @@ public class ItemObscurator extends BaseElectricItem implements IPlayerItemDataL
       !variant.equals(getVariant(nbt)) || 
       getSide(nbt) != side || 
       !Arrays.equals(getColorMultipliers(nbt), colorMultipliers)) {
-      ((NetworkManager)IC2.network.get(false)).sendPlayerItemData(player, player.inventory.field_70461_c, new Object[] { state
+      ((NetworkManager)IC2.network.get(false)).sendPlayerItemData(player, player.inventory.currentItem, new Object[] { state
             .getBlock(), variant, side, colorMultipliers });
       return true;
     } 
@@ -116,7 +116,7 @@ public class ItemObscurator extends BaseElectricItem implements IPlayerItemDataL
       return; 
     if (!(data[3] instanceof int[]))
       return; 
-    ItemStack stack = (ItemStack)player.inventory.field_70462_a.get(slot);
+    ItemStack stack = (ItemStack)player.inventory.mainInventory.get(slot);
     if (!ElectricItem.manager.use(stack, 20000.0D, (EntityLivingBase)player))
       return; 
     NBTTagCompound nbt = StackUtil.getOrCreateNbtData(stack);
@@ -168,20 +168,20 @@ public class ItemObscurator extends BaseElectricItem implements IPlayerItemDataL
   }
   
   private static void clear(NBTTagCompound nbt) {
-    nbt.func_82580_o("refBlock");
-    nbt.func_82580_o("refVariant");
-    nbt.func_82580_o("refSide");
-    nbt.func_82580_o("refColorMul");
+    nbt.removeTag("refBlock");
+    nbt.removeTag("refVariant");
+    nbt.removeTag("refSide");
+    nbt.removeTag("refColorMul");
   }
   
   public static ObscuredRenderInfo getRenderInfo(IBlockState state, EnumFacing side) {
     Block block = state.getBlock();
-    if (block.func_180664_k() == BlockRenderLayer.TRANSLUCENT)
+    if (block.getBlockLayer() == BlockRenderLayer.TRANSLUCENT)
       return null; 
     IBakedModel model = ModelUtil.getBlockModel(state);
     if (model == null)
       return null; 
-    List<BakedQuad> faceQuads = model.func_188616_a(state, side, 0L);
+    List<BakedQuad> faceQuads = model.getQuads(state, side, 0L);
     if (faceQuads.isEmpty())
       return null; 
     float[] uvs = new float[faceQuads.size() * 4];
@@ -190,7 +190,7 @@ public class ItemObscurator extends BaseElectricItem implements IPlayerItemDataL
     TextureAtlasSprite[] sprites = new TextureAtlasSprite[faceQuads.size()];
     ExtractingVertexConsumer testConsumer = testConsumers.get();
     for (BakedQuad faceQuad : faceQuads) {
-      testConsumer.setTexture(faceQuad.func_187508_a());
+      testConsumer.setTexture(faceQuad.getSprite());
       try {
         faceQuad.pipe(testConsumer);
       } catch (Throwable t) {
@@ -285,7 +285,7 @@ public class ItemObscurator extends BaseElectricItem implements IPlayerItemDataL
   
   private static class ExtractingVertexConsumer implements IVertexConsumer {
     public VertexFormat getVertexFormat() {
-      return DefaultVertexFormats.field_181707_g;
+      return DefaultVertexFormats.POSITION_TEX;
     }
     
     public void setQuadTint(int tint) {

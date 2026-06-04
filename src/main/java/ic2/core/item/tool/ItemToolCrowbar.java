@@ -33,7 +33,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ItemToolCrowbar extends ItemToolIC2 implements IEnhancedOverlayProvider {
   public ItemToolCrowbar() {
     super(ItemName.crowbar, HarvestLevel.Iron, EnumSet.of(ToolClass.Crowbar));
-    func_77656_e(250);
+    setMaxDamage(250);
   }
   
   public boolean canTakeDamage(ItemStack stack, int amount) {
@@ -54,7 +54,7 @@ public class ItemToolCrowbar extends ItemToolIC2 implements IEnhancedOverlayProv
       if (target.canRemoveCover(world, pos, selectedFacing))
         if (!world.isRemote) {
           target.removeCover(world, pos, selectedFacing);
-          stack.func_77972_a(1, (EntityLivingBase)player);
+          stack.damageItem(1, (EntityLivingBase)player);
         } else {
           IC2.audioManager.playOnce(player, PositionSpec.Hand, "Tools/Crowbar.ogg", true, IC2.audioManager.getDefaultVolume());
           IC2.platform.messagePlayer(player, Localization.translate("Attachment removed"), new Object[0]);
@@ -64,17 +64,17 @@ public class ItemToolCrowbar extends ItemToolIC2 implements IEnhancedOverlayProv
     return EnumActionResult.FAIL;
   }
   
-  public boolean func_82789_a(ItemStack toRepair, ItemStack repair) {
+  public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
     return (repair != null && Util.matchesOD(repair, "ingotBronze"));
   }
   
-  public boolean func_77616_k(ItemStack stack) {
+  public boolean isEnchantable(ItemStack stack) {
     return false;
   }
   
   @SideOnly(Side.CLIENT)
-  public void func_77624_a(ItemStack stack, @Nullable World worldIn, List<String> info, ITooltipFlag flagIn) {
-    info.add((Minecraft.getMinecraft()).field_71474_y.field_74313_G.getDisplayName() + ":");
+  public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> info, ITooltipFlag flagIn) {
+    info.add((Minecraft.getMinecraft()).gameSettings.keyBindUseItem.getDisplayName() + ":");
     info.add(" Remove attachments from blocks");
   }
   

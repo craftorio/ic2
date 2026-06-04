@@ -32,7 +32,7 @@ public class CropFlax extends IC2CropCard {
   }
   
   public ItemStack getGain(ICropTile crop) {
-    return new ItemStack(Items.field_151007_F);
+    return new ItemStack(Items.STRING);
   }
   
   public int getSizeAfterHarvest(ICropTile crop) {

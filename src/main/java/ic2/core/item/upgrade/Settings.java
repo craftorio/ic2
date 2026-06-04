@@ -16,7 +16,7 @@ public class Settings {
   public final ComparisonSettings extra;
   
   public Settings(NBTTagCompound nbt) {
-    this.active = nbt.func_74767_n("active");
+    this.active = nbt.getBoolean("active");
     if (!this.active) {
       this.comparison = ComparisonType.IGNORED;
       this.mainBox = this.extraBox = "";

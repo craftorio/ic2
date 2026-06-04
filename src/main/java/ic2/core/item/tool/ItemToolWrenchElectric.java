@@ -21,8 +21,8 @@ import net.minecraft.util.NonNullList;
 public class ItemToolWrenchElectric extends ItemToolWrench implements IPseudoDamageItem, IElectricItem, IItemHudInfo {
   public ItemToolWrenchElectric() {
     super(ItemName.electric_wrench);
-    func_77656_e(27);
-    func_77625_d(1);
+    setMaxDamage(27);
+    setMaxStackSize(1);
     setNoRepair();
   }
   
@@ -57,13 +57,13 @@ public class ItemToolWrenchElectric extends ItemToolWrench implements IPseudoDam
     return 250.0D;
   }
   
-  public void func_150895_a(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-    if (!func_194125_a(tab))
+  public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
+    if (!isInCreativeTab(tab))
       return; 
     ElectricItemManager.addChargeVariants((Item)this, (List)subItems);
   }
   
-  public boolean func_82789_a(ItemStack toRepair, ItemStack repair) {
+  public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
     return false;
   }
   

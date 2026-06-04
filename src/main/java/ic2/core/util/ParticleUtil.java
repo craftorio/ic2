@@ -36,19 +36,19 @@ public class ParticleUtil {
     } else {
       x += world.rand.nextFloat() * 0.625D - 0.3125D;
     } 
-    world.func_175688_a(EnumParticleTypes.SMOKE_NORMAL, x, y, z, 0.0D, 0.0D, 0.0D, new int[0]);
-    world.func_175688_a(EnumParticleTypes.FLAME, x, y, z, 0.0D, 0.0D, 0.0D, new int[0]);
+    world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, x, y, z, 0.0D, 0.0D, 0.0D, new int[0]);
+    world.spawnParticle(EnumParticleTypes.FLAME, x, y, z, 0.0D, 0.0D, 0.0D, new int[0]);
   }
   
   public static void spawnBlockLandParticles(World world, BlockPos pos, double x, double y, double z, int count, ITeBlock teBlock) {
     Minecraft mc = Minecraft.getMinecraft();
     Random rnd = world.rand;
-    if (mc.field_71441_e != world || mc.player == null)
+    if (mc.world != world || mc.player == null)
       return; 
-    if (mc.field_71474_y.field_74362_aa > 1 || (mc.field_71474_y.field_74362_aa == 1 && rnd
+    if (mc.gameSettings.particleSetting > 1 || (mc.gameSettings.particleSetting == 1 && rnd
       .nextInt(3) == 0))
       return; 
-    if (mc.player.func_70092_e(x, y, z) > 1024.0D)
+    if (mc.player.getDistanceSq(x, y, z) > 1024.0D)
       return; 
     double speed = 0.15D;
     IBlockState state = TeBlockRegistry.get(teBlock.getIdentifier()).getState(teBlock);
@@ -57,16 +57,16 @@ public class ParticleUtil {
       double my = rnd.nextGaussian() * 0.15D;
       double mz = rnd.nextGaussian() * 0.15D;
       ParticleBlockDust particleBlockDust = newParticleBlockDust(world, x, y, z, mx, my, mz, state);
-      ensureTexture(world, pos, (Particle)particleBlockDust.func_174845_l(), state);
-      mc.field_71452_i.func_78873_a((Particle)particleBlockDust);
+      ensureTexture(world, pos, (Particle)particleBlockDust.init(), state);
+      mc.effectRenderer.addEffect((Particle)particleBlockDust);
     } 
   }
   
   public static void spawnBlockRunParticles(World world, BlockPos pos, double x, double y, double z, double xSpeed, double zSpeed, ITeBlock block) {
     IBlockState state = TeBlockRegistry.get(block.getIdentifier()).getState(block);
     ParticleDigging particle = newParticleDigging(world, x, y, z, xSpeed, 1.5D, zSpeed, state);
-    ensureTexture(world, pos, (Particle)particle.func_174845_l(), state);
-    (Minecraft.getMinecraft()).field_71452_i.func_78873_a((Particle)particle);
+    ensureTexture(world, pos, (Particle)particle.init(), state);
+    (Minecraft.getMinecraft()).effectRenderer.addEffect((Particle)particle);
   }
   
   public static void spawnBlockHitParticles(TileEntityBlock te, EnumFacing side) {
@@ -78,38 +78,38 @@ public class ParticleUtil {
     BlockPos pos = te.getPos();
     double offset = 0.1D;
     AxisAlignedBB aabb = te.getVisualBoundingBox();
-    double x = pos.getX() + world.rand.nextDouble() * (aabb.field_72336_d - aabb.field_72340_a - offset * 2.0D) + offset + aabb.field_72340_a;
-    double y = pos.getY() + world.rand.nextDouble() * (aabb.field_72337_e - aabb.field_72338_b - offset * 2.0D) + offset + aabb.field_72338_b;
-    double z = pos.getZ() + world.rand.nextDouble() * (aabb.field_72334_f - aabb.field_72339_c - offset * 2.0D) + offset + aabb.field_72339_c;
+    double x = pos.getX() + world.rand.nextDouble() * (aabb.maxX - aabb.minX - offset * 2.0D) + offset + aabb.minX;
+    double y = pos.getY() + world.rand.nextDouble() * (aabb.maxY - aabb.minY - offset * 2.0D) + offset + aabb.minY;
+    double z = pos.getZ() + world.rand.nextDouble() * (aabb.maxZ - aabb.minZ - offset * 2.0D) + offset + aabb.minZ;
     switch (side) {
       case DOWN:
-        y = pos.getY() + aabb.field_72338_b - offset;
+        y = pos.getY() + aabb.minY - offset;
         break;
       case UP:
-        y = pos.getY() + aabb.field_72337_e + offset;
+        y = pos.getY() + aabb.maxY + offset;
         break;
       case NORTH:
-        z = pos.getZ() + aabb.field_72339_c - offset;
+        z = pos.getZ() + aabb.minZ - offset;
         break;
       case SOUTH:
-        z = pos.getZ() + aabb.field_72334_f + offset;
+        z = pos.getZ() + aabb.maxZ + offset;
         break;
       case WEST:
-        x = pos.getX() + aabb.field_72340_a - offset;
+        x = pos.getX() + aabb.minX - offset;
         break;
       case EAST:
-        x = pos.getX() + aabb.field_72336_d + offset;
+        x = pos.getX() + aabb.maxX + offset;
         break;
       default:
         throw new IllegalStateException("invalid facing: " + side);
     } 
     ParticleDigging particle = newParticleDigging(world, x, y, z, 0.0D, 0.0D, 0.0D, te.getBlockState());
-    particle.func_174846_a(pos);
-    particle.func_70543_e(0.2F);
-    particle.func_70541_f(0.6F);
+    particle.setBlockPos(pos);
+    particle.multiplyVelocity(0.2F);
+    particle.multipleParticleScaleBy(0.6F);
     if (checkTexture)
       ensureTexture(world, pos, (Particle)particle, te.getBlockState()); 
-    (Minecraft.getMinecraft()).field_71452_i.func_78873_a((Particle)particle);
+    (Minecraft.getMinecraft()).effectRenderer.addEffect((Particle)particle);
   }
   
   public static void spawnBlockBreakParticles(TileEntityBlock te) {
@@ -124,9 +124,9 @@ public class ParticleUtil {
           double yOffset = (y + 0.5D) / 4.0D;
           double zOffset = (z + 0.5D) / 4.0D;
           ParticleDigging particle = newParticleDigging(world, pos.getX() + xOffset, pos.getY() + yOffset, pos.getZ() + zOffset, xOffset - 0.5D, yOffset - 0.5D, zOffset - 0.5D, state);
-          particle.func_174846_a(pos);
+          particle.setBlockPos(pos);
           ensureTexture(world, pos, (Particle)particle, state);
-          mc.field_71452_i.func_78873_a((Particle)particle);
+          mc.effectRenderer.addEffect((Particle)particle);
         } 
       } 
     } 
@@ -153,7 +153,7 @@ public class ParticleUtil {
       return; 
     IBakedModel model = ModelUtil.getBlockModel(state);
     if (model instanceof ISpecialParticleModel && ((ISpecialParticleModel)model).needsEnhancing(state)) {
-      state = state.func_185899_b((IBlockAccess)world, pos);
+      state = state.getActualState((IBlockAccess)world, pos);
       state = state.getBlock().getExtendedState(state, (IBlockAccess)world, pos);
       assert state instanceof Ic2BlockState.Ic2BlockStateInstance;
       ((ISpecialParticleModel)model).enhanceParticle(particle, (Ic2BlockState.Ic2BlockStateInstance)state);

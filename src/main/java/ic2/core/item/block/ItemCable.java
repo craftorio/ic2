@@ -61,7 +61,7 @@ public class ItemCable extends ItemIC2 implements IMultiItem<CableType>, IBoxabl
   public ItemCable() {
     super(ItemName.cable);
     this.variants = new ArrayList<>();
-    func_77627_a(true);
+    setHasSubtypes(true);
     for (CableType type : CableType.values) {
       for (int insulation = 0; insulation <= type.maxInsulation; insulation++)
         this.variants.add(getCable(type, insulation)); 
@@ -72,7 +72,7 @@ public class ItemCable extends ItemIC2 implements IMultiItem<CableType>, IBoxabl
   public void registerModels(ItemName name) {
     final ResourceLocation loc = Util.getName((Item)this);
     ModelLoader.setCustomMeshDefinition((Item)this, new ItemMeshDefinition() {
-          public ModelResourceLocation func_178113_a(ItemStack stack) {
+          public ModelResourceLocation getModelLocation(ItemStack stack) {
             return ItemCable.getModelLocation(loc, stack);
           }
         });
@@ -82,7 +82,7 @@ public class ItemCable extends ItemIC2 implements IMultiItem<CableType>, IBoxabl
   }
   
   static ModelResourceLocation getModelLocation(ResourceLocation loc, ItemStack stack) {
-    return new ModelResourceLocation(new ResourceLocation(loc.func_110624_b(), loc.func_110623_a() + "/" + getName(stack)), null);
+    return new ModelResourceLocation(new ResourceLocation(loc.getResourceDomain(), loc.getResourcePath() + "/" + getName(stack)), null);
   }
   
   public ItemStack getItemStack(CableType type) {
@@ -163,12 +163,12 @@ public class ItemCable extends ItemIC2 implements IMultiItem<CableType>, IBoxabl
     return type.getName(insulation, null);
   }
   
-  public String func_77667_c(ItemStack stack) {
-    return super.func_77667_c(stack) + "." + getName(stack);
+  public String getUnlocalizedName(ItemStack stack) {
+    return super.getUnlocalizedName(stack) + "." + getName(stack);
   }
   
   @SideOnly(Side.CLIENT)
-  public void func_77624_a(ItemStack stack, World world, List<String> info, ITooltipFlag b) {
+  public void addInformation(ItemStack stack, World world, List<String> info, ITooltipFlag b) {
     int capacity;
     double loss;
     CableType type = getCableType(stack);
@@ -183,15 +183,15 @@ public class ItemCable extends ItemIC2 implements IMultiItem<CableType>, IBoxabl
     info.add(Localization.translate("ic2.cable.tooltip.loss", new Object[] { lossFormat.format(loss) }));
   }
   
-  public EnumActionResult func_180614_a(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+  public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
     TileEntityCable te;
     ItemStack stack = StackUtil.get(player, hand);
     IBlockState oldState = world.getBlockState(pos);
     Block oldBlock = oldState.getBlock();
-    if (!oldBlock.func_176200_f((IBlockAccess)world, pos))
+    if (!oldBlock.isReplaceable((IBlockAccess)world, pos))
       pos = pos.offset(side); 
     Block newBlock = BlockName.te.getInstance();
-    if (StackUtil.isEmpty(stack) || !player.func_175151_a(pos, side, stack) || !world.func_190527_a(newBlock, pos, false, side, (Entity)player) || !((BlockTileEntity)newBlock).canReplace(world, pos, side, BlockName.te.getItemStack((Enum)TeBlock.cable)))
+    if (StackUtil.isEmpty(stack) || !player.canPlayerEdit(pos, side, stack) || !world.mayPlace(newBlock, pos, false, side, (Entity)player) || !((BlockTileEntity)newBlock).canReplace(world, pos, side, BlockName.te.getItemStack((Enum)TeBlock.cable)))
       return EnumActionResult.PASS; 
     newBlock.getStateForPlacement(world, pos, side, hitX, hitY, hitZ, 0, (EntityLivingBase)player, hand);
     CableType type = getCableType(stack);
@@ -222,7 +222,7 @@ public class ItemCable extends ItemIC2 implements IMultiItem<CableType>, IBoxabl
     } 
     if (ItemBlockTileEntity.placeTeBlock(stack, (EntityLivingBase)player, world, pos, side, (TileEntityBlock)te)) {
       SoundType soundtype = newBlock.getSoundType(world.getBlockState(pos), world, pos, (Entity)player);
-      world.func_184133_a(player, pos, soundtype.func_185841_e(), SoundCategory.BLOCKS, (soundtype.func_185843_a() + 1.0F) / 2.0F, soundtype.func_185847_b() * 0.8F);
+      world.playSound(player, pos, soundtype.getPlaceSound(), SoundCategory.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
       StackUtil.consumeOrError(player, hand, 1);
       if (damage != null)
         damage.run(); 
@@ -230,8 +230,8 @@ public class ItemCable extends ItemIC2 implements IMultiItem<CableType>, IBoxabl
     return EnumActionResult.SUCCESS;
   }
   
-  public void func_150895_a(CreativeTabs tab, NonNullList<ItemStack> itemList) {
-    if (!func_194125_a(tab))
+  public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> itemList) {
+    if (!isInCreativeTab(tab))
       return; 
     List<ItemStack> variants = new ArrayList<>(this.variants);
     if (IC2.version.isClassic())

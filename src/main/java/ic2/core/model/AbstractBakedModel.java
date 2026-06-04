@@ -6,27 +6,27 @@ import net.minecraft.client.renderer.block.model.ItemOverrideList;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
 public abstract class AbstractBakedModel implements IBakedModel {
-  public boolean func_177555_b() {
+  public boolean isAmbientOcclusion() {
     return true;
   }
   
-  public boolean func_177556_c() {
+  public boolean isGui3d() {
     return false;
   }
   
-  public boolean func_188618_c() {
+  public boolean isBuiltInRenderer() {
     return false;
   }
   
-  public TextureAtlasSprite func_177554_e() {
+  public TextureAtlasSprite getParticleTexture() {
     return null;
   }
   
-  public ItemCameraTransforms func_177552_f() {
+  public ItemCameraTransforms getItemCameraTransforms() {
     return null;
   }
   
-  public ItemOverrideList func_188617_f() {
+  public ItemOverrideList getOverrides() {
     return null;
   }
 }

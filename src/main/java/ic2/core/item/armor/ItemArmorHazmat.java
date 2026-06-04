@@ -31,18 +31,18 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 public class ItemArmorHazmat extends ItemArmorUtility implements IHazmatLike {
   public ItemArmorHazmat(ItemName name, EntityEquipmentSlot type) {
     super(name, "hazmat", type);
-    func_77656_e(64);
-    if (this.field_77881_a == EntityEquipmentSlot.FEET)
+    setMaxDamage(64);
+    if (this.armorType == EntityEquipmentSlot.FEET)
       MinecraftForge.EVENT_BUS.register(this); 
   }
   
   public ISpecialArmor.ArmorProperties getProperties(EntityLivingBase player, ItemStack armor, DamageSource source, double damage, int slot) {
-    if (this.field_77881_a == EntityEquipmentSlot.HEAD && hazmatAbsorbs(source) && hasCompleteHazmat(player)) {
-      if (source == DamageSource.field_76372_a || source == DamageSource.field_76371_c || source == DamageSource.field_190095_e)
-        player.func_70690_d(new PotionEffect(MobEffects.field_76426_n, 60, 1)); 
+    if (this.armorType == EntityEquipmentSlot.HEAD && hazmatAbsorbs(source) && hasCompleteHazmat(player)) {
+      if (source == DamageSource.IN_FIRE || source == DamageSource.LAVA || source == DamageSource.HOT_FLOOR)
+        player.addPotionEffect(new PotionEffect(MobEffects.FIRE_RESISTANCE, 60, 1)); 
       return new ISpecialArmor.ArmorProperties(10, 1.0D, 2147483647);
     } 
-    if (this.field_77881_a == EntityEquipmentSlot.FEET && source == DamageSource.field_76379_h)
+    if (this.armorType == EntityEquipmentSlot.FEET && source == DamageSource.FALL)
       return new ISpecialArmor.ArmorProperties(10, (damage < 8.0D) ? 1.0D : 0.875D, (armor.getMaxDamage() - armor.getItemDamage() + 2) * 2 * 25); 
     return new ISpecialArmor.ArmorProperties(0, 0.05D, (armor.getMaxDamage() - armor.getItemDamage() + 2) / 2 * 25);
   }
@@ -51,23 +51,23 @@ public class ItemArmorHazmat extends ItemArmorUtility implements IHazmatLike {
     if (hazmatAbsorbs(source) && hasCompleteHazmat(entity))
       return; 
     int damageTotal = damage * 2;
-    if (this.field_77881_a == EntityEquipmentSlot.FEET && source == DamageSource.field_76379_h)
+    if (this.armorType == EntityEquipmentSlot.FEET && source == DamageSource.FALL)
       damageTotal = (damage + 1) / 2; 
-    stack.func_77972_a(damageTotal, entity);
+    stack.damageItem(damageTotal, entity);
   }
   
   @SubscribeEvent(priority = EventPriority.LOW)
   public void onEntityLivingFallEvent(LivingFallEvent event) {
     if (IC2.platform.isSimulating() && event.getEntity() instanceof EntityPlayer) {
       EntityPlayer player = (EntityPlayer)event.getEntity();
-      ItemStack armor = (ItemStack)player.inventory.field_70460_b.get(0);
+      ItemStack armor = (ItemStack)player.inventory.armorInventory.get(0);
       if (armor != null && armor.getItem() == this) {
         int fallDamage = (int)event.getDistance() - 3;
         if (fallDamage >= 8)
           return; 
         int armorDamage = (fallDamage + 1) / 2;
         if (armorDamage <= armor.getMaxDamage() - armor.getItemDamage() && armorDamage >= 0) {
-          armor.func_77972_a(armorDamage, (EntityLivingBase)player);
+          armor.damageItem(armorDamage, (EntityLivingBase)player);
           event.setCanceled(true);
         } 
       } 
@@ -83,36 +83,36 @@ public class ItemArmorHazmat extends ItemArmorUtility implements IHazmatLike {
   }
   
   public void onArmorTick(World world, EntityPlayer player, ItemStack stack) {
-    if (!world.isRemote && this.field_77881_a == EntityEquipmentSlot.HEAD) {
-      if (player.func_70027_ad() && hasCompleteHazmat((EntityLivingBase)player)) {
+    if (!world.isRemote && this.armorType == EntityEquipmentSlot.HEAD) {
+      if (player.isBurning() && hasCompleteHazmat((EntityLivingBase)player)) {
         if (isInLava(player))
-          player.func_70690_d(new PotionEffect(MobEffects.field_76426_n, 20, 0, true, true)); 
-        player.func_70066_B();
+          player.addPotionEffect(new PotionEffect(MobEffects.FIRE_RESISTANCE, 20, 0, true, true)); 
+        player.extinguish();
       } 
       int maxAir = 300;
       int refillThreshold = 100;
       int airToMbMul = 1000;
       int airToMbDiv = 150;
       int minAmount = 7;
-      int air = player.func_70086_ai();
+      int air = player.getAir();
       if (air <= 100) {
         int needed = (300 - air) * 1000 / 150;
         int supplied = 0;
-        for (int i = 0; i < player.inventory.field_70462_a.size() && needed > 0; i++) {
-          ItemStack cStack = (ItemStack)player.inventory.field_70462_a.get(i);
+        for (int i = 0; i < player.inventory.mainInventory.size() && needed > 0; i++) {
+          ItemStack cStack = (ItemStack)player.inventory.mainInventory.get(i);
           if (cStack != null) {
             LiquidUtil.FluidOperationResult result = LiquidUtil.drainContainer(cStack, FluidName.air.getInstance(), needed, FluidContainerOutputMode.InPlacePreferred);
             if (result != null && result.fluidChange.amount >= 7)
               if (result.extraOutput == null || 
                 StackUtil.storeInventoryItem(result.extraOutput, player, false)) {
-                player.inventory.field_70462_a.set(i, result.inPlaceOutput);
+                player.inventory.mainInventory.set(i, result.inPlaceOutput);
                 int amount = result.fluidChange.amount;
                 supplied += amount;
                 needed -= amount;
               }  
           } 
         } 
-        player.func_70050_g(air + supplied * 150 / 1000);
+        player.setAir(air + supplied * 150 / 1000);
       } 
     } 
   }
@@ -122,8 +122,8 @@ public class ItemArmorHazmat extends ItemArmorUtility implements IHazmatLike {
     int y = (int)Math.floor(player.posY + 0.02D);
     int z = (int)Math.floor(player.posZ);
     IBlockState state = player.getEntityWorld().getBlockState(new BlockPos(x, y, z));
-    if (state.getBlock() instanceof BlockLiquid && (state.getMaterial() == Material.field_151587_i || state.getMaterial() == Material.field_151581_o)) {
-      float height = (y + 1) - BlockLiquid.func_149801_b(((Integer)state.func_177229_b((IProperty)BlockLiquid.field_176367_b)).intValue());
+    if (state.getBlock() instanceof BlockLiquid && (state.getMaterial() == Material.LAVA || state.getMaterial() == Material.FIRE)) {
+      float height = (y + 1) - BlockLiquid.getLiquidHeightPercent(((Integer)state.getValue((IProperty)BlockLiquid.LEVEL)).intValue());
       return (player.posY < height);
     } 
     return false;
@@ -135,7 +135,7 @@ public class ItemArmorHazmat extends ItemArmorUtility implements IHazmatLike {
   
   public static boolean hasCompleteHazmat(EntityLivingBase living) {
     for (EntityEquipmentSlot slot : ArmorSlot.getAll()) {
-      ItemStack stack = living.func_184582_a(slot);
+      ItemStack stack = living.getItemStackFromSlot(slot);
       if (stack == null || !(stack.getItem() instanceof IHazmatLike))
         return false; 
       IHazmatLike hazmat = (IHazmatLike)stack.getItem();
@@ -148,7 +148,7 @@ public class ItemArmorHazmat extends ItemArmorUtility implements IHazmatLike {
   }
   
   public static boolean hazmatAbsorbs(DamageSource source) {
-    return (source == DamageSource.field_76372_a || source == DamageSource.field_76368_d || source == DamageSource.field_76371_c || source == DamageSource.field_190095_e || source == DamageSource.field_76370_b || source == IC2DamageSource.electricity || source == IC2DamageSource.radiation);
+    return (source == DamageSource.IN_FIRE || source == DamageSource.IN_WALL || source == DamageSource.LAVA || source == DamageSource.HOT_FLOOR || source == DamageSource.ON_FIRE || source == IC2DamageSource.electricity || source == IC2DamageSource.radiation);
   }
   
   public boolean isMetalArmor(ItemStack itemstack, EntityPlayer player) {

@@ -50,7 +50,7 @@ public class CropEating extends IC2CropCard {
   public boolean canGrow(ICropTile crop) {
     if (crop.getCurrentSize() < 3)
       return (crop.getLightLevel() > 10); 
-    return (crop.isBlockBelow((Block)Blocks.field_150353_l) && crop.getCurrentSize() < getMaxSize() && crop.getLightLevel() > 10);
+    return (crop.isBlockBelow((Block)Blocks.LAVA) && crop.getCurrentSize() < getMaxSize() && crop.getLightLevel() > 10);
   }
   
   public int getOptimalHarvestSize(ICropTile crop) {
@@ -63,7 +63,7 @@ public class CropEating extends IC2CropCard {
   
   public ItemStack getGain(ICropTile crop) {
     if (crop.getCurrentSize() >= 4 && crop.getCurrentSize() < 6)
-      return new ItemStack((Block)Blocks.field_150434_aF); 
+      return new ItemStack((Block)Blocks.CACTUS); 
     return null;
   }
   
@@ -78,11 +78,11 @@ public class CropEating extends IC2CropCard {
     double xcentered = coords.getX() + 0.5D;
     double ycentered = coords.getY() + 0.5D;
     double zcentered = coords.getZ() + 0.5D;
-    if (crop.getCustomData().func_74767_n("eaten")) {
-      StackUtil.dropAsEntity(crop.getWorldObj(), coords, new ItemStack(Items.field_151078_bh));
-      crop.getCustomData().func_74757_a("eaten", false);
+    if (crop.getCustomData().getBoolean("eaten")) {
+      StackUtil.dropAsEntity(crop.getWorldObj(), coords, new ItemStack(Items.ROTTEN_FLESH));
+      crop.getCustomData().setBoolean("eaten", false);
     } 
-    List<EntityLivingBase> list = crop.getWorldObj().func_72872_a(EntityLivingBase.class, new AxisAlignedBB(xcentered - 1.0D, coords
+    List<EntityLivingBase> list = crop.getWorldObj().getEntitiesWithinAABB(EntityLivingBase.class, new AxisAlignedBB(xcentered - 1.0D, coords
           
           .getY(), zcentered - 1.0D, xcentered + 1.0D, coords
           
@@ -91,22 +91,22 @@ public class CropEating extends IC2CropCard {
       return; 
     Collections.shuffle(list);
     for (EntityLivingBase entity : list) {
-      if (entity instanceof EntityPlayer && ((EntityPlayer)entity).field_71075_bZ.field_75098_d)
+      if (entity instanceof EntityPlayer && ((EntityPlayer)entity).capabilities.isCreativeMode)
         continue; 
       entity.motionX = (xcentered - entity.posX) * 0.5D;
       entity.motionZ = (zcentered - entity.posZ) * 0.5D;
       if (entity.motionY > -0.05D)
         entity.motionY = -0.05D; 
-      entity.func_70097_a((DamageSource)damage, crop.getCurrentSize() * 2.0F);
+      entity.attackEntityFrom((DamageSource)damage, crop.getCurrentSize() * 2.0F);
       if (!hasMetalAromor(entity)) {
-        entity.func_70690_d(new PotionEffect(MobEffects.field_76421_d, 64, 50));
-        entity.func_70690_d(new PotionEffect(MobEffects.field_76441_p, 64, 0));
-        entity.func_70690_d(new PotionEffect(MobEffects.field_76440_q, 64, 0));
+        entity.addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 64, 50));
+        entity.addPotionEffect(new PotionEffect(MobEffects.INVISIBILITY, 64, 0));
+        entity.addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, 64, 0));
       } 
       if (canGrow(crop))
         crop.setGrowthPoints(crop.getGrowthPoints() + 100); 
-      crop.getWorldObj().func_184148_a(null, xcentered, ycentered, zcentered, SoundEvents.field_187537_bA, SoundCategory.BLOCKS, 1.0F, IC2.random.nextFloat() * 0.1F + 0.9F);
-      crop.getCustomData().func_74757_a("eaten", true);
+      crop.getWorldObj().playSound(null, xcentered, ycentered, zcentered, SoundEvents.ENTITY_GENERIC_EAT, SoundCategory.BLOCKS, 1.0F, IC2.random.nextFloat() * 0.1F + 0.9F);
+      crop.getCustomData().setBoolean("eaten", true);
     } 
   }
   
@@ -128,7 +128,7 @@ public class CropEating extends IC2CropCard {
     if (!(entity instanceof EntityPlayer))
       return false; 
     EntityPlayer player = (EntityPlayer)entity;
-    for (ItemStack stack : player.inventory.field_70460_b) {
+    for (ItemStack stack : player.inventory.armorInventory) {
       if (stack != null && ItemWrapper.isMetalArmor(stack, player))
         return true; 
     } 

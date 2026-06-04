@@ -3,6 +3,8 @@ package ic2.api.energy.prefab;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 
+import javax.annotation.Nonnull;
+
 public class BasicEnergyTe<T extends BasicEnergyTile> extends TileEntity
 {
 	protected T energyBuffer;
@@ -44,13 +46,13 @@ public class BasicEnergyTe<T extends BasicEnergyTile> extends TileEntity
 		this.energyBuffer.onChunkUnload();
 	}
 
-	public void readFromNBT(NBTTagCompound nbt)
+	public void readFromNBT(@Nonnull NBTTagCompound nbt)
 	{
 		super.readFromNBT(nbt);
 		this.energyBuffer.readFromNBT(nbt);
 	}
 
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
+	public NBTTagCompound writeToNBT(@Nonnull NBTTagCompound nbt)
 	{
 		return this.energyBuffer.writeToNBT(super.writeToNBT(nbt));
 	}

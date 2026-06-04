@@ -21,15 +21,15 @@ public class HandHeldMeter extends HandHeldInventory {
     return (GuiScreen)new GuiToolMeter(new ContainerMeter(player, this));
   }
   
-  public String func_70005_c_() {
+  public String getName() {
     return "ic2.meter";
   }
   
-  public boolean func_145818_k_() {
+  public boolean hasCustomName() {
     return false;
   }
   
   void closeGUI() {
-    this.player.func_71053_j();
+    this.player.closeScreen();
   }
 }

@@ -17,57 +17,57 @@ public class ContainerHandHeldInventory<T extends HandHeldInventory> extends Con
     super((IInventory)inventory);
   }
   
-  public ItemStack func_184996_a(int slot, int button, ClickType type, EntityPlayer player) {
+  public ItemStack slotClick(int slot, int button, ClickType type, EntityPlayer player) {
     boolean swapOut, swapTo, closeGUI = false;
     switch (type) {
       case CLONE:
         break;
       case PICKUP:
-        if (slot >= 0 && slot < this.field_75151_b.size())
-          closeGUI = ((HandHeldInventory)this.base).isThisContainer(((Slot)this.field_75151_b.get(slot)).func_75211_c()); 
+        if (slot >= 0 && slot < this.inventorySlots.size())
+          closeGUI = ((HandHeldInventory)this.base).isThisContainer(((Slot)this.inventorySlots.get(slot)).getStack()); 
         break;
       case PICKUP_ALL:
       case QUICK_CRAFT:
         break;
       case QUICK_MOVE:
-        if (slot >= 0 && slot < this.field_75151_b.size() && ((HandHeldInventory)this.base).isThisContainer(((Slot)this.field_75151_b.get(slot)).func_75211_c()))
+        if (slot >= 0 && slot < this.inventorySlots.size() && ((HandHeldInventory)this.base).isThisContainer(((Slot)this.inventorySlots.get(slot)).getStack()))
           return StackUtil.emptyStack; 
         break;
       case SWAP:
-        assert slot >= 0 && slot < this.field_75151_b.size();
-        assert func_75147_a((IInventory)player.inventory, button) != null;
-        swapOut = ((HandHeldInventory)this.base).isThisContainer(func_75147_a((IInventory)player.inventory, button).func_75211_c());
-        swapTo = ((HandHeldInventory)this.base).isThisContainer(((Slot)this.field_75151_b.get(slot)).func_75211_c());
+        assert slot >= 0 && slot < this.inventorySlots.size();
+        assert getSlotFromInventory((IInventory)player.inventory, button) != null;
+        swapOut = ((HandHeldInventory)this.base).isThisContainer(getSlotFromInventory((IInventory)player.inventory, button).getStack());
+        swapTo = ((HandHeldInventory)this.base).isThisContainer(((Slot)this.inventorySlots.get(slot)).getStack());
         if (swapOut || swapTo)
           for (int i = 0; i < 9; i++) {
-            if ((swapOut && slot == (func_75147_a((IInventory)player.inventory, i)).field_75222_d) || (swapTo && button == i)) {
+            if ((swapOut && slot == (getSlotFromInventory((IInventory)player.inventory, i)).slotNumber) || (swapTo && button == i)) {
               if (player instanceof EntityPlayerMP)
-                ((EntityPlayerMP)player).field_71135_a.func_147359_a((Packet)new SPacketHeldItemChange(i)); 
+                ((EntityPlayerMP)player).connection.sendPacket((Packet)new SPacketHeldItemChange(i)); 
               break;
             } 
           }  
         break;
       case THROW:
-        if (slot >= 0 && slot < this.field_75151_b.size())
-          closeGUI = ((HandHeldInventory)this.base).isThisContainer(((Slot)this.field_75151_b.get(slot)).func_75211_c()); 
+        if (slot >= 0 && slot < this.inventorySlots.size())
+          closeGUI = ((HandHeldInventory)this.base).isThisContainer(((Slot)this.inventorySlots.get(slot)).getStack()); 
         break;
       default:
         throw new RuntimeException("Unexpected ClickType: " + type);
     } 
-    ItemStack stack = super.func_184996_a(slot, button, type, player);
+    ItemStack stack = super.slotClick(slot, button, type, player);
     if (closeGUI && !(player.getEntityWorld()).isRemote) {
       ((HandHeldInventory)this.base).saveAsThrown(stack);
-      player.func_71053_j();
+      player.closeScreen();
     } else if (type == ClickType.CLONE) {
-      ItemStack held = player.inventory.func_70445_o();
+      ItemStack held = player.inventory.getItemStack();
       if (((HandHeldInventory)this.base).isThisContainer(held))
-        held.func_77978_p().func_82580_o("uid"); 
+        held.getTagCompound().removeTag("uid"); 
     } 
     return stack;
   }
   
-  public void func_75134_a(EntityPlayer player) {
+  public void onContainerClosed(EntityPlayer player) {
     ((HandHeldInventory)this.base).onGuiClosed(player);
-    super.func_75134_a(player);
+    super.onContainerClosed(player);
   }
 }

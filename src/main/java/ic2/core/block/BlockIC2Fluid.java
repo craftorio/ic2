@@ -44,17 +44,17 @@ public class BlockIC2Fluid extends BlockFluidClassic implements IBlockModelProvi
   
   public BlockIC2Fluid(FluidName name, Fluid fluid, Material material, int color) {
     super(fluid, material);
-    func_149663_c(name.name());
-    func_149647_a((CreativeTabs)IC2.tabIC2);
+    setUnlocalizedName(name.name());
+    setCreativeTab((CreativeTabs)IC2.tabIC2);
     this.fluid = fluid;
     this.color = color;
     if (this.density <= FluidRegistry.WATER.getDensity()) {
       this.displacements.put(Blocks.WATER, Boolean.valueOf(false));
-      this.displacements.put(Blocks.field_150358_i, Boolean.valueOf(false));
+      this.displacements.put(Blocks.FLOWING_WATER, Boolean.valueOf(false));
     } 
     if (this.density <= FluidRegistry.LAVA.getDensity()) {
-      this.displacements.put(Blocks.field_150353_l, Boolean.valueOf(false));
-      this.displacements.put(Blocks.field_150356_k, Boolean.valueOf(false));
+      this.displacements.put(Blocks.LAVA, Boolean.valueOf(false));
+      this.displacements.put(Blocks.FLOWING_LAVA, Boolean.valueOf(false));
     } 
     ResourceLocation regName = IC2.getIdentifier(name.name());
     BlocksItems.registerBlock((Block)this, regName);
@@ -66,84 +66,84 @@ public class BlockIC2Fluid extends BlockFluidClassic implements IBlockModelProvi
     BlockBase.registerDefaultItemModel((Block)this);
   }
   
-  public void func_149666_a(CreativeTabs tab, NonNullList<ItemStack> items) {
+  public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> items) {
     boolean defaultState = Version.shouldEnable(FluidName.class);
     try {
-      if (Version.shouldEnable(FluidName.class.getField(super.func_149739_a().substring(5)), defaultState))
+      if (Version.shouldEnable(FluidName.class.getField(super.getUnlocalizedName().substring(5)), defaultState))
         items.add(new ItemStack((Block)this)); 
     } catch (NoSuchFieldException e) {
       throw new RuntimeException("Impossible missing enum field!", e);
     } 
   }
   
-  public void func_180650_b(World world, BlockPos pos, IBlockState state, Random random) {
-    super.func_180650_b(world, pos, state, random);
+  public void updateTick(World world, BlockPos pos, IBlockState state, Random random) {
+    super.updateTick(world, pos, state, random);
     if (!world.isRemote)
       if (this.fluid == FluidName.pahoehoe_lava.getInstance()) {
         if (isSourceBlock((IBlockAccess)world, pos) && world
-          .func_175671_l(pos) >= world.rand.nextInt(120)) {
-          world.func_175656_a(pos, BlockName.resource.getBlockState((IIdProvider)ResourceBlock.basalt));
+          .getLightFromNeighbors(pos) >= world.rand.nextInt(120)) {
+          world.setBlockState(pos, BlockName.resource.getBlockState((IIdProvider)ResourceBlock.basalt));
         } else if (!hardenFromNeighbors(world, pos)) {
-          world.func_175684_a(pos, (Block)this, func_149738_a(world));
+          world.scheduleUpdate(pos, (Block)this, tickRate(world));
         } 
       } else if (this.fluid == FluidName.hot_water.getInstance()) {
-        if (isSourceBlock((IBlockAccess)world, pos) && !isLavaBlock(world.getBlockState(pos.func_177979_c(2)).getBlock()) && world.getBlockState(pos.func_177977_b()).getBlock() != this && world.rand.nextInt(60) == 0) {
-          world.func_175656_a(pos, Blocks.field_150358_i.getDefaultState());
+        if (isSourceBlock((IBlockAccess)world, pos) && !isLavaBlock(world.getBlockState(pos.down(2)).getBlock()) && world.getBlockState(pos.down()).getBlock() != this && world.rand.nextInt(60) == 0) {
+          world.setBlockState(pos, Blocks.FLOWING_WATER.getDefaultState());
         } else {
-          world.func_175684_a(pos, (Block)this, func_149738_a(world));
+          world.scheduleUpdate(pos, (Block)this, tickRate(world));
         } 
       }  
   }
   
   private static boolean isLavaBlock(Block block) {
-    return (block == Blocks.field_150353_l || block == Blocks.field_150356_k);
+    return (block == Blocks.LAVA || block == Blocks.FLOWING_LAVA);
   }
   
-  public void func_189540_a(IBlockState state, World world, BlockPos pos, Block block, BlockPos neighborPos) {
-    super.func_189540_a(state, world, pos, block, neighborPos);
+  public void neighborChanged(IBlockState state, World world, BlockPos pos, Block block, BlockPos neighborPos) {
+    super.neighborChanged(state, world, pos, block, neighborPos);
     hardenFromNeighbors(world, pos);
   }
   
-  public void func_176213_c(World world, BlockPos pos, IBlockState state) {
-    super.func_176213_c(world, pos, state);
+  public void onBlockAdded(World world, BlockPos pos, IBlockState state) {
+    super.onBlockAdded(world, pos, state);
     hardenFromNeighbors(world, pos);
   }
   
-  public void func_180633_a(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
+  public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
     if (world.isRemote)
       return; 
     if (this.fluid == FluidName.biogas.getInstance() || this.fluid == FluidName.air.getInstance()) {
-      world.func_175698_g(pos);
-      world.func_184133_a(null, pos, SoundEvents.field_187616_bj, SoundCategory.BLOCKS, 1.0F, RANDOM.nextFloat() * 0.4F + 0.8F);
+      world.setBlockToAir(pos);
+      world.playSound(null, pos, SoundEvents.ITEM_FIRECHARGE_USE, SoundCategory.BLOCKS, 1.0F, RANDOM.nextFloat() * 0.4F + 0.8F);
     } 
   }
   
-  public void func_180634_a(World worldIn, BlockPos pos, IBlockState state, Entity entityIn) {
-    func_176199_a(worldIn, pos, entityIn);
+  public void onEntityCollidedWithBlock(World worldIn, BlockPos pos, IBlockState state, Entity entityIn) {
+    onEntityWalk(worldIn, pos, entityIn);
   }
   
-  public void func_176199_a(World world, BlockPos pos, Entity entity) {
+  public void onEntityWalk(World world, BlockPos pos, Entity entity) {
     if (world.isRemote)
       return; 
     if (this.fluid == FluidName.pahoehoe_lava.getInstance()) {
-      entity.func_70015_d(10);
+      entity.setFire(10);
     } else if (this.fluid == FluidName.hot_coolant.getInstance()) {
-      entity.func_70015_d(30);
+      entity.setFire(30);
     } 
     if (entity instanceof EntityLivingBase) {
       EntityLivingBase living = (EntityLivingBase)entity;
       if (this.fluid == FluidName.construction_foam.getInstance()) {
-        addPotion(living, MobEffects.field_76421_d, 300, 2);
+        addPotion(living, MobEffects.SLOWNESS, 300, 2);
       } else if (this.fluid == FluidName.uu_matter.getInstance()) {
-        addPotion(living, MobEffects.field_76428_l, 100, 1);
+        addPotion(living, MobEffects.REGENERATION, 100, 1);
       } else if (this.fluid == FluidName.steam.getInstance() || this.fluid == FluidName.superheated_steam.getInstance()) {
-        addPotion(living, MobEffects.field_76440_q, 300, 0);
+        addPotion(living, MobEffects.BLINDNESS, 300, 0);
       } else if (this.fluid == FluidName.hot_water.getInstance()) {
         Potion potion;
-        if (((EntityLivingBase)entity).func_70662_br()) {
-          potion = MobEffects.field_82731_v;
+        if (((EntityLivingBase)entity).isEntityUndead()) {
+          potion = MobEffects.WITHER;
         } else {
-          potion = MobEffects.field_76428_l;
+          potion = MobEffects.REGENERATION;
         } 
         addPotion(living, potion, 100, IC2.random.nextInt(2));
       } 
@@ -151,13 +151,13 @@ public class BlockIC2Fluid extends BlockFluidClassic implements IBlockModelProvi
   }
   
   private static void addPotion(EntityLivingBase entity, Potion potion, int duration, int amplifier) {
-    if (entity.func_70644_a(potion))
+    if (entity.isPotionActive(potion))
       return; 
-    entity.func_70690_d(new PotionEffect(potion, duration, amplifier, true, true));
+    entity.addPotionEffect(new PotionEffect(potion, duration, amplifier, true, true));
   }
   
-  public String func_149739_a() {
-    return "ic2." + super.func_149739_a().substring(5);
+  public String getUnlocalizedName() {
+    return "ic2." + super.getUnlocalizedName().substring(5);
   }
   
   public int getColor() {
@@ -173,9 +173,9 @@ public class BlockIC2Fluid extends BlockFluidClassic implements IBlockModelProvi
         if (data != null && data.liquid
           .getTemperature() <= this.fluid.getTemperature() / 4) {
           if (isSourceBlock((IBlockAccess)world, pos)) {
-            world.func_175656_a(pos, BlockName.resource.getBlockState((IIdProvider)ResourceBlock.basalt));
+            world.setBlockState(pos, BlockName.resource.getBlockState((IIdProvider)ResourceBlock.basalt));
           } else {
-            world.func_175698_g(pos);
+            world.setBlockToAir(pos);
           } 
           return true;
         } 

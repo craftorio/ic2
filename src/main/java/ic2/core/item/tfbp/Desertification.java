@@ -14,27 +14,27 @@ class Desertification extends TerraformerBase {
     if (pos == null)
       return false; 
     IBlockState sand = Blocks.SAND.getDefaultState();
-    if (TileEntityTerra.switchGround(world, pos, Blocks.field_150346_d, sand, false) || 
-      TileEntityTerra.switchGround(world, pos, (Block)Blocks.field_150349_c, sand, false) || 
+    if (TileEntityTerra.switchGround(world, pos, Blocks.DIRT, sand, false) || 
+      TileEntityTerra.switchGround(world, pos, (Block)Blocks.GRASS, sand, false) || 
       TileEntityTerra.switchGround(world, pos, Blocks.FARMLAND, sand, false)) {
-      TileEntityTerra.switchGround(world, pos, Blocks.field_150346_d, sand, false);
+      TileEntityTerra.switchGround(world, pos, Blocks.DIRT, sand, false);
       return true;
     } 
     Block block = world.getBlockState(pos).getBlock();
-    if (block == Blocks.WATER || block == Blocks.field_150358_i || block == Blocks.field_150431_aC || block == Blocks.field_150362_t || block == Blocks.field_150361_u || block == BlockName.leaves
+    if (block == Blocks.WATER || block == Blocks.FLOWING_WATER || block == Blocks.SNOW_LAYER || block == Blocks.LEAVES || block == Blocks.LEAVES2 || block == BlockName.leaves
       .getInstance() || isPlant(block)) {
-      world.func_175698_g(pos);
+      world.setBlockToAir(pos);
       if (isPlant(world.getBlockState(pos.up()).getBlock()))
-        world.func_175698_g(pos.up()); 
+        world.setBlockToAir(pos.up()); 
       return true;
     } 
-    if (block == Blocks.field_150432_aD || block == Blocks.field_150433_aE) {
-      world.func_175656_a(pos, Blocks.field_150358_i.getDefaultState());
+    if (block == Blocks.ICE || block == Blocks.SNOW) {
+      world.setBlockState(pos, Blocks.FLOWING_WATER.getDefaultState());
       return true;
     } 
-    if ((block == Blocks.field_150344_f || block == Blocks.field_150364_r || block == BlockName.rubber_wood.getInstance()) && world.rand
+    if ((block == Blocks.PLANKS || block == Blocks.LOG || block == BlockName.rubber_wood.getInstance()) && world.rand
       .nextInt(15) == 0) {
-      world.func_175656_a(pos, Blocks.field_150480_ab.getDefaultState());
+      world.setBlockState(pos, Blocks.FIRE.getDefaultState());
       return true;
     } 
     return false;

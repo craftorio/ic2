@@ -27,12 +27,12 @@ public class FluidCellModel extends MaskOverlayModel {
           ResourceLocation spriteLoc;
           if (fs == null || (spriteLoc = fs.getFluid().getStill(fs)) == null)
             return FluidCellModel.this.get(); 
-          return FluidCellModel.this.get(Minecraft.getMinecraft().func_147117_R().func_110572_b(spriteLoc.toString()), fs.getFluid().getColor(fs));
+          return FluidCellModel.this.get(Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(spriteLoc.toString()), fs.getFluid().getColor(fs));
         }
       };
   }
   
-  public ItemOverrideList func_188617_f() {
+  public ItemOverrideList getOverrides() {
     return this.overrideHandler;
   }
   

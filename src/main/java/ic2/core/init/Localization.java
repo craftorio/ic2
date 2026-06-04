@@ -62,25 +62,25 @@ public class Localization {
   
   @SideOnly(Side.CLIENT)
   private static void registerResourceReloadHook() {
-    IResourceManager resManager = Minecraft.getMinecraft().func_110442_L();
+    IResourceManager resManager = Minecraft.getMinecraft().getResourceManager();
     if (resManager instanceof IReloadableResourceManager)
-      ((IReloadableResourceManager)resManager).func_110542_a(new IResourceManagerReloadListener() {
-            public void func_110549_a(IResourceManager manager) {
+      ((IReloadableResourceManager)resManager).registerReloadListener(new IResourceManagerReloadListener() {
+            public void onResourceManagerReload(IResourceManager manager) {
               Map<String, String> tmpMap = new HashMap<>();
               Map<String, String> lmMap = Localization.getLanguageMapMap();
               Map<String, String> localeMap = Localization.getLocaleMap();
               Set<String> languages = new LinkedHashSet<>();
               languages.add("en_us");
-              languages.add((Minecraft.getMinecraft()).field_71474_y.field_74363_ab);
+              languages.add((Minecraft.getMinecraft()).gameSettings.language);
               for (String lang : languages) {
                 try {
-                  for (IResource res : manager.func_135056_b(new ResourceLocation("ic2", Localization.getLangPath(lang)))) {
+                  for (IResource res : manager.getAllResources(new ResourceLocation("ic2", Localization.getLangPath(lang)))) {
                     try {
                       tmpMap.clear();
-                      Localization.loadLocalization(res.func_110527_b(), tmpMap);
+                      Localization.loadLocalization(res.getInputStream(), tmpMap);
                       lmMap.putAll(tmpMap);
                       localeMap.putAll(tmpMap);
-                      IC2.log.debug(LogCategory.Resource, "Loaded translation keys from %s.", new Object[] { res.func_177241_a() });
+                      IC2.log.debug(LogCategory.Resource, "Loaded translation keys from %s.", new Object[] { res.getResourceLocation() });
                     } finally {
                       try {
                         res.close();
@@ -140,10 +140,10 @@ public class Localization {
   }
   
   public static String translate(String key) {
-    return I18n.func_74838_a(key);
+    return I18n.translateToLocal(key);
   }
   
   public static String translate(String key, Object... args) {
-    return I18n.func_74837_a(key, args);
+    return I18n.translateToLocalFormatted(key, args);
   }
 }

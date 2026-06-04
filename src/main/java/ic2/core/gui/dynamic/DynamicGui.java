@@ -98,7 +98,7 @@ public class DynamicGui<T extends ContainerBase<? extends IInventory>> extends G
           } 
           if (recipeButton != null) {
             Button button1;
-            String str = buttonNode.text.get(this.container.base, Collections.singletonMap("name", TextProvider.ofTranslated(this.container.base.func_70005_c_())));
+            String str = buttonNode.text.get(this.container.base, Collections.singletonMap("name", TextProvider.ofTranslated(this.container.base.getName())));
             if (buttonNode.icon == null) {
               button1 = recipeButton.withText(str);
             } else {
@@ -138,7 +138,7 @@ public class DynamicGui<T extends ContainerBase<? extends IInventory>> extends G
           parentNode.addElement(this, (GuiElement<?>)new SlotGrid((GuiIC2)this, playerInventoryNode.x, playerInventoryNode.y + playerInventoryNode.hotbarOffset, 9, 1, playerInventoryNode.style, 0, playerInventoryNode.spacing));
           if (playerInventoryNode.showTitle)
             parentNode.addElement(this, (GuiElement<?>)Text.create((GuiIC2)this, playerInventoryNode.x + 1, playerInventoryNode.y - 10, 
-                  TextProvider.ofTranslated(player.inventory.func_70005_c_()), 4210752, false)); 
+                  TextProvider.ofTranslated(player.inventory.getName()), 4210752, false)); 
           break;
         case slot:
         case slothologram:
@@ -165,10 +165,10 @@ public class DynamicGui<T extends ContainerBase<? extends IInventory>> extends G
               x = textNode.x;
               break;
             case gui:
-              x = textNode.x + this.field_146999_f / 2;
+              x = textNode.x + this.xSize / 2;
               break;
             case key:
-              x = textNode.x + this.field_146999_f;
+              x = textNode.x + this.xSize;
               break;
             default:
               throw new IllegalArgumentException("invalid alignment: " + textNode.align);

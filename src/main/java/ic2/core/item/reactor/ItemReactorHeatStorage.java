@@ -47,8 +47,8 @@ public class ItemReactorHeatStorage extends AbstractDamageableReactorComponent {
   }
   
   @SideOnly(Side.CLIENT)
-  public void func_77624_a(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
-    super.func_77624_a(stack, world, tooltip, advanced);
+  public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
+    super.addInformation(stack, world, tooltip, advanced);
     if (getCustomDamage(stack) > 0) {
       tooltip.add(Localization.translate("ic2.reactoritem.heatwarning.line1"));
       tooltip.add(Localization.translate("ic2.reactoritem.heatwarning.line2"));

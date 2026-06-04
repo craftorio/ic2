@@ -29,34 +29,34 @@ public class GuiToolMeter extends GuiIC2<ContainerMeter> {
   private IClickHandler createModeSetter(final ContainerMeter.Mode mode) {
     return new IClickHandler() {
         public void onClick(MouseButton button) {
-          ((ContainerMeter)GuiToolMeter.this.container).setMode(mode);
+          GuiToolMeter.this.container.setMode(mode);
         }
       };
   }
   
-  protected void func_73864_a(int i, int j, int k) throws IOException {
-    super.func_73864_a(i, j, k);
-    int xMin = (this.width - this.field_146999_f) / 2;
-    int yMin = (this.height - this.field_147000_g) / 2;
+  protected void mouseClicked(int i, int j, int k) throws IOException {
+    super.mouseClicked(i, j, k);
+    int xMin = (this.width - this.xSize) / 2;
+    int yMin = (this.height - this.ySize) / 2;
     int x = i - xMin;
     int y = j - yMin;
     if (x >= 26 && y >= 111 && x <= 83 && y <= 123)
-      ((ContainerMeter)this.container).reset(); 
+      this.container.reset(); 
   }
   
   protected void drawForegroundLayer(int mouseX, int mouseY) {
     super.drawForegroundLayer(mouseX, mouseY);
-    String unit = (((ContainerMeter)this.container).getMode() == ContainerMeter.Mode.Voltage) ? "ic2.generic.text.v" : "ic2.generic.text.EUt";
+    String unit = (this.container.getMode() == ContainerMeter.Mode.Voltage) ? "ic2.generic.text.v" : "ic2.generic.text.EUt";
     unit = Localization.translate(unit);
     this.fontRenderer.drawString(Localization.translate("ic2.itemToolMEter.mode"), 115, 43, 2157374);
     this.fontRenderer.drawString(Localization.translate("ic2.itemToolMEter.avg"), 15, 41, 2157374);
-    this.fontRenderer.drawString("" + Util.toSiString(((ContainerMeter)this.container).getResultAvg(), 6) + unit, 15, 51, 2157374);
+    this.fontRenderer.drawString(Util.toSiString(this.container.getResultAvg(), 6) + unit, 15, 51, 2157374);
     this.fontRenderer.drawString(Localization.translate("ic2.itemToolMEter.max/min"), 15, 64, 2157374);
-    this.fontRenderer.drawString("" + Util.toSiString(((ContainerMeter)this.container).getResultMax(), 6) + unit, 15, 74, 2157374);
-    this.fontRenderer.drawString("" + Util.toSiString(((ContainerMeter)this.container).getResultMin(), 6) + unit, 15, 84, 2157374);
-    this.fontRenderer.drawString(Localization.translate("ic2.itemToolMEter.cycle", new Object[] { Integer.valueOf(((ContainerMeter)this.container).getResultCount() / 20) }), 15, 100, 2157374);
+    this.fontRenderer.drawString(Util.toSiString(this.container.getResultMax(), 6) + unit, 15, 74, 2157374);
+    this.fontRenderer.drawString(Util.toSiString(this.container.getResultMin(), 6) + unit, 15, 84, 2157374);
+    this.fontRenderer.drawString(Localization.translate("ic2.itemToolMEter.cycle", Integer.valueOf(this.container.getResultCount() / 20)), 15, 100, 2157374);
     this.fontRenderer.drawString(Localization.translate("ic2.itemToolMEter.mode.reset"), 39, 114, 2157374);
-    switch (((ContainerMeter)this.container).getMode()) {
+    switch (this.container.getMode()) {
       case EnergyIn:
         this.fontRenderer.drawString(Localization.translate("ic2.itemToolMEter.mode.EnergyIn"), 105, 100, 2157374);
         break;
@@ -72,10 +72,10 @@ public class GuiToolMeter extends GuiIC2<ContainerMeter> {
     } 
   }
   
-  protected void func_146976_a(float f, int x, int y) {
-    super.func_146976_a(f, x, y);
+  protected void drawGuiContainerBackgroundLayer(float f, int x, int y) {
+    super.drawGuiContainerBackgroundLayer(f, x, y);
     bindTexture();
-    switch (((ContainerMeter)this.container).getMode()) {
+    switch (this.container.getMode()) {
       case EnergyIn:
         drawTexturedRect(112.0D, 55.0D, 40.0D, 40.0D, 176.0D, 0.0D);
         break;

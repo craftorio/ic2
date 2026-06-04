@@ -217,9 +217,9 @@ public enum TeBlock implements ITeBlock, ITeBlock.ITeBlockCreativeRegisterer {
   personal_chest((Class)TileEntityPersonalChest.class, 66, false, Util.horizontalFacings, false, HarvestTool.Pickaxe, DefaultDrop.Self, -1.0F, 3600000.0F, EnumRarity.UNCOMMON),
   trade_o_mat((Class)TileEntityTradeOMat.class, 67, true, Util.horizontalFacings, false, HarvestTool.Pickaxe, DefaultDrop.Self, -1.0F, 3600000.0F, EnumRarity.COMMON),
   trading_terminal((Class)TileEntityTradingTerminal.class, 94, false, Util.horizontalFacings, false, HarvestTool.Wrench, DefaultDrop.Machine, 2.0F, 10.0F, EnumRarity.UNCOMMON, IC2Material.MACHINE, false),
-  cable(TileEntityCable.delegate(), -1, false, Util.noFacings, false, HarvestTool.Pickaxe, DefaultDrop.Self, 0.5F, 5.0F, EnumRarity.COMMON, Material.field_151580_n, true),
-  detector_cable(TileEntityCableDetector.delegate(), -1, false, Util.noFacings, false, HarvestTool.Pickaxe, DefaultDrop.Self, 0.5F, 5.0F, EnumRarity.COMMON, Material.field_151580_n, false),
-  splitter_cable(TileEntityCableSplitter.delegate(), -1, false, Util.noFacings, false, HarvestTool.Pickaxe, DefaultDrop.Self, 0.5F, 5.0F, EnumRarity.COMMON, Material.field_151580_n, false),
+  cable(TileEntityCable.delegate(), -1, false, Util.noFacings, false, HarvestTool.Pickaxe, DefaultDrop.Self, 0.5F, 5.0F, EnumRarity.COMMON, Material.CLOTH, true),
+  detector_cable(TileEntityCableDetector.delegate(), -1, false, Util.noFacings, false, HarvestTool.Pickaxe, DefaultDrop.Self, 0.5F, 5.0F, EnumRarity.COMMON, Material.CLOTH, false),
+  splitter_cable(TileEntityCableSplitter.delegate(), -1, false, Util.noFacings, false, HarvestTool.Pickaxe, DefaultDrop.Self, 0.5F, 5.0F, EnumRarity.COMMON, Material.CLOTH, false),
   chargepad_batbox((Class)TileEntityChargepadBatBox.class, 68, true, Util.downSideFacings, true, HarvestTool.Wrench, DefaultDrop.Self, 2.0F, 10.0F, EnumRarity.COMMON, IC2Material.MACHINE, false),
   chargepad_cesu((Class)TileEntityChargepadCESU.class, 69, true, Util.downSideFacings, true, HarvestTool.Wrench, DefaultDrop.Self, 2.0F, 10.0F, EnumRarity.COMMON, IC2Material.MACHINE, false),
   chargepad_mfe((Class)TileEntityChargepadMFE.class, 70, true, Util.downSideFacings, true, HarvestTool.Wrench, DefaultDrop.Self, 2.0F, 10.0F, EnumRarity.COMMON, IC2Material.MACHINE, false),
@@ -242,14 +242,14 @@ public enum TeBlock implements ITeBlock, ITeBlock.ITeBlockCreativeRegisterer {
   weighted_item_distributor((Class)TileEntityWeightedItemDistributor.class, 91, false, Util.allFacings, true, HarvestTool.Wrench, DefaultDrop.Machine, 2.0F, 10.0F, EnumRarity.COMMON, IC2Material.MACHINE, false),
   rci_rsh((Class)TileEntityRCI_RSH.class, 84, true, Util.allFacings, true, HarvestTool.Wrench, DefaultDrop.AdvMachine, 2.0F, 10.0F, EnumRarity.COMMON, IC2Material.MACHINE, false),
   rci_lzh((Class)TileEntityRCI_LZH.class, 85, true, Util.allFacings, true, HarvestTool.Wrench, DefaultDrop.AdvMachine, 2.0F, 10.0F, EnumRarity.COMMON, IC2Material.MACHINE, false),
-  crop((Class)TileEntityCrop.class, -1, false, Util.noFacings, false, HarvestTool.Axe, DefaultDrop.Self, 0.8F, 0.2F, EnumRarity.COMMON, Material.field_151585_k, true),
+  crop((Class)TileEntityCrop.class, -1, false, Util.noFacings, false, HarvestTool.Axe, DefaultDrop.Self, 0.8F, 0.2F, EnumRarity.COMMON, Material.PLANTS, true),
   industrial_workbench((Class)TileEntityIndustrialWorkbench.class, 88, false, Util.horizontalFacings, true, HarvestTool.Wrench, DefaultDrop.Self, 2.0F, 10.0F, EnumRarity.COMMON, IC2Material.MACHINE, false),
   batch_crafter((Class)TileEntityBatchCrafter.class, 89, true, Util.horizontalFacings, true, HarvestTool.Wrench, DefaultDrop.AdvMachine, 2.0F, 10.0F, EnumRarity.UNCOMMON, IC2Material.MACHINE, false),
   fluid_pipe((Class)TileEntityFluidPipe.class, -1, false, Util.allFacings, false, HarvestTool.Wrench, DefaultDrop.Self, 1.0F, 5.0F, EnumRarity.COMMON, IC2Material.PIPE, true),
-  coke_kiln((Class)TileEntityCokeKiln.class, 100, true, Util.horizontalFacings, true, HarvestTool.Pickaxe, DefaultDrop.Self, 2.0F, 10.0F, EnumRarity.COMMON, Material.field_151576_e, false),
-  coke_kiln_hatch((Class)TileEntityCokeKilnHatch.class, 101, false, Util.allFacings, true, HarvestTool.Pickaxe, DefaultDrop.Self, 2.0F, 10.0F, EnumRarity.COMMON, Material.field_151576_e, false),
-  coke_kiln_grate((Class)TileEntityCokeKilnGrate.class, 102, false, Util.allFacings, true, HarvestTool.Pickaxe, DefaultDrop.Self, 2.0F, 10.0F, EnumRarity.COMMON, Material.field_151576_e, false),
-  wooden_storage_box((Class)TileEntityWoodenStorageBox.class, 111, false, Util.noFacings, false, HarvestTool.Axe, DefaultDrop.Self, 1.0F, 10.0F, EnumRarity.COMMON, Material.field_151575_d, false),
+  coke_kiln((Class)TileEntityCokeKiln.class, 100, true, Util.horizontalFacings, true, HarvestTool.Pickaxe, DefaultDrop.Self, 2.0F, 10.0F, EnumRarity.COMMON, Material.ROCK, false),
+  coke_kiln_hatch((Class)TileEntityCokeKilnHatch.class, 101, false, Util.allFacings, true, HarvestTool.Pickaxe, DefaultDrop.Self, 2.0F, 10.0F, EnumRarity.COMMON, Material.ROCK, false),
+  coke_kiln_grate((Class)TileEntityCokeKilnGrate.class, 102, false, Util.allFacings, true, HarvestTool.Pickaxe, DefaultDrop.Self, 2.0F, 10.0F, EnumRarity.COMMON, Material.ROCK, false),
+  wooden_storage_box((Class)TileEntityWoodenStorageBox.class, 111, false, Util.noFacings, false, HarvestTool.Axe, DefaultDrop.Self, 1.0F, 10.0F, EnumRarity.COMMON, Material.WOOD, false),
   iron_storage_box((Class)TileEntityIronStorageBox.class, 112, false, Util.noFacings, false, HarvestTool.Wrench, DefaultDrop.Self, 1.0F, 15.0F, EnumRarity.COMMON, IC2Material.MACHINE, false),
   bronze_storage_box((Class)TileEntityBronzeStorageBox.class, 113, false, Util.noFacings, false, HarvestTool.Wrench, DefaultDrop.Self, 1.0F, 15.0F, EnumRarity.COMMON, IC2Material.MACHINE, false),
   steel_storage_box((Class)TileEntitySteelStorageBox.class, 114, false, Util.noFacings, false, HarvestTool.Wrench, DefaultDrop.Self, 2.0F, 20.0F, EnumRarity.UNCOMMON, IC2Material.MACHINE, false),
@@ -376,7 +376,7 @@ public enum TeBlock implements ITeBlock, ITeBlock.ITeBlockCreativeRegisterer {
   }
   
   public void addSubBlocks(NonNullList<ItemStack> list, BlockTileEntity block, ItemBlockTileEntity item, CreativeTabs tab) {
-    if (tab == IC2.tabIC2 || tab == CreativeTabs.field_78027_g)
+    if (tab == IC2.tabIC2 || tab == CreativeTabs.SEARCH)
       for (TeBlock type : values) {
         if (type.hasItem() && Version.shouldEnable(type.teClass)) {
           list.add(block.getItemStack(type));

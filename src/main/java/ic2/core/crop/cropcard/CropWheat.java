@@ -10,7 +10,7 @@ import net.minecraft.item.ItemStack;
 
 public class CropWheat extends CropVanilla {
   public CropWheat() {
-    super((BlockCrops)Blocks.field_150464_aj);
+    super((BlockCrops)Blocks.WHEAT);
   }
   
   public String getId() {
@@ -26,11 +26,11 @@ public class CropWheat extends CropVanilla {
   }
   
   public ItemStack getProduct() {
-    return new ItemStack(Items.field_151015_O, 1);
+    return new ItemStack(Items.WHEAT, 1);
   }
   
   public ItemStack getSeeds() {
-    return new ItemStack(Items.field_151014_N);
+    return new ItemStack(Items.WHEAT_SEEDS);
   }
   
   public int getSizeAfterHarvest(ICropTile crop) {

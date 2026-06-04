@@ -57,7 +57,7 @@ public abstract class TileEntityStorageBox extends TileEntityInventory implement
   }
   
   protected SoundType getBlockSound(Entity entity) {
-    return SoundType.field_185852_e;
+    return SoundType.METAL;
   }
   
   public ContainerBase<? extends TileEntityStorageBox> getGuiContainer(EntityPlayer player) {

@@ -32,8 +32,8 @@ public abstract class ItemArmorFluidTank extends ItemArmorUtility implements IIt
   
   public ItemArmorFluidTank(ItemName name, String armorName, Fluid allowfluid, int capacity) {
     super(name, armorName, EntityEquipmentSlot.CHEST);
-    func_77656_e(27);
-    func_77625_d(1);
+    setMaxDamage(27);
+    setMaxStackSize(1);
     this.capacity = capacity;
     this.allowfluid = allowfluid;
     addCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, new Function<ItemStack, IFluidHandlerItem>() {
@@ -78,7 +78,7 @@ public abstract class ItemArmorFluidTank extends ItemArmorUtility implements IIt
   }
   
   protected void Updatedamage(ItemStack stack) {
-    stack.func_77964_b(stack.getMaxDamage() - 1 - (int)Util.map(getCharge(stack), getMaxCharge(stack), (stack.getMaxDamage() - 2)));
+    stack.setItemDamage(stack.getMaxDamage() - 1 - (int)Util.map(getCharge(stack), getMaxCharge(stack), (stack.getMaxDamage() - 2)));
   }
   
   public boolean isEmpty(ItemStack stack) {
@@ -86,8 +86,8 @@ public abstract class ItemArmorFluidTank extends ItemArmorUtility implements IIt
   }
   
   @SideOnly(Side.CLIENT)
-  public void func_77624_a(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
-    super.func_77624_a(stack, world, tooltip, advanced);
+  public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
+    super.addInformation(stack, world, tooltip, advanced);
     FluidStack fs = FluidUtil.getFluidContained(stack);
     if (fs != null) {
       tooltip.add("< " + fs.getLocalizedName() + ", " + fs.amount + " mB >");
@@ -111,7 +111,7 @@ public abstract class ItemArmorFluidTank extends ItemArmorUtility implements IIt
     return info;
   }
   
-  public boolean func_82789_a(ItemStack par1ItemStack, ItemStack par2ItemStack) {
+  public boolean getIsRepairable(ItemStack par1ItemStack, ItemStack par2ItemStack) {
     return false;
   }
 }

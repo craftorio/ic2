@@ -14,11 +14,11 @@ public class ItemArmorUtility extends ItemArmorIC2 implements ISpecialArmor {
     super(name, ItemArmor.ArmorMaterial.DIAMOND, armorName, type, null);
   }
   
-  public int func_77619_b() {
+  public int getItemEnchantability() {
     return 0;
   }
   
-  public boolean func_82789_a(ItemStack par1ItemStack, ItemStack par2ItemStack) {
+  public boolean getIsRepairable(ItemStack par1ItemStack, ItemStack par2ItemStack) {
     return false;
   }
   

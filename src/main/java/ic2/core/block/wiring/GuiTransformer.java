@@ -26,15 +26,15 @@ public class GuiTransformer extends GuiIC2<ContainerTransformer> {
     this.mode[3] = Localization.translate("ic2.Transformer.gui.switch.mode3");
   }
   
-  protected void func_146284_a(GuiButton guibutton) throws IOException {
-    super.func_146284_a(guibutton);
-    ((NetworkManager)IC2.network.get(false)).initiateClientTileEntityEvent((TileEntity)((ContainerTransformer)this.container).base, guibutton.field_146127_k);
+  protected void actionPerformed(GuiButton guibutton) throws IOException {
+    super.actionPerformed(guibutton);
+    ((NetworkManager)IC2.network.get(false)).initiateClientTileEntityEvent((TileEntity)((ContainerTransformer)this.container).base, guibutton.id);
   }
   
-  protected void func_73864_a(int i, int j, int k) throws IOException {
-    super.func_73864_a(i, j, k);
-    int x = i - this.field_147003_i;
-    int y = j - this.field_147009_r;
+  protected void mouseClicked(int i, int j, int k) throws IOException {
+    super.mouseClicked(i, j, k);
+    int x = i - this.guiLeft;
+    int y = j - this.guiTop;
     if (x >= 150 && y >= 32 && x <= 167 && y <= 49)
       ((NetworkManager)IC2.network.get(false)).initiateClientTileEntityEvent((TileEntity)((ContainerTransformer)this.container).base, 3); 
   }
@@ -45,27 +45,27 @@ public class GuiTransformer extends GuiIC2<ContainerTransformer> {
     this.fontRenderer.drawString(Localization.translate("ic2.Transformer.gui.Input"), 6, 43, 4210752);
     this.fontRenderer.drawString(((TileEntityTransformer)((ContainerTransformer)this.container).base).getoutputflow() + " " + Localization.translate("ic2.generic.text.EUt"), 52, 30, 2157374);
     this.fontRenderer.drawString(((TileEntityTransformer)((ContainerTransformer)this.container).base).getinputflow() + " " + Localization.translate("ic2.generic.text.EUt"), 52, 45, 2157374);
-    RenderItem renderItem = this.mc.func_175599_af();
-    RenderHelper.func_74520_c();
+    RenderItem renderItem = this.mc.getRenderItem();
+    RenderHelper.enableGUIStandardItemLighting();
     switch (((TileEntityTransformer)((ContainerTransformer)this.container).base).getMode()) {
       case redstone:
-        renderItem.func_175042_a(ItemName.wrench.getItemStack(), 152, 67);
+        renderItem.renderItemIntoGUI(ItemName.wrench.getItemStack(), 152, 67);
         break;
       case stepdown:
-        renderItem.func_175042_a(ItemName.wrench.getItemStack(), 152, 87);
+        renderItem.renderItemIntoGUI(ItemName.wrench.getItemStack(), 152, 87);
         break;
       case stepup:
-        renderItem.func_175042_a(ItemName.wrench.getItemStack(), 152, 107);
+        renderItem.renderItemIntoGUI(ItemName.wrench.getItemStack(), 152, 107);
         break;
     } 
-    RenderHelper.func_74518_a();
+    RenderHelper.disableStandardItemLighting();
   }
   
-  public void func_73866_w_() {
-    super.func_73866_w_();
-    this.field_146292_n.add(new GuiButton(0, (this.width - this.field_146999_f) / 2 + 7, (this.height - this.field_147000_g) / 2 + 65, 144, 20, this.mode[1]));
-    this.field_146292_n.add(new GuiButton(1, (this.width - this.field_146999_f) / 2 + 7, (this.height - this.field_147000_g) / 2 + 85, 144, 20, this.mode[2]));
-    this.field_146292_n.add(new GuiButton(2, (this.width - this.field_146999_f) / 2 + 7, (this.height - this.field_147000_g) / 2 + 105, 144, 20, this.mode[3]));
+  public void initGui() {
+    super.initGui();
+    this.buttonList.add(new GuiButton(0, (this.width - this.xSize) / 2 + 7, (this.height - this.ySize) / 2 + 65, 144, 20, this.mode[1]));
+    this.buttonList.add(new GuiButton(1, (this.width - this.xSize) / 2 + 7, (this.height - this.ySize) / 2 + 85, 144, 20, this.mode[2]));
+    this.buttonList.add(new GuiButton(2, (this.width - this.xSize) / 2 + 7, (this.height - this.ySize) / 2 + 105, 144, 20, this.mode[3]));
   }
   
   protected ResourceLocation getTexture() {

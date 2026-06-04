@@ -8,6 +8,6 @@ import net.minecraft.item.ItemStack;
 @NotClassic
 public class TileEntityRCI_LZH extends TileEntityAbstractRCI {
   public TileEntityRCI_LZH() {
-    super(ItemName.lzh_condensator.getItemStack(), new ItemStack(Blocks.field_150368_y));
+    super(ItemName.lzh_condensator.getItemStack(), new ItemStack(Blocks.LAPIS_BLOCK));
   }
 }

@@ -1,10 +1,10 @@
 package ic2.api.tile;
 
+import net.minecraft.block.Block;
+
 import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.Set;
-
-import net.minecraft.block.Block;
 
 public final class ExplosionWhitelist
 {
@@ -23,5 +23,5 @@ public final class ExplosionWhitelist
 		return whitelist.contains(block);
 	}
 
-	private static Set<Block> whitelist = Collections.newSetFromMap(new IdentityHashMap<>());
+	private static final Set<Block> whitelist = Collections.newSetFromMap(new IdentityHashMap<>());
 }

@@ -44,7 +44,7 @@ public class CropCocoa extends IC2CropCard {
   }
   
   public ItemStack getGain(ICropTile crop) {
-    return new ItemStack(Items.field_151100_aR, 1, 3);
+    return new ItemStack(Items.DYE, 1, 3);
   }
   
   public int getGrowthDuration(ICropTile crop) {

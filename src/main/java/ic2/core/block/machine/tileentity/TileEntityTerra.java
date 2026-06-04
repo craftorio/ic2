@@ -86,7 +86,7 @@ public class TileEntityTerra extends TileEntityElectricMachine {
   
   public boolean onActivated(final EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
     final World world = getWorld();
-    if (!player.func_70093_af() && !world.isRemote) {
+    if (!player.isSneaking() && !world.isRemote) {
       if (ejectBlueprint())
         return true; 
       ItemStack stack = StackUtil.consumeAndGet(player, hand, new Predicate<ItemStack>() {
@@ -121,7 +121,7 @@ public class TileEntityTerra extends TileEntityElectricMachine {
   public static BlockPos getFirstSolidBlockFrom(World world, BlockPos pos, int yOffset) {
     Ic2BlockPos ret = new Ic2BlockPos(pos.getX(), pos.getY() + yOffset, pos.getZ());
     while (ret.getY() >= 0) {
-      if (world.func_175677_d((BlockPos)ret, false))
+      if (world.isBlockNormalCube((BlockPos)ret, false))
         return new BlockPos((Vec3i)ret); 
       ret.moveDown();
     } 
@@ -148,7 +148,7 @@ public class TileEntityTerra extends TileEntityElectricMachine {
     } 
     if ((upwards && cPos.getY() == pos.getY()) || (!upwards && cPos.getY() < 0))
       return false; 
-    world.func_175656_a(upwards ? cPos.up() : new BlockPos((Vec3i)cPos), to);
+    world.setBlockState(upwards ? cPos.up() : new BlockPos((Vec3i)cPos), to);
     return true;
   }
   

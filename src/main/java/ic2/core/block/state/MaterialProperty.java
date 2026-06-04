@@ -85,11 +85,11 @@ public class MaterialProperty extends PropertyHelper<MaterialProperty.WrappedMat
     this.length = this.values.size();
   }
   
-  public Collection<WrappedMaterial> func_177700_c() {
+  public Collection<WrappedMaterial> getAllowedValues() {
     return this.values;
   }
   
-  public Optional<WrappedMaterial> func_185929_b(String value) {
+  public Optional<WrappedMaterial> parseValue(String value) {
     for (WrappedMaterial material : WrappedMaterial.MATERIAL_TO_WRAP.values()) {
       if (material.getName().equals(value))
         return Optional.of(material); 
@@ -97,7 +97,7 @@ public class MaterialProperty extends PropertyHelper<MaterialProperty.WrappedMat
     return Optional.absent();
   }
   
-  public String func_177702_a(WrappedMaterial value) {
+  public String getName(WrappedMaterial value) {
     return value.getName();
   }
   

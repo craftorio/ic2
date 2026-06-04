@@ -55,22 +55,22 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ItemToolPainter extends ItemIC2 implements IMultiItem<Ic2Color>, IBoxable {
   public ItemToolPainter() {
     super(ItemName.painter);
-    func_77656_e(31);
-    func_77625_d(1);
-    func_77627_a(true);
+    setMaxDamage(31);
+    setMaxStackSize(1);
+    setHasSubtypes(true);
     MinecraftForge.EVENT_BUS.register(this);
   }
   
   @SideOnly(Side.CLIENT)
   public void registerModels(final ItemName name) {
     ModelLoader.setCustomMeshDefinition((Item)this, new ItemMeshDefinition() {
-          public ModelResourceLocation func_178113_a(ItemStack stack) {
+          public ModelResourceLocation getModelLocation(ItemStack stack) {
             Ic2Color color = ItemToolPainter.this.getColor(stack);
             return ItemIC2.getModelLocation(name, (color != null) ? color.getName() : null);
           }
         });
     ModelBakery.registerItemVariants((Item)this, new ResourceLocation[] { (ResourceLocation)getModelLocation(name, null) });
-    for (Ic2Color type : typeProperty.func_177700_c()) {
+    for (Ic2Color type : typeProperty.getAllowedValues()) {
       ModelBakery.registerItemVariants((Item)this, new ResourceLocation[] { (ResourceLocation)getModelLocation(name, type.getName()) });
     } 
   }
@@ -127,27 +127,27 @@ public class ItemToolPainter extends ItemIC2 implements IMultiItem<Ic2Color>, IB
   }
   
   private boolean colorBlock(World world, BlockPos pos, Block block, IBlockState state, EnumDyeColor newColor) {
-    for (UnmodifiableIterator<IProperty> unmodifiableIterator = state.func_177228_b().keySet().iterator(); unmodifiableIterator.hasNext(); ) {
+    for (UnmodifiableIterator<IProperty> unmodifiableIterator = state.getProperties().keySet().iterator(); unmodifiableIterator.hasNext(); ) {
       IProperty<?> property = unmodifiableIterator.next();
-      if (property.func_177699_b() == EnumDyeColor.class) {
+      if (property.getValueClass() == EnumDyeColor.class) {
         IProperty<EnumDyeColor> typedProperty = (IProperty)property;
-        EnumDyeColor oldColor = (EnumDyeColor)state.func_177229_b(typedProperty);
-        if (oldColor == newColor || !typedProperty.func_177700_c().contains(newColor))
+        EnumDyeColor oldColor = (EnumDyeColor)state.getValue(typedProperty);
+        if (oldColor == newColor || !typedProperty.getAllowedValues().contains(newColor))
           return false; 
-        world.func_175656_a(pos, state.func_177226_a(typedProperty, (Comparable)newColor));
+        world.setBlockState(pos, state.withProperty(typedProperty, (Comparable)newColor));
         return true;
       } 
     } 
-    if (block == Blocks.field_150405_ch) {
-      world.func_175656_a(pos, Blocks.field_150406_ce.getDefaultState().func_177226_a((IProperty)BlockColored.field_176581_a, (Comparable)newColor));
+    if (block == Blocks.HARDENED_CLAY) {
+      world.setBlockState(pos, Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty((IProperty)BlockColored.COLOR, (Comparable)newColor));
       return true;
     } 
-    if (block == Blocks.field_150359_w) {
-      world.func_175656_a(pos, Blocks.field_150399_cn.getDefaultState().func_177226_a((IProperty)BlockStainedGlass.field_176547_a, (Comparable)newColor));
+    if (block == Blocks.GLASS) {
+      world.setBlockState(pos, Blocks.STAINED_GLASS.getDefaultState().withProperty((IProperty)BlockStainedGlass.COLOR, (Comparable)newColor));
       return true;
     } 
-    if (block == Blocks.field_150410_aZ) {
-      world.func_175656_a(pos, Blocks.field_150397_co.getDefaultState().func_177226_a((IProperty)BlockStainedGlassPane.field_176245_a, (Comparable)newColor));
+    if (block == Blocks.GLASS_PANE) {
+      world.setBlockState(pos, Blocks.STAINED_GLASS_PANE.getDefaultState().withProperty((IProperty)BlockStainedGlassPane.COLOR, (Comparable)newColor));
       return true;
     } 
     return false;
@@ -159,7 +159,7 @@ public class ItemToolPainter extends ItemIC2 implements IMultiItem<Ic2Color>, IB
     if ((player.getEntityWorld()).isRemote)
       return; 
     Entity entity = event.getEntity();
-    ItemStack stack = player.func_184607_cu();
+    ItemStack stack = player.getActiveItemStack();
     if (StackUtil.isEmpty(stack) || stack.getItem() != this)
       return; 
     Ic2Color color = getColor(stack);
@@ -167,20 +167,20 @@ public class ItemToolPainter extends ItemIC2 implements IMultiItem<Ic2Color>, IB
       return; 
     if (entity instanceof EntitySheep) {
       EntitySheep sheep = (EntitySheep)entity;
-      if (sheep.func_175509_cj() != color.mcColor) {
-        ((EntitySheep)entity).func_175512_b(color.mcColor);
+      if (sheep.getFleeceColor() != color.mcColor) {
+        ((EntitySheep)entity).setFleeceColor(color.mcColor);
         damagePainter(player, event.getHand(), color);
         event.setCanceled(true);
       } 
     } 
   }
   
-  public ActionResult<ItemStack> func_77659_a(World world, EntityPlayer player, EnumHand hand) {
+  public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
     ItemStack stack = StackUtil.get(player, hand);
     if (!world.isRemote && IC2.keyboard.isModeSwitchKeyDown(player)) {
       NBTTagCompound nbtData = StackUtil.getOrCreateNbtData(stack);
-      boolean newValue = !nbtData.func_74767_n("autoRefill");
-      nbtData.func_74757_a("autoRefill", newValue);
+      boolean newValue = !nbtData.getBoolean("autoRefill");
+      nbtData.setBoolean("autoRefill", newValue);
       if (newValue) {
         IC2.platform.messagePlayer(player, "Painter automatic refill mode enabled", new Object[0]);
       } else {
@@ -191,18 +191,18 @@ public class ItemToolPainter extends ItemIC2 implements IMultiItem<Ic2Color>, IB
     return new ActionResult(EnumActionResult.PASS, stack);
   }
   
-  public String func_77667_c(ItemStack stack) {
+  public String getUnlocalizedName(ItemStack stack) {
     Ic2Color color = getColor(stack);
     if (color == null)
-      return func_77658_a(); 
-    return func_77658_a() + "." + color.getName();
+      return getUnlocalizedName(); 
+    return getUnlocalizedName() + "." + color.getName();
   }
   
-  public final void func_150895_a(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-    if (!func_194125_a(tab))
+  public final void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
+    if (!isInCreativeTab(tab))
       return; 
     subItems.add(getItemStackUnchecked((Ic2Color)null));
-    for (Ic2Color type : typeProperty.func_177700_c())
+    for (Ic2Color type : typeProperty.getAllowedValues())
       subItems.add(getItemStackUnchecked(type)); 
   }
   
@@ -211,12 +211,12 @@ public class ItemToolPainter extends ItemIC2 implements IMultiItem<Ic2Color>, IB
   }
   
   @SideOnly(Side.CLIENT)
-  public void func_77624_a(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
+  public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
     Ic2Color color = getColor(stack);
     if (color == null)
       return; 
-    ItemStack dyeStack = new ItemStack(Items.field_151100_aR, 1, color.mcColor.func_176767_b());
-    tooltip.add(Localization.translate(Items.field_151100_aR.func_77667_c(dyeStack) + ".name"));
+    ItemStack dyeStack = new ItemStack(Items.DYE, 1, color.mcColor.getDyeDamage());
+    tooltip.add(Localization.translate(Items.DYE.getUnlocalizedName(dyeStack) + ".name"));
   }
   
   public void damagePainter(EntityPlayer player, EnumHand hand, Ic2Color color) {
@@ -224,19 +224,19 @@ public class ItemToolPainter extends ItemIC2 implements IMultiItem<Ic2Color>, IB
     ItemStack stack = StackUtil.get(player, hand);
     if (stack.getItemDamage() >= stack.getMaxDamage()) {
       NBTTagCompound nbtData = StackUtil.getOrCreateNbtData(stack);
-      if (nbtData.func_74767_n("autoRefill") && 
+      if (nbtData.getBoolean("autoRefill") && 
         StackUtil.consumeFromPlayerInventory(player, StackUtil.oreDict(color.oreDictDyeName), 1, false)) {
         setDamage(stack, 0);
       } else {
         super.setDamage(stack, 0);
       } 
     } else {
-      stack.func_77972_a(1, (EntityLivingBase)player);
+      stack.damageItem(1, (EntityLivingBase)player);
     } 
   }
   
   public ItemStack getItemStack(Ic2Color type) {
-    if (type != null && !typeProperty.func_177700_c().contains(type))
+    if (type != null && !typeProperty.getAllowedValues().contains(type))
       throw new IllegalArgumentException("invalid property value " + type + " for property " + typeProperty); 
     return getItemStackUnchecked(type);
   }

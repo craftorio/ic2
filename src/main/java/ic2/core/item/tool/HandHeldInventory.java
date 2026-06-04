@@ -48,11 +48,11 @@ public abstract class HandHeldInventory implements IHasGui {
     } 
   }
   
-  public int func_70302_i_() {
+  public int getSizeInventory() {
     return this.inventory.length;
   }
   
-  public boolean func_191420_l() {
+  public boolean isEmpty() {
     for (ItemStack stack : this.inventory) {
       if (!StackUtil.isEmpty(stack))
         return false; 
@@ -60,11 +60,11 @@ public abstract class HandHeldInventory implements IHasGui {
     return true;
   }
   
-  public ItemStack func_70301_a(int slot) {
+  public ItemStack getStackInSlot(int slot) {
     return StackUtil.wrapEmpty(this.inventory[slot]);
   }
   
-  public ItemStack func_70298_a(int index, int amount) {
+  public ItemStack decrStackSize(int index, int amount) {
     ItemStack stack;
     if (index >= 0 && index < this.inventory.length && !StackUtil.isEmpty(stack = this.inventory[index])) {
       ItemStack ret;
@@ -81,9 +81,9 @@ public abstract class HandHeldInventory implements IHasGui {
     return StackUtil.emptyStack;
   }
   
-  public void func_70299_a(int slot, ItemStack stack) {
-    if (!StackUtil.isEmpty(stack) && StackUtil.getSize(stack) > func_70297_j_())
-      stack = StackUtil.copyWithSize(stack, func_70297_j_()); 
+  public void setInventorySlotContents(int slot, ItemStack stack) {
+    if (!StackUtil.isEmpty(stack) && StackUtil.getSize(stack) > getInventoryStackLimit())
+      stack = StackUtil.copyWithSize(stack, getInventoryStackLimit()); 
     if (StackUtil.isEmpty(stack)) {
       this.inventory[slot] = StackUtil.emptyStack;
     } else {
@@ -92,11 +92,11 @@ public abstract class HandHeldInventory implements IHasGui {
     save();
   }
   
-  public int func_70297_j_() {
+  public int getInventoryStackLimit() {
     return 64;
   }
   
-  public boolean func_94041_b(int slot, ItemStack stack1) {
+  public boolean isItemValidForSlot(int slot, ItemStack stack1) {
     return false;
   }
   
@@ -104,33 +104,33 @@ public abstract class HandHeldInventory implements IHasGui {
     save();
   }
   
-  public boolean func_70300_a(EntityPlayer player) {
+  public boolean isUsableByPlayer(EntityPlayer player) {
     return (player == this.player && getPlayerInventoryIndex() >= -1);
   }
   
-  public void func_174889_b(EntityPlayer player) {}
+  public void openInventory(EntityPlayer player) {}
   
-  public void func_174886_c(EntityPlayer player) {}
+  public void closeInventory(EntityPlayer player) {}
   
-  public ItemStack func_70304_b(int index) {
-    ItemStack ret = func_70301_a(index);
+  public ItemStack removeStackFromSlot(int index) {
+    ItemStack ret = getStackInSlot(index);
     if (!StackUtil.isEmpty(ret))
-      func_70299_a(index, null); 
+      setInventorySlotContents(index, null); 
     return ret;
   }
   
-  public int func_174887_a_(int id) {
+  public int getField(int id) {
     return 0;
   }
   
-  public void func_174885_b(int id, int value) {}
+  public void setField(int id, int value) {}
   
-  public int func_174890_g() {
+  public int getFieldCount() {
     return 0;
   }
   
-  public ITextComponent func_145748_c_() {
-    return (ITextComponent)new TextComponentString(func_70005_c_());
+  public ITextComponent getDisplayName() {
+    return (ITextComponent)new TextComponentString(getName());
   }
   
   public void onGuiClosed(EntityPlayer player) {
@@ -139,14 +139,14 @@ public abstract class HandHeldInventory implements IHasGui {
       if (PLAYERS_IN_GUI.contains(player)) {
         PLAYERS_IN_GUI.remove(player);
       } else {
-        StackUtil.getOrCreateNbtData(this.containerStack).func_82580_o("uid");
+        StackUtil.getOrCreateNbtData(this.containerStack).removeTag("uid");
       }  
   }
   
   public boolean isThisContainer(ItemStack stack) {
     if (StackUtil.isEmpty(stack) || stack.getItem() != this.containerStack.getItem())
       return false; 
-    NBTTagCompound nbt = stack.func_77978_p();
+    NBTTagCompound nbt = stack.getTagCompound();
     return (nbt != null && nbt.getInteger("uid") == getUid());
   }
   
@@ -156,8 +156,8 @@ public abstract class HandHeldInventory implements IHasGui {
   }
   
   protected int getPlayerInventoryIndex() {
-    for (int i = -1; i < this.player.inventory.func_70302_i_(); i++) {
-      ItemStack stack = (i == -1) ? this.player.inventory.func_70445_o() : this.player.inventory.func_70301_a(i);
+    for (int i = -1; i < this.player.inventory.getSizeInventory(); i++) {
+      ItemStack stack = (i == -1) ? this.player.inventory.getItemStack() : this.player.inventory.getStackInSlot(i);
       if (isThisContainer(stack))
         return i; 
     } 
@@ -190,36 +190,36 @@ public abstract class HandHeldInventory implements IHasGui {
       this.containerStack = StackUtil.copyWithSize(this.containerStack, 1);
     } catch (IllegalArgumentException e) {
       CrashReport crash = new CrashReport("Hand held container stack vanished", e);
-      CrashReportCategory category = crash.func_85058_a("Container stack");
-      category.func_71507_a("Stack", StackUtil.toStringSafe(this.containerStack));
-      category.func_71507_a("NBT", this.containerStack.func_77978_p());
-      category.func_71507_a("Position", Integer.valueOf(getPlayerInventoryIndex()));
-      category.func_71507_a("Had thrown", Boolean.valueOf(dropItself));
-      category = crash.func_85058_a("Container info");
-      category.func_71507_a("Type", getClass().getName());
-      category.func_71507_a("Container", (this.player.field_71070_bA == null) ? null : this.player.field_71070_bA.getClass().getName());
-      if (this.player.field_70170_p.isRemote)
-        category.func_189529_a("GUI", new ICrashReportDetail<String>() {
+      CrashReportCategory category = crash.makeCategory("Container stack");
+      category.addCrashSection("Stack", StackUtil.toStringSafe(this.containerStack));
+      category.addCrashSection("NBT", this.containerStack.getTagCompound());
+      category.addCrashSection("Position", Integer.valueOf(getPlayerInventoryIndex()));
+      category.addCrashSection("Had thrown", Boolean.valueOf(dropItself));
+      category = crash.makeCategory("Container info");
+      category.addCrashSection("Type", getClass().getName());
+      category.addCrashSection("Container", (this.player.openContainer == null) ? null : this.player.openContainer.getClass().getName());
+      if (this.player.world.isRemote)
+        category.addDetail("GUI", new ICrashReportDetail<String>() {
               public String call() throws Exception {
-                GuiScreen gui = (Minecraft.getMinecraft()).field_71462_r;
+                GuiScreen gui = (Minecraft.getMinecraft()).currentScreen;
                 return (gui == null) ? null : gui.getClass().getName();
               }
             }); 
-      category.func_71507_a("Opened by", this.player);
+      category.addCrashSection("Opened by", this.player);
       throw new ReportedException(crash);
     } 
     if (dropItself) {
-      StackUtil.dropAsEntity(this.player.getEntityWorld(), this.player.func_180425_c(), this.containerStack);
-      func_174888_l();
+      StackUtil.dropAsEntity(this.player.getEntityWorld(), this.player.getPosition(), this.containerStack);
+      clear();
     } else {
       int idx = getPlayerInventoryIndex();
       if (idx < -1) {
-        IC2.log.warn(LogCategory.Item, "Handheld inventory saving failed for player " + this.player.func_145748_c_().func_150260_c() + '.');
-        func_174888_l();
+        IC2.log.warn(LogCategory.Item, "Handheld inventory saving failed for player " + this.player.getDisplayName().getUnformattedText() + '.');
+        clear();
       } else if (idx == -1) {
-        this.player.inventory.func_70437_b(this.containerStack);
+        this.player.inventory.setItemStack(this.containerStack);
       } else {
-        this.player.inventory.func_70299_a(idx, this.containerStack);
+        this.player.inventory.setInventorySlotContents(idx, this.containerStack);
       } 
     } 
   }
@@ -237,10 +237,10 @@ public abstract class HandHeldInventory implements IHasGui {
     } 
     StackUtil.getOrCreateNbtData(stack).setTag("Items", (NBTBase)contentList);
     assert StackUtil.getOrCreateNbtData(stack).getInteger("uid") == 0;
-    func_174888_l();
+    clear();
   }
   
-  public void func_174888_l() {
+  public void clear() {
     for (int i = 0; i < this.inventory.length; i++)
       this.inventory[i] = null; 
     this.cleared = true;

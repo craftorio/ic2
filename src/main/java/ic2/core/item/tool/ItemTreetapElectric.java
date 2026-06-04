@@ -23,7 +23,7 @@ public class ItemTreetapElectric extends ItemElectricTool {
     this.tier = 1;
   }
   
-  public EnumActionResult func_180614_a(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+  public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
     IBlockState state = world.getBlockState(pos);
     Block block = state.getBlock();
     ItemStack stack = StackUtil.get(player, hand);
@@ -34,6 +34,6 @@ public class ItemTreetapElectric extends ItemElectricTool {
       ElectricItem.manager.use(stack, this.operationEnergyCost, (EntityLivingBase)player);
       return EnumActionResult.SUCCESS;
     } 
-    return super.func_180614_a(player, world, pos, hand, side, hitX, hitY, hitZ);
+    return super.onItemUse(player, world, pos, hand, side, hitX, hitY, hitZ);
   }
 }

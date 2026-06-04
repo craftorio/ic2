@@ -24,7 +24,7 @@ public class IngredientRecipeInput extends Ingredient {
     this.part = part;
   }
   
-  public ItemStack[] func_193365_a() {
+  public ItemStack[] getMatchingStacks() {
     if (this.items == null)
       this.items = (ItemStack[])this.part.getInputs().toArray((Object[])new ItemStack[0]); 
     return this.items;
@@ -35,12 +35,12 @@ public class IngredientRecipeInput extends Ingredient {
   }
   
   @SideOnly(Side.CLIENT)
-  public IntList func_194139_b() {
+  public IntList getValidItemStacksPacked() {
     if (this.list == null) {
-      ItemStack[] items = func_193365_a();
+      ItemStack[] items = getMatchingStacks();
       this.list = (IntList)new IntArrayList(items.length);
       for (ItemStack itemstack : items)
-        this.list.add(RecipeItemHelper.func_194113_b(itemstack)); 
+        this.list.add(RecipeItemHelper.pack(itemstack)); 
       this.list.sort((Comparator)IntComparators.NATURAL_COMPARATOR);
     } 
     return this.list;

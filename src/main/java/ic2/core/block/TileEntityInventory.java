@@ -54,14 +54,14 @@ public abstract class TileEntityInventory extends TileEntityBlock implements ISi
     return nbt;
   }
   
-  public int func_70302_i_() {
+  public int getSizeInventory() {
     int ret = 0;
     for (InvSlot invSlot : this.invSlots)
       ret += invSlot.size(); 
     return ret;
   }
   
-  public boolean func_191420_l() {
+  public boolean isEmpty() {
     for (InvSlot invSlot : this.invSlots) {
       if (!invSlot.isEmpty())
         return false; 
@@ -69,14 +69,14 @@ public abstract class TileEntityInventory extends TileEntityBlock implements ISi
     return true;
   }
   
-  public ItemStack func_70301_a(int index) {
+  public ItemStack getStackInSlot(int index) {
     int loc = locateInvSlot(index);
     if (loc == -1)
       return StackUtil.emptyStack; 
     return getStackAt(loc);
   }
   
-  public ItemStack func_70298_a(int index, int amount) {
+  public ItemStack decrStackSize(int index, int amount) {
     int loc = locateInvSlot(index);
     if (loc == -1)
       return StackUtil.emptyStack; 
@@ -99,7 +99,7 @@ public abstract class TileEntityInventory extends TileEntityBlock implements ISi
     return ret;
   }
   
-  public ItemStack func_70304_b(int index) {
+  public ItemStack removeStackFromSlot(int index) {
     int loc = locateInvSlot(index);
     if (loc == -1)
       return StackUtil.emptyStack; 
@@ -109,7 +109,7 @@ public abstract class TileEntityInventory extends TileEntityBlock implements ISi
     return ret;
   }
   
-  public void func_70299_a(int index, ItemStack stack) {
+  public void setInventorySlotContents(int index, ItemStack stack) {
     int loc = locateInvSlot(index);
     if (loc == -1) {
       assert false;
@@ -126,50 +126,50 @@ public abstract class TileEntityInventory extends TileEntityBlock implements ISi
       invSlot.onChanged(); 
   }
   
-  public String func_70005_c_() {
+  public String getName() {
     ITeBlock teBlock = TeBlockRegistry.get((Class)getClass());
     String name = (teBlock == null) ? "invalid" : teBlock.getName();
-    return getBlockType().func_149739_a() + "." + name;
+    return getBlockType().getUnlocalizedName() + "." + name;
   }
   
-  public boolean func_145818_k_() {
+  public boolean hasCustomName() {
     return false;
   }
   
-  public ITextComponent func_145748_c_() {
-    return (ITextComponent)new TextComponentString(func_70005_c_());
+  public ITextComponent getDisplayName() {
+    return (ITextComponent)new TextComponentString(getName());
   }
   
-  public int func_70297_j_() {
+  public int getInventoryStackLimit() {
     int max = 0;
     for (InvSlot slot : this.invSlots)
       max = Math.max(max, slot.getStackSizeLimit()); 
     return max;
   }
   
-  public boolean func_70300_a(EntityPlayer player) {
-    return (!isInvalid() && player.func_174818_b(this.pos) <= 64.0D);
+  public boolean isUsableByPlayer(EntityPlayer player) {
+    return (!isInvalid() && player.getDistanceSq(this.pos) <= 64.0D);
   }
   
-  public void func_174889_b(EntityPlayer player) {}
+  public void openInventory(EntityPlayer player) {}
   
-  public void func_174886_c(EntityPlayer player) {}
+  public void closeInventory(EntityPlayer player) {}
   
-  public boolean func_94041_b(int index, ItemStack stack) {
-    if (stack.func_190926_b())
+  public boolean isItemValidForSlot(int index, ItemStack stack) {
+    if (stack.isEmpty())
       return false; 
     InvSlot invSlot = getInventorySlot(index);
     return (invSlot != null && invSlot.canInput() && invSlot.accepts(stack));
   }
   
-  public int[] func_180463_a(EnumFacing side) {
-    int[] ret = new int[func_70302_i_()];
+  public int[] getSlotsForFace(EnumFacing side) {
+    int[] ret = new int[getSizeInventory()];
     for (int i = 0; i < ret.length; i++)
       ret[i] = i; 
     return ret;
   }
   
-  public boolean func_180462_a(int index, ItemStack stack, EnumFacing side) {
+  public boolean canInsertItem(int index, ItemStack stack, EnumFacing side) {
     if (StackUtil.isEmpty(stack))
       return false; 
     InvSlot targetSlot = getInventorySlot(index);
@@ -186,7 +186,7 @@ public abstract class TileEntityInventory extends TileEntityBlock implements ISi
     return true;
   }
   
-  public boolean func_180461_b(int index, ItemStack stack, EnumFacing side) {
+  public boolean canExtractItem(int index, ItemStack stack, EnumFacing side) {
     InvSlot targetSlot = getInventorySlot(index);
     if (targetSlot == null || !targetSlot.canOutput())
       return false; 
@@ -200,17 +200,17 @@ public abstract class TileEntityInventory extends TileEntityBlock implements ISi
     return true;
   }
   
-  public int func_174887_a_(int id) {
+  public int getField(int id) {
     return 0;
   }
   
-  public void func_174885_b(int id, int value) {}
+  public void setField(int id, int value) {}
   
-  public int func_174890_g() {
+  public int getFieldCount() {
     return 0;
   }
   
-  public void func_174888_l() {
+  public void clear() {
     for (InvSlot invSlot : this.invSlots)
       invSlot.clear(); 
   }
@@ -333,7 +333,7 @@ public abstract class TileEntityInventory extends TileEntityBlock implements ISi
       for (int i = 0; i < size; i++) {
         ItemStack stack = slot.get(i);
         if (!StackUtil.isEmpty(stack))
-          used += Math.min(limit, stack.func_190916_E() * limit / stack.getMaxStackSize()); 
+          used += Math.min(limit, stack.getCount() * limit / stack.getMaxStackSize()); 
       } 
     } 
     if (used == 0 || space == 0)

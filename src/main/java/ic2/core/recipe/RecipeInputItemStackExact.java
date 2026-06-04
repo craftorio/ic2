@@ -15,7 +15,7 @@ public class RecipeInputItemStackExact extends RecipeInputBase {
   }
   
   RecipeInputItemStackExact(ItemStack input, int amount) {
-    if (StackUtil.isEmpty(input) || input.func_77960_j() == 32767)
+    if (StackUtil.isEmpty(input) || input.getMetadata() == 32767)
       throw new IllegalArgumentException("invalid input stack"); 
     this.input = StackUtil.copy(input);
     this.amount = amount;
@@ -23,7 +23,7 @@ public class RecipeInputItemStackExact extends RecipeInputBase {
   
   public boolean matches(ItemStack subject) {
     return (subject.getItem() == this.input.getItem() && subject
-      .func_77960_j() == this.input.func_77960_j() && 
+      .getMetadata() == this.input.getMetadata() && 
       StackUtil.checkNbtEqualityStrict(subject, this.input));
   }
   

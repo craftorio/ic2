@@ -34,11 +34,11 @@ public class PointExplosion extends Explosion {
     this.explosionSize = power;
   }
   
-  public void func_77278_a() {
-    double explosionX = (getPosition()).field_72450_a;
-    double explosionY = (getPosition()).field_72448_b;
-    double explosionZ = (getPosition()).field_72449_c;
-    ExplosionEvent event = new ExplosionEvent(this.world, this.entity, getPosition(), this.explosionSize, func_94613_c(), 0, 1.0D);
+  public void doExplosionA() {
+    double explosionX = (getPosition()).x;
+    double explosionY = (getPosition()).y;
+    double explosionZ = (getPosition()).z;
+    ExplosionEvent event = new ExplosionEvent(this.world, this.entity, getPosition(), this.explosionSize, getExplosivePlacedBy(), 0, 1.0D);
     if (MinecraftForge.EVENT_BUS.post((Event)event))
       return; 
     for (int x = Util.roundToNegInf(explosionX) - 1; x <= Util.roundToNegInf(explosionX) + 1; x++) {
@@ -46,14 +46,14 @@ public class PointExplosion extends Explosion {
         for (int z = Util.roundToNegInf(explosionZ) - 1; z <= Util.roundToNegInf(explosionZ) + 1; z++) {
           BlockPos pos = new BlockPos(x, y, z);
           IBlockState block = this.world.getBlockState(pos);
-          if (block.getBlock().getExplosionResistance(this.world, pos, (Entity)func_94613_c(), this) < this.explosionSize * 10.0F)
-            func_180343_e().add(pos); 
+          if (block.getBlock().getExplosionResistance(this.world, pos, (Entity)getExplosivePlacedBy(), this) < this.explosionSize * 10.0F)
+            getAffectedBlockPositions().add(pos); 
         } 
       } 
     } 
-    List<Entity> entitiesInRange = this.world.func_72839_b((Entity)func_94613_c(), new AxisAlignedBB(explosionX - 2.0D, explosionY - 2.0D, explosionZ - 2.0D, explosionX + 2.0D, explosionY + 2.0D, explosionZ + 2.0D));
+    List<Entity> entitiesInRange = this.world.getEntitiesWithinAABBExcludingEntity((Entity)getExplosivePlacedBy(), new AxisAlignedBB(explosionX - 2.0D, explosionY - 2.0D, explosionZ - 2.0D, explosionX + 2.0D, explosionY + 2.0D, explosionZ + 2.0D));
     for (Entity entity : entitiesInRange)
-      entity.func_70097_a(DamageSource.func_94539_a(this), this.entityDamage); 
+      entity.attackEntityFrom(DamageSource.causeExplosionDamage(this), this.entityDamage); 
     this.explosionSize = 1.0F / this.dropRate;
   }
 }

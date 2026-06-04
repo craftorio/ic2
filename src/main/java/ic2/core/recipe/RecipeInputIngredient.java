@@ -18,7 +18,7 @@ public class RecipeInputIngredient implements IRecipeInput {
   }
   
   public List<ItemStack> getInputs() {
-    return Arrays.asList(this.ingredient.func_193365_a());
+    return Arrays.asList(this.ingredient.getMatchingStacks());
   }
   
   public int getAmount() {

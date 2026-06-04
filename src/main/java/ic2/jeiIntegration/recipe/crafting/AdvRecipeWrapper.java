@@ -62,6 +62,6 @@ public class AdvRecipeWrapper extends BlankRecipeWrapper implements IShapedCraft
   
   public void getIngredients(IIngredients ingredients) {
     ingredients.setInputLists(ItemStack.class, getInputs());
-    ingredients.setOutput(ItemStack.class, this.recipe.func_77571_b());
+    ingredients.setOutput(ItemStack.class, this.recipe.getRecipeOutput());
   }
 }

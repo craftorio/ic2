@@ -13,9 +13,9 @@ public class BehaviorDynamiteDispense extends BehaviorProjectileDispense {
     this.sticky = sticky;
   }
   
-  protected IProjectile func_82499_a(World world, IPosition pos, ItemStack stack) {
+  protected IProjectile getProjectileEntity(World world, IPosition pos, ItemStack stack) {
     if (this.sticky)
-      return new EntityStickyDynamite(world, pos.func_82615_a(), pos.func_82617_b(), pos.func_82616_c()); 
-    return new EntityDynamite(world, pos.func_82615_a(), pos.func_82617_b(), pos.func_82616_c());
+      return new EntityStickyDynamite(world, pos.getX(), pos.getY(), pos.getZ()); 
+    return new EntityDynamite(world, pos.getX(), pos.getY(), pos.getZ());
   }
 }

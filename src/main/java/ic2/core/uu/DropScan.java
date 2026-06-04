@@ -91,7 +91,7 @@ public class DropScan {
       id = parentWorld.rand.nextInt();
     } while (DimensionManager.getWorld(id) != null);
     this.dimensionId = id;
-    DimensionManager.registerDimension(this.dimensionId, parentWorld.provider.func_186058_p());
+    DimensionManager.registerDimension(this.dimensionId, parentWorld.provider.getDimensionType());
     this.world = new DummyWorld();
     this.player = Ic2Player.get((World)this.world);
     updateCollectionsToClear();
@@ -100,9 +100,9 @@ public class DropScan {
   private void updateCollectionsToClear() {
     this.collectionsToClear.add(ReflectionUtil.getFieldValue(WorldServer_pendingTickListEntriesHashSet, this.world));
     this.collectionsToClear.add(ReflectionUtil.getFieldValue(WorldServer_pendingTickListEntriesTreeSet, this.world));
-    this.collectionsToClear.add(this.world.field_72996_f);
-    this.collectionsToClear.add(this.world.field_147482_g);
-    this.collectionsToClear.add(this.world.field_175730_i);
+    this.collectionsToClear.add(this.world.loadedEntityList);
+    this.collectionsToClear.add(this.world.loadedTileEntityList);
+    this.collectionsToClear.add(this.world.tickableTileEntities);
   }
   
   public void start(int area, int areaCount) {
@@ -126,7 +126,7 @@ public class DropScan {
   }
   
   private void stopWatchDog() {
-    if (this.world.func_73046_m() instanceof DedicatedServer && ((DedicatedServer)this.world.func_73046_m()).func_175593_aQ() > 0L)
+    if (this.world.getMinecraftServer() instanceof DedicatedServer && ((DedicatedServer)this.world.getMinecraftServer()).getMaxTickTime() > 0L)
       try {
         Method getThreads = Thread.class.getDeclaredMethod("getThreads", new Class[0]);
         getThreads.setAccessible(true);
@@ -145,7 +145,7 @@ public class DropScan {
   }
   
   public void cleanup() {
-    DimensionManager.setWorld(this.dimensionId, null, this.parentWorld.func_73046_m());
+    DimensionManager.setWorld(this.dimensionId, null, this.parentWorld.getMinecraftServer());
     DimensionManager.unregisterDimension(this.dimensionId);
     deleteRecursive(this.tmpDir, false);
     if (this.watchDog != null)
@@ -166,14 +166,14 @@ public class DropScan {
   }
   
   private void fixWatchDog() {
-    ReflectionUtil.setValue(this.watchDog, ReflectionUtil.getField(ServerHangWatchdog.class, long.class), Long.valueOf(((DedicatedServer)this.world.func_73046_m()).func_175593_aQ()));
+    ReflectionUtil.setValue(this.watchDog, ReflectionUtil.getField(ServerHangWatchdog.class, long.class), Long.valueOf(((DedicatedServer)this.world.getMinecraftServer()).getMaxTickTime()));
     this.watchDog = null;
   }
   
   private void analyze() {
     double normalizeBy;
-    ItemComparableItemStack cobblestone = new ItemComparableItemStack(new ItemStack(Blocks.field_150347_e), false);
-    ItemComparableItemStack netherrack = new ItemComparableItemStack(new ItemStack(Blocks.field_150424_aL), false);
+    ItemComparableItemStack cobblestone = new ItemComparableItemStack(new ItemStack(Blocks.COBBLESTONE), false);
+    ItemComparableItemStack netherrack = new ItemComparableItemStack(new ItemStack(Blocks.NETHERRACK), false);
     if (!this.drops.containsKey(cobblestone)) {
       if (!this.drops.containsKey(netherrack)) {
         IC2.log.warn(LogCategory.Uu, "UU scan failed, there was no cobblestone or netherrack dropped");
@@ -199,21 +199,21 @@ public class DropScan {
     for (Map.Entry<ItemComparableItemStack, MutableLong> entry : sorted) {
       ItemStack stack = ((ItemComparableItemStack)entry.getKey()).toStack();
       long count = ((MutableLong)entry.getValue()).getValue().longValue();
-      IC2.log.info(LogCategory.Uu, "%d %s", new Object[] { Long.valueOf(count), stack.getItem().func_77653_i(stack) });
+      IC2.log.info(LogCategory.Uu, "%d %s", new Object[] { Long.valueOf(count), stack.getItem().getItemStackDisplayName(stack) });
       config.set(ConfigUtil.fromStack(stack), Double.valueOf(normalizeBy / count));
     } 
     MainConfig.save();
   }
   
   private void scanArea(int xStart, int zStart) {
-    DummyChunkProvider provider = this.world.func_72863_F();
+    DummyChunkProvider provider = this.world.getChunkProvider();
     List<Chunk> chunks = new ArrayList<>(Util.square(this.range));
     List<Chunk> toDecorate = new ArrayList<>(Util.square(this.range - 1));
     List<Chunk> toScan = new ArrayList<>(Util.square(this.range - 3));
     provider.enableGenerate();
     for (int x = xStart; x < xStart + this.range; x++) {
       for (int z = zStart; z < zStart + this.range; z++) {
-        Chunk chunk = this.world.func_72964_e(x, z);
+        Chunk chunk = this.world.getChunkFromChunkCoords(x, z);
         chunks.add(chunk);
         if (x != xStart + this.range - 1 && z != zStart + this.range - 1) {
           toDecorate.add(chunk);
@@ -226,7 +226,7 @@ public class DropScan {
     for (Chunk chunk : toDecorate)
       MinecraftForge.EVENT_BUS.post((Event)new ChunkEvent.Load(chunk)); 
     for (Chunk chunk : toDecorate)
-      chunk.func_186030_a((IChunkProvider)provider, provider.field_186029_c); 
+      chunk.populate((IChunkProvider)provider, provider.chunkGenerator); 
     provider.disableGenerate();
     for (Chunk chunk : toScan)
       scanChunk(this.world, chunk); 
@@ -236,16 +236,16 @@ public class DropScan {
   }
   
   private void scanChunk(DummyWorld world, Chunk chunk) {
-    assert world.func_72964_e(chunk.field_76635_g, chunk.field_76647_h) == chunk;
-    int xMax = (chunk.field_76635_g + 1) * 16;
-    int yMax = world.func_72800_K();
-    int zMax = (chunk.field_76647_h + 1) * 16;
+    assert world.getChunkFromChunkCoords(chunk.x, chunk.z) == chunk;
+    int xMax = (chunk.x + 1) * 16;
+    int yMax = world.getHeight();
+    int zMax = (chunk.z + 1) * 16;
     BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
     for (int y = 0; y < yMax; y++) {
-      for (int z = chunk.field_76647_h * 16; z < zMax; z++) {
-        for (int x = chunk.field_76635_g * 16; x < xMax; x++) {
+      for (int z = chunk.z * 16; z < zMax; z++) {
+        for (int x = chunk.x * 16; x < xMax; x++) {
           pos.setPos(x, y, z);
-          IBlockState state = chunk.func_177435_g((BlockPos)pos);
+          IBlockState state = chunk.getBlockState((BlockPos)pos);
           Block block = state.getBlock();
           if (!block.isAir(state, (IBlockAccess)world, (BlockPos)pos))
             for (ItemStack drop : getDrops(world, (BlockPos)pos, block, state))
@@ -258,17 +258,17 @@ public class DropScan {
   private List<ItemStack> getDrops(DummyWorld world, BlockPos pos, Block block, IBlockState state) {
     DropDesc typicalDrop = this.typicalDrops.get(state);
     if (typicalDrop == null || typicalDrop.dropCount.get() < 1000) {
-      block.func_176208_a((World)world, pos, state, this.player);
+      block.onBlockHarvested((World)world, pos, state, this.player);
       if (block.removedByPlayer(state, (World)world, pos, this.player, true)) {
-        block.func_176206_d((World)world, pos, state);
-        block.func_176226_b((World)world, pos, state, 0);
+        block.onBlockDestroyedByPlayer((World)world, pos, state);
+        block.dropBlockAsItem((World)world, pos, state, 0);
       } else {
         IC2.log.info(LogCategory.Uu, "Can't harvest %s.", new Object[] { block });
       } 
       List<ItemStack> drops = new ArrayList<>(world.spawnedEntities.size());
       for (Entity entity : world.spawnedEntities) {
         if (entity instanceof EntityItem)
-          drops.add(((EntityItem)entity).func_92059_d()); 
+          drops.add(((EntityItem)entity).getItem()); 
       } 
       world.spawnedEntities.clear();
       if (typicalDrop == null) {
@@ -313,43 +313,43 @@ public class DropScan {
     List<Entity> spawnedEntities;
     
     public DummyWorld() {
-      super(DropScan.this.parentWorld.func_73046_m(), new DropScan.DummySaveHandler(DropScan.this, null), DropScan.this.parentWorld.func_72912_H(), DropScan.this.dimensionId, DropScan.this.parentWorld.field_72984_F);
+      super(DropScan.this.parentWorld.getMinecraftServer(), new DropScan.DummySaveHandler(DropScan.this, null), DropScan.this.parentWorld.getWorldInfo(), DropScan.this.dimensionId, DropScan.this.parentWorld.profiler);
       this.spawnedEntities = new ArrayList<>();
-      this.field_184151_B = DropScan.this.parentWorld.func_184146_ak();
+      this.lootTable = DropScan.this.parentWorld.getLootTableManager();
     }
     
-    protected IChunkProvider func_72970_h() {
-      return (IChunkProvider)new DropScan.DummyChunkProvider(this, this.provider.func_186060_c());
+    protected IChunkProvider createChunkProvider() {
+      return (IChunkProvider)new DropScan.DummyChunkProvider(this, this.provider.createChunkGenerator());
     }
     
-    public DropScan.DummyChunkProvider func_72863_F() {
-      return (DropScan.DummyChunkProvider)super.func_72863_F();
+    public DropScan.DummyChunkProvider getChunkProvider() {
+      return (DropScan.DummyChunkProvider)super.getChunkProvider();
     }
     
     public File getChunkSaveLocation() {
       return DropScan.this.tmpDir;
     }
     
-    protected boolean func_175680_a(int x, int z, boolean allowEmpty) {
-      return (func_72863_F().func_186026_b(x, z) != null);
+    protected boolean isChunkLoaded(int x, int z, boolean allowEmpty) {
+      return (getChunkProvider().getLoadedChunk(x, z) != null);
     }
     
-    public Entity func_73045_a(int i) {
+    public Entity getEntityByID(int i) {
       return null;
     }
     
-    public boolean func_180501_a(BlockPos pos, IBlockState state, int flags) {
+    public boolean setBlockState(BlockPos pos, IBlockState state, int flags) {
       if (pos.getY() >= 256 || pos.getY() < 0)
         return false; 
-      Chunk chunk = func_72964_e(pos.getX() >> 4, pos.getZ() >> 4);
-      return (chunk.func_177436_a(pos, state) != null);
+      Chunk chunk = getChunkFromChunkCoords(pos.getX() >> 4, pos.getZ() >> 4);
+      return (chunk.setBlockState(pos, state) != null);
     }
     
-    public boolean func_180500_c(EnumSkyBlock lightType, BlockPos pos) {
+    public boolean checkLightFor(EnumSkyBlock lightType, BlockPos pos) {
       return true;
     }
     
-    public void func_72835_b() {}
+    public void tick() {}
     
     public boolean spawnEntity(Entity entity) {
       this.spawnedEntities.add(entity);
@@ -357,7 +357,7 @@ public class DropScan {
     }
     
     public void clear() {
-      func_72863_F().clear();
+      getChunkProvider().clear();
       for (Collection<?> c : (Iterable<Collection<?>>)DropScan.this.collectionsToClear)
         c.clear(); 
     }
@@ -368,80 +368,80 @@ public class DropScan {
       super(world, x, z);
     }
     
-    public boolean func_76600_a(int x, int z) {
-      return (this.field_76635_g == x && this.field_76647_h == z);
+    public boolean isAtLocation(int x, int z) {
+      return (this.x == x && this.z == z);
     }
     
-    public int func_76611_b(int x, int z) {
+    public int getHeightValue(int x, int z) {
       return 0;
     }
     
-    public void func_76590_a() {}
+    public void generateHeightMap() {}
     
-    public void func_76603_b() {}
+    public void generateSkylightMap() {}
     
-    public IBlockState func_177435_g(BlockPos pos) {
+    public IBlockState getBlockState(BlockPos pos) {
       return Blocks.AIR.getDefaultState();
     }
     
-    public int func_177437_b(BlockPos pos) {
+    public int getBlockLightOpacity(BlockPos pos) {
       return 255;
     }
     
-    public int func_177413_a(EnumSkyBlock sky, BlockPos pos) {
-      return sky.field_77198_c;
+    public int getLightFor(EnumSkyBlock sky, BlockPos pos) {
+      return sky.defaultLightValue;
     }
     
-    public void func_177431_a(EnumSkyBlock sky, BlockPos pos, int value) {}
+    public void setLightFor(EnumSkyBlock sky, BlockPos pos, int value) {}
     
-    public int func_177443_a(BlockPos pos, int amount) {
+    public int getLightSubtracted(BlockPos pos, int amount) {
       return 0;
     }
     
-    public void func_76612_a(Entity entity) {}
+    public void addEntity(Entity entity) {}
     
-    public void func_76622_b(Entity entity) {}
+    public void removeEntity(Entity entity) {}
     
-    public void func_76608_a(Entity entity, int index) {}
+    public void removeEntityAtIndex(Entity entity, int index) {}
     
-    public boolean func_177444_d(BlockPos pos) {
+    public boolean canSeeSky(BlockPos pos) {
       return false;
     }
     
     @Nullable
-    public TileEntity func_177424_a(BlockPos pos, Chunk.EnumCreateEntityType createType) {
+    public TileEntity getTileEntity(BlockPos pos, Chunk.EnumCreateEntityType createType) {
       return null;
     }
     
-    public void func_150813_a(TileEntity tileEntity) {}
+    public void addTileEntity(TileEntity tileEntity) {}
     
-    public void func_177426_a(BlockPos pos, TileEntity tileEntity) {}
+    public void addTileEntity(BlockPos pos, TileEntity tileEntity) {}
     
-    public void func_177425_e(BlockPos pos) {}
+    public void removeTileEntity(BlockPos pos) {}
     
-    public void func_76631_c() {}
+    public void onLoad() {}
     
-    public void func_76623_d() {}
+    public void onUnload() {}
     
-    public void func_76630_e() {}
+    public void markDirty() {}
     
-    public void func_177414_a(@Nullable Entity entity, AxisAlignedBB aabb, List<Entity> listToFill, Predicate<? super Entity> valid) {}
+    public void getEntitiesWithinAABBForEntity(@Nullable Entity entity, AxisAlignedBB aabb, List<Entity> listToFill, Predicate<? super Entity> valid) {}
     
-    public <T extends Entity> void func_177430_a(Class<? extends T> entityClass, AxisAlignedBB aabb, List<T> listToFill, Predicate<? super T> valid) {}
+    public <T extends Entity> void getEntitiesOfTypeWithinAABB(Class<? extends T> entityClass, AxisAlignedBB aabb, List<T> listToFill, Predicate<? super T> valid) {}
     
-    public boolean func_76601_a(boolean flag) {
+    public boolean needsSaving(boolean flag) {
       return false;
     }
     
-    public Random func_76617_a(long seed) {
-      return new Random(func_177412_p().func_72905_C() + (this.field_76635_g * this.field_76635_g * 4987142) + (this.field_76635_g * 5947611) + (this.field_76647_h * this.field_76647_h) * 4392871L + (this.field_76647_h * 389711) ^ seed);
+    public Random getRandomWithSeed(long seed) {
+      return new Random(getWorld().getSeed() + (this.x * this.x * 4987142) + (this.x * 5947611) + (this.z * this.z) * 4392871L + (this.z * 389711) ^ seed);
     }
     
-    public boolean func_76621_g() {
+    public boolean isEmpty() {
       return true;
     }
     
-    public boolean func_76606_c(int startY, int endY) {
+    public boolean isEmptyBetween(int startY, int endY) {
       return true;
     }
   }
@@ -471,7 +471,7 @@ public class DropScan {
       this.xStart = xStart;
       this.zStart = zStart;
       for (Chunk chunk : newChunks) {
-        int index = getIndex(chunk.field_76635_g, chunk.field_76647_h);
+        int index = getIndex(chunk.x, chunk.z);
         if (index < 0)
           throw new IllegalArgumentException("out of range"); 
         this.chunks[index] = chunk;
@@ -491,40 +491,40 @@ public class DropScan {
       Arrays.fill((Object[])this.chunks, (Object)null);
     }
     
-    public String func_73148_d() {
+    public String makeString() {
       return "Dummy";
     }
     
-    public Chunk func_186026_b(int x, int z) {
+    public Chunk getLoadedChunk(int x, int z) {
       int index = getIndex(x, z);
       if (index >= 0)
         return this.chunks[index]; 
-      return (Chunk)this.extraChunks.get(ChunkPos.func_77272_a(x, z));
+      return (Chunk)this.extraChunks.get(ChunkPos.asLong(x, z));
     }
     
-    public Chunk func_186025_d(int x, int z) {
-      Chunk ret = func_186026_b(x, z);
+    public Chunk provideChunk(int x, int z) {
+      Chunk ret = getLoadedChunk(x, z);
       if (ret == null) {
         if (this.disableGenerate)
           return this.emptyChunk; 
-        ret = this.field_186029_c.func_185932_a(x, z);
+        ret = this.chunkGenerator.generateChunk(x, z);
         int index = getIndex(x, z);
         if (index >= 0) {
           this.chunks[index] = ret;
         } else {
-          this.extraChunks.put(ChunkPos.func_77272_a(x, z), ret);
+          this.extraChunks.put(ChunkPos.asLong(x, z), ret);
         } 
       } 
       return ret;
     }
     
-    public boolean func_186027_a(boolean all) {
+    public boolean saveChunks(boolean all) {
       return true;
     }
     
-    public void func_104112_b() {}
+    public void flushToDisk() {}
     
-    public boolean func_73156_b() {
+    public boolean tick() {
       return false;
     }
     
@@ -538,35 +538,35 @@ public class DropScan {
   }
   
   private class DummySaveHandler implements ISaveHandler {
-    public WorldInfo func_75757_d() {
-      return DropScan.this.world.func_72912_H();
+    public WorldInfo loadWorldInfo() {
+      return DropScan.this.world.getWorldInfo();
     }
     
-    public void func_75762_c() throws MinecraftException {}
+    public void checkSessionLock() throws MinecraftException {}
     
-    public IChunkLoader func_75763_a(WorldProvider provider) {
+    public IChunkLoader getChunkLoader(WorldProvider provider) {
       throw new UnsupportedOperationException();
     }
     
-    public void func_75755_a(WorldInfo worldInformation, NBTTagCompound tagCompound) {}
+    public void saveWorldInfoWithPlayer(WorldInfo worldInformation, NBTTagCompound tagCompound) {}
     
-    public void func_75761_a(WorldInfo worldInformation) {}
+    public void saveWorldInfo(WorldInfo worldInformation) {}
     
-    public IPlayerFileData func_75756_e() {
+    public IPlayerFileData getPlayerNBTManager() {
       throw new UnsupportedOperationException();
     }
     
-    public void func_75759_a() {}
+    public void flush() {}
     
-    public File func_75765_b() {
+    public File getWorldDirectory() {
       throw new UnsupportedOperationException();
     }
     
-    public File func_75758_b(String mapName) {
+    public File getMapFileFromName(String mapName) {
       throw new UnsupportedOperationException();
     }
     
-    public TemplateManager func_186340_h() {
+    public TemplateManager getStructureTemplateManager() {
       return this.templateManager;
     }
     
@@ -586,9 +586,9 @@ public class DropScan {
     }
   }
   
-  private static final Field WorldServer_pendingTickListEntriesHashSet = ReflectionUtil.getField(WorldServer.class, new String[] { "field_73064_N", "pendingTickListEntriesHashSet" });
+  private static final Field WorldServer_pendingTickListEntriesHashSet = ReflectionUtil.getField(WorldServer.class, new String[] { "pendingTickListEntriesHashSet", "pendingTickListEntriesHashSet" });
   
-  private static final Field WorldServer_pendingTickListEntriesTreeSet = ReflectionUtil.getField(WorldServer.class, new String[] { "field_73065_O", "pendingTickListEntriesTreeSet" });
+  private static final Field WorldServer_pendingTickListEntriesTreeSet = ReflectionUtil.getField(WorldServer.class, new String[] { "pendingTickListEntriesTreeSet", "pendingTickListEntriesTreeSet" });
   
   private final WorldServer parentWorld;
   

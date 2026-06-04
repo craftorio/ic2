@@ -58,7 +58,7 @@ public class GatewayElectricItemManager implements IElectricItemManager {
   public boolean use(ItemStack stack, double amount, EntityLivingBase entity) {
     if (StackUtil.isEmpty(stack))
       return false; 
-    if (entity instanceof EntityPlayer && ((EntityPlayer)entity).field_71075_bZ.field_75098_d)
+    if (entity instanceof EntityPlayer && ((EntityPlayer)entity).capabilities.isCreativeMode)
       return canUse(stack, amount); 
     IElectricItemManager manager = getManager(stack);
     if (manager == null)

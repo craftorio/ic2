@@ -7,7 +7,6 @@ import ic2.api.info.ILocatable;
 import ic2.api.info.Info;
 import ic2.api.item.ElectricItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
@@ -121,11 +120,6 @@ abstract class BasicEnergyTile implements ILocatable, IEnergyTile
 	public void setEnergyStored(double amount)
 	{
 		this.energyStored = amount;
-	}
-
-	public double getFreeCapacity()
-	{
-		return getCapacity() - getEnergyStored();
 	}
 
 	public double addEnergy(double amount)

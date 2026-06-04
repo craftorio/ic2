@@ -19,8 +19,8 @@ public class EnhancedOverlay {
     public static Segment forRayTrace(RayTraceResult ray) {
       assert ray.typeOfHit == RayTraceResult.Type.BLOCK;
       BlockPos blockPos = ray.getBlockPos();
-      Vec3d hit = ray.field_72307_f;
-      return forHit(ray.field_178784_b, hit.field_72450_a - blockPos.getX(), hit.field_72448_b - blockPos.getY(), hit.field_72449_c - blockPos.getZ());
+      Vec3d hit = ray.hitVec;
+      return forHit(ray.sideHit, hit.x - blockPos.getX(), hit.y - blockPos.getY(), hit.z - blockPos.getZ());
     }
     
     public static Segment forHit(EnumFacing face, double x, double y, double z) {
@@ -141,7 +141,7 @@ public class EnhancedOverlay {
     };
     
     void draw(BufferBuilder buffer) {
-      drawRaw((x, y, z) -> buffer.func_181662_b(x, y, z).func_181675_d());
+      drawRaw((x, y, z) -> buffer.pos(x, y, z).endVertex());
     }
     
     abstract void drawRaw(EnhancedOverlay.TripleDoubleConsumer param1TripleDoubleConsumer);
@@ -222,7 +222,7 @@ public class EnhancedOverlay {
     };
     
     void draw(BufferBuilder buffer) {
-      drawRaw((x, y, z) -> buffer.func_181662_b(x, y, z).func_181675_d());
+      drawRaw((x, y, z) -> buffer.pos(x, y, z).endVertex());
     }
     
     abstract void drawRaw(EnhancedOverlay.TripleDoubleConsumer param1TripleDoubleConsumer);
@@ -310,39 +310,39 @@ public class EnhancedOverlay {
   }
   
   public static void transformToFace(Entity entity, BlockPos pos, EnumFacing face, float partialTicks) {
-    GlStateManager.func_179137_b(-(entity.field_70142_S + (entity.posX - entity.field_70142_S) * partialTicks), -(entity.field_70137_T + (entity.posY - entity.field_70137_T) * partialTicks), -(entity.field_70136_U + (entity.posZ - entity.field_70136_U) * partialTicks));
-    GlStateManager.func_179109_b(pos.getX() + 0.5F, pos.getY() + 0.5F, pos.getZ() + 0.5F);
+    GlStateManager.translate(-(entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks), -(entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks), -(entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks));
+    GlStateManager.translate(pos.getX() + 0.5F, pos.getY() + 0.5F, pos.getZ() + 0.5F);
     switch (face) {
       case UP:
-        GlStateManager.func_179114_b(180.0F, 1.0F, 0.0F, 0.0F);
+        GlStateManager.rotate(180.0F, 1.0F, 0.0F, 0.0F);
         break;
       case NORTH:
-        GlStateManager.func_179114_b(90.0F, 1.0F, 0.0F, 0.0F);
+        GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F);
         break;
       case SOUTH:
-        GlStateManager.func_179114_b(-90.0F, 1.0F, 0.0F, 0.0F);
+        GlStateManager.rotate(-90.0F, 1.0F, 0.0F, 0.0F);
         break;
       case EAST:
-        GlStateManager.func_179114_b(90.0F, 0.0F, 0.0F, 1.0F);
+        GlStateManager.rotate(90.0F, 0.0F, 0.0F, 1.0F);
         break;
       case WEST:
-        GlStateManager.func_179114_b(-90.0F, 0.0F, 0.0F, 1.0F);
+        GlStateManager.rotate(-90.0F, 0.0F, 0.0F, 1.0F);
         break;
     } 
-    GlStateManager.func_179137_b(0.0D, -0.501D, 0.0D);
+    GlStateManager.translate(0.0D, -0.501D, 0.0D);
   }
   
   public static void drawArea(EnumFacing face, Segment... segments) {
     EnhancedOverlay overlay = forFace(face);
-    BufferBuilder buffer = Tessellator.func_178181_a().func_178180_c();
+    BufferBuilder buffer = Tessellator.getInstance().getBuffer();
     for (Segment segment : segments)
       overlay.drawArea(segment, buffer); 
   }
   
   public static void drawDebug(EnumFacing face) {
     EnhancedOverlay overlay = forFace(face);
-    BufferBuilder buffer = Tessellator.func_178181_a().func_178180_c();
-    GlStateManager.func_179090_x();
+    BufferBuilder buffer = Tessellator.getInstance().getBuffer();
+    GlStateManager.disableTexture2D();
     overlay.drawArea(Segment.TOP_LEFT, buffer, 255, 0, 0);
     overlay.drawArea(Segment.TOP, buffer, 255, 127, 0);
     overlay.drawArea(Segment.TOP_RIGHT, buffer, 255, 255, 0);
@@ -352,13 +352,13 @@ public class EnhancedOverlay {
     overlay.drawArea(Segment.BOTTOM_LEFT, buffer, 0, 0, 255);
     overlay.drawArea(Segment.BOTTOM, buffer, 127, 0, 255);
     overlay.drawArea(Segment.BOTTOM_RIGHT, buffer, 255, 0, 255);
-    GlStateManager.func_179098_w();
+    GlStateManager.enableTexture2D();
   }
   
   public void drawLines(Segment segment, BufferBuilder buffer) {
-    buffer.func_181668_a(1, DefaultVertexFormats.field_181705_e);
+    buffer.begin(1, DefaultVertexFormats.POSITION);
     ((RawSegment)this.segmentMap.get(segment)).draw(buffer);
-    Tessellator.func_178181_a().func_78381_a();
+    Tessellator.getInstance().draw();
   }
   
   public void drawLines(Segment segment, BufferBuilder buffer, int red, int green, int blue) {
@@ -366,15 +366,15 @@ public class EnhancedOverlay {
   }
   
   public void drawLines(Segment segment, BufferBuilder buffer, int red, int green, int blue, int alpha) {
-    buffer.func_181668_a(1, DefaultVertexFormats.field_181706_f);
-    ((RawSegment)this.segmentMap.get(segment)).drawRaw((x, y, z) -> buffer.func_181662_b(x, y, z).func_181669_b(red, green, blue, alpha).func_181675_d());
-    Tessellator.func_178181_a().func_78381_a();
+    buffer.begin(1, DefaultVertexFormats.POSITION_COLOR);
+    ((RawSegment)this.segmentMap.get(segment)).drawRaw((x, y, z) -> buffer.pos(x, y, z).color(red, green, blue, alpha).endVertex());
+    Tessellator.getInstance().draw();
   }
   
   public void drawArea(Segment segment, BufferBuilder buffer) {
-    buffer.func_181668_a(7, DefaultVertexFormats.field_181705_e);
+    buffer.begin(7, DefaultVertexFormats.POSITION);
     ((RawSegment)this.segmentMap.get(segment)).draw(buffer);
-    Tessellator.func_178181_a().func_78381_a();
+    Tessellator.getInstance().draw();
   }
   
   public void drawArea(Segment segment, BufferBuilder buffer, int red, int green, int blue) {
@@ -382,9 +382,9 @@ public class EnhancedOverlay {
   }
   
   public void drawArea(Segment segment, BufferBuilder buffer, int red, int green, int blue, int alpha) {
-    buffer.func_181668_a(7, DefaultVertexFormats.field_181706_f);
-    ((RawSegment)this.segmentMap.get(segment)).drawRaw((x, y, z) -> buffer.func_181662_b(x, y, z).func_181669_b(red, green, blue, alpha).func_181675_d());
-    Tessellator.func_178181_a().func_78381_a();
+    buffer.begin(7, DefaultVertexFormats.POSITION_COLOR);
+    ((RawSegment)this.segmentMap.get(segment)).drawRaw((x, y, z) -> buffer.pos(x, y, z).color(red, green, blue, alpha).endVertex());
+    Tessellator.getInstance().draw();
   }
   
   public void drawSide(BufferBuilder buffer, int red, int green, int blue) {
@@ -392,12 +392,12 @@ public class EnhancedOverlay {
   }
   
   public void drawSide(BufferBuilder buffer, int red, int green, int blue, int alpha) {
-    buffer.func_181668_a(7, DefaultVertexFormats.field_181706_f);
-    buffer.func_181662_b(0.5D, 0.0D, -0.5D).func_181669_b(red, green, blue, alpha).func_181675_d();
-    buffer.func_181662_b(-0.5D, 0.0D, -0.5D).func_181669_b(red, green, blue, alpha).func_181675_d();
-    buffer.func_181662_b(-0.5D, 0.0D, 0.5D).func_181669_b(red, green, blue, alpha).func_181675_d();
-    buffer.func_181662_b(0.5D, 0.0D, 0.5D).func_181669_b(red, green, blue, alpha).func_181675_d();
-    Tessellator.func_178181_a().func_78381_a();
+    buffer.begin(7, DefaultVertexFormats.POSITION_COLOR);
+    buffer.pos(0.5D, 0.0D, -0.5D).color(red, green, blue, alpha).endVertex();
+    buffer.pos(-0.5D, 0.0D, -0.5D).color(red, green, blue, alpha).endVertex();
+    buffer.pos(-0.5D, 0.0D, 0.5D).color(red, green, blue, alpha).endVertex();
+    buffer.pos(0.5D, 0.0D, 0.5D).color(red, green, blue, alpha).endVertex();
+    Tessellator.getInstance().draw();
   }
   
   @FunctionalInterface

@@ -28,6 +28,6 @@ public final class MetalFormerCategory extends DynamicCategory<IBasicMachineReci
   
   public void draw(Minecraft minecraft) {
     super.draw(minecraft);
-    minecraft.func_175599_af().func_180450_b(icon[this.mode], 70, 35);
+    minecraft.getRenderItem().renderItemAndEffectIntoGUI(icon[this.mode], 70, 35);
   }
 }

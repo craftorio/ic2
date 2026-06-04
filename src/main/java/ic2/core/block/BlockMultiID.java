@@ -42,7 +42,7 @@ public class BlockMultiID<T extends Enum<T> & IIdProvider> extends BlockBase imp
   
   private static <T extends Enum<T> & IIdProvider> EnumProperty<T> createTypeProperty(Class<T> typeClass) {
     EnumProperty<T> ret = new EnumProperty("type", typeClass);
-    if (ret.func_177700_c().size() > 16)
+    if (ret.getAllowedValues().size() > 16)
       throw new IllegalArgumentException("Too many values to fit in 16 meta values for " + typeClass); 
     return ret;
   }
@@ -91,8 +91,8 @@ public class BlockMultiID<T extends Enum<T> & IIdProvider> extends BlockBase imp
   protected BlockMultiID(BlockName name, Material material, Class<? extends ItemBlock> itemClass) {
     super(name, material, itemClass);
     this.typeProperty = getTypeProperty();
-    func_180632_j(this.field_176227_L.func_177621_b()
-        .func_177226_a((IProperty)this.typeProperty, this.typeProperty.getDefault()));
+    setDefaultState(this.blockState.getBaseState()
+        .withProperty((IProperty)this.typeProperty, this.typeProperty.getDefault()));
   }
   
   @SideOnly(Side.CLIENT)
@@ -101,23 +101,23 @@ public class BlockMultiID<T extends Enum<T> & IIdProvider> extends BlockBase imp
   }
   
   protected final List<IBlockState> getTypeStates() {
-    List<IBlockState> ret = new ArrayList<>(this.typeProperty.func_177700_c().size());
-    for (Enum enum_ : this.typeProperty.func_177700_c())
-      ret.add(getDefaultState().func_177226_a((IProperty)this.typeProperty, enum_)); 
+    List<IBlockState> ret = new ArrayList<>(this.typeProperty.getAllowedValues().size());
+    for (Enum enum_ : this.typeProperty.getAllowedValues())
+      ret.add(getDefaultState().withProperty((IProperty)this.typeProperty, enum_)); 
     return ret;
   }
   
-  protected BlockStateContainer func_180661_e() {
+  protected BlockStateContainer createBlockState() {
     return new BlockStateContainer(this, new IProperty[] { (IProperty)getTypeProperty() });
   }
   
-  public IBlockState func_176203_a(int meta) {
+  public IBlockState getStateFromMeta(int meta) {
     EnumProperty<T> typeProperty = getTypeProperty();
-    return getDefaultState().func_177226_a((IProperty)typeProperty, typeProperty.getValueOrDefault(meta));
+    return getDefaultState().withProperty((IProperty)typeProperty, typeProperty.getValueOrDefault(meta));
   }
   
-  public int func_176201_c(IBlockState state) {
-    return ((IIdProvider)state.func_177229_b((IProperty)getTypeProperty())).getId();
+  public int getMetaFromState(IBlockState state) {
+    return ((IIdProvider)state.getValue((IProperty)getTypeProperty())).getId();
   }
   
   public T getType(IBlockAccess world, BlockPos pos) {
@@ -127,19 +127,19 @@ public class BlockMultiID<T extends Enum<T> & IIdProvider> extends BlockBase imp
   public final T getType(IBlockState state) {
     if (state.getBlock() != this)
       return null; 
-    return (T)state.func_177229_b((IProperty)this.typeProperty);
+    return (T)state.getValue((IProperty)this.typeProperty);
   }
   
   public IBlockState getState(T type) {
     if (type == null)
       throw new IllegalArgumentException("invalid type: " + type); 
-    return getDefaultState().func_177226_a((IProperty)this.typeProperty, (Comparable)type);
+    return getDefaultState().withProperty((IProperty)this.typeProperty, (Comparable)type);
   }
   
   public IBlockState getState(String variant) {
     if (variant == null)
       return getDefaultState(); 
-    for (Enum enum_ : this.typeProperty.func_177700_c()) {
+    for (Enum enum_ : this.typeProperty.getAllowedValues()) {
       if (enum_.name().equals(variant))
         return getState((T)enum_); 
     } 
@@ -165,7 +165,7 @@ public class BlockMultiID<T extends Enum<T> & IIdProvider> extends BlockBase imp
     Item item = Item.getItemFromBlock(this);
     if (stack.getItem() != item)
       throw new IllegalArgumentException("The stack " + stack + " doesn't match " + item + " (" + this + ")"); 
-    IBlockState state = func_176203_a(stack.func_77960_j());
+    IBlockState state = getStateFromMeta(stack.getMetadata());
     T type = getType(state);
     return ((IIdProvider)type).getName();
   }
@@ -176,7 +176,7 @@ public class BlockMultiID<T extends Enum<T> & IIdProvider> extends BlockBase imp
     Item item = Item.getItemFromBlock(this);
     if (item == null || item == Items.AIR)
       throw new RuntimeException("no matching item for " + this); 
-    int meta = func_176201_c(state);
+    int meta = getMetaFromState(state);
     return new ItemStack(item, 1, meta);
   }
   
@@ -189,16 +189,16 @@ public class BlockMultiID<T extends Enum<T> & IIdProvider> extends BlockBase imp
     return ret;
   }
   
-  public void func_149666_a(CreativeTabs tabs, NonNullList<ItemStack> itemList) {
+  public void getSubBlocks(CreativeTabs tabs, NonNullList<ItemStack> itemList) {
     for (Enum enum_ : this.typeProperty.getShownValues())
       itemList.add(getItemStack((T)enum_)); 
   }
   
   public Set<T> getAllTypes() {
-    return EnumSet.allOf(this.typeProperty.func_177699_b());
+    return EnumSet.allOf(this.typeProperty.getValueClass());
   }
   
-  public ItemStack func_185473_a(World world, BlockPos pos, IBlockState state) {
+  public ItemStack getItem(World world, BlockPos pos, IBlockState state) {
     return getItemStack(state);
   }
   
@@ -214,17 +214,17 @@ public class BlockMultiID<T extends Enum<T> & IIdProvider> extends BlockBase imp
     return ret;
   }
   
-  public float func_176195_g(IBlockState state, World world, BlockPos pos) {
-    if (IExtBlockType.class.isAssignableFrom(this.typeProperty.func_177699_b())) {
+  public float getBlockHardness(IBlockState state, World world, BlockPos pos) {
+    if (IExtBlockType.class.isAssignableFrom(this.typeProperty.getValueClass())) {
       T type = getType(state);
       if (type != null)
         return ((IExtBlockType)type).getHardness(); 
     } 
-    return super.func_176195_g(state, world, pos);
+    return super.getBlockHardness(state, world, pos);
   }
   
   public float getExplosionResistance(World world, BlockPos pos, Entity exploder, Explosion explosion) {
-    if (IExtBlockType.class.isAssignableFrom(this.typeProperty.func_177699_b())) {
+    if (IExtBlockType.class.isAssignableFrom(this.typeProperty.getValueClass())) {
       T type = getType((IBlockAccess)world, pos);
       if (type != null)
         return ((IExtBlockType)type).getExplosionResistance(); 
@@ -233,7 +233,7 @@ public class BlockMultiID<T extends Enum<T> & IIdProvider> extends BlockBase imp
   }
   
   public SoundType getSoundType(IBlockState state, World world, BlockPos pos, Entity entity) {
-    if (IBlockSound.class.isAssignableFrom(this.typeProperty.func_177699_b())) {
+    if (IBlockSound.class.isAssignableFrom(this.typeProperty.getValueClass())) {
       T type = getType(state);
       if (type != null)
         return ((IBlockSound)type).getSound(); 

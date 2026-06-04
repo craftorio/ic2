@@ -34,7 +34,7 @@ public class ItemArmorNanoSuit extends ItemArmorElectric implements IItemHudProv
   }
   
   public ISpecialArmor.ArmorProperties getProperties(EntityLivingBase player, ItemStack armor, DamageSource source, double damage, int slot) {
-    if (source == DamageSource.field_76379_h && this.field_77881_a == EntityEquipmentSlot.FEET) {
+    if (source == DamageSource.FALL && this.armorType == EntityEquipmentSlot.FEET) {
       int energyPerDamage = getEnergyPerDamage();
       int damageLimit = Integer.MAX_VALUE;
       if (energyPerDamage > 0)
@@ -48,7 +48,7 @@ public class ItemArmorNanoSuit extends ItemArmorElectric implements IItemHudProv
   public void onEntityLivingFallEvent(LivingFallEvent event) {
     if (IC2.platform.isSimulating() && event.getEntity() instanceof EntityLivingBase) {
       EntityLivingBase entity = (EntityLivingBase)event.getEntity();
-      ItemStack armor = entity.func_184582_a(EntityEquipmentSlot.FEET);
+      ItemStack armor = entity.getItemStackFromSlot(EntityEquipmentSlot.FEET);
       if (armor != null && armor.getItem() == this) {
         int fallDamage = (int)event.getDistance() - 3;
         if (fallDamage >= 8)
@@ -66,15 +66,15 @@ public class ItemArmorNanoSuit extends ItemArmorElectric implements IItemHudProv
     NBTTagCompound nbtData = StackUtil.getOrCreateNbtData(stack);
     byte toggleTimer = nbtData.getByte("toggleTimer");
     boolean ret = false;
-    if (this.field_77881_a == EntityEquipmentSlot.HEAD) {
+    if (this.armorType == EntityEquipmentSlot.HEAD) {
       IC2.platform.profilerStartSection("NanoHelmet");
-      boolean Nightvision = nbtData.func_74767_n("Nightvision");
+      boolean Nightvision = nbtData.getBoolean("Nightvision");
       short hubmode = nbtData.getShort("HudMode");
       if (IC2.keyboard.isAltKeyDown(player) && IC2.keyboard.isModeSwitchKeyDown(player) && toggleTimer == 0) {
         toggleTimer = 10;
         Nightvision = !Nightvision;
         if (IC2.platform.isSimulating()) {
-          nbtData.func_74757_a("Nightvision", Nightvision);
+          nbtData.setBoolean("Nightvision", Nightvision);
           if (Nightvision) {
             IC2.platform.messagePlayer(player, "Nightvision enabled.", new Object[0]);
           } else {
@@ -90,7 +90,7 @@ public class ItemArmorNanoSuit extends ItemArmorElectric implements IItemHudProv
           hubmode = (short)(hubmode + 1);
         } 
         if (IC2.platform.isSimulating()) {
-          nbtData.func_74777_a("HudMode", hubmode);
+          nbtData.setShort("HudMode", hubmode);
           IC2.platform.messagePlayer(player, Localization.translate(HudMode.getFromID(hubmode).getTranslationKey()), new Object[0]);
         } 
       } 
@@ -101,20 +101,20 @@ public class ItemArmorNanoSuit extends ItemArmorElectric implements IItemHudProv
       if (Nightvision && IC2.platform.isSimulating() && 
         ElectricItem.manager.use(stack, 1.0D, (EntityLivingBase)player)) {
         BlockPos pos = new BlockPos((int)Math.floor(player.posX), (int)Math.floor(player.posY), (int)Math.floor(player.posZ));
-        int skylight = player.getEntityWorld().func_175671_l(pos);
+        int skylight = player.getEntityWorld().getLightFromNeighbors(pos);
         if (skylight > 8) {
-          IC2.platform.removePotion((EntityLivingBase)player, MobEffects.field_76439_r);
-          player.func_70690_d(new PotionEffect(MobEffects.field_76440_q, 100, 0, true, true));
+          IC2.platform.removePotion((EntityLivingBase)player, MobEffects.NIGHT_VISION);
+          player.addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, 100, 0, true, true));
         } else {
-          IC2.platform.removePotion((EntityLivingBase)player, MobEffects.field_76440_q);
-          player.func_70690_d(new PotionEffect(MobEffects.field_76439_r, 300, 0, true, true));
+          IC2.platform.removePotion((EntityLivingBase)player, MobEffects.BLINDNESS);
+          player.addPotionEffect(new PotionEffect(MobEffects.NIGHT_VISION, 300, 0, true, true));
         } 
         ret = true;
       } 
       IC2.platform.profilerEndSection();
     } 
     if (ret)
-      player.field_71069_bz.func_75142_b(); 
+      player.inventoryContainer.detectAndSendChanges(); 
   }
   
   public double getDamageAbsorptionRatio() {
@@ -126,12 +126,12 @@ public class ItemArmorNanoSuit extends ItemArmorElectric implements IItemHudProv
   }
   
   @SideOnly(Side.CLIENT)
-  public EnumRarity func_77613_e(ItemStack stack) {
+  public EnumRarity getRarity(ItemStack stack) {
     return EnumRarity.UNCOMMON;
   }
   
   public boolean doesProvideHUD(ItemStack stack) {
-    return (this.field_77881_a == EntityEquipmentSlot.HEAD && ElectricItem.manager.getCharge(stack) > 0.0D);
+    return (this.armorType == EntityEquipmentSlot.HEAD && ElectricItem.manager.getCharge(stack) > 0.0D);
   }
   
   public HudMode getHudMode(ItemStack stack) {

@@ -52,29 +52,29 @@ public abstract class ContainerBase<T extends IInventory> extends Container {
       addSlotToContainer(new Slot((IInventory)player.inventory, col, xStart + col * 18, height + -24)); 
   }
   
-  public ItemStack func_184996_a(int slotId, int dragType, ClickType clickType, EntityPlayer player) {
+  public ItemStack slotClick(int slotId, int dragType, ClickType clickType, EntityPlayer player) {
     Slot slot;
-    if (slotId >= 0 && slotId < this.field_75151_b.size() && 
-      slot = this.field_75151_b.get(slotId) instanceof SlotHologramSlot)
+    if (slotId >= 0 && slotId < this.inventorySlots.size() && 
+      slot = this.inventorySlots.get(slotId) instanceof SlotHologramSlot)
       return ((SlotHologramSlot)slot).slotClick(dragType, clickType, player); 
-    return super.func_184996_a(slotId, dragType, clickType, player);
+    return super.slotClick(slotId, dragType, clickType, player);
   }
   
-  public final ItemStack func_82846_b(EntityPlayer player, int sourceSlotIndex) {
-    Slot sourceSlot = this.field_75151_b.get(sourceSlotIndex);
-    if (sourceSlot != null && sourceSlot.func_75216_d()) {
-      ItemStack resultStack, sourceItemStack = sourceSlot.func_75211_c();
+  public final ItemStack transferStackInSlot(EntityPlayer player, int sourceSlotIndex) {
+    Slot sourceSlot = this.inventorySlots.get(sourceSlotIndex);
+    if (sourceSlot != null && sourceSlot.getHasStack()) {
+      ItemStack resultStack, sourceItemStack = sourceSlot.getStack();
       int oldSourceItemStackSize = StackUtil.getSize(sourceItemStack);
-      if (sourceSlot.field_75224_c == player.inventory) {
+      if (sourceSlot.inventory == player.inventory) {
         resultStack = handlePlayerSlotShiftClick(player, sourceItemStack);
       } else {
         resultStack = handleGUISlotShiftClick(player, sourceItemStack);
       } 
       if (StackUtil.isEmpty(resultStack) || StackUtil.getSize(resultStack) != oldSourceItemStackSize) {
-        sourceSlot.func_75215_d(resultStack);
-        sourceSlot.func_190901_a(player, sourceItemStack);
+        sourceSlot.putStack(resultStack);
+        sourceSlot.onTake(player, sourceItemStack);
         if (!(player.getEntityWorld()).isRemote)
-          func_75142_b(); 
+          detectAndSendChanges(); 
       } 
     } 
     return StackUtil.emptyStack;
@@ -82,8 +82,8 @@ public abstract class ContainerBase<T extends IInventory> extends Container {
   
   protected ItemStack handlePlayerSlotShiftClick(EntityPlayer player, ItemStack sourceItemStack) {
     for (int run = 0; run < 4 && !StackUtil.isEmpty(sourceItemStack); run++) {
-      for (Slot targetSlot : this.field_75151_b) {
-        if (targetSlot.field_75224_c != player.inventory)
+      for (Slot targetSlot : this.inventorySlots) {
+        if (targetSlot.inventory != player.inventory)
           if (isValidTargetSlot(targetSlot, sourceItemStack, (run % 2 == 1), (run < 2))) {
             sourceItemStack = transfer(sourceItemStack, targetSlot);
             if (StackUtil.isEmpty(sourceItemStack))
@@ -96,9 +96,9 @@ public abstract class ContainerBase<T extends IInventory> extends Container {
   
   protected ItemStack handleGUISlotShiftClick(EntityPlayer player, ItemStack sourceItemStack) {
     for (int run = 0; run < 2 && !StackUtil.isEmpty(sourceItemStack); run++) {
-      for (ListIterator<Slot> it = this.field_75151_b.listIterator(this.field_75151_b.size()); it.hasPrevious(); ) {
+      for (ListIterator<Slot> it = this.inventorySlots.listIterator(this.inventorySlots.size()); it.hasPrevious(); ) {
         Slot targetSlot = it.previous();
-        if (targetSlot.field_75224_c == player.inventory && 
+        if (targetSlot.inventory == player.inventory && 
           isValidTargetSlot(targetSlot, sourceItemStack, (run == 1), false)) {
           sourceItemStack = transfer(sourceItemStack, targetSlot);
           if (StackUtil.isEmpty(sourceItemStack))
@@ -112,9 +112,9 @@ public abstract class ContainerBase<T extends IInventory> extends Container {
   protected static final boolean isValidTargetSlot(Slot slot, ItemStack stack, boolean allowEmpty, boolean requireInputOnly) {
     if (slot instanceof ic2.core.slot.SlotInvSlotReadOnly || slot instanceof SlotHologramSlot)
       return false; 
-    if (!slot.func_75214_a(stack))
+    if (!slot.isItemValid(stack))
       return false; 
-    if (!allowEmpty && !slot.func_75216_d())
+    if (!allowEmpty && !slot.getHasStack())
       return false; 
     if (requireInputOnly)
       return (slot instanceof SlotInvSlot && ((SlotInvSlot)slot).invSlot
@@ -122,22 +122,22 @@ public abstract class ContainerBase<T extends IInventory> extends Container {
     return true;
   }
   
-  public boolean func_75145_c(EntityPlayer entityplayer) {
-    return this.base.func_70300_a(entityplayer);
+  public boolean canInteractWith(EntityPlayer entityplayer) {
+    return this.base.isUsableByPlayer(entityplayer);
   }
   
-  public void func_75142_b() {
-    super.func_75142_b();
+  public void detectAndSendChanges() {
+    super.detectAndSendChanges();
     if (this.base instanceof TileEntity) {
       for (String name : getNetworkedFields()) {
-        for (IContainerListener crafter : this.field_75149_d) {
+        for (IContainerListener crafter : this.listeners) {
           if (crafter instanceof EntityPlayerMP)
             ((NetworkManager)IC2.network.get(true)).updateTileEntityFieldTo((TileEntity)this.base, name, (EntityPlayerMP)crafter); 
         } 
       } 
       if (this.base instanceof TileEntityBlock)
         for (TileEntityComponent component : ((TileEntityBlock)this.base).getComponents()) {
-          for (IContainerListener crafter : this.field_75149_d) {
+          for (IContainerListener crafter : this.listeners) {
             if (crafter instanceof EntityPlayerMP)
               component.onContainerUpdate((EntityPlayerMP)crafter); 
           } 
@@ -150,7 +150,7 @@ public abstract class ContainerBase<T extends IInventory> extends Container {
   }
   
   public List<IContainerListener> getListeners() {
-    return this.field_75149_d;
+    return this.listeners;
   }
   
   public void onContainerEvent(String event) {}
@@ -159,20 +159,20 @@ public abstract class ContainerBase<T extends IInventory> extends Container {
     int amount = getTransferAmount(stack, dst);
     if (amount <= 0)
       return stack; 
-    ItemStack dstStack = dst.func_75211_c();
+    ItemStack dstStack = dst.getStack();
     if (StackUtil.isEmpty(dstStack)) {
-      dst.func_75215_d(StackUtil.copyWithSize(stack, amount));
+      dst.putStack(StackUtil.copyWithSize(stack, amount));
     } else {
-      dst.func_75215_d(StackUtil.incSize(dstStack, amount));
+      dst.putStack(StackUtil.incSize(dstStack, amount));
     } 
     stack = StackUtil.decSize(stack, amount);
     return stack;
   }
   
   private int getTransferAmount(ItemStack stack, Slot dst) {
-    int amount = Math.min(dst.field_75224_c.func_70297_j_(), dst.func_75219_a());
-    amount = Math.min(amount, stack.func_77985_e() ? stack.getMaxStackSize() : 1);
-    ItemStack dstStack = dst.func_75211_c();
+    int amount = Math.min(dst.inventory.getInventoryStackLimit(), dst.getSlotStackLimit());
+    amount = Math.min(amount, stack.isStackable() ? stack.getMaxStackSize() : 1);
+    ItemStack dstStack = dst.getStack();
     if (!StackUtil.isEmpty(dstStack)) {
       if (!StackUtil.checkItemEqualityStrict(stack, dstStack))
         return 0; 

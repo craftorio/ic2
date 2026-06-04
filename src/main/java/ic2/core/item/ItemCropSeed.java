@@ -27,10 +27,10 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ItemCropSeed extends ItemIC2 implements ICropSeed {
   public ItemCropSeed() {
     super(ItemName.crop_seed_bag);
-    func_77625_d(1);
+    setMaxStackSize(1);
   }
   
-  public String func_77667_c(ItemStack itemstack) {
+  public String getUnlocalizedName(ItemStack itemstack) {
     if (itemstack == null)
       return "ic2.crop.unknown"; 
     CropCard cropCard = Crops.instance.getCropCard(itemstack);
@@ -42,9 +42,9 @@ public class ItemCropSeed extends ItemIC2 implements ICropSeed {
     return cropCard.getUnlocalizedName();
   }
   
-  public String func_77653_i(ItemStack stack) {
+  public String getItemStackDisplayName(ItemStack stack) {
     CropCard crop = Crops.instance.getCropCard(stack);
-    return Localization.translate((crop == null) ? "ic2.crop.seeds" : crop.getSeedType(), new Object[] { super.func_77653_i(stack) });
+    return Localization.translate((crop == null) ? "ic2.crop.seeds" : crop.getSeedType(), new Object[] { super.getItemStackDisplayName(stack) });
   }
   
   public boolean isDamageable() {
@@ -56,7 +56,7 @@ public class ItemCropSeed extends ItemIC2 implements ICropSeed {
   }
   
   @SideOnly(Side.CLIENT)
-  public void func_77624_a(ItemStack stack, World world, List<String> info, ITooltipFlag debugTooltips) {
+  public void addInformation(ItemStack stack, World world, List<String> info, ITooltipFlag debugTooltips) {
     if (getScannedFromStack(stack) >= 4) {
       info.add("§2Gr§7 " + getGrowthFromStack(stack));
       info.add("§6Ga§7 " + getGainFromStack(stack));
@@ -69,22 +69,22 @@ public class ItemCropSeed extends ItemIC2 implements ICropSeed {
     } 
   }
   
-  public EnumActionResult func_180614_a(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float a, float b, float c) {
+  public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float a, float b, float c) {
     TileEntity te = world.getTileEntity(pos);
     if (te instanceof TileEntityCrop) {
       TileEntityCrop crop = (TileEntityCrop)te;
       ItemStack stack = StackUtil.get(player, hand);
       if (crop.tryPlantIn(Crops.instance.getCropCard(stack), 1, getGrowthFromStack(stack), getGainFromStack(stack), getResistanceFromStack(stack), getScannedFromStack(stack))) {
-        if (!player.field_71075_bZ.field_75098_d)
-          player.inventory.field_70462_a.set(player.inventory.field_70461_c, StackUtil.emptyStack); 
+        if (!player.capabilities.isCreativeMode)
+          player.inventory.mainInventory.set(player.inventory.currentItem, StackUtil.emptyStack); 
         return EnumActionResult.SUCCESS;
       } 
     } 
     return EnumActionResult.PASS;
   }
   
-  public void func_150895_a(CreativeTabs tabs, NonNullList<ItemStack> items) {
-    if (!func_194125_a(tabs))
+  public void getSubItems(CreativeTabs tabs, NonNullList<ItemStack> items) {
+    if (!isInCreativeTab(tabs))
       return; 
     for (CropCard crop : Crops.instance.getCrops())
       items.add(generateItemStackFromValues(crop, 1, 1, 1, 4)); 
@@ -99,12 +99,12 @@ public class ItemCropSeed extends ItemIC2 implements ICropSeed {
     tag.setByte("gain", (byte)statGain);
     tag.setByte("resistance", (byte)statResistance);
     tag.setByte("scan", (byte)scan);
-    stack.func_77982_d(tag);
+    stack.setTagCompound(tag);
     return stack;
   }
   
   public CropCard getCropFromStack(ItemStack is) {
-    NBTTagCompound nbt = is.func_77978_p();
+    NBTTagCompound nbt = is.getTagCompound();
     if (nbt == null || 
       !nbt.hasKey("owner", 8) || 
       !nbt.hasKey("id", 8))
@@ -115,63 +115,63 @@ public class ItemCropSeed extends ItemIC2 implements ICropSeed {
   }
   
   public void setCropFromStack(ItemStack is, CropCard crop) {
-    if (is.func_77978_p() == null)
+    if (is.getTagCompound() == null)
       return; 
-    is.func_77978_p().setString("owner", crop.getOwner());
-    is.func_77978_p().setString("id", crop.getId());
+    is.getTagCompound().setString("owner", crop.getOwner());
+    is.getTagCompound().setString("id", crop.getId());
   }
   
   public int getGrowthFromStack(ItemStack is) {
-    if (is.func_77978_p() == null)
+    if (is.getTagCompound() == null)
       return -1; 
-    return is.func_77978_p().getByte("growth");
+    return is.getTagCompound().getByte("growth");
   }
   
   public void setGrowthFromStack(ItemStack is, int value) {
-    if (is.func_77978_p() == null)
+    if (is.getTagCompound() == null)
       return; 
-    is.func_77978_p().setByte("growth", (byte)value);
+    is.getTagCompound().setByte("growth", (byte)value);
   }
   
   public int getGainFromStack(ItemStack is) {
-    if (is.func_77978_p() == null)
+    if (is.getTagCompound() == null)
       return -1; 
-    return is.func_77978_p().getByte("gain");
+    return is.getTagCompound().getByte("gain");
   }
   
   public void setGainFromStack(ItemStack is, int value) {
-    if (is.func_77978_p() == null)
+    if (is.getTagCompound() == null)
       return; 
-    is.func_77978_p().setByte("gain", (byte)value);
+    is.getTagCompound().setByte("gain", (byte)value);
   }
   
   public int getResistanceFromStack(ItemStack is) {
-    if (is.func_77978_p() == null)
+    if (is.getTagCompound() == null)
       return -1; 
-    return is.func_77978_p().getByte("resistance");
+    return is.getTagCompound().getByte("resistance");
   }
   
   public void setResistanceFromStack(ItemStack is, int value) {
-    if (is.func_77978_p() == null)
+    if (is.getTagCompound() == null)
       return; 
-    is.func_77978_p().setByte("resistance", (byte)value);
+    is.getTagCompound().setByte("resistance", (byte)value);
   }
   
   public int getScannedFromStack(ItemStack is) {
-    if (is.func_77978_p() == null)
+    if (is.getTagCompound() == null)
       return -1; 
-    return is.func_77978_p().getByte("scan");
+    return is.getTagCompound().getByte("scan");
   }
   
   public void setScannedFromStack(ItemStack is, int value) {
-    if (is.func_77978_p() == null)
+    if (is.getTagCompound() == null)
       return; 
-    is.func_77978_p().setByte("scan", (byte)value);
+    is.getTagCompound().setByte("scan", (byte)value);
   }
   
   public void incrementScannedFromStack(ItemStack is) {
-    if (is.func_77978_p() == null)
+    if (is.getTagCompound() == null)
       return; 
-    is.func_77978_p().setByte("scan", (byte)(getScannedFromStack(is) + 1));
+    is.getTagCompound().setByte("scan", (byte)(getScannedFromStack(is) + 1));
   }
 }

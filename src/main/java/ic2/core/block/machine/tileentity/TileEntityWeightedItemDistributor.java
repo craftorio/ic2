@@ -33,7 +33,7 @@ public class TileEntityWeightedItemDistributor extends TileEntityInventory imple
     if (!this.priority.isEmpty()) {
       int[] indexes = new int[this.priority.size()];
       for (int i = 0; i < indexes.length; i++)
-        indexes[i] = ((EnumFacing)this.priority.get(i)).func_176745_a(); 
+        indexes[i] = ((EnumFacing)this.priority.get(i)).getIndex(); 
       nbt.setIntArray("priority", indexes);
     } 
     return nbt;
@@ -44,7 +44,7 @@ public class TileEntityWeightedItemDistributor extends TileEntityInventory imple
     int[] indexes = nbt.getIntArray("priority");
     if (indexes.length > 0)
       for (int index : indexes)
-        this.priority.add(EnumFacing.func_82600_a(index));  
+        this.priority.add(EnumFacing.getFront(index));  
   }
   
   public List<String> getNetworkedFields() {

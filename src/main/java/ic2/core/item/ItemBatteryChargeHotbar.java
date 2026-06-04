@@ -31,24 +31,24 @@ public class ItemBatteryChargeHotbar extends ItemBattery implements IBoxable {
   }
   
   @SideOnly(Side.CLIENT)
-  public void func_77624_a(ItemStack stack, World world, List<String> list, ITooltipFlag advanced) {
-    super.func_77624_a(stack, world, list, advanced);
+  public void addInformation(ItemStack stack, World world, List<String> list, ITooltipFlag advanced) {
+    super.addInformation(stack, world, list, advanced);
     Mode mode = getMode(stack);
     list.add(getNameOfMode(mode));
-    if ((Minecraft.getMinecraft()).field_71462_r instanceof ic2.core.item.tool.GuiToolbox)
+    if ((Minecraft.getMinecraft()).currentScreen instanceof ic2.core.item.tool.GuiToolbox)
       list.add((mode.enabled ? (String)TextFormatting.RED : (String)TextFormatting.GREEN) + Localization.translate("ic2.tooltip.mode.boxable")); 
   }
   
-  public void func_77663_a(ItemStack stack, World world, Entity entity, int itemSlot, boolean isSelected) {
+  public void onUpdate(ItemStack stack, World world, Entity entity, int itemSlot, boolean isSelected) {
     Mode mode = getMode(stack);
     if (entity instanceof net.minecraft.entity.player.EntityPlayerMP && world.getTotalWorldTime() % 10L < getTier(stack) && mode.enabled) {
       EntityPlayer thePlayer = (EntityPlayer)entity;
-      NonNullList<ItemStack> nonNullList = thePlayer.inventory.field_70462_a;
+      NonNullList<ItemStack> nonNullList = thePlayer.inventory.mainInventory;
       double limit = getTransferLimit(stack);
       int tier = getTier(stack);
       for (int i = 0; i < 9 && limit > 0.0D; i++) {
         ItemStack toCharge = nonNullList.get(i);
-        if (!StackUtil.isEmpty(toCharge) && (mode != Mode.NOT_IN_HAND || i != thePlayer.inventory.field_70461_c))
+        if (!StackUtil.isEmpty(toCharge) && (mode != Mode.NOT_IN_HAND || i != thePlayer.inventory.currentItem))
           if (!(toCharge.getItem() instanceof ItemBatteryChargeHotbar)) {
             double charge = ElectricItem.manager.charge(toCharge, limit, tier, false, true);
             charge = ElectricItem.manager.discharge(stack, charge, tier, true, false, false);
@@ -59,7 +59,7 @@ public class ItemBatteryChargeHotbar extends ItemBattery implements IBoxable {
     } 
   }
   
-  public ActionResult<ItemStack> func_77659_a(World world, EntityPlayer player, EnumHand hand) {
+  public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
     ItemStack stack = StackUtil.get(player, hand);
     if (world.isRemote)
       return new ActionResult(EnumActionResult.PASS, stack); 
@@ -81,7 +81,7 @@ public class ItemBatteryChargeHotbar extends ItemBattery implements IBoxable {
   
   public Mode getMode(ItemStack stack) {
     NBTTagCompound nbt = StackUtil.getOrCreateNbtData(stack);
-    if (!nbt.func_74764_b("mode"))
+    if (!nbt.hasKey("mode"))
       return Mode.ENABLED; 
     return getMode(nbt.getByte("mode"));
   }

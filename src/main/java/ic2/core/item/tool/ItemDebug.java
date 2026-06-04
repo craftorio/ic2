@@ -58,9 +58,9 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 public class ItemDebug extends ItemIC2 implements ISpecialElectricItem, IBoxable {
   public ItemDebug() {
     super(ItemName.debug_item);
-    func_77627_a(false);
+    setHasSubtypes(false);
     if (!Util.inDev())
-      func_77637_a(null); 
+      setCreativeTab(null); 
   }
   
   public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
@@ -102,17 +102,17 @@ public class ItemDebug extends ItemIC2 implements ISpecialElectricItem, IBoxable
         if (mode == Mode.InterfacesFields) {
           position = new RayTraceResult(RayTraceResult.Type.BLOCK, new Vec3d(hitX, hitY, hitX), side, pos);
         } else {
-          position = func_77621_a(world, player, true);
+          position = rayTrace(world, player, true);
           if (position == null)
             return EnumActionResult.PASS; 
-          RayTraceResult entityPosition = Util.traceEntities(player, position.field_72307_f, true);
+          RayTraceResult entityPosition = Util.traceEntities(player, position.hitVec, true);
           if (entityPosition != null)
             position = entityPosition; 
         } 
         if (FMLCommonHandler.instance().getSide().isClient()) {
           if (!world.isRemote) {
             plat = "sp server";
-          } else if (player.func_184102_h() == null) {
+          } else if (player.getServer() == null) {
             plat = "mp client";
           } else {
             plat = "sp client";
@@ -126,7 +126,7 @@ public class ItemDebug extends ItemIC2 implements ISpecialElectricItem, IBoxable
           Block block = state.getBlock();
           TileEntity tileEntity1 = world.getTileEntity(pos);
           String message = String.format("[%s] block state: %s%nname: %s%ncls: %s%nte: %s", new Object[] { plat, state
-                .func_185899_b((IBlockAccess)world, pos), block.func_149739_a(), block.getClass().getName(), tileEntity1 });
+                .getActualState((IBlockAccess)world, pos), block.getUnlocalizedName(), block.getClass().getName(), tileEntity1 });
           chat.println(message);
           console.println(message);
           if (tileEntity1 != null) {
@@ -150,16 +150,16 @@ public class ItemDebug extends ItemIC2 implements ISpecialElectricItem, IBoxable
           break;
         } 
         if (position.typeOfHit == RayTraceResult.Type.ENTITY) {
-          String message = "[" + plat + "] entity: " + position.field_72308_g;
+          String message = "[" + plat + "] entity: " + position.entityHit;
           chat.println(message);
           console.println(message);
-          if (position.field_72308_g instanceof EntityItem) {
-            ItemStack entStack = ((EntityItem)position.field_72308_g).func_92059_d();
+          if (position.entityHit instanceof EntityItem) {
+            ItemStack entStack = ((EntityItem)position.entityHit).getItem();
             String name = Util.getName(entStack.getItem()).toString();
-            message = "[" + plat + "] item id: " + name + " meta: " + entStack.getItemDamage() + " size: " + StackUtil.getSize(entStack) + " name: " + entStack.func_77977_a();
+            message = "[" + plat + "] item id: " + name + " meta: " + entStack.getItemDamage() + " size: " + StackUtil.getSize(entStack) + " name: " + entStack.getUnlocalizedName();
             chat.println(message);
             console.println(message);
-            console.println("NBT: " + entStack.func_77978_p());
+            console.println("NBT: " + entStack.getTagCompound());
           } 
           break;
         } 
@@ -197,7 +197,7 @@ public class ItemDebug extends ItemIC2 implements ISpecialElectricItem, IBoxable
         } 
         if (tileEntity instanceof IPersonalBlock) {
           IPersonalBlock iPersonalBlock = (IPersonalBlock)tileEntity;
-          chat.println("PersonalBlock: CanAccess=" + iPersonalBlock.permitsAccess(player.func_146103_bH()));
+          chat.println("PersonalBlock: CanAccess=" + iPersonalBlock.permitsAccess(player.getGameProfile()));
         } 
         if (tileEntity instanceof TileEntityCrop) {
           TileEntityCrop tileEntityCrop = (TileEntityCrop)tileEntity;
@@ -226,11 +226,11 @@ public class ItemDebug extends ItemIC2 implements ISpecialElectricItem, IBoxable
         count = (mode == Mode.Accelerate) ? 1000 : 100000;
         if (te == null) {
           IBlockState state = world.getBlockState(pos);
-          if (state.getBlock().func_149653_t()) {
+          if (state.getBlock().getTickRandomly()) {
             chat.println("Running" + count + " ticks on " + state.getBlock() + "(" + pos + ").");
             int i;
             for (i = 0; i < count && world.getBlockState(pos) == state; i++)
-              state.getBlock().func_180645_a(world, pos, state, field_77697_d); 
+              state.getBlock().randomTick(world, pos, state, itemRand); 
             if (i != count)
               chat.println("Ran " + i + " ticks before a state change."); 
           } 
@@ -251,7 +251,7 @@ public class ItemDebug extends ItemIC2 implements ISpecialElectricItem, IBoxable
               } 
               tickable = (ITickable)te;
             } 
-            tickable.func_73660_a();
+            tickable.update();
           } 
           if (changes > 0) {
             if (interruptCount != -1) {

@@ -71,22 +71,22 @@ public class Ic2WorldDecorator implements IWorldGenerator {
   }
   
   private static void checkRetroGen(Chunk chunk, NBTTagCompound nbt) {
-    if (!chunk.func_177419_t())
+    if (!chunk.isTerrainPopulated())
       return; 
     Config config = MainConfig.get().getSub("worldgen");
     if (getCheckLimit(config) <= 0 || getUpdateLimit(config) <= 0)
       return; 
     float epsilon = 1.0E-5F;
     float treeScale = getTreeScale(config) - epsilon;
-    float oreScale = getOreScale(config, getBaseHeight(config, chunk.func_177412_p())) - epsilon;
+    float oreScale = getOreScale(config, getBaseHeight(config, chunk.getWorld())) - epsilon;
     if (treeScale <= 0.0F && oreScale <= 0.0F)
       return; 
-    if ((rubberTreeGenEnabled(config, chunk.func_177412_p()) && nbt.func_74760_g("rubberTree") < treeScale) || (
-      ConfigUtil.getBool(config, "copper/enabled") && nbt.func_74760_g("copperOre") < oreScale) || (
-      ConfigUtil.getBool(config, "lead/enabled") && nbt.func_74760_g("leadOre") < oreScale) || (
-      ConfigUtil.getBool(config, "tin/enabled") && nbt.func_74760_g("tinOre") < oreScale) || (
-      ConfigUtil.getBool(config, "uranium/enabled") && nbt.func_74760_g("uraniumOre") < oreScale))
-      (WorldData.get(chunk.func_177412_p())).chunksToDecorate.add(chunk); 
+    if ((rubberTreeGenEnabled(config, chunk.getWorld()) && nbt.getFloat("rubberTree") < treeScale) || (
+      ConfigUtil.getBool(config, "copper/enabled") && nbt.getFloat("copperOre") < oreScale) || (
+      ConfigUtil.getBool(config, "lead/enabled") && nbt.getFloat("leadOre") < oreScale) || (
+      ConfigUtil.getBool(config, "tin/enabled") && nbt.getFloat("tinOre") < oreScale) || (
+      ConfigUtil.getBool(config, "uranium/enabled") && nbt.getFloat("uraniumOre") < oreScale))
+      (WorldData.get(chunk.getWorld())).chunksToDecorate.add(chunk); 
   }
   
   @SubscribeEvent
@@ -95,7 +95,7 @@ public class Ic2WorldDecorator implements IWorldGenerator {
     Chunk chunk = event.getChunk();
     NBTTagCompound nbt = (WorldData.get(event.getWorld())).worldGenData.get(chunk);
     if (nbt != null && !nbt.hasNoTags()) {
-      nbt = nbt.func_74737_b();
+      nbt = nbt.copy();
       event.getData().setTag("ic2WorldGen", (NBTBase)nbt);
     } 
   }
@@ -129,12 +129,12 @@ public class Ic2WorldDecorator implements IWorldGenerator {
     Config config = MainConfig.get().getSub("worldgen");
     int chunksToCheck = getCheckLimit(config);
     int chunksToDecorate = getUpdateLimit(config);
-    long worldSeed = world.func_72905_C();
+    long worldSeed = world.getSeed();
     Random rnd = new Random(worldSeed);
     long xSeed = rnd.nextLong() >> 3L;
     long zSeed = rnd.nextLong() >> 3L;
     int baseHeight = getBaseHeight(config, world);
-    int worldHeight = world.func_72800_K();
+    int worldHeight = world.getHeight();
     float treeScale = getTreeScale(config);
     float oreScale = getOreScale(config, baseHeight);
     int skip = worldData.chunksToDecorate.size() - chunksToCheck;
@@ -151,7 +151,7 @@ public class Ic2WorldDecorator implements IWorldGenerator {
         NBTTagCompound nbt = worldData.worldGenData.get(chunk);
         if (nbt == null)
           nbt = new NBTTagCompound(); 
-        long chunkSeed = xSeed * chunk.field_76635_g + zSeed * chunk.field_76647_h ^ worldSeed;
+        long chunkSeed = xSeed * chunk.x + zSeed * chunk.z ^ worldSeed;
         rnd.setSeed(chunkSeed);
         long rubberTreeSeed = rnd.nextLong();
         long copperOreSeed = rnd.nextLong();
@@ -159,15 +159,15 @@ public class Ic2WorldDecorator implements IWorldGenerator {
         long uraniumOreSeed = rnd.nextLong();
         long leadOreSeed = rnd.nextLong();
         float extra;
-        if (rubberTreeGenEnabled(config, world) && (extra = treeScale - nbt.func_74760_g("rubberTree")) > 0.0F)
+        if (rubberTreeGenEnabled(config, world) && (extra = treeScale - nbt.getFloat("rubberTree")) > 0.0F)
           genRubberTree(rnd, rubberTreeSeed, chunk, extra); 
-        if ((extra = oreScale - nbt.func_74760_g("copperOre")) > 0.0F)
+        if ((extra = oreScale - nbt.getFloat("copperOre")) > 0.0F)
           genOre(rnd, copperOreSeed, chunk, BlockName.resource.getBlockState((IIdProvider)ResourceBlock.copper_ore), "copperOre", config.getSub("copper"), baseHeight, worldHeight, extra); 
-        if ((extra = oreScale - nbt.func_74760_g("leadOre")) > 0.0F)
+        if ((extra = oreScale - nbt.getFloat("leadOre")) > 0.0F)
           genOre(rnd, leadOreSeed, chunk, BlockName.resource.getBlockState((IIdProvider)ResourceBlock.lead_ore), "leadOre", config.getSub("lead"), baseHeight, worldHeight, extra); 
-        if ((extra = oreScale - nbt.func_74760_g("tinOre")) > 0.0F)
+        if ((extra = oreScale - nbt.getFloat("tinOre")) > 0.0F)
           genOre(rnd, tinOreSeed, chunk, BlockName.resource.getBlockState((IIdProvider)ResourceBlock.tin_ore), "tinOre", config.getSub("tin"), baseHeight, worldHeight, extra); 
-        if ((extra = oreScale - nbt.func_74760_g("uraniumOre")) > 0.0F)
+        if ((extra = oreScale - nbt.getFloat("uraniumOre")) > 0.0F)
           genOre(rnd, uraniumOreSeed, chunk, BlockName.resource.getBlockState((IIdProvider)ResourceBlock.uranium_ore), "uraniumOre", config.getSub("uranium"), baseHeight, worldHeight, extra); 
         it.remove();
         if (--chunksToDecorate == 0)
@@ -179,13 +179,13 @@ public class Ic2WorldDecorator implements IWorldGenerator {
   }
   
   private static boolean hasNeighborChunks(Chunk chunk) {
-    World world = chunk.func_177412_p();
+    World world = chunk.getWorld();
     Ic2BlockPos pos = new Ic2BlockPos();
     for (int dx = 0; dx <= 1; dx++) {
       for (int dz = 0; dz <= 1; dz++) {
         if (dx != 0 || dz != 0) {
-          pos.set((chunk.field_76635_g + dx) * 16, 0, (chunk.field_76647_h + dz) * 16);
-          if (!world.func_175668_a((BlockPos)pos, false))
+          pos.set((chunk.x + dx) * 16, 0, (chunk.z + dz) * 16);
+          if (!world.isBlockLoaded((BlockPos)pos, false))
             return false; 
         } 
       } 
@@ -194,7 +194,7 @@ public class Ic2WorldDecorator implements IWorldGenerator {
   }
   
   public void generate(Random rnd, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
-    Chunk chunk = chunkProvider.func_186025_d(chunkX, chunkZ);
+    Chunk chunk = chunkProvider.provideChunk(chunkX, chunkZ);
     assert hasNeighborChunks(chunk);
     long rubberTreeSeed = rnd.nextLong();
     long copperOreSeed = rnd.nextLong();
@@ -208,7 +208,7 @@ public class Ic2WorldDecorator implements IWorldGenerator {
     if (rubberTreeGenEnabled(config, world) && treeScale > 0.0F)
       genRubberTree(rnd, rubberTreeSeed, chunk, treeScale); 
     if (oreScale > 0.0F) {
-      int worldHeight = world.func_72800_K();
+      int worldHeight = world.getHeight();
       genOre(rnd, copperOreSeed, chunk, BlockName.resource.getBlockState((IIdProvider)ResourceBlock.copper_ore), "copperOre", config.getSub("copper"), baseHeight, worldHeight, oreScale);
       genOre(rnd, leadOreSeed, chunk, BlockName.resource.getBlockState((IIdProvider)ResourceBlock.lead_ore), "leadOre", config.getSub("lead"), baseHeight, worldHeight, oreScale);
       genOre(rnd, tinOreSeed, chunk, BlockName.resource.getBlockState((IIdProvider)ResourceBlock.tin_ore), "tinOre", config.getSub("tin"), baseHeight, worldHeight, oreScale);
@@ -220,10 +220,10 @@ public class Ic2WorldDecorator implements IWorldGenerator {
     rnd.setSeed(seed);
     Biome[] biomes = new Biome[4];
     for (int i = 0; i < 4; i++) {
-      int x = chunk.field_76635_g * 16 + 8 + (i & 0x1) * 15;
-      int z = chunk.field_76647_h * 16 + 8 + ((i & 0x2) >>> 1) * 15;
-      BlockPos pos = new BlockPos(x, chunk.func_177412_p().func_181545_F(), z);
-      biomes[i] = BiomeUtil.getOriginalBiome(chunk.func_177412_p(), pos);
+      int x = chunk.x * 16 + 8 + (i & 0x1) * 15;
+      int z = chunk.z * 16 + 8 + ((i & 0x2) >>> 1) * 15;
+      BlockPos pos = new BlockPos(x, chunk.getWorld().getSeaLevel(), z);
+      biomes[i] = BiomeUtil.getOriginalBiome(chunk.getWorld(), pos);
     } 
     int rubberTrees = 0;
     for (Biome biome : biomes) {
@@ -239,9 +239,9 @@ public class Ic2WorldDecorator implements IWorldGenerator {
     if (rubberTrees > 0 && rnd.nextInt(100) < rubberTrees) {
       WorldGenRubTree gen = new WorldGenRubTree(false);
       for (int j = 0; j < rubberTrees; j++) {
-        if (!gen.func_180709_b(chunk.func_177412_p(), rnd, new BlockPos(
+        if (!gen.generate(chunk.getWorld(), rnd, new BlockPos(
               randomX(chunk, rnd), chunk
-              .func_177412_p().func_181545_F(), 
+              .getWorld().getSeaLevel(), 
               randomZ(chunk, rnd))))
           rubberTrees -= 3; 
       } 
@@ -297,14 +297,14 @@ public class Ic2WorldDecorator implements IWorldGenerator {
           throw new IllegalStateException();
       } 
       pos.setPos(x, y, z);
-      worldGenMinable.func_180709_b(chunk.func_177412_p(), rnd, (BlockPos)pos);
+      worldGenMinable.generate(chunk.getWorld(), rnd, (BlockPos)pos);
     } 
     updateScale(chunk, oreScaleKey, baseScale);
   }
   
   private static int getBaseHeight(Config config, World world) {
     if (ConfigUtil.getBool(config, "normalizeHeight"))
-      return world.func_181545_F() + 1; 
+      return world.getSeaLevel() + 1; 
     return 64;
   }
   
@@ -329,14 +329,14 @@ public class Ic2WorldDecorator implements IWorldGenerator {
   }
   
   private static void updateScale(Chunk chunk, String key, float scale) {
-    WorldData worldData = WorldData.get(chunk.func_177412_p());
+    WorldData worldData = WorldData.get(chunk.getWorld());
     NBTTagCompound nbt = worldData.worldGenData.get(chunk);
     if (nbt == null) {
       nbt = new NBTTagCompound();
       worldData.worldGenData.put(chunk, nbt);
     } 
-    nbt.func_74776_a(key, nbt.func_74760_g(key) + scale);
-    chunk.func_177427_f(true);
+    nbt.setFloat(key, nbt.getFloat(key) + scale);
+    chunk.setModified(true);
   }
   
   private static int zeroRnd(Random rnd, int limit) {
@@ -348,11 +348,11 @@ public class Ic2WorldDecorator implements IWorldGenerator {
   }
   
   private static int randomX(Chunk chunk, Random rnd) {
-    return chunk.field_76635_g * 16 + rnd.nextInt(16);
+    return chunk.x * 16 + rnd.nextInt(16);
   }
   
   private static int randomZ(Chunk chunk, Random rnd) {
-    return chunk.field_76647_h * 16 + rnd.nextInt(16);
+    return chunk.z * 16 + rnd.nextInt(16);
   }
   
   private enum OreDistribution {

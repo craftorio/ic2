@@ -28,7 +28,7 @@ public abstract class IORecipeCategory<T> implements IRecipeCategory<IRecipeWrap
   }
   
   public String getTitle() {
-    return getBlockStack().func_82833_r();
+    return getBlockStack().getDisplayName();
   }
   
   public void drawExtras(Minecraft minecraft) {}

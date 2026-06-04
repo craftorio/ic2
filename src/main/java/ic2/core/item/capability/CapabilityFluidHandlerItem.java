@@ -10,7 +10,7 @@ public class CapabilityFluidHandlerItem extends FluidHandlerItemStack {
   
   protected void setContainerToEmpty() {
     super.setContainerToEmpty();
-    if (this.container.func_77978_p().hasNoTags())
-      this.container.func_77982_d(null); 
+    if (this.container.getTagCompound().hasNoTags())
+      this.container.setTagCompound(null); 
   }
 }

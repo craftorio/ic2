@@ -113,7 +113,7 @@ public class DynamicRecipe {
   public DynamicRecipe withMetadata(String key, short value) {
     if (this.metadata == null)
       this.metadata = new NBTTagCompound(); 
-    this.metadata.func_74777_a(key, value);
+    this.metadata.setShort(key, value);
     return this;
   }
   
@@ -127,7 +127,7 @@ public class DynamicRecipe {
   public DynamicRecipe withMetadata(String key, float value) {
     if (this.metadata == null)
       this.metadata = new NBTTagCompound(); 
-    this.metadata.func_74776_a(key, value);
+    this.metadata.setFloat(key, value);
     return this;
   }
   
@@ -141,7 +141,7 @@ public class DynamicRecipe {
   public DynamicRecipe withMetadata(String key, boolean value) {
     if (this.metadata == null)
       this.metadata = new NBTTagCompound(); 
-    this.metadata.func_74757_a(key, value);
+    this.metadata.setBoolean(key, value);
     return this;
   }
   

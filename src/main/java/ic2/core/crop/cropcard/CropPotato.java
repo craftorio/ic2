@@ -38,9 +38,9 @@ public class CropPotato extends IC2CropCard {
   
   public ItemStack getGain(ICropTile crop) {
     if (crop.getCurrentSize() >= 4 && IC2.random.nextInt(20) <= 0)
-      return new ItemStack(Items.field_151170_bI); 
+      return new ItemStack(Items.POISONOUS_POTATO); 
     if (crop.getCurrentSize() >= 3)
-      return new ItemStack(Items.field_151174_bG); 
+      return new ItemStack(Items.POTATO); 
     return null;
   }
   

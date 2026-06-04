@@ -11,10 +11,10 @@ public class BlockOre extends BlockMultiID<ResourceBlock> {
   }
   
   public BlockOre() {
-    super(BlockName.resource, Material.field_151576_e);
+    super(BlockName.resource, Material.ROCK);
   }
   
-  public int func_180651_a(IBlockState state) {
-    return func_176201_c(state);
+  public int damageDropped(IBlockState state) {
+    return getMetaFromState(state);
   }
 }

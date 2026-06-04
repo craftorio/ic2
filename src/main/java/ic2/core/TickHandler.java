@@ -35,10 +35,10 @@ public class TickHandler {
         worldData.windSim.updateWind();
         if (ConfigUtil.getBool(MainConfig.get(), "balance/disableEnderChest")) {
           IC2.platform.profilerEndStartSection("EnderChestCheck");
-          for (int i = 0; i < world.field_175730_i.size(); i++) {
-            TileEntity te = world.field_175730_i.get(i);
+          for (int i = 0; i < world.tickableTileEntities.size(); i++) {
+            TileEntity te = world.tickableTileEntities.get(i);
             if (te instanceof net.minecraft.tileentity.TileEntityEnderChest && !te.isInvalid() && !world.isAirBlock(te.getPos())) {
-              world.func_175698_g(te.getPos());
+              world.setBlockToAir(te.getPos());
               IC2.log.info(LogCategory.General, "Removed vanilla ender chest at %s.", new Object[] { Util.formatPosition(te) });
             } 
           } 

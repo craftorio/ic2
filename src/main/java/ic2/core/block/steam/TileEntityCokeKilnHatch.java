@@ -19,13 +19,13 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class TileEntityCokeKilnHatch extends TileEntityInventory implements IHasGui {
   protected final InvSlot inventory = new InvSlot((IInventorySlotHolder)this, "inventory", InvSlot.Access.I, 1, InvSlot.InvSide.ANY);
   
-  public boolean func_180462_a(int index, ItemStack stack, EnumFacing side) {
+  public boolean canInsertItem(int index, ItemStack stack, EnumFacing side) {
     if (side != getFacing())
       return false; 
-    return super.func_180462_a(index, stack, side);
+    return super.canInsertItem(index, stack, side);
   }
   
-  public boolean func_180461_b(int index, ItemStack stack, EnumFacing side) {
+  public boolean canExtractItem(int index, ItemStack stack, EnumFacing side) {
     return false;
   }
   

@@ -14,9 +14,9 @@ public class IC2Potion extends Potion {
   private final List<ItemStack> curativeItems;
   
   public static void init() {
-    radiation.func_76390_b("ic2.potion.radiation");
-    radiation.func_76399_b(6, 0);
-    radiation.func_76404_a(0.25D);
+    radiation.setPotionName("ic2.potion.radiation");
+    radiation.setIconIndex(6, 0);
+    radiation.setEffectiveness(0.25D);
   }
   
   public IC2Potion(String name, boolean badEffect, int liquidColor, ItemStack... curativeItems) {
@@ -25,12 +25,12 @@ public class IC2Potion extends Potion {
     ForgeRegistries.POTIONS.register(setRegistryName(name));
   }
   
-  public void func_76394_a(EntityLivingBase entity, int amplifier) {
+  public void performEffect(EntityLivingBase entity, int amplifier) {
     if (this == radiation)
-      entity.func_70097_a(IC2DamageSource.radiation, (amplifier / 100) + 0.5F); 
+      entity.attackEntityFrom(IC2DamageSource.radiation, (amplifier / 100) + 0.5F); 
   }
   
-  public boolean func_76397_a(int duration, int amplifier) {
+  public boolean isReady(int duration, int amplifier) {
     if (this == radiation) {
       int rate = 25 >> amplifier;
       return (rate > 0) ? ((duration % rate == 0)) : true;
@@ -41,6 +41,6 @@ public class IC2Potion extends Potion {
   public void applyTo(EntityLivingBase entity, int duration, int amplifier) {
     PotionEffect effect = new PotionEffect(radiation, duration, amplifier);
     effect.setCurativeItems(this.curativeItems);
-    entity.func_70690_d(effect);
+    entity.addPotionEffect(effect);
   }
 }

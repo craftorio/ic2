@@ -129,7 +129,7 @@ public class TileEntityCable extends TileEntityBlock implements IEnergyConductor
         TileEntityCable newTe = (this.cableType == CableType.detector) ? new TileEntityCableDetector() : new TileEntityCableSplitter();
         NBTTagCompound nbt = new NBTTagCompound();
         writeToNBT(nbt);
-        this.world.func_175690_a(getPos(), (TileEntity)newTe);
+        this.world.setTileEntity(getPos(), (TileEntity)newTe);
         newTe.readFromNBT(nbt);
         return;
       } 
@@ -154,7 +154,7 @@ public class TileEntityCable extends TileEntityBlock implements IEnergyConductor
   }
   
   protected SoundType getBlockSound(Entity entity) {
-    return SoundType.field_185854_g;
+    return SoundType.CLOTH;
   }
   
   public void onPlaced(ItemStack stack, EntityLivingBase placer, EnumFacing facing) {
@@ -279,9 +279,9 @@ public class TileEntityCable extends TileEntityBlock implements IEnergyConductor
   protected float getHardness() {
     switch (this.foam) {
       case Soft:
-        return BlockName.foam.getInstance().func_176195_g(null, null, null);
+        return BlockName.foam.getInstance().getBlockHardness(null, null, null);
       case Hardened:
-        return BlockName.wall.getInstance().func_176195_g(null, null, null);
+        return BlockName.wall.getInstance().getBlockHardness(null, null, null);
     } 
     return super.getHardness();
   }
@@ -421,7 +421,7 @@ public class TileEntityCable extends TileEntityBlock implements IEnergyConductor
   }
   
   public void removeConductor() {
-    getWorld().func_175698_g(this.pos);
+    getWorld().setBlockToAir(this.pos);
     ((NetworkManager)IC2.network.get(true)).initiateTileEntityEvent((TileEntity)this, 0, true);
   }
   
@@ -456,9 +456,9 @@ public class TileEntityCable extends TileEntityBlock implements IEnergyConductor
     World world = getWorld();
     switch (event) {
       case 0:
-        world.func_184133_a(null, this.pos, SoundEvents.field_187658_bx, SoundCategory.BLOCKS, 0.5F, 2.6F + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.8F);
+        world.playSound(null, this.pos, SoundEvents.ENTITY_GENERIC_BURN, SoundCategory.BLOCKS, 0.5F, 2.6F + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.8F);
         for (l = 0; l < 8; l++)
-          world.func_175688_a(EnumParticleTypes.SMOKE_LARGE, this.pos.getX() + Math.random(), this.pos.getY() + 1.2D, this.pos.getZ() + Math.random(), 0.0D, 0.0D, 0.0D, new int[0]); 
+          world.spawnParticle(EnumParticleTypes.SMOKE_LARGE, this.pos.getX() + Math.random(), this.pos.getY() + 1.2D, this.pos.getZ() + Math.random(), 0.0D, 0.0D, 0.0D, new int[0]); 
         return;
     } 
     IC2.platform.displayError("An unknown event type was received over multiplayer.\nThis could happen due to corrupted data or a bug.\n\n(Technical information: event ID " + event + ", tile entity below)\nT: " + this + " (" + this.pos + ")", new Object[0]);

@@ -34,8 +34,8 @@ public class ItemToolWrench extends ItemIC2 implements IBoxable {
   
   protected ItemToolWrench(ItemName name) {
     super(name);
-    func_77656_e(120);
-    func_77625_d(1);
+    setMaxDamage(120);
+    setMaxStackSize(1);
   }
   
   public boolean canTakeDamage(ItemStack stack, int amount) {
@@ -69,14 +69,14 @@ public class ItemToolWrench extends ItemIC2 implements IBoxable {
       EnumFacing newFacing = currentFacing;
       if (IC2.keyboard.isAltKeyDown(player)) {
         EnumFacing.Axis axis = side.getAxis();
-        if ((side.func_176743_c() == EnumFacing.AxisDirection.POSITIVE && !player.func_70093_af()) || (side
-          .func_176743_c() == EnumFacing.AxisDirection.NEGATIVE && player.func_70093_af())) {
+        if ((side.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE && !player.isSneaking()) || (side
+          .getAxisDirection() == EnumFacing.AxisDirection.NEGATIVE && player.isSneaking())) {
           newFacing = newFacing.rotateAround(axis);
         } else {
           for (int i = 0; i < 3; i++)
             newFacing = newFacing.rotateAround(axis); 
         } 
-      } else if (player.func_70093_af()) {
+      } else if (player.isSneaking()) {
         newFacing = side.getOpposite();
       } else {
         newFacing = side;
@@ -88,20 +88,20 @@ public class ItemToolWrench extends ItemIC2 implements IBoxable {
           int experience;
           TileEntity te = world.getTileEntity(pos);
           if (ConfigUtil.getBool(MainConfig.get(), "protection/wrenchLogging")) {
-            String playerName = player.func_146103_bH().getName() + "/" + player.func_146103_bH().getId();
+            String playerName = player.getGameProfile().getName() + "/" + player.getGameProfile().getId();
             IC2.log.info(LogCategory.PlayerActivity, "Player %s used a wrench to remove the block %s (te %s) at %s.", new Object[] { playerName, state, 
                   getTeName(te), Util.formatPosition((IBlockAccess)world, pos) });
           } 
           if (player instanceof EntityPlayerMP) {
-            experience = ForgeHooks.onBlockBreakEvent(world, ((EntityPlayerMP)player).field_71134_c.func_73081_b(), (EntityPlayerMP)player, pos);
+            experience = ForgeHooks.onBlockBreakEvent(world, ((EntityPlayerMP)player).interactionManager.getGameType(), (EntityPlayerMP)player, pos);
             if (experience < 0)
               return WrenchResult.Nothing; 
           } else {
             experience = 0;
           } 
-          block.func_176208_a(world, pos, state, player);
+          block.onBlockHarvested(world, pos, state, player);
           if (block.removedByPlayer(state, world, pos, player, true)) {
-            block.func_176206_d(world, pos, state);
+            block.onBlockDestroyedByPlayer(world, pos, state);
           } else {
             return WrenchResult.Nothing;
           } 
@@ -113,8 +113,8 @@ public class ItemToolWrench extends ItemIC2 implements IBoxable {
             for (ItemStack stack : drops)
               StackUtil.dropAsEntity(world, pos, stack); 
           } 
-          if (!player.field_71075_bZ.field_75098_d && experience > 0)
-            block.func_180637_b(world, pos, experience); 
+          if (!player.capabilities.isCreativeMode && experience > 0)
+            block.dropXpOnBlockBreak(world, pos, experience); 
         } 
         return WrenchResult.Removed;
       } 
@@ -133,14 +133,14 @@ public class ItemToolWrench extends ItemIC2 implements IBoxable {
   }
   
   public void damage(ItemStack is, int damage, EntityPlayer player) {
-    is.func_77972_a(damage, (EntityLivingBase)player);
+    is.damageItem(damage, (EntityLivingBase)player);
   }
   
   public boolean canBeStoredInToolbox(ItemStack itemstack) {
     return true;
   }
   
-  public boolean func_82789_a(ItemStack toRepair, ItemStack repair) {
+  public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
     return (repair != null && Util.matchesOD(repair, "ingotBronze"));
   }
   

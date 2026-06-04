@@ -14,7 +14,7 @@ public class VanillaSmeltingResolver implements IRecipeResolver {
   
   public List<RecipeTransformation> getTransformations() {
     List<RecipeTransformation> ret = new ArrayList<>();
-    for (Map.Entry<ItemStack, ItemStack> entry : (Iterable<Map.Entry<ItemStack, ItemStack>>)FurnaceRecipes.func_77602_a().func_77599_b().entrySet()) {
+    for (Map.Entry<ItemStack, ItemStack> entry : (Iterable<Map.Entry<ItemStack, ItemStack>>)FurnaceRecipes.instance().getSmeltingList().entrySet()) {
       try {
         List<List<LeanItemStack>> inputs = RecipeUtil.convertIngredients(AdvRecipe.expand(entry.getKey()));
         LeanItemStack output = new LeanItemStack(entry.getValue());

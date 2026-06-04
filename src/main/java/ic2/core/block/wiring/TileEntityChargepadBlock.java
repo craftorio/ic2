@@ -83,12 +83,12 @@ public abstract class TileEntityChargepadBlock extends TileEntityElectricBlock {
     if (rnd.nextInt(8) != 0)
       return; 
     if (getActive()) {
-      ParticleManager effect = (FMLClientHandler.instance().getClient()).field_71452_i;
+      ParticleManager effect = (FMLClientHandler.instance().getClient()).effectRenderer;
       for (int particles = 20; particles > 0; particles--) {
         double x = (this.pos.getX() + 0.0F + rnd.nextFloat());
         double y = (this.pos.getY() + 0.9F + rnd.nextFloat());
         double z = (this.pos.getZ() + 0.0F + rnd.nextFloat());
-        effect.func_78873_a((Particle)new EntityIC2FX(world, x, y, z, 60, new double[] { 0.0D, 0.1D, 0.0D }, new float[] { 0.2F, 0.2F, 1.0F }));
+        effect.addEffect((Particle)new EntityIC2FX(world, x, y, z, 60, new double[] { 0.0D, 0.1D, 0.0D }, new float[] { 0.2F, 0.2F, 1.0F }));
       } 
     } 
   }

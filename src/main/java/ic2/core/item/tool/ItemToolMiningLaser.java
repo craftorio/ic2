@@ -56,9 +56,9 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
   }
   
   @SideOnly(Side.CLIENT)
-  public void func_77624_a(ItemStack stack, World world, List<String> list, ITooltipFlag par4) {
+  public void addInformation(ItemStack stack, World world, List<String> list, ITooltipFlag par4) {
     String mode;
-    super.func_77624_a(stack, world, list, par4);
+    super.addInformation(stack, world, list, par4);
     NBTTagCompound nbtData = StackUtil.getOrCreateNbtData(stack);
     switch (nbtData.getInteger("laserSetting")) {
       case 0:
@@ -100,7 +100,7 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
     return info;
   }
   
-  public ActionResult<ItemStack> func_77659_a(World world, EntityPlayer player, EnumHand hand) {
+  public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
     ItemStack stack = StackUtil.get(player, hand);
     if (!IC2.platform.isSimulating())
       return new ActionResult(EnumActionResult.PASS, stack); 
@@ -170,7 +170,7 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
           break;
       } 
     } 
-    return super.func_77659_a(world, player, hand);
+    return super.onItemRightClick(world, player, hand);
   }
   
   public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
@@ -196,7 +196,7 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
             shootLaser(stack, world, start, dir, (EntityLivingBase)player, Float.POSITIVE_INFINITY, 5.0F, 2147483647, false, false)) {
             shootLaser(stack, world, new Vector3(start.x, start.y - 1.0D, start.z), dir, (EntityLivingBase)player, Float.POSITIVE_INFINITY, 5.0F, 2147483647, false, false);
             shootLaser(stack, world, new Vector3(start.x, start.y + 1.0D, start.z), dir, (EntityLivingBase)player, Float.POSITIVE_INFINITY, 5.0F, 2147483647, false, false);
-            if (player.func_174811_aO().equals(EnumFacing.SOUTH) || player.func_174811_aO().equals(EnumFacing.NORTH)) {
+            if (player.getHorizontalFacing().equals(EnumFacing.SOUTH) || player.getHorizontalFacing().equals(EnumFacing.NORTH)) {
               shootLaser(stack, world, new Vector3(start.x - 1.0D, start.y, start.z), dir, (EntityLivingBase)player, Float.POSITIVE_INFINITY, 5.0F, 2147483647, false, false);
               shootLaser(stack, world, new Vector3(start.x + 1.0D, start.y, start.z), dir, (EntityLivingBase)player, Float.POSITIVE_INFINITY, 5.0F, 2147483647, false, false);
               shootLaser(stack, world, new Vector3(start.x - 1.0D, start.y - 1.0D, start.z), dir, (EntityLivingBase)player, Float.POSITIVE_INFINITY, 5.0F, 2147483647, false, false);
@@ -204,7 +204,7 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
               shootLaser(stack, world, new Vector3(start.x - 1.0D, start.y + 1.0D, start.z), dir, (EntityLivingBase)player, Float.POSITIVE_INFINITY, 5.0F, 2147483647, false, false);
               shootLaser(stack, world, new Vector3(start.x + 1.0D, start.y + 1.0D, start.z), dir, (EntityLivingBase)player, Float.POSITIVE_INFINITY, 5.0F, 2147483647, false, false);
             } 
-            if (player.func_174811_aO().equals(EnumFacing.EAST) || player.func_174811_aO().equals(EnumFacing.WEST)) {
+            if (player.getHorizontalFacing().equals(EnumFacing.EAST) || player.getHorizontalFacing().equals(EnumFacing.WEST)) {
               shootLaser(stack, world, new Vector3(start.x, start.y, start.z - 1.0D), dir, (EntityLivingBase)player, Float.POSITIVE_INFINITY, 5.0F, 2147483647, false, false);
               shootLaser(stack, world, new Vector3(start.x, start.y, start.z + 1.0D), dir, (EntityLivingBase)player, Float.POSITIVE_INFINITY, 5.0F, 2147483647, false, false);
               shootLaser(stack, world, new Vector3(start.x, start.y - 1.0D, start.z - 1.0D), dir, (EntityLivingBase)player, Float.POSITIVE_INFINITY, 5.0F, 2147483647, false, false);
@@ -269,7 +269,7 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
   }
   
   @SideOnly(Side.CLIENT)
-  public EnumRarity func_77613_e(ItemStack stack) {
+  public EnumRarity getRarity(ItemStack stack) {
     return EnumRarity.UNCOMMON;
   }
   

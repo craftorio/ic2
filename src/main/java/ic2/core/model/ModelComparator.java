@@ -28,8 +28,8 @@ public class ModelComparator {
     assert stateA != stateB;
     byte renderMask = 0;
     for (EnumFacing facing : EnumFacing.VALUES) {
-      boolean renderA = stateA.func_185894_c((IBlockAccess)world, pos, facing);
-      boolean renderB = stateB.func_185894_c((IBlockAccess)world, pos, facing);
+      boolean renderA = stateA.shouldSideBeRendered((IBlockAccess)world, pos, facing);
+      boolean renderB = stateB.shouldSideBeRendered((IBlockAccess)world, pos, facing);
       if (renderA != renderB)
         return false; 
       if (renderA)
@@ -48,9 +48,9 @@ public class ModelComparator {
       cacheResult = UNCACHEABLE;
     } 
     assert cacheResult == null || cacheResult == UNCACHEABLE;
-    BlockRendererDispatcher renderer = Minecraft.getMinecraft().func_175602_ab();
-    IBakedModel modelA = renderer.func_184389_a(stateA);
-    IBakedModel modelB = renderer.func_184389_a(stateB);
+    BlockRendererDispatcher renderer = Minecraft.getMinecraft().getBlockRendererDispatcher();
+    IBakedModel modelA = renderer.getModelForState(stateA);
+    IBakedModel modelB = renderer.getModelForState(stateB);
     Class<?> modelCls = modelA.getClass();
     if (modelB.getClass() != modelCls) {
       if (cacheResult == null)
@@ -65,12 +65,12 @@ public class ModelComparator {
       cacheResult = UNCACHEABLE;
       cache.putIfAbsent(cacheKey, UNCACHEABLE);
     } 
-    long rand = MathHelper.func_180186_a((Vec3i)pos);
+    long rand = MathHelper.getPositionRandom((Vec3i)pos);
     byte equal = 63;
     label88: for (EnumFacing facing : facings) {
       if (cacheResult == null || facing == null || (renderMask & 1 << facing.ordinal()) != 0) {
-        List<BakedQuad> quadsA = modelA.func_188616_a(stateA, facing, rand);
-        List<BakedQuad> quadsB = modelB.func_188616_a(stateB, facing, rand);
+        List<BakedQuad> quadsA = modelA.getQuads(stateA, facing, rand);
+        List<BakedQuad> quadsB = modelB.getQuads(stateB, facing, rand);
         if (quadsA.size() != quadsB.size()) {
           if (cacheResult != null)
             return false; 
@@ -81,7 +81,7 @@ public class ModelComparator {
           equal = (byte)(equal & (1 << facing.ordinal() ^ 0xFFFFFFFF));
         } else if (!quadsA.isEmpty()) {
           for (int i = 0; i < quadsA.size(); i++) {
-            if (!Arrays.equals(((BakedQuad)quadsA.get(i)).func_178209_a(), ((BakedQuad)quadsB.get(i)).func_178209_a())) {
+            if (!Arrays.equals(((BakedQuad)quadsA.get(i)).getVertexData(), ((BakedQuad)quadsB.get(i)).getVertexData())) {
               if (cacheResult != null)
                 return false; 
               if (facing == null) {

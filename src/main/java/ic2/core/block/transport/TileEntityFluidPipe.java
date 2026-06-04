@@ -463,23 +463,23 @@ public class TileEntityFluidPipe extends TileEntityPipe implements IFluidPipe {
     EntityPlayer player = event.getPlayer();
     World world = player.getEntityWorld();
     BlockPos pos = rayTrace.getBlockPos();
-    if (!world.func_175723_af().func_177746_a(pos))
+    if (!world.getWorldBorder().contains(pos))
       return; 
     TileEntity te = world.getTileEntity(pos);
     if (!(te instanceof TileEntityFluidPipe))
       return; 
-    GlStateManager.func_179147_l();
-    GlStateManager.func_187428_a(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-    GlStateManager.func_187441_d(2.0F);
-    GlStateManager.func_179090_x();
-    GlStateManager.func_179132_a(false);
-    double xOffset = player.field_70142_S + (player.posX - player.field_70142_S) * event.getPartialTicks();
-    double yOffset = player.field_70137_T + (player.posY - player.field_70137_T) * event.getPartialTicks();
-    double zOffset = player.field_70136_U + (player.posZ - player.field_70136_U) * event.getPartialTicks();
-    RenderGlobal.func_189697_a(((TileEntityFluidPipe)te).getVisualBoundingBox().func_186670_a(pos).func_186662_g(0.002D).func_72317_d(-xOffset, -yOffset, -zOffset), 0.0F, 0.0F, 0.0F, 0.4F);
-    GlStateManager.func_179132_a(true);
-    GlStateManager.func_179098_w();
-    GlStateManager.func_179084_k();
+    GlStateManager.enableBlend();
+    GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+    GlStateManager.glLineWidth(2.0F);
+    GlStateManager.disableTexture2D();
+    GlStateManager.depthMask(false);
+    double xOffset = player.lastTickPosX + (player.posX - player.lastTickPosX) * event.getPartialTicks();
+    double yOffset = player.lastTickPosY + (player.posY - player.lastTickPosY) * event.getPartialTicks();
+    double zOffset = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * event.getPartialTicks();
+    RenderGlobal.drawSelectionBoundingBox(((TileEntityFluidPipe)te).getVisualBoundingBox().offset(pos).grow(0.002D).offset(-xOffset, -yOffset, -zOffset), 0.0F, 0.0F, 0.0F, 0.4F);
+    GlStateManager.depthMask(true);
+    GlStateManager.enableTexture2D();
+    GlStateManager.disableBlend();
     event.setCanceled(true);
   }
   

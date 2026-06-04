@@ -69,8 +69,8 @@ public class CannerBottleRecipeManager implements ICannerBottleRecipeManager {
         if (acceptTest || (!StackUtil.isEmpty(container) && StackUtil.getSize(container) >= recipeInput.container.getAmount() && StackUtil.getSize(fill) >= recipeInput.fill.getAmount())) {
           if (adjustInput) {
             if (!StackUtil.isEmpty(container))
-              container.func_190918_g(recipeInput.container.getAmount()); 
-            fill.func_190918_g(recipeInput.fill.getAmount());
+              container.shrink(recipeInput.container.getAmount()); 
+            fill.shrink(recipeInput.fill.getAmount());
           } 
           new RecipeOutput(null, new ItemStack[] { (ItemStack)recipe.getOutput() });
         } 

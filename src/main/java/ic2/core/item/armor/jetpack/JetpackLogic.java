@@ -33,8 +33,8 @@ public class JetpackLogic {
       } 
       float forwardpower = power * retruster * 2.0F;
       if (forwardpower > 0.0F) {
-        player.func_191958_b(0.0F, 0.0F, 0.4F * forwardpower + boost, 0.02F + boost);
-        if (boost != 0.0F && !player.field_70122_E)
+        player.moveRelative(0.0F, 0.0F, 0.4F * forwardpower + boost, 0.02F + boost);
+        if (boost != 0.0F && !player.onGround)
           bjetpack.useBoostPower(stack, boost); 
       } 
     } 
@@ -69,10 +69,10 @@ public class JetpackLogic {
     int consume = 2;
     if (hoverMode)
       consume = 1; 
-    if (!player.field_70122_E)
+    if (!player.onGround)
       jetpack.drainEnergy(stack, consume); 
-    player.field_70143_R = 0.0F;
-    player.field_70140_Q = 0.0F;
+    player.fallDistance = 0.0F;
+    player.distanceWalkedModified = 0.0F;
     IC2.platform.resetPlayerInAirTime(player);
     return true;
   }
@@ -88,7 +88,7 @@ public class JetpackLogic {
       toggleTimer = 10;
       hoverMode = !hoverMode;
       if (IC2.platform.isSimulating()) {
-        nbtData.func_74757_a("hoverMode", hoverMode);
+        nbtData.setBoolean("hoverMode", hoverMode);
         if (hoverMode) {
           IC2.platform.messagePlayer(player, "Hover Mode enabled.", new Object[0]);
         } else {
@@ -98,7 +98,7 @@ public class JetpackLogic {
     } 
     if (IC2.keyboard.isJumpKeyDown(player) || hoverMode) {
       jetpackUsed = useJetpack(player, hoverMode, jetpack, stack);
-      if (player.field_70122_E && hoverMode && IC2.platform.isSimulating()) {
+      if (player.onGround && hoverMode && IC2.platform.isSimulating()) {
         setHoverMode(nbtData, false);
         IC2.platform.messagePlayer(player, "Hover Mode disabled.", new Object[0]);
       } 
@@ -124,15 +124,15 @@ public class JetpackLogic {
         audioSource.updatePosition(); 
     } 
     if (jetpackUsed)
-      player.field_71069_bz.func_75142_b(); 
+      player.inventoryContainer.detectAndSendChanges(); 
   }
   
   private static void setHoverMode(NBTTagCompound nbt, boolean value) {
-    nbt.func_74757_a("hoverMode", value);
+    nbt.setBoolean("hoverMode", value);
   }
   
   private static boolean getHoverMode(NBTTagCompound nbt) {
-    return nbt.func_74767_n("hoverMode");
+    return nbt.getBoolean("hoverMode");
   }
   
   private static NBTTagCompound getJetpackCompound(ItemStack stack) {

@@ -18,9 +18,11 @@ import ic2.core.gui.dynamic.GuiParser;
 import ic2.core.network.GuiSynced;
 import ic2.core.profile.NotClassic;
 import ic2.core.recipe.BasicMachineRecipeManager;
+
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Set;
+
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -29,62 +31,72 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @NotClassic
-public class TileEntityBlockCutter extends TileEntityStandardMachine<IRecipeInput, Collection<ItemStack>, ItemStack> {
-  @GuiSynced
-  private boolean bladeTooWeak;
-  
-  public final InvSlotConsumableClass cutterSlot;
-  
-  public TileEntityBlockCutter() {
-    super(4, 450, 1);
-    this.bladeTooWeak = false;
-    this.inputSlot = (InvSlotProcessable<IRecipeInput, Collection<ItemStack>, ItemStack>)new InvSlotProcessableGeneric((IInventorySlotHolder)this, "input", 1, (IMachineRecipeManager)Recipes.blockcutter);
-    this.cutterSlot = new InvSlotConsumableClass((IInventorySlotHolder)this, "cutterInputSlot", 1, IBlockCuttingBlade.class);
-  }
-  
-  public static void init() {
-    Recipes.blockcutter = (IBasicMachineRecipeManager)new BasicMachineRecipeManager();
-  }
-  
-  public MachineRecipeResult<IRecipeInput, Collection<ItemStack>, ItemStack> getOutput() {
-    if (this.cutterSlot.isEmpty()) {
-      if (this.bladeTooWeak != true)
-        this.bladeTooWeak = true; 
-      return null;
-    } 
-    if (this.bladeTooWeak)
-      this.bladeTooWeak = false; 
-    MachineRecipeResult<IRecipeInput, Collection<ItemStack>, ItemStack> ret = super.getOutput();
-    if (ret == null || ret.getRecipe().getMetaData() == null)
-      return null; 
-    ItemStack bladeStack = this.cutterSlot.get();
-    IBlockCuttingBlade blade = (IBlockCuttingBlade)bladeStack.getItem();
-    if (ret.getRecipe().getMetaData().getInteger("hardness") > blade.getHardness(bladeStack)) {
-      if (this.bladeTooWeak != true)
-        this.bladeTooWeak = true; 
-      return null;
-    } 
-    if (this.bladeTooWeak)
-      this.bladeTooWeak = false; 
-    return ret;
-  }
-  
-  public ContainerBase<TileEntityBlockCutter> getGuiContainer(EntityPlayer player) {
-    return (ContainerBase<TileEntityBlockCutter>)DynamicContainer.create((IInventory)this, player, GuiParser.parse(this.teBlock));
-  }
-  
-  @SideOnly(Side.CLIENT)
-  public GuiScreen getGui(EntityPlayer player, boolean isAdmin) {
-    return (GuiScreen)DynamicGui.create((IInventory)this, player, GuiParser.parse(this.teBlock));
-  }
-  
-  public boolean getGuiState(String name) {
-    if ("isBladeTooWeak".equals(name))
-      return this.bladeTooWeak; 
-    return super.getGuiState(name);
-  }
-  
-  public Set<UpgradableProperty> getUpgradableProperties() {
-    return EnumSet.of(UpgradableProperty.Processing, UpgradableProperty.Transformer, UpgradableProperty.EnergyStorage, UpgradableProperty.ItemConsuming, UpgradableProperty.ItemProducing);
-  }
+public class TileEntityBlockCutter extends TileEntityStandardMachine<IRecipeInput, Collection<ItemStack>, ItemStack>
+{
+	@GuiSynced
+	private boolean bladeTooWeak;
+
+	public final InvSlotConsumableClass cutterSlot;
+
+	public TileEntityBlockCutter()
+	{
+		super(4, 450, 1);
+		this.bladeTooWeak = false;
+		this.inputSlot = new InvSlotProcessableGeneric(this, "input", 1, Recipes.blockcutter);
+		this.cutterSlot = new InvSlotConsumableClass(this, "cutterInputSlot", 1, IBlockCuttingBlade.class);
+	}
+
+	public static void init()
+	{
+		Recipes.blockcutter = new BasicMachineRecipeManager();
+	}
+
+	public MachineRecipeResult<IRecipeInput, Collection<ItemStack>, ItemStack> getOutput()
+	{
+		if (this.cutterSlot.isEmpty())
+		{
+			if (!this.bladeTooWeak)
+				this.bladeTooWeak = true;
+			return null;
+		}
+		if (this.bladeTooWeak)
+			this.bladeTooWeak = false;
+		MachineRecipeResult<IRecipeInput, Collection<ItemStack>, ItemStack> ret = super.getOutput();
+		if (ret == null || ret.getRecipe().getMetaData() == null)
+			return null;
+		ItemStack bladeStack = this.cutterSlot.get();
+		IBlockCuttingBlade blade = (IBlockCuttingBlade) bladeStack.getItem();
+		if (ret.getRecipe().getMetaData().getInteger("hardness") > blade.getHardness(bladeStack))
+		{
+			if (!this.bladeTooWeak)
+				this.bladeTooWeak = true;
+			return null;
+		}
+		if (this.bladeTooWeak)
+			this.bladeTooWeak = false;
+		return ret;
+	}
+
+	public ContainerBase<TileEntityBlockCutter> getGuiContainer(EntityPlayer player)
+	{
+		return DynamicContainer.create(this, player, GuiParser.parse(this.teBlock));
+	}
+
+	@SideOnly(Side.CLIENT)
+	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
+	{
+		return DynamicGui.create(this, player, GuiParser.parse(this.teBlock));
+	}
+
+	public boolean getGuiState(String name)
+	{
+		if ("isBladeTooWeak".equals(name))
+			return this.bladeTooWeak;
+		return super.getGuiState(name);
+	}
+
+	public Set<UpgradableProperty> getUpgradableProperties()
+	{
+		return EnumSet.of(UpgradableProperty.Processing, UpgradableProperty.Transformer, UpgradableProperty.EnergyStorage, UpgradableProperty.ItemConsuming, UpgradableProperty.ItemProducing);
+	}
 }

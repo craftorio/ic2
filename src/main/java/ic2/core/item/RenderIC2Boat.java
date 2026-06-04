@@ -14,7 +14,7 @@ public class RenderIC2Boat extends RenderBoat {
     super(manager);
   }
   
-  protected ResourceLocation func_110775_a(EntityBoat entity) {
+  protected ResourceLocation getEntityTexture(EntityBoat entity) {
     return new ResourceLocation("ic2", ((EntityIC2Boat)entity).getTexture());
   }
 }

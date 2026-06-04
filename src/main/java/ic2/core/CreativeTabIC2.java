@@ -18,12 +18,12 @@ public class CreativeTabIC2 extends CreativeTabs {
     super("IC2");
   }
   
-  public ItemStack func_151244_d() {
+  public ItemStack getIconItemStack() {
     if (IC2.seasonal) {
       if (a == null)
-        a = new ItemStack(Items.field_151144_bL, 1, 2); 
+        a = new ItemStack(Items.SKULL, 1, 2); 
       if (b == null)
-        b = new ItemStack(Items.field_151144_bL, 1, 0); 
+        b = new ItemStack(Items.SKULL, 1, 0); 
       if (z == null)
         z = ItemName.nano_chestplate.getItemStack(); 
       if (++this.ticker >= 5000)
@@ -34,7 +34,7 @@ public class CreativeTabIC2 extends CreativeTabs {
     return ItemName.mining_laser.getItemStack();
   }
   
-  public ItemStack func_78016_d() {
+  public ItemStack getTabIconItem() {
     return null;
   }
 }

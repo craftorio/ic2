@@ -8,7 +8,7 @@ public abstract class CropVanilla extends IC2CropCard {
   protected final int maxAge;
   
   protected CropVanilla(BlockCrops block) {
-    this(block.func_185526_g());
+    this(block.getMaxAge());
   }
   
   protected CropVanilla(int maxAge) {

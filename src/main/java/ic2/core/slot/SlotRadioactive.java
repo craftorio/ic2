@@ -9,7 +9,7 @@ public class SlotRadioactive extends Slot {
     super(inventory, index, x, y);
   }
   
-  public boolean func_75214_a(ItemStack stack) {
-    return this.field_75224_c.func_94041_b(this.field_75222_d, stack);
+  public boolean isItemValid(ItemStack stack) {
+    return this.inventory.isItemValidForSlot(this.slotNumber, stack);
   }
 }

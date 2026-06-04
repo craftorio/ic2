@@ -29,30 +29,30 @@ public class ItemBlockTileEntity extends ItemBlockIC2 {
   
   public ItemBlockTileEntity(Block block, ResourceLocation identifier) {
     super(block);
-    func_77627_a(true);
+    setHasSubtypes(true);
     this.identifier = identifier;
   }
   
-  public String func_77667_c(ItemStack stack) {
+  public String getUnlocalizedName(ItemStack stack) {
     ITeBlock teBlock = getTeBlock(stack);
     String name = (teBlock == null) ? "invalid" : teBlock.getName();
-    return func_77658_a() + "." + name;
+    return getUnlocalizedName() + "." + name;
   }
   
-  public void func_150895_a(CreativeTabs tab, NonNullList<ItemStack> items) {
-    this.field_150939_a.func_149666_a(tab, items);
+  public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items) {
+    this.block.getSubBlocks(tab, items);
   }
   
   @SideOnly(Side.CLIENT)
-  public void func_77624_a(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
+  public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
     ITeBlock block = getTeBlock(stack);
     if (block != null && block.getDummyTe() != null)
       block.getDummyTe().addInformation(stack, tooltip, advanced); 
   }
   
   public boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, IBlockState newState) {
-    assert newState.getBlock() == this.field_150939_a;
-    if (!((BlockTileEntity)this.field_150939_a).canReplace(world, pos, side, stack))
+    assert newState.getBlock() == this.block;
+    if (!((BlockTileEntity)this.block).canReplace(world, pos, side, stack))
       return false; 
     ITeBlock teBlock = getTeBlock(stack);
     if (teBlock == null)
@@ -69,17 +69,17 @@ public class ItemBlockTileEntity extends ItemBlockIC2 {
   public static boolean placeTeBlock(ItemStack stack, EntityLivingBase placer, World world, BlockPos pos, EnumFacing side, TileEntityBlock te) {
     IBlockState oldState = world.getBlockState(pos);
     IBlockState newState = te.getBlockState();
-    if (!world.func_180501_a(pos, newState, 0))
+    if (!world.setBlockState(pos, newState, 0))
       return false; 
-    world.func_175690_a(pos, (TileEntity)te);
+    world.setTileEntity(pos, (TileEntity)te);
     te.onPlaced(stack, placer, side);
-    world.markAndNotifyBlock(pos, world.func_175726_f(pos), oldState, newState, 3);
+    world.markAndNotifyBlock(pos, world.getChunkFromBlockCoords(pos), oldState, newState, 3);
     if (!world.isRemote)
       ((NetworkManager)IC2.network.get(true)).sendInitialData((TileEntity)te); 
     return true;
   }
   
-  public EnumRarity func_77613_e(ItemStack stack) {
+  public EnumRarity getRarity(ItemStack stack) {
     ITeBlock teblock = getTeBlock(stack);
     return (teblock != null) ? teblock.getRarity() : EnumRarity.COMMON;
   }

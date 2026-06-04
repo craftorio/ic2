@@ -12,25 +12,25 @@ import net.minecraft.world.World;
 
 class Flatification extends TerraformerBase {
   void init() {
-    removable.add(Blocks.field_150433_aE);
-    removable.add(Blocks.field_150432_aD);
-    removable.add(Blocks.field_150349_c);
-    removable.add(Blocks.field_150348_b);
-    removable.add(Blocks.field_150351_n);
+    removable.add(Blocks.SNOW);
+    removable.add(Blocks.ICE);
+    removable.add(Blocks.GRASS);
+    removable.add(Blocks.STONE);
+    removable.add(Blocks.GRAVEL);
     removable.add(Blocks.SAND);
-    removable.add(Blocks.field_150346_d);
-    removable.add(Blocks.field_150362_t);
-    removable.add(Blocks.field_150361_u);
-    removable.add(Blocks.field_150364_r);
-    removable.add(Blocks.field_150329_H);
-    removable.add(Blocks.field_150328_O);
-    removable.add(Blocks.field_150327_N);
-    removable.add(Blocks.field_150345_g);
-    removable.add(Blocks.field_150464_aj);
-    removable.add(Blocks.field_150337_Q);
-    removable.add(Blocks.field_150338_P);
-    removable.add(Blocks.field_150423_aK);
-    removable.add(Blocks.field_150440_ba);
+    removable.add(Blocks.DIRT);
+    removable.add(Blocks.LEAVES);
+    removable.add(Blocks.LEAVES2);
+    removable.add(Blocks.LOG);
+    removable.add(Blocks.TALLGRASS);
+    removable.add(Blocks.RED_FLOWER);
+    removable.add(Blocks.YELLOW_FLOWER);
+    removable.add(Blocks.SAPLING);
+    removable.add(Blocks.WHEAT);
+    removable.add(Blocks.RED_MUSHROOM);
+    removable.add(Blocks.BROWN_MUSHROOM);
+    removable.add(Blocks.PUMPKIN);
+    removable.add(Blocks.MELON_BLOCK);
     removable.add(BlockName.leaves.getInstance());
     removable.add(BlockName.sapling.getInstance());
     removable.add(BlockName.rubber_wood.getInstance());
@@ -40,16 +40,16 @@ class Flatification extends TerraformerBase {
     BlockPos workPos = TileEntityTerra.getFirstBlockFrom(world, pos, 20);
     if (workPos == null)
       return false; 
-    if (world.getBlockState(workPos).getBlock() == Blocks.field_150431_aC)
-      workPos = workPos.func_177977_b(); 
+    if (world.getBlockState(workPos).getBlock() == Blocks.SNOW_LAYER)
+      workPos = workPos.down(); 
     if (pos.getY() == workPos.getY())
       return false; 
     if (workPos.getY() < pos.getY()) {
-      world.func_175656_a(workPos.up(), Blocks.field_150346_d.getDefaultState());
+      world.setBlockState(workPos.up(), Blocks.DIRT.getDefaultState());
       return true;
     } 
     if (canRemove(world.getBlockState(workPos).getBlock())) {
-      world.func_175698_g(workPos);
+      world.setBlockToAir(workPos);
       return true;
     } 
     return false;

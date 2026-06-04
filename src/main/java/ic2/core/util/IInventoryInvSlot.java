@@ -14,48 +14,48 @@ public class IInventoryInvSlot implements IInventory {
     this.slot = slot;
   }
   
-  public int func_70302_i_() {
+  public int getSizeInventory() {
     return this.slot.size();
   }
   
-  public int func_70297_j_() {
+  public int getInventoryStackLimit() {
     return this.slot.getStackSizeLimit();
   }
   
-  public boolean func_191420_l() {
+  public boolean isEmpty() {
     return this.slot.isEmpty();
   }
   
-  public boolean func_94041_b(int index, ItemStack stack) {
+  public boolean isItemValidForSlot(int index, ItemStack stack) {
     return this.slot.accepts(stack);
   }
   
-  public ItemStack func_70301_a(int index) {
+  public ItemStack getStackInSlot(int index) {
     return this.slot.get(index);
   }
   
-  public ItemStack func_70298_a(int index, int count) {
-    ItemStack stack = func_70301_a(index);
+  public ItemStack decrStackSize(int index, int count) {
+    ItemStack stack = getStackInSlot(index);
     if (!StackUtil.isEmpty(stack)) {
       int amount = Math.min(StackUtil.getSize(stack), count);
       ItemStack out = StackUtil.copyWithSize(stack, amount);
-      func_70299_a(index, StackUtil.decSize(stack, amount));
+      setInventorySlotContents(index, StackUtil.decSize(stack, amount));
       return out;
     } 
     return StackUtil.emptyStack;
   }
   
-  public void func_70299_a(int index, ItemStack stack) {
+  public void setInventorySlotContents(int index, ItemStack stack) {
     this.slot.put(index, stack);
   }
   
-  public ItemStack func_70304_b(int index) {
-    ItemStack stack = func_70301_a(index);
-    func_70299_a(index, StackUtil.emptyStack);
+  public ItemStack removeStackFromSlot(int index) {
+    ItemStack stack = getStackInSlot(index);
+    setInventorySlotContents(index, StackUtil.emptyStack);
     return stack;
   }
   
-  public void func_174888_l() {
+  public void clear() {
     this.slot.clear();
   }
   
@@ -63,41 +63,41 @@ public class IInventoryInvSlot implements IInventory {
     this.slot.onChanged();
   }
   
-  public boolean func_70300_a(EntityPlayer player) {
+  public boolean isUsableByPlayer(EntityPlayer player) {
     return true;
   }
   
-  public void func_174889_b(EntityPlayer player) {}
+  public void openInventory(EntityPlayer player) {}
   
-  public void func_174886_c(EntityPlayer player) {}
+  public void closeInventory(EntityPlayer player) {}
   
-  public boolean func_145818_k_() {
+  public boolean hasCustomName() {
     assert this.slot.base != null;
-    return ((IWorldNameable)this.slot.base.getParent()).func_145818_k_();
+    return ((IWorldNameable)this.slot.base.getParent()).hasCustomName();
   }
   
-  public String func_70005_c_() {
+  public String getName() {
     assert this.slot.base != null;
-    return ((IWorldNameable)this.slot.base.getParent()).func_70005_c_();
+    return ((IWorldNameable)this.slot.base.getParent()).getName();
   }
   
-  public ITextComponent func_145748_c_() {
+  public ITextComponent getDisplayName() {
     assert this.slot.base != null;
-    return this.slot.base.getParent().func_145748_c_();
+    return this.slot.base.getParent().getDisplayName();
   }
   
-  public int func_174890_g() {
+  public int getFieldCount() {
     assert this.slot.base != null;
-    return ((IInventory)this.slot.base.getParent()).func_174890_g();
+    return ((IInventory)this.slot.base.getParent()).getFieldCount();
   }
   
-  public int func_174887_a_(int id) {
+  public int getField(int id) {
     assert this.slot.base != null;
-    return ((IInventory)this.slot.base.getParent()).func_174887_a_(id);
+    return ((IInventory)this.slot.base.getParent()).getField(id);
   }
   
-  public void func_174885_b(int id, int value) {
+  public void setField(int id, int value) {
     assert this.slot.base != null;
-    ((IInventory)this.slot.base.getParent()).func_174885_b(id, value);
+    ((IInventory)this.slot.base.getParent()).setField(id, value);
   }
 }

@@ -164,7 +164,7 @@ public class ExplosionIC2 extends Explosion {
     if (isNuclear()) {
       this.damageSource = IC2DamageSource.getNukeSource(this);
     } else {
-      this.damageSource = DamageSource.func_94539_a(this);
+      this.damageSource = DamageSource.causeExplosionDamage(this);
     } 
     this.destroyedBlockPositions = new long[this.mapHeight][];
   }
@@ -184,7 +184,7 @@ public class ExplosionIC2 extends Explosion {
     BlockPos start = pos.add(-range, -range, -range);
     BlockPos end = pos.add(range, range, range);
     this.chunkCache = new ChunkCache(this.worldObj, start, end, 0);
-    List<Entity> entities = this.worldObj.func_72839_b(null, new AxisAlignedBB(start, end));
+    List<Entity> entities = this.worldObj.getEntitiesWithinAABBExcludingEntity(null, new AxisAlignedBB(start, end));
     for (Entity entity : entities) {
       if (entity instanceof EntityLivingBase || entity instanceof EntityItem) {
         int distance = (int)(Util.square(entity.posX - this.explosionX) + Util.square(entity.posY - this.explosionY) + Util.square(entity.posZ - this.explosionZ));
@@ -210,10 +210,10 @@ public class ExplosionIC2 extends Explosion {
     } 
     for (EntityDamage entry : this.entitiesInRange) {
       Entity entity = entry.entity;
-      entity.func_70097_a(this.damageSource, (float)entry.damage);
+      entity.attackEntityFrom(this.damageSource, (float)entry.damage);
       if (entity instanceof EntityPlayer) {
         EntityPlayer player = (EntityPlayer)entity;
-        if (isNuclear() && this.igniter != null && player == this.igniter && player.func_110143_aJ() <= 0.0F)
+        if (isNuclear() && this.igniter != null && player == this.igniter && player.getHealth() <= 0.0F)
           IC2.achievements.issueAchievement(player, "dieFromOwnNuke"); 
       } 
       double motionSq = Util.square(entry.motionX) + Util.square(entity.motionY) + Util.square(entity.motionZ);
@@ -223,22 +223,22 @@ public class ExplosionIC2 extends Explosion {
       entity.motionZ += entry.motionZ * reduction;
     } 
     if (isNuclear() && this.radiationRange >= 1) {
-      List<EntityLiving> entitiesInRange = this.worldObj.func_72872_a(EntityLiving.class, new AxisAlignedBB(this.explosionX - this.radiationRange, this.explosionY - this.radiationRange, this.explosionZ - this.radiationRange, this.explosionX + this.radiationRange, this.explosionY + this.radiationRange, this.explosionZ + this.radiationRange));
+      List<EntityLiving> entitiesInRange = this.worldObj.getEntitiesWithinAABB(EntityLiving.class, new AxisAlignedBB(this.explosionX - this.radiationRange, this.explosionY - this.radiationRange, this.explosionZ - this.radiationRange, this.explosionX + this.radiationRange, this.explosionY + this.radiationRange, this.explosionZ + this.radiationRange));
       for (EntityLiving entity : entitiesInRange) {
         if (ItemArmorHazmat.hasCompleteHazmat((EntityLivingBase)entity))
           continue; 
-        double distance = entity.func_70011_f(this.explosionX, this.explosionY, this.explosionZ);
+        double distance = entity.getDistance(this.explosionX, this.explosionY, this.explosionZ);
         int hungerLength = (int)(120.0D * (this.radiationRange - distance));
         int poisonLength = (int)(80.0D * ((this.radiationRange / 3) - distance));
         if (hungerLength >= 0)
-          entity.func_70690_d(new PotionEffect(MobEffects.field_76438_s, hungerLength, 0)); 
+          entity.addPotionEffect(new PotionEffect(MobEffects.HUNGER, hungerLength, 0)); 
         if (poisonLength >= 0)
           IC2Potion.radiation.applyTo((EntityLivingBase)entity, poisonLength, 0); 
       } 
     } 
     ((NetworkManager)IC2.network.get(true)).initiateExplosionEffect(this.worldObj, getPosition(), this.type);
     Random rng = this.worldObj.rand;
-    boolean doDrops = this.worldObj.func_82736_K().func_82766_b("doTileDrops");
+    boolean doDrops = this.worldObj.getGameRules().getBoolean("doTileDrops");
     Map<XZposition, Map<ItemComparableItemStack, DropData>> blocksToDrop = new HashMap<>();
     for (int y = 0; y < this.destroyedBlockPositions.length; y++) {
       long[] bitSet = this.destroyedBlockPositions[y];
@@ -254,7 +254,7 @@ public class ExplosionIC2 extends Explosion {
           IBlockState state = this.chunkCache.getBlockState((BlockPos)tmpPos);
           Block block = state.getBlock();
           if (this.power < 20.0F);
-          if (doDrops && block.func_149659_a(this) && getAtIndex(index, bitSet, 2) == 1)
+          if (doDrops && block.canDropFromExplosion(this) && getAtIndex(index, bitSet, 2) == 1)
             for (ItemStack stack : StackUtil.getDrops((IBlockAccess)this.worldObj, (BlockPos)tmpPos, state, block, 0)) {
               if (rng.nextFloat() > this.explosionDropRate)
                 continue; 
@@ -285,7 +285,7 @@ public class ExplosionIC2 extends Explosion {
         while (count > 0) {
           int stackSize = Math.min(count, 64);
           EntityItem entityitem = new EntityItem(this.worldObj, ((xZposition.x + this.worldObj.rand.nextFloat()) * 2.0F), ((DropData)entry2.getValue()).maxY + 0.5D, ((xZposition.z + this.worldObj.rand.nextFloat()) * 2.0F), isw.toStack(stackSize));
-          entityitem.func_174869_p();
+          entityitem.setDefaultPickupDelay();
           this.worldObj.spawnEntity((Entity)entityitem);
           count -= stackSize;
         } 
@@ -333,7 +333,7 @@ public class ExplosionIC2 extends Explosion {
       } else {
         if (absorption > power1)
           break; 
-        if (block == Blocks.field_150348_b || (block != Blocks.AIR && !block.isAir(state, (IBlockAccess)this.worldObj, (BlockPos)tmpPos)))
+        if (block == Blocks.STONE || (block != Blocks.AIR && !block.isAir(state, (IBlockAccess)this.worldObj, (BlockPos)tmpPos)))
           destroyUnchecked(blockX, blockY, blockZ, (power1 > 8.0D)); 
       } 
       if (killEntities && (step + 4) % 8 == 0 && !this.entitiesInRange.isEmpty() && power1 >= 0.25D)
@@ -352,7 +352,7 @@ public class ExplosionIC2 extends Explosion {
     double ret = 0.5D;
     if (block == Blocks.AIR || block.isAir(block.getDefaultState(), (IBlockAccess)this.worldObj, pos))
       return ret; 
-    if ((block == Blocks.WATER || block == Blocks.field_150358_i) && this.type != Type.Normal) {
+    if ((block == Blocks.WATER || block == Blocks.FLOWING_WATER) && this.type != Type.Normal) {
       ret++;
     } else {
       float resistance = block.getExplosionResistance(this.worldObj, pos, this.exploder, this);
@@ -406,8 +406,8 @@ public class ExplosionIC2 extends Explosion {
         entry.motionY += dy / distance * 0.0875D * power;
         entry.motionZ += dz / distance * 0.0875D * power;
         if (entry.health <= 0.0D) {
-          entity.func_70097_a(this.damageSource, (float)entry.damage);
-          if (!entity.func_70089_S()) {
+          entity.attackEntityFrom(this.damageSource, (float)entry.damage);
+          if (!entity.isEntityAlive()) {
             this.entitiesInRange.remove(i);
             i--;
           } 
@@ -416,7 +416,7 @@ public class ExplosionIC2 extends Explosion {
     } 
   }
   
-  public EntityLivingBase func_94613_c() {
+  public EntityLivingBase getExplosivePlacedBy() {
     return this.igniter;
   }
   

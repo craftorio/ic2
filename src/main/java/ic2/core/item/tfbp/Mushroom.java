@@ -18,7 +18,7 @@ class Mushroom extends TerraformerBase {
     pos = TileEntityTerra.getFirstSolidBlockFrom(world, pos, 20);
     if (pos == null)
       return false; 
-    if (growBlockWithDependancy(world, pos, Blocks.field_150420_aW, (Block)Blocks.field_150338_P))
+    if (growBlockWithDependancy(world, pos, Blocks.BROWN_MUSHROOM_BLOCK, (Block)Blocks.BROWN_MUSHROOM))
       return true; 
     return false;
   }
@@ -31,56 +31,56 @@ class Mushroom extends TerraformerBase {
           cPos.setPos(xm, ym, zm);
           IBlockState state = world.getBlockState((BlockPos)cPos);
           Block block = state.getBlock();
-          if (dependancy == Blocks.field_150391_bh) {
-            if (block == dependancy || block == Blocks.field_150420_aW || block == Blocks.field_150419_aX)
+          if (dependancy == Blocks.MYCELIUM) {
+            if (block == dependancy || block == Blocks.BROWN_MUSHROOM_BLOCK || block == Blocks.RED_MUSHROOM_BLOCK)
               break; 
             if (!block.isAir(state, (IBlockAccess)world, (BlockPos)cPos))
-              if (block == Blocks.field_150346_d || block == Blocks.field_150349_c) {
+              if (block == Blocks.DIRT || block == Blocks.GRASS) {
                 BlockPos dstPos = new BlockPos((Vec3i)cPos);
-                world.func_175656_a(dstPos, dependancy.getDefaultState());
-                BiomeUtil.setBiome(world, dstPos, Biomes.field_76789_p);
+                world.setBlockState(dstPos, dependancy.getDefaultState());
+                BiomeUtil.setBiome(world, dstPos, Biomes.MUSHROOM_ISLAND);
                 return true;
               }  
-          } else if (dependancy == Blocks.field_150338_P) {
-            if (block == Blocks.field_150338_P || block == Blocks.field_150337_Q)
+          } else if (dependancy == Blocks.BROWN_MUSHROOM) {
+            if (block == Blocks.BROWN_MUSHROOM || block == Blocks.RED_MUSHROOM)
               break; 
             if (!block.isAir(state, (IBlockAccess)world, (BlockPos)cPos))
-              if (growBlockWithDependancy(world, (BlockPos)cPos, (Block)Blocks.field_150338_P, (Block)Blocks.field_150391_bh))
+              if (growBlockWithDependancy(world, (BlockPos)cPos, (Block)Blocks.BROWN_MUSHROOM, (Block)Blocks.MYCELIUM))
                 return true;  
           } 
         } 
       } 
     } 
-    if (target == Blocks.field_150338_P) {
+    if (target == Blocks.BROWN_MUSHROOM) {
       Block base = world.getBlockState(pos).getBlock();
-      if (base != Blocks.field_150391_bh)
-        if (base == Blocks.field_150420_aW || base == Blocks.field_150419_aX) {
-          world.func_175656_a(pos, Blocks.field_150391_bh.getDefaultState());
+      if (base != Blocks.MYCELIUM)
+        if (base == Blocks.BROWN_MUSHROOM_BLOCK || base == Blocks.RED_MUSHROOM_BLOCK) {
+          world.setBlockState(pos, Blocks.MYCELIUM.getDefaultState());
         } else {
           return false;
         }  
       BlockPos above = pos.up();
       IBlockState state = world.getBlockState(above);
       Block block = state.getBlock();
-      if (!block.isAir(state, (IBlockAccess)world, above) && block != Blocks.field_150329_H)
+      if (!block.isAir(state, (IBlockAccess)world, above) && block != Blocks.TALLGRASS)
         return false; 
-      BlockBush blockBush = world.rand.nextBoolean() ? Blocks.field_150338_P : Blocks.field_150337_Q;
-      world.func_175656_a(above, blockBush.getDefaultState());
+      BlockBush blockBush = world.rand.nextBoolean() ? Blocks.BROWN_MUSHROOM : Blocks.RED_MUSHROOM;
+      world.setBlockState(above, blockBush.getDefaultState());
       return true;
     } 
-    if (target == Blocks.field_150420_aW) {
+    if (target == Blocks.BROWN_MUSHROOM_BLOCK) {
       BlockPos above = pos.up();
       IBlockState state = world.getBlockState(above);
       Block base = state.getBlock();
-      if (base != Blocks.field_150338_P && base != Blocks.field_150337_Q)
+      if (base != Blocks.BROWN_MUSHROOM && base != Blocks.RED_MUSHROOM)
         return false; 
-      if (((BlockMushroom)base).func_176485_d(world, above, state, world.rand)) {
+      if (((BlockMushroom)base).generateBigMushroom(world, above, state, world.rand)) {
         for (int i = pos.getX() - 1; i < pos.getX() + 1; i++) {
           for (int zm = pos.getZ() - 1; zm < pos.getZ() + 1; zm++) {
             cPos.setPos(i, above.getY(), zm);
             Block block = world.getBlockState((BlockPos)cPos).getBlock();
-            if (block == Blocks.field_150338_P || block == Blocks.field_150337_Q)
-              world.func_175698_g(new BlockPos((Vec3i)cPos)); 
+            if (block == Blocks.BROWN_MUSHROOM || block == Blocks.RED_MUSHROOM)
+              world.setBlockToAir(new BlockPos((Vec3i)cPos)); 
           } 
         } 
         return true;

@@ -32,12 +32,12 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ItemPumpCover extends ItemMulti<PumpCoverType> implements IFluidConsumingCover, IEnhancedOverlayProvider {
   public ItemPumpCover() {
     super(ItemName.cover, PumpCoverType.class);
-    func_77627_a(true);
+    setHasSubtypes(true);
     for (PumpCoverType type : PumpCoverType.values())
       CoverRegistry.register(new ItemStack((Item)this, 1, type.getId())); 
   }
   
-  public EnumActionResult func_180614_a(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float xOffset, float yOffset, float zOffset) {
+  public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float xOffset, float yOffset, float zOffset) {
     ItemStack stack = StackUtil.get(player, hand);
     PumpCoverType type = (PumpCoverType)getType(stack);
     if (type == null)
@@ -49,7 +49,7 @@ public class ItemPumpCover extends ItemMulti<PumpCoverType> implements IFluidCon
     if (((ICoverHolder)tileEntity).canPlaceCover(world, pos, selectedFacing, stack))
       if (!world.isRemote) {
         ((ICoverHolder)tileEntity).placeCover(world, pos, selectedFacing, StackUtil.copyWithSize(stack, 1));
-        stack.func_190918_g(1);
+        stack.shrink(1);
       } else {
         IC2.platform.messagePlayer(player, Localization.translate("Attachment placed"), new Object[0]);
       }  
@@ -57,8 +57,8 @@ public class ItemPumpCover extends ItemMulti<PumpCoverType> implements IFluidCon
   }
   
   @SideOnly(Side.CLIENT)
-  public void func_77624_a(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
-    super.func_77624_a(stack, world, tooltip, advanced);
+  public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
+    super.addInformation(stack, world, tooltip, advanced);
     PumpCoverType type = (PumpCoverType)getType(stack);
     if (type == null)
       return; 

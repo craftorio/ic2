@@ -70,7 +70,7 @@ public class NetworkManager implements INetworkManager {
     try {
       SubPacketType.PlayerItemData.writeTo(buffer);
       buffer.writeByte(slot);
-      DataEncoder.encode(buffer, ((ItemStack)player.inventory.field_70462_a.get(slot)).getItem(), false);
+      DataEncoder.encode(buffer, ((ItemStack)player.inventory.mainInventory.get(slot)).getItem(), false);
       buffer.writeVarInt(data.length);
       for (Object o : data)
         DataEncoder.encode(buffer, o); 
@@ -155,7 +155,7 @@ public class NetworkManager implements INetworkManager {
   
   public final void initiateTileEntityEvent(TileEntity te, int event, boolean limitRange) {
     assert !isClient();
-    if ((te.getWorld()).field_73010_i.isEmpty())
+    if ((te.getWorld()).playerEntities.isEmpty())
       return; 
     GrowingBuffer buffer = new GrowingBuffer(32);
     try {
@@ -184,14 +184,14 @@ public class NetworkManager implements INetworkManager {
     GrowingBuffer buffer = new GrowingBuffer(256);
     try {
       SubPacketType.ItemEvent.writeTo(buffer);
-      DataEncoder.encode(buffer, player.func_146103_bH(), false);
+      DataEncoder.encode(buffer, player.getGameProfile(), false);
       DataEncoder.encode(buffer, stack, false);
       buffer.writeInt(event);
     } catch (Exception e) {
       throw new RuntimeException(e);
     } 
     buffer.flip();
-    for (EntityPlayerMP target : getPlayersInRange(player.getEntityWorld(), player.func_180425_c(), new ArrayList())) {
+    for (EntityPlayerMP target : getPlayersInRange(player.getEntityWorld(), player.getPosition(), new ArrayList())) {
       if (limitRange) {
         int dX = (int)(player.posX - target.posX);
         int dZ = (int)(player.posZ - target.posZ);
@@ -228,7 +228,7 @@ public class NetworkManager implements INetworkManager {
       GrowingBuffer buffer = new GrowingBuffer(32);
       SubPacketType.GuiDisplay.writeTo(buffer);
       MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
-      boolean isAdmin = server.func_184103_al().func_152596_g(player.func_146103_bH());
+      boolean isAdmin = server.getPlayerList().canSendCommands(player.getGameProfile());
       buffer.writeBoolean(isAdmin);
       if (inventory instanceof TileEntity) {
         TileEntity te = (TileEntity)inventory;
@@ -236,12 +236,12 @@ public class NetworkManager implements INetworkManager {
         DataEncoder.encode(buffer, te, false);
       } else if (player.inventory.getCurrentItem() != null && player.inventory.getCurrentItem().getItem() instanceof IHandHeldInventory) {
         buffer.writeByte(1);
-        buffer.writeInt(player.inventory.field_70461_c);
+        buffer.writeInt(player.inventory.currentItem);
         handleSubData(buffer, player.inventory.getCurrentItem(), ID);
-      } else if (player.func_184592_cb() != null && player.func_184592_cb().getItem() instanceof IHandHeldInventory) {
+      } else if (player.getHeldItemOffhand() != null && player.getHeldItemOffhand().getItem() instanceof IHandHeldInventory) {
         buffer.writeByte(1);
         buffer.writeInt(-1);
-        handleSubData(buffer, player.func_184592_cb(), ID);
+        handleSubData(buffer, player.getHeldItemOffhand(), ID);
       } else {
         IC2.platform.displayError("An unknown GUI type was attempted to be displayed.\nThis could happen due to corrupted data from a player or a bug.\n\n(Technical information: " + inventory + ")", new Object[0]);
       } 
@@ -311,7 +311,7 @@ public class NetworkManager implements INetworkManager {
     GrowingBuffer buffer = new GrowingBuffer(256);
     try {
       SubPacketType.ContainerData.writeTo(buffer);
-      buffer.writeInt(container.field_75152_c);
+      buffer.writeInt(container.windowId);
       writeFieldData(container, fieldName, buffer);
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -330,7 +330,7 @@ public class NetworkManager implements INetworkManager {
   public final void sendContainerEvent(ContainerBase<?> container, String event) {
     GrowingBuffer buffer = new GrowingBuffer(64);
     SubPacketType.ContainerEvent.writeTo(buffer);
-    buffer.writeInt(container.field_75152_c);
+    buffer.writeInt(container.windowId);
     buffer.writeString(event);
     buffer.flip();
     if (!isClient()) {
@@ -355,7 +355,7 @@ public class NetworkManager implements INetworkManager {
     GrowingBuffer buffer = new GrowingBuffer(256);
     try {
       SubPacketType.HandHeldInvData.writeTo(buffer);
-      buffer.writeInt(container.field_75152_c);
+      buffer.writeInt(container.windowId);
       writeFieldData(container.base, fieldName, buffer);
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -396,10 +396,10 @@ public class NetworkManager implements INetworkManager {
       throw new RuntimeException(e);
     } 
     buffer.flip();
-    for (EntityPlayer player : world.field_73010_i) {
+    for (EntityPlayer player : world.playerEntities) {
       if (!(player instanceof EntityPlayerMP))
         continue; 
-      double distance = player.func_70092_e(x, y, z);
+      double distance = player.getDistanceSq(x, y, z);
       if (distance <= 1024.0D)
         sendPacket(buffer, false, (EntityPlayerMP)player); 
     } 
@@ -421,9 +421,9 @@ public class NetworkManager implements INetworkManager {
       } else {
         buffer.writeBoolean(false);
       } 
-      buffer.writeDouble(entity.posX + (IC2.random.nextFloat() - 0.5D) * entity.field_70130_N);
-      buffer.writeDouble((entity.func_174813_aQ()).field_72338_b + 0.1D);
-      buffer.writeDouble(entity.posZ + (IC2.random.nextFloat() - 0.5D) * entity.field_70130_N);
+      buffer.writeDouble(entity.posX + (IC2.random.nextFloat() - 0.5D) * entity.width);
+      buffer.writeDouble((entity.getEntityBoundingBox()).minY + 0.1D);
+      buffer.writeDouble(entity.posZ + (IC2.random.nextFloat() - 0.5D) * entity.width);
       buffer.writeDouble(-entity.motionX * 4.0D);
       buffer.writeDouble(-entity.motionZ * 4.0D);
       buffer.writeString(teBlock.getName());
@@ -431,10 +431,10 @@ public class NetworkManager implements INetworkManager {
       throw new RuntimeException(e);
     } 
     buffer.flip();
-    for (EntityPlayer player : world.field_73010_i) {
+    for (EntityPlayer player : world.playerEntities) {
       if (!(player instanceof EntityPlayerMP))
         continue; 
-      double distance = player.func_70092_e(entity.posX, entity.posY, entity.posZ);
+      double distance = player.getDistanceSq(entity.posX, entity.posY, entity.posZ);
       if (distance <= 1024.0D)
         sendPacket(buffer, false, (EntityPlayerMP)player); 
     } 
@@ -481,7 +481,7 @@ public class NetworkManager implements INetworkManager {
     if (getClass() == NetworkManager.class) {
       try {
         onPacketData(GrowingBuffer.wrap(event.getPacket().payload()), 
-            (EntityPlayer)((NetHandlerPlayServer)event.getHandler()).field_147369_b);
+            (EntityPlayer)((NetHandlerPlayServer)event.getHandler()).player);
       } catch (Throwable t) {
         IC2.log.warn(LogCategory.Network, t, "Network read failed");
         throw new RuntimeException(t);
@@ -544,7 +544,7 @@ public class NetworkManager implements INetworkManager {
               
               public void run() {
                 if (hand) {
-                  for (ItemStack stack : player.func_184214_aD()) {
+                  for (ItemStack stack : player.getHeldEquipment()) {
                     IHasGui gui = tryFindGUI(stack);
                     if (gui != null) {
                       IC2.platform.launchGui(player, gui);
@@ -587,7 +587,7 @@ public class NetworkManager implements INetworkManager {
                 public void run() {
                   for (int i = 0; i < subData.length; i++)
                     subData[i] = DataEncoder.getValue(subData[i]); 
-                  ItemStack stack = (ItemStack)player.inventory.field_70462_a.get(slot);
+                  ItemStack stack = (ItemStack)player.inventory.mainInventory.get(slot);
                   if (!StackUtil.isEmpty(stack) && stack.getItem() == item && 
                     item instanceof IPlayerItemDataListener)
                     ((IPlayerItemDataListener)item).onPlayerItemNetworkData(player, slot, subData); 
@@ -600,10 +600,10 @@ public class NetworkManager implements INetworkManager {
         value = DataEncoder.decode(is);
         IC2.platform.requestTick(simulating, new Runnable() {
               public void run() {
-                if (player.field_71070_bA instanceof ContainerBase && player.field_71070_bA.field_75152_c == windowId && (NetworkManager.this
+                if (player.openContainer instanceof ContainerBase && player.openContainer.windowId == windowId && (NetworkManager.this
                   
-                  .isClient() || NetworkManager.this.getClientModifiableField(player.field_71070_bA.getClass(), fieldName) != null))
-                  ReflectionUtil.setValueRecursive(player.field_71070_bA, fieldName, DataEncoder.getValue(value)); 
+                  .isClient() || NetworkManager.this.getClientModifiableField(player.openContainer.getClass(), fieldName) != null))
+                  ReflectionUtil.setValueRecursive(player.openContainer, fieldName, DataEncoder.getValue(value)); 
               }
             });
         return;
@@ -612,8 +612,8 @@ public class NetworkManager implements INetworkManager {
         event = is.readString();
         IC2.platform.requestTick(simulating, new Runnable() {
               public void run() {
-                if (player.field_71070_bA instanceof ContainerBase && player.field_71070_bA.field_75152_c == windowId)
-                  ((ContainerBase)player.field_71070_bA).onContainerEvent(event); 
+                if (player.openContainer instanceof ContainerBase && player.openContainer.windowId == windowId)
+                  ((ContainerBase)player.openContainer).onContainerEvent(event); 
               }
             });
         return;
@@ -623,8 +623,8 @@ public class NetworkManager implements INetworkManager {
         value = DataEncoder.decode(is);
         IC2.platform.requestTick(simulating, new Runnable() {
               public void run() {
-                if (player.field_71070_bA instanceof ContainerBase && player.field_71070_bA.field_75152_c == windowId) {
-                  ContainerBase<?> container = (ContainerBase)player.field_71070_bA;
+                if (player.openContainer instanceof ContainerBase && player.openContainer.windowId == windowId) {
+                  ContainerBase<?> container = (ContainerBase)player.openContainer;
                   if (container.base instanceof ic2.core.item.tool.HandHeldInventory && (NetworkManager.this
                     .isClient() || NetworkManager.this.getClientModifiableField(container.base.getClass(), fieldName) != null))
                     ReflectionUtil.setValueRecursive(container.base, fieldName, DataEncoder.getValue(value)); 
@@ -662,11 +662,11 @@ public class NetworkManager implements INetworkManager {
       DataEncoder.encode(buffer, pos, false);
       DataEncoder.encode(buffer, type, false);
       buffer.flip();
-      for (Object obj : world.field_73010_i) {
+      for (Object obj : world.playerEntities) {
         if (!(obj instanceof EntityPlayerMP))
           continue; 
         EntityPlayerMP player = (EntityPlayerMP)obj;
-        if (player.func_70092_e(pos.field_72450_a, pos.field_72448_b, pos.field_72449_c) < 128.0D)
+        if (player.getDistanceSq(pos.x, pos.y, pos.z) < 128.0D)
           sendPacket(buffer, false, player); 
       } 
     } catch (IOException e) {
@@ -690,8 +690,8 @@ public class NetworkManager implements INetworkManager {
   static <T extends Collection<EntityPlayerMP>> T getPlayersInRange(World world, BlockPos pos, T result) {
     if (!(world instanceof WorldServer))
       return result; 
-    PlayerChunkMap playerManager = ((WorldServer)world).func_184164_w();
-    PlayerChunkMapEntry instance = playerManager.func_187301_b(pos.getX() >> 4, pos.getZ() >> 4);
+    PlayerChunkMap playerManager = ((WorldServer)world).getPlayerChunkMap();
+    PlayerChunkMapEntry instance = playerManager.getEntry(pos.getX() >> 4, pos.getZ() >> 4);
     if (instance == null)
       return result; 
     result.addAll((Collection)ReflectionUtil.getFieldValue(playerInstancePlayers, instance));

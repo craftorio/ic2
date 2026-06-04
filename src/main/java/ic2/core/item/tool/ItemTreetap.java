@@ -26,11 +26,11 @@ import net.minecraft.world.World;
 public class ItemTreetap extends ItemIC2 implements IBoxable {
   public ItemTreetap() {
     super(ItemName.treetap);
-    func_77625_d(1);
-    func_77656_e(16);
+    setMaxStackSize(1);
+    setMaxDamage(16);
   }
   
-  public EnumActionResult func_180614_a(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float xOffset, float yOffset, float zOffset) {
+  public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float xOffset, float yOffset, float zOffset) {
     IBlockState state = world.getBlockState(pos);
     Block block = state.getBlock();
     if (block == BlockName.rubber_wood.getInstance()) {
@@ -46,12 +46,12 @@ public class ItemTreetap extends ItemIC2 implements IBoxable {
   
   public static boolean attemptExtract(EntityPlayer player, World world, BlockPos pos, EnumFacing side, IBlockState state, List<ItemStack> stacks) {
     assert state.getBlock() == BlockName.rubber_wood.getInstance();
-    BlockRubWood.RubberWoodState rwState = (BlockRubWood.RubberWoodState)state.func_177229_b((IProperty)BlockRubWood.stateProperty);
+    BlockRubWood.RubberWoodState rwState = (BlockRubWood.RubberWoodState)state.getValue((IProperty)BlockRubWood.stateProperty);
     if (rwState.isPlain() || rwState.facing != side)
       return false; 
     if (rwState.wet) {
       if (!world.isRemote) {
-        world.func_175656_a(pos, state.func_177226_a((IProperty)BlockRubWood.stateProperty, (Comparable)rwState.getDry()));
+        world.setBlockState(pos, state.withProperty((IProperty)BlockRubWood.stateProperty, (Comparable)rwState.getDry()));
         if (stacks != null) {
           stacks.add(StackUtil.copyWithSize(ItemName.misc_resource.getItemStack((Enum)MiscResourceType.resin), world.rand.nextInt(3) + 1));
         } else {
@@ -65,7 +65,7 @@ public class ItemTreetap extends ItemIC2 implements IBoxable {
       return true;
     } 
     if (!world.isRemote && world.rand.nextInt(5) == 0)
-      world.func_175656_a(pos, state.func_177226_a((IProperty)BlockRubWood.stateProperty, (Comparable)BlockRubWood.RubberWoodState.plain_y)); 
+      world.setBlockState(pos, state.withProperty((IProperty)BlockRubWood.stateProperty, (Comparable)BlockRubWood.RubberWoodState.plain_y)); 
     if (world.rand.nextInt(5) == 0) {
       if (!world.isRemote) {
         ejectResin(world, pos, side, 1);
@@ -89,7 +89,7 @@ public class ItemTreetap extends ItemIC2 implements IBoxable {
     double ejectZ = pos.getZ() + 0.5D + side.getFrontOffsetZ() * 0.3D;
     for (int i = 0; i < quantity; i++) {
       EntityItem entityitem = new EntityItem(world, ejectX, ejectY, ejectZ, ItemName.misc_resource.getItemStack((Enum)MiscResourceType.resin));
-      entityitem.func_174869_p();
+      entityitem.setDefaultPickupDelay();
       world.spawnEntity((Entity)entityitem);
     } 
   }

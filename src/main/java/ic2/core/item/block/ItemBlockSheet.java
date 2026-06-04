@@ -15,7 +15,7 @@ public class ItemBlockSheet extends ItemBlockMulti {
   }
   
   public boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, IBlockState newState) {
-    if (!((BlockSheet)this.field_150939_a).canReplace(world, pos, side, stack))
+    if (!((BlockSheet)this.block).canReplace(world, pos, side, stack))
       return false; 
     return super.placeBlockAt(stack, player, world, pos, side, hitX, hitY, hitZ, newState);
   }

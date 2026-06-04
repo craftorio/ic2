@@ -29,7 +29,7 @@ public abstract class RecipeInputBase extends Ingredient implements IRecipeInput
     return this;
   }
   
-  public ItemStack[] func_193365_a() {
+  public ItemStack[] getMatchingStacks() {
     if (this.items == null)
       this.items = (ItemStack[])getInputs().toArray((Object[])new ItemStack[0]); 
     return this.items;
@@ -40,12 +40,12 @@ public abstract class RecipeInputBase extends Ingredient implements IRecipeInput
   }
   
   @SideOnly(Side.CLIENT)
-  public IntList func_194139_b() {
+  public IntList getValidItemStacksPacked() {
     if (this.list == null) {
-      ItemStack[] items = func_193365_a();
+      ItemStack[] items = getMatchingStacks();
       this.list = (IntList)new IntArrayList(items.length);
       for (ItemStack itemstack : items)
-        this.list.add(RecipeItemHelper.func_194113_b(itemstack)); 
+        this.list.add(RecipeItemHelper.pack(itemstack)); 
       this.list.sort((Comparator)IntComparators.NATURAL_COMPARATOR);
     } 
     return this.list;

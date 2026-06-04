@@ -83,7 +83,7 @@ class NodeLink {
   private void calculateDirections() {
     for (IEnergyTile posA : this.nodeA.tile.subTiles) {
       for (IEnergyTile posB : this.nodeB.tile.subTiles) {
-        BlockPos delta = EnergyNet.instance.getPos(posA).func_177973_b((Vec3i)EnergyNet.instance.getPos(posB));
+        BlockPos delta = EnergyNet.instance.getPos(posA).subtract((Vec3i)EnergyNet.instance.getPos(posB));
         for (EnumFacing dir : EnumFacing.VALUES) {
           if (dir.getFrontOffsetX() == delta.getX() && dir
             .getFrontOffsetY() == delta.getY() && dir

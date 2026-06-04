@@ -21,19 +21,19 @@ public class Ic2Loot {
   @SubscribeEvent
   public void onLootTableLoad(LootTableLoadEvent event) {
     try {
-      if (!event.getName().func_110624_b().equals("minecraft"))
+      if (!event.getName().getResourceDomain().equals("minecraft"))
         return; 
-      if (getClass().getResource("/assets/ic2/loot_tables/" + event.getName().func_110623_a() + ".json") == null)
+      if (getClass().getResource("/assets/ic2/loot_tables/" + event.getName().getResourcePath() + ".json") == null)
         return; 
-      LootTable table = event.getLootTableManager().func_186521_a(new ResourceLocation("ic2", event.getName().func_110623_a()));
-      if (table == null || table == LootTable.field_186464_a)
+      LootTable table = event.getLootTableManager().getLootTableFromLocation(new ResourceLocation("ic2", event.getName().getResourcePath()));
+      if (table == null || table == LootTable.EMPTY_LOOT_TABLE)
         return; 
       LootPool pool = table.getPool("ic2");
       if (pool == null)
         return; 
       event.getTable().addPool(pool);
     } catch (Throwable t) {
-      IC2.log.warn(LogCategory.General, t, "Error loading loot table %s.", new Object[] { event.getName().func_110623_a() });
+      IC2.log.warn(LogCategory.General, t, "Error loading loot table %s.", new Object[] { event.getName().getResourcePath() });
     } 
   }
 }

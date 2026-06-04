@@ -48,7 +48,7 @@ public class FluidSlot extends GuiElement<FluidSlot> {
       int fluidWidth = 16;
       int fluidHeight = 16;
       Fluid fluid = fs.getFluid();
-      TextureAtlasSprite sprite = (fluid != null) ? getBlockTextureMap().func_110572_b(fluid.getStill(fs).toString()) : null;
+      TextureAtlasSprite sprite = (fluid != null) ? getBlockTextureMap().getAtlasSprite(fluid.getStill(fs).toString()) : null;
       int color = (fluid != null) ? fluid.getColor(fs) : -1;
       bindBlockTexture();
       this.gui.drawSprite(fluidX, fluidY, fluidWidth, fluidHeight, sprite, color, 1.0D, false, false);

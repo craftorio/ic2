@@ -44,8 +44,8 @@ public abstract class AbstractDamageableReactorComponent extends ItemGradualInt 
   }
   
   @SideOnly(Side.CLIENT)
-  public void func_77624_a(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
-    super.func_77624_a(stack, world, tooltip, advanced);
+  public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
+    super.addInformation(stack, world, tooltip, advanced);
     tooltip.add(Localization.translate("ic2.reactoritem.durability") + " " + (
         getMaxCustomDamage(stack) - getCustomDamage(stack)) + "/" + getMaxCustomDamage(stack));
   }

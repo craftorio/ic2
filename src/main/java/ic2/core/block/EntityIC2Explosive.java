@@ -37,8 +37,8 @@ public class EntityIC2Explosive extends Entity {
     this.radiationRange = 0;
     this.dropRate = 0.3F;
     this.damageVsEntitys = 1.0F;
-    this.renderBlockState = Blocks.field_150346_d.getDefaultState();
-    this.field_70156_m = true;
+    this.renderBlockState = Blocks.DIRT.getDefaultState();
+    this.preventEntitySpawning = true;
     setSize(0.98F, 0.98F);
   }
   
@@ -62,12 +62,12 @@ public class EntityIC2Explosive extends Entity {
   
   protected void entityInit() {}
   
-  protected boolean func_70041_e_() {
+  protected boolean canTriggerWalking() {
     return false;
   }
   
-  public boolean func_70067_L() {
-    return !this.field_70128_L;
+  public boolean canBeCollidedWith() {
+    return !this.isDead;
   }
   
   public void onUpdate() {
@@ -79,7 +79,7 @@ public class EntityIC2Explosive extends Entity {
     this.motionX *= 0.98D;
     this.motionY *= 0.98D;
     this.motionZ *= 0.98D;
-    if (this.field_70122_E) {
+    if (this.onGround) {
       this.motionX *= 0.7D;
       this.motionZ *= 0.7D;
       this.motionY *= -0.5D;
@@ -89,7 +89,7 @@ public class EntityIC2Explosive extends Entity {
       if (IC2.platform.isSimulating())
         explode(); 
     } else {
-      getEntityWorld().func_175688_a(EnumParticleTypes.SMOKE_NORMAL, this.posX, this.posY + 0.5D, this.posZ, 0.0D, 0.0D, 0.0D, new int[0]);
+      getEntityWorld().spawnParticle(EnumParticleTypes.SMOKE_NORMAL, this.posX, this.posY + 0.5D, this.posZ, 0.0D, 0.0D, 0.0D, new int[0]);
     } 
   }
   

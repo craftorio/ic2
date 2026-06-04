@@ -11,21 +11,21 @@ import net.minecraft.world.World;
 public class ItemArmorSolarHelmet extends ItemArmorUtility {
   public ItemArmorSolarHelmet() {
     super(ItemName.solar_helmet, "solar", EntityEquipmentSlot.HEAD);
-    func_77656_e(0);
+    setMaxDamage(0);
   }
   
   public void onArmorTick(World world, EntityPlayer player, ItemStack stack) {
     boolean ret = false;
-    if (player.inventory.field_70460_b.get(2) != null) {
-      double chargeAmount = TileEntitySolarGenerator.getSkyLight(player.getEntityWorld(), player.func_180425_c());
+    if (player.inventory.armorInventory.get(2) != null) {
+      double chargeAmount = TileEntitySolarGenerator.getSkyLight(player.getEntityWorld(), player.getPosition());
       if (chargeAmount > 0.0D)
-        ret = (ElectricItem.manager.charge((ItemStack)player.inventory.field_70460_b.get(2), chargeAmount, 2147483647, true, false) > 0.0D); 
+        ret = (ElectricItem.manager.charge((ItemStack)player.inventory.armorInventory.get(2), chargeAmount, 2147483647, true, false) > 0.0D); 
     } 
     if (ret)
-      player.field_71069_bz.func_75142_b(); 
+      player.inventoryContainer.detectAndSendChanges(); 
   }
   
-  public int func_77619_b() {
+  public int getItemEnchantability() {
     return 0;
   }
 }

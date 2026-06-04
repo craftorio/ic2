@@ -37,7 +37,7 @@ public class CropReed extends IC2CropCard {
   }
   
   public ItemStack getGain(ICropTile crop) {
-    return new ItemStack(Items.field_151120_aE, crop.getCurrentSize() - 1);
+    return new ItemStack(Items.REEDS, crop.getCurrentSize() - 1);
   }
   
   public boolean onEntityCollision(ICropTile crop, Entity entity) {

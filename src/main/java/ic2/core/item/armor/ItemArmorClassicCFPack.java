@@ -8,12 +8,12 @@ import net.minecraft.item.ItemStack;
 public class ItemArmorClassicCFPack extends ItemArmorUtility {
   public ItemArmorClassicCFPack() {
     super(ItemName.cf_pack, "batpack", EntityEquipmentSlot.CHEST);
-    func_77656_e(260);
+    setMaxDamage(260);
   }
   
   public boolean getCFPellet(EntityPlayer player, ItemStack pack) {
     if (pack.getItemDamage() > 0) {
-      pack.func_77964_b(pack.getItemDamage() - 1);
+      pack.setItemDamage(pack.getItemDamage() - 1);
       return true;
     } 
     return false;

@@ -91,11 +91,11 @@ import org.lwjgl.opengl.Display;
 @SideOnly(Side.CLIENT)
 public class PlatformClient extends Platform {
   public boolean isRendering() {
-    return Minecraft.getMinecraft().func_152345_ab();
+    return Minecraft.getMinecraft().isCallingFromMinecraftThread();
   }
   
   public void preInit() {
-    ClientCommandHandler.instance.func_71560_a((ICommand)new CommandIc2c());
+    ClientCommandHandler.instance.registerCommand((ICommand)new CommandIc2c());
     for (BlockName name : BlockName.values) {
       if (!name.hasInstance()) {
         IC2.log.warn(LogCategory.Block, "The block " + name + " is not initialized.");
@@ -155,7 +155,7 @@ public class PlatformClient extends Platform {
         });
     RenderingRegistry.registerEntityRenderingHandler(EntityDynamite.class, new IRenderFactory<EntityDynamite>() {
           public Render<EntityDynamite> createRenderFor(RenderManager manager) {
-            return (Render<EntityDynamite>)new RenderSnowball(manager, ItemName.dynamite.getInstance(), PlatformClient.this.mc.func_175599_af());
+            return (Render<EntityDynamite>)new RenderSnowball(manager, ItemName.dynamite.getInstance(), PlatformClient.this.mc.getRenderItem());
           }
         });
     if (Util.inDev())
@@ -164,7 +164,7 @@ public class PlatformClient extends Platform {
   }
   
   public void displayError(String error, Object... args) {
-    if (!this.mc.func_152345_ab()) {
+    if (!this.mc.isCallingFromMinecraftThread()) {
       super.displayError(error, args);
       return;
     } 
@@ -175,7 +175,7 @@ public class PlatformClient extends Platform {
     error = error.replace("\n", System.getProperty("line.separator"));
     dialogError = dialogError.replace("\n", System.getProperty("line.separator"));
     IC2.log.error(LogCategory.General, "%s", new Object[] { error });
-    this.mc.func_71364_i();
+    this.mc.setIngameNotInFocus();
     try {
       if (!Loader.instance().hasReachedState(LoaderState.AVAILABLE))
         SplashProgress.finish(); 
@@ -198,30 +198,30 @@ public class PlatformClient extends Platform {
   public World getWorld(int dimId) {
     if (isSimulating())
       return super.getWorld(dimId); 
-    WorldClient worldClient = this.mc.field_71441_e;
+    WorldClient worldClient = this.mc.world;
     return (((World)worldClient).provider.getDimension() == dimId) ? (World)worldClient : null;
   }
   
   public World getPlayerWorld() {
-    return (World)this.mc.field_71441_e;
+    return (World)this.mc.world;
   }
   
   public void messagePlayer(EntityPlayer player, String message, Object... args) {
     if (args.length > 0) {
-      this.mc.field_71456_v.func_146158_b().func_146227_a((ITextComponent)new TextComponentTranslation(message, (Object[])getMessageComponents(args)));
+      this.mc.ingameGUI.getChatGUI().printChatMessage((ITextComponent)new TextComponentTranslation(message, (Object[])getMessageComponents(args)));
     } else {
-      this.mc.field_71456_v.func_146158_b().func_146227_a((ITextComponent)new TextComponentString(message));
+      this.mc.ingameGUI.getChatGUI().printChatMessage((ITextComponent)new TextComponentString(message));
     } 
   }
   
   public boolean launchGuiClient(EntityPlayer player, IHasGui inventory, boolean isAdmin) {
-    this.mc.func_147108_a(inventory.getGui(player, isAdmin));
+    this.mc.displayGuiScreen(inventory.getGui(player, isAdmin));
     return true;
   }
   
   public void profilerStartSection(String section) {
     if (isRendering()) {
-      this.mc.field_71424_I.func_76320_a(section);
+      this.mc.mcProfiler.startSection(section);
     } else {
       super.profilerStartSection(section);
     } 
@@ -229,7 +229,7 @@ public class PlatformClient extends Platform {
   
   public void profilerEndSection() {
     if (isRendering()) {
-      this.mc.field_71424_I.func_76319_b();
+      this.mc.mcProfiler.endSection();
     } else {
       super.profilerEndSection();
     } 
@@ -237,14 +237,14 @@ public class PlatformClient extends Platform {
   
   public void profilerEndStartSection(String section) {
     if (isRendering()) {
-      this.mc.field_71424_I.func_76318_c(section);
+      this.mc.mcProfiler.endStartSection(section);
     } else {
       super.profilerEndStartSection(section);
     } 
   }
   
   public File getMinecraftDir() {
-    return this.mc.field_71412_D;
+    return this.mc.mcDataDir;
   }
   
   public void playSoundSp(String sound, float f, float g) {
@@ -256,30 +256,30 @@ public class PlatformClient extends Platform {
     new RpcHandler();
     new ElectricItemTooltipHandler();
     Block leaves = BlockName.leaves.getInstance();
-    this.mc.func_184125_al().func_186722_a(new IBlockColor() {
-          public int func_186720_a(IBlockState state, IBlockAccess worldIn, BlockPos pos, int tintIndex) {
+    this.mc.getBlockColors().registerBlockColorHandler(new IBlockColor() {
+          public int colorMultiplier(IBlockState state, IBlockAccess worldIn, BlockPos pos, int tintIndex) {
             return 6723908;
           }
         },  new Block[] { leaves });
-    this.mc.getItemColors().func_186731_a(new IItemColor() {
-          public int func_186726_a(ItemStack stack, int tintIndex) {
+    this.mc.getItemColors().registerItemColorHandler(new IItemColor() {
+          public int colorMultiplier(ItemStack stack, int tintIndex) {
             return 6723908;
           }
         },  new Block[] { leaves });
-    this.mc.getItemColors().func_186730_a(new IItemColor() {
-          public int func_186726_a(ItemStack stack, int tintIndex) {
-            return (tintIndex > 0) ? -1 : ((ItemArmor)stack.getItem()).func_82814_b(stack);
+    this.mc.getItemColors().registerItemColorHandler(new IItemColor() {
+          public int colorMultiplier(ItemStack stack, int tintIndex) {
+            return (tintIndex > 0) ? -1 : ((ItemArmor)stack.getItem()).getColor(stack);
           }
         },  new Item[] { ItemName.quantum_helmet.getInstance(), ItemName.quantum_chestplate.getInstance(), ItemName.quantum_leggings.getInstance(), ItemName.quantum_boots.getInstance() });
-    this.mc.getItemColors().func_186730_a(new IItemColor() {
-          public int func_186726_a(ItemStack stack, int tintIndex) {
+    this.mc.getItemColors().registerItemColorHandler(new IItemColor() {
+          public int colorMultiplier(ItemStack stack, int tintIndex) {
             PipeType type = ItemFluidPipe.getPipeType(stack);
             return (type.red & 0xFF) << 16 | (type.green & 0xFF) << 8 | type.blue & 0xFF;
           }
         },  new Item[] { ItemName.pipe.getInstance() });
-    this.mc.func_184125_al().func_186722_a(new IBlockColor() {
-          public int func_186720_a(IBlockState state, IBlockAccess worldIn, BlockPos pos, int tintIndex) {
-            String variant = ((MetaTeBlock)state.func_177229_b(((BlockTileEntity)state.getBlock()).typeProperty)).teBlock.getName();
+    this.mc.getBlockColors().registerBlockColorHandler(new IBlockColor() {
+          public int colorMultiplier(IBlockState state, IBlockAccess worldIn, BlockPos pos, int tintIndex) {
+            String variant = ((MetaTeBlock)state.getValue(((BlockTileEntity)state.getBlock()).typeProperty)).teBlock.getName();
             if (variant.endsWith("_storage_box")) {
               switch (variant) {
                 case "wooden_storage_box":
@@ -296,8 +296,8 @@ public class PlatformClient extends Platform {
             return 16777215;
           }
         },  new Block[] { BlockName.te.getInstance() });
-    this.mc.getItemColors().func_186731_a(new IItemColor() {
-          public int func_186726_a(ItemStack stack, int tintIndex) {
+    this.mc.getItemColors().registerItemColorHandler(new IItemColor() {
+          public int colorMultiplier(ItemStack stack, int tintIndex) {
             String variant = Objects.<String>requireNonNull(BlockName.te.getVariant(stack));
             if (variant.endsWith("_storage_box")) {
               switch (variant) {
@@ -315,7 +315,7 @@ public class PlatformClient extends Platform {
             return 16777215;
           }
         },  new Block[] { BlockName.te.getInstance() });
-    this.mc.getItemColors().func_186730_a((stack, tintIndex) -> {
+    this.mc.getItemColors().registerItemColorHandler((stack, tintIndex) -> {
           PumpCoverType type = (PumpCoverType)((ItemPumpCover)stack.getItem()).getType(stack);
           return (tintIndex == 1) ? type.color : 16777215;
         }new Item[] { ItemName.cover
@@ -327,12 +327,12 @@ public class PlatformClient extends Platform {
     if (simulating) {
       super.requestTick(simulating, runnable);
     } else {
-      this.mc.func_152344_a(runnable);
+      this.mc.addScheduledTask(runnable);
     } 
   }
   
   public int getColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tint) {
-    return this.mc.func_184125_al().func_186724_a(state, world, pos, tint);
+    return this.mc.getBlockColors().colorMultiplier(state, world, pos, tint);
   }
   
   private final Minecraft mc = Minecraft.getMinecraft();

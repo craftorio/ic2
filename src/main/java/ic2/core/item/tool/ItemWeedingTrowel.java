@@ -20,7 +20,7 @@ import net.minecraft.world.World;
 public class ItemWeedingTrowel extends ItemIC2 {
   public ItemWeedingTrowel() {
     super(ItemName.weeding_trowel);
-    func_77625_d(1);
+    setMaxStackSize(1);
   }
   
   public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {

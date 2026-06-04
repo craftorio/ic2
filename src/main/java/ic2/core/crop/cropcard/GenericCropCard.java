@@ -161,7 +161,7 @@ public class GenericCropCard extends IC2CropCard {
         candidates[index] = (String)candidate;
       } else if (candidate instanceof ItemStack) {
         ItemStack temp = (ItemStack)candidate;
-        candidates[index] = temp.func_82833_r();
+        candidates[index] = temp.getDisplayName();
       } 
     } 
     List<String> info = new ArrayList<>(1);
@@ -176,11 +176,11 @@ public class GenericCropCard extends IC2CropCard {
   }
   
   public GenericCropCard register() {
-    if (StringUtils.func_151246_b(this.id))
+    if (StringUtils.isNullOrEmpty(this.id))
       throw new IllegalArgumentException("The id must not be null or empty!"); 
-    if (StringUtils.func_151246_b(this.owner))
+    if (StringUtils.isNullOrEmpty(this.owner))
       throw new IllegalArgumentException("The owner must not be null or empty!"); 
-    if (StringUtils.func_151246_b(this.discoveredBy))
+    if (StringUtils.isNullOrEmpty(this.discoveredBy))
       throw new IllegalArgumentException("The discoveredBy must not be null or empty!"); 
     if (this.properties == null)
       throw new IllegalArgumentException("The properties must not be null!"); 

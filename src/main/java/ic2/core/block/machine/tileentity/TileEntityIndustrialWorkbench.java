@@ -63,11 +63,11 @@ public class TileEntityIndustrialWorkbench extends TileEntityInventory implement
             getSlot(index).put(stack);
           }
           
-          public boolean func_191420_l() {
+          public boolean isEmpty() {
             return (TileEntityIndustrialWorkbench.InvSlotCraftingCombo.this.input.isEmpty() && TileEntityIndustrialWorkbench.InvSlotCraftingCombo.this.tool.isEmpty());
           }
           
-          public void func_174888_l() {
+          public void clear() {
             TileEntityIndustrialWorkbench.InvSlotCraftingCombo.this.input.clear();
             TileEntityIndustrialWorkbench.InvSlotCraftingCombo.this.tool.clear();
           }
@@ -85,20 +85,20 @@ public class TileEntityIndustrialWorkbench extends TileEntityInventory implement
           }
           
           public void onChanged() {
-            TileEntityIndustrialWorkbench.InvSlotCraftingCombo.this.resultInv.func_70299_a(0, TileEntityIndustrialWorkbench.InvSlotCraftingCombo.this.getOutputStack());
+            TileEntityIndustrialWorkbench.InvSlotCraftingCombo.this.resultInv.setInventorySlotContents(0, TileEntityIndustrialWorkbench.InvSlotCraftingCombo.this.getOutputStack());
           }
         };
       this.tool = new InvSlotConsumableOreDict((IInventorySlotHolder)base, name + "Tool", InvSlot.Access.I, 1, InvSlot.InvSide.ANY, tool) {
           public void onChanged() {
-            TileEntityIndustrialWorkbench.InvSlotCraftingCombo.this.resultInv.func_70299_a(0, TileEntityIndustrialWorkbench.InvSlotCraftingCombo.this.getOutputStack());
+            TileEntityIndustrialWorkbench.InvSlotCraftingCombo.this.resultInv.setInventorySlotContents(0, TileEntityIndustrialWorkbench.InvSlotCraftingCombo.this.getOutputStack());
           }
         };
     }
     
     protected boolean canProcess() {
-      if (!this.crafting.func_191420_l()) {
-        if (this.recipe == null || !this.recipe.func_77569_a(this.crafting, this.tool.base.getParent().getWorld())) {
-          this.recipe = CraftingManager.func_192413_b(this.crafting, this.tool.base.getParent().getWorld());
+      if (!this.crafting.isEmpty()) {
+        if (this.recipe == null || !this.recipe.matches(this.crafting, this.tool.base.getParent().getWorld())) {
+          this.recipe = CraftingManager.findMatchingRecipe(this.crafting, this.tool.base.getParent().getWorld());
           return (this.recipe != null);
         } 
         return true;
@@ -107,13 +107,13 @@ public class TileEntityIndustrialWorkbench extends TileEntityInventory implement
     }
     
     public ItemStack getOutputStack() {
-      return !canProcess() ? StackUtil.emptyStack : this.recipe.func_77572_b(this.crafting);
+      return !canProcess() ? StackUtil.emptyStack : this.recipe.getCraftingResult(this.crafting);
     }
   }
   
   public void onPlaced(ItemStack stack, EntityLivingBase placer, EnumFacing facing) {
     super.onPlaced(stack, placer, facing);
-    if (!stack.func_77942_o() || !stack.func_77978_p().func_74764_b("PLACED")) {
+    if (!stack.hasTagCompound() || !stack.getTagCompound().hasKey("PLACED")) {
       this.leftCrafting.tool.put(ItemName.forge_hammer.getItemStack());
       this.rightCrafting.tool.put(ItemName.cutter.getItemStack());
     } 
@@ -121,7 +121,7 @@ public class TileEntityIndustrialWorkbench extends TileEntityInventory implement
   
   protected ItemStack adjustDrop(ItemStack drop, boolean wrench) {
     drop = super.adjustDrop(drop, wrench);
-    StackUtil.getOrCreateNbtData(drop).func_74757_a("PLACED", true);
+    StackUtil.getOrCreateNbtData(drop).setBoolean("PLACED", true);
     return drop;
   }
   
@@ -145,7 +145,7 @@ public class TileEntityIndustrialWorkbench extends TileEntityInventory implement
   }
   
   private static int getPossible(int max, ItemStack existing, ItemStack in) {
-    int amount = Math.min(max, in.func_77985_e() ? in.getMaxStackSize() : 1);
+    int amount = Math.min(max, in.isStackable() ? in.getMaxStackSize() : 1);
     if (!StackUtil.isEmpty(existing)) {
       if (!StackUtil.checkItemEqualityStrict(existing, in))
         return 0; 

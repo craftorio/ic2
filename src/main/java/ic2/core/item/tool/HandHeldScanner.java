@@ -27,11 +27,11 @@ public class HandHeldScanner extends HandHeldInventory {
     return (GuiScreen)new GuiToolScanner(new ContainerToolScanner(player, this));
   }
   
-  public String func_70005_c_() {
-    return this.itemScanner.func_77977_a();
+  public String getName() {
+    return this.itemScanner.getUnlocalizedName();
   }
   
-  public boolean func_145818_k_() {
+  public boolean hasCustomName() {
     return false;
   }
 }

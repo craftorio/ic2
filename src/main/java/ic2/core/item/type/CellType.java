@@ -71,9 +71,9 @@ public enum CellType implements IIdProvider {
   public int getUsage(ItemStack stack) {
     switch (this) {
       case weed_ex:
-        return stack.func_77942_o() ? stack.func_77978_p().getInteger("weedEX") : 0;
+        return stack.hasTagCompound() ? stack.getTagCompound().getInteger("weedEX") : 0;
       case hydration:
-        return stack.func_77942_o() ? stack.func_77978_p().getInteger("hydration") : 0;
+        return stack.hasTagCompound() ? stack.getTagCompound().getInteger("hydration") : 0;
     } 
     return 0;
   }
@@ -231,8 +231,8 @@ public enum CellType implements IIdProvider {
     
     public FluidStack drain(int maxDrain, boolean doDrain) {
       int remaining;
-      if (this.container.func_77942_o()) {
-        remaining = 10000 - this.container.func_77978_p().getInteger("hydration");
+      if (this.container.hasTagCompound()) {
+        remaining = 10000 - this.container.getTagCompound().getInteger("hydration");
       } else {
         remaining = 10000;
       } 

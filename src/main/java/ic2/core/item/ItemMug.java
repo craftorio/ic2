@@ -22,10 +22,10 @@ import net.minecraft.world.World;
 public class ItemMug extends ItemMulti<ItemMug.MugType> {
   public ItemMug() {
     super(ItemName.mug, MugType.class);
-    func_77625_d(1);
+    setMaxStackSize(1);
   }
   
-  public EnumActionResult func_180614_a(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+  public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
     ItemStack stack = StackUtil.get(player, hand);
     MugType type = getType(stack);
     if (type == MugType.empty) {
@@ -42,8 +42,8 @@ public class ItemMug extends ItemMulti<ItemMug.MugType> {
         ItemStack is = new ItemStack(ItemName.booze_mug.getInstance(), 1, value);
         stack = StackUtil.decSize(stack);
         if (!StackUtil.isEmpty(stack)) {
-          if (!player.inventory.func_70441_a(is))
-            player.func_71019_a(is, false); 
+          if (!player.inventory.addItemStackToInventory(is))
+            player.dropItem(is, false); 
         } else {
           StackUtil.set(player, hand, is);
         } 
@@ -53,7 +53,7 @@ public class ItemMug extends ItemMulti<ItemMug.MugType> {
     return EnumActionResult.PASS;
   }
   
-  public ItemStack func_77654_b(ItemStack stack, World worldIn, EntityLivingBase entityLiving) {
+  public ItemStack onItemUseFinish(ItemStack stack, World worldIn, EntityLivingBase entityLiving) {
     int maxAmplifier, extraDuration;
     if (!(entityLiving instanceof EntityPlayer))
       return stack; 
@@ -78,57 +78,57 @@ public class ItemMug extends ItemMulti<ItemMug.MugType> {
         throw new IllegalStateException("unexpected type: " + type);
     } 
     int highest = 0;
-    int x = amplifyEffect(player, MobEffects.field_76424_c, maxAmplifier, extraDuration);
+    int x = amplifyEffect(player, MobEffects.SPEED, maxAmplifier, extraDuration);
     if (x > highest)
       highest = x; 
-    x = amplifyEffect(player, MobEffects.field_76422_e, maxAmplifier, extraDuration);
+    x = amplifyEffect(player, MobEffects.HASTE, maxAmplifier, extraDuration);
     if (x > highest)
       highest = x; 
     if (type == MugType.coffee)
       highest -= 2; 
     if (highest >= 3) {
-      player.func_70690_d(new PotionEffect(MobEffects.field_76431_k, (highest - 2) * 200, 0));
+      player.addPotionEffect(new PotionEffect(MobEffects.NAUSEA, (highest - 2) * 200, 0));
       if (highest >= 4)
-        player.func_70690_d(new PotionEffect(MobEffects.field_76433_i, 1, highest - 3)); 
+        player.addPotionEffect(new PotionEffect(MobEffects.INSTANT_DAMAGE, 1, highest - 3)); 
     } 
     return getItemStack(MugType.empty);
   }
   
   private int amplifyEffect(EntityPlayer player, Potion potion, int maxAmplifier, int extraDuration) {
-    PotionEffect eff = player.func_70660_b(potion);
+    PotionEffect eff = player.getActivePotionEffect(potion);
     if (eff != null) {
-      int newAmp = eff.func_76458_c();
-      int newDur = eff.func_76459_b();
+      int newAmp = eff.getAmplifier();
+      int newDur = eff.getDuration();
       if (newAmp < maxAmplifier)
         newAmp++; 
       newDur += extraDuration;
-      assert potion == eff.func_188419_a();
-      player.func_70690_d(new PotionEffect(potion, newDur, newAmp));
+      assert potion == eff.getPotion();
+      player.addPotionEffect(new PotionEffect(potion, newDur, newAmp));
       return newAmp;
     } 
-    player.func_70690_d(new PotionEffect(potion, 300, 0));
+    player.addPotionEffect(new PotionEffect(potion, 300, 0));
     return 1;
   }
   
-  public int func_77626_a(ItemStack stack) {
+  public int getMaxItemUseDuration(ItemStack stack) {
     MugType type = getType(stack);
     if (type == null || type == MugType.empty)
       return 0; 
     return 32;
   }
   
-  public EnumAction func_77661_b(ItemStack stack) {
+  public EnumAction getItemUseAction(ItemStack stack) {
     MugType type = getType(stack);
     if (type == null || type == MugType.empty)
       return EnumAction.NONE; 
     return EnumAction.DRINK;
   }
   
-  public ActionResult<ItemStack> func_77659_a(World world, EntityPlayer player, EnumHand hand) {
+  public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
     MugType type = getType(StackUtil.get(player, hand));
     if (type != null && type != MugType.empty)
-      player.func_184598_c(hand); 
-    return super.func_77659_a(world, player, hand);
+      player.setActiveHand(hand); 
+    return super.onItemRightClick(world, player, hand);
   }
   
   public enum MugType implements IIdProvider {

@@ -41,42 +41,42 @@ public abstract class ItemToolIC2 extends ItemTool implements IItemModelProvider
     super(damage, speed, harvestLevel.toolMaterial, mineableBlocks);
     this.rarity = EnumRarity.COMMON;
     this.toolClasses = toolClasses;
-    func_77625_d(1);
-    func_77637_a((CreativeTabs)IC2.tabIC2);
+    setMaxStackSize(1);
+    setCreativeTab((CreativeTabs)IC2.tabIC2);
     for (IToolClass toolClass : toolClasses) {
       if (toolClass.getName() != null)
         setHarvestLevel(toolClass.getName(), harvestLevel.level); 
     } 
     if (toolClasses.contains(ToolClass.Pickaxe) && harvestLevel.toolMaterial == Item.ToolMaterial.DIAMOND) {
-      mineableBlocks.add(Blocks.field_150343_Z);
-      mineableBlocks.add(Blocks.field_150450_ax);
-      mineableBlocks.add(Blocks.field_150439_ay);
+      mineableBlocks.add(Blocks.OBSIDIAN);
+      mineableBlocks.add(Blocks.REDSTONE_ORE);
+      mineableBlocks.add(Blocks.LIT_REDSTONE_ORE);
     } 
     if (name != null) {
-      func_77655_b(name.name());
+      setUnlocalizedName(name.name());
       BlocksItems.registerItem((Item)this, IC2.getIdentifier(name.name()));
       name.setInstance((Item)this);
     } 
   }
   
-  public String func_77658_a() {
-    return "ic2." + super.func_77658_a().substring(5);
+  public String getUnlocalizedName() {
+    return "ic2." + super.getUnlocalizedName().substring(5);
   }
   
-  public String func_77667_c(ItemStack itemStack) {
-    return func_77658_a();
+  public String getUnlocalizedName(ItemStack itemStack) {
+    return getUnlocalizedName();
   }
   
-  public String func_77657_g(ItemStack itemStack) {
-    return func_77667_c(itemStack);
+  public String getUnlocalizedNameInefficiently(ItemStack itemStack) {
+    return getUnlocalizedName(itemStack);
   }
   
-  public String func_77653_i(ItemStack itemStack) {
-    return Localization.translate(func_77667_c(itemStack));
+  public String getItemStackDisplayName(ItemStack itemStack) {
+    return Localization.translate(getUnlocalizedName(itemStack));
   }
   
-  protected boolean func_194125_a(CreativeTabs tab) {
-    return (isEnabled() && super.func_194125_a(tab));
+  protected boolean isInCreativeTab(CreativeTabs tab) {
+    return (isEnabled() && super.isInCreativeTab(tab));
   }
   
   public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
@@ -98,12 +98,12 @@ public abstract class ItemToolIC2 extends ItemTool implements IItemModelProvider
     return super.canHarvestBlock(state, itemStack);
   }
   
-  public float func_150893_a(ItemStack itemStack, IBlockState state) {
-    return canHarvestBlock(state, itemStack) ? this.field_77864_a : super.func_150893_a(itemStack, state);
+  public float getDestroySpeed(ItemStack itemStack, IBlockState state) {
+    return canHarvestBlock(state, itemStack) ? this.efficiency : super.getDestroySpeed(itemStack, state);
   }
   
-  public EnumRarity func_77613_e(ItemStack stack) {
-    return (stack.func_77948_v() && this.rarity != EnumRarity.EPIC) ? EnumRarity.RARE : this.rarity;
+  public EnumRarity getRarity(ItemStack stack) {
+    return (stack.isItemEnchanted() && this.rarity != EnumRarity.EPIC) ? EnumRarity.RARE : this.rarity;
   }
   
   @SideOnly(Side.CLIENT)

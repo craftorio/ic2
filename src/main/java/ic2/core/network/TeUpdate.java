@@ -158,7 +158,7 @@ class TeUpdate {
   
   private static void apply(TeUpdateDataClient.TeData update, World world) {
     TileEntityBlock tileEntityBlock;
-    if (!world.func_175668_a(update.pos, false)) {
+    if (!world.isBlockLoaded(update.pos, false)) {
       if (debug)
         IC2.log.info(LogCategory.Network, "Skipping update at %s, chunk not loaded.", new Object[] { Util.formatPosition((IBlockAccess)world, update.pos) }); 
       return;
@@ -168,7 +168,7 @@ class TeUpdate {
       if (debug)
         IC2.log.info(LogCategory.Network, "Instantiating %s with %s.", new Object[] { Util.formatPosition((IBlockAccess)world, update.pos), update.teClass.getName() }); 
       tileEntityBlock = TileEntityBlock.instantiate(update.teClass);
-      world.func_175690_a(update.pos, (TileEntity)tileEntityBlock);
+      world.setTileEntity(update.pos, (TileEntity)tileEntityBlock);
       assert !tileEntityBlock.isInvalid();
       assert tileEntityBlock.getWorld() == world;
     } else {

@@ -22,7 +22,7 @@ public class BaseSeed
 	}
 
 	@Deprecated
-	public BaseSeed(CropCard crop, int size, int statGrowth, int statGain, int statResistance, int stackSize)
+	public BaseSeed(CropCard crop, int size, int statGrowth, int statGain, int statResistance, int ignored)
 	{
 		this(crop, size, statGrowth, statGain, statResistance);
 	}

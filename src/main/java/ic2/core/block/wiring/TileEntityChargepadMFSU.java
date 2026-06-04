@@ -11,12 +11,12 @@ public class TileEntityChargepadMFSU extends TileEntityChargepadBlock {
   }
   
   protected void getItems(EntityPlayer player) {
-    for (ItemStack current : player.inventory.field_70460_b) {
+    for (ItemStack current : player.inventory.armorInventory) {
       if (current == null)
         continue; 
       chargeItem(current, 2048);
     } 
-    for (ItemStack current : player.inventory.field_70462_a) {
+    for (ItemStack current : player.inventory.mainInventory) {
       if (current == null)
         continue; 
       chargeItem(current, 2048);

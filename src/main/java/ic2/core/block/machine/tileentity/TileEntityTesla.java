@@ -35,18 +35,18 @@ public class TileEntityTesla extends TileEntityBlock {
   protected boolean shock(int damage) {
     int r = 4;
     World world = getWorld();
-    List<EntityLivingBase> entities = world.func_72872_a(EntityLivingBase.class, new AxisAlignedBB((this.pos
+    List<EntityLivingBase> entities = world.getEntitiesWithinAABB(EntityLivingBase.class, new AxisAlignedBB((this.pos
           .getX() - 4), (this.pos.getY() - 4), (this.pos.getZ() - 4), (this.pos
           .getX() + 4 + 1), (this.pos.getY() + 4 + 1), (this.pos.getZ() + 4 + 1)));
     for (EntityLivingBase entity : entities) {
       if (ItemArmorHazmat.hasCompleteHazmat(entity))
         continue; 
-      if (entity.func_70097_a((DamageSource)IC2DamageSource.electricity, damage)) {
+      if (entity.attackEntityFrom((DamageSource)IC2DamageSource.electricity, damage)) {
         if (world instanceof WorldServer) {
           WorldServer worldServer = (WorldServer)world;
           Random rnd = world.rand;
           for (int i = 0; i < damage; i++)
-            worldServer.func_180505_a(EnumParticleTypes.REDSTONE, true, entity.posX + rnd
+            worldServer.spawnParticle(EnumParticleTypes.REDSTONE, true, entity.posX + rnd
                 
                 .nextFloat() - 0.5D, entity.posY + (rnd
                 .nextFloat() * 2.0F) - 1.0D, entity.posZ + rnd

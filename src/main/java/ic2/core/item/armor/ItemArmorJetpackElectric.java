@@ -13,8 +13,8 @@ import net.minecraftforge.common.ISpecialArmor;
 public class ItemArmorJetpackElectric extends ItemArmorElectric implements IJetpack {
   public ItemArmorJetpackElectric() {
     super(ItemName.jetpack_electric, "jetpack", EntityEquipmentSlot.CHEST, 30000.0D, 60.0D, 1);
-    func_77656_e(27);
-    func_77625_d(1);
+    setMaxDamage(27);
+    setMaxStackSize(1);
     setNoRepair();
   }
   

@@ -24,12 +24,12 @@ public class BlockWall extends BlockMultiID<Ic2Color> {
   }
   
   private BlockWall() {
-    super(BlockName.wall, Material.field_151576_e);
-    func_149711_c(3.0F);
-    func_149752_b(30.0F);
-    func_149672_a(SoundType.field_185851_d);
-    func_180632_j(this.field_176227_L.func_177621_b()
-        .func_177226_a((IProperty)this.typeProperty, (Comparable)defaultColor));
+    super(BlockName.wall, Material.ROCK);
+    setHardness(3.0F);
+    setResistance(30.0F);
+    setSoundType(SoundType.STONE);
+    setDefaultState(this.blockState.getBaseState()
+        .withProperty((IProperty)this.typeProperty, (Comparable)defaultColor));
     MinecraftForge.EVENT_BUS.register(this);
   }
   
@@ -40,7 +40,7 @@ public class BlockWall extends BlockMultiID<Ic2Color> {
       return false; 
     Ic2Color newColor = Ic2Color.get(color);
     if (type != newColor) {
-      world.func_175656_a(pos, state.func_177226_a((IProperty)this.typeProperty, (Comparable)newColor));
+      world.setBlockState(pos, state.withProperty((IProperty)this.typeProperty, (Comparable)newColor));
       return true;
     } 
     return false;
@@ -51,7 +51,7 @@ public class BlockWall extends BlockMultiID<Ic2Color> {
     if (event.state.getBlock() != this)
       return; 
     World world = event.getWorld();
-    Ic2Color color = (Ic2Color)event.state.func_177229_b((IProperty)this.typeProperty);
+    Ic2Color color = (Ic2Color)event.state.getValue((IProperty)this.typeProperty);
     if (!ItemBlockTileEntity.placeTeBlock(null, (EntityLivingBase)Ic2Player.get(world), world, event.pos, EnumFacing.DOWN, new TileEntityWall(color)))
       return; 
     IBlockState newState = BlockName.te.getInstance().getDefaultState();
@@ -61,7 +61,7 @@ public class BlockWall extends BlockMultiID<Ic2Color> {
       event.applied = true;
       event.setCanceled(true);
     } else {
-      world.func_175656_a(event.pos, event.state);
+      world.setBlockState(event.pos, event.state);
     } 
   }
   

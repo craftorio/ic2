@@ -13,11 +13,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 
 public class BehaviorScrapboxDispense extends BehaviorDefaultDispenseItem {
-  protected ItemStack func_82487_b(IBlockSource blockSource, ItemStack stack) {
+  protected ItemStack dispenseStack(IBlockSource blockSource, ItemStack stack) {
     if (StackUtil.checkItemEquality(stack, ItemName.crafting.getItemStack((Enum)CraftingItemType.scrap_box))) {
-      EnumFacing facing = (EnumFacing)blockSource.func_189992_e().func_177229_b((IProperty)BlockDispenser.field_176441_a);
-      IPosition position = BlockDispenser.func_149939_a(blockSource);
-      func_82486_a(blockSource.func_82618_k(), Recipes.scrapboxDrops.getDrop(stack, true), 6, facing, position);
+      EnumFacing facing = (EnumFacing)blockSource.getBlockState().getValue((IProperty)BlockDispenser.FACING);
+      IPosition position = BlockDispenser.getDispensePosition(blockSource);
+      doDispense(blockSource.getWorld(), Recipes.scrapboxDrops.getDrop(stack, true), 6, facing, position);
     } 
     return stack;
   }

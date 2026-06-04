@@ -32,8 +32,8 @@ public class MergedBlockModel implements IBakedModel {
       List<BakedQuad> newMergedFaceQuads = new ArrayList<>(mergedFaceQuads);
       for (int i = this.retextureStart[side]; i < mergedFaceQuads.size(); i++) {
         BakedQuad oldQuad = mergedFaceQuads.get(i);
-        int[] vertexData = Arrays.copyOf(oldQuad.func_178209_a(), (oldQuad.func_178209_a()).length);
-        BakedQuad newQuad = new BakedQuad(vertexData, oldQuad.func_178211_c(), oldQuad.func_178210_d(), oldQuad.func_187508_a(), oldQuad.shouldApplyDiffuseLighting(), oldQuad.getFormat());
+        int[] vertexData = Arrays.copyOf(oldQuad.getVertexData(), (oldQuad.getVertexData()).length);
+        BakedQuad newQuad = new BakedQuad(vertexData, oldQuad.getTintIndex(), oldQuad.getFace(), oldQuad.getSprite(), oldQuad.shouldApplyDiffuseLighting(), oldQuad.getFormat());
         newMergedFaceQuads.set(i, newQuad);
       } 
     } 
@@ -71,7 +71,7 @@ public class MergedBlockModel implements IBakedModel {
       TextureAtlasSprite sprite = sprites[texture];
       for (int i = 0; i < 1; i++) {
         BakedQuad quad = quads.get(retextureStart + texture + i);
-        int[] vertexData = quad.func_178209_a();
+        int[] vertexData = quad.getVertexData();
         for (int j = 0; j < 4; j++) {
           int offset = j * VdUtil.dataStride;
           vertexData[offset + 3] = colorMultiplier;
@@ -84,7 +84,7 @@ public class MergedBlockModel implements IBakedModel {
       } 
     } 
     for (BakedQuad quad : quads) {
-      if (quad.func_187508_a() == null)
+      if (quad.getSprite() == null)
         ReflectionUtil.setValue(quad, SPRITE, ModelLoader.White.INSTANCE); 
     } 
   }
@@ -126,38 +126,38 @@ public class MergedBlockModel implements IBakedModel {
     return 0xFF000000 | color & 0xFF00 | (color & 0xFF) << 16 | (color & 0xFF0000) >> 16;
   }
   
-  public List<BakedQuad> func_188616_a(IBlockState state, EnumFacing side, long rand) {
+  public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
     if (side == null)
-      return this.parent.func_188616_a(state, side, rand); 
+      return this.parent.getQuads(state, side, rand); 
     return this.mergedFaceQuads[side.ordinal()];
   }
   
-  public boolean func_177555_b() {
-    return this.parent.func_177555_b();
+  public boolean isAmbientOcclusion() {
+    return this.parent.isAmbientOcclusion();
   }
   
-  public boolean func_177556_c() {
-    return this.parent.func_177556_c();
+  public boolean isGui3d() {
+    return this.parent.isGui3d();
   }
   
-  public boolean func_188618_c() {
-    return this.parent.func_188618_c();
+  public boolean isBuiltInRenderer() {
+    return this.parent.isBuiltInRenderer();
   }
   
-  public TextureAtlasSprite func_177554_e() {
-    return this.parent.func_177554_e();
+  public TextureAtlasSprite getParticleTexture() {
+    return this.parent.getParticleTexture();
   }
   
   @Deprecated
-  public ItemCameraTransforms func_177552_f() {
-    return this.parent.func_177552_f();
+  public ItemCameraTransforms getItemCameraTransforms() {
+    return this.parent.getItemCameraTransforms();
   }
   
   public Pair<? extends IBakedModel, Matrix4f> handlePerspective(ItemCameraTransforms.TransformType cameraTransformType) {
     return Pair.of(this, this.parent.handlePerspective(cameraTransformType).getRight());
   }
   
-  public ItemOverrideList func_188617_f() {
-    return this.parent.func_188617_f();
+  public ItemOverrideList getOverrides() {
+    return this.parent.getOverrides();
   }
 }

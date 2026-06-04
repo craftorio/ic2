@@ -23,15 +23,15 @@ public class HandHeldToolbox extends HandHeldInventory {
     return (GuiScreen)new GuiToolbox(new ContainerToolbox(player, this));
   }
   
-  public String func_70005_c_() {
+  public String getName() {
     return "toolbox";
   }
   
-  public boolean func_145818_k_() {
+  public boolean hasCustomName() {
     return false;
   }
   
-  public boolean func_94041_b(int i, ItemStack itemstack) {
+  public boolean isItemValidForSlot(int i, ItemStack itemstack) {
     if (StackUtil.isEmpty(itemstack))
       return false; 
     return ItemWrapper.canBeStoredInToolbox(itemstack);

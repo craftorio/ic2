@@ -61,7 +61,7 @@ public class UpgradeKit extends ItemMulti<UpdateKitType> {
       NBTTagCompound nbt = new NBTTagCompound();
       te.writeToNBT(nbt);
       tileEntityChargepadMFSU.readFromNBT(nbt);
-      world.func_175690_a(pos, (TileEntity)tileEntityChargepadMFSU);
+      world.setTileEntity(pos, (TileEntity)tileEntityChargepadMFSU);
       tileEntityChargepadMFSU.onUpgraded();
       tileEntityChargepadMFSU.markDirty();
       return true;
@@ -70,7 +70,7 @@ public class UpgradeKit extends ItemMulti<UpdateKitType> {
   }
   
   @SideOnly(Side.CLIENT)
-  public void func_77624_a(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
+  public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
     UpdateKitType type = (UpdateKitType)getType(stack);
     if (type == null)
       return; 

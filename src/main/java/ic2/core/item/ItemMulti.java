@@ -37,7 +37,7 @@ public class ItemMulti<T extends Enum<T> & IIdProvider> extends ItemIC2 implemen
   
   public static <T extends Enum<T> & IIdProvider> ItemMulti<T> create(ItemName name, Class<T> typeClass) {
     EnumProperty<T> typeProperty = new EnumProperty("type", typeClass);
-    if (typeProperty.func_177700_c().size() > 32767)
+    if (typeProperty.getAllowedValues().size() > 32767)
       throw new IllegalArgumentException("Too many values to fit in a short for " + typeClass); 
     return new ItemMulti<>(name, typeProperty);
   }
@@ -49,7 +49,7 @@ public class ItemMulti<T extends Enum<T> & IIdProvider> extends ItemIC2 implemen
     this.updateHandlers = new IdentityHashMap<>();
     this.rarityFilter = new IdentityHashMap<>();
     this.typeProperty = typeProperty;
-    func_77627_a(true);
+    setHasSubtypes(true);
   }
   
   protected ItemMulti(ItemName name, Class<T> typeClass) {
@@ -58,7 +58,7 @@ public class ItemMulti<T extends Enum<T> & IIdProvider> extends ItemIC2 implemen
   
   @SideOnly(Side.CLIENT)
   public void registerModels(ItemName name) {
-    for (Enum enum_ : this.typeProperty.func_177700_c())
+    for (Enum enum_ : this.typeProperty.getAllowedValues())
       registerModel(((IIdProvider)enum_).getId(), name, ((IIdProvider)enum_).getModelName()); 
   }
   
@@ -70,15 +70,15 @@ public class ItemMulti<T extends Enum<T> & IIdProvider> extends ItemIC2 implemen
     return ((IIdProvider)type).getColor();
   }
   
-  public final String func_77667_c(ItemStack stack) {
+  public final String getUnlocalizedName(ItemStack stack) {
     T type = getType(stack);
     if (type == null)
-      return super.func_77667_c(stack); 
-    return super.func_77667_c(stack) + "." + ((IIdProvider)type).getName();
+      return super.getUnlocalizedName(stack); 
+    return super.getUnlocalizedName(stack) + "." + ((IIdProvider)type).getName();
   }
   
   public ItemStack getItemStack(T type) {
-    if (!this.typeProperty.func_177700_c().contains(type))
+    if (!this.typeProperty.getAllowedValues().contains(type))
       throw new IllegalArgumentException("invalid property value " + type + " for property " + this.typeProperty); 
     return getItemStackUnchecked(type);
   }
@@ -105,22 +105,22 @@ public class ItemMulti<T extends Enum<T> & IIdProvider> extends ItemIC2 implemen
     return ((IIdProvider)type).getName();
   }
   
-  public final void func_150895_a(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-    if (!func_194125_a(tab))
+  public final void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
+    if (!isInCreativeTab(tab))
       return; 
     for (Enum enum_ : this.typeProperty.getShownValues())
       subItems.add(getItemStackUnchecked((T)enum_)); 
   }
   
   public Set<T> getAllTypes() {
-    return EnumSet.allOf(this.typeProperty.func_177699_b());
+    return EnumSet.allOf(this.typeProperty.getValueClass());
   }
   
   public final T getType(ItemStack stack) {
-    return (T)this.typeProperty.getValue(stack.func_77960_j());
+    return (T)this.typeProperty.getValue(stack.getMetadata());
   }
   
-  public ActionResult<ItemStack> func_77659_a(World world, EntityPlayer player, EnumHand hand) {
+  public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
     ItemStack stack = StackUtil.get(player, hand);
     T type = getType(stack);
     if (type == null)
@@ -131,7 +131,7 @@ public class ItemMulti<T extends Enum<T> & IIdProvider> extends ItemIC2 implemen
     return handler.onRightClick(stack, player, hand);
   }
   
-  public EnumActionResult func_180614_a(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+  public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
     ItemStack stack = StackUtil.get(player, hand);
     T type = getType(stack);
     if (type == null)
@@ -142,7 +142,7 @@ public class ItemMulti<T extends Enum<T> & IIdProvider> extends ItemIC2 implemen
     return handler.onUse(stack, player, pos, hand, side);
   }
   
-  public void func_77663_a(ItemStack stack, World world, Entity entity, int slotIndex, boolean isCurrentItem) {
+  public void onUpdate(ItemStack stack, World world, Entity entity, int slotIndex, boolean isCurrentItem) {
     T type = getType(stack);
     if (type == null)
       return; 
@@ -152,14 +152,14 @@ public class ItemMulti<T extends Enum<T> & IIdProvider> extends ItemIC2 implemen
     handler.onUpdate(stack, world, entity, slotIndex, isCurrentItem);
   }
   
-  public EnumRarity func_77613_e(ItemStack stack) {
+  public EnumRarity getRarity(ItemStack stack) {
     EnumRarity rarity = this.rarityFilter.get(getType(stack));
-    return (rarity != null) ? rarity : super.func_77613_e(stack);
+    return (rarity != null) ? rarity : super.getRarity(stack);
   }
   
   public void setRightClickHandler(T type, IItemRightClickHandler handler) {
     if (type == null) {
-      for (Enum enum_ : this.typeProperty.func_177700_c())
+      for (Enum enum_ : this.typeProperty.getAllowedValues())
         setRightClickHandler((T)enum_, handler); 
     } else {
       this.rightClickHandlers.put(type, handler);
@@ -168,7 +168,7 @@ public class ItemMulti<T extends Enum<T> & IIdProvider> extends ItemIC2 implemen
   
   public void setUseHandler(T type, IItemUseHandler handler) {
     if (type == null) {
-      for (Enum enum_ : this.typeProperty.func_177700_c())
+      for (Enum enum_ : this.typeProperty.getAllowedValues())
         setUseHandler((T)enum_, handler); 
     } else {
       this.useHandlers.put(type, handler);
@@ -177,7 +177,7 @@ public class ItemMulti<T extends Enum<T> & IIdProvider> extends ItemIC2 implemen
   
   public void setUpdateHandler(T type, IItemUpdateHandler handler) {
     if (type == null) {
-      for (Enum enum_ : this.typeProperty.func_177700_c())
+      for (Enum enum_ : this.typeProperty.getAllowedValues())
         setUpdateHandler((T)enum_, handler); 
     } else {
       this.updateHandlers.put(type, handler);

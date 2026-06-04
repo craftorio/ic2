@@ -44,7 +44,7 @@ public class TileEntityBarrel extends TileEntityBlock {
     this.type = nbt.getByte("type");
     this.boozeAmount = nbt.getByte("waterCount");
     this.age = nbt.getInteger("age");
-    this.opened = nbt.func_74767_n("opened");
+    this.opened = nbt.getBoolean("opened");
     if (this.type == 1) {
       if (!this.opened) {
         this.hopsCount = nbt.getByte("hopsCount");
@@ -61,7 +61,7 @@ public class TileEntityBarrel extends TileEntityBlock {
     nbt.setByte("type", (byte)this.type);
     nbt.setByte("waterCount", (byte)this.boozeAmount);
     nbt.setInteger("age", this.age);
-    nbt.func_74757_a("opened", this.opened);
+    nbt.setBoolean("opened", this.opened);
     if (this.type == 1) {
       if (!this.opened) {
         nbt.setByte("hopsCount", this.hopsCount);
@@ -111,7 +111,7 @@ public class TileEntityBarrel extends TileEntityBlock {
       if (this.type == 0 || this.type == 1) {
         int minAmount = 1000;
         int space = (32 - this.boozeAmount) * 1000;
-        if (player.func_70093_af())
+        if (player.isSneaking())
           space = Math.min(space, 1000); 
         FluidStack fs;
         if (space >= 1000 && (
@@ -125,10 +125,10 @@ public class TileEntityBarrel extends TileEntityBlock {
           this.boozeAmount += amount / 1000;
           return true;
         } 
-        if (stack.getItem() == Items.field_151015_O) {
+        if (stack.getItem() == Items.WHEAT) {
           this.type = 1;
           int amount = StackUtil.getSize(stack);
-          if (player.func_70093_af())
+          if (player.isSneaking())
             amount = 1; 
           if (amount > 64 - this.wheatCount)
             amount = 64 - this.wheatCount; 
@@ -142,7 +142,7 @@ public class TileEntityBarrel extends TileEntityBlock {
         if (StackUtil.checkItemEquality(stack, ItemName.crop_res.getItemStack((Enum)CropResItemType.hops))) {
           this.type = 1;
           int amount = StackUtil.getSize(stack);
-          if (player.func_70093_af())
+          if (player.isSneaking())
             amount = 1; 
           if (amount > 64 - this.hopsCount)
             amount = 64 - this.hopsCount; 
@@ -155,12 +155,12 @@ public class TileEntityBarrel extends TileEntityBlock {
         } 
       } 
       if ((this.type == 0 || this.type == 2) && 
-        stack.getItem() == Items.field_151120_aE) {
+        stack.getItem() == Items.REEDS) {
         if (this.age > 600)
           return false; 
         this.type = 2;
         int amount = StackUtil.getSize(stack);
-        if (player.func_70093_af())
+        if (player.isSneaking())
           amount = 1; 
         if (this.boozeAmount + amount > 32)
           amount = 32 - this.boozeAmount; 
@@ -187,7 +187,7 @@ public class TileEntityBarrel extends TileEntityBlock {
     } 
     if (!world.isRemote)
       StackUtil.dropAsEntity(world, this.pos, new ItemStack(ItemName.barrel.getInstance(), 1, calculateMetaValue())); 
-    world.func_175656_a(this.pos, BlockName.scaffold.getBlockState(BlockScaffold.ScaffoldType.wood));
+    world.setBlockState(this.pos, BlockName.scaffold.getBlockState(BlockScaffold.ScaffoldType.wood));
   }
   
   private void alterComposition() {

@@ -32,7 +32,7 @@ public class Covers extends TileEntityComponent {
   
   public ItemStack removeCover(EnumFacing side) {
     ItemStack ret = this.covers[side.ordinal()];
-    ret.func_77982_d(null);
+    ret.setTagCompound(null);
     this.covers[side.ordinal()] = null;
     return ret;
   }

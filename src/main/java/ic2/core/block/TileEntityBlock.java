@@ -18,16 +18,13 @@ import ic2.core.block.type.ResourceBlock;
 import ic2.core.gui.dynamic.IGuiConditionProvider;
 import ic2.core.init.Localization;
 import ic2.core.model.ModelComparator;
-import ic2.core.network.NetworkManager;
 import ic2.core.ref.BlockName;
-import ic2.core.ref.MetaTeBlock;
 import ic2.core.ref.MetaTeBlockProperty;
 import ic2.core.ref.TeBlock;
 import ic2.core.util.AabbUtil;
 import ic2.core.util.LogCategory;
 import ic2.core.util.Util;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
@@ -37,7 +34,6 @@ import java.util.Set;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.util.ITooltipFlag;
@@ -46,7 +42,6 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
@@ -58,7 +53,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.Explosion;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.EnumPlantType;
 import net.minecraftforge.common.capabilities.Capability;
@@ -88,8 +82,8 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
     this.active = false;
     this.facing = (byte)EnumFacing.DOWN.ordinal();
     this.loadState = 0;
-    ITeBlock teb = TeBlockRegistry.get((Class)getClass());
-    this.teBlock = (teb == null) ? (ITeBlock)TeBlock.invalid : teb;
+    ITeBlock teb = TeBlockRegistry.get(getClass());
+    this.teBlock = (teb == null) ? TeBlock.invalid : teb;
     this.block = TeBlockRegistry.get(this.teBlock.getIdentifier());
   }
   
@@ -98,17 +92,17 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
   }
   
   public final IBlockState getBlockState() {
-    return this.block.getDefaultState().func_177226_a((IProperty)this.block.materialProperty, (Comparable)MaterialProperty.WrappedMaterial.get(this.teBlock.getMaterial())).func_177226_a(this.block.typeProperty, (Comparable)MetaTeBlockProperty.getState(this.teBlock, getActive())).func_177226_a(BlockTileEntity.facingProperty, (Comparable)getFacing()).func_177226_a(BlockTileEntity.transparentProperty, Boolean.valueOf(this.teBlock.isTransparent()));
+    return this.block.getDefaultState().withProperty(this.block.materialProperty, MaterialProperty.WrappedMaterial.get(this.teBlock.getMaterial())).withProperty(this.block.typeProperty, MetaTeBlockProperty.getState(this.teBlock, getActive())).withProperty(BlockTileEntity.facingProperty, getFacing()).withProperty(BlockTileEntity.transparentProperty, this.teBlock.isTransparent());
   }
   
   public final void invalidate() {
     if (this.loadState == 2) {
       if (debugLoad)
-        IC2.log.debug(LogCategory.Block, "TE onUnloaded (invalidate) for %s at %s.", new Object[] { this, Util.formatPosition(this) }); 
+        IC2.log.debug(LogCategory.Block, "TE onUnloaded (invalidate) for %s at %s.", this, Util.formatPosition(this)); 
       onUnloaded();
     } else {
       if (debugLoad)
-        IC2.log.debug(LogCategory.Block, "Skipping TE onUnloaded (invalidate) for %s at %s, state: %d.", new Object[] { this, Util.formatPosition(this), Byte.valueOf(this.loadState) }); 
+        IC2.log.debug(LogCategory.Block, "Skipping TE onUnloaded (invalidate) for %s at %s, state: %d.", this, Util.formatPosition(this), Byte.valueOf(this.loadState)); 
       this.loadState = 3;
     } 
     super.invalidate();
@@ -117,18 +111,18 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
   public final void onChunkUnload() {
     if (this.loadState == 2) {
       if (debugLoad)
-        IC2.log.debug(LogCategory.Block, "TE onUnloaded (chunk unload) for %s at %s.", new Object[] { this, Util.formatPosition(this) }); 
+        IC2.log.debug(LogCategory.Block, "TE onUnloaded (chunk unload) for %s at %s.", this, Util.formatPosition(this)); 
       onUnloaded();
     } else {
       if (debugLoad)
-        IC2.log.debug(LogCategory.Block, "Skipping TE onUnloaded (chunk unload) for %s at %s, state: %d.", new Object[] { this, Util.formatPosition(this), Byte.valueOf(this.loadState) }); 
+        IC2.log.debug(LogCategory.Block, "Skipping TE onUnloaded (chunk unload) for %s at %s, state: %d.", this, Util.formatPosition(this), Byte.valueOf(this.loadState)); 
       this.loadState = 3;
     } 
     super.onChunkUnload();
   }
   
-  public final void func_145829_t() {
-    super.func_145829_t();
+  public final void validate() {
+    super.validate();
     World world = getWorld();
     if (world == null || this.pos == null)
       throw new IllegalStateException("no world/pos"); 
@@ -138,12 +132,12 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
     IC2.tickHandler.requestSingleWorldTick(world, new IWorldTickCallback() {
           public void onTick(World world) {
             IBlockState state;
-            if (world == TileEntityBlock.this.getWorld() && TileEntityBlock.this.pos != null && !TileEntityBlock.this.isInvalid() && TileEntityBlock.this.loadState == 1 && world.func_175667_e(TileEntityBlock.this.pos) && (state = world.getBlockState(TileEntityBlock.this.pos)).getBlock() == TileEntityBlock.this.block && world.getTileEntity(TileEntityBlock.this.pos) == TileEntityBlock.this) {
+            if (world == TileEntityBlock.this.getWorld() && TileEntityBlock.this.pos != null && !TileEntityBlock.this.isInvalid() && TileEntityBlock.this.loadState == 1 && world.isBlockLoaded(TileEntityBlock.this.pos) && (state = world.getBlockState(TileEntityBlock.this.pos)).getBlock() == TileEntityBlock.this.block && world.getTileEntity(TileEntityBlock.this.pos) == TileEntityBlock.this) {
               Material expectedMaterial = TileEntityBlock.this.teBlock.getMaterial();
-              if (((MaterialProperty.WrappedMaterial)state.func_177229_b((IProperty)TileEntityBlock.this.block.materialProperty)).getMaterial() != expectedMaterial) {
+              if (state.getValue(TileEntityBlock.this.block.materialProperty).getMaterial() != expectedMaterial) {
                 if (TileEntityBlock.debugLoad)
                   IC2.log.debug(LogCategory.Block, "Adjusting material for %s at %s.", new Object[] { this.this$0, Util.formatPosition(this.this$0) }); 
-                world.func_180501_a(TileEntityBlock.this.pos, state.func_177226_a((IProperty)TileEntityBlock.this.block.materialProperty, (Comparable)MaterialProperty.WrappedMaterial.get(expectedMaterial)), 0);
+                world.setBlockState(TileEntityBlock.this.pos, state.withProperty(TileEntityBlock.this.block.materialProperty, MaterialProperty.WrappedMaterial.get(expectedMaterial)), 0);
                 assert world.getTileEntity(TileEntityBlock.this.pos) == TileEntityBlock.this;
               } 
               if (TileEntityBlock.debugLoad)
@@ -173,7 +167,7 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
         } 
       }  
     if (!this.enableWorldTick && this.updatableComponents == null)
-      (getWorld()).field_175730_i.remove(this); 
+      (getWorld()).tickableTileEntities.remove(this); 
   }
   
   protected void onUnloaded() {
@@ -192,19 +186,19 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
       if (facingValue >= 0 && facingValue < EnumFacing.VALUES.length && getSupportedFacings().contains(EnumFacing.VALUES[facingValue])) {
         this.facing = facingValue;
       } else if (!getSupportedFacings().isEmpty()) {
-        this.facing = (byte)((EnumFacing)getSupportedFacings().iterator().next()).ordinal();
+        this.facing = (byte) getSupportedFacings().iterator().next().ordinal();
       } else {
         this.facing = (byte)EnumFacing.DOWN.ordinal();
       } 
     } 
-    this.active = nbt.func_74767_n("active");
+    this.active = nbt.getBoolean("active");
     if (this.components != null && nbt.hasKey("components", 10)) {
       NBTTagCompound componentsNbt = nbt.getCompoundTag("components");
-      for (String name : componentsNbt.func_150296_c()) {
+      for (String name : componentsNbt.getKeySet()) {
         Class<? extends TileEntityComponent> cls = Components.getClass(name);
         TileEntityComponent component;
         if (cls == null || (component = getComponent((Class)cls)) == null) {
-          IC2.log.warn(LogCategory.Block, "Can't find component %s while loading %s.", new Object[] { name, this });
+          IC2.log.warn(LogCategory.Block, "Can't find component %s while loading %s.", name, this);
           continue;
         } 
         NBTTagCompound componentNbt = componentsNbt.getCompoundTag(name);
@@ -217,7 +211,7 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
     super.writeToNBT(nbt);
     if (!getSupportedFacings().isEmpty())
       nbt.setByte("facing", this.facing); 
-    nbt.func_74757_a("active", this.active);
+    nbt.setBoolean("active", this.active);
     if (this.components != null) {
       NBTTagCompound componentsNbt = null;
       for (TileEntityComponent component : this.components.values()) {
@@ -226,25 +220,25 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
           continue; 
         if (componentsNbt == null) {
           componentsNbt = new NBTTagCompound();
-          nbt.setTag("components", (NBTBase)componentsNbt);
+          nbt.setTag("components", componentsNbt);
         } 
-        componentsNbt.setTag(Components.getId(component.getClass()), (NBTBase)componentNbt);
+        componentsNbt.setTag(Components.getId(component.getClass()), componentNbt);
       } 
     } 
     return nbt;
   }
   
-  public NBTTagCompound func_189517_E_() {
-    ((NetworkManager)IC2.network.get(true)).sendInitialData(this);
+  public NBTTagCompound getUpdateTag() {
+    IC2.network.get(true).sendInitialData(this);
     return emptyNbt;
   }
   
-  public SPacketUpdateTileEntity func_189518_D_() {
-    ((NetworkManager)IC2.network.get(true)).sendInitialData(this);
+  public SPacketUpdateTileEntity getUpdatePacket() {
+    IC2.network.get(true).sendInitialData(this);
     return null;
   }
   
-  public final void func_73660_a() {
+  public final void update() {
     if (this.loadState != 2)
       return; 
     if (this.updatableComponents != null)
@@ -286,7 +280,7 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
     if (!this.teBlock.hasActive())
       return false; 
     IBlockState stateA = getBlockState();
-    IBlockState stateB = stateA.func_177226_a(this.block.typeProperty, (Comparable)MetaTeBlockProperty.getState(this.teBlock, !((MetaTeBlock)stateA.func_177229_b(this.block.typeProperty)).active));
+    IBlockState stateB = stateA.withProperty(this.block.typeProperty, MetaTeBlockProperty.getState(this.teBlock, !stateA.getValue(this.block.typeProperty).active));
     return !ModelComparator.isEqual(stateA, stateB, getWorld(), getPos());
   }
   
@@ -305,10 +299,10 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
   }
   
   protected RayTraceResult collisionRayTrace(Vec3d start, Vec3d end) {
-    Vec3d startNormalized = start.func_178786_a(this.pos.getX(), this.pos.getY(), this.pos.getZ());
-    double lengthSq = Util.square(end.field_72450_a - start.field_72450_a) + Util.square(end.field_72448_b - start.field_72448_b) + Util.square(end.field_72449_c - start.field_72449_c);
+    Vec3d startNormalized = start.subtract(this.pos.getX(), this.pos.getY(), this.pos.getZ());
+    double lengthSq = Util.square(end.x - start.x) + Util.square(end.y - start.y) + Util.square(end.z - start.z);
     double lengthInv = 1.0D / Math.sqrt(lengthSq);
-    Vec3d direction = new Vec3d((end.field_72450_a - start.field_72450_a) * lengthInv, (end.field_72448_b - start.field_72448_b) * lengthInv, (end.field_72449_c - start.field_72449_c) * lengthInv);
+    Vec3d direction = new Vec3d((end.x - start.x) * lengthInv, (end.y - start.y) * lengthInv, (end.z - start.z) * lengthInv);
     double minDistanceSq = lengthSq;
     Vec3d minIntersection = null;
     EnumFacing minIntersectionSide = null;
@@ -317,8 +311,8 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
       EnumFacing side = AabbUtil.getIntersection(startNormalized, direction, aabb, intersectionOut);
       if (side == null)
         continue; 
-      Vec3d intersection = (Vec3d)intersectionOut.getValue();
-      double distanceSq = Util.square(intersection.field_72450_a - startNormalized.field_72450_a) + Util.square(intersection.field_72448_b - startNormalized.field_72448_b) + Util.square(intersection.field_72449_c - startNormalized.field_72449_c);
+      Vec3d intersection = intersectionOut.getValue();
+      double distanceSq = Util.square(intersection.x - startNormalized.x) + Util.square(intersection.y - startNormalized.y) + Util.square(intersection.z - startNormalized.z);
       if (distanceSq < minDistanceSq) {
         minDistanceSq = distanceSq;
         minIntersection = intersection;
@@ -343,11 +337,11 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
   }
   
   protected void addCollisionBoxesToList(AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity) {
-    AxisAlignedBB maskNormalized = mask.func_72317_d(-this.pos.getX(), -this.pos.getY(), -this.pos.getZ());
+    AxisAlignedBB maskNormalized = mask.offset(-this.pos.getX(), -this.pos.getY(), -this.pos.getZ());
     for (AxisAlignedBB aabb : getAabbs(true)) {
-      if (!aabb.func_72326_a(maskNormalized))
+      if (!aabb.intersects(maskNormalized))
         continue; 
-      list.add(aabb.func_186670_a(this.pos));
+      list.add(aabb.offset(this.pos));
     } 
   }
   
@@ -360,12 +354,12 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
     double zS = Double.POSITIVE_INFINITY, yS = zS, xS = yS;
     double zE = Double.NEGATIVE_INFINITY, yE = zE, xE = yE;
     for (AxisAlignedBB aabb : aabbs) {
-      xS = Math.min(xS, aabb.field_72340_a);
-      yS = Math.min(yS, aabb.field_72338_b);
-      zS = Math.min(zS, aabb.field_72339_c);
-      xE = Math.max(xE, aabb.field_72336_d);
-      yE = Math.max(yE, aabb.field_72337_e);
-      zE = Math.max(zE, aabb.field_72334_f);
+      xS = Math.min(xS, aabb.minX);
+      yS = Math.min(yS, aabb.minY);
+      zS = Math.min(zS, aabb.minZ);
+      xE = Math.max(xE, aabb.maxX);
+      yE = Math.max(yE, aabb.maxY);
+      zE = Math.max(zE, aabb.maxZ);
     } 
     return new AxisAlignedBB(xS, yS, zS, xE, yE, zE);
   }
@@ -378,32 +372,32 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
     if (aabb != defaultAabbs)
       switch (side) {
         case Self:
-          if (aabb.field_72338_b > 0.0D)
+          if (aabb.minY > 0.0D)
             return true; 
           break;
         case None:
-          if (aabb.field_72337_e < 1.0D)
+          if (aabb.maxY < 1.0D)
             return true; 
           break;
         case Generator:
-          if (aabb.field_72339_c > 0.0D)
+          if (aabb.minZ > 0.0D)
             return true; 
           break;
         case Machine:
-          if (aabb.field_72334_f < 1.0D)
+          if (aabb.maxZ < 1.0D)
             return true; 
           break;
         case AdvMachine:
-          if (aabb.field_72340_a > 0.0D)
+          if (aabb.minX > 0.0D)
             return true; 
           break;
         case null:
-          if (aabb.field_72336_d < 1.0D)
+          if (aabb.maxX < 1.0D)
             return true; 
           break;
       }  
     World world = getWorld();
-    return !world.getBlockState(otherPos).doesSideBlockRendering((IBlockAccess)world, otherPos, side.getOpposite());
+    return !world.getBlockState(otherPos).doesSideBlockRendering(world, otherPos, side.getOpposite());
   }
   
   protected boolean doesSideBlockRendering(EnumFacing side) {
@@ -426,27 +420,27 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
       for (AxisAlignedBB aabb : aabbs) {
         switch (side) {
           case Self:
-            if (aabb.field_72338_b < 0.0D)
+            if (aabb.minY < 0.0D)
               return false; 
           case None:
-            if (aabb.field_72337_e > 1.0D)
+            if (aabb.maxY > 1.0D)
               return false; 
           case Generator:
-            if (aabb.field_72339_c < 0.0D)
+            if (aabb.minZ < 0.0D)
               return false; 
           case Machine:
-            if (aabb.field_72334_f > 1.0D)
+            if (aabb.maxZ > 1.0D)
               return false; 
           case AdvMachine:
-            if (aabb.field_72340_a < 0.0D)
+            if (aabb.minX < 0.0D)
               return false; 
           case null:
-            if (aabb.field_72336_d > 1.0D)
+            if (aabb.maxX > 1.0D)
               return false; 
         } 
       }  
     for (AxisAlignedBB aabb : aabbs) {
-      if (aabb.field_72340_a <= xS && aabb.field_72338_b <= yS && aabb.field_72339_c <= zS && aabb.field_72336_d >= xE && aabb.field_72337_e >= yE && aabb.field_72334_f >= zE)
+      if (aabb.minX <= xS && aabb.minY <= yS && aabb.minZ <= zS && aabb.maxX >= xE && aabb.maxY >= yE && aabb.maxZ >= zE)
         return true; 
     } 
     return false;
@@ -459,7 +453,7 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
     if (aabbs.size() != 1)
       return false; 
     AxisAlignedBB aabb = aabbs.get(0);
-    return (aabb.field_72340_a <= 0.0D && aabb.field_72338_b <= 0.0D && aabb.field_72339_c <= 0.0D && aabb.field_72336_d >= 1.0D && aabb.field_72337_e >= 1.0D && aabb.field_72334_f >= 1.0D);
+    return (aabb.minX <= 0.0D && aabb.minY <= 0.0D && aabb.minZ <= 0.0D && aabb.maxX >= 1.0D && aabb.maxY >= 1.0D && aabb.maxZ >= 1.0D);
   }
   
   protected boolean isSideSolid(EnumFacing side) {
@@ -496,16 +490,16 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
   }
   
   protected int getWeakPower(EnumFacing side) {
-    BasicRedstoneComponent component = (BasicRedstoneComponent)getComponent(RedstoneEmitter.class);
+    BasicRedstoneComponent component = getComponent(RedstoneEmitter.class);
     return (component == null) ? 0 : component.getLevel();
   }
   
   protected boolean canConnectRedstone(EnumFacing side) {
-    return (hasComponent((Class)RedstoneEmitter.class) || hasComponent((Class)Redstone.class));
+    return (hasComponent(RedstoneEmitter.class) || hasComponent(Redstone.class));
   }
   
   protected int getComparatorInputOverride() {
-    BasicRedstoneComponent component = (BasicRedstoneComponent)getComponent(ComparatorEmitter.class);
+    BasicRedstoneComponent component = getComponent(ComparatorEmitter.class);
     return (component == null) ? 0 : component.getLevel();
   }
   
@@ -534,11 +528,11 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
   }
   
   protected List<ItemStack> getSelfDrops(int fortune, boolean wrench) {
-    ItemStack drop = getPickBlock((EntityPlayer)null, (RayTraceResult)null);
+    ItemStack drop = getPickBlock(null, null);
     drop = adjustDrop(drop, wrench);
     if (drop == null)
       return Collections.emptyList(); 
-    return Arrays.asList(new ItemStack[] { drop });
+    return Collections.singletonList(drop);
   }
   
   protected List<ItemStack> getAuxDrops(int fortune) {
@@ -565,10 +559,8 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
     if (!this.teBlock.allowWrenchRotating())
       return false; 
     if (facing == getFacing())
-      return false; 
-    if (!getSupportedFacings().contains(facing))
-      return false; 
-    return true;
+      return false;
+	  return getSupportedFacings().contains(facing);
   }
   
   protected boolean setFacingWrench(EnumFacing facing, EntityPlayer player) {
@@ -594,7 +586,7 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
   }
   
   protected SoundType getBlockSound(Entity entity) {
-    return SoundType.field_185851_d;
+    return SoundType.STONE;
   }
   
   protected EnumFacing getPlacementFacing(EntityLivingBase placer, EnumFacing facing) {
@@ -603,11 +595,11 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
       return EnumFacing.DOWN; 
     if (placer == null)
       return (facing != null && supportedFacings.contains(facing.getOpposite())) ? facing.getOpposite() : getSupportedFacings().iterator().next(); 
-    Vec3d dir = placer.func_70040_Z();
+    Vec3d dir = placer.getLookVec();
     EnumFacing bestFacing = null;
     double maxMatch = Double.NEGATIVE_INFINITY;
     for (EnumFacing cFacing : supportedFacings) {
-      double match = dir.func_72430_b(new Vec3d(cFacing.getOpposite().func_176730_m()));
+      double match = dir.dotProduct(new Vec3d(cFacing.getOpposite().getDirectionVec()));
       if (match > maxMatch) {
         maxMatch = match;
         bestFacing = cFacing;
@@ -652,7 +644,7 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
       throw new IllegalArgumentException("invalid facing: " + facing + ", supported: " + getSupportedFacings()); 
     this.facing = (byte)facing.ordinal();
     if (!(getWorld()).isRemote)
-      ((NetworkManager)IC2.network.get(true)).updateTileEntityField(this, "facing"); 
+      IC2.network.get(true).updateTileEntityField(this, "facing"); 
   }
   
   public boolean getActive() {
@@ -663,7 +655,7 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
     if (this.active == active)
       return; 
     this.active = active;
-    ((NetworkManager)IC2.network.get(true)).updateTileEntityField(this, "active");
+    IC2.network.get(true).updateTileEntityField(this, "active");
   }
   
   public boolean getGuiState(String name) {
@@ -674,12 +666,12 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
   
   @SideOnly(Side.CLIENT)
   public void addInformation(ItemStack stack, List<String> tooltip, ITooltipFlag advanced) {
-    if (hasComponent((Class)Energy.class)) {
+    if (hasComponent(Energy.class)) {
       Energy energy = getComponent(Energy.class);
       if (!energy.getSourceDirs().isEmpty()) {
-        tooltip.add(Localization.translate("ic2.item.tooltip.PowerTier", new Object[] { Integer.valueOf(energy.getSourceTier()) }));
+        tooltip.add(Localization.translate("ic2.item.tooltip.PowerTier", Integer.valueOf(energy.getSourceTier())));
       } else if (!energy.getSinkDirs().isEmpty()) {
-        tooltip.add(Localization.translate("ic2.item.tooltip.PowerTier", new Object[] { Integer.valueOf(energy.getSinkTier()) }));
+        tooltip.add(Localization.translate("ic2.item.tooltip.PowerTier", Integer.valueOf(energy.getSinkTier())));
       } 
     } 
   }
@@ -697,11 +689,11 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
   
   public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
     if (this.capabilityComponents == null)
-      return (T)super.getCapability(capability, facing); 
+      return super.getCapability(capability, facing); 
     TileEntityComponent comp = this.capabilityComponents.get(capability);
     if (comp == null)
-      return (T)super.getCapability(capability, facing); 
-    return (T)comp.getCapability(capability, facing);
+      return super.getCapability(capability, facing); 
+    return comp.getCapability(capability, facing);
   }
   
   protected final <T extends TileEntityComponent> T addComponent(T component) {
@@ -709,11 +701,11 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
       throw new NullPointerException("null component"); 
     if (this.components == null)
       this.components = new IdentityHashMap<>(4); 
-    TileEntityComponent prev = this.components.put(component.getClass(), (TileEntityComponent)component);
+    TileEntityComponent prev = this.components.put(component.getClass(), component);
     if (prev != null)
       throw new RuntimeException("conflicting component while adding " + component + ", already used by " + prev + "."); 
-    for (Capability<?> cap : (Iterable<Capability<?>>)component.getProvidedCapabilities(null))
-      addComponentCapability(cap, (TileEntityComponent)component); 
+    for (Capability<?> cap : component.getProvidedCapabilities(null))
+      addComponentCapability(cap, component); 
     return component;
   }
   
@@ -744,7 +736,7 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
   
   protected final void rerender() {
     IBlockState state = getBlockState();
-    getWorld().func_184138_a(this.pos, state, state, 2);
+    getWorld().notifyBlockUpdate(this.pos, state, state, 2);
   }
   
   protected boolean clientNeedsExtraModelInfo() {
@@ -766,7 +758,7 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
         if (!hasUpdateClient && isClient) {
           boolean found = true;
           try {
-            cls.getDeclaredMethod("updateEntityClient", new Class[0]);
+            cls.getDeclaredMethod("updateEntityClient");
           } catch (NoSuchMethodException e) {
             found = false;
           } 
@@ -776,7 +768,7 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
         if (!hasUpdateServer) {
           boolean found = true;
           try {
-            cls.getDeclaredMethod("updateEntityServer", new Class[0]);
+            cls.getDeclaredMethod("updateEntityServer");
           } catch (NoSuchMethodException e) {
             found = false;
           } 
@@ -804,14 +796,14 @@ public abstract class TileEntityBlock extends TileEntity implements INetworkData
   }
   
   private enum TickSubscription {
-    None, Client, Server, Both;
+    None, Client, Server, Both
   }
   
   protected static final EnumPlantType noCrop = EnumPlantType.getPlantType("IC2_NO_CROP");
   
   private static final NBTTagCompound emptyNbt = new NBTTagCompound();
   
-  private static final List<AxisAlignedBB> defaultAabbs = Arrays.asList(new AxisAlignedBB[] { new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 1.0D, 1.0D) });
+  private static final List<AxisAlignedBB> defaultAabbs = Collections.singletonList(new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 1.0D, 1.0D));
   
   private static final List<TileEntityComponent> emptyComponents = Collections.emptyList();
   

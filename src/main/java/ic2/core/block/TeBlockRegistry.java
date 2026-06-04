@@ -42,7 +42,7 @@ public final class TeBlockRegistry {
     }
     
     TeBlockInfo(Class<E> universe) {
-      this.defaultMaterial = Material.field_151573_f;
+      this.defaultMaterial = Material.IRON;
       this.idMap = new ArrayList<>();
       this.teBlocks = EnumSet.noneOf(universe);
       this.specialModels = ITeBlockSpecialItem.class.isAssignableFrom(universe);
@@ -210,7 +210,7 @@ public final class TeBlockRegistry {
       if (location == ic2Loc) {
         block = BlockTileEntity.create(BlockName.te, mats);
       } else {
-        block = BlockTileEntity.create("te_" + location.func_110623_a(), location, mats);
+        block = BlockTileEntity.create("te_" + location.getResourcePath(), location, mats);
       } 
       info.setBlock(block);
     } 

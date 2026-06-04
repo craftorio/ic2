@@ -111,7 +111,7 @@ public class NetworkManagerClient extends NetworkManager {
       } else {
         EntityPlayerSP entityPlayerSP = (Minecraft.getMinecraft()).player;
         if ((!StackUtil.isEmpty(((EntityPlayer)entityPlayerSP).inventory.getCurrentItem()) && ((EntityPlayer)entityPlayerSP).inventory.getCurrentItem().getItem() instanceof IHandHeldInventory) || (
-          !StackUtil.isEmpty(entityPlayerSP.func_184592_cb()) && entityPlayerSP.func_184592_cb().getItem() instanceof IHandHeldInventory)) {
+          !StackUtil.isEmpty(entityPlayerSP.getHeldItemOffhand()) && entityPlayerSP.getHeldItemOffhand().getItem() instanceof IHandHeldInventory)) {
           buffer.writeBoolean(true);
         } else {
           IC2.platform.displayError("An unknown GUI type was attempted to be displayed.\nThis could happen due to corrupted data from a player or a bug.\n\n(Technical information: " + inventory + ")", new Object[0]);
@@ -229,11 +229,11 @@ public class NetworkManagerClient extends NetworkManager {
         i = is.readInt();
         IC2.platform.requestTick(false, new Runnable() {
               public void run() {
-                WorldClient worldClient = (Minecraft.getMinecraft()).field_71441_e;
-                for (Object obj : ((World)worldClient).field_73010_i) {
+                WorldClient worldClient = (Minecraft.getMinecraft()).world;
+                for (Object obj : ((World)worldClient).playerEntities) {
                   EntityPlayer player = (EntityPlayer)obj;
-                  if ((profile.getId() != null && profile.getId().equals(player.func_146103_bH().getId())) || (profile
-                    .getId() == null && profile.getName().equals(player.func_146103_bH().getName()))) {
+                  if ((profile.getId() != null && profile.getId().equals(player.getGameProfile().getId())) || (profile
+                    .getId() == null && profile.getName().equals(player.getGameProfile().getName()))) {
                     if (stack.getItem() instanceof INetworkItemEventListener)
                       ((INetworkItemEventListener)stack.getItem()).onNetworkEvent(stack, player, event); 
                     break;
@@ -254,9 +254,9 @@ public class NetworkManagerClient extends NetworkManager {
                     TileEntity te = DataEncoder.<TileEntity>getValue(teDeferred);
                     if (te instanceof IHasGui) {
                       IC2.platform.launchGuiClient(player, (IHasGui)te, isAdmin);
-                      player.field_71070_bA.field_75152_c = windowId;
+                      player.openContainer.windowId = windowId;
                     } else if (player instanceof EntityPlayerSP) {
-                      ((EntityPlayerSP)player).field_71174_a.func_147297_a((Packet)new CPacketCloseWindow(windowId));
+                      ((EntityPlayerSP)player).connection.sendPacket((Packet)new CPacketCloseWindow(windowId));
                     } 
                   }
                 });
@@ -272,11 +272,11 @@ public class NetworkManagerClient extends NetworkManager {
                     EntityPlayer player = IC2.platform.getPlayerInstance();
                     if (currentItemPosition < 0) {
                       int actualItemPosition = currentItemPosition ^ 0xFFFFFFFF;
-                      if (actualItemPosition > player.inventory.field_184439_c.size() - 1)
+                      if (actualItemPosition > player.inventory.offHandInventory.size() - 1)
                         return; 
-                      currentItem = (ItemStack)player.inventory.field_184439_c.get(actualItemPosition);
+                      currentItem = (ItemStack)player.inventory.offHandInventory.get(actualItemPosition);
                     } else {
-                      if (currentItemPosition != player.inventory.field_70461_c)
+                      if (currentItemPosition != player.inventory.currentItem)
                         return; 
                       currentItem = player.inventory.getCurrentItem();
                     } 
@@ -287,9 +287,9 @@ public class NetworkManagerClient extends NetworkManager {
                         IC2.platform.launchGuiClient(player, ((IHandHeldInventory)currentItem.getItem()).getInventory(player, currentItem), isAdmin);
                       } 
                     } else if (player instanceof EntityPlayerSP) {
-                      ((EntityPlayerSP)player).field_71174_a.func_147297_a((Packet)new CPacketCloseWindow(windowId));
+                      ((EntityPlayerSP)player).connection.sendPacket((Packet)new CPacketCloseWindow(windowId));
                     } 
-                    player.field_71070_bA.field_75152_c = windowId;
+                    player.openContainer.windowId = windowId;
                   }
                 });
             break;
@@ -305,20 +305,20 @@ public class NetworkManagerClient extends NetworkManager {
                 if (world != null)
                   switch (type) {
                     case LargePacket:
-                      world.func_184133_a(player, new BlockPos(pos), SoundEvents.field_187539_bB, SoundCategory.BLOCKS, 4.0F, (1.0F + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.2F) * 0.7F);
-                      world.func_175688_a(EnumParticleTypes.EXPLOSION_HUGE, pos.field_72450_a, pos.field_72448_b, pos.field_72449_c, 0.0D, 0.0D, 0.0D, new int[0]);
+                      world.playSound(player, new BlockPos(pos), SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.BLOCKS, 4.0F, (1.0F + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.2F) * 0.7F);
+                      world.spawnParticle(EnumParticleTypes.EXPLOSION_HUGE, pos.x, pos.y, pos.z, 0.0D, 0.0D, 0.0D, new int[0]);
                       break;
                     case TileEntityEvent:
-                      IC2.audioManager.playOnce(new AudioPosition(world, (float)pos.field_72450_a, (float)pos.field_72448_b, (float)pos.field_72449_c), PositionSpec.Center, "Machines/MachineOverload.ogg", true, IC2.audioManager.getDefaultVolume());
-                      world.func_175688_a(EnumParticleTypes.EXPLOSION_HUGE, pos.field_72450_a, pos.field_72448_b, pos.field_72449_c, 0.0D, 0.0D, 0.0D, new int[0]);
+                      IC2.audioManager.playOnce(new AudioPosition(world, (float)pos.x, (float)pos.y, (float)pos.z), PositionSpec.Center, "Machines/MachineOverload.ogg", true, IC2.audioManager.getDefaultVolume());
+                      world.spawnParticle(EnumParticleTypes.EXPLOSION_HUGE, pos.x, pos.y, pos.z, 0.0D, 0.0D, 0.0D, new int[0]);
                       break;
                     case ItemEvent:
-                      world.func_184133_a(player, new BlockPos(pos), SoundEvents.field_187646_bt, SoundCategory.BLOCKS, 4.0F, (1.0F + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.2F) * 0.7F);
-                      world.func_175688_a(EnumParticleTypes.EXPLOSION_HUGE, pos.field_72450_a, pos.field_72448_b, pos.field_72449_c, 0.0D, 0.0D, 0.0D, new int[0]);
+                      world.playSound(player, new BlockPos(pos), SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 4.0F, (1.0F + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.2F) * 0.7F);
+                      world.spawnParticle(EnumParticleTypes.EXPLOSION_HUGE, pos.x, pos.y, pos.z, 0.0D, 0.0D, 0.0D, new int[0]);
                       break;
                     case GuiDisplay:
-                      IC2.audioManager.playOnce(new AudioPosition(world, (float)pos.field_72450_a, (float)pos.field_72448_b, (float)pos.field_72449_c), PositionSpec.Center, "Tools/NukeExplosion.ogg", true, IC2.audioManager.getDefaultVolume());
-                      world.func_175688_a(EnumParticleTypes.EXPLOSION_HUGE, pos.field_72450_a, pos.field_72448_b, pos.field_72449_c, 0.0D, 0.0D, 0.0D, new int[0]);
+                      IC2.audioManager.playOnce(new AudioPosition(world, (float)pos.x, (float)pos.y, (float)pos.z), PositionSpec.Center, "Tools/NukeExplosion.ogg", true, IC2.audioManager.getDefaultVolume());
+                      world.spawnParticle(EnumParticleTypes.EXPLOSION_HUGE, pos.x, pos.y, pos.z, 0.0D, 0.0D, 0.0D, new int[0]);
                       break;
                   }  
               }
@@ -340,7 +340,7 @@ public class NetworkManagerClient extends NetworkManager {
         is.readFully(data);
         IC2.platform.requestTick(false, new Runnable() {
               public void run() {
-                WorldClient worldClient = (Minecraft.getMinecraft()).field_71441_e;
+                WorldClient worldClient = (Minecraft.getMinecraft()).world;
                 if (((World)worldClient).provider.getDimension() != dimensionId)
                   return; 
                 TileEntity teRaw = worldClient.getTileEntity(pos);

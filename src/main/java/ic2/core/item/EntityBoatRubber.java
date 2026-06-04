@@ -15,7 +15,7 @@ public class EntityBoatRubber extends EntityIC2Boat {
   }
   
   protected ItemStack getBrokenItem() {
-    func_184185_a(SoundEvents.field_187638_cR, 16.0F, 8.0F);
+    playSound(SoundEvents.ENTITY_ITEM_PICKUP, 16.0F, 8.0F);
     return ItemName.boat.getItemStack(ItemIC2Boat.BoatType.broken_rubber);
   }
   

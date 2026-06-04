@@ -51,7 +51,7 @@ public class ItemHandlers {
             return new ActionResult(EnumActionResult.FAIL, stack); 
           if (world.getBlockState(position.getBlockPos()).getBlock() == Blocks.WATER) {
             stack = StackUtil.decSize(stack);
-            world.func_175656_a(position.getBlockPos(), FluidName.construction_foam.getInstance().getBlock().getDefaultState());
+            world.setBlockState(position.getBlockPos(), FluidName.construction_foam.getInstance().getBlock().getDefaultState());
             new ActionResult(EnumActionResult.SUCCESS, stack);
           } 
         } 
@@ -64,7 +64,7 @@ public class ItemHandlers {
         if (!(player.getEntityWorld()).isRemote) {
           ItemStack drop = Recipes.scrapboxDrops.getDrop(stack, false);
           if (drop != null && player
-            .func_71019_a(drop, false) != null && !player.field_71075_bZ.field_75098_d) {
+            .dropItem(drop, false) != null && !player.capabilities.isCreativeMode) {
             stack = StackUtil.decSize(stack);
             return new ActionResult(EnumActionResult.SUCCESS, stack);
           } 
@@ -77,10 +77,10 @@ public class ItemHandlers {
       public EnumActionResult onUse(ItemStack stack, EntityPlayer player, BlockPos pos, EnumHand hand, EnumFacing side) {
         World world = player.getEntityWorld();
         IBlockState state = world.getBlockState(pos);
-        if (state.getBlock() == Blocks.field_150331_J && state.func_177229_b((IProperty)BlockPistonBase.field_176387_N) == side) {
-          IBlockState newState = Blocks.field_150320_F.getDefaultState().func_177226_a((IProperty)BlockPistonBase.field_176387_N, (Comparable)side).func_177226_a((IProperty)BlockPistonBase.field_176320_b, state.func_177229_b((IProperty)BlockPistonBase.field_176320_b));
-          world.func_180501_a(pos, newState, 3);
-          if (!player.field_71075_bZ.field_75098_d)
+        if (state.getBlock() == Blocks.PISTON && state.getValue((IProperty)BlockPistonBase.FACING) == side) {
+          IBlockState newState = Blocks.STICKY_PISTON.getDefaultState().withProperty((IProperty)BlockPistonBase.FACING, (Comparable)side).withProperty((IProperty)BlockPistonBase.EXTENDED, state.getValue((IProperty)BlockPistonBase.EXTENDED));
+          world.setBlockState(pos, newState, 3);
+          if (!player.capabilities.isCreativeMode)
             StackUtil.consumeOrError(player, hand, 1); 
           return EnumActionResult.SUCCESS;
         } 
@@ -88,10 +88,10 @@ public class ItemHandlers {
           return EnumActionResult.PASS; 
         pos = pos.up();
         if (!state.getBlock().isAir(state, (IBlockAccess)world, pos) || 
-          !BlockName.sheet.getInstance().func_176198_a(world, pos, side))
+          !BlockName.sheet.getInstance().canPlaceBlockOnSide(world, pos, side))
           return EnumActionResult.PASS; 
-        world.func_175656_a(pos, BlockName.sheet.getBlockState((IIdProvider)BlockSheet.SheetType.resin));
-        if (!player.field_71075_bZ.field_75098_d)
+        world.setBlockState(pos, BlockName.sheet.getBlockState((IIdProvider)BlockSheet.SheetType.resin));
+        if (!player.capabilities.isCreativeMode)
           StackUtil.consumeOrError(player, hand, 1); 
         return EnumActionResult.PASS;
       }
@@ -141,13 +141,13 @@ public class ItemHandlers {
         public EnumActionResult onUse(ItemStack stack, EntityPlayer player, BlockPos pos, EnumHand hand, EnumFacing side) {
           assert stack.getItem() == ItemName.misc_resource.getInstance();
           World world = player.getEntityWorld();
-          if (!world.getBlockState(pos).getBlock().func_176200_f((IBlockAccess)world, pos))
+          if (!world.getBlockState(pos).getBlock().isReplaceable((IBlockAccess)world, pos))
             pos = pos.offset(side); 
-          if (player.func_175151_a(pos, side, stack) && world.func_190527_a(type, pos, false, side, null)) {
+          if (player.canPlayerEdit(pos, side, stack) && world.mayPlace(type, pos, false, side, null)) {
             IBlockState placedState = type.getStateForPlacement(world, pos, side, 0.0F, 0.0F, 0.0F, 0, (EntityLivingBase)player, hand);
-            world.func_175656_a(pos, placedState);
+            world.setBlockState(pos, placedState);
             SoundType sound = placedState.getBlock().getSoundType(placedState, world, pos, (Entity)player);
-            world.func_184133_a(player, pos, sound.func_185841_e(), SoundCategory.BLOCKS, (sound.func_185843_a() + 1.0F) / 2.0F, sound.func_185847_b() * 0.8F);
+            world.playSound(player, pos, sound.getPlaceSound(), SoundCategory.BLOCKS, (sound.getVolume() + 1.0F) / 2.0F, sound.getPitch() * 0.8F);
             StackUtil.consumeOrError(player, hand, 1);
             return EnumActionResult.SUCCESS;
           } 
@@ -167,18 +167,18 @@ public class ItemHandlers {
           pos = position.getBlockPos();
           if (!world.canMineBlockBody(player, pos))
             return EnumActionResult.FAIL; 
-          if (!player.func_175151_a(pos, position.field_178784_b, player.func_184586_b(hand)))
+          if (!player.canPlayerEdit(pos, position.sideHit, player.getHeldItem(hand)))
             return EnumActionResult.FAIL; 
           LiquidUtil.LiquidData data = LiquidUtil.getLiquid(world, pos);
           if (data != null && data.isSource) {
             if (data.liquid == FluidRegistry.WATER && StackUtil.storeInventoryItem(ItemName.cell.getItemStack((Enum)CellType.water), player, true)) {
-              world.func_175698_g(pos);
+              world.setBlockToAir(pos);
               StackUtil.consumeOrError(player, hand, 1);
               StackUtil.storeInventoryItem(ItemName.cell.getItemStack((Enum)CellType.water), player, false);
               return EnumActionResult.SUCCESS;
             } 
             if (data.liquid == FluidRegistry.LAVA && StackUtil.storeInventoryItem(ItemName.cell.getItemStack((Enum)CellType.lava), player, true)) {
-              world.func_175698_g(pos);
+              world.setBlockToAir(pos);
               StackUtil.consumeOrError(player, hand, 1);
               StackUtil.storeInventoryItem(ItemName.cell.getItemStack((Enum)CellType.lava), player, false);
               return EnumActionResult.SUCCESS;

@@ -105,7 +105,7 @@ public class Text extends GuiElement<Text> {
     String text = textProvider.get((gui.getContainer()).base, TextProvider.emptyTokens());
     if (text.isEmpty())
       return 0; 
-    return (Minecraft.getMinecraft()).field_71466_p.func_78256_a(text);
+    return (Minecraft.getMinecraft()).fontRenderer.getStringWidth(text);
   }
   
   public void drawBackground(int mouseX, int mouseY) {

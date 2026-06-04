@@ -28,7 +28,7 @@ public class DamageHandler {
         throw new IllegalStateException("can't damage " + stack + " physically"); 
       ((IPseudoDamageItem)item).setStackDamage(stack, damage);
     } else {
-      stack.func_77964_b(damage);
+      stack.setItemDamage(damage);
     } 
   }
   
@@ -48,9 +48,9 @@ public class DamageHandler {
     if (item instanceof ICustomDamageItem)
       return ((ICustomDamageItem)item).applyCustomDamage(stack, damage, src); 
     if (src != null) {
-      stack.func_77972_a(damage, src);
+      stack.damageItem(damage, src);
       return true;
     } 
-    return stack.func_96631_a(damage, IC2.random, (src instanceof EntityPlayerMP) ? (EntityPlayerMP)src : null);
+    return stack.attemptDamageItem(damage, IC2.random, (src instanceof EntityPlayerMP) ? (EntityPlayerMP)src : null);
   }
 }

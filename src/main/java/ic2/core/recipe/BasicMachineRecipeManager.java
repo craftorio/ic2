@@ -49,7 +49,7 @@ public class BasicMachineRecipeManager extends MachineRecipeHelper<IRecipeInput,
         return false;
       } 
       if (input.matches(stack))
-        if (metadata == null || !metadata.func_74764_b("ignoreSameInputOutput")) {
+        if (metadata == null || !metadata.hasKey("ignoreSameInputOutput")) {
           displayError("The output ItemStack " + stack.toString() + " is the same as the recipe input " + input + ".");
           return false;
         }  
@@ -85,7 +85,7 @@ public class BasicMachineRecipeManager extends MachineRecipeHelper<IRecipeInput,
       if (adjustInput) {
         if (input.getItem().hasContainerItem(input))
           throw new UnsupportedOperationException("can't adjust input item, use apply() instead"); 
-        input.func_190918_g(((IRecipeInput)recipe.getInput()).getAmount());
+        input.shrink(((IRecipeInput)recipe.getInput()).getAmount());
       } 
       return new RecipeOutput(recipe.getMetaData(), new ArrayList((Collection)recipe.getOutput()));
     } 

@@ -513,7 +513,7 @@ public class ProfileParser {
         String nbt = attributes.getValue("nbt");
         if (nbt != null)
           try {
-            this.stack.func_77982_d(JsonToNBT.func_180713_a(nbt));
+            this.stack.setTagCompound(JsonToNBT.getTagFromJson(nbt));
           } catch (NBTException e) {
             throw new SAXException("Invalid stack NBT: " + nbt, e);
           }  

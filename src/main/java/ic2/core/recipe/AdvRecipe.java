@@ -102,9 +102,9 @@ public class AdvRecipe implements IShapedRecipe {
     this.inputWidth = ((String)inputArrangement.get(0)).length();
     if (debug && !isFixedSize) {
       if (StringUtils.containsOnly(inputArrangement.get(0), new char[] { ' ' }))
-        IC2.log.warn(LogCategory.Recipe, "Leading empty row in shaped recipe for %s (%s), from %s.", new Object[] { result, result.func_82833_r(), getCaller() }); 
+        IC2.log.warn(LogCategory.Recipe, "Leading empty row in shaped recipe for %s (%s), from %s.", new Object[] { result, result.getDisplayName(), getCaller() }); 
       if (StringUtils.containsOnly(inputArrangement.get(this.inputHeight - 1), new char[] { ' ' }))
-        IC2.log.warn(LogCategory.Recipe, "Trailing empty row in shaped recipe for %s (%s), from %s.", new Object[] { result, result.func_82833_r(), getCaller() }); 
+        IC2.log.warn(LogCategory.Recipe, "Trailing empty row in shaped recipe for %s (%s), from %s.", new Object[] { result, result.getDisplayName(), getCaller() }); 
       for (int pass = 0; pass < 2; pass++) {
         boolean found = true;
         for (int j = 0; j < this.inputHeight; j++) {
@@ -117,9 +117,9 @@ public class AdvRecipe implements IShapedRecipe {
         } 
         if (found)
           if (pass == 0) {
-            IC2.log.warn(LogCategory.Recipe, "Leading empty column in shaped recipe for %s (%s), from %s.", new Object[] { result, result.func_82833_r(), getCaller() });
+            IC2.log.warn(LogCategory.Recipe, "Leading empty column in shaped recipe for %s (%s), from %s.", new Object[] { result, result.getDisplayName(), getCaller() });
           } else {
-            IC2.log.warn(LogCategory.Recipe, "Trailing empty column in shaped recipe for %s (%s), from %s.", new Object[] { result, result.func_82833_r(), getCaller() });
+            IC2.log.warn(LogCategory.Recipe, "Trailing empty column in shaped recipe for %s (%s), from %s.", new Object[] { result, result.getDisplayName(), getCaller() });
           }  
       } 
     } 
@@ -201,16 +201,16 @@ public class AdvRecipe implements IShapedRecipe {
     this.output = result;
   }
   
-  public boolean func_77569_a(InventoryCrafting inventorycrafting, World world) {
-    return (func_77572_b(inventorycrafting) != StackUtil.emptyStack);
+  public boolean matches(InventoryCrafting inventorycrafting, World world) {
+    return (getCraftingResult(inventorycrafting) != StackUtil.emptyStack);
   }
   
-  public ItemStack func_77572_b(InventoryCrafting inventorycrafting) {
-    int size = inventorycrafting.func_70302_i_();
+  public ItemStack getCraftingResult(InventoryCrafting inventorycrafting) {
+    int size = inventorycrafting.getSizeInventory();
     int mask = 0;
     for (int i = 0; i < size; i++) {
       mask <<= 1;
-      if (!StackUtil.isEmpty(inventorycrafting.func_70301_a(i)))
+      if (!StackUtil.isEmpty(inventorycrafting.getStackInSlot(i)))
         mask |= 0x1; 
     } 
     if (size == 4)
@@ -228,7 +228,7 @@ public class AdvRecipe implements IShapedRecipe {
     return StackUtil.emptyStack;
   }
   
-  public ItemStack func_77571_b() {
+  public ItemStack getRecipeOutput() {
     return this.output;
   }
   
@@ -352,10 +352,10 @@ public class AdvRecipe implements IShapedRecipe {
   }
   
   private ItemStack checkItems(IInventory inventory, IRecipeInput[] request) {
-    int size = inventory.func_70302_i_();
+    int size = inventory.getSizeInventory();
     double outputCharge = 0.0D;
     for (int i = 0, j = 0; i < size; i++) {
-      ItemStack offer = inventory.func_70301_a(i);
+      ItemStack offer = inventory.getStackInSlot(i);
       if (!StackUtil.isEmpty(offer))
         if (request[j++].matches(offer)) {
           outputCharge += ElectricItem.manager.getCharge(StackUtil.copyWithSize(offer, 1));
@@ -368,8 +368,8 @@ public class AdvRecipe implements IShapedRecipe {
     return ret;
   }
   
-  public NonNullList<ItemStack> func_179532_b(InventoryCrafting inv) {
-    return this.consuming ? NonNullList.func_191197_a(inv.func_70302_i_(), StackUtil.emptyStack) : ForgeHooks.defaultRecipeGetRemainingItems(inv);
+  public NonNullList<ItemStack> getRemainingItems(InventoryCrafting inv) {
+    return this.consuming ? NonNullList.withSize(inv.getSizeInventory(), StackUtil.emptyStack) : ForgeHooks.defaultRecipeGetRemainingItems(inv);
   }
   
   public IRecipe setRegistryName(ResourceLocation name) {
@@ -385,7 +385,7 @@ public class AdvRecipe implements IShapedRecipe {
     return IRecipe.class;
   }
   
-  public boolean func_194133_a(int x, int y) {
+  public boolean canFit(int x, int y) {
     return (this.inputWidth <= x && this.inputHeight <= y);
   }
   
@@ -397,8 +397,8 @@ public class AdvRecipe implements IShapedRecipe {
     return this.inputHeight;
   }
   
-  public NonNullList<Ingredient> func_192400_c() {
-    NonNullList<Ingredient> list = NonNullList.func_191196_a();
+  public NonNullList<Ingredient> getIngredients() {
+    NonNullList<Ingredient> list = NonNullList.create();
     if (!this.hidden) {
       int mask = this.masks[0];
       int actualIngredient = 0;
@@ -406,14 +406,14 @@ public class AdvRecipe implements IShapedRecipe {
         if ((mask >>> 8 - x & 0x1) != 0) {
           list.add(this.input[actualIngredient++].getIngredient());
         } else {
-          list.add(Ingredient.field_193370_a);
+          list.add(Ingredient.EMPTY);
         } 
       } 
     } 
     return list;
   }
   
-  public boolean func_192399_d() {
+  public boolean isDynamic() {
     return this.hidden;
   }
   

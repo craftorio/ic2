@@ -224,19 +224,19 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
   
   private void removePipe(Ic2BlockPos operatingPos) {
     World world = getWorld();
-    world.func_175698_g((BlockPos)operatingPos);
+    world.setBlockToAir((BlockPos)operatingPos);
     storeDrop(BlockName.mining_pipe.getItemStack((Enum)BlockMiningPipe.MiningPipeType.pipe));
     ItemStack pipe = this.pipeSlot.consume(1, true, false);
     if (pipe != null && !StackUtil.checkItemEquality(pipe, BlockName.mining_pipe.getItemStack((Enum)BlockMiningPipe.MiningPipeType.pipe))) {
       ItemStack filler = this.pipeSlot.consume(1);
       Item fillerItem = filler.getItem();
       EntityPlayer player = Ic2Player.get(world);
-      player.func_184611_a(EnumHand.MAIN_HAND, filler);
+      player.setHeldItem(EnumHand.MAIN_HAND, filler);
       try {
         if (fillerItem instanceof ItemBlock)
-          ((ItemBlock)fillerItem).func_180614_a(player, world, operatingPos.up(), EnumHand.MAIN_HAND, EnumFacing.DOWN, 0.0F, 0.0F, 0.0F); 
+          ((ItemBlock)fillerItem).onItemUse(player, world, operatingPos.up(), EnumHand.MAIN_HAND, EnumFacing.DOWN, 0.0F, 0.0F, 0.0F); 
       } finally {
-        player.func_184611_a(EnumHand.MAIN_HAND, StackUtil.emptyStack);
+        player.setHeldItem(EnumHand.MAIN_HAND, StackUtil.emptyStack);
       } 
     } 
   }
@@ -247,20 +247,20 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
       return false; 
     if (operatingPos.isBelowMap()) {
       if (removeTipAbove)
-        getWorld().func_175656_a((BlockPos)operatingPos.setY(0), BlockName.mining_pipe.getBlockState((IIdProvider)BlockMiningPipe.MiningPipeType.pipe)); 
+        getWorld().setBlockState((BlockPos)operatingPos.setY(0), BlockName.mining_pipe.getBlockState((IIdProvider)BlockMiningPipe.MiningPipeType.pipe)); 
       return false;
     } 
     MineResult result = mineBlock((BlockPos)operatingPos, state);
     if (result == MineResult.Failed_Temp || result == MineResult.Failed_Perm) {
       if (removeTipAbove)
-        getWorld().func_175656_a((BlockPos)operatingPos.moveUp(), BlockName.mining_pipe.getBlockState((IIdProvider)BlockMiningPipe.MiningPipeType.pipe)); 
+        getWorld().setBlockState((BlockPos)operatingPos.moveUp(), BlockName.mining_pipe.getBlockState((IIdProvider)BlockMiningPipe.MiningPipeType.pipe)); 
       return false;
     } 
     if (result == MineResult.Done) {
       if (removeTipAbove)
-        getWorld().func_175656_a(operatingPos.up(), BlockName.mining_pipe.getBlockState((IIdProvider)BlockMiningPipe.MiningPipeType.pipe)); 
+        getWorld().setBlockState(operatingPos.up(), BlockName.mining_pipe.getBlockState((IIdProvider)BlockMiningPipe.MiningPipeType.pipe)); 
       this.pipeSlot.consume(1);
-      getWorld().func_175656_a((BlockPos)operatingPos, BlockName.mining_pipe.getBlockState((IIdProvider)BlockMiningPipe.MiningPipeType.tip));
+      getWorld().setBlockState((BlockPos)operatingPos, BlockName.mining_pipe.getBlockState((IIdProvider)BlockMiningPipe.MiningPipeType.tip));
     } 
     return true;
   }
@@ -429,7 +429,7 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
     this.energy.useEnergy(energyCost);
     for (ItemStack drop : StackUtil.getDrops((IBlockAccess)world, target, state, (this.lastMode == Mode.MineIDrill) ? 3 : 0))
       storeDrop(drop); 
-    world.func_175698_g(target);
+    world.setBlockToAir(target);
     return true;
   }
   
@@ -449,21 +449,21 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
     Block block = state.getBlock();
     if (block.isAir(state, (IBlockAccess) getWorld(), target))
       return true; 
-    if (block == BlockName.mining_pipe.getInstance() || block == Blocks.field_150486_ae)
+    if (block == BlockName.mining_pipe.getInstance() || block == Blocks.CHEST)
       return false; 
     if (block instanceof net.minecraftforge.fluids.IFluidBlock && isPumpConnected(target))
       return true; 
-    if ((block == Blocks.WATER || block == Blocks.field_150358_i || block == Blocks.field_150353_l || block == Blocks.field_150356_k) && isPumpConnected(target))
+    if ((block == Blocks.WATER || block == Blocks.FLOWING_WATER || block == Blocks.LAVA || block == Blocks.FLOWING_LAVA) && isPumpConnected(target))
       return true; 
     World world = getWorld();
-    if (state.func_185887_b(world, target) < 0.0F)
+    if (state.getBlockHardness(world, target) < 0.0F)
       return false; 
-    if (block.func_176209_a(state, false) && state.getMaterial().func_76229_l())
+    if (block.canCollideCheck(state, false) && state.getMaterial().isToolNotRequired())
       return true; 
-    if (block == Blocks.field_150321_G)
+    if (block == Blocks.WEB)
       return true; 
     if (!this.drillSlot.isEmpty())
-      return (ForgeHooks.canToolHarvestBlock((IBlockAccess)world, target, this.drillSlot.get()) || this.drillSlot.get().func_150998_b(state)); 
+      return (ForgeHooks.canToolHarvestBlock((IBlockAccess)world, target, this.drillSlot.get()) || this.drillSlot.get().canHarvestBlock(state)); 
     return false;
   }
   

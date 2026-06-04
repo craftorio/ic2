@@ -22,15 +22,15 @@ public class HandHeldContainmentbox extends HandHeldInventory {
     return (GuiScreen)new GuiContainmentbox(new ContainerContainmentbox(player, this));
   }
   
-  public String func_70005_c_() {
+  public String getName() {
     return "ic2.containment_box";
   }
   
-  public boolean func_145818_k_() {
+  public boolean hasCustomName() {
     return false;
   }
   
-  public boolean func_94041_b(int index, ItemStack stack) {
+  public boolean isItemValidForSlot(int index, ItemStack stack) {
     if (stack == null)
       return false; 
     return (stack.getItem() == ItemName.nuclear.getInstance() || stack

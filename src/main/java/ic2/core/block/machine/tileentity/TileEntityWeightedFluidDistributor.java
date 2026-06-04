@@ -26,7 +26,7 @@ public class TileEntityWeightedFluidDistributor extends TileEntityFluidDistribut
     if (!this.priority.isEmpty()) {
       int[] indexes = new int[this.priority.size()];
       for (int i = 0; i < indexes.length; i++)
-        indexes[i] = ((EnumFacing)this.priority.get(i)).func_176745_a(); 
+        indexes[i] = ((EnumFacing)this.priority.get(i)).getIndex(); 
       nbt.setIntArray("priority", indexes);
     } 
     return nbt;
@@ -37,7 +37,7 @@ public class TileEntityWeightedFluidDistributor extends TileEntityFluidDistribut
     int[] indexes = nbt.getIntArray("priority");
     if (indexes.length > 0)
       for (int index : indexes)
-        this.priority.add(EnumFacing.func_82600_a(index));  
+        this.priority.add(EnumFacing.getFront(index));  
   }
   
   public List<String> getNetworkedFields() {
@@ -92,7 +92,7 @@ public class TileEntityWeightedFluidDistributor extends TileEntityFluidDistribut
   
   public void onNetworkEvent(EntityPlayer player, int event) {
     int position = event / 10;
-    EnumFacing facing = EnumFacing.func_82600_a(event % 10 & 0x6);
+    EnumFacing facing = EnumFacing.getFront(event % 10 & 0x6);
     assert position >= 0 && position <= this.priority.size() : "Position was " + position;
     assert facing != getFacing();
     if (position == this.priority.size()) {

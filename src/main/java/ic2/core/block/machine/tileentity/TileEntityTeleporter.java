@@ -40,7 +40,7 @@ public class TileEntityTeleporter extends TileEntityBlock implements INetworkTil
   
   public void readFromNBT(NBTTagCompound nbt) {
     super.readFromNBT(nbt);
-    if (nbt.func_74764_b("targetX"))
+    if (nbt.hasKey("targetX"))
       this.target = new BlockPos(nbt.getInteger("targetX"), nbt.getInteger("targetY"), nbt.getInteger("targetZ")); 
   }
   
@@ -81,23 +81,23 @@ public class TileEntityTeleporter extends TileEntityBlock implements INetworkTil
       if (coolingDown) {
         entitiesNearby = Collections.emptyList();
       } else {
-        entitiesNearby = world.func_72872_a(Entity.class, new AxisAlignedBB((this.pos
+        entitiesNearby = world.getEntitiesWithinAABB(Entity.class, new AxisAlignedBB((this.pos
               .getX() - 1), this.pos.getY(), (this.pos.getZ() - 1), (this.pos.getX() + 2), (this.pos.getY() + 3), (this.pos.getZ() + 2)));
       } 
       if (!entitiesNearby.isEmpty() && verifyTarget()) {
         double minDistanceSquared = Double.MAX_VALUE;
         Entity closestEntity = null;
         for (Entity entity : entitiesNearby) {
-          if (entity.func_184187_bx() != null)
+          if (entity.getRidingEntity() != null)
             continue; 
-          double distSquared = this.pos.func_177957_d(entity.posX, entity.posY, entity.posZ);
+          double distSquared = this.pos.distanceSqToCenter(entity.posX, entity.posY, entity.posZ);
           if (distSquared < minDistanceSquared) {
             minDistanceSquared = distSquared;
             closestEntity = entity;
           } 
         } 
         assert closestEntity != null;
-        teleport(closestEntity, Math.sqrt(this.pos.func_177951_i((Vec3i)this.target)));
+        teleport(closestEntity, Math.sqrt(this.pos.distanceSq((Vec3i)this.target)));
       } else if (++this.targetCheckTicker % 1024 == 0) {
         verifyTarget();
       } 
@@ -140,9 +140,9 @@ public class TileEntityTeleporter extends TileEntityBlock implements INetworkTil
       return; 
     consumeEnergy(energyCost);
     if (user instanceof EntityPlayerMP) {
-      ((EntityPlayerMP)user).func_70634_a(this.target.getX() + 0.5D, this.target.getY() + 1.5D + user.func_70033_W(), this.target.getZ() + 0.5D);
+      ((EntityPlayerMP)user).setPositionAndUpdate(this.target.getX() + 0.5D, this.target.getY() + 1.5D + user.getYOffset(), this.target.getZ() + 0.5D);
     } else {
-      user.func_70080_a(this.target.getX() + 0.5D, this.target.getY() + 1.5D + user.func_70033_W(), this.target.getZ() + 0.5D, user.rotationYaw, user.rotationPitch);
+      user.setPositionAndRotation(this.target.getX() + 0.5D, this.target.getY() + 1.5D + user.getYOffset(), this.target.getZ() + 0.5D, user.rotationYaw, user.rotationPitch);
     } 
     TileEntity te = getWorld().getTileEntity(this.target);
     assert te instanceof TileEntityTeleporter;
@@ -164,11 +164,11 @@ public class TileEntityTeleporter extends TileEntityBlock implements INetworkTil
     World world = getWorld();
     Random rnd = world.rand;
     for (int i = 0; i < n; i++) {
-      world.func_175688_a(EnumParticleTypes.REDSTONE, (pos
+      world.spawnParticle(EnumParticleTypes.REDSTONE, (pos
           .getX() + rnd.nextFloat()), ((pos
           .getY() + 1) + rnd.nextFloat()), (pos
           .getZ() + rnd.nextFloat()), red, green, blue, new int[0]);
-      world.func_175688_a(EnumParticleTypes.REDSTONE, (pos
+      world.spawnParticle(EnumParticleTypes.REDSTONE, (pos
           .getX() + rnd.nextFloat()), ((pos
           .getY() + 2) + rnd.nextFloat()), (pos
           .getZ() + rnd.nextFloat()), red, green, blue, new int[0]);
@@ -222,14 +222,14 @@ public class TileEntityTeleporter extends TileEntityBlock implements INetworkTil
     boolean teleporterUseInventoryWeight = ConfigUtil.getBool(MainConfig.get(), "balance/teleporterUseInventoryWeight");
     int weight = 0;
     if (user instanceof EntityItem) {
-      ItemStack is = ((EntityItem)user).func_92059_d();
+      ItemStack is = ((EntityItem)user).getItem();
       weight += 100 * StackUtil.getSize(is) / is.getMaxStackSize();
     } else if (user instanceof net.minecraft.entity.passive.EntityAnimal || user instanceof net.minecraft.entity.item.EntityMinecart || user instanceof net.minecraft.entity.item.EntityBoat) {
       weight += 100;
     } else if (user instanceof EntityPlayer) {
       weight += 1000;
       if (teleporterUseInventoryWeight)
-        for (ItemStack stack : ((EntityPlayer)user).inventory.field_70462_a)
+        for (ItemStack stack : ((EntityPlayer)user).inventory.mainInventory)
           weight += getStackCost(stack);  
     } else if (user instanceof net.minecraft.entity.monster.EntityGhast) {
       weight += 2500;
@@ -242,14 +242,14 @@ public class TileEntityTeleporter extends TileEntityBlock implements INetworkTil
     } 
     if (teleporterUseInventoryWeight && user instanceof EntityLivingBase) {
       EntityLivingBase living = (EntityLivingBase)user;
-      for (ItemStack stack : living.func_184209_aF())
+      for (ItemStack stack : living.getEquipmentAndArmor())
         weight += getStackCost(stack); 
       if (user instanceof EntityPlayer) {
-        ItemStack stack = living.func_184614_ca();
+        ItemStack stack = living.getHeldItemMainhand();
         weight -= getStackCost(stack);
       } 
     } 
-    for (Entity passenger : user.func_184188_bt())
+    for (Entity passenger : user.getPassengers())
       weight += getWeightOf(passenger); 
     return weight;
   }

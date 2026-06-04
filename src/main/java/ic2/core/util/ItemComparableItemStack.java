@@ -15,21 +15,21 @@ public class ItemComparableItemStack {
   
   public ItemComparableItemStack(ItemStack stack, boolean copyNbt) {
     this.item = stack.getItem();
-    this.meta = stack.func_77981_g() ? stack.func_77960_j() : 0;
-    NBTTagCompound nbt = stack.func_77978_p();
+    this.meta = stack.getHasSubtypes() ? stack.getMetadata() : 0;
+    NBTTagCompound nbt = stack.getTagCompound();
     if (nbt != null)
       if (nbt.hasNoTags()) {
         nbt = null;
       } else {
         if (copyNbt)
-          nbt = nbt.func_74737_b(); 
+          nbt = nbt.copy(); 
         boolean copied = copyNbt;
         for (String key : StackUtil.ignoredNbtKeys) {
-          if (!copied && nbt.func_74764_b(key)) {
-            nbt = nbt.func_74737_b();
+          if (!copied && nbt.hasKey(key)) {
+            nbt = nbt.copy();
             copied = true;
           } 
-          nbt.func_82580_o(key);
+          nbt.removeTag(key);
         } 
         if (nbt.hasNoTags())
           nbt = null; 
@@ -41,7 +41,7 @@ public class ItemComparableItemStack {
   private ItemComparableItemStack(ItemComparableItemStack src) {
     this.item = src.item;
     this.meta = src.meta;
-    this.nbt = (src.nbt != null) ? src.nbt.func_74737_b() : null;
+    this.nbt = (src.nbt != null) ? src.nbt.copy() : null;
     this.hashCode = src.hashCode;
   }
   
@@ -86,7 +86,7 @@ public class ItemComparableItemStack {
     if (this.item == null)
       return null; 
     ItemStack ret = new ItemStack(this.item, size, this.meta);
-    ret.func_77982_d(this.nbt);
+    ret.setTagCompound(this.nbt);
     return ret;
   }
 }

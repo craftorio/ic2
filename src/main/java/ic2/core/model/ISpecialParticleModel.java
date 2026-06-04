@@ -8,14 +8,14 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
 public interface ISpecialParticleModel extends IBakedModel {
   default boolean needsEnhancing(IBlockState state) {
-    return ModelUtil.getMissingModel().func_177554_e().func_94215_i().equals(func_177554_e().func_94215_i());
+    return ModelUtil.getMissingModel().getParticleTexture().getIconName().equals(getParticleTexture().getIconName());
   }
   
   default void enhanceParticle(Particle particle, Ic2BlockState.Ic2BlockStateInstance state) {
-    particle.func_187117_a(getParticleTexture(state));
+    particle.setParticleTexture(getParticleTexture(state));
   }
   
   default TextureAtlasSprite getParticleTexture(Ic2BlockState.Ic2BlockStateInstance state) {
-    return func_177554_e();
+    return getParticleTexture();
   }
 }

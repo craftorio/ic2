@@ -228,7 +228,7 @@ public class TileEntityMassFabricator extends TileEntityElectricMachine implemen
   
   @SideOnly(Side.CLIENT)
   public void addInformation(ItemStack stack, List<String> tooltip, ITooltipFlag advanced) {
-    tooltip.add("You probably want the " + Localization.translate(getBlockType().func_149739_a() + '.' + TeBlock.matter_generator.getName()));
+    tooltip.add("You probably want the " + Localization.translate(getBlockType().getUnlocalizedName() + '.' + TeBlock.matter_generator.getName()));
   }
   
   public double getEnergy() {

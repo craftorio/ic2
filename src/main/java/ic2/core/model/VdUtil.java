@@ -19,33 +19,33 @@ public class VdUtil {
   }
   
   public static void addCuboid(float xS, float yS, float zS, float xE, float yE, float zE, Set<EnumFacing> faces, TextureAtlasSprite sprite, List<BakedQuad>[] faceQuads, List<BakedQuad> generalQuads) {
-    float spriteU = sprite.func_94209_e();
-    float spriteV = sprite.func_94206_g();
-    addCuboid(xS, yS, zS, xE, yE, zE, spriteU, spriteV, sprite.func_94212_f() - spriteU, sprite.func_94210_h() - spriteV, faces, sprite, faceQuads, generalQuads);
+    float spriteU = sprite.getMinU();
+    float spriteV = sprite.getMinV();
+    addCuboid(xS, yS, zS, xE, yE, zE, spriteU, spriteV, sprite.getMaxU() - spriteU, sprite.getMaxV() - spriteV, faces, sprite, faceQuads, generalQuads);
   }
   
   public static void addCuboid(float xS, float yS, float zS, float xE, float yE, float zE, int color, Set<EnumFacing> faces, TextureAtlasSprite sprite, List<BakedQuad>[] faceQuads, List<BakedQuad> generalQuads) {
-    float spriteU = sprite.func_94209_e();
-    float spriteV = sprite.func_94206_g();
-    addCuboid(xS, yS, zS, xE, yE, zE, color, spriteU, spriteV, sprite.func_94212_f() - spriteU, sprite.func_94210_h() - spriteV, faces, sprite, faceQuads, generalQuads);
+    float spriteU = sprite.getMinU();
+    float spriteV = sprite.getMinV();
+    addCuboid(xS, yS, zS, xE, yE, zE, color, spriteU, spriteV, sprite.getMaxU() - spriteU, sprite.getMaxV() - spriteV, faces, sprite, faceQuads, generalQuads);
   }
   
   public static void addFlippedCuboid(float xS, float yS, float zS, float xE, float yE, float zE, Set<EnumFacing> faces, TextureAtlasSprite sprite, List<BakedQuad>[] faceQuads, List<BakedQuad> generalQuads) {
-    float spriteU = sprite.func_94212_f();
-    float spriteV = sprite.func_94210_h();
-    addCuboid(xS, yS, zS, xE, yE, zE, spriteU, spriteV, sprite.func_94209_e() - spriteU, sprite.func_94206_g() - spriteV, faces, sprite, faceQuads, generalQuads);
+    float spriteU = sprite.getMaxU();
+    float spriteV = sprite.getMaxV();
+    addCuboid(xS, yS, zS, xE, yE, zE, spriteU, spriteV, sprite.getMinU() - spriteU, sprite.getMinV() - spriteV, faces, sprite, faceQuads, generalQuads);
   }
   
   public static void addFlippedCuboid(float xS, float yS, float zS, float xE, float yE, float zE, int colour, Set<EnumFacing> faces, TextureAtlasSprite sprite, List<BakedQuad>[] faceQuads, List<BakedQuad> generalQuads) {
-    float spriteU = sprite.func_94212_f();
-    float spriteV = sprite.func_94210_h();
-    addCuboid(xS, yS, zS, xE, yE, zE, colour, spriteU, spriteV, sprite.func_94209_e() - spriteU, sprite.func_94206_g() - spriteV, faces, sprite, faceQuads, generalQuads);
+    float spriteU = sprite.getMaxU();
+    float spriteV = sprite.getMaxV();
+    addCuboid(xS, yS, zS, xE, yE, zE, colour, spriteU, spriteV, sprite.getMinU() - spriteU, sprite.getMinV() - spriteV, faces, sprite, faceQuads, generalQuads);
   }
   
   public static void addFlippedCuboidWithYOffset(float xS, float yS, float zS, float xE, float yE, float zE, int colour, Set<EnumFacing> faces, TextureAtlasSprite sprite, List<BakedQuad>[] faceQuads, List<BakedQuad> generalQuads, float offset) {
-    float spriteU = sprite.func_94212_f();
-    float spriteV = sprite.func_94210_h();
-    addCuboidWithYOffset(xS, yS, zS, xE, yE, zE, colour, spriteU, spriteV, sprite.func_94209_e() - spriteU, sprite.func_94206_g() - spriteV, faces, sprite, faceQuads, generalQuads, offset);
+    float spriteU = sprite.getMaxU();
+    float spriteV = sprite.getMaxV();
+    addCuboidWithYOffset(xS, yS, zS, xE, yE, zE, colour, spriteU, spriteV, sprite.getMinU() - spriteU, sprite.getMinV() - spriteV, faces, sprite, faceQuads, generalQuads, offset);
   }
   
   private static void addCuboid(float xS, float yS, float zS, float xE, float yE, float zE, float spriteU, float spriteV, float spriteWidth, float spriteHeight, Set<EnumFacing> faces, TextureAtlasSprite sprite, List<BakedQuad>[] faceQuads, List<BakedQuad> generalQuads) {
@@ -313,9 +313,9 @@ public class VdUtil {
     return ret;
   }
   
-  public static final VertexFormat vertexFormat = DefaultVertexFormats.field_176599_b;
+  public static final VertexFormat vertexFormat = DefaultVertexFormats.ITEM;
   
-  public static final int dataStride = vertexFormat.func_177338_f() / 4;
+  public static final int dataStride = vertexFormat.getNextOffset() / 4;
   
   private static final int[] faceShades = getFaceShades();
 }

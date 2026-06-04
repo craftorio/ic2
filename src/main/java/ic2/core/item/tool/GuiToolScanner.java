@@ -22,21 +22,21 @@ public class GuiToolScanner extends GuiIC2<ContainerToolScanner> {
     if (((ContainerToolScanner)this.container).scanResults != null) {
       int count = 0;
       for (Tuple.T2<ItemStack, Integer> result : ((ContainerToolScanner)this.container).scanResults) {
-        String name = ((ItemStack)result.a).getItem().func_77653_i((ItemStack)result.a);
+        String name = ((ItemStack)result.a).getItem().getItemStackDisplayName((ItemStack)result.a);
         this.fontRenderer.drawString(result.b + "x " + name, 10, 34 + count * 11, 5752026);
         count++;
         if (count == 10)
           break; 
       } 
-      RenderHelper.func_74518_a();
+      RenderHelper.disableStandardItemLighting();
     } 
   }
   
-  protected void func_146976_a(float f, int x, int y) {
-    super.func_146976_a(f, x, y);
+  protected void drawGuiContainerBackgroundLayer(float f, int x, int y) {
+    super.drawGuiContainerBackgroundLayer(f, x, y);
     if (((ContainerToolScanner)this.container).scanResults != null) {
       int count = 0;
-      RenderHelper.func_74520_c();
+      RenderHelper.enableGUIStandardItemLighting();
       for (Tuple.T2<ItemStack, Integer> result : ((ContainerToolScanner)this.container).scanResults) {
         int xPos = 135 + (count & 0x1) * 15;
         drawItem(xPos, 11 * count + 28, (ItemStack)result.a);
@@ -44,7 +44,7 @@ public class GuiToolScanner extends GuiIC2<ContainerToolScanner> {
         if (count == 10)
           break; 
       } 
-      RenderHelper.func_74518_a();
+      RenderHelper.disableStandardItemLighting();
     } 
   }
   

@@ -61,20 +61,20 @@ public class JetpackHandler implements IBackupElectricItemManager {
     if (stack == null)
       return; 
     if (!value) {
-      if (!stack.func_77942_o())
+      if (!stack.hasTagCompound())
         return; 
-      stack.func_77978_p().func_82580_o("hasIC2Jetpack");
-      if (stack.func_77978_p().hasNoTags())
-        stack.func_77982_d(null); 
-    } else if (EntityLiving.func_184640_d(stack) == EntityEquipmentSlot.CHEST) {
-      StackUtil.getOrCreateNbtData(stack).func_74757_a("hasIC2Jetpack", true);
+      stack.getTagCompound().removeTag("hasIC2Jetpack");
+      if (stack.getTagCompound().hasNoTags())
+        stack.setTagCompound(null); 
+    } else if (EntityLiving.getSlotForItemStack(stack) == EntityEquipmentSlot.CHEST) {
+      StackUtil.getOrCreateNbtData(stack).setBoolean("hasIC2Jetpack", true);
     } 
   }
   
   public static boolean hasJetpackAttached(ItemStack stack) {
     return (stack != null && 
-      EntityLiving.func_184640_d(stack) == EntityEquipmentSlot.CHEST && stack
-      .func_77942_o() && stack.func_77978_p().func_74767_n("hasIC2Jetpack"));
+      EntityLiving.getSlotForItemStack(stack) == EntityEquipmentSlot.CHEST && stack
+      .hasTagCompound() && stack.getTagCompound().getBoolean("hasIC2Jetpack"));
   }
   
   public static boolean hasJetpack(ItemStack stack) {
@@ -97,7 +97,7 @@ public class JetpackHandler implements IBackupElectricItemManager {
       return 0.0D; 
     if (!ignoreTransferLimit)
       amount = Math.min(amount, getTransferLimit()); 
-    double charge = stack.func_77942_o() ? stack.func_77978_p().getDouble("charge") : 0.0D;
+    double charge = stack.hasTagCompound() ? stack.getTagCompound().getDouble("charge") : 0.0D;
     amount = Math.min(amount, getMaxCharge(stack) - charge);
     if (!simulate)
       StackUtil.getOrCreateNbtData(stack).setDouble("charge", charge + amount); 
@@ -105,20 +105,20 @@ public class JetpackHandler implements IBackupElectricItemManager {
   }
   
   public double discharge(ItemStack stack, double amount, int tier, boolean ignoreTransferLimit, boolean externally, boolean simulate) {
-    if (externally || getTier(stack) > tier || !stack.func_77942_o())
+    if (externally || getTier(stack) > tier || !stack.hasTagCompound())
       return 0.0D; 
     if (!ignoreTransferLimit)
       amount = Math.min(amount, getTransferLimit()); 
-    double charge = stack.func_77978_p().getDouble("charge");
+    double charge = stack.getTagCompound().getDouble("charge");
     amount = Math.min(amount, charge);
     if (!simulate) {
       charge -= amount;
       if (charge == 0.0D) {
-        stack.func_77978_p().func_82580_o("charge");
-        if (stack.func_77978_p().hasNoTags())
-          stack.func_77982_d(null); 
+        stack.getTagCompound().removeTag("charge");
+        if (stack.getTagCompound().hasNoTags())
+          stack.setTagCompound(null); 
       } else {
-        stack.func_77978_p().setDouble("charge", charge);
+        stack.getTagCompound().setDouble("charge", charge);
       } 
     } 
     return amount;
@@ -163,7 +163,7 @@ public class JetpackHandler implements IBackupElectricItemManager {
   public void tick(TickEvent.PlayerTickEvent event) {
     if (event.phase != TickEvent.Phase.START)
       return; 
-    ItemStack stack = event.player.func_184582_a(EntityEquipmentSlot.CHEST);
+    ItemStack stack = event.player.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
     if (hasJetpack(stack))
       JetpackLogic.onArmorTick(event.player.getEntityWorld(), event.player, stack, getJetpack(stack)); 
     if (playerArmorBuffer.containsKey(event.player)) {
@@ -172,7 +172,7 @@ public class JetpackHandler implements IBackupElectricItemManager {
         ItemStack newJetpack = jetpack.copy();
         double oldCharge = ElectricItem.manager.getCharge(lastStack);
         ElectricItem.manager.charge(newJetpack, oldCharge, 2147483647, true, false);
-        event.player.func_184201_a(EntityEquipmentSlot.CHEST, newJetpack);
+        event.player.setItemStackToSlot(EntityEquipmentSlot.CHEST, newJetpack);
       } 
       playerArmorBuffer.remove(event.player);
     } 
@@ -187,9 +187,9 @@ public class JetpackHandler implements IBackupElectricItemManager {
   
   @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
   public void livingAttack(LivingAttackEvent event) {
-    if (event.getEntityLiving() instanceof EntityPlayer && event.getSource() != null && !event.getSource().func_76363_c()) {
+    if (event.getEntityLiving() instanceof EntityPlayer && event.getSource() != null && !event.getSource().isUnblockable()) {
       EntityPlayer player = (EntityPlayer)event.getEntityLiving();
-      ItemStack currentArmor = player.func_184582_a(EntityEquipmentSlot.CHEST);
+      ItemStack currentArmor = player.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
       if (hasJetpackAttached(currentArmor))
         playerArmorBuffer.put(player, currentArmor); 
     } 
@@ -199,12 +199,12 @@ public class JetpackHandler implements IBackupElectricItemManager {
   @SideOnly(Side.CLIENT)
   public void render(RenderLivingEvent.Pre<EntityLivingBase> event) {
     EntityLivingBase entity = event.getEntity();
-    if (hasJetpackAttached(entity.func_184582_a(EntityEquipmentSlot.CHEST))) {
+    if (hasJetpackAttached(entity.getItemStackFromSlot(EntityEquipmentSlot.CHEST))) {
       if (render == null) {
         render = new LayerJetpackOverride(event.getRenderer());
         renderLayers = ReflectionUtil.getField(RenderLivingBase.class, List.class);
       } 
-      event.getRenderer().func_177094_a((LayerRenderer)render);
+      event.getRenderer().addLayer((LayerRenderer)render);
     } 
   }
   

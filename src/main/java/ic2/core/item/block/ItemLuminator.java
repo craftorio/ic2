@@ -13,11 +13,11 @@ import net.minecraft.world.World;
 public class ItemLuminator extends ItemBlockIC2 {
   public ItemLuminator(Block block) {
     super(block);
-    func_77637_a((CreativeTabs)IC2.tabIC2);
+    setCreativeTab((CreativeTabs)IC2.tabIC2);
   }
   
   public boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, IBlockState state) {
-    if (!world.func_180501_a(pos, state, 3))
+    if (!world.setBlockState(pos, state, 3))
       return false; 
     return true;
   }

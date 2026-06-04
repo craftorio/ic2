@@ -36,7 +36,7 @@ public class ItemInfo implements IInfoProvider {
     boolean isLava = (liquid != null && liquid.amount > 0 && liquid.getFluid() == FluidRegistry.LAVA);
     if (isLava && !allowLava)
       return 0; 
-    int ret = TileEntityFurnace.func_145952_a(stack);
+    int ret = TileEntityFurnace.getItemBurnTime(stack);
     return isLava ? (ret / 10) : ret;
   }
 }

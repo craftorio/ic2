@@ -30,27 +30,27 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ItemBarrel extends ItemIC2 {
   public ItemBarrel() {
     super(ItemName.barrel);
-    func_77625_d(1);
+    setMaxStackSize(1);
   }
   
   @SideOnly(Side.CLIENT)
   public void registerModels(final ItemName name) {
     ModelLoader.setCustomMeshDefinition((Item)this, new ItemMeshDefinition() {
-          public ModelResourceLocation func_178113_a(ItemStack stack) {
+          public ModelResourceLocation getModelLocation(ItemStack stack) {
             return ItemIC2.getModelLocation(name, null);
           }
         });
     ModelBakery.registerItemVariants((Item)this, new ResourceLocation[] { (ResourceLocation)getModelLocation(name, null) });
   }
   
-  public String func_77653_i(ItemStack itemstack) {
+  public String getItemStackDisplayName(ItemStack itemstack) {
     int v = ItemBooze.getAmountOfValue(itemstack.getItemDamage());
     if (v > 0)
       return "" + v + Localization.translate("ic2.item.LBoozeBarrel"); 
     return Localization.translate("ic2.item.EmptyBoozeBarrel");
   }
   
-  public EnumActionResult func_180614_a(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float a, float b, float c) {
+  public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float a, float b, float c) {
     ItemStack stack = StackUtil.get(player, hand);
     if (world.getBlockState(pos) == BlockName.scaffold.getBlockState((IIdProvider)BlockScaffold.ScaffoldType.wood) && 
       ItemBlockTileEntity.placeTeBlock(stack, (EntityLivingBase)player, world, pos, side, (TileEntityBlock)new TileEntityBarrel(stack.getItemDamage()))) {

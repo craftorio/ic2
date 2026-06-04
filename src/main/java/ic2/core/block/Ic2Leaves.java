@@ -35,96 +35,96 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class Ic2Leaves extends BlockLeaves implements IBlockModelProvider {
   public Ic2Leaves() {
-    func_149663_c(BlockName.leaves.name());
-    func_149647_a((CreativeTabs)IC2.tabIC2);
+    setUnlocalizedName(BlockName.leaves.name());
+    setCreativeTab((CreativeTabs)IC2.tabIC2);
     ResourceLocation name = IC2.getIdentifier(BlockName.leaves.name());
     BlocksItems.registerBlock((Block)this, name);
     BlocksItems.registerItem((Item)new ItemIc2Leaves((Block)this), name);
     BlockName.leaves.setInstance((Block)this);
-    func_180632_j(this.field_176227_L.func_177621_b()
-        .func_177226_a((IProperty)field_176236_b, Boolean.valueOf(true))
-        .func_177226_a((IProperty)field_176237_a, Boolean.valueOf(true))
-        .func_177226_a((IProperty)typeProperty, LeavesType.rubber));
+    setDefaultState(this.blockState.getBaseState()
+        .withProperty((IProperty)CHECK_DECAY, Boolean.valueOf(true))
+        .withProperty((IProperty)DECAYABLE, Boolean.valueOf(true))
+        .withProperty((IProperty)typeProperty, LeavesType.rubber));
   }
   
   @SideOnly(Side.CLIENT)
   public void registerModels(BlockName name) {
-    StateMap stateMap = (new StateMap.Builder()).func_178442_a(new IProperty[] { (IProperty)field_176236_b, (IProperty)field_176237_a }).func_178441_a();
+    StateMap stateMap = (new StateMap.Builder()).ignore(new IProperty[] { (IProperty)CHECK_DECAY, (IProperty)DECAYABLE }).build();
     ModelLoader.setCustomStateMapper((Block)this, (IStateMapper)stateMap);
-    List<IBlockState> states = new ArrayList<>(typeProperty.func_177700_c().size());
+    List<IBlockState> states = new ArrayList<>(typeProperty.getAllowedValues().size());
     for (LeavesType type : LeavesType.values)
-      states.add(getDropState(getDefaultState().func_177226_a((IProperty)typeProperty, type))); 
+      states.add(getDropState(getDefaultState().withProperty((IProperty)typeProperty, type))); 
     BlockBase.registerItemModels((Block)this, states, (IStateMapper)stateMap);
   }
   
   private static IBlockState getDropState(IBlockState state) {
-    return state.func_177226_a((IProperty)field_176236_b, Boolean.valueOf(false))
-      .func_177226_a((IProperty)field_176237_a, Boolean.valueOf(false));
+    return state.withProperty((IProperty)CHECK_DECAY, Boolean.valueOf(false))
+      .withProperty((IProperty)DECAYABLE, Boolean.valueOf(false));
   }
   
-  protected BlockStateContainer func_180661_e() {
-    return new BlockStateContainer((Block)this, new IProperty[] { (IProperty)field_176236_b, (IProperty)field_176237_a, (IProperty)typeProperty });
+  protected BlockStateContainer createBlockState() {
+    return new BlockStateContainer((Block)this, new IProperty[] { (IProperty)CHECK_DECAY, (IProperty)DECAYABLE, (IProperty)typeProperty });
   }
   
-  public IBlockState func_176203_a(int meta) {
+  public IBlockState getStateFromMeta(int meta) {
     boolean checkDecay = ((meta & 0x8) != 0);
     boolean decayable = ((meta & 0x4) != 0);
     meta &= 0x3;
-    IBlockState ret = getDefaultState().func_177226_a((IProperty)field_176236_b, Boolean.valueOf(checkDecay)).func_177226_a((IProperty)field_176237_a, Boolean.valueOf(decayable));
+    IBlockState ret = getDefaultState().withProperty((IProperty)CHECK_DECAY, Boolean.valueOf(checkDecay)).withProperty((IProperty)DECAYABLE, Boolean.valueOf(decayable));
     if (meta < LeavesType.values.length)
-      ret = ret.func_177226_a((IProperty)typeProperty, LeavesType.values[meta]); 
+      ret = ret.withProperty((IProperty)typeProperty, LeavesType.values[meta]); 
     return ret;
   }
   
-  public int func_176201_c(IBlockState state) {
+  public int getMetaFromState(IBlockState state) {
     int ret = 0;
-    if (((Boolean)state.func_177229_b((IProperty)field_176236_b)).booleanValue())
+    if (((Boolean)state.getValue((IProperty)CHECK_DECAY)).booleanValue())
       ret |= 0x8; 
-    if (((Boolean)state.func_177229_b((IProperty)field_176237_a)).booleanValue())
+    if (((Boolean)state.getValue((IProperty)DECAYABLE)).booleanValue())
       ret |= 0x4; 
-    ret |= ((LeavesType)state.func_177229_b((IProperty)typeProperty)).ordinal();
+    ret |= ((LeavesType)state.getValue((IProperty)typeProperty)).ordinal();
     return ret;
   }
   
-  public boolean func_149662_c(IBlockState state) {
-    return Blocks.field_150362_t.func_149662_c(state);
+  public boolean isOpaqueCube(IBlockState state) {
+    return Blocks.LEAVES.isOpaqueCube(state);
   }
   
   @SideOnly(Side.CLIENT)
-  public BlockRenderLayer func_180664_k() {
-    return Blocks.field_150362_t.func_180664_k();
+  public BlockRenderLayer getBlockLayer() {
+    return Blocks.LEAVES.getBlockLayer();
   }
   
-  public boolean func_176225_a(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
+  public boolean shouldSideBeRendered(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
     BlockPos nPos = pos.offset(side);
-    return ((!func_149662_c(state) || world.getBlockState(nPos) != state) && 
+    return ((!isOpaqueCube(state) || world.getBlockState(nPos) != state) && 
       !world.getBlockState(nPos).doesSideBlockRendering(world, nPos, side.getOpposite()));
   }
   
-  public Item func_180660_a(IBlockState state, Random rand, int fortune) {
-    return ((LeavesType)state.func_177229_b((IProperty)typeProperty)).getSapling().getItem();
+  public Item getItemDropped(IBlockState state, Random rand, int fortune) {
+    return ((LeavesType)state.getValue((IProperty)typeProperty)).getSapling().getItem();
   }
   
-  public int func_180651_a(IBlockState state) {
-    return ((LeavesType)state.func_177229_b((IProperty)typeProperty)).getSapling().func_77960_j();
+  public int damageDropped(IBlockState state) {
+    return ((LeavesType)state.getValue((IProperty)typeProperty)).getSapling().getMetadata();
   }
   
-  protected int func_176232_d(IBlockState state) {
-    return ((LeavesType)state.func_177229_b((IProperty)typeProperty)).saplingDropChance;
+  protected int getSaplingDropChance(IBlockState state) {
+    return ((LeavesType)state.getValue((IProperty)typeProperty)).saplingDropChance;
   }
   
   public List<ItemStack> onSheared(ItemStack item, IBlockAccess world, BlockPos pos, int fortune) {
     IBlockState state = getDropState(world.getBlockState(pos));
-    return Arrays.asList(new ItemStack[] { new ItemStack((Block)this, 1, func_176201_c(state)) });
+    return Arrays.asList(new ItemStack[] { new ItemStack((Block)this, 1, getMetaFromState(state)) });
   }
   
-  public void func_149666_a(CreativeTabs tab, NonNullList<ItemStack> list) {
+  public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list) {
     IBlockState state = getDropState(getDefaultState());
     for (LeavesType type : LeavesType.values)
-      list.add(new ItemStack((Block)this, 1, func_176201_c(state.func_177226_a((IProperty)typeProperty, type)))); 
+      list.add(new ItemStack((Block)this, 1, getMetaFromState(state.withProperty((IProperty)typeProperty, type)))); 
   }
   
-  public BlockPlanks.EnumType func_176233_b(int meta) {
+  public BlockPlanks.EnumType getWoodType(int meta) {
     return null;
   }
   
@@ -172,7 +172,7 @@ public class Ic2Leaves extends BlockLeaves implements IBlockModelProvider {
     }
   }
   
-  public static final PropertyEnum<LeavesType> typeProperty = PropertyEnum.func_177709_a("type", LeavesType.class);
+  public static final PropertyEnum<LeavesType> typeProperty = PropertyEnum.create("type", LeavesType.class);
   
   private static final int checkDecayFlag = 8;
   

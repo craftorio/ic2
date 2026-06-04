@@ -77,16 +77,16 @@ public abstract class GuiIC2<T extends ContainerBase<? extends IInventory>> exte
     this.queuedTooltips = new ArrayDeque<>();
     this.elements = new ArrayList<>();
     this.container = container;
-    this.field_147000_g = ySize;
-    this.field_146999_f = xSize;
+    this.ySize = ySize;
+    this.xSize = xSize;
   }
   
   public T getContainer() {
     return this.container;
   }
   
-  public void func_73866_w_() {
-    super.func_73866_w_();
+  public void initGui() {
+    super.initGui();
     for (GuiElement<?> element : this.elements) {
       if (element instanceof ic2.core.gui.IKeyboardDependent) {
         Keyboard.enableRepeatEvents(true);
@@ -96,14 +96,14 @@ public abstract class GuiIC2<T extends ContainerBase<? extends IInventory>> exte
     } 
   }
   
-  public void func_73863_a(int mouseX, int mouseY, float partialTicks) {
-    func_146276_q_();
-    super.func_73863_a(mouseX, mouseY, partialTicks);
-    func_191948_b(mouseX, mouseY);
+  public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+    drawDefaultBackground();
+    super.drawScreen(mouseX, mouseY, partialTicks);
+    renderHoveredToolTip(mouseX, mouseY);
   }
   
-  public void func_73876_c() {
-    super.func_73876_c();
+  public void updateScreen() {
+    super.updateScreen();
     if (this.tick)
       for (GuiElement<?> element : this.elements) {
         if (element.isEnabled())
@@ -111,13 +111,13 @@ public abstract class GuiIC2<T extends ContainerBase<? extends IInventory>> exte
       }  
   }
   
-  protected void func_146976_a(float partialTicks, int mouseX, int mouseY) {
-    mouseX -= this.field_147003_i;
-    mouseY -= this.field_147009_r;
+  protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+    mouseX -= this.guiLeft;
+    mouseY -= this.guiTop;
     GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
     drawBackgroundAndTitle(partialTicks, mouseX, mouseY);
     if (((ContainerBase)this.container).base instanceof IUpgradableBlock) {
-      this.mc.func_110434_K().func_110577_a(new ResourceLocation("ic2", "textures/gui/infobutton.png"));
+      this.mc.getTextureManager().bindTexture(new ResourceLocation("ic2", "textures/gui/infobutton.png"));
       drawTexturedRect(3.0D, 3.0D, 10.0D, 10.0D, 0.0D, 0.0D);
     } 
     if (this.background)
@@ -129,13 +129,13 @@ public abstract class GuiIC2<T extends ContainerBase<? extends IInventory>> exte
   
   protected void drawBackgroundAndTitle(float partialTicks, int mouseX, int mouseY) {
     bindTexture();
-    drawTexturedModalRect(this.field_147003_i, this.field_147009_r, 0, 0, this.field_146999_f, this.field_147000_g);
-    String name = Localization.translate(((ContainerBase)this.container).base.func_70005_c_());
-    drawXCenteredString(this.field_146999_f / 2, 6, name, 4210752, false);
+    drawTexturedModalRect(this.guiLeft, this.guiTop, 0, 0, this.xSize, this.ySize);
+    String name = Localization.translate(((ContainerBase)this.container).base.getName());
+    drawXCenteredString(this.xSize / 2, 6, name, 4210752, false);
   }
   
-  protected final void func_146979_b(int mouseX, int mouseY) {
-    drawForegroundLayer(mouseX - this.field_147003_i, mouseY - this.field_147009_r);
+  protected final void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
+    drawForegroundLayer(mouseX - this.guiLeft, mouseY - this.guiTop);
     flushTooltips();
   }
   
@@ -155,7 +155,7 @@ public abstract class GuiIC2<T extends ContainerBase<? extends IInventory>> exte
     List<String> text = new ArrayList<>();
     text.add(Localization.translate("ic2.generic.text.upgrade"));
     for (ItemStack stack : getCompatibleUpgrades((IUpgradableBlock)((ContainerBase)this.container).base))
-      text.add(stack.func_82833_r()); 
+      text.add(stack.getDisplayName()); 
     drawTooltip(mouseX, mouseY, text);
   }
   
@@ -170,12 +170,12 @@ public abstract class GuiIC2<T extends ContainerBase<? extends IInventory>> exte
     return ret;
   }
   
-  public void func_146274_d() throws IOException {
-    super.func_146274_d();
+  public void handleMouseInput() throws IOException {
+    super.handleMouseInput();
     if (this.mouseScroll) {
       ScrollDirection direction;
-      int mouseX = Mouse.getEventX() * this.width / this.mc.field_71443_c - this.field_147003_i;
-      int mouseY = this.height - Mouse.getEventY() * this.height / this.mc.field_71440_d - 1 - this.field_147009_r;
+      int mouseX = Mouse.getEventX() * this.width / this.mc.displayWidth - this.guiLeft;
+      int mouseY = this.height - Mouse.getEventY() * this.height / this.mc.displayHeight - 1 - this.guiTop;
       int scrollDelta = Mouse.getEventDWheel();
       if (scrollDelta != 0) {
         direction = (scrollDelta < 0) ? ScrollDirection.down : ScrollDirection.up;
@@ -189,76 +189,76 @@ public abstract class GuiIC2<T extends ContainerBase<? extends IInventory>> exte
     } 
   }
   
-  protected void func_73864_a(int mouseX, int mouseY, int mouseButton) throws IOException {
+  protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
     boolean handled = false;
     if (this.mouseClick) {
       MouseButton button = MouseButton.get(mouseButton);
       if (button != null) {
-        mouseX -= this.field_147003_i;
-        mouseY -= this.field_147009_r;
+        mouseX -= this.guiLeft;
+        mouseY -= this.guiTop;
         for (GuiElement<?> element : this.elements) {
           if (element.isEnabled())
             handled |= element.onMouseClick(mouseX, mouseY, button, element.contains(mouseX, mouseY)); 
         } 
         if (!handled) {
-          mouseX += this.field_147003_i;
-          mouseY += this.field_147009_r;
+          mouseX += this.guiLeft;
+          mouseY += this.guiTop;
         } else {
           this.mouseHandled = true;
         } 
       } 
     } 
     if (!handled)
-      super.func_73864_a(mouseX, mouseY, mouseButton); 
+      super.mouseClicked(mouseX, mouseY, mouseButton); 
   }
   
-  protected void func_146273_a(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
+  protected void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
     boolean handled = false;
     if (this.mouseDrag) {
       MouseButton button = MouseButton.get(clickedMouseButton);
       if (button != null) {
-        mouseX -= this.field_147003_i;
-        mouseY -= this.field_147009_r;
+        mouseX -= this.guiLeft;
+        mouseY -= this.guiTop;
         for (GuiElement<?> element : this.elements) {
           if (element.isEnabled())
             handled |= element.onMouseDrag(mouseX, mouseY, button, timeSinceLastClick, element.contains(mouseX, mouseY)); 
         } 
         if (!handled) {
-          mouseX += this.field_147003_i;
-          mouseY += this.field_147009_r;
+          mouseX += this.guiLeft;
+          mouseY += this.guiTop;
         } else {
           this.mouseHandled = true;
         } 
       } 
     } 
     if (!handled)
-      super.func_146273_a(mouseX, mouseY, clickedMouseButton, timeSinceLastClick); 
+      super.mouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick); 
   }
   
-  protected void func_146286_b(int mouseX, int mouseY, int state) {
+  protected void mouseReleased(int mouseX, int mouseY, int state) {
     boolean handled = false;
     if (this.mouseRelease) {
       MouseButton button = MouseButton.get(state);
       if (button != null) {
-        mouseX -= this.field_147003_i;
-        mouseY -= this.field_147009_r;
+        mouseX -= this.guiLeft;
+        mouseY -= this.guiTop;
         for (GuiElement<?> element : this.elements) {
           if (element.isEnabled())
             handled |= element.onMouseRelease(mouseX, mouseY, button, element.contains(mouseX, mouseY)); 
         } 
         if (!handled) {
-          mouseX += this.field_147003_i;
-          mouseY += this.field_147009_r;
+          mouseX += this.guiLeft;
+          mouseY += this.guiTop;
         } else {
           this.mouseHandled = true;
         } 
       } 
     } 
     if (!handled)
-      super.func_146286_b(mouseX, mouseY, state); 
+      super.mouseReleased(mouseX, mouseY, state); 
   }
   
-  protected void func_73869_a(char typedChar, int keyCode) throws IOException {
+  protected void keyTyped(char typedChar, int keyCode) throws IOException {
     boolean handled = false;
     if (this.key) {
       for (GuiElement<?> element : this.elements) {
@@ -268,11 +268,11 @@ public abstract class GuiIC2<T extends ContainerBase<? extends IInventory>> exte
       this.keyHandled = handled;
     } 
     if (!handled)
-      super.func_73869_a(typedChar, keyCode); 
+      super.keyTyped(typedChar, keyCode); 
   }
   
-  public void func_146281_b() {
-    super.func_146281_b();
+  public void onGuiClosed() {
+    super.onGuiClosed();
     if (this.fixKeyEvents)
       Keyboard.enableRepeatEvents(false); 
   }
@@ -286,8 +286,8 @@ public abstract class GuiIC2<T extends ContainerBase<? extends IInventory>> exte
   }
   
   public void drawTexturedRect(double x, double y, double width, double height, double uS, double vS, double uE, double vE, boolean mirrorX) {
-    x += this.field_147003_i;
-    y += this.field_147009_r;
+    x += this.guiLeft;
+    y += this.guiTop;
     double xE = x + width;
     double yE = y + height;
     if (mirrorX) {
@@ -296,34 +296,34 @@ public abstract class GuiIC2<T extends ContainerBase<? extends IInventory>> exte
       uE = tmp;
     } 
     GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-    Tessellator tessellator = Tessellator.func_178181_a();
-    BufferBuilder worldrenderer = tessellator.func_178180_c();
-    worldrenderer.func_181668_a(7, DefaultVertexFormats.field_181707_g);
-    worldrenderer.func_181662_b(x, y, this.field_73735_i).func_187315_a(uS, vS).func_181675_d();
-    worldrenderer.func_181662_b(x, yE, this.field_73735_i).func_187315_a(uS, vE).func_181675_d();
-    worldrenderer.func_181662_b(xE, yE, this.field_73735_i).func_187315_a(uE, vE).func_181675_d();
-    worldrenderer.func_181662_b(xE, y, this.field_73735_i).func_187315_a(uE, vS).func_181675_d();
-    tessellator.func_78381_a();
+    Tessellator tessellator = Tessellator.getInstance();
+    BufferBuilder worldrenderer = tessellator.getBuffer();
+    worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX);
+    worldrenderer.pos(x, y, this.zLevel).tex(uS, vS).endVertex();
+    worldrenderer.pos(x, yE, this.zLevel).tex(uS, vE).endVertex();
+    worldrenderer.pos(xE, yE, this.zLevel).tex(uE, vE).endVertex();
+    worldrenderer.pos(xE, y, this.zLevel).tex(uE, vS).endVertex();
+    tessellator.draw();
   }
   
   public void drawSprite(double x, double y, double width, double height, TextureAtlasSprite sprite, int color, double scale, boolean fixRight, boolean fixBottom) {
     if (sprite == null)
-      sprite = this.mc.func_147117_R().func_174944_f(); 
-    x += this.field_147003_i;
-    y += this.field_147009_r;
+      sprite = this.mc.getTextureMapBlocks().getMissingSprite(); 
+    x += this.guiLeft;
+    y += this.guiTop;
     scale *= 16.0D;
-    double spriteUS = sprite.func_94209_e();
-    double spriteVS = sprite.func_94206_g();
-    double spriteWidth = sprite.func_94212_f() - spriteUS;
-    double spriteHeight = sprite.func_94210_h() - spriteVS;
+    double spriteUS = sprite.getMinU();
+    double spriteVS = sprite.getMinV();
+    double spriteWidth = sprite.getMaxU() - spriteUS;
+    double spriteHeight = sprite.getMaxV() - spriteVS;
     int a = color >>> 24 & 0xFF;
     int r = color >>> 16 & 0xFF;
     int g = color >>> 8 & 0xFF;
     int b = color & 0xFF;
     GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-    Tessellator tessellator = Tessellator.func_178181_a();
-    BufferBuilder buffer = tessellator.func_178180_c();
-    buffer.func_181668_a(7, DefaultVertexFormats.field_181709_i);
+    Tessellator tessellator = Tessellator.getInstance();
+    BufferBuilder buffer = tessellator.getBuffer();
+    buffer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
     double xS;
     for (xS = x; xS < x + width; xS += maxWidth) {
       double uS, maxWidth;
@@ -346,32 +346,32 @@ public abstract class GuiIC2<T extends ContainerBase<? extends IInventory>> exte
         } 
         double yE = Math.min(yS + maxHeight, y + height);
         double vE = vS + (yE - yS) / scale * spriteHeight;
-        buffer.func_181662_b(xS, yS, this.field_73735_i).func_187315_a(uS, vS).func_181669_b(r, g, b, a).func_181675_d();
-        buffer.func_181662_b(xS, yE, this.field_73735_i).func_187315_a(uS, vE).func_181669_b(r, g, b, a).func_181675_d();
-        buffer.func_181662_b(xE, yE, this.field_73735_i).func_187315_a(uE, vE).func_181669_b(r, g, b, a).func_181675_d();
-        buffer.func_181662_b(xE, yS, this.field_73735_i).func_187315_a(uE, vS).func_181669_b(r, g, b, a).func_181675_d();
+        buffer.pos(xS, yS, this.zLevel).tex(uS, vS).color(r, g, b, a).endVertex();
+        buffer.pos(xS, yE, this.zLevel).tex(uS, vE).color(r, g, b, a).endVertex();
+        buffer.pos(xE, yE, this.zLevel).tex(uE, vE).color(r, g, b, a).endVertex();
+        buffer.pos(xE, yS, this.zLevel).tex(uE, vS).color(r, g, b, a).endVertex();
       } 
     } 
-    tessellator.func_78381_a();
+    tessellator.draw();
   }
   
   public void drawItem(int x, int y, ItemStack stack) {
-    this.field_146296_j.func_175042_a(stack, this.field_147003_i + x, this.field_147009_r + y);
+    this.itemRender.renderItemIntoGUI(stack, this.guiLeft + x, this.guiTop + y);
   }
   
   public void drawItemStack(int x, int y, ItemStack stack) {
     drawItem(x, y, stack);
-    this.field_146296_j.func_180453_a(this.fontRenderer, stack, this.field_147003_i + x, this.field_147009_r + y, null);
+    this.itemRender.renderItemOverlayIntoGUI(this.fontRenderer, stack, this.guiLeft + x, this.guiTop + y, null);
   }
   
   public void drawColoredRect(int x, int y, int width, int height, int color) {
-    x += this.field_147003_i;
-    y += this.field_147009_r;
-    func_73734_a(x, y, x + width, y + height, color);
+    x += this.guiLeft;
+    y += this.guiTop;
+    drawRect(x, y, x + width, y + height, color);
   }
   
   public int drawString(int x, int y, String text, int color, boolean shadow) {
-    return this.fontRenderer.func_175065_a(text, (this.field_147003_i + x), (this.field_147009_r + y), color, shadow) - this.field_147003_i;
+    return this.fontRenderer.drawString(text, (this.guiLeft + x), (this.guiTop + y), color, shadow) - this.guiLeft;
   }
   
   public void drawXCenteredString(int x, int y, String text, int color, boolean shadow) {
@@ -387,19 +387,19 @@ public abstract class GuiIC2<T extends ContainerBase<? extends IInventory>> exte
       x -= getStringWidth(text) / 2; 
     if (centerY)
       y -= 4; 
-    this.fontRenderer.drawString(text, this.field_147003_i + x, this.field_147009_r + y, color);
+    this.fontRenderer.drawString(text, this.guiLeft + x, this.guiTop + y, color);
   }
   
   public int getStringWidth(String text) {
-    return this.fontRenderer.func_78256_a(text);
+    return this.fontRenderer.getStringWidth(text);
   }
   
   public String trimStringToWidth(String text, int width) {
-    return this.fontRenderer.func_78262_a(text, width, false);
+    return this.fontRenderer.trimStringToWidth(text, width, false);
   }
   
   public String trimStringToWidthReverse(String text, int width) {
-    return this.fontRenderer.func_78262_a(text, width, true);
+    return this.fontRenderer.trimStringToWidth(text, width, true);
   }
   
   public void drawTooltip(int x, int y, List<String> text) {
@@ -408,14 +408,14 @@ public abstract class GuiIC2<T extends ContainerBase<? extends IInventory>> exte
   
   public void drawTooltip(int x, int y, ItemStack stack) {
     assert !StackUtil.isEmpty(stack);
-    func_146285_a(stack, x, y);
+    renderToolTip(stack, x, y);
   }
   
   protected void flushTooltips() {
     for (Tooltip tooltip : this.queuedTooltips) {
       GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-      func_146283_a(tooltip.text, tooltip.x, tooltip.y);
-      GlStateManager.func_179140_f();
+      drawHoveringText(tooltip.text, tooltip.x, tooltip.y);
+      GlStateManager.disableLighting();
     } 
     this.queuedTooltips.clear();
   }
@@ -442,7 +442,7 @@ public abstract class GuiIC2<T extends ContainerBase<? extends IInventory>> exte
   }
   
   protected final void bindTexture() {
-    this.mc.func_110434_K().func_110577_a(getTexture());
+    this.mc.getTextureManager().bindTexture(getTexture());
   }
   
   protected IClickHandler createEventSender(final int event) {

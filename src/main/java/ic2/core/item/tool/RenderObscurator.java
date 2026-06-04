@@ -37,7 +37,7 @@ public class RenderObscurator extends MaskOverlayModel {
       };
   }
   
-  public ItemOverrideList func_188617_f() {
+  public ItemOverrideList getOverrides() {
     return this.overrideHandler;
   }
   

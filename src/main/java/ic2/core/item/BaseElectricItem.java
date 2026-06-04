@@ -20,8 +20,8 @@ public abstract class BaseElectricItem extends ItemIC2 implements IPseudoDamageI
     this.maxCharge = maxCharge;
     this.transferLimit = transferLimit;
     this.tier = tier;
-    func_77656_e(27);
-    func_77625_d(1);
+    setMaxDamage(27);
+    setMaxStackSize(1);
     setNoRepair();
   }
   
@@ -47,8 +47,8 @@ public abstract class BaseElectricItem extends ItemIC2 implements IPseudoDamageI
     return info;
   }
   
-  public void func_150895_a(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-    if (!func_194125_a(tab))
+  public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
+    if (!isInCreativeTab(tab))
       return; 
     ElectricItemManager.addChargeVariants(this, (List<ItemStack>)subItems);
   }

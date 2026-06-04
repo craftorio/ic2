@@ -15,8 +15,8 @@ public class RecipeResolver implements IRecipeResolver {
   public List<RecipeTransformation> getTransformations() {
     List<RecipeTransformation> ret = new ArrayList<>();
     for (IRecipe irecipe : ForgeRegistries.RECIPES) {
-      NonNullList<Ingredient> inputs = irecipe.func_192400_c();
-      ItemStack output = irecipe.func_77571_b();
+      NonNullList<Ingredient> inputs = irecipe.getIngredients();
+      ItemStack output = irecipe.getRecipeOutput();
       if (StackUtil.isEmpty(output) || inputs.isEmpty())
         continue; 
       ret.add(new RecipeTransformation(1.0D, toDoubleStackList((List<Ingredient>)inputs), new LeanItemStack[] { new LeanItemStack(output) }));
@@ -27,7 +27,7 @@ public class RecipeResolver implements IRecipeResolver {
   private static List<List<LeanItemStack>> toDoubleStackList(List<Ingredient> list) {
     List<List<LeanItemStack>> ret = new ArrayList<>(list.size());
     for (Ingredient ingredient : list) {
-      ItemStack[] arr = ingredient.func_193365_a();
+      ItemStack[] arr = ingredient.getMatchingStacks();
       List<LeanItemStack> toAdd = new ArrayList<>(arr.length);
       for (ItemStack stack : arr)
         toAdd.add(new LeanItemStack(stack)); 

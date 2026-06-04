@@ -49,7 +49,7 @@ public class CropStickreed extends IC2CropCard {
   
   public ItemStack getGain(ICropTile crop) {
     if (crop.getCurrentSize() <= 3)
-      return new ItemStack(Items.field_151120_aE, crop.getCurrentSize() - 1); 
+      return new ItemStack(Items.REEDS, crop.getCurrentSize() - 1); 
     return ItemName.misc_resource.getItemStack((Enum)MiscResourceType.resin);
   }
   

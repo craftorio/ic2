@@ -45,9 +45,9 @@ public class ItemGradualInt extends ItemIC2 implements ICustomDamageItem {
   }
   
   public int getCustomDamage(ItemStack stack) {
-    if (!stack.func_77942_o())
+    if (!stack.hasTagCompound())
       return 0; 
-    return stack.func_77978_p().getInteger("advDmg");
+    return stack.getTagCompound().getInteger("advDmg");
   }
   
   public int getMaxDamage(ItemStack stack) {
@@ -74,8 +74,8 @@ public class ItemGradualInt extends ItemIC2 implements ICustomDamageItem {
     return true;
   }
   
-  public void func_150895_a(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-    if (!func_194125_a(tab))
+  public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
+    if (!isInCreativeTab(tab))
       return; 
     ItemStack stack = new ItemStack(this);
     setCustomDamage(stack, 0);

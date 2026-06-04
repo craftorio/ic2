@@ -21,12 +21,12 @@ public abstract class InventorySlotCrafting extends InventoryCrafting {
     return (index >= 0 && index < this.size);
   }
   
-  public int func_70302_i_() {
+  public int getSizeInventory() {
     return this.size;
   }
   
-  public ItemStack func_70463_b(int row, int column) {
-    return (row >= 0 && row < this.height && column >= 0 && column < this.width) ? func_70301_a(row + column * this.height) : StackUtil.emptyStack;
+  public ItemStack getStackInRowAndColumn(int row, int column) {
+    return (row >= 0 && row < this.height && column >= 0 && column < this.width) ? getStackInSlot(row + column * this.height) : StackUtil.emptyStack;
   }
   
   protected abstract ItemStack get(int paramInt);
@@ -37,11 +37,11 @@ public abstract class InventorySlotCrafting extends InventoryCrafting {
     put(index, StackUtil.emptyStack);
   }
   
-  public ItemStack func_70301_a(int index) {
+  public ItemStack getStackInSlot(int index) {
     return !validIndex(index) ? StackUtil.emptyStack : get(index);
   }
   
-  public ItemStack func_70304_b(int index) {
+  public ItemStack removeStackFromSlot(int index) {
     if (validIndex(index)) {
       ItemStack stack = get(index);
       clear(index);
@@ -50,7 +50,7 @@ public abstract class InventorySlotCrafting extends InventoryCrafting {
     return StackUtil.emptyStack;
   }
   
-  public ItemStack func_70298_a(int index, int count) {
+  public ItemStack decrStackSize(int index, int count) {
     ItemStack stack;
     if (validIndex(index) && !StackUtil.isEmpty(stack = get(index))) {
       ItemStack ret;
@@ -66,20 +66,20 @@ public abstract class InventorySlotCrafting extends InventoryCrafting {
     return StackUtil.emptyStack;
   }
   
-  public void func_70299_a(int index, ItemStack stack) {
+  public void setInventorySlotContents(int index, ItemStack stack) {
     if (validIndex(index))
       put(index, stack); 
   }
   
-  public abstract void func_174888_l();
+  public abstract void clear();
   
-  public abstract boolean func_191420_l();
+  public abstract boolean isEmpty();
   
-  public int func_174922_i() {
+  public int getWidth() {
     return this.width;
   }
   
-  public int func_174923_h() {
+  public int getHeight() {
     return this.height;
   }
 }

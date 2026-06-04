@@ -10,19 +10,19 @@ public class SlotInvSlotReadOnly extends SlotInvSlot {
     super(invSlot, index, xDisplayPosition, yDisplayPosition);
   }
   
-  public boolean func_75214_a(ItemStack stack) {
+  public boolean isItemValid(ItemStack stack) {
     return false;
   }
   
-  public ItemStack func_190901_a(EntityPlayer player, ItemStack stack) {
+  public ItemStack onTake(EntityPlayer player, ItemStack stack) {
     return stack;
   }
   
-  public boolean func_82869_a(EntityPlayer player) {
+  public boolean canTakeStack(EntityPlayer player) {
     return false;
   }
   
-  public ItemStack func_75209_a(int par1) {
+  public ItemStack decrStackSize(int par1) {
     return StackUtil.emptyStack;
   }
 }

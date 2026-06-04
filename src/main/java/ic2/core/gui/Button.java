@@ -55,9 +55,9 @@ public abstract class Button<T extends Button<T>> extends GuiElement<T> {
     } else if (this.iconProvider != null) {
       ItemStack stack = (ItemStack)this.iconProvider.get();
       if (stack != null && stack.getItem() != null) {
-        RenderHelper.func_74520_c();
+        RenderHelper.enableGUIStandardItemLighting();
         this.gui.drawItem(this.x + (this.width - 16) / 2, this.y + (this.height - 16) / 2, stack);
-        RenderHelper.func_74518_a();
+        RenderHelper.disableStandardItemLighting();
       } 
     } 
   }

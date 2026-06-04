@@ -25,7 +25,7 @@ public class RotorRegistry
 		INSTANCE = i;
 	}
 
-	public static interface IRotorRegistry
+	public interface IRotorRegistry
 	{
 		<T extends net.minecraft.tileentity.TileEntity & IRotorProvider> void registerRotorProvider(Class<T> param1Class);
 	}

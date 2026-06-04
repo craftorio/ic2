@@ -22,10 +22,10 @@ import org.lwjgl.opengl.GL11;
 
 public class GlTexture implements Closeable {
   public static void init() {
-    IResourceManager manager = Minecraft.getMinecraft().func_110442_L();
+    IResourceManager manager = Minecraft.getMinecraft().getResourceManager();
     if (manager instanceof IReloadableResourceManager) {
-      ((IReloadableResourceManager)manager).func_110542_a(new IResourceManagerReloadListener() {
-            public void func_110549_a(IResourceManager manager) {
+      ((IReloadableResourceManager)manager).registerReloadListener(new IResourceManagerReloadListener() {
+            public void onResourceManagerReload(IResourceManager manager) {
               for (GlTexture texture : GlTexture.textures.values()) {
                 if (texture != null)
                   texture.close(); 
@@ -47,7 +47,7 @@ public class GlTexture implements Closeable {
   
   public static GlTexture add(ResourceLocation identifier, GlTexture texture) {
     try {
-      texture.load(Minecraft.getMinecraft().func_110442_L());
+      texture.load(Minecraft.getMinecraft().getResourceManager());
     } catch (IOException e) {
       IC2.log.warn(LogCategory.General, "Can't load texture %s", new Object[] { identifier });
       texture.close();
@@ -62,8 +62,8 @@ public class GlTexture implements Closeable {
   }
   
   protected void load(IResourceManager manager) throws IOException {
-    IResource resource = manager.func_110536_a(this.loc);
-    try (InputStream is = resource.func_110527_b()) {
+    IResource resource = manager.getResource(this.loc);
+    try (InputStream is = resource.getInputStream()) {
       load(ImageIO.read(is));
     } 
   }
@@ -73,8 +73,8 @@ public class GlTexture implements Closeable {
     this.height = img.getHeight();
     this.canvasWidth = Integer.highestOneBit((this.width - 1) * 2);
     this.canvasHeight = Integer.highestOneBit((this.height - 1) * 2);
-    this.textureId = GlStateManager.func_179146_y();
-    IntBuffer buffer = GLAllocation.func_74527_f(this.canvasWidth * this.canvasHeight);
+    this.textureId = GlStateManager.generateTexture();
+    IntBuffer buffer = GLAllocation.createDirectIntBuffer(this.canvasWidth * this.canvasHeight);
     int[] tmp = new int[this.canvasWidth * this.canvasHeight];
     img.getRGB(0, 0, this.width, this.height, tmp, 0, this.canvasWidth);
     buffer.put(tmp);
@@ -93,14 +93,14 @@ public class GlTexture implements Closeable {
   public void close() {
     if (this.textureId == 0)
       return; 
-    GlStateManager.func_179150_h(this.textureId);
+    GlStateManager.deleteTexture(this.textureId);
     this.textureId = 0;
   }
   
   public void bind() {
     if (this.textureId == 0)
       throw new IllegalStateException("uninitialized texture"); 
-    GlStateManager.func_179144_i(this.textureId);
+    GlStateManager.bindTexture(this.textureId);
   }
   
   public int getWidth() {

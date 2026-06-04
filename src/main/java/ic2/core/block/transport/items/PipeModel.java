@@ -78,15 +78,15 @@ public class PipeModel extends AbstractModel implements ISpecialParticleModel {
     return new ResourceLocation("ic2", loc);
   }
   
-  public List<BakedQuad> func_188616_a(IBlockState rawState, EnumFacing side, long rand) {
+  public List<BakedQuad> getQuads(IBlockState rawState, EnumFacing side, long rand) {
     if (!(rawState instanceof Ic2BlockState.Ic2BlockStateInstance))
-      return ModelUtil.getMissingModel().func_188616_a(rawState, side, rand); 
+      return ModelUtil.getMissingModel().getQuads(rawState, side, rand); 
     Ic2BlockState.Ic2BlockStateInstance state = (Ic2BlockState.Ic2BlockStateInstance)rawState;
     if (!state.hasValue(TileEntityFluidPipe.renderStateProperty))
-      return ModelUtil.getMissingModel().func_188616_a((IBlockState)state, side, rand); 
+      return ModelUtil.getMissingModel().getQuads((IBlockState)state, side, rand); 
     TileEntityPipe.PipeRenderState prop = (TileEntityPipe.PipeRenderState)state.getValue(TileEntityFluidPipe.renderStateProperty);
     try {
-      return ((IBakedModel)this.modelCache.get(prop)).func_188616_a((IBlockState)state, side, rand);
+      return ((IBakedModel)this.modelCache.get(prop)).getQuads((IBlockState)state, side, rand);
     } catch (ExecutionException e) {
       throw new RuntimeException(e);
     } 
@@ -249,7 +249,7 @@ public class PipeModel extends AbstractModel implements ISpecialParticleModel {
     this.modelCache.invalidateAll();
   }
   
-  public TextureAtlasSprite func_177554_e() {
+  public TextureAtlasSprite getParticleTexture() {
     return this.textures.get(getSideTextureLocation());
   }
   
@@ -260,7 +260,7 @@ public class PipeModel extends AbstractModel implements ISpecialParticleModel {
   public void enhanceParticle(Particle particle, Ic2BlockState.Ic2BlockStateInstance state) {
     if (state.hasValue(TileEntityPipe.renderStateProperty)) {
       TileEntityPipe.PipeRenderState prop = (TileEntityPipe.PipeRenderState)state.getValue(TileEntityPipe.renderStateProperty);
-      particle.func_70538_b(prop.type.red / 255.0F, prop.type.green / 255.0F, prop.type.blue / 255.0F);
+      particle.setRBGColorF(prop.type.red / 255.0F, prop.type.green / 255.0F, prop.type.blue / 255.0F);
     } 
   }
   

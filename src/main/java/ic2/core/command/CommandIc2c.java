@@ -17,23 +17,23 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 
 public class CommandIc2c extends CommandBase {
-  public String func_71517_b() {
+  public String getName() {
     return "ic2c";
   }
   
-  public String func_71518_a(ICommandSender icommandsender) {
+  public String getUsage(ICommandSender icommandsender) {
     return "/ic2c (rightClick <x> <y> <z> [XN|XP|YN|YP|ZN|ZP]) | currentItem";
   }
   
-  public List<String> func_184883_a(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos) {
+  public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos) {
     if (args.length == 1)
-      return func_71530_a(args, new String[] { "rightClick", "currentItem" }); 
+      return getListOfStringsMatchingLastWord(args, new String[] { "rightClick", "currentItem" }); 
     return Collections.emptyList();
   }
   
-  public void func_184881_a(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+  public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
     if (args.length == 0)
-      throw new WrongUsageException(func_71518_a(sender), new Object[0]); 
+      throw new WrongUsageException(getUsage(sender), new Object[0]); 
     if (args.length >= 4 && args.length <= 5 && args[0].equals("rightClick")) {
       cmdRightClick(sender, args);
     } else if (args.length == 1 && args[0].equals("currentItem")) {
@@ -57,7 +57,7 @@ public class CommandIc2c extends CommandBase {
     } 
     Minecraft mc = Minecraft.getMinecraft();
     EntityPlayerSP player = mc.player;
-    mc.field_71442_b.func_187099_a(player, (WorldClient)player.getEntityWorld(), pos, side.facing, new Vec3d((Vec3i)pos), EnumHand.MAIN_HAND);
+    mc.playerController.processRightClickBlock(player, (WorldClient)player.getEntityWorld(), pos, side.facing, new Vec3d((Vec3i)pos), EnumHand.MAIN_HAND);
     CommandIc2.msg(sender, "Right click executed.");
   }
   

@@ -42,7 +42,7 @@ public class RpcHandler extends SimpleChannelInboundHandler<Packet<?>> {
     Object[] args = (Object[])DataEncoder.decode(is);
     IRpcProvider<?> provider = providers.get(providerClassName);
     if (provider == null) {
-      IC2.log.warn(LogCategory.Network, "Invalid RPC request from %s.", new Object[] { player.func_70005_c_() });
+      IC2.log.warn(LogCategory.Network, "Invalid RPC request from %s.", new Object[] { player.getName() });
       return;
     } 
     Object result = provider.executeRpc(args);

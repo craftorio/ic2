@@ -18,9 +18,9 @@ public class ItemStackImage extends GuiElement<ItemStackImage> {
     super.drawBackground(mouseX, mouseY);
     ItemStack stack = (ItemStack)this.itemSupplier.get();
     if (!StackUtil.isEmpty(stack)) {
-      RenderHelper.func_74520_c();
+      RenderHelper.enableGUIStandardItemLighting();
       this.gui.drawItemStack(this.x, this.y, stack);
-      RenderHelper.func_74518_a();
+      RenderHelper.disableStandardItemLighting();
     } 
   }
   

@@ -39,7 +39,7 @@ public class TileEntitySteamGenerator extends TileEntityInventory implements IHa
     super.readFromNBT(nbttagcompound);
     this.inputMB = nbttagcompound.getInteger("inputmb");
     this.pressure = nbttagcompound.getInteger("pressurevalve");
-    this.systemHeat = nbttagcompound.func_74760_g("systemheat");
+    this.systemHeat = nbttagcompound.getFloat("systemheat");
     this.calcification = nbttagcompound.getInteger("calcification");
   }
   
@@ -47,7 +47,7 @@ public class TileEntitySteamGenerator extends TileEntityInventory implements IHa
     super.writeToNBT(nbt);
     nbt.setInteger("inputmb", this.inputMB);
     nbt.setInteger("pressurevalve", this.pressure);
-    nbt.func_74776_a("systemheat", this.systemHeat);
+    nbt.setFloat("systemheat", this.systemHeat);
     nbt.setInteger("calcification", this.calcification);
     return nbt;
   }
@@ -155,7 +155,7 @@ public class TileEntitySteamGenerator extends TileEntityInventory implements IHa
     this.systemHeat += heatinput * 5.0E-4F;
     if (this.systemHeat > 500.0F) {
       World world = getWorld();
-      world.func_175698_g(this.pos);
+      world.setBlockToAir(this.pos);
       (new ExplosionIC2(world, null, this.pos, 10, 0.01F, ExplosionIC2.Type.Heat)).doExplosion();
     } 
   }

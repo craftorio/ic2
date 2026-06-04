@@ -142,7 +142,7 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
   public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
     nbt = super.writeToNBT(nbt);
     nbt.setInteger("heat", this.heat);
-    nbt.func_74777_a("output", (short)(int)getReactorEnergyOutput());
+    nbt.setShort("output", (short)(int)getReactorEnergyOutput());
     return nbt;
   }
   
@@ -276,10 +276,10 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
       puffs = rnd.nextInt(puffs);
       int n;
       for (n = 0; n < puffs; n++)
-        world.func_175688_a(EnumParticleTypes.SMOKE_NORMAL, (pos.getX() + rnd.nextFloat()), (pos.getY() + 0.95F), (pos.getZ() + rnd.nextFloat()), 0.0D, 0.0D, 0.0D, new int[0]); 
+        world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, (pos.getX() + rnd.nextFloat()), (pos.getY() + 0.95F), (pos.getZ() + rnd.nextFloat()), 0.0D, 0.0D, 0.0D, new int[0]); 
       puffs -= rnd.nextInt(4) + 3;
       for (n = 0; n < puffs; n++)
-        world.func_175688_a(EnumParticleTypes.FLAME, (pos.getX() + rnd.nextFloat()), (pos.getY() + 1), (pos.getZ() + rnd.nextFloat()), 0.0D, 0.0D, 0.0D, new int[0]); 
+        world.spawnParticle(EnumParticleTypes.FLAME, (pos.getX() + rnd.nextFloat()), (pos.getY() + 1), (pos.getZ() + rnd.nextFloat()), 0.0D, 0.0D, 0.0D, new int[0]); 
     } 
   }
   
@@ -330,36 +330,36 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
       IBlockState state = world.getBlockState(coord);
       Block block = state.getBlock();
       if (block.isAir(state, (IBlockAccess)world, coord)) {
-        world.func_175656_a(coord, Blocks.field_150480_ab.getDefaultState());
-      } else if (state.func_185887_b(world, coord) >= 0.0F && world
+        world.setBlockState(coord, Blocks.FIRE.getDefaultState());
+      } else if (state.getBlockHardness(world, coord) >= 0.0F && world
         .getTileEntity(coord) == null) {
         Material mat = state.getMaterial();
-        if (mat == Material.field_151576_e || mat == Material.field_151573_f || mat == Material.field_151587_i || mat == Material.field_151578_c || mat == Material.field_151571_B) {
-          world.func_175656_a(coord, Blocks.field_150356_k.getDefaultState());
+        if (mat == Material.ROCK || mat == Material.IRON || mat == Material.LAVA || mat == Material.GROUND || mat == Material.CLAY) {
+          world.setBlockState(coord, Blocks.FLOWING_LAVA.getDefaultState());
         } else {
-          world.func_175656_a(coord, Blocks.field_150480_ab.getDefaultState());
+          world.setBlockState(coord, Blocks.FIRE.getDefaultState());
         } 
       } 
     } 
     if (power >= 0.7F) {
-      List<EntityLivingBase> nearByEntities = world.func_72872_a(EntityLivingBase.class, new AxisAlignedBB((this.pos.getX() - 3), (this.pos.getY() - 3), (this.pos.getZ() - 3), (this.pos
+      List<EntityLivingBase> nearByEntities = world.getEntitiesWithinAABB(EntityLivingBase.class, new AxisAlignedBB((this.pos.getX() - 3), (this.pos.getY() - 3), (this.pos.getZ() - 3), (this.pos
             .getX() + 4), (this.pos.getY() + 4), (this.pos.getZ() + 4)));
       for (EntityLivingBase entity : nearByEntities)
-        entity.func_70097_a((DamageSource)IC2DamageSource.radiation, (int)(world.rand.nextInt(4) * this.hem)); 
+        entity.attackEntityFrom((DamageSource)IC2DamageSource.radiation, (int)(world.rand.nextInt(4) * this.hem)); 
     } 
     if (power >= 0.5F && world.rand.nextFloat() <= this.hem) {
       BlockPos coord = getRandCoord(2);
       IBlockState state = world.getBlockState(coord);
       if (state.getMaterial() == Material.WATER)
-        world.func_175698_g(coord); 
+        world.setBlockToAir(coord); 
     } 
     if (power >= 0.4F && world.rand.nextFloat() <= this.hem) {
       BlockPos coord = getRandCoord(2);
       if (world.getTileEntity(coord) == null) {
         IBlockState state = world.getBlockState(coord);
         Material mat = state.getMaterial();
-        if (mat == Material.field_151575_d || mat == Material.field_151584_j || mat == Material.field_151580_n)
-          world.func_175656_a(coord, Blocks.field_150480_ab.getDefaultState()); 
+        if (mat == Material.WOOD || mat == Material.LEAVES || mat == Material.CLOTH)
+          world.setBlockState(coord, Blocks.FIRE.getDefaultState()); 
       } 
     } 
     return false;
@@ -540,9 +540,9 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
     for (EnumFacing dir : EnumFacing.VALUES) {
       TileEntity target = world.getTileEntity(this.pos.offset(dir));
       if (target instanceof TileEntityReactorChamberElectric)
-        world.func_175698_g(target.getPos()); 
+        world.setBlockToAir(target.getPos()); 
     } 
-    world.func_175698_g(this.pos);
+    world.setBlockToAir(this.pos);
     ExplosionIC2 explosion = new ExplosionIC2(world, null, this.pos, boomPower, 0.01F, ExplosionIC2.Type.Nuclear);
     explosion.doExplosion();
   }
@@ -741,7 +741,7 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
     return (FluidTank)this.outputTank;
   }
   
-  public int func_70297_j_() {
+  public int getInventoryStackLimit() {
     return 1;
   }
   

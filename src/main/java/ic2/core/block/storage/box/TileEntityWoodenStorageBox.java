@@ -9,6 +9,6 @@ public class TileEntityWoodenStorageBox extends TileEntityStorageBox {
   }
   
   protected SoundType getBlockSound(Entity entity) {
-    return SoundType.field_185848_a;
+    return SoundType.WOOD;
   }
 }

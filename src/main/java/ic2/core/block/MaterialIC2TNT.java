@@ -7,12 +7,12 @@ public class MaterialIC2TNT extends Material {
   public static Material instance = new MaterialIC2TNT();
   
   public MaterialIC2TNT() {
-    super(MapColor.field_151656_f);
-    func_85158_p();
-    func_76226_g();
+    super(MapColor.TNT);
+    setAdventureModeExempt();
+    setBurning();
   }
   
-  public boolean func_76218_k() {
+  public boolean isOpaque() {
     return false;
   }
 }

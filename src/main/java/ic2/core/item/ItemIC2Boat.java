@@ -26,7 +26,7 @@ public class ItemIC2Boat extends ItemMulti<ItemIC2Boat.BoatType> {
     super(ItemName.boat, BoatType.class);
   }
   
-  public ActionResult<ItemStack> func_77659_a(World world, EntityPlayer player, EnumHand hand) {
+  public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
     ItemStack stack = StackUtil.get(player, hand);
     EntityIC2Boat boat = makeBoat(stack, world, player);
     if (boat == null)
@@ -34,20 +34,20 @@ public class ItemIC2Boat extends ItemMulti<ItemIC2Boat.BoatType> {
     Vector3 lookVec = Util.getLookScaled((Entity)player);
     Vector3 start = Util.getEyePosition((Entity)player);
     Vec3d startMc = start.toVec3();
-    RayTraceResult hitPos = world.func_72901_a(startMc, start.add(lookVec).toVec3(), true);
+    RayTraceResult hitPos = world.rayTraceBlocks(startMc, start.add(lookVec).toVec3(), true);
     if (hitPos == null)
       return new ActionResult(EnumActionResult.PASS, stack); 
     boolean inEntity = false;
     float border = 1.0F;
-    List<Entity> list = world.func_72839_b((Entity)player, player
-        .func_174813_aQ()
-        .func_72321_a(lookVec.x, lookVec.y, lookVec.z)
-        .func_186662_g(border));
+    List<Entity> list = world.getEntitiesWithinAABBExcludingEntity((Entity)player, player
+        .getEntityBoundingBox()
+        .expand(lookVec.x, lookVec.y, lookVec.z)
+        .grow(border));
     for (Entity entity : list) {
-      if (entity.func_70067_L()) {
-        border = entity.func_70111_Y();
-        AxisAlignedBB aabb = entity.func_174813_aQ().func_186662_g(border);
-        if (aabb.func_72318_a(startMc)) {
+      if (entity.canBeCollidedWith()) {
+        border = entity.getCollisionBorderSize();
+        AxisAlignedBB aabb = entity.getEntityBoundingBox().grow(border);
+        if (aabb.contains(startMc)) {
           inEntity = true;
           break;
         } 
@@ -57,15 +57,15 @@ public class ItemIC2Boat extends ItemMulti<ItemIC2Boat.BoatType> {
       return new ActionResult(EnumActionResult.PASS, stack); 
     if (hitPos.typeOfHit == RayTraceResult.Type.BLOCK) {
       BlockPos pos = hitPos.getBlockPos();
-      if (world.getBlockState(pos).getBlock() == Blocks.field_150431_aC)
-        pos = pos.func_177977_b(); 
+      if (world.getBlockState(pos).getBlock() == Blocks.SNOW_LAYER)
+        pos = pos.down(); 
       boat.setPosition(pos.getX() + 0.5D, (pos.getY() + 1), pos.getZ() + 0.5D);
-      boat.rotationYaw = (((MathHelper.func_76128_c((player.rotationYaw * 4.0F / 360.0F) + 0.5D) & 0x3) - 1) * 90);
-      if (!world.func_184144_a((Entity)boat, boat.func_70046_E().func_72321_a(-0.1D, -0.1D, -0.1D)).isEmpty())
+      boat.rotationYaw = (((MathHelper.floor((player.rotationYaw * 4.0F / 360.0F) + 0.5D) & 0x3) - 1) * 90);
+      if (!world.getCollisionBoxes((Entity)boat, boat.getCollisionBoundingBox().expand(-0.1D, -0.1D, -0.1D)).isEmpty())
         return new ActionResult(EnumActionResult.PASS, stack); 
       if (!world.isRemote)
         world.spawnEntity((Entity)boat); 
-      if (!player.field_71075_bZ.field_75098_d)
+      if (!player.capabilities.isCreativeMode)
         stack = StackUtil.decSize(stack); 
     } 
     return new ActionResult(EnumActionResult.SUCCESS, stack);
@@ -94,7 +94,7 @@ public class ItemIC2Boat extends ItemMulti<ItemIC2Boat.BoatType> {
     assert hasCustomEntity(stack);
     assert !world.isRemote;
     EntityItem item = new FireproofItem(world, location.posX, location.posY, location.posZ, stack);
-    item.func_174869_p();
+    item.setDefaultPickupDelay();
     item.motionX = location.motionX;
     item.motionY = location.motionY;
     item.motionZ = location.motionZ;
@@ -116,28 +116,28 @@ public class ItemIC2Boat extends ItemMulti<ItemIC2Boat.BoatType> {
   public static class FireproofItem extends EntityItem {
     public FireproofItem(World world, double x, double y, double z, ItemStack stack) {
       super(world, x, y, z, stack);
-      this.field_70178_ae = true;
+      this.isImmuneToFire = true;
     }
     
     public FireproofItem(World world, double x, double y, double z) {
       super(world, x, y, z);
-      this.field_70178_ae = true;
+      this.isImmuneToFire = true;
     }
     
     public FireproofItem(World world) {
       super(world);
-      this.field_70178_ae = true;
+      this.isImmuneToFire = true;
     }
     
     public void onUpdate() {
       super.onUpdate();
-      func_70066_B();
+      extinguish();
     }
     
-    protected void func_70081_e(int amount) {}
+    protected void dealFireDamage(int amount) {}
     
-    public void func_70015_d(int seconds) {
-      func_70066_B();
+    public void setFire(int seconds) {
+      extinguish();
     }
   }
 }

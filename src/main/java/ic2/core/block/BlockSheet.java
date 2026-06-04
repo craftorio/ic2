@@ -31,30 +31,30 @@ public class BlockSheet extends BlockMultiID<BlockSheet.SheetType> {
   }
   
   public BlockSheet() {
-    super(BlockName.sheet, Material.field_151594_q, (Class)ItemBlockSheet.class);
+    super(BlockName.sheet, Material.CIRCUITS, (Class)ItemBlockSheet.class);
   }
   
-  public boolean func_149686_d(IBlockState state) {
+  public boolean isFullCube(IBlockState state) {
     return false;
   }
   
-  public boolean func_149662_c(IBlockState state) {
+  public boolean isOpaqueCube(IBlockState state) {
     return false;
   }
   
-  public AxisAlignedBB func_185496_a(IBlockState state, IBlockAccess source, BlockPos pos) {
+  public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
     return aabb;
   }
   
-  public void func_185477_a(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
+  public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
     if (getType(state) == SheetType.wool && 
-      entityIn instanceof EntityPlayer && (entityIn.func_70093_af() || entityIn.posY < pos.getY() + aabb.field_72337_e - entityIn.field_70138_W))
+      entityIn instanceof EntityPlayer && (entityIn.isSneaking() || entityIn.posY < pos.getY() + aabb.maxY - entityIn.stepHeight))
       return; 
-    super.func_185477_a(state, worldIn, pos, entityBox, collidingBoxes, entityIn, isActualState);
+    super.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn, isActualState);
   }
   
-  public AxisAlignedBB func_180646_a(IBlockState state, IBlockAccess world, BlockPos pos) {
-    AxisAlignedBB aabb = super.func_180646_a(state, world, pos);
+  public AxisAlignedBB getCollisionBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
+    AxisAlignedBB aabb = super.getCollisionBoundingBox(state, world, pos);
     switch (getType(state)) {
       case resin:
         return null;
@@ -63,7 +63,7 @@ public class BlockSheet extends BlockMultiID<BlockSheet.SheetType> {
   }
   
   public boolean canReplace(World world, BlockPos pos, EnumFacing side, ItemStack stack) {
-    return isValidPosition(world, pos, func_176203_a(stack.getItemDamage()));
+    return isValidPosition(world, pos, getStateFromMeta(stack.getItemDamage()));
   }
   
   private boolean isValidPosition(World world, BlockPos pos, IBlockState state) {
@@ -71,7 +71,7 @@ public class BlockSheet extends BlockMultiID<BlockSheet.SheetType> {
       case resin:
         return isNormalCubeBelow(world, pos);
       case rubber:
-        for (EnumFacing facing : EnumFacing.field_176754_o) {
+        for (EnumFacing facing : EnumFacing.HORIZONTALS) {
           state = world.getBlockState(pos.offset(facing));
           if (state == BlockName.sheet.getBlockState(SheetType.rubber) || state
             .getBlock().isNormalCube(state, (IBlockAccess)world, pos))
@@ -85,35 +85,35 @@ public class BlockSheet extends BlockMultiID<BlockSheet.SheetType> {
   }
   
   private boolean isNormalCubeBelow(World world, BlockPos pos) {
-    pos = pos.func_177977_b();
+    pos = pos.down();
     IBlockState state = world.getBlockState(pos);
     return state.getBlock().isNormalCube(state, (IBlockAccess)world, pos);
   }
   
-  public void func_189540_a(IBlockState state, World world, BlockPos pos, Block neighborBlock, BlockPos neighborPos) {
+  public void neighborChanged(IBlockState state, World world, BlockPos pos, Block neighborBlock, BlockPos neighborPos) {
     if (!isValidPosition(world, pos, state)) {
-      world.func_175698_g(pos);
-      func_176226_b(world, pos, state, 0);
+      world.setBlockToAir(pos);
+      dropBlockAsItem(world, pos, state, 0);
     } 
   }
   
-  public void func_180634_a(World world, BlockPos pos, IBlockState state, Entity entity) {
+  public void onEntityCollidedWithBlock(World world, BlockPos pos, IBlockState state, Entity entity) {
     switch (getType(state)) {
       case resin:
-        entity.field_70143_R = (float)(entity.field_70143_R * 0.75D);
+        entity.fallDistance = (float)(entity.fallDistance * 0.75D);
         entity.motionX *= 0.6D;
         entity.motionY *= 0.85D;
         entity.motionZ *= 0.6D;
         break;
       case rubber:
-        if (world.func_175677_d(pos.func_177977_b(), false))
+        if (world.isBlockNormalCube(pos.down(), false))
           return; 
         if (entity instanceof net.minecraft.entity.EntityLivingBase && !canSupportWeight(world, pos)) {
-          world.func_175698_g(pos);
+          world.setBlockToAir(pos);
           return;
         } 
         if (entity.motionY <= -0.4D) {
-          entity.field_70143_R = 0.0F;
+          entity.fallDistance = 0.0F;
           entity.motionX *= 1.1D;
           entity.motionZ *= 1.1D;
           if (entity instanceof net.minecraft.entity.EntityLivingBase) {
@@ -121,7 +121,7 @@ public class BlockSheet extends BlockMultiID<BlockSheet.SheetType> {
               entity.motionY *= -1.3D;
               break;
             } 
-            if (entity instanceof EntityPlayer && ((EntityPlayer)entity).func_70093_af()) {
+            if (entity instanceof EntityPlayer && ((EntityPlayer)entity).isSneaking()) {
               entity.motionY *= -0.1D;
               break;
             } 
@@ -132,7 +132,7 @@ public class BlockSheet extends BlockMultiID<BlockSheet.SheetType> {
         } 
         break;
       case wool:
-        entity.field_70143_R = (float)(entity.field_70143_R * 0.95D);
+        entity.fallDistance = (float)(entity.fallDistance * 0.95D);
         break;
     } 
   }

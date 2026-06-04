@@ -18,20 +18,20 @@ public class SlotInvSlot extends Slot {
     this.index = index;
   }
   
-  public boolean func_75214_a(ItemStack stack) {
+  public boolean isItemValid(ItemStack stack) {
     return this.invSlot.accepts(stack);
   }
   
-  public ItemStack func_75211_c() {
+  public ItemStack getStack() {
     return this.invSlot.get(this.index);
   }
   
-  public void func_75215_d(ItemStack stack) {
+  public void putStack(ItemStack stack) {
     this.invSlot.put(this.index, stack);
-    func_75218_e();
+    onSlotChanged();
   }
   
-  public ItemStack func_75209_a(int amount) {
+  public ItemStack decrStackSize(int amount) {
     ItemStack ret;
     if (amount <= 0)
       return StackUtil.emptyStack; 
@@ -46,11 +46,11 @@ public class SlotInvSlot extends Slot {
       ret = StackUtil.copyWithSize(stack, amount);
       this.invSlot.put(this.index, StackUtil.decSize(stack, amount));
     } 
-    func_75218_e();
+    onSlotChanged();
     return ret;
   }
   
-  public boolean func_75217_a(IInventory inventory, int index) {
+  public boolean isHere(IInventory inventory, int index) {
     if (inventory != this.invSlot.base)
       return false; 
     int baseIndex = this.invSlot.base.getBaseIndex(this.invSlot);
@@ -59,12 +59,12 @@ public class SlotInvSlot extends Slot {
     return (baseIndex + this.index == index);
   }
   
-  public int func_75219_a() {
+  public int getSlotStackLimit() {
     return this.invSlot.getStackSizeLimit();
   }
   
-  public ItemStack func_190901_a(EntityPlayer player, ItemStack stack) {
-    stack = super.func_190901_a(player, stack);
+  public ItemStack onTake(EntityPlayer player, ItemStack stack) {
+    stack = super.onTake(player, stack);
     this.invSlot.onPickupFromSlot(player, stack);
     return stack;
   }

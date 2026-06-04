@@ -24,7 +24,7 @@ public final class Vector3 {
   }
   
   public Vector3(Vec3d v) {
-    this(v.field_72450_a, v.field_72448_b, v.field_72449_c);
+    this(v.x, v.y, v.z);
   }
   
   public Vector3 copy() {
@@ -47,7 +47,7 @@ public final class Vector3 {
   }
   
   public Vector3 set(Vec3d v) {
-    return set(v.field_72450_a, v.field_72448_b, v.field_72449_c);
+    return set(v.x, v.y, v.z);
   }
   
   public Vector3 add(double vx, double vy, double vz) {
@@ -127,7 +127,7 @@ public final class Vector3 {
   }
   
   public double distanceSquared(Vec3d v) {
-    return distanceSquared(v.field_72450_a, v.field_72448_b, v.field_72449_c);
+    return distanceSquared(v.x, v.y, v.z);
   }
   
   public double distance(double vx, double vy, double vz) {
@@ -139,7 +139,7 @@ public final class Vector3 {
   }
   
   public double distance(Vec3d v) {
-    return distance(v.field_72450_a, v.field_72448_b, v.field_72449_c);
+    return distance(v.x, v.y, v.z);
   }
   
   public Vector3 scale(double factor) {

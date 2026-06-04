@@ -69,12 +69,12 @@ public class LiquidUtil {
       IFluidBlock fblock = (IFluidBlock)block;
       liquid = fblock.getFluid();
       isSource = fblock.canDrain(world, pos);
-    } else if (block == Blocks.WATER || block == Blocks.field_150358_i) {
+    } else if (block == Blocks.WATER || block == Blocks.FLOWING_WATER) {
       liquid = FluidRegistry.WATER;
-      isSource = (((Integer)state.func_177229_b((IProperty)BlockLiquid.field_176367_b)).intValue() == 0);
-    } else if (block == Blocks.field_150353_l || block == Blocks.field_150356_k) {
+      isSource = (((Integer)state.getValue((IProperty)BlockLiquid.LEVEL)).intValue() == 0);
+    } else if (block == Blocks.LAVA || block == Blocks.FLOWING_LAVA) {
       liquid = FluidRegistry.LAVA;
-      isSource = (((Integer)state.func_177229_b((IProperty)BlockLiquid.field_176367_b)).intValue() == 0);
+      isSource = (((Integer)state.getValue((IProperty)BlockLiquid.LEVEL)).intValue() == 0);
     } 
     if (liquid != null)
       return new LiquidData(liquid, isSource); 
@@ -401,15 +401,15 @@ public class LiquidUtil {
       IFluidBlock liquid = (IFluidBlock)block;
       if (liquid.canDrain(world, pos))
         return liquid.drain(world, pos, !simulate); 
-    } else if (block instanceof BlockLiquid && ((Integer)state.func_177229_b((IProperty)BlockLiquid.field_176367_b)).intValue() == 0) {
+    } else if (block instanceof BlockLiquid && ((Integer)state.getValue((IProperty)BlockLiquid.LEVEL)).intValue() == 0) {
       FluidStack fluid = null;
-      if (block == Blocks.WATER || block == Blocks.field_150358_i) {
+      if (block == Blocks.WATER || block == Blocks.FLOWING_WATER) {
         fluid = new FluidStack(FluidRegistry.WATER, 1000);
-      } else if (block == Blocks.field_150353_l || block == Blocks.field_150356_k) {
+      } else if (block == Blocks.LAVA || block == Blocks.FLOWING_LAVA) {
         fluid = new FluidStack(FluidRegistry.LAVA, 1000);
       } 
       if (fluid != null && !simulate)
-        world.func_175698_g(pos); 
+        world.setBlockToAir(pos); 
       return fluid;
     } 
     return null;
@@ -435,31 +435,31 @@ public class LiquidUtil {
       return false; 
     IBlockState state = world.getBlockState(pos);
     Block block = state.getBlock();
-    if (!block.isAir(state, (IBlockAccess)world, pos) && state.getMaterial().func_76220_a())
+    if (!block.isAir(state, (IBlockAccess)world, pos) && state.getMaterial().isSolid())
       return false; 
     if (block == fluid.getBlock() && isFullFluidBlock(world, pos, block, state))
       return false; 
     if (simulate)
       return true; 
     Block fluidBlock;
-    if (world.provider.func_177500_n() && (
+    if (world.provider.doesWaterVaporize() && (
       fluidBlock = fluid.getBlock()) != null && fluidBlock
       .getDefaultState().getMaterial() == Material.WATER) {
-      world.func_184133_a(null, pos, SoundEvents.field_187646_bt, SoundCategory.BLOCKS, 0.5F, 2.6F + (world.rand
+      world.playSound(null, pos, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.5F, 2.6F + (world.rand
           .nextFloat() - world.rand.nextFloat()) * 0.8F);
       for (int i = 0; i < 8; i++)
-        world.func_175688_a(EnumParticleTypes.SMOKE_LARGE, pos.getX() + Math.random(), pos.getY() + Math.random(), pos.getZ() + Math.random(), 0.0D, 0.0D, 0.0D, new int[0]); 
+        world.spawnParticle(EnumParticleTypes.SMOKE_LARGE, pos.getX() + Math.random(), pos.getY() + Math.random(), pos.getZ() + Math.random(), 0.0D, 0.0D, 0.0D, new int[0]); 
     } else {
-      if (!world.isRemote && !state.getMaterial().func_76220_a() && !state.getMaterial().func_76224_d())
-        world.func_175655_b(pos, true); 
+      if (!world.isRemote && !state.getMaterial().isSolid() && !state.getMaterial().isLiquid())
+        world.destroyBlock(pos, true); 
       if (fluid == FluidRegistry.WATER) {
-        BlockDynamicLiquid blockDynamicLiquid = Blocks.field_150358_i;
+        BlockDynamicLiquid blockDynamicLiquid = Blocks.FLOWING_WATER;
       } else if (fluid == FluidRegistry.LAVA) {
-        BlockDynamicLiquid blockDynamicLiquid = Blocks.field_150356_k;
+        BlockDynamicLiquid blockDynamicLiquid = Blocks.FLOWING_LAVA;
       } else {
         block = fluid.getBlock();
       } 
-      if (!world.func_175656_a(pos, block.getDefaultState()))
+      if (!world.setBlockState(pos, block.getDefaultState()))
         return false; 
     } 
     fs.amount -= 1000;
@@ -472,8 +472,8 @@ public class LiquidUtil {
       FluidStack drained = fBlock.drain(world, pos, false);
       return (drained != null && drained.amount >= 1000);
     } 
-    if (state.func_177228_b().containsKey(BlockLiquid.field_176367_b))
-      return (((Integer)state.func_177229_b((IProperty)BlockLiquid.field_176367_b)).intValue() == 0); 
+    if (state.getProperties().containsKey(BlockLiquid.LEVEL))
+      return (((Integer)state.getValue((IProperty)BlockLiquid.LEVEL)).intValue() == 0); 
     return false;
   }
   

@@ -18,13 +18,13 @@ public class RecipeInputFactory implements IRecipeInputFactory {
   }
   
   public IRecipeInput forExactStack(ItemStack stack) {
-    if (stack.func_77960_j() == 32767)
+    if (stack.getMetadata() == 32767)
       return forStack(stack); 
     return new RecipeInputItemStackExact(stack);
   }
   
   public IRecipeInput forExactStack(ItemStack stack, int amount) {
-    if (stack.func_77960_j() == 32767)
+    if (stack.getMetadata() == 32767)
       return forStack(stack, amount); 
     return new RecipeInputItemStackExact(stack, amount);
   }

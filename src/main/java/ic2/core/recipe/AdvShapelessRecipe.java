@@ -66,12 +66,12 @@ public class AdvShapelessRecipe implements IRecipe {
     this.output = result;
   }
   
-  public boolean func_77569_a(InventoryCrafting inventorycrafting, World world) {
-    return (func_77572_b(inventorycrafting) != StackUtil.emptyStack);
+  public boolean matches(InventoryCrafting inventorycrafting, World world) {
+    return (getCraftingResult(inventorycrafting) != StackUtil.emptyStack);
   }
   
-  public ItemStack func_77572_b(InventoryCrafting inventorycrafting) {
-    int offerSize = inventorycrafting.func_70302_i_();
+  public ItemStack getCraftingResult(InventoryCrafting inventorycrafting) {
+    int offerSize = inventorycrafting.getSizeInventory();
     if (offerSize < this.input.length)
       return StackUtil.emptyStack; 
     List<IRecipeInput> unmatched = new Vector<>();
@@ -79,7 +79,7 @@ public class AdvShapelessRecipe implements IRecipe {
       unmatched.add(o); 
     double outputCharge = 0.0D;
     for (int i = 0; i < offerSize; i++) {
-      ItemStack offer = inventorycrafting.func_70301_a(i);
+      ItemStack offer = inventorycrafting.getStackInSlot(i);
       if (!StackUtil.isEmpty(offer)) {
         int j = 0;
         while (true) {
@@ -103,7 +103,7 @@ public class AdvShapelessRecipe implements IRecipe {
     return ret;
   }
   
-  public ItemStack func_77571_b() {
+  public ItemStack getRecipeOutput() {
     return this.output;
   }
   
@@ -111,8 +111,8 @@ public class AdvShapelessRecipe implements IRecipe {
     return AdvRecipe.canShow((Object[])this.input, this.output, this.hidden);
   }
   
-  public NonNullList<ItemStack> func_179532_b(InventoryCrafting inv) {
-    return this.consuming ? NonNullList.func_191197_a(inv.func_70302_i_(), StackUtil.emptyStack) : ForgeHooks.defaultRecipeGetRemainingItems(inv);
+  public NonNullList<ItemStack> getRemainingItems(InventoryCrafting inv) {
+    return this.consuming ? NonNullList.withSize(inv.getSizeInventory(), StackUtil.emptyStack) : ForgeHooks.defaultRecipeGetRemainingItems(inv);
   }
   
   public IRecipe setRegistryName(ResourceLocation name) {
@@ -128,19 +128,19 @@ public class AdvShapelessRecipe implements IRecipe {
     return IRecipe.class;
   }
   
-  public boolean func_194133_a(int x, int y) {
+  public boolean canFit(int x, int y) {
     return (x * y >= this.input.length);
   }
   
-  public NonNullList<Ingredient> func_192400_c() {
-    NonNullList<Ingredient> list = NonNullList.func_191196_a();
+  public NonNullList<Ingredient> getIngredients() {
+    NonNullList<Ingredient> list = NonNullList.create();
     if (!this.hidden)
       for (IRecipeInput input : this.input)
         list.add(input.getIngredient());  
     return list;
   }
   
-  public boolean func_192399_d() {
+  public boolean isDynamic() {
     return this.hidden;
   }
 }

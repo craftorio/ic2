@@ -19,7 +19,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ItemCrystalMemory extends ItemIC2 {
   public ItemCrystalMemory() {
     super(ItemName.crystal_memory);
-    func_77625_d(1);
+    setMaxStackSize(1);
   }
   
   public boolean isRepairable() {
@@ -27,10 +27,10 @@ public class ItemCrystalMemory extends ItemIC2 {
   }
   
   @SideOnly(Side.CLIENT)
-  public void func_77624_a(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
+  public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
     ItemStack recorded = readItemStack(stack);
     if (!StackUtil.isEmpty(recorded)) {
-      tooltip.add(Localization.translate("ic2.item.CrystalMemory.tooltip.Item") + " " + recorded.func_82833_r());
+      tooltip.add(Localization.translate("ic2.item.CrystalMemory.tooltip.Item") + " " + recorded.getDisplayName());
       tooltip.add(Localization.translate("ic2.item.CrystalMemory.tooltip.UU-Matter") + " " + Util.toSiString(UuIndex.instance.getInBuckets(recorded), 4) + "B");
     } else {
       tooltip.add(Localization.translate("ic2.item.CrystalMemory.tooltip.Empty"));

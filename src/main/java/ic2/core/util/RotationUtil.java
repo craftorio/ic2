@@ -9,9 +9,9 @@ import net.minecraft.util.math.Vec3d;
 public class RotationUtil {
   public static EnumFacing rotateByRay(RayTraceResult ray) {
     assert ray.typeOfHit == RayTraceResult.Type.BLOCK;
-    Vec3d hit = ray.field_72307_f;
+    Vec3d hit = ray.hitVec;
     BlockPos pos = ray.getBlockPos();
-    return rotateByHit(ray.field_178784_b, (float)hit.field_72450_a - pos.getX(), (float)hit.field_72448_b - pos.getY(), (float)hit.field_72449_c - pos.getZ());
+    return rotateByHit(ray.sideHit, (float)hit.x - pos.getX(), (float)hit.y - pos.getY(), (float)hit.z - pos.getZ());
   }
   
   public static EnumFacing rotateByHit(EnumFacing facingHit, float hitX, float hitY, float hitZ) {

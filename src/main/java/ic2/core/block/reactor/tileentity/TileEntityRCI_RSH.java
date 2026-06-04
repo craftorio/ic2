@@ -8,6 +8,6 @@ import net.minecraft.item.ItemStack;
 @NotClassic
 public class TileEntityRCI_RSH extends TileEntityAbstractRCI {
   public TileEntityRCI_RSH() {
-    super(ItemName.rsh_condensator.getItemStack(), new ItemStack(Blocks.field_150451_bX));
+    super(ItemName.rsh_condensator.getItemStack(), new ItemStack(Blocks.REDSTONE_BLOCK));
   }
 }

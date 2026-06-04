@@ -15,23 +15,23 @@ import net.minecraft.nbt.NBTTagCompound;
 
 public class SmeltingRecipeManager implements IMachineRecipeManager<ItemStack, ItemStack, ItemStack> {
   public boolean addRecipe(ItemStack input, ItemStack output, NBTTagCompound metadata, boolean replace) {
-    FurnaceRecipes recipes = FurnaceRecipes.func_77602_a();
-    if (!StackUtil.isEmpty(recipes.func_151395_a(input)) && !replace)
+    FurnaceRecipes recipes = FurnaceRecipes.instance();
+    if (!StackUtil.isEmpty(recipes.getSmeltingResult(input)) && !replace)
       return false; 
-    float experience = (metadata != null && metadata.func_74764_b("experience")) ? metadata.func_74760_g("experience") : 0.0F;
+    float experience = (metadata != null && metadata.hasKey("experience")) ? metadata.getFloat("experience") : 0.0F;
     if (experience < 0.0F)
       throw new IllegalArgumentException("Negative xp for " + StackUtil.toStringSafe(input) + " -> " + StackUtil.toStringSafe(output)); 
-    recipes.func_151394_a(input, output, experience);
+    recipes.addSmeltingRecipe(input, output, experience);
     return true;
   }
   
   public MachineRecipeResult<ItemStack, ItemStack, ItemStack> apply(ItemStack input, boolean acceptTest) {
-    FurnaceRecipes recipes = FurnaceRecipes.func_77602_a();
-    ItemStack output = recipes.func_151395_a(input);
+    FurnaceRecipes recipes = FurnaceRecipes.instance();
+    ItemStack output = recipes.getSmeltingResult(input);
     if (StackUtil.isEmpty(output))
       return null; 
     NBTTagCompound nbt = new NBTTagCompound();
-    nbt.func_74776_a("experience", recipes.func_151398_b(output) * StackUtil.getSize(output));
+    nbt.setFloat("experience", recipes.getSmeltingExperience(output) * StackUtil.getSize(output));
     return (new MachineRecipe(input, output, nbt)).getResult(StackUtil.copyShrunk(input, 1));
   }
   

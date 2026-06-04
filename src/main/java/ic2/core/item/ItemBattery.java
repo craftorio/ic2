@@ -21,13 +21,13 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ItemBattery extends BaseElectricItem {
   public ItemBattery(ItemName name, double maxCharge, double transferLimit, int tier) {
     super(name, maxCharge, transferLimit, tier);
-    func_77625_d(16);
+    setMaxStackSize(16);
   }
   
   @SideOnly(Side.CLIENT)
   public void registerModels(final ItemName name) {
     ModelLoader.setCustomMeshDefinition(this, new ItemMeshDefinition() {
-          public ModelResourceLocation func_178113_a(ItemStack stack) {
+          public ModelResourceLocation getModelLocation(ItemStack stack) {
             int level, damage = stack.getItemDamage();
             int maxDamage = stack.getMaxDamage() - 1;
             if (maxDamage > 0) {
@@ -47,14 +47,14 @@ public class ItemBattery extends BaseElectricItem {
     return true;
   }
   
-  public ActionResult<ItemStack> func_77659_a(World world, EntityPlayer player, EnumHand hand) {
+  public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
     ItemStack stack = StackUtil.get(player, hand);
     if (world.isRemote || StackUtil.getSize(stack) != 1)
       return new ActionResult(EnumActionResult.PASS, stack); 
     if (ElectricItem.manager.getCharge(stack) > 0.0D) {
       boolean transferred = false;
       for (int i = 0; i < 9; i++) {
-        ItemStack target = (ItemStack)player.inventory.field_70462_a.get(i);
+        ItemStack target = (ItemStack)player.inventory.mainInventory.get(i);
         if (target != null && target != stack)
           if (ElectricItem.manager.discharge(target, Double.POSITIVE_INFINITY, 2147483647, true, true, true) <= 0.0D) {
             double transfer = ElectricItem.manager.discharge(stack, 2.0D * this.transferLimit, 2147483647, true, true, true);
@@ -68,7 +68,7 @@ public class ItemBattery extends BaseElectricItem {
           }  
       } 
       if (transferred && !world.isRemote)
-        player.field_71070_bA.func_75142_b(); 
+        player.openContainer.detectAndSendChanges(); 
     } 
     return new ActionResult(EnumActionResult.SUCCESS, stack);
   }

@@ -62,7 +62,7 @@ public class TileEntityIronFurnace extends TileEntityInventory implements IHasGu
     super.writeToNBT(nbt);
     nbt.setInteger("fuel", this.fuel);
     nbt.setInteger("totalFuel", this.totalFuel);
-    nbt.func_74777_a("progress", this.progress);
+    nbt.setShort("progress", this.progress);
     nbt.setDouble("xp", this.xp);
     return nbt;
   }
@@ -102,7 +102,7 @@ public class TileEntityIronFurnace extends TileEntityInventory implements IHasGu
       World world = getWorld();
       showFlames(world, this.pos, getFacing());
       if (world.rand.nextDouble() < 0.1D)
-        world.func_184134_a(this.pos.getX() + 0.5D, this.pos.getY(), this.pos.getZ() + 0.5D, SoundEvents.field_187652_bv, SoundCategory.BLOCKS, 1.0F, 1.0F, false); 
+        world.playSound(this.pos.getX() + 0.5D, this.pos.getY(), this.pos.getZ() + 0.5D, SoundEvents.BLOCK_FURNACE_FIRE_CRACKLE, SoundCategory.BLOCKS, 1.0F, 1.0F, false); 
     } 
   }
   
@@ -120,8 +120,8 @@ public class TileEntityIronFurnace extends TileEntityInventory implements IHasGu
     } else {
       x += world.rand.nextFloat() * 0.625D - 0.3125D;
     } 
-    world.func_175688_a(EnumParticleTypes.SMOKE_NORMAL, x, y, z, 0.0D, 0.0D, 0.0D, new int[0]);
-    world.func_175688_a(EnumParticleTypes.FLAME, x, y, z, 0.0D, 0.0D, 0.0D, new int[0]);
+    world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, x, y, z, 0.0D, 0.0D, 0.0D, new int[0]);
+    world.spawnParticle(EnumParticleTypes.FLAME, x, y, z, 0.0D, 0.0D, 0.0D, new int[0]);
   }
   
   public static double spawnXP(EntityPlayer player, double xp) {
@@ -130,7 +130,7 @@ public class TileEntityIronFurnace extends TileEntityInventory implements IHasGu
     while (balls > 0L) {
       int amount;
       if (balls < 2477L) {
-        amount = EntityXPOrb.func_70527_a((int)balls);
+        amount = EntityXPOrb.getXPSplit((int)balls);
       } else {
         amount = 2477;
       } 
@@ -145,7 +145,7 @@ public class TileEntityIronFurnace extends TileEntityInventory implements IHasGu
     ItemStack output = (ItemStack)result.getOutput();
     this.outputSlot.add(output);
     this.inputSlot.consume(result);
-    this.xp += result.getRecipe().getMetaData().func_74760_g("experience");
+    this.xp += result.getRecipe().getMetaData().getFloat("experience");
   }
   
   private boolean canOperate() {

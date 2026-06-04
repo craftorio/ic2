@@ -38,7 +38,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 public class GuiParser {
   public static GuiNode parse(ITeBlock teBlock) {
-    ResourceLocation loc = new ResourceLocation(teBlock.getIdentifier().func_110624_b(), "guidef/" + teBlock.getName() + ".xml");
+    ResourceLocation loc = new ResourceLocation(teBlock.getIdentifier().getResourceDomain(), "guidef/" + teBlock.getName() + ".xml");
     try {
       return parse(loc, teBlock.getTeClass());
     } catch (Exception e) {
@@ -47,7 +47,7 @@ public class GuiParser {
   }
   
   public static GuiNode parse(ResourceLocation location, Class<?> baseClass) throws IOException, SAXException {
-    String fileLoc = "/assets/" + location.func_110624_b() + '/' + location.func_110623_a();
+    String fileLoc = "/assets/" + location.getResourceDomain() + '/' + location.getResourcePath();
     InputStream is = GuiParser.class.getResourceAsStream(fileLoc);
     if (is == null)
       throw new FileNotFoundException("Could not load " + fileLoc + " from the classpath."); 
@@ -345,7 +345,7 @@ public class GuiParser {
     }
     
     protected boolean isKeyDown() {
-      return GuiScreen.func_146272_n();
+      return GuiScreen.isShiftKeyDown();
     }
   }
   
@@ -355,7 +355,7 @@ public class GuiParser {
     }
     
     protected boolean isKeyDown() {
-      return GuiScreen.func_146271_m();
+      return GuiScreen.isCtrlKeyDown();
     }
   }
   
@@ -365,7 +365,7 @@ public class GuiParser {
     }
     
     protected boolean isKeyDown() {
-      return GuiScreen.func_175283_s();
+      return GuiScreen.isAltKeyDown();
     }
   }
   

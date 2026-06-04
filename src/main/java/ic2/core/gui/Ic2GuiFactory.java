@@ -84,11 +84,11 @@ public class Ic2GuiFactory implements IModGuiFactory {
       } 
     }
     
-    public void func_146281_b() {
+    public void onGuiClosed() {
       for (IConfigElement config : this.configElements)
         saveConfig(config); 
       MainConfig.save();
-      super.func_146281_b();
+      super.onGuiClosed();
     }
     
     private void saveConfig(IConfigElement config) {
@@ -162,7 +162,7 @@ public class Ic2GuiFactory implements IModGuiFactory {
     public static class ItemEntry extends GuiEditArrayEntries.StringEntry {
       private static final Field ENABLED = ReflectionUtil.getField(GuiEditArray.class, boolean.class);
       
-      private static final Method TOOLTIP = ReflectionUtil.getMethod(GuiScreen.class, new String[] { "func_146285_a", "renderToolTip", "a" }, new Class[] { ItemStack.class, int.class, int.class });
+      private static final Method TOOLTIP = ReflectionUtil.getMethod(GuiScreen.class, new String[] { "renderToolTip", "renderToolTip", "a" }, new Class[] { ItemStack.class, int.class, int.class });
       
       protected ItemStack stack;
       
@@ -208,16 +208,16 @@ public class Ic2GuiFactory implements IModGuiFactory {
           updateStack(); 
       }
       
-      public void func_192634_a(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected, float partial) {
+      public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected, float partial) {
         if (this.isValidValue)
           this.isValidated = false; 
-        super.func_192634_a(slotIndex, x, y, listWidth, slotHeight, mouseX, mouseY, isSelected, partial);
+        super.drawEntry(slotIndex, x, y, listWidth, slotHeight, mouseX, mouseY, isSelected, partial);
         this.isValidated = true;
         assert getValue() != null;
         if (this.isValidValue) {
-          RenderHelper.func_74520_c();
-          this.owningEntryList.getMC().func_175599_af().func_175042_a(this.stack, this.stackX = listWidth / 4 - 16 - 1, this.stackY = y + slotHeight / 2 - 8);
-          RenderHelper.func_74518_a();
+          RenderHelper.enableGUIStandardItemLighting();
+          this.owningEntryList.getMC().getRenderItem().renderItemIntoGUI(this.stack, this.stackX = listWidth / 4 - 16 - 1, this.stackY = y + slotHeight / 2 - 8);
+          RenderHelper.disableStandardItemLighting();
         } 
       }
       
@@ -249,9 +249,9 @@ public class Ic2GuiFactory implements IModGuiFactory {
           this.childScreen = buildChildScreen();
         }
         
-        public boolean func_148278_a(int index, int x, int y, int mouseEvent, int relativeX, int relativeY) {
+        public boolean mousePressed(int index, int x, int y, int mouseEvent, int relativeX, int relativeY) {
           this.index = index;
-          return super.func_148278_a(index, x, y, mouseEvent, relativeX, relativeY);
+          return super.mousePressed(index, x, y, mouseEvent, relativeX, relativeY);
         }
         
         protected GuiScreen buildChildScreen() {
@@ -290,14 +290,14 @@ public class Ic2GuiFactory implements IModGuiFactory {
         
         public UUEntry(GuiEditArray owningScreen, GuiEditArrayEntries owningEntryList, IConfigElement configElement, Object value) {
           super(owningScreen, owningEntryList, configElement, value);
-          int totalSpace = this.textFieldValue.field_146218_h;
+          int totalSpace = this.textFieldValue.width;
           int textSpace = Math.round((totalSpace * 3) / 4.0F);
           int numSpace = totalSpace - textSpace;
-          this.textFieldValue.field_146218_h = textSpace - 1;
-          this.uuValue = new GuiTextField(1, (owningEntryList.getMC()).field_71466_p, this.textFieldValue.field_146209_f + textSpace, 0, numSpace, 16);
-          this.uuValue.func_146203_f(25);
-          this.uuValue.func_146180_a(value.toString());
-          this.uuValue.func_175205_a(new Predicate<String>() {
+          this.textFieldValue.width = textSpace - 1;
+          this.uuValue = new GuiTextField(1, (owningEntryList.getMC()).fontRenderer, this.textFieldValue.x + textSpace, 0, numSpace, 16);
+          this.uuValue.setMaxStringLength(25);
+          this.uuValue.setText(value.toString());
+          this.uuValue.setValidator(new Predicate<String>() {
                 public boolean apply(String input) {
                   try {
                     return (Double.parseDouble(input) >= 0.0D);
@@ -309,11 +309,11 @@ public class Ic2GuiFactory implements IModGuiFactory {
           String val = value.toString();
           int split = val.lastIndexOf(':');
           if (split > -1) {
-            this.textFieldValue.func_146180_a(val.substring(0, split));
-            this.uuValue.func_146180_a(val.substring(split + 1));
+            this.textFieldValue.setText(val.substring(0, split));
+            this.uuValue.setText(val.substring(split + 1));
           } else {
-            assert this.textFieldValue.func_146179_b().isEmpty() : "Expected empty textFieldValue but found: " + this.textFieldValue.func_146179_b();
-            assert this.uuValue.func_146179_b().isEmpty() : "Expected empty uuValue but found: " + this.uuValue.func_146179_b();
+            assert this.textFieldValue.getText().isEmpty() : "Expected empty textFieldValue but found: " + this.textFieldValue.getText();
+            assert this.uuValue.getText().isEmpty() : "Expected empty uuValue but found: " + this.uuValue.getText();
           } 
           assert configElement.getValidationPattern() != null;
           updateState();
@@ -326,24 +326,24 @@ public class Ic2GuiFactory implements IModGuiFactory {
           } else {
             this.hasValidStack = false;
           } 
-          this.isValidValue &= !this.uuValue.func_146179_b().trim().isEmpty() ? 1 : 0;
+          this.isValidValue &= !this.uuValue.getText().trim().isEmpty() ? 1 : 0;
         }
         
-        public void func_192634_a(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected, float partial) {
+        public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected, float partial) {
           boolean previous = this.isValidValue;
           this.isValidValue = this.hasValidStack;
-          super.func_192634_a(slotIndex, x, y, listWidth, slotHeight, mouseX, mouseY, isSelected, partial);
+          super.drawEntry(slotIndex, x, y, listWidth, slotHeight, mouseX, mouseY, isSelected, partial);
           this.isValidValue = previous;
-          this.uuValue.func_146189_e((slotIndex != this.owningEntryList.listEntries.size() - 1));
-          this.uuValue.field_146210_g = y + 1;
-          this.uuValue.func_146194_f();
+          this.uuValue.setVisible((slotIndex != this.owningEntryList.listEntries.size() - 1));
+          this.uuValue.y = y + 1;
+          this.uuValue.drawTextBox();
         }
         
         public void keyTyped(char eventChar, int eventKey) {
           boolean enabled = isEnabled();
           if (enabled || eventKey == 203 || eventKey == 205 || eventKey == 199 || eventKey == 207) {
-            this.textFieldValue.func_146201_a(enabled ? eventChar : Character.MIN_VALUE, eventKey);
-            this.uuValue.func_146201_a(enabled ? eventChar : Character.MIN_VALUE, eventKey);
+            this.textFieldValue.textboxKeyTyped(enabled ? eventChar : Character.MIN_VALUE, eventKey);
+            this.uuValue.textboxKeyTyped(enabled ? eventChar : Character.MIN_VALUE, eventKey);
             if (enabled)
               updateState(); 
           } 
@@ -351,16 +351,16 @@ public class Ic2GuiFactory implements IModGuiFactory {
         
         public void updateCursorCounter() {
           super.updateCursorCounter();
-          this.uuValue.func_146178_a();
+          this.uuValue.updateCursorCounter();
         }
         
         public void mouseClicked(int x, int y, int mouseEvent) {
           super.mouseClicked(x, y, mouseEvent);
-          this.uuValue.func_146192_a(x, y, mouseEvent);
+          this.uuValue.mouseClicked(x, y, mouseEvent);
         }
         
         public String getValue() {
-          return getStack() + ':' + this.uuValue.func_146179_b().trim();
+          return getStack() + ':' + this.uuValue.getText().trim();
         }
         
         protected String getStack() {

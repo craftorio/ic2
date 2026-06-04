@@ -50,8 +50,8 @@ public final class ChunkLoaderLogic implements ForgeChunkManager.LoadingCallback
       worldTickets.add(ticket);
       NBTTagList list = ticket.getModData().getTagList("loadedChunks", 4);
       for (int i = 0; i < list.tagCount(); i++) {
-        NBTTagLong value = (NBTTagLong)list.func_179238_g(i);
-        ForgeChunkManager.forceChunk(ticket, deserialize(value.func_150291_c()));
+        NBTTagLong value = (NBTTagLong)list.get(i);
+        ForgeChunkManager.forceChunk(ticket, deserialize(value.getLong()));
       } 
       ChunkPos mainChunk = getChunkCoords(getPosFromTicket(ticket));
       if (!ticket.getChunkList().contains(mainChunk))
@@ -94,7 +94,7 @@ public final class ChunkLoaderLogic implements ForgeChunkManager.LoadingCallback
     if (!ticket.getModData().hasKey("loadedChunks", 9))
       ticket.getModData().setTag("loadedChunks", (NBTBase)list); 
     ticket.getModData().setTag("loadedChunks", (NBTBase)list);
-    list.appendTag((NBTBase)new NBTTagLong(chunk.field_77276_a & 0xFFFFFFFFL | (chunk.field_77275_b & 0xFFFFFFFFL) << 32L));
+    list.appendTag((NBTBase)new NBTTagLong(chunk.x & 0xFFFFFFFFL | (chunk.z & 0xFFFFFFFFL) << 32L));
   }
   
   public void removeChunkFromTicket(ForgeChunkManager.Ticket ticket, ChunkPos chunk) {
@@ -104,9 +104,9 @@ public final class ChunkLoaderLogic implements ForgeChunkManager.LoadingCallback
     NBTTagList list = ticket.getModData().getTagList("loadedChunks", 4);
     long serializedChunk = serialize(chunk);
     for (int i = 0; i < list.tagCount(); i++) {
-      NBTTagLong pos = (NBTTagLong)list.func_179238_g(i);
-      if (pos.func_150291_c() == serializedChunk)
-        list.func_74744_a(i--); 
+      NBTTagLong pos = (NBTTagLong)list.get(i);
+      if (pos.getLong() == serializedChunk)
+        list.removeTag(i--); 
     } 
   }
   
@@ -132,7 +132,7 @@ public final class ChunkLoaderLogic implements ForgeChunkManager.LoadingCallback
   }
   
   public static long serialize(ChunkPos chunk) {
-    return chunk.field_77276_a & 0xFFFFFFFFL | (chunk.field_77275_b & 0xFFFFFFFFL) << 32L;
+    return chunk.x & 0xFFFFFFFFL | (chunk.z & 0xFFFFFFFFL) << 32L;
   }
   
   public static ChunkPos deserialize(long value) {

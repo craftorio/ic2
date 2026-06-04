@@ -30,14 +30,14 @@ public class BlockFoam extends BlockMultiID<BlockFoam.FoamType> {
   }
   
   private BlockFoam() {
-    super(BlockName.foam, Material.field_151580_n);
-    func_149675_a(true);
-    func_149711_c(0.01F);
-    func_149752_b(10.0F);
-    func_149672_a(SoundType.field_185854_g);
+    super(BlockName.foam, Material.CLOTH);
+    setTickRandomly(true);
+    setHardness(0.01F);
+    setResistance(10.0F);
+    setSoundType(SoundType.CLOTH);
   }
   
-  public boolean func_149662_c(IBlockState state) {
+  public boolean isOpaqueCube(IBlockState state) {
     return false;
   }
   
@@ -46,7 +46,7 @@ public class BlockFoam extends BlockMultiID<BlockFoam.FoamType> {
   }
   
   @Nullable
-  public AxisAlignedBB func_180646_a(IBlockState blockState, IBlockAccess world, BlockPos pos) {
+  public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess world, BlockPos pos) {
     return null;
   }
   
@@ -54,36 +54,36 @@ public class BlockFoam extends BlockMultiID<BlockFoam.FoamType> {
     return false;
   }
   
-  public void func_180645_a(World world, BlockPos pos, IBlockState state, Random random) {
-    int tickSpeed = world.func_82736_K().func_180263_c("randomTickSpeed");
+  public void randomTick(World world, BlockPos pos, IBlockState state, Random random) {
+    int tickSpeed = world.getGameRules().getInt("randomTickSpeed");
     if (tickSpeed <= 0)
       throw new IllegalStateException("Foam was randomly ticked when world " + world + " isn't ticking?"); 
-    FoamType type = (FoamType)state.func_177229_b((IProperty)this.typeProperty);
+    FoamType type = (FoamType)state.getValue((IProperty)this.typeProperty);
     float chance = getHardenChance(world, pos, state, type) * 4096.0F / tickSpeed;
     if (random.nextFloat() < chance)
-      world.func_175656_a(pos, ((FoamType)state.func_177229_b((IProperty)this.typeProperty)).getResult()); 
+      world.setBlockState(pos, ((FoamType)state.getValue((IProperty)this.typeProperty)).getResult()); 
   }
   
   public static float getHardenChance(World world, BlockPos pos, IBlockState state, FoamType type) {
-    int light = world.func_175671_l(pos);
-    if (!state.func_185916_f() && state
+    int light = world.getLightFromNeighbors(pos);
+    if (!state.useNeighborBrightness() && state
       .getBlock().getLightOpacity(state, (IBlockAccess)world, pos) == 0)
       for (EnumFacing side : EnumFacing.VALUES)
-        light = Math.max(light, world.func_175721_c(pos.offset(side), false));  
+        light = Math.max(light, world.getLight(pos.offset(side), false));  
     int avgTime = type.hardenTime * (16 - light);
     return 1.0F / (avgTime * 20);
   }
   
-  public boolean func_180639_a(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+  public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
     if (StackUtil.consume(player, hand, StackUtil.sameItem((Block)Blocks.SAND), 1)) {
-      world.func_175656_a(pos, ((FoamType)state.func_177229_b((IProperty)this.typeProperty)).getResult());
+      world.setBlockState(pos, ((FoamType)state.getValue((IProperty)this.typeProperty)).getResult());
       return true;
     } 
     return false;
   }
   
   public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
-    return ((FoamType)state.func_177229_b((IProperty)this.typeProperty)).getDrops();
+    return ((FoamType)state.getValue((IProperty)this.typeProperty)).getDrops();
   }
   
   public boolean canCreatureSpawn(IBlockState state, IBlockAccess world, BlockPos pos, EntityLiving.SpawnPlacementType type) {

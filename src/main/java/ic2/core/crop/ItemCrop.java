@@ -27,26 +27,26 @@ public class ItemCrop extends ItemIC2 implements IBoxable {
     super(ItemName.crop_stick);
   }
   
-  public EnumActionResult func_180614_a(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-    if (!world.getBlockState(pos).getBlock().func_176200_f((IBlockAccess)world, pos))
+  public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+    if (!world.getBlockState(pos).getBlock().isReplaceable((IBlockAccess)world, pos))
       pos = pos.offset(side); 
     ItemStack cropStickStack = StackUtil.get(player, hand);
     if (StackUtil.isEmpty(cropStickStack))
       return EnumActionResult.PASS; 
-    if (world.getBlockState(pos.func_177977_b()).getBlock() != Blocks.FARMLAND)
+    if (world.getBlockState(pos.down()).getBlock() != Blocks.FARMLAND)
       return EnumActionResult.PASS; 
-    if (!player.func_175151_a(pos, side, cropStickStack))
+    if (!player.canPlayerEdit(pos, side, cropStickStack))
       return EnumActionResult.PASS; 
-    if (!world.func_190527_a(BlockName.te.getInstance(), pos, true, side, (Entity)player))
+    if (!world.mayPlace(BlockName.te.getInstance(), pos, true, side, (Entity)player))
       return EnumActionResult.PASS; 
     TileEntityBlock tile = TileEntityBlock.instantiate(TeBlock.crop.getTeClass());
     if (ItemBlockTileEntity.placeTeBlock(cropStickStack, (EntityLivingBase)player, world, pos, side, tile)) {
-      SoundType stepSound = SoundType.field_185850_c;
-      world.func_184148_a(null, pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, stepSound
-          .func_185841_e(), SoundCategory.BLOCKS, (stepSound
+      SoundType stepSound = SoundType.PLANT;
+      world.playSound(null, pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, stepSound
+          .getPlaceSound(), SoundCategory.BLOCKS, (stepSound
           
-          .func_185843_a() + 1.0F) / 2.0F, stepSound
-          .func_185847_b() * 0.8F);
+          .getVolume() + 1.0F) / 2.0F, stepSound
+          .getPitch() * 0.8F);
       StackUtil.consumeOrError(player, hand, 1);
       return EnumActionResult.SUCCESS;
     } 

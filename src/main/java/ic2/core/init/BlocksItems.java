@@ -171,7 +171,7 @@ public class BlocksItems {
     TeBlock.reactor_chamber.setPlaceHandler(ItemHandlers.reactorChamberPlace);
     TeBlockRegistry.buildBlocks();
     ItemBlockTileEntity itemTeBlock = TeBlockRegistry.get(TeBlock.itnt.getIdentifier()).getItem();
-    BlockDispenser.field_149943_a.func_82595_a(itemTeBlock, new BehaviorTeBlockDispense());
+    BlockDispenser.DISPENSE_BEHAVIOR_REGISTRY.putObject(itemTeBlock, new BehaviorTeBlockDispense());
     BlockOre.create();
     BlockName.resource.getInstance().setHarvestLevel("pickaxe", 1, BlockName.resource.getBlockState((IIdProvider)ResourceBlock.copper_ore));
     BlockName.resource.getInstance().setHarvestLevel("pickaxe", 1, BlockName.resource.getBlockState((IIdProvider)ResourceBlock.lead_ore));
@@ -195,7 +195,7 @@ public class BlocksItems {
   }
   
   private static void initFluids() {
-    MaterialLiquid materialLiquid = new MaterialLiquid(MapColor.field_151680_x);
+    MaterialLiquid materialLiquid = new MaterialLiquid(MapColor.SILVER);
     registerIC2fluid(FluidName.uu_matter, Material.WATER, 3867955, 3000, 3000, 0, 300, false);
     registerIC2fluid(FluidName.construction_foam, Material.WATER, 2105376, 10000, 50000, 0, 300, false);
     registerIC2fluid(FluidName.coolant, Material.WATER, 1333866, 1000, 3000, 0, 300, false);
@@ -264,13 +264,13 @@ public class BlocksItems {
     miscResource.setRarity((Enum)MiscResourceType.iridium_shard, EnumRarity.UNCOMMON);
     miscResource.setUseHandler((Enum)MiscResourceType.resin, ItemHandlers.resinUse);
     miscResource.setUseHandler((Enum)MiscResourceType.water_sheet, ItemHandlers.getFluidPlacer((Block)Blocks.WATER));
-    miscResource.setUseHandler((Enum)MiscResourceType.lava_sheet, ItemHandlers.getFluidPlacer((Block)Blocks.field_150353_l));
+    miscResource.setUseHandler((Enum)MiscResourceType.lava_sheet, ItemHandlers.getFluidPlacer((Block)Blocks.LAVA));
     ItemMulti<CraftingItemType> crafting = ItemMulti.create(ItemName.crafting, CraftingItemType.class);
     crafting.setRarity((Enum)CraftingItemType.advanced_circuit, EnumRarity.UNCOMMON);
     crafting.setRarity((Enum)CraftingItemType.iridium, EnumRarity.RARE);
     crafting.setRightClickHandler((Enum)CraftingItemType.cf_powder, ItemHandlers.cfPowderApply);
     crafting.setRightClickHandler((Enum)CraftingItemType.scrap_box, ItemHandlers.scrapBoxUnpack);
-    BlockDispenser.field_149943_a.func_82595_a(crafting, new BehaviorScrapboxDispense());
+    BlockDispenser.DISPENSE_BEHAVIOR_REGISTRY.putObject(crafting, new BehaviorScrapboxDispense());
     new BlockCuttingBlade();
     new UpgradeKit();
     new ItemCrop();
@@ -395,7 +395,7 @@ public class BlocksItems {
     if (!fluid.canBePlacedInWorld()) {
       BlockIC2Fluid blockIC2Fluid = new BlockIC2Fluid(name, fluid, material, color);
       fluid.setBlock((Block)blockIC2Fluid);
-      fluid.setUnlocalizedName(blockIC2Fluid.func_149739_a().substring(4));
+      fluid.setUnlocalizedName(blockIC2Fluid.getUnlocalizedName().substring(4));
     } else {
       Block block = fluid.getBlock();
     } 

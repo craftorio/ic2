@@ -30,7 +30,7 @@ public class ItemWindRotor extends ItemGradualInt implements IKineticRotor {
   
   public ItemWindRotor(ItemName name, int Radius, int durability, float efficiency, int minWindStrength, int maxWindStrength, ResourceLocation RenderTexture) {
     super(name, durability);
-    func_77625_d(1);
+    setMaxStackSize(1);
     this.radius = Radius;
     this.efficiency = efficiency;
     this.renderTexture = RenderTexture;
@@ -40,12 +40,12 @@ public class ItemWindRotor extends ItemGradualInt implements IKineticRotor {
   }
   
   @SideOnly(Side.CLIENT)
-  public void func_77624_a(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
+  public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
     tooltip.add(Localization.translate("ic2.itemrotor.wind.info", new Object[] { Integer.valueOf(this.minWindStrength), Integer.valueOf(this.maxWindStrength) }));
     IKineticRotor.GearboxType type = null;
-    if ((Minecraft.getMinecraft()).field_71462_r instanceof ic2.core.block.kineticgenerator.gui.GuiWaterKineticGenerator) {
+    if ((Minecraft.getMinecraft()).currentScreen instanceof ic2.core.block.kineticgenerator.gui.GuiWaterKineticGenerator) {
       type = IKineticRotor.GearboxType.WATER;
-    } else if ((Minecraft.getMinecraft()).field_71462_r instanceof ic2.core.block.kineticgenerator.gui.GuiWindKineticGenerator) {
+    } else if ((Minecraft.getMinecraft()).currentScreen instanceof ic2.core.block.kineticgenerator.gui.GuiWindKineticGenerator) {
       type = IKineticRotor.GearboxType.WIND;
     } 
     if (type != null)

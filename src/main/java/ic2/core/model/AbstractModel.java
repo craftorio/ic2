@@ -34,31 +34,31 @@ public abstract class AbstractModel implements IReloadableModel, IBakedModel {
     return (IModelState)TRSRTransformation.identity();
   }
   
-  public List<BakedQuad> func_188616_a(IBlockState state, EnumFacing side, long rand) {
+  public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
     throw new UnsupportedOperationException();
   }
   
-  public boolean func_177555_b() {
+  public boolean isAmbientOcclusion() {
     return true;
   }
   
-  public boolean func_177556_c() {
+  public boolean isGui3d() {
     return false;
   }
   
-  public boolean func_188618_c() {
+  public boolean isBuiltInRenderer() {
     return false;
   }
   
-  public TextureAtlasSprite func_177554_e() {
-    return Minecraft.getMinecraft().func_147117_R().func_174944_f();
+  public TextureAtlasSprite getParticleTexture() {
+    return Minecraft.getMinecraft().getTextureMapBlocks().getMissingSprite();
   }
   
-  public ItemCameraTransforms func_177552_f() {
-    return ItemCameraTransforms.field_178357_a;
+  public ItemCameraTransforms getItemCameraTransforms() {
+    return ItemCameraTransforms.DEFAULT;
   }
   
-  public ItemOverrideList func_188617_f() {
-    return ItemOverrideList.field_188022_a;
+  public ItemOverrideList getOverrides() {
+    return ItemOverrideList.NONE;
   }
 }

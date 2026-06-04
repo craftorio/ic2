@@ -27,13 +27,13 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockIC2Door extends BlockDoor implements IBlockModelProvider {
   public BlockIC2Door() {
-    super(Material.field_151573_f);
-    func_149711_c(50.0F);
-    func_149752_b(150.0F);
-    func_149672_a(SoundType.field_185852_e);
-    func_149649_H();
-    func_149663_c(BlockName.reinforced_door.name());
-    func_149647_a((CreativeTabs)IC2.tabIC2);
+    super(Material.IRON);
+    setHardness(50.0F);
+    setResistance(150.0F);
+    setSoundType(SoundType.METAL);
+    disableStats();
+    setUnlocalizedName(BlockName.reinforced_door.name());
+    setCreativeTab((CreativeTabs)IC2.tabIC2);
     ResourceLocation name = IC2.getIdentifier(BlockName.reinforced_door.name());
     BlocksItems.registerBlock((Block)this, name);
     BlocksItems.registerItem((Item)new ItemIC2Door((Block)this), name);
@@ -42,28 +42,28 @@ public class BlockIC2Door extends BlockDoor implements IBlockModelProvider {
   
   @SideOnly(Side.CLIENT)
   public void registerModels(BlockName name) {
-    StateMap stateMap = (new StateMap.Builder()).func_178442_a(new IProperty[] { (IProperty)field_176522_N }).func_178441_a();
+    StateMap stateMap = (new StateMap.Builder()).ignore(new IProperty[] { (IProperty)POWERED }).build();
     ModelLoader.setCustomStateMapper((Block)this, (IStateMapper)stateMap);
     BlockBase.registerDefaultVanillaItemModel((Block)this, null);
   }
   
-  public String func_149739_a() {
-    return "ic2." + super.func_149739_a().substring(5);
+  public String getUnlocalizedName() {
+    return "ic2." + super.getUnlocalizedName().substring(5);
   }
   
-  public boolean func_176198_a(World world, BlockPos pos, EnumFacing side) {
+  public boolean canPlaceBlockOnSide(World world, BlockPos pos, EnumFacing side) {
     if (side != EnumFacing.UP)
       return false; 
-    return super.func_176198_a(world, pos, side);
+    return super.canPlaceBlockOnSide(world, pos, side);
   }
   
-  public Item func_180660_a(IBlockState state, Random rand, int fortune) {
-    if (state.func_177229_b((IProperty)field_176523_O) == BlockDoor.EnumDoorHalf.UPPER)
+  public Item getItemDropped(IBlockState state, Random rand, int fortune) {
+    if (state.getValue((IProperty)HALF) == BlockDoor.EnumDoorHalf.UPPER)
       return null; 
     return Item.getItemFromBlock((Block)this);
   }
   
-  public ItemStack func_185473_a(World world, BlockPos pos, IBlockState state) {
+  public ItemStack getItem(World world, BlockPos pos, IBlockState state) {
     return new ItemStack(Item.getItemFromBlock((Block)this));
   }
 }

@@ -24,8 +24,8 @@ public class RecipeInputItemStack extends RecipeInputBase implements IRecipeInpu
   
   public boolean matches(ItemStack subject) {
     return (subject.getItem() == this.input.getItem() && (subject
-      .func_77960_j() == this.input.func_77960_j() || this.input.func_77960_j() == 32767) && (this.input
-      .func_77960_j() == 32767 || StackUtil.matchesNBT(subject.func_77978_p(), this.input.func_77978_p())));
+      .getMetadata() == this.input.getMetadata() || this.input.getMetadata() == 32767) && (this.input
+      .getMetadata() == 32767 || StackUtil.matchesNBT(subject.getTagCompound(), this.input.getTagCompound())));
   }
   
   public int getAmount() {

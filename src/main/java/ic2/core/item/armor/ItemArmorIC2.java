@@ -39,10 +39,10 @@ public class ItemArmorIC2 extends ItemArmor implements IItemModelProvider, IMeta
     super(armorMaterial, -1, armorType);
     this.repairMaterial = repairMaterial;
     this.armorName = armorName;
-    func_77656_e(armorMaterial.func_78046_a(armorType));
+    setMaxDamage(armorMaterial.getDurability(armorType));
     if (name != null)
-      func_77655_b(name.name()); 
-    func_77637_a((CreativeTabs)IC2.tabIC2);
+      setUnlocalizedName(name.name()); 
+    setCreativeTab((CreativeTabs)IC2.tabIC2);
     if (name != null) {
       BlocksItems.registerItem((Item)this, IC2.getIdentifier(name.name()));
       name.setInstance((Item)this);
@@ -55,7 +55,7 @@ public class ItemArmorIC2 extends ItemArmor implements IItemModelProvider, IMeta
   }
   
   public String getArmorTexture(ItemStack stack, Entity entity, EntityEquipmentSlot slot, String type) {
-    char suffix1 = (this.field_77881_a == EntityEquipmentSlot.LEGS) ? '2' : '1';
+    char suffix1 = (this.armorType == EntityEquipmentSlot.LEGS) ? '2' : '1';
     String suffix2 = (type != null && hasOverlayTexture()) ? "_overlay" : "";
     return "ic2:textures/armor/" + this.armorName + '_' + suffix1 + suffix2 + ".png";
   }
@@ -64,24 +64,24 @@ public class ItemArmorIC2 extends ItemArmor implements IItemModelProvider, IMeta
     return false;
   }
   
-  public String func_77658_a() {
-    return "ic2." + super.func_77658_a().substring(5);
+  public String getUnlocalizedName() {
+    return "ic2." + super.getUnlocalizedName().substring(5);
   }
   
-  public String func_77667_c(ItemStack stack) {
-    return func_77658_a();
+  public String getUnlocalizedName(ItemStack stack) {
+    return getUnlocalizedName();
   }
   
-  public String func_77657_g(ItemStack stack) {
-    return func_77667_c(stack);
+  public String getUnlocalizedNameInefficiently(ItemStack stack) {
+    return getUnlocalizedName(stack);
   }
   
-  public String func_77653_i(ItemStack stack) {
-    return Localization.translate(func_77667_c(stack));
+  public String getItemStackDisplayName(ItemStack stack) {
+    return Localization.translate(getUnlocalizedName(stack));
   }
   
-  protected boolean func_194125_a(CreativeTabs tab) {
-    return (isEnabled() && super.func_194125_a(tab));
+  protected boolean isInCreativeTab(CreativeTabs tab) {
+    return (isEnabled() && super.isInCreativeTab(tab));
   }
   
   protected boolean isEnabled() {
@@ -92,7 +92,7 @@ public class ItemArmorIC2 extends ItemArmor implements IItemModelProvider, IMeta
     return true;
   }
   
-  public boolean func_82789_a(ItemStack toRepair, ItemStack repair) {
+  public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
     return (repair != null && Util.matchesOD(repair, this.repairMaterial));
   }
   

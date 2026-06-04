@@ -47,35 +47,35 @@ public class BlockScaffold extends BlockMultiID<BlockScaffold.ScaffoldType> {
   }
   
   private BlockScaffold() {
-    super(BlockName.scaffold, Material.field_151575_d);
-    func_149675_a(true);
+    super(BlockName.scaffold, Material.WOOD);
+    setTickRandomly(true);
   }
   
   @SideOnly(Side.CLIENT)
-  public BlockRenderLayer func_180664_k() {
+  public BlockRenderLayer getBlockLayer() {
     return BlockRenderLayer.CUTOUT;
   }
   
-  public Material func_149688_o(IBlockState state) {
+  public Material getMaterial(IBlockState state) {
     ScaffoldType type = getType(state);
     if (type == null)
-      return super.func_149688_o(state); 
+      return super.getMaterial(state); 
     switch (type) {
       case wood:
       case reinforced_wood:
-        return Material.field_151575_d;
+        return Material.WOOD;
       case iron:
       case reinforced_iron:
-        return Material.field_151573_f;
+        return Material.IRON;
     } 
     throw new IllegalStateException("Invalid scaffold type: " + type);
   }
   
-  public boolean func_149662_c(IBlockState state) {
+  public boolean isOpaqueCube(IBlockState state) {
     return false;
   }
   
-  public boolean func_149721_r(IBlockState state) {
+  public boolean isNormalCube(IBlockState state) {
     return false;
   }
   
@@ -83,20 +83,20 @@ public class BlockScaffold extends BlockMultiID<BlockScaffold.ScaffoldType> {
     return true;
   }
   
-  public void func_180634_a(World world, BlockPos pos, IBlockState state, Entity rawEntity) {
+  public void onEntityCollidedWithBlock(World world, BlockPos pos, IBlockState state, Entity rawEntity) {
     if (rawEntity instanceof EntityLivingBase) {
       EntityLivingBase entity = (EntityLivingBase)rawEntity;
-      entity.field_70143_R = 0.0F;
+      entity.fallDistance = 0.0F;
       double limit = 0.15D;
       entity.motionX = Util.limit(entity.motionX, -limit, limit);
       entity.motionZ = Util.limit(entity.motionZ, -limit, limit);
-      if (entity.func_70093_af() && entity instanceof EntityPlayer) {
-        if (entity.func_70090_H()) {
+      if (entity.isSneaking() && entity instanceof EntityPlayer) {
+        if (entity.isInWater()) {
           entity.motionY = 0.02D;
         } else {
           entity.motionY = 0.08D;
         } 
-      } else if (entity.field_70123_F) {
+      } else if (entity.collidedHorizontally) {
         entity.motionY = 0.2D;
       } else {
         entity.motionY = Math.max(entity.motionY, -0.07D);
@@ -104,12 +104,12 @@ public class BlockScaffold extends BlockMultiID<BlockScaffold.ScaffoldType> {
     } 
   }
   
-  public AxisAlignedBB func_185496_a(IBlockState state, IBlockAccess world, BlockPos pos) {
+  public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
     return aabb;
   }
   
-  public AxisAlignedBB func_180640_a(IBlockState state, World worldIn, BlockPos pos) {
-    return field_185505_j.func_186670_a(pos);
+  public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World worldIn, BlockPos pos) {
+    return FULL_BLOCK_AABB.offset(pos);
   }
   
   public boolean isSideSolid(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
@@ -120,7 +120,7 @@ public class BlockScaffold extends BlockMultiID<BlockScaffold.ScaffoldType> {
     if (state.getBlock() != this)
       return Collections.emptyList(); 
     List<ItemStack> ret = new ArrayList<>();
-    ScaffoldType type = (ScaffoldType)state.func_177229_b((IProperty)this.typeProperty);
+    ScaffoldType type = (ScaffoldType)state.getValue((IProperty)this.typeProperty);
     switch (type) {
       case wood:
       case iron:
@@ -128,7 +128,7 @@ public class BlockScaffold extends BlockMultiID<BlockScaffold.ScaffoldType> {
         return ret;
       case reinforced_wood:
         ret.add(getItemStack(ScaffoldType.wood));
-        ret.add(new ItemStack(Items.field_151055_y, 2));
+        ret.add(new ItemStack(Items.STICK, 2));
         return ret;
       case reinforced_iron:
         ret.add(getItemStack(ScaffoldType.iron));
@@ -140,10 +140,10 @@ public class BlockScaffold extends BlockMultiID<BlockScaffold.ScaffoldType> {
   
   private static final IRecipeInput stickInput = Recipes.inputFactory.forOreDict("stickWood");
   
-  public boolean func_180639_a(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-    if (player.func_70093_af())
+  public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+    if (player.isSneaking())
       return false; 
-    ItemStack stack = player.func_184586_b(hand);
+    ItemStack stack = player.getHeldItem(hand);
     if (StackUtil.isEmpty(stack))
       return false; 
     ScaffoldType type = getType(state);
@@ -172,29 +172,29 @@ public class BlockScaffold extends BlockMultiID<BlockScaffold.ScaffoldType> {
       case wood:
         StackUtil.consumeOrError(player, hand, StackUtil.recipeInput(stickInput), 2);
         type = ScaffoldType.reinforced_wood;
-        world.func_175656_a(pos, state.func_177226_a((IProperty)this.typeProperty, type));
+        world.setBlockState(pos, state.withProperty((IProperty)this.typeProperty, type));
         return true;
       case iron:
         StackUtil.consumeOrError(player, hand, StackUtil.sameStack(BlockName.fence.getItemStack(BlockIC2Fence.IC2FenceType.iron)), 1);
         type = ScaffoldType.reinforced_iron;
-        world.func_175656_a(pos, state.func_177226_a((IProperty)this.typeProperty, type));
+        world.setBlockState(pos, state.withProperty((IProperty)this.typeProperty, type));
         return true;
     } 
     throw new IllegalStateException();
   }
   
-  public void func_180649_a(World world, BlockPos pos, EntityPlayer player) {
+  public void onBlockClicked(World world, BlockPos pos, EntityPlayer player) {
     EnumHand hand = EnumHand.MAIN_HAND;
-    ItemStack stack = player.func_184586_b(hand);
+    ItemStack stack = player.getHeldItem(hand);
     if (StackUtil.isEmpty(stack))
       return; 
     if (StackUtil.checkItemEquality(stack, Item.getItemFromBlock(this))) {
       while (world.getBlockState(pos).getBlock() == this)
         pos = pos.up(); 
-      if (func_176196_c(world, pos) && pos.getY() < IC2.getWorldHeight(world)) {
-        boolean isCreative = player.field_71075_bZ.field_75098_d;
+      if (canPlaceBlockAt(world, pos) && pos.getY() < IC2.getWorldHeight(world)) {
+        boolean isCreative = player.capabilities.isCreativeMode;
         ItemStack prev = isCreative ? StackUtil.copy(stack) : null;
-        stack.func_179546_a(player, world, pos.func_177977_b(), hand, EnumFacing.UP, 0.5F, 1.0F, 0.5F);
+        stack.onItemUse(player, world, pos.down(), hand, EnumFacing.UP, 0.5F, 1.0F, 0.5F);
         if (!isCreative) {
           StackUtil.clearEmpty(player, hand);
         } else {
@@ -204,22 +204,22 @@ public class BlockScaffold extends BlockMultiID<BlockScaffold.ScaffoldType> {
     } 
   }
   
-  public boolean func_176196_c(World world, BlockPos pos) {
-    return (super.func_176196_c(world, pos) && hasSupport((IBlockAccess)world, pos, ScaffoldType.wood));
+  public boolean canPlaceBlockAt(World world, BlockPos pos) {
+    return (super.canPlaceBlockAt(world, pos) && hasSupport((IBlockAccess)world, pos, ScaffoldType.wood));
   }
   
-  public void func_189540_a(IBlockState state, World world, BlockPos pos, Block neighborBlock, BlockPos neighborPos) {
+  public void neighborChanged(IBlockState state, World world, BlockPos pos, Block neighborBlock, BlockPos neighborPos) {
     checkSupport(world, pos);
   }
   
-  public void func_180645_a(World world, BlockPos pos, IBlockState state, Random random) {
+  public void randomTick(World world, BlockPos pos, IBlockState state, Random random) {
     if (random.nextInt(8) == 0)
       checkSupport(world, pos); 
   }
   
   private boolean isPillar(World world, BlockPos pos) {
-    for (; world.getBlockState(pos).getBlock() == this; pos = pos.func_177977_b());
-    return world.func_175677_d(pos, false);
+    for (; world.getBlockState(pos).getBlock() == this; pos = pos.down());
+    return world.isBlockNormalCube(pos, false);
   }
   
   public int getFireSpreadSpeed(IBlockAccess world, BlockPos pos, EnumFacing face) {
@@ -260,19 +260,19 @@ public class BlockScaffold extends BlockMultiID<BlockScaffold.ScaffoldType> {
     IBlockState state = world.getBlockState(start);
     if (state.getBlock() != this)
       return; 
-    Map<BlockPos, Support> results = calculateSupport((IBlockAccess)world, start, (ScaffoldType)state.func_177229_b((IProperty)this.typeProperty));
+    Map<BlockPos, Support> results = calculateSupport((IBlockAccess)world, start, (ScaffoldType)state.getValue((IProperty)this.typeProperty));
     boolean droppedAny = false;
     for (Support support : results.values()) {
       if (support.strength >= 0)
         continue; 
-      world.func_180501_a(support.pos, Blocks.AIR.getDefaultState(), 2);
-      func_176226_b(world, support.pos, getDefaultState().func_177226_a((IProperty)this.typeProperty, support.type), 0);
+      world.setBlockState(support.pos, Blocks.AIR.getDefaultState(), 2);
+      dropBlockAsItem(world, support.pos, getDefaultState().withProperty((IProperty)this.typeProperty, support.type), 0);
       droppedAny = true;
     } 
     if (droppedAny)
       for (Support support : results.values()) {
         if (support.strength < 0)
-          world.func_175722_b(support.pos, this, true); 
+          world.notifyNeighborsRespectDebug(support.pos, this, true); 
       }  
   }
   
@@ -290,7 +290,7 @@ public class BlockScaffold extends BlockMultiID<BlockScaffold.ScaffoldType> {
           IBlockState state = world.getBlockState(pos);
           Block block = state.getBlock();
           if (block == this) {
-            type = (ScaffoldType)state.func_177229_b((IProperty)this.typeProperty);
+            type = (ScaffoldType)state.getValue((IProperty)this.typeProperty);
             Support cSupport = new Support(pos, type, -1);
             results.put(pos, cSupport);
             queue.add(cSupport);
@@ -317,7 +317,7 @@ public class BlockScaffold extends BlockMultiID<BlockScaffold.ScaffoldType> {
         } 
         if (support.strength < strength) {
           support.strength = strength;
-          for (EnumFacing dir : EnumFacing.field_176754_o) {
+          for (EnumFacing dir : EnumFacing.HORIZONTALS) {
             BlockPos nPos = pos.offset(dir);
             Support nSupport = results.get(nPos);
             if (nSupport != null && nSupport.strength < strength) {
@@ -362,10 +362,10 @@ public class BlockScaffold extends BlockMultiID<BlockScaffold.ScaffoldType> {
   }
   
   public enum ScaffoldType implements IIdProvider, IExtBlockType, IBlockSound {
-    wood(2, 0.5F, 0.12F, SoundType.field_185848_a),
-    reinforced_wood(5, 0.6F, 0.24F, SoundType.field_185848_a),
-    iron(5, 0.8F, 6.0F, SoundType.field_185852_e),
-    reinforced_iron(12, 1.0F, 8.0F, SoundType.field_185852_e);
+    wood(2, 0.5F, 0.12F, SoundType.WOOD),
+    reinforced_wood(5, 0.6F, 0.24F, SoundType.WOOD),
+    iron(5, 0.8F, 6.0F, SoundType.METAL),
+    reinforced_iron(12, 1.0F, 8.0F, SoundType.METAL);
     
     public final int strength;
     

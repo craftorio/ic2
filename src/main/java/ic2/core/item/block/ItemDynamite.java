@@ -32,33 +32,33 @@ public class ItemDynamite extends ItemIC2 implements IBoxable {
   public ItemDynamite(ItemName name) {
     super(name);
     this.sticky = (name == ItemName.dynamite_sticky);
-    func_77625_d(16);
-    BlockDispenser.field_149943_a.func_82595_a(this, new BehaviorDynamiteDispense(this.sticky));
+    setMaxStackSize(16);
+    BlockDispenser.DISPENSE_BEHAVIOR_REGISTRY.putObject(this, new BehaviorDynamiteDispense(this.sticky));
   }
   
-  public int func_77647_b(int i) {
+  public int getMetadata(int i) {
     return i;
   }
   
-  public EnumActionResult func_180614_a(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float a, float b, float c) {
+  public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float a, float b, float c) {
     if (this.sticky)
       return EnumActionResult.PASS; 
     pos = pos.offset(side);
     IBlockState state = world.getBlockState(pos);
     Block dynamite = BlockName.dynamite.getInstance();
-    if (state.getBlock().isAir(state, (IBlockAccess)world, pos) && dynamite.func_176198_a(world, pos, side) && dynamite.func_176196_c(world, pos)) {
-      world.func_180501_a(pos, dynamite.getStateForPlacement(world, pos, side, a, b, c, 0, (EntityLivingBase)player, hand), 3);
+    if (state.getBlock().isAir(state, (IBlockAccess)world, pos) && dynamite.canPlaceBlockOnSide(world, pos, side) && dynamite.canPlaceBlockAt(world, pos)) {
+      world.setBlockState(pos, dynamite.getStateForPlacement(world, pos, side, a, b, c, 0, (EntityLivingBase)player, hand), 3);
       StackUtil.consumeOrError(player, hand, 1);
       return EnumActionResult.SUCCESS;
     } 
     return EnumActionResult.FAIL;
   }
   
-  public ActionResult<ItemStack> func_77659_a(World world, EntityPlayer player, EnumHand hand) {
+  public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
     ItemStack stack = StackUtil.get(player, hand);
-    if (!player.field_71075_bZ.field_75098_d)
+    if (!player.capabilities.isCreativeMode)
       stack = StackUtil.decSize(stack); 
-    world.func_184133_a(player, player.func_180425_c(), SoundEvents.field_187737_v, SoundCategory.PLAYERS, 0.5F, 0.4F / (field_77697_d.nextFloat() * 0.4F + 0.8F));
+    world.playSound(player, player.getPosition(), SoundEvents.ENTITY_ARROW_SHOOT, SoundCategory.PLAYERS, 0.5F, 0.4F / (itemRand.nextFloat() * 0.4F + 0.8F));
     if (IC2.platform.isSimulating())
       if (this.sticky) {
         world.spawnEntity((Entity)new EntityStickyDynamite(world, (EntityLivingBase)player));

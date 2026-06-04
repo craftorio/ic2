@@ -187,20 +187,20 @@ public class TextBox extends GuiElement<TextBox> {
       endX = this.x + this.width; 
     if (startX > this.x + this.width)
       startX = this.x + this.width; 
-    Tessellator tessellator = Tessellator.func_178181_a();
-    BufferBuilder vertexbuffer = tessellator.func_178180_c();
+    Tessellator tessellator = Tessellator.getInstance();
+    BufferBuilder vertexbuffer = tessellator.getBuffer();
     GlStateManager.color(0.0F, 0.0F, 255.0F, 255.0F);
-    GlStateManager.func_179090_x();
-    GlStateManager.func_179115_u();
-    GlStateManager.func_187422_a(GlStateManager.LogicOp.OR_REVERSE);
-    vertexbuffer.func_181668_a(7, DefaultVertexFormats.field_181705_e);
-    vertexbuffer.func_181662_b(startX, endY, 0.0D).func_181675_d();
-    vertexbuffer.func_181662_b(endX, endY, 0.0D).func_181675_d();
-    vertexbuffer.func_181662_b(endX, startY, 0.0D).func_181675_d();
-    vertexbuffer.func_181662_b(startX, startY, 0.0D).func_181675_d();
-    tessellator.func_78381_a();
-    GlStateManager.func_179134_v();
-    GlStateManager.func_179098_w();
+    GlStateManager.disableTexture2D();
+    GlStateManager.enableColorLogic();
+    GlStateManager.colorLogicOp(GlStateManager.LogicOp.OR_REVERSE);
+    vertexbuffer.begin(7, DefaultVertexFormats.POSITION);
+    vertexbuffer.pos(startX, endY, 0.0D).endVertex();
+    vertexbuffer.pos(endX, endY, 0.0D).endVertex();
+    vertexbuffer.pos(endX, startY, 0.0D).endVertex();
+    vertexbuffer.pos(startX, startY, 0.0D).endVertex();
+    tessellator.draw();
+    GlStateManager.disableColorLogic();
+    GlStateManager.enableTexture2D();
   }
   
   public boolean onMouseClick(int mouseX, int mouseY, MouseButton button, boolean onThis) {
@@ -218,22 +218,22 @@ public class TextBox extends GuiElement<TextBox> {
   public boolean onKeyTyped(char typedChar, int keyCode) {
     if (!this.focused)
       return super.onKeyTyped(typedChar, keyCode); 
-    if (GuiScreen.func_175278_g(keyCode)) {
+    if (GuiScreen.isKeyComboCtrlA(keyCode)) {
       setCursorPositionEnd();
       setSelectionPos(0);
-    } else if (GuiScreen.func_175280_f(keyCode)) {
-      GuiScreen.func_146275_d(getSelectedText());
-    } else if (GuiScreen.func_175279_e(keyCode)) {
+    } else if (GuiScreen.isKeyComboCtrlC(keyCode)) {
+      GuiScreen.setClipboardString(getSelectedText());
+    } else if (GuiScreen.isKeyComboCtrlV(keyCode)) {
       if (willDraw())
-        writeText(GuiScreen.func_146277_j()); 
-    } else if (GuiScreen.func_175277_d(keyCode)) {
-      GuiScreen.func_146275_d(getSelectedText());
+        writeText(GuiScreen.getClipboardString()); 
+    } else if (GuiScreen.isKeyComboCtrlX(keyCode)) {
+      GuiScreen.setClipboardString(getSelectedText());
       if (willDraw())
         writeText(""); 
     } else {
       switch (keyCode) {
         case 14:
-          if (GuiScreen.func_146271_m()) {
+          if (GuiScreen.isCtrlKeyDown()) {
             if (willDraw())
               deleteWords(-1); 
           } else if (willDraw()) {
@@ -241,47 +241,47 @@ public class TextBox extends GuiElement<TextBox> {
           } 
           return true;
         case 199:
-          if (GuiScreen.func_146272_n()) {
+          if (GuiScreen.isShiftKeyDown()) {
             setSelectionPos(0);
           } else {
             setCursorPositionStart();
           } 
           return true;
         case 203:
-          if (GuiScreen.func_146272_n()) {
-            if (GuiScreen.func_146271_m()) {
+          if (GuiScreen.isShiftKeyDown()) {
+            if (GuiScreen.isCtrlKeyDown()) {
               setSelectionPos(getNthWordFromPos(-1, this.selectionEnd));
             } else {
               setSelectionPos(this.selectionEnd - 1);
             } 
-          } else if (GuiScreen.func_146271_m()) {
+          } else if (GuiScreen.isCtrlKeyDown()) {
             setCursorPosition(getNthWordFromCursor(-1));
           } else {
             moveCursorBy(-1);
           } 
           return true;
         case 205:
-          if (GuiScreen.func_146272_n()) {
-            if (GuiScreen.func_146271_m()) {
+          if (GuiScreen.isShiftKeyDown()) {
+            if (GuiScreen.isCtrlKeyDown()) {
               setSelectionPos(getNthWordFromPos(1, this.selectionEnd));
             } else {
               setSelectionPos(this.selectionEnd + 1);
             } 
-          } else if (GuiScreen.func_146271_m()) {
+          } else if (GuiScreen.isCtrlKeyDown()) {
             setCursorPosition(getNthWordFromCursor(1));
           } else {
             moveCursorBy(1);
           } 
           return true;
         case 207:
-          if (GuiScreen.func_146272_n()) {
+          if (GuiScreen.isShiftKeyDown()) {
             setSelectionPos(this.text.length());
           } else {
             setCursorPositionEnd();
           } 
           return true;
         case 211:
-          if (GuiScreen.func_146271_m()) {
+          if (GuiScreen.isCtrlKeyDown()) {
             if (willDraw())
               deleteWords(1); 
           } else if (willDraw()) {
@@ -289,7 +289,7 @@ public class TextBox extends GuiElement<TextBox> {
           } 
           return true;
       } 
-      if (ChatAllowedCharacters.func_71566_a(typedChar) && willDraw()) {
+      if (ChatAllowedCharacters.isAllowedCharacter(typedChar) && willDraw()) {
         writeText(String.valueOf(typedChar));
       } else {
         return super.onKeyTyped(typedChar, keyCode);
@@ -301,7 +301,7 @@ public class TextBox extends GuiElement<TextBox> {
   public void writeText(String textToWrite) {
     int extraLength;
     StringBuilder newText = new StringBuilder();
-    String cleanString = ChatAllowedCharacters.func_71565_a(textToWrite);
+    String cleanString = ChatAllowedCharacters.filterAllowedCharacters(textToWrite);
     int start = Math.min(this.cursor, this.selectionEnd);
     int end = Math.max(this.cursor, this.selectionEnd);
     int insertionPoint = this.maxTextLength - this.text.length() - start - end;

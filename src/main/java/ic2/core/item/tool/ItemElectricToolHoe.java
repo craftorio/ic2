@@ -29,7 +29,7 @@ public class ItemElectricToolHoe extends ItemElectricTool {
     this.maxCharge = 10000;
     this.transferLimit = 100;
     this.tier = 1;
-    this.field_77864_a = 16.0F;
+    this.efficiency = 16.0F;
   }
   
   public boolean onBlockStartBreak(ItemStack stack, BlockPos pos, EntityPlayer player) {
@@ -37,9 +37,9 @@ public class ItemElectricToolHoe extends ItemElectricTool {
     return false;
   }
   
-  public EnumActionResult func_180614_a(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+  public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
     ItemStack stack = StackUtil.get(player, hand);
-    if (!player.func_175151_a(pos, side, stack))
+    if (!player.canPlayerEdit(pos, side, stack))
       return EnumActionResult.PASS; 
     if (!ElectricItem.manager.canUse(stack, this.operationEnergyCost))
       return EnumActionResult.PASS; 
@@ -48,16 +48,16 @@ public class ItemElectricToolHoe extends ItemElectricTool {
     IBlockState state = world.getBlockState(pos);
     Block block = state.getBlock();
     if (side != EnumFacing.DOWN && world
-      .isAirBlock(pos.up()) && (block == Blocks.field_150391_bh || block == Blocks.field_150349_c || block == Blocks.field_150346_d)) {
+      .isAirBlock(pos.up()) && (block == Blocks.MYCELIUM || block == Blocks.GRASS || block == Blocks.DIRT)) {
       block = Blocks.FARMLAND;
       SoundType stepSound = block.getSoundType(state, world, pos, (Entity)player);
-      world.func_184148_a(null, pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, stepSound.func_185844_d(), SoundCategory.BLOCKS, (stepSound.func_185843_a() + 1.0F) / 2.0F, stepSound.func_185847_b() * 0.8F);
+      world.playSound(null, pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, stepSound.getStepSound(), SoundCategory.BLOCKS, (stepSound.getVolume() + 1.0F) / 2.0F, stepSound.getPitch() * 0.8F);
       if (IC2.platform.isSimulating()) {
-        world.func_175656_a(pos, block.getDefaultState());
+        world.setBlockState(pos, block.getDefaultState());
         ElectricItem.manager.use(stack, this.operationEnergyCost, (EntityLivingBase)player);
       } 
       return EnumActionResult.SUCCESS;
     } 
-    return super.func_180614_a(player, world, pos, hand, side, hitX, hitY, hitZ);
+    return super.onItemUse(player, world, pos, hand, side, hitX, hitY, hitZ);
   }
 }

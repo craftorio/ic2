@@ -75,9 +75,9 @@ public class WindSim {
     x.setRow(0, 0, new double[] { height, height * height, height * height * height });
     double heightMultiplier = Math.max(0.0D, ((SimpleMatrix)x.mult((SimpleBase)this.windHeightCoefficients)).get(0));
     ret *= heightMultiplier;
-    if (this.world.func_72911_I()) {
+    if (this.world.isThundering()) {
       ret *= 1.5D;
-    } else if (this.world.func_72896_J()) {
+    } else if (this.world.isRaining()) {
       ret *= 1.25D;
     } 
     ret *= 2.4D;

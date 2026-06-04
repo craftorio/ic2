@@ -71,7 +71,7 @@ public class TradingMarket {
   
   public Stream<BlockPos> tradersAround(BlockPos position, int radius) {
     long squareRadius = (radius * radius);
-    return this.traders.stream().filter(pos -> (position.func_177951_i((Vec3i)pos) <= squareRadius));
+    return this.traders.stream().filter(pos -> (position.distanceSq((Vec3i)pos) <= squareRadius));
   }
   
   public static interface MarketWatcher {

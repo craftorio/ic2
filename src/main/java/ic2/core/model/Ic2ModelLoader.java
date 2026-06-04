@@ -17,7 +17,7 @@ public class Ic2ModelLoader implements ICustomModelLoader {
     models.put(location, model);
   }
   
-  public void func_110549_a(IResourceManager resourceManager) {
+  public void onResourceManagerReload(IResourceManager resourceManager) {
     for (IReloadableModel model : models.values())
       model.onReload(); 
     ModelComparator.onReload();

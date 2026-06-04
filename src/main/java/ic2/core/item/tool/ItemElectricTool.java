@@ -60,31 +60,31 @@ public abstract class ItemElectricTool extends ItemToolIC2 implements IPseudoDam
   private ItemElectricTool(ItemName name, float damage, float speed, int operationEnergyCost, HarvestLevel harvestLevel, Set<? extends IToolClass> toolClasses, Set<Block> mineableBlocks) {
     super(name, damage, speed, harvestLevel, toolClasses, mineableBlocks);
     this.operationEnergyCost = operationEnergyCost;
-    func_77656_e(27);
+    setMaxDamage(27);
     setNoRepair();
   }
   
-  public EnumActionResult func_180614_a(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float xOffset, float yOffset, float zOffset) {
+  public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float xOffset, float yOffset, float zOffset) {
     ElectricItem.manager.use(StackUtil.get(player, hand), 0.0D, (EntityLivingBase)player);
-    return super.func_180614_a(player, world, pos, hand, side, xOffset, yOffset, zOffset);
+    return super.onItemUse(player, world, pos, hand, side, xOffset, yOffset, zOffset);
   }
   
-  public ActionResult<ItemStack> func_77659_a(World world, EntityPlayer player, EnumHand hand) {
+  public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
     ElectricItem.manager.use(StackUtil.get(player, hand), 0.0D, (EntityLivingBase)player);
-    return super.func_77659_a(world, player, hand);
+    return super.onItemRightClick(world, player, hand);
   }
   
-  public float func_150893_a(ItemStack stack, IBlockState state) {
+  public float getDestroySpeed(ItemStack stack, IBlockState state) {
     if (!ElectricItem.manager.canUse(stack, this.operationEnergyCost))
       return 1.0F; 
-    return super.func_150893_a(stack, state);
+    return super.getDestroySpeed(stack, state);
   }
   
-  public boolean func_77644_a(ItemStack itemstack, EntityLivingBase entityliving, EntityLivingBase entityliving1) {
+  public boolean hitEntity(ItemStack itemstack, EntityLivingBase entityliving, EntityLivingBase entityliving1) {
     return true;
   }
   
-  public int func_77619_b() {
+  public int getItemEnchantability() {
     return 0;
   }
   
@@ -108,8 +108,8 @@ public abstract class ItemElectricTool extends ItemToolIC2 implements IPseudoDam
     return this.transferLimit;
   }
   
-  public boolean func_179218_a(ItemStack stack, World world, IBlockState state, BlockPos pos, EntityLivingBase user) {
-    if (state.func_185887_b(world, pos) != 0.0F)
+  public boolean onBlockDestroyed(ItemStack stack, World world, IBlockState state, BlockPos pos, EntityLivingBase user) {
+    if (state.getBlockHardness(world, pos) != 0.0F)
       if (user != null) {
         ElectricItem.manager.use(stack, this.operationEnergyCost, user);
       } else {
@@ -118,7 +118,7 @@ public abstract class ItemElectricTool extends ItemToolIC2 implements IPseudoDam
     return true;
   }
   
-  public boolean func_82789_a(ItemStack par1ItemStack, ItemStack par2ItemStack) {
+  public boolean getIsRepairable(ItemStack par1ItemStack, ItemStack par2ItemStack) {
     return false;
   }
   
@@ -126,8 +126,8 @@ public abstract class ItemElectricTool extends ItemToolIC2 implements IPseudoDam
     return false;
   }
   
-  public void func_150895_a(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-    if (!func_194125_a(tab))
+  public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
+    if (!isInCreativeTab(tab))
       return; 
     ElectricItemManager.addChargeVariants((Item)this, (List)subItems);
   }
@@ -145,7 +145,7 @@ public abstract class ItemElectricTool extends ItemToolIC2 implements IPseudoDam
     return ret;
   }
   
-  public void func_77663_a(ItemStack itemstack, World world, Entity entity, int i, boolean flag) {
+  public void onUpdate(ItemStack itemstack, World world, Entity entity, int i, boolean flag) {
     boolean isEquipped = (flag && entity instanceof EntityLivingBase);
     if (IC2.platform.isRendering()) {
       if (isEquipped && !this.wasEquipped) {
@@ -162,7 +162,7 @@ public abstract class ItemElectricTool extends ItemToolIC2 implements IPseudoDam
       } else if (!isEquipped && this.audioSource != null) {
         if (entity instanceof EntityLivingBase) {
           EntityLivingBase theEntity = (EntityLivingBase)entity;
-          ItemStack stack = theEntity.func_184582_a(EntityEquipmentSlot.MAINHAND);
+          ItemStack stack = theEntity.getItemStackFromSlot(EntityEquipmentSlot.MAINHAND);
           if (stack == null || stack.getItem() != this || stack == itemstack) {
             removeAudioSource();
             String sound = getStopSound(theEntity, itemstack);

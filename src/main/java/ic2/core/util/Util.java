@@ -151,7 +151,7 @@ public final class Util {
   
   public static boolean matchesOD(ItemStack stack, Object match) {
     if (match instanceof ItemStack)
-      return (!StackUtil.isEmpty(stack) && stack.func_77969_a((ItemStack)match)); 
+      return (!StackUtil.isEmpty(stack) && stack.isItemEqual((ItemStack)match)); 
     if (match instanceof String) {
       if (StackUtil.isEmpty(stack))
         return false; 
@@ -356,7 +356,7 @@ public final class Util {
   }
   
   public static Vector3 getLook(Entity entity) {
-    return new Vector3(entity.func_70040_Z());
+    return new Vector3(entity.getLookVec());
   }
   
   public static Vector3 getLookScaled(Entity entity) {
@@ -365,7 +365,7 @@ public final class Util {
   
   public static double getReachDistance(Entity entity) {
     if (entity instanceof EntityPlayerMP)
-      return ((EntityPlayerMP)entity).field_71134_c.getBlockReachDistance(); 
+      return ((EntityPlayerMP)entity).interactionManager.getBlockReachDistance(); 
     return 5.0D;
   }
   
@@ -389,19 +389,19 @@ public final class Util {
   }
   
   public static RayTraceResult traceEntities(World world, Vec3d start, Vec3d end, Entity exclude, boolean alwaysCollide) {
-    AxisAlignedBB aabb = new AxisAlignedBB(Math.min(start.field_72450_a, end.field_72450_a), Math.min(start.field_72448_b, end.field_72448_b), Math.min(start.field_72449_c, end.field_72449_c), Math.max(start.field_72450_a, end.field_72450_a), Math.max(start.field_72448_b, end.field_72448_b), Math.max(start.field_72449_c, end.field_72449_c));
-    List<Entity> entities = world.func_72839_b(exclude, aabb);
+    AxisAlignedBB aabb = new AxisAlignedBB(Math.min(start.x, end.x), Math.min(start.y, end.y), Math.min(start.z, end.z), Math.max(start.x, end.x), Math.max(start.y, end.y), Math.max(start.z, end.z));
+    List<Entity> entities = world.getEntitiesWithinAABBExcludingEntity(exclude, aabb);
     RayTraceResult closest = null;
     double minDist = Double.POSITIVE_INFINITY;
     for (Entity entity : entities) {
-      if (!alwaysCollide && !entity.func_70067_L())
+      if (!alwaysCollide && !entity.canBeCollidedWith())
         continue; 
-      RayTraceResult pos = entity.func_174813_aQ().func_72327_a(start, end);
+      RayTraceResult pos = entity.getEntityBoundingBox().calculateIntercept(start, end);
       if (pos == null)
         continue; 
-      double distance = start.func_72436_e(pos.field_72307_f);
+      double distance = start.squareDistanceTo(pos.hitVec);
       if (distance < minDist) {
-        pos.field_72308_g = entity;
+        pos.entityHit = entity;
         pos.typeOfHit = RayTraceResult.Type.ENTITY;
         minDist = distance;
         closest = pos;
@@ -447,16 +447,16 @@ public final class Util {
   
   public static Chunk getLoadedChunk(World world, int chunkX, int chunkZ) {
     Chunk chunk = null;
-    if (world.func_72863_F() instanceof ChunkProviderServer) {
-      ChunkProviderServer cps = (ChunkProviderServer)world.func_72863_F();
+    if (world.getChunkProvider() instanceof ChunkProviderServer) {
+      ChunkProviderServer cps = (ChunkProviderServer)world.getChunkProvider();
       try {
-        chunk = (Chunk)cps.field_73244_f.get(ChunkPos.func_77272_a(chunkX, chunkZ));
+        chunk = (Chunk)cps.id2ChunkMap.get(ChunkPos.asLong(chunkX, chunkZ));
       } catch (NoSuchFieldError e) {
-        if (cps.func_73149_a(chunkX, chunkZ))
-          chunk = cps.func_186025_d(chunkX, chunkZ); 
+        if (cps.chunkExists(chunkX, chunkZ))
+          chunk = cps.provideChunk(chunkX, chunkZ); 
       } 
     } else {
-      chunk = world.func_72964_e(chunkX, chunkZ);
+      chunk = world.getChunkFromChunkCoords(chunkX, chunkZ);
     } 
     if (chunk instanceof net.minecraft.world.chunk.EmptyChunk)
       return null; 
@@ -509,7 +509,7 @@ public final class Util {
   
   public static IBlockState getBlockState(IBlockAccess world, BlockPos pos) {
     IBlockState state = world.getBlockState(pos);
-    return state.func_185899_b(world, pos);
+    return state.getActualState(world, pos);
   }
   
   public static Block getBlock(String name) {
@@ -519,16 +519,16 @@ public final class Util {
   }
   
   public static Block getBlock(ResourceLocation loc) {
-    Block ret = (Block)Block.field_149771_c.func_82594_a(loc);
+    Block ret = (Block)Block.REGISTRY.getObject(loc);
     if (ret != Blocks.AIR)
       return ret; 
-    if (loc.func_110624_b().equals("minecraft") && loc.func_110623_a().equals("air"))
+    if (loc.getResourceDomain().equals("minecraft") && loc.getResourcePath().equals("air"))
       return ret; 
     return null;
   }
   
   public static ResourceLocation getName(Block block) {
-    return (ResourceLocation)Block.field_149771_c.func_177774_c(block);
+    return (ResourceLocation)Block.REGISTRY.getNameForObject(block);
   }
   
   public static Item getItem(String name) {
@@ -538,11 +538,11 @@ public final class Util {
   }
   
   public static Item getItem(ResourceLocation loc) {
-    return (Item)Item.field_150901_e.func_82594_a(loc);
+    return (Item)Item.REGISTRY.getObject(loc);
   }
   
   public static ResourceLocation getName(Item item) {
-    return (ResourceLocation)Item.field_150901_e.func_177774_c(item);
+    return (ResourceLocation)Item.REGISTRY.getNameForObject(item);
   }
   
   public static boolean harvestBlock(World world, BlockPos pos) {
@@ -553,10 +553,10 @@ public final class Util {
     TileEntity te = world.getTileEntity(pos);
     EntityPlayer player = Ic2Player.get(world);
     boolean canHarvest = block.canHarvestBlock((IBlockAccess)world, pos, player);
-    block.func_176208_a(world, pos, state, player);
+    block.onBlockHarvested(world, pos, state, player);
     boolean removed = block.removedByPlayer(state, world, pos, player, canHarvest);
     if (canHarvest && removed)
-      block.func_180657_a(world, player, pos, state, te, new ItemStack(Items.field_151046_w)); 
+      block.harvestBlock(world, player, pos, state, te, new ItemStack(Items.DIAMOND_PICKAXE)); 
     return removed;
   }
   
@@ -564,7 +564,7 @@ public final class Util {
   
   public static Set<EnumFacing> onlyNorth = Collections.unmodifiableSet(EnumSet.of(EnumFacing.NORTH));
   
-  public static Set<EnumFacing> horizontalFacings = Collections.unmodifiableSet(EnumSet.copyOf(Arrays.asList(EnumFacing.field_176754_o)));
+  public static Set<EnumFacing> horizontalFacings = Collections.unmodifiableSet(EnumSet.copyOf(Arrays.asList(EnumFacing.HORIZONTALS)));
   
   public static Set<EnumFacing> verticalFacings = Collections.unmodifiableSet(EnumSet.of(EnumFacing.DOWN, EnumFacing.UP));
   

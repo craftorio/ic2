@@ -24,30 +24,30 @@ import net.minecraft.world.World;
 
 public class BlockRubWood extends BlockBase {
   public BlockRubWood() {
-    super(BlockName.rubber_wood, Material.field_151575_d);
-    func_149675_a(true);
-    func_149711_c(1.0F);
-    func_149672_a(SoundType.field_185848_a);
-    func_180632_j(this.field_176227_L.func_177621_b().func_177226_a((IProperty)stateProperty, RubberWoodState.plain_y));
+    super(BlockName.rubber_wood, Material.WOOD);
+    setTickRandomly(true);
+    setHardness(1.0F);
+    setSoundType(SoundType.WOOD);
+    setDefaultState(this.blockState.getBaseState().withProperty((IProperty)stateProperty, RubberWoodState.plain_y));
   }
   
-  protected BlockStateContainer func_180661_e() {
+  protected BlockStateContainer createBlockState() {
     return new BlockStateContainer(this, new IProperty[] { (IProperty)stateProperty });
   }
   
-  public IBlockState func_176203_a(int meta) {
+  public IBlockState getStateFromMeta(int meta) {
     if (meta >= 0 && meta < RubberWoodState.values.length)
-      return getDefaultState().func_177226_a((IProperty)stateProperty, RubberWoodState.values[meta]); 
+      return getDefaultState().withProperty((IProperty)stateProperty, RubberWoodState.values[meta]); 
     return getDefaultState();
   }
   
-  public int func_176201_c(IBlockState state) {
-    return ((RubberWoodState)state.func_177229_b((IProperty)stateProperty)).ordinal();
+  public int getMetaFromState(IBlockState state) {
+    return ((RubberWoodState)state.getValue((IProperty)stateProperty)).ordinal();
   }
   
-  public IBlockState func_180642_a(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
-    IBlockState state = super.func_180642_a(world, pos, facing, hitX, hitY, hitZ, meta, placer);
-    return state.func_177226_a((IProperty)stateProperty, getPlainAxisState(facing.getAxis()));
+  public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
+    IBlockState state = super.getStateForPlacement(world, pos, facing, hitX, hitY, hitZ, meta, placer);
+    return state.withProperty((IProperty)stateProperty, getPlainAxisState(facing.getAxis()));
   }
   
   private static RubberWoodState getPlainAxisState(EnumFacing.Axis axis) {
@@ -62,22 +62,22 @@ public class BlockRubWood extends BlockBase {
     throw new IllegalArgumentException("invalid axis: " + axis);
   }
   
-  public void func_180653_a(World world, BlockPos pos, IBlockState state, float chance, int fortune) {
+  public void dropBlockAsItemWithChance(World world, BlockPos pos, IBlockState state, float chance, int fortune) {
     if (world.isRemote)
       return; 
-    int count = func_149745_a(world.rand);
+    int count = quantityDropped(world.rand);
     for (int j1 = 0; j1 < count; j1++) {
       if (world.rand.nextFloat() <= chance) {
-        Item item = func_180660_a(state, world.rand, fortune);
+        Item item = getItemDropped(state, world.rand, fortune);
         if (item != null)
-          func_180635_a(world, pos, new ItemStack(item, 1, 0)); 
-        if (!((RubberWoodState)state.func_177229_b((IProperty)stateProperty)).isPlain() && world.rand.nextInt(6) == 0)
-          func_180635_a(world, pos, ItemName.misc_resource.getItemStack((Enum)MiscResourceType.resin)); 
+          spawnAsEntity(world, pos, new ItemStack(item, 1, 0)); 
+        if (!((RubberWoodState)state.getValue((IProperty)stateProperty)).isPlain() && world.rand.nextInt(6) == 0)
+          spawnAsEntity(world, pos, ItemName.misc_resource.getItemStack((Enum)MiscResourceType.resin)); 
       } 
     } 
   }
   
-  public void func_180663_b(World world, BlockPos pos, IBlockState state) {
+  public void breakBlock(World world, BlockPos pos, IBlockState state) {
     int range = 4;
     BlockPos.MutableBlockPos cPos = new BlockPos.MutableBlockPos();
     for (int y = -range; y <= range; y++) {
@@ -93,17 +93,17 @@ public class BlockRubWood extends BlockBase {
     } 
   }
   
-  public void func_180645_a(World world, BlockPos pos, IBlockState state, Random random) {
+  public void randomTick(World world, BlockPos pos, IBlockState state, Random random) {
     if (random.nextInt(7) == 0) {
-      RubberWoodState rwState = (RubberWoodState)state.func_177229_b((IProperty)stateProperty);
+      RubberWoodState rwState = (RubberWoodState)state.getValue((IProperty)stateProperty);
       if (!rwState.canRegenerate())
         return; 
-      world.func_175656_a(pos, state.func_177226_a((IProperty)stateProperty, rwState.getWet()));
+      world.setBlockState(pos, state.withProperty((IProperty)stateProperty, rwState.getWet()));
     } 
   }
   
-  public EnumPushReaction func_149656_h(IBlockState state) {
-    RubberWoodState rstate = (RubberWoodState)state.func_177229_b((IProperty)stateProperty);
+  public EnumPushReaction getMobilityFlag(IBlockState state) {
+    RubberWoodState rstate = (RubberWoodState)state.getValue((IProperty)stateProperty);
     if (rstate == RubberWoodState.plain_x || rstate == RubberWoodState.plain_y || rstate == RubberWoodState.plain_z)
       return EnumPushReaction.NORMAL; 
     return EnumPushReaction.BLOCK;
@@ -197,5 +197,5 @@ public class BlockRubWood extends BlockBase {
     }
   }
   
-  public static final PropertyEnum<RubberWoodState> stateProperty = PropertyEnum.func_177709_a("state", RubberWoodState.class);
+  public static final PropertyEnum<RubberWoodState> stateProperty = PropertyEnum.create("state", RubberWoodState.class);
 }

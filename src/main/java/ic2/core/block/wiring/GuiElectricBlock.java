@@ -33,7 +33,7 @@ public class GuiElectricBlock extends GuiIC2<ContainerElectricBlock> {
   
   protected void drawForegroundLayer(int mouseX, int mouseY) {
     super.drawForegroundLayer(mouseX, mouseY);
-    this.fontRenderer.drawString(Localization.translate("ic2.EUStorage.gui.info.armor"), 8, this.field_147000_g - 126 + 3, 4210752);
+    this.fontRenderer.drawString(Localization.translate("ic2.EUStorage.gui.info.armor"), 8, this.ySize - 126 + 3, 4210752);
     this.fontRenderer.drawString(Localization.translate("ic2.EUStorage.gui.info.level"), 79, 25, 4210752);
     int e = (int)Math.min(((TileEntityElectricBlock)((ContainerElectricBlock)this.container).base).energy.getEnergy(), ((TileEntityElectricBlock)((ContainerElectricBlock)this.container).base).energy.getCapacity());
     this.fontRenderer.drawString(" " + e, 110, 35, 4210752);

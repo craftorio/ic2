@@ -72,8 +72,8 @@ public class TileEntityEnergyOMat extends TileEntityInventory implements IPerson
   
   public void readFromNBT(NBTTagCompound nbttagcompound) {
     super.readFromNBT(nbttagcompound);
-    if (nbttagcompound.func_74764_b("ownerGameProfile"))
-      this.owner = NBTUtil.func_152459_a(nbttagcompound.getCompoundTag("ownerGameProfile")); 
+    if (nbttagcompound.hasKey("ownerGameProfile"))
+      this.owner = NBTUtil.readGameProfileFromNBT(nbttagcompound.getCompoundTag("ownerGameProfile")); 
     this.euOffer = nbttagcompound.getInteger("euOffer");
     this.paidFor = nbttagcompound.getInteger("paidFor");
     try {
@@ -87,7 +87,7 @@ public class TileEntityEnergyOMat extends TileEntityInventory implements IPerson
     super.writeToNBT(nbt);
     if (this.owner != null) {
       NBTTagCompound ownerNbt = new NBTTagCompound();
-      NBTUtil.func_180708_a(ownerNbt, this.owner);
+      NBTUtil.writeGameProfile(ownerNbt, this.owner);
       nbt.setTag("ownerGameProfile", (NBTBase)ownerNbt);
     } 
     nbt.setInteger("euOffer", this.euOffer);
@@ -97,7 +97,7 @@ public class TileEntityEnergyOMat extends TileEntityInventory implements IPerson
   }
   
   public boolean wrenchCanRemove(EntityPlayer player) {
-    return permitsAccess(player.func_146103_bH());
+    return permitsAccess(player.getGameProfile());
   }
   
   protected void onLoaded() {
@@ -175,7 +175,7 @@ public class TileEntityEnergyOMat extends TileEntityInventory implements IPerson
   }
   
   protected boolean canSetFacingWrench(EnumFacing facing, EntityPlayer player) {
-    if (player == null || !permitsAccess(player.func_146103_bH()))
+    if (player == null || !permitsAccess(player.getGameProfile()))
       return false; 
     return super.canSetFacingWrench(facing, player);
   }
@@ -220,14 +220,14 @@ public class TileEntityEnergyOMat extends TileEntityInventory implements IPerson
   }
   
   public ContainerBase<TileEntityEnergyOMat> getGuiContainer(EntityPlayer player) {
-    if (permitsAccess(player.func_146103_bH()))
+    if (permitsAccess(player.getGameProfile()))
       return (ContainerBase<TileEntityEnergyOMat>)new ContainerEnergyOMatOpen(player, this); 
     return (ContainerBase<TileEntityEnergyOMat>)new ContainerEnergyOMatClosed(player, this);
   }
   
   @SideOnly(Side.CLIENT)
   public GuiScreen getGui(EntityPlayer player, boolean isAdmin) {
-    if (isAdmin || permitsAccess(player.func_146103_bH()))
+    if (isAdmin || permitsAccess(player.getGameProfile()))
       return (GuiScreen)new GuiEnergyOMatOpen(new ContainerEnergyOMatOpen(player, this)); 
     return (GuiScreen)new GuiEnergyOMatClosed(new ContainerEnergyOMatClosed(player, this));
   }
@@ -235,7 +235,7 @@ public class TileEntityEnergyOMat extends TileEntityInventory implements IPerson
   public void onGuiClosed(EntityPlayer player) {}
   
   public void onNetworkEvent(EntityPlayer player, int event) {
-    if (!permitsAccess(player.func_146103_bH()))
+    if (!permitsAccess(player.getGameProfile()))
       return; 
     switch (event) {
       case 0:

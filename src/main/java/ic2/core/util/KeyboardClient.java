@@ -29,21 +29,21 @@ public class KeyboardClient extends Keyboard {
   
   public void sendKeyUpdate() {
     Set<Keyboard.Key> keys = EnumSet.noneOf(Keyboard.Key.class);
-    GuiScreen currentScreen = (Minecraft.getMinecraft()).field_71462_r;
-    if (currentScreen == null || currentScreen.field_146291_p) {
-      if (GameSettings.func_100015_a(this.altKey))
+    GuiScreen currentScreen = (Minecraft.getMinecraft()).currentScreen;
+    if (currentScreen == null || currentScreen.allowUserInput) {
+      if (GameSettings.isKeyDown(this.altKey))
         keys.add(Keyboard.Key.alt); 
-      if (GameSettings.func_100015_a(this.boostKey))
+      if (GameSettings.isKeyDown(this.boostKey))
         keys.add(Keyboard.Key.boost); 
-      if (GameSettings.func_100015_a(this.mc.field_71474_y.field_74351_w))
+      if (GameSettings.isKeyDown(this.mc.gameSettings.keyBindForward))
         keys.add(Keyboard.Key.forward); 
-      if (GameSettings.func_100015_a(this.modeSwitchKey))
+      if (GameSettings.isKeyDown(this.modeSwitchKey))
         keys.add(Keyboard.Key.modeSwitch); 
-      if (GameSettings.func_100015_a(this.mc.field_71474_y.field_74314_A))
+      if (GameSettings.isKeyDown(this.mc.gameSettings.keyBindJump))
         keys.add(Keyboard.Key.jump); 
-      if (GameSettings.func_100015_a(this.sideinventoryKey))
+      if (GameSettings.isKeyDown(this.sideinventoryKey))
         keys.add(Keyboard.Key.sideInventory); 
-      if (GameSettings.func_100015_a(this.expandinfo))
+      if (GameSettings.isKeyDown(this.expandinfo))
         keys.add(Keyboard.Key.hubMode); 
       for (Keyboard.IKeyWatcher watcher : this.watchers)
         watcher.checkForKey(keys); 

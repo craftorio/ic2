@@ -29,11 +29,11 @@ public class Ic2BlockState extends BlockStateContainer {
   }
   
   private Map<Map<IProperty<?>, Comparable<?>>, Ic2BlockStateInstance> createIndex() {
-    Map<Map<IProperty<?>, Comparable<?>>, Ic2BlockStateInstance> ret = new HashMap<>(func_177619_a().size());
-    for (UnmodifiableIterator<IBlockState> unmodifiableIterator = func_177619_a().iterator(); unmodifiableIterator.hasNext(); ) {
+    Map<Map<IProperty<?>, Comparable<?>>, Ic2BlockStateInstance> ret = new HashMap<>(getValidStates().size());
+    for (UnmodifiableIterator<IBlockState> unmodifiableIterator = getValidStates().iterator(); unmodifiableIterator.hasNext(); ) {
       IBlockState rawState = unmodifiableIterator.next();
       Ic2BlockStateInstance state = (Ic2BlockStateInstance)rawState;
-      ret.put(createMap((Map<IProperty<?>, Comparable<?>>)rawState.func_177228_b()), state);
+      ret.put(createMap((Map<IProperty<?>, Comparable<?>>)rawState.getProperties()), state);
       state.clearPropertyValueTable();
     } 
     return ret;
@@ -52,30 +52,30 @@ public class Ic2BlockState extends BlockStateContainer {
       super(block, properties, null);
       this.tlProperties = new ThreadLocal<Map<IProperty<?>, Comparable<?>>>() {
           protected Map<IProperty<?>, Comparable<?>> initialValue() {
-            return Ic2BlockState.createMap((Map<IProperty<?>, Comparable<?>>)Ic2BlockState.Ic2BlockStateInstance.this.func_177228_b());
+            return Ic2BlockState.createMap((Map<IProperty<?>, Comparable<?>>)Ic2BlockState.Ic2BlockStateInstance.this.getProperties());
           }
         };
       this.extraProperties = Collections.emptyMap();
     }
     
     private Ic2BlockStateInstance(Ic2BlockStateInstance parent, Map<IUnlistedProperty<?>, Object> extraProperties) {
-      super(parent.getBlock(), parent.func_177228_b(), parent.field_177238_c);
+      super(parent.getBlock(), parent.getProperties(), parent.propertyValueTable);
       this.tlProperties = new ThreadLocal<Map<IProperty<?>, Comparable<?>>>() {
           protected Map<IProperty<?>, Comparable<?>> initialValue() {
-            return Ic2BlockState.createMap((Map<IProperty<?>, Comparable<?>>)Ic2BlockState.Ic2BlockStateInstance.this.func_177228_b());
+            return Ic2BlockState.createMap((Map<IProperty<?>, Comparable<?>>)Ic2BlockState.Ic2BlockStateInstance.this.getProperties());
           }
         };
       this.extraProperties = extraProperties;
     }
     
-    public <T extends Comparable<T>, V extends T> Ic2BlockStateInstance func_177226_a(IProperty<T> property, V value) {
-      Comparable<?> comparable = (Comparable)func_177228_b().get(property);
+    public <T extends Comparable<T>, V extends T> Ic2BlockStateInstance withProperty(IProperty<T> property, V value) {
+      Comparable<?> comparable = (Comparable)getProperties().get(property);
       if (comparable == value)
         return this; 
       if (comparable == null)
         throw new IllegalArgumentException("invalid property for this state: " + property); 
-      if (!property.func_177700_c().contains(value))
-        throw new IllegalArgumentException("invalid property value " + value + " for property " + property + " (" + property.func_177702_a(value) + ')'); 
+      if (!property.getAllowedValues().contains(value))
+        throw new IllegalArgumentException("invalid property value " + value + " for property " + property + " (" + property.getName(value) + ')'); 
       Map<IProperty<?>, Comparable<?>> lookup = this.tlProperties.get();
       lookup.put(property, (Comparable<?>)value);
       Ic2BlockStateInstance ret = (Ic2BlockStateInstance)Ic2BlockState.this.index.get(lookup);
@@ -154,7 +154,7 @@ public class Ic2BlockState extends BlockStateContainer {
     }
     
     private void clearPropertyValueTable() {
-      this.field_177238_c = null;
+      this.propertyValueTable = null;
     }
   }
 }

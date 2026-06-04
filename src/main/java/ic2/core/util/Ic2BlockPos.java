@@ -36,7 +36,7 @@ public class Ic2BlockPos extends BlockPos {
   }
   
   public Ic2BlockPos(Vec3d v) {
-    this(v.field_72450_a, v.field_72448_b, v.field_72449_c);
+    this(v.x, v.y, v.z);
   }
   
   public Ic2BlockPos copy() {
@@ -84,7 +84,7 @@ public class Ic2BlockPos extends BlockPos {
     return this;
   }
   
-  public BlockPos func_185334_h() {
+  public BlockPos toImmutable() {
     return new BlockPos((Vec3i)this);
   }
   
@@ -96,11 +96,11 @@ public class Ic2BlockPos extends BlockPos {
     if (count == 0)
       return this; 
     if (facing.getAxis() == EnumFacing.Axis.X) {
-      this.x += facing.func_176743_c().func_179524_a() * count;
+      this.x += facing.getAxisDirection().getOffset() * count;
     } else if (facing.getAxis() == EnumFacing.Axis.Y) {
-      this.y += facing.func_176743_c().func_179524_a() * count;
+      this.y += facing.getAxisDirection().getOffset() * count;
     } else {
-      this.z += facing.func_176743_c().func_179524_a() * count;
+      this.z += facing.getAxisDirection().getOffset() * count;
     } 
     return this;
   }

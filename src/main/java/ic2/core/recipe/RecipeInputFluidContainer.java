@@ -64,7 +64,7 @@ public class RecipeInputFluidContainer extends RecipeInputBase implements IRecip
           ItemStack container = handler.getContainer();
           if (container == null)
             IC2.platform.displayError("Null container stack!\nItem: %s\nRegistry: %s\nUnlocalised: %s\nHandler: %s (%s)", new Object[] { item, item
-                  .getRegistryName(), item.func_77658_a(), handler, handler.getClass() }); 
+                  .getRegistryName(), item.getUnlocalizedName(), handler, handler.getClass() }); 
           if (FluidUtil.getFluidContained(container) == null)
             list.add(stack); 
         } 

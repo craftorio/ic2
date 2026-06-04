@@ -122,9 +122,9 @@ public class PumpUtil {
           if (decay == 0)
             return (BlockPos)cPos; 
           if (decay >= 1 && decay < 7 && state.getBlock() instanceof BlockLiquid) {
-            world.func_175656_a((BlockPos)cPos, state.func_177226_a((IProperty)BlockLiquid.field_176367_b, Integer.valueOf(decay + 1)));
+            world.setBlockState((BlockPos)cPos, state.withProperty((IProperty)BlockLiquid.LEVEL, Integer.valueOf(decay + 1)));
           } else {
-            world.func_175698_g((BlockPos)cPos);
+            world.setBlockToAir((BlockPos)cPos);
           } 
         } 
       } 
@@ -147,7 +147,7 @@ public class PumpUtil {
       return 7 - Util.limit(Math.round(6.0F * level), 0, 6);
     } 
     if (block instanceof BlockLiquid)
-      return ((Integer)state.func_177229_b((IProperty)BlockLiquid.field_176367_b)).intValue(); 
+      return ((Integer)state.getValue((IProperty)BlockLiquid.LEVEL)).intValue(); 
     return -1;
   }
   

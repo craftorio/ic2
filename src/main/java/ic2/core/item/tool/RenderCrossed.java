@@ -21,16 +21,16 @@ public class RenderCrossed extends Render<EntityMiningLaser> {
     this.texture = texture;
   }
   
-  public void func_76986_a(EntityMiningLaser entity, double x, double y, double z, float entityYaw, float partialTicks) {
-    if (entity.field_70126_B == 0.0F && entity.field_70127_C == 0.0F)
+  public void doRender(EntityMiningLaser entity, double x, double y, double z, float entityYaw, float partialTicks) {
+    if (entity.prevRotationYaw == 0.0F && entity.prevRotationPitch == 0.0F)
       return; 
-    bindTexture(func_110775_a(entity));
-    GlStateManager.func_179094_E();
-    GlStateManager.func_179109_b((float)x, (float)y, (float)z);
-    GlStateManager.func_179114_b(entity.field_70126_B + (entity.rotationYaw - entity.field_70126_B) * partialTicks - 90.0F, 0.0F, 1.0F, 0.0F);
-    GlStateManager.func_179114_b(entity.field_70127_C + (entity.rotationPitch - entity.field_70127_C) * partialTicks, 0.0F, 0.0F, 1.0F);
-    Tessellator tessellator = Tessellator.func_178181_a();
-    BufferBuilder worldrenderer = tessellator.func_178180_c();
+    bindTexture(getEntityTexture(entity));
+    GlStateManager.pushMatrix();
+    GlStateManager.translate((float)x, (float)y, (float)z);
+    GlStateManager.rotate(entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * partialTicks - 90.0F, 0.0F, 1.0F, 0.0F);
+    GlStateManager.rotate(entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks, 0.0F, 0.0F, 1.0F);
+    Tessellator tessellator = Tessellator.getInstance();
+    BufferBuilder worldrenderer = tessellator.getBuffer();
     float uSideS = 0.0F;
     float uSideE = 0.5F;
     float vSideS = 0.0F;
@@ -40,39 +40,39 @@ public class RenderCrossed extends Render<EntityMiningLaser> {
     float vBackS = 0.15625F;
     float vBackE = 0.3125F;
     float scale = 0.05625F;
-    GlStateManager.func_179091_B();
-    GlStateManager.func_179114_b(45.0F, 1.0F, 0.0F, 0.0F);
-    GlStateManager.func_179152_a(scale, scale, scale);
-    GlStateManager.func_179109_b(-4.0F, 0.0F, 0.0F);
+    GlStateManager.enableRescaleNormal();
+    GlStateManager.rotate(45.0F, 1.0F, 0.0F, 0.0F);
+    GlStateManager.scale(scale, scale, scale);
+    GlStateManager.translate(-4.0F, 0.0F, 0.0F);
     GL11.glNormal3f(scale, 0.0F, 0.0F);
-    worldrenderer.func_181668_a(7, DefaultVertexFormats.field_181707_g);
-    worldrenderer.func_181662_b(-7.0D, -2.0D, -2.0D).func_187315_a(uBackS, vBackS).func_181675_d();
-    worldrenderer.func_181662_b(-7.0D, -2.0D, 2.0D).func_187315_a(uBackE, vBackS).func_181675_d();
-    worldrenderer.func_181662_b(-7.0D, 2.0D, 2.0D).func_187315_a(uBackE, vBackE).func_181675_d();
-    worldrenderer.func_181662_b(-7.0D, 2.0D, -2.0D).func_187315_a(uBackS, vBackE).func_181675_d();
-    tessellator.func_78381_a();
+    worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX);
+    worldrenderer.pos(-7.0D, -2.0D, -2.0D).tex(uBackS, vBackS).endVertex();
+    worldrenderer.pos(-7.0D, -2.0D, 2.0D).tex(uBackE, vBackS).endVertex();
+    worldrenderer.pos(-7.0D, 2.0D, 2.0D).tex(uBackE, vBackE).endVertex();
+    worldrenderer.pos(-7.0D, 2.0D, -2.0D).tex(uBackS, vBackE).endVertex();
+    tessellator.draw();
     GL11.glNormal3f(-scale, 0.0F, 0.0F);
-    worldrenderer.func_181668_a(7, DefaultVertexFormats.field_181707_g);
-    worldrenderer.func_181662_b(-7.0D, 2.0D, -2.0D).func_187315_a(uBackS, vBackS).func_181675_d();
-    worldrenderer.func_181662_b(-7.0D, 2.0D, 2.0D).func_187315_a(uBackE, vBackS).func_181675_d();
-    worldrenderer.func_181662_b(-7.0D, -2.0D, 2.0D).func_187315_a(uBackE, vBackE).func_181675_d();
-    worldrenderer.func_181662_b(-7.0D, -2.0D, -2.0D).func_187315_a(uBackS, vBackE).func_181675_d();
-    tessellator.func_78381_a();
+    worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX);
+    worldrenderer.pos(-7.0D, 2.0D, -2.0D).tex(uBackS, vBackS).endVertex();
+    worldrenderer.pos(-7.0D, 2.0D, 2.0D).tex(uBackE, vBackS).endVertex();
+    worldrenderer.pos(-7.0D, -2.0D, 2.0D).tex(uBackE, vBackE).endVertex();
+    worldrenderer.pos(-7.0D, -2.0D, -2.0D).tex(uBackS, vBackE).endVertex();
+    tessellator.draw();
     for (int j = 0; j < 4; j++) {
-      GlStateManager.func_179114_b(90.0F, 1.0F, 0.0F, 0.0F);
+      GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F);
       GL11.glNormal3f(0.0F, 0.0F, scale);
-      worldrenderer.func_181668_a(7, DefaultVertexFormats.field_181707_g);
-      worldrenderer.func_181662_b(-8.0D, -2.0D, 0.0D).func_187315_a(uSideS, vSideS).func_181675_d();
-      worldrenderer.func_181662_b(8.0D, -2.0D, 0.0D).func_187315_a(uSideE, vSideS).func_181675_d();
-      worldrenderer.func_181662_b(8.0D, 2.0D, 0.0D).func_187315_a(uSideE, vSideE).func_181675_d();
-      worldrenderer.func_181662_b(-8.0D, 2.0D, 0.0D).func_187315_a(uSideS, vSideE).func_181675_d();
-      tessellator.func_78381_a();
+      worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX);
+      worldrenderer.pos(-8.0D, -2.0D, 0.0D).tex(uSideS, vSideS).endVertex();
+      worldrenderer.pos(8.0D, -2.0D, 0.0D).tex(uSideE, vSideS).endVertex();
+      worldrenderer.pos(8.0D, 2.0D, 0.0D).tex(uSideE, vSideE).endVertex();
+      worldrenderer.pos(-8.0D, 2.0D, 0.0D).tex(uSideS, vSideE).endVertex();
+      tessellator.draw();
     } 
-    GlStateManager.func_179101_C();
-    GlStateManager.func_179121_F();
+    GlStateManager.disableRescaleNormal();
+    GlStateManager.popMatrix();
   }
   
-  protected ResourceLocation func_110775_a(EntityMiningLaser entity) {
+  protected ResourceLocation getEntityTexture(EntityMiningLaser entity) {
     return this.texture;
   }
 }

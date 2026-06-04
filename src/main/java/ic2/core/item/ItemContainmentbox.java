@@ -21,10 +21,10 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ItemContainmentbox extends ItemIC2 implements IHandHeldInventory {
   public ItemContainmentbox() {
     super(ItemName.containment_box);
-    func_77625_d(1);
+    setMaxStackSize(1);
   }
   
-  public ActionResult<ItemStack> func_77659_a(World world, EntityPlayer player, EnumHand hand) {
+  public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
     ItemStack stack = StackUtil.get(player, hand);
     if (!world.isRemote)
       IC2.platform.launchGui(player, getInventory(player, stack)); 
@@ -32,18 +32,18 @@ public class ItemContainmentbox extends ItemIC2 implements IHandHeldInventory {
   }
   
   public boolean onDroppedByPlayer(ItemStack stack, EntityPlayer player) {
-    if (!(player.getEntityWorld()).isRemote && !StackUtil.isEmpty(stack) && player.field_71070_bA instanceof ContainerContainmentbox) {
-      HandHeldContainmentbox containmentBox = (HandHeldContainmentbox)((ContainerContainmentbox)player.field_71070_bA).base;
+    if (!(player.getEntityWorld()).isRemote && !StackUtil.isEmpty(stack) && player.openContainer instanceof ContainerContainmentbox) {
+      HandHeldContainmentbox containmentBox = (HandHeldContainmentbox)((ContainerContainmentbox)player.openContainer).base;
       if (containmentBox.isThisContainer(stack)) {
         containmentBox.saveAsThrown(stack);
-        player.func_71053_j();
+        player.closeScreen();
       } 
     } 
     return true;
   }
   
   @SideOnly(Side.CLIENT)
-  public EnumRarity func_77613_e(ItemStack stack) {
+  public EnumRarity getRarity(ItemStack stack) {
     return EnumRarity.UNCOMMON;
   }
   

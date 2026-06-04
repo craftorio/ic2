@@ -75,7 +75,7 @@ public class TileEntityReactorChamberElectric extends TileEntityBlock implements
     TileEntityNuclearReactorElectric reactor = getReactor();
     if (reactor != null) {
       World world = getWorld();
-      return reactor.getBlockType().func_180639_a(world, reactor.getPos(), world.getBlockState(reactor.getPos()), player, hand, side, hitX, hitY, hitZ);
+      return reactor.getBlockType().onBlockActivated(world, reactor.getPos(), world.getBlockState(reactor.getPos()), player, hand, side, hitX, hitY, hitZ);
     } 
     return false;
   }
@@ -89,104 +89,104 @@ public class TileEntityReactorChamberElectric extends TileEntityBlock implements
   
   public void destoryChamber(boolean wrench) {
     World world = getWorld();
-    world.func_175698_g(this.pos);
+    world.setBlockToAir(this.pos);
     for (ItemStack drop : getSelfDrops(0, wrench))
       StackUtil.dropAsEntity(world, this.pos, drop); 
   }
   
-  public String func_70005_c_() {
+  public String getName() {
     TileEntityNuclearReactorElectric reactor = getReactor();
-    return (reactor != null) ? reactor.func_70005_c_() : "<null>";
+    return (reactor != null) ? reactor.getName() : "<null>";
   }
   
-  public boolean func_145818_k_() {
+  public boolean hasCustomName() {
     TileEntityNuclearReactorElectric reactor = getReactor();
-    return (reactor != null) ? reactor.func_145818_k_() : false;
+    return (reactor != null) ? reactor.hasCustomName() : false;
   }
   
-  public ITextComponent func_145748_c_() {
+  public ITextComponent getDisplayName() {
     TileEntityNuclearReactorElectric reactor = getReactor();
-    return (reactor != null) ? reactor.func_145748_c_() : (ITextComponent)new TextComponentString("<null>");
+    return (reactor != null) ? reactor.getDisplayName() : (ITextComponent)new TextComponentString("<null>");
   }
   
-  public int func_70302_i_() {
+  public int getSizeInventory() {
     TileEntityNuclearReactorElectric reactor = getReactor();
-    return (reactor != null) ? reactor.func_70302_i_() : 0;
+    return (reactor != null) ? reactor.getSizeInventory() : 0;
   }
   
-  public boolean func_191420_l() {
+  public boolean isEmpty() {
     TileEntityNuclearReactorElectric reactor = getReactor();
-    return (reactor != null) ? reactor.func_191420_l() : true;
+    return (reactor != null) ? reactor.isEmpty() : true;
   }
   
-  public ItemStack func_70301_a(int index) {
+  public ItemStack getStackInSlot(int index) {
     TileEntityNuclearReactorElectric reactor = getReactor();
-    return (reactor != null) ? reactor.func_70301_a(index) : null;
+    return (reactor != null) ? reactor.getStackInSlot(index) : null;
   }
   
-  public ItemStack func_70298_a(int index, int count) {
+  public ItemStack decrStackSize(int index, int count) {
     TileEntityNuclearReactorElectric reactor = getReactor();
-    return (reactor != null) ? reactor.func_70298_a(index, count) : null;
+    return (reactor != null) ? reactor.decrStackSize(index, count) : null;
   }
   
-  public ItemStack func_70304_b(int index) {
+  public ItemStack removeStackFromSlot(int index) {
     TileEntityNuclearReactorElectric reactor = getReactor();
-    return (reactor != null) ? reactor.func_70304_b(index) : null;
+    return (reactor != null) ? reactor.removeStackFromSlot(index) : null;
   }
   
-  public void func_70299_a(int index, ItemStack stack) {
+  public void setInventorySlotContents(int index, ItemStack stack) {
     TileEntityNuclearReactorElectric reactor = getReactor();
     if (reactor != null)
-      reactor.func_70299_a(index, stack); 
+      reactor.setInventorySlotContents(index, stack); 
   }
   
-  public int func_70297_j_() {
+  public int getInventoryStackLimit() {
     TileEntityNuclearReactorElectric reactor = getReactor();
-    return (reactor != null) ? reactor.func_70297_j_() : 0;
+    return (reactor != null) ? reactor.getInventoryStackLimit() : 0;
   }
   
-  public boolean func_70300_a(EntityPlayer player) {
+  public boolean isUsableByPlayer(EntityPlayer player) {
     TileEntityNuclearReactorElectric reactor = getReactor();
-    return (reactor != null) ? reactor.func_70300_a(player) : false;
+    return (reactor != null) ? reactor.isUsableByPlayer(player) : false;
   }
   
-  public void func_174889_b(EntityPlayer player) {
-    TileEntityNuclearReactorElectric reactor = getReactor();
-    if (reactor != null)
-      reactor.func_174889_b(player); 
-  }
-  
-  public void func_174886_c(EntityPlayer player) {
+  public void openInventory(EntityPlayer player) {
     TileEntityNuclearReactorElectric reactor = getReactor();
     if (reactor != null)
-      reactor.func_174886_c(player); 
+      reactor.openInventory(player); 
   }
   
-  public boolean func_94041_b(int index, ItemStack stack) {
-    TileEntityNuclearReactorElectric reactor = getReactor();
-    return (reactor != null) ? reactor.func_94041_b(index, stack) : false;
-  }
-  
-  public int func_174887_a_(int id) {
-    TileEntityNuclearReactorElectric reactor = getReactor();
-    return (reactor != null) ? reactor.func_174887_a_(id) : 0;
-  }
-  
-  public void func_174885_b(int id, int value) {
+  public void closeInventory(EntityPlayer player) {
     TileEntityNuclearReactorElectric reactor = getReactor();
     if (reactor != null)
-      reactor.func_174885_b(id, value); 
+      reactor.closeInventory(player); 
   }
   
-  public int func_174890_g() {
+  public boolean isItemValidForSlot(int index, ItemStack stack) {
     TileEntityNuclearReactorElectric reactor = getReactor();
-    return (reactor != null) ? reactor.func_174890_g() : 0;
+    return (reactor != null) ? reactor.isItemValidForSlot(index, stack) : false;
   }
   
-  public void func_174888_l() {
+  public int getField(int id) {
+    TileEntityNuclearReactorElectric reactor = getReactor();
+    return (reactor != null) ? reactor.getField(id) : 0;
+  }
+  
+  public void setField(int id, int value) {
     TileEntityNuclearReactorElectric reactor = getReactor();
     if (reactor != null)
-      reactor.func_174888_l(); 
+      reactor.setField(id, value); 
+  }
+  
+  public int getFieldCount() {
+    TileEntityNuclearReactorElectric reactor = getReactor();
+    return (reactor != null) ? reactor.getFieldCount() : 0;
+  }
+  
+  public void clear() {
+    TileEntityNuclearReactorElectric reactor = getReactor();
+    if (reactor != null)
+      reactor.clear(); 
   }
   
   public boolean emitsEnergyTo(IEnergyAcceptor receiver, EnumFacing side) {

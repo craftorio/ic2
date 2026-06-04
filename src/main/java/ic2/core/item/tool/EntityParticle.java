@@ -47,7 +47,7 @@ public class EntityParticle extends Entity implements IThrowableEntity {
     this.owner = (Entity)owner1;
     Vector3 eyePos = Util.getEyePosition(this.owner);
     setPosition(eyePos.x, eyePos.y, eyePos.z);
-    Vector3 motion = new Vector3(owner1.func_70040_Z());
+    Vector3 motion = new Vector3(owner1.getLookVec());
     Vector3 ortho = motion.copy().cross(Vector3.UP).scaleTo(influenceSize1);
     double stepAngle = Math.atan(0.5D / influenceSize1) * 2.0D;
     int steps = (int)Math.ceil(6.283185307179586D / stepAngle);
@@ -88,24 +88,24 @@ public class EntityParticle extends Entity implements IThrowableEntity {
     Vector3 start = new Vector3(this.prevPosX, this.prevPosY, this.prevPosZ);
     Vector3 end = new Vector3(this.posX, this.posY, this.posZ);
     World world = getEntityWorld();
-    RayTraceResult hit = world.func_72901_a(start.toVec3(), end.toVec3(), true);
+    RayTraceResult hit = world.rayTraceBlocks(start.toVec3(), end.toVec3(), true);
     if (hit != null) {
-      end.set(hit.field_72307_f);
-      this.posX = hit.field_72307_f.field_72450_a;
-      this.posY = hit.field_72307_f.field_72448_b;
-      this.posZ = hit.field_72307_f.field_72449_c;
+      end.set(hit.hitVec);
+      this.posX = hit.hitVec.x;
+      this.posY = hit.hitVec.y;
+      this.posZ = hit.hitVec.z;
     } 
-    List<Entity> entitiesToCheck = world.func_72839_b(this, (new AxisAlignedBB(this.prevPosX, this.prevPosY, this.prevPosZ, this.posX, this.posY, this.posZ)).func_186662_g(this.influenceSize));
+    List<Entity> entitiesToCheck = world.getEntitiesWithinAABBExcludingEntity(this, (new AxisAlignedBB(this.prevPosX, this.prevPosY, this.prevPosZ, this.posX, this.posY, this.posZ)).grow(this.influenceSize));
     List<RayTraceResult> entitiesInfluences = new ArrayList<>();
     double minDistanceSq = start.distanceSquared(end);
     for (Entity entity : entitiesToCheck) {
-      if (entity != this.owner && entity.func_70067_L()) {
-        RayTraceResult entityInfluence = entity.func_174813_aQ().func_186662_g(this.influenceSize).func_72327_a(start.toVec3(), end.toVec3());
+      if (entity != this.owner && entity.canBeCollidedWith()) {
+        RayTraceResult entityInfluence = entity.getEntityBoundingBox().grow(this.influenceSize).calculateIntercept(start.toVec3(), end.toVec3());
         if (entityInfluence != null) {
           entitiesInfluences.add(entityInfluence);
-          RayTraceResult entityHit = entity.func_174813_aQ().func_186662_g(this.coreSize).func_72327_a(start.toVec3(), end.toVec3());
+          RayTraceResult entityHit = entity.getEntityBoundingBox().grow(this.coreSize).calculateIntercept(start.toVec3(), end.toVec3());
           if (entityHit != null) {
-            double distanceSq = start.distanceSquared(entityHit.field_72307_f);
+            double distanceSq = start.distanceSquared(entityHit.hitVec);
             if (distanceSq < minDistanceSq) {
               hit = entityHit;
               minDistanceSq = distanceSq;
@@ -116,7 +116,7 @@ public class EntityParticle extends Entity implements IThrowableEntity {
     } 
     double maxInfluenceDistance = Math.sqrt(minDistanceSq) + this.influenceSize;
     for (RayTraceResult entityInfluence : entitiesInfluences) {
-      if (start.distance(entityInfluence.field_72307_f) <= maxInfluenceDistance)
+      if (start.distance(entityInfluence.hitVec) <= maxInfluenceDistance)
         onInfluence(entityInfluence); 
     } 
     if (this.radialTestVectors != null) {
@@ -128,7 +128,7 @@ public class EntityParticle extends Entity implements IThrowableEntity {
       for (int d = 0; d < len; d++) {
         for (Vector3 radialTestVector : this.radialTestVectors) {
           origin.copy(tmp).add(radialTestVector);
-          RayTraceResult influence = world.func_72901_a(origin.toVec3(), tmp.toVec3(), true);
+          RayTraceResult influence = world.rayTraceBlocks(origin.toVec3(), tmp.toVec3(), true);
           if (influence != null)
             onInfluence(influence); 
         } 
@@ -148,31 +148,31 @@ public class EntityParticle extends Entity implements IThrowableEntity {
   protected void onImpact(RayTraceResult hit) {
     if (!IC2.platform.isSimulating())
       return; 
-    System.out.println("hit " + hit.typeOfHit + " " + hit.field_72307_f + " sim=" + IC2.platform.isSimulating());
+    System.out.println("hit " + hit.typeOfHit + " " + hit.hitVec + " sim=" + IC2.platform.isSimulating());
     if (hit.typeOfHit != RayTraceResult.Type.BLOCK || IC2.platform.isSimulating());
-    ExplosionIC2 explosion = new ExplosionIC2(getEntityWorld(), this.owner, hit.field_72307_f.field_72450_a, hit.field_72307_f.field_72448_b, hit.field_72307_f.field_72449_c, 18.0F, 0.95F, ExplosionIC2.Type.Heat);
+    ExplosionIC2 explosion = new ExplosionIC2(getEntityWorld(), this.owner, hit.hitVec.x, hit.hitVec.y, hit.hitVec.z, 18.0F, 0.95F, ExplosionIC2.Type.Heat);
     explosion.doExplosion();
   }
   
   protected void onInfluence(RayTraceResult hit) {
     if (!IC2.platform.isSimulating())
       return; 
-    System.out.println("influenced " + hit.typeOfHit + " " + hit.field_72307_f + " sim=" + IC2.platform.isSimulating());
+    System.out.println("influenced " + hit.typeOfHit + " " + hit.hitVec + " sim=" + IC2.platform.isSimulating());
     if (hit.typeOfHit == RayTraceResult.Type.BLOCK && IC2.platform.isSimulating()) {
       World world = getEntityWorld();
       IBlockState state = world.getBlockState(hit.getBlockPos());
       Block block = state.getBlock();
-      if (block == Blocks.WATER || block == Blocks.field_150358_i) {
-        world.func_175698_g(hit.getBlockPos());
+      if (block == Blocks.WATER || block == Blocks.FLOWING_WATER) {
+        world.setBlockToAir(hit.getBlockPos());
       } else {
         List<ItemStack> drops = StackUtil.getDrops((IBlockAccess)world, hit.getBlockPos(), state, null, 0, true);
         if (drops.size() == 1 && StackUtil.getSize(drops.get(0)) == 1) {
           ItemStack existing = drops.get(0);
-          ItemStack smelted = FurnaceRecipes.func_77602_a().func_151395_a(existing);
+          ItemStack smelted = FurnaceRecipes.instance().getSmeltingResult(existing);
           if (smelted != null && smelted.getItem() instanceof ItemBlock) {
-            world.func_175656_a(hit.getBlockPos(), ((ItemBlock)smelted.getItem()).func_179223_d().getDefaultState());
-          } else if (block.isFlammable((IBlockAccess)world, hit.getBlockPos(), hit.field_178784_b)) {
-            world.func_175656_a(hit.getBlockPos().offset(hit.field_178784_b.getOpposite()), Blocks.field_150480_ab.getDefaultState());
+            world.setBlockState(hit.getBlockPos(), ((ItemBlock)smelted.getItem()).getBlock().getDefaultState());
+          } else if (block.isFlammable((IBlockAccess)world, hit.getBlockPos(), hit.sideHit)) {
+            world.setBlockState(hit.getBlockPos().offset(hit.sideHit.getOpposite()), Blocks.FIRE.getDefaultState());
           } 
         } 
       } 

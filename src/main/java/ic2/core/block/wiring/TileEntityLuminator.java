@@ -47,12 +47,12 @@ public class TileEntityLuminator extends TileEntityBlock {
   
   public void readFromNBT(NBTTagCompound nbt) {
     super.readFromNBT(nbt);
-    this.invertRedstone = nbt.func_74767_n("invert");
+    this.invertRedstone = nbt.getBoolean("invert");
   }
   
   public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
     super.writeToNBT(nbt);
-    nbt.func_74757_a("invert", this.invertRedstone);
+    nbt.setBoolean("invert", this.invertRedstone);
     return nbt;
   }
   
@@ -107,15 +107,15 @@ public class TileEntityLuminator extends TileEntityBlock {
   private void checkPlacement() {
     World world = getWorld();
     if (!isValidPosition(world, this.pos.offset(getFacing().getOpposite()), getFacing())) {
-      getBlockType().func_180657_a(world, Ic2Player.get(world), this.pos, world.getBlockState(this.pos), (TileEntity)this, StackUtil.emptyStack);
-      world.func_175698_g(this.pos);
+      getBlockType().harvestBlock(world, Ic2Player.get(world), this.pos, world.getBlockState(this.pos), (TileEntity)this, StackUtil.emptyStack);
+      world.setBlockToAir(this.pos);
     } 
   }
   
   public static boolean isValidPosition(World world, BlockPos pos, EnumFacing side) {
     if (world.isRemote || ignoreBlockStay)
       return true; 
-    if (world.getBlockState(pos).func_193401_d((IBlockAccess)world, pos, side) == BlockFaceShape.SOLID)
+    if (world.getBlockState(pos).getBlockFaceShape((IBlockAccess)world, pos, side) == BlockFaceShape.SOLID)
       return true; 
     IEnergyTile tile = EnergyNet.instance.getSubTile(world, pos);
     return tile instanceof ic2.api.energy.tile.IEnergyEmitter;
@@ -132,8 +132,8 @@ public class TileEntityLuminator extends TileEntityBlock {
   protected void onEntityCollision(Entity entity) {
     super.onEntityCollision(entity);
     if (getActive() && entity instanceof net.minecraft.entity.monster.EntityMob) {
-      boolean isUndead = (entity instanceof EntityLivingBase && ((EntityLivingBase)entity).func_70668_bt() == EnumCreatureAttribute.UNDEAD);
-      entity.func_70015_d(isUndead ? 20 : 10);
+      boolean isUndead = (entity instanceof EntityLivingBase && ((EntityLivingBase)entity).getCreatureAttribute() == EnumCreatureAttribute.UNDEAD);
+      entity.setFire(isUndead ? 20 : 10);
     } 
   }
   
@@ -157,7 +157,7 @@ public class TileEntityLuminator extends TileEntityBlock {
   }
   
   private void updateLight() {
-    getWorld().func_180500_c(EnumSkyBlock.BLOCK, this.pos);
+    getWorld().checkLightFor(EnumSkyBlock.BLOCK, this.pos);
   }
   
   private static Map<EnumFacing, List<AxisAlignedBB>> getAabbMap() {

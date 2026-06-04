@@ -208,14 +208,14 @@ public class IC2 implements IFuelHandler {
     Keys.instance = (IKeyboard)keyboard;
     Components.init();
     BlocksItems.init();
-    Blocks.field_150343_Z.func_149752_b(60.0F);
-    Blocks.field_150381_bn.func_149752_b(60.0F);
-    Blocks.field_150477_bB.func_149752_b(60.0F);
-    Blocks.field_150467_bQ.func_149752_b(60.0F);
-    Blocks.WATER.func_149752_b(30.0F);
-    Blocks.field_150358_i.func_149752_b(30.0F);
-    Blocks.field_150353_l.func_149752_b(30.0F);
-    ExplosionWhitelist.addWhitelistedBlock(Blocks.field_150357_h);
+    Blocks.OBSIDIAN.setResistance(60.0F);
+    Blocks.ENCHANTING_TABLE.setResistance(60.0F);
+    Blocks.ENDER_CHEST.setResistance(60.0F);
+    Blocks.ANVIL.setResistance(60.0F);
+    Blocks.WATER.setResistance(30.0F);
+    Blocks.FLOWING_WATER.setResistance(30.0F);
+    Blocks.LAVA.setResistance(30.0F);
+    ExplosionWhitelist.addWhitelistedBlock(Blocks.BEDROCK);
     ScrapboxRecipeManager.setup();
     Tfbp.init();
     TileEntityCanner.init();
@@ -302,13 +302,13 @@ public class IC2 implements IFuelHandler {
     List<IRecipeInput> purgedRecipes = new ArrayList<>();
     purgedRecipes.addAll(ConfigUtil.asRecipeInputList(MainConfig.get(), "recipes/purge"));
     if (ConfigUtil.getBool(MainConfig.get(), "balance/disableEnderChest"))
-      purgedRecipes.add(Recipes.inputFactory.forStack(new ItemStack(Blocks.field_150477_bB))); 
+      purgedRecipes.add(Recipes.inputFactory.forStack(new ItemStack(Blocks.ENDER_CHEST))); 
     List<IRecipe> recipesToPurge = new ArrayList<>();
     for (IRecipe recipe : ForgeRegistries.RECIPES) {
-      ItemStack output = recipe.func_77571_b();
+      ItemStack output = recipe.getRecipeOutput();
       if (StackUtil.isEmpty(output))
         continue; 
-      if (recipe.getRegistryName().func_110624_b() == "ic2")
+      if (recipe.getRegistryName().getResourceDomain() == "ic2")
         continue; 
       for (IRecipeInput input : purgedRecipes) {
         if (input.matches(output))
@@ -317,7 +317,7 @@ public class IC2 implements IFuelHandler {
     } 
     recipesToPurge.stream().map(IForgeRegistryEntry::getRegistryName).forEach((IForgeRegistryModifiable)ForgeRegistries.RECIPES::remove);
     if (ConfigUtil.getBool(MainConfig.get(), "recipes/smeltToIc2Items")) {
-      Map<ItemStack, ItemStack> smeltingMap = FurnaceRecipes.func_77602_a().func_77599_b();
+      Map<ItemStack, ItemStack> smeltingMap = FurnaceRecipes.instance().getSmeltingList();
       for (Map.Entry<ItemStack, ItemStack> entry : smeltingMap.entrySet()) {
         ItemStack output = entry.getValue();
         if (StackUtil.isEmpty(output))
@@ -326,7 +326,7 @@ public class IC2 implements IFuelHandler {
         for (int oreId : OreDictionary.getOreIDs(output)) {
           String oreName = OreDictionary.getOreName(oreId);
           for (ItemStack ore : OreDictionary.getOres(oreName)) {
-            if (ore.getItem() != null && Util.getName(ore.getItem()).func_110624_b().equals("ic2")) {
+            if (ore.getItem() != null && Util.getName(ore.getItem()).getResourceDomain().equals("ic2")) {
               entry.setValue(StackUtil.copyWithSize(ore, StackUtil.getSize(output)));
               found = true;
               break;
@@ -373,9 +373,9 @@ public class IC2 implements IFuelHandler {
       Item item = stack.getItem();
       if (StackUtil.checkItemEquality(stack, BlockName.sapling.getItemStack()))
         return 80; 
-      if (item == Items.field_151120_aE)
+      if (item == Items.REEDS)
         return 50; 
-      if (item == Item.getItemFromBlock((Block)Blocks.field_150434_aF))
+      if (item == Item.getItemFromBlock((Block)Blocks.CACTUS))
         return 50; 
       if (StackUtil.checkItemEquality(stack, ItemName.crafting.getItemStack((Enum)CraftingItemType.scrap)))
         return 350; 
@@ -384,11 +384,11 @@ public class IC2 implements IFuelHandler {
       if (item == ItemName.fluid_cell.getInstance()) {
         FluidStack fs = FluidUtil.getFluidContained(stack);
         if (fs != null && fs.getFluid() == FluidRegistry.LAVA) {
-          int ret = TileEntityFurnace.func_145952_a(new ItemStack(Items.field_151129_at));
+          int ret = TileEntityFurnace.getItemBurnTime(new ItemStack(Items.LAVA_BUCKET));
           return ret * fs.amount / 1000;
         } 
       } else if (StackUtil.checkItemEquality(stack, ItemName.cell.getItemStack((Enum)CellType.lava))) {
-        return TileEntityFurnace.func_145952_a(new ItemStack(Items.field_151129_at));
+        return TileEntityFurnace.getItemBurnTime(new ItemStack(Items.LAVA_BUCKET));
       } 
     } 
     return 0;
@@ -417,11 +417,11 @@ public class IC2 implements IFuelHandler {
   }
   
   public static int getSeaLevel(World world) {
-    return world.provider.func_76557_i();
+    return world.provider.getAverageGroundLevel();
   }
   
   public static int getWorldHeight(World world) {
-    return world.func_72800_K();
+    return world.getHeight();
   }
   
   @SubscribeEvent
@@ -458,19 +458,19 @@ public class IC2 implements IFuelHandler {
     if (seasonal && (event.getEntityLiving() instanceof net.minecraft.entity.monster.EntityZombie || event.getEntityLiving() instanceof net.minecraft.entity.monster.EntitySkeleton) && (event.getEntityLiving().getEntityWorld()).rand.nextFloat() < 0.1F) {
       EntityLiving entity = (EntityLiving)event.getEntityLiving();
       for (EntityEquipmentSlot slot : EntityEquipmentSlot.values())
-        entity.func_184642_a(slot, Float.NEGATIVE_INFINITY); 
+        entity.setDropChance(slot, Float.NEGATIVE_INFINITY); 
       if (entity instanceof net.minecraft.entity.monster.EntityZombie)
-        entity.func_184201_a(EntityEquipmentSlot.MAINHAND, ItemName.nano_saber.getItemStack()); 
+        entity.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, ItemName.nano_saber.getItemStack()); 
       if ((entity.getEntityWorld()).rand.nextFloat() < 0.1F) {
-        entity.func_184201_a(EntityEquipmentSlot.HEAD, ItemName.quantum_helmet.getItemStack());
-        entity.func_184201_a(EntityEquipmentSlot.CHEST, ItemName.quantum_chestplate.getItemStack());
-        entity.func_184201_a(EntityEquipmentSlot.LEGS, ItemName.quantum_leggings.getItemStack());
-        entity.func_184201_a(EntityEquipmentSlot.FEET, ItemName.quantum_boots.getItemStack());
+        entity.setItemStackToSlot(EntityEquipmentSlot.HEAD, ItemName.quantum_helmet.getItemStack());
+        entity.setItemStackToSlot(EntityEquipmentSlot.CHEST, ItemName.quantum_chestplate.getItemStack());
+        entity.setItemStackToSlot(EntityEquipmentSlot.LEGS, ItemName.quantum_leggings.getItemStack());
+        entity.setItemStackToSlot(EntityEquipmentSlot.FEET, ItemName.quantum_boots.getItemStack());
       } else {
-        entity.func_184201_a(EntityEquipmentSlot.HEAD, ItemName.nano_helmet.getItemStack());
-        entity.func_184201_a(EntityEquipmentSlot.CHEST, ItemName.nano_chestplate.getItemStack());
-        entity.func_184201_a(EntityEquipmentSlot.LEGS, ItemName.nano_leggings.getItemStack());
-        entity.func_184201_a(EntityEquipmentSlot.FEET, ItemName.nano_boots.getItemStack());
+        entity.setItemStackToSlot(EntityEquipmentSlot.HEAD, ItemName.nano_helmet.getItemStack());
+        entity.setItemStackToSlot(EntityEquipmentSlot.CHEST, ItemName.nano_chestplate.getItemStack());
+        entity.setItemStackToSlot(EntityEquipmentSlot.LEGS, ItemName.nano_leggings.getItemStack());
+        entity.setItemStackToSlot(EntityEquipmentSlot.FEET, ItemName.nano_boots.getItemStack());
       } 
     } 
   }
@@ -482,7 +482,7 @@ public class IC2 implements IFuelHandler {
       return; 
     event.setCanceled(true);
     Fluid fluid = ((BlockIC2Fluid)event.getState().getBlock()).getFluid();
-    GlStateManager.func_187430_a(GlStateManager.FogMode.EXP);
+    GlStateManager.setFog(GlStateManager.FogMode.EXP);
     event.setDensity((float)Util.map(Math.abs(fluid.getDensity()), 20000.0D, 2.0D));
   }
   
@@ -502,9 +502,9 @@ public class IC2 implements IFuelHandler {
   public void renderEnhancedOverlay(DrawBlockHighlightEvent event) {
     ItemStack inHand = StackUtil.get(event.getPlayer(), EnumHand.MAIN_HAND);
     if (event.getSubID() == 0 && (event.getTarget()).typeOfHit == RayTraceResult.Type.BLOCK && inHand.getItem() instanceof IEnhancedOverlayProvider) {
-      World world = (event.getPlayer()).field_70170_p;
+      World world = (event.getPlayer()).world;
       BlockPos blockPos = event.getTarget().getBlockPos();
-      EnumFacing side = (event.getTarget()).field_178784_b;
+      EnumFacing side = (event.getTarget()).sideHit;
       if (((IEnhancedOverlayProvider)inHand.getItem()).providesEnhancedOverlay(world, blockPos, side, event.getPlayer(), inHand)) {
         GL11.glPushMatrix();
         EnhancedOverlay.transformToFace((Entity)event.getPlayer(), blockPos, side, event.getPartialTicks());
@@ -529,8 +529,8 @@ public class IC2 implements IFuelHandler {
         GL11.glVertex3d(-0.5D, 0.0D, 0.5D);
         GL11.glEnd();
         GlStateManager.enableBlend();
-        GlStateManager.func_187428_a(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-        GlStateManager.func_179090_x();
+        GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+        GlStateManager.disableTexture2D();
         GlStateManager.depthMask(false);
         Map<EnumFacing, Runnable> additionalRenders = new EnumMap<>(EnumFacing.class);
         if (world.getBlockState(blockPos).getBlock() instanceof IWrenchable) {
@@ -544,32 +544,32 @@ public class IC2 implements IFuelHandler {
                 spin = side;
                 break;
               case Y:
-                if (side.getAxis().func_176720_b()) {
+                if (side.getAxis().isVertical()) {
                   spin = EnumFacing.NORTH;
                   break;
                 } 
                 spin = EnumFacing.UP;
                 break;
               case Z:
-                if (side.getAxis().func_176720_b()) {
+                if (side.getAxis().isVertical()) {
                   spin = EnumFacing.SOUTH;
                   break;
                 } 
                 spin = EnumFacing.DOWN;
                 break;
               case null:
-                if (side.getAxis().func_176720_b()) {
+                if (side.getAxis().isVertical()) {
                   spin = EnumFacing.WEST;
                   break;
                 } 
-                spin = side.func_176746_e();
+                spin = side.rotateY();
                 break;
               case null:
-                if (side.getAxis().func_176720_b()) {
+                if (side.getAxis().isVertical()) {
                   spin = EnumFacing.EAST;
                   break;
                 } 
-                spin = side.func_176735_f();
+                spin = side.rotateYCCW();
                 break;
               case null:
               case null:
@@ -598,10 +598,10 @@ public class IC2 implements IFuelHandler {
                       edges = new EnumFacing[] { EnumFacing.DOWN, EnumFacing.UP, EnumFacing.NORTH, EnumFacing.SOUTH };
                       break;
                     case Y:
-                      sides = EnumFacing.Plane.HORIZONTAL.func_179516_a();
+                      sides = EnumFacing.Plane.HORIZONTAL.facings();
                       break;
                     case Z:
-                      sides = EnumFacing.Plane.VERTICAL.func_179516_a();
+                      sides = EnumFacing.Plane.VERTICAL.facings();
                       edges = new EnumFacing[] { EnumFacing.WEST, EnumFacing.EAST };
                       break;
                   } 
@@ -639,14 +639,14 @@ public class IC2 implements IFuelHandler {
           r.run(); 
         GL11.glPopMatrix();
         for (Map.Entry<EnumFacing, Runnable> entry : additionalRenders.entrySet()) {
-          GlStateManager.func_179094_E();
+          GlStateManager.pushMatrix();
           EnhancedOverlay.transformToFace((Entity)event.getPlayer(), blockPos, entry.getKey(), event.getPartialTicks());
           ((Runnable)entry.getValue()).run();
-          GlStateManager.func_179121_F();
+          GlStateManager.popMatrix();
         } 
         GlStateManager.depthMask(true);
-        GlStateManager.func_179098_w();
-        GlStateManager.func_179084_k();
+        GlStateManager.enableTexture2D();
+        GlStateManager.disableBlend();
       } 
     } 
   }

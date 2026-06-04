@@ -46,7 +46,7 @@ public class ItemToolMulti<T extends Enum<T> & IIdProvider> extends ItemToolIC2 
   
   public static <T extends Enum<T> & IIdProvider> ItemToolMulti<T> create(ItemName name, Class<T> typeClass, float damage, float speed, HarvestLevel harvestLevel, Set<? extends IToolClass> toolClasses, Set<Block> mineableBlocks) {
     EnumProperty<T> typeProperty = new EnumProperty("type", typeClass);
-    if (typeProperty.func_177700_c().size() > 32767)
+    if (typeProperty.getAllowedValues().size() > 32767)
       throw new IllegalArgumentException("Too many values to fit in a short for " + typeClass); 
     return new ItemToolMulti<>(name, typeProperty, damage, speed, harvestLevel, toolClasses, mineableBlocks);
   }
@@ -58,7 +58,7 @@ public class ItemToolMulti<T extends Enum<T> & IIdProvider> extends ItemToolIC2 
     this.updateHandlers = new IdentityHashMap<>();
     this.rarityFilter = new IdentityHashMap<>();
     this.typeProperty = typeProperty;
-    func_77627_a(true);
+    setHasSubtypes(true);
   }
   
   protected ItemToolMulti(ItemName name, Class<T> typeClass, HarvestLevel harvestLevel, Set<? extends IToolClass> toolClasses) {
@@ -73,24 +73,24 @@ public class ItemToolMulti<T extends Enum<T> & IIdProvider> extends ItemToolIC2 
     this(name, new EnumProperty("type", typeClass), damage, speed, harvestLevel, toolClasses, mineableBlocks);
   }
   
-  public final String func_77667_c(ItemStack stack) {
+  public final String getUnlocalizedName(ItemStack stack) {
     T type = getType(stack);
-    return (type == null) ? super.func_77667_c(stack) : (super.func_77667_c(stack) + "." + ((IIdProvider)type).getName());
+    return (type == null) ? super.getUnlocalizedName(stack) : (super.getUnlocalizedName(stack) + "." + ((IIdProvider)type).getName());
   }
   
-  public final void func_150895_a(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-    if (!func_194125_a(tab))
+  public final void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
+    if (!isInCreativeTab(tab))
       return; 
     for (Enum enum_ : this.typeProperty.getShownValues())
       subItems.add(getItemStackUnchecked((T)enum_)); 
   }
   
-  public EnumRarity func_77613_e(ItemStack stack) {
+  public EnumRarity getRarity(ItemStack stack) {
     EnumRarity rarity = this.rarityFilter.get(getType(stack));
-    return (rarity != null) ? rarity : super.func_77613_e(stack);
+    return (rarity != null) ? rarity : super.getRarity(stack);
   }
   
-  public ActionResult<ItemStack> func_77659_a(World world, EntityPlayer player, EnumHand hand) {
+  public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
     ItemStack stack = StackUtil.get(player, hand);
     T type = getType(stack);
     if (type == null)
@@ -101,7 +101,7 @@ public class ItemToolMulti<T extends Enum<T> & IIdProvider> extends ItemToolIC2 
     return handler.onRightClick(stack, player, hand);
   }
   
-  public EnumActionResult func_180614_a(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+  public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
     ItemStack stack = StackUtil.get(player, hand);
     T type = getType(stack);
     if (type == null)
@@ -112,7 +112,7 @@ public class ItemToolMulti<T extends Enum<T> & IIdProvider> extends ItemToolIC2 
     return handler.onUse(stack, player, pos, hand, side);
   }
   
-  public void func_77663_a(ItemStack stack, World world, Entity entity, int slotIndex, boolean isCurrentItem) {
+  public void onUpdate(ItemStack stack, World world, Entity entity, int slotIndex, boolean isCurrentItem) {
     T type = getType(stack);
     if (type == null)
       return; 
@@ -148,7 +148,7 @@ public class ItemToolMulti<T extends Enum<T> & IIdProvider> extends ItemToolIC2 
   
   @SideOnly(Side.CLIENT)
   public void registerModels(ItemName name) {
-    for (Enum enum_ : this.typeProperty.func_177700_c())
+    for (Enum enum_ : this.typeProperty.getAllowedValues())
       ItemIC2.registerModel((Item)this, ((IIdProvider)enum_).getId(), name, ((IIdProvider)enum_).getModelName()); 
   }
   
@@ -159,7 +159,7 @@ public class ItemToolMulti<T extends Enum<T> & IIdProvider> extends ItemToolIC2 
   }
   
   public ItemStack getItemStack(T type) {
-    if (!this.typeProperty.func_177700_c().contains(type))
+    if (!this.typeProperty.getAllowedValues().contains(type))
       throw new IllegalArgumentException("Invalid property value " + type + " for property " + this.typeProperty); 
     return getItemStackUnchecked(type);
   }
@@ -183,23 +183,23 @@ public class ItemToolMulti<T extends Enum<T> & IIdProvider> extends ItemToolIC2 
   }
   
   public Set<T> getAllTypes() {
-    return EnumSet.allOf(this.typeProperty.func_177699_b());
+    return EnumSet.allOf(this.typeProperty.getValueClass());
   }
   
   public int getCustomDamage(ItemStack stack) {
-    if (!stack.func_77942_o())
+    if (!stack.hasTagCompound())
       return 0; 
-    NBTTagCompound data = stack.func_77978_p();
+    NBTTagCompound data = stack.getTagCompound();
     assert data != null;
-    return data.func_74764_b("durability") ? data.getInteger("durability") : 0;
+    return data.hasKey("durability") ? data.getInteger("durability") : 0;
   }
   
   public int getMaxCustomDamage(ItemStack stack) {
-    if (!stack.func_77942_o())
+    if (!stack.hasTagCompound())
       return 0; 
-    NBTTagCompound data = stack.func_77978_p();
+    NBTTagCompound data = stack.getTagCompound();
     assert data != null;
-    return data.func_74764_b("maxDurability") ? data.getInteger("maxDurability") : 0;
+    return data.hasKey("maxDurability") ? data.getInteger("maxDurability") : 0;
   }
   
   public void setCustomDamage(ItemStack stack, int damage) {
@@ -213,12 +213,12 @@ public class ItemToolMulti<T extends Enum<T> & IIdProvider> extends ItemToolIC2 
   }
   
   public final T getType(ItemStack stack) {
-    return (T)this.typeProperty.getValue(stack.func_77960_j());
+    return (T)this.typeProperty.getValue(stack.getMetadata());
   }
   
   public void setRightClickHandler(T type, ItemMulti.IItemRightClickHandler handler) {
     if (type == null) {
-      for (Enum enum_ : this.typeProperty.func_177700_c())
+      for (Enum enum_ : this.typeProperty.getAllowedValues())
         setRightClickHandler((T)enum_, handler); 
     } else {
       this.rightClickHandlers.put(type, handler);
@@ -227,7 +227,7 @@ public class ItemToolMulti<T extends Enum<T> & IIdProvider> extends ItemToolIC2 
   
   public void setUseHandler(T type, ItemMulti.IItemUseHandler handler) {
     if (type == null) {
-      for (Enum enum_ : this.typeProperty.func_177700_c())
+      for (Enum enum_ : this.typeProperty.getAllowedValues())
         setUseHandler((T)enum_, handler); 
     } else {
       this.useHandlers.put(type, handler);
@@ -236,7 +236,7 @@ public class ItemToolMulti<T extends Enum<T> & IIdProvider> extends ItemToolIC2 
   
   public void setUpdateHandler(T type, ItemMulti.IItemUpdateHandler handler) {
     if (type == null) {
-      for (Enum enum_ : this.typeProperty.func_177700_c())
+      for (Enum enum_ : this.typeProperty.getAllowedValues())
         setUpdateHandler((T)enum_, handler); 
     } else {
       this.updateHandlers.put(type, handler);

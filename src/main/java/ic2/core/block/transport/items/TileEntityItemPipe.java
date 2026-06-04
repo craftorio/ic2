@@ -32,11 +32,11 @@ public class TileEntityItemPipe extends TileEntityPipe implements IItemTransport
       return 0; 
     if (!StackUtil.isEmpty(this.contents))
       return 0; 
-    if (stack.func_190916_E() > getMaxStackSizeAllowed())
+    if (stack.getCount() > getMaxStackSizeAllowed())
       return 0; 
     if (!simulate)
       this.contents = StackUtil.copy(stack); 
-    return stack.func_190916_E();
+    return stack.getCount();
   }
   
   public int getMaxStackSizeAllowed() {
@@ -65,7 +65,7 @@ public class TileEntityItemPipe extends TileEntityPipe implements IItemTransport
         (IItemTransportTile)target).putItems(this.contents, facing.getOpposite(), true) > 0) {
         int amount = ((IItemTransportTile)target).putItems(this.contents, facing.getOpposite(), false);
         ItemStack newStack = StackUtil.copyShrunk(this.contents, amount);
-        assert newStack.func_190926_b();
+        assert newStack.isEmpty();
         this.contents = null;
         needsInventoryUpdate = true;
       } 

@@ -35,7 +35,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ItemToolWrenchNew extends ItemToolIC2 implements IEnhancedOverlayProvider, IHitSoundOverride {
   public ItemToolWrenchNew() {
     super(ItemName.wrench_new, HarvestLevel.Iron, EnumSet.of(ToolClass.Wrench));
-    func_77656_e(120);
+    setMaxDamage(120);
   }
   
   public boolean canTakeDamage(ItemStack stack, int amount) {
@@ -78,20 +78,20 @@ public class ItemToolWrenchNew extends ItemToolIC2 implements IEnhancedOverlayPr
     return EnumActionResult.FAIL;
   }
   
-  public boolean func_82789_a(ItemStack toRepair, ItemStack repair) {
+  public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
     return Util.matchesOD(repair, "ingotBronze");
   }
   
-  public boolean func_77616_k(ItemStack stack) {
+  public boolean isEnchantable(ItemStack stack) {
     return false;
   }
   
   @SideOnly(Side.CLIENT)
-  public void func_77624_a(ItemStack stack, @Nullable World worldIn, List<String> info, ITooltipFlag flagIn) {
-    info.add((Minecraft.getMinecraft()).field_71474_y.field_74312_F.getDisplayName() + ":");
+  public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> info, ITooltipFlag flagIn) {
+    info.add((Minecraft.getMinecraft()).gameSettings.keyBindAttack.getDisplayName() + ":");
     info.add(" Safely mine IC2 machines (Yes you will get the machine and not the machine block)");
     info.add("");
-    info.add((Minecraft.getMinecraft()).field_71474_y.field_74313_G.getDisplayName() + ":");
+    info.add((Minecraft.getMinecraft()).gameSettings.keyBindUseItem.getDisplayName() + ":");
     info.add(" Set the machine facing (rotate)");
     info.add(" Connect pipes together and to covers");
   }
@@ -113,7 +113,7 @@ public class ItemToolWrenchNew extends ItemToolIC2 implements IEnhancedOverlayPr
   
   @SideOnly(Side.CLIENT)
   public String getBreakSoundForBlock(EntityPlayerSP player, World world, BlockPos pos, ItemStack stack) {
-    if (player.field_71075_bZ.field_75098_d)
+    if (player.capabilities.isCreativeMode)
       return null; 
     IBlockState state = world.getBlockState(pos);
     return (state.getBlock() instanceof IWrenchable) ? "Tools/wrench.ogg" : null;

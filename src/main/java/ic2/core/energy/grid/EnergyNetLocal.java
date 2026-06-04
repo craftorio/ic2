@@ -163,9 +163,9 @@ public class EnergyNetLocal {
       if (!this.positionsToNotify.isEmpty()) {
         Block block = BlockName.te.getInstance();
         for (BlockPos pos : this.positionsToNotify) {
-          if (!this.world.func_175667_e(pos))
+          if (!this.world.isBlockLoaded(pos))
             continue; 
-          this.world.getBlockState(pos).func_189546_a(this.world, pos, block, pos);
+          this.world.getBlockState(pos).neighborChanged(this.world, pos, block, pos);
         } 
         this.positionsToNotify.clear();
       } 

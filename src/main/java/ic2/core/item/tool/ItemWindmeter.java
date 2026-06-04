@@ -28,20 +28,20 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ItemWindmeter extends ItemElectricTool {
   public ItemWindmeter() {
     super(ItemName.wind_meter, 50);
-    func_77625_d(1);
+    setMaxStackSize(1);
     this.maxCharge = 10000;
     this.transferLimit = 100;
     this.tier = 1;
   }
   
   @SideOnly(Side.CLIENT)
-  public void func_77624_a(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
+  public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
     tooltip.add(Localization.translate("ic2.wind_meter.tooltipA"));
     tooltip.add(Localization.translate("ic2.wind_meter.tooltipB"));
   }
   
   public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
-    if (world.isRemote || player.func_70093_af())
+    if (world.isRemote || player.isSneaking())
       return EnumActionResult.PASS; 
     ItemStack stack = StackUtil.get(player, hand);
     if (!ElectricItem.manager.canUse(stack, this.operationEnergyCost))
@@ -86,7 +86,7 @@ public class ItemWindmeter extends ItemElectricTool {
     return EnumActionResult.PASS;
   }
   
-  public ActionResult<ItemStack> func_77659_a(World world, EntityPlayer player, EnumHand hand) {
+  public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
     ItemStack stack = StackUtil.get(player, hand);
     if (!IC2.platform.isSimulating())
       return new ActionResult(EnumActionResult.PASS, stack); 

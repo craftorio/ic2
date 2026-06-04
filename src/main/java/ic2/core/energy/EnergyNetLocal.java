@@ -84,7 +84,7 @@ public final class EnergyNetLocal implements IEnergyCalculator {
             
             Integer.valueOf(retry), EnergyNet.instance
             .getWorld(mainTile), EnergyNet.instance
-            .getWorld(mainTile).func_175726_f(EnergyNet.instance.getPos(mainTile)), this }); 
+            .getWorld(mainTile).getChunkFromBlockCoords(EnergyNet.instance.getPos(mainTile)), this }); 
     if (EnergyNetGlobal.checkApi && !Util.checkInterfaces(mainTile.getClass()))
       IC2.log.warn(LogCategory.EnergyNet, "EnergyNet.addTile: %s doesn't implement its advertised interfaces completely.", new Object[] { mainTile }); 
     if (mainTile instanceof TileEntity && ((TileEntity)mainTile).isInvalid()) {
@@ -110,7 +110,7 @@ public final class EnergyNetLocal implements IEnergyCalculator {
     } 
     for (ListIterator<IEnergyTile> it = tile.subTiles.listIterator(); it.hasNext(); ) {
       IEnergyTile subTile = it.next();
-      BlockPos pos = EnergyNet.instance.getPos(subTile).func_185334_h();
+      BlockPos pos = EnergyNet.instance.getPos(subTile).toImmutable();
       Tile conflicting = this.registeredTiles.get(pos);
       boolean abort = false;
       if (conflicting != null) {
@@ -128,7 +128,7 @@ public final class EnergyNetLocal implements IEnergyCalculator {
         if (conflicting != null)
           abort = true; 
       } 
-      if (!abort && !this.world.func_175667_e(pos)) {
+      if (!abort && !this.world.isBlockLoaded(pos)) {
         if (retry < 1) {
           logWarn("EnergyNet.addTileEntity: " + subTile + " (" + mainTile + ") was added too early, postponing");
           this.pendingAdds.put(mainTile, Integer.valueOf(retry + 1));
@@ -157,7 +157,7 @@ public final class EnergyNetLocal implements IEnergyCalculator {
   private void notifyLoadedNeighbors(BlockPos pos, List<IEnergyTile> excluded) {
     Set<BlockPos> excludedPositions = new HashSet<>(excluded.size());
     for (IEnergyTile subTile : excluded)
-      excludedPositions.add(EnergyNet.instance.getPos(subTile).func_185334_h()); 
+      excludedPositions.add(EnergyNet.instance.getPos(subTile).toImmutable()); 
     Block block = this.world.getBlockState(pos).getBlock();
     int ocx = pos.getX() >> 4;
     int ocz = pos.getZ() >> 4;
@@ -166,10 +166,10 @@ public final class EnergyNetLocal implements IEnergyCalculator {
       if (!excludedPositions.contains(cPos)) {
         int ccx = cPos.getX() >> 4;
         int ccz = cPos.getZ() >> 4;
-        if (dir.getAxis().func_176720_b() || (ccx == ocx && ccz == ocz) || this.world
+        if (dir.getAxis().isVertical() || (ccx == ocx && ccz == ocz) || this.world
           
-          .func_175667_e(cPos))
-          this.world.getBlockState(cPos).func_189546_a(this.world, cPos, block, pos); 
+          .isBlockLoaded(cPos))
+          this.world.getBlockState(cPos).neighborChanged(this.world, cPos, block, pos); 
       } 
     } 
   }
@@ -182,7 +182,7 @@ public final class EnergyNetLocal implements IEnergyCalculator {
       IC2.log.debug(LogCategory.EnergyNet, "EnergyNet.removeTile(%s), world=%s, chunk=%s, this=%s", new Object[] { mainTile, EnergyNet.instance
             
             .getWorld(mainTile), EnergyNet.instance
-            .getWorld(mainTile).func_175726_f(EnergyNet.instance.getPos(mainTile)), this }); 
+            .getWorld(mainTile).getChunkFromBlockCoords(EnergyNet.instance.getPos(mainTile)), this }); 
     if (mainTile instanceof IMetaDelegate) {
       subTiles = ((IMetaDelegate)mainTile).getSubTiles();
     } else {
@@ -216,7 +216,7 @@ public final class EnergyNetLocal implements IEnergyCalculator {
         this.removedTiles.add(tile);
       } 
       this.registeredTiles.remove(pos);
-      if (this.world.func_175667_e(pos))
+      if (this.world.isBlockLoaded(pos))
         notifyLoadedNeighbors(pos, tile.subTiles); 
     } 
   }

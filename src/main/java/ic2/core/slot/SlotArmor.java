@@ -15,19 +15,19 @@ public class SlotArmor extends Slot {
   private final EntityEquipmentSlot armorType;
   
   public SlotArmor(InventoryPlayer inventory, EntityEquipmentSlot armorType, int x, int y) {
-    super((IInventory)inventory, 36 + armorType.func_188454_b(), x, y);
+    super((IInventory)inventory, 36 + armorType.getIndex(), x, y);
     this.armorType = armorType;
   }
   
-  public boolean func_75214_a(ItemStack stack) {
+  public boolean isItemValid(ItemStack stack) {
     Item item = stack.getItem();
     if (item == null)
       return false; 
-    return item.isValidArmor(stack, this.armorType, (Entity)((InventoryPlayer)this.field_75224_c).field_70458_d);
+    return item.isValidArmor(stack, this.armorType, (Entity)((InventoryPlayer)this.inventory).player);
   }
   
   @SideOnly(Side.CLIENT)
-  public String func_178171_c() {
-    return ItemArmor.field_94603_a[this.armorType.func_188454_b()];
+  public String getSlotTexture() {
+    return ItemArmor.EMPTY_SLOT_NAMES[this.armorType.getIndex()];
   }
 }

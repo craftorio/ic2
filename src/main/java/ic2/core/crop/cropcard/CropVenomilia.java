@@ -51,7 +51,7 @@ public class CropVenomilia extends IC2CropCard {
     if (crop.getCurrentSize() == 5)
       return ItemName.crop_res.getItemStack((Enum)CropResItemType.grin_powder); 
     if (crop.getCurrentSize() >= 4)
-      return new ItemStack(Items.field_151100_aR, 1, 5); 
+      return new ItemStack(Items.DYE, 1, 5); 
     return null;
   }
   
@@ -66,22 +66,22 @@ public class CropVenomilia extends IC2CropCard {
   }
   
   public boolean onRightClick(ICropTile crop, EntityPlayer player) {
-    if (!player.func_70093_af())
+    if (!player.isSneaking())
       onEntityCollision(crop, (Entity)player); 
     return crop.performManualHarvest();
   }
   
   public boolean onLeftClick(ICropTile crop, EntityPlayer player) {
-    if (!player.func_70093_af())
+    if (!player.isSneaking())
       onEntityCollision(crop, (Entity)player); 
     return crop.pick();
   }
   
   public boolean onEntityCollision(ICropTile crop, Entity entity) {
     if (crop.getCurrentSize() == 5 && entity instanceof EntityLivingBase) {
-      if (entity instanceof EntityPlayer && ((EntityPlayer)entity).func_70093_af() && IC2.random.nextInt(50) != 0)
+      if (entity instanceof EntityPlayer && ((EntityPlayer)entity).isSneaking() && IC2.random.nextInt(50) != 0)
         return super.onEntityCollision(crop, entity); 
-      ((EntityLivingBase)entity).func_70690_d(new PotionEffect(MobEffects.field_76436_u, (IC2.random.nextInt(10) + 5) * 20, 0));
+      ((EntityLivingBase)entity).addPotionEffect(new PotionEffect(MobEffects.POISON, (IC2.random.nextInt(10) + 5) * 20, 0));
       crop.setCurrentSize(4);
       crop.updateState();
     } 

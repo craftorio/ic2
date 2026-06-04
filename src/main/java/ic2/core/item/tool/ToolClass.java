@@ -8,15 +8,15 @@ import net.minecraft.block.material.Material;
 import net.minecraft.init.Blocks;
 
 public enum ToolClass implements IToolClass {
-  Axe("axe", new Object[] { Material.field_151575_d, Material.field_151585_k, Material.field_151582_l }),
-  Pickaxe("pickaxe", new Object[] { Material.field_151573_f, Material.field_151574_g, Material.field_151576_e }),
-  Shears("shears", new Object[] { Blocks.field_150321_G, Blocks.field_150325_L, Blocks.field_150488_af, Blocks.field_150473_bD, Material.field_151584_j }),
-  Shovel("shovel", new Object[] { Blocks.field_150431_aC, Blocks.field_150433_aE }),
-  Sword("sword", new Object[] { Blocks.field_150321_G, Material.field_151585_k, Material.field_151582_l, Material.field_151589_v, Material.field_151584_j, Material.field_151572_C }),
-  Hoe(null, new Object[] { Blocks.field_150346_d, Blocks.field_150349_c, Blocks.field_150391_bh }),
+  Axe("axe", new Object[] { Material.WOOD, Material.PLANTS, Material.VINE }),
+  Pickaxe("pickaxe", new Object[] { Material.IRON, Material.ANVIL, Material.ROCK }),
+  Shears("shears", new Object[] { Blocks.WEB, Blocks.WOOL, Blocks.REDSTONE_WIRE, Blocks.TRIPWIRE, Material.LEAVES }),
+  Shovel("shovel", new Object[] { Blocks.SNOW_LAYER, Blocks.SNOW }),
+  Sword("sword", new Object[] { Blocks.WEB, Material.PLANTS, Material.VINE, Material.CORAL, Material.LEAVES, Material.GOURD }),
+  Hoe(null, new Object[] { Blocks.DIRT, Blocks.GRASS, Blocks.MYCELIUM }),
   Wrench("wrench", new Object[] { IC2Material.MACHINE, IC2Material.PIPE }),
   WireCutter("wire_cutter", new Object[] { IC2Material.CABLE }),
-  Crowbar("crowbar", new Object[] { Blocks.field_150448_aq, Blocks.field_150408_cc, Blocks.field_150319_E, Blocks.field_150318_D });
+  Crowbar("crowbar", new Object[] { Blocks.RAIL, Blocks.ACTIVATOR_RAIL, Blocks.DETECTOR_RAIL, Blocks.GOLDEN_RAIL });
   
   public final String name;
   

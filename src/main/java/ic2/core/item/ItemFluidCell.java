@@ -24,33 +24,33 @@ import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 public class ItemFluidCell extends ItemIC2FluidContainer {
   public ItemFluidCell() {
     super(ItemName.fluid_cell, 1000);
-    BlockDispenser.field_149943_a.func_82595_a(this, DispenseFluidContainer.getInstance());
+    BlockDispenser.DISPENSE_BEHAVIOR_REGISTRY.putObject(this, DispenseFluidContainer.getInstance());
   }
   
   public boolean isRepairable() {
     return false;
   }
   
-  public EnumActionResult func_180614_a(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float xOffset, float yOffset, float zOffset) {
+  public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float xOffset, float yOffset, float zOffset) {
     if (world.isRemote)
       return EnumActionResult.SUCCESS; 
     if (interactWithTank(player, hand, world, pos, side)) {
-      player.field_71069_bz.func_75142_b();
+      player.inventoryContainer.detectAndSendChanges();
       return EnumActionResult.SUCCESS;
     } 
-    RayTraceResult position = func_77621_a(world, player, true);
+    RayTraceResult position = rayTrace(world, player, true);
     if (position == null)
       return EnumActionResult.FAIL; 
     if (position.typeOfHit == RayTraceResult.Type.BLOCK) {
       pos = position.getBlockPos();
       if (!world.canMineBlockBody(player, pos))
         return EnumActionResult.FAIL; 
-      if (!player.func_175151_a(pos, position.field_178784_b, player.func_184586_b(hand)))
+      if (!player.canPlayerEdit(pos, position.sideHit, player.getHeldItem(hand)))
         return EnumActionResult.FAIL; 
       if (LiquidUtil.drainBlockToContainer(world, pos, player, hand) || 
         LiquidUtil.fillBlockFromContainer(world, pos, player, hand) || 
         LiquidUtil.fillBlockFromContainer(world, pos.offset(side), player, hand)) {
-        player.field_71069_bz.func_75142_b();
+        player.inventoryContainer.detectAndSendChanges();
         return EnumActionResult.SUCCESS;
       } 
     } 
@@ -61,8 +61,8 @@ public class ItemFluidCell extends ItemIC2FluidContainer {
     return true;
   }
   
-  public void func_150895_a(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-    if (!func_194125_a(tab) || IC2.version.isClassic())
+  public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
+    if (!isInCreativeTab(tab) || IC2.version.isClassic())
       return; 
     ItemStack emptyStack = new ItemStack(this);
     subItems.add(emptyStack);

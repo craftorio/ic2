@@ -15,8 +15,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ItemFoodIc2 extends ItemFood implements IItemModelProvider {
   protected ItemFoodIc2(ItemName name, int amount, float saturation, boolean isWolfFood) {
     super(amount, saturation, isWolfFood);
-    func_77655_b(name.name());
-    func_77637_a((CreativeTabs)IC2.tabIC2);
+    setUnlocalizedName(name.name());
+    setCreativeTab((CreativeTabs)IC2.tabIC2);
     BlocksItems.registerItem((Item)this, IC2.getIdentifier(name.name()));
     name.setInstance((Item)this);
   }
@@ -26,19 +26,19 @@ public class ItemFoodIc2 extends ItemFood implements IItemModelProvider {
     ItemIC2.registerModel((Item)this, 0, name, null);
   }
   
-  public String func_77658_a() {
-    return "ic2." + super.func_77658_a().substring(5);
+  public String getUnlocalizedName() {
+    return "ic2." + super.getUnlocalizedName().substring(5);
   }
   
-  public String func_77667_c(ItemStack stack) {
-    return func_77658_a();
+  public String getUnlocalizedName(ItemStack stack) {
+    return getUnlocalizedName();
   }
   
-  public String func_77657_g(ItemStack stack) {
-    return func_77667_c(stack);
+  public String getUnlocalizedNameInefficiently(ItemStack stack) {
+    return getUnlocalizedName(stack);
   }
   
-  public String func_77653_i(ItemStack stack) {
-    return Localization.translate(func_77667_c(stack));
+  public String getItemStackDisplayName(ItemStack stack) {
+    return Localization.translate(getUnlocalizedName(stack));
   }
 }

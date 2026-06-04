@@ -139,7 +139,7 @@ public class EnergyNetGlobal implements IEnergyNet {
   public static EnergyNetLocal getLocal(World world) {
     if (world.isRemote)
       throw new IllegalStateException("not applicable clientside"); 
-    assert world.func_73046_m().func_152345_ab();
+    assert world.getMinecraftServer().isCallingFromMinecraftThread();
     return (WorldData.get(world)).energyNet;
   }
   

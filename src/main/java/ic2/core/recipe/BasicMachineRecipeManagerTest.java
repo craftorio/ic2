@@ -36,7 +36,7 @@ public class BasicMachineRecipeManagerTest implements IBasicMachineRecipeManager
     if (adjustInput) {
       if (input.getItem().hasContainerItem(input))
         throw new UnsupportedOperationException("can't adjust input item, use apply() instead"); 
-      input.func_190918_g(((IRecipeInput)recipe.getInput()).getAmount());
+      input.shrink(((IRecipeInput)recipe.getInput()).getAmount());
     } 
     return new RecipeOutput(recipe.getMetaData(), new ArrayList((Collection)recipe.getOutput()));
   }

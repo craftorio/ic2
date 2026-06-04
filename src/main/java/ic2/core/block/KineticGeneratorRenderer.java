@@ -28,12 +28,12 @@ public class KineticGeneratorRenderer<T extends TileEntity> extends TileEntitySp
     } 
     EnumFacing facing = windGen.getFacing();
     pos = pos.offset(facing);
-    int light = world.func_175626_b(pos, 0);
+    int light = world.getCombinedLight(pos, 0);
     int blockLight = light % 65536;
     int skyLight = light / 65536;
-    OpenGlHelper.func_77475_a(OpenGlHelper.field_77476_b, blockLight, skyLight);
-    GlStateManager.func_179094_E();
-    GlStateManager.func_179109_b(0.5F, 0.5F, 0.5F);
+    OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, blockLight, skyLight);
+    GlStateManager.pushMatrix();
+    GlStateManager.translate(0.5F, 0.5F, 0.5F);
     switch (facing) {
       case NORTH:
         GL11.glRotatef(-90.0F, 0.0F, 1.0F, 0.0F);
@@ -48,14 +48,14 @@ public class KineticGeneratorRenderer<T extends TileEntity> extends TileEntitySp
         GL11.glRotatef(-90.0F, 0.0F, 0.0F, 1.0F);
         break;
     } 
-    GlStateManager.func_179114_b(angle, 1.0F, 0.0F, 0.0F);
-    GlStateManager.func_179109_b(-0.2F, 0.0F, 0.0F);
-    func_147499_a(rotorRL);
-    model.func_78088_a(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
-    GlStateManager.func_179121_F();
+    GlStateManager.rotate(angle, 1.0F, 0.0F, 0.0F);
+    GlStateManager.translate(-0.2F, 0.0F, 0.0F);
+    bindTexture(rotorRL);
+    model.render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
+    GlStateManager.popMatrix();
   }
   
-  public void func_192841_a(T te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
+  public void render(T te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
     GL11.glPushMatrix();
     GL11.glTranslatef((float)x, (float)y, (float)z);
     if (te instanceof IRotorProvider)

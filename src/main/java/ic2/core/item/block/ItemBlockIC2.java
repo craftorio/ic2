@@ -18,12 +18,12 @@ public class ItemBlockIC2 extends ItemBlock {
     super(block);
   }
   
-  public String func_77667_c(ItemStack stack) {
-    return func_77658_a();
+  public String getUnlocalizedName(ItemStack stack) {
+    return getUnlocalizedName();
   }
   
-  public String func_77653_i(ItemStack stack) {
-    return Localization.translate(func_77667_c(stack));
+  public String getItemStackDisplayName(ItemStack stack) {
+    return Localization.translate(getUnlocalizedName(stack));
   }
   
   public boolean canHarvestBlock(IBlockState block, ItemStack stack) {
@@ -31,18 +31,18 @@ public class ItemBlockIC2 extends ItemBlock {
   }
   
   public int getItemBurnTime(ItemStack stack) {
-    if (this.field_150939_a == BlockName.scaffold.getInstance()) {
-      BlockScaffold scaffold = (BlockScaffold)this.field_150939_a;
+    if (this.block == BlockName.scaffold.getInstance()) {
+      BlockScaffold scaffold = (BlockScaffold)this.block;
       IBlockState state = scaffold.getState(scaffold.getVariant(stack));
-      return (state.getMaterial() == Material.field_151575_d) ? 300 : 0;
+      return (state.getMaterial() == Material.WOOD) ? 300 : 0;
     } 
     return -1;
   }
   
-  public EnumRarity func_77613_e(ItemStack stack) {
-    if (this.field_150939_a instanceof BlockBase)
-      return ((BlockBase)this.field_150939_a).getRarity(stack); 
-    return super.func_77613_e(stack);
+  public EnumRarity getRarity(ItemStack stack) {
+    if (this.block instanceof BlockBase)
+      return ((BlockBase)this.block).getRarity(stack); 
+    return super.getRarity(stack);
   }
   
   public static Function<Block, Item> supplier = ItemBlockIC2::new;

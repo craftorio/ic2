@@ -66,7 +66,7 @@ public class TransferHandlerIndustrialWorkbench implements IRecipeTransferHandle
     public List<Slot> getRecipeSlots(ContainerIndustrialWorkbench container) {
       List<Slot> recipeSlots = new ArrayList<>();
       for (int i = container.indexGridStart; i < container.indexGridEnd; i++)
-        recipeSlots.add(container.func_75139_a(i)); 
+        recipeSlots.add(container.getSlot(i)); 
       return recipeSlots;
     }
     
@@ -74,9 +74,9 @@ public class TransferHandlerIndustrialWorkbench implements IRecipeTransferHandle
       List<Slot> inventorySlots = new ArrayList<>();
       int i;
       for (i = container.indexBufferStart; i < container.indexBufferEnd; i++)
-        inventorySlots.add(container.func_75139_a(i)); 
+        inventorySlots.add(container.getSlot(i)); 
       for (i = 0; i < 36; i++)
-        inventorySlots.add(container.func_75139_a(i)); 
+        inventorySlots.add(container.getSlot(i)); 
       return inventorySlots;
     }
   }
@@ -105,21 +105,21 @@ public class TransferHandlerIndustrialWorkbench implements IRecipeTransferHandle
         .forEach(ingredients::add);
       if (ingredients.size() != 2)
         return this.handlerHelper.createInternalError(); 
-      Slot toolLeft = container.func_75139_a(container.indexOutputHammer - 2);
-      Slot toolRight = container.func_75139_a(container.indexOutputCutter - 2);
-      Slot itemLeft = container.func_75139_a(container.indexOutputHammer - 1);
-      Slot itemRight = container.func_75139_a(container.indexOutputCutter - 1);
+      Slot toolLeft = container.getSlot(container.indexOutputHammer - 2);
+      Slot toolRight = container.getSlot(container.indexOutputCutter - 2);
+      Slot itemLeft = container.getSlot(container.indexOutputHammer - 1);
+      Slot itemRight = container.getSlot(container.indexOutputCutter - 1);
       Slot[][] craftingSlots = { { toolLeft, itemLeft }, { toolRight, itemRight } };
       int toolIdx = -1;
       int craftingIdx = -1;
       for (int i = 0; i < ingredients.size(); i++) {
         ItemStack stack = (ItemStack)((IGuiIngredient)ingredients.get(i)).getDisplayedIngredient();
-        if (toolLeft.func_75214_a(stack)) {
+        if (toolLeft.isItemValid(stack)) {
           toolIdx = i;
           craftingIdx = 0;
           break;
         } 
-        if (toolRight.func_75214_a(stack)) {
+        if (toolRight.isItemValid(stack)) {
           toolIdx = i;
           craftingIdx = 1;
           break;
@@ -134,21 +134,21 @@ public class TransferHandlerIndustrialWorkbench implements IRecipeTransferHandle
       int filledCraftSlotCount = 0;
       int emptySlotCount = 0;
       for (Slot slot : craftingSlots[craftingIdx]) {
-        ItemStack stack = slot.func_75211_c();
-        if (!stack.func_190926_b()) {
-          if (!slot.func_82869_a(player)) {
-            Log.get().error("Recipe Transfer helper {} does not work for container {}. Player can't move item out of Crafting Slot number {}", this.transferHelper.getClass(), container.getClass(), Integer.valueOf(slot.field_75222_d));
+        ItemStack stack = slot.getStack();
+        if (!stack.isEmpty()) {
+          if (!slot.canTakeStack(player)) {
+            Log.get().error("Recipe Transfer helper {} does not work for container {}. Player can't move item out of Crafting Slot number {}", this.transferHelper.getClass(), container.getClass(), Integer.valueOf(slot.slotNumber));
             return this.handlerHelper.createInternalError();
           } 
           filledCraftSlotCount++;
-          availableItemStacks.put(Integer.valueOf(slot.field_75222_d), stack.copy());
+          availableItemStacks.put(Integer.valueOf(slot.slotNumber), stack.copy());
         } 
       } 
       List<Slot> inventorySlots = this.transferHelper.getInventorySlots((Container)container);
       for (Slot slot : inventorySlots) {
-        ItemStack stack = slot.func_75211_c();
-        if (!stack.func_190926_b()) {
-          availableItemStacks.put(Integer.valueOf(slot.field_75222_d), stack.copy());
+        ItemStack stack = slot.getStack();
+        if (!stack.isEmpty()) {
+          availableItemStacks.put(Integer.valueOf(slot.slotNumber), stack.copy());
           continue;
         } 
         emptySlotCount++;
@@ -163,10 +163,10 @@ public class TransferHandlerIndustrialWorkbench implements IRecipeTransferHandle
         return this.handlerHelper.createUserErrorForSlots(message, matchingItemsResult.missingItems);
       } 
       List<Integer> inventorySlotIndexes = new ArrayList<>();
-      inventorySlots.stream().map(s -> Integer.valueOf(s.field_75222_d)).forEach(inventorySlotIndexes::add);
+      inventorySlots.stream().map(s -> Integer.valueOf(s.slotNumber)).forEach(inventorySlotIndexes::add);
       if (doTransfer) {
-        List<Integer> craftingSlotIndexes = Arrays.asList(new Integer[] { Integer.valueOf((craftingSlots[craftingIdx][0]).field_75222_d), 
-              Integer.valueOf((craftingSlots[craftingIdx][1]).field_75222_d) });
+        List<Integer> craftingSlotIndexes = Arrays.asList(new Integer[] { Integer.valueOf((craftingSlots[craftingIdx][0]).slotNumber), 
+              Integer.valueOf((craftingSlots[craftingIdx][1]).slotNumber) });
         PacketRecipeTransfer packet = new PacketRecipeTransfer(matchingItemsResult.matchingItems, craftingSlotIndexes, inventorySlotIndexes, maxTransfer, false);
         JustEnoughItems.getProxy().sendPacketToServer((PacketJei)packet);
       } 

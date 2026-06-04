@@ -49,9 +49,9 @@ public class ItemClassicCell extends ItemMulti<CellType> {
   }
   
   @SideOnly(Side.CLIENT)
-  public void func_77624_a(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
+  public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
     CellType type = getType(stack);
-    if (type.getStackSize() == 1 && advanced.func_194127_a()) {
+    if (type.getStackSize() == 1 && advanced.isAdvanced()) {
       int max = type.getMaximum(stack);
       tooltip.add(Localization.translate("item.durability", new Object[] { Integer.valueOf(max - type.getUsage(stack)), Integer.valueOf(max) }));
     } 

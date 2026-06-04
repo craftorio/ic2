@@ -20,7 +20,7 @@ public class ItemIodineTablet extends ItemIC2 {
     super(ItemName.iodine_tablet);
   }
   
-  public ActionResult<ItemStack> func_77659_a(World world, EntityPlayer player, EnumHand hand) {
+  public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
     ItemStack stack = StackUtil.get(player, hand);
     if (!world.isRemote)
       return onEaten(player, stack); 
@@ -28,16 +28,16 @@ public class ItemIodineTablet extends ItemIC2 {
   }
   
   public ActionResult<ItemStack> onEaten(EntityPlayer player, ItemStack stack) {
-    PotionEffect radiation = player.func_70660_b((Potion)IC2Potion.radiation);
+    PotionEffect radiation = player.getActivePotionEffect((Potion)IC2Potion.radiation);
     if (radiation == null)
       return new ActionResult(EnumActionResult.PASS, stack); 
-    int duration = radiation.func_76459_b() / 20;
+    int duration = radiation.getDuration() / 20;
     int amount = Math.min(StackUtil.getSize(stack), duration);
     if (amount <= 0)
       return new ActionResult(EnumActionResult.PASS, stack); 
-    player.func_184589_d((Potion)IC2Potion.radiation);
+    player.removePotionEffect((Potion)IC2Potion.radiation);
     if (amount < duration)
-      player.func_70690_d(new PotionEffect((Potion)IC2Potion.radiation, (duration - amount) * 20)); 
+      player.addPotionEffect(new PotionEffect((Potion)IC2Potion.radiation, (duration - amount) * 20)); 
     stack = StackUtil.decSize(stack, amount);
     IC2.platform.playSoundSp("Tools/eat.ogg", 1.0F, 1.0F);
     return new ActionResult(EnumActionResult.SUCCESS, stack);

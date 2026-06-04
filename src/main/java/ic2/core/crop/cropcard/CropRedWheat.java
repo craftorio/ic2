@@ -48,7 +48,7 @@ public class CropRedWheat extends IC2CropCard {
     BlockPos coords = crop.getPosition();
     if (crop.getWorldObj().isBlockIndirectlyGettingPowered(coords) > 0 || (crop.getWorldObj()).rand.nextBoolean())
       return new ItemStack(Items.REDSTONE, 1); 
-    return new ItemStack(Items.field_151015_O, 1);
+    return new ItemStack(Items.WHEAT, 1);
   }
   
   public boolean isRedstoneSignalEmitter(ICropTile crop) {

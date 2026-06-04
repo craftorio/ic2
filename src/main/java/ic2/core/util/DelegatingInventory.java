@@ -12,79 +12,79 @@ public class DelegatingInventory implements IInventory {
     this.parent = parent;
   }
   
-  public String func_70005_c_() {
-    return this.parent.func_70005_c_();
+  public String getName() {
+    return this.parent.getName();
   }
   
-  public boolean func_145818_k_() {
-    return this.parent.func_145818_k_();
+  public boolean hasCustomName() {
+    return this.parent.hasCustomName();
   }
   
-  public ITextComponent func_145748_c_() {
-    return this.parent.func_145748_c_();
+  public ITextComponent getDisplayName() {
+    return this.parent.getDisplayName();
   }
   
-  public int func_70302_i_() {
-    return this.parent.func_70302_i_();
+  public int getSizeInventory() {
+    return this.parent.getSizeInventory();
   }
   
-  public boolean func_191420_l() {
-    return this.parent.func_191420_l();
+  public boolean isEmpty() {
+    return this.parent.isEmpty();
   }
   
-  public ItemStack func_70301_a(int index) {
-    return this.parent.func_70301_a(index);
+  public ItemStack getStackInSlot(int index) {
+    return this.parent.getStackInSlot(index);
   }
   
-  public ItemStack func_70298_a(int index, int count) {
-    return this.parent.func_70298_a(index, count);
+  public ItemStack decrStackSize(int index, int count) {
+    return this.parent.decrStackSize(index, count);
   }
   
-  public ItemStack func_70304_b(int index) {
-    return this.parent.func_70304_b(index);
+  public ItemStack removeStackFromSlot(int index) {
+    return this.parent.removeStackFromSlot(index);
   }
   
-  public void func_70299_a(int index, ItemStack stack) {
-    this.parent.func_70299_a(index, stack);
+  public void setInventorySlotContents(int index, ItemStack stack) {
+    this.parent.setInventorySlotContents(index, stack);
   }
   
-  public int func_70297_j_() {
-    return this.parent.func_70297_j_();
+  public int getInventoryStackLimit() {
+    return this.parent.getInventoryStackLimit();
   }
   
   public void markDirty() {
     this.parent.markDirty();
   }
   
-  public boolean func_70300_a(EntityPlayer player) {
-    return this.parent.func_70300_a(player);
+  public boolean isUsableByPlayer(EntityPlayer player) {
+    return this.parent.isUsableByPlayer(player);
   }
   
-  public void func_174889_b(EntityPlayer player) {
-    this.parent.func_174889_b(player);
+  public void openInventory(EntityPlayer player) {
+    this.parent.openInventory(player);
   }
   
-  public void func_174886_c(EntityPlayer player) {
-    this.parent.func_174886_c(player);
+  public void closeInventory(EntityPlayer player) {
+    this.parent.closeInventory(player);
   }
   
-  public boolean func_94041_b(int index, ItemStack stack) {
-    return this.parent.func_94041_b(index, stack);
+  public boolean isItemValidForSlot(int index, ItemStack stack) {
+    return this.parent.isItemValidForSlot(index, stack);
   }
   
-  public int func_174887_a_(int id) {
-    return this.parent.func_174887_a_(id);
+  public int getField(int id) {
+    return this.parent.getField(id);
   }
   
-  public void func_174885_b(int id, int value) {
-    this.parent.func_174885_b(id, value);
+  public void setField(int id, int value) {
+    this.parent.setField(id, value);
   }
   
-  public int func_174890_g() {
-    return this.parent.func_174890_g();
+  public int getFieldCount() {
+    return this.parent.getFieldCount();
   }
   
-  public void func_174888_l() {
-    this.parent.func_174888_l();
+  public void clear() {
+    this.parent.clear();
   }
 }

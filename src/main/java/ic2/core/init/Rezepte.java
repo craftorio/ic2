@@ -433,11 +433,11 @@ public class Rezepte {
       for (String part : splitWhitespace(value.getString())) {
         if (part.startsWith("@")) {
           if (part.startsWith("@ignoreSameInputOutput")) {
-            metadata.func_74757_a("ignoreSameInputOutput", true);
+            metadata.setBoolean("ignoreSameInputOutput", true);
             continue;
           } 
           if (part.startsWith("@xp:") && type == MachineType.Furnace) {
-            metadata.func_74776_a("experience", Float.parseFloat(part.substring(4)));
+            metadata.setFloat("experience", Float.parseFloat(part.substring(4)));
             continue;
           } 
           if (part.startsWith("@hardness:") && type == MachineType.BlockCutter) {
@@ -547,7 +547,7 @@ public class Rezepte {
     
     boolean hasRequiredTags(NBTTagCompound metadata) {
       for (String key : this.tagsRequired) {
-        if (!metadata.func_74764_b(key))
+        if (!metadata.hasKey(key))
           return false; 
       } 
       return true;

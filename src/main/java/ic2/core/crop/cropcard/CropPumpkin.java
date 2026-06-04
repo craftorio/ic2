@@ -26,11 +26,11 @@ public class CropPumpkin extends CropVanillaStem {
   }
   
   protected ItemStack getProduct() {
-    return new ItemStack(Blocks.field_150423_aK);
+    return new ItemStack(Blocks.PUMPKIN);
   }
   
   protected ItemStack getSeeds() {
-    return new ItemStack(Items.field_151080_bb, IC2.random.nextInt(3) + 1);
+    return new ItemStack(Items.PUMPKIN_SEEDS, IC2.random.nextInt(3) + 1);
   }
   
   public int getGrowthDuration(ICropTile crop) {

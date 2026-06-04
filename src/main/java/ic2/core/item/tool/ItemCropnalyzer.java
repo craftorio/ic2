@@ -30,7 +30,7 @@ public class ItemCropnalyzer extends BaseElectricItem implements IHandHeldInvent
     super(ItemName.cropnalyzer, 100000.0D, 128.0D, 2);
   }
   
-  public ActionResult<ItemStack> func_77659_a(World world, EntityPlayer player, EnumHand hand) {
+  public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
     ItemStack stack = StackUtil.get(player, hand);
     if (IC2.platform.isSimulating())
       IC2.platform.launchGui(player, getInventory(player, stack)); 
@@ -38,7 +38,7 @@ public class ItemCropnalyzer extends BaseElectricItem implements IHandHeldInvent
   }
   
   @SideOnly(Side.CLIENT)
-  public EnumRarity func_77613_e(ItemStack stack) {
+  public EnumRarity getRarity(ItemStack stack) {
     return EnumRarity.UNCOMMON;
   }
   
@@ -48,18 +48,18 @@ public class ItemCropnalyzer extends BaseElectricItem implements IHandHeldInvent
   
   public boolean onDroppedByPlayer(ItemStack stack, EntityPlayer player) {
     if (player instanceof EntityPlayerMP && 
-      !StackUtil.isEmpty(stack) && player.field_71070_bA instanceof ContainerCropnalyzer) {
-      HandHeldCropnalyzer cropnalyzer = (HandHeldCropnalyzer)((ContainerCropnalyzer)player.field_71070_bA).base;
+      !StackUtil.isEmpty(stack) && player.openContainer instanceof ContainerCropnalyzer) {
+      HandHeldCropnalyzer cropnalyzer = (HandHeldCropnalyzer)((ContainerCropnalyzer)player.openContainer).base;
       if (cropnalyzer.isThisContainer(stack)) {
         cropnalyzer.saveAsThrown(stack);
-        ((EntityPlayerMP)player).func_71053_j();
+        ((EntityPlayerMP)player).closeScreen();
       } 
     } 
     return true;
   }
   
   public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
-    if (world.isRemote || player.func_70093_af())
+    if (world.isRemote || player.isSneaking())
       return EnumActionResult.PASS; 
     TileEntity te = world.getTileEntity(pos);
     if (te instanceof TileEntityCrop) {

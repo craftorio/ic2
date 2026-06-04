@@ -22,7 +22,7 @@ public abstract class HandHeldUpgradeOption extends HandHeldInventory {
   }
   
   protected NBTTagCompound getNBT() {
-    return HandHeldAdvancedUpgrade.getTag(StackUtil.getOrCreateNbtData(this.containerStack), func_70005_c_());
+    return HandHeldAdvancedUpgrade.getTag(StackUtil.getOrCreateNbtData(this.containerStack), getName());
   }
   
   Button<?> getBackButton(GuiIC2<?> gui, int x, int y) {
@@ -33,11 +33,11 @@ public abstract class HandHeldUpgradeOption extends HandHeldInventory {
         })).withText(Localization.translate("ic2.upgrade.advancedGUI.back"));
   }
   
-  public String func_70005_c_() {
+  public String getName() {
     return this.name;
   }
   
-  public boolean func_145818_k_() {
+  public boolean hasCustomName() {
     return false;
   }
 }

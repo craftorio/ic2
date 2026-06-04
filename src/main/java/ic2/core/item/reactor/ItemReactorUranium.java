@@ -25,7 +25,7 @@ public class ItemReactorUranium extends AbstractDamageableReactorComponent {
   
   protected ItemReactorUranium(ItemName name, int cells, int duration) {
     super(name, duration);
-    func_77625_d(64);
+    setMaxStackSize(64);
     this.numberOfCells = cells;
   }
   
@@ -146,7 +146,7 @@ public class ItemReactorUranium extends AbstractDamageableReactorComponent {
     return (2 * this.numberOfCells);
   }
   
-  public void func_77663_a(ItemStack stack, World world, Entity entity, int slotIndex, boolean isCurrentItem) {
+  public void onUpdate(ItemStack stack, World world, Entity entity, int slotIndex, boolean isCurrentItem) {
     if (entity instanceof EntityLivingBase) {
       EntityLivingBase entityLiving = (EntityLivingBase)entity;
       if (!ItemArmorHazmat.hasCompleteHazmat(entityLiving))

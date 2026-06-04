@@ -11,13 +11,13 @@ import net.minecraft.world.IBlockAccess;
 
 public class BlockRefractoryBricks extends BlockBase {
   public BlockRefractoryBricks() {
-    super(BlockName.refractory_bricks, Material.field_151576_e);
-    func_149711_c(2.0F);
-    func_149752_b(10.0F);
+    super(BlockName.refractory_bricks, Material.ROCK);
+    setHardness(2.0F);
+    setResistance(10.0F);
     setHarvestLevel("pickaxe", 0);
   }
   
-  protected BlockStateContainer func_180661_e() {
+  protected BlockStateContainer createBlockState() {
     return new BlockStateContainer((Block)this, new net.minecraft.block.properties.IProperty[0]);
   }
   

@@ -26,11 +26,11 @@ public class ItemBatterySU extends ItemIC2 implements IBoxable, IItemHudInfo {
     this.tier = tier1;
   }
   
-  public ActionResult<ItemStack> func_77659_a(World world, EntityPlayer player, EnumHand hand) {
+  public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
     ItemStack stack = StackUtil.get(player, hand);
     double energy = this.capacity;
     for (int i = 0; i < 9 && energy > 0.0D; i++) {
-      ItemStack target = (ItemStack)player.inventory.field_70462_a.get(i);
+      ItemStack target = (ItemStack)player.inventory.mainInventory.get(i);
       if (target != null && target != stack)
         energy -= ElectricItem.manager.charge(target, energy, this.tier, true, false); 
     } 

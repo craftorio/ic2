@@ -6,7 +6,7 @@ import net.minecraft.item.ItemStack;
 public class ItemCoke extends ItemIC2 {
   public ItemCoke() {
     super(ItemName.coke);
-    func_77625_d(64);
+    setMaxStackSize(64);
   }
   
   public int getItemBurnTime(ItemStack itemStack) {

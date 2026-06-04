@@ -9,7 +9,7 @@ import net.minecraft.block.state.IBlockState;
 
 public class BlockStateUtil {
   public static String getVariantString(IBlockState state) {
-    ImmutableMap<IProperty<?>, Comparable<?>> properties = state.func_177228_b();
+    ImmutableMap<IProperty<?>, Comparable<?>> properties = state.getProperties();
     if (properties.isEmpty())
       return "normal"; 
     StringBuilder ret = new StringBuilder();
@@ -18,9 +18,9 @@ public class BlockStateUtil {
       IProperty property = entry.getKey();
       if (ret.length() > 0)
         ret.append(','); 
-      ret.append(property.func_177701_a());
+      ret.append(property.getName());
       ret.append('=');
-      ret.append(property.func_177702_a(entry.getValue()));
+      ret.append(property.getName(entry.getValue()));
     } 
     return ret.toString();
   }
@@ -47,17 +47,17 @@ public class BlockStateUtil {
   
   private static <T extends Comparable<T>> IBlockState applyProperty(IBlockState state, String name, String value) {
     IProperty<T> property = null;
-    for (IProperty<?> cProperty : (Iterable<IProperty<?>>)state.func_177227_a()) {
-      if (cProperty.func_177701_a().equals(name)) {
+    for (IProperty<?> cProperty : (Iterable<IProperty<?>>)state.getPropertyKeys()) {
+      if (cProperty.getName().equals(name)) {
         property = (IProperty)cProperty;
         break;
       } 
     } 
     if (property == null)
       return state; 
-    for (Comparable comparable : property.func_177700_c()) {
-      if (value.equals(property.func_177702_a(comparable)))
-        return state.func_177226_a(property, comparable); 
+    for (Comparable comparable : property.getAllowedValues()) {
+      if (value.equals(property.getName(comparable)))
+        return state.withProperty(property, comparable); 
     } 
     return state;
   }

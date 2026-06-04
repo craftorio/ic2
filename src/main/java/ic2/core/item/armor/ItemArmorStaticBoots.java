@@ -15,22 +15,22 @@ public class ItemArmorStaticBoots extends ItemArmorUtility {
   }
   
   public void onArmorTick(World world, EntityPlayer player, ItemStack stack) {
-    if (StackUtil.isEmpty((ItemStack)player.inventory.field_70460_b.get(2)))
+    if (StackUtil.isEmpty((ItemStack)player.inventory.armorInventory.get(2)))
       return; 
     boolean ret = false;
     NBTTagCompound compound = StackUtil.getOrCreateNbtData(stack);
-    boolean isNotWalking = (player.func_184187_bx() != null || player.func_70090_H());
-    if (!compound.func_74764_b("x") || isNotWalking)
+    boolean isNotWalking = (player.getRidingEntity() != null || player.isInWater());
+    if (!compound.hasKey("x") || isNotWalking)
       compound.setInteger("x", (int)player.posX); 
-    if (!compound.func_74764_b("z") || isNotWalking)
+    if (!compound.hasKey("z") || isNotWalking)
       compound.setInteger("z", (int)player.posZ); 
     double distance = Math.sqrt(((compound.getInteger("x") - (int)player.posX) * (compound.getInteger("x") - (int)player.posX) + (compound.getInteger("z") - (int)player.posZ) * (compound.getInteger("z") - (int)player.posZ)));
     if (distance >= 5.0D) {
       compound.setInteger("x", (int)player.posX);
       compound.setInteger("z", (int)player.posZ);
-      ret = (ElectricItem.manager.charge((ItemStack)player.inventory.field_70460_b.get(2), Math.min(3.0D, distance / 5.0D), 2147483647, true, false) > 0.0D);
+      ret = (ElectricItem.manager.charge((ItemStack)player.inventory.armorInventory.get(2), Math.min(3.0D, distance / 5.0D), 2147483647, true, false) > 0.0D);
     } 
     if (ret)
-      player.field_71069_bz.func_75142_b(); 
+      player.inventoryContainer.detectAndSendChanges(); 
   }
 }

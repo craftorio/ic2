@@ -40,23 +40,23 @@ public class JetpackAttachmentRecipe implements IRecipe {
       blacklistedItems.add(stack.getItem()); 
   }
   
-  public boolean func_77569_a(InventoryCrafting inv, World worldIn) {
-    return (func_77572_b(inv) != StackUtil.emptyStack);
+  public boolean matches(InventoryCrafting inv, World worldIn) {
+    return (getCraftingResult(inv) != StackUtil.emptyStack);
   }
   
-  public ItemStack func_77572_b(InventoryCrafting inv) {
+  public ItemStack getCraftingResult(InventoryCrafting inv) {
     ItemStack jetpack = null;
     ItemStack armor = null;
     boolean attachmentPlate = false;
-    for (int i = 0; i < inv.func_70302_i_(); i++) {
-      ItemStack currentStack = inv.func_70301_a(i);
+    for (int i = 0; i < inv.getSizeInventory(); i++) {
+      ItemStack currentStack = inv.getStackInSlot(i);
       if (!StackUtil.isEmpty(currentStack)) {
         Item item = currentStack.getItem();
         if (item == ItemName.jetpack_electric.getInstance()) {
           if (jetpack != null)
             return StackUtil.emptyStack; 
           jetpack = currentStack;
-        } else if (EntityLiving.func_184640_d(currentStack) == EntityEquipmentSlot.CHEST && 
+        } else if (EntityLiving.getSlotForItemStack(currentStack) == EntityEquipmentSlot.CHEST && 
           !blacklistedItems.contains(item)) {
           if (armor != null)
             return StackUtil.emptyStack; 
@@ -78,11 +78,11 @@ public class JetpackAttachmentRecipe implements IRecipe {
     return ret;
   }
   
-  public ItemStack func_77571_b() {
+  public ItemStack getRecipeOutput() {
     return StackUtil.emptyStack;
   }
   
-  public NonNullList<ItemStack> func_179532_b(InventoryCrafting inv) {
+  public NonNullList<ItemStack> getRemainingItems(InventoryCrafting inv) {
     return ForgeHooks.defaultRecipeGetRemainingItems(inv);
   }
   
@@ -99,7 +99,7 @@ public class JetpackAttachmentRecipe implements IRecipe {
     return IRecipe.class;
   }
   
-  public boolean func_194133_a(int x, int y) {
+  public boolean canFit(int x, int y) {
     return (x * y >= 3);
   }
 }

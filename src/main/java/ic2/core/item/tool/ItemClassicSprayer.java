@@ -31,14 +31,14 @@ import net.minecraft.world.World;
 public class ItemClassicSprayer extends ItemGradualInt {
   public ItemClassicSprayer() {
     super(ItemName.foam_sprayer, 1602);
-    func_77625_d(1);
+    setMaxStackSize(1);
   }
   
-  public EnumActionResult func_180614_a(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+  public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
     if (!IC2.platform.isSimulating())
       return EnumActionResult.SUCCESS; 
     ItemStack stack = StackUtil.get(player, hand);
-    ItemStack pack = (ItemStack)player.inventory.field_70460_b.get(2);
+    ItemStack pack = (ItemStack)player.inventory.armorInventory.get(2);
     boolean pulledFromCFPack = (StackUtil.check(pack) && pack.getItem() == ItemName.cf_pack.getInstance() && ((ItemArmorClassicCFPack)pack.getItem()).getCFPellet(player, pack));
     if (!pulledFromCFPack && getCustomDamage(stack) < 100)
       return EnumActionResult.FAIL; 
@@ -89,7 +89,7 @@ public class ItemClassicSprayer extends ItemGradualInt {
       if (canFoam(world, set, scaffold) && place.add(set)) {
         for (int i : generateRngSpread(IC2.random)) {
           if (scaffold || directions[i])
-            check.add(set.offset(EnumFacing.func_82600_a(i))); 
+            check.add(set.offset(EnumFacing.getFront(i))); 
         } 
         foamcount--;
       } 
@@ -99,11 +99,11 @@ public class ItemClassicSprayer extends ItemGradualInt {
       Block targetBlock = state.getBlock();
       if (targetBlock == BlockName.scaffold.getInstance()) {
         BlockScaffold block = (BlockScaffold)targetBlock;
-        switch ((BlockScaffold.ScaffoldType)state.func_177229_b((IProperty)block.getTypeProperty())) {
+        switch ((BlockScaffold.ScaffoldType)state.getValue((IProperty)block.getTypeProperty())) {
           case wood:
           case reinforced_wood:
-            block.func_176226_b(world, pos, state, 0);
-            world.func_175656_a(pos, BlockName.foam.getBlockState((IIdProvider)BlockFoam.FoamType.normal));
+            block.dropBlockAsItem(world, pos, state, 0);
+            world.setBlockState(pos, BlockName.foam.getBlockState((IIdProvider)BlockFoam.FoamType.normal));
             continue;
         } 
         continue;
@@ -114,14 +114,14 @@ public class ItemClassicSprayer extends ItemGradualInt {
           ((TileEntityCable)te).foam(); 
         continue;
       } 
-      world.func_175656_a(pos, BlockName.foam.getBlockState((IIdProvider)BlockFoam.FoamType.normal));
+      world.setBlockState(pos, BlockName.foam.getBlockState((IIdProvider)BlockFoam.FoamType.normal));
     } 
     return true;
   }
   
   private static boolean canFoam(World world, BlockPos pos, boolean scaffold) {
     if (!scaffold) {
-      if (BlockName.foam.getInstance().func_176198_a(world, pos, EnumFacing.DOWN))
+      if (BlockName.foam.getInstance().canPlaceBlockOnSide(world, pos, EnumFacing.DOWN))
         return true; 
       if (world.getBlockState(pos).getBlock() != BlockName.te.getInstance())
         return false; 

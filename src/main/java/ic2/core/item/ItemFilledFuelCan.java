@@ -8,7 +8,7 @@ import net.minecraft.item.ItemStack;
 public class ItemFilledFuelCan extends ItemIC2 {
   public ItemFilledFuelCan() {
     super(ItemName.filled_fuel_can);
-    func_77625_d(1);
+    setMaxStackSize(1);
   }
   
   public boolean hasContainerItem(ItemStack stack) {

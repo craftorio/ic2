@@ -47,19 +47,19 @@ public class MergedItemModel implements IBakedModel {
     List<BakedQuad> newMergedQuads = new ArrayList<>(this.mergedQuads);
     for (int i = this.retextureStart; i < this.mergedQuads.size(); i++) {
       BakedQuad oldQuad = this.mergedQuads.get(i);
-      int[] vertexData = Arrays.copyOf(oldQuad.func_178209_a(), (oldQuad.func_178209_a()).length);
-      BakedQuad newQuad = new BakedQuad(vertexData, oldQuad.func_178211_c(), oldQuad.func_178210_d(), oldQuad.func_187508_a(), oldQuad.shouldApplyDiffuseLighting(), oldQuad.getFormat());
+      int[] vertexData = Arrays.copyOf(oldQuad.getVertexData(), (oldQuad.getVertexData()).length);
+      BakedQuad newQuad = new BakedQuad(vertexData, oldQuad.getTintIndex(), oldQuad.getFace(), oldQuad.getSprite(), oldQuad.shouldApplyDiffuseLighting(), oldQuad.getFormat());
       newMergedQuads.set(i, newQuad);
     } 
     return new MergedItemModel(this.parent, newMergedQuads, this.retextureStart, this.textureStride);
   }
   
   public void setSprite(TextureAtlasSprite sprite, int colorMultiplier, float uSShift, float vSShift, float uEShift, float vEShift) {
-    boolean matchingUvs = (this.currentUvs != null && this.currentUvs.length == 4 && this.currentUvs[0] == sprite.func_94209_e() && this.currentUvs[1] == sprite.func_94206_g() && this.currentUvs[2] == sprite.func_94212_f() && this.currentUvs[3] == sprite.func_94210_h());
+    boolean matchingUvs = (this.currentUvs != null && this.currentUvs.length == 4 && this.currentUvs[0] == sprite.getMinU() && this.currentUvs[1] == sprite.getMinV() && this.currentUvs[2] == sprite.getMaxU() && this.currentUvs[3] == sprite.getMaxV());
     boolean matchingColorMul = (this.currentColorMultipliers != null && this.currentColorMultipliers[0] == colorMultiplier);
     if (!matchingUvs || !matchingColorMul) {
       if (!matchingUvs)
-        this.currentUvs = new float[] { sprite.func_94209_e(), sprite.func_94206_g(), sprite.func_94212_f(), sprite.func_94210_h() }; 
+        this.currentUvs = new float[] { sprite.getMinU(), sprite.getMinV(), sprite.getMaxU(), sprite.getMaxV() }; 
       if (!matchingColorMul)
         this.currentColorMultipliers = new int[] { colorMultiplier }; 
       setSpriteUnchecked(uSShift, vSShift, uEShift, vEShift);
@@ -100,7 +100,7 @@ public class MergedItemModel implements IBakedModel {
       vS -= dv * (1.0F - vEShift);
       int colorMultiplier = mapColor(this.currentColorMultipliers[texture]);
       for (int i = 0; i < this.textureStride; i++) {
-        int[] vertexData = ((BakedQuad)this.mergedQuads.get(baseIdx + i)).func_178209_a();
+        int[] vertexData = ((BakedQuad)this.mergedQuads.get(baseIdx + i)).getVertexData();
         for (int j = 0; j < 4; j++) {
           int offset = j * VdUtil.dataStride;
           vertexData[offset + 3] = colorMultiplier;
@@ -120,38 +120,38 @@ public class MergedItemModel implements IBakedModel {
     return 0xFF000000 | color & 0xFF00 | (color & 0xFF) << 16 | (color & 0xFF0000) >> 16;
   }
   
-  public List<BakedQuad> func_188616_a(IBlockState state, EnumFacing side, long rand) {
+  public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
     if (side != null)
-      return this.parent.func_188616_a(state, side, rand); 
+      return this.parent.getQuads(state, side, rand); 
     return this.mergedQuads;
   }
   
-  public boolean func_177555_b() {
-    return this.parent.func_177555_b();
+  public boolean isAmbientOcclusion() {
+    return this.parent.isAmbientOcclusion();
   }
   
-  public boolean func_177556_c() {
-    return this.parent.func_177556_c();
+  public boolean isGui3d() {
+    return this.parent.isGui3d();
   }
   
-  public boolean func_188618_c() {
-    return this.parent.func_188618_c();
+  public boolean isBuiltInRenderer() {
+    return this.parent.isBuiltInRenderer();
   }
   
-  public TextureAtlasSprite func_177554_e() {
-    return this.parent.func_177554_e();
+  public TextureAtlasSprite getParticleTexture() {
+    return this.parent.getParticleTexture();
   }
   
   @Deprecated
-  public ItemCameraTransforms func_177552_f() {
-    return this.parent.func_177552_f();
+  public ItemCameraTransforms getItemCameraTransforms() {
+    return this.parent.getItemCameraTransforms();
   }
   
   public Pair<? extends IBakedModel, Matrix4f> handlePerspective(ItemCameraTransforms.TransformType cameraTransformType) {
     return Pair.of(this, this.parent.handlePerspective(cameraTransformType).getRight());
   }
   
-  public ItemOverrideList func_188617_f() {
-    return this.parent.func_188617_f();
+  public ItemOverrideList getOverrides() {
+    return this.parent.getOverrides();
   }
 }

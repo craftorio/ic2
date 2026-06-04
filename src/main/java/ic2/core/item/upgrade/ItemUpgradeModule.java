@@ -52,7 +52,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ItemUpgradeModule extends ItemMulti<ItemUpgradeModule.UpgradeType> implements IFullUpgrade, IHandHeldSubInventory, IItemHudInfo {
   public ItemUpgradeModule() {
     super(ItemName.upgrade, UpgradeType.class);
-    func_77627_a(true);
+    setHasSubtypes(true);
     for (UpgradeType type : UpgradeType.values())
       UpgradeRegistry.register(new ItemStack((Item)this, 1, type.getId())); 
   }
@@ -60,7 +60,7 @@ public class ItemUpgradeModule extends ItemMulti<ItemUpgradeModule.UpgradeType> 
   @SideOnly(Side.CLIENT)
   public void registerModels(final ItemName name) {
     ModelLoader.setCustomMeshDefinition((Item)this, new ItemMeshDefinition() {
-          public ModelResourceLocation func_178113_a(ItemStack stack) {
+          public ModelResourceLocation getModelLocation(ItemStack stack) {
             ItemUpgradeModule.UpgradeType type = (ItemUpgradeModule.UpgradeType)ItemUpgradeModule.this.getType(stack);
             if (type == null)
               return new ModelResourceLocation("builtin/missing", "missing"); 
@@ -70,7 +70,7 @@ public class ItemUpgradeModule extends ItemMulti<ItemUpgradeModule.UpgradeType> 
             return ItemIC2.getModelLocation(name, type.getName());
           }
         });
-    for (UpgradeType type : this.typeProperty.func_177700_c()) {
+    for (UpgradeType type : this.typeProperty.getAllowedValues()) {
       ModelBakery.registerItemVariants((Item)this, new ResourceLocation[] { (ResourceLocation)getModelLocation(name, type.getName()) });
       if (type.directional)
         for (EnumFacing dir : EnumFacing.VALUES) {
@@ -86,9 +86,9 @@ public class ItemUpgradeModule extends ItemMulti<ItemUpgradeModule.UpgradeType> 
   }
   
   @SideOnly(Side.CLIENT)
-  public void func_77624_a(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
+  public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
     String side;
-    super.func_77624_a(stack, world, tooltip, advanced);
+    super.addInformation(stack, world, tooltip, advanced);
     UpgradeType type = (UpgradeType)getType(stack);
     if (type == null)
       return; 
@@ -153,7 +153,7 @@ public class ItemUpgradeModule extends ItemMulti<ItemUpgradeModule.UpgradeType> 
     throw new RuntimeException("invalid dir: " + dir);
   }
   
-  public EnumActionResult func_180614_a(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float xOffset, float yOffset, float zOffset) {
+  public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float xOffset, float yOffset, float zOffset) {
     ItemStack stack = StackUtil.get(player, hand);
     UpgradeType type = (UpgradeType)getType(stack);
     if (type == null)
@@ -194,11 +194,11 @@ public class ItemUpgradeModule extends ItemMulti<ItemUpgradeModule.UpgradeType> 
       switch (type) {
         case null:
         case null:
-          if (!(player.getEntityWorld()).isRemote && !StackUtil.isEmpty(stack) && player.field_71070_bA instanceof DynamicHandHeldContainer) {
-            HandHeldInventory base = (HandHeldInventory)((DynamicHandHeldContainer)player.field_71070_bA).base;
+          if (!(player.getEntityWorld()).isRemote && !StackUtil.isEmpty(stack) && player.openContainer instanceof DynamicHandHeldContainer) {
+            HandHeldInventory base = (HandHeldInventory)((DynamicHandHeldContainer)player.openContainer).base;
             if (base instanceof HandHeldAdvancedUpgrade && base.isThisContainer(stack)) {
               base.saveAsThrown(stack);
-              player.func_71053_j();
+              player.closeScreen();
             } 
           } 
           break;
@@ -425,7 +425,7 @@ public class ItemUpgradeModule extends ItemMulti<ItemUpgradeModule.UpgradeType> 
         private boolean checkMeta(ItemStack stack, ItemStack filter) {
           assert this.meta.active;
           assert this.meta.comparison == ComparisonType.DIRECT;
-          return (stack.func_77960_j() == filter.func_77960_j());
+          return (stack.getMetadata() == filter.getMetadata());
         }
         
         private boolean checkDamage(ItemStack stack, ItemStack filter, boolean customStack) {
@@ -443,7 +443,7 @@ public class ItemUpgradeModule extends ItemMulti<ItemUpgradeModule.UpgradeType> 
             case IGNORED:
               return true;
             case FUZZY:
-              return StackUtil.checkNbtEquality(stack.func_77978_p(), filter.func_77978_p());
+              return StackUtil.checkNbtEquality(stack.getTagCompound(), filter.getTagCompound());
             case EXACT:
               return StackUtil.checkNbtEqualityStrict(stack, filter);
           } 
@@ -462,7 +462,7 @@ public class ItemUpgradeModule extends ItemMulti<ItemUpgradeModule.UpgradeType> 
           if (!this.hasInitialised)
             initalise(); 
           if (!this.meta.comparison.ignoreFilters()) {
-            if (this.meta.doComparison(stack.func_77960_j())) {
+            if (this.meta.doComparison(stack.getMetadata())) {
               checkMeta = false;
             } else {
               return false;

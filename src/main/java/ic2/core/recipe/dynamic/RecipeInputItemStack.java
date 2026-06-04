@@ -37,7 +37,7 @@ public class RecipeInputItemStack extends RecipeInputIngredient<ItemStack> {
   }
   
   public void shrink(int amount) {
-    this.ingredient.func_190918_g(amount);
+    this.ingredient.shrink(amount);
   }
   
   public boolean matches(Object other) {

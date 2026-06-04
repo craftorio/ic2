@@ -25,15 +25,15 @@ public class TextDrawable implements IDrawable {
         x = 0;
         break;
       case Center:
-        x = arg0.field_71462_r.width / 2;
+        x = arg0.currentScreen.width / 2;
         break;
       case End:
-        x = arg0.field_71462_r.width - getWidth();
+        x = arg0.currentScreen.width - getWidth();
         break;
       default:
         throw new IllegalArgumentException("invalid alignment: " + this.alignment);
     } 
-    arg0.field_71466_p.drawString(Localization.translate(this.text), x, 0, this.color);
+    arg0.fontRenderer.drawString(Localization.translate(this.text), x, 0, this.color);
   }
   
   public void draw(Minecraft arg0, int arg1, int arg2) {}
@@ -43,6 +43,6 @@ public class TextDrawable implements IDrawable {
   }
   
   public int getWidth() {
-    return (Minecraft.getMinecraft()).field_71466_p.func_78256_a(Localization.translate(this.text));
+    return (Minecraft.getMinecraft()).fontRenderer.getStringWidth(Localization.translate(this.text));
   }
 }

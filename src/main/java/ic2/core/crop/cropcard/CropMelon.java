@@ -31,12 +31,12 @@ public class CropMelon extends CropVanillaStem {
   
   protected ItemStack getProduct() {
     if (IC2.random.nextInt(3) == 0)
-      return new ItemStack(Blocks.field_150440_ba); 
-    return new ItemStack(Items.field_151127_ba, IC2.random.nextInt(4) + 2);
+      return new ItemStack(Blocks.MELON_BLOCK); 
+    return new ItemStack(Items.MELON, IC2.random.nextInt(4) + 2);
   }
   
   protected ItemStack getSeeds() {
-    return new ItemStack(Items.field_151081_bc, IC2.random.nextInt(2) + 1);
+    return new ItemStack(Items.MELON_SEEDS, IC2.random.nextInt(2) + 1);
   }
   
   public int getGrowthDuration(ICropTile crop) {

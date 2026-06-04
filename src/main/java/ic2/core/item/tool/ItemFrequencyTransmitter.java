@@ -34,20 +34,20 @@ public class ItemFrequencyTransmitter extends ItemIC2 {
   
   public ItemFrequencyTransmitter() {
     super(ItemName.frequency_transmitter);
-    this.field_77777_bU = 1;
+    this.maxStackSize = 1;
   }
   
-  public ActionResult<ItemStack> func_77659_a(World world, EntityPlayer player, EnumHand hand) {
+  public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
     ItemStack stack = StackUtil.get(player, hand);
     if (IC2.platform.isSimulating()) {
       NBTTagCompound nbtData = StackUtil.getOrCreateNbtData(stack);
-      boolean hadJustSet = nbtData.func_74767_n("targetJustSet");
-      if (nbtData.func_74767_n("targetSet") && !hadJustSet) {
-        nbtData.func_74757_a("targetSet", false);
+      boolean hadJustSet = nbtData.getBoolean("targetJustSet");
+      if (nbtData.getBoolean("targetSet") && !hadJustSet) {
+        nbtData.setBoolean("targetSet", false);
         IC2.platform.messagePlayer(player, "Frequency Transmitter unlinked", new Object[0]);
       } 
       if (hadJustSet)
-        nbtData.func_74757_a("targetJustSet", false); 
+        nbtData.setBoolean("targetJustSet", false); 
     } 
     return new ActionResult(EnumActionResult.SUCCESS, stack);
   }
@@ -60,7 +60,7 @@ public class ItemFrequencyTransmitter extends ItemIC2 {
       return EnumActionResult.PASS; 
     TileEntityTeleporter tp = (TileEntityTeleporter)te;
     NBTTagCompound nbtData = StackUtil.getOrCreateNbtData(StackUtil.get(player, hand));
-    boolean targetSet = nbtData.func_74767_n("targetSet");
+    boolean targetSet = nbtData.getBoolean("targetSet");
     boolean justSetTarget = true;
     BlockPos target = new BlockPos(nbtData.getInteger("targetX"), nbtData.getInteger("targetY"), nbtData.getInteger("targetZ"));
     if (!targetSet) {
@@ -81,8 +81,8 @@ public class ItemFrequencyTransmitter extends ItemIC2 {
         targetSet = justSetTarget = false;
       } 
     } 
-    nbtData.func_74757_a("targetSet", targetSet);
-    nbtData.func_74757_a("targetJustSet", justSetTarget);
+    nbtData.setBoolean("targetSet", targetSet);
+    nbtData.setBoolean("targetJustSet", justSetTarget);
     nbtData.setInteger("targetX", target.getX());
     nbtData.setInteger("targetY", target.getY());
     nbtData.setInteger("targetZ", target.getZ());
@@ -90,9 +90,9 @@ public class ItemFrequencyTransmitter extends ItemIC2 {
   }
   
   @SideOnly(Side.CLIENT)
-  public void func_77624_a(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
+  public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
     NBTTagCompound nbtData = StackUtil.getOrCreateNbtData(stack);
-    if (nbtData.func_74767_n("targetSet")) {
+    if (nbtData.getBoolean("targetSet")) {
       tooltip.add(Localization.translate("ic2.frequency_transmitter.tooltip.target", new Object[] { Integer.valueOf(nbtData.getInteger("targetX")), Integer.valueOf(nbtData.getInteger("targetY")), Integer.valueOf(nbtData.getInteger("targetZ")) }));
     } else {
       tooltip.add(Localization.translate("ic2.frequency_transmitter.tooltip.blank"));

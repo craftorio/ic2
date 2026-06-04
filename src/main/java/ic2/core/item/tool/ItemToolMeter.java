@@ -20,8 +20,8 @@ import net.minecraft.world.World;
 public class ItemToolMeter extends ItemIC2 implements IBoxable, IHandHeldInventory {
   public ItemToolMeter() {
     super(ItemName.meter);
-    this.field_77777_bU = 1;
-    func_77656_e(0);
+    this.maxStackSize = 1;
+    setMaxDamage(0);
   }
   
   public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
@@ -30,7 +30,7 @@ public class ItemToolMeter extends ItemIC2 implements IBoxable, IHandHeldInvento
     IEnergyTile tile = EnergyNet.instance.getTile(world, pos);
     if (tile instanceof ic2.api.energy.tile.IEnergySource || tile instanceof ic2.api.energy.tile.IEnergyConductor || tile instanceof ic2.api.energy.tile.IEnergySink) {
       if (IC2.platform.launchGui(player, getInventory(player, StackUtil.get(player, hand)))) {
-        ContainerMeter container = (ContainerMeter)player.field_71070_bA;
+        ContainerMeter container = (ContainerMeter)player.openContainer;
         container.setUut(tile);
         return EnumActionResult.SUCCESS;
       } 
@@ -41,11 +41,11 @@ public class ItemToolMeter extends ItemIC2 implements IBoxable, IHandHeldInvento
   }
   
   public boolean onDroppedByPlayer(ItemStack stack, EntityPlayer player) {
-    if (!(player.getEntityWorld()).isRemote && !StackUtil.isEmpty(stack) && player.field_71070_bA instanceof ContainerMeter) {
-      HandHeldMeter euReader = (HandHeldMeter)((ContainerMeter)player.field_71070_bA).base;
+    if (!(player.getEntityWorld()).isRemote && !StackUtil.isEmpty(stack) && player.openContainer instanceof ContainerMeter) {
+      HandHeldMeter euReader = (HandHeldMeter)((ContainerMeter)player.openContainer).base;
       if (euReader.isThisContainer(stack)) {
         euReader.saveAsThrown(stack);
-        player.func_71053_j();
+        player.closeScreen();
       } 
     } 
     return true;

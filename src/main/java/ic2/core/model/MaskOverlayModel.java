@@ -61,8 +61,8 @@ public abstract class MaskOverlayModel extends AbstractModel {
     BufferedImage img;
     try {
       baseModel = ModelLoaderRegistry.getModel(this.baseModelLocation);
-      IResource resource = Minecraft.getMinecraft().func_110442_L().func_110536_a(this.maskTextureLocation);
-      img = TextureUtil.func_177053_a(resource.func_110527_b());
+      IResource resource = Minecraft.getMinecraft().getResourceManager().getResource(this.maskTextureLocation);
+      img = TextureUtil.readBufferedImage(resource.getInputStream());
     } catch (Exception e) {
       throw new RuntimeException(e);
     } 
@@ -70,7 +70,7 @@ public abstract class MaskOverlayModel extends AbstractModel {
     int height = img.getHeight();
     List<Area> areas = searchAreas(readMask(img), width);
     this.bakedModel = baseModel.bake(baseModel.getDefaultState(), format, bakedTextureGetter);
-    List<BakedQuad> origQuads = this.bakedModel.func_188616_a(null, null, 0L);
+    List<BakedQuad> origQuads = this.bakedModel.getQuads(null, null, 0L);
     int retextureStart = origQuads.size();
     List<BakedQuad> mergedQuads = new ArrayList<>(retextureStart + areas.size() * 2);
     mergedQuads.addAll(origQuads);

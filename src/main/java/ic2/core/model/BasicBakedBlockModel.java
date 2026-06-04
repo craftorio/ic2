@@ -20,7 +20,7 @@ public class BasicBakedBlockModel extends AbstractBakedModel {
     this.particleTexture = particleTexture;
   }
   
-  public List<BakedQuad> func_188616_a(IBlockState state, EnumFacing side, long rand) {
+  public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
     if (side == null)
       return this.generalQuads; 
     if (this.faceQuads == null)
@@ -28,7 +28,7 @@ public class BasicBakedBlockModel extends AbstractBakedModel {
     return this.faceQuads[side.ordinal()];
   }
   
-  public TextureAtlasSprite func_177554_e() {
+  public TextureAtlasSprite getParticleTexture() {
     return this.particleTexture;
   }
   

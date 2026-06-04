@@ -37,7 +37,7 @@ public class JetpackRecipeWrapper extends BlankRecipeWrapper {
   public static List<JetpackRecipeWrapper> generateJetpackRecipes() {
     if (jetpackRecipes != null)
       return jetpackRecipes; 
-    NonNullList<ItemStack> stacks = NonNullList.func_191196_a();
+    NonNullList<ItemStack> stacks = NonNullList.create();
     Set<ItemComparableItemStack> added = new HashSet<>();
     jetpackRecipes = new ArrayList<>(100);
     for (Item item : ForgeRegistries.ITEMS) {
@@ -45,9 +45,9 @@ public class JetpackRecipeWrapper extends BlankRecipeWrapper {
         continue; 
       stacks.clear();
       added.clear();
-      item.func_150895_a(CreativeTabs.field_78027_g, stacks);
+      item.getSubItems(CreativeTabs.SEARCH, stacks);
       for (ItemStack stack : stacks) {
-        if (EntityLiving.func_184640_d(stack) == EntityEquipmentSlot.CHEST) {
+        if (EntityLiving.getSlotForItemStack(stack) == EntityEquipmentSlot.CHEST) {
           ItemComparableItemStack comparable = new ItemComparableItemStack(stack, false);
           if (!added.contains(comparable)) {
             jetpackRecipes.add(new JetpackRecipeWrapper(stack));

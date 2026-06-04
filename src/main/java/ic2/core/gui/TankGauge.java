@@ -77,7 +77,7 @@ public class TankGauge extends GuiElement<TankGauge> {
         fluidHeight = 47;
       } 
       Fluid fluid = fs.getFluid();
-      TextureAtlasSprite sprite = (fluid != null) ? getBlockTextureMap().func_110572_b(fluid.getStill(fs).toString()) : null;
+      TextureAtlasSprite sprite = (fluid != null) ? getBlockTextureMap().getAtlasSprite(fluid.getStill(fs).toString()) : null;
       int color = (fluid != null) ? fluid.getColor(fs) : -1;
       double renderHeight = fluidHeight * Util.limit(fs.amount / this.tank.getCapacity(), 0.0D, 1.0D);
       bindBlockTexture();

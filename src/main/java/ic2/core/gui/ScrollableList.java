@@ -100,9 +100,9 @@ public class ScrollableList extends GuiElement<ScrollableList> {
     int bottom = GUIheight + this.y + this.height - 1;
     int viewWidth = this.width - 7 - 1;
     int viewHeight = this.height - 2;
-    int scale = (new ScaledResolution(this.gui.mc)).func_78325_e();
+    int scale = (new ScaledResolution(this.gui.mc)).getScaleFactor();
     GL11.glEnable(3089);
-    GL11.glScissor(left * scale, this.gui.mc.field_71440_d - bottom * scale, viewWidth * scale, viewHeight * scale);
+    GL11.glScissor(left * scale, this.gui.mc.displayHeight - bottom * scale, viewWidth * scale, viewHeight * scale);
   }
   
   protected boolean onMouseClick(int mouseX, int mouseY, MouseButton button) {

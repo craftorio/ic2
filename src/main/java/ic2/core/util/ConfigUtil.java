@@ -157,8 +157,8 @@ public class ConfigUtil {
       } else if (tmp.startsWith("#")) {
         if (item instanceof IMultiItem) {
           stack = ((IMultiItem)item).getItemStack(tmp.substring(1));
-        } else if (item instanceof ItemBlock && ((ItemBlock)item).func_179223_d() instanceof IMultiBlock) {
-          stack = ((IMultiBlock)((ItemBlock)item).func_179223_d()).getItemStack(tmp.substring(1));
+        } else if (item instanceof ItemBlock && ((ItemBlock)item).getBlock() instanceof IMultiBlock) {
+          stack = ((IMultiBlock)((ItemBlock)item).getBlock()).getItemStack(tmp.substring(1));
         } else {
           throw new ParseException("# is not supported on non-IC2-Items: " + str, 0);
         } 
@@ -193,8 +193,8 @@ public class ConfigUtil {
       String variant = ((IMultiItem)stack.getItem()).getVariant(stack);
       if (variant != null)
         ret = ret + "#" + variant; 
-    } else if (stack.getItem() instanceof ItemBlock && ((ItemBlock)stack.getItem()).func_179223_d() instanceof IMultiBlock) {
-      String variant = ((IMultiBlock)((ItemBlock)stack.getItem()).func_179223_d()).getVariant(stack);
+    } else if (stack.getItem() instanceof ItemBlock && ((ItemBlock)stack.getItem()).getBlock() instanceof IMultiBlock) {
+      String variant = ((IMultiBlock)((ItemBlock)stack.getItem()).getBlock()).getVariant(stack);
       if (variant != null)
         ret = ret + "#" + variant; 
     } else if (stack.getItemDamage() == 32767) {

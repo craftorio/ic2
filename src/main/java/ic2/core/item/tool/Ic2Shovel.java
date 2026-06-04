@@ -19,10 +19,10 @@ public class Ic2Shovel extends ItemSpade implements IItemModelProvider {
   
   public Ic2Shovel(Item.ToolMaterial material) {
     super(material);
-    this.field_77864_a = 5.0F;
+    this.efficiency = 5.0F;
     this.repairMaterial = "ingotBronze";
-    func_77655_b(ItemName.bronze_shovel.name());
-    func_77637_a((CreativeTabs)IC2.tabIC2);
+    setUnlocalizedName(ItemName.bronze_shovel.name());
+    setCreativeTab((CreativeTabs)IC2.tabIC2);
     BlocksItems.registerItem((Item)this, IC2.getIdentifier(ItemName.bronze_shovel.name()));
     ItemName.bronze_shovel.setInstance((Item)this);
   }
@@ -32,23 +32,23 @@ public class Ic2Shovel extends ItemSpade implements IItemModelProvider {
     ItemIC2.registerModel((Item)this, 0, name, null);
   }
   
-  public String func_77658_a() {
-    return "ic2." + super.func_77658_a().substring(5);
+  public String getUnlocalizedName() {
+    return "ic2." + super.getUnlocalizedName().substring(5);
   }
   
-  public String func_77667_c(ItemStack stack) {
-    return func_77658_a();
+  public String getUnlocalizedName(ItemStack stack) {
+    return getUnlocalizedName();
   }
   
-  public String func_77657_g(ItemStack stack) {
-    return func_77667_c(stack);
+  public String getUnlocalizedNameInefficiently(ItemStack stack) {
+    return getUnlocalizedName(stack);
   }
   
-  public String func_77653_i(ItemStack stack) {
-    return Localization.translate(func_77667_c(stack));
+  public String getItemStackDisplayName(ItemStack stack) {
+    return Localization.translate(getUnlocalizedName(stack));
   }
   
-  public boolean func_82789_a(ItemStack stack1, ItemStack stack2) {
+  public boolean getIsRepairable(ItemStack stack1, ItemStack stack2) {
     return (stack2 != null && Util.matchesOD(stack2, this.repairMaterial));
   }
 }

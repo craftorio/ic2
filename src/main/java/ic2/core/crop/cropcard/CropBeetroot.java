@@ -9,7 +9,7 @@ import net.minecraft.item.ItemStack;
 
 public class CropBeetroot extends CropVanilla {
   public CropBeetroot() {
-    super((BlockCrops)Blocks.field_185773_cZ);
+    super((BlockCrops)Blocks.BEETROOTS);
   }
   
   public String getId() {
@@ -25,10 +25,10 @@ public class CropBeetroot extends CropVanilla {
   }
   
   public ItemStack getProduct() {
-    return new ItemStack(Items.field_185164_cV, 1);
+    return new ItemStack(Items.BEETROOT, 1);
   }
   
   public ItemStack getSeeds() {
-    return new ItemStack(Items.field_185163_cU);
+    return new ItemStack(Items.BEETROOT_SEEDS);
   }
 }

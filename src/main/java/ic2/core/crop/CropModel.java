@@ -58,7 +58,7 @@ public class CropModel extends AbstractModel {
     return crop.getTexturesLocation().get(currentSize - 1);
   }
   
-  public List<BakedQuad> func_188616_a(IBlockState rawState, EnumFacing side, long rand) {
+  public List<BakedQuad> getQuads(IBlockState rawState, EnumFacing side, long rand) {
     TileEntityCrop.CropRenderState prop;
     Ic2BlockState.Ic2BlockStateInstance state;
     if (rawState instanceof Ic2BlockState.Ic2BlockStateInstance && (state = (Ic2BlockState.Ic2BlockStateInstance)rawState).hasValue(TileEntityCrop.renderStateProperty)) {
@@ -67,21 +67,21 @@ public class CropModel extends AbstractModel {
       prop = new TileEntityCrop.CropRenderState(null, 0, false);
     } 
     try {
-      return ((IBakedModel)this.modelCache.get(prop)).func_188616_a(rawState, side, rand);
+      return ((IBakedModel)this.modelCache.get(prop)).getQuads(rawState, side, rand);
     } catch (Exception error) {
       throw new RuntimeException(error);
     } 
   }
   
   IBakedModel generateModel(TileEntityCrop.CropRenderState prop) {
-    List[] arrayOfList = new List[EnumFacing.field_176754_o.length];
+    List[] arrayOfList = new List[EnumFacing.HORIZONTALS.length];
     for (int index = 0; index < arrayOfList.length; ) {
       arrayOfList[index] = new ArrayList();
       index++;
     } 
     List<BakedQuad> generalQuads = new ArrayList<>();
     TextureAtlasSprite cropSprite = textures.computeIfAbsent(getTextureLocation(prop.crop, prop.size), MISSING);
-    for (EnumFacing facing : EnumFacing.field_176754_o) {
+    for (EnumFacing facing : EnumFacing.HORIZONTALS) {
       int offsetX = facing.getFrontOffsetX();
       int offsetZ = facing.getFrontOffsetZ();
       float x = Math.abs(offsetX) * (0.5F + offsetX * 0.25F);
@@ -109,7 +109,7 @@ public class CropModel extends AbstractModel {
   }
   
   IBakedModel generateStickModel(boolean crosscrop) {
-    List[] arrayOfList = new List[EnumFacing.field_176754_o.length];
+    List[] arrayOfList = new List[EnumFacing.HORIZONTALS.length];
     for (int index = 0; index < arrayOfList.length; ) {
       arrayOfList[index] = new ArrayList();
       index++;
@@ -117,7 +117,7 @@ public class CropModel extends AbstractModel {
     List<BakedQuad> generalQuads = new ArrayList<>();
     TextureAtlasSprite stickSprite = textures.get(STICK);
     TextureAtlasSprite upgradedStickSprite = textures.get(UPGRADED_STICK);
-    for (EnumFacing facing : EnumFacing.field_176754_o) {
+    for (EnumFacing facing : EnumFacing.HORIZONTALS) {
       int offsetX = facing.getFrontOffsetX();
       int offsetZ = facing.getFrontOffsetZ();
       float x = Math.abs(offsetX) * (0.5F + offsetX * 0.25F);
@@ -149,7 +149,7 @@ public class CropModel extends AbstractModel {
     return (IBakedModel)new BasicBakedBlockModel(arrayOfList, generalQuads, stickSprite);
   }
   
-  public TextureAtlasSprite func_177554_e() {
+  public TextureAtlasSprite getParticleTexture() {
     return textures.get(STICK);
   }
   
@@ -161,7 +161,7 @@ public class CropModel extends AbstractModel {
   
   private static final ResourceLocation UPGRADED_STICK = new ResourceLocation("ic2", "blocks/crop/stick_upgraded");
   
-  private static final Function<ResourceLocation, TextureAtlasSprite> MISSING = location -> Minecraft.getMinecraft().func_147117_R().func_174944_f();
+  private static final Function<ResourceLocation, TextureAtlasSprite> MISSING = location -> Minecraft.getMinecraft().getTextureMapBlocks().getMissingSprite();
   
   static final Map<ResourceLocation, TextureAtlasSprite> textures = new HashMap<>();
   

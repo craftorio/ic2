@@ -19,14 +19,14 @@ class LeanItemStack {
   public LeanItemStack(ItemStack stack) {
     this(stack.getItem(), 
         StackUtil.getRawMeta(stack), stack
-        .func_77978_p(), 
+        .getTagCompound(), 
         StackUtil.getSize(stack));
   }
   
   public LeanItemStack(ItemStack stack, int size) {
     this(stack.getItem(), 
         StackUtil.getRawMeta(stack), stack
-        .func_77978_p(), size);
+        .getTagCompound(), size);
   }
   
   public LeanItemStack(Item item, int meta, NBTTagCompound nbt, int size) {
@@ -60,7 +60,7 @@ class LeanItemStack {
   
   public boolean hasSameItem(LeanItemStack o) {
     return (this.item == o.item && (this.meta == o.meta || 
-      !this.item.func_77614_k()) && 
+      !this.item.getHasSubtypes()) && 
       StackUtil.checkNbtEquality(this.nbt, o.nbt));
   }
   
@@ -78,7 +78,7 @@ class LeanItemStack {
     if (this.size <= 0)
       return StackUtil.emptyStack; 
     ItemStack ret = new ItemStack(this.item, this.size, this.meta);
-    ret.func_77982_d(this.nbt);
+    ret.setTagCompound(this.nbt);
     return ret;
   }
   

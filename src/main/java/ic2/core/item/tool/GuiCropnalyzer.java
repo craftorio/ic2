@@ -16,7 +16,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class GuiCropnalyzer extends GuiIC2<ContainerCropnalyzer> {
   public GuiCropnalyzer(ContainerCropnalyzer container) {
     super((ContainerBase)container, 223);
-    addElement((GuiElement)Text.create(this, 74, 11, ItemName.cropnalyzer.getItemStack().func_82833_r(), 0, false));
+    addElement((GuiElement)Text.create(this, 74, 11, ItemName.cropnalyzer.getItemStack().getDisplayName(), 0, false));
     addElement(Text.create(this, 8, 37, "UNKNOWN", 16777215, false).withEnableHandler(() -> (((HandHeldCropnalyzer)container.base).getScannedLevel() == 0)));
     addElement(Text.create(this, 8, 37, cropSensitiveText((HandHeldCropnalyzer)container.base::getSeedName), 16777215, false).withEnableHandler(atLeastLevel(1)));
     IEnableHandler atLeast2 = atLeastLevel(2);
@@ -45,7 +45,7 @@ public class GuiCropnalyzer extends GuiIC2<ContainerCropnalyzer> {
   
   protected void drawBackgroundAndTitle(float partialTicks, int mouseX, int mouseY) {
     bindTexture();
-    drawTexturedModalRect(this.field_147003_i, this.field_147009_r, 0, 0, this.field_146999_f, this.field_147000_g);
+    drawTexturedModalRect(this.guiLeft, this.guiTop, 0, 0, this.xSize, this.ySize);
   }
   
   protected ResourceLocation getTexture() {

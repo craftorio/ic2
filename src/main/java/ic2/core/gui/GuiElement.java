@@ -134,24 +134,24 @@ public abstract class GuiElement<T extends GuiElement<T>> {
   
   protected final Map<String, TextProvider.ITextProvider> getTokens() {
     Map<String, TextProvider.ITextProvider> ret = new HashMap<>();
-    ret.put("name", TextProvider.ofTranslated(getBase().func_70005_c_()));
+    ret.put("name", TextProvider.ofTranslated(getBase().getName()));
     return ret;
   }
   
   protected static void bindTexture(ResourceLocation texture) {
-    (Minecraft.getMinecraft()).field_71446_o.func_110577_a(texture);
+    (Minecraft.getMinecraft()).renderEngine.bindTexture(texture);
   }
   
   public static void bindCommonTexture() {
-    (Minecraft.getMinecraft()).field_71446_o.func_110577_a(commonTexture);
+    (Minecraft.getMinecraft()).renderEngine.bindTexture(commonTexture);
   }
   
   protected static void bindBlockTexture() {
-    (Minecraft.getMinecraft()).field_71446_o.func_110577_a(TextureMap.field_110575_b);
+    (Minecraft.getMinecraft()).renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
   }
   
   protected static TextureMap getBlockTextureMap() {
-    return Minecraft.getMinecraft().func_147117_R();
+    return Minecraft.getMinecraft().getTextureMapBlocks();
   }
   
   private static final Method hasMethod(Class<?> cls, String name, Class<?>... params) {

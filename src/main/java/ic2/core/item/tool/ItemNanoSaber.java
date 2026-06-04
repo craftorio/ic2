@@ -49,7 +49,7 @@ public class ItemNanoSaber extends ItemElectricTool {
   public void registerModels(final ItemName name) {
     String activeSuffix = "active";
     ModelLoader.setCustomMeshDefinition((Item)this, new ItemMeshDefinition() {
-          public ModelResourceLocation func_178113_a(ItemStack stack) {
+          public ModelResourceLocation getModelLocation(ItemStack stack) {
             return ItemIC2.getModelLocation(name, ItemNanoSaber.isActive(stack) ? "active" : null);
           }
         });
@@ -57,12 +57,12 @@ public class ItemNanoSaber extends ItemElectricTool {
     ModelBakery.registerItemVariants((Item)this, new ResourceLocation[] { (ResourceLocation)ItemIC2.getModelLocation(name, "active") });
   }
   
-  public float func_150893_a(ItemStack stack, IBlockState state) {
+  public float getDestroySpeed(ItemStack stack, IBlockState state) {
     if (isActive(stack)) {
       this.soundTicker++;
       if (IC2.platform.isRendering() && this.soundTicker % 4 == 0)
         IC2.platform.playSoundSp(getRandomSwingSound(), 1.0F, 1.0F); 
-      return (state.getBlock() == Blocks.field_150321_G) ? 50.0F : 4.0F;
+      return (state.getBlock() == Blocks.WEB) ? 50.0F : 4.0F;
     } 
     return 1.0F;
   }
@@ -74,21 +74,21 @@ public class ItemNanoSaber extends ItemElectricTool {
     if (ElectricItem.manager.canUse(stack, 400.0D) && isActive(stack))
       dmg = 20; 
     HashMultimap hashMultimap = HashMultimap.create();
-    hashMultimap.put(SharedMonsterAttributes.field_188790_f.func_111108_a(), new AttributeModifier(field_185050_h, "Tool modifier", this.field_185065_c, 0));
-    hashMultimap.put(SharedMonsterAttributes.field_111264_e.func_111108_a(), new AttributeModifier(Item.field_111210_e, "Tool modifier", dmg, 0));
+    hashMultimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Tool modifier", this.attackSpeed, 0));
+    hashMultimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(Item.ATTACK_DAMAGE_MODIFIER, "Tool modifier", dmg, 0));
     return (Multimap<String, AttributeModifier>)hashMultimap;
   }
   
-  public boolean func_77644_a(ItemStack stack, EntityLivingBase target, EntityLivingBase source) {
+  public boolean hitEntity(ItemStack stack, EntityLivingBase target, EntityLivingBase source) {
     if (!isActive(stack))
       return true; 
     if (IC2.platform.isSimulating()) {
       drainSaber(stack, 400.0D, source);
-      if (!(source instanceof EntityPlayerMP) || !(target instanceof EntityPlayer) || ((EntityPlayerMP)source).func_96122_a((EntityPlayer)target))
+      if (!(source instanceof EntityPlayerMP) || !(target instanceof EntityPlayer) || ((EntityPlayerMP)source).canAttackPlayer((EntityPlayer)target))
         for (EntityEquipmentSlot slot : ArmorSlot.getAll()) {
           if (!ElectricItem.manager.canUse(stack, 2000.0D))
             break; 
-          ItemStack armor = target.func_184582_a(slot);
+          ItemStack armor = target.getItemStackFromSlot(slot);
           if (armor == null)
             continue; 
           double amount = 0.0D;
@@ -100,7 +100,7 @@ public class ItemNanoSaber extends ItemElectricTool {
           if (amount > 0.0D) {
             ElectricItem.manager.discharge(armor, amount, this.tier, true, false, false);
             if (!ElectricItem.manager.canUse(armor, 1.0D))
-              target.func_184201_a(slot, null); 
+              target.setItemStackToSlot(slot, null); 
             drainSaber(stack, 2000.0D, source);
           } 
         }  
@@ -132,7 +132,7 @@ public class ItemNanoSaber extends ItemElectricTool {
     return false;
   }
   
-  public boolean func_77662_d() {
+  public boolean isFull3D() {
     return true;
   }
   
@@ -143,7 +143,7 @@ public class ItemNanoSaber extends ItemElectricTool {
     } 
   }
   
-  public ActionResult<ItemStack> func_77659_a(World world, EntityPlayer player, EnumHand hand) {
+  public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
     ItemStack stack = StackUtil.get(player, hand);
     if (world.isRemote)
       return new ActionResult(EnumActionResult.PASS, stack); 
@@ -156,11 +156,11 @@ public class ItemNanoSaber extends ItemElectricTool {
       setActive(nbt, true);
       return new ActionResult(EnumActionResult.SUCCESS, stack);
     } 
-    return super.func_77659_a(world, player, hand);
+    return super.onItemRightClick(world, player, hand);
   }
   
-  public void func_77663_a(ItemStack stack, World world, Entity entity, int slot, boolean par5) {
-    super.func_77663_a(stack, world, entity, slot, (par5 && isActive(stack)));
+  public void onUpdate(ItemStack stack, World world, Entity entity, int slot, boolean par5) {
+    super.onUpdate(stack, world, entity, slot, (par5 && isActive(stack)));
     if (!isActive(stack))
       return; 
     if (ticker % 16 == 0 && entity instanceof EntityPlayerMP)
@@ -172,7 +172,7 @@ public class ItemNanoSaber extends ItemElectricTool {
   }
   
   @SideOnly(Side.CLIENT)
-  public EnumRarity func_77613_e(ItemStack stack) {
+  public EnumRarity getRarity(ItemStack stack) {
     return EnumRarity.UNCOMMON;
   }
   
@@ -182,11 +182,11 @@ public class ItemNanoSaber extends ItemElectricTool {
   }
   
   private static boolean isActive(NBTTagCompound nbt) {
-    return nbt.func_74767_n("active");
+    return nbt.getBoolean("active");
   }
   
   private static void setActive(NBTTagCompound nbt, boolean active) {
-    nbt.func_74757_a("active", active);
+    nbt.setBoolean("active", active);
   }
   
   public boolean onEntitySwing(EntityLivingBase entity, ItemStack stack) {

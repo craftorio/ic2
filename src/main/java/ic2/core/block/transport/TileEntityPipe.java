@@ -118,7 +118,7 @@ public abstract class TileEntityPipe extends TileEntityBlock implements IPipe, I
   }
   
   protected SoundType getBlockSound(Entity entity) {
-    return SoundType.field_185852_e;
+    return SoundType.METAL;
   }
   
   protected boolean isNormalCube() {

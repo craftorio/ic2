@@ -54,7 +54,7 @@ public class ItemFluidPipe extends ItemIC2 implements IMultiItem<PipeType>, IBox
   public ItemFluidPipe() {
     super(ItemName.pipe);
     this.variants = new ArrayList<>();
-    func_77627_a(true);
+    setHasSubtypes(true);
     for (PipeType type : PipeType.values) {
       for (PipeSize pipeSize : PipeSize.values)
         this.variants.add(getPipe(type, pipeSize)); 
@@ -71,7 +71,7 @@ public class ItemFluidPipe extends ItemIC2 implements IMultiItem<PipeType>, IBox
   }
   
   private static ModelResourceLocation getModelLocation(ResourceLocation loc, ItemStack itemStack) {
-    return new ModelResourceLocation(new ResourceLocation(loc.func_110624_b(), loc.func_110623_a() + "/pipe_" + getSize(itemStack).name()), null);
+    return new ModelResourceLocation(new ResourceLocation(loc.getResourceDomain(), loc.getResourcePath() + "/pipe_" + getSize(itemStack).name()), null);
   }
   
   public ItemStack getItemStack(PipeType type) {
@@ -143,12 +143,12 @@ public class ItemFluidPipe extends ItemIC2 implements IMultiItem<PipeType>, IBox
     return PipeSize.small;
   }
   
-  public String func_77667_c(ItemStack stack) {
-    return super.func_77667_c(stack) + '.' + getPipeType(stack).getName(getSize(stack));
+  public String getUnlocalizedName(ItemStack stack) {
+    return super.getUnlocalizedName(stack) + '.' + getPipeType(stack).getName(getSize(stack));
   }
   
   @SideOnly(Side.CLIENT)
-  public void func_77624_a(ItemStack itemStack, World world, List<String> info, ITooltipFlag b) {
+  public void addInformation(ItemStack itemStack, World world, List<String> info, ITooltipFlag b) {
     PipeType type = getPipeType(itemStack);
     PipeSize size = getSize(itemStack);
     info.add(TextFormatting.WHITE + "Transfer rate: " + (int)(type.transferRate * size.multiplier) + " mb/sec");
@@ -156,14 +156,14 @@ public class ItemFluidPipe extends ItemIC2 implements IMultiItem<PipeType>, IBox
     info.add(TextFormatting.GOLD + "Make connections with a wrench");
   }
   
-  public EnumActionResult func_180614_a(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+  public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
     ItemStack itemStack = StackUtil.get(player, hand);
     IBlockState oldState = world.getBlockState(pos);
     Block oldBlock = oldState.getBlock();
-    if (!oldBlock.func_176200_f((IBlockAccess)world, pos))
+    if (!oldBlock.isReplaceable((IBlockAccess)world, pos))
       pos = pos.offset(side); 
     Block newBlock = BlockName.te.getInstance();
-    if (StackUtil.isEmpty(itemStack) || !player.func_175151_a(pos, side, itemStack) || !world.func_190527_a(newBlock, pos, false, side, (Entity)player) || !((BlockTileEntity)newBlock).canReplace(world, pos, side, BlockName.te.getItemStack((Enum)TeBlock.fluid_pipe)))
+    if (StackUtil.isEmpty(itemStack) || !player.canPlayerEdit(pos, side, itemStack) || !world.mayPlace(newBlock, pos, false, side, (Entity)player) || !((BlockTileEntity)newBlock).canReplace(world, pos, side, BlockName.te.getItemStack((Enum)TeBlock.fluid_pipe)))
       return EnumActionResult.PASS; 
     newBlock.getStateForPlacement(world, pos, side, hitX, hitY, hitZ, 0, (EntityLivingBase)player, hand);
     PipeType type = getPipeType(itemStack);
@@ -171,14 +171,14 @@ public class ItemFluidPipe extends ItemIC2 implements IMultiItem<PipeType>, IBox
     TileEntityFluidPipe tileEntity = new TileEntityFluidPipe(type, size);
     if (ItemBlockTileEntity.placeTeBlock(itemStack, (EntityLivingBase)player, world, pos, side, (TileEntityBlock)tileEntity)) {
       SoundType soundtype = newBlock.getSoundType(world.getBlockState(pos), world, pos, (Entity)player);
-      world.func_184133_a(player, pos, soundtype.func_185841_e(), SoundCategory.BLOCKS, (soundtype.func_185843_a() + 1.0F) / 2.0F, soundtype.func_185847_b() * 0.8F);
+      world.playSound(player, pos, soundtype.getPlaceSound(), SoundCategory.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
       StackUtil.consumeOrError(player, hand, 1);
     } 
     return EnumActionResult.SUCCESS;
   }
   
-  public void func_150895_a(CreativeTabs tab, NonNullList<ItemStack> itemList) {
-    if (!func_194125_a(tab))
+  public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> itemList) {
+    if (!isInCreativeTab(tab))
       return; 
     List<ItemStack> variants = new ArrayList<>(this.variants);
     itemList.addAll(variants);

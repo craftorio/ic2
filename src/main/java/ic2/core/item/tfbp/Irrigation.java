@@ -15,42 +15,42 @@ import net.minecraft.world.World;
 class Irrigation extends TerraformerBase {
   boolean terraform(World world, BlockPos pos) {
     if (world.rand.nextInt(48000) == 0) {
-      world.func_72912_H().func_76084_b(true);
+      world.getWorldInfo().setRaining(true);
       return true;
     } 
     pos = TileEntityTerra.getFirstBlockFrom(world, pos, 10);
     if (pos == null)
       return false; 
-    if (TileEntityTerra.switchGround(world, pos, (Block)Blocks.SAND, Blocks.field_150346_d.getDefaultState(), true)) {
-      TileEntityTerra.switchGround(world, pos, (Block)Blocks.SAND, Blocks.field_150346_d.getDefaultState(), true);
+    if (TileEntityTerra.switchGround(world, pos, (Block)Blocks.SAND, Blocks.DIRT.getDefaultState(), true)) {
+      TileEntityTerra.switchGround(world, pos, (Block)Blocks.SAND, Blocks.DIRT.getDefaultState(), true);
       return true;
     } 
     IBlockState state = world.getBlockState(pos);
     Block block = state.getBlock();
-    if (block instanceof IGrowable && ((IGrowable)block).func_176473_a(world, pos, state, false)) {
-      ((IGrowable)block).func_176474_b(world, world.rand, pos, state);
+    if (block instanceof IGrowable && ((IGrowable)block).canGrow(world, pos, state, false)) {
+      ((IGrowable)block).grow(world, world.rand, pos, state);
       return true;
     } 
-    if (block == Blocks.field_150329_H)
-      return (spreadGrass(world, pos.func_177978_c()) || spreadGrass(world, pos.func_177974_f()) || 
-        spreadGrass(world, pos.func_177968_d()) || spreadGrass(world, pos.func_177976_e())); 
-    if (block == Blocks.field_150364_r || block == Blocks.field_150363_s) {
+    if (block == Blocks.TALLGRASS)
+      return (spreadGrass(world, pos.north()) || spreadGrass(world, pos.east()) || 
+        spreadGrass(world, pos.south()) || spreadGrass(world, pos.west())); 
+    if (block == Blocks.LOG || block == Blocks.LOG2) {
       BlockPos above = pos.up();
-      world.func_175656_a(above, state);
+      world.setBlockState(above, state);
       IBlockState leaves = getLeaves(world, pos);
       if (leaves != null)
         createLeaves(world, above, leaves); 
       return true;
     } 
-    if (block == Blocks.field_150480_ab) {
-      world.func_175698_g(pos);
+    if (block == Blocks.FIRE) {
+      world.setBlockToAir(pos);
       return true;
     } 
     return false;
   }
   
   private static IBlockState getLeaves(World world, BlockPos pos) {
-    for (EnumFacing facing : EnumFacing.field_176754_o) {
+    for (EnumFacing facing : EnumFacing.HORIZONTALS) {
       BlockPos cPos = pos.offset(facing);
       IBlockState state = world.getBlockState(cPos);
       if (state.getBlock().isLeaves(state, (IBlockAccess)world, cPos))
@@ -62,11 +62,11 @@ class Irrigation extends TerraformerBase {
   private static void createLeaves(World world, BlockPos pos, IBlockState state) {
     BlockPos above = pos.up();
     if (world.isAirBlock(above))
-      world.func_175656_a(above, state); 
-    for (EnumFacing facing : EnumFacing.field_176754_o) {
+      world.setBlockState(above, state); 
+    for (EnumFacing facing : EnumFacing.HORIZONTALS) {
       BlockPos cPos = pos.offset(facing);
       if (world.isAirBlock(cPos))
-        world.func_175656_a(cPos, state); 
+        world.setBlockState(cPos, state); 
     } 
   }
   
@@ -77,12 +77,12 @@ class Irrigation extends TerraformerBase {
     if (pos == null)
       return false; 
     Block block = world.getBlockState(pos).getBlock();
-    if (block == Blocks.field_150346_d) {
-      world.func_175656_a(pos, Blocks.field_150349_c.getDefaultState());
+    if (block == Blocks.DIRT) {
+      world.setBlockState(pos, Blocks.GRASS.getDefaultState());
       return true;
     } 
-    if (block == Blocks.field_150349_c) {
-      world.func_175656_a(pos.up(), Blocks.field_150329_H.getDefaultState().func_177226_a((IProperty)BlockTallGrass.field_176497_a, (Comparable)BlockTallGrass.EnumType.GRASS));
+    if (block == Blocks.GRASS) {
+      world.setBlockState(pos.up(), Blocks.TALLGRASS.getDefaultState().withProperty((IProperty)BlockTallGrass.TYPE, (Comparable)BlockTallGrass.EnumType.GRASS));
       return true;
     } 
     return false;

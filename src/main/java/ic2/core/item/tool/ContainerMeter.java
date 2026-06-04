@@ -31,8 +31,8 @@ public class ContainerMeter extends ContainerFullInv<HandHeldMeter> {
     this.mode = Mode.EnergyIn;
   }
   
-  public void func_75142_b() {
-    super.func_75142_b();
+  public void detectAndSendChanges() {
+    super.detectAndSendChanges();
     if (this.uut == null)
       return; 
     NodeStats stats = EnergyNet.instance.getNodeStats(this.uut);

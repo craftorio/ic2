@@ -69,19 +69,19 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
 public class CommandIc2 extends CommandBase {
-  public String func_71517_b() {
+  public String getName() {
     return "ic2";
   }
   
-  public String func_71518_a(ICommandSender icommandsender) {
+  public String getUsage(ICommandSender icommandsender) {
     return "/ic2 uu-world-scan <tiny|small|medium|large> | debug (dumpUuValues | resolveIngredient <name> | dumpTextures <name> <size> | dumpLargeGrids | enet (logIssues | logUpdates) (true|false)) | currentItem | itemNameWithVariant | giveCrop <owner> <name> <growth (1-31)> <gain (1-31)> <resistance (1-31)>";
   }
   
-  public List<String> func_184883_a(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos) {
+  public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos) {
     if (args.length == 1)
-      return func_71530_a(args, new String[] { "uu-world-scan", "debug", "currentItem", "itemNameWithVariant", "giveCrop" }); 
+      return getListOfStringsMatchingLastWord(args, new String[] { "uu-world-scan", "debug", "currentItem", "itemNameWithVariant", "giveCrop" }); 
     if (args.length == 2 && args[0].equals("uu-world-scan"))
-      return func_71530_a(args, new String[] { "tiny", "small", "medium", "large" }); 
+      return getListOfStringsMatchingLastWord(args, new String[] { "tiny", "small", "medium", "large" }); 
     if (args.length >= 2 && args[0].equals("debug"))
       return getDebugTabCompletionOptions(server, sender, args, pos); 
     if (args.length == 6 && args[0].equals("giveCrop"))
@@ -91,47 +91,47 @@ public class CommandIc2 extends CommandBase {
   
   private List<String> getDebugTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos) {
     if (args.length == 2)
-      return func_71530_a(args, new String[] { "dumpUuValues", "resolveIngredient", "dumpTextures", "dumpLargeGrids", "enet" }); 
+      return getListOfStringsMatchingLastWord(args, new String[] { "dumpUuValues", "resolveIngredient", "dumpTextures", "dumpLargeGrids", "enet" }); 
     if (args.length == 3 && args[1].equals("resolveIngredient")) {
       List<String> possibilities = new ArrayList<>(1024);
-      for (ResourceLocation loc : Item.field_150901_e.func_148742_b())
+      for (ResourceLocation loc : Item.REGISTRY.getKeys())
         possibilities.add(loc.toString()); 
       for (String name : OreDictionary.getOreNames())
         possibilities.add("OreDict:" + name); 
       for (String name : FluidRegistry.getRegisteredFluids().keySet())
         possibilities.add("Fluid:" + name); 
-      return func_175762_a(args, possibilities);
+      return getListOfStringsMatchingLastWord(args, possibilities);
     } 
     if (args.length >= 3 && "dumpTextures".equals(args[1])) {
       if (args.length == 3) {
         List<String> possibilities = new ArrayList<>(1024);
-        for (ResourceLocation loc : Item.field_150901_e.func_148742_b())
+        for (ResourceLocation loc : Item.REGISTRY.getKeys())
           possibilities.add(loc.toString()); 
-        return func_175762_a(args, possibilities);
+        return getListOfStringsMatchingLastWord(args, possibilities);
       } 
       if (args.length == 4) {
         List<String> possibilities = new ArrayList<>();
         short num;
         for (num = 512; num > 8; num = (short)(num >> 1))
           possibilities.add(Integer.toString(num)); 
-        return func_175762_a(args, possibilities);
+        return getListOfStringsMatchingLastWord(args, possibilities);
       } 
     } else if (args.length >= 3 && "enet".equals(args[1])) {
       if (args.length == 3) {
         List<String> possibilities = new ArrayList<>(1024);
-        for (ResourceLocation loc : Item.field_150901_e.func_148742_b())
+        for (ResourceLocation loc : Item.REGISTRY.getKeys())
           possibilities.add(loc.toString()); 
-        return func_71530_a(args, new String[] { "logIssues", "logUpdates" });
+        return getListOfStringsMatchingLastWord(args, new String[] { "logIssues", "logUpdates" });
       } 
       if (args.length == 4)
-        return func_71530_a(args, new String[] { "true", "false" }); 
+        return getListOfStringsMatchingLastWord(args, new String[] { "true", "false" }); 
     } 
     return Collections.emptyList();
   }
   
-  public void func_184881_a(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+  public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
     if (args.length == 0)
-      throw new WrongUsageException(func_71518_a(sender), new Object[0]); 
+      throw new WrongUsageException(getUsage(sender), new Object[0]); 
     if (args.length == 2 && args[0].equals("uu-world-scan")) {
       cmdUuWorldScan(sender, args[1]);
     } else if (args[0].equals("debug")) {
@@ -144,9 +144,9 @@ public class CommandIc2 extends CommandBase {
       } else if (args.length == 2 && args[1].equals("dumpLargeGrids")) {
         dumpLargeGrids(sender);
       } else if (args.length == 4 && args[1].equals("enet")) {
-        cmdDebugEnet(sender, args[2], func_180527_d(args[3]));
+        cmdDebugEnet(sender, args[2], parseBoolean(args[3]));
       } else {
-        throw new WrongUsageException(func_71518_a(sender), new Object[0]);
+        throw new WrongUsageException(getUsage(sender), new Object[0]);
       } 
     } else if (args.length == 1 && args[0].equals("currentItem")) {
       cmdCurrentItem(sender);
@@ -158,12 +158,12 @@ public class CommandIc2 extends CommandBase {
       } else if (!stack.getItem().getClass().getCanonicalName().startsWith("ic2.core")) {
         msg(sender, "Not an IC2 Item.");
       } else {
-        String name = Util.getName(stack.getItem()).func_110623_a();
+        String name = Util.getName(stack.getItem()).getResourcePath();
         String variant = null;
         if (stack.getItem() instanceof IMultiItem) {
           variant = ((IMultiItem)stack.getItem()).getVariant(stack);
-        } else if (stack.getItem() instanceof ItemBlock && ((ItemBlock)stack.getItem()).func_179223_d() instanceof IMultiBlock) {
-          variant = ((IMultiBlock)((ItemBlock)stack.getItem()).func_179223_d()).getVariant(stack);
+        } else if (stack.getItem() instanceof ItemBlock && ((ItemBlock)stack.getItem()).getBlock() instanceof IMultiBlock) {
+          variant = ((IMultiBlock)((ItemBlock)stack.getItem()).getBlock()).getVariant(stack);
         } 
         msg(sender, "Name: " + name + ((variant == null) ? "" : (" Variant: " + variant)));
       } 
@@ -185,14 +185,14 @@ public class CommandIc2 extends CommandBase {
     } else if (arg.equals("large")) {
       areaCount = 4096;
     } else {
-      throw new WrongUsageException(func_71518_a(sender), new Object[0]);
+      throw new WrongUsageException(getUsage(sender), new Object[0]);
     } 
     float time = areaCount * 0.0032F;
     msg(sender, String.format("Starting world scan, this will take about %.1f minutes with a powerful cpu.", new Object[] { Float.valueOf(time) }));
     msg(sender, "The server will not respond while the calculations are running.");
     WorldServer world = null;
     if (sender instanceof EntityPlayerMP) {
-      world = ((EntityPlayerMP)sender).func_71121_q();
+      world = ((EntityPlayerMP)sender).getServerWorld();
     } else {
       world = DimensionManager.getWorld(0);
     } 
@@ -216,10 +216,10 @@ public class CommandIc2 extends CommandBase {
           public int compare(Map.Entry<ItemStack, Double> a, Map.Entry<ItemStack, Double> b) {
             return ((ItemStack)a.getKey())
               .getItem()
-              .func_77653_i(a.getKey())
+              .getItemStackDisplayName(a.getKey())
               .compareTo(((ItemStack)b
                 .getKey()).getItem()
-                .func_77653_i(b.getKey()));
+                .getItemStackDisplayName(b.getKey()));
           }
         });
     msg(sender, "UU Values:");
@@ -227,7 +227,7 @@ public class CommandIc2 extends CommandBase {
       Map.Entry<ItemStack, Double> entry = it.next();
       msg(sender, String.format("  %s: %s", new Object[] { ((ItemStack)entry
               .getKey()).getItem()
-              .func_77653_i(entry.getKey()), entry
+              .getItemStackDisplayName(entry.getKey()), entry
               .getValue() }));
     } 
     msg(sender, "(check console for full list)");
@@ -250,8 +250,8 @@ public class CommandIc2 extends CommandBase {
               String.format(" %s (%s, od: %s, name: %s / %s)", new Object[] { StackUtil.toStringSafe(stack), 
                   Util.getName(stack.getItem()), 
                   getOreDictNames(stack), stack
-                  .func_77977_a(), stack
-                  .func_82833_r() }));
+                  .getUnlocalizedName(), stack
+                  .getDisplayName() }));
         } 
       } 
     } catch (Exception e) {
@@ -319,18 +319,18 @@ public class CommandIc2 extends CommandBase {
       msg(sender, "setting logGridUpdatesVerbose to " + value);
       EnergyNetSettings.logGridUpdatesVerbose = value;
     } else {
-      throw new WrongUsageException(func_71518_a(sender), new Object[0]);
+      throw new WrongUsageException(getUsage(sender), new Object[0]);
     } 
   }
   
   public static void msg(ICommandSender sender, String text) {
-    sender.func_145747_a((ITextComponent)new TextComponentString(text));
+    sender.sendMessage((ITextComponent)new TextComponentString(text));
   }
   
   static void cmdCurrentItem(ICommandSender sender) {
-    if (!(sender.func_174793_f() instanceof EntityPlayer))
+    if (!(sender.getCommandSenderEntity() instanceof EntityPlayer))
       msg(sender, "Not applicable for non-player"); 
-    EntityPlayer player = (EntityPlayer)sender.func_174793_f();
+    EntityPlayer player = (EntityPlayer)sender.getCommandSenderEntity();
     ItemStack stack = player.inventory.getCurrentItem();
     if (StackUtil.isEmpty(stack)) {
       msg(sender, "empty: " + StackUtil.toStringSafe(stack));
@@ -338,9 +338,9 @@ public class CommandIc2 extends CommandBase {
       msg(sender, String.format("ID: %s, Raw Meta: %d, Meta: %d, Damage: %d, NBT: %s", new Object[] { stack
               .getItem().getRegistryName(), 
               Integer.valueOf(StackUtil.getRawMeta(stack)), 
-              Integer.valueOf(stack.func_77960_j()), 
+              Integer.valueOf(stack.getMetadata()), 
               Integer.valueOf(stack.getItemDamage()), stack
-              .func_77978_p() }));
+              .getTagCompound() }));
       msg(sender, "Current Item excluding amount: " + 
           ConfigUtil.fromStack(stack));
       msg(sender, "Current Item including amount: " + 
@@ -363,11 +363,11 @@ public class CommandIc2 extends CommandBase {
           gain = Integer.parseInt(args[4]);
           resistance = Integer.parseInt(args[5]);
         } catch (NumberFormatException exception) {
-          throw new WrongUsageException(func_71518_a(sender), new Object[0]);
+          throw new WrongUsageException(getUsage(sender), new Object[0]);
         } 
         if (growth < 1 || growth > 31 || gain < 1 || gain > 31 || resistance < 1 || resistance > 31)
-          throw new WrongUsageException(func_71518_a(sender), new Object[0]); 
-        player.inventory.func_70441_a(
+          throw new WrongUsageException(getUsage(sender), new Object[0]); 
+        player.inventory.addItemStackToInventory(
             ItemCropSeed.generateItemStackFromValues(crop, growth, gain, resistance, 4));
       } 
     } 
@@ -396,8 +396,8 @@ public class CommandIc2 extends CommandBase {
     public void onRenderWorldLast(RenderWorldLastEvent event) {
       IC2.log.info(LogCategory.General, "Starting texture dump.");
       int count = 0;
-      GlStateManager.func_179094_E();
-      GlStateManager.func_179123_a();
+      GlStateManager.pushMatrix();
+      GlStateManager.pushAttrib();
       for (Item item : ForgeRegistries.ITEMS) {
         String regName = Util.getName(item).toString();
         if (this.pattern.matcher(regName).matches())
@@ -413,7 +413,7 @@ public class CommandIc2 extends CommandBase {
               for (int i = 0; i < 32767; i++) {
                 ItemStack stack = new ItemStack(item, 1, i);
                 try {
-                  String name = stack.func_77977_a();
+                  String name = stack.getUnlocalizedName();
                   if (name == null || !processedNames.add(name))
                     break; 
                 } catch (Exception e) {
@@ -431,8 +431,8 @@ public class CommandIc2 extends CommandBase {
         if (Keyboard.isKeyDown(1))
           break; 
       } 
-      GlStateManager.func_179099_b();
-      GlStateManager.func_179121_F();
+      GlStateManager.popAttrib();
+      GlStateManager.popMatrix();
       IC2.log.info(LogCategory.General, "Dumped %d sprites.", new Object[] { Integer.valueOf(count) });
       MinecraftForge.EVENT_BUS.unregister(this);
     }
@@ -444,26 +444,26 @@ public class CommandIc2 extends CommandBase {
       GL11.glMatrixMode(5889);
       GL11.glPushMatrix();
       GL11.glLoadIdentity();
-      GL11.glOrtho(0.0D, mc.field_71443_c * 16.0D / this.size, mc.field_71440_d * 16.0D / this.size, 0.0D, 1000.0D, 3000.0D);
+      GL11.glOrtho(0.0D, mc.displayWidth * 16.0D / this.size, mc.displayHeight * 16.0D / this.size, 0.0D, 1000.0D, 3000.0D);
       GL11.glMatrixMode(5888);
       GL11.glPushMatrix();
       GL11.glLoadIdentity();
       GL11.glTranslatef(0.0F, 0.0F, -2000.0F);
-      RenderHelper.func_74520_c();
+      RenderHelper.enableGUIStandardItemLighting();
       GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
       GL11.glEnable(32826);
-      mc.func_175599_af().func_175042_a(stack, 0, 0);
+      mc.getRenderItem().renderItemIntoGUI(stack, 0, 0);
       BufferedImage img = new BufferedImage(this.size, this.size, 2);
-      if (OpenGlHelper.func_148822_b()) {
-        Framebuffer fb = mc.func_147110_a();
-        int width = fb.field_147622_a;
-        int height = fb.field_147620_b;
+      if (OpenGlHelper.isFramebufferEnabled()) {
+        Framebuffer fb = mc.getFramebuffer();
+        int width = fb.framebufferTextureWidth;
+        int height = fb.framebufferTextureHeight;
         IntBuffer buffer = BufferUtils.createIntBuffer(width * height);
         int[] data = new int[width * height];
-        GlStateManager.func_187425_g(3333, 1);
-        GlStateManager.func_187425_g(3317, 1);
-        GlStateManager.func_179144_i(fb.field_147617_g);
-        GlStateManager.func_187433_a(3553, 0, 32993, 33639, buffer);
+        GlStateManager.glPixelStorei(3333, 1);
+        GlStateManager.glPixelStorei(3317, 1);
+        GlStateManager.bindTexture(fb.framebufferTexture);
+        GlStateManager.glGetTexImage(3553, 0, 32993, 33639, buffer);
         buffer.get(data);
         int[] mirroredData = new int[data.length];
         for (int y = 0; y < height; y++)
@@ -472,18 +472,18 @@ public class CommandIc2 extends CommandBase {
       } else {
         IntBuffer buffer = BufferUtils.createIntBuffer(this.size * this.size);
         int[] data = new int[this.size * this.size];
-        GlStateManager.func_187425_g(3333, 1);
-        GlStateManager.func_187425_g(3317, 1);
-        GlStateManager.func_187413_a(0, 0, this.size, this.size, 32993, 33639, buffer);
+        GlStateManager.glPixelStorei(3333, 1);
+        GlStateManager.glPixelStorei(3317, 1);
+        GlStateManager.glReadPixels(0, 0, this.size, this.size, 32993, 33639, buffer);
         buffer.get(data);
-        TextureUtil.func_147953_a(data, this.size, this.size);
+        TextureUtil.processPixelValues(data, this.size, this.size);
         img.setRGB(0, 0, this.size, this.size, data, 0, this.size);
       } 
       try {
         File dir = new File(IC2.platform.getMinecraftDir(), "sprites");
         dir.mkdir();
         String modId = (name.indexOf(':') >= 0) ? name.substring(0, name.indexOf(':')) : name;
-        String fileName = "Sprite_" + modId + '_' + stack.func_82833_r() + '_' + this.size;
+        String fileName = "Sprite_" + modId + '_' + stack.getDisplayName() + '_' + this.size;
         fileName = fileName.replaceAll("[^\\w\\- ]+", "");
         File file = new File(dir, fileName + ".png");
         int extra = 0;

@@ -33,7 +33,7 @@ public class BlockCuttingBlade extends ItemMulti<BlockCuttingBladeType> implemen
   }
   
   @SideOnly(Side.CLIENT)
-  public void func_77624_a(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
+  public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
     BlockCuttingBladeType blade = (BlockCuttingBladeType)getType(stack);
     if (blade == null)
       return; 

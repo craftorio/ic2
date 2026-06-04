@@ -50,12 +50,12 @@ public class TileEntityCokeKiln extends TileEntityInventory implements IMultiBlo
     recipeManager = new DynamicRecipeManager();
     recipeManager.createRecipe()
       .withInput("logWood")
-      .withOutput(new ItemStack(Items.field_151044_h, 1, 1))
+      .withOutput(new ItemStack(Items.COAL, 1, 1))
       .withOutput(new FluidStack(FluidName.creosote.getInstance(), 250))
       .withOperationDurationTicks(1800)
       .register();
     recipeManager.createRecipe()
-      .withInput(new ItemStack(Items.field_151044_h, 1, 0))
+      .withInput(new ItemStack(Items.COAL, 1, 0))
       .withOutput(new ItemStack(ItemName.coke.getInstance(), 1))
       .withOutput(new FluidStack(FluidName.creosote.getInstance(), 500))
       .withOperationDurationTicks(1800)
@@ -116,7 +116,7 @@ public class TileEntityCokeKiln extends TileEntityInventory implements IMultiBlo
     if (!(hatch instanceof TileEntityCokeKilnHatch))
       return false; 
     ItemStack input = ((TileEntityCokeKilnHatch)hatch).inventory.get();
-    if (input.func_190926_b())
+    if (input.isEmpty())
       return false; 
     if (this.recipe != null) {
       boolean canUse = recipeManager.apply(this.recipe, new ItemStack[] { input }, new FluidStack[0], true);
@@ -170,7 +170,7 @@ public class TileEntityCokeKiln extends TileEntityInventory implements IMultiBlo
     if (!(hatch instanceof TileEntityCokeKilnHatch))
       return; 
     InvSlot inventory = ((TileEntityCokeKilnHatch)hatch).inventory;
-    if (inventory.get().func_190926_b())
+    if (inventory.get().isEmpty())
       return; 
     recipeManager.apply(this.recipe, new ItemStack[] { inventory.get() }, new FluidStack[0], false);
     List<ItemStack> itemOutputs = new ArrayList<>();
@@ -185,7 +185,7 @@ public class TileEntityCokeKiln extends TileEntityInventory implements IMultiBlo
     } 
     for (ItemStack stack : itemOutputs) {
       int amount = this.outputSlot.add(StackUtil.copy(stack));
-      stack.func_190918_g(amount);
+      stack.shrink(amount);
     } 
     itemOutputs.clear();
     BlockPos gratePos = new BlockPos(this.pos.getX() + -getFacing().getFrontOffsetX(), this.pos.getY() - 1, this.pos.getZ() + -getFacing().getFrontOffsetZ());
@@ -217,7 +217,7 @@ public class TileEntityCokeKiln extends TileEntityInventory implements IMultiBlo
       World world = getWorld();
       ParticleUtil.showFlames(world, this.pos, getFacing());
       if (world.rand.nextDouble() < 0.1D)
-        world.func_184134_a(this.pos.getX() + 0.5D, this.pos.getY() + 0.5D, this.pos.getZ() + 0.5D, SoundEvents.field_187652_bv, SoundCategory.BLOCKS, 1.0F, 1.0F, false); 
+        world.playSound(this.pos.getX() + 0.5D, this.pos.getY() + 0.5D, this.pos.getZ() + 0.5D, SoundEvents.BLOCK_FURNACE_FIRE_CRACKLE, SoundCategory.BLOCKS, 1.0F, 1.0F, false); 
     } 
   }
   

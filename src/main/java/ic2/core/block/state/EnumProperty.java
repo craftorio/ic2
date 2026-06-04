@@ -39,12 +39,12 @@ public class EnumProperty<T extends Enum<T> & IIdProvider> extends PropertyHelpe
     } 
   }
   
-  public List<T> func_177700_c() {
+  public List<T> getAllowedValues() {
     return this.values;
   }
   
   public List<T> getShownValues() {
-    Class<T> valueClass = func_177699_b();
+    Class<T> valueClass = getValueClass();
     boolean defaultState = Version.shouldEnable(valueClass);
     return (List<T>)this.values.stream().filter(value -> {
           try {
@@ -55,11 +55,11 @@ public class EnumProperty<T extends Enum<T> & IIdProvider> extends PropertyHelpe
         }).collect(Collectors.toList());
   }
   
-  public String func_177702_a(T value) {
+  public String getName(T value) {
     return ((IIdProvider)value).getName();
   }
   
-  public Optional<T> func_185929_b(String value) {
+  public Optional<T> parseValue(String value) {
     return Optional.fromNullable(getValue(value));
   }
   

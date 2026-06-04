@@ -47,11 +47,11 @@ public final class ScrapboxRecipeManager implements IScrapboxManager {
   public boolean addRecipe(IRecipeInput input, Collection<ItemStack> output, NBTTagCompound metadata, boolean replace) {
     if (!input.matches(ItemName.crafting.getItemStack((Enum)CraftingItemType.scrap_box)))
       throw new IllegalArgumentException("currently only scrap boxes are supported"); 
-    if (metadata == null || !metadata.func_74764_b("weight"))
+    if (metadata == null || !metadata.hasKey("weight"))
       throw new IllegalArgumentException("no weight metadata"); 
     if (output.size() != 1)
       throw new IllegalArgumentException("currently only a single drop stack is supported"); 
-    float weight = metadata.func_74760_g("weight");
+    float weight = metadata.getFloat("weight");
     if (weight <= 0.0F || Float.isInfinite(weight) || Float.isNaN(weight))
       throw new IllegalArgumentException("invalid weight"); 
     addDrop(output.iterator().next(), weight);
@@ -106,7 +106,7 @@ public final class ScrapboxRecipeManager implements IScrapboxManager {
     if (result == null || ((Collection)result.getOutput()).isEmpty())
       return null; 
     if (adjustInput)
-      input.func_190920_e(StackUtil.getSize((ItemStack)result.getAdjustedInput())); 
+      input.setCount(StackUtil.getSize((ItemStack)result.getAdjustedInput())); 
     return ((Collection<ItemStack>)result.getOutput()).iterator().next();
   }
   
@@ -135,51 +135,51 @@ public final class ScrapboxRecipeManager implements IScrapboxManager {
   
   private void addBuiltinDrops() {
     if (IC2.suddenlyHoes) {
-      addDrop(Items.field_151017_I, 9001.0F);
+      addDrop(Items.WOODEN_HOE, 9001.0F);
     } else {
-      addDrop(Items.field_151017_I, 5.01F);
+      addDrop(Items.WOODEN_HOE, 5.01F);
     } 
-    addDrop(Blocks.field_150346_d, 5.0F);
-    addDrop(Items.field_151055_y, 4.0F);
-    addDrop((Block)Blocks.field_150349_c, 3.0F);
-    addDrop(Blocks.field_150351_n, 3.0F);
-    addDrop(Blocks.field_150424_aL, 2.0F);
-    addDrop(Items.field_151078_bh, 2.0F);
-    addDrop(Items.field_151034_e, 1.5F);
-    addDrop(Items.field_151025_P, 1.5F);
+    addDrop(Blocks.DIRT, 5.0F);
+    addDrop(Items.STICK, 4.0F);
+    addDrop((Block)Blocks.GRASS, 3.0F);
+    addDrop(Blocks.GRAVEL, 3.0F);
+    addDrop(Blocks.NETHERRACK, 2.0F);
+    addDrop(Items.ROTTEN_FLESH, 2.0F);
+    addDrop(Items.APPLE, 1.5F);
+    addDrop(Items.BREAD, 1.5F);
     addDrop(ItemName.filled_tin_can.getItemStack(), 1.5F);
-    addDrop(Items.field_151041_m, 1.0F);
-    addDrop(Items.field_151038_n, 1.0F);
-    addDrop(Items.field_151039_o, 1.0F);
+    addDrop(Items.WOODEN_SWORD, 1.0F);
+    addDrop(Items.WOODEN_SHOVEL, 1.0F);
+    addDrop(Items.WOODEN_PICKAXE, 1.0F);
     addDrop(Blocks.SOUL_SAND, 1.0F);
-    addDrop(Items.field_151155_ap, 1.0F);
-    addDrop(Items.field_151116_aA, 1.0F);
-    addDrop(Items.field_151008_G, 1.0F);
-    addDrop(Items.field_151103_aS, 1.0F);
-    addDrop(Items.field_151157_am, 0.9F);
-    addDrop(Items.field_151083_be, 0.9F);
-    addDrop(Blocks.field_150423_aK, 0.9F);
-    addDrop(Items.field_151077_bg, 0.9F);
-    addDrop(Items.field_151143_au, 0.01F);
+    addDrop(Items.SIGN, 1.0F);
+    addDrop(Items.LEATHER, 1.0F);
+    addDrop(Items.FEATHER, 1.0F);
+    addDrop(Items.BONE, 1.0F);
+    addDrop(Items.COOKED_PORKCHOP, 0.9F);
+    addDrop(Items.COOKED_BEEF, 0.9F);
+    addDrop(Blocks.PUMPKIN, 0.9F);
+    addDrop(Items.COOKED_CHICKEN, 0.9F);
+    addDrop(Items.MINECART, 0.01F);
     addDrop(Items.REDSTONE, 0.9F);
     addDrop(ItemName.crafting.getItemStack((Enum)CraftingItemType.rubber), 0.8F);
-    addDrop(Items.field_151114_aO, 0.8F);
+    addDrop(Items.GLOWSTONE_DUST, 0.8F);
     addDrop(ItemName.dust.getItemStack((Enum)DustResourceType.coal), 0.8F);
     addDrop(ItemName.dust.getItemStack((Enum)DustResourceType.copper), 0.8F);
     addDrop(ItemName.dust.getItemStack((Enum)DustResourceType.tin), 0.8F);
     addDrop(ItemName.single_use_battery.getItemStack(), 0.7F);
     addDrop(ItemName.dust.getItemStack((Enum)DustResourceType.iron), 0.7F);
     addDrop(ItemName.dust.getItemStack((Enum)DustResourceType.gold), 0.7F);
-    addDrop(Items.field_151123_aH, 0.6F);
-    addDrop(Blocks.field_150366_p, 0.5F);
-    addDrop((Item)Items.field_151169_ag, 0.01F);
-    addDrop(Blocks.field_150352_o, 0.5F);
-    addDrop(Items.field_151105_aU, 0.5F);
+    addDrop(Items.SLIME_BALL, 0.6F);
+    addDrop(Blocks.IRON_ORE, 0.5F);
+    addDrop((Item)Items.GOLDEN_HELMET, 0.01F);
+    addDrop(Blocks.GOLD_ORE, 0.5F);
+    addDrop(Items.CAKE, 0.5F);
     addDrop(Items.DIAMOND, 0.1F);
-    addDrop(Items.field_151166_bC, 0.05F);
-    addDrop(Items.field_151079_bi, 0.08F);
-    addDrop(Items.field_151072_bj, 0.04F);
-    addDrop(Items.field_151110_aK, 0.8F);
+    addDrop(Items.EMERALD, 0.05F);
+    addDrop(Items.ENDER_PEARL, 0.08F);
+    addDrop(Items.BLAZE_ROD, 0.04F);
+    addDrop(Items.EGG, 0.8F);
     addDrop(BlockName.resource.getItemStack((Enum)ResourceBlock.copper_ore), 0.7F);
     addDrop(BlockName.resource.getItemStack((Enum)ResourceBlock.tin_ore), 0.7F);
   }

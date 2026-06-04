@@ -40,7 +40,7 @@ public abstract class BlockBase extends Block implements IBlockModelProvider {
   
   protected BlockBase(BlockName name, Material material, Function<Block, Item> itemSupplier) {
     super(material);
-    func_149647_a((CreativeTabs)IC2.tabIC2);
+    setCreativeTab((CreativeTabs)IC2.tabIC2);
     if (name != null) {
       register(name.name(), IC2.getIdentifier(name.name()), itemSupplier);
       name.setInstance(this);
@@ -48,7 +48,7 @@ public abstract class BlockBase extends Block implements IBlockModelProvider {
   }
   
   protected void register(String name, ResourceLocation identifier, Function<Block, Item> itemSupplier) {
-    func_149663_c(name);
+    setUnlocalizedName(name);
     BlocksItems.registerBlock(this, identifier);
     if (itemSupplier != null)
       BlocksItems.registerItem(itemSupplier.apply(this), identifier); 
@@ -91,9 +91,9 @@ public abstract class BlockBase extends Block implements IBlockModelProvider {
     ResourceLocation loc = Util.getName(item);
     if (loc == null)
       return; 
-    Map<IBlockState, ModelResourceLocation> locations = (mapper != null) ? mapper.func_178130_a(block) : null;
+    Map<IBlockState, ModelResourceLocation> locations = (mapper != null) ? mapper.putStateModelLocations(block) : null;
     for (IBlockState state : states) {
-      int meta = block.func_176201_c(state);
+      int meta = block.getMetaFromState(state);
       ModelResourceLocation location = (locations != null) ? locations.get(state) : ModelUtil.getModelLocation(loc, state);
       if (location == null)
         throw new RuntimeException("can't map state " + state); 
@@ -117,12 +117,12 @@ public abstract class BlockBase extends Block implements IBlockModelProvider {
     ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(path, null));
   }
   
-  public String func_149739_a() {
-    return "ic2." + super.func_149739_a().substring(5);
+  public String getUnlocalizedName() {
+    return "ic2." + super.getUnlocalizedName().substring(5);
   }
   
-  public String func_149732_F() {
-    return Localization.translate(func_149739_a());
+  public String getLocalizedName() {
+    return Localization.translate(getUnlocalizedName());
   }
   
   public boolean canBeReplacedByLeaves(IBlockState state, IBlockAccess world, BlockPos pos) {

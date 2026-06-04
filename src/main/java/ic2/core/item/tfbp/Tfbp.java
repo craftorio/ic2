@@ -21,7 +21,7 @@ public class Tfbp extends ItemMulti<Tfbp.TfbpType> implements ITerraformingBP {
   
   public Tfbp() {
     super(ItemName.tfbp, TfbpType.class);
-    func_77625_d(1);
+    setMaxStackSize(1);
   }
   
   public double getConsume(ItemStack stack) {
@@ -39,7 +39,7 @@ public class Tfbp extends ItemMulti<Tfbp.TfbpType> implements ITerraformingBP {
     if (type == null)
       return false; 
     if (type == TfbpType.cultivation && world.provider
-      .func_186058_p() == DimensionType.THE_END)
+      .getDimensionType() == DimensionType.THE_END)
       IC2.achievements.issueAchievement(player, "terraformEndCultivation"); 
     return true;
   }

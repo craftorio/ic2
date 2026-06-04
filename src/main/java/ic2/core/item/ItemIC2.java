@@ -30,9 +30,9 @@ public class ItemIC2 extends Item implements IItemModelProvider {
   private Map<Capability<?>, Function<ItemStack, ?>> caps;
   
   public ItemIC2(ItemName name) {
-    func_77637_a((CreativeTabs)IC2.tabIC2);
+    setCreativeTab((CreativeTabs)IC2.tabIC2);
     if (name != null) {
-      func_77655_b(name.name());
+      setUnlocalizedName(name.name());
       BlocksItems.registerItem(this, IC2.getIdentifier(name.name()));
       name.setInstance(this);
     } 
@@ -72,24 +72,24 @@ public class ItemIC2 extends Item implements IItemModelProvider {
     return 16777215;
   }
   
-  public String func_77658_a() {
-    return "ic2." + super.func_77658_a().substring(5);
+  public String getUnlocalizedName() {
+    return "ic2." + super.getUnlocalizedName().substring(5);
   }
   
-  public String func_77667_c(ItemStack stack) {
-    return func_77658_a();
+  public String getUnlocalizedName(ItemStack stack) {
+    return getUnlocalizedName();
   }
   
-  public String func_77657_g(ItemStack stack) {
-    return func_77667_c(stack);
+  public String getUnlocalizedNameInefficiently(ItemStack stack) {
+    return getUnlocalizedName(stack);
   }
   
-  public String func_77653_i(ItemStack stack) {
-    return Localization.translate(func_77667_c(stack));
+  public String getItemStackDisplayName(ItemStack stack) {
+    return Localization.translate(getUnlocalizedName(stack));
   }
   
-  protected boolean func_194125_a(CreativeTabs tab) {
-    return (isEnabled() && super.func_194125_a(tab));
+  protected boolean isInCreativeTab(CreativeTabs tab) {
+    return (isEnabled() && super.isInCreativeTab(tab));
   }
   
   protected boolean isEnabled() {
@@ -103,8 +103,8 @@ public class ItemIC2 extends Item implements IItemModelProvider {
     return this;
   }
   
-  public EnumRarity func_77613_e(ItemStack stack) {
-    if (stack.func_77948_v() && this.rarity != EnumRarity.EPIC)
+  public EnumRarity getRarity(ItemStack stack) {
+    if (stack.isItemEnchanted() && this.rarity != EnumRarity.EPIC)
       return EnumRarity.RARE; 
     return this.rarity;
   }

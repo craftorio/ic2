@@ -29,17 +29,17 @@ public class ContainerEnergyOMatClosed extends ContainerFullInv<TileEntityEnergy
     return ret;
   }
   
-  public void func_75142_b() {
-    super.func_75142_b();
-    for (IContainerListener listener : this.field_75149_d) {
+  public void detectAndSendChanges() {
+    super.detectAndSendChanges();
+    for (IContainerListener listener : this.listeners) {
       if (((TileEntityEnergyOMat)this.base).chargeSlot.tier != this.lastTier)
-        listener.func_71112_a((Container)this, 0, ((TileEntityEnergyOMat)this.base).chargeSlot.tier); 
+        listener.sendWindowProperty((Container)this, 0, ((TileEntityEnergyOMat)this.base).chargeSlot.tier); 
     } 
     this.lastTier = ((TileEntityEnergyOMat)this.base).chargeSlot.tier;
   }
   
-  public void func_75137_b(int index, int value) {
-    super.func_75137_b(index, value);
+  public void updateProgressBar(int index, int value) {
+    super.updateProgressBar(index, value);
     switch (index) {
       case 0:
         ((TileEntityEnergyOMat)this.base).chargeSlot.tier = value;

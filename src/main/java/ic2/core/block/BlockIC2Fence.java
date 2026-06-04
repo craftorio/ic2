@@ -45,11 +45,11 @@ public class BlockIC2Fence extends BlockMultiID<BlockIC2Fence.IC2FenceType> {
   }
   
   private BlockIC2Fence() {
-    super(BlockName.fence, Material.field_151573_f);
-    IBlockState defaultState = this.field_176227_L.func_177621_b().func_177226_a((IProperty)this.typeProperty, this.typeProperty.getDefault());
+    super(BlockName.fence, Material.IRON);
+    IBlockState defaultState = this.blockState.getBaseState().withProperty((IProperty)this.typeProperty, this.typeProperty.getDefault());
     for (IProperty<Boolean> property : connectProperties.values())
-      defaultState = defaultState.func_177226_a(property, Boolean.valueOf(false)); 
-    func_180632_j(defaultState);
+      defaultState = defaultState.withProperty(property, Boolean.valueOf(false)); 
+    setDefaultState(defaultState);
   }
   
   @SideOnly(Side.CLIENT)
@@ -62,15 +62,15 @@ public class BlockIC2Fence extends BlockMultiID<BlockIC2Fence.IC2FenceType> {
       return; 
     for (IBlockState state : getTypeStates())
       ModelLoader.setCustomModelResourceLocation(item, 
-          func_176201_c(state), new ModelResourceLocation(loc
-            .toString() + "/" + ((IC2FenceType)state.func_177229_b((IProperty)this.typeProperty)).getName(), null)); 
+          getMetaFromState(state), new ModelResourceLocation(loc
+            .toString() + "/" + ((IC2FenceType)state.getValue((IProperty)this.typeProperty)).getName(), null)); 
   }
   
-  public boolean func_149686_d(IBlockState state) {
+  public boolean isFullCube(IBlockState state) {
     return false;
   }
   
-  protected BlockStateContainer func_180661_e() {
+  protected BlockStateContainer createBlockState() {
     List<IProperty<?>> properties = new ArrayList<>();
     properties.add(getTypeProperty());
     properties.addAll(connectProperties.values());
@@ -78,38 +78,38 @@ public class BlockIC2Fence extends BlockMultiID<BlockIC2Fence.IC2FenceType> {
         .<IProperty>toArray(new IProperty[0]));
   }
   
-  public IBlockState func_176221_a(IBlockState state, IBlockAccess world, BlockPos pos) {
+  public IBlockState getActualState(IBlockState state, IBlockAccess world, BlockPos pos) {
     boolean isPole = true;
     boolean magnetizerConnected = false;
     IBlockState ret = state;
-    for (EnumFacing facing : EnumFacing.field_176754_o) {
+    for (EnumFacing facing : EnumFacing.HORIZONTALS) {
       IBlockState neighborState = world.getBlockState(pos.offset(facing));
       if (isFence(neighborState)) {
         isPole = false;
         if (magnetizerConnected)
           break; 
-        ret = ret.func_177226_a(connectProperties.get(facing), Boolean.valueOf(true));
+        ret = ret.withProperty(connectProperties.get(facing), Boolean.valueOf(true));
       } else if (isPole && getMagnetizer(world, pos.offset(facing), facing, world.getBlockState(pos.offset(facing)), false) != null) {
         magnetizerConnected = true;
-        ret = ret.func_177226_a(connectProperties.get(facing), Boolean.valueOf(true));
+        ret = ret.withProperty(connectProperties.get(facing), Boolean.valueOf(true));
       } 
     } 
     if (!isPole && magnetizerConnected) {
       ret = state;
-      for (EnumFacing facing : EnumFacing.field_176754_o) {
+      for (EnumFacing facing : EnumFacing.HORIZONTALS) {
         IBlockState neighborState = world.getBlockState(pos.offset(facing));
         if (isFence(neighborState))
-          ret = ret.func_177226_a(connectProperties.get(facing), Boolean.valueOf(true)); 
+          ret = ret.withProperty(connectProperties.get(facing), Boolean.valueOf(true)); 
       } 
     } 
     return ret;
   }
   
-  public boolean func_149662_c(IBlockState state) {
+  public boolean isOpaqueCube(IBlockState state) {
     return false;
   }
   
-  public boolean func_149721_r(IBlockState state) {
+  public boolean isNormalCube(IBlockState state) {
     return false;
   }
   
@@ -121,20 +121,20 @@ public class BlockIC2Fence extends BlockMultiID<BlockIC2Fence.IC2FenceType> {
     return true;
   }
   
-  public BlockFaceShape func_193383_a(IBlockAccess world, IBlockState state, BlockPos pos, EnumFacing face) {
+  public BlockFaceShape getBlockFaceShape(IBlockAccess world, IBlockState state, BlockPos pos, EnumFacing face) {
     return (face.getAxis() != EnumFacing.Axis.Y) ? BlockFaceShape.MIDDLE_POLE : BlockFaceShape.CENTER;
   }
   
-  public void func_180634_a(World world, BlockPos pos, IBlockState state, Entity rawEntity) {
+  public void onEntityCollidedWithBlock(World world, BlockPos pos, IBlockState state, Entity rawEntity) {
     if (!(rawEntity instanceof EntityPlayer))
       return; 
-    boolean powered = isPowered(world, pos, (IC2FenceType)state.func_177229_b((IProperty)this.typeProperty));
+    boolean powered = isPowered(world, pos, (IC2FenceType)state.getValue((IProperty)this.typeProperty));
     EntityPlayer player = (EntityPlayer)rawEntity;
     boolean metalShoes = hasMetalShoes(player);
-    boolean descending = player.func_70093_af();
+    boolean descending = player.isSneaking();
     boolean slow = (player.motionY >= -0.25D || player.motionY < 1.6D);
     if (slow)
-      player.field_70143_R = 0.0F; 
+      player.fallDistance = 0.0F; 
     if (!powered) {
       if (descending && !slow && metalShoes)
         player.motionY *= 0.9D; 
@@ -155,32 +155,32 @@ public class BlockIC2Fence extends BlockMultiID<BlockIC2Fence.IC2FenceType> {
     } 
   }
   
-  public void func_185477_a(IBlockState state, World world, BlockPos pos, AxisAlignedBB mask, List<AxisAlignedBB> result, Entity collidingEntity, boolean isActualState) {
+  public void addCollisionBoxToList(IBlockState state, World world, BlockPos pos, AxisAlignedBB mask, List<AxisAlignedBB> result, Entity collidingEntity, boolean isActualState) {
     if (!isActualState)
-      state = func_176221_a(state, (IBlockAccess)world, pos); 
-    func_185492_a(pos, mask, result, aabbs.get(null));
+      state = getActualState(state, (IBlockAccess)world, pos); 
+    addCollisionBoxToList(pos, mask, result, aabbs.get(null));
     for (IProperty<Boolean> property : connectProperties.values()) {
-      if (((Boolean)state.func_177229_b(property)).booleanValue())
-        func_185492_a(pos, mask, result, aabbs.get(property)); 
+      if (((Boolean)state.getValue(property)).booleanValue())
+        addCollisionBoxToList(pos, mask, result, aabbs.get(property)); 
     } 
   }
   
-  public AxisAlignedBB func_185496_a(IBlockState state, IBlockAccess world, BlockPos pos) {
+  public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
     AxisAlignedBB ret = aabbs.get(null);
-    double xS = ret.field_72340_a;
+    double xS = ret.minX;
     double yS = 0.0D;
-    double zS = ret.field_72339_c;
-    double xE = ret.field_72336_d;
+    double zS = ret.minZ;
+    double xE = ret.maxX;
     double yE = 1.0D;
-    double zE = ret.field_72334_f;
-    state = func_176221_a(state, world, pos);
+    double zE = ret.maxZ;
+    state = getActualState(state, world, pos);
     for (IProperty<Boolean> property : connectProperties.values()) {
-      if (((Boolean)state.func_177229_b(property)).booleanValue()) {
+      if (((Boolean)state.getValue(property)).booleanValue()) {
         AxisAlignedBB aabb = aabbs.get(property);
-        xS = Math.min(xS, aabb.field_72340_a);
-        zS = Math.min(zS, aabb.field_72339_c);
-        xE = Math.max(xE, aabb.field_72336_d);
-        zE = Math.max(zE, aabb.field_72334_f);
+        xS = Math.min(xS, aabb.minX);
+        zS = Math.min(zS, aabb.minZ);
+        xE = Math.max(xE, aabb.maxX);
+        zE = Math.max(zE, aabb.maxZ);
       } 
     } 
     return new AxisAlignedBB(xS, 0.0D, zS, xE, 1.0D, zE);
@@ -205,10 +205,10 @@ public class BlockIC2Fence extends BlockMultiID<BlockIC2Fence.IC2FenceType> {
   }
   
   public static boolean hasMetalShoes(EntityPlayer player) {
-    ItemStack shoes = (ItemStack)player.inventory.field_70460_b.get(0);
+    ItemStack shoes = (ItemStack)player.inventory.armorInventory.get(0);
     if (shoes != null) {
       Item item = shoes.getItem();
-      if (item == Items.field_151167_ab || item == Items.field_151151_aj || item == Items.field_151029_X || 
+      if (item == Items.IRON_BOOTS || item == Items.GOLDEN_BOOTS || item == Items.CHAINMAIL_BOOTS || 
         
         ItemWrapper.isMetalArmor(shoes, player))
         return true; 
@@ -233,7 +233,7 @@ public class BlockIC2Fence extends BlockMultiID<BlockIC2Fence.IC2FenceType> {
     List<TileEntityMagnetizer> ret = new ArrayList<>();
     Ic2BlockPos center = new Ic2BlockPos((Vec3i)start);
     Ic2BlockPos tmp = new Ic2BlockPos();
-    for (EnumFacing facing : EnumFacing.field_176754_o) {
+    for (EnumFacing facing : EnumFacing.HORIZONTALS) {
       Ic2BlockPos nPos = tmp.set((Vec3i)center).move(facing);
       IBlockState state = nPos.getBlockState(world);
       if (isFence(state))
@@ -253,7 +253,7 @@ public class BlockIC2Fence extends BlockMultiID<BlockIC2Fence.IC2FenceType> {
         center.setY(start.getY() + offset * dy);
         IBlockState centerState = center.getBlockState(world);
         if (!(centerState.getBlock() instanceof BlockIC2Fence) || 
-          !((IC2FenceType)centerState.func_177229_b((IProperty)this.typeProperty)).canBoost) {
+          !((IC2FenceType)centerState.getValue((IProperty)this.typeProperty)).canBoost) {
           if (dir == 0) {
             minDir = 1;
           } else {
@@ -264,7 +264,7 @@ public class BlockIC2Fence extends BlockMultiID<BlockIC2Fence.IC2FenceType> {
           break;
         } 
         int oldSize = ret.size();
-        for (EnumFacing facing : EnumFacing.field_176754_o) {
+        for (EnumFacing facing : EnumFacing.HORIZONTALS) {
           Ic2BlockPos nPos = tmp.set((Vec3i)center).move(facing);
           IBlockState state = nPos.getBlockState(world);
           if (isFence(state)) {
@@ -293,8 +293,8 @@ public class BlockIC2Fence extends BlockMultiID<BlockIC2Fence.IC2FenceType> {
   
   private static Map<EnumFacing, IProperty<Boolean>> getConnectProperties() {
     Map<EnumFacing, IProperty<Boolean>> ret = new EnumMap<>(EnumFacing.class);
-    for (EnumFacing facing : EnumFacing.field_176754_o)
-      ret.put(facing, PropertyBool.func_177716_a(facing.getName())); 
+    for (EnumFacing facing : EnumFacing.HORIZONTALS)
+      ret.put(facing, PropertyBool.create(facing.getName())); 
     return ret;
   }
   
@@ -303,10 +303,10 @@ public class BlockIC2Fence extends BlockMultiID<BlockIC2Fence.IC2FenceType> {
     double spaceL = 0.375D;
     double spaceR = 0.625D;
     ret.put(null, new AxisAlignedBB(0.375D, 0.0D, 0.375D, 0.625D, 1.5D, 0.625D));
-    for (EnumFacing facing : EnumFacing.field_176754_o) {
+    for (EnumFacing facing : EnumFacing.HORIZONTALS) {
       double start, end;
       AxisAlignedBB aabb;
-      if (facing.func_176743_c() == EnumFacing.AxisDirection.NEGATIVE) {
+      if (facing.getAxisDirection() == EnumFacing.AxisDirection.NEGATIVE) {
         start = 0.0D;
         end = 0.375D;
       } else {

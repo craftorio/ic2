@@ -20,7 +20,7 @@ public class EntityNuke extends EntityIC2Explosive {
     this(world, 0.0D, 0.0D, 0.0D, 0.0F, 0);
   }
   
-  public boolean func_184230_a(EntityPlayer player, EnumHand hand) {
+  public boolean processInitialInteract(EntityPlayer player, EnumHand hand) {
     ItemStack stack = StackUtil.get(player, hand);
     if (IC2.platform.isSimulating() && !StackUtil.isEmpty(stack) && stack.getItem() instanceof ItemToolWrench) {
       ItemToolWrench wrench = (ItemToolWrench)stack.getItem();

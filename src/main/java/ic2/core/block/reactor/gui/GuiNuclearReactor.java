@@ -53,8 +53,8 @@ public class GuiNuclearReactor extends GuiIC2<ContainerNuclearReactor> {
           }));
   }
   
-  protected void func_146976_a(float partialTicks, int mouseX, int mouseY) {
-    super.func_146976_a(partialTicks, mouseX, mouseY);
+  protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+    super.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
     int size = ((TileEntityNuclearReactorElectric)((ContainerNuclearReactor)this.container).base).getReactorSize();
     int startX = 26;
     int startY = 25;

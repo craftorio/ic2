@@ -90,26 +90,26 @@ public class CableModel extends AbstractModel implements ISpecialParticleModel {
     return new ResourceLocation("ic2", loc);
   }
   
-  public List<BakedQuad> func_188616_a(IBlockState rawState, EnumFacing side, long rand) {
+  public List<BakedQuad> getQuads(IBlockState rawState, EnumFacing side, long rand) {
     if (!(rawState instanceof Ic2BlockState.Ic2BlockStateInstance))
-      return ModelUtil.getMissingModel().func_188616_a(rawState, side, rand); 
+      return ModelUtil.getMissingModel().getQuads(rawState, side, rand); 
     Ic2BlockState.Ic2BlockStateInstance state = (Ic2BlockState.Ic2BlockStateInstance)rawState;
     if (!state.hasValue(TileEntityCable.renderStateProperty))
-      return ModelUtil.getMissingModel().func_188616_a((IBlockState)state, side, rand); 
+      return ModelUtil.getMissingModel().getQuads((IBlockState)state, side, rand); 
     TileEntityCable.CableRenderState prop = (TileEntityCable.CableRenderState)state.getValue(TileEntityCable.renderStateProperty);
     if (prop.foam == CableFoam.Soft)
-      return ModelUtil.getBlockModel(BlockName.foam.getBlockState((IIdProvider)BlockFoam.FoamType.normal)).func_188616_a((IBlockState)state, side, rand); 
+      return ModelUtil.getBlockModel(BlockName.foam.getBlockState((IIdProvider)BlockFoam.FoamType.normal)).getQuads((IBlockState)state, side, rand); 
     if (prop.foam == CableFoam.Hardened) {
       TileEntityWall.WallRenderState wallProp = (TileEntityWall.WallRenderState)state.getValue(TileEntityWall.renderStateProperty);
       if (wallProp == null)
-        return ModelUtil.getMissingModel().func_188616_a((IBlockState)state, side, rand); 
+        return ModelUtil.getMissingModel().getQuads((IBlockState)state, side, rand); 
       if (wallProp.obscurations == null)
-        return ModelUtil.getBlockModel(BlockName.wall.getBlockState((IIdProvider)wallProp.color)).func_188616_a((IBlockState)state, side, rand); 
+        return ModelUtil.getBlockModel(BlockName.wall.getBlockState((IIdProvider)wallProp.color)).getQuads((IBlockState)state, side, rand); 
       IBakedModel model = ModelUtil.getBlockModel(BlockName.te.getBlockState((IIdProvider)TeBlock.wall));
-      return model.func_188616_a((IBlockState)state, side, rand);
+      return model.getQuads((IBlockState)state, side, rand);
     } 
     try {
-      return ((IBakedModel)this.modelCache.get(prop)).func_188616_a((IBlockState)state, side, rand);
+      return ((IBakedModel)this.modelCache.get(prop)).getQuads((IBlockState)state, side, rand);
     } catch (ExecutionException e) {
       throw new RuntimeException(e);
     } 
@@ -186,20 +186,20 @@ public class CableModel extends AbstractModel implements ISpecialParticleModel {
   
   public TextureAtlasSprite getParticleTexture(Ic2BlockState.Ic2BlockStateInstance state) {
     if (!state.hasValue(TileEntityCable.renderStateProperty))
-      return ModelUtil.getMissingModel().func_177554_e(); 
+      return ModelUtil.getMissingModel().getParticleTexture(); 
     TileEntityCable.CableRenderState prop = (TileEntityCable.CableRenderState)state.getValue(TileEntityCable.renderStateProperty);
     if (prop.foam == CableFoam.Soft)
-      return ModelUtil.getBlockModel(BlockName.foam.getBlockState((IIdProvider)BlockFoam.FoamType.normal)).func_177554_e(); 
+      return ModelUtil.getBlockModel(BlockName.foam.getBlockState((IIdProvider)BlockFoam.FoamType.normal)).getParticleTexture(); 
     if (prop.foam == CableFoam.Hardened) {
       TileEntityWall.WallRenderState wallProp = (TileEntityWall.WallRenderState)state.getValue(TileEntityWall.renderStateProperty);
       if (wallProp == null)
-        return ModelUtil.getMissingModel().func_177554_e(); 
+        return ModelUtil.getMissingModel().getParticleTexture(); 
       if (wallProp.obscurations == null)
-        return ModelUtil.getBlockModel(BlockName.wall.getBlockState((IIdProvider)wallProp.color)).func_177554_e(); 
+        return ModelUtil.getBlockModel(BlockName.wall.getBlockState((IIdProvider)wallProp.color)).getParticleTexture(); 
       Obscuration.ObscurationData data = wallProp.obscurations[EnumFacing.UP.ordinal()];
       if (data == null)
-        return ModelUtil.getBlockModel(BlockName.wall.getBlockState((IIdProvider)wallProp.color)).func_177554_e(); 
-      return ModelUtil.getBlockModel(data.state).func_177554_e();
+        return ModelUtil.getBlockModel(BlockName.wall.getBlockState((IIdProvider)wallProp.color)).getParticleTexture(); 
+      return ModelUtil.getBlockModel(data.state).getParticleTexture();
     } 
     return this.textures.get(getTextureLocation(prop.type, prop.insulation, prop.color, prop.active));
   }

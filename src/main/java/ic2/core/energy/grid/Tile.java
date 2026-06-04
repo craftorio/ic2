@@ -106,10 +106,10 @@ public class Tile {
   public String toString() {
     String ret = getTeClassName(this.mainTile);
     World world = EnergyNet.instance.getWorld(this.mainTile);
-    MinecraftServer server = world.func_73046_m();
-    if (server != null && server.func_152345_ab()) {
+    MinecraftServer server = world.getMinecraftServer();
+    if (server != null && server.isCallingFromMinecraftThread()) {
       BlockPos pos = EnergyNet.instance.getPos(this.mainTile);
-      if (world.func_175667_e(pos)) {
+      if (world.isBlockLoaded(pos)) {
         TileEntity te = world.getTileEntity(pos);
         if (te != null) {
           ret = ret + "|" + getTeClassName(te);

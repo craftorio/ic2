@@ -41,7 +41,7 @@ public class WorldGenRubTree extends WorldGenerator {
     super(notify);
   }
   
-  public boolean func_180709_b(World world, Random random, BlockPos pos) {
+  public boolean generate(World world, Random random, BlockPos pos) {
     BlockPos.MutableBlockPos cPos = new BlockPos.MutableBlockPos();
     cPos.setPos(pos.getX() + 8, IC2.getWorldHeight(world) - 1, pos.getZ() + 8);
     while (world.isAirBlock((BlockPos)cPos) && cPos.getY() > 0)
@@ -68,7 +68,7 @@ public class WorldGenRubTree extends WorldGenerator {
       return false;
     } 
     Block woodBlock = BlockName.rubber_wood.getInstance();
-    IBlockState leaves = BlockName.leaves.getInstance().getDefaultState().func_177226_a((IProperty)Ic2Leaves.typeProperty, Ic2Leaves.LeavesType.rubber);
+    IBlockState leaves = BlockName.leaves.getInstance().getDefaultState().withProperty((IProperty)Ic2Leaves.typeProperty, Ic2Leaves.LeavesType.rubber);
     int treeholechance = 25;
     int height = getGrowHeight(world, pos);
     if (height < 2)
@@ -76,14 +76,14 @@ public class WorldGenRubTree extends WorldGenerator {
     height -= random.nextInt(height / 2 + 1);
     BlockPos.MutableBlockPos tmpPos = new BlockPos.MutableBlockPos();
     for (int cHeight = 0; cHeight < height; cHeight++) {
-      BlockPos cPos = pos.func_177981_b(cHeight);
+      BlockPos cPos = pos.up(cHeight);
       if (random.nextInt(100) <= treeholechance) {
         treeholechance -= 10;
-        func_175903_a(world, cPos, woodBlock.getDefaultState()
-            .func_177226_a((IProperty)BlockRubWood.stateProperty, BlockRubWood.RubberWoodState.getWet(EnumFacing.field_176754_o[random.nextInt(4)])));
+        setBlockAndNotifyAdequately(world, cPos, woodBlock.getDefaultState()
+            .withProperty((IProperty)BlockRubWood.stateProperty, BlockRubWood.RubberWoodState.getWet(EnumFacing.HORIZONTALS[random.nextInt(4)])));
       } else {
-        func_175903_a(world, cPos, woodBlock.getDefaultState()
-            .func_177226_a((IProperty)BlockRubWood.stateProperty, BlockRubWood.RubberWoodState.plain_y));
+        setBlockAndNotifyAdequately(world, cPos, woodBlock.getDefaultState()
+            .withProperty((IProperty)BlockRubWood.stateProperty, BlockRubWood.RubberWoodState.plain_y));
       } 
       if (height < 4 || (height < 7 && cHeight > 1) || cHeight > 2)
         for (int cx = pos.getX() - 2; cx <= pos.getX() + 2; cx++) {
@@ -96,7 +96,7 @@ public class WorldGenRubTree extends WorldGenerator {
               .nextInt(chance) == 0)) {
               tmpPos.setPos(cx, pos.getY() + cHeight, cz);
               if (world.isAirBlock((BlockPos)tmpPos))
-                func_175903_a(world, new BlockPos((Vec3i)tmpPos), leaves); 
+                setBlockAndNotifyAdequately(world, new BlockPos((Vec3i)tmpPos), leaves); 
             } 
           } 
         }  
@@ -104,13 +104,13 @@ public class WorldGenRubTree extends WorldGenerator {
     for (int i = 0; i <= height / 4 + random.nextInt(2); i++) {
       tmpPos.setPos(pos.getX(), pos.getY() + height + i, pos.getZ());
       if (world.isAirBlock((BlockPos)tmpPos))
-        func_175903_a(world, new BlockPos((Vec3i)tmpPos), leaves); 
+        setBlockAndNotifyAdequately(world, new BlockPos((Vec3i)tmpPos), leaves); 
     } 
     return true;
   }
   
   public int getGrowHeight(World world, BlockPos pos) {
-    BlockPos below = pos.func_177977_b();
+    BlockPos below = pos.down();
     IBlockState baseState = world.getBlockState(below);
     Block baseBlock = baseState.getBlock();
     if (baseBlock.isAir(baseState, (IBlockAccess)world, below) || 

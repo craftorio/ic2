@@ -40,7 +40,7 @@ public class TileEntityMacerator extends TileEntityStandardMachine<IRecipeInput,
         double x = this.pos.getX() + 0.5D + world.rand.nextFloat() * 0.6D - 0.3D;
         double y = (this.pos.getY() + 1) + world.rand.nextFloat() * 0.2D - 0.1D;
         double z = this.pos.getZ() + 0.5D + world.rand.nextFloat() * 0.6D - 0.3D;
-        world.func_175688_a(EnumParticleTypes.SMOKE_NORMAL, x, y, z, 0.0D, 0.0D, 0.0D, new int[0]);
+        world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, x, y, z, 0.0D, 0.0D, 0.0D, new int[0]);
       }  
   }
   

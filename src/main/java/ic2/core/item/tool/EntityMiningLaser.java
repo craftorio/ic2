@@ -93,12 +93,12 @@ public class EntityMiningLaser extends Entity implements IThrowableEntity {
     this.motionX = motionX / currentSpeed * speed;
     this.motionY = motionY / currentSpeed * speed;
     this.motionZ = motionZ / currentSpeed * speed;
-    this.field_70126_B = this.rotationYaw = (float)Math.toDegrees(Math.atan2(motionX, motionZ));
-    this.field_70127_C = this.rotationPitch = (float)Math.toDegrees(Math.atan2(motionY, Math.sqrt(motionX * motionX + motionZ * motionZ)));
+    this.prevRotationYaw = this.rotationYaw = (float)Math.toDegrees(Math.atan2(motionX, motionZ));
+    this.prevRotationPitch = this.rotationPitch = (float)Math.toDegrees(Math.atan2(motionY, Math.sqrt(motionX * motionX + motionZ * motionZ)));
     this.headingSet = true;
   }
   
-  public void func_70016_h(double motionX, double motionY, double motionZ) {
+  public void setVelocity(double motionX, double motionY, double motionZ) {
     setLaserHeading(motionX, motionY, motionZ, 1.0D);
   }
   
@@ -117,21 +117,21 @@ public class EntityMiningLaser extends Entity implements IThrowableEntity {
     RayTraceResult result = world.rayTraceBlocks(oldPosition, newPosition, false, true, false);
     oldPosition = new Vec3d(this.posX, this.posY, this.posZ);
     if (result != null) {
-      newPosition = new Vec3d(result.field_72307_f.field_72450_a, result.field_72307_f.field_72448_b, result.field_72307_f.field_72449_c);
+      newPosition = new Vec3d(result.hitVec.x, result.hitVec.y, result.hitVec.z);
     } else {
       newPosition = new Vec3d(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
     } 
     Entity hitEntity = null;
-    List<Entity> list = world.func_72839_b(this, func_174813_aQ().func_72321_a(this.motionX, this.motionY, this.motionZ).func_186662_g(1.0D));
+    List<Entity> list = world.getEntitiesWithinAABBExcludingEntity(this, getEntityBoundingBox().expand(this.motionX, this.motionY, this.motionZ).grow(1.0D));
     double distance = 0.0D;
     for (Entity entity : list) {
-      if (!entity.func_70067_L() || (entity == this.owner && this.ticksInAir < 5))
+      if (!entity.canBeCollidedWith() || (entity == this.owner && this.ticksInAir < 5))
         continue; 
-      AxisAlignedBB hitBox = entity.func_174813_aQ().func_186662_g(0.3D);
-      RayTraceResult intercept = hitBox.func_72327_a(oldPosition, newPosition);
+      AxisAlignedBB hitBox = entity.getEntityBoundingBox().grow(0.3D);
+      RayTraceResult intercept = hitBox.calculateIntercept(oldPosition, newPosition);
       if (intercept == null)
         continue; 
-      double newDistance = oldPosition.func_72438_d(intercept.field_72307_f);
+      double newDistance = oldPosition.distanceTo(intercept.hitVec);
       if (newDistance < distance || distance == 0.0D) {
         hitEntity = entity;
         distance = newDistance;
@@ -148,7 +148,7 @@ public class EntityMiningLaser extends Entity implements IThrowableEntity {
       } 
       switch (result.typeOfHit) {
         case ENTITY:
-          if (hitEntity(result.field_72308_g))
+          if (hitEntity(result.entityHit))
             break; 
           if (blockHit == null) {
             this.power -= 0.5F;
@@ -156,7 +156,7 @@ public class EntityMiningLaser extends Entity implements IThrowableEntity {
           } 
           result = blockHit;
         case BLOCK:
-          if (!hitBlock(result.getBlockPos(), result.field_178784_b))
+          if (!hitBlock(result.getBlockPos(), result.sideHit))
             this.power -= 0.5F; 
           break;
         default:
@@ -167,7 +167,7 @@ public class EntityMiningLaser extends Entity implements IThrowableEntity {
     } 
     setPosition(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
     this.range = (float)(this.range - Math.sqrt(this.motionX * this.motionX + this.motionY * this.motionY + this.motionZ * this.motionZ));
-    if (func_70090_H())
+    if (isInWater())
       setDead(); 
   }
   
@@ -195,8 +195,8 @@ public class EntityMiningLaser extends Entity implements IThrowableEntity {
     entity = event.hitEntity;
     int damage = (int)this.power;
     if (damage > 0) {
-      entity.func_70015_d(damage * (this.smelt ? 2 : 1));
-      if (entity.func_70097_a((new EntityDamageSourceIndirect("arrow", this, (Entity)this.owner)).func_76349_b(), damage) && ((this.owner instanceof EntityPlayer && entity instanceof EntityDragon && ((EntityDragon)entity).func_110143_aJ() <= 0.0F) || (entity instanceof MultiPartEntityPart && ((MultiPartEntityPart)entity).field_70259_a instanceof EntityDragon && ((EntityLivingBase)((MultiPartEntityPart)entity).field_70259_a).func_110143_aJ() <= 0.0F)))
+      entity.setFire(damage * (this.smelt ? 2 : 1));
+      if (entity.attackEntityFrom((new EntityDamageSourceIndirect("arrow", this, (Entity)this.owner)).setProjectile(), damage) && ((this.owner instanceof EntityPlayer && entity instanceof EntityDragon && ((EntityDragon)entity).getHealth() <= 0.0F) || (entity instanceof MultiPartEntityPart && ((MultiPartEntityPart)entity).parent instanceof EntityDragon && ((EntityLivingBase)((MultiPartEntityPart)entity).parent).getHealth() <= 0.0F)))
         IC2.achievements.issueAchievement((EntityPlayer)this.owner, "killDragonMiningLaser"); 
     } 
     setDead();
@@ -218,11 +218,11 @@ public class EntityMiningLaser extends Entity implements IThrowableEntity {
       setDead();
       return true;
     } 
-    if (block.isAir(state, (IBlockAccess)world, event.pos) || block == Blocks.field_150359_w || block == Blocks.field_150410_aZ || block == BlockName.glass.getInstance())
+    if (block.isAir(state, (IBlockAccess)world, event.pos) || block == Blocks.GLASS || block == Blocks.GLASS_PANE || block == BlockName.glass.getInstance())
       return false; 
     if (world.isRemote)
       return true; 
-    float hardness = state.func_185887_b(world, event.pos);
+    float hardness = state.getBlockHardness(world, event.pos);
     if (hardness < 0.0F) {
       setDead();
       return true;
@@ -231,14 +231,14 @@ public class EntityMiningLaser extends Entity implements IThrowableEntity {
     if (this.power < 0.0F)
       return true; 
     List<ItemStack> replacements = new ArrayList<>();
-    if (state.getMaterial() == Material.field_151590_u || state.getMaterial() == MaterialIC2TNT.instance) {
-      block.func_180652_a(world, event.pos, new Explosion(world, this, event.pos.getX() + 0.5D, event.pos.getY() + 0.5D, event.pos.getZ() + 0.5D, 1.0F, false, true));
+    if (state.getMaterial() == Material.TNT || state.getMaterial() == MaterialIC2TNT.instance) {
+      block.onBlockDestroyedByExplosion(world, event.pos, new Explosion(world, this, event.pos.getX() + 0.5D, event.pos.getY() + 0.5D, event.pos.getZ() + 0.5D, 1.0F, false, true));
     } else if (this.smelt) {
-      if (state.getMaterial() == Material.field_151575_d) {
+      if (state.getMaterial() == Material.WOOD) {
         event.dropBlock = false;
       } else {
         for (ItemStack isa : StackUtil.getDrops((IBlockAccess)world, event.pos, state, block, 0)) {
-          ItemStack is = FurnaceRecipes.func_77602_a().func_151395_a(isa);
+          ItemStack is = FurnaceRecipes.instance().getSmeltingResult(isa);
           if (!StackUtil.isEmpty(is))
             replacements.add(is); 
         } 
@@ -247,15 +247,15 @@ public class EntityMiningLaser extends Entity implements IThrowableEntity {
     } 
     if (event.removeBlock) {
       if (event.dropBlock)
-        block.func_180653_a(world, event.pos, state, event.dropChance, 0); 
-      world.func_175698_g(event.pos);
+        block.dropBlockAsItemWithChance(world, event.pos, state, event.dropChance, 0); 
+      world.setBlockToAir(event.pos);
       for (ItemStack replacement : replacements) {
         if (!StackUtil.placeBlock(replacement, world, event.pos))
           StackUtil.dropAsEntity(world, event.pos, replacement); 
         this.power = 0.0F;
       } 
-      if (world.rand.nextInt(10) == 0 && state.getMaterial().func_76217_h())
-        world.func_175656_a(event.pos, Blocks.field_150480_ab.getDefaultState()); 
+      if (world.rand.nextInt(10) == 0 && state.getMaterial().getCanBurn())
+        world.setBlockState(event.pos, Blocks.FIRE.getDefaultState()); 
     } 
     this.blockBreaks--;
     return true;

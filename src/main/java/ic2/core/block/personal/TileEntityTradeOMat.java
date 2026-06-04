@@ -46,23 +46,23 @@ public class TileEntityTradeOMat extends TileEntityInventory implements IPersona
   
   public void readFromNBT(NBTTagCompound nbt) {
     super.readFromNBT(nbt);
-    if (nbt.func_74764_b("ownerGameProfile"))
-      this.owner = NBTUtil.func_152459_a(nbt.getCompoundTag("ownerGameProfile")); 
+    if (nbt.hasKey("ownerGameProfile"))
+      this.owner = NBTUtil.readGameProfileFromNBT(nbt.getCompoundTag("ownerGameProfile")); 
     this.totalTradeCount = nbt.getInteger("totalTradeCount");
-    if (nbt.func_74764_b("infinite"))
-      this.infinite = nbt.func_74767_n("infinite"); 
+    if (nbt.hasKey("infinite"))
+      this.infinite = nbt.getBoolean("infinite"); 
   }
   
   public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
     super.writeToNBT(nbt);
     if (this.owner != null) {
       NBTTagCompound ownerNbt = new NBTTagCompound();
-      NBTUtil.func_180708_a(ownerNbt, this.owner);
+      NBTUtil.writeGameProfile(ownerNbt, this.owner);
       nbt.setTag("ownerGameProfile", (NBTBase)ownerNbt);
     } 
     nbt.setInteger("totalTradeCount", this.totalTradeCount);
     if (this.infinite)
-      nbt.func_74757_a("infinite", this.infinite); 
+      nbt.setBoolean("infinite", this.infinite); 
     return nbt;
   }
   
@@ -168,7 +168,7 @@ public class TileEntityTradeOMat extends TileEntityInventory implements IPersona
   }
   
   public boolean wrenchCanRemove(EntityPlayer player) {
-    return permitsAccess(player.func_146103_bH());
+    return permitsAccess(player.getGameProfile());
   }
   
   protected List<ItemStack> getAuxDrops(int fortune) {
@@ -199,14 +199,14 @@ public class TileEntityTradeOMat extends TileEntityInventory implements IPersona
   }
   
   public ContainerBase<TileEntityTradeOMat> getGuiContainer(EntityPlayer player) {
-    if (permitsAccess(player.func_146103_bH()))
+    if (permitsAccess(player.getGameProfile()))
       return (ContainerBase<TileEntityTradeOMat>)new ContainerTradeOMatOpen(player, this); 
     return (ContainerBase<TileEntityTradeOMat>)new ContainerTradeOMatClosed(player, this);
   }
   
   @SideOnly(Side.CLIENT)
   public GuiScreen getGui(EntityPlayer player, boolean isAdmin) {
-    if (isAdmin || permitsAccess(player.func_146103_bH()))
+    if (isAdmin || permitsAccess(player.getGameProfile()))
       return (GuiScreen)new GuiTradeOMatOpen(new ContainerTradeOMatOpen(player, this), isAdmin); 
     return (GuiScreen)new GuiTradeOMatClosed(new ContainerTradeOMatClosed(player, this));
   }
@@ -224,7 +224,7 @@ public class TileEntityTradeOMat extends TileEntityInventory implements IPersona
   
   public void onNetworkEvent(EntityPlayer player, int event) {
     if (event == 0 && 
-      getWorld().func_73046_m().func_184103_al().func_152596_g(player.func_146103_bH())) {
+      getWorld().getMinecraftServer().getPlayerList().canSendCommands(player.getGameProfile())) {
       this.infinite = !this.infinite;
       if (!this.infinite)
         updateStock(); 

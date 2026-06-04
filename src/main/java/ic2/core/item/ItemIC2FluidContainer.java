@@ -33,7 +33,7 @@ public abstract class ItemIC2FluidContainer extends ItemIC2 implements IMultiIte
   public ItemIC2FluidContainer(ItemName name, int capacity) {
     super(name);
     this.capacity = capacity;
-    func_77627_a(true);
+    setHasSubtypes(true);
     addCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, new Function<ItemStack, IFluidHandlerItem>() {
           public IFluidHandlerItem apply(@Nullable ItemStack stack) {
             return (IFluidHandlerItem)new CapabilityFluidHandlerItem(stack, ItemIC2FluidContainer.this.capacity) {
@@ -114,8 +114,8 @@ public abstract class ItemIC2FluidContainer extends ItemIC2 implements IMultiIte
   }
   
   @SideOnly(Side.CLIENT)
-  public void func_77624_a(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
-    super.func_77624_a(stack, world, tooltip, advanced);
+  public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
+    super.addInformation(stack, world, tooltip, advanced);
     FluidStack fs = FluidUtil.getFluidContained(stack);
     if (fs != null) {
       tooltip.add("< " + fs.getLocalizedName() + ", " + fs.amount + " mB >");

@@ -51,6 +51,6 @@ public enum ResourceBlock implements IIdProvider, IExtBlockType, IBlockSound {
   }
   
   public SoundType getSound() {
-    return this.metal ? SoundType.field_185852_e : SoundType.field_185851_d;
+    return this.metal ? SoundType.METAL : SoundType.STONE;
   }
 }

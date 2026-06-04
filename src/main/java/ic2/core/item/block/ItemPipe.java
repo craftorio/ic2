@@ -41,7 +41,7 @@ public class ItemPipe extends ItemIC2 implements IMultiItem<PipeType>, IBoxable 
   public ItemPipe() {
     super(ItemName.pipe);
     this.variants = new ArrayList<>();
-    func_77627_a(true);
+    setHasSubtypes(true);
     for (PipeType type : PipeType.values) {
       for (PipeSize pipeSize : PipeSize.values)
         this.variants.add(getPipe(type, pipeSize)); 
@@ -58,7 +58,7 @@ public class ItemPipe extends ItemIC2 implements IMultiItem<PipeType>, IBoxable 
   }
   
   static ModelResourceLocation getModelLocation(ResourceLocation loc, ItemStack itemStack) {
-    return new ModelResourceLocation(new ResourceLocation(loc.func_110624_b(), loc.func_110623_a() + "/" + getName(itemStack)), null);
+    return new ModelResourceLocation(new ResourceLocation(loc.getResourceDomain(), loc.getResourcePath() + "/" + getName(itemStack)), null);
   }
   
   public ItemStack getItemStack(PipeType type) {
@@ -134,24 +134,24 @@ public class ItemPipe extends ItemIC2 implements IMultiItem<PipeType>, IBoxable 
     return type.getName(size);
   }
   
-  public String func_77667_c(ItemStack stack) {
-    return super.func_77667_c(stack) + "." + getName(stack);
+  public String getUnlocalizedName(ItemStack stack) {
+    return super.getUnlocalizedName(stack) + "." + getName(stack);
   }
   
   @SideOnly(Side.CLIENT)
-  public void func_77624_a(ItemStack itemStack, World world, List<String> info, ITooltipFlag b) {
+  public void addInformation(ItemStack itemStack, World world, List<String> info, ITooltipFlag b) {
     PipeType type = getPipeType(itemStack);
     PipeSize size = getSize(itemStack);
     info.add("Transfer rate: " + type.transferRate + " stacks/second");
     info.add("Max stack size: " + size.maxStackSize);
   }
   
-  public EnumActionResult func_180614_a(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+  public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
     return EnumActionResult.SUCCESS;
   }
   
-  public void func_150895_a(CreativeTabs tab, NonNullList<ItemStack> itemList) {
-    if (!func_194125_a(tab))
+  public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> itemList) {
+    if (!isInCreativeTab(tab))
       return; 
     List<ItemStack> variants = new ArrayList<>(this.variants);
     itemList.addAll(variants);

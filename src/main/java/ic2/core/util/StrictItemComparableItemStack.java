@@ -16,12 +16,12 @@ public class StrictItemComparableItemStack {
   public StrictItemComparableItemStack(ItemStack stack, boolean copyNbt) {
     this.item = stack.getItem();
     this.meta = StackUtil.getRawMeta(stack);
-    NBTTagCompound nbt = stack.func_77978_p();
+    NBTTagCompound nbt = stack.getTagCompound();
     if (nbt != null)
       if (nbt.hasNoTags()) {
         nbt = null;
       } else if (copyNbt) {
-        nbt = nbt.func_74737_b();
+        nbt = nbt.copy();
       }  
     this.nbt = nbt;
     this.hashCode = calculateHashCode();

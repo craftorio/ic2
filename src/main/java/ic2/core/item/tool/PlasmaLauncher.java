@@ -19,11 +19,11 @@ public class PlasmaLauncher extends ItemElectricTool {
     this.tier = 3;
   }
   
-  public ActionResult<ItemStack> func_77659_a(World world, EntityPlayer player, EnumHand hand) {
+  public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
     if (!IC2.platform.isSimulating())
       return new ActionResult(EnumActionResult.PASS, StackUtil.get(player, hand)); 
     EntityParticle particle = new EntityParticle(world, (EntityLivingBase)player, 8.0F, 1.0D, 2.0D);
     world.spawnEntity(particle);
-    return super.func_77659_a(world, player, hand);
+    return super.onItemRightClick(world, player, hand);
   }
 }

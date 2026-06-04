@@ -22,12 +22,12 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.EnumFacing;
 
 public class RenderBlockWall extends AbstractModel implements ISpecialParticleModel {
-  public List<BakedQuad> func_188616_a(IBlockState rawState, EnumFacing side, long rand) {
+  public List<BakedQuad> getQuads(IBlockState rawState, EnumFacing side, long rand) {
     if (!(rawState instanceof Ic2BlockState.Ic2BlockStateInstance))
-      return ModelUtil.getMissingModel().func_188616_a(rawState, side, rand); 
+      return ModelUtil.getMissingModel().getQuads(rawState, side, rand); 
     Ic2BlockState.Ic2BlockStateInstance state = (Ic2BlockState.Ic2BlockStateInstance)rawState;
     if (!state.hasValue(TileEntityWall.renderStateProperty))
-      return ModelUtil.getMissingModel().func_188616_a((IBlockState)state, side, rand); 
+      return ModelUtil.getMissingModel().getQuads((IBlockState)state, side, rand); 
     TileEntityWall.WallRenderState prop = (TileEntityWall.WallRenderState)state.getValue(TileEntityWall.renderStateProperty);
     float[][] uvs = new float[6][];
     int[][] colorMultipliers = new int[6][];
@@ -48,10 +48,10 @@ public class RenderBlockWall extends AbstractModel implements ISpecialParticleMo
     } 
     IBakedModel baseModel = ModelUtil.getBlockModel(BlockName.wall.getBlockState((IIdProvider)prop.color));
     if (total == 0)
-      return baseModel.func_188616_a((IBlockState)state, side, rand); 
+      return baseModel.getQuads((IBlockState)state, side, rand); 
     MergedBlockModel mergedModel = generateModel(baseModel, (IBlockState)state, colorMultipliers);
     mergedModel.setSprite(uvs, colorMultipliers, sprites);
-    return mergedModel.func_188616_a((IBlockState)state, side, rand);
+    return mergedModel.getQuads((IBlockState)state, side, rand);
   }
   
   private static MergedBlockModel generateModel(IBakedModel baseModel, IBlockState state, int[][] colorMultipliers) {
@@ -61,7 +61,7 @@ public class RenderBlockWall extends AbstractModel implements ISpecialParticleMo
     IntBuffer buffer = VdUtil.getQuadBuffer();
     for (EnumFacing side : EnumFacing.VALUES) {
       int[] sideColorMultipliers = colorMultipliers[side.ordinal()];
-      List<BakedQuad> baseFaceQuads = baseModel.func_188616_a(state, side, 0L);
+      List<BakedQuad> baseFaceQuads = baseModel.getQuads(state, side, 0L);
       if (sideColorMultipliers == null) {
         arrayOfList[side.ordinal()] = baseFaceQuads;
       } else {
@@ -131,11 +131,11 @@ public class RenderBlockWall extends AbstractModel implements ISpecialParticleMo
   
   public TextureAtlasSprite getParticleTexture(Ic2BlockState.Ic2BlockStateInstance state) {
     if (!state.hasValue(TileEntityWall.renderStateProperty))
-      return ModelUtil.getMissingModel().func_177554_e(); 
+      return ModelUtil.getMissingModel().getParticleTexture(); 
     TileEntityWall.WallRenderState prop = (TileEntityWall.WallRenderState)state.getValue(TileEntityWall.renderStateProperty);
     Obscuration.ObscurationData data = prop.obscurations[EnumFacing.UP.ordinal()];
     if (data == null)
-      return ModelUtil.getBlockModel(BlockName.wall.getBlockState((IIdProvider)prop.color)).func_177554_e(); 
-    return ModelUtil.getBlockModel(data.state).func_177554_e();
+      return ModelUtil.getBlockModel(BlockName.wall.getBlockState((IIdProvider)prop.color)).getParticleTexture(); 
+    return ModelUtil.getBlockModel(data.state).getParticleTexture();
   }
 }

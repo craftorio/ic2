@@ -46,21 +46,21 @@ public class ItemScanner extends BaseElectricItem implements IBoxable, IHandHeld
   }
   
   @SideOnly(Side.CLIENT)
-  public void func_77624_a(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
-    super.func_77624_a(stack, world, tooltip, advanced);
+  public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
+    super.addInformation(stack, world, tooltip, advanced);
     tooltip.add(Localization.translate("ic2.scanner.range", new Object[] { "" + getScanRange() }));
   }
   
-  public ActionResult<ItemStack> func_77659_a(World world, EntityPlayer player, EnumHand hand) {
+  public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
     ItemStack stack = StackUtil.get(player, hand);
     if ((this.tier == 1 && !ElectricItem.manager.use(stack, 50.0D, (EntityLivingBase)player)) || (this.tier == 2 && 
       !ElectricItem.manager.use(stack, 250.0D, (EntityLivingBase)player)))
       return new ActionResult(EnumActionResult.FAIL, stack); 
     if (!world.isRemote) {
-      if (IC2.platform.launchGui(player, getInventory(player, stack)) && player.field_71070_bA instanceof ContainerToolScanner) {
-        ContainerToolScanner container = (ContainerToolScanner)player.field_71070_bA;
+      if (IC2.platform.launchGui(player, getInventory(player, stack)) && player.openContainer instanceof ContainerToolScanner) {
+        ContainerToolScanner container = (ContainerToolScanner)player.openContainer;
         Map<ItemComparableItemStack, Integer> scanResult = scan(player.getEntityWorld(), player
-            .func_180425_c(), 
+            .getPosition(), 
             getScanRange());
         container.setResults(scanMapToSortedList(scanResult));
       } 
@@ -71,11 +71,11 @@ public class ItemScanner extends BaseElectricItem implements IBoxable, IHandHeld
   }
   
   public boolean onDroppedByPlayer(ItemStack stack, EntityPlayer player) {
-    if (!(player.getEntityWorld()).isRemote && !StackUtil.isEmpty(stack) && player.field_71070_bA instanceof ContainerToolScanner) {
-      HandHeldScanner scanner = (HandHeldScanner)((ContainerToolScanner)player.field_71070_bA).base;
+    if (!(player.getEntityWorld()).isRemote && !StackUtil.isEmpty(stack) && player.openContainer instanceof ContainerToolScanner) {
+      HandHeldScanner scanner = (HandHeldScanner)((ContainerToolScanner)player.openContainer).base;
       if (scanner.isThisContainer(stack)) {
         scanner.saveAsThrown(stack);
-        player.func_71053_j();
+        player.closeScreen();
       } 
     } 
     return true;

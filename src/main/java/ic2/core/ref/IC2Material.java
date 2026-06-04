@@ -13,12 +13,12 @@ public class IC2Material extends Material {
   public final String name;
   
   public IC2Material(String name, boolean requiresTool, boolean immovableMobility) {
-    super(MapColor.field_151668_h);
+    super(MapColor.IRON);
     this.name = name;
     if (requiresTool)
-      func_76221_f(); 
+      setRequiresTool(); 
     if (immovableMobility)
-      func_76225_o(); 
-    func_85158_p();
+      setImmovableMobility(); 
+    setAdventureModeExempt();
   }
 }

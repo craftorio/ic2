@@ -25,23 +25,23 @@ public class DynamicHandHeldContainer<T extends HandHeldInventory> extends Dynam
     super.onContainerEvent(event);
   }
   
-  public ItemStack func_184996_a(int slot, int button, ClickType type, EntityPlayer player) {
+  public ItemStack slotClick(int slot, int button, ClickType type, EntityPlayer player) {
     boolean thrown = false;
     Slot realSlot = null;
-    if (!(player.getEntityWorld()).isRemote && slot >= 0 && slot < this.field_75151_b.size()) {
-      realSlot = this.field_75151_b.get(slot);
-      thrown = ((HandHeldInventory)this.base).isThisContainer(realSlot.func_75211_c());
+    if (!(player.getEntityWorld()).isRemote && slot >= 0 && slot < this.inventorySlots.size()) {
+      realSlot = this.inventorySlots.get(slot);
+      thrown = ((HandHeldInventory)this.base).isThisContainer(realSlot.getStack());
     } 
-    ItemStack stack = super.func_184996_a(slot, button, type, player);
-    if (thrown && !realSlot.func_75216_d()) {
+    ItemStack stack = super.slotClick(slot, button, type, player);
+    if (thrown && !realSlot.getHasStack()) {
       ((HandHeldInventory)this.base).saveAsThrown(stack);
-      player.func_71053_j();
+      player.closeScreen();
     } 
     return stack;
   }
   
-  public void func_75134_a(EntityPlayer player) {
+  public void onContainerClosed(EntityPlayer player) {
     ((HandHeldInventory)this.base).onGuiClosed(player);
-    super.func_75134_a(player);
+    super.onContainerClosed(player);
   }
 }

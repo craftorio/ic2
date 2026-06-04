@@ -58,20 +58,20 @@ public abstract class EntityIC2Boat extends EntityBoat {
   private static Field field_backInputDown;
   
   public static void init() {
-    method_tickLerp = getMethod("tickLerp", "func_184447_s", new Class[0]);
-    field_paddlePositions = getField("paddlePositions", "field_184470_f");
-    field_previousStatus = getField("previousStatus", "field_184471_aG");
-    field_status = getField("status", "field_184469_aF");
-    field_outOfControlTicks = getField("outOfControlTicks", "field_184474_h");
-    field_momentum = getField("momentum", "field_184472_g");
-    field_lastYd = getField("lastYd", "field_184473_aH");
-    field_waterLevel = getField("waterLevel", "field_184465_aD");
-    field_boatGlide = getField("boatGlide", "field_184467_aE");
-    field_deltaRotation = getField("deltaRotation", "field_184475_as");
-    field_rightInputDown = getField("rightInputDown", "field_184459_aA");
-    field_leftInputDown = getField("leftInputDown", "field_184480_az");
-    field_forwardInputDown = getField("forwardInputDown", "field_184461_aB");
-    field_backInputDown = getField("backInputDown", "field_184463_aC");
+    method_tickLerp = getMethod("tickLerp", "tickLerp", new Class[0]);
+    field_paddlePositions = getField("paddlePositions", "paddlePositions");
+    field_previousStatus = getField("previousStatus", "previousStatus");
+    field_status = getField("status", "status");
+    field_outOfControlTicks = getField("outOfControlTicks", "outOfControlTicks");
+    field_momentum = getField("momentum", "momentum");
+    field_lastYd = getField("lastYd", "lastYd");
+    field_waterLevel = getField("waterLevel", "waterLevel");
+    field_boatGlide = getField("boatGlide", "boatGlide");
+    field_deltaRotation = getField("deltaRotation", "deltaRotation");
+    field_rightInputDown = getField("rightInputDown", "rightInputDown");
+    field_leftInputDown = getField("leftInputDown", "leftInputDown");
+    field_forwardInputDown = getField("forwardInputDown", "forwardInputDown");
+    field_backInputDown = getField("backInputDown", "backInputDown");
   }
   
   private static Field getField(String deobfName, String srgName) {
@@ -98,23 +98,23 @@ public abstract class EntityIC2Boat extends EntityBoat {
         field_outOfControlTicks.setFloat(this, field_outOfControlTicks.getFloat(this) + 1.0F);
       } 
       if (!world.isRemote && field_outOfControlTicks.getFloat(this) >= 60.0F)
-        func_184226_ay(); 
-      if (func_70268_h() > 0)
-        func_70265_b(func_70268_h() - 1); 
-      if (func_70271_g() > 0.0F)
-        func_70266_a(func_70271_g() - 1.0F); 
+        removePassengers(); 
+      if (getTimeSinceHit() > 0)
+        setTimeSinceHit(getTimeSinceHit() - 1); 
+      if (getDamageTaken() > 0.0F)
+        setDamageTaken(getDamageTaken() - 1.0F); 
       this.prevPosX = this.posX;
       this.prevPosY = this.posY;
       this.prevPosZ = this.posZ;
       doEntityUpdate(world);
       method_tickLerp.invoke(this, new Object[0]);
-      if (func_184186_bw()) {
-        if (func_184188_bt().isEmpty() || !(func_184188_bt().get(0) instanceof net.minecraft.entity.player.EntityPlayer))
-          func_184445_a(false, false); 
+      if (canPassengerSteer()) {
+        if (getPassengers().isEmpty() || !(getPassengers().get(0) instanceof net.minecraft.entity.player.EntityPlayer))
+          setPaddleState(false, false); 
         updateMotion();
         if (world.isRemote) {
           controlBoat();
-          world.func_184135_a((Packet)new CPacketSteerBoat(func_184457_a(0), func_184457_a(1)));
+          world.sendPacketToServer((Packet)new CPacketSteerBoat(getPaddleState(0), getPaddleState(1)));
         } 
         move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
       } else {
@@ -123,14 +123,14 @@ public abstract class EntityIC2Boat extends EntityBoat {
         this.motionZ = 0.0D;
       } 
       for (int i = 0; i <= 1; i++) {
-        if (func_184457_a(i)) {
+        if (getPaddleState(i)) {
           double paddlePosition = Array.getFloat(field_paddlePositions.get(this), i);
-          if (!func_174814_R() && paddlePosition % 6.283185307179586D <= 0.7853981633974483D && (paddlePosition + 0.4D) % 6.283185307179586D >= 0.7853981633974483D) {
-            SoundEvent soundevent = func_193047_k();
+          if (!isSilent() && paddlePosition % 6.283185307179586D <= 0.7853981633974483D && (paddlePosition + 0.4D) % 6.283185307179586D >= 0.7853981633974483D) {
+            SoundEvent soundevent = getPaddleSound();
             if (soundevent != null) {
-              Vec3d look = func_70676_i(1.0F);
-              world.func_184148_a(null, this.posX + ((i == 1) ? -look.field_72449_c : look.field_72449_c), this.posY, this.posZ + ((i == 1) ? look.field_72450_a : -look.field_72450_a), soundevent, 
-                  func_184176_by(), 1.0F, 0.8F + 0.4F * this.field_70146_Z.nextFloat());
+              Vec3d look = getLook(1.0F);
+              world.playSound(null, this.posX + ((i == 1) ? -look.z : look.z), this.posY, this.posZ + ((i == 1) ? look.x : -look.x), soundevent, 
+                  getSoundCategory(), 1.0F, 0.8F + 0.4F * this.rand.nextFloat());
             } 
           } 
           Array.setFloat(field_paddlePositions.get(this), i, (float)(paddlePosition + 0.04D));
@@ -141,17 +141,17 @@ public abstract class EntityIC2Boat extends EntityBoat {
     } catch (Exception e) {
       throw new RuntimeException("Error reflecting boat in update", e);
     } 
-    func_145775_I();
-    List<Entity> list = world.func_175674_a((Entity)this, func_174813_aQ().func_72314_b(0.2D, -0.01D, 0.2D), EntitySelectors.func_188442_a((Entity)this));
+    doBlockCollisions();
+    List<Entity> list = world.getEntitiesInAABBexcluding((Entity)this, getEntityBoundingBox().grow(0.2D, -0.01D, 0.2D), EntitySelectors.getTeamCollisionPredicate((Entity)this));
     if (!list.isEmpty()) {
-      boolean flag = (!world.isRemote && !(func_184179_bs() instanceof net.minecraft.entity.player.EntityPlayer));
+      boolean flag = (!world.isRemote && !(getControllingPassenger() instanceof net.minecraft.entity.player.EntityPlayer));
       for (Entity entity : list) {
-        if (!entity.func_184196_w((Entity)this)) {
-          if (flag && func_184188_bt().size() < 2 && !entity.func_184218_aH() && entity.field_70130_N < this.field_70130_N && entity instanceof net.minecraft.entity.EntityLivingBase && !(entity instanceof net.minecraft.entity.passive.EntityWaterMob) && !(entity instanceof net.minecraft.entity.player.EntityPlayer)) {
-            entity.func_184220_m((Entity)this);
+        if (!entity.isPassenger((Entity)this)) {
+          if (flag && getPassengers().size() < 2 && !entity.isRiding() && entity.width < this.width && entity instanceof net.minecraft.entity.EntityLivingBase && !(entity instanceof net.minecraft.entity.passive.EntityWaterMob) && !(entity instanceof net.minecraft.entity.player.EntityPlayer)) {
+            entity.startRiding((Entity)this);
             continue;
           } 
-          func_70108_f(entity);
+          applyEntityCollision(entity);
         } 
       } 
     } 
@@ -159,19 +159,19 @@ public abstract class EntityIC2Boat extends EntityBoat {
   
   private void doEntityUpdate(World world) {
     if (!world.isRemote)
-      func_70052_a(6, func_184202_aL()); 
-    func_70030_z();
+      setFlag(6, isGlowing()); 
+    onEntityUpdate();
   }
   
   private void updateMotion() {
-    double generalHeightChangingValue = func_189652_ae() ? 0.0D : -0.04D;
+    double generalHeightChangingValue = hasNoGravity() ? 0.0D : -0.04D;
     double heightChange = 0.0D;
     float momentum = 0.05F;
     try {
       EntityBoat.Status status = (EntityBoat.Status)field_status.get(this);
       if (field_previousStatus.get(this) == EntityBoat.Status.IN_AIR && status != EntityBoat.Status.IN_AIR && status != EntityBoat.Status.ON_LAND) {
-        field_waterLevel.setDouble(this, (func_174813_aQ()).field_72338_b + this.field_70131_O);
-        setPosition(this.posX, (func_184451_k() - this.field_70131_O) + 0.101D, this.posZ);
+        field_waterLevel.setDouble(this, (getEntityBoundingBox()).minY + this.height);
+        setPosition(this.posX, (getWaterLevelAbove() - this.height) + 0.101D, this.posZ);
         this.motionY = 0.0D;
         field_lastYd.setDouble(this, 0.0D);
         field_status.set(this, EntityBoat.Status.IN_WATER);
@@ -181,12 +181,12 @@ public abstract class EntityIC2Boat extends EntityBoat {
             momentum = 0.9F;
             break;
           case IN_WATER:
-            heightChange = (field_waterLevel.getDouble(this) - (func_174813_aQ()).field_72338_b) / this.field_70131_O;
+            heightChange = (field_waterLevel.getDouble(this) - (getEntityBoundingBox()).minY) / this.height;
             momentum = 0.9F;
             break;
           case ON_LAND:
             momentum = field_boatGlide.getFloat(this);
-            if (func_184179_bs() instanceof net.minecraft.entity.player.EntityPlayer)
+            if (getControllingPassenger() instanceof net.minecraft.entity.player.EntityPlayer)
               field_boatGlide.setFloat(this, momentum / 2.0F); 
             break;
           case UNDER_FLOWING_WATER:
@@ -213,17 +213,17 @@ public abstract class EntityIC2Boat extends EntityBoat {
     } 
   }
   
-  public float func_184451_k() {
-    AxisAlignedBB boundingBox = func_174813_aQ();
-    int minX = (int)Math.floor(boundingBox.field_72340_a);
-    int maxX = (int)Math.ceil(boundingBox.field_72336_d);
-    int minZ = (int)Math.floor(boundingBox.field_72339_c);
-    int maxZ = (int)Math.ceil(boundingBox.field_72334_f);
-    BlockPos.PooledMutableBlockPos blockPosPool = BlockPos.PooledMutableBlockPos.func_185346_s();
+  public float getWaterLevelAbove() {
+    AxisAlignedBB boundingBox = getEntityBoundingBox();
+    int minX = (int)Math.floor(boundingBox.minX);
+    int maxX = (int)Math.ceil(boundingBox.maxX);
+    int minZ = (int)Math.floor(boundingBox.minZ);
+    int maxZ = (int)Math.ceil(boundingBox.maxZ);
+    BlockPos.PooledMutableBlockPos blockPosPool = BlockPos.PooledMutableBlockPos.retain();
     try {
       World world = getEntityWorld();
-      int maxY = (int)Math.ceil(boundingBox.field_72337_e - field_lastYd.getDouble(this));
-      for (int y = (int)Math.floor(boundingBox.field_72337_e); y < maxY; y++) {
+      int maxY = (int)Math.ceil(boundingBox.maxY - field_lastYd.getDouble(this));
+      for (int y = (int)Math.floor(boundingBox.maxY); y < maxY; y++) {
         float waterHeight = 0.0F;
         int x = minX;
         label29: while (true) {
@@ -247,7 +247,7 @@ public abstract class EntityIC2Boat extends EntityBoat {
     } catch (Exception e) {
       throw new RuntimeException("Error reflecting boat in getWaterLevelAbove", e);
     } finally {
-      blockPosPool.func_185344_t();
+      blockPosPool.release();
     } 
   }
   
@@ -255,12 +255,12 @@ public abstract class EntityIC2Boat extends EntityBoat {
     EntityBoat.Status isUnderWater = getUnderwaterStatus();
     try {
       if (isUnderWater != null) {
-        field_waterLevel.setDouble(this, (func_174813_aQ()).field_72337_e);
+        field_waterLevel.setDouble(this, (getEntityBoundingBox()).maxY);
         return isUnderWater;
       } 
       if (checkInWater())
         return EntityBoat.Status.IN_WATER; 
-      float glideSpeed = func_184441_l();
+      float glideSpeed = getBoatGlide();
       if (glideSpeed > 0.0F) {
         field_boatGlide.setFloat(this, glideSpeed);
         return EntityBoat.Status.ON_LAND;
@@ -274,20 +274,20 @@ public abstract class EntityIC2Boat extends EntityBoat {
   private boolean checkInWater() {
     int i;
     World world = getEntityWorld();
-    AxisAlignedBB boundingBox = func_174813_aQ();
+    AxisAlignedBB boundingBox = getEntityBoundingBox();
     boolean isInWater = false;
-    BlockPos.PooledMutableBlockPos blockPosPool = BlockPos.PooledMutableBlockPos.func_185346_s();
+    BlockPos.PooledMutableBlockPos blockPosPool = BlockPos.PooledMutableBlockPos.retain();
     try {
       double waterLevel = Double.MIN_VALUE;
-      for (int x = (int)Math.floor(boundingBox.field_72340_a); x < Math.ceil(boundingBox.field_72336_d); x++) {
-        for (int y = (int)Math.floor(boundingBox.field_72338_b); y < Math.ceil(boundingBox.field_72338_b + 0.001D); y++) {
-          for (int z = (int)Math.floor(boundingBox.field_72339_c); z < Math.ceil(boundingBox.field_72334_f); z++) {
+      for (int x = (int)Math.floor(boundingBox.minX); x < Math.ceil(boundingBox.maxX); x++) {
+        for (int y = (int)Math.floor(boundingBox.minY); y < Math.ceil(boundingBox.minY + 0.001D); y++) {
+          for (int z = (int)Math.floor(boundingBox.minZ); z < Math.ceil(boundingBox.maxZ); z++) {
             blockPosPool.setPos(x, y, z);
             IBlockState block = world.getBlockState((BlockPos)blockPosPool);
             if (isWater(block)) {
               float waterHeight = getLiquidHeight(block, (IBlockAccess)world, (BlockPos)blockPosPool);
               waterLevel = Math.max(waterHeight, waterLevel);
-              i = isInWater | ((boundingBox.field_72338_b < waterHeight) ? 1 : 0);
+              i = isInWater | ((boundingBox.minY < waterHeight) ? 1 : 0);
             } 
           } 
         } 
@@ -296,7 +296,7 @@ public abstract class EntityIC2Boat extends EntityBoat {
     } catch (Exception e) {
       throw new RuntimeException("Error reflecting boat in checkInWater", e);
     } finally {
-      blockPosPool.func_185344_t();
+      blockPosPool.release();
     } 
     return i;
   }
@@ -304,22 +304,22 @@ public abstract class EntityIC2Boat extends EntityBoat {
   @Nullable
   private EntityBoat.Status getUnderwaterStatus() {
     World world = getEntityWorld();
-    AxisAlignedBB boundingBox = func_174813_aQ();
-    double boatTop = boundingBox.field_72337_e + 0.001D;
-    BlockPos.PooledMutableBlockPos blockPosPool = BlockPos.PooledMutableBlockPos.func_185346_s();
+    AxisAlignedBB boundingBox = getEntityBoundingBox();
+    double boatTop = boundingBox.maxY + 0.001D;
+    BlockPos.PooledMutableBlockPos blockPosPool = BlockPos.PooledMutableBlockPos.retain();
     try {
-      for (int x = (int)Math.floor(boundingBox.field_72340_a); x < Math.ceil(boundingBox.field_72336_d); x++) {
-        for (int y = (int)Math.floor(boundingBox.field_72337_e); y < Math.ceil(boatTop); y++) {
-          for (int z = (int)Math.floor(boundingBox.field_72339_c); z < Math.ceil(boundingBox.field_72334_f); z++) {
+      for (int x = (int)Math.floor(boundingBox.minX); x < Math.ceil(boundingBox.maxX); x++) {
+        for (int y = (int)Math.floor(boundingBox.maxY); y < Math.ceil(boatTop); y++) {
+          for (int z = (int)Math.floor(boundingBox.minZ); z < Math.ceil(boundingBox.maxZ); z++) {
             blockPosPool.setPos(x, y, z);
             IBlockState block = world.getBlockState((BlockPos)blockPosPool);
             if (isWater(block) && boatTop < getLiquidHeight(block, (IBlockAccess)world, (BlockPos)blockPosPool))
-              return (((Integer)block.func_177229_b((IProperty)BlockLiquid.field_176367_b)).intValue() != 0) ? EntityBoat.Status.UNDER_FLOWING_WATER : EntityBoat.Status.UNDER_WATER; 
+              return (((Integer)block.getValue((IProperty)BlockLiquid.LEVEL)).intValue() != 0) ? EntityBoat.Status.UNDER_FLOWING_WATER : EntityBoat.Status.UNDER_WATER; 
           } 
         } 
       } 
     } finally {
-      blockPosPool.func_185344_t();
+      blockPosPool.release();
     } 
     return null;
   }
@@ -329,12 +329,12 @@ public abstract class EntityIC2Boat extends EntityBoat {
   }
   
   public static float getBlockLiquidHeight(IBlockState block, IBlockAccess world, BlockPos pos) {
-    int liquidHeight = ((Integer)block.func_177229_b((IProperty)BlockLiquid.field_176367_b)).intValue();
-    return ((liquidHeight & 0x7) == 0 && world.getBlockState(pos.up()).getMaterial() == block.getMaterial()) ? 1.0F : (1.0F - BlockLiquid.func_149801_b(liquidHeight));
+    int liquidHeight = ((Integer)block.getValue((IProperty)BlockLiquid.LEVEL)).intValue();
+    return ((liquidHeight & 0x7) == 0 && world.getBlockState(pos.up()).getMaterial() == block.getMaterial()) ? 1.0F : (1.0F - BlockLiquid.getLiquidHeightPercent(liquidHeight));
   }
   
   private void controlBoat() {
-    if (func_184207_aI()) {
+    if (isBeingRidden()) {
       float speed = 0.0F;
       try {
         boolean left = field_leftInputDown.getBoolean(this);
@@ -354,23 +354,23 @@ public abstract class EntityIC2Boat extends EntityBoat {
           speed -= 0.005F; 
         this.motionX += (MathHelper.sin(-this.rotationYaw * 3.1415927F / 180.0F) * speed) * getAccelerationFactor();
         this.motionZ += (MathHelper.cos(this.rotationYaw * 3.1415927F / 180.0F) * speed) * getAccelerationFactor();
-        func_184445_a(((right && !left) || forward), ((left && !right) || forward));
+        setPaddleState(((right && !left) || forward), ((left && !right) || forward));
       } catch (Exception e) {
         throw new RuntimeException("Error reflecting boat in controlBoat", e);
       } 
     } 
   }
   
-  protected void func_184231_a(double y, boolean onGround, IBlockState state, BlockPos pos) {
-    boolean expectDeath = (this.field_70143_R > 3.0F && !this.field_70128_L);
-    super.func_184231_a(y, onGround, state, pos);
-    if (expectDeath && this.field_70128_L && getEntityWorld().func_82736_K().func_82766_b("doEntityDrops"))
-      super.func_70099_a(getBrokenItem(), 0.0F); 
+  protected void updateFallState(double y, boolean onGround, IBlockState state, BlockPos pos) {
+    boolean expectDeath = (this.fallDistance > 3.0F && !this.isDead);
+    super.updateFallState(y, onGround, state, pos);
+    if (expectDeath && this.isDead && getEntityWorld().getGameRules().getBoolean("doEntityDrops"))
+      super.entityDropItem(getBrokenItem(), 0.0F); 
   }
   
-  public EntityItem func_70099_a(ItemStack stack, float offsetY) {
-    if (stack.getItem() == Items.field_151124_az)
-      return super.func_70099_a(getItem(), offsetY); 
+  public EntityItem entityDropItem(ItemStack stack, float offsetY) {
+    if (stack.getItem() == Items.BOAT)
+      return super.entityDropItem(getItem(), offsetY); 
     return null;
   }
   

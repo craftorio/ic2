@@ -35,16 +35,16 @@ public abstract class ItemArmorElectric extends ItemArmorIC2 implements ISpecial
     this.maxCharge = maxCharge;
     this.tier = tier;
     this.transferLimit = transferLimit;
-    func_77656_e(27);
-    func_77625_d(1);
+    setMaxDamage(27);
+    setMaxStackSize(1);
     setNoRepair();
   }
   
-  public int func_77619_b() {
+  public int getItemEnchantability() {
     return 0;
   }
   
-  public boolean func_77616_k(ItemStack stack) {
+  public boolean isEnchantable(ItemStack stack) {
     return false;
   }
   
@@ -59,14 +59,14 @@ public abstract class ItemArmorElectric extends ItemArmorIC2 implements ISpecial
     return info;
   }
   
-  public void func_150895_a(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-    if (!func_194125_a(tab))
+  public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
+    if (!isInCreativeTab(tab))
       return; 
     ElectricItemManager.addChargeVariants((Item)this, (List)subItems);
   }
   
   public ISpecialArmor.ArmorProperties getProperties(EntityLivingBase player, ItemStack armor, DamageSource source, double damage, int slot) {
-    if (source.func_76363_c())
+    if (source.isUnblockable())
       return new ISpecialArmor.ArmorProperties(0, 0.0D, 0); 
     double absorptionRatio = getBaseAbsorptionRatio() * getDamageAbsorptionRatio();
     int energyPerDamage = getEnergyPerDamage();
@@ -102,7 +102,7 @@ public abstract class ItemArmorElectric extends ItemArmorIC2 implements ISpecial
     return this.transferLimit;
   }
   
-  public boolean func_82789_a(ItemStack par1ItemStack, ItemStack par2ItemStack) {
+  public boolean getIsRepairable(ItemStack par1ItemStack, ItemStack par2ItemStack) {
     return false;
   }
   
@@ -121,7 +121,7 @@ public abstract class ItemArmorElectric extends ItemArmorIC2 implements ISpecial
   public abstract int getEnergyPerDamage();
   
   protected final double getBaseAbsorptionRatio() {
-    switch (this.field_77881_a) {
+    switch (this.armorType) {
       case HEAD:
         return 0.15D;
       case CHEST:

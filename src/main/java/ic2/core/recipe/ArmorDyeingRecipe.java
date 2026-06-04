@@ -24,7 +24,7 @@ public class ArmorDyeingRecipe extends RecipesArmorDyes {
   private static Map<IRecipeInput, int[]> buildDyeMap() {
     Map<IRecipeInput, int[]> ret = (Map)new HashMap<>();
     for (Ic2Color colour : Ic2Color.values) {
-      float[] dyeMap = colour.mcColor.func_193349_f();
+      float[] dyeMap = colour.mcColor.getColorComponentValues();
       assert dyeMap != null;
       ret.put(Recipes.inputFactory.forOreDict(colour.oreDictDyeName), new int[] { (int)(dyeMap[0] * 255.0F), (int)(dyeMap[1] * 255.0F), (int)(dyeMap[2] * 255.0F) });
     } 
@@ -63,10 +63,10 @@ public class ArmorDyeingRecipe extends RecipesArmorDyes {
     return null;
   }
   
-  public boolean func_77569_a(InventoryCrafting craftingInv, World world) {
+  public boolean matches(InventoryCrafting craftingInv, World world) {
     ItemStack Qsuit = null;
-    for (int slot = 0; slot < craftingInv.func_70302_i_(); slot++) {
-      ItemStack stack = craftingInv.func_70301_a(slot);
+    for (int slot = 0; slot < craftingInv.getSizeInventory(); slot++) {
+      ItemStack stack = craftingInv.getStackInSlot(slot);
       if (!StackUtil.isEmpty(stack))
         if (this.armour.matches(stack)) {
           if (Qsuit != null)
@@ -79,22 +79,22 @@ public class ArmorDyeingRecipe extends RecipesArmorDyes {
     return (Qsuit != null);
   }
   
-  public ItemStack func_77572_b(InventoryCrafting craftingInv) {
+  public ItemStack getCraftingResult(InventoryCrafting craftingInv) {
     ItemStack armourStack = null;
     ItemArmor Qsuit = null;
     int[] newRBG = new int[3];
     int totalColour = 0;
     int numberOfDyes = 0;
-    for (int slot = 0; slot < craftingInv.func_70302_i_(); slot++) {
-      ItemStack stack = craftingInv.func_70301_a(slot);
+    for (int slot = 0; slot < craftingInv.getSizeInventory(); slot++) {
+      ItemStack stack = craftingInv.getStackInSlot(slot);
       if (!StackUtil.isEmpty(stack))
         if (this.armour.matches(stack)) {
           Qsuit = (ItemArmor)stack.getItem();
           if (!StackUtil.isEmpty(armourStack))
             return StackUtil.emptyStack; 
           armourStack = StackUtil.copyWithSize(stack, 1);
-          if (Qsuit.func_82816_b_(stack)) {
-            int oldColour = Qsuit.func_82814_b(armourStack);
+          if (Qsuit.hasColor(stack)) {
+            int oldColour = Qsuit.getColor(armourStack);
             int r = oldColour >> 16 & 0xFF;
             int g = oldColour >> 8 & 0xFF;
             int b = oldColour & 0xFF;
@@ -120,8 +120,8 @@ public class ArmorDyeingRecipe extends RecipesArmorDyes {
     } 
     if (Qsuit == null || numberOfDyes == 0)
       return StackUtil.emptyStack; 
-    if (Qsuit.func_82816_b_(armourStack) && numberOfDyes == 1) {
-      Qsuit.func_82815_c(armourStack);
+    if (Qsuit.hasColor(armourStack) && numberOfDyes == 1) {
+      Qsuit.removeColor(armourStack);
     } else {
       int averageRed = newRBG[0] / numberOfDyes;
       int averageGreen = newRBG[1] / numberOfDyes;
@@ -133,7 +133,7 @@ public class ArmorDyeingRecipe extends RecipesArmorDyes {
       averageBlue = (int)(averageBlue * gain / averageMax);
       int finalColour = (averageRed << 8) + averageGreen;
       finalColour = (finalColour << 8) + averageBlue;
-      Qsuit.func_82813_b(armourStack, finalColour);
+      Qsuit.setColor(armourStack, finalColour);
     } 
     return armourStack;
   }

@@ -40,7 +40,7 @@ class ChangeHandler {
         IC2.log.warn(LogCategory.EnergyNet, "Tile %s has the wrong position in grid update (%s)", new Object[] { Util.toString(ioTile, (IBlockAccess)enet.getWorld(), pos), type }); 
       return false;
     } 
-    if (type != GridChange.Type.REMOVAL && !world.func_175667_e(pos)) {
+    if (type != GridChange.Type.REMOVAL && !world.isBlockLoaded(pos)) {
       if (EnergyNetSettings.logGridUpdateIssues)
         IC2.log.warn(LogCategory.EnergyNet, "Tile %s was unloaded in grid update (%s)", new Object[] { Util.toString(ioTile, (IBlockAccess)enet.getWorld(), pos), type }); 
       return false;

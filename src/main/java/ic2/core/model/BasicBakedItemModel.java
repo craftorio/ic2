@@ -18,18 +18,18 @@ public class BasicBakedItemModel extends AbstractBakedModel {
     this.particleTexture = particleTexture;
   }
   
-  public List<BakedQuad> func_188616_a(IBlockState state, EnumFacing side, long rand) {
+  public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
     if (side != null)
       return Collections.emptyList(); 
     return this.quads;
   }
   
-  public TextureAtlasSprite func_177554_e() {
+  public TextureAtlasSprite getParticleTexture() {
     return this.particleTexture;
   }
   
-  public ItemCameraTransforms func_177552_f() {
-    return ItemCameraTransforms.field_178357_a;
+  public ItemCameraTransforms getItemCameraTransforms() {
+    return ItemCameraTransforms.DEFAULT;
   }
   
   public static BakedQuad createQuad(int[] vertexData, EnumFacing side) {

@@ -55,9 +55,9 @@ public class HandHeldAdvancedUpgrade extends HandHeldInventory implements IHolog
   private static final byte ORE_GUI = 3;
   
   private static ItemStack checkContainerStack(EntityPlayer player, ItemStack containerStack) {
-    if (!(player.getEntityWorld()).isRemote && player.field_71070_bA instanceof ContainerHandHeldInventory && ((ContainerHandHeldInventory)player.field_71070_bA).base instanceof HandHeldUpgradeOption) {
+    if (!(player.getEntityWorld()).isRemote && player.openContainer instanceof ContainerHandHeldInventory && ((ContainerHandHeldInventory)player.openContainer).base instanceof HandHeldUpgradeOption) {
       addMaintainedPlayer(player);
-      return (ItemStack)ReflectionUtil.getFieldValue(ReflectionUtil.getField(HandHeldInventory.class, ItemStack.class), ((ContainerHandHeldInventory)player.field_71070_bA).base);
+      return (ItemStack)ReflectionUtil.getFieldValue(ReflectionUtil.getField(HandHeldInventory.class, ItemStack.class), ((ContainerHandHeldInventory)player.openContainer).base);
     } 
     return containerStack;
   }
@@ -73,11 +73,11 @@ public class HandHeldAdvancedUpgrade extends HandHeldInventory implements IHolog
   protected void save() {
     super.save();
     if (IC2.platform.isSimulating()) {
-      NBTTagCompound nbt = this.containerStack.func_77978_p();
+      NBTTagCompound nbt = this.containerStack.getTagCompound();
       assert nbt != null;
       writeTag(nbt, "meta", this.meta);
       NBTTagCompound tag = getTag(nbt, "nbt");
-      tag.func_74757_a("active", this.nbt.enabled());
+      tag.setBoolean("active", this.nbt.enabled());
       tag.setByte("type", this.nbt.getForNBT());
       nbt.setTag("nbtSettings", (NBTBase)tag);
       writeTag(nbt, "energy", this.energy);
@@ -89,12 +89,12 @@ public class HandHeldAdvancedUpgrade extends HandHeldInventory implements IHolog
   }
   
   protected static boolean readTag(NBTTagCompound nbt, String name) {
-    return getTag(nbt, name).func_74767_n("active");
+    return getTag(nbt, name).getBoolean("active");
   }
   
   protected static void writeTag(NBTTagCompound nbt, String name, boolean active) {
     NBTTagCompound tag = getTag(nbt, name);
-    tag.func_74757_a("active", active);
+    tag.setBoolean("active", active);
     nbt.setTag(name + "Settings", (NBTBase)tag);
   }
   
@@ -148,12 +148,12 @@ public class HandHeldAdvancedUpgrade extends HandHeldInventory implements IHolog
     } 
   }
   
-  public boolean func_145818_k_() {
+  public boolean hasCustomName() {
     return false;
   }
   
-  public String func_70005_c_() {
-    return this.containerStack.func_77977_a();
+  public String getName() {
+    return this.containerStack.getUnlocalizedName();
   }
   
   EntityPlayer getPlayer() {

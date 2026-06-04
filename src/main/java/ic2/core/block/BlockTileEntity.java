@@ -101,38 +101,38 @@ public final class BlockTileEntity extends BlockBase implements IMultiBlock<ITeB
     this.typeProperty = getTypeProperty();
     this.materialProperty = getMaterialProperty();
     ModContainer ic2 = Loader.instance().activeModContainer();
-    Loader.instance().getActiveModList().stream().filter(mod -> identifier.func_110624_b().equals(mod.getModId())).findFirst().ifPresent(Loader.instance()::setActiveModContainer);
+    Loader.instance().getActiveModList().stream().filter(mod -> identifier.getResourceDomain().equals(mod.getModId())).findFirst().ifPresent(Loader.instance()::setActiveModContainer);
     register(name, identifier, (Function<Block, Item>)new Function<Block, Item>() {
           public Item apply(Block input) {
             return (Item)new ItemBlockTileEntity(input, identifier);
           }
         });
     Loader.instance().setActiveModContainer(ic2);
-    func_180632_j(this.field_176227_L.func_177621_b()
-        .func_177226_a((IProperty)this.materialProperty, (Comparable)MaterialProperty.WrappedMaterial.get(this.field_149764_J))
-        .func_177226_a(this.typeProperty, (Comparable)MetaTeBlockProperty.invalid)
-        .func_177226_a(facingProperty, (Comparable)EnumFacing.DOWN)
-        .func_177226_a(transparentProperty, Boolean.FALSE));
+    setDefaultState(this.blockState.getBaseState()
+        .withProperty((IProperty)this.materialProperty, (Comparable)MaterialProperty.WrappedMaterial.get(this.blockMaterial))
+        .withProperty(this.typeProperty, (Comparable)MetaTeBlockProperty.invalid)
+        .withProperty(facingProperty, (Comparable)EnumFacing.DOWN)
+        .withProperty(transparentProperty, Boolean.FALSE));
     this.item = (ItemBlockTileEntity)Item.getItemFromBlock(this);
     IC2.log.debug(LogCategory.Block, "Successfully built BlockTileEntity for identity " + identifier + '.');
   }
   
   @SideOnly(Side.CLIENT)
   public void registerModels(BlockName name) {
-    final ModelResourceLocation invalidLocation = ModelUtil.getTEBlockModelLocation(Util.getName(BlockName.te.getInstance()), this.field_176227_L.func_177621_b()
-        .func_177226_a((IProperty)this.materialProperty, (Comparable)MaterialProperty.WrappedMaterial.get(this.field_149764_J))
-        .func_177226_a(this.typeProperty, (Comparable)MetaTeBlockProperty.invalid)
-        .func_177226_a(facingProperty, (Comparable)EnumFacing.NORTH)
-        .func_177226_a(transparentProperty, Boolean.FALSE));
+    final ModelResourceLocation invalidLocation = ModelUtil.getTEBlockModelLocation(Util.getName(BlockName.te.getInstance()), this.blockState.getBaseState()
+        .withProperty((IProperty)this.materialProperty, (Comparable)MaterialProperty.WrappedMaterial.get(this.blockMaterial))
+        .withProperty(this.typeProperty, (Comparable)MetaTeBlockProperty.invalid)
+        .withProperty(facingProperty, (Comparable)EnumFacing.NORTH)
+        .withProperty(transparentProperty, Boolean.FALSE));
     IC2.log.debug(LogCategory.Block, "Preparing to set models for " + this.item.identifier + '.');
-    IC2.log.debug(LogCategory.Block, "Mapping " + func_176194_O().func_177619_a().size() + " states.");
+    IC2.log.debug(LogCategory.Block, "Mapping " + getBlockState().getValidStates().size() + " states.");
     ModelLoader.setCustomStateMapper(this, new IStateMapper() {
-          public Map<IBlockState, ModelResourceLocation> func_178130_a(Block block) {
+          public Map<IBlockState, ModelResourceLocation> putStateModelLocations(Block block) {
             Map<IBlockState, ModelResourceLocation> ret = new IdentityHashMap<>();
-            for (UnmodifiableIterator<IBlockState> unmodifiableIterator = block.func_176194_O().func_177619_a().iterator(); unmodifiableIterator.hasNext(); ) {
+            for (UnmodifiableIterator<IBlockState> unmodifiableIterator = block.getBlockState().getValidStates().iterator(); unmodifiableIterator.hasNext(); ) {
               IBlockState state = unmodifiableIterator.next();
-              MetaTeBlock metaTeBlock = (MetaTeBlock)state.func_177229_b(BlockTileEntity.this.typeProperty);
-              EnumFacing facing = (EnumFacing)state.func_177229_b(BlockTileEntity.facingProperty);
+              MetaTeBlock metaTeBlock = (MetaTeBlock)state.getValue(BlockTileEntity.this.typeProperty);
+              EnumFacing facing = (EnumFacing)state.getValue(BlockTileEntity.facingProperty);
               if (metaTeBlock.teBlock.getSupportedFacings().contains(facing) || (facing == EnumFacing.DOWN && metaTeBlock.teBlock
                 .getSupportedFacings().isEmpty())) {
                 ret.put(state, ModelUtil.getTEBlockModelLocation(metaTeBlock.teBlock.getIdentifier(), state));
@@ -144,7 +144,7 @@ public final class BlockTileEntity extends BlockBase implements IMultiBlock<ITeB
           }
         });
     ModelLoader.setCustomMeshDefinition((Item)this.item, new ItemMeshDefinition() {
-          public ModelResourceLocation func_178113_a(ItemStack stack) {
+          public ModelResourceLocation getModelLocation(ItemStack stack) {
             ITeBlock teBlock = TeBlockRegistry.get(BlockTileEntity.this.item.identifier, stack.getItemDamage());
             if (teBlock == null)
               return invalidLocation; 
@@ -152,7 +152,7 @@ public final class BlockTileEntity extends BlockBase implements IMultiBlock<ITeB
               ModelResourceLocation location = ((ITeBlockSpecialItem)teBlock).getModelLocation(stack);
               return (location == null) ? invalidLocation : location;
             } 
-            IBlockState state = BlockTileEntity.this.getDefaultState().func_177226_a(BlockTileEntity.this.typeProperty, (Comparable)MetaTeBlockProperty.getState(teBlock)).func_177226_a(BlockTileEntity.facingProperty, (Comparable)BlockTileEntity.getItemFacing(teBlock));
+            IBlockState state = BlockTileEntity.this.getDefaultState().withProperty(BlockTileEntity.this.typeProperty, (Comparable)MetaTeBlockProperty.getState(teBlock)).withProperty(BlockTileEntity.facingProperty, (Comparable)BlockTileEntity.getItemFacing(teBlock));
             return ModelUtil.getTEBlockModelLocation(teBlock.getIdentifier(), state);
           }
         });
@@ -161,7 +161,7 @@ public final class BlockTileEntity extends BlockBase implements IMultiBlock<ITeB
       if (block.hasItem()) {
         ModelResourceLocation model = checkSpecialModels ? getSpecialModel(block) : null;
         if (model == null) {
-          IBlockState state = this.field_176227_L.func_177621_b().func_177226_a(this.typeProperty, (Comparable)block.inactive).func_177226_a(facingProperty, (Comparable)getItemFacing(block.getBlock()));
+          IBlockState state = this.blockState.getBaseState().withProperty(this.typeProperty, (Comparable)block.inactive).withProperty(facingProperty, (Comparable)getItemFacing(block.getBlock()));
           model = ModelUtil.getTEBlockModelLocation(block.getIdentifier(), state);
         } 
         assert model != null;
@@ -189,10 +189,10 @@ public final class BlockTileEntity extends BlockBase implements IMultiBlock<ITeB
   }
   
   public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer) {
-    return ((Boolean)state.func_177229_b(transparentProperty)).booleanValue() ? ((layer == BlockRenderLayer.CUTOUT)) : ((layer == BlockRenderLayer.SOLID));
+    return ((Boolean)state.getValue(transparentProperty)).booleanValue() ? ((layer == BlockRenderLayer.CUTOUT)) : ((layer == BlockRenderLayer.SOLID));
   }
   
-  public boolean func_149716_u() {
+  public boolean hasTileEntity() {
     return true;
   }
   
@@ -200,42 +200,42 @@ public final class BlockTileEntity extends BlockBase implements IMultiBlock<ITeB
     return true;
   }
   
-  protected BlockStateContainer func_180661_e() {
+  protected BlockStateContainer createBlockState() {
     return (BlockStateContainer)new Ic2BlockState(this, new IProperty[] { getTypeProperty(), (IProperty)getMaterialProperty(), facingProperty, transparentProperty });
   }
   
-  public int func_176201_c(IBlockState state) {
-    int ret = this.materialProperty.getId((MaterialProperty.WrappedMaterial)state.func_177229_b((IProperty)this.materialProperty));
+  public int getMetaFromState(IBlockState state) {
+    int ret = this.materialProperty.getId((MaterialProperty.WrappedMaterial)state.getValue((IProperty)this.materialProperty));
     if (ret < 0 || ret >= 8)
       throw new IllegalStateException("invalid material id: " + ret); 
-    ret |= ((Boolean)state.func_177229_b(transparentProperty)).booleanValue() ? 8 : 0;
+    ret |= ((Boolean)state.getValue(transparentProperty)).booleanValue() ? 8 : 0;
     return ret;
   }
   
-  public IBlockState func_176203_a(int meta) {
+  public IBlockState getStateFromMeta(int meta) {
     boolean isTransparent = ((meta & 0x8) != 0);
     int materialId = meta & 0x7;
-    return getDefaultState().func_177226_a((IProperty)this.materialProperty, (Comparable)this.materialProperty.getMaterial(materialId)).func_177226_a(transparentProperty, Boolean.valueOf(isTransparent));
+    return getDefaultState().withProperty((IProperty)this.materialProperty, (Comparable)this.materialProperty.getMaterial(materialId)).withProperty(transparentProperty, Boolean.valueOf(isTransparent));
   }
   
-  public IBlockState func_176221_a(IBlockState state, IBlockAccess world, BlockPos pos) {
+  public IBlockState getActualState(IBlockState state, IBlockAccess world, BlockPos pos) {
     TileEntityBlock te = getTe(world, pos);
     if (te == null)
       return state; 
     return te.getBlockState();
   }
   
-  public String func_149739_a() {
+  public String getUnlocalizedName() {
     if (!isIC2())
-      return this.item.identifier.func_110624_b() + '.' + this.item.identifier.func_110623_a(); 
-    return super.func_149739_a();
+      return this.item.identifier.getResourceDomain() + '.' + this.item.identifier.getResourcePath(); 
+    return super.getUnlocalizedName();
   }
   
-  public void func_149666_a(CreativeTabs tabs, NonNullList<ItemStack> list) {
+  public void getSubBlocks(CreativeTabs tabs, NonNullList<ItemStack> list) {
     TeBlockRegistry.TeBlockInfo<?> info = TeBlockRegistry.getInfo(this.item.identifier);
     if (info.hasCreativeRegisterer()) {
       info.getCreativeRegisterer().addSubBlocks(list, this, this.item, tabs);
-    } else if (tabs == IC2.tabIC2 || tabs == CreativeTabs.field_78027_g) {
+    } else if (tabs == IC2.tabIC2 || tabs == CreativeTabs.SEARCH) {
       for (ITeBlock type : info.getTeBlocks()) {
         if (type.hasItem())
           list.add(getItemStack(type)); 
@@ -247,7 +247,7 @@ public final class BlockTileEntity extends BlockBase implements IMultiBlock<ITeB
     return Collections.unmodifiableSet(TeBlockRegistry.getAll(this.item.identifier));
   }
   
-  public ItemStack func_185473_a(World world, BlockPos pos, IBlockState state) {
+  public ItemStack getItem(World world, BlockPos pos, IBlockState state) {
     TileEntityBlock te = getTe((IBlockAccess)world, pos);
     if (te == null)
       return StackUtil.emptyStack; 
@@ -274,10 +274,10 @@ public final class BlockTileEntity extends BlockBase implements IMultiBlock<ITeB
       facing = supportedFacings.iterator().next();
     } 
     return getDefaultState()
-      .func_177226_a((IProperty)this.materialProperty, (Comparable)MaterialProperty.WrappedMaterial.get(variant.getMaterial()))
-      .func_177226_a(this.typeProperty, (Comparable)MetaTeBlockProperty.getState(variant))
-      .func_177226_a(facingProperty, (Comparable)facing)
-      .func_177226_a(transparentProperty, Boolean.valueOf(variant.isTransparent()));
+      .withProperty((IProperty)this.materialProperty, (Comparable)MaterialProperty.WrappedMaterial.get(variant.getMaterial()))
+      .withProperty(this.typeProperty, (Comparable)MetaTeBlockProperty.getState(variant))
+      .withProperty(facingProperty, (Comparable)facing)
+      .withProperty(transparentProperty, Boolean.valueOf(variant.isTransparent()));
   }
   
   public IBlockState getState(String variant) {
@@ -307,18 +307,18 @@ public final class BlockTileEntity extends BlockBase implements IMultiBlock<ITeB
       throw new NullPointerException("null stack"); 
     if (stack.getItem() != this.item)
       throw new IllegalArgumentException("The stack " + stack + " doesn't match " + this.item + " (" + this + ")"); 
-    ITeBlock type = TeBlockRegistry.get(this.item.identifier, stack.func_77960_j());
+    ITeBlock type = TeBlockRegistry.get(this.item.identifier, stack.getMetadata());
     if (type == null)
       throw new IllegalArgumentException("The stack " + stack + " doesn't reference any valid subtype"); 
     return type.getName();
   }
   
-  public boolean func_149686_d(IBlockState state) {
+  public boolean isFullCube(IBlockState state) {
     return false;
   }
   
-  public boolean func_149662_c(IBlockState state) {
-    return !((Boolean)state.func_177229_b(transparentProperty)).booleanValue();
+  public boolean isOpaqueCube(IBlockState state) {
+    return !((Boolean)state.getValue(transparentProperty)).booleanValue();
   }
   
   public boolean canReplace(World world, BlockPos pos, EnumFacing side, ItemStack stack) {
@@ -326,7 +326,7 @@ public final class BlockTileEntity extends BlockBase implements IMultiBlock<ITeB
       return true; 
     if (stack.getItem() != this.item)
       return false; 
-    ITeBlock type = TeBlockRegistry.get(this.item.identifier, stack.func_77960_j());
+    ITeBlock type = TeBlockRegistry.get(this.item.identifier, stack.getMetadata());
     if (type == null)
       return false; 
     TeBlock.ITePlaceHandler handler = type.getPlaceHandler();
@@ -367,7 +367,7 @@ public final class BlockTileEntity extends BlockBase implements IMultiBlock<ITeB
     TileEntityBlock te = getTe((IBlockAccess)world, pos);
     if (te == null)
       return super.addHitEffects(state, world, target, manager); 
-    ParticleUtil.spawnBlockHitParticles(te, target.field_178784_b, te.clientNeedsExtraModelInfo());
+    ParticleUtil.spawnBlockHitParticles(te, target.sideHit, te.clientNeedsExtraModelInfo());
     return true;
   }
   
@@ -381,32 +381,32 @@ public final class BlockTileEntity extends BlockBase implements IMultiBlock<ITeB
     return super.addDestroyEffects(world, pos, manager);
   }
   
-  public Material func_149688_o(IBlockState state) {
-    return ((MaterialProperty.WrappedMaterial)state.func_177229_b((IProperty)this.materialProperty)).getMaterial();
+  public Material getMaterial(IBlockState state) {
+    return ((MaterialProperty.WrappedMaterial)state.getValue((IProperty)this.materialProperty)).getMaterial();
   }
   
-  public boolean func_176214_u(IBlockState state) {
-    return (func_149688_o(state).func_76230_c() && getDefaultState().func_185917_h());
+  public boolean causesSuffocation(IBlockState state) {
+    return (getMaterial(state).blocksMovement() && getDefaultState().isFullCube());
   }
   
-  public boolean func_176205_b(IBlockAccess world, BlockPos pos) {
-    return !func_149688_o(world.getBlockState(pos)).func_76230_c();
+  public boolean isPassable(IBlockAccess world, BlockPos pos) {
+    return !getMaterial(world.getBlockState(pos)).blocksMovement();
   }
   
-  public boolean func_181623_g() {
-    return super.func_181623_g();
+  public boolean canSpawnInBlock() {
+    return super.canSpawnInBlock();
   }
   
-  public EnumPushReaction func_149656_h(IBlockState state) {
-    return func_149688_o(state).func_186274_m();
+  public EnumPushReaction getMobilityFlag(IBlockState state) {
+    return getMaterial(state).getMobilityFlag();
   }
   
-  public boolean func_149751_l(IBlockState state) {
-    return !func_149688_o(state).func_76228_b();
+  public boolean isTranslucent(IBlockState state) {
+    return !getMaterial(state).blocksLight();
   }
   
-  public MapColor func_180659_g(IBlockState state, IBlockAccess world, BlockPos pos) {
-    return func_149688_o(state).func_151565_r();
+  public MapColor getMapColor(IBlockState state, IBlockAccess world, BlockPos pos) {
+    return getMaterial(state).getMaterialMapColor();
   }
   
   public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
@@ -416,51 +416,51 @@ public final class BlockTileEntity extends BlockBase implements IMultiBlock<ITeB
     return (IBlockState)te.getExtendedState((Ic2BlockState.Ic2BlockStateInstance)state);
   }
   
-  public void func_180633_a(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
+  public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
     TileEntityBlock te = getTe((IBlockAccess)world, pos);
     if (te == null)
       return; 
     te.onPlaced(stack, placer, EnumFacing.UP);
   }
   
-  public RayTraceResult func_180636_a(IBlockState state, World world, BlockPos pos, Vec3d start, Vec3d end) {
+  public RayTraceResult collisionRayTrace(IBlockState state, World world, BlockPos pos, Vec3d start, Vec3d end) {
     TileEntityBlock te = getTe((IBlockAccess)world, pos);
     if (te == null)
-      return super.func_180636_a(state, world, pos, start, end); 
+      return super.collisionRayTrace(state, world, pos, start, end); 
     return te.collisionRayTrace(start, end);
   }
   
-  public AxisAlignedBB func_185496_a(IBlockState state, IBlockAccess world, BlockPos pos) {
+  public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
     TileEntityBlock te = getTe(world, pos);
     if (te == null)
-      return super.func_185496_a(state, world, pos); 
+      return super.getBoundingBox(state, world, pos); 
     return te.getVisualBoundingBox();
   }
   
-  public AxisAlignedBB func_180640_a(IBlockState state, World world, BlockPos pos) {
+  public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World world, BlockPos pos) {
     TileEntityBlock te = getTe((IBlockAccess)world, pos);
     if (te == null)
-      return super.func_180640_a(state, world, pos); 
-    return te.getOutlineBoundingBox().func_186670_a(pos);
+      return super.getSelectedBoundingBox(state, world, pos); 
+    return te.getOutlineBoundingBox().offset(pos);
   }
   
-  public AxisAlignedBB func_180646_a(IBlockState state, IBlockAccess world, BlockPos pos) {
+  public AxisAlignedBB getCollisionBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
     TileEntityBlock te = getTe(world, pos);
     if (te == null)
-      return super.func_180646_a(state, world, pos); 
+      return super.getCollisionBoundingBox(state, world, pos); 
     return te.getPhysicsBoundingBox();
   }
   
-  public void func_185477_a(IBlockState state, World world, BlockPos pos, AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity, boolean isActualState) {
+  public void addCollisionBoxToList(IBlockState state, World world, BlockPos pos, AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity, boolean isActualState) {
     TileEntityBlock te = getTe((IBlockAccess)world, pos);
     if (te == null) {
-      super.func_185477_a(state, world, pos, mask, list, collidingEntity, isActualState);
+      super.addCollisionBoxToList(state, world, pos, mask, list, collidingEntity, isActualState);
     } else {
       te.addCollisionBoxesToList(mask, list, collidingEntity);
     } 
   }
   
-  public void func_180634_a(World world, BlockPos pos, IBlockState state, Entity entity) {
+  public void onEntityCollidedWithBlock(World world, BlockPos pos, IBlockState state, Entity entity) {
     TileEntityBlock te = getTe((IBlockAccess)world, pos);
     if (te == null)
       return; 
@@ -468,10 +468,10 @@ public final class BlockTileEntity extends BlockBase implements IMultiBlock<ITeB
   }
   
   @SideOnly(Side.CLIENT)
-  public boolean func_176225_a(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
+  public boolean shouldSideBeRendered(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
     TileEntityBlock te = getTe(world, pos);
     if (te == null)
-      return super.func_176225_a(state, world, pos, side); 
+      return super.shouldSideBeRendered(state, world, pos, side); 
     return te.shouldSideBeRendered(side, pos.offset(side));
   }
   
@@ -496,17 +496,17 @@ public final class BlockTileEntity extends BlockBase implements IMultiBlock<ITeB
     return te.isSideSolid(side);
   }
   
-  public BlockFaceShape func_193383_a(IBlockAccess world, IBlockState state, BlockPos pos, EnumFacing face) {
+  public BlockFaceShape getBlockFaceShape(IBlockAccess world, IBlockState state, BlockPos pos, EnumFacing face) {
     TileEntityBlock te = getTe(world, pos);
     if (te == null)
-      return super.func_193383_a(world, state, pos, face); 
+      return super.getBlockFaceShape(world, state, pos, face); 
     return te.getFaceShape(face);
   }
   
   public int getLightOpacity(IBlockState state, IBlockAccess world, BlockPos pos) {
     TileEntityBlock te = getTe(world, pos);
     if (te == null)
-      return func_149717_k(state); 
+      return getLightOpacity(state); 
     return te.getLightOpacity();
   }
   
@@ -517,8 +517,8 @@ public final class BlockTileEntity extends BlockBase implements IMultiBlock<ITeB
     return te.getLightValue();
   }
   
-  public boolean func_180639_a(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-    if (player.func_70093_af())
+  public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+    if (player.isSneaking())
       return false; 
     TileEntityBlock te = getTe((IBlockAccess)world, pos);
     if (te == null)
@@ -526,21 +526,21 @@ public final class BlockTileEntity extends BlockBase implements IMultiBlock<ITeB
     return te.onActivated(player, hand, side, hitX, hitY, hitZ);
   }
   
-  public void func_180649_a(World world, BlockPos pos, EntityPlayer player) {
+  public void onBlockClicked(World world, BlockPos pos, EntityPlayer player) {
     TileEntityBlock te = getTe((IBlockAccess)world, pos);
     if (te == null)
       return; 
     te.onClicked(player);
   }
   
-  public void func_189540_a(IBlockState state, World world, BlockPos pos, Block neighborBlock, BlockPos neighborPos) {
+  public void neighborChanged(IBlockState state, World world, BlockPos pos, Block neighborBlock, BlockPos neighborPos) {
     TileEntityBlock te = getTe((IBlockAccess)world, pos);
     if (te == null)
       return; 
     te.onNeighborChange(neighborBlock, neighborPos);
   }
   
-  public int func_180656_a(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
+  public int getWeakPower(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
     TileEntityBlock te = getTe(world, pos);
     if (te == null)
       return 0; 
@@ -554,11 +554,11 @@ public final class BlockTileEntity extends BlockBase implements IMultiBlock<ITeB
     return te.canConnectRedstone(side);
   }
   
-  public boolean func_149740_M(IBlockState state) {
+  public boolean hasComparatorInputOverride(IBlockState state) {
     return true;
   }
   
-  public int func_180641_l(IBlockState state, World world, BlockPos pos) {
+  public int getComparatorInputOverride(IBlockState state, World world, BlockPos pos) {
     TileEntityBlock te = getTe((IBlockAccess)world, pos);
     if (te == null)
       return 0; 
@@ -579,11 +579,11 @@ public final class BlockTileEntity extends BlockBase implements IMultiBlock<ITeB
     super.onBlockExploded(world, pos, explosion);
   }
   
-  public void func_180663_b(World world, BlockPos pos, IBlockState state) {
+  public void breakBlock(World world, BlockPos pos, IBlockState state) {
     TileEntityBlock te = getTe((IBlockAccess)world, pos);
     if (te != null)
       te.onBlockBreak(); 
-    super.func_180663_b(world, pos, state);
+    super.breakBlock(world, pos, state);
   }
   
   public boolean removedByPlayer(IBlockState state, World world, BlockPos pos, EntityPlayer player, boolean willHarvest) {
@@ -606,9 +606,9 @@ public final class BlockTileEntity extends BlockBase implements IMultiBlock<ITeB
     return tile.isFlammable(face);
   }
   
-  public float func_180647_a(IBlockState state, EntityPlayer player, World world, BlockPos pos) {
-    float ret = super.func_180647_a(state, player, world, pos);
-    if (!player.func_184823_b(state)) {
+  public float getPlayerRelativeBlockHardness(IBlockState state, EntityPlayer player, World world, BlockPos pos) {
+    float ret = super.getPlayerRelativeBlockHardness(state, player, world, pos);
+    if (!player.canHarvestBlock(state)) {
       TileEntityBlock te = getTe((IBlockAccess)world, pos);
       if (te != null && te.teBlock.getHarvestTool() == TeBlock.HarvestTool.None)
         ret *= 3.3333333F; 
@@ -628,8 +628,8 @@ public final class BlockTileEntity extends BlockBase implements IMultiBlock<ITeB
       case None:
         return true;
       case Wrench:
-        stack = player.func_184614_ca();
-        if (!stack.func_190926_b()) {
+        stack = player.getHeldItemMainhand();
+        if (!stack.isEmpty()) {
           String tool = TeBlock.HarvestTool.Pickaxe.toolClass;
           return (stack.getItem().getHarvestLevel(stack, tool, player, world.getBlockState(pos)) >= TeBlock.HarvestTool.Pickaxe.level);
         } 
@@ -641,13 +641,13 @@ public final class BlockTileEntity extends BlockBase implements IMultiBlock<ITeB
   public String getHarvestTool(IBlockState state) {
     if (state.getBlock() != this)
       return null; 
-    return (((MetaTeBlock)state.func_177229_b(this.typeProperty)).teBlock.getHarvestTool()).toolClass;
+    return (((MetaTeBlock)state.getValue(this.typeProperty)).teBlock.getHarvestTool()).toolClass;
   }
   
   public int getHarvestLevel(IBlockState state) {
     if (state.getBlock() != this)
       return 0; 
-    return (((MetaTeBlock)state.func_177229_b(this.typeProperty)).teBlock.getHarvestTool()).level;
+    return (((MetaTeBlock)state.getValue(this.typeProperty)).teBlock.getHarvestTool()).level;
   }
   
   public void getDrops(NonNullList<ItemStack> list, IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
@@ -685,8 +685,8 @@ public final class BlockTileEntity extends BlockBase implements IMultiBlock<ITeB
     if (!wasWrench) {
       EntityPlayer player = this.harvesters.get();
       if (player != null) {
-        ItemStack stack = player.func_184614_ca();
-        if (!stack.func_190926_b()) {
+        ItemStack stack = player.getHeldItemMainhand();
+        if (!stack.isEmpty()) {
           String tool = TeBlock.HarvestTool.Wrench.toolClass;
           i = wasWrench | ((stack.getItem().getHarvestLevel(stack, tool, player, state) >= TeBlock.HarvestTool.Wrench.level) ? 1 : 0);
         } 
@@ -697,7 +697,7 @@ public final class BlockTileEntity extends BlockBase implements IMultiBlock<ITeB
     return ret;
   }
   
-  public float func_176195_g(IBlockState state, World world, BlockPos pos) {
+  public float getBlockHardness(IBlockState state, World world, BlockPos pos) {
     TileEntityBlock te = getTe((IBlockAccess)world, pos);
     if (te == null)
       return 5.0F; 
@@ -817,7 +817,7 @@ public final class BlockTileEntity extends BlockBase implements IMultiBlock<ITeB
     return ret;
   }
   
-  public static final IProperty<EnumFacing> facingProperty = (IProperty<EnumFacing>)PropertyDirection.func_177714_a("facing");
+  public static final IProperty<EnumFacing> facingProperty = (IProperty<EnumFacing>)PropertyDirection.create("facing");
   
   private static final ThreadLocal<IProperty<MetaTeBlock>> currentTypeProperty = new UnstartingThreadLocal<>();
   

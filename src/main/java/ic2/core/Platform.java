@@ -75,20 +75,20 @@ public class Platform {
       } else {
         textComponentTranslation = new TextComponentTranslation(message, new Object[0]);
       } 
-      ((EntityPlayerMP)player).func_145747_a((ITextComponent)textComponentTranslation);
+      ((EntityPlayerMP)player).sendMessage((ITextComponent)textComponentTranslation);
     } 
   }
   
   public boolean launchGui(EntityPlayer player, IHasGui inventory) {
     if (!Util.isFakePlayer(player, true)) {
       EntityPlayerMP playerMp = (EntityPlayerMP)player;
-      playerMp.func_71117_bO();
-      playerMp.func_71128_l();
-      int windowId = playerMp.field_71139_cq;
+      playerMp.getNextWindowId();
+      playerMp.closeContainer();
+      int windowId = playerMp.currentWindowId;
       ((NetworkManager)IC2.network.get(true)).initiateGuiDisplay(playerMp, inventory, windowId);
-      player.field_71070_bA = inventory.getGuiContainer(player);
-      player.field_71070_bA.field_75152_c = windowId;
-      player.field_71070_bA.func_75132_a((IContainerListener)playerMp);
+      player.openContainer = inventory.getGuiContainer(player);
+      player.openContainer.windowId = windowId;
+      player.openContainer.addListener((IContainerListener)playerMp);
       return true;
     } 
     return false;
@@ -97,13 +97,13 @@ public class Platform {
   public boolean launchSubGui(EntityPlayer player, IHasGui inventory, int ID) {
     if (!Util.isFakePlayer(player, true)) {
       EntityPlayerMP playerMp = (EntityPlayerMP)player;
-      playerMp.func_71117_bO();
-      playerMp.func_71128_l();
-      int windowId = playerMp.field_71139_cq;
+      playerMp.getNextWindowId();
+      playerMp.closeContainer();
+      int windowId = playerMp.currentWindowId;
       ((NetworkManager)IC2.network.get(true)).initiateGuiDisplay(playerMp, inventory, windowId, Integer.valueOf(ID));
-      player.field_71070_bA = inventory.getGuiContainer(player);
-      player.field_71070_bA.field_75152_c = windowId;
-      player.field_71070_bA.func_75132_a((IContainerListener)playerMp);
+      player.openContainer = inventory.getGuiContainer(player);
+      player.openContainer.windowId = windowId;
+      player.openContainer.addListener((IContainerListener)playerMp);
       return true;
     } 
     return false;
@@ -128,9 +128,9 @@ public class Platform {
   public void resetPlayerInAirTime(EntityPlayer player) {
     if (!(player instanceof EntityPlayerMP))
       return; 
-    ObfuscationReflectionHelper.setPrivateValue(NetHandlerPlayServer.class, ((EntityPlayerMP)player).field_71135_a, 
+    ObfuscationReflectionHelper.setPrivateValue(NetHandlerPlayServer.class, ((EntityPlayerMP)player).connection, 
         
-        Integer.valueOf(0), new String[] { "field_147365_f", "floatingTickCount" });
+        Integer.valueOf(0), new String[] { "floatingTickCount", "floatingTickCount" });
   }
   
   public int getBlockTexture(Block block, IBlockAccess world, int x, int y, int z, int side) {
@@ -138,7 +138,7 @@ public class Platform {
   }
   
   public void removePotion(EntityLivingBase entity, Potion potion) {
-    entity.func_184589_d(potion);
+    entity.removePotionEffect(potion);
   }
   
   public void onPostInit() {}
@@ -158,7 +158,7 @@ public class Platform {
   public void requestTick(boolean simulating, Runnable runnable) {
     if (!simulating)
       throw new IllegalStateException(); 
-    FMLCommonHandler.instance().getMinecraftServerInstance().func_152344_a(runnable);
+    FMLCommonHandler.instance().getMinecraftServerInstance().addScheduledTask(runnable);
   }
   
   public int getColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tint) {

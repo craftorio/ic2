@@ -68,15 +68,15 @@ public class GradualRecipe implements IRecipe {
     this.hidden = hidden;
   }
   
-  public boolean func_77569_a(InventoryCrafting ic, World world) {
-    return (func_77572_b(ic) != StackUtil.emptyStack);
+  public boolean matches(InventoryCrafting ic, World world) {
+    return (getCraftingResult(ic) != StackUtil.emptyStack);
   }
   
-  public ItemStack func_77572_b(InventoryCrafting ic) {
+  public ItemStack getCraftingResult(InventoryCrafting ic) {
     ItemStack gridItem = null;
     int chargeMats = 0;
-    for (int slot = 0; slot < ic.func_70302_i_(); slot++) {
-      ItemStack stack = ic.func_70301_a(slot);
+    for (int slot = 0; slot < ic.getSizeInventory(); slot++) {
+      ItemStack stack = ic.getStackInSlot(slot);
       if (!StackUtil.isEmpty(stack))
         if (gridItem == null && stack.getItem() == this.item) {
           gridItem = stack;
@@ -100,16 +100,16 @@ public class GradualRecipe implements IRecipe {
     return StackUtil.emptyStack;
   }
   
-  public ItemStack func_77571_b() {
+  public ItemStack getRecipeOutput() {
     return new ItemStack((Item)this.item);
   }
   
-  public NonNullList<ItemStack> func_179532_b(InventoryCrafting inv) {
+  public NonNullList<ItemStack> getRemainingItems(InventoryCrafting inv) {
     return ForgeHooks.defaultRecipeGetRemainingItems(inv);
   }
   
   public boolean canShow() {
-    return AdvRecipe.canShow(new Object[] { this.chargeMaterial }, func_77571_b(), this.hidden);
+    return AdvRecipe.canShow(new Object[] { this.chargeMaterial }, getRecipeOutput(), this.hidden);
   }
   
   public IRecipe setRegistryName(ResourceLocation name) {
@@ -125,7 +125,7 @@ public class GradualRecipe implements IRecipe {
     return IRecipe.class;
   }
   
-  public boolean func_194133_a(int x, int y) {
+  public boolean canFit(int x, int y) {
     return (x * y >= 2);
   }
 }

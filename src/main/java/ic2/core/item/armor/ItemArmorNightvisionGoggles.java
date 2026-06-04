@@ -26,7 +26,7 @@ import net.minecraft.world.World;
 public class ItemArmorNightvisionGoggles extends ItemArmorUtility implements IElectricItem, IItemHudInfo {
   public ItemArmorNightvisionGoggles() {
     super(ItemName.nightvision_goggles, "nightvision", EntityEquipmentSlot.HEAD);
-    func_77656_e(27);
+    setMaxDamage(27);
     setNoRepair();
   }
   
@@ -54,13 +54,13 @@ public class ItemArmorNightvisionGoggles extends ItemArmorUtility implements IEl
   
   public void onArmorTick(World world, EntityPlayer player, ItemStack stack) {
     NBTTagCompound nbtData = StackUtil.getOrCreateNbtData(stack);
-    boolean active = nbtData.func_74767_n("active");
+    boolean active = nbtData.getBoolean("active");
     byte toggleTimer = nbtData.getByte("toggleTimer");
     if (IC2.keyboard.isAltKeyDown(player) && IC2.keyboard.isModeSwitchKeyDown(player) && toggleTimer == 0) {
       toggleTimer = 10;
       active = !active;
       if (IC2.platform.isSimulating()) {
-        nbtData.func_74757_a("active", active);
+        nbtData.setBoolean("active", active);
         if (active) {
           IC2.platform.messagePlayer(player, "Nightvision enabled.", new Object[0]);
         } else {
@@ -75,27 +75,27 @@ public class ItemArmorNightvisionGoggles extends ItemArmorUtility implements IEl
     boolean ret = false;
     if (active && IC2.platform.isSimulating() && 
       ElectricItem.manager.use(stack, 1.0D, (EntityLivingBase)player)) {
-      int skylight = player.getEntityWorld().func_175671_l(new BlockPos((Entity)player));
+      int skylight = player.getEntityWorld().getLightFromNeighbors(new BlockPos((Entity)player));
       if (skylight > 8) {
-        IC2.platform.removePotion((EntityLivingBase)player, MobEffects.field_76439_r);
-        player.func_70690_d(new PotionEffect(MobEffects.field_76440_q, 100, 0, true, true));
+        IC2.platform.removePotion((EntityLivingBase)player, MobEffects.NIGHT_VISION);
+        player.addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, 100, 0, true, true));
       } else {
-        IC2.platform.removePotion((EntityLivingBase)player, MobEffects.field_76440_q);
-        player.func_70690_d(new PotionEffect(MobEffects.field_76439_r, 300, 0, true, true));
+        IC2.platform.removePotion((EntityLivingBase)player, MobEffects.BLINDNESS);
+        player.addPotionEffect(new PotionEffect(MobEffects.NIGHT_VISION, 300, 0, true, true));
       } 
       ret = true;
     } 
     if (ret)
-      player.field_71069_bz.func_75142_b(); 
+      player.inventoryContainer.detectAndSendChanges(); 
   }
   
-  public void func_150895_a(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-    if (!func_194125_a(tab))
+  public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
+    if (!isInCreativeTab(tab))
       return; 
     ElectricItemManager.addChargeVariants((Item)this, (List)subItems);
   }
   
-  public boolean func_82789_a(ItemStack par1ItemStack, ItemStack par2ItemStack) {
+  public boolean getIsRepairable(ItemStack par1ItemStack, ItemStack par2ItemStack) {
     return false;
   }
 }

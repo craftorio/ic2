@@ -23,10 +23,10 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class Ic2Sapling extends BlockBush implements IBlockModelProvider, IGrowable {
   public Ic2Sapling() {
-    func_149711_c(0.0F);
-    func_149672_a(SoundType.field_185850_c);
-    func_149663_c(BlockName.sapling.name());
-    func_149647_a((CreativeTabs)IC2.tabIC2);
+    setHardness(0.0F);
+    setSoundType(SoundType.PLANT);
+    setUnlocalizedName(BlockName.sapling.name());
+    setCreativeTab((CreativeTabs)IC2.tabIC2);
     ResourceLocation name = IC2.getIdentifier(BlockName.sapling.name());
     BlocksItems.registerBlock((Block)this, name);
     BlocksItems.registerItem((Item)new ItemBlockIC2((Block)this), name);
@@ -38,39 +38,39 @@ public class Ic2Sapling extends BlockBush implements IBlockModelProvider, IGrowa
     BlockBase.registerDefaultItemModel((Block)this);
   }
   
-  public String func_149739_a() {
-    return "ic2." + super.func_149739_a().substring(5) + ".rubber";
+  public String getUnlocalizedName() {
+    return "ic2." + super.getUnlocalizedName().substring(5) + ".rubber";
   }
   
   public boolean canBeReplacedByLeaves(IBlockState state, IBlockAccess world, BlockPos pos) {
     return true;
   }
   
-  public void func_180650_b(World world, BlockPos pos, IBlockState state, Random random) {
+  public void updateTick(World world, BlockPos pos, IBlockState state, Random random) {
     if (world.isRemote)
       return; 
-    if (!func_180671_f(world, pos, state)) {
-      func_176226_b(world, pos, state, 0);
-      world.func_175698_g(pos);
+    if (!canBlockStay(world, pos, state)) {
+      dropBlockAsItem(world, pos, state, 0);
+      world.setBlockToAir(pos);
       return;
     } 
-    if (world.func_175671_l(pos.up()) >= 9 && random.nextInt(30) == 0)
-      func_176474_b(world, random, pos, state); 
+    if (world.getLightFromNeighbors(pos.up()) >= 9 && random.nextInt(30) == 0)
+      grow(world, random, pos, state); 
   }
   
-  public void func_176474_b(World world, Random rand, BlockPos pos, IBlockState state) {
+  public void grow(World world, Random rand, BlockPos pos, IBlockState state) {
     (new WorldGenRubTree(true)).grow(world, pos, rand);
   }
   
-  public int func_180651_a(IBlockState state) {
+  public int damageDropped(IBlockState state) {
     return 0;
   }
   
-  public boolean func_176473_a(World worldIn, BlockPos pos, IBlockState state, boolean isClient) {
+  public boolean canGrow(World worldIn, BlockPos pos, IBlockState state, boolean isClient) {
     return true;
   }
   
-  public boolean func_180670_a(World worldIn, Random rand, BlockPos pos, IBlockState state) {
+  public boolean canUseBonemeal(World worldIn, Random rand, BlockPos pos, IBlockState state) {
     return true;
   }
   

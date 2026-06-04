@@ -25,7 +25,7 @@ public class ItemDrill extends ItemElectricTool implements IMiningDrill, IHitSou
     this.maxCharge = maxCharge;
     this.transferLimit = transferLimit;
     this.tier = tier;
-    this.field_77864_a = efficiency;
+    this.efficiency = efficiency;
   }
   
   @SideOnly(Side.CLIENT)
@@ -35,20 +35,20 @@ public class ItemDrill extends ItemElectricTool implements IMiningDrill, IHitSou
   
   @SideOnly(Side.CLIENT)
   public String getBreakSoundForBlock(EntityPlayerSP player, World world, BlockPos pos, ItemStack stack) {
-    if (player.field_71075_bZ.field_75098_d)
+    if (player.capabilities.isCreativeMode)
       return null; 
     IBlockState state = world.getBlockState(pos);
-    float hardness = state.func_185887_b(world, pos);
+    float hardness = state.getBlockHardness(world, pos);
     return (hardness > 1.0F || hardness < 0.0F) ? "Tools/Drill/DrillHard.ogg" : "Tools/Drill/DrillSoft.ogg";
   }
   
-  public float func_150893_a(ItemStack stack, IBlockState state) {
-    float speed = super.func_150893_a(stack, state);
+  public float getDestroySpeed(ItemStack stack, IBlockState state) {
+    float speed = super.getDestroySpeed(stack, state);
     EntityPlayer player = getPlayerHoldingItem(stack);
     if (player != null) {
-      if (player.func_70055_a(Material.WATER) && !EnchantmentHelper.func_185287_i((EntityLivingBase)player))
+      if (player.isInsideOfMaterial(Material.WATER) && !EnchantmentHelper.getAquaAffinityModifier((EntityLivingBase)player))
         speed *= 5.0F; 
-      if (!player.field_70122_E)
+      if (!player.onGround)
         speed *= 5.0F; 
     } 
     return speed;
@@ -60,7 +60,7 @@ public class ItemDrill extends ItemElectricTool implements IMiningDrill, IHitSou
       if (player != null && player.inventory.getCurrentItem() == stack)
         return player; 
     } else {
-      for (EntityPlayer player : FMLCommonHandler.instance().getMinecraftServerInstance().func_184103_al().func_181057_v()) {
+      for (EntityPlayer player : FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayers()) {
         if (player.inventory.getCurrentItem() == stack)
           return player; 
       } 

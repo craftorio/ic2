@@ -30,10 +30,10 @@ public class Ic2Fluid extends Fluid implements IFluidModelProvider {
       return; 
     final String variant = "type=" + name.name();
     ModelLoader.setCustomStateMapper(getBlock(), new IStateMapper() {
-          public Map<IBlockState, ModelResourceLocation> func_178130_a(Block blockIn) {
+          public Map<IBlockState, ModelResourceLocation> putStateModelLocations(Block blockIn) {
             Map<IBlockState, ModelResourceLocation> ret = new IdentityHashMap<>();
             ModelResourceLocation loc = new ModelResourceLocation(Ic2Fluid.fluidLocation, variant);
-            for (UnmodifiableIterator<IBlockState> unmodifiableIterator = Ic2Fluid.this.getBlock().func_176194_O().func_177619_a().iterator(); unmodifiableIterator.hasNext(); ) {
+            for (UnmodifiableIterator<IBlockState> unmodifiableIterator = Ic2Fluid.this.getBlock().getBlockState().getValidStates().iterator(); unmodifiableIterator.hasNext(); ) {
               IBlockState state = unmodifiableIterator.next();
               ret.put(state, loc);
             } 

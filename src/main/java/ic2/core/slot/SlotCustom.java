@@ -13,7 +13,7 @@ public class SlotCustom extends Slot {
     this.item = item;
   }
   
-  public boolean func_75214_a(ItemStack itemstack) {
+  public boolean isItemValid(ItemStack itemstack) {
     if (itemstack == null)
       return false; 
     return (this.item != null && itemstack.getItem() == this.item);

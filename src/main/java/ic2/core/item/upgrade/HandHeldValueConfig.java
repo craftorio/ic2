@@ -68,9 +68,9 @@ public class HandHeldValueConfig extends HandHeldUpgradeOption {
         addSlotToContainer((Slot)new SlotHologramSlot(HandHeldValueConfig.this.inventory, slot, 8 + 18 * slot, 8, 1, HandHeldValueConfig.this.makeSaveCallback())); 
     }
     
-    public void func_75134_a(EntityPlayer player) {
+    public void onContainerClosed(EntityPlayer player) {
       NBTTagCompound nbt = HandHeldValueConfig.this.getNBT();
-      nbt.func_74757_a("active", this.comparisonType.enabled());
+      nbt.setBoolean("active", this.comparisonType.enabled());
       ComparisonType saveType = this.comparisonType;
       switch (this.comparisonType) {
         case LESS:
@@ -102,7 +102,7 @@ public class HandHeldValueConfig extends HandHeldUpgradeOption {
           break;
       } 
       nbt.setByte("type", saveType.getForNBT());
-      super.func_75134_a(player);
+      super.onContainerClosed(player);
     }
   }
   
@@ -122,7 +122,7 @@ public class HandHeldValueConfig extends HandHeldUpgradeOption {
                 return Localization.translate(((HandHeldValueConfig.ContainerValueConfig)HandHeldValueConfig.GuiValueConfig.this.container).comparisonType.name);
               }
             })).withTooltip(new Supplier<String>() {
-              private final String name = Localization.translate("ic2.upgrade.advancedGUI." + HandHeldValueConfig.this.func_70005_c_());
+              private final String name = Localization.translate("ic2.upgrade.advancedGUI." + HandHeldValueConfig.this.getName());
               
               public String get() {
                 return Localization.translate(((HandHeldValueConfig.ContainerValueConfig)HandHeldValueConfig.GuiValueConfig.this.container).comparisonType.name + ".desc", new Object[] { this.name });
@@ -227,12 +227,12 @@ public class HandHeldValueConfig extends HandHeldUpgradeOption {
                 ((NetworkManager)IC2.network.get(false)).sendContainerField(HandHeldValueConfig.GuiValueConfig.this.container, "extraBox");
               }
             }).withTextValidator(numberOnly).withEnableHandler(rangeEnabled));
-      addElement(Text.create((GuiIC2)this, 100, 47, TextProvider.ofTranslated("ic2.upgrade.advancedGUI." + HandHeldValueConfig.this.func_70005_c_()), 4210752, false).withEnableHandler(new IEnableHandler() {
+      addElement(Text.create((GuiIC2)this, 100, 47, TextProvider.ofTranslated("ic2.upgrade.advancedGUI." + HandHeldValueConfig.this.getName()), 4210752, false).withEnableHandler(new IEnableHandler() {
               public boolean isEnabled() {
                 return (textBox.isEnabled() && !textBox.isMoved());
               }
             }));
-      addElement(Text.create((GuiIC2)this, 80, 47, TextProvider.ofTranslated("ic2.upgrade.advancedGUI." + HandHeldValueConfig.this.func_70005_c_()), 4210752, false).withEnableHandler(new IEnableHandler() {
+      addElement(Text.create((GuiIC2)this, 80, 47, TextProvider.ofTranslated("ic2.upgrade.advancedGUI." + HandHeldValueConfig.this.getName()), 4210752, false).withEnableHandler(new IEnableHandler() {
               public boolean isEnabled() {
                 return (textBox.isEnabled() && textBox.isMoved());
               }

@@ -10,6 +10,7 @@ import ic2.core.util.LogCategory;
 import ic2.core.util.ReflectionUtil;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.SequenceInputStream;
@@ -46,7 +47,10 @@ public class ProfileManager {
       ret.put("Experimental", new Profile("Experimental", Collections.singleton(TextureStyle.EXPERIMENTAL), Version.NEW));
 
       try {
-         ret.put("Classic", ProfileParser.parse(ProfileTarget.fromJar("ic2/profiles/classic")));
+         Profile profile = ProfileParser.parse(ProfileTarget.fromJar("ic2/profiles/classic"));
+         if (profile != null) {
+            ret.put("Classic", profile);
+         }
          return ret;
       } catch (IOException e) {
          throw new RuntimeException("Error opening profile XML", e);
@@ -61,7 +65,7 @@ public class ProfileManager {
          if (root.exists()) {
             for (File file : root.listFiles()) {
                if (file.isDirectory()) {
-                  for (File profile : file.listFiles(new NameFileFilter("profile.xml"))) {
+                  for (File profile : file.listFiles((FileFilter)new NameFileFilter("profile.xml"))) {
                      try {
                         Profile p = ProfileParser.parse(new ProfileRoot(profile.getParentFile()));
                         if (!registerProfile(p)) {

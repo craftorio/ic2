@@ -37,7 +37,7 @@ public class DynamicContainer<T extends IInventory> extends ContainerBase<T> {
                   continue;
                }
                break;
-            case playerinventory:
+            case playerinventory: {
                GuiParser.PlayerInventoryNode node = (GuiParser.PlayerInventoryNode)rawNode;
                int xOffset = (node.style.width - 16) / 2;
                int yOffset = (node.style.height - 16) / 2;
@@ -54,7 +54,8 @@ public class DynamicContainer<T extends IInventory> extends ContainerBase<T> {
                   this.addSlotToContainer(new Slot(player.inventory, col, node.x + col * width + xOffset, node.y + node.hotbarOffset + yOffset));
                }
                break;
-            case slot:
+            }
+            case slot: {
                if (!(this.base instanceof IInventorySlotHolder)) {
                   throw new RuntimeException("Invalid base " + this.base + " for slot elements");
                }
@@ -69,7 +70,8 @@ public class DynamicContainer<T extends IInventory> extends ContainerBase<T> {
                int y = node.y + (node.style.height - 16) / 2;
                this.addSlotToContainer(new SlotInvSlot(slot, node.index, x, y));
                break;
-            case slotgrid:
+            }
+            case slotgrid: {
                if (!(this.base instanceof IInventorySlotHolder)) {
                   throw new RuntimeException("Invalid base " + this.base + " for slot elements");
                }
@@ -121,7 +123,8 @@ public class DynamicContainer<T extends IInventory> extends ContainerBase<T> {
                   }
                }
                break;
-            case slothologram:
+            }
+            case slothologram: {
                if (!(this.base instanceof IHolographicSlotProvider)) {
                   throw new RuntimeException("Invalid base " + this.base + " for holographic slot elements");
                }
@@ -134,6 +137,8 @@ public class DynamicContainer<T extends IInventory> extends ContainerBase<T> {
                      ((IHolographicSlotProvider)this.base).getStacksForName(node.name), node.index, x, y, node.stackSizeLimit, this.getCallback()
                   )
                );
+               break;
+            }
             case gui:
             case key:
             case only:

@@ -192,7 +192,7 @@ public class NetworkManager implements INetworkManager {
 
          buffer.flip();
 
-         for (EntityPlayerMP target : (ArrayList)getPlayersInRange(te.getWorld(), te.getPos(), new ArrayList())) {
+         for (EntityPlayerMP target : (ArrayList<EntityPlayerMP>)getPlayersInRange(te.getWorld(), te.getPos(), new ArrayList())) {
             if (limitRange) {
                int dX = (int)(te.getPos().getX() + 0.5 - target.posX);
                int dZ = (int)(te.getPos().getZ() + 0.5 - target.posZ);
@@ -226,7 +226,7 @@ public class NetworkManager implements INetworkManager {
 
       buffer.flip();
 
-      for (EntityPlayerMP target : (ArrayList)getPlayersInRange(player.getEntityWorld(), player.getPosition(), new ArrayList())) {
+      for (EntityPlayerMP target : (ArrayList<EntityPlayerMP>)getPlayersInRange(player.getEntityWorld(), player.getPosition(), new ArrayList())) {
          if (limitRange) {
             int dX = (int)(player.posX - target.posX);
             int dZ = (int)(player.posZ - target.posZ);

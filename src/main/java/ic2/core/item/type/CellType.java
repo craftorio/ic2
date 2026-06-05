@@ -97,7 +97,7 @@ public enum CellType implements IIdProvider {
    public EnumActionResult doCropAction(ItemStack stack, Consumer<ItemStack> result, TileEntityCrop crop, boolean manual) {
       assert this.hasCropAction();
       switch (this) {
-         case weed_ex:
+         case weed_ex: {
             IFluidHandlerItem handler = new CellType.WeedExHandler(stack);
             if (crop.applyWeedEx(handler, manual)) {
                result.accept(handler.getContainer());
@@ -105,7 +105,8 @@ public enum CellType implements IIdProvider {
             }
 
             return EnumActionResult.FAIL;
-         case hydration:
+         }
+         case hydration: {
             IFluidHandlerItem handler = new CellType.HydrationHandler(stack, manual);
             if (crop.applyHydration(handler)) {
                result.accept(handler.getContainer());
@@ -113,6 +114,7 @@ public enum CellType implements IIdProvider {
             }
 
             return EnumActionResult.FAIL;
+         }
          case water:
             if (crop.getStorageWater() < 10) {
                crop.setStorageWater(10);

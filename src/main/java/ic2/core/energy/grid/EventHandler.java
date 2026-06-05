@@ -1,6 +1,7 @@
 package ic2.core.energy.grid;
 
 import ic2.api.energy.EnergyNet;
+import ic2.api.energy.IEnergyNet;
 import ic2.api.energy.event.EnergyTileLoadEvent;
 import ic2.api.energy.event.EnergyTileUnloadEvent;
 import ic2.api.energy.tile.IEnergyTile;
@@ -8,6 +9,7 @@ import ic2.api.info.ILocatable;
 import ic2.core.IC2;
 import ic2.core.util.LogCategory;
 import ic2.core.util.Util;
+import java.lang.reflect.Method;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -39,14 +41,24 @@ public class EventHandler {
             );
       } else {
          if (event.tile instanceof TileEntity) {
-            EnergyNet.instance.addTile((TileEntity & IEnergyTile & TileEntity)event.tile);
+            addTileToNet(event.tile);
          } else {
             if (!(event.tile instanceof ILocatable)) {
                throw new IllegalArgumentException("invalid tile type: " + event.tile);
             }
 
-            EnergyNet.instance.addTile((ILocatable & IEnergyTile & ILocatable)event.tile);
+            addTileToNet(event.tile);
          }
+      }
+   }
+
+   private static void addTileToNet(IEnergyTile tile) {
+      try {
+         Method addTileMethod = EnergyNet.instance.getClass().getDeclaredMethod("addTile", IEnergyTile.class);
+         addTileMethod.setAccessible(true);
+         addTileMethod.invoke(EnergyNet.instance, tile);
+      } catch (Exception e) {
+         throw new RuntimeException(e);
       }
    }
 

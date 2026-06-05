@@ -172,7 +172,7 @@ public final class Util {
    }
 
    public static boolean hasAssertions() {
-      boolean ret;
+      boolean ret = false;
       assert ret = true;
       return ret;
    }

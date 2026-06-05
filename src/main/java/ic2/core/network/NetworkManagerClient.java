@@ -252,7 +252,7 @@ public class NetworkManagerClient extends NetworkManager {
                            @Override
                            public void run() {
                               EntityPlayer player = IC2.platform.getPlayerInstance();
-                              TileEntity te = DataEncoder.getValue(teDeferred);
+                              TileEntity te = DataEncoder.getValue(teDeferredx);
                               if (te instanceof IHasGui) {
                                  IC2.platform.launchGuiClient(player, (IHasGui)te, isAdmin);
                                  player.openContainer.windowId = windowId;

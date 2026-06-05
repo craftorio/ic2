@@ -422,35 +422,39 @@ public class ItemUpgradeModule extends ItemMulti<ItemUpgradeModule.UpgradeType> 
       TileEntity te = (TileEntity)parent;
       boolean ret = false;
       switch (type) {
-         case ejector:
+         case ejector: {
             int amount = (int)Math.pow(4.0, Math.min(4, size - 1));
 
             for (StackUtil.AdjacentInv inv : getTargetInventories(stack, te)) {
                StackUtil.transfer(te, inv.te, inv.dir, amount);
             }
             break;
-         case advanced_ejector:
+         }
+         case advanced_ejector: {
             int amount = (int)Math.pow(4.0, Math.min(4, size - 1));
 
             for (StackUtil.AdjacentInv inv : getTargetInventories(stack, te)) {
                StackUtil.transfer(te, inv.te, inv.dir, amount, stackChecker(stack));
             }
             break;
-         case pulling:
+         }
+         case pulling: {
             int amount = (int)Math.pow(4.0, Math.min(4, size - 1));
 
             for (StackUtil.AdjacentInv inv : getTargetInventories(stack, te)) {
                StackUtil.transfer(inv.te, te, inv.dir.getOpposite(), amount);
             }
             break;
-         case advanced_pulling:
+         }
+         case advanced_pulling: {
             int amount = (int)Math.pow(4.0, Math.min(4, size - 1));
 
             for (StackUtil.AdjacentInv inv : getTargetInventories(stack, te)) {
                StackUtil.transfer(inv.te, te, inv.dir.getOpposite(), amount, stackChecker(stack));
             }
             break;
-         case fluid_ejector:
+         }
+         case fluid_ejector: {
             if (!LiquidUtil.isFluidTile(te, null)) {
                return false;
             }
@@ -461,7 +465,8 @@ public class ItemUpgradeModule extends ItemMulti<ItemUpgradeModule.UpgradeType> 
                LiquidUtil.transfer(te, fh.dir, fh.handler, amount);
             }
             break;
-         case fluid_pulling:
+         }
+         case fluid_pulling: {
             if (!LiquidUtil.isFluidTile(te, null)) {
                return false;
             }
@@ -472,6 +477,7 @@ public class ItemUpgradeModule extends ItemMulti<ItemUpgradeModule.UpgradeType> 
                LiquidUtil.transfer(fh.handler, fh.dir.getOpposite(), te, amount);
             }
             break;
+         }
          default:
             return false;
       }

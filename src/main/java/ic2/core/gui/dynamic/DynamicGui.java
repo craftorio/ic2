@@ -34,12 +34,12 @@ import net.minecraft.inventory.IInventory;
 public class DynamicGui<T extends ContainerBase<? extends IInventory>> extends GuiDefaultBackground<T> {
    public static <T extends IInventory> DynamicGui<ContainerBase<T>> create(T base, EntityPlayer player, GuiParser.GuiNode guiNode) {
       DynamicContainer<T> container = DynamicContainer.create(base, player, guiNode);
-      return new DynamicGui(player, (T)container, guiNode);
+      return new DynamicGui(player, container, guiNode);
    }
 
    public static <T extends HandHeldInventory> DynamicGui<ContainerBase<T>> create(T base, EntityPlayer player, GuiParser.GuiNode guiNode) {
       DynamicHandHeldContainer<T> container = DynamicHandHeldContainer.create(base, player, guiNode);
-      return new DynamicGui(player, (T)container, guiNode);
+      return new DynamicGui(player, container, guiNode);
    }
 
    protected DynamicGui(EntityPlayer player, T container, GuiParser.GuiNode guiNode) {
@@ -175,7 +175,7 @@ public class DynamicGui<T extends ContainerBase<? extends IInventory>> extends G
                }
                break;
             }
-            case text:
+            case text: {
                GuiParser.TextNode nodex = (GuiParser.TextNode)rawNode;
                int x;
                switch (nodex.align) {
@@ -227,7 +227,8 @@ public class DynamicGui<T extends ContainerBase<? extends IInventory>> extends G
 
                parentNode.addElement(this, text);
                break;
-            case fluidtank:
+            }
+            case fluidtank: {
                if (!(this.container.base instanceof TileEntityBlock) || !((TileEntityBlock)this.container.base).hasComponent(Fluids.class)) {
                   throw new RuntimeException("invalid base " + this.container.base + " for tank elements");
                }
@@ -251,6 +252,7 @@ public class DynamicGui<T extends ContainerBase<? extends IInventory>> extends G
 
                parentNode.addElement(this, tankGauge);
                break;
+            }
             case fluidslot: {
                if (!(this.container.base instanceof TileEntityBlock) || !((TileEntityBlock)this.container.base).hasComponent(Fluids.class)) {
                   throw new RuntimeException("invalid base " + this.container.base + " for tank elements");

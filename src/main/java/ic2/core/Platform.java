@@ -74,7 +74,7 @@ public class Platform {
       if (player instanceof EntityPlayerMP) {
          ITextComponent msg;
          if (args.length > 0) {
-            msg = new TextComponentTranslation(message, this.getMessageComponents(args));
+            msg = new TextComponentTranslation(message, (Object[])this.getMessageComponents(args));
          } else {
             msg = new TextComponentTranslation(message, new Object[0]);
          }

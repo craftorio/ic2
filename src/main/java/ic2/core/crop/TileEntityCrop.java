@@ -1010,7 +1010,7 @@ public class TileEntityCrop extends TileEntityBlock implements ICropTile {
       }
 
       assert min == max;
-      if ($assertionsDisabled || min >= 0 && min < ratios.length) {
+      if (min >= 0 && min < ratios.length) {
          assert ratios[min] > search;
          assert min == 0 || ratios[min - 1] <= search;
          this.setCrossingBase(false);

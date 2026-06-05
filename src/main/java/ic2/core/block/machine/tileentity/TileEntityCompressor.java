@@ -80,7 +80,7 @@ public class TileEntityCompressor extends TileEntityStandardMachine<IRecipeInput
 
             if (fluid.amount <= 0) {
                this.usingPumpRecipe = true;
-               output = new MachineRecipe<>(null, Collections.singletonList(new ItemStack(Items.SNOWBALL))).getResult(null);
+               output = (MachineRecipeResult)new MachineRecipe<>(null, Collections.singletonList(new ItemStack(Items.SNOWBALL))).getResult(null);
                break;
             }
          }

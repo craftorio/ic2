@@ -213,7 +213,7 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
                IC2.achievements.issueAchievement(player, "starveWithQHelmet");
             }
 
-            for (PotionEffect effect : new LinkedList(player.getActivePotionEffects())) {
+            for (PotionEffect effect : new LinkedList<PotionEffect>(player.getActivePotionEffects())) {
                Potion potion = effect.getPotion();
                Integer cost = potionRemovalCost.get(potion);
                if (cost != null) {

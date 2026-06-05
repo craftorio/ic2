@@ -509,7 +509,7 @@ public class LiquidUtil {
                   world.destroyBlock(pos, true);
                }
 
-               Object var9;
+               Block var9;
                if (fluid == FluidRegistry.WATER) {
                   var9 = Blocks.FLOWING_WATER;
                } else if (fluid == FluidRegistry.LAVA) {

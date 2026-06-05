@@ -41,7 +41,7 @@ public class FillFluidContainerRecipeManager implements IFillFluidContainerRecip
          FluidStack changedFluid = result.fluidChange.amount >= input.fluid.amount
             ? null
             : new FluidStack(input.fluid, input.fluid.amount - result.fluidChange.amount);
-         return new MachineRecipe<>(null, output).getResult(new IFillFluidContainerRecipeManager.Input(result.inPlaceOutput, changedFluid));
+         return (MachineRecipeResult)new MachineRecipe<>(null, output).getResult(new IFillFluidContainerRecipeManager.Input(result.inPlaceOutput, changedFluid));
       } else if (!acceptTest) {
          return null;
       } else if (StackUtil.isEmpty(input.container) && input.fluid == null) {
@@ -49,7 +49,7 @@ public class FillFluidContainerRecipeManager implements IFillFluidContainerRecip
       } else {
          return !StackUtil.isEmpty(input.container) && !LiquidUtil.isFillableFluidContainer(input.container)
             ? null
-            : new MachineRecipe<>(null, Collections.emptyList()).getResult(input);
+            : (MachineRecipeResult)new MachineRecipe<>(null, Collections.emptyList()).getResult(input);
       }
    }
 

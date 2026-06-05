@@ -586,18 +586,18 @@ class Grid {
                }
                break;
             case Sink:
-               double current;
+               double sinkCurrent;
                if (EnergyNetLocal.useLinearTransferModel) {
-                  current = node.getVoltage() / node.getResistance();
-                  node.setAmount(node.getVoltage() * current);
+                  sinkCurrent = node.getVoltage() / node.getResistance();
+                  node.setAmount(node.getVoltage() * sinkCurrent);
                } else {
-                  current = node.getVoltage();
-                  node.setAmount(current);
+                  sinkCurrent = node.getVoltage();
+                  node.setAmount(sinkCurrent);
                }
 
                assert node.getAmount() >= 0.0;
                if (EnergyNetGlobal.debugGrid) {
-                  IC2.log.debug(LogCategory.EnergyNet, "%d %s %f EU, %f V, %f A.", this.uid, node, node.getAmount(), node.getVoltage(), current);
+                  IC2.log.debug(LogCategory.EnergyNet, "%d %s %f EU, %f V, %f A.", this.uid, node, node.getAmount(), node.getVoltage(), sinkCurrent);
                }
             case Conductor:
          }
@@ -728,9 +728,6 @@ class Grid {
          }
       }
 
-      return;
-
-      throw new AssertionError();
    }
 
    private void optimize(StructureCache.Data data) {

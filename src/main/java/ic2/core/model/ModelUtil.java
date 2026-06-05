@@ -35,7 +35,7 @@ public class ModelUtil {
       }
 
       private <T extends Comparable<T>> String getPropertyName(IProperty<T> property, Comparable<?> value) {
-         return property.getName(value);
+         return property.getName((T)value);
       }
    };
 

@@ -466,7 +466,7 @@ public class CommandIc2 extends CommandBase {
             if (this.pattern.matcher(regName).matches()) {
                if (this.meta == null) {
                   if (item instanceof IMultiItem) {
-                     for (ItemStack stack : ((IMultiItem)item).getAllStacks()) {
+                     for (ItemStack stack : (Iterable<ItemStack>)((IMultiItem)item).getAllStacks()) {
                         assert stack != null : item + " produced a null stack in getAllStacks()";
                         this.dump(stack, regName);
                         count++;

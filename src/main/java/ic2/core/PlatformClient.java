@@ -228,7 +228,7 @@ public class PlatformClient extends Platform {
    @Override
    public void messagePlayer(EntityPlayer player, String message, Object... args) {
       if (args.length > 0) {
-         this.mc.ingameGUI.getChatGUI().printChatMessage(new TextComponentTranslation(message, this.getMessageComponents(args)));
+         this.mc.ingameGUI.getChatGUI().printChatMessage(new TextComponentTranslation(message, (Object[])this.getMessageComponents(args)));
       } else {
          this.mc.ingameGUI.getChatGUI().printChatMessage(new TextComponentString(message));
       }

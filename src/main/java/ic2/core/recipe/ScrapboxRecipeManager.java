@@ -92,7 +92,7 @@ public final class ScrapboxRecipeManager implements IScrapboxManager {
          }
 
          ItemStack drop = this.drops.get(low).item.copy();
-         return new MachineRecipe<>(Recipes.inputFactory.forStack(ItemName.crafting.getItemStack(CraftingItemType.scrap_box)), Collections.singletonList(drop))
+         return (MachineRecipeResult)new MachineRecipe<>(Recipes.inputFactory.forStack(ItemName.crafting.getItemStack(CraftingItemType.scrap_box)), Collections.singletonList(drop))
             .getResult(StackUtil.copyShrunk(input, 1));
       } else {
          return null;

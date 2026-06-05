@@ -62,7 +62,7 @@ public class RecipeInputFactory implements IRecipeInputFactory {
    @Override
    public IRecipeInput forAny(Iterable<IRecipeInput> options) {
       return options instanceof Collection
-         ? new RecipeInputMultiple(((Collection)options).toArray(new IRecipeInput[0]))
+         ? new RecipeInputMultiple((IRecipeInput[])((Collection)options).toArray(new IRecipeInput[0]))
          : new RecipeInputMultiple((IRecipeInput[])Iterables.toArray(options, IRecipeInput.class));
    }
 

@@ -79,14 +79,14 @@ public class TileEntityFluidBottler extends TileEntityStandardMachine<Void, Obje
       if (emptyRes != null
          && emptyRes.getOutput().fluid.amount <= this.fluidTank.getCapacity() - this.fluidTank.getFluidAmount()
          && this.outputSlot.canAdd(emptyRes.getOutput().container)) {
-         return emptyRes;
+         return (MachineRecipeResult)emptyRes;
       }
 
       MachineRecipeResult<Void, Collection<ItemStack>, IFillFluidContainerRecipeManager.Input> fillRes = Recipes.fillFluidContainer
          .apply(
             new IFillFluidContainerRecipeManager.Input(this.fillInputSlot.get(), this.fluidTank.getFluid()), FluidContainerOutputMode.EmptyFullToOutput, false
          );
-      return fillRes != null && this.outputSlot.canAdd(fillRes.getOutput()) ? fillRes : null;
+      return fillRes != null && this.outputSlot.canAdd(fillRes.getOutput()) ? (MachineRecipeResult)fillRes : null;
    }
 
    @Override

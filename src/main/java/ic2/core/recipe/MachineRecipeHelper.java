@@ -94,7 +94,7 @@ public abstract class MachineRecipeHelper<RI, RO> implements IMachineRecipeManag
                @Override
                public void remove() {
                   this.recipeIt.remove();
-                  MachineRecipeHelper.this.removeCachedRecipes(this.lastInput);
+                  MachineRecipeHelper.this.removeCachedRecipes((RI)this.lastInput);
                }
             };
          }

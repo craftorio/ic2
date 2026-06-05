@@ -176,18 +176,18 @@ class ChangeHandler {
                         IEnergyTile neighborIoTile = neighbor.tile.getMainTile();
                         boolean canEmit = false;
                         if ((node.nodeType == NodeType.Source || node.nodeType == NodeType.Conductor) && neighbor.nodeType != NodeType.Source) {
-                           var emitter = (IEnergyEmitter & IEnergyEmitter)(subTile instanceof IEnergyEmitter ? subTile : ioTile);
+                           IEnergyEmitter emitter = (IEnergyEmitter)(subTile instanceof IEnergyEmitter ? subTile : ioTile);
                            IEnergyTile neighborSubTe = neighborTile.getSubTileAt(coords);
-                           var acceptor = (IEnergyAcceptor & IEnergyAcceptor)(neighborSubTe instanceof IEnergyAcceptor ? neighborSubTe : neighborIoTile);
+                           IEnergyAcceptor acceptor = (IEnergyAcceptor)(neighborSubTe instanceof IEnergyAcceptor ? neighborSubTe : neighborIoTile);
                            canEmit = emitter.emitsEnergyTo((IEnergyAcceptor)neighborIoTile, dir)
                               && acceptor.acceptsEnergyFrom((IEnergyEmitter)ioTile, dir.getOpposite());
                         }
 
                         boolean canAccept = false;
                         if (!canEmit && (node.nodeType == NodeType.Sink || node.nodeType == NodeType.Conductor) && neighbor.nodeType != NodeType.Sink) {
-                           var acceptor = (IEnergyAcceptor & IEnergyAcceptor)(subTile instanceof IEnergyAcceptor ? subTile : ioTile);
+                           IEnergyAcceptor acceptor = (IEnergyAcceptor)(subTile instanceof IEnergyAcceptor ? subTile : ioTile);
                            IEnergyTile neighborSubTe = neighborTile.getSubTileAt(coords);
-                           var emitter = (IEnergyEmitter & IEnergyEmitter)(neighborSubTe instanceof IEnergyEmitter ? neighborSubTe : neighborIoTile);
+                           IEnergyEmitter emitter = (IEnergyEmitter)(neighborSubTe instanceof IEnergyEmitter ? neighborSubTe : neighborIoTile);
                            canAccept = acceptor.acceptsEnergyFrom((IEnergyEmitter)neighborIoTile, dir)
                               && emitter.emitsEnergyTo((IEnergyAcceptor)ioTile, dir.getOpposite());
                         }

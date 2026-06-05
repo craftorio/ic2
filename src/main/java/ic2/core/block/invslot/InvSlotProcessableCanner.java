@@ -108,13 +108,13 @@ public class InvSlotProcessableCanner extends InvSlotProcessable<Object, Object,
    protected MachineRecipeResult<Object, Object, Object> getOutput(Object input, boolean forAccept) {
       switch (((TileEntityCanner)this.base).getMode()) {
          case BottleSolid:
-            return Recipes.cannerBottle.apply((ICannerBottleRecipeManager.RawInput)input, forAccept);
+            return (MachineRecipeResult)Recipes.cannerBottle.apply((ICannerBottleRecipeManager.RawInput)input, forAccept);
          case EnrichLiquid:
-            return Recipes.cannerEnrich.apply((ICannerEnrichRecipeManager.RawInput)input, forAccept);
+            return (MachineRecipeResult)Recipes.cannerEnrich.apply((ICannerEnrichRecipeManager.RawInput)input, forAccept);
          case BottleLiquid:
-            return Recipes.fillFluidContainer.apply((IFillFluidContainerRecipeManager.Input)input, FluidContainerOutputMode.EmptyFullToOutput, forAccept);
+            return (MachineRecipeResult)Recipes.fillFluidContainer.apply((IFillFluidContainerRecipeManager.Input)input, FluidContainerOutputMode.EmptyFullToOutput, forAccept);
          case EmptyLiquid:
-            return Recipes.emptyFluidContainer
+            return (MachineRecipeResult)Recipes.emptyFluidContainer
                .apply(
                   (ItemStack)input, this.getTankFluid() == null ? null : this.getTankFluid().getFluid(), FluidContainerOutputMode.EmptyFullToOutput, forAccept
                );

@@ -401,7 +401,7 @@ public class ItemDebug extends ItemIC2 implements ISpecialElectricItem, IBoxable
                } else if (value instanceof Map) {
                   ps.println("  values (" + ((Map)value).size() + "):");
 
-                  for (Entry<?, ?> entry : ((Map)value).entrySet()) {
+                  for (Entry<?, ?> entry : ((Map<?, ?>)value).entrySet()) {
                      ps.print("    " + entry.getKey() + ": ");
                      dumpValueString(entry.getValue(), field, "      ", ps);
                   }

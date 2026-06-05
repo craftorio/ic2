@@ -405,7 +405,7 @@ public final class DataEncoder {
                   assert constants != null;
 
                   for (int i = 0; i < len; i++) {
-                     Array.set(array, i, constants[decode(is, componentType)]);
+                     Array.set(array, i, constants[(Integer)decode(is, componentType)]);
                   }
                } else {
                   for (int i = 0; i < len; i++) {

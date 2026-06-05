@@ -1,7 +1,2 @@
-.claude/
-.idea/
 .vscode/
-
-.gradle/
-build/
-run/
+.idea/

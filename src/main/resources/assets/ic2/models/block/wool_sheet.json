@@ -1,6 +1,0 @@
-{
-	"parent": "ic2:block/sheet_base",
-	"textures": {
-		"texture": "blocks/wool_colored_white"
-	}
-}

@@ -19,7 +19,7 @@ archivesBaseName = 'ic2'
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
 
@@ -58,7 +58,7 @@ jar {
             "Specification-Vendor": "IndustrialCraft 2",
             "Specification-Version": "1",
             "Implementation-Title": project.name,
-            "Implementation-Version": "${version}",
+            "Implementation-Version": "${archiveVersion}",
             "Implementation-Vendor" :"IndustrialCraft 2",
             "Implementation-Timestamp": new Date().format("yyyy-MM-dd-HH:mm:ssZ")
         ])

@@ -73,6 +73,16 @@ public class EnergyNetGlobal implements IEnergyNet {
       addTile(tile, tile.getWorldObj(), tile.getPosition());
    }
 
+   public void addTile(IEnergyTile tile) {
+      if (tile == null) {
+         throw new NullPointerException("null tile");
+      }
+
+      World world = this.getWorld(tile);
+      BlockPos pos = this.getPos(tile);
+      addTile(tile, world, pos);
+   }
+
    private static void addTile(IEnergyTile tile, World world, BlockPos pos) {
       if (EnergyNetSettings.logEnetApiAccessTraces) {
          IC2.log.debug(LogCategory.EnergyNet, new Throwable("Called from:"), "API addTile %s.", Util.toString(tile, world, pos));

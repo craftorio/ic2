@@ -1,29 +1,24 @@
-// 
-// Decompiled by Procyon v0.6.0
-// 
-
 package ic2.api.item;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 
-public interface IElectricItemManager
-{
-    double charge(final ItemStack p0, final double p1, final int p2, final boolean p3, final boolean p4);
-    
-    double discharge(final ItemStack p0, final double p1, final int p2, final boolean p3, final boolean p4, final boolean p5);
-    
-    double getCharge(final ItemStack p0);
-    
-    double getMaxCharge(final ItemStack p0);
-    
-    boolean canUse(final ItemStack p0, final double p1);
-    
-    boolean use(final ItemStack p0, final double p1, final EntityLivingBase p2);
-    
-    void chargeFromArmor(final ItemStack p0, final EntityLivingBase p1);
-    
-    String getToolTip(final ItemStack p0);
-    
-    int getTier(final ItemStack p0);
+public interface IElectricItemManager {
+   double charge(ItemStack var1, double var2, int var4, boolean var5, boolean var6);
+
+   double discharge(ItemStack var1, double var2, int var4, boolean var5, boolean var6, boolean var7);
+
+   double getCharge(ItemStack var1);
+
+   double getMaxCharge(ItemStack var1);
+
+   boolean canUse(ItemStack var1, double var2);
+
+   boolean use(ItemStack var1, double var2, EntityLivingBase var4);
+
+   void chargeFromArmor(ItemStack var1, EntityLivingBase var2);
+
+   String getToolTip(ItemStack var1);
+
+   int getTier(ItemStack var1);
 }

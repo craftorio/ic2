@@ -1,208 +1,217 @@
-// 
-// Decompiled by Procyon v0.6.0
-// 
-
 package ic2.core.util;
 
 import ic2.core.IC2;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.RayTraceResult.Type;
 
-public class RotationUtil
-{
-    public static EnumFacing rotateByRay(final RayTraceResult ray) {
-        assert ray.typeOfHit == RayTraceResult.Type.BLOCK;
-        final Vec3d hit = ray.hitVec;
-        final BlockPos pos = ray.getBlockPos();
-        return rotateByHit(ray.sideHit, (float)hit.x - pos.getX(), (float)hit.y - pos.getY(), (float)hit.z - pos.getZ());
-    }
-    
-    public static EnumFacing rotateByHit(final EnumFacing facingHit, final float hitX, final float hitY, final float hitZ) {
-        switch (facingHit) {
-            case DOWN: {
-                if (hitX <= 0.25f) {
-                    if (hitZ > 0.25f && hitZ < 0.75f) {
-                        return EnumFacing.WEST;
-                    }
-                    return EnumFacing.UP;
-                }
-                else if (hitX > 0.25f && hitX < 0.75f) {
-                    if (hitZ <= 0.25f) {
-                        return EnumFacing.NORTH;
-                    }
-                    if (hitZ >= 0.75f) {
-                        return EnumFacing.SOUTH;
-                    }
-                    return EnumFacing.DOWN;
-                }
-                else {
-                    if (hitX < 0.75f) {
-                        break;
-                    }
-                    if (hitZ > 0.25f && hitZ < 0.75f) {
-                        return EnumFacing.EAST;
-                    }
-                    return EnumFacing.UP;
-                }
-                break;
+public class RotationUtil {
+   public static EnumFacing rotateByRay(RayTraceResult ray) {
+      assert ray.typeOfHit == Type.BLOCK;
+      Vec3d hit = ray.hitVec;
+      BlockPos pos = ray.getBlockPos();
+      return rotateByHit(
+         ray.sideHit,
+         (float)hit.x - pos.getX(),
+         (float)hit.y - pos.getY(),
+         (float)hit.z - pos.getZ()
+      );
+   }
+
+   public static EnumFacing rotateByHit(EnumFacing facingHit, float hitX, float hitY, float hitZ) {
+      switch (facingHit) {
+         case DOWN:
+            if (hitX <= 0.25F) {
+               if (hitZ > 0.25F && hitZ < 0.75F) {
+                  return EnumFacing.WEST;
+               }
+
+               return EnumFacing.UP;
             }
-            case UP: {
-                if (hitX <= 0.25f) {
-                    if (hitZ > 0.25f && hitZ < 0.75f) {
-                        return EnumFacing.WEST;
-                    }
-                    return EnumFacing.DOWN;
-                }
-                else if (hitX > 0.25f && hitX < 0.75f) {
-                    if (hitZ <= 0.25f) {
-                        return EnumFacing.NORTH;
-                    }
-                    if (hitZ >= 0.75f) {
-                        return EnumFacing.SOUTH;
-                    }
-                    return EnumFacing.UP;
-                }
-                else {
-                    if (hitX < 0.75f) {
-                        break;
-                    }
-                    if (hitZ > 0.25f && hitZ < 0.75f) {
-                        return EnumFacing.EAST;
-                    }
-                    return EnumFacing.DOWN;
-                }
-                break;
+
+            if (hitX > 0.25F && hitX < 0.75F) {
+               if (hitZ <= 0.25F) {
+                  return EnumFacing.NORTH;
+               }
+
+               if (hitZ >= 0.75F) {
+                  return EnumFacing.SOUTH;
+               }
+
+               return EnumFacing.DOWN;
             }
-            case NORTH: {
-                if (hitX <= 0.25f) {
-                    if (hitY > 0.25f && hitY < 0.75f) {
-                        return EnumFacing.WEST;
-                    }
-                    return EnumFacing.SOUTH;
-                }
-                else if (hitX > 0.25f && hitX < 0.75f) {
-                    if (hitY <= 0.25f) {
-                        return EnumFacing.DOWN;
-                    }
-                    if (hitY >= 0.75f) {
-                        return EnumFacing.UP;
-                    }
-                    return EnumFacing.NORTH;
-                }
-                else {
-                    if (hitX < 0.75f) {
-                        break;
-                    }
-                    if (hitY > 0.25f && hitY < 0.75f) {
-                        return EnumFacing.EAST;
-                    }
-                    return EnumFacing.SOUTH;
-                }
-                break;
+
+            if (hitX >= 0.75F) {
+               if (hitZ > 0.25F && hitZ < 0.75F) {
+                  return EnumFacing.EAST;
+               }
+
+               return EnumFacing.UP;
             }
-            case SOUTH: {
-                if (hitX <= 0.25f) {
-                    if (hitY > 0.25f && hitY < 0.75f) {
-                        return EnumFacing.WEST;
-                    }
-                    return EnumFacing.NORTH;
-                }
-                else if (hitX > 0.25f && hitX < 0.75f) {
-                    if (hitY <= 0.25f) {
-                        return EnumFacing.DOWN;
-                    }
-                    if (hitY >= 0.75f) {
-                        return EnumFacing.UP;
-                    }
-                    return EnumFacing.SOUTH;
-                }
-                else {
-                    if (hitX < 0.75f) {
-                        break;
-                    }
-                    if (hitY > 0.25f && hitY < 0.75f) {
-                        return EnumFacing.EAST;
-                    }
-                    return EnumFacing.NORTH;
-                }
-                break;
+            break;
+         case UP:
+            if (hitX <= 0.25F) {
+               if (hitZ > 0.25F && hitZ < 0.75F) {
+                  return EnumFacing.WEST;
+               }
+
+               return EnumFacing.DOWN;
             }
-            case WEST: {
-                if (hitZ <= 0.25f) {
-                    if (hitY > 0.25f && hitY < 0.75f) {
-                        return EnumFacing.NORTH;
-                    }
-                    return EnumFacing.EAST;
-                }
-                else if (hitZ > 0.25f && hitZ < 0.75f) {
-                    if (hitY <= 0.25f) {
-                        return EnumFacing.DOWN;
-                    }
-                    if (hitY >= 0.75f) {
-                        return EnumFacing.UP;
-                    }
-                    return EnumFacing.WEST;
-                }
-                else {
-                    if (hitZ < 0.75f) {
-                        break;
-                    }
-                    if (hitY > 0.25f && hitY < 0.75f) {
-                        return EnumFacing.SOUTH;
-                    }
-                    return EnumFacing.EAST;
-                }
-                break;
+
+            if (hitX > 0.25F && hitX < 0.75F) {
+               if (hitZ <= 0.25F) {
+                  return EnumFacing.NORTH;
+               }
+
+               if (hitZ >= 0.75F) {
+                  return EnumFacing.SOUTH;
+               }
+
+               return EnumFacing.UP;
             }
-            case EAST: {
-                if (hitZ <= 0.25f) {
-                    if (hitY > 0.25f && hitY < 0.75f) {
-                        return EnumFacing.NORTH;
-                    }
-                    return EnumFacing.WEST;
-                }
-                else if (hitZ > 0.25f && hitZ < 0.75f) {
-                    if (hitY <= 0.25f) {
-                        return EnumFacing.DOWN;
-                    }
-                    if (hitY >= 0.75f) {
-                        return EnumFacing.UP;
-                    }
-                    return EnumFacing.EAST;
-                }
-                else {
-                    if (hitZ < 0.75f) {
-                        break;
-                    }
-                    if (hitY > 0.25f && hitY < 0.75f) {
-                        return EnumFacing.SOUTH;
-                    }
-                    return EnumFacing.WEST;
-                }
-                break;
+
+            if (hitX >= 0.75F) {
+               if (hitZ > 0.25F && hitZ < 0.75F) {
+                  return EnumFacing.EAST;
+               }
+
+               return EnumFacing.DOWN;
             }
-        }
-        return facingHit;
-    }
-    
-    public static int[] shuffledFacings() {
-        final int[] ordinals = { 0, 1, 2, 3, 4, 5 };
-        for (int i = ordinals.length - 1; i > 0; --i) {
-            final int index = IC2.random.nextInt(i + 1);
-            if (index != i) {
-                final int[] array = ordinals;
-                final int n = index;
-                array[n] ^= ordinals[i];
-                final int[] array2 = ordinals;
-                final int n2 = i;
-                array2[n2] ^= ordinals[index];
-                final int[] array3 = ordinals;
-                final int n3 = index;
-                array3[n3] ^= ordinals[i];
+            break;
+         case NORTH:
+            if (hitX <= 0.25F) {
+               if (hitY > 0.25F && hitY < 0.75F) {
+                  return EnumFacing.WEST;
+               }
+
+               return EnumFacing.SOUTH;
             }
-        }
-        return ordinals;
-    }
+
+            if (hitX > 0.25F && hitX < 0.75F) {
+               if (hitY <= 0.25F) {
+                  return EnumFacing.DOWN;
+               }
+
+               if (hitY >= 0.75F) {
+                  return EnumFacing.UP;
+               }
+
+               return EnumFacing.NORTH;
+            }
+
+            if (hitX >= 0.75F) {
+               if (hitY > 0.25F && hitY < 0.75F) {
+                  return EnumFacing.EAST;
+               }
+
+               return EnumFacing.SOUTH;
+            }
+            break;
+         case SOUTH:
+            if (hitX <= 0.25F) {
+               if (hitY > 0.25F && hitY < 0.75F) {
+                  return EnumFacing.WEST;
+               }
+
+               return EnumFacing.NORTH;
+            }
+
+            if (hitX > 0.25F && hitX < 0.75F) {
+               if (hitY <= 0.25F) {
+                  return EnumFacing.DOWN;
+               }
+
+               if (hitY >= 0.75F) {
+                  return EnumFacing.UP;
+               }
+
+               return EnumFacing.SOUTH;
+            }
+
+            if (hitX >= 0.75F) {
+               if (hitY > 0.25F && hitY < 0.75F) {
+                  return EnumFacing.EAST;
+               }
+
+               return EnumFacing.NORTH;
+            }
+            break;
+         case WEST:
+            if (hitZ <= 0.25F) {
+               if (hitY > 0.25F && hitY < 0.75F) {
+                  return EnumFacing.NORTH;
+               }
+
+               return EnumFacing.EAST;
+            }
+
+            if (hitZ > 0.25F && hitZ < 0.75F) {
+               if (hitY <= 0.25F) {
+                  return EnumFacing.DOWN;
+               }
+
+               if (hitY >= 0.75F) {
+                  return EnumFacing.UP;
+               }
+
+               return EnumFacing.WEST;
+            }
+
+            if (hitZ >= 0.75F) {
+               if (hitY > 0.25F && hitY < 0.75F) {
+                  return EnumFacing.SOUTH;
+               }
+
+               return EnumFacing.EAST;
+            }
+            break;
+         case EAST:
+            if (hitZ <= 0.25F) {
+               if (hitY > 0.25F && hitY < 0.75F) {
+                  return EnumFacing.NORTH;
+               }
+
+               return EnumFacing.WEST;
+            }
+
+            if (hitZ > 0.25F && hitZ < 0.75F) {
+               if (hitY <= 0.25F) {
+                  return EnumFacing.DOWN;
+               }
+
+               if (hitY >= 0.75F) {
+                  return EnumFacing.UP;
+               }
+
+               return EnumFacing.EAST;
+            }
+
+            if (hitZ >= 0.75F) {
+               if (hitY > 0.25F && hitY < 0.75F) {
+                  return EnumFacing.SOUTH;
+               }
+
+               return EnumFacing.WEST;
+            }
+      }
+
+      return facingHit;
+   }
+
+   public static int[] shuffledFacings() {
+      int[] ordinals = new int[]{0, 1, 2, 3, 4, 5};
+
+      for (int i = ordinals.length - 1; i > 0; i--) {
+         int index = IC2.random.nextInt(i + 1);
+         if (index != i) {
+            ordinals[index] ^= ordinals[i];
+            ordinals[i] ^= ordinals[index];
+            ordinals[index] ^= ordinals[i];
+         }
+      }
+
+      return ordinals;
+   }
 }

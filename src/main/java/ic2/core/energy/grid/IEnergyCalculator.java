@@ -1,23 +1,18 @@
-// 
-// Decompiled by Procyon v0.6.0
-// 
-
 package ic2.core.energy.grid;
 
-import java.io.PrintStream;
 import ic2.api.energy.NodeStats;
+import java.io.PrintStream;
 
-public interface IEnergyCalculator
-{
-    void handleGridChange(final Grid p0);
-    
-    boolean runSyncStep(final EnergyNetLocal p0);
-    
-    boolean runSyncStep(final Grid p0);
-    
-    void runAsyncStep(final Grid p0);
-    
-    NodeStats getNodeStats(final Tile p0);
-    
-    void dumpNodeInfo(final Node p0, final String p1, final PrintStream p2, final PrintStream p3);
+public interface IEnergyCalculator {
+   void handleGridChange(Grid var1);
+
+   boolean runSyncStep(EnergyNetLocal var1);
+
+   boolean runSyncStep(Grid var1);
+
+   void runAsyncStep(Grid var1);
+
+   NodeStats getNodeStats(Tile var1);
+
+   void dumpNodeInfo(Node var1, String var2, PrintStream var3, PrintStream var4);
 }

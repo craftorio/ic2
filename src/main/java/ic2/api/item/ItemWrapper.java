@@ -1,51 +1,44 @@
-// 
-// Decompiled by Procyon v0.6.0
-// 
-
 package ic2.api.item;
 
 import com.google.common.collect.ArrayListMultimap;
-import net.minecraft.entity.player.EntityPlayer;
-import java.util.Iterator;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Item;
 import com.google.common.collect.Multimap;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 
-public class ItemWrapper
-{
-    private static final Multimap<Item, IBoxable> boxableItems;
-    private static final Multimap<Item, IMetalArmor> metalArmorItems;
-    
-    public static void registerBoxable(final Item item, final IBoxable boxable) {
-        ItemWrapper.boxableItems.put((Object)item, (Object)boxable);
-    }
-    
-    public static boolean canBeStoredInToolbox(final ItemStack stack) {
-        final Item item = stack.getItem();
-        for (final IBoxable boxable : ItemWrapper.boxableItems.get((Object)item)) {
-            if (boxable.canBeStoredInToolbox(stack)) {
-                return true;
-            }
-        }
-        return item instanceof IBoxable && ((IBoxable)item).canBeStoredInToolbox(stack);
-    }
-    
-    public static void registerMetalArmor(final Item item, final IMetalArmor armor) {
-        ItemWrapper.metalArmorItems.put((Object)item, (Object)armor);
-    }
-    
-    public static boolean isMetalArmor(final ItemStack stack, final EntityPlayer player) {
-        final Item item = stack.getItem();
-        for (final IMetalArmor metalArmor : ItemWrapper.metalArmorItems.get((Object)item)) {
-            if (metalArmor.isMetalArmor(stack, player)) {
-                return true;
-            }
-        }
-        return item instanceof IMetalArmor && ((IMetalArmor)item).isMetalArmor(stack, player);
-    }
-    
-    static {
-        boxableItems = (Multimap)ArrayListMultimap.create();
-        metalArmorItems = (Multimap)ArrayListMultimap.create();
-    }
+public class ItemWrapper {
+   private static final Multimap<Item, IBoxable> boxableItems = ArrayListMultimap.create();
+   private static final Multimap<Item, IMetalArmor> metalArmorItems = ArrayListMultimap.create();
+
+   public static void registerBoxable(Item item, IBoxable boxable) {
+      boxableItems.put(item, boxable);
+   }
+
+   public static boolean canBeStoredInToolbox(ItemStack stack) {
+      Item item = stack.getItem();
+
+      for (IBoxable boxable : boxableItems.get(item)) {
+         if (boxable.canBeStoredInToolbox(stack)) {
+            return true;
+         }
+      }
+
+      return item instanceof IBoxable && ((IBoxable)item).canBeStoredInToolbox(stack);
+   }
+
+   public static void registerMetalArmor(Item item, IMetalArmor armor) {
+      metalArmorItems.put(item, armor);
+   }
+
+   public static boolean isMetalArmor(ItemStack stack, EntityPlayer player) {
+      Item item = stack.getItem();
+
+      for (IMetalArmor metalArmor : metalArmorItems.get(item)) {
+         if (metalArmor.isMetalArmor(stack, player)) {
+            return true;
+         }
+      }
+
+      return item instanceof IMetalArmor && ((IMetalArmor)item).isMetalArmor(stack, player);
+   }
 }

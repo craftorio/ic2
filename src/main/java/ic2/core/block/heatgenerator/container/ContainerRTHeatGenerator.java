@@ -1,35 +1,29 @@
-// 
-// Decompiled by Procyon v0.6.0
-// 
-
 package ic2.core.block.heatgenerator.container;
 
-import java.util.List;
-import net.minecraft.inventory.Slot;
-import ic2.core.block.invslot.InvSlot;
-import ic2.core.slot.SlotInvSlot;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.entity.player.EntityPlayer;
-import ic2.core.block.heatgenerator.tileentity.TileEntityRTHeatGenerator;
 import ic2.core.ContainerFullInv;
+import ic2.core.block.heatgenerator.tileentity.TileEntityRTHeatGenerator;
+import ic2.core.slot.SlotInvSlot;
+import java.util.List;
+import net.minecraft.entity.player.EntityPlayer;
 
-public class ContainerRTHeatGenerator extends ContainerFullInv<TileEntityRTHeatGenerator>
-{
-    public ContainerRTHeatGenerator(final EntityPlayer player, final TileEntityRTHeatGenerator tileEntity1) {
-        super(player, (IInventory)tileEntity1, 166);
-        for (int i = 0; i < 3; ++i) {
-            this.addSlotToContainer((Slot)new SlotInvSlot(tileEntity1.fuelSlot, i, 62 + i * 18, 27));
-        }
-        for (int i = 3; i < 6; ++i) {
-            this.addSlotToContainer((Slot)new SlotInvSlot(tileEntity1.fuelSlot, i, 62 + (i - 3) * 18, 45));
-        }
-    }
-    
-    @Override
-    public List<String> getNetworkedFields() {
-        final List<String> ret = super.getNetworkedFields();
-        ret.add("transmitHeat");
-        ret.add("maxHeatEmitpeerTick");
-        return ret;
-    }
+public class ContainerRTHeatGenerator extends ContainerFullInv<TileEntityRTHeatGenerator> {
+   public ContainerRTHeatGenerator(EntityPlayer player, TileEntityRTHeatGenerator tileEntity1) {
+      super(player, tileEntity1, 166);
+
+      for (int i = 0; i < 3; i++) {
+         this.addSlotToContainer(new SlotInvSlot(tileEntity1.fuelSlot, i, 62 + i * 18, 27));
+      }
+
+      for (int i = 3; i < 6; i++) {
+         this.addSlotToContainer(new SlotInvSlot(tileEntity1.fuelSlot, i, 62 + (i - 3) * 18, 45));
+      }
+   }
+
+   @Override
+   public List<String> getNetworkedFields() {
+      List<String> ret = super.getNetworkedFields();
+      ret.add("transmitHeat");
+      ret.add("maxHeatEmitpeerTick");
+      return ret;
+   }
 }

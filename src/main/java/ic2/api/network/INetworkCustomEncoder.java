@@ -1,16 +1,11 @@
-// 
-// Decompiled by Procyon v0.6.0
-// 
-
 package ic2.api.network;
 
 import java.io.IOException;
 
-public interface INetworkCustomEncoder
-{
-    void encode(final IGrowingBuffer p0, final Object p1) throws IOException;
-    
-    Object decode(final IGrowingBuffer p0) throws IOException;
-    
-    boolean isThreadSafe();
+public interface INetworkCustomEncoder {
+   void encode(IGrowingBuffer var1, Object var2) throws IOException;
+
+   Object decode(IGrowingBuffer var1) throws IOException;
+
+   boolean isThreadSafe();
 }

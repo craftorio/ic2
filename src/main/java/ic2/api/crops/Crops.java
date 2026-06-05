@@ -1,58 +1,52 @@
-// 
-// Decompiled by Procyon v0.6.0
-// 
-
 package ic2.api.crops;
 
+import java.util.Collection;
+import java.util.Map;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.biome.Biome;
+import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.util.ResourceLocation;
-import java.util.Map;
-import java.util.Collection;
-import net.minecraft.item.ItemStack;
-import net.minecraft.world.biome.Biome;
-import net.minecraftforge.common.BiomeDictionary;
 
-public abstract class Crops
-{
-    public static Crops instance;
-    public static CropCard weed;
-    
-    public abstract void addBiomenutrientsBonus(final BiomeDictionary.Type p0, final int p1);
-    
-    public abstract void addBiomehumidityBonus(final BiomeDictionary.Type p0, final int p1);
-    
-    public abstract int getHumidityBiomeBonus(final Biome p0);
-    
-    public abstract int getNutrientBiomeBonus(final Biome p0);
-    
-    public abstract CropCard getCropCard(final String p0, final String p1);
-    
-    public abstract CropCard getCropCard(final ItemStack p0);
-    
-    public abstract Collection<CropCard> getCrops();
-    
-    public abstract void registerCrop(final CropCard p0);
-    
-    @SideOnly(Side.CLIENT)
-    public abstract void registerCropTextures(final Map<ResourceLocation, TextureAtlasSprite> p0);
-    
-    public abstract boolean registerBaseSeed(final ItemStack p0, final CropCard p1, final int p2, final int p3, final int p4, final int p5);
-    
-    public abstract BaseSeed getBaseSeed(final ItemStack p0);
-    
-    public static class CropRegisterEvent extends Event
-    {
-        public void register(final CropCard crop) {
-            Crops.instance.registerCrop(crop);
-        }
-        
-        public void register(final CropCard... crops) {
-            for (final CropCard crop : crops) {
-                this.register(crop);
-            }
-        }
-    }
+public abstract class Crops {
+   public static Crops instance;
+   public static CropCard weed;
+
+   public abstract void addBiomenutrientsBonus(BiomeDictionary.Type var1, int var2);
+
+   public abstract void addBiomehumidityBonus(BiomeDictionary.Type var1, int var2);
+
+   public abstract int getHumidityBiomeBonus(Biome var1);
+
+   public abstract int getNutrientBiomeBonus(Biome var1);
+
+   public abstract CropCard getCropCard(String var1, String var2);
+
+   public abstract CropCard getCropCard(ItemStack var1);
+
+   public abstract Collection<CropCard> getCrops();
+
+   public abstract void registerCrop(CropCard var1);
+
+   @SideOnly(Side.CLIENT)
+   public abstract void registerCropTextures(Map<ResourceLocation, TextureAtlasSprite> var1);
+
+   public abstract boolean registerBaseSeed(ItemStack var1, CropCard var2, int var3, int var4, int var5, int var6);
+
+   public abstract BaseSeed getBaseSeed(ItemStack var1);
+
+   public static class CropRegisterEvent extends Event {
+      public void register(CropCard crop) {
+         Crops.instance.registerCrop(crop);
+      }
+
+      public void register(CropCard... crops) {
+         for (CropCard crop : crops) {
+            this.register(crop);
+         }
+      }
+   }
 }

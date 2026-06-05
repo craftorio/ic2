@@ -1,32 +1,27 @@
-// 
-// Decompiled by Procyon v0.6.0
-// 
-
 package ic2.api.crops;
 
 import net.minecraft.item.ItemStack;
 
-public interface ICropSeed
-{
-    CropCard getCropFromStack(final ItemStack p0);
-    
-    void setCropFromStack(final ItemStack p0, final CropCard p1);
-    
-    int getGrowthFromStack(final ItemStack p0);
-    
-    void setGrowthFromStack(final ItemStack p0, final int p1);
-    
-    int getGainFromStack(final ItemStack p0);
-    
-    void setGainFromStack(final ItemStack p0, final int p1);
-    
-    int getResistanceFromStack(final ItemStack p0);
-    
-    void setResistanceFromStack(final ItemStack p0, final int p1);
-    
-    int getScannedFromStack(final ItemStack p0);
-    
-    void setScannedFromStack(final ItemStack p0, final int p1);
-    
-    void incrementScannedFromStack(final ItemStack p0);
+public interface ICropSeed {
+   CropCard getCropFromStack(ItemStack var1);
+
+   void setCropFromStack(ItemStack var1, CropCard var2);
+
+   int getGrowthFromStack(ItemStack var1);
+
+   void setGrowthFromStack(ItemStack var1, int var2);
+
+   int getGainFromStack(ItemStack var1);
+
+   void setGainFromStack(ItemStack var1, int var2);
+
+   int getResistanceFromStack(ItemStack var1);
+
+   void setResistanceFromStack(ItemStack var1, int var2);
+
+   int getScannedFromStack(ItemStack var1);
+
+   void setScannedFromStack(ItemStack var1, int var2);
+
+   void incrementScannedFromStack(ItemStack var1);
 }

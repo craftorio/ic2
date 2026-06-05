@@ -1,633 +1,700 @@
-// 
-// Decompiled by Procyon v0.6.0
-// 
-
 package ic2.core.recipe.dynamic;
 
+import ic2.core.IC2;
+import ic2.core.init.MainConfig;
+import ic2.core.util.LogCategory;
+import ic2.core.util.StackUtil;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.IdentityHashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.Set;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.oredict.OreDictionary;
-import ic2.core.init.MainConfig;
-import java.util.Collections;
-import net.minecraftforge.common.MinecraftForge;
-import ic2.core.util.StackUtil;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraft.item.ItemStack;
-import java.util.ListIterator;
-import net.minecraftforge.fluids.Fluid;
-import java.util.Iterator;
-import ic2.core.util.LogCategory;
-import ic2.core.IC2;
-import java.util.ArrayList;
-import java.util.IdentityHashMap;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.List;
-import net.minecraft.item.Item;
-import java.util.Collection;
-import java.util.Map;
 
-public class DynamicRecipeManager implements IDynamicRecipeManager
-{
-    protected final Map<Collection<RecipeInputIngredient>, DynamicRecipe> recipes;
-    private final Map<Item, List<DynamicRecipe>> recipeCacheItem;
-    private final Map<String, List<DynamicRecipe>> recipeCacheFluid;
-    private final List<DynamicRecipe> uncacheableRecipes;
-    private static boolean oreRegisterEventSubscribed;
-    private static final Set<DynamicRecipeManager> watchingManagers;
-    
-    public DynamicRecipeManager() {
-        this.recipes = new HashMap<Collection<RecipeInputIngredient>, DynamicRecipe>();
-        this.recipeCacheItem = new IdentityHashMap<Item, List<DynamicRecipe>>();
-        this.recipeCacheFluid = new IdentityHashMap<String, List<DynamicRecipe>>();
-        this.uncacheableRecipes = new ArrayList<DynamicRecipe>();
-    }
-    
-    public DynamicRecipe createRecipe() {
-        return new DynamicRecipe(this);
-    }
-    
-    @Override
-    public boolean addRecipe(DynamicRecipe recipe, final boolean replace) {
-        if (recipe.getInputIngredients() == null) {
-            throw new NullPointerException("The recipe input is null");
-        }
-        if (recipe.getInputIngredients().size() <= 0) {
-            throw new IllegalArgumentException("No inputs");
-        }
-        if (recipe.getOutputIngredients() == null) {
-            throw new NullPointerException("The recipe output is null");
-        }
-        if (recipe.getOutputIngredients().size() <= 0) {
-            throw new IllegalArgumentException("No outputs");
-        }
-        final List<RecipeInputIngredient> listOfInputs = new ArrayList<RecipeInputIngredient>(recipe.getInputIngredients().size());
-        for (final RecipeInputIngredient entry : recipe.getInputIngredients()) {
-            if (entry.isEmpty()) {
-                this.displayError("The RecipeInputIngredient " + entry.toStringSafe() + " is invalid.");
-                return false;
-            }
-            listOfInputs.add(entry);
-        }
-        final List<RecipeOutputIngredient> listOfOutputs = new ArrayList<RecipeOutputIngredient>(recipe.getOutputIngredients().size());
-        for (final RecipeOutputIngredient entry2 : recipe.getOutputIngredients()) {
-            if (entry2.isEmpty()) {
-                this.displayError("The RecipeOutputIngredient " + entry2.toStringSafe() + " is invalid.");
-                return false;
-            }
-            listOfOutputs.add(entry2);
-        }
-        final DynamicRecipe temp = this.getRecipe(recipe.getInputIngredients());
-        if (temp != null) {
-            if (!replace) {
-                IC2.log.error(LogCategory.Recipe, "Skipping %s => %s due to duplicate recipe for %s (%s => %s)", recipe.getInputIngredients(), recipe.getOutputIngredients(), recipe.getInputIngredients(), recipe.getInputIngredients(), recipe.getOutputIngredients());
-                return false;
-            }
-            do {
-                this.recipes.remove(recipe.getInputIngredients());
-                this.removeCachedRecipes(recipe.getInputIngredients());
-                recipe = this.getRecipe(recipe.getInputIngredients());
-            } while (recipe != null);
-        }
-        final DynamicRecipe newRecipe = this.createRecipe().withInput(listOfInputs).withOutput(listOfOutputs).withOperationEnergyCost(recipe.getOperationEnergyCost()).withOperationDurationTicks(recipe.getOperationDuration()).withMetadata(recipe.getMetadata());
-        this.recipes.put(recipe.getInputIngredients(), newRecipe);
-        this.addToCache(newRecipe);
-        return true;
-    }
-    
-    protected DynamicRecipe getRecipe(final Collection<RecipeInputIngredient> input) {
-        if (input.isEmpty()) {
-            return null;
-        }
-        final List<DynamicRecipe> recipes = new ArrayList<DynamicRecipe>();
-        for (final RecipeInputIngredient entry : input) {
-            final Object unspecific = entry.getUnspecific();
-            if (unspecific instanceof Item) {
-                if (this.recipeCacheItem.get(unspecific) == null) {
-                    continue;
-                }
-                recipes.addAll(this.recipeCacheItem.get(unspecific));
-            }
-            else {
-                if (!(unspecific instanceof Fluid) || !this.recipeCacheFluid.containsKey(((Fluid)unspecific).getName())) {
-                    continue;
-                }
-                recipes.addAll(this.recipeCacheFluid.get(((Fluid)unspecific).getName()));
-            }
-        }
-        if (!recipes.isEmpty()) {
-        Label_0173:
-            for (final DynamicRecipe recipe : recipes) {
-                if (input.size() != recipe.getInputIngredients().size()) {
-                    continue;
-                }
-                final ListIterator<RecipeInputIngredient> itB = (ListIterator<RecipeInputIngredient>)new ArrayList<RecipeInputIngredient>(recipe.getInputIngredients()).listIterator();
-            Label_0240:
-                for (final RecipeInputIngredient entry2 : input) {
-                    while (itB.hasNext()) {
-                        final RecipeInputIngredient temp = itB.next();
-                        if (temp.matches(entry2.ingredient) && entry2.getCount() >= temp.getCount()) {
-                            itB.remove();
-                            while (itB.hasPrevious()) {
-                                itB.previous();
-                            }
-                            continue Label_0240;
-                        }
-                    }
-                    continue Label_0173;
-                }
-                return recipe;
-            }
-        }
-    Label_0354:
-        for (final DynamicRecipe recipe : this.uncacheableRecipes) {
-            if (input.size() != recipe.getInputIngredients().size()) {
-                continue;
-            }
-            final ListIterator<RecipeInputIngredient> itB = (ListIterator<RecipeInputIngredient>)new ArrayList<RecipeInputIngredient>(recipe.getInputIngredients()).listIterator();
-        Label_0421:
-            for (final RecipeInputIngredient entry2 : input) {
-                while (itB.hasNext()) {
-                    final RecipeInputIngredient temp = itB.next();
-                    if (temp.matches(entry2.ingredient) && entry2.getCount() >= temp.getCount()) {
-                        itB.remove();
-                        while (itB.hasPrevious()) {
-                            itB.previous();
-                        }
-                        continue Label_0421;
-                    }
-                }
-                continue Label_0354;
-            }
-            return recipe;
-        }
-        return null;
-    }
-    
-    public DynamicRecipe findRecipe(final ItemStack[] items, final FluidStack[] fluids) {
-        final List<RecipeInputIngredient> inputs = new ArrayList<RecipeInputIngredient>();
-        for (final ItemStack stack : items) {
-            if (StackUtil.isEmpty(stack)) {
-                return null;
-            }
-            inputs.add(RecipeInputItemStack.of(stack));
-        }
-        for (final FluidStack stack2 : fluids) {
-            if (stack2.amount <= 0) {
-                return null;
-            }
-            inputs.add(RecipeInputFluidStack.of(stack2));
-        }
-        if (inputs.isEmpty()) {
-            return null;
-        }
-        final List<DynamicRecipe> recipes = new ArrayList<DynamicRecipe>();
-        for (final RecipeInputIngredient entry : inputs) {
-            final Object unspecific = entry.getUnspecific();
-            if (unspecific instanceof Item) {
-                if (this.recipeCacheItem.get(unspecific) == null) {
-                    continue;
-                }
-                recipes.addAll(this.recipeCacheItem.get(unspecific));
-            }
-            else {
-                if (!(unspecific instanceof Fluid) || !this.recipeCacheFluid.containsKey(((Fluid)unspecific).getName())) {
-                    continue;
-                }
-                recipes.addAll(this.recipeCacheFluid.get(((Fluid)unspecific).getName()));
-            }
-        }
-        if (!recipes.isEmpty()) {
-        Label_0296:
-            for (final DynamicRecipe recipe : recipes) {
-                if (inputs.size() != recipe.getInputIngredients().size()) {
-                    continue;
-                }
-                final ListIterator<RecipeInputIngredient> itB = (ListIterator<RecipeInputIngredient>)new ArrayList<RecipeInputIngredient>(recipe.getInputIngredients()).listIterator();
-            Label_0365:
-                for (final RecipeInputIngredient entry2 : inputs) {
-                    while (itB.hasNext()) {
-                        final RecipeInputIngredient temp = itB.next();
-                        if (temp.matches(entry2.ingredient) && entry2.getCount() >= temp.getCount()) {
-                            itB.remove();
-                            while (itB.hasPrevious()) {
-                                itB.previous();
-                            }
-                            continue Label_0365;
-                        }
-                    }
-                    continue Label_0296;
-                }
-                return recipe;
-            }
-        }
-    Label_0480:
-        for (final DynamicRecipe recipe : this.uncacheableRecipes) {
-            if (inputs.size() != recipe.getInputIngredients().size()) {
-                continue;
-            }
-            final ListIterator<RecipeInputIngredient> itB = (ListIterator<RecipeInputIngredient>)new ArrayList<RecipeInputIngredient>(recipe.getInputIngredients()).listIterator();
-        Label_0549:
-            for (final RecipeInputIngredient entry2 : inputs) {
-                while (itB.hasNext()) {
-                    final RecipeInputIngredient temp = itB.next();
-                    if (temp.matches(entry2.ingredient) && entry2.getCount() >= temp.getCount()) {
-                        itB.remove();
-                        while (itB.hasPrevious()) {
-                            itB.previous();
-                        }
-                        continue Label_0549;
-                    }
-                }
-                continue Label_0480;
-            }
-            return recipe;
-        }
-        return null;
-    }
-    
-    public boolean isPartOfRecipe(final ItemStack stack) {
-        if (StackUtil.isEmpty(stack)) {
+public class DynamicRecipeManager implements IDynamicRecipeManager {
+   protected final Map<Collection<RecipeInputIngredient>, DynamicRecipe> recipes = new HashMap<>();
+   private final Map<Item, List<DynamicRecipe>> recipeCacheItem = new IdentityHashMap<>();
+   private final Map<String, List<DynamicRecipe>> recipeCacheFluid = new IdentityHashMap<>();
+   private final List<DynamicRecipe> uncacheableRecipes = new ArrayList<>();
+   private static boolean oreRegisterEventSubscribed;
+   private static final Set<DynamicRecipeManager> watchingManagers = Collections.newSetFromMap(new IdentityHashMap<>());
+
+   public DynamicRecipe createRecipe() {
+      return new DynamicRecipe(this);
+   }
+
+   @Override
+   public boolean addRecipe(DynamicRecipe recipe, boolean replace) {
+      if (recipe.getInputIngredients() == null) {
+         throw new NullPointerException("The recipe input is null");
+      }
+
+      if (recipe.getInputIngredients().size() <= 0) {
+         throw new IllegalArgumentException("No inputs");
+      }
+
+      if (recipe.getOutputIngredients() == null) {
+         throw new NullPointerException("The recipe output is null");
+      }
+
+      if (recipe.getOutputIngredients().size() <= 0) {
+         throw new IllegalArgumentException("No outputs");
+      }
+
+      List<RecipeInputIngredient> listOfInputs = new ArrayList<>(recipe.getInputIngredients().size());
+
+      for (RecipeInputIngredient entry : recipe.getInputIngredients()) {
+         if (entry.isEmpty()) {
+            this.displayError("The RecipeInputIngredient " + entry.toStringSafe() + " is invalid.");
             return false;
-        }
-        final RecipeInputItemStack subject = RecipeInputItemStack.of(stack);
-        final List<DynamicRecipe> recipes = new ArrayList<DynamicRecipe>();
-        final Object unspecific = subject.getUnspecific();
-        if (unspecific instanceof Item) {
-            if (this.recipeCacheItem.get(unspecific) != null) {
-                recipes.addAll(this.recipeCacheItem.get(unspecific));
-            }
-        }
-        else if (unspecific instanceof Fluid && this.recipeCacheFluid.containsKey(((Fluid)unspecific).getName())) {
-            recipes.addAll(this.recipeCacheFluid.get(((Fluid)unspecific).getName()));
-        }
-        if (!recipes.isEmpty()) {
-            for (final DynamicRecipe recipe : recipes) {
-                final ListIterator<RecipeInputIngredient> itB = (ListIterator<RecipeInputIngredient>)new ArrayList<RecipeInputIngredient>(recipe.getInputIngredients()).listIterator();
-                while (itB.hasNext()) {
-                    final RecipeInputIngredient temp = itB.next();
-                    if (temp.matches(subject.ingredient)) {
-                        return true;
-                    }
-                }
-            }
-        }
-        if (!this.uncacheableRecipes.isEmpty()) {
-            for (final DynamicRecipe recipe : this.uncacheableRecipes) {
-                final ListIterator<RecipeInputIngredient> itB = (ListIterator<RecipeInputIngredient>)new ArrayList<RecipeInputIngredient>(recipe.getInputIngredients()).listIterator();
-                final RecipeInputIngredient temp = itB.next();
-                if (temp.matches(subject.ingredient)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-    
-    @Override
-    public DynamicRecipe apply(final ItemStack[] items, final FluidStack[] fluids, final boolean simulate) {
-        final List<RecipeInputIngredient> inputs = new ArrayList<RecipeInputIngredient>();
-        for (final ItemStack stack : items) {
-            if (StackUtil.isEmpty(stack)) {
-                return null;
-            }
-            inputs.add(RecipeInputItemStack.of(stack));
-        }
-        for (final FluidStack stack2 : fluids) {
-            if (stack2.amount <= 0) {
-                return null;
-            }
-            inputs.add(RecipeInputFluidStack.of(stack2));
-        }
-        final DynamicRecipe recipe = this.getRecipe(inputs);
-        if (recipe == null) {
-            return null;
-        }
-        if (items.length + fluids.length != recipe.getInputIngredients().size()) {
-            return null;
-        }
-        ListIterator<RecipeInputIngredient> itB = (ListIterator<RecipeInputIngredient>)new ArrayList<RecipeInputIngredient>(recipe.getInputIngredients()).listIterator();
-    Label_0178:
-        for (final RecipeInputIngredient entry : inputs) {
-            while (itB.hasNext()) {
-                final RecipeInputIngredient temp = itB.next();
-                if (temp.matches(entry.ingredient) && entry.getCount() >= temp.getCount()) {
-                    itB.remove();
-                    while (itB.hasPrevious()) {
-                        itB.previous();
-                    }
-                    continue Label_0178;
-                }
-            }
-            return null;
-        }
-        if (!simulate) {
-            itB = (ListIterator<RecipeInputIngredient>)new ArrayList<RecipeInputIngredient>(recipe.getInputIngredients()).listIterator();
-            Label_0311:
-            for (final RecipeInputIngredient entry : inputs) {
-                while (itB.hasNext()) {
-                    final RecipeInputIngredient temp = itB.next();
-                    if (temp.matches(entry.ingredient)) {
-                        entry.shrink(temp.getCount());
-                        itB.remove();
-                        while (itB.hasPrevious()) {
-                            itB.previous();
-                        }
-                        continue Label_0311;
-                    }
-                }
-                return null;
-            }
-        }
-        return recipe;
-    }
-    
-    public boolean apply(final DynamicRecipe recipe, final ItemStack[] items, final FluidStack[] fluids, final boolean simulate) {
-        if (recipe == null) {
+         }
+
+         listOfInputs.add(entry);
+      }
+
+      List<RecipeOutputIngredient> listOfOutputs = new ArrayList<>(recipe.getOutputIngredients().size());
+
+      for (RecipeOutputIngredient entry : recipe.getOutputIngredients()) {
+         if (entry.isEmpty()) {
+            this.displayError("The RecipeOutputIngredient " + entry.toStringSafe() + " is invalid.");
             return false;
-        }
-        final List<RecipeInputIngredient> inputs = new ArrayList<RecipeInputIngredient>();
-        for (final ItemStack stack : items) {
-            if (StackUtil.isEmpty(stack)) {
-                return false;
-            }
-            inputs.add(RecipeInputItemStack.of(stack));
-        }
-        for (final FluidStack stack2 : fluids) {
-            if (stack2.amount <= 0) {
-                return false;
-            }
-            inputs.add(RecipeInputFluidStack.of(stack2));
-        }
-        if (items.length + fluids.length != recipe.getInputIngredients().size()) {
+         }
+
+         listOfOutputs.add(entry);
+      }
+
+      DynamicRecipe temp = this.getRecipe(recipe.getInputIngredients());
+      if (temp != null) {
+         if (!replace) {
+            IC2.log
+               .error(
+                  LogCategory.Recipe,
+                  "Skipping %s => %s due to duplicate recipe for %s (%s => %s)",
+                  recipe.getInputIngredients(),
+                  recipe.getOutputIngredients(),
+                  recipe.getInputIngredients(),
+                  recipe.getInputIngredients(),
+                  recipe.getOutputIngredients()
+               );
             return false;
-        }
-        ListIterator<RecipeInputIngredient> itB = (ListIterator<RecipeInputIngredient>)new ArrayList<RecipeInputIngredient>(recipe.getInputIngredients()).listIterator();
-    Label_0167:
-        for (final RecipeInputIngredient entry : inputs) {
-            while (itB.hasNext()) {
-                final RecipeInputIngredient temp = itB.next();
-                if (temp.matches(entry.ingredient) && entry.getCount() >= temp.getCount()) {
-                    itB.remove();
-                    while (itB.hasPrevious()) {
-                        itB.previous();
-                    }
-                    continue Label_0167;
-                }
-            }
-            return false;
-        }
-        if (!simulate) {
-            itB = (ListIterator<RecipeInputIngredient>)new ArrayList<RecipeInputIngredient>(recipe.getInputIngredients()).listIterator();
-            Label_0300:
-            for (final RecipeInputIngredient entry : inputs) {
-                while (itB.hasNext()) {
-                    final RecipeInputIngredient temp = itB.next();
-                    if (temp.matches(entry.ingredient)) {
-                        entry.shrink(temp.getCount());
-                        itB.remove();
-                        while (itB.hasPrevious()) {
-                            itB.previous();
-                        }
-                        continue Label_0300;
-                    }
-                }
-                return false;
-            }
-        }
-        return true;
-    }
-    
-    @Override
-    public Iterable<? extends DynamicRecipe> getRecipes() {
-        return () -> new Iterator<DynamicRecipe>() {
-            private final Iterator recipeIt;
-            private Collection lastInput;
-            
-            {
-                this.recipeIt = DynamicRecipeManager.this.recipes.values().iterator();
-            }
-            
-            @Override
-            public boolean hasNext() {
-                return this.recipeIt.hasNext();
-            }
-            
-            @Override
-            public DynamicRecipe next() {
-                final DynamicRecipe next = this.recipeIt.next();
-                this.lastInput = next.getInputIngredients();
-                return next;
-            }
-            
-            @Override
-            public void remove() {
-                this.recipeIt.remove();
-                DynamicRecipeManager.this.removeCachedRecipes(this.lastInput);
-            }
-        };
-    }
-    
-    @Override
-    public boolean isIterable() {
-        return true;
-    }
-    
-    protected void addToCache(final DynamicRecipe recipe) {
-        if (recipe.getInputIngredients().stream().anyMatch(entry -> entry instanceof RecipeInputOreDictionary)) {
-            if (!DynamicRecipeManager.oreRegisterEventSubscribed) {
-                MinecraftForge.EVENT_BUS.register((Object)DynamicRecipeManager.class);
-                DynamicRecipeManager.oreRegisterEventSubscribed = true;
-            }
-            DynamicRecipeManager.watchingManagers.add(this);
-        }
-        final Collection<Item> items = this.getItemsFromRecipe(recipe.getInputIngredients());
-        final Collection<Fluid> fluids = this.getFluidsFromRecipe(recipe.getInputIngredients());
-        if (items != null) {
-            for (final Item item : items) {
-                this.addToCache(item, recipe);
-            }
-        }
-        if (fluids != null) {
-            for (final Fluid fluid : fluids) {
-                this.addToCache(fluid, recipe);
-            }
-        }
-        if (items == null && fluids == null) {
-            this.uncacheableRecipes.add(recipe);
-        }
-    }
-    
-    private void addToCache(final Item item, final DynamicRecipe recipe) {
-        final List<DynamicRecipe> recipes = this.recipeCacheItem.computeIfAbsent(item, newValue -> new ArrayList());
-        if (!recipes.contains(recipe)) {
-            recipes.add(recipe);
-        }
-    }
-    
-    private void addToCache(final Fluid fluid, final DynamicRecipe recipe) {
-        final List<DynamicRecipe> recipes = this.recipeCacheFluid.computeIfAbsent(fluid.getName(), newValue -> new ArrayList());
-        if (!recipes.contains(recipe)) {
-            recipes.add(recipe);
-        }
-    }
-    
-    protected void removeCachedRecipes(final Collection<RecipeInputIngredient> input) {
-        final Collection<Item> items = this.getItemsFromRecipe(input);
-        final Collection<Fluid> fluids = this.getFluidsFromRecipe(input);
-        if (items != null) {
-            for (final Item item : items) {
-                final List<DynamicRecipe> recipes = this.recipeCacheItem.get(item);
-                if (recipes == null) {
-                    IC2.log.warn(LogCategory.Recipe, "Inconsistent recipe cache, the entry for the item " + item + " is missing.");
-                }
-                else {
-                    this.removeInputFromRecipes(recipes.iterator(), input);
-                    if (!recipes.isEmpty()) {
-                        continue;
-                    }
-                    this.recipeCacheItem.remove(item);
-                }
-            }
-        }
-        if (fluids != null) {
-            for (final Fluid fluid : fluids) {
-                final List<DynamicRecipe> recipes = this.recipeCacheFluid.get(fluid.getName());
-                if (recipes == null) {
-                    IC2.log.warn(LogCategory.Recipe, "Inconsistent recipe cache, the entry for the fluid " + fluid + " is missing.");
-                }
-                else {
-                    this.removeInputFromRecipes(recipes.iterator(), input);
-                    if (!recipes.isEmpty()) {
-                        continue;
-                    }
-                    this.recipeCacheFluid.remove(fluid.getName());
-                }
-            }
-        }
-        if (items == null && fluids == null) {
-            this.removeInputFromRecipes(this.uncacheableRecipes.iterator(), input);
-        }
-    }
-    
-    private void removeInputFromRecipes(final Iterator<DynamicRecipe> it, final Collection<RecipeInputIngredient> target) {
-        assert target != null;
-        while (it.hasNext()) {
-            if (target.equals(it.next().getInputIngredients())) {
-                it.remove();
-            }
-        }
-    }
-    
-    private Collection<Item> getItemsFromRecipe(final Collection<RecipeInputIngredient> recipe) {
-        final List<ItemStack> inputs = new ArrayList<ItemStack>();
-        for (final RecipeInputIngredient entry : recipe) {
-            if (entry instanceof RecipeInputItemStack) {
-                inputs.add((ItemStack)((RecipeInputItemStack)entry).ingredient);
-            }
-        }
-        if (inputs.isEmpty()) {
-            return null;
-        }
-        final Set<Item> ret = Collections.newSetFromMap(new IdentityHashMap<Item, Boolean>(inputs.size()));
-        for (final ItemStack stack : inputs) {
-            ret.add(stack.getItem());
-        }
-        return ret;
-    }
-    
-    private Collection<Fluid> getFluidsFromRecipe(final Collection<RecipeInputIngredient> recipe) {
-        final List<FluidStack> inputs = new ArrayList<FluidStack>();
-        for (final RecipeInputIngredient entry : recipe) {
-            if (entry instanceof RecipeInputFluidStack) {
-                inputs.add((FluidStack)((RecipeInputFluidStack)entry).ingredient);
-            }
-        }
-        if (inputs.isEmpty()) {
-            return null;
-        }
-        final Set<Fluid> ret = Collections.newSetFromMap(new IdentityHashMap<Fluid, Boolean>(inputs.size()));
-        for (final FluidStack stack : inputs) {
-            ret.add(stack.getFluid());
-        }
-        return ret;
-    }
-    
-    @Override
-    public boolean removeRecipe(final Collection<RecipeInputIngredient> input, final Collection<RecipeOutputIngredient> output) {
-        final DynamicRecipe recipe = this.getRecipe(input);
-        if (recipe == null) {
-            return false;
-        }
-        if (checkListEqualityIngredient(output, recipe.getOutputIngredients(), true)) {
+         }
+
+         do {
             this.recipes.remove(recipe.getInputIngredients());
             this.removeCachedRecipes(recipe.getInputIngredients());
-        }
-        return false;
-    }
-    
-    private static boolean checkListEqualityIngredient(final Collection<? extends RecipeIngredient> first, final Collection<? extends RecipeIngredient> second, final boolean strict) {
-        if (first.size() != second.size()) {
-            return false;
-        }
-        final ListIterator<RecipeIngredient> itB = (ListIterator<RecipeIngredient>)new ArrayList<RecipeIngredient>(second).listIterator();
-    Label_0037:
-        for (final RecipeIngredient ingredient : first) {
+            recipe = this.getRecipe(recipe.getInputIngredients());
+         } while (recipe != null);
+      }
+
+      DynamicRecipe newRecipe = this.createRecipe()
+         .withInput(listOfInputs)
+         .withOutput(listOfOutputs)
+         .withOperationEnergyCost(recipe.getOperationEnergyCost())
+         .withOperationDurationTicks(recipe.getOperationDuration())
+         .withMetadata(recipe.getMetadata());
+      this.recipes.put(recipe.getInputIngredients(), newRecipe);
+      this.addToCache(newRecipe);
+      return true;
+   }
+
+   protected DynamicRecipe getRecipe(Collection<RecipeInputIngredient> input) {
+      if (input.isEmpty()) {
+         return null;
+      }
+
+      List<DynamicRecipe> recipes = new ArrayList<>();
+
+      for (RecipeInputIngredient entry : input) {
+         Object unspecific = entry.getUnspecific();
+         if (unspecific instanceof Item) {
+            if (this.recipeCacheItem.get(unspecific) != null) {
+               recipes.addAll(this.recipeCacheItem.get(unspecific));
+            }
+         } else if (unspecific instanceof Fluid && this.recipeCacheFluid.containsKey(((Fluid)unspecific).getName())) {
+            recipes.addAll(this.recipeCacheFluid.get(((Fluid)unspecific).getName()));
+         }
+      }
+
+      if (!recipes.isEmpty()) {
+         label104:
+         for (DynamicRecipe recipe : recipes) {
+            if (input.size() == recipe.getInputIngredients().size()) {
+               ListIterator<RecipeInputIngredient> itB = new ArrayList<>(recipe.getInputIngredients()).listIterator();
+
+               for (RecipeInputIngredient entry : input) {
+                  RecipeInputIngredient temp;
+                  do {
+                     if (!itB.hasNext()) {
+                        continue label104;
+                     }
+
+                     temp = itB.next();
+                  } while (!temp.matches(entry.ingredient) || entry.getCount() < temp.getCount());
+
+                  itB.remove();
+
+                  while (itB.hasPrevious()) {
+                     itB.previous();
+                  }
+               }
+
+               return recipe;
+            }
+         }
+      }
+
+      label79:
+      for (DynamicRecipe recipe : this.uncacheableRecipes) {
+         if (input.size() == recipe.getInputIngredients().size()) {
+            ListIterator<RecipeInputIngredient> itB = new ArrayList<>(recipe.getInputIngredients()).listIterator();
+
+            for (RecipeInputIngredient entry : input) {
+               RecipeInputIngredient temp;
+               do {
+                  if (!itB.hasNext()) {
+                     continue label79;
+                  }
+
+                  temp = itB.next();
+               } while (!temp.matches(entry.ingredient) || entry.getCount() < temp.getCount());
+
+               itB.remove();
+
+               while (itB.hasPrevious()) {
+                  itB.previous();
+               }
+            }
+
+            return recipe;
+         }
+      }
+
+      return null;
+   }
+
+   public DynamicRecipe findRecipe(ItemStack[] items, FluidStack[] fluids) {
+      List<RecipeInputIngredient> inputs = new ArrayList<>();
+
+      for (ItemStack stack : items) {
+         if (StackUtil.isEmpty(stack)) {
+            return null;
+         }
+
+         inputs.add(RecipeInputItemStack.of(stack));
+      }
+
+      for (FluidStack stack : fluids) {
+         if (stack.amount <= 0) {
+            return null;
+         }
+
+         inputs.add(RecipeInputFluidStack.of(stack));
+      }
+
+      if (inputs.isEmpty()) {
+         return null;
+      }
+
+      List<DynamicRecipe> recipes = new ArrayList<>();
+
+      for (RecipeInputIngredient entry : inputs) {
+         Object unspecific = entry.getUnspecific();
+         if (unspecific instanceof Item) {
+            if (this.recipeCacheItem.get(unspecific) != null) {
+               recipes.addAll(this.recipeCacheItem.get(unspecific));
+            }
+         } else if (unspecific instanceof Fluid && this.recipeCacheFluid.containsKey(((Fluid)unspecific).getName())) {
+            recipes.addAll(this.recipeCacheFluid.get(((Fluid)unspecific).getName()));
+         }
+      }
+
+      if (!recipes.isEmpty()) {
+         label118:
+         for (DynamicRecipe recipe : recipes) {
+            if (inputs.size() == recipe.getInputIngredients().size()) {
+               ListIterator<RecipeInputIngredient> itB = new ArrayList<>(recipe.getInputIngredients()).listIterator();
+
+               for (RecipeInputIngredient entry : inputs) {
+                  RecipeInputIngredient temp;
+                  do {
+                     if (!itB.hasNext()) {
+                        continue label118;
+                     }
+
+                     temp = itB.next();
+                  } while (!temp.matches(entry.ingredient) || entry.getCount() < temp.getCount());
+
+                  itB.remove();
+
+                  while (itB.hasPrevious()) {
+                     itB.previous();
+                  }
+               }
+
+               return recipe;
+            }
+         }
+      }
+
+      label93:
+      for (DynamicRecipe recipe : this.uncacheableRecipes) {
+         if (inputs.size() == recipe.getInputIngredients().size()) {
+            ListIterator<RecipeInputIngredient> itB = new ArrayList<>(recipe.getInputIngredients()).listIterator();
+
+            for (RecipeInputIngredient entry : inputs) {
+               RecipeInputIngredient temp;
+               do {
+                  if (!itB.hasNext()) {
+                     continue label93;
+                  }
+
+                  temp = itB.next();
+               } while (!temp.matches(entry.ingredient) || entry.getCount() < temp.getCount());
+
+               itB.remove();
+
+               while (itB.hasPrevious()) {
+                  itB.previous();
+               }
+            }
+
+            return recipe;
+         }
+      }
+
+      return null;
+   }
+
+   public boolean isPartOfRecipe(ItemStack stack) {
+      if (StackUtil.isEmpty(stack)) {
+         return false;
+      }
+
+      RecipeInputItemStack subject = RecipeInputItemStack.of(stack);
+      List<DynamicRecipe> recipes = new ArrayList<>();
+      Object unspecific = subject.getUnspecific();
+      if (unspecific instanceof Item) {
+         if (this.recipeCacheItem.get(unspecific) != null) {
+            recipes.addAll(this.recipeCacheItem.get(unspecific));
+         }
+      } else if (unspecific instanceof Fluid && this.recipeCacheFluid.containsKey(((Fluid)unspecific).getName())) {
+         recipes.addAll(this.recipeCacheFluid.get(((Fluid)unspecific).getName()));
+      }
+
+      if (!recipes.isEmpty()) {
+         for (DynamicRecipe recipe : recipes) {
+            for (RecipeInputIngredient temp : new ArrayList<>(recipe.getInputIngredients())) {
+               if (temp.matches(subject.ingredient)) {
+                  return true;
+               }
+            }
+         }
+      }
+
+      if (!this.uncacheableRecipes.isEmpty()) {
+         for (DynamicRecipe recipe : this.uncacheableRecipes) {
+            ListIterator<RecipeInputIngredient> itB = new ArrayList<>(recipe.getInputIngredients()).listIterator();
+            RecipeInputIngredient temp = itB.next();
+            if (temp.matches(subject.ingredient)) {
+               return true;
+            }
+         }
+      }
+
+      return false;
+   }
+
+   @Override
+   public DynamicRecipe apply(ItemStack[] items, FluidStack[] fluids, boolean simulate) {
+      List<RecipeInputIngredient> inputs = new ArrayList<>();
+
+      for (ItemStack stack : items) {
+         if (StackUtil.isEmpty(stack)) {
+            return null;
+         }
+
+         inputs.add(RecipeInputItemStack.of(stack));
+      }
+
+      for (FluidStack stack : fluids) {
+         if (stack.amount <= 0) {
+            return null;
+         }
+
+         inputs.add(RecipeInputFluidStack.of(stack));
+      }
+
+      DynamicRecipe recipe = this.getRecipe(inputs);
+      if (recipe == null) {
+         return null;
+      }
+
+      if (items.length + fluids.length != recipe.getInputIngredients().size()) {
+         return null;
+      }
+
+      ListIterator<RecipeInputIngredient> itB = new ArrayList<>(recipe.getInputIngredients()).listIterator();
+
+      label83:
+      for (RecipeInputIngredient entry : inputs) {
+         while (itB.hasNext()) {
+            RecipeInputIngredient temp = itB.next();
+            if (temp.matches(entry.ingredient) && entry.getCount() >= temp.getCount()) {
+               itB.remove();
+
+               while (itB.hasPrevious()) {
+                  itB.previous();
+               }
+               continue label83;
+            }
+         }
+
+         return null;
+      }
+
+      if (!simulate) {
+         itB = new ArrayList<>(recipe.getInputIngredients()).listIterator();
+
+         label65:
+         for (RecipeInputIngredient entry : inputs) {
             while (itB.hasNext()) {
-                if (strict) {
-                    if (!ingredient.matchesStrict(itB.next())) {
-                        continue;
-                    }
-                }
-                else if (!ingredient.matches(itB.next())) {
-                    continue;
-                }
-                itB.remove();
-                while (itB.hasPrevious()) {
-                    itB.previous();
-                }
-                continue Label_0037;
+               RecipeInputIngredient temp = itB.next();
+               if (temp.matches(entry.ingredient)) {
+                  entry.shrink(temp.getCount());
+                  itB.remove();
+
+                  while (itB.hasPrevious()) {
+                     itB.previous();
+                  }
+                  continue label65;
+               }
             }
+
+            return null;
+         }
+      }
+
+      return recipe;
+   }
+
+   public boolean apply(DynamicRecipe recipe, ItemStack[] items, FluidStack[] fluids, boolean simulate) {
+      if (recipe == null) {
+         return false;
+      }
+
+      List<RecipeInputIngredient> inputs = new ArrayList<>();
+
+      for (ItemStack stack : items) {
+         if (StackUtil.isEmpty(stack)) {
             return false;
-        }
-        return true;
-    }
-    
-    protected void displayError(final String message) {
-        if (MainConfig.ignoreInvalidRecipes) {
-            IC2.log.warn(LogCategory.Recipe, message);
-            return;
-        }
-        throw new RuntimeException(message);
-    }
-    
-    @SubscribeEvent
-    public static void onOreRegister(final OreDictionary.OreRegisterEvent event) {
-        final Item item = event.getOre().getItem();
-        if (item == null) {
-            IC2.log.warn(LogCategory.Recipe, "Found null item ore dict registration.", new Throwable());
-            return;
-        }
-        for (final DynamicRecipeManager manager : DynamicRecipeManager.watchingManagers) {
-            manager.onOreRegister(item, event.getName());
-        }
-    }
-    
-    private void onOreRegister(final Item item, final String name) {
-        for (final DynamicRecipe rawRecipe : this.recipes.values()) {
-            for (final RecipeInputIngredient entry : rawRecipe.getInputIngredients()) {
-                if (!(entry instanceof RecipeInputOreDictionary)) {
-                    continue;
-                }
-                final RecipeInputOreDictionary input = (RecipeInputOreDictionary)entry;
-                if (!input.matchesStrict(name)) {
-                    continue;
-                }
-                this.addToCache(item, rawRecipe);
+         }
+
+         inputs.add(RecipeInputItemStack.of(stack));
+      }
+
+      for (FluidStack stack : fluids) {
+         if (stack.amount <= 0) {
+            return false;
+         }
+
+         inputs.add(RecipeInputFluidStack.of(stack));
+      }
+
+      if (items.length + fluids.length != recipe.getInputIngredients().size()) {
+         return false;
+      }
+
+      ListIterator<RecipeInputIngredient> itB = new ArrayList<>(recipe.getInputIngredients()).listIterator();
+
+      label83:
+      for (RecipeInputIngredient entry : inputs) {
+         while (itB.hasNext()) {
+            RecipeInputIngredient temp = itB.next();
+            if (temp.matches(entry.ingredient) && entry.getCount() >= temp.getCount()) {
+               itB.remove();
+
+               while (itB.hasPrevious()) {
+                  itB.previous();
+               }
+               continue label83;
             }
-        }
-    }
-    
-    static {
-        watchingManagers = Collections.newSetFromMap(new IdentityHashMap<DynamicRecipeManager, Boolean>());
-    }
+         }
+
+         return false;
+      }
+
+      if (!simulate) {
+         itB = new ArrayList<>(recipe.getInputIngredients()).listIterator();
+
+         label65:
+         for (RecipeInputIngredient entry : inputs) {
+            while (itB.hasNext()) {
+               RecipeInputIngredient temp = itB.next();
+               if (temp.matches(entry.ingredient)) {
+                  entry.shrink(temp.getCount());
+                  itB.remove();
+
+                  while (itB.hasPrevious()) {
+                     itB.previous();
+                  }
+                  continue label65;
+               }
+            }
+
+            return false;
+         }
+      }
+
+      return true;
+   }
+
+   @Override
+   public Iterable<? extends DynamicRecipe> getRecipes() {
+      return () -> new Iterator<DynamicRecipe>() {
+         private final Iterator recipeIt = DynamicRecipeManager.this.recipes.values().iterator();
+         private Collection lastInput;
+
+         @Override
+         public boolean hasNext() {
+            return this.recipeIt.hasNext();
+         }
+
+         public DynamicRecipe next() {
+            DynamicRecipe next = (DynamicRecipe)this.recipeIt.next();
+            this.lastInput = next.getInputIngredients();
+            return next;
+         }
+
+         @Override
+         public void remove() {
+            this.recipeIt.remove();
+            DynamicRecipeManager.this.removeCachedRecipes(this.lastInput);
+         }
+      };
+   }
+
+   @Override
+   public boolean isIterable() {
+      return true;
+   }
+
+   protected void addToCache(DynamicRecipe recipe) {
+      if (recipe.getInputIngredients().stream().anyMatch(entry -> entry instanceof RecipeInputOreDictionary)) {
+         if (!oreRegisterEventSubscribed) {
+            MinecraftForge.EVENT_BUS.register(DynamicRecipeManager.class);
+            oreRegisterEventSubscribed = true;
+         }
+
+         watchingManagers.add(this);
+      }
+
+      Collection<Item> items = this.getItemsFromRecipe(recipe.getInputIngredients());
+      Collection<Fluid> fluids = this.getFluidsFromRecipe(recipe.getInputIngredients());
+      if (items != null) {
+         for (Item item : items) {
+            this.addToCache(item, recipe);
+         }
+      }
+
+      if (fluids != null) {
+         for (Fluid fluid : fluids) {
+            this.addToCache(fluid, recipe);
+         }
+      }
+
+      if (items == null && fluids == null) {
+         this.uncacheableRecipes.add(recipe);
+      }
+   }
+
+   private void addToCache(Item item, DynamicRecipe recipe) {
+      List<DynamicRecipe> recipes = this.recipeCacheItem.computeIfAbsent(item, newValue -> new ArrayList<>());
+      if (!recipes.contains(recipe)) {
+         recipes.add(recipe);
+      }
+   }
+
+   private void addToCache(Fluid fluid, DynamicRecipe recipe) {
+      List<DynamicRecipe> recipes = this.recipeCacheFluid.computeIfAbsent(fluid.getName(), newValue -> new ArrayList<>());
+      if (!recipes.contains(recipe)) {
+         recipes.add(recipe);
+      }
+   }
+
+   protected void removeCachedRecipes(Collection<RecipeInputIngredient> input) {
+      Collection<Item> items = this.getItemsFromRecipe(input);
+      Collection<Fluid> fluids = this.getFluidsFromRecipe(input);
+      if (items != null) {
+         for (Item item : items) {
+            List<DynamicRecipe> recipes = this.recipeCacheItem.get(item);
+            if (recipes == null) {
+               IC2.log.warn(LogCategory.Recipe, "Inconsistent recipe cache, the entry for the item " + item + " is missing.");
+            } else {
+               this.removeInputFromRecipes(recipes.iterator(), input);
+               if (recipes.isEmpty()) {
+                  this.recipeCacheItem.remove(item);
+               }
+            }
+         }
+      }
+
+      if (fluids != null) {
+         for (Fluid fluid : fluids) {
+            List<DynamicRecipe> recipes = this.recipeCacheFluid.get(fluid.getName());
+            if (recipes == null) {
+               IC2.log.warn(LogCategory.Recipe, "Inconsistent recipe cache, the entry for the fluid " + fluid + " is missing.");
+            } else {
+               this.removeInputFromRecipes(recipes.iterator(), input);
+               if (recipes.isEmpty()) {
+                  this.recipeCacheFluid.remove(fluid.getName());
+               }
+            }
+         }
+      }
+
+      if (items == null && fluids == null) {
+         this.removeInputFromRecipes(this.uncacheableRecipes.iterator(), input);
+      }
+   }
+
+   private void removeInputFromRecipes(Iterator<DynamicRecipe> it, Collection<RecipeInputIngredient> target) {
+      assert target != null;
+
+      while (it.hasNext()) {
+         if (target.equals(it.next().getInputIngredients())) {
+            it.remove();
+         }
+      }
+   }
+
+   private Collection<Item> getItemsFromRecipe(Collection<RecipeInputIngredient> recipe) {
+      List<ItemStack> inputs = new ArrayList<>();
+
+      for (RecipeInputIngredient entry : recipe) {
+         if (entry instanceof RecipeInputItemStack) {
+            inputs.add(((RecipeInputItemStack)entry).ingredient);
+         }
+      }
+
+      if (inputs.isEmpty()) {
+         return null;
+      }
+
+      Set<Item> ret = Collections.newSetFromMap(new IdentityHashMap<>(inputs.size()));
+
+      for (ItemStack stack : inputs) {
+         ret.add(stack.getItem());
+      }
+
+      return ret;
+   }
+
+   private Collection<Fluid> getFluidsFromRecipe(Collection<RecipeInputIngredient> recipe) {
+      List<FluidStack> inputs = new ArrayList<>();
+
+      for (RecipeInputIngredient entry : recipe) {
+         if (entry instanceof RecipeInputFluidStack) {
+            inputs.add(((RecipeInputFluidStack)entry).ingredient);
+         }
+      }
+
+      if (inputs.isEmpty()) {
+         return null;
+      }
+
+      Set<Fluid> ret = Collections.newSetFromMap(new IdentityHashMap<>(inputs.size()));
+
+      for (FluidStack stack : inputs) {
+         ret.add(stack.getFluid());
+      }
+
+      return ret;
+   }
+
+   @Override
+   public boolean removeRecipe(Collection<RecipeInputIngredient> input, Collection<RecipeOutputIngredient> output) {
+      DynamicRecipe recipe = this.getRecipe(input);
+      if (recipe == null) {
+         return false;
+      }
+
+      if (checkListEqualityIngredient(output, recipe.getOutputIngredients(), true)) {
+         this.recipes.remove(recipe.getInputIngredients());
+         this.removeCachedRecipes(recipe.getInputIngredients());
+      }
+
+      return false;
+   }
+
+   private static boolean checkListEqualityIngredient(
+      Collection<? extends RecipeIngredient> first, Collection<? extends RecipeIngredient> second, boolean strict
+   ) {
+      if (first.size() != second.size()) {
+         return false;
+      }
+
+      ListIterator<RecipeIngredient> itB = new ArrayList<>(second).listIterator();
+
+      label37:
+      for (RecipeIngredient ingredient : first) {
+         while (itB.hasNext()) {
+            if (strict ? ingredient.matchesStrict(itB.next()) : ingredient.matches(itB.next())) {
+               itB.remove();
+
+               while (itB.hasPrevious()) {
+                  itB.previous();
+               }
+               continue label37;
+            }
+         }
+
+         return false;
+      }
+
+      return true;
+   }
+
+   protected void displayError(String message) {
+      if (MainConfig.ignoreInvalidRecipes) {
+         IC2.log.warn(LogCategory.Recipe, message);
+      } else {
+         throw new RuntimeException(message);
+      }
+   }
+
+   @SubscribeEvent
+   public static void onOreRegister(OreDictionary.OreRegisterEvent event) {
+      Item item = event.getOre().getItem();
+      if (item == null) {
+         IC2.log.warn(LogCategory.Recipe, "Found null item ore dict registration.", new Throwable());
+      } else {
+         for (DynamicRecipeManager manager : watchingManagers) {
+            manager.onOreRegister(item, event.getName());
+         }
+      }
+   }
+
+   private void onOreRegister(Item item, String name) {
+      for (DynamicRecipe rawRecipe : this.recipes.values()) {
+         for (RecipeInputIngredient entry : rawRecipe.getInputIngredients()) {
+            if (entry instanceof RecipeInputOreDictionary) {
+               RecipeInputOreDictionary input = (RecipeInputOreDictionary)entry;
+               if (input.matchesStrict(name)) {
+                  this.addToCache(item, rawRecipe);
+               }
+            }
+         }
+      }
+   }
 }

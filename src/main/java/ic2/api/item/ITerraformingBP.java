@@ -1,21 +1,16 @@
-// 
-// Decompiled by Procyon v0.6.0
-// 
-
 package ic2.api.item;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
-public interface ITerraformingBP
-{
-    double getConsume(final ItemStack p0);
-    
-    int getRange(final ItemStack p0);
-    
-    boolean canInsert(final ItemStack p0, final EntityPlayer p1, final World p2, final BlockPos p3);
-    
-    boolean terraform(final ItemStack p0, final World p1, final BlockPos p2);
+public interface ITerraformingBP {
+   double getConsume(ItemStack var1);
+
+   int getRange(ItemStack var1);
+
+   boolean canInsert(ItemStack var1, EntityPlayer var2, World var3, BlockPos var4);
+
+   boolean terraform(ItemStack var1, World var2, BlockPos var3);
 }

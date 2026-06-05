@@ -1,14 +1,9 @@
-// 
-// Decompiled by Procyon v0.6.0
-// 
-
 package ic2.api.info;
 
 import net.minecraft.item.ItemStack;
 
-public interface IInfoProvider
-{
-    double getEnergyValue(final ItemStack p0);
-    
-    int getFuelValue(final ItemStack p0, final boolean p1);
+public interface IInfoProvider {
+   double getEnergyValue(ItemStack var1);
+
+   int getFuelValue(ItemStack var1, boolean var2);
 }

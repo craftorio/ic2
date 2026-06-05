@@ -1,24 +1,19 @@
-// 
-// Decompiled by Procyon v0.6.0
-// 
-
 package ic2.core.slot;
 
-import net.minecraft.item.ItemStack;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.item.Item;
 import net.minecraft.inventory.Slot;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 
-public class SlotCustom extends Slot
-{
-    private final Item item;
-    
-    public SlotCustom(final IInventory iinventory, final Item item, final int i, final int j, final int k) {
-        super(iinventory, i, j, k);
-        this.item = item;
-    }
-    
-    public boolean isItemValid(final ItemStack itemstack) {
-        return itemstack != null && this.item != null && itemstack.getItem() == this.item;
-    }
+public class SlotCustom extends Slot {
+   private final Item item;
+
+   public SlotCustom(IInventory iinventory, Item item, int i, int j, int k) {
+      super(iinventory, i, j, k);
+      this.item = item;
+   }
+
+   public boolean isItemValid(ItemStack itemstack) {
+      return itemstack == null ? false : this.item != null && itemstack.getItem() == this.item;
+   }
 }

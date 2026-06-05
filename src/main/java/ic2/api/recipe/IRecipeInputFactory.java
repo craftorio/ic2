@@ -1,38 +1,33 @@
-// 
-// Decompiled by Procyon v0.6.0
-// 
-
 package ic2.api.recipe;
 
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraftforge.fluids.Fluid;
-import net.minecraft.item.ItemStack;
 
-public interface IRecipeInputFactory
-{
-    IRecipeInput forStack(final ItemStack p0);
-    
-    IRecipeInput forStack(final ItemStack p0, final int p1);
-    
-    IRecipeInput forExactStack(final ItemStack p0);
-    
-    IRecipeInput forExactStack(final ItemStack p0, final int p1);
-    
-    IRecipeInput forOreDict(final String p0);
-    
-    IRecipeInput forOreDict(final String p0, final int p1);
-    
-    IRecipeInput forOreDict(final String p0, final int p1, final int p2);
-    
-    IRecipeInput forFluidContainer(final Fluid p0);
-    
-    IRecipeInput forFluidContainer(final Fluid p0, final int p1);
-    
-    IRecipeInput forAny(final IRecipeInput... p0);
-    
-    IRecipeInput forAny(final Iterable<IRecipeInput> p0);
-    
-    IRecipeInput forIngredient(final Ingredient p0);
-    
-    Ingredient getIngredient(final IRecipeInput p0);
+public interface IRecipeInputFactory {
+   IRecipeInput forStack(ItemStack var1);
+
+   IRecipeInput forStack(ItemStack var1, int var2);
+
+   IRecipeInput forExactStack(ItemStack var1);
+
+   IRecipeInput forExactStack(ItemStack var1, int var2);
+
+   IRecipeInput forOreDict(String var1);
+
+   IRecipeInput forOreDict(String var1, int var2);
+
+   IRecipeInput forOreDict(String var1, int var2, int var3);
+
+   IRecipeInput forFluidContainer(Fluid var1);
+
+   IRecipeInput forFluidContainer(Fluid var1, int var2);
+
+   IRecipeInput forAny(IRecipeInput... var1);
+
+   IRecipeInput forAny(Iterable<IRecipeInput> var1);
+
+   IRecipeInput forIngredient(Ingredient var1);
+
+   Ingredient getIngredient(IRecipeInput var1);
 }

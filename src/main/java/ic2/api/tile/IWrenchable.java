@@ -1,29 +1,24 @@
-// 
-// Decompiled by Procyon v0.6.0
-// 
-
 package ic2.api.tile;
 
-import net.minecraft.item.ItemStack;
 import java.util.List;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public interface IWrenchable
-{
-    EnumFacing getFacing(final World p0, final BlockPos p1);
-    
-    default boolean canSetFacing(final World world, final BlockPos pos, final EnumFacing newDirection, final EntityPlayer player) {
-        return true;
-    }
-    
-    boolean setFacing(final World p0, final BlockPos p1, final EnumFacing p2, final EntityPlayer p3);
-    
-    boolean wrenchCanRemove(final World p0, final BlockPos p1, final EntityPlayer p2);
-    
-    List<ItemStack> getWrenchDrops(final World p0, final BlockPos p1, final IBlockState p2, final TileEntity p3, final EntityPlayer p4, final int p5);
+public interface IWrenchable {
+   EnumFacing getFacing(World var1, BlockPos var2);
+
+   default boolean canSetFacing(World world, BlockPos pos, EnumFacing newDirection, EntityPlayer player) {
+      return true;
+   }
+
+   boolean setFacing(World var1, BlockPos var2, EnumFacing var3, EntityPlayer var4);
+
+   boolean wrenchCanRemove(World var1, BlockPos var2, EntityPlayer var3);
+
+   List<ItemStack> getWrenchDrops(World var1, BlockPos var2, IBlockState var3, TileEntity var4, EntityPlayer var5, int var6);
 }

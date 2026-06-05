@@ -1,10 +1,10 @@
 
 # IndustrialCraft 2 重构项目
 
-<img src="https://img.shields.io/badge/Minecraft-1.12.2-brightgreen">
-<img src="https://img.shields.io/badge/Forge-14.23.5.2864-orange">
-<img src="https://img.shields.io/badge/Version-2.8.222--ex112-blue">
-<img src="https://img.shields.io/badge/License-ARR-red">
+<img src="https://img.shields.io/badge/Minecraft-1.12.2-brightgreen" alt="Minecraft 1.12.2">
+<img src="https://img.shields.io/badge/Forge-14.23.5.2864-orange" alt="Forge 14.23.5.2864">
+<img src="https://img.shields.io/badge/Version-2.8.222--ex112-blue" alt="Version 2.8.222-ex112">
+<img src="https://img.shields.io/badge/License-ARR-red" alt="License ARR">
 
 ## 关于
 
@@ -52,7 +52,7 @@
 
 ---
 
-##  快速开始
+## 快速开始
 
 ```bash
 
@@ -76,9 +76,9 @@ git clone <repo-url> && cd ic2
 
 ---
 
-##  项目结构
+## 项目结构
 
-```
+```plain
 ic2/
 ├── src/main/java/ic2/
 │   ├── core/               #  核心逻辑 — 电网、机器、GUI、配方
@@ -101,7 +101,7 @@ ic2/
 
 ---
 
-##  开发进度
+## 开发进度
 
 | 阶段 | 状态 | 说明 |
 |:-----|:----:|:-----|
@@ -115,7 +115,7 @@ ic2/
 
 ---
 
-##  技术栈
+## 技术栈
 
 <p align="center">
   <img src="https://img.shields.io/badge/Java-1.8-ED8B00?style=flat-square&logo=java&logoColor=white">

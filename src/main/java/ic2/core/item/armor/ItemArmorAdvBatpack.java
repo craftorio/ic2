@@ -6,23 +6,28 @@ import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 
 @NotClassic
-public class ItemArmorAdvBatpack extends ItemArmorElectric {
-   public ItemArmorAdvBatpack() {
-      super(ItemName.advanced_batpack, "advbatpack", EntityEquipmentSlot.CHEST, 600000.0, 1000.0, 2);
-   }
+public class ItemArmorAdvBatpack extends ItemArmorElectric
+{
+	public ItemArmorAdvBatpack()
+	{
+		super(ItemName.advanced_batpack, "advbatpack", EntityEquipmentSlot.CHEST, 600000.0, 1000.0, 2);
+	}
 
-   @Override
-   public boolean canProvideEnergy(ItemStack stack) {
-      return true;
-   }
+	@Override
+	public boolean canProvideEnergy(ItemStack stack)
+	{
+		return true;
+	}
 
-   @Override
-   public double getDamageAbsorptionRatio() {
-      return 0.0;
-   }
+	@Override
+	public double getDamageAbsorptionRatio()
+	{
+		return 0.0;
+	}
 
-   @Override
-   public int getEnergyPerDamage() {
-      return 0;
-   }
+	@Override
+	public int getEnergyPerDamage()
+	{
+		return 0;
+	}
 }

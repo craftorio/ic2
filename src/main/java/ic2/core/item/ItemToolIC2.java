@@ -10,8 +10,10 @@ import ic2.core.item.tool.ToolClass;
 import ic2.core.profile.Version;
 import ic2.core.ref.IItemModelProvider;
 import ic2.core.ref.ItemName;
+
 import java.util.HashSet;
 import java.util.Set;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -24,125 +26,153 @@ import net.minecraft.item.Item.ToolMaterial;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public abstract class ItemToolIC2 extends ItemTool implements IItemModelProvider, IBoxable {
-   protected EnumRarity rarity = EnumRarity.COMMON;
-   protected final Set<? extends IToolClass> toolClasses;
+public abstract class ItemToolIC2 extends ItemTool implements IItemModelProvider, IBoxable
+{
+	protected EnumRarity rarity = EnumRarity.COMMON;
+	protected final Set<? extends IToolClass> toolClasses;
 
-   protected ItemToolIC2(ItemName name, HarvestLevel harvestLevel, Set<? extends IToolClass> toolClasses) {
-      this(name, harvestLevel, toolClasses, new HashSet<>());
-   }
+	protected ItemToolIC2(ItemName name, HarvestLevel harvestLevel, Set<? extends IToolClass> toolClasses)
+	{
+		this(name, harvestLevel, toolClasses, new HashSet<>());
+	}
 
-   protected ItemToolIC2(ItemName name, HarvestLevel harvestLevel, Set<? extends IToolClass> toolClasses, Set<Block> mineableBlocks) {
-      this(name, 0.0F, 0.0F, harvestLevel, toolClasses, mineableBlocks);
-   }
+	protected ItemToolIC2(ItemName name, HarvestLevel harvestLevel, Set<? extends IToolClass> toolClasses, Set<Block> mineableBlocks)
+	{
+		this(name, 0.0F, 0.0F, harvestLevel, toolClasses, mineableBlocks);
+	}
 
-   protected ItemToolIC2(ItemName name, float damage, float speed, HarvestLevel harvestLevel, Set<? extends IToolClass> toolClasses, Set<Block> mineableBlocks) {
-      super(damage, speed, harvestLevel.toolMaterial, mineableBlocks);
-      this.toolClasses = toolClasses;
-      this.setMaxStackSize(1);
-      this.setCreativeTab(IC2.tabIC2);
+	protected ItemToolIC2(ItemName name, float damage, float speed, HarvestLevel harvestLevel, Set<? extends IToolClass> toolClasses, Set<Block> mineableBlocks)
+	{
+		super(damage, speed, harvestLevel.toolMaterial, mineableBlocks);
+		this.toolClasses = toolClasses;
+		this.setMaxStackSize(1);
+		this.setCreativeTab(IC2.tabIC2);
 
-      for (IToolClass toolClass : toolClasses) {
-         if (toolClass.getName() != null) {
-            this.setHarvestLevel(toolClass.getName(), harvestLevel.level);
-         }
-      }
+		for (IToolClass toolClass : toolClasses)
+		{
+			if (toolClass.getName() != null)
+			{
+				this.setHarvestLevel(toolClass.getName(), harvestLevel.level);
+			}
+		}
 
-      if (toolClasses.contains(ToolClass.Pickaxe) && harvestLevel.toolMaterial == ToolMaterial.DIAMOND) {
-         mineableBlocks.add(Blocks.OBSIDIAN);
-         mineableBlocks.add(Blocks.REDSTONE_ORE);
-         mineableBlocks.add(Blocks.LIT_REDSTONE_ORE);
-      }
+		if (toolClasses.contains(ToolClass.Pickaxe) && harvestLevel.toolMaterial == ToolMaterial.DIAMOND)
+		{
+			mineableBlocks.add(Blocks.OBSIDIAN);
+			mineableBlocks.add(Blocks.REDSTONE_ORE);
+			mineableBlocks.add(Blocks.LIT_REDSTONE_ORE);
+		}
 
-      if (name != null) {
-         this.setUnlocalizedName(name.name());
-         BlocksItems.registerItem(this, IC2.getIdentifier(name.name()));
-         name.setInstance(this);
-      }
-   }
+		if (name != null)
+		{
+			this.setUnlocalizedName(name.name());
+			BlocksItems.registerItem(this, IC2.getIdentifier(name.name()));
+			name.setInstance(this);
+		}
+	}
 
-   public String getUnlocalizedName() {
-      return "ic2." + super.getUnlocalizedName().substring(5);
-   }
+	public String getUnlocalizedName()
+	{
+		return "ic2." + super.getUnlocalizedName().substring(5);
+	}
 
-   public String getUnlocalizedName(ItemStack itemStack) {
-      return this.getUnlocalizedName();
-   }
+	public String getUnlocalizedName(ItemStack itemStack)
+	{
+		return this.getUnlocalizedName();
+	}
 
-   public String getUnlocalizedNameInefficiently(ItemStack itemStack) {
-      return this.getUnlocalizedName(itemStack);
-   }
+	public String getUnlocalizedNameInefficiently(ItemStack itemStack)
+	{
+		return this.getUnlocalizedName(itemStack);
+	}
 
-   public String getItemStackDisplayName(ItemStack itemStack) {
-      return Localization.translate(this.getUnlocalizedName(itemStack));
-   }
+	public String getItemStackDisplayName(ItemStack itemStack)
+	{
+		return Localization.translate(this.getUnlocalizedName(itemStack));
+	}
 
-   protected boolean isInCreativeTab(CreativeTabs tab) {
-      return this.isEnabled() && super.isInCreativeTab(tab);
-   }
+	protected boolean isInCreativeTab(CreativeTabs tab)
+	{
+		return this.isEnabled() && super.isInCreativeTab(tab);
+	}
 
-   public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
-      return ItemIC2.shouldReequip(oldStack, newStack, slotChanged);
-   }
+	public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged)
+	{
+		return ItemIC2.shouldReequip(oldStack, newStack, slotChanged);
+	}
 
-   public boolean canHarvestBlock(IBlockState state, ItemStack itemStack) {
-      Material material = state.getMaterial();
+	public boolean canHarvestBlock(IBlockState state, ItemStack itemStack)
+	{
+		Material material = state.getMaterial();
 
-      for (IToolClass toolClass : this.toolClasses) {
-         if (toolClass.getBlacklist().contains(state.getBlock())) {
-            return false;
-         }
+		for (IToolClass toolClass : this.toolClasses)
+		{
+			if (toolClass.getBlacklist().contains(state.getBlock()))
+			{
+				return false;
+			}
 
-         if (toolClass.getBlacklist().contains(material)) {
-            return false;
-         }
+			if (toolClass.getBlacklist().contains(material))
+			{
+				return false;
+			}
 
-         if (toolClass.getWhitelist().contains(state.getBlock())) {
-            return true;
-         }
+			if (toolClass.getWhitelist().contains(state.getBlock()))
+			{
+				return true;
+			}
 
-         if (toolClass.getWhitelist().contains(material)) {
-            return true;
-         }
-      }
+			if (toolClass.getWhitelist().contains(material))
+			{
+				return true;
+			}
+		}
 
-      return super.canHarvestBlock(state, itemStack);
-   }
+		return super.canHarvestBlock(state, itemStack);
+	}
 
-   public float getDestroySpeed(ItemStack itemStack, IBlockState state) {
-      return this.canHarvestBlock(state, itemStack) ? this.efficiency : super.getDestroySpeed(itemStack, state);
-   }
+	public float getDestroySpeed(ItemStack itemStack, IBlockState state)
+	{
+		return this.canHarvestBlock(state, itemStack) ? this.efficiency : super.getDestroySpeed(itemStack, state);
+	}
 
-   public EnumRarity getRarity(ItemStack stack) {
-      return stack.isItemEnchanted() && this.rarity != EnumRarity.EPIC ? EnumRarity.RARE : this.rarity;
-   }
+	public EnumRarity getRarity(ItemStack stack)
+	{
+		return stack.isItemEnchanted() && this.rarity != EnumRarity.EPIC ? EnumRarity.RARE : this.rarity;
+	}
 
-   @SideOnly(Side.CLIENT)
-   @Override
-   public void registerModels(ItemName name) {
-      ItemIC2.registerModel(this, 0, name, null);
-   }
+	@SideOnly(Side.CLIENT)
+	@Override
+	public void registerModels(ItemName name)
+	{
+		ItemIC2.registerModel(this, 0, name, null);
+	}
 
-   @Override
-   public boolean canBeStoredInToolbox(ItemStack itemStack) {
-      return true;
-   }
+	@Override
+	public boolean canBeStoredInToolbox(ItemStack itemStack)
+	{
+		return true;
+	}
 
-   @SideOnly(Side.CLIENT)
-   public int getItemColor(ItemStack stack, int tintIndex) {
-      return 16777215;
-   }
+	@SideOnly(Side.CLIENT)
+	public int getItemColor(ItemStack stack, int tintIndex)
+	{
+		return 16777215;
+	}
 
-   public ItemToolIC2 setRarity(EnumRarity rarity) {
-      if (rarity == null) {
-         throw new NullPointerException("Rarity cannot be null");
-      }
+	public ItemToolIC2 setRarity(EnumRarity rarity)
+	{
+		if (rarity == null)
+		{
+			throw new NullPointerException("Rarity cannot be null");
+		}
 
-      this.rarity = rarity;
-      return this;
-   }
+		this.rarity = rarity;
+		return this;
+	}
 
-   protected boolean isEnabled() {
-      return Version.shouldEnable(this.getClass());
-   }
+	protected boolean isEnabled()
+	{
+		return Version.shouldEnable(this.getClass());
+	}
 }

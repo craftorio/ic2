@@ -5,23 +5,30 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 
 @NotClassic
-public class TileEntityChargepadMFSU extends TileEntityChargepadBlock {
-   public TileEntityChargepadMFSU() {
-      super(4, 2048, 40000000);
-   }
+public class TileEntityChargepadMFSU extends TileEntityChargepadBlock
+{
+	public TileEntityChargepadMFSU()
+	{
+		super(4, 2048, 40000000);
+	}
 
-   @Override
-   protected void getItems(EntityPlayer player) {
-      for (ItemStack current : player.inventory.armorInventory) {
-         if (current != null) {
-            this.chargeItem(current, 2048);
-         }
-      }
+	@Override
+	protected void getItems(EntityPlayer player)
+	{
+		for (ItemStack current : player.inventory.armorInventory)
+		{
+			if (current != null)
+			{
+				this.chargeItem(current, 2048);
+			}
+		}
 
-      for (ItemStack current : player.inventory.mainInventory) {
-         if (current != null) {
-            this.chargeItem(current, 2048);
-         }
-      }
-   }
+		for (ItemStack current : player.inventory.mainInventory)
+		{
+			if (current != null)
+			{
+				this.chargeItem(current, 2048);
+			}
+		}
+	}
 }

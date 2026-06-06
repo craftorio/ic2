@@ -4,16 +4,20 @@ import ic2.api.recipe.Recipes;
 import ic2.core.block.IInventorySlotHolder;
 import net.minecraft.item.ItemStack;
 
-public class InvSlotProcessableSmelting extends InvSlotProcessable<ItemStack, ItemStack, ItemStack> {
-   public InvSlotProcessableSmelting(IInventorySlotHolder<?> base, String name, int count) {
-      super(base, name, count, Recipes.furnace);
-   }
+public class InvSlotProcessableSmelting extends InvSlotProcessable<ItemStack, ItemStack, ItemStack>
+{
+	public InvSlotProcessableSmelting(IInventorySlotHolder<?> base, String name, int count)
+	{
+		super(base, name, count, Recipes.furnace);
+	}
 
-   protected ItemStack getInput(ItemStack stack) {
-      return stack;
-   }
+	protected ItemStack getInput(ItemStack stack)
+	{
+		return stack;
+	}
 
-   protected void setInput(ItemStack input) {
-      this.put(input);
-   }
+	protected void setInput(ItemStack input)
+	{
+		this.put(input);
+	}
 }

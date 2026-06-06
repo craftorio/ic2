@@ -6,24 +6,28 @@ import ic2.core.gui.TankGauge;
 import ic2.core.init.Localization;
 import net.minecraft.util.ResourceLocation;
 
-public class GuiFluidHeatGenerator extends GuiIC2<ContainerFluidHeatGenerator> {
-   private static final ResourceLocation background = new ResourceLocation("ic2", "textures/gui/GUIFluidHeatGenerator.png");
+public class GuiFluidHeatGenerator extends GuiIC2<ContainerFluidHeatGenerator>
+{
+	private static final ResourceLocation background = new ResourceLocation("ic2", "textures/gui/GUIFluidHeatGenerator.png");
 
-   public GuiFluidHeatGenerator(ContainerFluidHeatGenerator container) {
-      super(container);
-      this.addElement(TankGauge.createNormal(this, 70, 20, container.base.getFluidTank()));
-   }
+	public GuiFluidHeatGenerator(ContainerFluidHeatGenerator container)
+	{
+		super(container);
+		this.addElement(TankGauge.createNormal(this, 70, 20, container.base.getFluidTank()));
+	}
 
-   @Override
-   protected void drawForegroundLayer(int mouseX, int mouseY) {
-      super.drawForegroundLayer(mouseX, mouseY);
-      this.fontRenderer.drawString(Localization.translate("ic2.FluidHeatGenerator.gui.info.Emit") + this.container.base.gettransmitHeat(), 96, 33, 5752026);
-      this.fontRenderer
-         .drawString(Localization.translate("ic2.FluidHeatGenerator.gui.info.MaxEmit") + this.container.base.getMaxHeatEmittedPerTick(), 96, 52, 5752026);
-   }
+	@Override
+	protected void drawForegroundLayer(int mouseX, int mouseY)
+	{
+		super.drawForegroundLayer(mouseX, mouseY);
+		this.fontRenderer.drawString(Localization.translate("ic2.FluidHeatGenerator.gui.info.Emit") + this.container.base.gettransmitHeat(), 96, 33, 5752026);
+		this.fontRenderer
+			.drawString(Localization.translate("ic2.FluidHeatGenerator.gui.info.MaxEmit") + this.container.base.getMaxHeatEmittedPerTick(), 96, 52, 5752026);
+	}
 
-   @Override
-   protected ResourceLocation getTexture() {
-      return background;
-   }
+	@Override
+	protected ResourceLocation getTexture()
+	{
+		return background;
+	}
 }

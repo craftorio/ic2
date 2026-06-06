@@ -1,6 +1,6 @@
 {
-	"parent": "ic2:item/default",
-	"textures": {
-		"layer0": "ic2:items/crafting/electric_motor"
-	}
+  "parent": "ic2:item/default",
+  "textures": {
+    "layer0": "ic2:items/crafting/electric_motor"
+  }
 }

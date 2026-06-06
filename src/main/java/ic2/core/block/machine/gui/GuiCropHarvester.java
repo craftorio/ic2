@@ -8,14 +8,17 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class GuiCropHarvester extends GuiIC2<ContainerCropHarvester> {
-   public GuiCropHarvester(ContainerCropHarvester container) {
-      super(container);
-      this.addElement(EnergyGauge.asBolt(this, 19, 37, container.base));
-   }
+public class GuiCropHarvester extends GuiIC2<ContainerCropHarvester>
+{
+	public GuiCropHarvester(ContainerCropHarvester container)
+	{
+		super(container);
+		this.addElement(EnergyGauge.asBolt(this, 19, 37, container.base));
+	}
 
-   @Override
-   public ResourceLocation getTexture() {
-      return new ResourceLocation("ic2", "textures/gui/GUICropHarvester.png");
-   }
+	@Override
+	public ResourceLocation getTexture()
+	{
+		return new ResourceLocation("ic2", "textures/gui/GUICropHarvester.png");
+	}
 }

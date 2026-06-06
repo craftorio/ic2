@@ -10,25 +10,31 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
 
-public class EntityNuke extends EntityIC2Explosive {
-   public EntityNuke(World world, double x, double y, double z, float power, int radiationRange) {
-      super(world, x, y, z, 300, power, 0.05F, 1.5F, BlockName.te.getBlockState(TeBlock.nuke), radiationRange);
-   }
+public class EntityNuke extends EntityIC2Explosive
+{
+	public EntityNuke(World world, double x, double y, double z, float power, int radiationRange)
+	{
+		super(world, x, y, z, 300, power, 0.05F, 1.5F, BlockName.te.getBlockState(TeBlock.nuke), radiationRange);
+	}
 
-   public EntityNuke(World world) {
-      this(world, 0.0, 0.0, 0.0, 0.0F, 0);
-   }
+	public EntityNuke(World world)
+	{
+		this(world, 0.0, 0.0, 0.0, 0.0F, 0);
+	}
 
-   public boolean processInitialInteract(EntityPlayer player, EnumHand hand) {
-      ItemStack stack = StackUtil.get(player, hand);
-      if (IC2.platform.isSimulating() && !StackUtil.isEmpty(stack) && stack.getItem() instanceof ItemToolWrench) {
-         ItemToolWrench wrench = (ItemToolWrench)stack.getItem();
-         if (wrench.canTakeDamage(stack, 1)) {
-            wrench.damage(stack, 1, player);
-            this.setDead();
-         }
-      }
+	public boolean processInitialInteract(EntityPlayer player, EnumHand hand)
+	{
+		ItemStack stack = StackUtil.get(player, hand);
+		if (IC2.platform.isSimulating() && !StackUtil.isEmpty(stack) && stack.getItem() instanceof ItemToolWrench)
+		{
+			ItemToolWrench wrench = (ItemToolWrench) stack.getItem();
+			if (wrench.canTakeDamage(stack, 1))
+			{
+				wrench.damage(stack, 1, player);
+				this.setDead();
+			}
+		}
 
-      return false;
-   }
+		return false;
+	}
 }

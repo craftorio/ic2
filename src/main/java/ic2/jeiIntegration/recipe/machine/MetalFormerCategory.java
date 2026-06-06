@@ -8,25 +8,29 @@ import mezz.jei.api.IGuiHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 
-public final class MetalFormerCategory extends DynamicCategory<IBasicMachineRecipeManager> {
-   private final int mode;
-   private static final ItemStack[] icon = new ItemStack[]{
-      ItemName.cable.getItemStack(CableType.copper), ItemName.forge_hammer.getItemStack(), ItemName.cutter.getItemStack()
-   };
+public final class MetalFormerCategory extends DynamicCategory<IBasicMachineRecipeManager>
+{
+	private final int mode;
+	private static final ItemStack[] icon = new ItemStack[] {
+		ItemName.cable.getItemStack(CableType.copper), ItemName.forge_hammer.getItemStack(), ItemName.cutter.getItemStack()
+	};
 
-   public MetalFormerCategory(IBasicMachineRecipeManager recipeManager, int mode, IGuiHelper guiHelper) {
-      super(TeBlock.metal_former, recipeManager, guiHelper);
-      this.mode = mode;
-   }
+	public MetalFormerCategory(IBasicMachineRecipeManager recipeManager, int mode, IGuiHelper guiHelper)
+	{
+		super(TeBlock.metal_former, recipeManager, guiHelper);
+		this.mode = mode;
+	}
 
-   @Override
-   public String getUid() {
-      return super.getUid() + this.mode;
-   }
+	@Override
+	public String getUid()
+	{
+		return super.getUid() + this.mode;
+	}
 
-   @Override
-   public void draw(Minecraft minecraft) {
-      super.draw(minecraft);
-      minecraft.getRenderItem().renderItemAndEffectIntoGUI(icon[this.mode], 70, 35);
-   }
+	@Override
+	public void draw(Minecraft minecraft)
+	{
+		super.draw(minecraft);
+		minecraft.getRenderItem().renderItemAndEffectIntoGUI(icon[this.mode], 70, 35);
+	}
 }

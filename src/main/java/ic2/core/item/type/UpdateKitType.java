@@ -4,22 +4,26 @@ import ic2.core.block.state.IIdProvider;
 import ic2.core.profile.NotClassic;
 
 @NotClassic
-public enum UpdateKitType implements IIdProvider {
-   mfsu(0);
+public enum UpdateKitType implements IIdProvider
+{
+	mfsu(0);
 
-   private final int id;
+	private final int id;
 
-   UpdateKitType(int id) {
-      this.id = id;
-   }
+	UpdateKitType(int id)
+	{
+		this.id = id;
+	}
 
-   @Override
-   public String getName() {
-      return this.name();
-   }
+	@Override
+	public String getName()
+	{
+		return this.name();
+	}
 
-   @Override
-   public int getId() {
-      return this.id;
-   }
+	@Override
+	public int getId()
+	{
+		return this.id;
+	}
 }

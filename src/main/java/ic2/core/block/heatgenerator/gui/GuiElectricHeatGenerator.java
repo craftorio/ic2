@@ -13,42 +13,47 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class GuiElectricHeatGenerator extends GuiIC2<ContainerElectricHeatGenerator> {
-   private static final ResourceLocation background = new ResourceLocation("ic2", "textures/gui/GUIElectricHeatGenerator.png");
+public class GuiElectricHeatGenerator extends GuiIC2<ContainerElectricHeatGenerator>
+{
+	private static final ResourceLocation background = new ResourceLocation("ic2", "textures/gui/GUIElectricHeatGenerator.png");
 
-   public GuiElectricHeatGenerator(ContainerElectricHeatGenerator container) {
-      super(container);
-      this.addElement(new SlotGrid(this, 43, 26, 5, 2, SlotGrid.SlotStyle.Normal).withTooltip("ic2.ElectricHeatGenerator.gui.coils"));
-      this.addElement(EnergyGauge.asBolt(this, 12, 44, container.base));
-      this.addElement(
-         Text.create(
-               this,
-               34,
-               66,
-               109,
-               13,
-               TextProvider.of(
-                  new Supplier<String>() {
-                     public String get() {
-                        return Localization.translate(
-                           "ic2.ElectricHeatGenerator.gui.hUmax",
-                           GuiElectricHeatGenerator.this.container.base.gettransmitHeat(),
-                           GuiElectricHeatGenerator.this.container.base.getMaxHeatEmittedPerTick()
-                        );
-                     }
-                  }
-               ),
-               5752026,
-               false,
-               true,
-               true
-            )
-            .withTooltip("ic2.ElectricHeatGenerator.gui.tooltipheat")
-      );
-   }
+	public GuiElectricHeatGenerator(ContainerElectricHeatGenerator container)
+	{
+		super(container);
+		this.addElement(new SlotGrid(this, 43, 26, 5, 2, SlotGrid.SlotStyle.Normal).withTooltip("ic2.ElectricHeatGenerator.gui.coils"));
+		this.addElement(EnergyGauge.asBolt(this, 12, 44, container.base));
+		this.addElement(
+			Text.create(
+					this,
+					34,
+					66,
+					109,
+					13,
+					TextProvider.of(
+						new Supplier<String>()
+						{
+							public String get()
+							{
+								return Localization.translate(
+									"ic2.ElectricHeatGenerator.gui.hUmax",
+									GuiElectricHeatGenerator.this.container.base.gettransmitHeat(),
+									GuiElectricHeatGenerator.this.container.base.getMaxHeatEmittedPerTick()
+								);
+							}
+						}
+					),
+					5752026,
+					false,
+					true,
+					true
+				)
+				.withTooltip("ic2.ElectricHeatGenerator.gui.tooltipheat")
+		);
+	}
 
-   @Override
-   protected ResourceLocation getTexture() {
-      return background;
-   }
+	@Override
+	protected ResourceLocation getTexture()
+	{
+		return background;
+	}
 }

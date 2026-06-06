@@ -8,67 +8,81 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class BasicSink extends BasicEnergyTile implements IEnergySink {
-   protected int tier;
+public class BasicSink extends BasicEnergyTile implements IEnergySink
+{
+	protected int tier;
 
-   public BasicSink(TileEntity parent, double capacity, int tier) {
-      super(parent, capacity);
-      if (tier < 0) {
-         throw new IllegalArgumentException("invalid tier: " + tier);
-      }
+	public BasicSink(TileEntity parent, double capacity, int tier)
+	{
+		super(parent, capacity);
+		if (tier < 0)
+		{
+			throw new IllegalArgumentException("invalid tier: " + tier);
+		}
 
-      this.tier = tier;
-   }
+		this.tier = tier;
+	}
 
-   public BasicSink(ILocatable parent, double capacity, int tier) {
-      super(parent, capacity);
-      if (tier < 0) {
-         throw new IllegalArgumentException("invalid tier: " + tier);
-      }
+	public BasicSink(ILocatable parent, double capacity, int tier)
+	{
+		super(parent, capacity);
+		if (tier < 0)
+		{
+			throw new IllegalArgumentException("invalid tier: " + tier);
+		}
 
-      this.tier = tier;
-   }
+		this.tier = tier;
+	}
 
-   public BasicSink(World world, BlockPos pos, double capacity, int tier) {
-      super(world, pos, capacity);
-      if (tier < 0) {
-         throw new IllegalArgumentException("invalid tier: " + tier);
-      }
+	public BasicSink(World world, BlockPos pos, double capacity, int tier)
+	{
+		super(world, pos, capacity);
+		if (tier < 0)
+		{
+			throw new IllegalArgumentException("invalid tier: " + tier);
+		}
 
-      this.tier = tier;
-   }
+		this.tier = tier;
+	}
 
-   public void setSinkTier(int tier) {
-      if (tier < 0) {
-         throw new IllegalArgumentException("invalid tier: " + tier);
-      }
+	public void setSinkTier(int tier)
+	{
+		if (tier < 0)
+		{
+			throw new IllegalArgumentException("invalid tier: " + tier);
+		}
 
-      this.tier = tier;
-   }
+		this.tier = tier;
+	}
 
-   @Override
-   public boolean acceptsEnergyFrom(IEnergyEmitter emitter, EnumFacing direction) {
-      return true;
-   }
+	@Override
+	public boolean acceptsEnergyFrom(IEnergyEmitter emitter, EnumFacing direction)
+	{
+		return true;
+	}
 
-   @Override
-   public double getDemandedEnergy() {
-      return Math.max(0.0, this.getCapacity() - this.getEnergyStored());
-   }
+	@Override
+	public double getDemandedEnergy()
+	{
+		return Math.max(0.0, this.getCapacity() - this.getEnergyStored());
+	}
 
-   @Override
-   public double injectEnergy(EnumFacing directionFrom, double amount, double voltage) {
-      this.setEnergyStored(this.getEnergyStored() + amount);
-      return 0.0;
-   }
+	@Override
+	public double injectEnergy(EnumFacing directionFrom, double amount, double voltage)
+	{
+		this.setEnergyStored(this.getEnergyStored() + amount);
+		return 0.0;
+	}
 
-   @Override
-   public int getSinkTier() {
-      return this.tier;
-   }
+	@Override
+	public int getSinkTier()
+	{
+		return this.tier;
+	}
 
-   @Override
-   protected String getNbtTagName() {
-      return "IC2BasicSink";
-   }
+	@Override
+	protected String getNbtTagName()
+	{
+		return "IC2BasicSink";
+	}
 }

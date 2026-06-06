@@ -9,19 +9,23 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 
-public class BlockRefractoryBricks extends BlockBase {
-   public BlockRefractoryBricks() {
-      super(BlockName.refractory_bricks, Material.ROCK);
-      this.setHardness(2.0F);
-      this.setResistance(10.0F);
-      this.setHarvestLevel("pickaxe", 0);
-   }
+public class BlockRefractoryBricks extends BlockBase
+{
+	public BlockRefractoryBricks()
+	{
+		super(BlockName.refractory_bricks, Material.ROCK);
+		this.setHardness(2.0F);
+		this.setResistance(10.0F);
+		this.setHarvestLevel("pickaxe", 0);
+	}
 
-   protected BlockStateContainer createBlockState() {
-      return new BlockStateContainer(this, new IProperty[0]);
-   }
+	protected BlockStateContainer createBlockState()
+	{
+		return new BlockStateContainer(this, new IProperty[0]);
+	}
 
-   public boolean isFlammable(IBlockAccess world, BlockPos pos, EnumFacing face) {
-      return false;
-   }
+	public boolean isFlammable(IBlockAccess world, BlockPos pos, EnumFacing face)
+	{
+		return false;
+	}
 }

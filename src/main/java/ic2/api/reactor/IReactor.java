@@ -4,40 +4,41 @@ import ic2.api.info.ILocatable;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 
-public interface IReactor extends ILocatable {
-   TileEntity getCoreTe();
+public interface IReactor extends ILocatable
+{
+	TileEntity getCoreTe();
 
-   int getHeat();
+	int getHeat();
 
-   void setHeat(int var1);
+	void setHeat(int var1);
 
-   int addHeat(int var1);
+	int addHeat(int var1);
 
-   int getMaxHeat();
+	int getMaxHeat();
 
-   void setMaxHeat(int var1);
+	void setMaxHeat(int var1);
 
-   void addEmitHeat(int var1);
+	void addEmitHeat(int var1);
 
-   float getHeatEffectModifier();
+	float getHeatEffectModifier();
 
-   void setHeatEffectModifier(float var1);
+	void setHeatEffectModifier(float var1);
 
-   float getReactorEnergyOutput();
+	float getReactorEnergyOutput();
 
-   double getReactorEUEnergyOutput();
+	double getReactorEUEnergyOutput();
 
-   float addOutput(float var1);
+	float addOutput(float var1);
 
-   ItemStack getItemAt(int var1, int var2);
+	ItemStack getItemAt(int var1, int var2);
 
-   void setItemAt(int var1, int var2, ItemStack var3);
+	void setItemAt(int var1, int var2, ItemStack var3);
 
-   void explode();
+	void explode();
 
-   int getTickRate();
+	int getTickRate();
 
-   boolean produceEnergy();
+	boolean produceEnergy();
 
-   boolean isFluidCooled();
+	boolean isFluidCooled();
 }

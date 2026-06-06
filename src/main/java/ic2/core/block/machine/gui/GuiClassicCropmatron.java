@@ -8,16 +8,19 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class GuiClassicCropmatron extends GuiIC2<ContainerClassicCropmatron> {
-   private static final ResourceLocation background = new ResourceLocation("ic2", "textures/gui/GUI_Cropmatron_Classic.png");
+public class GuiClassicCropmatron extends GuiIC2<ContainerClassicCropmatron>
+{
+	private static final ResourceLocation background = new ResourceLocation("ic2", "textures/gui/GUI_Cropmatron_Classic.png");
 
-   public GuiClassicCropmatron(ContainerClassicCropmatron container) {
-      super(container);
-      this.addElement(EnergyGauge.asBolt(this, 29, 39, container.base));
-   }
+	public GuiClassicCropmatron(ContainerClassicCropmatron container)
+	{
+		super(container);
+		this.addElement(EnergyGauge.asBolt(this, 29, 39, container.base));
+	}
 
-   @Override
-   protected ResourceLocation getTexture() {
-      return background;
-   }
+	@Override
+	protected ResourceLocation getTexture()
+	{
+		return background;
+	}
 }

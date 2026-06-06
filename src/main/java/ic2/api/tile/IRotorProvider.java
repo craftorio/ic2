@@ -3,12 +3,13 @@ package ic2.api.tile;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 
-public interface IRotorProvider {
-   int getRotorDiameter();
+public interface IRotorProvider
+{
+	int getRotorDiameter();
 
-   EnumFacing getFacing();
+	EnumFacing getFacing();
 
-   float getAngle();
+	float getAngle();
 
-   ResourceLocation getRotorRenderTexture();
+	ResourceLocation getRotorRenderTexture();
 }

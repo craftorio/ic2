@@ -9,16 +9,19 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class ItemIC2Door extends ItemBlockIC2 {
-   public ItemIC2Door(Block block) {
-      super(block);
-      this.setMaxStackSize(8);
-   }
+public class ItemIC2Door extends ItemBlockIC2
+{
+	public ItemIC2Door(Block block)
+	{
+		super(block);
+		this.setMaxStackSize(8);
+	}
 
-   public boolean placeBlockAt(
-      ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, IBlockState newState
-   ) {
-      ItemDoor.placeDoor(world, pos, EnumFacing.fromAngle(player.rotationYaw), this.block, false);
-      return true;
-   }
+	public boolean placeBlockAt(
+		ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, IBlockState newState
+	)
+	{
+		ItemDoor.placeDoor(world, pos, EnumFacing.fromAngle(player.rotationYaw), this.block, false);
+		return true;
+	}
 }

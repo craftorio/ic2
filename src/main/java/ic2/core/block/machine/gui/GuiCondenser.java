@@ -11,26 +11,31 @@ import ic2.core.gui.TankGauge;
 import ic2.core.init.Localization;
 import net.minecraft.util.ResourceLocation;
 
-public class GuiCondenser extends GuiIC2<ContainerCondenser> {
-   private static final ResourceLocation BACKGROUND = new ResourceLocation("ic2", "textures/gui/GUICondenser.png");
+public class GuiCondenser extends GuiIC2<ContainerCondenser>
+{
+	private static final ResourceLocation BACKGROUND = new ResourceLocation("ic2", "textures/gui/GUICondenser.png");
 
-   public GuiCondenser(final ContainerCondenser container) {
-      super(container, 184);
-      Supplier<String> ventTooltipSupplier = new Supplier<String>() {
-         public String get() {
-            return Localization.translate("ic2.Condenser.gui.tooltipvent", (short)2);
-         }
-      };
-      this.addElement(new SlotGrid(this, 25, 25, 1, 2, SlotGrid.SlotStyle.Normal).withTooltip(ventTooltipSupplier));
-      this.addElement(new SlotGrid(this, 133, 25, 1, 2, SlotGrid.SlotStyle.Normal).withTooltip(ventTooltipSupplier));
-      this.addElement(EnergyGauge.asBolt(this, 12, 26, container.base));
-      this.addElement(TankGauge.createPlain(this, 46, 27, 84, 33, container.base.getInputTank()));
-      this.addElement(TankGauge.createPlain(this, 46, 74, 84, 15, container.base.getOutputTank()));
-      this.addElement(new LinkedGauge(this, 47, 63, container.base, "progress", Gauge.GaugeStyle.ProgressCondenser));
-   }
+	public GuiCondenser(final ContainerCondenser container)
+	{
+		super(container, 184);
+		Supplier<String> ventTooltipSupplier = new Supplier<String>()
+		{
+			public String get()
+			{
+				return Localization.translate("ic2.Condenser.gui.tooltipvent", (short) 2);
+			}
+		};
+		this.addElement(new SlotGrid(this, 25, 25, 1, 2, SlotGrid.SlotStyle.Normal).withTooltip(ventTooltipSupplier));
+		this.addElement(new SlotGrid(this, 133, 25, 1, 2, SlotGrid.SlotStyle.Normal).withTooltip(ventTooltipSupplier));
+		this.addElement(EnergyGauge.asBolt(this, 12, 26, container.base));
+		this.addElement(TankGauge.createPlain(this, 46, 27, 84, 33, container.base.getInputTank()));
+		this.addElement(TankGauge.createPlain(this, 46, 74, 84, 15, container.base.getOutputTank()));
+		this.addElement(new LinkedGauge(this, 47, 63, container.base, "progress", Gauge.GaugeStyle.ProgressCondenser));
+	}
 
-   @Override
-   protected ResourceLocation getTexture() {
-      return BACKGROUND;
-   }
+	@Override
+	protected ResourceLocation getTexture()
+	{
+		return BACKGROUND;
+	}
 }

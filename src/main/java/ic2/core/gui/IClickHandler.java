@@ -1,5 +1,6 @@
 package ic2.core.gui;
 
-public interface IClickHandler {
-   void onClick(MouseButton var1);
+public interface IClickHandler
+{
+	void onClick(MouseButton var1);
 }

@@ -1,6 +1,6 @@
 {
-	"parent": "ic2:item/default",
-	"textures": {
-		"layer0": "ic2:items/crafting/copper_boiler"
-	}
+  "parent": "ic2:item/default",
+  "textures": {
+    "layer0": "ic2:items/crafting/copper_boiler"
+  }
 }

@@ -14,26 +14,32 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class ItemTreetapElectric extends ItemElectricTool {
-   public ItemTreetapElectric() {
-      super(ItemName.electric_treetap, 50);
-      this.maxCharge = 10000;
-      this.transferLimit = 100;
-      this.tier = 1;
-   }
+public class ItemTreetapElectric extends ItemElectricTool
+{
+	public ItemTreetapElectric()
+	{
+		super(ItemName.electric_treetap, 50);
+		this.maxCharge = 10000;
+		this.transferLimit = 100;
+		this.tier = 1;
+	}
 
-   @Override
-   public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-      IBlockState state = world.getBlockState(pos);
-      Block block = state.getBlock();
-      ItemStack stack = StackUtil.get(player, hand);
-      if (block != BlockName.rubber_wood.getInstance() || !ElectricItem.manager.canUse(stack, this.operationEnergyCost)) {
-         return EnumActionResult.PASS;
-      } else if (ItemTreetap.attemptExtract(player, world, pos, side, state, null)) {
-         ElectricItem.manager.use(stack, this.operationEnergyCost, player);
-         return EnumActionResult.SUCCESS;
-      } else {
-         return super.onItemUse(player, world, pos, hand, side, hitX, hitY, hitZ);
-      }
-   }
+	@Override
+	public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ)
+	{
+		IBlockState state = world.getBlockState(pos);
+		Block block = state.getBlock();
+		ItemStack stack = StackUtil.get(player, hand);
+		if (block != BlockName.rubber_wood.getInstance() || !ElectricItem.manager.canUse(stack, this.operationEnergyCost))
+		{
+			return EnumActionResult.PASS;
+		} else if (ItemTreetap.attemptExtract(player, world, pos, side, state, null))
+		{
+			ElectricItem.manager.use(stack, this.operationEnergyCost, player);
+			return EnumActionResult.SUCCESS;
+		} else
+		{
+			return super.onItemUse(player, world, pos, hand, side, hitX, hitY, hitZ);
+		}
+	}
 }

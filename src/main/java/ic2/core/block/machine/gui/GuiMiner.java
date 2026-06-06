@@ -8,14 +8,17 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class GuiMiner extends GuiIC2<ContainerMiner> {
-   public GuiMiner(ContainerMiner container) {
-      super(container);
-      this.addElement(EnergyGauge.asBolt(this, 155, 41, container.base));
-   }
+public class GuiMiner extends GuiIC2<ContainerMiner>
+{
+	public GuiMiner(ContainerMiner container)
+	{
+		super(container);
+		this.addElement(EnergyGauge.asBolt(this, 155, 41, container.base));
+	}
 
-   @Override
-   protected ResourceLocation getTexture() {
-      return new ResourceLocation("ic2", "textures/gui/GUIMiner.png");
-   }
+	@Override
+	protected ResourceLocation getTexture()
+	{
+		return new ResourceLocation("ic2", "textures/gui/GUIMiner.png");
+	}
 }

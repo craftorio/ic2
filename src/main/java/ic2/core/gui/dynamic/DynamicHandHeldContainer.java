@@ -7,46 +7,55 @@ import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
-public class DynamicHandHeldContainer<T extends HandHeldInventory> extends DynamicContainer<T> {
-   public static <T extends HandHeldInventory> DynamicHandHeldContainer<T> create(T base, EntityPlayer player, GuiParser.GuiNode guiNode) {
-      return new DynamicHandHeldContainer<>(base, player, guiNode);
-   }
+public class DynamicHandHeldContainer<T extends HandHeldInventory> extends DynamicContainer<T>
+{
+	public static <T extends HandHeldInventory> DynamicHandHeldContainer<T> create(T base, EntityPlayer player, GuiParser.GuiNode guiNode)
+	{
+		return new DynamicHandHeldContainer<>(base, player, guiNode);
+	}
 
-   protected DynamicHandHeldContainer(T base, EntityPlayer player, GuiParser.GuiNode guiNode) {
-      super(base, player, guiNode);
-   }
+	protected DynamicHandHeldContainer(T base, EntityPlayer player, GuiParser.GuiNode guiNode)
+	{
+		super(base, player, guiNode);
+	}
 
-   @Override
-   protected SlotHologramSlot.ChangeCallback getCallback() {
-      return this.base.makeSaveCallback();
-   }
+	@Override
+	protected SlotHologramSlot.ChangeCallback getCallback()
+	{
+		return this.base.makeSaveCallback();
+	}
 
-   @Override
-   public void onContainerEvent(String event) {
-      this.base.onEvent(event);
-      super.onContainerEvent(event);
-   }
+	@Override
+	public void onContainerEvent(String event)
+	{
+		this.base.onEvent(event);
+		super.onContainerEvent(event);
+	}
 
-   @Override
-   public ItemStack slotClick(int slot, int button, ClickType type, EntityPlayer player) {
-      boolean thrown = false;
-      Slot realSlot = null;
-      if (!player.getEntityWorld().isRemote && slot >= 0 && slot < this.inventorySlots.size()) {
-         realSlot = (Slot)this.inventorySlots.get(slot);
-         thrown = this.base.isThisContainer(realSlot.getStack());
-      }
+	@Override
+	public ItemStack slotClick(int slot, int button, ClickType type, EntityPlayer player)
+	{
+		boolean thrown = false;
+		Slot realSlot = null;
+		if (!player.getEntityWorld().isRemote && slot >= 0 && slot < this.inventorySlots.size())
+		{
+			realSlot = (Slot) this.inventorySlots.get(slot);
+			thrown = this.base.isThisContainer(realSlot.getStack());
+		}
 
-      ItemStack stack = super.slotClick(slot, button, type, player);
-      if (thrown && !realSlot.getHasStack()) {
-         this.base.saveAsThrown(stack);
-         player.closeScreen();
-      }
+		ItemStack stack = super.slotClick(slot, button, type, player);
+		if (thrown && !realSlot.getHasStack())
+		{
+			this.base.saveAsThrown(stack);
+			player.closeScreen();
+		}
 
-      return stack;
-   }
+		return stack;
+	}
 
-   public void onContainerClosed(EntityPlayer player) {
-      this.base.onGuiClosed(player);
-      super.onContainerClosed(player);
-   }
+	public void onContainerClosed(EntityPlayer player)
+	{
+		this.base.onGuiClosed(player);
+		super.onContainerClosed(player);
+	}
 }

@@ -1,11 +1,12 @@
 package ic2.core.gui;
 
-public interface IOverlaySupplier {
-   int getUS();
+public interface IOverlaySupplier
+{
+	int getUS();
 
-   int getVS();
+	int getVS();
 
-   int getUE();
+	int getUE();
 
-   int getVE();
+	int getVE();
 }

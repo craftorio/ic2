@@ -1,15 +1,16 @@
 package ic2.api.energy.tile;
 
-public interface IEnergyConductor extends IEnergyAcceptor, IEnergyEmitter {
-   double getConductionLoss();
+public interface IEnergyConductor extends IEnergyAcceptor, IEnergyEmitter
+{
+	double getConductionLoss();
 
-   double getInsulationEnergyAbsorption();
+	double getInsulationEnergyAbsorption();
 
-   double getInsulationBreakdownEnergy();
+	double getInsulationBreakdownEnergy();
 
-   double getConductorBreakdownEnergy();
+	double getConductorBreakdownEnergy();
 
-   void removeInsulation();
+	void removeInsulation();
 
-   void removeConductor();
+	void removeConductor();
 }

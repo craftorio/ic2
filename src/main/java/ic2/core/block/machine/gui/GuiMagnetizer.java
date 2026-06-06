@@ -10,24 +10,30 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class GuiMagnetizer extends GuiIC2<ContainerMagnetizer> {
-   public GuiMagnetizer(ContainerMagnetizer container) {
-      super(container);
-      this.addElement(EnergyGauge.asBolt(this, 11, 28, container.base));
-   }
+public class GuiMagnetizer extends GuiIC2<ContainerMagnetizer>
+{
+	public GuiMagnetizer(ContainerMagnetizer container)
+	{
+		super(container);
+		this.addElement(EnergyGauge.asBolt(this, 11, 28, container.base));
+	}
 
-   @Override
-   protected ResourceLocation getTexture() {
-      return new ResourceLocation("ic2", "textures/gui/GUIMagnetizer.png");
-   }
+	@Override
+	protected ResourceLocation getTexture()
+	{
+		return new ResourceLocation("ic2", "textures/gui/GUIMagnetizer.png");
+	}
 
-   @Override
-   protected void drawForegroundLayer(int mouseX, int mouseY) {
-      super.drawForegroundLayer(mouseX, mouseY);
-      if (BlockIC2Fence.hasMetalShoes(this.container.player)) {
-         this.fontRenderer.drawString(Localization.translate("ic2.Magnetizer.gui.hasMetalShoes"), 18, 66, 4259648);
-      } else {
-         this.fontRenderer.drawString(Localization.translate("ic2.Magnetizer.gui.noMetalShoes"), 18, 66, 16728128);
-      }
-   }
+	@Override
+	protected void drawForegroundLayer(int mouseX, int mouseY)
+	{
+		super.drawForegroundLayer(mouseX, mouseY);
+		if (BlockIC2Fence.hasMetalShoes(this.container.player))
+		{
+			this.fontRenderer.drawString(Localization.translate("ic2.Magnetizer.gui.hasMetalShoes"), 18, 66, 4259648);
+		} else
+		{
+			this.fontRenderer.drawString(Localization.translate("ic2.Magnetizer.gui.noMetalShoes"), 18, 66, 16728128);
+		}
+	}
 }

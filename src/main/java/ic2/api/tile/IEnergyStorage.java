@@ -2,18 +2,19 @@ package ic2.api.tile;
 
 import net.minecraft.util.EnumFacing;
 
-public interface IEnergyStorage {
-   int getStored();
+public interface IEnergyStorage
+{
+	int getStored();
 
-   void setStored(int var1);
+	void setStored(int var1);
 
-   int addEnergy(int var1);
+	int addEnergy(int var1);
 
-   int getCapacity();
+	int getCapacity();
 
-   int getOutput();
+	int getOutput();
 
-   double getOutputEnergyUnitsPerTick();
+	double getOutputEnergyUnitsPerTick();
 
-   boolean isTeleporterCompatible(EnumFacing var1);
+	boolean isTeleporterCompatible(EnumFacing var1);
 }

@@ -5,12 +5,15 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
-public class SlotBoxable extends Slot {
-   public SlotBoxable(IInventory iinventory, int i, int j, int k) {
-      super(iinventory, i, j, k);
-   }
+public class SlotBoxable extends Slot
+{
+	public SlotBoxable(IInventory iinventory, int i, int j, int k)
+	{
+		super(iinventory, i, j, k);
+	}
 
-   public boolean isItemValid(ItemStack itemstack) {
-      return itemstack == null ? false : ItemWrapper.canBeStoredInToolbox(itemstack);
-   }
+	public boolean isItemValid(ItemStack itemstack)
+	{
+		return itemstack == null ? false : ItemWrapper.canBeStoredInToolbox(itemstack);
+	}
 }

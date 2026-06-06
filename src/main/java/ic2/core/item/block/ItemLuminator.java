@@ -9,15 +9,18 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class ItemLuminator extends ItemBlockIC2 {
-   public ItemLuminator(Block block) {
-      super(block);
-      this.setCreativeTab(IC2.tabIC2);
-   }
+public class ItemLuminator extends ItemBlockIC2
+{
+	public ItemLuminator(Block block)
+	{
+		super(block);
+		this.setCreativeTab(IC2.tabIC2);
+	}
 
-   public boolean placeBlockAt(
-      ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, IBlockState state
-   ) {
-      return world.setBlockState(pos, state, 3);
-   }
+	public boolean placeBlockAt(
+		ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, IBlockState state
+	)
+	{
+		return world.setBlockState(pos, state, 3);
+	}
 }

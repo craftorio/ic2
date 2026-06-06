@@ -10,17 +10,20 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class GuiClassicCanner extends GuiIC2<ContainerClassicCanner> {
-   public static final ResourceLocation background = new ResourceLocation("ic2", "textures/gui/GUI_Canner_Classic.png");
+public class GuiClassicCanner extends GuiIC2<ContainerClassicCanner>
+{
+	public static final ResourceLocation background = new ResourceLocation("ic2", "textures/gui/GUI_Canner_Classic.png");
 
-   public GuiClassicCanner(ContainerClassicCanner container) {
-      super(container);
-      this.addElement(new LinkedGauge(this, 74, 36, container.base, "progress", Gauge.GaugeStyle.ProgressLongArrow));
-      this.addElement(EnergyGauge.asBolt(this, 34, 28, container.base));
-   }
+	public GuiClassicCanner(ContainerClassicCanner container)
+	{
+		super(container);
+		this.addElement(new LinkedGauge(this, 74, 36, container.base, "progress", Gauge.GaugeStyle.ProgressLongArrow));
+		this.addElement(EnergyGauge.asBolt(this, 34, 28, container.base));
+	}
 
-   @Override
-   protected ResourceLocation getTexture() {
-      return background;
-   }
+	@Override
+	protected ResourceLocation getTexture()
+	{
+		return background;
+	}
 }

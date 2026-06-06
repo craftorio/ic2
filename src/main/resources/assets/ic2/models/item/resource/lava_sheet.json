@@ -1,6 +1,6 @@
 {
-	"parent": "ic2:item/default",
-	"textures": {
-		"layer0": "minecraft:blocks/lava_still"
-	}
+  "parent": "ic2:item/default",
+  "textures": {
+    "layer0": "minecraft:blocks/lava_still"
+  }
 }

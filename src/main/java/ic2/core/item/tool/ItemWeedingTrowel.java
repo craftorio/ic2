@@ -17,27 +17,33 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 @NotClassic
-public class ItemWeedingTrowel extends ItemIC2 {
-   public ItemWeedingTrowel() {
-      super(ItemName.weeding_trowel);
-      this.setMaxStackSize(1);
-   }
+public class ItemWeedingTrowel extends ItemIC2
+{
+	public ItemWeedingTrowel()
+	{
+		super(ItemName.weeding_trowel);
+		this.setMaxStackSize(1);
+	}
 
-   public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
-      if (!IC2.platform.isSimulating()) {
-         return EnumActionResult.PASS;
-      }
+	public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand)
+	{
+		if (!IC2.platform.isSimulating())
+		{
+			return EnumActionResult.PASS;
+		}
 
-      TileEntity tileEntity = world.getTileEntity(pos);
-      if (tileEntity instanceof TileEntityCrop) {
-         TileEntityCrop tileEntityCrop = (TileEntityCrop)tileEntity;
-         if (tileEntityCrop.getCrop() == IC2Crops.weed) {
-            StackUtil.dropAsEntity(world, pos, StackUtil.copyWithSize(ItemName.crop_res.getItemStack(CropResItemType.weed), tileEntityCrop.getCurrentSize()));
-            tileEntityCrop.reset();
-            return EnumActionResult.SUCCESS;
-         }
-      }
+		TileEntity tileEntity = world.getTileEntity(pos);
+		if (tileEntity instanceof TileEntityCrop)
+		{
+			TileEntityCrop tileEntityCrop = (TileEntityCrop) tileEntity;
+			if (tileEntityCrop.getCrop() == IC2Crops.weed)
+			{
+				StackUtil.dropAsEntity(world, pos, StackUtil.copyWithSize(ItemName.crop_res.getItemStack(CropResItemType.weed), tileEntityCrop.getCurrentSize()));
+				tileEntityCrop.reset();
+				return EnumActionResult.SUCCESS;
+			}
+		}
 
-      return EnumActionResult.PASS;
-   }
+		return EnumActionResult.PASS;
+	}
 }

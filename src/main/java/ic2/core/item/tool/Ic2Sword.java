@@ -13,41 +13,49 @@ import net.minecraft.item.Item.ToolMaterial;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class Ic2Sword extends ItemSword implements IItemModelProvider {
-   public int weaponDamage = 7;
-   private final Object repairMaterial = "ingotBronze";
+public class Ic2Sword extends ItemSword implements IItemModelProvider
+{
+	public int weaponDamage = 7;
+	private final Object repairMaterial = "ingotBronze";
 
-   public Ic2Sword(ToolMaterial material) {
-      super(material);
-      this.setUnlocalizedName(ItemName.bronze_sword.name());
-      this.setCreativeTab(IC2.tabIC2);
-      BlocksItems.registerItem(this, IC2.getIdentifier(ItemName.bronze_sword.name()));
-      ItemName.bronze_sword.setInstance(this);
-   }
+	public Ic2Sword(ToolMaterial material)
+	{
+		super(material);
+		this.setUnlocalizedName(ItemName.bronze_sword.name());
+		this.setCreativeTab(IC2.tabIC2);
+		BlocksItems.registerItem(this, IC2.getIdentifier(ItemName.bronze_sword.name()));
+		ItemName.bronze_sword.setInstance(this);
+	}
 
-   @SideOnly(Side.CLIENT)
-   @Override
-   public void registerModels(ItemName name) {
-      ItemIC2.registerModel(this, 0, name, null);
-   }
+	@SideOnly(Side.CLIENT)
+	@Override
+	public void registerModels(ItemName name)
+	{
+		ItemIC2.registerModel(this, 0, name, null);
+	}
 
-   public String getUnlocalizedName() {
-      return "ic2." + super.getUnlocalizedName().substring(5);
-   }
+	public String getUnlocalizedName()
+	{
+		return "ic2." + super.getUnlocalizedName().substring(5);
+	}
 
-   public String getUnlocalizedName(ItemStack stack) {
-      return this.getUnlocalizedName();
-   }
+	public String getUnlocalizedName(ItemStack stack)
+	{
+		return this.getUnlocalizedName();
+	}
 
-   public String getUnlocalizedNameInefficiently(ItemStack stack) {
-      return this.getUnlocalizedName(stack);
-   }
+	public String getUnlocalizedNameInefficiently(ItemStack stack)
+	{
+		return this.getUnlocalizedName(stack);
+	}
 
-   public String getItemStackDisplayName(ItemStack stack) {
-      return Localization.translate(this.getUnlocalizedName(stack));
-   }
+	public String getItemStackDisplayName(ItemStack stack)
+	{
+		return Localization.translate(this.getUnlocalizedName(stack));
+	}
 
-   public boolean getIsRepairable(ItemStack stack1, ItemStack stack2) {
-      return stack2 != null && Util.matchesOD(stack2, this.repairMaterial);
-   }
+	public boolean getIsRepairable(ItemStack stack1, ItemStack stack2)
+	{
+		return stack2 != null && Util.matchesOD(stack2, this.repairMaterial);
+	}
 }

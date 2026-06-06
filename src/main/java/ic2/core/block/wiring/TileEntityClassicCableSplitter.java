@@ -7,27 +7,33 @@ import ic2.core.ref.TeBlock;
 import net.minecraftforge.common.MinecraftForge;
 
 @TeBlock.Delegated(current = TileEntityCableSplitter.class, old = TileEntityClassicCableSplitter.class)
-public class TileEntityClassicCableSplitter extends TileEntityClassicCable {
-   public final Redstone redstone;
+public class TileEntityClassicCableSplitter extends TileEntityClassicCable
+{
+	public final Redstone redstone;
 
-   public TileEntityClassicCableSplitter() {
-      super(CableType.splitter, 0);
-      this.addComponent(this.redstone = new Redstone(this));
-   }
+	public TileEntityClassicCableSplitter()
+	{
+		super(CableType.splitter, 0);
+		this.addComponent(this.redstone = new Redstone(this));
+	}
 
-   @Override
-   protected void updateEntityServer() {
-      super.updateEntityServer();
-      if (this.redstone.hasRedstoneInput() == this.addedToEnergyNet) {
-         if (this.addedToEnergyNet) {
-            MinecraftForge.EVENT_BUS.post(new EnergyTileUnloadEvent(this));
-            this.addedToEnergyNet = false;
-         } else {
-            MinecraftForge.EVENT_BUS.post(new EnergyTileLoadEvent(this));
-            this.addedToEnergyNet = true;
-         }
-      }
+	@Override
+	protected void updateEntityServer()
+	{
+		super.updateEntityServer();
+		if (this.redstone.hasRedstoneInput() == this.addedToEnergyNet)
+		{
+			if (this.addedToEnergyNet)
+			{
+				MinecraftForge.EVENT_BUS.post(new EnergyTileUnloadEvent(this));
+				this.addedToEnergyNet = false;
+			} else
+			{
+				MinecraftForge.EVENT_BUS.post(new EnergyTileLoadEvent(this));
+				this.addedToEnergyNet = true;
+			}
+		}
 
-      this.setActive(this.addedToEnergyNet);
-   }
+		this.setActive(this.addedToEnergyNet);
+	}
 }

@@ -17,43 +17,54 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class ItemToolCutter extends ItemToolCrafting implements IEnhancedOverlayProvider {
-   public ItemToolCutter() {
-      super(ItemName.cutter, 60);
-   }
+public class ItemToolCutter extends ItemToolCrafting implements IEnhancedOverlayProvider
+{
+	public ItemToolCutter()
+	{
+		super(ItemName.cutter, 60);
+	}
 
-   public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-      TileEntity te = world.getTileEntity(pos);
-      if (te instanceof TileEntityCable) {
-         TileEntityCable cable = (TileEntityCable)te;
-         Predicate<ItemStack> request = StackUtil.sameStack(ItemName.crafting.getItemStack(CraftingItemType.rubber));
-         if (StackUtil.consumeFromPlayerInventory(player, request, 1, true) && cable.tryAddInsulation()) {
-            StackUtil.consumeFromPlayerInventory(player, request, 1, false);
-            StackUtil.damageOrError(player, hand, 1);
-            return EnumActionResult.SUCCESS;
-         }
-      }
+	public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ)
+	{
+		TileEntity te = world.getTileEntity(pos);
+		if (te instanceof TileEntityCable)
+		{
+			TileEntityCable cable = (TileEntityCable) te;
+			Predicate<ItemStack> request = StackUtil.sameStack(ItemName.crafting.getItemStack(CraftingItemType.rubber));
+			if (StackUtil.consumeFromPlayerInventory(player, request, 1, true) && cable.tryAddInsulation())
+			{
+				StackUtil.consumeFromPlayerInventory(player, request, 1, false);
+				StackUtil.damageOrError(player, hand, 1);
+				return EnumActionResult.SUCCESS;
+			}
+		}
 
-      return EnumActionResult.PASS;
-   }
+		return EnumActionResult.PASS;
+	}
 
-   public boolean removeInsulation(EntityPlayer player, EnumHand hand, TileEntityCable cable) {
-      if (cable.tryRemoveInsulation(true) && StackUtil.damage(player, hand, StackUtil.sameItem(this), 3)) {
-         cable.tryRemoveInsulation(false);
-         if (cable.getWorld().isRemote) {
-            IC2.audioManager.playOnce(new AudioPosition(cable.getWorld(), cable.getPos()), "Tools/InsulationCutters.ogg");
-         } else {
-            StackUtil.dropAsEntity(cable.getWorld(), cable.getPos(), ItemName.crafting.getItemStack(CraftingItemType.rubber));
-         }
+	public boolean removeInsulation(EntityPlayer player, EnumHand hand, TileEntityCable cable)
+	{
+		if (cable.tryRemoveInsulation(true) && StackUtil.damage(player, hand, StackUtil.sameItem(this), 3))
+		{
+			cable.tryRemoveInsulation(false);
+			if (cable.getWorld().isRemote)
+			{
+				IC2.audioManager.playOnce(new AudioPosition(cable.getWorld(), cable.getPos()), "Tools/InsulationCutters.ogg");
+			} else
+			{
+				StackUtil.dropAsEntity(cable.getWorld(), cable.getPos(), ItemName.crafting.getItemStack(CraftingItemType.rubber));
+			}
 
-         return true;
-      } else {
-         return false;
-      }
-   }
+			return true;
+		} else
+		{
+			return false;
+		}
+	}
 
-   @Override
-   public boolean providesEnhancedOverlay(World world, BlockPos pos, EnumFacing side, EntityPlayer player, ItemStack stack) {
-      return false;
-   }
+	@Override
+	public boolean providesEnhancedOverlay(World world, BlockPos pos, EnumFacing side, EntityPlayer player, ItemStack stack)
+	{
+		return false;
+	}
 }

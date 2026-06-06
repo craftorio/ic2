@@ -6,39 +6,48 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
-public class ItemWrapper {
-   private static final Multimap<Item, IBoxable> boxableItems = ArrayListMultimap.create();
-   private static final Multimap<Item, IMetalArmor> metalArmorItems = ArrayListMultimap.create();
+public class ItemWrapper
+{
+	private static final Multimap<Item, IBoxable> boxableItems = ArrayListMultimap.create();
+	private static final Multimap<Item, IMetalArmor> metalArmorItems = ArrayListMultimap.create();
 
-   public static void registerBoxable(Item item, IBoxable boxable) {
-      boxableItems.put(item, boxable);
-   }
+	public static void registerBoxable(Item item, IBoxable boxable)
+	{
+		boxableItems.put(item, boxable);
+	}
 
-   public static boolean canBeStoredInToolbox(ItemStack stack) {
-      Item item = stack.getItem();
+	public static boolean canBeStoredInToolbox(ItemStack stack)
+	{
+		Item item = stack.getItem();
 
-      for (IBoxable boxable : boxableItems.get(item)) {
-         if (boxable.canBeStoredInToolbox(stack)) {
-            return true;
-         }
-      }
+		for (IBoxable boxable : boxableItems.get(item))
+		{
+			if (boxable.canBeStoredInToolbox(stack))
+			{
+				return true;
+			}
+		}
 
-      return item instanceof IBoxable && ((IBoxable)item).canBeStoredInToolbox(stack);
-   }
+		return item instanceof IBoxable && ((IBoxable) item).canBeStoredInToolbox(stack);
+	}
 
-   public static void registerMetalArmor(Item item, IMetalArmor armor) {
-      metalArmorItems.put(item, armor);
-   }
+	public static void registerMetalArmor(Item item, IMetalArmor armor)
+	{
+		metalArmorItems.put(item, armor);
+	}
 
-   public static boolean isMetalArmor(ItemStack stack, EntityPlayer player) {
-      Item item = stack.getItem();
+	public static boolean isMetalArmor(ItemStack stack, EntityPlayer player)
+	{
+		Item item = stack.getItem();
 
-      for (IMetalArmor metalArmor : metalArmorItems.get(item)) {
-         if (metalArmor.isMetalArmor(stack, player)) {
-            return true;
-         }
-      }
+		for (IMetalArmor metalArmor : metalArmorItems.get(item))
+		{
+			if (metalArmor.isMetalArmor(stack, player))
+			{
+				return true;
+			}
+		}
 
-      return item instanceof IMetalArmor && ((IMetalArmor)item).isMetalArmor(stack, player);
-   }
+		return item instanceof IMetalArmor && ((IMetalArmor) item).isMetalArmor(stack, player);
+	}
 }

@@ -24,67 +24,82 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ItemCropnalyzer extends BaseElectricItem implements IHandHeldInventory {
-   public ItemCropnalyzer() {
-      super(ItemName.cropnalyzer, 100000.0, 128.0, 2);
-   }
+public class ItemCropnalyzer extends BaseElectricItem implements IHandHeldInventory
+{
+	public ItemCropnalyzer()
+	{
+		super(ItemName.cropnalyzer, 100000.0, 128.0, 2);
+	}
 
-   public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
-      ItemStack stack = StackUtil.get(player, hand);
-      if (IC2.platform.isSimulating()) {
-         IC2.platform.launchGui(player, this.getInventory(player, stack));
-      }
+	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand)
+	{
+		ItemStack stack = StackUtil.get(player, hand);
+		if (IC2.platform.isSimulating())
+		{
+			IC2.platform.launchGui(player, this.getInventory(player, stack));
+		}
 
-      return new ActionResult(EnumActionResult.SUCCESS, stack);
-   }
+		return new ActionResult(EnumActionResult.SUCCESS, stack);
+	}
 
-   @SideOnly(Side.CLIENT)
-   @Override
-   public EnumRarity getRarity(ItemStack stack) {
-      return EnumRarity.UNCOMMON;
-   }
+	@SideOnly(Side.CLIENT)
+	@Override
+	public EnumRarity getRarity(ItemStack stack)
+	{
+		return EnumRarity.UNCOMMON;
+	}
 
-   @Override
-   public IHasGui getInventory(EntityPlayer player, ItemStack stack) {
-      return new HandHeldCropnalyzer(player, stack);
-   }
+	@Override
+	public IHasGui getInventory(EntityPlayer player, ItemStack stack)
+	{
+		return new HandHeldCropnalyzer(player, stack);
+	}
 
-   public boolean onDroppedByPlayer(ItemStack stack, EntityPlayer player) {
-      if (player instanceof EntityPlayerMP && !StackUtil.isEmpty(stack) && player.openContainer instanceof ContainerCropnalyzer) {
-         HandHeldCropnalyzer cropnalyzer = ((ContainerCropnalyzer)player.openContainer).base;
-         if (cropnalyzer.isThisContainer(stack)) {
-            cropnalyzer.saveAsThrown(stack);
-            ((EntityPlayerMP)player).closeScreen();
-         }
-      }
+	public boolean onDroppedByPlayer(ItemStack stack, EntityPlayer player)
+	{
+		if (player instanceof EntityPlayerMP && !StackUtil.isEmpty(stack) && player.openContainer instanceof ContainerCropnalyzer)
+		{
+			HandHeldCropnalyzer cropnalyzer = ((ContainerCropnalyzer) player.openContainer).base;
+			if (cropnalyzer.isThisContainer(stack))
+			{
+				cropnalyzer.saveAsThrown(stack);
+				((EntityPlayerMP) player).closeScreen();
+			}
+		}
 
-      return true;
-   }
+		return true;
+	}
 
-   public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
-      if (!world.isRemote && !player.isSneaking()) {
-         TileEntity te = world.getTileEntity(pos);
-         if (te instanceof TileEntityCrop) {
-            TileEntityCrop crop = (TileEntityCrop)te;
-            if (crop.getCrop() == null) {
-               return EnumActionResult.PASS;
-            }
+	public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand)
+	{
+		if (!world.isRemote && !player.isSneaking())
+		{
+			TileEntity te = world.getTileEntity(pos);
+			if (te instanceof TileEntityCrop)
+			{
+				TileEntityCrop crop = (TileEntityCrop) te;
+				if (crop.getCrop() == null)
+				{
+					return EnumActionResult.PASS;
+				}
 
-            if (ElectricItem.manager.discharge(StackUtil.get(player, hand), HandHeldCropnalyzer.energyForLevel(2), 3, true, false, false) > 0.0) {
-               CropCard plant = crop.getCrop();
-               IC2.platform.messagePlayer(player, "Crop name: " + Localization.translate(plant.getUnlocalizedName()) + " (by " + plant.getDiscoveredBy() + ')');
-               IC2.platform.messagePlayer(player, "Crop size: " + crop.getCurrentSize() + '/' + plant.getMaxSize());
-               IC2.platform.messagePlayer(player, "Nutrient storage: " + crop.getStorageNutrients() + "/100");
-               IC2.platform.messagePlayer(player, "Water storage: " + crop.getStorageWater() + "/200");
-               IC2.platform.messagePlayer(player, "Weed-Ex storage: " + crop.getStorageWeedEX() + "/100");
-               IC2.platform.messagePlayer(player, "Growth points: " + crop.getGrowthPoints() + '/' + plant.getGrowthDuration(crop));
-               return EnumActionResult.SUCCESS;
-            }
-         }
+				if (ElectricItem.manager.discharge(StackUtil.get(player, hand), HandHeldCropnalyzer.energyForLevel(2), 3, true, false, false) > 0.0)
+				{
+					CropCard plant = crop.getCrop();
+					IC2.platform.messagePlayer(player, "Crop name: " + Localization.translate(plant.getUnlocalizedName()) + " (by " + plant.getDiscoveredBy() + ')');
+					IC2.platform.messagePlayer(player, "Crop size: " + crop.getCurrentSize() + '/' + plant.getMaxSize());
+					IC2.platform.messagePlayer(player, "Nutrient storage: " + crop.getStorageNutrients() + "/100");
+					IC2.platform.messagePlayer(player, "Water storage: " + crop.getStorageWater() + "/200");
+					IC2.platform.messagePlayer(player, "Weed-Ex storage: " + crop.getStorageWeedEX() + "/100");
+					IC2.platform.messagePlayer(player, "Growth points: " + crop.getGrowthPoints() + '/' + plant.getGrowthDuration(crop));
+					return EnumActionResult.SUCCESS;
+				}
+			}
 
-         return EnumActionResult.PASS;
-      } else {
-         return EnumActionResult.PASS;
-      }
-   }
+			return EnumActionResult.PASS;
+		} else
+		{
+			return EnumActionResult.PASS;
+		}
+	}
 }

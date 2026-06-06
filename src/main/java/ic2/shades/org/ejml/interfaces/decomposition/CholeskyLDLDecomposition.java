@@ -2,10 +2,11 @@ package ic2.shades.org.ejml.interfaces.decomposition;
 
 import ic2.shades.org.ejml.data.Matrix64F;
 
-public interface CholeskyLDLDecomposition<MatrixType extends Matrix64F> extends DecompositionInterface<MatrixType> {
-   MatrixType getL(MatrixType var1);
+public interface CholeskyLDLDecomposition<MatrixType extends Matrix64F> extends DecompositionInterface<MatrixType>
+{
+	MatrixType getL(MatrixType var1);
 
-   double[] getDiagonal();
+	double[] getDiagonal();
 
-   MatrixType getD(MatrixType var1);
+	MatrixType getD(MatrixType var1);
 }

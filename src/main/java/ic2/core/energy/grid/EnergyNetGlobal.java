@@ -10,182 +10,232 @@ import ic2.core.WorldData;
 import ic2.core.energy.leg.EnergyCalculatorLeg;
 import ic2.core.util.LogCategory;
 import ic2.core.util.Util;
+
 import java.io.PrintStream;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class EnergyNetGlobal implements IEnergyNet {
-   private static final List<IEnergyNetEventReceiver> eventReceivers = new CopyOnWriteArrayList<>();
-   private static IEnergyCalculator calculator;
+public class EnergyNetGlobal implements IEnergyNet
+{
+	private static final List<IEnergyNetEventReceiver> eventReceivers = new CopyOnWriteArrayList<>();
+	private static IEnergyCalculator calculator;
 
-   public static EnergyNetGlobal create() {
-      if (System.getProperty("IC2ExpEnet") != null) {
-      }
+	public static EnergyNetGlobal create()
+	{
+		if (System.getProperty("IC2ExpEnet") != null)
+		{
+		}
 
-      calculator = new EnergyCalculatorLeg();
-      EventHandler.init();
-      return new EnergyNetGlobal();
-   }
+		calculator = new EnergyCalculatorLeg();
+		EventHandler.init();
+		return new EnergyNetGlobal();
+	}
 
-   private EnergyNetGlobal() {
-   }
+	private EnergyNetGlobal()
+	{
+	}
 
-   @Override
-   public IEnergyTile getTile(World world, BlockPos pos) {
-      if (world == null) {
-         throw new NullPointerException("null world");
-      } else if (pos == null) {
-         throw new NullPointerException("null pos");
-      } else {
-         return getLocal(world).getIoTile(pos);
-      }
-   }
+	@Override
+	public IEnergyTile getTile(World world, BlockPos pos)
+	{
+		if (world == null)
+		{
+			throw new NullPointerException("null world");
+		} else if (pos == null)
+		{
+			throw new NullPointerException("null pos");
+		} else
+		{
+			return getLocal(world).getIoTile(pos);
+		}
+	}
 
-   @Override
-   public IEnergyTile getSubTile(World world, BlockPos pos) {
-      if (world == null) {
-         throw new NullPointerException("null world");
-      } else if (pos == null) {
-         throw new NullPointerException("null pos");
-      } else {
-         return getLocal(world).getSubTile(pos);
-      }
-   }
+	@Override
+	public IEnergyTile getSubTile(World world, BlockPos pos)
+	{
+		if (world == null)
+		{
+			throw new NullPointerException("null world");
+		} else if (pos == null)
+		{
+			throw new NullPointerException("null pos");
+		} else
+		{
+			return getLocal(world).getSubTile(pos);
+		}
+	}
 
-   @Override
-   public <T extends TileEntity & IEnergyTile> void addTile(T tile) {
-      if (tile == null) {
-         throw new NullPointerException("null tile");
-      }
+	@Override
+	public <T extends TileEntity & IEnergyTile> void addTile(T tile)
+	{
+		if (tile == null)
+		{
+			throw new NullPointerException("null tile");
+		}
 
-      addTile(tile, tile.getWorld(), tile.getPos());
-   }
+		addTile(tile, tile.getWorld(), tile.getPos());
+	}
 
-   @Override
-   public <T extends ILocatable & IEnergyTile> void addTile(T tile) {
-      if (tile == null) {
-         throw new NullPointerException("null tile");
-      }
+	@Override
+	public <T extends ILocatable & IEnergyTile> void addTile(T tile)
+	{
+		if (tile == null)
+		{
+			throw new NullPointerException("null tile");
+		}
 
-      addTile(tile, tile.getWorldObj(), tile.getPosition());
-   }
+		addTile(tile, tile.getWorldObj(), tile.getPosition());
+	}
 
-   public void addTile(IEnergyTile tile) {
-      if (tile == null) {
-         throw new NullPointerException("null tile");
-      }
+	public void addTile(IEnergyTile tile)
+	{
+		if (tile == null)
+		{
+			throw new NullPointerException("null tile");
+		}
 
-      World world = this.getWorld(tile);
-      BlockPos pos = this.getPos(tile);
-      addTile(tile, world, pos);
-   }
+		World world = this.getWorld(tile);
+		BlockPos pos = this.getPos(tile);
+		addTile(tile, world, pos);
+	}
 
-   private static void addTile(IEnergyTile tile, World world, BlockPos pos) {
-      if (EnergyNetSettings.logEnetApiAccessTraces) {
-         IC2.log.debug(LogCategory.EnergyNet, new Throwable("Called from:"), "API addTile %s.", Util.toString(tile, world, pos));
-      } else if (EnergyNetSettings.logEnetApiAccesses) {
-         IC2.log.debug(LogCategory.EnergyNet, "API addTile %s.", Util.toString(tile, world, pos));
-      }
+	private static void addTile(IEnergyTile tile, World world, BlockPos pos)
+	{
+		if (EnergyNetSettings.logEnetApiAccessTraces)
+		{
+			IC2.log.debug(LogCategory.EnergyNet, new Throwable("Called from:"), "API addTile %s.", Util.toString(tile, world, pos));
+		} else if (EnergyNetSettings.logEnetApiAccesses)
+		{
+			IC2.log.debug(LogCategory.EnergyNet, "API addTile %s.", Util.toString(tile, world, pos));
+		}
 
-      getLocal(world).addTile(tile, pos);
-   }
+		getLocal(world).addTile(tile, pos);
+	}
 
-   @Override
-   public void removeTile(IEnergyTile tile) {
-      if (tile == null) {
-         throw new NullPointerException("null tile");
-      }
+	@Override
+	public void removeTile(IEnergyTile tile)
+	{
+		if (tile == null)
+		{
+			throw new NullPointerException("null tile");
+		}
 
-      World world = this.getWorld(tile);
-      BlockPos pos = this.getPos(tile);
-      if (EnergyNetSettings.logEnetApiAccessTraces) {
-         IC2.log.debug(LogCategory.EnergyNet, new Throwable("Called from:"), "API removeTile %s.", Util.toString(tile, world, pos));
-      } else if (EnergyNetSettings.logEnetApiAccesses) {
-         IC2.log.debug(LogCategory.EnergyNet, "API removeTile %s.", Util.toString(tile, world, pos));
-      }
+		World world = this.getWorld(tile);
+		BlockPos pos = this.getPos(tile);
+		if (EnergyNetSettings.logEnetApiAccessTraces)
+		{
+			IC2.log.debug(LogCategory.EnergyNet, new Throwable("Called from:"), "API removeTile %s.", Util.toString(tile, world, pos));
+		} else if (EnergyNetSettings.logEnetApiAccesses)
+		{
+			IC2.log.debug(LogCategory.EnergyNet, "API removeTile %s.", Util.toString(tile, world, pos));
+		}
 
-      getLocal(world).removeTile(tile, pos);
-   }
+		getLocal(world).removeTile(tile, pos);
+	}
 
-   @Override
-   public World getWorld(IEnergyTile tile) {
-      if (tile == null) {
-         throw new NullPointerException("null tile");
-      } else if (tile instanceof ILocatable) {
-         return ((ILocatable)tile).getWorldObj();
-      } else if (tile instanceof TileEntity) {
-         return ((TileEntity)tile).getWorld();
-      } else {
-         throw new UnsupportedOperationException("unlocatable tile type: " + tile.getClass().getName());
-      }
-   }
+	@Override
+	public World getWorld(IEnergyTile tile)
+	{
+		if (tile == null)
+		{
+			throw new NullPointerException("null tile");
+		} else if (tile instanceof ILocatable)
+		{
+			return ((ILocatable) tile).getWorldObj();
+		} else if (tile instanceof TileEntity)
+		{
+			return ((TileEntity) tile).getWorld();
+		} else
+		{
+			throw new UnsupportedOperationException("unlocatable tile type: " + tile.getClass().getName());
+		}
+	}
 
-   @Override
-   public BlockPos getPos(IEnergyTile tile) {
-      if (tile == null) {
-         throw new NullPointerException("null tile");
-      } else if (tile instanceof ILocatable) {
-         return ((ILocatable)tile).getPosition();
-      } else if (tile instanceof TileEntity) {
-         return ((TileEntity)tile).getPos();
-      } else {
-         throw new UnsupportedOperationException("unlocatable tile type: " + tile.getClass().getName());
-      }
-   }
+	@Override
+	public BlockPos getPos(IEnergyTile tile)
+	{
+		if (tile == null)
+		{
+			throw new NullPointerException("null tile");
+		} else if (tile instanceof ILocatable)
+		{
+			return ((ILocatable) tile).getPosition();
+		} else if (tile instanceof TileEntity)
+		{
+			return ((TileEntity) tile).getPos();
+		} else
+		{
+			throw new UnsupportedOperationException("unlocatable tile type: " + tile.getClass().getName());
+		}
+	}
 
-   @Override
-   public NodeStats getNodeStats(IEnergyTile tile) {
-      return getLocal(this.getWorld(tile)).getNodeStats(tile);
-   }
+	@Override
+	public NodeStats getNodeStats(IEnergyTile tile)
+	{
+		return getLocal(this.getWorld(tile)).getNodeStats(tile);
+	}
 
-   @Override
-   public boolean dumpDebugInfo(World world, BlockPos pos, PrintStream console, PrintStream chat) {
-      return getLocal(world).dumpDebugInfo(pos, console, chat);
-   }
+	@Override
+	public boolean dumpDebugInfo(World world, BlockPos pos, PrintStream console, PrintStream chat)
+	{
+		return getLocal(world).dumpDebugInfo(pos, console, chat);
+	}
 
-   @Override
-   public double getPowerFromTier(int tier) {
-      if (tier < 14) {
-         return 8 << tier * 2;
-      } else {
-         return tier < 30 ? 8.0 * Math.pow(4.0, tier) : 9.223372E18F;
-      }
-   }
+	@Override
+	public double getPowerFromTier(int tier)
+	{
+		if (tier < 14)
+		{
+			return 8 << tier * 2;
+		} else
+		{
+			return tier < 30 ? 8.0 * Math.pow(4.0, tier) : 9.223372E18F;
+		}
+	}
 
-   @Override
-   public int getTierFromPower(double power) {
-      return power <= 0.0 ? 0 : (int)Math.ceil(Math.log(power / 8.0) / Math.log(4.0));
-   }
+	@Override
+	public int getTierFromPower(double power)
+	{
+		return power <= 0.0 ? 0 : (int) Math.ceil(Math.log(power / 8.0) / Math.log(4.0));
+	}
 
-   @Override
-   public synchronized void registerEventReceiver(IEnergyNetEventReceiver receiver) {
-      if (!eventReceivers.contains(receiver)) {
-         eventReceivers.add(receiver);
-      }
-   }
+	@Override
+	public synchronized void registerEventReceiver(IEnergyNetEventReceiver receiver)
+	{
+		if (!eventReceivers.contains(receiver))
+		{
+			eventReceivers.add(receiver);
+		}
+	}
 
-   @Override
-   public synchronized void unregisterEventReceiver(IEnergyNetEventReceiver receiver) {
-      eventReceivers.remove(receiver);
-   }
+	@Override
+	public synchronized void unregisterEventReceiver(IEnergyNetEventReceiver receiver)
+	{
+		eventReceivers.remove(receiver);
+	}
 
-   static Iterable<IEnergyNetEventReceiver> getEventReceivers() {
-      return eventReceivers;
-   }
+	static Iterable<IEnergyNetEventReceiver> getEventReceivers()
+	{
+		return eventReceivers;
+	}
 
-   static IEnergyCalculator getCalculator() {
-      return calculator;
-   }
+	static IEnergyCalculator getCalculator()
+	{
+		return calculator;
+	}
 
-   public static EnergyNetLocal getLocal(World world) {
-      if (world.isRemote) {
-         throw new IllegalStateException("not applicable clientside");
-      }
+	public static EnergyNetLocal getLocal(World world)
+	{
+		if (world.isRemote)
+		{
+			throw new IllegalStateException("not applicable clientside");
+		}
 
-      assert world.getMinecraftServer().isCallingFromMinecraftThread();
-      return WorldData.get(world).energyNet;
-   }
+		assert world.getMinecraftServer().isCallingFromMinecraftThread();
+		return WorldData.get(world).energyNet;
+	}
 }

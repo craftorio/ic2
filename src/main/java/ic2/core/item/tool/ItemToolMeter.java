@@ -20,49 +20,60 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class ItemToolMeter extends ItemIC2 implements IBoxable, IHandHeldInventory {
-   public ItemToolMeter() {
-      super(ItemName.meter);
-      this.maxStackSize = 1;
-      this.setMaxDamage(0);
-   }
+public class ItemToolMeter extends ItemIC2 implements IBoxable, IHandHeldInventory
+{
+	public ItemToolMeter()
+	{
+		super(ItemName.meter);
+		this.maxStackSize = 1;
+		this.setMaxDamage(0);
+	}
 
-   public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
-      if (world.isRemote) {
-         return EnumActionResult.PASS;
-      }
+	public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand)
+	{
+		if (world.isRemote)
+		{
+			return EnumActionResult.PASS;
+		}
 
-      IEnergyTile tile = EnergyNet.instance.getTile(world, pos);
-      if (!(tile instanceof IEnergySource) && !(tile instanceof IEnergyConductor) && !(tile instanceof IEnergySink)) {
-         IC2.platform.messagePlayer(player, "Not an energy net tile");
-      } else if (IC2.platform.launchGui(player, this.getInventory(player, StackUtil.get(player, hand)))) {
-         ContainerMeter container = (ContainerMeter)player.openContainer;
-         container.setUut(tile);
-         return EnumActionResult.SUCCESS;
-      }
+		IEnergyTile tile = EnergyNet.instance.getTile(world, pos);
+		if (!(tile instanceof IEnergySource) && !(tile instanceof IEnergyConductor) && !(tile instanceof IEnergySink))
+		{
+			IC2.platform.messagePlayer(player, "Not an energy net tile");
+		} else if (IC2.platform.launchGui(player, this.getInventory(player, StackUtil.get(player, hand))))
+		{
+			ContainerMeter container = (ContainerMeter) player.openContainer;
+			container.setUut(tile);
+			return EnumActionResult.SUCCESS;
+		}
 
-      return EnumActionResult.SUCCESS;
-   }
+		return EnumActionResult.SUCCESS;
+	}
 
-   public boolean onDroppedByPlayer(ItemStack stack, EntityPlayer player) {
-      if (!player.getEntityWorld().isRemote && !StackUtil.isEmpty(stack) && player.openContainer instanceof ContainerMeter) {
-         HandHeldMeter euReader = ((ContainerMeter)player.openContainer).base;
-         if (euReader.isThisContainer(stack)) {
-            euReader.saveAsThrown(stack);
-            player.closeScreen();
-         }
-      }
+	public boolean onDroppedByPlayer(ItemStack stack, EntityPlayer player)
+	{
+		if (!player.getEntityWorld().isRemote && !StackUtil.isEmpty(stack) && player.openContainer instanceof ContainerMeter)
+		{
+			HandHeldMeter euReader = ((ContainerMeter) player.openContainer).base;
+			if (euReader.isThisContainer(stack))
+			{
+				euReader.saveAsThrown(stack);
+				player.closeScreen();
+			}
+		}
 
-      return true;
-   }
+		return true;
+	}
 
-   @Override
-   public boolean canBeStoredInToolbox(ItemStack itemstack) {
-      return true;
-   }
+	@Override
+	public boolean canBeStoredInToolbox(ItemStack itemstack)
+	{
+		return true;
+	}
 
-   @Override
-   public IHasGui getInventory(EntityPlayer player, ItemStack stack) {
-      return new HandHeldMeter(player, stack);
-   }
+	@Override
+	public IHasGui getInventory(EntityPlayer player, ItemStack stack)
+	{
+		return new HandHeldMeter(player, stack);
+	}
 }

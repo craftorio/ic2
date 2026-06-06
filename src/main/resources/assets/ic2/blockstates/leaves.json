@@ -1,12 +1,16 @@
 {
-	"forge_marker": 1,
-	"defaults": {
-		"transform": "forge:default-block"
-	},
-	"variants": {
-		"type": {
-			"rubber": { "model": "birch_leaves" }
-		},
-		"inventory": [{}]
-	}
+  "forge_marker": 1,
+  "defaults": {
+    "transform": "forge:default-block"
+  },
+  "variants": {
+    "type": {
+      "rubber": {
+        "model": "birch_leaves"
+      }
+    },
+    "inventory": [
+      {}
+    ]
+  }
 }

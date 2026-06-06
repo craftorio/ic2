@@ -8,23 +8,28 @@ import ic2.shades.org.ejml.data.BlockMatrix64F;
 import ic2.shades.org.ejml.data.DenseMatrix64F;
 import ic2.shades.org.ejml.interfaces.decomposition.CholeskyDecomposition;
 
-public class CholeskyDecomposition_B64_to_D64 extends BaseDecomposition_B64_to_D64 implements CholeskyDecomposition<DenseMatrix64F> {
-   public CholeskyDecomposition_B64_to_D64(boolean lower) {
-      super(new CholeskyOuterForm_B64(lower), EjmlParameters.BLOCK_WIDTH);
-   }
+public class CholeskyDecomposition_B64_to_D64 extends BaseDecomposition_B64_to_D64 implements CholeskyDecomposition<DenseMatrix64F>
+{
+	public CholeskyDecomposition_B64_to_D64(boolean lower)
+	{
+		super(new CholeskyOuterForm_B64(lower), EjmlParameters.BLOCK_WIDTH);
+	}
 
-   @Override
-   public boolean isLower() {
-      return ((CholeskyOuterForm_B64)this.alg).isLower();
-   }
+	@Override
+	public boolean isLower()
+	{
+		return ((CholeskyOuterForm_B64) this.alg).isLower();
+	}
 
-   public DenseMatrix64F getT(DenseMatrix64F T) {
-      BlockMatrix64F T_block = ((CholeskyOuterForm_B64)this.alg).getT((BlockMatrix64F)null);
-      if (T == null) {
-         T = new DenseMatrix64F(T_block.numRows, T_block.numCols);
-      }
+	public DenseMatrix64F getT(DenseMatrix64F T)
+	{
+		BlockMatrix64F T_block = ((CholeskyOuterForm_B64) this.alg).getT((BlockMatrix64F) null);
+		if (T == null)
+		{
+			T = new DenseMatrix64F(T_block.numRows, T_block.numCols);
+		}
 
-      BlockMatrixOps.convert(T_block, T);
-      return T;
-   }
+		BlockMatrixOps.convert(T_block, T);
+		return T;
+	}
 }

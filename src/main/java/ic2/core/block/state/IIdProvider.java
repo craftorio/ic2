@@ -1,15 +1,18 @@
 package ic2.core.block.state;
 
-public interface IIdProvider {
-   String getName();
+public interface IIdProvider
+{
+	String getName();
 
-   int getId();
+	int getId();
 
-   default int getColor() {
-      return 16777215;
-   }
+	default int getColor()
+	{
+		return 16777215;
+	}
 
-   default String getModelName() {
-      return this.getName();
-   }
+	default String getModelName()
+	{
+		return this.getName();
+	}
 }

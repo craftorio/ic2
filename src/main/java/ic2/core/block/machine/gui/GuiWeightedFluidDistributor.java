@@ -7,16 +7,19 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class GuiWeightedFluidDistributor extends GuiWeightedDistributor<ContainerWeightedFluidDistributor> {
-   private static final ResourceLocation TEXTURE = new ResourceLocation("ic2", "textures/gui/GUIWeightedFluidDistributor.png");
+public class GuiWeightedFluidDistributor extends GuiWeightedDistributor<ContainerWeightedFluidDistributor>
+{
+	private static final ResourceLocation TEXTURE = new ResourceLocation("ic2", "textures/gui/GUIWeightedFluidDistributor.png");
 
-   public GuiWeightedFluidDistributor(ContainerWeightedFluidDistributor container) {
-      super(container, 211);
-      this.addElement(TankGauge.createPlain(this, 33, 111, 110, 10, container.base.fluidTank));
-   }
+	public GuiWeightedFluidDistributor(ContainerWeightedFluidDistributor container)
+	{
+		super(container, 211);
+		this.addElement(TankGauge.createPlain(this, 33, 111, 110, 10, container.base.fluidTank));
+	}
 
-   @Override
-   protected ResourceLocation getTexture() {
-      return TEXTURE;
-   }
+	@Override
+	protected ResourceLocation getTexture()
+	{
+		return TEXTURE;
+	}
 }

@@ -6,11 +6,12 @@ import net.minecraft.inventory.IInventory;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public interface IHasGui extends IInventory {
-   ContainerBase<?> getGuiContainer(EntityPlayer var1);
+public interface IHasGui extends IInventory
+{
+	ContainerBase<?> getGuiContainer(EntityPlayer var1);
 
-   @SideOnly(Side.CLIENT)
-   GuiScreen getGui(EntityPlayer var1, boolean var2);
+	@SideOnly(Side.CLIENT)
+	GuiScreen getGui(EntityPlayer var1, boolean var2);
 
-   void onGuiClosed(EntityPlayer var1);
+	void onGuiClosed(EntityPlayer var1);
 }

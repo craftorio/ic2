@@ -7,8 +7,10 @@ import ic2.core.init.MainConfig;
 import ic2.core.init.Rezepte;
 import ic2.core.util.StackUtil;
 import ic2.core.util.Util;
+
 import java.util.List;
 import java.util.Vector;
+
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
@@ -18,140 +20,175 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 
-public class AdvShapelessRecipe implements IRecipe {
-   public ItemStack output;
-   public IRecipeInput[] input;
-   public boolean hidden;
-   public boolean consuming;
-   private ResourceLocation name;
+public class AdvShapelessRecipe implements IRecipe
+{
+	public final ItemStack output;
+	public final IRecipeInput[] input;
+	public boolean hidden;
+	public boolean consuming;
+	private ResourceLocation name;
 
-   public static void addAndRegister(ItemStack result, Object... args) {
-      try {
-         Rezepte.registerRecipe(new AdvShapelessRecipe(result, args));
-      } catch (RuntimeException e) {
-         if (!MainConfig.ignoreInvalidRecipes) {
-            throw e;
-         }
-      }
-   }
+	public static void addAndRegister(ItemStack result, Object... args)
+	{
+		try
+		{
+			Rezepte.registerRecipe(new AdvShapelessRecipe(result, args));
+		} catch (RuntimeException e)
+		{
+			if (!MainConfig.ignoreInvalidRecipes)
+			{
+				throw e;
+			}
+		}
+	}
 
-   public AdvShapelessRecipe(ItemStack result, Object... args) {
-      if (result == null) {
-         AdvRecipe.displayError("null result", null, null, true);
-      } else {
-         result = result.copy();
-      }
+	public AdvShapelessRecipe(ItemStack result, Object... args)
+	{
+		if (result == null)
+		{
+			AdvRecipe.displayError("null result", null, null, true);
+		} else
+		{
+			result = result.copy();
+		}
 
-      this.input = new IRecipeInput[args.length - Util.countInArray(args, Boolean.class, ICraftingRecipeManager.AttributeContainer.class)];
-      int inputIndex = 0;
+		this.input = new IRecipeInput[args.length - Util.countInArray(args, Boolean.class, ICraftingRecipeManager.AttributeContainer.class)];
+		int inputIndex = 0;
 
-      for (Object o : args) {
-         if (o instanceof Boolean) {
-            this.hidden = (Boolean)o;
-         } else if (o instanceof ICraftingRecipeManager.AttributeContainer) {
-            this.hidden = ((ICraftingRecipeManager.AttributeContainer)o).hidden;
-            this.consuming = ((ICraftingRecipeManager.AttributeContainer)o).consuming;
-         } else {
-            try {
-               this.input[inputIndex++] = AdvRecipe.getRecipeObject(o);
-            } catch (Exception e) {
-               e.printStackTrace();
-               AdvRecipe.displayError("unknown type", "O: " + o + "\nT: " + o.getClass().getName(), result, true);
-            }
-         }
-      }
+		for (Object o : args)
+		{
+			if (o instanceof Boolean)
+			{
+				this.hidden = (Boolean) o;
+			} else if (o instanceof ICraftingRecipeManager.AttributeContainer)
+			{
+				this.hidden = ((ICraftingRecipeManager.AttributeContainer) o).hidden;
+				this.consuming = ((ICraftingRecipeManager.AttributeContainer) o).consuming;
+			} else
+			{
+				try
+				{
+					this.input[inputIndex++] = AdvRecipe.getRecipeObject(o);
+				} catch (Exception e)
+				{
+					e.printStackTrace();
+					AdvRecipe.displayError("unknown type", "O: " + o + "\nT: " + o.getClass().getName(), result, true);
+				}
+			}
+		}
 
-      if (inputIndex != this.input.length) {
-         AdvRecipe.displayError("length calculation error", "I: " + inputIndex + "\nL: " + this.input.length, result, true);
-      }
+		if (inputIndex != this.input.length)
+		{
+			AdvRecipe.displayError("length calculation error", "I: " + inputIndex + "\nL: " + this.input.length, result, true);
+		}
 
-      this.output = result;
-   }
+		this.output = result;
+	}
 
-   public boolean matches(InventoryCrafting inventorycrafting, World world) {
-      return this.getCraftingResult(inventorycrafting) != StackUtil.emptyStack;
-   }
+	public boolean matches(InventoryCrafting inventorycrafting, World world)
+	{
+		return this.getCraftingResult(inventorycrafting) != StackUtil.emptyStack;
+	}
 
-   public ItemStack getCraftingResult(InventoryCrafting inventorycrafting) {
-      int offerSize = inventorycrafting.getSizeInventory();
-      if (offerSize < this.input.length) {
-         return StackUtil.emptyStack;
-      }
+	public ItemStack getCraftingResult(InventoryCrafting inventorycrafting)
+	{
+		int offerSize = inventorycrafting.getSizeInventory();
+		if (offerSize < this.input.length)
+		{
+			return StackUtil.emptyStack;
+		}
 
-      List<IRecipeInput> unmatched = new Vector<>();
+		List<IRecipeInput> unmatched = new Vector<>();
 
-      for (IRecipeInput o : this.input) {
-         unmatched.add(o);
-      }
+		for (IRecipeInput o : this.input)
+		{
+			unmatched.add(o);
+		}
 
-      double outputCharge = 0.0;
+		double outputCharge = 0.0;
 
-      label39:
-      for (int i = 0; i < offerSize; i++) {
-         ItemStack offer = inventorycrafting.getStackInSlot(i);
-         if (!StackUtil.isEmpty(offer)) {
-            for (int j = 0; j < unmatched.size(); j++) {
-               if (unmatched.get(j).matches(offer)) {
-                  outputCharge += ElectricItem.manager.getCharge(StackUtil.copyWithSize(offer, 1));
-                  unmatched.remove(j);
-                  continue label39;
-               }
-            }
+		label39:
+		for (int i = 0; i < offerSize; i++)
+		{
+			ItemStack offer = inventorycrafting.getStackInSlot(i);
+			if (!StackUtil.isEmpty(offer))
+			{
+				for (int j = 0; j < unmatched.size(); j++)
+				{
+					if (unmatched.get(j).matches(offer))
+					{
+						outputCharge += ElectricItem.manager.getCharge(StackUtil.copyWithSize(offer, 1));
+						unmatched.remove(j);
+						continue label39;
+					}
+				}
 
-            return StackUtil.emptyStack;
-         }
-      }
+				return StackUtil.emptyStack;
+			}
+		}
 
-      if (!unmatched.isEmpty()) {
-         return StackUtil.emptyStack;
-      }
+		if (!unmatched.isEmpty())
+		{
+			return StackUtil.emptyStack;
+		}
 
-      ItemStack ret = this.output.copy();
-      ElectricItem.manager.charge(ret, outputCharge, Integer.MAX_VALUE, true, false);
-      return ret;
-   }
+		ItemStack ret = this.output.copy();
+		ElectricItem.manager.charge(ret, outputCharge, Integer.MAX_VALUE, true, false);
+		return ret;
+	}
 
-   public ItemStack getRecipeOutput() {
-      return this.output;
-   }
+	public ItemStack getRecipeOutput()
+	{
+		return this.output;
+	}
 
-   public boolean canShow() {
-      return AdvRecipe.canShow(this.input, this.output, this.hidden);
-   }
+	public boolean canShow()
+	{
+		return AdvRecipe.canShow(this.input, this.output, this.hidden);
+	}
 
-   public NonNullList<ItemStack> getRemainingItems(InventoryCrafting inv) {
-      return this.consuming ? NonNullList.withSize(inv.getSizeInventory(), StackUtil.emptyStack) : ForgeHooks.defaultRecipeGetRemainingItems(inv);
-   }
+	public NonNullList<ItemStack> getRemainingItems(InventoryCrafting inv)
+	{
+		return this.consuming ? NonNullList.withSize(inv.getSizeInventory(), StackUtil.emptyStack) : ForgeHooks.defaultRecipeGetRemainingItems(inv);
+	}
 
-   public IRecipe setRegistryName(ResourceLocation name) {
-      this.name = name;
-      return this;
-   }
+	public IRecipe setRegistryName(ResourceLocation name)
+	{
+		this.name = name;
+		return this;
+	}
 
-   public ResourceLocation getRegistryName() {
-      return this.name;
-   }
+	public ResourceLocation getRegistryName()
+	{
+		return this.name;
+	}
 
-   public Class<IRecipe> getRegistryType() {
-      return IRecipe.class;
-   }
+	public Class<IRecipe> getRegistryType()
+	{
+		return IRecipe.class;
+	}
 
-   public boolean canFit(int x, int y) {
-      return x * y >= this.input.length;
-   }
+	public boolean canFit(int x, int y)
+	{
+		return x * y >= this.input.length;
+	}
 
-   public NonNullList<Ingredient> getIngredients() {
-      NonNullList<Ingredient> list = NonNullList.create();
-      if (!this.hidden) {
-         for (IRecipeInput input : this.input) {
-            list.add(input.getIngredient());
-         }
-      }
+	public NonNullList<Ingredient> getIngredients()
+	{
+		NonNullList<Ingredient> list = NonNullList.create();
+		if (!this.hidden)
+		{
+			for (IRecipeInput input : this.input)
+			{
+				list.add(input.getIngredient());
+			}
+		}
 
-      return list;
-   }
+		return list;
+	}
 
-   public boolean isDynamic() {
-      return this.hidden;
-   }
+	public boolean isDynamic()
+	{
+		return this.hidden;
+	}
 }

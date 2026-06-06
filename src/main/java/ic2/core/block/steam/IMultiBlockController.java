@@ -3,14 +3,15 @@ package ic2.core.block.steam;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public interface IMultiBlockController {
-   World getWorld();
+public interface IMultiBlockController
+{
+	World getWorld();
 
-   BlockPos getPos();
+	BlockPos getPos();
 
-   boolean isInvalid();
+	boolean isInvalid();
 
-   boolean hasValidStructure();
+	boolean hasValidStructure();
 
-   boolean isFormed();
+	boolean isFormed();
 }

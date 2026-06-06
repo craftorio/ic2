@@ -1,7 +1,8 @@
 package ic2.core.block.type;
 
-public interface IExtBlockType {
-   float getHardness();
+public interface IExtBlockType
+{
+	float getHardness();
 
-   float getExplosionResistance();
+	float getExplosionResistance();
 }

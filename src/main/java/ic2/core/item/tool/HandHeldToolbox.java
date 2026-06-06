@@ -9,32 +9,39 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class HandHeldToolbox extends HandHeldInventory {
-   public HandHeldToolbox(EntityPlayer player, ItemStack stack, int inventorySize) {
-      super(player, stack, inventorySize);
-   }
+public class HandHeldToolbox extends HandHeldInventory
+{
+	public HandHeldToolbox(EntityPlayer player, ItemStack stack, int inventorySize)
+	{
+		super(player, stack, inventorySize);
+	}
 
-   @Override
-   public ContainerBase<HandHeldToolbox> getGuiContainer(EntityPlayer player) {
-      return new ContainerToolbox(player, this);
-   }
+	@Override
+	public ContainerBase<HandHeldToolbox> getGuiContainer(EntityPlayer player)
+	{
+		return new ContainerToolbox(player, this);
+	}
 
-   @SideOnly(Side.CLIENT)
-   @Override
-   public GuiScreen getGui(EntityPlayer player, boolean isAdmin) {
-      return new GuiToolbox(new ContainerToolbox(player, this));
-   }
+	@SideOnly(Side.CLIENT)
+	@Override
+	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
+	{
+		return new GuiToolbox(new ContainerToolbox(player, this));
+	}
 
-   public String getName() {
-      return "toolbox";
-   }
+	public String getName()
+	{
+		return "toolbox";
+	}
 
-   public boolean hasCustomName() {
-      return false;
-   }
+	public boolean hasCustomName()
+	{
+		return false;
+	}
 
-   @Override
-   public boolean isItemValidForSlot(int i, ItemStack itemstack) {
-      return StackUtil.isEmpty(itemstack) ? false : ItemWrapper.canBeStoredInToolbox(itemstack);
-   }
+	@Override
+	public boolean isItemValidForSlot(int i, ItemStack itemstack)
+	{
+		return StackUtil.isEmpty(itemstack) ? false : ItemWrapper.canBeStoredInToolbox(itemstack);
+	}
 }

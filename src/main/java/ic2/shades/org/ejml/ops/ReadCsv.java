@@ -7,68 +7,83 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReadCsv {
-   private boolean hasComment = false;
-   private char comment;
-   private BufferedReader in;
-   private int lineNumber = 0;
+public class ReadCsv
+{
+	private boolean hasComment = false;
+	private char comment;
+	private final BufferedReader in;
+	private int lineNumber = 0;
 
-   public ReadCsv(InputStream in) {
-      this.in = new BufferedReader(new InputStreamReader(in));
-   }
+	public ReadCsv(InputStream in)
+	{
+		this.in = new BufferedReader(new InputStreamReader(in));
+	}
 
-   public void setComment(char comment) {
-      this.hasComment = true;
-      this.comment = comment;
-   }
+	public void setComment(char comment)
+	{
+		this.hasComment = true;
+		this.comment = comment;
+	}
 
-   public int getLineNumber() {
-      return this.lineNumber;
-   }
+	public int getLineNumber()
+	{
+		return this.lineNumber;
+	}
 
-   public BufferedReader getReader() {
-      return this.in;
-   }
+	public BufferedReader getReader()
+	{
+		return this.in;
+	}
 
-   protected List<String> extractWords() throws IOException {
-      String line;
-      do {
-         this.lineNumber++;
-         line = this.in.readLine();
-         if (line == null) {
-            return null;
-         }
-      } while (this.hasComment && line.charAt(0) == this.comment);
+	protected List<String> extractWords() throws IOException
+	{
+		String line;
+		do
+		{
+			this.lineNumber++;
+			line = this.in.readLine();
+			if (line == null)
+			{
+				return null;
+			}
+		} while (this.hasComment && line.charAt(0) == this.comment);
 
-      return this.parseWords(line);
-   }
+		return this.parseWords(line);
+	}
 
-   protected List<String> parseWords(String line) {
-      List<String> words = new ArrayList<>();
-      boolean insideWord = !this.isSpace(line.charAt(0));
-      int last = 0;
+	protected List<String> parseWords(String line)
+	{
+		List<String> words = new ArrayList<>();
+		boolean insideWord = !this.isSpace(line.charAt(0));
+		int last = 0;
 
-      for (int i = 0; i < line.length(); i++) {
-         char c = line.charAt(i);
-         if (insideWord) {
-            if (this.isSpace(c)) {
-               words.add(line.substring(last, i));
-               insideWord = false;
-            }
-         } else if (!this.isSpace(c)) {
-            last = i;
-            insideWord = true;
-         }
-      }
+		for (int i = 0; i < line.length(); i++)
+		{
+			char c = line.charAt(i);
+			if (insideWord)
+			{
+				if (this.isSpace(c))
+				{
+					words.add(line.substring(last, i));
+					insideWord = false;
+				}
+			} else if (!this.isSpace(c))
+			{
+				last = i;
+				insideWord = true;
+			}
+		}
 
-      if (insideWord) {
-         words.add(line.substring(last));
-      }
+		if (insideWord)
+		{
+			words.add(line.substring(last));
+		}
 
-      return words;
-   }
+		return words;
+	}
 
-   private boolean isSpace(char c) {
-      return c == ' ' || c == '\t';
-   }
+	private boolean isSpace(char c)
+	{
+		return c == ' ' || c == '\t';
+	}
 }

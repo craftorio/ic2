@@ -9,132 +9,156 @@ import ic2.shades.org.ejml.interfaces.decomposition.EigenDecomposition;
 import ic2.shades.org.ejml.interfaces.decomposition.TridiagonalSimilarDecomposition;
 import ic2.shades.org.ejml.ops.CommonOps;
 
-public class SymmetricQRAlgorithmDecomposition_D64 implements EigenDecomposition<DenseMatrix64F> {
-   private TridiagonalSimilarDecomposition<DenseMatrix64F> decomp;
-   private SymmetricQREigenHelper helper;
-   private SymmetricQrAlgorithm vector;
-   private boolean computeVectorsWithValues = false;
-   private double[] values;
-   private double[] diag;
-   private double[] off;
-   private double[] diagSaved;
-   private double[] offSaved;
-   private DenseMatrix64F V;
-   private DenseMatrix64F[] eigenvectors;
-   boolean computeVectors;
+public class SymmetricQRAlgorithmDecomposition_D64 implements EigenDecomposition<DenseMatrix64F>
+{
+	private final TridiagonalSimilarDecomposition<DenseMatrix64F> decomp;
+	private final SymmetricQREigenHelper helper;
+	private final SymmetricQrAlgorithm vector;
+	private boolean computeVectorsWithValues = false;
+	private double[] values;
+	private double[] diag;
+	private double[] off;
+	private double[] diagSaved;
+	private double[] offSaved;
+	private DenseMatrix64F V;
+	private DenseMatrix64F[] eigenvectors;
+	final boolean computeVectors;
 
-   public SymmetricQRAlgorithmDecomposition_D64(TridiagonalSimilarDecomposition<DenseMatrix64F> decomp, boolean computeVectors) {
-      this.decomp = decomp;
-      this.computeVectors = computeVectors;
-      this.helper = new SymmetricQREigenHelper();
-      this.vector = new SymmetricQrAlgorithm(this.helper);
-   }
+	public SymmetricQRAlgorithmDecomposition_D64(TridiagonalSimilarDecomposition<DenseMatrix64F> decomp, boolean computeVectors)
+	{
+		this.decomp = decomp;
+		this.computeVectors = computeVectors;
+		this.helper = new SymmetricQREigenHelper();
+		this.vector = new SymmetricQrAlgorithm(this.helper);
+	}
 
-   public SymmetricQRAlgorithmDecomposition_D64(boolean computeVectors) {
-      this(DecompositionFactory.tridiagonal(0), computeVectors);
-   }
+	public SymmetricQRAlgorithmDecomposition_D64(boolean computeVectors)
+	{
+		this(DecompositionFactory.tridiagonal(0), computeVectors);
+	}
 
-   public void setComputeVectorsWithValues(boolean computeVectorsWithValues) {
-      if (!this.computeVectors) {
-         throw new IllegalArgumentException("Compute eigenvalues has been set to false");
-      }
+	public void setComputeVectorsWithValues(boolean computeVectorsWithValues)
+	{
+		if (!this.computeVectors)
+		{
+			throw new IllegalArgumentException("Compute eigenvalues has been set to false");
+		}
 
-      this.computeVectorsWithValues = computeVectorsWithValues;
-   }
+		this.computeVectorsWithValues = computeVectorsWithValues;
+	}
 
-   public void setMaxIterations(int max) {
-      this.vector.setMaxIterations(max);
-   }
+	public void setMaxIterations(int max)
+	{
+		this.vector.setMaxIterations(max);
+	}
 
-   @Override
-   public int getNumberOfEigenvalues() {
-      return this.helper.getMatrixSize();
-   }
+	@Override
+	public int getNumberOfEigenvalues()
+	{
+		return this.helper.getMatrixSize();
+	}
 
-   @Override
-   public Complex64F getEigenvalue(int index) {
-      return new Complex64F(this.values[index], 0.0);
-   }
+	@Override
+	public Complex64F getEigenvalue(int index)
+	{
+		return new Complex64F(this.values[index], 0.0);
+	}
 
-   public DenseMatrix64F getEigenVector(int index) {
-      return this.eigenvectors[index];
-   }
+	public DenseMatrix64F getEigenVector(int index)
+	{
+		return this.eigenvectors[index];
+	}
 
-   public boolean decompose(DenseMatrix64F orig) {
-      if (orig.numCols != orig.numRows) {
-         throw new IllegalArgumentException("Matrix must be square.");
-      }
+	public boolean decompose(DenseMatrix64F orig)
+	{
+		if (orig.numCols != orig.numRows)
+		{
+			throw new IllegalArgumentException("Matrix must be square.");
+		}
 
-      if (orig.numCols <= 0) {
-         return false;
-      }
+		if (orig.numCols <= 0)
+		{
+			return false;
+		}
 
-      int N = orig.numRows;
-      if (!this.decomp.decompose(orig)) {
-         return false;
-      }
+		int N = orig.numRows;
+		if (!this.decomp.decompose(orig))
+		{
+			return false;
+		}
 
-      if (this.diag == null || this.diag.length < N) {
-         this.diag = new double[N];
-         this.off = new double[N - 1];
-      }
+		if (this.diag == null || this.diag.length < N)
+		{
+			this.diag = new double[N];
+			this.off = new double[N - 1];
+		}
 
-      this.decomp.getDiagonal(this.diag, this.off);
-      this.helper.init(this.diag, this.off, N);
-      if (this.computeVectors) {
-         return this.computeVectorsWithValues ? this.extractTogether() : this.extractSeparate(N);
-      } else {
-         return this.computeEigenValues();
-      }
-   }
+		this.decomp.getDiagonal(this.diag, this.off);
+		this.helper.init(this.diag, this.off, N);
+		if (this.computeVectors)
+		{
+			return this.computeVectorsWithValues ? this.extractTogether() : this.extractSeparate(N);
+		} else
+		{
+			return this.computeEigenValues();
+		}
+	}
 
-   @Override
-   public boolean inputModified() {
-      return this.decomp.inputModified();
-   }
+	@Override
+	public boolean inputModified()
+	{
+		return this.decomp.inputModified();
+	}
 
-   private boolean extractTogether() {
-      this.V = this.decomp.getQ(this.V, true);
-      this.helper.setQ(this.V);
-      this.vector.setFastEigenvalues(false);
-      if (!this.vector.process(-1, null, null)) {
-         return false;
-      }
+	private boolean extractTogether()
+	{
+		this.V = this.decomp.getQ(this.V, true);
+		this.helper.setQ(this.V);
+		this.vector.setFastEigenvalues(false);
+		if (!this.vector.process(-1, null, null))
+		{
+			return false;
+		}
 
-      this.eigenvectors = CommonOps.rowsToVector(this.V, this.eigenvectors);
-      this.values = this.helper.copyEigenvalues(this.values);
-      return true;
-   }
+		this.eigenvectors = CommonOps.rowsToVector(this.V, this.eigenvectors);
+		this.values = this.helper.copyEigenvalues(this.values);
+		return true;
+	}
 
-   private boolean extractSeparate(int numCols) {
-      if (!this.computeEigenValues()) {
-         return false;
-      }
+	private boolean extractSeparate(int numCols)
+	{
+		if (!this.computeEigenValues())
+		{
+			return false;
+		}
 
-      this.helper.reset(numCols);
-      this.diagSaved = this.helper.swapDiag(this.diagSaved);
-      this.offSaved = this.helper.swapOff(this.offSaved);
-      this.V = this.decomp.getQ(this.V, true);
-      this.vector.setQ(this.V);
-      if (!this.vector.process(-1, null, null, this.values)) {
-         return false;
-      }
+		this.helper.reset(numCols);
+		this.diagSaved = this.helper.swapDiag(this.diagSaved);
+		this.offSaved = this.helper.swapOff(this.offSaved);
+		this.V = this.decomp.getQ(this.V, true);
+		this.vector.setQ(this.V);
+		if (!this.vector.process(-1, null, null, this.values))
+		{
+			return false;
+		}
 
-      this.values = this.helper.copyEigenvalues(this.values);
-      this.eigenvectors = CommonOps.rowsToVector(this.V, this.eigenvectors);
-      return true;
-   }
+		this.values = this.helper.copyEigenvalues(this.values);
+		this.eigenvectors = CommonOps.rowsToVector(this.V, this.eigenvectors);
+		return true;
+	}
 
-   private boolean computeEigenValues() {
-      this.diagSaved = this.helper.copyDiag(this.diagSaved);
-      this.offSaved = this.helper.copyOff(this.offSaved);
-      this.vector.setQ(null);
-      this.vector.setFastEigenvalues(true);
-      if (!this.vector.process(-1, null, null)) {
-         return false;
-      }
+	private boolean computeEigenValues()
+	{
+		this.diagSaved = this.helper.copyDiag(this.diagSaved);
+		this.offSaved = this.helper.copyOff(this.offSaved);
+		this.vector.setQ(null);
+		this.vector.setFastEigenvalues(true);
+		if (!this.vector.process(-1, null, null))
+		{
+			return false;
+		}
 
-      this.values = this.helper.copyEigenvalues(this.values);
-      return true;
-   }
+		this.values = this.helper.copyEigenvalues(this.values);
+		return true;
+	}
 }

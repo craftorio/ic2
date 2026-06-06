@@ -9,21 +9,25 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class SlotArmor extends Slot {
-   private final EntityEquipmentSlot armorType;
+public class SlotArmor extends Slot
+{
+	private final EntityEquipmentSlot armorType;
 
-   public SlotArmor(InventoryPlayer inventory, EntityEquipmentSlot armorType, int x, int y) {
-      super(inventory, 36 + armorType.getIndex(), x, y);
-      this.armorType = armorType;
-   }
+	public SlotArmor(InventoryPlayer inventory, EntityEquipmentSlot armorType, int x, int y)
+	{
+		super(inventory, 36 + armorType.getIndex(), x, y);
+		this.armorType = armorType;
+	}
 
-   public boolean isItemValid(ItemStack stack) {
-      Item item = stack.getItem();
-      return item == null ? false : item.isValidArmor(stack, this.armorType, ((InventoryPlayer)this.inventory).player);
-   }
+	public boolean isItemValid(ItemStack stack)
+	{
+		Item item = stack.getItem();
+		return item == null ? false : item.isValidArmor(stack, this.armorType, ((InventoryPlayer) this.inventory).player);
+	}
 
-   @SideOnly(Side.CLIENT)
-   public String getSlotTexture() {
-      return ItemArmor.EMPTY_SLOT_NAMES[this.armorType.getIndex()];
-   }
+	@SideOnly(Side.CLIENT)
+	public String getSlotTexture()
+	{
+		return ItemArmor.EMPTY_SLOT_NAMES[this.armorType.getIndex()];
+	}
 }

@@ -38,189 +38,237 @@ import net.minecraft.util.math.RayTraceResult.Type;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidRegistry;
 
-public class ItemHandlers {
-   public static ItemMulti.IItemRightClickHandler cfPowderApply = new ItemMulti.IItemRightClickHandler() {
-      @Override
-      public ActionResult<ItemStack> onRightClick(ItemStack stack, EntityPlayer player, EnumHand hand) {
-         RayTraceResult position = Util.traceBlocks(player, true);
-         if (position == null) {
-            return new ActionResult(EnumActionResult.PASS, stack);
-         }
+public class ItemHandlers
+{
+	public static final ItemMulti.IItemRightClickHandler cfPowderApply = new ItemMulti.IItemRightClickHandler()
+	{
+		@Override
+		public ActionResult<ItemStack> onRightClick(ItemStack stack, EntityPlayer player, EnumHand hand)
+		{
+			RayTraceResult position = Util.traceBlocks(player, true);
+			if (position == null)
+			{
+				return new ActionResult(EnumActionResult.PASS, stack);
+			}
 
-         if (position.typeOfHit == Type.BLOCK) {
-            World world = player.getEntityWorld();
-            if (!world.canMineBlockBody(player, position.getBlockPos())) {
-               return new ActionResult(EnumActionResult.FAIL, stack);
-            }
+			if (position.typeOfHit == Type.BLOCK)
+			{
+				World world = player.getEntityWorld();
+				if (!world.canMineBlockBody(player, position.getBlockPos()))
+				{
+					return new ActionResult(EnumActionResult.FAIL, stack);
+				}
 
-            if (world.getBlockState(position.getBlockPos()).getBlock() == Blocks.WATER) {
-               stack = StackUtil.decSize(stack);
-               world.setBlockState(position.getBlockPos(), FluidName.construction_foam.getInstance().getBlock().getDefaultState());
-               new ActionResult(EnumActionResult.SUCCESS, stack);
-            }
-         }
+				if (world.getBlockState(position.getBlockPos()).getBlock() == Blocks.WATER)
+				{
+					stack = StackUtil.decSize(stack);
+					world.setBlockState(position.getBlockPos(), FluidName.construction_foam.getInstance().getBlock().getDefaultState());
+					new ActionResult(EnumActionResult.SUCCESS, stack);
+				}
+			}
 
-         return new ActionResult(EnumActionResult.FAIL, stack);
-      }
-   };
-   public static ItemMulti.IItemRightClickHandler scrapBoxUnpack = new ItemMulti.IItemRightClickHandler() {
-      @Override
-      public ActionResult<ItemStack> onRightClick(ItemStack stack, EntityPlayer player, EnumHand hand) {
-         if (!player.getEntityWorld().isRemote) {
-            ItemStack drop = Recipes.scrapboxDrops.getDrop(stack, false);
-            if (drop != null && player.dropItem(drop, false) != null && !player.capabilities.isCreativeMode) {
-               stack = StackUtil.decSize(stack);
-               return new ActionResult(EnumActionResult.SUCCESS, stack);
-            }
-         }
+			return new ActionResult(EnumActionResult.FAIL, stack);
+		}
+	};
+	public static final ItemMulti.IItemRightClickHandler scrapBoxUnpack = new ItemMulti.IItemRightClickHandler()
+	{
+		@Override
+		public ActionResult<ItemStack> onRightClick(ItemStack stack, EntityPlayer player, EnumHand hand)
+		{
+			if (!player.getEntityWorld().isRemote)
+			{
+				ItemStack drop = Recipes.scrapboxDrops.getDrop(stack, false);
+				if (drop != null && player.dropItem(drop, false) != null && !player.capabilities.isCreativeMode)
+				{
+					stack = StackUtil.decSize(stack);
+					return new ActionResult(EnumActionResult.SUCCESS, stack);
+				}
+			}
 
-         return new ActionResult(EnumActionResult.PASS, stack);
-      }
-   };
-   public static ItemMulti.IItemUseHandler resinUse = new ItemMulti.IItemUseHandler() {
-      @Override
-      public EnumActionResult onUse(ItemStack stack, EntityPlayer player, BlockPos pos, EnumHand hand, EnumFacing side) {
-         World world = player.getEntityWorld();
-         IBlockState state = world.getBlockState(pos);
-         if (state.getBlock() == Blocks.PISTON && state.getValue(BlockPistonBase.FACING) == side) {
-            IBlockState newState = Blocks.STICKY_PISTON
-               .getDefaultState()
-               .withProperty(BlockPistonBase.FACING, side)
-               .withProperty(BlockPistonBase.EXTENDED, state.getValue(BlockPistonBase.EXTENDED));
-            world.setBlockState(pos, newState, 3);
-            if (!player.capabilities.isCreativeMode) {
-               StackUtil.consumeOrError(player, hand, 1);
-            }
+			return new ActionResult(EnumActionResult.PASS, stack);
+		}
+	};
+	public static final ItemMulti.IItemUseHandler resinUse = new ItemMulti.IItemUseHandler()
+	{
+		@Override
+		public EnumActionResult onUse(ItemStack stack, EntityPlayer player, BlockPos pos, EnumHand hand, EnumFacing side)
+		{
+			World world = player.getEntityWorld();
+			IBlockState state = world.getBlockState(pos);
+			if (state.getBlock() == Blocks.PISTON && state.getValue(BlockPistonBase.FACING) == side)
+			{
+				IBlockState newState = Blocks.STICKY_PISTON
+					.getDefaultState()
+					.withProperty(BlockPistonBase.FACING, side)
+					.withProperty(BlockPistonBase.EXTENDED, state.getValue(BlockPistonBase.EXTENDED));
+				world.setBlockState(pos, newState, 3);
+				if (!player.capabilities.isCreativeMode)
+				{
+					StackUtil.consumeOrError(player, hand, 1);
+				}
 
-            return EnumActionResult.SUCCESS;
-         } else {
-            if (side != EnumFacing.UP) {
-               return EnumActionResult.PASS;
-            }
+				return EnumActionResult.SUCCESS;
+			} else
+			{
+				if (side != EnumFacing.UP)
+				{
+					return EnumActionResult.PASS;
+				}
 
-            pos = pos.up();
-            if (state.getBlock().isAir(state, world, pos) && BlockName.sheet.getInstance().canPlaceBlockOnSide(world, pos, side)) {
-               world.setBlockState(pos, BlockName.sheet.getBlockState(BlockSheet.SheetType.resin));
-               if (!player.capabilities.isCreativeMode) {
-                  StackUtil.consumeOrError(player, hand, 1);
-               }
+				pos = pos.up();
+				if (state.getBlock().isAir(state, world, pos) && BlockName.sheet.getInstance().canPlaceBlockOnSide(world, pos, side))
+				{
+					world.setBlockState(pos, BlockName.sheet.getBlockState(BlockSheet.SheetType.resin));
+					if (!player.capabilities.isCreativeMode)
+					{
+						StackUtil.consumeOrError(player, hand, 1);
+					}
 
-               return EnumActionResult.PASS;
-            } else {
-               return EnumActionResult.PASS;
-            }
-         }
-      }
-   };
-   public static ItemMulti.IItemUpdateHandler radioactiveUpdate = new ItemMulti.IItemUpdateHandler() {
-      @Override
-      public void onUpdate(ItemStack stack, World world, Entity rawEntity, int slotIndex, boolean isCurrentItem) {
-         Item item = stack.getItem();
-         if (item != null && item instanceof ItemMulti) {
-            Object rawType = ((ItemMulti)item).getType(stack);
-            if (rawType instanceof IRadioactiveItemType) {
-               IRadioactiveItemType type = (IRadioactiveItemType)rawType;
-               if (rawEntity instanceof EntityLivingBase) {
-                  EntityLivingBase entity = (EntityLivingBase)rawEntity;
-                  if (!ItemArmorHazmat.hasCompleteHazmat(entity)) {
-                     IC2Potion.radiation.applyTo(entity, type.getRadiationDuration() * 20, type.getRadiationAmplifier());
-                  }
-               }
-            }
-         }
-      }
-   };
-   public static TeBlock.ITePlaceHandler reactorChamberPlace = new TeBlock.ITePlaceHandler() {
-      @Override
-      public boolean canReplace(World world, BlockPos pos, EnumFacing side, ItemStack stack) {
-         int count = 0;
+					return EnumActionResult.PASS;
+				} else
+				{
+					return EnumActionResult.PASS;
+				}
+			}
+		}
+	};
+	public static final ItemMulti.IItemUpdateHandler radioactiveUpdate = new ItemMulti.IItemUpdateHandler()
+	{
+		@Override
+		public void onUpdate(ItemStack stack, World world, Entity rawEntity, int slotIndex, boolean isCurrentItem)
+		{
+			Item item = stack.getItem();
+			if (item != null && item instanceof ItemMulti)
+			{
+				Object rawType = ((ItemMulti) item).getType(stack);
+				if (rawType instanceof IRadioactiveItemType)
+				{
+					IRadioactiveItemType type = (IRadioactiveItemType) rawType;
+					if (rawEntity instanceof EntityLivingBase)
+					{
+						EntityLivingBase entity = (EntityLivingBase) rawEntity;
+						if (!ItemArmorHazmat.hasCompleteHazmat(entity))
+						{
+							IC2Potion.radiation.applyTo(entity, type.getRadiationDuration() * 20, type.getRadiationAmplifier());
+						}
+					}
+				}
+			}
+		}
+	};
+	public static final TeBlock.ITePlaceHandler reactorChamberPlace = new TeBlock.ITePlaceHandler()
+	{
+		@Override
+		public boolean canReplace(World world, BlockPos pos, EnumFacing side, ItemStack stack)
+		{
+			int count = 0;
 
-         for (EnumFacing dir : EnumFacing.VALUES) {
-            TileEntity te = world.getTileEntity(pos.offset(dir));
-            if (te instanceof TileEntityNuclearReactorElectric) {
-               count++;
-            }
-         }
+			for (EnumFacing dir : EnumFacing.VALUES)
+			{
+				TileEntity te = world.getTileEntity(pos.offset(dir));
+				if (te instanceof TileEntityNuclearReactorElectric)
+				{
+					count++;
+				}
+			}
 
-         return count == 1;
-      }
-   };
-   public static ItemMulti.IItemRightClickHandler openAdvancedUpgradeGUI = new ItemMulti.IItemRightClickHandler() {
-      @Override
-      public ActionResult<ItemStack> onRightClick(ItemStack stack, EntityPlayer player, EnumHand hand) {
-         assert stack.getItem() == ItemName.upgrade.getInstance();
-         if (IC2.platform.isSimulating()) {
-            IC2.platform.launchGui(player, ((ItemUpgradeModule)stack.getItem()).getInventory(player, stack));
-         }
+			return count == 1;
+		}
+	};
+	public static final ItemMulti.IItemRightClickHandler openAdvancedUpgradeGUI = new ItemMulti.IItemRightClickHandler()
+	{
+		@Override
+		public ActionResult<ItemStack> onRightClick(ItemStack stack, EntityPlayer player, EnumHand hand)
+		{
+			assert stack.getItem() == ItemName.upgrade.getInstance();
+			if (IC2.platform.isSimulating())
+			{
+				IC2.platform.launchGui(player, ((ItemUpgradeModule) stack.getItem()).getInventory(player, stack));
+			}
 
-         return new ActionResult(EnumActionResult.SUCCESS, stack);
-      }
-   };
-   public static ItemMulti.IItemUseHandler emptyCellFill = new ItemMulti.IItemUseHandler() {
-      @Override
-      public EnumActionResult onUse(ItemStack stack, EntityPlayer player, BlockPos pos, EnumHand hand, EnumFacing side) {
-         assert stack.getItem() == ItemName.cell.getInstance();
-         World world = player.getEntityWorld();
-         RayTraceResult position = Util.traceBlocks(player, true);
-         if (position == null) {
-            return EnumActionResult.FAIL;
-         }
+			return new ActionResult(EnumActionResult.SUCCESS, stack);
+		}
+	};
+	public static final ItemMulti.IItemUseHandler emptyCellFill = new ItemMulti.IItemUseHandler()
+	{
+		@Override
+		public EnumActionResult onUse(ItemStack stack, EntityPlayer player, BlockPos pos, EnumHand hand, EnumFacing side)
+		{
+			assert stack.getItem() == ItemName.cell.getInstance();
+			World world = player.getEntityWorld();
+			RayTraceResult position = Util.traceBlocks(player, true);
+			if (position == null)
+			{
+				return EnumActionResult.FAIL;
+			}
 
-         if (position.typeOfHit == Type.BLOCK) {
-            pos = position.getBlockPos();
-            if (!world.canMineBlockBody(player, pos)) {
-               return EnumActionResult.FAIL;
-            }
+			if (position.typeOfHit == Type.BLOCK)
+			{
+				pos = position.getBlockPos();
+				if (!world.canMineBlockBody(player, pos))
+				{
+					return EnumActionResult.FAIL;
+				}
 
-            if (!player.canPlayerEdit(pos, position.sideHit, player.getHeldItem(hand))) {
-               return EnumActionResult.FAIL;
-            }
+				if (!player.canPlayerEdit(pos, position.sideHit, player.getHeldItem(hand)))
+				{
+					return EnumActionResult.FAIL;
+				}
 
-            LiquidUtil.LiquidData data = LiquidUtil.getLiquid(world, pos);
-            if (data != null && data.isSource) {
-               if (data.liquid == FluidRegistry.WATER && StackUtil.storeInventoryItem(ItemName.cell.getItemStack(CellType.water), player, true)) {
-                  world.setBlockToAir(pos);
-                  StackUtil.consumeOrError(player, hand, 1);
-                  StackUtil.storeInventoryItem(ItemName.cell.getItemStack(CellType.water), player, false);
-                  return EnumActionResult.SUCCESS;
-               }
+				LiquidUtil.LiquidData data = LiquidUtil.getLiquid(world, pos);
+				if (data != null && data.isSource)
+				{
+					if (data.liquid == FluidRegistry.WATER && StackUtil.storeInventoryItem(ItemName.cell.getItemStack(CellType.water), player, true))
+					{
+						world.setBlockToAir(pos);
+						StackUtil.consumeOrError(player, hand, 1);
+						StackUtil.storeInventoryItem(ItemName.cell.getItemStack(CellType.water), player, false);
+						return EnumActionResult.SUCCESS;
+					}
 
-               if (data.liquid == FluidRegistry.LAVA && StackUtil.storeInventoryItem(ItemName.cell.getItemStack(CellType.lava), player, true)) {
-                  world.setBlockToAir(pos);
-                  StackUtil.consumeOrError(player, hand, 1);
-                  StackUtil.storeInventoryItem(ItemName.cell.getItemStack(CellType.lava), player, false);
-                  return EnumActionResult.SUCCESS;
-               }
-            }
-         }
+					if (data.liquid == FluidRegistry.LAVA && StackUtil.storeInventoryItem(ItemName.cell.getItemStack(CellType.lava), player, true))
+					{
+						world.setBlockToAir(pos);
+						StackUtil.consumeOrError(player, hand, 1);
+						StackUtil.storeInventoryItem(ItemName.cell.getItemStack(CellType.lava), player, false);
+						return EnumActionResult.SUCCESS;
+					}
+				}
+			}
 
-         return EnumActionResult.PASS;
-      }
-   };
+			return EnumActionResult.PASS;
+		}
+	};
 
-   public static ItemMulti.IItemUseHandler getFluidPlacer(final Block type) {
-      return new ItemMulti.IItemUseHandler() {
-         @Override
-         public EnumActionResult onUse(ItemStack stack, EntityPlayer player, BlockPos pos, EnumHand hand, EnumFacing side) {
-            assert stack.getItem() == ItemName.misc_resource.getInstance();
-            World world = player.getEntityWorld();
-            if (!world.getBlockState(pos).getBlock().isReplaceable(world, pos)) {
-               pos = pos.offset(side);
-            }
+	public static ItemMulti.IItemUseHandler getFluidPlacer(final Block type)
+	{
+		return new ItemMulti.IItemUseHandler()
+		{
+			@Override
+			public EnumActionResult onUse(ItemStack stack, EntityPlayer player, BlockPos pos, EnumHand hand, EnumFacing side)
+			{
+				assert stack.getItem() == ItemName.misc_resource.getInstance();
+				World world = player.getEntityWorld();
+				if (!world.getBlockState(pos).getBlock().isReplaceable(world, pos))
+				{
+					pos = pos.offset(side);
+				}
 
-            if (player.canPlayerEdit(pos, side, stack) && world.mayPlace(type, pos, false, side, null)) {
-               IBlockState placedState = type.getStateForPlacement(world, pos, side, 0.0F, 0.0F, 0.0F, 0, player, hand);
-               world.setBlockState(pos, placedState);
-               SoundType sound = placedState.getBlock().getSoundType(placedState, world, pos, player);
-               world.playSound(
-                  player, pos, sound.getPlaceSound(), SoundCategory.BLOCKS, (sound.getVolume() + 1.0F) / 2.0F, sound.getPitch() * 0.8F
-               );
-               StackUtil.consumeOrError(player, hand, 1);
-               return EnumActionResult.SUCCESS;
-            } else {
-               return EnumActionResult.FAIL;
-            }
-         }
-      };
-   }
+				if (player.canPlayerEdit(pos, side, stack) && world.mayPlace(type, pos, false, side, null))
+				{
+					IBlockState placedState = type.getStateForPlacement(world, pos, side, 0.0F, 0.0F, 0.0F, 0, player, hand);
+					world.setBlockState(pos, placedState);
+					SoundType sound = placedState.getBlock().getSoundType(placedState, world, pos, player);
+					world.playSound(
+						player, pos, sound.getPlaceSound(), SoundCategory.BLOCKS, (sound.getVolume() + 1.0F) / 2.0F, sound.getPitch() * 0.8F
+					);
+					StackUtil.consumeOrError(player, hand, 1);
+					return EnumActionResult.SUCCESS;
+				} else
+				{
+					return EnumActionResult.FAIL;
+				}
+			}
+		};
+	}
 }

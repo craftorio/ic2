@@ -1,18 +1,21 @@
 package ic2.api.util;
 
-public enum FluidContainerOutputMode {
-   EmptyFullToOutput(true),
-   AnyToOutput(true),
-   InPlacePreferred(false),
-   InPlace(false);
+public enum FluidContainerOutputMode
+{
+	EmptyFullToOutput(true),
+	AnyToOutput(true),
+	InPlacePreferred(false),
+	InPlace(false);
 
-   private final boolean outputEmptyFull;
+	private final boolean outputEmptyFull;
 
-   FluidContainerOutputMode(boolean outputEmptyFull) {
-      this.outputEmptyFull = outputEmptyFull;
-   }
+	FluidContainerOutputMode(boolean outputEmptyFull)
+	{
+		this.outputEmptyFull = outputEmptyFull;
+	}
 
-   public boolean isOutputEmptyFull() {
-      return this.outputEmptyFull;
-   }
+	public boolean isOutputEmptyFull()
+	{
+		return this.outputEmptyFull;
+	}
 }

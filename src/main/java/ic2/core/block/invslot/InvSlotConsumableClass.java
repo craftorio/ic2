@@ -6,27 +6,33 @@ import net.minecraft.block.Block;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 
-public class InvSlotConsumableClass extends InvSlotConsumable {
-   private final Class<?> clazz;
+public class InvSlotConsumableClass extends InvSlotConsumable
+{
+	private final Class<?> clazz;
 
-   public InvSlotConsumableClass(IInventorySlotHolder<?> base1, String name1, InvSlot.Access access1, int count, InvSlot.InvSide preferredSide1, Class<?> clazz) {
-      super(base1, name1, access1, count, preferredSide1);
-      this.clazz = clazz;
-   }
+	public InvSlotConsumableClass(IInventorySlotHolder<?> base1, String name1, InvSlot.Access access1, int count, InvSlot.InvSide preferredSide1, Class<?> clazz)
+	{
+		super(base1, name1, access1, count, preferredSide1);
+		this.clazz = clazz;
+	}
 
-   public InvSlotConsumableClass(IInventorySlotHolder<?> base1, String name1, int count, Class<?> clazz) {
-      super(base1, name1, count);
-      this.clazz = clazz;
-   }
+	public InvSlotConsumableClass(IInventorySlotHolder<?> base1, String name1, int count, Class<?> clazz)
+	{
+		super(base1, name1, count);
+		this.clazz = clazz;
+	}
 
-   @Override
-   public boolean accepts(ItemStack stack) {
-      if (StackUtil.isEmpty(stack)) {
-         return false;
-      } else {
-         return stack.getItem() instanceof ItemBlock
-            ? this.clazz.isInstance(Block.getBlockFromItem(stack.getItem()))
-            : this.clazz.isInstance(stack.getItem());
-      }
-   }
+	@Override
+	public boolean accepts(ItemStack stack)
+	{
+		if (StackUtil.isEmpty(stack))
+		{
+			return false;
+		} else
+		{
+			return stack.getItem() instanceof ItemBlock
+				? this.clazz.isInstance(Block.getBlockFromItem(stack.getItem()))
+				: this.clazz.isInstance(stack.getItem());
+		}
+	}
 }

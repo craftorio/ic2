@@ -1,4 +1,5 @@
 package ic2.api.upgrade;
 
-public interface IFluidProducingUpgrade extends IUpgradeItem {
+public interface IFluidProducingUpgrade extends IUpgradeItem
+{
 }

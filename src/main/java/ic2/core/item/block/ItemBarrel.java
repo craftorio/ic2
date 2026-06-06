@@ -23,37 +23,46 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ItemBarrel extends ItemIC2 {
-   public ItemBarrel() {
-      super(ItemName.barrel);
-      this.setMaxStackSize(1);
-   }
+public class ItemBarrel extends ItemIC2
+{
+	public ItemBarrel()
+	{
+		super(ItemName.barrel);
+		this.setMaxStackSize(1);
+	}
 
-   @SideOnly(Side.CLIENT)
-   @Override
-   public void registerModels(final ItemName name) {
-      ModelLoader.setCustomMeshDefinition(this, new ItemMeshDefinition() {
-         public ModelResourceLocation getModelLocation(ItemStack stack) {
-            return ItemIC2.getModelLocation(name, null);
-         }
-      });
-      ModelBakery.registerItemVariants(this, new ResourceLocation[]{getModelLocation(name, null)});
-   }
+	@SideOnly(Side.CLIENT)
+	@Override
+	public void registerModels(final ItemName name)
+	{
+		ModelLoader.setCustomMeshDefinition(this, new ItemMeshDefinition()
+		{
+			public ModelResourceLocation getModelLocation(ItemStack stack)
+			{
+				return ItemIC2.getModelLocation(name, null);
+			}
+		});
+		ModelBakery.registerItemVariants(this, new ResourceLocation[] { getModelLocation(name, null) });
+	}
 
-   @Override
-   public String getItemStackDisplayName(ItemStack itemstack) {
-      int v = ItemBooze.getAmountOfValue(itemstack.getItemDamage());
-      return v > 0 ? "" + v + Localization.translate("ic2.item.LBoozeBarrel") : Localization.translate("ic2.item.EmptyBoozeBarrel");
-   }
+	@Override
+	public String getItemStackDisplayName(ItemStack itemstack)
+	{
+		int v = ItemBooze.getAmountOfValue(itemstack.getItemDamage());
+		return v > 0 ? "" + v + Localization.translate("ic2.item.LBoozeBarrel") : Localization.translate("ic2.item.EmptyBoozeBarrel");
+	}
 
-   public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float a, float b, float c) {
-      ItemStack stack = StackUtil.get(player, hand);
-      if (world.getBlockState(pos) == BlockName.scaffold.getBlockState(BlockScaffold.ScaffoldType.wood)
-         && ItemBlockTileEntity.placeTeBlock(stack, player, world, pos, side, new TileEntityBarrel(stack.getItemDamage()))) {
-         StackUtil.consumeOrError(player, hand, 1);
-         return EnumActionResult.SUCCESS;
-      } else {
-         return EnumActionResult.PASS;
-      }
-   }
+	public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float a, float b, float c)
+	{
+		ItemStack stack = StackUtil.get(player, hand);
+		if (world.getBlockState(pos) == BlockName.scaffold.getBlockState(BlockScaffold.ScaffoldType.wood)
+			&& ItemBlockTileEntity.placeTeBlock(stack, player, world, pos, side, new TileEntityBarrel(stack.getItemDamage())))
+		{
+			StackUtil.consumeOrError(player, hand, 1);
+			return EnumActionResult.SUCCESS;
+		} else
+		{
+			return EnumActionResult.PASS;
+		}
+	}
 }

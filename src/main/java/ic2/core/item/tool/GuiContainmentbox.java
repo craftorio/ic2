@@ -6,13 +6,16 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class GuiContainmentbox extends GuiIC2<ContainerContainmentbox> {
-   public GuiContainmentbox(ContainerContainmentbox container) {
-      super(container);
-   }
+public class GuiContainmentbox extends GuiIC2<ContainerContainmentbox>
+{
+	public GuiContainmentbox(ContainerContainmentbox container)
+	{
+		super(container);
+	}
 
-   @Override
-   public ResourceLocation getTexture() {
-      return new ResourceLocation("ic2", "textures/gui/GUIContainmentbox.png");
-   }
+	@Override
+	public ResourceLocation getTexture()
+	{
+		return new ResourceLocation("ic2", "textures/gui/GUIContainmentbox.png");
+	}
 }

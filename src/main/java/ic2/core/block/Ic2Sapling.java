@@ -5,7 +5,9 @@ import ic2.core.init.BlocksItems;
 import ic2.core.item.block.ItemBlockIC2;
 import ic2.core.ref.BlockName;
 import ic2.core.ref.IBlockModelProvider;
+
 import java.util.Random;
+
 import net.minecraft.block.BlockBush;
 import net.minecraft.block.IGrowable;
 import net.minecraft.block.SoundType;
@@ -18,62 +20,77 @@ import net.minecraftforge.common.EnumPlantType;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class Ic2Sapling extends BlockBush implements IBlockModelProvider, IGrowable {
-   public Ic2Sapling() {
-      this.setHardness(0.0F);
-      this.setSoundType(SoundType.PLANT);
-      this.setUnlocalizedName(BlockName.sapling.name());
-      this.setCreativeTab(IC2.tabIC2);
-      ResourceLocation name = IC2.getIdentifier(BlockName.sapling.name());
-      BlocksItems.registerBlock(this, name);
-      BlocksItems.registerItem(new ItemBlockIC2(this), name);
-      BlockName.sapling.setInstance(this);
-   }
+public class Ic2Sapling extends BlockBush implements IBlockModelProvider, IGrowable
+{
+	public Ic2Sapling()
+	{
+		this.setHardness(0.0F);
+		this.setSoundType(SoundType.PLANT);
+		this.setUnlocalizedName(BlockName.sapling.name());
+		this.setCreativeTab(IC2.tabIC2);
+		ResourceLocation name = IC2.getIdentifier(BlockName.sapling.name());
+		BlocksItems.registerBlock(this, name);
+		BlocksItems.registerItem(new ItemBlockIC2(this), name);
+		BlockName.sapling.setInstance(this);
+	}
 
-   @SideOnly(Side.CLIENT)
-   @Override
-   public void registerModels(BlockName name) {
-      BlockBase.registerDefaultItemModel(this);
-   }
+	@SideOnly(Side.CLIENT)
+	@Override
+	public void registerModels(BlockName name)
+	{
+		BlockBase.registerDefaultItemModel(this);
+	}
 
-   public String getUnlocalizedName() {
-      return "ic2." + super.getUnlocalizedName().substring(5) + ".rubber";
-   }
+	public String getUnlocalizedName()
+	{
+		return "ic2." + super.getUnlocalizedName().substring(5) + ".rubber";
+	}
 
-   public boolean canBeReplacedByLeaves(IBlockState state, IBlockAccess world, BlockPos pos) {
-      return true;
-   }
+	public boolean canBeReplacedByLeaves(IBlockState state, IBlockAccess world, BlockPos pos)
+	{
+		return true;
+	}
 
-   public void updateTick(World world, BlockPos pos, IBlockState state, Random random) {
-      if (!world.isRemote) {
-         if (!this.canBlockStay(world, pos, state)) {
-            this.dropBlockAsItem(world, pos, state, 0);
-            world.setBlockToAir(pos);
-         } else {
-            if (world.getLightFromNeighbors(pos.up()) >= 9 && random.nextInt(30) == 0) {
-               this.grow(world, random, pos, state);
-            }
-         }
-      }
-   }
+	public void updateTick(World world, BlockPos pos, IBlockState state, Random random)
+	{
+		if (!world.isRemote)
+		{
+			if (!this.canBlockStay(world, pos, state))
+			{
+				this.dropBlockAsItem(world, pos, state, 0);
+				world.setBlockToAir(pos);
+			} else
+			{
+				if (world.getLightFromNeighbors(pos.up()) >= 9 && random.nextInt(30) == 0)
+				{
+					this.grow(world, random, pos, state);
+				}
+			}
+		}
+	}
 
-   public void grow(World world, Random rand, BlockPos pos, IBlockState state) {
-      new WorldGenRubTree(true).grow(world, pos, rand);
-   }
+	public void grow(World world, Random rand, BlockPos pos, IBlockState state)
+	{
+		new WorldGenRubTree(true).grow(world, pos, rand);
+	}
 
-   public int damageDropped(IBlockState state) {
-      return 0;
-   }
+	public int damageDropped(IBlockState state)
+	{
+		return 0;
+	}
 
-   public boolean canGrow(World worldIn, BlockPos pos, IBlockState state, boolean isClient) {
-      return true;
-   }
+	public boolean canGrow(World worldIn, BlockPos pos, IBlockState state, boolean isClient)
+	{
+		return true;
+	}
 
-   public boolean canUseBonemeal(World worldIn, Random rand, BlockPos pos, IBlockState state) {
-      return true;
-   }
+	public boolean canUseBonemeal(World worldIn, Random rand, BlockPos pos, IBlockState state)
+	{
+		return true;
+	}
 
-   public EnumPlantType getPlantType(IBlockAccess world, BlockPos pos) {
-      return EnumPlantType.Plains;
-   }
+	public EnumPlantType getPlantType(IBlockAccess world, BlockPos pos)
+	{
+		return EnumPlantType.Plains;
+	}
 }

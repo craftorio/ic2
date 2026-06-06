@@ -2,12 +2,13 @@ package ic2.api.transport;
 
 import net.minecraftforge.fluids.FluidTank;
 
-public interface IFluidPipe extends IPipe {
-   int getTransferRate();
+public interface IFluidPipe extends IPipe
+{
+	int getTransferRate();
 
-   FluidTank getTank();
+	FluidTank getTank();
 
-   int getCurrentInnerCapacity();
+	int getCurrentInnerCapacity();
 
-   int getMaxInnerCapacity();
+	int getMaxInnerCapacity();
 }

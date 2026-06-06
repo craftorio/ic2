@@ -21,145 +21,174 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.RayTraceResult.Type;
 import net.minecraft.world.World;
 
-public class ItemIC2Boat extends ItemMulti<ItemIC2Boat.BoatType> {
-   public ItemIC2Boat() {
-      super(ItemName.boat, ItemIC2Boat.BoatType.class);
-   }
+public class ItemIC2Boat extends ItemMulti<ItemIC2Boat.BoatType>
+{
+	public ItemIC2Boat()
+	{
+		super(ItemName.boat, ItemIC2Boat.BoatType.class);
+	}
 
-   @Override
-   public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
-      ItemStack stack = StackUtil.get(player, hand);
-      EntityIC2Boat boat = this.makeBoat(stack, world, player);
-      if (boat == null) {
-         return new ActionResult(EnumActionResult.PASS, stack);
-      }
+	@Override
+	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand)
+	{
+		ItemStack stack = StackUtil.get(player, hand);
+		EntityIC2Boat boat = this.makeBoat(stack, world, player);
+		if (boat == null)
+		{
+			return new ActionResult(EnumActionResult.PASS, stack);
+		}
 
-      Vector3 lookVec = Util.getLookScaled(player);
-      Vector3 start = Util.getEyePosition(player);
-      Vec3d startMc = start.toVec3();
-      RayTraceResult hitPos = world.rayTraceBlocks(startMc, start.add(lookVec).toVec3(), true);
-      if (hitPos == null) {
-         return new ActionResult(EnumActionResult.PASS, stack);
-      }
+		Vector3 lookVec = Util.getLookScaled(player);
+		Vector3 start = Util.getEyePosition(player);
+		Vec3d startMc = start.toVec3();
+		RayTraceResult hitPos = world.rayTraceBlocks(startMc, start.add(lookVec).toVec3(), true);
+		if (hitPos == null)
+		{
+			return new ActionResult(EnumActionResult.PASS, stack);
+		}
 
-      boolean inEntity = false;
-      float border = 1.0F;
+		boolean inEntity = false;
+		float border = 1.0F;
 
-      for (Entity entity : world.getEntitiesWithinAABBExcludingEntity(player, player.getEntityBoundingBox().expand(lookVec.x, lookVec.y, lookVec.z).grow(border))) {
-         if (entity.canBeCollidedWith()) {
-            border = entity.getCollisionBorderSize();
-            AxisAlignedBB aabb = entity.getEntityBoundingBox().grow(border);
-            if (aabb.contains(startMc)) {
-               inEntity = true;
-               break;
-            }
-         }
-      }
+		for (Entity entity : world.getEntitiesWithinAABBExcludingEntity(player, player.getEntityBoundingBox().expand(lookVec.x, lookVec.y, lookVec.z).grow(border)))
+		{
+			if (entity.canBeCollidedWith())
+			{
+				border = entity.getCollisionBorderSize();
+				AxisAlignedBB aabb = entity.getEntityBoundingBox().grow(border);
+				if (aabb.contains(startMc))
+				{
+					inEntity = true;
+					break;
+				}
+			}
+		}
 
-      if (inEntity) {
-         return new ActionResult(EnumActionResult.PASS, stack);
-      }
+		if (inEntity)
+		{
+			return new ActionResult(EnumActionResult.PASS, stack);
+		}
 
-      if (hitPos.typeOfHit == Type.BLOCK) {
-         BlockPos pos = hitPos.getBlockPos();
-         if (world.getBlockState(pos).getBlock() == Blocks.SNOW_LAYER) {
-            pos = pos.down();
-         }
+		if (hitPos.typeOfHit == Type.BLOCK)
+		{
+			BlockPos pos = hitPos.getBlockPos();
+			if (world.getBlockState(pos).getBlock() == Blocks.SNOW_LAYER)
+			{
+				pos = pos.down();
+			}
 
-         boat.setPosition(pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5);
-         boat.rotationYaw = ((MathHelper.floor(player.rotationYaw * 4.0F / 360.0F + 0.5) & 3) - 1) * 90;
-         if (!world.getCollisionBoxes(boat, boat.getCollisionBoundingBox().expand(-0.1, -0.1, -0.1)).isEmpty()) {
-            return new ActionResult(EnumActionResult.PASS, stack);
-         }
+			boat.setPosition(pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5);
+			boat.rotationYaw = ((MathHelper.floor(player.rotationYaw * 4.0F / 360.0F + 0.5) & 3) - 1) * 90;
+			if (!world.getCollisionBoxes(boat, boat.getCollisionBoundingBox().expand(-0.1, -0.1, -0.1)).isEmpty())
+			{
+				return new ActionResult(EnumActionResult.PASS, stack);
+			}
 
-         if (!world.isRemote) {
-            world.spawnEntity(boat);
-         }
+			if (!world.isRemote)
+			{
+				world.spawnEntity(boat);
+			}
 
-         if (!player.capabilities.isCreativeMode) {
-            stack = StackUtil.decSize(stack);
-         }
-      }
+			if (!player.capabilities.isCreativeMode)
+			{
+				stack = StackUtil.decSize(stack);
+			}
+		}
 
-      return new ActionResult(EnumActionResult.SUCCESS, stack);
-   }
+		return new ActionResult(EnumActionResult.SUCCESS, stack);
+	}
 
-   protected EntityIC2Boat makeBoat(ItemStack stack, World world, EntityPlayer player) {
-      ItemIC2Boat.BoatType type = this.getType(stack);
-      if (type == null) {
-         return null;
-      }
+	protected EntityIC2Boat makeBoat(ItemStack stack, World world, EntityPlayer player)
+	{
+		ItemIC2Boat.BoatType type = this.getType(stack);
+		if (type == null)
+		{
+			return null;
+		}
 
-      switch (type) {
-         case carbon:
-            return new EntityBoatCarbon(world);
-         case rubber:
-            return new EntityBoatRubber(world);
-         case electric:
-            return new EntityBoatElectric(world);
-         default:
-            return null;
-      }
-   }
+		switch (type)
+		{
+			case carbon:
+				return new EntityBoatCarbon(world);
+			case rubber:
+				return new EntityBoatRubber(world);
+			case electric:
+				return new EntityBoatElectric(world);
+			default:
+				return null;
+		}
+	}
 
-   public boolean hasCustomEntity(ItemStack stack) {
-      return this.getType(stack) == ItemIC2Boat.BoatType.electric;
-   }
+	public boolean hasCustomEntity(ItemStack stack)
+	{
+		return this.getType(stack) == ItemIC2Boat.BoatType.electric;
+	}
 
-   public Entity createEntity(World world, Entity location, ItemStack stack) {
-      assert this.hasCustomEntity(stack);
-      assert !world.isRemote;
-      EntityItem item = new ItemIC2Boat.FireproofItem(world, location.posX, location.posY, location.posZ, stack);
-      item.setDefaultPickupDelay();
-      item.motionX = location.motionX;
-      item.motionY = location.motionY;
-      item.motionZ = location.motionZ;
-      return item;
-   }
+	public Entity createEntity(World world, Entity location, ItemStack stack)
+	{
+		assert this.hasCustomEntity(stack);
+		assert !world.isRemote;
+		EntityItem item = new ItemIC2Boat.FireproofItem(world, location.posX, location.posY, location.posZ, stack);
+		item.setDefaultPickupDelay();
+		item.motionX = location.motionX;
+		item.motionY = location.motionY;
+		item.motionZ = location.motionZ;
+		return item;
+	}
 
-   public enum BoatType implements IIdProvider {
-      broken_rubber,
-      rubber,
-      carbon,
-      electric;
+	public enum BoatType implements IIdProvider
+	{
+		broken_rubber,
+		rubber,
+		carbon,
+		electric;
 
-      @Override
-      public String getName() {
-         return this.name();
-      }
+		@Override
+		public String getName()
+		{
+			return this.name();
+		}
 
-      @Override
-      public int getId() {
-         return this.ordinal();
-      }
-   }
+		@Override
+		public int getId()
+		{
+			return this.ordinal();
+		}
+	}
 
-   public static class FireproofItem extends EntityItem {
-      public FireproofItem(World world, double x, double y, double z, ItemStack stack) {
-         super(world, x, y, z, stack);
-         this.isImmuneToFire = true;
-      }
+	public static class FireproofItem extends EntityItem
+	{
+		public FireproofItem(World world, double x, double y, double z, ItemStack stack)
+		{
+			super(world, x, y, z, stack);
+			this.isImmuneToFire = true;
+		}
 
-      public FireproofItem(World world, double x, double y, double z) {
-         super(world, x, y, z);
-         this.isImmuneToFire = true;
-      }
+		public FireproofItem(World world, double x, double y, double z)
+		{
+			super(world, x, y, z);
+			this.isImmuneToFire = true;
+		}
 
-      public FireproofItem(World world) {
-         super(world);
-         this.isImmuneToFire = true;
-      }
+		public FireproofItem(World world)
+		{
+			super(world);
+			this.isImmuneToFire = true;
+		}
 
-      public void onUpdate() {
-         super.onUpdate();
-         this.extinguish();
-      }
+		public void onUpdate()
+		{
+			super.onUpdate();
+			this.extinguish();
+		}
 
-      protected void dealFireDamage(int amount) {
-      }
+		protected void dealFireDamage(int amount)
+		{
+		}
 
-      public void setFire(int seconds) {
-         this.extinguish();
-      }
-   }
+		public void setFire(int seconds)
+		{
+			this.extinguish();
+		}
+	}
 }

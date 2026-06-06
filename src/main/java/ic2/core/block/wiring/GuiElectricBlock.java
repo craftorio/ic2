@@ -12,37 +12,45 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class GuiElectricBlock extends GuiIC2<ContainerElectricBlock> {
-   private static final ResourceLocation background = new ResourceLocation("ic2", "textures/gui/GUIElectricBlock.png");
+public class GuiElectricBlock extends GuiIC2<ContainerElectricBlock>
+{
+	private static final ResourceLocation background = new ResourceLocation("ic2", "textures/gui/GUIElectricBlock.png");
 
-   public GuiElectricBlock(final ContainerElectricBlock container) {
-      super(container, 196);
-      this.addElement(EnergyGauge.asBar(this, 79, 38, container.base));
-      this.addElement(new VanillaButton(this, 152, 4, 20, 20, this.createEventSender(0)).withIcon(new Supplier<ItemStack>() {
-         public ItemStack get() {
-            return new ItemStack(Items.REDSTONE);
-         }
-      }).withTooltip(new Supplier<String>() {
-         public String get() {
-            return container.base.getRedstoneMode();
-         }
-      }));
-   }
+	public GuiElectricBlock(final ContainerElectricBlock container)
+	{
+		super(container, 196);
+		this.addElement(EnergyGauge.asBar(this, 79, 38, container.base));
+		this.addElement(new VanillaButton(this, 152, 4, 20, 20, this.createEventSender(0)).withIcon(new Supplier<ItemStack>()
+		{
+			public ItemStack get()
+			{
+				return new ItemStack(Items.REDSTONE);
+			}
+		}).withTooltip(new Supplier<String>()
+		{
+			public String get()
+			{
+				return container.base.getRedstoneMode();
+			}
+		}));
+	}
 
-   @Override
-   protected void drawForegroundLayer(int mouseX, int mouseY) {
-      super.drawForegroundLayer(mouseX, mouseY);
-      this.fontRenderer.drawString(Localization.translate("ic2.EUStorage.gui.info.armor"), 8, this.ySize - 126 + 3, 4210752);
-      this.fontRenderer.drawString(Localization.translate("ic2.EUStorage.gui.info.level"), 79, 25, 4210752);
-      int e = (int)Math.min(this.container.base.energy.getEnergy(), this.container.base.energy.getCapacity());
-      this.fontRenderer.drawString(" " + e, 110, 35, 4210752);
-      this.fontRenderer.drawString("/" + (int)this.container.base.energy.getCapacity(), 110, 45, 4210752);
-      String output = Localization.translate("ic2.EUStorage.gui.info.output", this.container.base.output);
-      this.fontRenderer.drawString(output, 85, 60, 4210752);
-   }
+	@Override
+	protected void drawForegroundLayer(int mouseX, int mouseY)
+	{
+		super.drawForegroundLayer(mouseX, mouseY);
+		this.fontRenderer.drawString(Localization.translate("ic2.EUStorage.gui.info.armor"), 8, this.ySize - 126 + 3, 4210752);
+		this.fontRenderer.drawString(Localization.translate("ic2.EUStorage.gui.info.level"), 79, 25, 4210752);
+		int e = (int) Math.min(this.container.base.energy.getEnergy(), this.container.base.energy.getCapacity());
+		this.fontRenderer.drawString(" " + e, 110, 35, 4210752);
+		this.fontRenderer.drawString("/" + (int) this.container.base.energy.getCapacity(), 110, 45, 4210752);
+		String output = Localization.translate("ic2.EUStorage.gui.info.output", this.container.base.output);
+		this.fontRenderer.drawString(output, 85, 60, 4210752);
+	}
 
-   @Override
-   protected ResourceLocation getTexture() {
-      return background;
-   }
+	@Override
+	protected ResourceLocation getTexture()
+	{
+		return background;
+	}
 }

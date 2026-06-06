@@ -10,36 +10,43 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class HandHeldContainmentbox extends HandHeldInventory {
-   public HandHeldContainmentbox(EntityPlayer player, ItemStack stack1, int inventorySize) {
-      super(player, stack1, inventorySize);
-   }
+public class HandHeldContainmentbox extends HandHeldInventory
+{
+	public HandHeldContainmentbox(EntityPlayer player, ItemStack stack1, int inventorySize)
+	{
+		super(player, stack1, inventorySize);
+	}
 
-   @Override
-   public ContainerBase<HandHeldContainmentbox> getGuiContainer(EntityPlayer player) {
-      return new ContainerContainmentbox(player, this);
-   }
+	@Override
+	public ContainerBase<HandHeldContainmentbox> getGuiContainer(EntityPlayer player)
+	{
+		return new ContainerContainmentbox(player, this);
+	}
 
-   @SideOnly(Side.CLIENT)
-   @Override
-   public GuiScreen getGui(EntityPlayer player, boolean isAdmin) {
-      return new GuiContainmentbox(new ContainerContainmentbox(player, this));
-   }
+	@SideOnly(Side.CLIENT)
+	@Override
+	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
+	{
+		return new GuiContainmentbox(new ContainerContainmentbox(player, this));
+	}
 
-   public String getName() {
-      return "ic2.containment_box";
-   }
+	public String getName()
+	{
+		return "ic2.containment_box";
+	}
 
-   public boolean hasCustomName() {
-      return false;
-   }
+	public boolean hasCustomName()
+	{
+		return false;
+	}
 
-   @Override
-   public boolean isItemValidForSlot(int index, ItemStack stack) {
-      return stack == null
-         ? false
-         : stack.getItem() == ItemName.nuclear.getInstance()
-            || stack.getItem() instanceof ItemReactorMOX
-            || stack.getItem() instanceof ItemReactorUranium;
-   }
+	@Override
+	public boolean isItemValidForSlot(int index, ItemStack stack)
+	{
+		return stack == null
+			? false
+			: stack.getItem() == ItemName.nuclear.getInstance()
+			  || stack.getItem() instanceof ItemReactorMOX
+			  || stack.getItem() instanceof ItemReactorUranium;
+	}
 }

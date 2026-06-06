@@ -1,9 +1,10 @@
 package ic2.core.block.steam;
 
-public interface IKineticMachine {
-   int getMinimumPowerRequired();
+public interface IKineticMachine
+{
+	int getMinimumPowerRequired();
 
-   int getMaximumSafePower();
+	int getMaximumSafePower();
 
-   void destroy();
+	void destroy();
 }

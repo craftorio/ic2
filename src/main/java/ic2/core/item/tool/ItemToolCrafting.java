@@ -7,45 +7,54 @@ import ic2.core.init.Localization;
 import ic2.core.item.ItemIC2;
 import ic2.core.ref.ItemName;
 import ic2.core.util.StackUtil;
+
 import java.util.LinkedList;
 import java.util.List;
+
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public abstract class ItemToolCrafting extends ItemIC2 implements IBoxable, IItemHudInfo {
-   public ItemToolCrafting(ItemName name, int maximumUses) {
-      super(name);
-      this.setMaxDamage(maximumUses - 1);
-      this.setMaxStackSize(1);
-      this.canRepair = false;
-   }
+public abstract class ItemToolCrafting extends ItemIC2 implements IBoxable, IItemHudInfo
+{
+	public ItemToolCrafting(ItemName name, int maximumUses)
+	{
+		super(name);
+		this.setMaxDamage(maximumUses - 1);
+		this.setMaxStackSize(1);
+		this.canRepair = false;
+	}
 
-   @SideOnly(Side.CLIENT)
-   public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
-      tooltip.add(Localization.translate("ic2.item.ItemTool.tooltip.UsesLeft", getRemainingUses(stack)));
-   }
+	@SideOnly(Side.CLIENT)
+	public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced)
+	{
+		tooltip.add(Localization.translate("ic2.item.ItemTool.tooltip.UsesLeft", getRemainingUses(stack)));
+	}
 
-   @Override
-   public boolean canBeStoredInToolbox(ItemStack itemstack) {
-      return true;
-   }
+	@Override
+	public boolean canBeStoredInToolbox(ItemStack itemstack)
+	{
+		return true;
+	}
 
-   @Override
-   public List<String> getHudInfo(ItemStack stack, boolean advanced) {
-      List<String> info = new LinkedList<>();
-      info.add(Localization.translate("ic2.item.ItemTool.tooltip.UsesLeft", getRemainingUses(stack)));
-      return info;
-   }
+	@Override
+	public List<String> getHudInfo(ItemStack stack, boolean advanced)
+	{
+		List<String> info = new LinkedList<>();
+		info.add(Localization.translate("ic2.item.ItemTool.tooltip.UsesLeft", getRemainingUses(stack)));
+		return info;
+	}
 
-   public boolean hasContainerItem(ItemStack stack) {
-      return true;
-   }
+	public boolean hasContainerItem(ItemStack stack)
+	{
+		return true;
+	}
 
-   public ItemStack getContainerItem(ItemStack stack) {
-      ItemStack ret = stack.copy();
-      return ret.attemptDamageItem(1, IC2.random, null) ? StackUtil.emptyStack : ret;
-   }
+	public ItemStack getContainerItem(ItemStack stack)
+	{
+		ItemStack ret = stack.copy();
+		return ret.attemptDamageItem(1, IC2.random, null) ? StackUtil.emptyStack : ret;
+	}
 }

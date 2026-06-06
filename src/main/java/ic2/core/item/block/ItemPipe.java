@@ -10,11 +10,13 @@ import ic2.core.ref.ItemName;
 import ic2.core.util.LogCategory;
 import ic2.core.util.StackUtil;
 import ic2.core.util.Util;
+
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.util.ITooltipFlag;
@@ -33,153 +35,184 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ItemPipe extends ItemIC2 implements IMultiItem<PipeType>, IBoxable {
-   private final List<ItemStack> variants = new ArrayList<>();
+public class ItemPipe extends ItemIC2 implements IMultiItem<PipeType>, IBoxable
+{
+	private final List<ItemStack> variants = new ArrayList<>();
 
-   public ItemPipe() {
-      super(ItemName.pipe);
-      this.setHasSubtypes(true);
+	public ItemPipe()
+	{
+		super(ItemName.pipe);
+		this.setHasSubtypes(true);
 
-      for (PipeType type : PipeType.values) {
-         for (PipeSize pipeSize : PipeSize.values) {
-            this.variants.add(getPipe(type, pipeSize));
-         }
-      }
-   }
+		for (PipeType type : PipeType.values)
+		{
+			for (PipeSize pipeSize : PipeSize.values)
+			{
+				this.variants.add(getPipe(type, pipeSize));
+			}
+		}
+	}
 
-   @SideOnly(Side.CLIENT)
-   @Override
-   public void registerModels(ItemName name) {
-      ResourceLocation loc = Util.getName(this);
-      ModelLoader.setCustomMeshDefinition(this, stackx -> getModelLocation(loc, stackx));
+	@SideOnly(Side.CLIENT)
+	@Override
+	public void registerModels(ItemName name)
+	{
+		ResourceLocation loc = Util.getName(this);
+		ModelLoader.setCustomMeshDefinition(this, stackx -> getModelLocation(loc, stackx));
 
-      for (ItemStack stack : this.variants) {
-         ModelBakery.registerItemVariants(this, new ResourceLocation[]{getModelLocation(loc, stack)});
-      }
-   }
+		for (ItemStack stack : this.variants)
+		{
+			ModelBakery.registerItemVariants(this, new ResourceLocation[] { getModelLocation(loc, stack) });
+		}
+	}
 
-   static ModelResourceLocation getModelLocation(ResourceLocation loc, ItemStack itemStack) {
-      return new ModelResourceLocation(new ResourceLocation(loc.getResourceDomain(), loc.getResourcePath() + "/" + getName(itemStack)), null);
-   }
+	static ModelResourceLocation getModelLocation(ResourceLocation loc, ItemStack itemStack)
+	{
+		return new ModelResourceLocation(new ResourceLocation(loc.getResourceDomain(), loc.getResourcePath() + "/" + getName(itemStack)), null);
+	}
 
-   public ItemStack getItemStack(PipeType type) {
-      return getPipe(type, PipeSize.small);
-   }
+	public ItemStack getItemStack(PipeType type)
+	{
+		return getPipe(type, PipeSize.small);
+	}
 
-   @Override
-   public ItemStack getItemStack(String variant) {
-      int pos = 0;
-      PipeType type = null;
-      PipeSize size = null;
+	@Override
+	public ItemStack getItemStack(String variant)
+	{
+		int pos = 0;
+		PipeType type = null;
+		PipeSize size = null;
 
-      while (pos < variant.length()) {
-         int nextPos = variant.indexOf(44, pos);
-         if (nextPos == -1) {
-            nextPos = variant.length();
-         }
+		while (pos < variant.length())
+		{
+			int nextPos = variant.indexOf(44, pos);
+			if (nextPos == -1)
+			{
+				nextPos = variant.length();
+			}
 
-         int sepPos = variant.indexOf(58, pos);
-         if (sepPos == -1 || sepPos >= nextPos) {
-            return null;
-         }
+			int sepPos = variant.indexOf(58, pos);
+			if (sepPos == -1 || sepPos >= nextPos)
+			{
+				return null;
+			}
 
-         String key = variant.substring(pos, sepPos);
-         String value = variant.substring(sepPos + 1, nextPos);
-         if (key.equals("type")) {
-            type = PipeType.get(value);
-            if (type == null) {
-               IC2.log.warn(LogCategory.Item, "Invalid pipe type: %s", value);
-            }
-         } else if (key.equals("size")) {
-            size = PipeSize.get(value);
-            if (size == null) {
-               IC2.log.warn(LogCategory.Item, "Invalid pipe size: %s", value);
-            }
-         }
+			String key = variant.substring(pos, sepPos);
+			String value = variant.substring(sepPos + 1, nextPos);
+			if (key.equals("type"))
+			{
+				type = PipeType.get(value);
+				if (type == null)
+				{
+					IC2.log.warn(LogCategory.Item, "Invalid pipe type: %s", value);
+				}
+			} else if (key.equals("size"))
+			{
+				size = PipeSize.get(value);
+				if (size == null)
+				{
+					IC2.log.warn(LogCategory.Item, "Invalid pipe size: %s", value);
+				}
+			}
 
-         pos = nextPos + 1;
-      }
+			pos = nextPos + 1;
+		}
 
-      return type == null ? null : getPipe(type, size);
-   }
+		return type == null ? null : getPipe(type, size);
+	}
 
-   @Override
-   public String getVariant(ItemStack itemStack) {
-      if (itemStack == null) {
-         throw new NullPointerException("null stack");
-      }
+	@Override
+	public String getVariant(ItemStack itemStack)
+	{
+		if (itemStack == null)
+		{
+			throw new NullPointerException("null stack");
+		}
 
-      if (itemStack.getItem() != this) {
-         throw new IllegalArgumentException("The stack " + itemStack + " doesn't match " + this);
-      }
+		if (itemStack.getItem() != this)
+		{
+			throw new IllegalArgumentException("The stack " + itemStack + " doesn't match " + this);
+		}
 
-      PipeType type = getPipeType(itemStack);
-      PipeSize size = getSize(itemStack);
-      return "type:" + type.getName() + ", size:" + size.getName();
-   }
+		PipeType type = getPipeType(itemStack);
+		PipeSize size = getSize(itemStack);
+		return "type:" + type.getName() + ", size:" + size.getName();
+	}
 
-   public static ItemStack getPipe(PipeType type, PipeSize size) {
-      ItemStack ret = new ItemStack(ItemName.pipe.getInstance(), 1, type.getId());
-      NBTTagCompound nbt = StackUtil.getOrCreateNbtData(ret);
-      nbt.setByte("type", (byte)type.ordinal());
-      nbt.setByte("size", (byte)size.ordinal());
-      return ret;
-   }
+	public static ItemStack getPipe(PipeType type, PipeSize size)
+	{
+		ItemStack ret = new ItemStack(ItemName.pipe.getInstance(), 1, type.getId());
+		NBTTagCompound nbt = StackUtil.getOrCreateNbtData(ret);
+		nbt.setByte("type", (byte) type.ordinal());
+		nbt.setByte("size", (byte) size.ordinal());
+		return ret;
+	}
 
-   private static PipeType getPipeType(ItemStack stack) {
-      NBTTagCompound nbt = StackUtil.getOrCreateNbtData(stack);
-      int type = nbt.getByte("type") & 255;
-      return type < PipeType.values.length ? PipeType.values[type] : PipeType.bronze;
-   }
+	private static PipeType getPipeType(ItemStack stack)
+	{
+		NBTTagCompound nbt = StackUtil.getOrCreateNbtData(stack);
+		int type = nbt.getByte("type") & 255;
+		return type < PipeType.values.length ? PipeType.values[type] : PipeType.bronze;
+	}
 
-   private static PipeSize getSize(ItemStack stack) {
-      NBTTagCompound nbt = StackUtil.getOrCreateNbtData(stack);
-      int size = nbt.getByte("size") & 255;
-      return size < PipeSize.values.length ? PipeSize.values[size] : PipeSize.small;
-   }
+	private static PipeSize getSize(ItemStack stack)
+	{
+		NBTTagCompound nbt = StackUtil.getOrCreateNbtData(stack);
+		int size = nbt.getByte("size") & 255;
+		return size < PipeSize.values.length ? PipeSize.values[size] : PipeSize.small;
+	}
 
-   private static String getName(ItemStack stack) {
-      PipeType type = getPipeType(stack);
-      PipeSize size = getSize(stack);
-      return type.getName(size);
-   }
+	private static String getName(ItemStack stack)
+	{
+		PipeType type = getPipeType(stack);
+		PipeSize size = getSize(stack);
+		return type.getName(size);
+	}
 
-   @Override
-   public String getUnlocalizedName(ItemStack stack) {
-      return super.getUnlocalizedName(stack) + "." + getName(stack);
-   }
+	@Override
+	public String getUnlocalizedName(ItemStack stack)
+	{
+		return super.getUnlocalizedName(stack) + "." + getName(stack);
+	}
 
-   @SideOnly(Side.CLIENT)
-   public void addInformation(ItemStack itemStack, World world, List<String> info, ITooltipFlag b) {
-      PipeType type = getPipeType(itemStack);
-      PipeSize size = getSize(itemStack);
-      info.add("Transfer rate: " + type.transferRate + " stacks/second");
-      info.add("Max stack size: " + size.maxStackSize);
-   }
+	@SideOnly(Side.CLIENT)
+	public void addInformation(ItemStack itemStack, World world, List<String> info, ITooltipFlag b)
+	{
+		PipeType type = getPipeType(itemStack);
+		PipeSize size = getSize(itemStack);
+		info.add("Transfer rate: " + type.transferRate + " stacks/second");
+		info.add("Max stack size: " + size.maxStackSize);
+	}
 
-   public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-      return EnumActionResult.SUCCESS;
-   }
+	public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ)
+	{
+		return EnumActionResult.SUCCESS;
+	}
 
-   public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> itemList) {
-      if (this.isInCreativeTab(tab)) {
-         List<ItemStack> variants = new ArrayList<>(this.variants);
-         itemList.addAll(variants);
-      }
-   }
+	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> itemList)
+	{
+		if (this.isInCreativeTab(tab))
+		{
+			List<ItemStack> variants = new ArrayList<>(this.variants);
+			itemList.addAll(variants);
+		}
+	}
 
-   @Override
-   public Set<PipeType> getAllTypes() {
-      return EnumSet.allOf(PipeType.class);
-   }
+	@Override
+	public Set<PipeType> getAllTypes()
+	{
+		return EnumSet.allOf(PipeType.class);
+	}
 
-   @Override
-   public Set<ItemStack> getAllStacks() {
-      return new HashSet<>(this.variants);
-   }
+	@Override
+	public Set<ItemStack> getAllStacks()
+	{
+		return new HashSet<>(this.variants);
+	}
 
-   @Override
-   public boolean canBeStoredInToolbox(ItemStack itemstack) {
-      return true;
-   }
+	@Override
+	public boolean canBeStoredInToolbox(ItemStack itemstack)
+	{
+		return true;
+	}
 }

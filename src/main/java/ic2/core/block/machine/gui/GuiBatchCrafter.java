@@ -14,22 +14,27 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class GuiBatchCrafter extends GuiIC2<ContainerBatchCrafter> {
-   private static final ResourceLocation TEXTURE = new ResourceLocation("ic2", "textures/gui/GUIBatchCrafter.png");
+public class GuiBatchCrafter extends GuiIC2<ContainerBatchCrafter>
+{
+	private static final ResourceLocation TEXTURE = new ResourceLocation("ic2", "textures/gui/GUIBatchCrafter.png");
 
-   public GuiBatchCrafter(ContainerBatchCrafter container) {
-      super(container, 206);
-      this.addElement(EnergyGauge.asBolt(this, 12, 45, container.base));
-      this.addElement(new LinkedGauge(this, 90, 35, container.base, "progress", Gauge.GaugeStyle.ProgressArrow));
-      this.addElement(new ItemStackImage(this, 94, 14, new Supplier<ItemStack>() {
-         public ItemStack get() {
-            return StackUtil.wrapEmpty(GuiBatchCrafter.this.container.base.recipeOutput);
-         }
-      }));
-   }
+	public GuiBatchCrafter(ContainerBatchCrafter container)
+	{
+		super(container, 206);
+		this.addElement(EnergyGauge.asBolt(this, 12, 45, container.base));
+		this.addElement(new LinkedGauge(this, 90, 35, container.base, "progress", Gauge.GaugeStyle.ProgressArrow));
+		this.addElement(new ItemStackImage(this, 94, 14, new Supplier<ItemStack>()
+		{
+			public ItemStack get()
+			{
+				return StackUtil.wrapEmpty(GuiBatchCrafter.this.container.base.recipeOutput);
+			}
+		}));
+	}
 
-   @Override
-   protected ResourceLocation getTexture() {
-      return TEXTURE;
-   }
+	@Override
+	protected ResourceLocation getTexture()
+	{
+		return TEXTURE;
+	}
 }

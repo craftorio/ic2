@@ -5,28 +5,35 @@ import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.block.model.ItemOverrideList;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
-public abstract class AbstractBakedModel implements IBakedModel {
-   public boolean isAmbientOcclusion() {
-      return true;
-   }
+public abstract class AbstractBakedModel implements IBakedModel
+{
+	public boolean isAmbientOcclusion()
+	{
+		return true;
+	}
 
-   public boolean isGui3d() {
-      return false;
-   }
+	public boolean isGui3d()
+	{
+		return false;
+	}
 
-   public boolean isBuiltInRenderer() {
-      return false;
-   }
+	public boolean isBuiltInRenderer()
+	{
+		return false;
+	}
 
-   public TextureAtlasSprite getParticleTexture() {
-      return null;
-   }
+	public TextureAtlasSprite getParticleTexture()
+	{
+		return null;
+	}
 
-   public ItemCameraTransforms getItemCameraTransforms() {
-      return null;
-   }
+	public ItemCameraTransforms getItemCameraTransforms()
+	{
+		return null;
+	}
 
-   public ItemOverrideList getOverrides() {
-      return null;
-   }
+	public ItemOverrideList getOverrides()
+	{
+		return null;
+	}
 }

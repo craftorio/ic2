@@ -1,7 +1,8 @@
 package ic2.api.item;
 
-public interface IDebuggable {
-   boolean isDebuggable();
+public interface IDebuggable
+{
+	boolean isDebuggable();
 
-   String getDebugText();
+	String getDebugText();
 }

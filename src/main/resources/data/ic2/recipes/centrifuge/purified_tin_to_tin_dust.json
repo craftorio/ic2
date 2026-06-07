@@ -1,0 +1,15 @@
+{
+  "type": "ic2:centrifuge",
+  "ingredient": {
+    "item": "ic2:purified_tin"
+  },
+  "result": [
+    {
+      "item": "ic2:tin_dust"
+    },
+    {
+      "item": "ic2:small_iron_dust"
+    }
+  ],
+  "minHeat": 1000
+}

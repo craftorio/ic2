@@ -5,25 +5,19 @@ import ic2.api.recipe.IRecipeInput;
 import ic2.api.recipe.MachineRecipeResult;
 import ic2.api.recipe.Recipes;
 import ic2.api.upgrade.UpgradableProperty;
-import ic2.core.ContainerBase;
 import ic2.core.block.invslot.InvSlotConsumableClass;
 import ic2.core.block.invslot.InvSlotProcessableGeneric;
-import ic2.core.gui.dynamic.DynamicContainer;
-import ic2.core.gui.dynamic.DynamicGui;
-import ic2.core.gui.dynamic.GuiParser;
 import ic2.core.network.GuiSynced;
 import ic2.core.profile.NotClassic;
-import ic2.core.recipe.BasicMachineRecipeManager;
+import ic2.core.ref.Ic2BlockEntities;
 
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Set;
 
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 
 @NotClassic
 public class TileEntityBlockCutter extends TileEntityStandardMachine<IRecipeInput, Collection<ItemStack>, ItemStack>
@@ -32,20 +26,15 @@ public class TileEntityBlockCutter extends TileEntityStandardMachine<IRecipeInpu
 	private boolean bladeTooWeak = false;
 	public final InvSlotConsumableClass cutterSlot;
 
-	public TileEntityBlockCutter()
+	public TileEntityBlockCutter(BlockPos pos, BlockState state)
 	{
-		super(4, 450, 1);
+		super(Ic2BlockEntities.BLOCK_CUTTER, pos, state, 4, 450, 1);
 		this.inputSlot = new InvSlotProcessableGeneric(this, "input", 1, Recipes.blockcutter);
 		this.cutterSlot = new InvSlotConsumableClass(this, "cutterInputSlot", 1, IBlockCuttingBlade.class);
 	}
 
-	public static void init()
-	{
-		Recipes.blockcutter = new BasicMachineRecipeManager();
-	}
-
 	@Override
-	public MachineRecipeResult<IRecipeInput, Collection<ItemStack>, ItemStack> getOutput()
+	public MachineRecipeResult<IRecipeInput, Collection<ItemStack>, ItemStack> getRecipeResult()
 	{
 		if (this.cutterSlot.isEmpty())
 		{
@@ -62,12 +51,12 @@ public class TileEntityBlockCutter extends TileEntityStandardMachine<IRecipeInpu
 				this.bladeTooWeak = false;
 			}
 
-			MachineRecipeResult<IRecipeInput, Collection<ItemStack>, ItemStack> ret = super.getOutput();
+			MachineRecipeResult<IRecipeInput, Collection<ItemStack>, ItemStack> ret = super.getRecipeResult();
 			if (ret != null && ret.getRecipe().getMetaData() != null)
 			{
 				ItemStack bladeStack = this.cutterSlot.get();
 				IBlockCuttingBlade blade = (IBlockCuttingBlade) bladeStack.getItem();
-				if (ret.getRecipe().getMetaData().getInteger("hardness") > blade.getHardness(bladeStack))
+				if (ret.getRecipe().getMetaData().getInt("hardness") > blade.getHardness(bladeStack))
 				{
 					if (!this.bladeTooWeak)
 					{
@@ -89,19 +78,6 @@ public class TileEntityBlockCutter extends TileEntityStandardMachine<IRecipeInpu
 				return null;
 			}
 		}
-	}
-
-	@Override
-	public ContainerBase<TileEntityBlockCutter> getGuiContainer(EntityPlayer player)
-	{
-		return DynamicContainer.create(this, player, GuiParser.parse(this.teBlock));
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
-	{
-		return DynamicGui.<TileEntityBlockCutter>create(this, player, GuiParser.parse(this.teBlock));
 	}
 
 	@Override

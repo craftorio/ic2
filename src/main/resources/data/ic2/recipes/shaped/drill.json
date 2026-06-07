@@ -1,0 +1,19 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    " I ",
+    "III",
+    "IBI"
+  ],
+  "key": {
+    "I": {
+      "tag": "forge:plates/iron"
+    },
+    "B": {
+      "item": "ic2:power_unit"
+    }
+  },
+  "result": {
+    "item": "ic2:drill"
+  }
+}

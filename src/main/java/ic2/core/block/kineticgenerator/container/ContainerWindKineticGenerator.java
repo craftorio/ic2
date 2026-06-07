@@ -2,18 +2,19 @@ package ic2.core.block.kineticgenerator.container;
 
 import ic2.core.ContainerFullInv;
 import ic2.core.block.kineticgenerator.tileentity.TileEntityWindKineticGenerator;
+import ic2.core.ref.Ic2ScreenHandlers;
 import ic2.core.slot.SlotInvSlot;
 
 import java.util.List;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.entity.player.Inventory;
 
 public class ContainerWindKineticGenerator extends ContainerFullInv<TileEntityWindKineticGenerator>
 {
-	public ContainerWindKineticGenerator(EntityPlayer player, TileEntityWindKineticGenerator tileEntity1)
+	public ContainerWindKineticGenerator(int syncId, Inventory playerInventory, TileEntityWindKineticGenerator be)
 	{
-		super(player, tileEntity1, 166);
-		this.addSlotToContainer(new SlotInvSlot(tileEntity1.rotorSlot, 0, 80, 26));
+		super(Ic2ScreenHandlers.WIND_KINETIC_GENERATOR, syncId, playerInventory, be, 166);
+		this.m_38897_(new SlotInvSlot(be.rotorSlot, 0, 80, 26));
 	}
 
 	@Override

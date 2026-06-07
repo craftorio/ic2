@@ -2,7 +2,7 @@ package ic2.core.block.invslot;
 
 import ic2.core.block.IInventorySlotHolder;
 import ic2.core.util.StackUtil;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 public class InvSlotConsumableLinked extends InvSlotConsumable
 {

@@ -2,30 +2,32 @@ package ic2.core.block.heatgenerator.tileentity;
 
 import ic2.core.ContainerBase;
 import ic2.core.IHasGui;
-import ic2.core.block.TileEntityHeatSourceInventory;
 import ic2.core.block.heatgenerator.container.ContainerRTHeatGenerator;
-import ic2.core.block.heatgenerator.gui.GuiRTHeatGenerator;
 import ic2.core.block.invslot.InvSlotConsumable;
 import ic2.core.block.invslot.InvSlotConsumableItemStack;
+import ic2.core.block.tileentity.TileEntityHeatSourceInventory;
 import ic2.core.init.MainConfig;
-import ic2.core.item.type.NuclearResourceType;
+import ic2.core.network.GrowingBuffer;
 import ic2.core.profile.NotClassic;
-import ic2.core.ref.ItemName;
+import ic2.core.ref.Ic2BlockEntities;
+import ic2.core.ref.Ic2Items;
 import ic2.core.util.ConfigUtil;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 
 @NotClassic
 public class TileEntityRTHeatGenerator extends TileEntityHeatSourceInventory implements IHasGui
 {
 	private boolean newActive;
-	public final InvSlotConsumable fuelSlot = new InvSlotConsumableItemStack(this, "fuelSlot", 6, ItemName.nuclear.getItemStack(NuclearResourceType.rtg_pellet));
+	public final InvSlotConsumable fuelSlot = new InvSlotConsumableItemStack(this, "fuelSlot", 6, new ItemStack(Ic2Items.RTG_PELLET));
 	public static final float outputMultiplier = 2.0F * ConfigUtil.getFloat(MainConfig.get(), "balance/energy/heatgenerator/radioisotope");
 
-	public TileEntityRTHeatGenerator()
+	public TileEntityRTHeatGenerator(BlockPos pos, BlockState state)
 	{
+		super(Ic2BlockEntities.RT_HEAT_GENERATOR, pos, state);
 		this.fuelSlot.setStackSizeLimit(1);
 		this.newActive = false;
 	}
@@ -71,20 +73,14 @@ public class TileEntityRTHeatGenerator extends TileEntityHeatSourceInventory imp
 	}
 
 	@Override
-	public ContainerBase<TileEntityRTHeatGenerator> getGuiContainer(EntityPlayer player)
+	public ContainerBase<TileEntityRTHeatGenerator> createServerScreenHandler(int syncId, Player player)
 	{
-		return new ContainerRTHeatGenerator(player, this);
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
-	{
-		return new GuiRTHeatGenerator(new ContainerRTHeatGenerator(player, this));
+		return new ContainerRTHeatGenerator(syncId, player.getInventory(), this);
 	}
 
 	@Override
-	public void onGuiClosed(EntityPlayer player)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
+		return new ContainerRTHeatGenerator(syncId, inventory, this);
 	}
 }

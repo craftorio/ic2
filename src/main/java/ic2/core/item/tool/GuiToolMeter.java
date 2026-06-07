@@ -1,122 +1,121 @@
 package ic2.core.item.tool;
 
-import ic2.core.GuiIC2;
+import com.mojang.blaze3d.vertex.PoseStack;
+import ic2.core.Ic2Gui;
 import ic2.core.gui.CustomButton;
 import ic2.core.gui.IClickHandler;
-import ic2.core.gui.MouseButton;
 import ic2.core.init.Localization;
 import ic2.core.util.Util;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
 
-import java.io.IOException;
-
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-
-@SideOnly(Side.CLIENT)
-public class GuiToolMeter extends GuiIC2<ContainerMeter>
+public class GuiToolMeter extends Ic2Gui<ContainerMeter>
 {
-	public GuiToolMeter(ContainerMeter container)
+	public GuiToolMeter(ContainerMeter container, Inventory playerInventory, Component title)
 	{
-		super(container, 217);
+		super(container, playerInventory, title, 217);
 		this.addElement(
 			new CustomButton(this, 112, 55, 20, 20, this.createModeSetter(ContainerMeter.Mode.EnergyIn))
-				.withTooltip("ic2.itemToolMEter.mode.switch\nic2.itemToolMEter.mode.EnergyIn")
+				.withTooltip("ic2.meter.mode.switch\nic2.meter.mode.EnergyIn")
 		);
 		this.addElement(
 			new CustomButton(this, 132, 55, 20, 20, this.createModeSetter(ContainerMeter.Mode.EnergyOut))
-				.withTooltip("ic2.itemToolMEter.mode.switch\nic2.itemToolMEter.mode.EnergyOut")
+				.withTooltip("ic2.meter.mode.switch\nic2.meter.mode.EnergyOut")
 		);
 		this.addElement(
 			new CustomButton(this, 112, 75, 20, 20, this.createModeSetter(ContainerMeter.Mode.EnergyGain))
-				.withTooltip("ic2.itemToolMEter.mode.switch\nic2.itemToolMEter.mode.EnergyGain")
+				.withTooltip("ic2.meter.mode.switch\nic2.meter.mode.EnergyGain")
 		);
 		this.addElement(
 			new CustomButton(this, 132, 75, 20, 20, this.createModeSetter(ContainerMeter.Mode.Voltage))
-				.withTooltip("ic2.itemToolMEter.mode.switch\nic2.itemToolMEter.mode.Voltage")
+				.withTooltip("ic2.meter.mode.switch\nic2.meter.mode.Voltage")
 		);
 	}
 
-	private IClickHandler createModeSetter(final ContainerMeter.Mode mode)
+	private IClickHandler createModeSetter(ContainerMeter.Mode mode)
 	{
-		return new IClickHandler()
-		{
-			@Override
-			public void onClick(MouseButton button)
-			{
-				GuiToolMeter.this.container.setMode(mode);
-			}
-		};
+		return button -> this.getContainer().setMode(mode);
 	}
 
 	@Override
-	protected void mouseClicked(int i, int j, int k) throws IOException
+	public void m_181908_()
 	{
-		super.mouseClicked(i, j, k);
-		int xMin = (this.width - this.xSize) / 2;
-		int yMin = (this.height - this.ySize) / 2;
-		int x = i - xMin;
-		int y = j - yMin;
+		super.m_181908_();
+		this.getContainer().m_38946_();
+	}
+
+	@Override
+	public boolean m_6375_(double mouseX, double mouseY, int mouseButton)
+	{
+		int xMin = (this.f_96543_ - this.imageWidth) / 2;
+		int yMin = (this.f_96544_ - this.imageHeight) / 2;
+		int x = (int) (mouseX - xMin);
+		int y = (int) (mouseY - yMin);
 		if (x >= 26 && y >= 111 && x <= 83 && y <= 123)
 		{
-			this.container.reset();
+			this.getContainer().reset();
 		}
+
+		return super.m_6375_(mouseX, mouseY, mouseButton);
 	}
 
 	@Override
-	protected void drawForegroundLayer(int mouseX, int mouseY)
+	protected void drawForegroundLayer(PoseStack matrices, int mouseX, int mouseY)
 	{
-		super.drawForegroundLayer(mouseX, mouseY);
-		String unit = this.container.getMode() == ContainerMeter.Mode.Voltage ? "ic2.generic.text.v" : "ic2.generic.text.EUt";
+		super.drawForegroundLayer(matrices, mouseX, mouseY);
+		ContainerMeter container = this.getContainer();
+		String unit = container.getMode() == ContainerMeter.Mode.Voltage ? "ic2.generic.text.v" : "ic2.generic.text.EUt";
 		unit = Localization.translate(unit);
-		this.fontRenderer.drawString(Localization.translate("ic2.itemToolMEter.mode"), 115, 43, 2157374);
-		this.fontRenderer.drawString(Localization.translate("ic2.itemToolMEter.avg"), 15, 41, 2157374);
-		this.fontRenderer.drawString("" + Util.toSiString(this.container.getResultAvg(), 6) + unit, 15, 51, 2157374);
-		this.fontRenderer.drawString(Localization.translate("ic2.itemToolMEter.max/min"), 15, 64, 2157374);
-		this.fontRenderer.drawString("" + Util.toSiString(this.container.getResultMax(), 6) + unit, 15, 74, 2157374);
-		this.fontRenderer.drawString("" + Util.toSiString(this.container.getResultMin(), 6) + unit, 15, 84, 2157374);
-		this.fontRenderer.drawString(Localization.translate("ic2.itemToolMEter.cycle", this.container.getResultCount() / 20), 15, 100, 2157374);
-		this.fontRenderer.drawString(Localization.translate("ic2.itemToolMEter.mode.reset"), 39, 114, 2157374);
-		switch (this.container.getMode())
+		this.drawString(matrices, 115, 43, Localization.translate("ic2.meter.mode"), 2157374);
+		this.drawString(matrices, 15, 42, Localization.translate("ic2.meter.avg"), 2157374);
+		this.drawString(matrices, 15, 52, Util.toSiString(container.getResultAvg(), 6) + unit, 2157374);
+		this.drawString(matrices, 15, 66, Localization.translate("ic2.meter.max/min"), 2157374);
+		this.drawString(matrices, 15, 76, Util.toSiString(container.getResultMax(), 6) + unit, 2157374);
+		this.drawString(matrices, 15, 86, Util.toSiString(container.getResultMin(), 6) + unit, 2157374);
+		this.drawString(matrices, 15, 100, Localization.translate("ic2.meter.cycle", container.getResultCount() / 20), 2157374);
+		this.drawString(matrices, 39, 114, Localization.translate("ic2.meter.mode.reset"), 2157374);
+		switch (container.getMode())
 		{
 			case EnergyIn:
-				this.fontRenderer.drawString(Localization.translate("ic2.itemToolMEter.mode.EnergyIn"), 105, 100, 2157374);
+				this.drawString(matrices, 105, 1236, Localization.translate("ic2.meter.mode.EnergyIn"), 2157374);
 				break;
 			case EnergyOut:
-				this.fontRenderer.drawString(Localization.translate("ic2.itemToolMEter.mode.EnergyOut"), 105, 100, 2157374);
+				this.drawString(matrices, 105, 1236, Localization.translate("ic2.meter.mode.EnergyOut"), 2157374);
 				break;
 			case EnergyGain:
-				this.fontRenderer.drawString(Localization.translate("ic2.itemToolMEter.mode.EnergyGain"), 105, 100, 2157374);
+				this.drawString(matrices, 105, 1236, Localization.translate("ic2.meter.mode.EnergyGain"), 2157374);
 				break;
 			case Voltage:
-				this.fontRenderer.drawString(Localization.translate("ic2.itemToolMEter.mode.Voltage"), 105, 100, 2157374);
+				this.drawString(matrices, 105, 1236, Localization.translate("ic2.meter.mode.Voltage"), 2157374);
 		}
 	}
 
 	@Override
-	protected void drawGuiContainerBackgroundLayer(float f, int x, int y)
+	protected void m_7286_(PoseStack matrices, float delta, int mouseX, int mouseY)
 	{
-		super.drawGuiContainerBackgroundLayer(f, x, y);
+		super.m_7286_(matrices, delta, mouseX, mouseY);
 		this.bindTexture();
-		switch (this.container.getMode())
+		ContainerMeter container = this.getContainer();
+		switch (container.getMode())
 		{
 			case EnergyIn:
-				this.drawTexturedRect(112.0, 55.0, 40.0, 40.0, 176.0, 0.0);
+				this.drawTexturedRect(matrices, 112.0, 55.0, 40.0, 40.0, 176.0, 0.0);
 				break;
 			case EnergyOut:
-				this.drawTexturedRect(112.0, 55.0, 40.0, 40.0, 176.0, 40.0);
+				this.drawTexturedRect(matrices, 112.0, 55.0, 40.0, 40.0, 176.0, 40.0);
 				break;
 			case EnergyGain:
-				this.drawTexturedRect(112.0, 55.0, 40.0, 40.0, 176.0, 120.0);
+				this.drawTexturedRect(matrices, 112.0, 55.0, 40.0, 40.0, 176.0, 120.0);
 				break;
 			case Voltage:
-				this.drawTexturedRect(112.0, 55.0, 40.0, 40.0, 176.0, 80.0);
+				this.drawTexturedRect(matrices, 112.0, 55.0, 40.0, 40.0, 176.0, 80.0);
 		}
 	}
 
 	@Override
 	protected ResourceLocation getTexture()
 	{
-		return new ResourceLocation("ic2", "textures/gui/GUIToolEUMeter.png");
+		return ResourceLocation.fromNamespaceAndPath("ic2", "textures/gui/guitooleumeter.png");
 	}
 }

@@ -5,10 +5,10 @@ import ic2.api.item.IElectricItem;
 import ic2.api.item.IElectricItemManager;
 import ic2.api.item.ISpecialElectricItem;
 import ic2.core.util.StackUtil;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 public class GatewayElectricItemManager implements IElectricItemManager
 {
@@ -49,6 +49,18 @@ public class GatewayElectricItemManager implements IElectricItemManager
 	}
 
 	@Override
+	public double getStackCharge(ItemStack stack)
+	{
+		if (StackUtil.isEmpty(stack))
+		{
+			return 0.0;
+		}
+
+		IElectricItemManager manager = this.getManager(stack);
+		return manager == null ? 0.0 : manager.getStackCharge(stack);
+	}
+
+	@Override
 	public double getMaxCharge(ItemStack stack)
 	{
 		if (StackUtil.isEmpty(stack))
@@ -73,14 +85,14 @@ public class GatewayElectricItemManager implements IElectricItemManager
 	}
 
 	@Override
-	public boolean use(ItemStack stack, double amount, EntityLivingBase entity)
+	public boolean use(ItemStack stack, double amount, LivingEntity entity)
 	{
 		if (StackUtil.isEmpty(stack))
 		{
 			return false;
 		}
 
-		if (entity instanceof EntityPlayer && ((EntityPlayer) entity).capabilities.isCreativeMode)
+		if (entity instanceof Player && ((Player) entity).m_150110_().f_35937_)
 		{
 			return this.canUse(stack, amount);
 		}
@@ -90,7 +102,7 @@ public class GatewayElectricItemManager implements IElectricItemManager
 	}
 
 	@Override
-	public void chargeFromArmor(ItemStack stack, EntityLivingBase entity)
+	public void chargeFromArmor(ItemStack stack, LivingEntity entity)
 	{
 		if (!StackUtil.isEmpty(stack))
 		{

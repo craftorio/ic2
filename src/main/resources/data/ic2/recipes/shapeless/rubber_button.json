@@ -1,0 +1,11 @@
+{
+  "type": "ic2:shapeless",
+  "ingredients": [
+    {
+      "item": "ic2:rubber_planks"
+    }
+  ],
+  "result": {
+    "item": "ic2:rubber_button"
+  }
+}

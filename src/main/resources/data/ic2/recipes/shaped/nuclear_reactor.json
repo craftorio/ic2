@@ -1,0 +1,25 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "PcP",
+    "CCC",
+    "PGP"
+  ],
+  "key": {
+    "C": {
+      "item": "ic2:reactor_chamber"
+    },
+    "c": {
+      "item": "ic2:advanced_circuit"
+    },
+    "G": {
+      "item": "ic2:generator"
+    },
+    "P": {
+      "item": "ic2:dense_lead_plate"
+    }
+  },
+  "result": {
+    "item": "ic2:nuclear_reactor"
+  }
+}

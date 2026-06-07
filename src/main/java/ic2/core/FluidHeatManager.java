@@ -2,61 +2,49 @@ package ic2.core;
 
 import ic2.api.recipe.IFluidHeatManager;
 
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraft.world.level.material.Fluid;
 
 public class FluidHeatManager implements IFluidHeatManager
 {
-	private final Map<String, IFluidHeatManager.BurnProperty> burnProperties = new HashMap<>();
+	private final Map<Fluid, IFluidHeatManager.BurnProperty> burnProperties = new IdentityHashMap<>();
 
 	@Override
-	public void addFluid(String fluidName, int amount, int heat)
+	public void addFluid(Fluid fluid, int amount, int heat)
 	{
-		if (this.burnProperties.containsKey(fluidName))
+		if (this.burnProperties.containsKey(fluid))
 		{
-			throw new RuntimeException("The fluid " + fluidName + " does already have a burn property assigned.");
+			throw new RuntimeException("The fluid " + fluid + " does already have a burn property assigned.");
 		}
 
-		this.burnProperties.put(fluidName, new IFluidHeatManager.BurnProperty(amount, heat));
+		this.burnProperties.put(fluid, new IFluidHeatManager.BurnProperty(amount, heat));
 	}
 
 	@Override
 	public IFluidHeatManager.BurnProperty getBurnProperty(Fluid fluid)
 	{
-		return fluid == null ? null : this.burnProperties.get(fluid.getName());
+		return fluid == null ? null : this.burnProperties.get(fluid);
 	}
 
 	@Override
 	public boolean acceptsFluid(Fluid fluid)
 	{
-		return this.burnProperties.containsKey(fluid.getName());
+		return this.burnProperties.containsKey(fluid);
 	}
 
 	@Override
 	public Set<Fluid> getAcceptedFluids()
 	{
-		Set<Fluid> ret = new HashSet<>();
-
-		for (String fluidName : this.burnProperties.keySet())
-		{
-			Fluid fluid = FluidRegistry.getFluid(fluidName);
-			if (fluid != null)
-			{
-				ret.add(fluid);
-			}
-		}
-
-		return ret;
+		return Collections.unmodifiableSet(this.burnProperties.keySet());
 	}
 
 	@Override
-	public Map<String, IFluidHeatManager.BurnProperty> getBurnProperties()
+	public Map<Fluid, IFluidHeatManager.BurnProperty> getBurnProperties()
 	{
-		return this.burnProperties;
+		return Collections.unmodifiableMap(this.burnProperties);
 	}
 }

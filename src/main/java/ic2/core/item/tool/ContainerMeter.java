@@ -4,29 +4,34 @@ import ic2.api.energy.EnergyNet;
 import ic2.api.energy.NodeStats;
 import ic2.api.energy.tile.IEnergyTile;
 import ic2.api.network.ClientModifiable;
-import ic2.core.ContainerFullInv;
 import ic2.core.IC2;
-import net.minecraft.entity.player.EntityPlayer;
+import ic2.core.item.ContainerHandHeldInventory;
+import ic2.core.ref.Ic2ScreenHandlers;
+import net.minecraft.world.inventory.DataSlot;
 
-public class ContainerMeter extends ContainerFullInv<HandHeldMeter>
+public class ContainerMeter extends ContainerHandHeldInventory<HandHeldMeter>
 {
 	private IEnergyTile uut;
-	private double resultAvg;
-	private double resultMin;
-	private double resultMax;
-	private int resultCount = 0;
+	private DataSlot resultAvg = DataSlot.m_39401_();
+	private DataSlot resultMin = DataSlot.m_39401_();
+	private DataSlot resultMax = DataSlot.m_39401_();
+	private DataSlot resultCount = DataSlot.m_39401_();
 	@ClientModifiable
 	private ContainerMeter.Mode mode = ContainerMeter.Mode.EnergyIn;
 
-	public ContainerMeter(EntityPlayer player, HandHeldMeter meter)
+	public ContainerMeter(int syncId, HandHeldMeter inventory)
 	{
-		super(player, meter, 218);
+		super(Ic2ScreenHandlers.METER, syncId, inventory);
+		this.m_38895_(this.resultAvg);
+		this.m_38895_(this.resultMin);
+		this.m_38895_(this.resultMax);
+		this.m_38895_(this.resultCount);
 	}
 
 	@Override
-	public void detectAndSendChanges()
+	public void m_38946_()
 	{
-		super.detectAndSendChanges();
+		super.m_38946_();
 		if (this.uut != null)
 		{
 			NodeStats stats = EnergyNet.instance.getNodeStats(this.uut);
@@ -35,64 +40,56 @@ public class ContainerMeter extends ContainerFullInv<HandHeldMeter>
 				this.base.closeGUI();
 			} else
 			{
-				double result = 0.0;
-				switch (this.mode)
+				double result = switch (this.mode)
 				{
-					case EnergyIn:
-						result = stats.getEnergyIn();
-						break;
-					case EnergyOut:
-						result = stats.getEnergyOut();
-						break;
-					case EnergyGain:
-						result = stats.getEnergyIn() - stats.getEnergyOut();
-						break;
-					case Voltage:
-						result = stats.getVoltage();
-				}
-
-				if (this.resultCount == 0)
+					case EnergyIn -> stats.getEnergyIn();
+					case EnergyOut -> stats.getEnergyOut();
+					case EnergyGain -> stats.getEnergyIn() - stats.getEnergyOut();
+					case Voltage -> stats.getVoltage();
+				};
+				if (this.resultCount.m_6501_() == 0)
 				{
-					this.resultAvg = this.resultMin = this.resultMax = result;
+					this.resultAvg.m_6422_((int) result);
+					this.resultMin.m_6422_((int) result);
+					this.resultMax.m_6422_((int) result);
 				} else
 				{
-					if (result < this.resultMin)
+					if (result < this.resultMin.m_6501_())
 					{
-						this.resultMin = result;
+						this.resultMin.m_6422_((int) result);
 					}
 
-					if (result > this.resultMax)
+					if (result > this.resultMax.m_6501_())
 					{
-						this.resultMax = result;
+						this.resultMax.m_6422_((int) result);
 					}
 
-					this.resultAvg = (this.resultAvg * this.resultCount + result) / (this.resultCount + 1);
+					this.resultAvg.m_6422_((int) ((this.resultAvg.m_6501_() * this.resultCount.m_6501_() + result) / (this.resultCount.m_6501_() + 1)));
 				}
 
-				this.resultCount++;
-				IC2.network.get(true).sendContainerFields(this, "resultAvg", "resultMin", "resultMax", "resultCount");
+				this.resultCount.m_6422_(this.resultCount.m_6501_() + 1);
 			}
 		}
 	}
 
 	public double getResultAvg()
 	{
-		return this.resultAvg;
+		return this.resultAvg.m_6501_();
 	}
 
 	public double getResultMin()
 	{
-		return this.resultMin;
+		return this.resultMin.m_6501_();
 	}
 
 	public double getResultMax()
 	{
-		return this.resultMax;
+		return this.resultMax.m_6501_();
 	}
 
 	public int getResultCount()
 	{
-		return this.resultCount;
+		return this.resultCount.m_6501_();
 	}
 
 	public ContainerMeter.Mode getMode()
@@ -109,9 +106,9 @@ public class ContainerMeter extends ContainerFullInv<HandHeldMeter>
 
 	public void reset()
 	{
-		if (IC2.platform.isSimulating())
+		if (IC2.sideProxy.isSimulating())
 		{
-			this.resultCount = 0;
+			this.resultCount.m_6422_(0);
 		} else
 		{
 			IC2.network.get(false).sendContainerEvent(this, "reset");
@@ -120,8 +117,10 @@ public class ContainerMeter extends ContainerFullInv<HandHeldMeter>
 
 	public void setUut(IEnergyTile uut)
 	{
-		assert this.uut == null;
-		this.uut = uut;
+		if (this.uut == null)
+		{
+			this.uut = uut;
+		}
 	}
 
 	@Override

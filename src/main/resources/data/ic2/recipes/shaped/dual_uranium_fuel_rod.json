@@ -1,0 +1,17 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "UIU"
+  ],
+  "key": {
+    "U": {
+      "item": "ic2:uranium_fuel_rod"
+    },
+    "I": {
+      "tag": "forge:plates/iron"
+    }
+  },
+  "result": {
+    "item": "ic2:dual_uranium_fuel_rod"
+  }
+}

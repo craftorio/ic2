@@ -1,0 +1,10 @@
+{
+  "type": "ic2:macerator",
+  "ingredient": {
+    "item": "minecraft:raw_copper"
+  },
+  "result": {
+    "item": "ic2:crushed_copper",
+    "count": 2
+  }
+}

@@ -6,7 +6,7 @@ import ic2.core.util.ItemComparableItemStack;
 import java.util.HashSet;
 import java.util.Set;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 public class InvSlotConsumableItemStack extends InvSlotConsumable
 {

@@ -2,37 +2,33 @@ package ic2.core.crop.cropcard;
 
 import ic2.api.crops.CropProperties;
 import ic2.api.crops.ICropTile;
-import ic2.core.crop.IC2CropCard;
-import net.minecraft.block.Block;
-import net.minecraft.item.ItemStack;
+import ic2.api.crops.ICropType;
+import ic2.core.crop.CropBase;
 
-public class CropBaseMetalCommon extends IC2CropCard
+import java.util.Collection;
+
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+
+public class CropBaseMetalCommon extends CropBase
 {
-	protected final String cropName;
 	protected final String[] cropAttributes;
-	protected final Object[] cropRootsRequirement;
-	protected final ItemStack cropDrop;
+	protected final Block cropBlock;
+	protected final Collection<TagKey<Block>> cropRootsRequirement;
 
-	public CropBaseMetalCommon(String cropName, String[] cropAttributes, Block[] cropRootsRequirement, ItemStack cropDrop)
+	public CropBaseMetalCommon(ICropType cropType, Block cropBlock, String[] cropAttributes, Collection<TagKey<Block>> cropRootsRequirement, ItemStack cropDrop)
 	{
-		this.cropName = cropName;
+		super(cropType, cropDrop);
+		this.cropBlock = cropBlock;
 		this.cropAttributes = cropAttributes;
 		this.cropRootsRequirement = cropRootsRequirement;
-		this.cropDrop = cropDrop;
-	}
-
-	public CropBaseMetalCommon(String cropName, String[] cropAttributes, String[] cropRootsRequirement, ItemStack cropDrop)
-	{
-		this.cropName = cropName;
-		this.cropAttributes = cropAttributes;
-		this.cropRootsRequirement = cropRootsRequirement;
-		this.cropDrop = cropDrop;
 	}
 
 	@Override
-	public String getId()
+	public Block getCropBlock()
 	{
-		return this.cropName;
+		return this.cropBlock;
 	}
 
 	@Override
@@ -48,34 +44,24 @@ public class CropBaseMetalCommon extends IC2CropCard
 	}
 
 	@Override
-	public int getMaxSize()
-	{
-		return 4;
-	}
-
-	@Override
 	public boolean canGrow(ICropTile crop)
 	{
-		if (crop.getCurrentSize() < 3)
+		int sizeReq = this.getMaxAge() - 1;
+		if (crop.getCurrentAge() < sizeReq)
 		{
 			return true;
 		}
 
-		if (crop.getCurrentSize() == 3)
+		if (crop.getCurrentAge() == sizeReq)
 		{
-			if (this.cropRootsRequirement == null || this.cropRootsRequirement.length == 0)
+			if (this.cropRootsRequirement == null || this.cropRootsRequirement.isEmpty())
 			{
 				return true;
 			}
 
-			for (Object aux : this.cropRootsRequirement)
+			for (TagKey<Block> tag : this.cropRootsRequirement)
 			{
-				if (aux instanceof String && crop.isBlockBelow((String) aux))
-				{
-					return true;
-				}
-
-				if (aux instanceof Block && crop.isBlockBelow((Block) aux))
+				if (crop.isBlockBelow(tag))
 				{
 					return true;
 				}
@@ -92,21 +78,9 @@ public class CropBaseMetalCommon extends IC2CropCard
 	}
 
 	@Override
-	public boolean canBeHarvested(ICropTile crop)
-	{
-		return crop.getCurrentSize() == 4;
-	}
-
-	@Override
-	public int getOptimalHarvestSize(ICropTile crop)
-	{
-		return 4;
-	}
-
-	@Override
 	public ItemStack getGain(ICropTile crop)
 	{
-		return this.cropDrop.copy();
+		return this.cropDrop.m_41777_();
 	}
 
 	@Override
@@ -118,12 +92,12 @@ public class CropBaseMetalCommon extends IC2CropCard
 	@Override
 	public int getGrowthDuration(ICropTile crop)
 	{
-		return crop.getCurrentSize() == 3 ? 2000 : 800;
+		return crop.getCurrentAge() == this.getMaxAge() - 1 ? 2000 : 800;
 	}
 
 	@Override
-	public int getSizeAfterHarvest(ICropTile crop)
+	public int getAgeAfterHarvest(ICropTile crop)
 	{
-		return 2;
+		return 1;
 	}
 }

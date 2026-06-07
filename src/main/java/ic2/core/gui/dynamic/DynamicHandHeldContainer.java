@@ -1,22 +1,33 @@
 package ic2.core.gui.dynamic;
 
 import ic2.core.item.tool.HandHeldInventory;
+import ic2.core.ref.Ic2ScreenHandlers;
 import ic2.core.slot.SlotHologramSlot;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.ClickType;
-import net.minecraft.inventory.Slot;
-import net.minecraft.item.ItemStack;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
 public class DynamicHandHeldContainer<T extends HandHeldInventory> extends DynamicContainer<T>
 {
-	public static <T extends HandHeldInventory> DynamicHandHeldContainer<T> create(T base, EntityPlayer player, GuiParser.GuiNode guiNode)
+	public static DynamicHandHeldContainer<HandHeldInventory> create(int syncId, Inventory playerInventory, HandHeldInventory base, GuiParser.GuiNode guiNode)
 	{
-		return new DynamicHandHeldContainer<>(base, player, guiNode);
+		return new DynamicHandHeldContainer<>(Ic2ScreenHandlers.DYNAMIC_ITEM, syncId, playerInventory, base, guiNode);
 	}
 
-	protected DynamicHandHeldContainer(T base, EntityPlayer player, GuiParser.GuiNode guiNode)
+	public static <T extends HandHeldInventory> DynamicHandHeldContainer<T> create(
+		MenuType<DynamicContainer<T>> type, int syncId, Inventory playerInventory, T base, GuiParser.GuiNode guiNode
+	)
 	{
-		super(base, player, guiNode);
+		return new DynamicHandHeldContainer<>(type, syncId, playerInventory, base, guiNode);
+	}
+
+	protected DynamicHandHeldContainer(MenuType<DynamicContainer<T>> type, int syncId, Inventory playerInventory, T base, GuiParser.GuiNode guiNode)
+	{
+		super(type, syncId, playerInventory, base, guiNode);
 	}
 
 	@Override
@@ -33,29 +44,29 @@ public class DynamicHandHeldContainer<T extends HandHeldInventory> extends Dynam
 	}
 
 	@Override
-	public ItemStack slotClick(int slot, int button, ClickType type, EntityPlayer player)
+	public void m_150399_(int slot, int button, ClickType type, Player player)
 	{
+		ItemStack stack = null;
 		boolean thrown = false;
 		Slot realSlot = null;
-		if (!player.getEntityWorld().isRemote && slot >= 0 && slot < this.inventorySlots.size())
+		if (!player.getCommandSenderWorld().isClientSide && slot >= 0 && slot < this.f_38839_.size())
 		{
-			realSlot = (Slot) this.inventorySlots.get(slot);
-			thrown = this.base.isThisContainer(realSlot.getStack());
+			realSlot = (Slot) this.f_38839_.get(slot);
+			stack = realSlot.m_7993_();
+			thrown = this.base.isThisContainer(stack);
 		}
 
-		ItemStack stack = super.slotClick(slot, button, type, player);
-		if (thrown && !realSlot.getHasStack())
+		super.m_150399_(slot, button, type, player);
+		if (thrown && !realSlot.m_6657_())
 		{
 			this.base.saveAsThrown(stack);
-			player.closeScreen();
+			((ServerPlayer) player).m_6915_();
 		}
-
-		return stack;
 	}
 
-	public void onContainerClosed(EntityPlayer player)
+	public void removed(Player player)
 	{
-		this.base.onGuiClosed(player);
-		super.onContainerClosed(player);
+		this.base.onScreenClosed(player);
+		super.removed(player);
 	}
 }

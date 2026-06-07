@@ -1,0 +1,13 @@
+package ic2.core;
+
+public enum Ic2ItemGroupType
+{
+	GENERAL,
+	GENERATORS_AND_WIRING,
+	REACTOR,
+	MACHINES,
+	TOOLS_AND_UTILITIES,
+	COMBAT,
+	MATERIALS,
+	FARMING;
+}

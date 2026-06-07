@@ -1,0 +1,9 @@
+{
+  "type": "ic2:macerator",
+  "ingredient": {
+    "tag": "forge:plates/lead"
+  },
+  "result": {
+    "item": "ic2:lead_dust"
+  }
+}

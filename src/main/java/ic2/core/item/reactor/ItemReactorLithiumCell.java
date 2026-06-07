@@ -2,15 +2,15 @@ package ic2.core.item.reactor;
 
 import ic2.api.reactor.IReactor;
 import ic2.core.profile.NotClassic;
-import ic2.core.ref.ItemName;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item.Properties;
 
 @NotClassic
 public class ItemReactorLithiumCell extends AbstractDamageableReactorComponent
 {
-	public ItemReactorLithiumCell()
+	public ItemReactorLithiumCell(Properties settings)
 	{
-		super(ItemName.lithium_fuel_rod, 10000);
+		super(settings, 10000);
 	}
 
 	@Override
@@ -18,13 +18,10 @@ public class ItemReactorLithiumCell extends AbstractDamageableReactorComponent
 	{
 		if (heatrun)
 		{
-			int myLevel = this.getCustomDamage(stack) + reactor.getHeat() / 3000;
-			if (myLevel >= this.getMaxCustomDamage(stack))
+			int myLevel = this.getUse(stack) + reactor.getHeat() / 3000;
+			if (myLevel < this.getMaxUse())
 			{
-				reactor.setItemAt(youX, youY, ItemName.tritium_fuel_rod.getItemStack());
-			} else
-			{
-				this.setCustomDamage(stack, myLevel);
+				this.setUse(stack, myLevel);
 			}
 		}
 
@@ -32,8 +29,8 @@ public class ItemReactorLithiumCell extends AbstractDamageableReactorComponent
 	}
 
 	@Override
-	public double getDurabilityForDisplay(ItemStack stack)
+	public double getUseFraction(ItemStack stack)
 	{
-		return 1.0 - super.getDurabilityForDisplay(stack);
+		return 1.0 - super.getUseFraction(stack);
 	}
 }

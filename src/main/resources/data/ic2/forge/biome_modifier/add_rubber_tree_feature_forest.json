@@ -1,0 +1,8 @@
+{
+  "type": "forge:add_features",
+  "biomes": "#minecraft:is_forest",
+  "features": [
+    "ic2:trees_rubber_forest"
+  ],
+  "step": "vegetal_decoration"
+}

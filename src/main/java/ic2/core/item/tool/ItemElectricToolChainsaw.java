@@ -1,198 +1,199 @@
 package ic2.core.item.tool;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
-import ic2.api.item.ElectricItem;
+import ic2.api.item.BlockBreakableItem;
+import ic2.api.item.IEntityAttackableItem;
 import ic2.core.IC2;
 import ic2.core.IHitSoundOverride;
-import ic2.core.ref.ItemName;
+import ic2.core.ref.Ic2SoundEvents;
+import ic2.core.ref.Ic2ToolMaterials;
 import ic2.core.util.StackUtil;
+import ic2.core.util.Util;
 
-import java.util.EnumSet;
+import java.util.Collections;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.monster.EntityCreeper;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Enchantments;
-import net.minecraft.inventory.EntityEquipmentSlot;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.stats.StatList;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.common.IShearable;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Shearable;
+import net.minecraft.world.entity.monster.piglin.PiglinAi;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item.Properties;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.gameevent.GameEvent.Context;
+import org.jetbrains.annotations.Nullable;
 
-public class ItemElectricToolChainsaw extends ItemElectricTool implements IHitSoundOverride
+public class ItemElectricToolChainsaw extends ItemElectricTool implements IHitSoundOverride, BlockBreakableItem, IEntityAttackableItem
 {
-	public ItemElectricToolChainsaw()
+	public ItemElectricToolChainsaw(Properties settings)
 	{
-		super(ItemName.chainsaw, 100, HarvestLevel.Iron, EnumSet.of(ToolClass.Axe, ToolClass.Sword, ToolClass.Shears));
+		super(settings, 100, Ic2ToolMaterials.CHAINSAW, Collections.singletonList(BlockTags.f_144280_));
 		this.maxCharge = 30000;
 		this.transferLimit = 100;
 		this.tier = 1;
-		this.efficiency = 12.0F;
-		MinecraftForge.EVENT_BUS.register(this);
+	}
+
+	private boolean isShearMode(ItemStack stack)
+	{
+		return !StackUtil.getOrCreateNbtData(stack).getBoolean("disableShear");
 	}
 
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand)
+	public InteractionResultHolder<ItemStack> m_7203_(Level world, Player player, InteractionHand hand)
 	{
-		if (world.isRemote)
+		if (world.isClientSide)
 		{
-			return super.onItemRightClick(world, player, hand);
+			return super.m_7203_(world, player, hand);
 		}
 
 		if (IC2.keyboard.isModeSwitchKeyDown(player))
 		{
-			NBTTagCompound compoundTag = StackUtil.getOrCreateNbtData(StackUtil.get(player, hand));
+			CompoundTag compoundTag = StackUtil.getOrCreateNbtData(StackUtil.get(player, hand));
 			if (compoundTag.getBoolean("disableShear"))
 			{
-				compoundTag.setBoolean("disableShear", false);
-				IC2.platform.messagePlayer(player, "ic2.tooltip.mode", "ic2.tooltip.mode.normal");
+				compoundTag.putBoolean("disableShear", false);
+				IC2.sideProxy.messagePlayer(player, "ic2.tooltip.mode", "ic2.tooltip.mode.normal");
 			} else
 			{
-				compoundTag.setBoolean("disableShear", true);
-				IC2.platform.messagePlayer(player, "ic2.tooltip.mode", "ic2.tooltip.mode.noShear");
+				compoundTag.putBoolean("disableShear", true);
+				IC2.sideProxy.messagePlayer(player, "ic2.tooltip.mode", "ic2.tooltip.mode.noShear");
 			}
 		}
 
-		return super.onItemRightClick(world, player, hand);
-	}
-
-	public Multimap<String, AttributeModifier> getAttributeModifiers(EntityEquipmentSlot slot, ItemStack stack)
-	{
-		if (slot != EntityEquipmentSlot.MAINHAND)
-		{
-			return super.getAttributeModifiers(slot, stack);
-		}
-
-		Multimap<String, AttributeModifier> ret = HashMultimap.create();
-		if (ElectricItem.manager.canUse(stack, this.operationEnergyCost))
-		{
-			ret.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Tool modifier", this.attackSpeed, 0));
-			ret.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(Item.ATTACK_DAMAGE_MODIFIER, "Tool modifier", 9.0, 0));
-		}
-
-		return ret;
+		return super.m_7203_(world, player, hand);
 	}
 
 	@Override
-	public boolean hitEntity(ItemStack itemstack, EntityLivingBase entityliving, EntityLivingBase attacker)
+	public boolean m_8096_(BlockState state)
 	{
-		ElectricItem.manager.use(itemstack, this.operationEnergyCost, attacker);
-		if (attacker instanceof EntityPlayer && entityliving instanceof EntityCreeper && entityliving.getHealth() <= 0.0F)
+		return super.m_8096_(state) || state.m_60713_(Blocks.f_50033_) || Util.canShear(state);
+	}
+
+	@Override
+	public float m_8102_(ItemStack stack, BlockState state)
+	{
+		return !this.canUse(stack) || !state.m_204336_(BlockTags.f_144280_) && !state.m_60713_(Blocks.f_50033_) && !Util.canShear(state) ? 1.0F : this.f_40980_;
+	}
+
+	@Override
+	public boolean onAttackEntity(Player player, Entity target)
+	{
+		ItemStack itemstack = player.m_21205_();
+		if (this.consumeEnergy(itemstack, this.operationEnergyCost, player))
 		{
-			IC2.achievements.issueAchievement((EntityPlayer) attacker, "killCreeperChainsaw");
+			this.playUsingSound(player);
 		}
 
 		return true;
 	}
 
-	@SubscribeEvent
-	public void onEntityInteract(PlayerInteractEvent.EntityInteract event)
+	private void handleVanillaBlockBreakLogic(Player player, Level world, BlockPos pos, BlockState state)
 	{
-		if (IC2.platform.isSimulating())
+		world.m_5898_(player, 2001, pos, Block.m_49956_(state));
+		if (state.m_204336_(BlockTags.f_13088_))
 		{
-			Entity entity = event.getTarget();
-			EntityPlayer player = event.getEntityPlayer();
-			ItemStack itemstack = player.inventory.getStackInSlot(player.inventory.currentItem);
-			if (itemstack != null
-				&& itemstack.getItem() == this
-				&& entity instanceof IShearable
-				&& !StackUtil.getOrCreateNbtData(itemstack).getBoolean("disableShear")
-				&& ElectricItem.manager.use(itemstack, this.operationEnergyCost, player))
-			{
-				IShearable target = (IShearable) entity;
-				World world = entity.getEntityWorld();
-				BlockPos pos = new BlockPos(entity.posX, entity.posY, entity.posZ);
-				if (target.isShearable(itemstack, world, pos))
-				{
-					for (ItemStack stack : target.onSheared(itemstack, world, pos, EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, itemstack)))
-					{
-						EntityItem ent = entity.entityDropItem(stack, 1.0F);
-						ent.motionY = ent.motionY + itemRand.nextFloat() * 0.05F;
-						ent.motionX = ent.motionX + (itemRand.nextFloat() - itemRand.nextFloat()) * 0.1F;
-						ent.motionZ = ent.motionZ + (itemRand.nextFloat() - itemRand.nextFloat()) * 0.1F;
-					}
-				}
-			}
+			PiglinAi.m_34873_(player, false);
 		}
+
+		world.m_220407_(GameEvent.f_157794_, pos, Context.m_223719_(player, state));
 	}
 
-	public boolean onBlockStartBreak(ItemStack itemstack, BlockPos pos, EntityPlayer player)
-	{
-		if (!IC2.platform.isSimulating())
-		{
-			return false;
-		}
-
-		if (StackUtil.getOrCreateNbtData(itemstack).getBoolean("disableShear"))
-		{
-			return false;
-		}
-
-		World world = player.getEntityWorld();
-		IBlockState state = world.getBlockState(pos);
-		Block block = state.getBlock();
-		if (block instanceof IShearable)
-		{
-			IShearable target = (IShearable) block;
-			if (target.isShearable(itemstack, world, pos) && ElectricItem.manager.use(itemstack, this.operationEnergyCost, player))
-			{
-				for (ItemStack stack : target.onSheared(itemstack, world, pos, EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, itemstack)))
-				{
-					StackUtil.dropAsEntity(world, pos, stack);
-				}
-
-				player.addStat(StatList.getBlockStats(block), 1);
-				world.setBlockState(pos, Blocks.AIR.getDefaultState(), 11);
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	@SideOnly(Side.CLIENT)
 	@Override
-	public String getHitSoundForBlock(EntityPlayerSP player, World world, BlockPos pos, ItemStack stack)
+	public InteractionResult onBlockStartBreak(Player player, Level world, InteractionHand hand, BlockPos pos, Direction direction)
 	{
-		return null;
+		BlockState state = world.getBlockState(pos);
+		ItemStack stack = player.m_21120_(hand);
+		if (!this.isShearMode(stack) || !Util.canShear(state))
+		{
+			return InteractionResult.PASS;
+		} else if (this.consumeEnergy(stack, this.operationEnergyCost, player))
+		{
+			this.handleVanillaBlockBreakLogic(player, world, pos, state);
+			StackUtil.dropAsEntity(world, pos, new ItemStack(state.getBlock().m_5456_()));
+			world.m_7731_(pos, Blocks.f_50016_.defaultBlockState(), 11);
+			this.playUsingSound(player);
+			return InteractionResult.SUCCESS;
+		} else
+		{
+			return InteractionResult.PASS;
+		}
 	}
 
-	@SideOnly(Side.CLIENT)
+	public InteractionResult m_6880_(ItemStack stack, Player user, LivingEntity entity, InteractionHand hand)
+	{
+		if (entity instanceof Shearable shearable
+			&& !StackUtil.getOrCreateNbtData(stack).getBoolean("disableShear")
+			&& this.consumeEnergy(stack, this.operationEnergyCost, user)
+			&& shearable.m_6220_())
+		{
+			shearable.m_5851_(SoundSource.PLAYERS);
+			this.playUsingSound(user);
+			return InteractionResult.SUCCESS;
+		} else
+		{
+			return InteractionResult.PASS;
+		}
+	}
+
+	public void playUsingSound(LivingEntity user)
+	{
+		if (user.m_9236_().isClientSide)
+		{
+			user.m_5496_(this.getToolUsingSound(), 1.0F, 1.0F);
+		}
+	}
+
+	public SoundEvent getToolUsingSound()
+	{
+		return IC2.random.m_188499_() ? Ic2SoundEvents.ITEM_CHAINSAW_USE1 : Ic2SoundEvents.ITEM_CHAINSAW_USE2;
+	}
+
 	@Override
-	public String getBreakSoundForBlock(EntityPlayerSP player, World world, BlockPos pos, ItemStack stack)
+	public SoundEvent getHitSoundForBlock(LocalPlayer player, Level world, BlockPos pos, ItemStack stack)
+	{
+		return this.getToolUsingSound();
+	}
+
+	@Override
+	public SoundEvent getBreakSoundForBlock(LocalPlayer player, Level world, BlockPos pos, ItemStack stack)
 	{
 		return null;
 	}
 
 	@Override
-	protected String getIdleSound(EntityLivingBase player, ItemStack stack)
+	protected SoundEvent getIdleSound(LivingEntity player, ItemStack stack)
 	{
-		return "Tools/Chainsaw/ChainsawIdle.ogg";
+		return Ic2SoundEvents.ITEM_CHAINSAW_IDLE;
 	}
 
 	@Override
-	protected String getStopSound(EntityLivingBase player, ItemStack stack)
+	protected SoundEvent getStopSound(LivingEntity player, ItemStack stack)
 	{
-		return "Tools/Chainsaw/ChainsawStop.ogg";
+		return Ic2SoundEvents.ITEM_CHAINSAW_STOP;
+	}
+
+	@Override
+	public boolean beforeBlockBreak(Level world, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity)
+	{
+		return true;
+	}
+
+	@Override
+	public void afterBlockBreak(Level world, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity)
+	{
 	}
 }

@@ -1,0 +1,13 @@
+{
+  "type": "ic2:canner_bottle",
+  "container_ingredient": {
+    "item": "ic2:tin_can"
+  },
+  "fill_ingredient": {
+    "item": "minecraft:poisonous_potato",
+    "count": 2
+  },
+  "result": {
+    "item": "ic2:filled_tin_can"
+  }
+}

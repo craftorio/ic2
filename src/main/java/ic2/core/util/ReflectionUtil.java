@@ -8,6 +8,19 @@ import java.lang.reflect.Method;
 
 public class ReflectionUtil
 {
+	public static Field getField(Class<?> clazz, String name)
+	{
+		try
+		{
+			Field ret = clazz.getDeclaredField(name);
+			ret.setAccessible(true);
+			return ret;
+		} catch (ReflectiveOperationException e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+
 	public static Field getField(Class<?> clazz, String... names)
 	{
 		String[] var2 = names;

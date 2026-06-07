@@ -15,8 +15,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
 
 public class BasicMachineRecipeManager extends MachineRecipeHelper<IRecipeInput, Collection<ItemStack>> implements IBasicMachineRecipeManager
 {
@@ -35,7 +35,7 @@ public class BasicMachineRecipeManager extends MachineRecipeHelper<IRecipeInput,
 				return true;
 			}
 
-			if (output.getItem().hasContainerItem(output) && StackUtil.checkItemEqualityStrict(input, output.getItem().getContainerItem(output)))
+			if (IC2.envProxy.hasRecipeRemainder(output) && StackUtil.checkItemEqualityStrict(input, IC2.envProxy.getRecipeRemainder(output)))
 			{
 				return true;
 			}
@@ -44,13 +44,74 @@ public class BasicMachineRecipeManager extends MachineRecipeHelper<IRecipeInput,
 		return false;
 	}
 
-	@Override
-	public boolean addRecipe(IRecipeInput input, NBTTagCompound metadata, boolean replace, ItemStack... outputs)
+	public boolean addRecipe(MachineRecipe<IRecipeInput, Collection<ItemStack>> recipe, boolean replace)
+	{
+		if (recipe == null)
+		{
+			throw new NullPointerException("null recipe");
+		}
+
+		if (recipe.getInput() == null)
+		{
+			throw new NullPointerException("null recipe input");
+		}
+
+		if (recipe.getOutput() == null)
+		{
+			throw new NullPointerException("null recipe output");
+		}
+
+		if (recipe.getOutput().isEmpty())
+		{
+			throw new IllegalArgumentException("no outputs");
+		}
+
+		IRecipeInput input = recipe.getInput();
+
+		for (ItemStack is : input.getInputs())
+		{
+			MachineRecipe<IRecipeInput, Collection<ItemStack>> recipeGet = this.getRecipe(is);
+			if (recipeGet != null)
+			{
+				if (!replace)
+				{
+					IC2.log
+						.debug(
+							LogCategory.Recipe,
+							"Skipping %s => %s due to duplicate recipe for %s (%s => %s)",
+							input,
+							recipeGet.getOutput(),
+							is,
+							recipeGet.getInput(),
+							recipeGet.getOutput()
+						);
+					return false;
+				}
+
+				while (true)
+				{
+					this.recipes.remove(recipeGet.getInput());
+					this.removeCachedRecipes(input);
+					recipeGet = this.getRecipe(is);
+					if (recipeGet == null)
+					{
+						break;
+					}
+				}
+			}
+		}
+
+		this.recipes.put(input, recipe);
+		this.addToCache(recipe);
+		return true;
+	}
+
+	public boolean addRecipe(IRecipeInput input, CompoundTag metadata, boolean replace, ItemStack... outputs)
 	{
 		return this.addRecipe(input, Arrays.asList(outputs), metadata, replace);
 	}
 
-	public boolean addRecipe(IRecipeInput input, Collection<ItemStack> output, NBTTagCompound metadata, boolean replace)
+	public boolean addRecipe(IRecipeInput input, Collection<ItemStack> output, CompoundTag metadata, boolean replace)
 	{
 		if (input == null)
 		{
@@ -77,13 +138,13 @@ public class BasicMachineRecipeManager extends MachineRecipeHelper<IRecipeInput,
 				return false;
 			}
 
-			if (input.matches(stack) && (metadata == null || !metadata.hasKey("ignoreSameInputOutput")))
+			if (input.matches(stack) && (metadata == null || !metadata.contains("ignoreSameInputOutput")))
 			{
 				this.displayError("The output ItemStack " + stack.toString() + " is the same as the recipe input " + input + ".");
 				return false;
 			}
 
-			items.add(stack.copy());
+			items.add(stack.m_41777_());
 		}
 
 		for (ItemStack is : input.getInputs())
@@ -135,16 +196,16 @@ public class BasicMachineRecipeManager extends MachineRecipeHelper<IRecipeInput,
 		}
 
 		if (StackUtil.getSize(input) >= recipe.getInput().getAmount()
-			&& (!input.getItem().hasContainerItem(input) || StackUtil.getSize(input) == recipe.getInput().getAmount()))
+			&& (!IC2.envProxy.hasRecipeRemainder(input) || StackUtil.getSize(input) == recipe.getInput().getAmount()))
 		{
 			if (adjustInput)
 			{
-				if (input.getItem().hasContainerItem(input))
+				if (IC2.envProxy.hasRecipeRemainder(input))
 				{
 					throw new UnsupportedOperationException("can't adjust input item, use apply() instead");
 				}
 
-				input.shrink(recipe.getInput().getAmount());
+				input.m_41774_(recipe.getInput().getAmount());
 			}
 
 			return new RecipeOutput(recipe.getMetaData(), new ArrayList<>(recipe.getOutput()));

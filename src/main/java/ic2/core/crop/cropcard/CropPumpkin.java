@@ -2,23 +2,26 @@ package ic2.core.crop.cropcard;
 
 import ic2.api.crops.CropProperties;
 import ic2.api.crops.ICropTile;
+import ic2.api.crops.ICropType;
 import ic2.core.IC2;
 import ic2.core.crop.CropVanillaStem;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
+import ic2.core.ref.Ic2Blocks;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 
 public class CropPumpkin extends CropVanillaStem
 {
-	public CropPumpkin()
+	public CropPumpkin(ICropType cropType)
 	{
-		super(4);
+		super(cropType);
 	}
 
 	@Override
-	public String getId()
+	public Block getCropBlock()
 	{
-		return "pumpkin";
+		return Ic2Blocks.PUMPKIN_CROP;
 	}
 
 	@Override
@@ -36,18 +39,18 @@ public class CropPumpkin extends CropVanillaStem
 	@Override
 	protected ItemStack getProduct()
 	{
-		return new ItemStack(Blocks.PUMPKIN);
+		return new ItemStack(Blocks.f_50133_);
 	}
 
 	@Override
 	protected ItemStack getSeeds()
 	{
-		return new ItemStack(Items.PUMPKIN_SEEDS, IC2.random.nextInt(3) + 1);
+		return new ItemStack(Items.f_42577_, IC2.random.nextInt(3) + 1);
 	}
 
 	@Override
 	public int getGrowthDuration(ICropTile crop)
 	{
-		return crop.getCurrentSize() == 3 ? 600 : 200;
+		return crop.getCurrentAge() == this.getMaxAge() - 1 ? 600 : 200;
 	}
 }

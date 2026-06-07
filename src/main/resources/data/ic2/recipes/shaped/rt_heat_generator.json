@@ -1,0 +1,22 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "III",
+    "ICI",
+    "IGI"
+  ],
+  "key": {
+    "I": {
+      "item": "ic2:iron_casing"
+    },
+    "C": {
+      "item": "ic2:reactor_chamber"
+    },
+    "G": {
+      "item": "ic2:heat_conductor"
+    }
+  },
+  "result": {
+    "item": "ic2:rt_heat_generator"
+  }
+}

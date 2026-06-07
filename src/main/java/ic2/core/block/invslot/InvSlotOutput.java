@@ -6,7 +6,7 @@ import ic2.core.util.StackUtil;
 import java.util.Collection;
 import java.util.Collections;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 public class InvSlotOutput extends InvSlot
 {

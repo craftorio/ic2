@@ -2,7 +2,7 @@ package ic2.core.block.invslot;
 
 import ic2.api.info.Info;
 import ic2.core.block.IInventorySlotHolder;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 public class InvSlotConsumableFuel extends InvSlotConsumable
 {
@@ -17,12 +17,12 @@ public class InvSlotConsumableFuel extends InvSlotConsumable
 	@Override
 	public boolean accepts(ItemStack stack)
 	{
-		return Info.itemInfo.getFuelValue(stack, this.allowLava) > 0;
+		return Info.getItemInfo().getFuelValue(stack, this.allowLava) > 0;
 	}
 
 	public int consumeFuel()
 	{
 		ItemStack fuel = this.consume(1);
-		return fuel == null ? 0 : Info.itemInfo.getFuelValue(fuel, this.allowLava);
+		return fuel == null ? 0 : Info.getItemInfo().getFuelValue(fuel, this.allowLava);
 	}
 }

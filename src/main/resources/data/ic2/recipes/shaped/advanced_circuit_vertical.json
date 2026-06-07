@@ -1,0 +1,26 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "RLR",
+    "GCG",
+    "RLR"
+  ],
+  "key": {
+    "L": {
+      "item": "minecraft:lapis_lazuli"
+    },
+    "G": {
+      "item": "minecraft:glowstone_dust"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "C": {
+      "item": "ic2:circuit"
+    }
+  },
+  "group": "advanced_circuit",
+  "result": {
+    "item": "ic2:advanced_circuit"
+  }
+}

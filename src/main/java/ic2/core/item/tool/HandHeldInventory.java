@@ -9,55 +9,56 @@ import ic2.core.util.StackUtil;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.minecraft.CrashReport;
+import net.minecraft.CrashReportCategory;
+import net.minecraft.CrashReportDetail;
+import net.minecraft.ReportedException;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.crash.CrashReport;
-import net.minecraft.crash.CrashReportCategory;
-import net.minecraft.crash.ICrashReportDetail;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.ReportedException;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 
 public abstract class HandHeldInventory implements IHasGui
 {
 	protected ItemStack containerStack;
 	protected final ItemStack[] inventory;
-	protected final EntityPlayer player;
+	public final Player player;
+	protected final InteractionHand hand;
 	private boolean cleared;
-	private static final Set<EntityPlayer> PLAYERS_IN_GUI = new HashSet<>();
+	private static final Set<Player> PLAYERS_IN_GUI = new HashSet<>();
 
-	public HandHeldInventory(EntityPlayer player, ItemStack containerStack, int inventorySize)
+	public HandHeldInventory(Player player, InteractionHand hand, ItemStack containerStack, int inventorySize)
 	{
 		this.containerStack = containerStack;
 		this.inventory = new ItemStack[inventorySize];
 		this.player = player;
-		if (IC2.platform.isSimulating())
+		this.hand = hand;
+		if (IC2.sideProxy.isSimulating())
 		{
-			NBTTagCompound nbt = StackUtil.getOrCreateNbtData(containerStack);
-			if (!nbt.hasKey("uid", 3))
+			CompoundTag nbt = StackUtil.getOrCreateNbtData(containerStack);
+			if (!nbt.contains("uid", 3))
 			{
-				nbt.setInteger("uid", IC2.random.nextInt());
+				nbt.putInt("uid", IC2.random.m_188502_());
 			}
 
-			NBTTagList contentList = nbt.getTagList("Items", 10);
+			ListTag contentList = nbt.m_128437_("Items", 10);
 
-			for (int i = 0; i < contentList.tagCount(); i++)
+			for (int i = 0; i < contentList.size(); i++)
 			{
-				NBTTagCompound slotNbt = contentList.getCompoundTagAt(i);
+				CompoundTag slotNbt = contentList.m_128728_(i);
 				int slot = slotNbt.getByte("Slot");
 				if (slot >= 0 && slot < this.inventory.length)
 				{
-					this.inventory[slot] = new ItemStack(slotNbt);
+					this.inventory[slot] = ItemStack.m_41712_(slotNbt);
 				}
 			}
 		}
 	}
 
-	public int getSizeInventory()
+	public int getContainerSize()
 	{
 		return this.inventory.length;
 	}
@@ -75,12 +76,12 @@ public abstract class HandHeldInventory implements IHasGui
 		return true;
 	}
 
-	public ItemStack getStackInSlot(int slot)
+	public ItemStack getItem(int slot)
 	{
 		return StackUtil.wrapEmpty(this.inventory[slot]);
 	}
 
-	public ItemStack decrStackSize(int index, int amount)
+	public ItemStack removeItem(int index, int amount)
 	{
 		ItemStack stack;
 		if (index >= 0 && index < this.inventory.length && !StackUtil.isEmpty(stack = this.inventory[index]))
@@ -104,11 +105,11 @@ public abstract class HandHeldInventory implements IHasGui
 		}
 	}
 
-	public void setInventorySlotContents(int slot, ItemStack stack)
+	public void setItem(int slot, ItemStack stack)
 	{
-		if (!StackUtil.isEmpty(stack) && StackUtil.getSize(stack) > this.getInventoryStackLimit())
+		if (!StackUtil.isEmpty(stack) && StackUtil.getSize(stack) > this.getMaxStackSize())
 		{
-			stack = StackUtil.copyWithSize(stack, this.getInventoryStackLimit());
+			stack = StackUtil.copyWithSize(stack, this.getMaxStackSize());
 		}
 
 		if (StackUtil.isEmpty(stack))
@@ -122,86 +123,64 @@ public abstract class HandHeldInventory implements IHasGui
 		this.save();
 	}
 
-	public int getInventoryStackLimit()
+	public int getMaxStackSize()
 	{
 		return 64;
 	}
 
-	public boolean isItemValidForSlot(int slot, ItemStack stack1)
+	public boolean canPlaceItem(int slot, ItemStack stack1)
 	{
 		return false;
 	}
 
-	public void markDirty()
+	public void setChanged()
 	{
 		this.save();
 	}
 
-	public boolean isUsableByPlayer(EntityPlayer player)
+	public boolean stillValid(Player player)
 	{
 		return player == this.player && this.getPlayerInventoryIndex() >= -1;
 	}
 
-	public void openInventory(EntityPlayer player)
+	public ItemStack removeItemNoUpdate(int index)
 	{
-	}
-
-	public void closeInventory(EntityPlayer player)
-	{
-	}
-
-	public ItemStack removeStackFromSlot(int index)
-	{
-		ItemStack ret = this.getStackInSlot(index);
+		ItemStack ret = this.getItem(index);
 		if (!StackUtil.isEmpty(ret))
 		{
-			this.setInventorySlotContents(index, null);
+			this.setItem(index, null);
 		}
 
 		return ret;
 	}
 
-	public int getField(int id)
-	{
-		return 0;
-	}
-
-	public void setField(int id, int value)
-	{
-	}
-
-	public int getFieldCount()
-	{
-		return 0;
-	}
-
-	public ITextComponent getDisplayName()
-	{
-		return new TextComponentString(this.getName());
-	}
-
 	@Override
-	public void onGuiClosed(EntityPlayer player)
+	public void onScreenClosed(Player player)
 	{
 		this.save();
-		if (!player.getEntityWorld().isRemote)
+		if (!player.getCommandSenderWorld().isClientSide)
 		{
 			if (PLAYERS_IN_GUI.contains(player))
 			{
 				PLAYERS_IN_GUI.remove(player);
 			} else
 			{
-				StackUtil.getOrCreateNbtData(this.containerStack).removeTag("uid");
+				StackUtil.getOrCreateNbtData(this.containerStack).m_128473_("uid");
 			}
 		}
+	}
+
+	public ItemStack getContainerStack()
+	{
+		return this.containerStack;
 	}
 
 	public boolean isThisContainer(ItemStack stack)
 	{
 		if (!StackUtil.isEmpty(stack) && stack.getItem() == this.containerStack.getItem())
 		{
-			NBTTagCompound nbt = stack.getTagCompound();
-			return nbt != null && nbt.getInteger("uid") == this.getUid();
+			CompoundTag nbt = stack.getTag();
+			return nbt != null && nbt.getInt("uid") == this.getUid();
 		} else
 		{
 			return false;
@@ -210,15 +189,21 @@ public abstract class HandHeldInventory implements IHasGui
 
 	protected int getUid()
 	{
-		NBTTagCompound nbt = StackUtil.getOrCreateNbtData(this.containerStack);
-		return nbt.getInteger("uid");
+		CompoundTag nbt = StackUtil.getOrCreateNbtData(this.containerStack);
+		return nbt.getInt("uid");
 	}
 
 	protected int getPlayerInventoryIndex()
 	{
-		for (int i = -1; i < this.player.inventory.getSizeInventory(); i++)
+		ItemStack cursorStack = this.player.f_36096_.m_142621_();
+		if (this.isThisContainer(cursorStack))
 		{
-			ItemStack stack = i == -1 ? this.player.inventory.getItemStack() : this.player.inventory.getStackInSlot(i);
+			return -1;
+		}
+
+		for (int i = 0; i < this.player.getInventory().getContainerSize(); i++)
+		{
+			ItemStack stack = this.player.getInventory().getItem(i);
 			if (this.isThisContainer(stack))
 			{
 				return i;
@@ -230,7 +215,7 @@ public abstract class HandHeldInventory implements IHasGui
 
 	protected void save()
 	{
-		if (IC2.platform.isSimulating())
+		if (IC2.sideProxy.isSimulating())
 		{
 			if (!this.cleared)
 			{
@@ -245,20 +230,20 @@ public abstract class HandHeldInventory implements IHasGui
 					}
 				}
 
-				NBTTagList contentList = new NBTTagList();
+				ListTag contentList = new ListTag();
 
 				for (int i = 0; i < this.inventory.length; i++)
 				{
 					if (!StackUtil.isEmpty(this.inventory[i]))
 					{
-						NBTTagCompound nbt = new NBTTagCompound();
-						nbt.setByte("Slot", (byte) i);
-						this.inventory[i].writeToNBT(nbt);
-						contentList.appendTag(nbt);
+						CompoundTag nbt = new CompoundTag();
+						nbt.putByte("Slot", (byte) i);
+						this.inventory[i].m_41739_(nbt);
+						contentList.add(nbt);
 					}
 				}
 
-				StackUtil.getOrCreateNbtData(this.containerStack).setTag("Items", contentList);
+				StackUtil.getOrCreateNbtData(this.containerStack).put("Items", contentList);
 
 				try
 				{
@@ -266,47 +251,47 @@ public abstract class HandHeldInventory implements IHasGui
 				} catch (IllegalArgumentException e)
 				{
 					CrashReport crash = new CrashReport("Hand held container stack vanished", e);
-					CrashReportCategory category = crash.makeCategory("Container stack");
-					category.addCrashSection("Stack", StackUtil.toStringSafe(this.containerStack));
-					category.addCrashSection("NBT", this.containerStack.getTagCompound());
-					category.addCrashSection("Position", this.getPlayerInventoryIndex());
-					category.addCrashSection("Had thrown", dropItself);
-					category = crash.makeCategory("Container info");
-					category.addCrashSection("Type", this.getClass().getName());
-					category.addCrashSection("Container", this.player.openContainer == null ? null : this.player.openContainer.getClass().getName());
-					if (this.player.world.isRemote)
+					CrashReportCategory category = crash.m_127514_("Container stack");
+					category.m_128159_("Stack", StackUtil.toStringSafe(this.containerStack));
+					category.m_128159_("NBT", this.containerStack.getTag());
+					category.m_128159_("Position", this.getPlayerInventoryIndex());
+					category.m_128159_("Had thrown", dropItself);
+					category = crash.m_127514_("Container info");
+					category.m_128159_("Type", this.getClass().getName());
+					category.m_128159_("Container", this.player.f_36096_ == null ? null : this.player.f_36096_.getClass().getName());
+					if (this.player.f_19853_.isClientSide)
 					{
-						category.addDetail("GUI", new ICrashReportDetail<String>()
+						category.m_128165_("GUI", new CrashReportDetail<String>()
 						{
 							public String call() throws Exception
 							{
-								GuiScreen gui = Minecraft.getMinecraft().currentScreen;
+								Screen gui = Minecraft.m_91087_().f_91080_;
 								return gui == null ? null : gui.getClass().getName();
 							}
 						});
 					}
 
-					category.addCrashSection("Opened by", this.player);
+					category.m_128159_("Opened by", this.player);
 					throw new ReportedException(crash);
 				}
 
 				if (dropItself)
 				{
-					StackUtil.dropAsEntity(this.player.getEntityWorld(), this.player.getPosition(), this.containerStack);
-					this.clear();
+					StackUtil.dropAsEntity(this.player.getCommandSenderWorld(), this.player.m_20183_(), this.containerStack);
+					this.clearContent();
 				} else
 				{
 					int idx = this.getPlayerInventoryIndex();
 					if (idx < -1)
 					{
-						IC2.log.warn(LogCategory.Item, "Handheld inventory saving failed for player " + this.player.getDisplayName().getUnformattedText() + '.');
-						this.clear();
+						IC2.log.warn(LogCategory.Item, "Handheld inventory saving failed for player " + this.player.m_5446_().getString() + ".");
+						this.clearContent();
 					} else if (idx == -1)
 					{
-						this.player.inventory.setItemStack(this.containerStack);
+						this.player.f_36096_.m_142503_(this.containerStack);
 					} else
 					{
-						this.player.inventory.setInventorySlotContents(idx, this.containerStack);
+						this.player.getInventory().setItem(idx, this.containerStack);
 					}
 				}
 			}
@@ -315,26 +300,26 @@ public abstract class HandHeldInventory implements IHasGui
 
 	public void saveAsThrown(ItemStack stack)
 	{
-		assert IC2.platform.isSimulating();
-		NBTTagList contentList = new NBTTagList();
+		assert IC2.sideProxy.isSimulating();
+		ListTag contentList = new ListTag();
 
 		for (int i = 0; i < this.inventory.length; i++)
 		{
 			if (!StackUtil.isEmpty(this.inventory[i]) && !this.isThisContainer(this.inventory[i]))
 			{
-				NBTTagCompound nbt = new NBTTagCompound();
-				nbt.setByte("Slot", (byte) i);
-				this.inventory[i].writeToNBT(nbt);
-				contentList.appendTag(nbt);
+				CompoundTag nbt = new CompoundTag();
+				nbt.putByte("Slot", (byte) i);
+				this.inventory[i].m_41739_(nbt);
+				contentList.add(nbt);
 			}
 		}
 
-		StackUtil.getOrCreateNbtData(stack).setTag("Items", contentList);
-		assert StackUtil.getOrCreateNbtData(stack).getInteger("uid") == 0;
-		this.clear();
+		StackUtil.getOrCreateNbtData(stack).put("Items", contentList);
+		assert StackUtil.getOrCreateNbtData(stack).getInt("uid") == 0;
+		this.clearContent();
 	}
 
-	public void clear()
+	public void clearContent()
 	{
 		for (int i = 0; i < this.inventory.length; i++)
 		{
@@ -360,7 +345,7 @@ public abstract class HandHeldInventory implements IHasGui
 	{
 	}
 
-	public static void addMaintainedPlayer(EntityPlayer player)
+	public static void addMaintainedPlayer(Player player)
 	{
 		PLAYERS_IN_GUI.add(player);
 	}

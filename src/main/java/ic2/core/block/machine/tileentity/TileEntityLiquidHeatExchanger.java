@@ -5,9 +5,9 @@ import ic2.api.recipe.Recipes;
 import ic2.api.upgrade.IUpgradableBlock;
 import ic2.api.upgrade.UpgradableProperty;
 import ic2.core.ContainerBase;
+import ic2.core.IC2;
 import ic2.core.IHasGui;
 import ic2.core.LiquidHeatExchangerManager;
-import ic2.core.block.TileEntityHeatSourceInventory;
 import ic2.core.block.comp.Fluids;
 import ic2.core.block.invslot.InvSlot;
 import ic2.core.block.invslot.InvSlotConsumable;
@@ -18,31 +18,31 @@ import ic2.core.block.invslot.InvSlotConsumableLiquidByTank;
 import ic2.core.block.invslot.InvSlotOutput;
 import ic2.core.block.invslot.InvSlotUpgrade;
 import ic2.core.block.machine.container.ContainerLiquidHeatExchanger;
-import ic2.core.block.machine.gui.GuiLiquidHeatExchanger;
+import ic2.core.block.tileentity.TileEntityHeatSourceInventory;
+import ic2.core.fluid.Ic2FluidStack;
+import ic2.core.fluid.Ic2FluidTank;
 import ic2.core.init.MainConfig;
-import ic2.core.item.type.CraftingItemType;
-import ic2.core.profile.NotClassic;
-import ic2.core.ref.FluidName;
-import ic2.core.ref.ItemName;
+import ic2.core.network.GrowingBuffer;
+import ic2.core.ref.Ic2BlockEntities;
+import ic2.core.ref.Ic2Fluids;
+import ic2.core.ref.Ic2Items;
 import ic2.core.util.ConfigUtil;
 
 import java.util.EnumSet;
 import java.util.Set;
 
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidTank;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
 
-@NotClassic
 public class TileEntityLiquidHeatExchanger extends TileEntityHeatSourceInventory implements IHasGui, IUpgradableBlock
 {
 	private boolean newActive;
-	public final FluidTank inputTank;
-	public final FluidTank outputTank;
+	public final Ic2FluidTank inputTank;
+	public final Ic2FluidTank outputTank;
 	public final InvSlotConsumable heatexchangerslots;
 	public final InvSlotOutput hotoutputSlot;
 	public final InvSlotOutput cooloutputSlot;
@@ -51,11 +51,12 @@ public class TileEntityLiquidHeatExchanger extends TileEntityHeatSourceInventory
 	public final InvSlotUpgrade upgradeSlot;
 	protected final Fluids fluids = this.addComponent(new Fluids(this));
 
-	public TileEntityLiquidHeatExchanger()
+	public TileEntityLiquidHeatExchanger(BlockPos pos, BlockState state)
 	{
+		super(Ic2BlockEntities.LIQUID_HEAT_EXCHANGER, pos, state);
 		this.inputTank = this.fluids.addTankInsert("inputTank", 2000, Fluids.fluidPredicate(Recipes.liquidCooldownManager));
 		this.outputTank = this.fluids.addTankExtract("outputTank", 2000);
-		this.heatexchangerslots = new InvSlotConsumableItemStack(this, "heatExchanger", 10, ItemName.crafting.getItemStack(CraftingItemType.heat_conductor));
+		this.heatexchangerslots = new InvSlotConsumableItemStack(this, "heatExchanger", 10, new ItemStack(Ic2Items.HEAT_CONDUCTOR));
 		this.heatexchangerslots.setStackSizeLimit(1);
 		this.hotoutputSlot = new InvSlotOutput(this, "hotOutputSlot", 1);
 		this.cooloutputSlot = new InvSlotOutput(this, "outputSlot", 1);
@@ -73,33 +74,41 @@ public class TileEntityLiquidHeatExchanger extends TileEntityHeatSourceInventory
 	{
 		Recipes.liquidCooldownManager = new LiquidHeatExchangerManager(false);
 		Recipes.liquidHeatupManager = new LiquidHeatExchangerManager(true);
-		addCooldownRecipe(
-			"lava",
-			FluidName.pahoehoe_lava.getName(),
-			Math.round(20.0F * ConfigUtil.getFloat(MainConfig.get(), "balance/energy/fluidconversion/heatExchangerLava"))
-		);
-		addBiDiRecipe(
-			FluidName.hot_coolant.getName(),
-			FluidName.coolant.getName(),
-			Math.round(20.0F * ConfigUtil.getFloat(MainConfig.get(), "balance/energy/fluidconversion/heatExchangerHotCoolant"))
-		);
-		addHeatupRecipe(
-			FluidName.hot_water.getName(), "water", Math.round(1.0F * ConfigUtil.getFloat(MainConfig.get(), "balance/energy/fluidconversion/heatExchangerWater"))
-		);
+		IC2.envProxy
+			.runAfterRegistryInit(
+				() ->
+				{
+					addCooldownRecipe(
+						net.minecraft.world.level.material.Fluids.f_76195_,
+						Ic2Fluids.PAHOEHOE_LAVA.still,
+						Math.round(20.0F * ConfigUtil.getFloat(MainConfig.get(), "balance/energy/fluidconversion/heatExchangerLava"))
+					);
+					addBiDiRecipe(
+						Ic2Fluids.HOT_COOLANT.still,
+						Ic2Fluids.COOLANT.still,
+						Math.round(20.0F * ConfigUtil.getFloat(MainConfig.get(), "balance/energy/fluidconversion/heatExchangerHotCoolant"))
+					);
+					addHeatupRecipe(
+						Ic2Fluids.HOT_WATER.still,
+						net.minecraft.world.level.material.Fluids.f_76193_,
+						Math.round(1.0F * ConfigUtil.getFloat(MainConfig.get(), "balance/energy/fluidconversion/heatExchangerWater"))
+					);
+				}
+			);
 	}
 
-	public static void addBiDiRecipe(String hotFluid, String coldFluid, int huPerMB)
+	public static void addBiDiRecipe(Fluid hotFluid, Fluid coldFluid, int huPerMB)
 	{
 		addHeatupRecipe(hotFluid, coldFluid, huPerMB);
 		addCooldownRecipe(hotFluid, coldFluid, huPerMB);
 	}
 
-	public static void addHeatupRecipe(String hotFluid, String coldFluid, int huPerMB)
+	public static void addHeatupRecipe(Fluid hotFluid, Fluid coldFluid, int huPerMB)
 	{
 		Recipes.liquidHeatupManager.addFluid(coldFluid, hotFluid, huPerMB);
 	}
 
-	public static void addCooldownRecipe(String hotFluid, String coldFluid, int huPerMB)
+	public static void addCooldownRecipe(Fluid hotFluid, Fluid coldFluid, int huPerMB)
 	{
 		Recipes.liquidCooldownManager.addFluid(hotFluid, coldFluid, huPerMB);
 	}
@@ -120,21 +129,15 @@ public class TileEntityLiquidHeatExchanger extends TileEntityHeatSourceInventory
 	}
 
 	@Override
-	public ContainerBase<TileEntityLiquidHeatExchanger> getGuiContainer(EntityPlayer player)
+	public ContainerBase<?> createServerScreenHandler(int syncId, Player player)
 	{
-		return new ContainerLiquidHeatExchanger(player, this);
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
-	{
-		return new GuiLiquidHeatExchanger(new ContainerLiquidHeatExchanger(player, this));
+		return new ContainerLiquidHeatExchanger(syncId, player.getInventory(), this);
 	}
 
 	@Override
-	public void onGuiClosed(EntityPlayer player)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
+		return new ContainerLiquidHeatExchanger(syncId, inventory, this);
 	}
 
 	public int gaugeLiquidScaled(int i, int tank)
@@ -183,13 +186,13 @@ public class TileEntityLiquidHeatExchanger extends TileEntityHeatSourceInventory
 		{
 			int AmountHotCoolant = this.inputTank.getFluidAmount();
 			int OutputTankFreeCap = this.outputTank.getCapacity() - this.outputTank.getFluidAmount();
-			FluidStack draincoolant = null;
+			Ic2FluidStack draincoolant = null;
 			if (OutputTankFreeCap == 0 || AmountHotCoolant == 0)
 			{
 				return 0;
 			}
 
-			Fluid fluidInputTank = this.inputTank.getFluid().getFluid();
+			Fluid fluidInputTank = this.inputTank.getFluidStack().getFluid();
 			Fluid fluidOutput = null;
 			int hUper1mb = 0;
 			if (Recipes.liquidCooldownManager.acceptsFluid(fluidInputTank))
@@ -204,7 +207,7 @@ public class TileEntityLiquidHeatExchanger extends TileEntityHeatSourceInventory
 				return 0;
 			}
 
-			if (this.outputTank.getFluidAmount() > 0 && !this.outputTank.getFluid().getFluid().equals(fluidOutput))
+			if (this.outputTank.getFluidAmount() > 0 && !this.outputTank.getFluidStack().hasExactFluid(fluidOutput))
 			{
 				return 0;
 			}
@@ -214,36 +217,36 @@ public class TileEntityLiquidHeatExchanger extends TileEntityHeatSourceInventory
 			{
 				if (mbtofillheatbuffer <= AmountHotCoolant)
 				{
-					draincoolant = this.inputTank.drainInternal(mbtofillheatbuffer, false);
+					draincoolant = this.inputTank.drainMbUnchecked(mbtofillheatbuffer, true);
 				} else
 				{
-					draincoolant = this.inputTank.drainInternal(AmountHotCoolant, false);
+					draincoolant = this.inputTank.drainMbUnchecked(AmountHotCoolant, true);
 				}
 			} else if (mbtofillheatbuffer <= OutputTankFreeCap)
 			{
-				draincoolant = this.inputTank.drainInternal(mbtofillheatbuffer, false);
+				draincoolant = this.inputTank.drainMbUnchecked(mbtofillheatbuffer, true);
 			} else
 			{
-				draincoolant = this.inputTank.drainInternal(OutputTankFreeCap * 20, false);
+				draincoolant = this.inputTank.drainMbUnchecked(OutputTankFreeCap * 20, true);
 			}
 
 			if (draincoolant != null)
 			{
-				this.inputTank.drainInternal(draincoolant.amount, true);
-				this.outputTank.fillInternal(new FluidStack(fluidOutput, draincoolant.amount), true);
-				return draincoolant.amount * hUper1mb;
+				this.inputTank.drainMbUnchecked(draincoolant.getAmountMb(), false);
+				this.outputTank.fillMbUnchecked(Ic2FluidStack.create(fluidOutput, draincoolant.getAmountMb()), false);
+				return draincoolant.getAmountMb() * hUper1mb;
 			}
 		}
 
 		return 0;
 	}
 
-	public FluidTank getInputTank()
+	public Ic2FluidTank getInputTank()
 	{
 		return this.inputTank;
 	}
 
-	public FluidTank getOutputTank()
+	public Ic2FluidTank getOutputTank()
 	{
 		return this.outputTank;
 	}

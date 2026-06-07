@@ -10,23 +10,25 @@ import ic2.core.block.invslot.InvSlotConsumableLiquid;
 import ic2.core.block.invslot.InvSlotConsumableLiquidByTank;
 import ic2.core.block.invslot.InvSlotOutput;
 import ic2.core.block.machine.container.ContainerFluidRegulator;
-import ic2.core.block.machine.gui.GuiFluidRegulator;
+import ic2.core.fluid.Ic2FluidTank;
 import ic2.core.init.Localization;
+import ic2.core.network.GrowingBuffer;
 import ic2.core.network.GuiSynced;
 import ic2.core.profile.NotClassic;
+import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.util.LiquidUtil;
 
 import java.util.Collections;
 import java.util.EnumSet;
 
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraftforge.fluids.FluidTank;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 @NotClassic
 public class TileEntityFluidRegulator extends TileEntityElectricMachine implements IHasGui, INetworkClientTileEntityEventListener
@@ -41,9 +43,9 @@ public class TileEntityFluidRegulator extends TileEntityElectricMachine implemen
 	protected final Fluids.InternalFluidTank fluidTank;
 	protected final Fluids fluids = this.addComponent(new Fluids(this));
 
-	public TileEntityFluidRegulator()
+	public TileEntityFluidRegulator(BlockPos pos, BlockState state)
 	{
-		super(10000, 4);
+		super(Ic2BlockEntities.FLUID_REGULATOR, pos, state, 10000, 4);
 		this.fluidTank = this.fluids.addTank("fluidTank", 10000, InvSlot.Access.NONE);
 		this.wasserinputSlot = new InvSlotConsumableLiquidByTank(
 			this, "wasserinputSlot", InvSlot.Access.I, 1, InvSlot.InvSide.TOP, InvSlotConsumableLiquid.OpType.Drain, this.fluidTank
@@ -56,20 +58,19 @@ public class TileEntityFluidRegulator extends TileEntityElectricMachine implemen
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound nbt)
+	public void load(CompoundTag nbt)
 	{
-		super.readFromNBT(nbt);
-		this.outputmb = nbt.getInteger("outputmb");
-		this.mode = nbt.getInteger("mode");
+		super.load(nbt);
+		this.outputmb = nbt.getInt("outputmb");
+		this.mode = nbt.getInt("mode");
 	}
 
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
+	public void saveAdditional(CompoundTag nbt)
 	{
-		super.writeToNBT(nbt);
-		nbt.setInteger("outputmb", this.outputmb);
-		nbt.setInteger("mode", this.mode);
-		return nbt;
+		super.saveAdditional(nbt);
+		nbt.putInt("outputmb", this.outputmb);
+		nbt.putInt("mode", this.mode);
 	}
 
 	@Override
@@ -80,9 +81,9 @@ public class TileEntityFluidRegulator extends TileEntityElectricMachine implemen
 	}
 
 	@Override
-	public void setFacing(EnumFacing side)
+	protected void setFacing(Level world, Direction facing)
 	{
-		super.setFacing(side);
+		super.setFacing(world, facing);
 		this.updateConnectivity();
 	}
 
@@ -123,15 +124,15 @@ public class TileEntityFluidRegulator extends TileEntityElectricMachine implemen
 			return false;
 		}
 
-		EnumFacing dir = this.getFacing();
-		TileEntity te = this.getWorld().getTileEntity(this.pos.offset(dir));
-		EnumFacing side = dir.getOpposite();
+		Direction dir = this.getFacing();
+		BlockEntity te = this.getLevel().getBlockEntity(this.worldPosition.relative(dir));
+		Direction side = dir.m_122424_();
 		if (LiquidUtil.isFluidTile(te, side))
 		{
-			int amount = LiquidUtil.fillTile(te, side, this.fluidTank.drainInternal(this.outputmb, false), false);
+			int amount = LiquidUtil.fillTile(te, side, this.fluidTank.drainMbUnchecked(this.outputmb, true), false);
 			if (amount > 0)
 			{
-				this.fluidTank.drainInternal(this.outputmb, true);
+				this.fluidTank.drainMbUnchecked(this.outputmb, false);
 				this.energy.useEnergy(10.0);
 				return true;
 			}
@@ -141,7 +142,7 @@ public class TileEntityFluidRegulator extends TileEntityElectricMachine implemen
 	}
 
 	@Override
-	public void onNetworkEvent(EntityPlayer player, int event)
+	public void onNetworkEvent(Player player, int event)
 	{
 		if (event != 1001 && event != 1002)
 		{
@@ -175,21 +176,15 @@ public class TileEntityFluidRegulator extends TileEntityElectricMachine implemen
 	}
 
 	@Override
-	public ContainerBase<TileEntityFluidRegulator> getGuiContainer(EntityPlayer player)
+	public ContainerBase<?> createServerScreenHandler(int syncId, Player player)
 	{
-		return new ContainerFluidRegulator(player, this);
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
-	{
-		return new GuiFluidRegulator(new ContainerFluidRegulator(player, this));
+		return new ContainerFluidRegulator(syncId, player.getInventory(), this);
 	}
 
 	@Override
-	public void onGuiClosed(EntityPlayer player)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
+		return new ContainerFluidRegulator(syncId, inventory, this);
 	}
 
 	public int gaugeLiquidScaled(int i, int tank)
@@ -226,7 +221,7 @@ public class TileEntityFluidRegulator extends TileEntityElectricMachine implemen
 		}
 	}
 
-	public FluidTank getFluidTank()
+	public Ic2FluidTank getFluidTank()
 	{
 		return this.fluidTank;
 	}

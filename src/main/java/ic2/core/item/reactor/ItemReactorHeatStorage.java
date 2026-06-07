@@ -1,22 +1,21 @@
 package ic2.core.item.reactor;
 
 import ic2.api.reactor.IReactor;
-import ic2.core.init.Localization;
-import ic2.core.ref.ItemName;
 
 import java.util.List;
 
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.Item.Properties;
+import net.minecraft.world.level.Level;
 
 public class ItemReactorHeatStorage extends AbstractDamageableReactorComponent
 {
-	public ItemReactorHeatStorage(ItemName name, int heatStorage)
+	public ItemReactorHeatStorage(Properties settings, int heatStorage)
 	{
-		super(name, heatStorage);
+		super(settings, heatStorage);
 	}
 
 	@Override
@@ -28,13 +27,13 @@ public class ItemReactorHeatStorage extends AbstractDamageableReactorComponent
 	@Override
 	public int getMaxHeat(ItemStack stack, IReactor reactor, int x, int y)
 	{
-		return this.getMaxCustomDamage(stack);
+		return this.getMaxUse();
 	}
 
 	@Override
 	public int getCurrentHeat(ItemStack stack, IReactor reactor, int x, int y)
 	{
-		return this.getCustomDamage(stack);
+		return this.getUse(stack);
 	}
 
 	@Override
@@ -58,21 +57,20 @@ public class ItemReactorHeatStorage extends AbstractDamageableReactorComponent
 				heat = 0;
 			}
 
-			this.setCustomDamage(stack, myHeat);
+			this.setUse(stack, myHeat);
 		}
 
 		return heat;
 	}
 
-	@SideOnly(Side.CLIENT)
 	@Override
-	public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced)
+	public void m_7373_(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag advanced)
 	{
-		super.addInformation(stack, world, tooltip, advanced);
-		if (this.getCustomDamage(stack) > 0)
+		super.m_7373_(stack, world, tooltip, advanced);
+		if (this.getUse(stack) > 0)
 		{
-			tooltip.add(Localization.translate("ic2.reactoritem.heatwarning.line1"));
-			tooltip.add(Localization.translate("ic2.reactoritem.heatwarning.line2"));
+			tooltip.add(Component.m_237113_("ic2.reactoritem.heatwarning.line1").m_130940_(ChatFormatting.GRAY));
+			tooltip.add(Component.m_237113_("ic2.reactoritem.heatwarning.line2").m_130940_(ChatFormatting.GRAY));
 		}
 	}
 }

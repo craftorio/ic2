@@ -1,89 +1,80 @@
 package ic2.core.block.machine.tileentity;
 
+import com.mojang.math.Vector3f;
 import ic2.api.network.INetworkTileEntityEventListener;
 import ic2.api.tile.IEnergyStorage;
 import ic2.core.IC2;
-import ic2.core.audio.AudioPosition;
-import ic2.core.audio.AudioSource;
-import ic2.core.audio.PositionSpec;
-import ic2.core.block.TileEntityBlock;
-import ic2.core.block.comp.ComparatorEmitter;
+import ic2.core.block.tileentity.TileEntityBase;
 import ic2.core.init.MainConfig;
+import ic2.core.ref.Ic2BlockEntities;
+import ic2.core.ref.Ic2SoundEvents;
 import ic2.core.util.ConfigUtil;
 import ic2.core.util.StackUtil;
+import ic2.core.util.Util;
 
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.boss.EntityDragon;
-import net.minecraft.entity.boss.EntityWither;
-import net.minecraft.entity.item.EntityBoat;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.item.EntityMinecart;
-import net.minecraft.entity.monster.EntityGhast;
-import net.minecraft.entity.passive.EntityAnimal;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySelector;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
+import net.minecraft.world.entity.boss.wither.WitherBoss;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.monster.Ghast;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.vehicle.AbstractMinecart;
+import net.minecraft.world.entity.vehicle.Boat;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 
-public class TileEntityTeleporter extends TileEntityBlock implements INetworkTileEntityEventListener
+public class TileEntityTeleporter extends TileEntityBase implements INetworkTileEntityEventListener
 {
 	private BlockPos target;
-	private AudioSource audioSource = null;
 	private int targetCheckTicker = IC2.random.nextInt(1024);
 	private int cooldown = 0;
-	protected final ComparatorEmitter comparator = this.addComponent(new ComparatorEmitter(this));
 	private static final int EventTeleport = 0;
 
-	@Override
-	public void readFromNBT(NBTTagCompound nbt)
+	public TileEntityTeleporter(BlockPos pos, BlockState state)
 	{
-		super.readFromNBT(nbt);
-		if (nbt.hasKey("targetX"))
+		super(Ic2BlockEntities.TELEPORTER, pos, state);
+	}
+
+	@Override
+	public void load(CompoundTag nbt)
+	{
+		super.load(nbt);
+		if (nbt.contains("targetX"))
 		{
-			this.target = new BlockPos(nbt.getInteger("targetX"), nbt.getInteger("targetY"), nbt.getInteger("targetZ"));
+			this.target = new BlockPos(nbt.getInt("targetX"), nbt.getInt("targetY"), nbt.getInt("targetZ"));
 		}
 	}
 
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
+	public void saveAdditional(CompoundTag nbt)
 	{
-		super.writeToNBT(nbt);
+		super.saveAdditional(nbt);
 		if (this.target != null)
 		{
-			nbt.setInteger("targetX", this.target.getX());
-			nbt.setInteger("targetY", this.target.getY());
-			nbt.setInteger("targetZ", this.target.getZ());
+			nbt.putInt("targetX", this.target.getX());
+			nbt.putInt("targetY", this.target.getY());
+			nbt.putInt("targetZ", this.target.getZ());
 		}
-
-		return nbt;
-	}
-
-	@Override
-	protected void onUnloaded()
-	{
-		if (IC2.platform.isRendering() && this.audioSource != null)
-		{
-			IC2.audioManager.removeSources(this);
-			this.audioSource = null;
-		}
-
-		super.onUnloaded();
 	}
 
 	@Override
@@ -104,26 +95,27 @@ public class TileEntityTeleporter extends TileEntityBlock implements INetworkTil
 			IC2.network.get(true).updateTileEntityField(this, "cooldown");
 		}
 
-		World world = this.getWorld();
-		if (world.isBlockPowered(this.pos) && this.target != null)
+		Level world = this.getLevel();
+		if (world.m_46753_(this.worldPosition) && this.target != null)
 		{
-			this.setActive(true);
+			this.activate(false);
 			List<Entity> entitiesNearby;
 			if (coolingDown)
 			{
 				entitiesNearby = Collections.emptyList();
 			} else
 			{
-				entitiesNearby = world.getEntitiesWithinAABB(
+				entitiesNearby = world.getEntitiesOfClass(
 					Entity.class,
-					new AxisAlignedBB(
-						this.pos.getX() - 1,
-						this.pos.getY(),
-						this.pos.getZ() - 1,
-						this.pos.getX() + 2,
-						this.pos.getY() + 3,
-						this.pos.getZ() + 2
-					)
+					new AABB(
+						this.worldPosition.getX() - 1,
+						this.worldPosition.getY(),
+						this.worldPosition.getZ() - 1,
+						this.worldPosition.getX() + 2,
+						this.worldPosition.getY() + 3,
+						this.worldPosition.getZ() + 2
+					),
+					EntitySelector.f_20402_
 				);
 			}
 
@@ -134,9 +126,9 @@ public class TileEntityTeleporter extends TileEntityBlock implements INetworkTil
 
 				for (Entity entity : entitiesNearby)
 				{
-					if (entity.getRidingEntity() == null)
+					if (entity.m_20202_() == null)
 					{
-						double distSquared = this.pos.distanceSqToCenter(entity.posX, entity.posY, entity.posZ);
+						double distSquared = this.worldPosition.m_203202_(entity.getX(), entity.getY(), entity.getZ());
 						if (distSquared < minDistanceSquared)
 						{
 							minDistanceSquared = distSquared;
@@ -146,31 +138,30 @@ public class TileEntityTeleporter extends TileEntityBlock implements INetworkTil
 				}
 
 				assert closestEntity != null;
-				this.teleport(closestEntity, Math.sqrt(this.pos.distanceSq(this.target)));
+				this.teleport(closestEntity, Math.sqrt(this.worldPosition.m_123331_(this.target)));
 			} else if (++this.targetCheckTicker % 1024 == 0)
 			{
 				this.verifyTarget();
 			}
 		} else
 		{
-			this.setActive(false);
+			this.shutdown(false);
 		}
 	}
 
 	private boolean verifyTarget()
 	{
-		if (this.getWorld().getTileEntity(this.target) instanceof TileEntityTeleporter)
+		if (this.getLevel().getBlockEntity(this.target) instanceof TileEntityTeleporter)
 		{
 			return true;
 		}
 
 		this.target = null;
 		this.updateComparatorLevel();
-		this.setActive(false);
+		this.shutdown(false);
 		return false;
 	}
 
-	@SideOnly(Side.CLIENT)
 	@Override
 	protected void updateEntityClient()
 	{
@@ -179,10 +170,10 @@ public class TileEntityTeleporter extends TileEntityBlock implements INetworkTil
 		{
 			if (this.cooldown > 0)
 			{
-				this.spawnGreenParticles(2, this.pos);
+				this.spawnGreenParticles(2, this.worldPosition);
 			} else
 			{
-				this.spawnBlueParticles(2, this.pos);
+				this.spawnBlueParticles(2, this.worldPosition);
 			}
 		}
 	}
@@ -202,28 +193,27 @@ public class TileEntityTeleporter extends TileEntityBlock implements INetworkTil
 			if (energyCost <= this.getAvailableEnergy())
 			{
 				this.consumeEnergy(energyCost);
-				if (user instanceof EntityPlayerMP)
+				if (user instanceof ServerPlayer)
 				{
-					((EntityPlayerMP) user)
-						.setPositionAndUpdate(this.target.getX() + 0.5, this.target.getY() + 1.5 + user.getYOffset(), this.target.getZ() + 0.5);
+					user.m_6021_(this.target.getX() + 0.5, this.target.getY() + 1.5 + user.m_6049_(), this.target.getZ() + 0.5);
 				} else
 				{
-					user.setPositionAndRotation(
+					user.m_19890_(
 						this.target.getX() + 0.5,
-						this.target.getY() + 1.5 + user.getYOffset(),
+						this.target.getY() + 1.5 + user.m_6049_(),
 						this.target.getZ() + 0.5,
-						user.rotationYaw,
-						user.rotationPitch
+						user.m_146908_(),
+						user.m_146909_()
 					);
 				}
 
-				TileEntity te = this.getWorld().getTileEntity(this.target);
+				BlockEntity te = this.getLevel().getBlockEntity(this.target);
 				assert te instanceof TileEntityTeleporter;
 				((TileEntityTeleporter) te).onTeleportTo(this, user);
 				IC2.network.get(true).initiateTileEntityEvent(this, 0, true);
-				if (user instanceof EntityPlayer && distance >= 1000.0)
+				if (user instanceof Player && distance >= 1000.0)
 				{
-					IC2.achievements.issueAchievement((EntityPlayer) user, "teleportFarAway");
+					IC2.achievements.issueAchievement((Player) user, "teleportFarAway");
 				}
 			}
 		}
@@ -241,49 +231,29 @@ public class TileEntityTeleporter extends TileEntityBlock implements INetworkTil
 
 	private void spawnParticles(int n, BlockPos pos, int red, int green, int blue)
 	{
-		World world = this.getWorld();
-		Random rnd = world.rand;
+		Level world = this.getLevel();
+		RandomSource rnd = world.random;
+		DustParticleOptions effect = new DustParticleOptions(new Vector3f(red / 255.0F, green / 255.0F, blue / 255.0F), 1.0F);
 
 		for (int i = 0; i < n; i++)
 		{
-			world.spawnParticle(
-				EnumParticleTypes.REDSTONE,
-				pos.getX() + rnd.nextFloat(),
-				pos.getY() + 1 + rnd.nextFloat(),
-				pos.getZ() + rnd.nextFloat(),
-				red,
-				green,
-				blue,
-				new int[0]
-			);
-			world.spawnParticle(
-				EnumParticleTypes.REDSTONE,
-				pos.getX() + rnd.nextFloat(),
-				pos.getY() + 2 + rnd.nextFloat(),
-				pos.getZ() + rnd.nextFloat(),
-				red,
-				green,
-				blue,
-				new int[0]
-			);
+			world.addParticle(effect, pos.getX() + rnd.nextFloat(), pos.getY() + 1 + rnd.nextFloat(), pos.getZ() + rnd.nextFloat(), 0.0, 0.0, 0.0);
+			world.addParticle(effect, pos.getX() + rnd.nextFloat(), pos.getY() + 2 + rnd.nextFloat(), pos.getZ() + rnd.nextFloat(), 0.0, 0.0, 0.0);
 		}
 	}
 
 	public void consumeEnergy(int energy)
 	{
-		World world = this.getWorld();
+		Level world = this.getLevel();
 		List<IEnergyStorage> energySources = new LinkedList<>();
 
-		for (EnumFacing dir : EnumFacing.VALUES)
+		for (Direction dir : Util.ALL_DIRS)
 		{
-			TileEntity target = world.getTileEntity(this.pos.offset(dir));
-			if (target instanceof IEnergyStorage)
+			if (world.getBlockEntity(this.worldPosition.relative(dir)) instanceof IEnergyStorage energySource
+				&& energySource.isTeleporterCompatible(dir.m_122424_())
+				&& energySource.getStored() > 0)
 			{
-				IEnergyStorage energySource = (IEnergyStorage) target;
-				if (energySource.isTeleporterCompatible(dir.getOpposite()) && energySource.getStored() > 0)
-				{
-					energySources.add(energySource);
-				}
+				energySources.add(energySource);
 			}
 		}
 
@@ -316,19 +286,14 @@ public class TileEntityTeleporter extends TileEntityBlock implements INetworkTil
 
 	public int getAvailableEnergy()
 	{
-		World world = this.getWorld();
+		Level world = this.getLevel();
 		int energy = 0;
 
-		for (EnumFacing dir : EnumFacing.VALUES)
+		for (Direction dir : Util.ALL_DIRS)
 		{
-			TileEntity target = world.getTileEntity(this.pos.offset(dir));
-			if (target instanceof IEnergyStorage)
+			if (world.getBlockEntity(this.worldPosition.relative(dir)) instanceof IEnergyStorage storage && storage.isTeleporterCompatible(dir.m_122424_()))
 			{
-				IEnergyStorage storage = (IEnergyStorage) target;
-				if (storage.isTeleporterCompatible(dir.getOpposite()))
-				{
-					energy += storage.getStored();
-				}
+				energy += storage.getStored();
 			}
 		}
 
@@ -339,54 +304,52 @@ public class TileEntityTeleporter extends TileEntityBlock implements INetworkTil
 	{
 		boolean teleporterUseInventoryWeight = ConfigUtil.getBool(MainConfig.get(), "balance/teleporterUseInventoryWeight");
 		int weight = 0;
-		if (user instanceof EntityItem)
+		if (user instanceof ItemEntity)
 		{
-			ItemStack is = ((EntityItem) user).getItem();
+			ItemStack is = ((ItemEntity) user).m_32055_();
 			weight += 100 * StackUtil.getSize(is) / is.getMaxStackSize();
-		} else if (user instanceof EntityAnimal || user instanceof EntityMinecart || user instanceof EntityBoat)
+		} else if (user instanceof Animal || user instanceof AbstractMinecart || user instanceof Boat)
 		{
 			weight += 100;
-		} else if (user instanceof EntityPlayer)
+		} else if (user instanceof Player)
 		{
 			weight += 1000;
 			if (teleporterUseInventoryWeight)
 			{
-				for (ItemStack stack : ((EntityPlayer) user).inventory.mainInventory)
+				for (ItemStack stack : ((Player) user).getInventory().f_35974_)
 				{
 					weight += getStackCost(stack);
 				}
 			}
-		} else if (user instanceof EntityGhast)
+		} else if (user instanceof Ghast)
 		{
 			weight += 2500;
-		} else if (user instanceof EntityWither)
+		} else if (user instanceof WitherBoss)
 		{
 			weight += 5000;
-		} else if (user instanceof EntityDragon)
+		} else if (user instanceof EnderDragon)
 		{
 			weight += 10000;
-		} else if (user instanceof EntityCreature)
+		} else if (user instanceof Mob)
 		{
 			weight += 500;
 		}
 
-		if (teleporterUseInventoryWeight && user instanceof EntityLivingBase)
+		if (teleporterUseInventoryWeight && user instanceof LivingEntity living)
 		{
-			EntityLivingBase living = (EntityLivingBase) user;
-
-			for (ItemStack stack : living.getEquipmentAndArmor())
+			for (ItemStack stack : living.m_20158_())
 			{
 				weight += getStackCost(stack);
 			}
 
-			if (user instanceof EntityPlayer)
+			if (user instanceof Player)
 			{
-				ItemStack stack = living.getHeldItemMainhand();
+				ItemStack stack = living.m_21205_();
 				weight -= getStackCost(stack);
 			}
 		}
 
-		for (Entity passenger : user.getPassengers())
+		for (Entity passenger : user.m_20197_())
 		{
 			weight += this.getWeightOf(passenger);
 		}
@@ -407,7 +370,7 @@ public class TileEntityTeleporter extends TileEntityBlock implements INetworkTil
 	@Override
 	protected boolean canEntityDestroy(Entity entity)
 	{
-		return !(entity instanceof EntityDragon) && !(entity instanceof EntityWither);
+		return !(entity instanceof EnderDragon) && !(entity instanceof WitherBoss);
 	}
 
 	public boolean hasTarget()
@@ -428,6 +391,12 @@ public class TileEntityTeleporter extends TileEntityBlock implements INetworkTil
 	}
 
 	@Override
+	public SoundEvent getLoopingSoundEvent()
+	{
+		return Ic2SoundEvents.MACHINE_TELEPORTER_CHARGE;
+	}
+
+	@Override
 	public List<String> getNetworkedFields()
 	{
 		List<String> ret = super.getNetworkedFields();
@@ -436,51 +405,39 @@ public class TileEntityTeleporter extends TileEntityBlock implements INetworkTil
 	}
 
 	@Override
-	public void onNetworkUpdate(String field)
-	{
-		if (field.equals("active"))
-		{
-			if (this.audioSource == null)
-			{
-				this.audioSource = IC2.audioManager
-					.createSource(this, PositionSpec.Center, "Machines/Teleporter/TeleChargedLoop.ogg", true, false, IC2.audioManager.getDefaultVolume());
-			}
-
-			if (this.getActive())
-			{
-				if (this.audioSource != null)
-				{
-					this.audioSource.play();
-				}
-			} else if (this.audioSource != null)
-			{
-				this.audioSource.stop();
-			}
-		}
-
-		super.onNetworkUpdate(field);
-	}
-
-	@Override
 	public void onNetworkEvent(int event)
 	{
 		switch (event)
 		{
 			case 0:
-				IC2.audioManager.playOnce(this, "Machines/Teleporter/TeleUse.ogg");
-				IC2.audioManager.playOnce(new AudioPosition(this.getWorld(), this.pos), "Machines/Teleporter/TeleUse.ogg");
-				this.spawnBlueParticles(20, this.pos);
+				if (this.level == null)
+				{
+					return;
+				}
+
+				this.level
+					.playLocalSound(
+						this.worldPosition.getX(),
+						this.worldPosition.getY(),
+						this.worldPosition.getZ(),
+						Ic2SoundEvents.MACHINE_TELEPORTER_USE,
+						SoundSource.BLOCKS,
+						1.0F,
+						1.0F,
+						true
+					);
+				this.spawnBlueParticles(20, this.worldPosition);
 				this.spawnBlueParticles(20, this.target);
 				break;
 			default:
-				IC2.platform
+				IC2.sideProxy
 					.displayError(
 						"An unknown event type was received over multiplayer.\nThis could happen due to corrupted data or a bug.\n\n(Technical information: event ID "
 							+ event
 							+ ", tile entity below)\nT: "
 							+ this
 							+ " ("
-							+ this.pos
+							+ this.worldPosition
 							+ ")"
 					);
 		}

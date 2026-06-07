@@ -1,17 +1,17 @@
 package ic2.core.item.reactor;
 
 import ic2.api.reactor.IReactor;
-import ic2.core.ref.ItemName;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item.Properties;
 
 public class ItemReactorPlating extends AbstractReactorComponent
 {
 	private final int maxHeatAdd;
 	private final float effectModifier;
 
-	public ItemReactorPlating(ItemName name, int maxheatadd, float effectmodifier)
+	public ItemReactorPlating(Properties settings, int maxheatadd, float effectmodifier)
 	{
-		super(name);
+		super(settings);
 		this.maxHeatAdd = maxheatadd;
 		this.effectModifier = effectmodifier;
 	}

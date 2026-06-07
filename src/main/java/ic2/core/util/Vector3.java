@@ -1,6 +1,6 @@
 package ic2.core.util;
 
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.phys.Vec3;
 
 public final class Vector3
 {
@@ -25,9 +25,9 @@ public final class Vector3
 		this(v.x, v.y, v.z);
 	}
 
-	public Vector3(Vec3d v)
+	public Vector3(Vec3 v)
 	{
-		this(v.x, v.y, v.z);
+		this(v.f_82479_, v.f_82480_, v.f_82481_);
 	}
 
 	public Vector3 copy()
@@ -53,9 +53,9 @@ public final class Vector3
 		return this.set(v.x, v.y, v.z);
 	}
 
-	public Vector3 set(Vec3d v)
+	public Vector3 set(Vec3 v)
 	{
-		return this.set(v.x, v.y, v.z);
+		return this.set(v.f_82479_, v.f_82480_, v.f_82481_);
 	}
 
 	public Vector3 add(double vx, double vy, double vz)
@@ -149,9 +149,9 @@ public final class Vector3
 		return this.distanceSquared(v.x, v.y, v.z);
 	}
 
-	public double distanceSquared(Vec3d v)
+	public double distanceSquared(Vec3 v)
 	{
-		return this.distanceSquared(v.x, v.y, v.z);
+		return this.distanceSquared(v.f_82479_, v.f_82480_, v.f_82481_);
 	}
 
 	public double distance(double vx, double vy, double vz)
@@ -164,9 +164,9 @@ public final class Vector3
 		return this.distance(v.x, v.y, v.z);
 	}
 
-	public double distance(Vec3d v)
+	public double distance(Vec3 v)
 	{
-		return this.distance(v.x, v.y, v.z);
+		return this.distance(v.f_82479_, v.f_82480_, v.f_82481_);
 	}
 
 	public Vector3 scale(double factor)
@@ -183,9 +183,9 @@ public final class Vector3
 		return this.scale(factor);
 	}
 
-	public Vec3d toVec3()
+	public Vec3 toVec3()
 	{
-		return new Vec3d(this.x, this.y, this.z);
+		return new Vec3(this.x, this.y, this.z);
 	}
 
 	@Override

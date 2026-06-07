@@ -1,0 +1,69 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_alloy": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:alloy"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_carbon_plate": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:carbon_plate"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_nuggets/iridium": {
+      "conditions": {
+        "items": [
+          {
+            "tag": "forge:nuggets/iridium"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_plates/steel": {
+      "conditions": {
+        "items": [
+          {
+            "tag": "forge:plates/steel"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "ic2:shaped/jetpack_attachment_plate"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_plates/steel",
+      "has_alloy",
+      "has_carbon_plate",
+      "has_nuggets/iridium",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "ic2:shaped/jetpack_attachment_plate"
+    ]
+  }
+}

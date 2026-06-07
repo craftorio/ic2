@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:ic2/build_generator/root",
+  "display": {
+    "icon": {
+      "item": "ic2:macerator"
+    },
+    "title": {
+      "translate": "advancements.ic2.buildMacerator"
+    },
+    "description": {
+      "translate": "advancements.ic2.buildMacerator.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "ic2:macerator": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:macerator"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "ic2:macerator"
+    ]
+  ]
+}

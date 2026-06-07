@@ -1,7 +1,9 @@
 package ic2.core.gui;
 
-import ic2.core.GuiIC2;
-import net.minecraft.util.ResourceLocation;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
+import ic2.core.Ic2Gui;
+import net.minecraft.resources.ResourceLocation;
 
 public class Image extends GuiElement<Image>
 {
@@ -13,14 +15,14 @@ public class Image extends GuiElement<Image>
 	private final boolean autoHeight;
 
 	public static Image create(
-		GuiIC2<?> gui, int x, int y, int width, int height, ResourceLocation texture, int baseWidth, int baseHeight, int uS, int vS, int uE, int vE
+		Ic2Gui<?> gui, int x, int y, int width, int height, ResourceLocation texture, int baseWidth, int baseHeight, int uS, int vS, int uE, int vE
 	)
 	{
 		return create(gui, x, y, width, height, texture, baseWidth, baseHeight, new OverlaySupplier(uS, vS, uE, vE));
 	}
 
 	public static Image create(
-		GuiIC2<?> gui, int x, int y, int width, int height, ResourceLocation texture, int baseWidth, int baseHeight, IOverlaySupplier overlay
+		Ic2Gui<?> gui, int x, int y, int width, int height, ResourceLocation texture, int baseWidth, int baseHeight, IOverlaySupplier overlay
 	)
 	{
 		boolean autoWidth = width < 0;
@@ -39,7 +41,7 @@ public class Image extends GuiElement<Image>
 	}
 
 	protected Image(
-		GuiIC2<?> gui,
+		Ic2Gui<?> gui,
 		int x,
 		int y,
 		int width,
@@ -72,9 +74,9 @@ public class Image extends GuiElement<Image>
 	}
 
 	@Override
-	public void drawBackground(int mouseX, int mouseY)
+	public void drawBackground(PoseStack matrices, int mouseX, int mouseY)
 	{
-		super.drawBackground(mouseX, mouseY);
+		super.drawBackground(matrices, mouseX, mouseY);
 		GlTexture texture = GlTexture.get(this.texture);
 		if (texture != null)
 		{
@@ -104,8 +106,9 @@ public class Image extends GuiElement<Image>
 				vE = vS + this.height;
 			}
 
-			texture.bind();
-			this.gui.drawTexturedRect(this.x, this.y, this.width, this.height, uS * widthScale, vS * heightScale, uE * widthScale, vE * heightScale, false);
+			RenderSystem.m_157456_(0, this.texture);
+			this.gui
+				.drawTexturedRect(matrices, this.x, this.y, this.width, this.height, uS * widthScale, vS * heightScale, uE * widthScale, vE * heightScale, false);
 		} else
 		{
 			if (this.autoWidth)

@@ -2,28 +2,29 @@ package ic2.core.block.machine.container;
 
 import ic2.core.ContainerFullInv;
 import ic2.core.block.machine.tileentity.TileEntityClassicCropmatron;
+import ic2.core.ref.Ic2ScreenHandlers;
 import ic2.core.slot.SlotInvSlot;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.entity.player.Inventory;
 
 public class ContainerClassicCropmatron extends ContainerFullInv<TileEntityClassicCropmatron>
 {
-	public ContainerClassicCropmatron(EntityPlayer player, TileEntityClassicCropmatron base)
+	public ContainerClassicCropmatron(int syncId, Inventory playerInventory, TileEntityClassicCropmatron base)
 	{
-		super(player, base, 166);
+		super(Ic2ScreenHandlers.CLASSIC_CROPMATRON, syncId, playerInventory, base, 166);
 
 		for (int i = 0; i < base.fertilizerSlot.size(); i++)
 		{
-			this.addSlotToContainer(new SlotInvSlot(base.fertilizerSlot, i, 62, 20 + i * 18));
+			this.m_38897_(new SlotInvSlot(base.fertilizerSlot, i, 62, 20 + i * 18));
 		}
 
 		for (int i = 0; i < base.hydrationSlot.size(); i++)
 		{
-			this.addSlotToContainer(new SlotInvSlot(base.hydrationSlot, i, 98, 20 + i * 18));
+			this.m_38897_(new SlotInvSlot(base.hydrationSlot, i, 98, 20 + i * 18));
 		}
 
 		for (int i = 0; i < base.weedExSlot.size(); i++)
 		{
-			this.addSlotToContainer(new SlotInvSlot(base.weedExSlot, i, 134, 20 + i * 18));
+			this.m_38897_(new SlotInvSlot(base.weedExSlot, i, 134, 20 + i * 18));
 		}
 	}
 }

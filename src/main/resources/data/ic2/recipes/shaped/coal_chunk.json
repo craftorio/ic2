@@ -1,0 +1,27 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "###",
+    "#O#",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "ic2:coal_block"
+    },
+    "O": [
+      {
+        "item": "minecraft:obsidian"
+      },
+      {
+        "item": "minecraft:iron_block"
+      },
+      {
+        "item": "minecraft:bricks"
+      }
+    ]
+  },
+  "result": {
+    "item": "ic2:coal_chunk"
+  }
+}

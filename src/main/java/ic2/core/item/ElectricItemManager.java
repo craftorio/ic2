@@ -10,12 +10,12 @@ import ic2.core.util.Util;
 
 import java.util.List;
 
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.EntityEquipmentSlot;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 public class ElectricItemManager implements IElectricItemManager
 {
@@ -31,7 +31,7 @@ public class ElectricItemManager implements IElectricItemManager
 				amount = item.getTransferLimit(stack);
 			}
 
-			NBTTagCompound tNBT = StackUtil.getOrCreateNbtData(stack);
+			CompoundTag tNBT = StackUtil.getOrCreateNbtData(stack);
 			double newCharge = tNBT.getDouble("charge");
 			amount = Math.min(amount, item.getMaxCharge(stack) - newCharge);
 			if (!simulate)
@@ -39,13 +39,13 @@ public class ElectricItemManager implements IElectricItemManager
 				newCharge += amount;
 				if (newCharge > 0.0)
 				{
-					tNBT.setDouble("charge", newCharge);
+					tNBT.putDouble("charge", newCharge);
 				} else
 				{
-					tNBT.removeTag("charge");
-					if (tNBT.hasNoTags())
+					tNBT.m_128473_("charge");
+					if (tNBT.m_128456_())
 					{
-						stack.setTagCompound(null);
+						stack.m_41751_(null);
 					}
 				}
 
@@ -98,7 +98,7 @@ public class ElectricItemManager implements IElectricItemManager
 			amount = item.getTransferLimit(stack);
 		}
 
-		NBTTagCompound tNBT = StackUtil.getOrCreateNbtData(stack);
+		CompoundTag tNBT = StackUtil.getOrCreateNbtData(stack);
 		double newCharge = tNBT.getDouble("charge");
 		amount = Math.min(amount, newCharge);
 		if (!simulate)
@@ -106,13 +106,13 @@ public class ElectricItemManager implements IElectricItemManager
 			newCharge -= amount;
 			if (newCharge > 0.0)
 			{
-				tNBT.setDouble("charge", newCharge);
+				tNBT.putDouble("charge", newCharge);
 			} else
 			{
-				tNBT.removeTag("charge");
-				if (tNBT.hasNoTags())
+				tNBT.m_128473_("charge");
+				if (tNBT.m_128456_())
 				{
-					stack.setTagCompound(null);
+					stack.m_41751_(null);
 				}
 			}
 
@@ -137,6 +137,15 @@ public class ElectricItemManager implements IElectricItemManager
 	}
 
 	@Override
+	public double getStackCharge(ItemStack stack)
+	{
+		IElectricItem item = (IElectricItem) stack.getItem();
+		assert item.getMaxCharge(stack) > 0.0;
+		CompoundTag tNBT = StackUtil.getOrCreateNbtData(stack);
+		return tNBT.getDouble("charge");
+	}
+
+	@Override
 	public double getMaxCharge(ItemStack stack)
 	{
 		return ElectricItem.manager.getCharge(stack) + ElectricItem.manager.charge(stack, Double.POSITIVE_INFINITY, Integer.MAX_VALUE, true, true);
@@ -149,7 +158,7 @@ public class ElectricItemManager implements IElectricItemManager
 	}
 
 	@Override
-	public boolean use(ItemStack stack, double amount, EntityLivingBase entity)
+	public boolean use(ItemStack stack, double amount, LivingEntity entity)
 	{
 		if (entity != null)
 		{
@@ -173,13 +182,13 @@ public class ElectricItemManager implements IElectricItemManager
 	}
 
 	@Override
-	public void chargeFromArmor(ItemStack target, EntityLivingBase entity)
+	public void chargeFromArmor(ItemStack target, LivingEntity entity)
 	{
 		boolean transferred = false;
 
-		for (EntityEquipmentSlot slot : ArmorSlot.getAll())
+		for (EquipmentSlot slot : ArmorSlot.getAll())
 		{
-			ItemStack source = entity.getItemStackFromSlot(slot);
+			ItemStack source = entity.m_6844_(slot);
 			if (source != null)
 			{
 				int tier;
@@ -204,9 +213,9 @@ public class ElectricItemManager implements IElectricItemManager
 			}
 		}
 
-		if (transferred && entity instanceof EntityPlayer && IC2.platform.isSimulating())
+		if (transferred && entity instanceof Player && IC2.sideProxy.isSimulating())
 		{
-			((EntityPlayer) entity).openContainer.detectAndSendChanges();
+			((Player) entity).f_36096_.m_38946_();
 		}
 	}
 

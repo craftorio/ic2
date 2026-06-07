@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "active=false": {
+      "model": "ic2:block/machine/misc/teleporter"
+    },
+    "active=true": {
+      "model": "ic2:block/machine/misc/teleporter_active"
+    }
+  }
+}

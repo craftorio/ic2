@@ -1,64 +1,68 @@
 package ic2.core.util;
 
-import ic2.core.block.state.IIdProvider;
-
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Map;
 
-import net.minecraft.item.EnumDyeColor;
+import net.minecraft.world.item.DyeColor;
 
-public enum Ic2Color implements IIdProvider
+public enum Ic2Color
 {
-	black(EnumDyeColor.BLACK, "dyeBlack"),
-	blue(EnumDyeColor.BLUE, "dyeBlue"),
-	brown(EnumDyeColor.BROWN, "dyeBrown"),
-	cyan(EnumDyeColor.CYAN, "dyeCyan"),
-	gray(EnumDyeColor.GRAY, "dyeGray"),
-	green(EnumDyeColor.GREEN, "dyeGreen"),
-	light_blue(EnumDyeColor.LIGHT_BLUE, "dyeLightBlue"),
-	light_gray(EnumDyeColor.SILVER, "dyeLightGray"),
-	lime(EnumDyeColor.LIME, "dyeLime"),
-	magenta(EnumDyeColor.MAGENTA, "dyeMagenta"),
-	orange(EnumDyeColor.ORANGE, "dyeOrange"),
-	pink(EnumDyeColor.PINK, "dyePink"),
-	purple(EnumDyeColor.PURPLE, "dyePurple"),
-	red(EnumDyeColor.RED, "dyeRed"),
-	white(EnumDyeColor.WHITE, "dyeWhite"),
-	yellow(EnumDyeColor.YELLOW, "dyeYellow");
+	BLACK(DyeColor.BLACK, 1908001),
+	BLUE(DyeColor.BLUE, 3949738),
+	BROWN(DyeColor.BROWN, 8606770),
+	CYAN(DyeColor.CYAN, 1481884),
+	GRAY(DyeColor.GRAY, 4673362),
+	GREEN(DyeColor.GREEN, 6192150),
+	LIGHT_BLUE(DyeColor.LIGHT_BLUE, 3847130),
+	LIGHT_GRAY(DyeColor.LIGHT_GRAY, 10329495),
+	LIME(DyeColor.LIME, 8439583),
+	MAGENTA(DyeColor.MAGENTA, 13061821),
+	ORANGE(DyeColor.ORANGE, 16351261),
+	PINK(DyeColor.PINK, 15961002),
+	PURPLE(DyeColor.PURPLE, 8991416),
+	RED(DyeColor.RED, 11546150),
+	WHITE(DyeColor.WHITE, 16383998),
+	YELLOW(DyeColor.YELLOW, 16701501);
 
 	public static final Ic2Color[] values = values();
-	private static final Map<EnumDyeColor, Ic2Color> mcColorMap = new EnumMap<>(EnumDyeColor.class);
-	public final EnumDyeColor mcColor;
-	public final String oreDictDyeName;
+	private static final Map<DyeColor, Ic2Color> dyeColorMap = new EnumMap<>(DyeColor.class);
+	private static final Map<Integer, Ic2Color> colorMap = new HashMap<>();
+	public final DyeColor dyeColor;
+	public final int color;
 
-	Ic2Color(EnumDyeColor mcColor, String oreDictDyeName)
+	Ic2Color(DyeColor mcColor, int color)
 	{
-		this.mcColor = mcColor;
-		this.oreDictDyeName = oreDictDyeName;
+		this.dyeColor = mcColor;
+		this.color = color;
 	}
 
-	@Override
-	public String getName()
-	{
-		return this.name();
-	}
-
-	@Override
 	public int getId()
 	{
 		return this.ordinal();
 	}
 
-	public static Ic2Color get(EnumDyeColor mcColor)
+	public int getColor()
 	{
-		return mcColorMap.get(mcColor);
+		return this.color;
+	}
+
+	public static Ic2Color get(DyeColor mcColor)
+	{
+		return dyeColorMap.get(mcColor);
+	}
+
+	public static Ic2Color byColor(int color)
+	{
+		return colorMap.get(color);
 	}
 
 	static
 	{
 		for (Ic2Color color : values)
 		{
-			mcColorMap.put(color.mcColor, color);
+			dyeColorMap.put(color.dyeColor, color);
+			colorMap.put(color.color, color);
 		}
 	}
 }

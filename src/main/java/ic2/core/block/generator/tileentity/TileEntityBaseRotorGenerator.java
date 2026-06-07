@@ -1,19 +1,30 @@
 package ic2.core.block.generator.tileentity;
 
 import ic2.api.tile.IRotorProvider;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 
 public abstract class TileEntityBaseRotorGenerator extends TileEntityBaseGenerator implements IRotorProvider
 {
 	private static final float rotationSpeed = 0.4F;
-	private static final ResourceLocation rotorTexture = new ResourceLocation("ic2", "textures/items/rotor/iron_rotor_model.png");
+	private static final ResourceLocation rotorTexture = ResourceLocation.fromNamespaceAndPath("ic2", "textures/items/rotor/iron_rotor_model.png");
 	private final int rotorDiameter;
 	private float angle = 0.0F;
 	private long lastcheck;
 
-	public TileEntityBaseRotorGenerator(double production, int tier, int maxStorage, int rotorDiameter)
+	public TileEntityBaseRotorGenerator(
+		BlockEntityType<? extends TileEntityBaseRotorGenerator> type,
+		BlockPos pos,
+		BlockState state,
+		double production,
+		int tier,
+		int maxStorage,
+		int rotorDiameter
+	)
 	{
-		super(production, tier, maxStorage);
+		super(type, pos, state, production, tier, maxStorage);
 		this.rotorDiameter = rotorDiameter;
 	}
 

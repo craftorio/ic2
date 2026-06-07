@@ -1,0 +1,49 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:copy_name",
+              "source": "block_entity"
+            },
+            {
+              "function": "minecraft:copy_nbt",
+              "ops": [
+                {
+                  "op": "replace",
+                  "source": "Lock",
+                  "target": "BlockEntityTag.Lock"
+                },
+                {
+                  "op": "replace",
+                  "source": "LootTable",
+                  "target": "BlockEntityTag.LootTable"
+                },
+                {
+                  "op": "replace",
+                  "source": "LootTableSeed",
+                  "target": "BlockEntityTag.LootTableSeed"
+                }
+              ],
+              "source": {
+                "type": "ic2:block_nbt"
+              }
+            }
+          ],
+          "name": "ic2:industrial_workbench"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ]
+}

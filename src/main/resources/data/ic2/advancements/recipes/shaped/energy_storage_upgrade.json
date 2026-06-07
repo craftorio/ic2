@@ -1,0 +1,71 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_circuit": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:circuit"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_insulated_copper_cable": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:insulated_copper_cable"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_planks": {
+      "conditions": {
+        "items": [
+          {
+            "tag": "minecraft:planks"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_re_battery": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:re_battery"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "ic2:shaped/energy_storage_upgrade"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_planks",
+      "has_insulated_copper_cable",
+      "has_re_battery",
+      "has_circuit",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "ic2:shaped/energy_storage_upgrade"
+    ]
+  }
+}

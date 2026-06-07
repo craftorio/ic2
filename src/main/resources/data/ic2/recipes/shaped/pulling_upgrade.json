@@ -1,0 +1,20 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "T T",
+    " P ",
+    "T T"
+  ],
+  "key": {
+    "T": {
+      "tag": "forge:plates/tin"
+    },
+    "P": {
+      "item": "minecraft:sticky_piston"
+    }
+  },
+  "group": "pulling_upgrade",
+  "result": {
+    "item": "ic2:pulling_upgrade"
+  }
+}

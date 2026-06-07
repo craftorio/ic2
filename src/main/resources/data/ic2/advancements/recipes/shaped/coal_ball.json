@@ -1,0 +1,45 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_dusts/coal": {
+      "conditions": {
+        "items": [
+          {
+            "tag": "forge:dusts/coal"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_flint": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:flint"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "ic2:shaped/coal_ball"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_dusts/coal",
+      "has_flint",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "ic2:shaped/coal_ball"
+    ]
+  }
+}

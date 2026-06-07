@@ -1,17 +1,17 @@
 package ic2.core;
 
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 public interface IHitSoundOverride
 {
-	@SideOnly(Side.CLIENT)
-	String getHitSoundForBlock(EntityPlayerSP var1, World var2, BlockPos var3, ItemStack var4);
+	@OnlyIn(Dist.CLIENT)
+	SoundEvent getHitSoundForBlock(LocalPlayer var1, Level var2, BlockPos var3, ItemStack var4);
 
-	@SideOnly(Side.CLIENT)
-	String getBreakSoundForBlock(EntityPlayerSP var1, World var2, BlockPos var3, ItemStack var4);
+	@OnlyIn(Dist.CLIENT)
+	SoundEvent getBreakSoundForBlock(LocalPlayer var1, Level var2, BlockPos var3, ItemStack var4);
 }

@@ -1,0 +1,26 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "c c",
+    "cCc",
+    "EME"
+  ],
+  "key": {
+    "E": {
+      "item": "ic2:empty_cell"
+    },
+    "c": {
+      "item": "ic2:insulated_copper_cable"
+    },
+    "M": {
+      "item": "ic2:machine"
+    },
+    "C": {
+      "item": "ic2:circuit"
+    }
+  },
+  "consuming": true,
+  "result": {
+    "item": "ic2:electrolyzer"
+  }
+}

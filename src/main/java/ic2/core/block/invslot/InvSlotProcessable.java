@@ -2,16 +2,16 @@ package ic2.core.block.invslot;
 
 import ic2.api.recipe.IMachineRecipeManager;
 import ic2.api.recipe.MachineRecipeResult;
+import ic2.api.recipe.Recipes;
 import ic2.core.block.IInventorySlotHolder;
-import ic2.core.item.upgrade.ItemUpgradeModule;
 import ic2.core.util.StackUtil;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 public abstract class InvSlotProcessable<RI, RO, I> extends InvSlotConsumable
 {
-	protected IMachineRecipeManager<RI, RO, I> recipeManager;
+	protected Recipes.IGetter<? extends IMachineRecipeManager<RI, RO, I>> recipeManager;
 
-	public InvSlotProcessable(IInventorySlotHolder<?> base, String name, int count, IMachineRecipeManager<RI, RO, I> recipeManager)
+	public InvSlotProcessable(IInventorySlotHolder<?> base, String name, int count, Recipes.IGetter<? extends IMachineRecipeManager<RI, RO, I>> recipeManager)
 	{
 		super(base, name, count);
 		this.recipeManager = recipeManager;
@@ -20,11 +20,6 @@ public abstract class InvSlotProcessable<RI, RO, I> extends InvSlotConsumable
 	@Override
 	public boolean accepts(ItemStack stack)
 	{
-		if (stack.getItem() instanceof ItemUpgradeModule)
-		{
-			return false;
-		}
-
 		ItemStack tmp = StackUtil.copyWithSize(stack, Integer.MAX_VALUE);
 		return this.getOutputFor(this.getInput(tmp), true) != null;
 	}
@@ -51,7 +46,7 @@ public abstract class InvSlotProcessable<RI, RO, I> extends InvSlotConsumable
 		this.setInput(result.getAdjustedInput());
 	}
 
-	public void setRecipeManager(IMachineRecipeManager<RI, RO, I> recipeManager)
+	public void setRecipeManager(Recipes.IGetter<? extends IMachineRecipeManager<RI, RO, I>> recipeManager)
 	{
 		this.recipeManager = recipeManager;
 	}
@@ -63,7 +58,7 @@ public abstract class InvSlotProcessable<RI, RO, I> extends InvSlotConsumable
 
 	protected MachineRecipeResult<RI, RO, I> getOutputFor(I input, boolean forAccept)
 	{
-		return this.recipeManager.apply(input, forAccept);
+		return this.recipeManager.get(this.base.getParent().getLevel()).apply(input, forAccept);
 	}
 
 	protected abstract I getInput(ItemStack var1);

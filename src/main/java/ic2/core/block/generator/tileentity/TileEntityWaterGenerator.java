@@ -7,11 +7,16 @@ import ic2.core.block.invslot.InvSlotConsumableLiquidByList;
 import ic2.core.gui.dynamic.IGuiValueProvider;
 import ic2.core.init.MainConfig;
 import ic2.core.network.GuiSynced;
+import ic2.core.ref.Ic2BlockEntities;
+import ic2.core.ref.Ic2SoundEvents;
 import ic2.core.util.ConfigUtil;
-import net.minecraft.block.material.Material;
-import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
-import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.material.Material;
 
 public class TileEntityWaterGenerator extends TileEntityBaseRotorGenerator implements IGuiValueProvider
 {
@@ -23,20 +28,14 @@ public class TileEntityWaterGenerator extends TileEntityBaseRotorGenerator imple
 	@GuiSynced
 	public int water = 0;
 	public int microStorage = 0;
-	public final int maxWater = 2000;
+	public int maxWater = 2000;
 
-	public TileEntityWaterGenerator()
+	public TileEntityWaterGenerator(BlockPos pos, BlockState state)
 	{
-		super(2.0, 1, 4, 2);
+		super(Ic2BlockEntities.WATER_GENERATOR, pos, state, 2.0, 1, 4, 2);
 		this.production = 2.0;
 		this.fuelSlot = new InvSlotConsumableLiquidByList(
-			this,
-			"fuel",
-			allowAutomation ? InvSlot.Access.IO : InvSlot.Access.NONE,
-			1,
-			InvSlot.InvSide.TOP,
-			InvSlotConsumableLiquid.OpType.Drain,
-			FluidRegistry.WATER
+			this, "fuel", allowAutomation ? InvSlot.Access.IO : InvSlot.Access.NONE, 1, InvSlot.InvSide.TOP, InvSlotConsumableLiquid.OpType.Drain, Fluids.f_76193_
 		);
 	}
 
@@ -64,7 +63,7 @@ public class TileEntityWaterGenerator extends TileEntityBaseRotorGenerator imple
 			}
 
 			this.fuel += 500;
-			if (liquid.getItem().hasContainerItem(liquid))
+			if (IC2.envProxy.hasRecipeRemainder(liquid))
 			{
 				this.production = 1.0;
 			} else
@@ -120,7 +119,7 @@ public class TileEntityWaterGenerator extends TileEntityBaseRotorGenerator imple
 
 	public void updateWaterCount()
 	{
-		World world = this.getWorld();
+		Level world = this.getLevel();
 		int count = 0;
 
 		for (int x = -1; x < 2; x++)
@@ -129,7 +128,7 @@ public class TileEntityWaterGenerator extends TileEntityBaseRotorGenerator imple
 			{
 				for (int z = -1; z < 2; z++)
 				{
-					if (world.getBlockState(this.pos.add(x, y, z)).getMaterial() == Material.WATER)
+					if (world.getBlockState(this.worldPosition.offset(x, y, z)).getMaterial() == Material.WATER)
 					{
 						count++;
 					}
@@ -141,9 +140,9 @@ public class TileEntityWaterGenerator extends TileEntityBaseRotorGenerator imple
 	}
 
 	@Override
-	public String getOperationSoundFile()
+	public SoundEvent getLoopingSoundEvent()
 	{
-		return "Generators/WatermillLoop.ogg";
+		return Ic2SoundEvents.GENERATOR_WATER_LOOP;
 	}
 
 	@Override

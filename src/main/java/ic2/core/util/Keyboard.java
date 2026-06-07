@@ -9,78 +9,77 @@ import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+
+import net.minecraft.world.entity.player.Player;
 
 public class Keyboard implements IKeyboard
 {
 	protected final List<Keyboard.IKeyWatcher> watchers = new ArrayList<>();
-	private final Map<EntityPlayer, Set<Keyboard.Key>> playerKeys = new WeakHashMap<>();
+	private final Map<Player, Set<Keyboard.Key>> playerKeys = new WeakHashMap<>();
 
 	@Override
-	public boolean isAltKeyDown(EntityPlayer player)
+	public boolean isAltKeyDown(Player player)
 	{
 		return this.get(player, Keyboard.Key.alt);
 	}
 
 	@Override
-	public boolean isBoostKeyDown(EntityPlayer player)
+	public boolean isBoostKeyDown(Player player)
 	{
 		return this.get(player, Keyboard.Key.boost);
 	}
 
 	@Override
-	public boolean isForwardKeyDown(EntityPlayer player)
+	public boolean isForwardKeyDown(Player player)
 	{
 		return this.get(player, Keyboard.Key.forward);
 	}
 
 	@Override
-	public boolean isJumpKeyDown(EntityPlayer player)
+	public boolean isJumpKeyDown(Player player)
 	{
 		return this.get(player, Keyboard.Key.jump);
 	}
 
 	@Override
-	public boolean isModeSwitchKeyDown(EntityPlayer player)
+	public boolean isModeSwitchKeyDown(Player player)
 	{
 		return this.get(player, Keyboard.Key.modeSwitch);
 	}
 
 	@Override
-	public boolean isSideinventoryKeyDown(EntityPlayer player)
+	public boolean isSideinventoryKeyDown(Player player)
 	{
 		return this.get(player, Keyboard.Key.sideInventory);
 	}
 
 	@Override
-	public boolean isHudModeKeyDown(EntityPlayer player)
+	public boolean isHudModeKeyDown(Player player)
 	{
 		return this.get(player, Keyboard.Key.hubMode);
 	}
 
 	@Override
-	public boolean isSneakKeyDown(EntityPlayer player)
+	public boolean isSneakKeyDown(Player player)
 	{
-		return player.isSneaking();
+		return player.m_6144_();
 	}
 
 	public void sendKeyUpdate()
 	{
 	}
 
-	public void processKeyUpdate(EntityPlayer player, int keyState)
+	public void processKeyUpdate(Player player, int keyState)
 	{
 		this.playerKeys.put(player, Keyboard.Key.fromInt(keyState));
 	}
 
-	public void removePlayerReferences(EntityPlayer player)
+	public void removePlayerReferences(Player player)
 	{
 		this.playerKeys.remove(player);
 	}
 
-	private boolean get(EntityPlayer player, Keyboard.Key key)
+	private boolean get(Player player, Keyboard.Key key)
 	{
 		Set<Keyboard.Key> keys = this.playerKeys.get(player);
 		return keys == null ? false : keys.contains(key);
@@ -91,14 +90,14 @@ public class Keyboard implements IKeyboard
 		this.watchers.add(watcher);
 	}
 
-	public boolean isKeyDown(EntityPlayer player, Keyboard.IKeyWatcher watcher)
+	public boolean isKeyDown(Player player, Keyboard.IKeyWatcher watcher)
 	{
 		return this.get(player, watcher.getRepresentation());
 	}
 
 	public interface IKeyWatcher
 	{
-		@SideOnly(Side.CLIENT)
+		@OnlyIn(Dist.CLIENT)
 		void checkForKey(Set<Keyboard.Key> var1);
 
 		Keyboard.Key getRepresentation();

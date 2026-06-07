@@ -1,24 +1,18 @@
 package ic2.core.item;
 
-import ic2.api.item.ICustomDamageItem;
 import ic2.core.IC2;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 public class DamageHandler
 {
 	public static int getDamage(ItemStack stack)
 	{
 		Item item = stack.getItem();
-		if (item == null)
-		{
-			return 0;
-		} else
-		{
-			return item instanceof ICustomDamageItem ? ((ICustomDamageItem) item).getCustomDamage(stack) : stack.getItemDamage();
-		}
+		return item == null ? 0 : stack.getDamageValue();
 	}
 
 	public static void setDamage(ItemStack stack, int damage, boolean displayOnly)
@@ -26,10 +20,7 @@ public class DamageHandler
 		Item item = stack.getItem();
 		if (item != null)
 		{
-			if (item instanceof ICustomDamageItem)
-			{
-				((ICustomDamageItem) item).setCustomDamage(stack, damage);
-			} else if (item instanceof IPseudoDamageItem)
+			if (item instanceof IPseudoDamageItem)
 			{
 				if (!displayOnly)
 				{
@@ -37,9 +28,9 @@ public class DamageHandler
 				}
 
 				((IPseudoDamageItem) item).setStackDamage(stack, damage);
-			} else
+			} else if (stack.m_41763_())
 			{
-				stack.setItemDamage(damage);
+				stack.m_41721_(damage);
 			}
 		}
 	}
@@ -47,31 +38,28 @@ public class DamageHandler
 	public static int getMaxDamage(ItemStack stack)
 	{
 		Item item = stack.getItem();
-		if (item == null)
-		{
-			return 0;
-		} else
-		{
-			return item instanceof ICustomDamageItem ? ((ICustomDamageItem) item).getMaxCustomDamage(stack) : stack.getMaxDamage();
-		}
+		return item == null ? 0 : stack.m_41776_();
 	}
 
-	public static boolean damage(ItemStack stack, int damage, EntityLivingBase src)
+	public static boolean damage(ItemStack stack, int damage, LivingEntity src, InteractionHand hand)
 	{
 		Item item = stack.getItem();
 		if (item == null)
 		{
 			return false;
-		} else if (item instanceof ICustomDamageItem)
-		{
-			return ((ICustomDamageItem) item).applyCustomDamage(stack, damage, src);
 		} else if (src != null)
 		{
-			stack.damageItem(damage, src);
+			stack.m_41622_(damage, src, player ->
+			{
+				if (hand != null)
+				{
+					player.m_21190_(hand);
+				}
+			});
 			return true;
 		} else
 		{
-			return stack.attemptDamageItem(damage, IC2.random, src instanceof EntityPlayerMP ? (EntityPlayerMP) src : null);
+			return stack.m_220157_(damage, IC2.random, src instanceof ServerPlayer ? (ServerPlayer) src : null);
 		}
 	}
 }

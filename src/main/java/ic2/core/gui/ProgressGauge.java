@@ -1,8 +1,9 @@
 package ic2.core.gui;
 
-import ic2.core.GuiIC2;
-import ic2.core.block.TileEntityBlock;
+import com.mojang.blaze3d.vertex.PoseStack;
+import ic2.core.Ic2Gui;
 import ic2.core.block.comp.Process;
+import ic2.core.block.tileentity.Ic2TileEntity;
 import ic2.core.util.Util;
 
 public class ProgressGauge extends GuiElement<ProgressGauge>
@@ -10,7 +11,7 @@ public class ProgressGauge extends GuiElement<ProgressGauge>
 	private final Process process;
 	private final ProgressGauge.ProgressBarType type;
 
-	public ProgressGauge(GuiIC2<?> gui, int x, int y, TileEntityBlock te, ProgressGauge.ProgressBarType type)
+	public ProgressGauge(Ic2Gui<?> gui, int x, int y, Ic2TileEntity te, ProgressGauge.ProgressBarType type)
 	{
 		super(gui, x, y, type.w, type.h);
 		this.type = type;
@@ -18,14 +19,14 @@ public class ProgressGauge extends GuiElement<ProgressGauge>
 	}
 
 	@Override
-	public void drawBackground(int mouseX, int mouseY)
+	public void drawBackground(PoseStack matrices, int mouseX, int mouseY)
 	{
 		bindCommonTexture();
-		this.gui.drawTexturedRect(this.x, this.y, this.type.w, this.type.h, this.type.emptyX, this.type.emptyY);
+		this.gui.drawTexturedRect(matrices, this.x, this.y, this.type.w, this.type.h, this.type.emptyX, this.type.emptyY);
 		int renderWidth = Util.limit((int) Math.round(this.getProgressRatio() * this.type.w), 0, this.type.w);
 		if (renderWidth > 0)
 		{
-			this.gui.drawTexturedRect(this.x, this.y, renderWidth, this.type.h, this.type.fullX, this.type.fullY);
+			this.gui.drawTexturedRect(matrices, this.x, this.y, renderWidth, this.type.h, this.type.fullX, this.type.fullY);
 		}
 	}
 
@@ -42,12 +43,12 @@ public class ProgressGauge extends GuiElement<ProgressGauge>
 		type_4(165, 96, 165, 112, 22, 15),
 		type_5(133, 64, 133, 80, 18, 15);
 
-		private final int emptyX;
-		private final int emptyY;
-		private final int fullX;
-		private final int fullY;
-		private final int w;
-		private final int h;
+		private int emptyX;
+		private int emptyY;
+		private int fullX;
+		private int fullY;
+		private int w;
+		private int h;
 
 		ProgressBarType(int emptyX, int emptyY, int fullX, int fullY, int w, int h)
 		{

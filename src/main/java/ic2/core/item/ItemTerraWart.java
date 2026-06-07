@@ -1,54 +1,44 @@
 package ic2.core.item;
 
-import ic2.core.IC2;
-import ic2.core.IC2Potion;
-import ic2.core.ref.ItemName;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.init.MobEffects;
-import net.minecraft.item.EnumRarity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.potion.PotionEffect;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import ic2.core.Ic2Potion;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item.Properties;
+import net.minecraft.world.level.Level;
 
-public class ItemTerraWart extends ItemFoodIc2
+public class ItemTerraWart extends Item
 {
-	public ItemTerraWart()
+	public ItemTerraWart(Properties settings)
 	{
-		super(ItemName.terra_wart, 0, 1.0F, false);
-		this.setAlwaysEdible();
+		super(settings);
 	}
 
-	public ItemStack onItemUseFinish(ItemStack stack, World world, EntityLivingBase player)
+	public ItemStack m_5922_(ItemStack stack, Level world, LivingEntity player)
 	{
-		IC2.platform.removePotion(player, MobEffects.NAUSEA);
-		IC2.platform.removePotion(player, MobEffects.MINING_FATIGUE);
-		IC2.platform.removePotion(player, MobEffects.HUNGER);
-		IC2.platform.removePotion(player, MobEffects.SLOWNESS);
-		IC2.platform.removePotion(player, MobEffects.WEAKNESS);
-		IC2.platform.removePotion(player, MobEffects.BLINDNESS);
-		IC2.platform.removePotion(player, MobEffects.POISON);
-		IC2.platform.removePotion(player, MobEffects.WITHER);
-		PotionEffect effect = player.getActivePotionEffect(IC2Potion.radiation);
+		player.m_21195_(MobEffects.f_19604_);
+		player.m_21195_(MobEffects.f_19599_);
+		player.m_21195_(MobEffects.f_19612_);
+		player.m_21195_(MobEffects.f_19597_);
+		player.m_21195_(MobEffects.f_19613_);
+		player.m_21195_(MobEffects.f_19610_);
+		player.m_21195_(MobEffects.f_19614_);
+		player.m_21195_(MobEffects.f_19615_);
+		MobEffectInstance effect = player.m_21124_(Ic2Potion.radiation);
 		if (effect != null)
 		{
-			if (effect.getDuration() <= 600)
+			if (effect.m_19557_() <= 600)
 			{
-				IC2.platform.removePotion(player, IC2Potion.radiation);
+				player.m_21195_(Ic2Potion.radiation);
 			} else
 			{
-				IC2.platform.removePotion(player, IC2Potion.radiation);
-				IC2Potion.radiation.applyTo(player, effect.getDuration() - 600, effect.getAmplifier());
+				player.m_21195_(Ic2Potion.radiation);
+				Ic2Potion.radiation.applyTo(player, effect.m_19557_() - 600, effect.m_19564_());
 			}
 		}
 
-		return super.onItemUseFinish(stack, world, player);
-	}
-
-	@SideOnly(Side.CLIENT)
-	public EnumRarity getRarity(ItemStack stack)
-	{
-		return EnumRarity.RARE;
+		return super.m_5922_(stack, world, player);
 	}
 }

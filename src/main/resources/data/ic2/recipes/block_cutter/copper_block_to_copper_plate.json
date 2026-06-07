@@ -1,0 +1,11 @@
+{
+  "type": "ic2:block_cutter",
+  "ingredient": {
+    "item": "minecraft:copper_block"
+  },
+  "result": {
+    "item": "ic2:copper_plate",
+    "count": 9
+  },
+  "hardness": 2
+}

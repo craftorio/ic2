@@ -5,21 +5,21 @@ import ic2.api.recipe.IRecipeInput;
 import ic2.api.recipe.MachineRecipe;
 import ic2.api.recipe.MachineRecipeResult;
 import ic2.api.recipe.RecipeOutput;
+import ic2.core.fluid.Ic2FluidStack;
 import ic2.core.util.LiquidUtil;
 import ic2.core.util.StackUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.fluids.FluidStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
 
 public class CannerEnrichRecipeManager implements ICannerEnrichRecipeManager
 {
-	private final List<MachineRecipe<ICannerEnrichRecipeManager.Input, FluidStack>> recipes = new ArrayList<>();
+	private final List<MachineRecipe<ICannerEnrichRecipeManager.Input, Ic2FluidStack>> recipes = new ArrayList<>();
 
-	public boolean addRecipe(ICannerEnrichRecipeManager.Input input, FluidStack output, NBTTagCompound metadata, boolean replace)
+	public boolean addRecipe(ICannerEnrichRecipeManager.Input input, Ic2FluidStack output, CompoundTag metadata, boolean replace)
 	{
 		if (input.fluid == null)
 		{
@@ -48,7 +48,7 @@ public class CannerEnrichRecipeManager implements ICannerEnrichRecipeManager
 
 		for (ItemStack stack : input.additive.getInputs())
 		{
-			MachineRecipe<ICannerEnrichRecipeManager.Input, FluidStack> recipe = this.getRecipe(input.fluid, stack, true);
+			MachineRecipe<ICannerEnrichRecipeManager.Input, Ic2FluidStack> recipe = this.getRecipe(input.fluid, stack, true);
 			if (recipe != null)
 			{
 				if (!replace)
@@ -64,8 +64,7 @@ public class CannerEnrichRecipeManager implements ICannerEnrichRecipeManager
 		return true;
 	}
 
-	@Override
-	public void addRecipe(FluidStack fluid, IRecipeInput additive, FluidStack output)
+	public void addRecipe(Ic2FluidStack fluid, IRecipeInput additive, Ic2FluidStack output)
 	{
 		if (!this.addRecipe(new ICannerEnrichRecipeManager.Input(fluid, additive), output, null, false))
 		{
@@ -73,25 +72,25 @@ public class CannerEnrichRecipeManager implements ICannerEnrichRecipeManager
 		}
 	}
 
-	public MachineRecipeResult<ICannerEnrichRecipeManager.Input, FluidStack, ICannerEnrichRecipeManager.RawInput> apply(
+	public MachineRecipeResult<ICannerEnrichRecipeManager.Input, Ic2FluidStack, ICannerEnrichRecipeManager.RawInput> apply(
 		ICannerEnrichRecipeManager.RawInput input, boolean acceptTest
 	)
 	{
-		MachineRecipe<ICannerEnrichRecipeManager.Input, FluidStack> recipe = this.getRecipe(input.fluid, input.additive, acceptTest);
+		MachineRecipe<ICannerEnrichRecipeManager.Input, Ic2FluidStack> recipe = this.getRecipe(input.fluid, input.additive, acceptTest);
 		if (recipe == null)
 		{
 			return null;
 		}
 
-		FluidStack remainingFluid;
+		Ic2FluidStack remainingFluid;
 		if (input.fluid == null)
 		{
 			remainingFluid = null;
 		} else
 		{
 			remainingFluid = input.fluid.copy();
-			remainingFluid.amount = remainingFluid.amount - recipe.getInput().fluid.amount;
-			if (remainingFluid.amount <= 0)
+			remainingFluid.decreaseMb(recipe.getInput().fluid.getAmountMb());
+			if (remainingFluid.isEmpty())
 			{
 				remainingFluid = null;
 			}
@@ -102,13 +101,13 @@ public class CannerEnrichRecipeManager implements ICannerEnrichRecipeManager
 		);
 	}
 
-	private MachineRecipe<ICannerEnrichRecipeManager.Input, FluidStack> getRecipe(FluidStack fluid, ItemStack additive, boolean acceptTest)
+	private MachineRecipe<ICannerEnrichRecipeManager.Input, Ic2FluidStack> getRecipe(Ic2FluidStack fluid, ItemStack additive, boolean acceptTest)
 	{
 		if (acceptTest || fluid != null && !StackUtil.isEmpty(additive))
 		{
-			for (MachineRecipe<ICannerEnrichRecipeManager.Input, FluidStack> recipe : this.recipes)
+			for (MachineRecipe<ICannerEnrichRecipeManager.Input, Ic2FluidStack> recipe : this.recipes)
 			{
-				if ((fluid == null || fluid.isFluidEqual(recipe.getInput().fluid) && (acceptTest || recipe.getInput().fluid.amount <= fluid.amount))
+				if ((fluid == null || fluid.hasExactFluid(recipe.getInput().fluid) && (acceptTest || recipe.getInput().fluid.getAmountMb() <= fluid.getAmountMb()))
 					&& (
 					additive == null
 						|| recipe.getInput().additive.matches(additive) && (acceptTest || recipe.getInput().additive.getAmount() <= StackUtil.getSize(additive))
@@ -126,9 +125,9 @@ public class CannerEnrichRecipeManager implements ICannerEnrichRecipeManager
 	}
 
 	@Override
-	public RecipeOutput getOutputFor(FluidStack fluid, ItemStack additive, boolean adjustInput, boolean acceptTest)
+	public RecipeOutput getOutputFor(Ic2FluidStack fluid, ItemStack additive, boolean adjustInput, boolean acceptTest)
 	{
-		MachineRecipeResult<ICannerEnrichRecipeManager.Input, FluidStack, ICannerEnrichRecipeManager.RawInput> result = this.apply(
+		MachineRecipeResult<ICannerEnrichRecipeManager.Input, Ic2FluidStack, ICannerEnrichRecipeManager.RawInput> result = this.apply(
 			new ICannerEnrichRecipeManager.RawInput(fluid, additive), acceptTest
 		);
 		if (result == null)
@@ -138,17 +137,17 @@ public class CannerEnrichRecipeManager implements ICannerEnrichRecipeManager
 
 		if (adjustInput)
 		{
-			fluid.amount = result.getAdjustedInput().fluid == null ? 0 : result.getAdjustedInput().fluid.amount;
-			additive.setCount(StackUtil.isEmpty(result.getAdjustedInput().additive) ? 0 : StackUtil.getSize(result.getAdjustedInput().additive));
+			fluid.setAmountMb(result.getAdjustedInput().fluid == null ? 0 : result.getAdjustedInput().fluid.getAmountMb());
+			additive.m_41764_(StackUtil.isEmpty(result.getAdjustedInput().additive) ? 0 : StackUtil.getSize(result.getAdjustedInput().additive));
 		}
 
-		NBTTagCompound output = new NBTTagCompound();
-		result.getOutput().writeToNBT(output);
+		CompoundTag output = new CompoundTag();
+		result.getOutput().toNbt(output);
 		return new RecipeOutput(output);
 	}
 
 	@Override
-	public Iterable<? extends MachineRecipe<ICannerEnrichRecipeManager.Input, FluidStack>> getRecipes()
+	public Iterable<? extends MachineRecipe<ICannerEnrichRecipeManager.Input, Ic2FluidStack>> getRecipes()
 	{
 		return this.recipes;
 	}

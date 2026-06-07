@@ -6,18 +6,18 @@ import ic2.api.recipe.MachineRecipeResult;
 import ic2.api.recipe.Recipes;
 import ic2.api.upgrade.IUpgradableBlock;
 import ic2.api.upgrade.IUpgradeItem;
-import ic2.core.block.TileEntityInventory;
 import ic2.core.block.invslot.InvSlotOutput;
 import ic2.core.block.invslot.InvSlotProcessable;
 import ic2.core.block.invslot.InvSlotProcessableGeneric;
 import ic2.core.block.invslot.InvSlotUpgrade;
+import ic2.core.block.tileentity.TileEntityInventory;
 import ic2.core.recipe.SmeltingRecipeManager;
 import ic2.core.util.StackUtil;
 
 import java.util.Collection;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
 
 public class Process extends TileEntityComponent
 {
@@ -40,7 +40,7 @@ public class Process extends TileEntityComponent
 
 	public static Process asFurnace(TileEntityInventory parent, int operationCost, int operationDuration, int outputSlots, int upgradeSlots)
 	{
-		return new Process(parent, SmeltingRecipeManager.SmeltingBridge.INSTANCE, operationCost, operationDuration, outputSlots, upgradeSlots);
+		return new Process(parent, w -> SmeltingRecipeManager.SmeltingBridge.INSTANCE, operationCost, operationDuration, outputSlots, upgradeSlots);
 	}
 
 	public static Process asMacerator(TileEntityInventory parent)
@@ -90,7 +90,7 @@ public class Process extends TileEntityComponent
 
 	public static Process asRecycler(TileEntityInventory parent, int operationCost, int operationDuration, int outputSlots, int upgradeSlots)
 	{
-		return new Process(parent, Recipes.recycler, operationCost, operationDuration, outputSlots, upgradeSlots);
+		return new Process(parent, w -> Recipes.recycler, operationCost, operationDuration, outputSlots, upgradeSlots);
 	}
 
 	public static Process asOreWasher(TileEntityInventory parent)
@@ -153,14 +153,14 @@ public class Process extends TileEntityComponent
 		return new Process(parent, Recipes.metalformerRolling, operationCost, operationDuration, outputSlots, upgradeSlots);
 	}
 
-	public Process(TileEntityInventory parent, IMachineRecipeManager<IRecipeInput, Collection<ItemStack>, ItemStack> recipeManager)
+	public Process(TileEntityInventory parent, Recipes.IGetter<? extends IMachineRecipeManager<IRecipeInput, Collection<ItemStack>, ItemStack>> recipeManager)
 	{
 		this(parent, recipeManager, 2, 100, 1, 0);
 	}
 
 	public Process(
 		TileEntityInventory parent,
-		IMachineRecipeManager<IRecipeInput, Collection<ItemStack>, ItemStack> recipeManager,
+		Recipes.IGetter<? extends IMachineRecipeManager<IRecipeInput, Collection<ItemStack>, ItemStack>> recipeManager,
 		int operationCost,
 		int operationDuration,
 		int outputSlots,
@@ -190,14 +190,14 @@ public class Process extends TileEntityComponent
 		}
 	}
 
-	public void readFromNBT(NBTTagCompound nbt)
+	public void readFromNBT(CompoundTag nbt)
 	{
-		this.progress = nbt.getInteger("progress");
+		this.progress = nbt.getInt("progress");
 	}
 
-	public void writeToNBT(NBTTagCompound nbt)
+	public void writeToNBT(CompoundTag nbt)
 	{
-		nbt.setInteger("progress", this.progress);
+		nbt.putInt("progress", this.progress);
 	}
 
 	public static int applyModifier(int base, int extra, double multiplier)

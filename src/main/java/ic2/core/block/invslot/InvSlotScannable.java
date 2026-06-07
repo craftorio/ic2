@@ -12,7 +12,7 @@ import ic2.core.uu.UuIndex;
 
 import java.util.concurrent.TimeUnit;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 public class InvSlotScannable extends InvSlotConsumable
 {
@@ -25,7 +25,7 @@ public class InvSlotScannable extends InvSlotConsumable
 	@Override
 	public boolean accepts(ItemStack stack)
 	{
-		if (IC2.platform.isSimulating())
+		if (IC2.sideProxy.isSimulating())
 		{
 			return isValidStack(stack);
 		}

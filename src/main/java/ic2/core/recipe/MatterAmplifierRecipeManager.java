@@ -9,14 +9,14 @@ import ic2.core.util.StackUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
 
 public class MatterAmplifierRecipeManager implements IMachineRecipeManager<IRecipeInput, Integer, ItemStack>
 {
 	private final List<MachineRecipe<IRecipeInput, Integer>> recipes = new ArrayList<>();
 
-	public boolean addRecipe(IRecipeInput input, Integer output, NBTTagCompound metadata, boolean replace)
+	public boolean addRecipe(IRecipeInput input, Integer output, CompoundTag metadata, boolean replace)
 	{
 		if (output <= 0)
 		{

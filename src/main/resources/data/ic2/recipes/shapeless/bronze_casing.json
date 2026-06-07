@@ -1,0 +1,15 @@
+{
+  "type": "ic2:shapeless",
+  "ingredients": [
+    {
+      "tag": "forge:plates/bronze"
+    },
+    {
+      "tag": "ic2:forge_hammers"
+    }
+  ],
+  "result": {
+    "item": "ic2:bronze_casing",
+    "count": 2
+  }
+}

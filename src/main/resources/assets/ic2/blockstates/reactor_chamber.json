@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "ic2:block/generator/reactor/reactor_chamber"
+    }
+  }
+}

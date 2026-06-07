@@ -17,7 +17,7 @@ public class EnumCycleHandler<E extends Enum<E>> extends CycleHandler
 		this(0, 0, 0, 0, 0, false, set, start);
 	}
 
-	public EnumCycleHandler(int uS, int vS, int uE, int vE, int overlayStep, boolean vertical, final E[] set, final E start)
+	public EnumCycleHandler(int uS, int vS, int uE, int vE, int overlayStep, boolean vertical, E[] set, E start)
 	{
 		super(uS, vS, uE, vE, overlayStep, vertical, set.length, new INumericValueHandler()
 		{

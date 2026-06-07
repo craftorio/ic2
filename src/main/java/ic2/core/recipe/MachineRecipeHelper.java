@@ -5,6 +5,8 @@ import ic2.api.recipe.IRecipeInput;
 import ic2.api.recipe.MachineRecipe;
 import ic2.api.recipe.MachineRecipeResult;
 import ic2.core.IC2;
+import ic2.core.recipe.input.RecipeInputIngredient;
+import ic2.core.recipe.input.RecipeInputItemStack;
 import ic2.core.util.LogCategory;
 import ic2.core.util.StackUtil;
 
@@ -18,19 +20,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.oredict.OreDictionary;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 public abstract class MachineRecipeHelper<RI, RO> implements IMachineRecipeManager<RI, RO, ItemStack>
 {
 	protected final Map<RI, MachineRecipe<RI, RO>> recipes = new HashMap<>();
 	private final Map<Item, List<MachineRecipe<RI, RO>>> recipeCache = new IdentityHashMap<>();
 	private final List<MachineRecipe<RI, RO>> uncacheableRecipes = new ArrayList<>();
-	private static boolean oreRegisterEventSubscribed;
-	private static final Set<MachineRecipeHelper<?, ?>> watchingManagers = Collections.newSetFromMap(new IdentityHashMap<>());
 
 	protected abstract IRecipeInput getForInput(RI var1);
 
@@ -64,8 +61,8 @@ public abstract class MachineRecipeHelper<RI, RO> implements IMachineRecipeManag
 		}
 
 		ItemStack adjustedInput;
-		if (input.getItem().hasContainerItem(input)
-			&& !StackUtil.isEmpty(adjustedInput = input.getItem().getContainerItem(input))
+		if (IC2.envProxy.hasRecipeRemainder(input)
+			&& !StackUtil.isEmpty(adjustedInput = IC2.envProxy.getRecipeRemainder(input))
 			&& !acceptTest
 			&& !this.consumeContainer(input, adjustedInput, recipe))
 		{
@@ -113,7 +110,7 @@ public abstract class MachineRecipeHelper<RI, RO> implements IMachineRecipeManag
 					public void remove()
 					{
 						this.recipeIt.remove();
-						MachineRecipeHelper.this.removeCachedRecipes((RI) this.lastInput);
+						MachineRecipeHelper.this.removeCachedRecipes(this.lastInput);
 					}
 				};
 			}
@@ -164,17 +161,6 @@ public abstract class MachineRecipeHelper<RI, RO> implements IMachineRecipeManag
 			for (Item item : items)
 			{
 				this.addToCache(item, recipe);
-			}
-
-			if (recipe.getInput().getClass() == RecipeInputOreDict.class)
-			{
-				if (!oreRegisterEventSubscribed)
-				{
-					MinecraftForge.EVENT_BUS.register(MachineRecipeHelper.class);
-					oreRegisterEventSubscribed = true;
-				}
-
-				watchingManagers.add(this);
 			}
 		} else
 		{
@@ -244,7 +230,7 @@ public abstract class MachineRecipeHelper<RI, RO> implements IMachineRecipeManag
 	private Collection<Item> getItemsFromRecipe(IRecipeInput recipe)
 	{
 		Class<?> recipeClass = recipe.getClass();
-		if (recipeClass != RecipeInputItemStack.class && recipeClass != RecipeInputOreDict.class)
+		if (recipeClass != RecipeInputIngredient.class && recipeClass != RecipeInputItemStack.class)
 		{
 			return null;
 		}
@@ -258,36 +244,5 @@ public abstract class MachineRecipeHelper<RI, RO> implements IMachineRecipeManag
 		}
 
 		return ret;
-	}
-
-	private void onOreRegister(Item item, String name)
-	{
-		for (MachineRecipe<RI, RO> rawRecipe : this.recipes.values())
-		{
-			if (rawRecipe.getInput().getClass() == RecipeInputOreDict.class)
-			{
-				RecipeInputOreDict recipe = (RecipeInputOreDict) rawRecipe.getInput();
-				if (recipe.input.equals(name))
-				{
-					this.addToCache(item, rawRecipe);
-				}
-			}
-		}
-	}
-
-	@SubscribeEvent
-	public static void onOreRegister(OreDictionary.OreRegisterEvent event)
-	{
-		Item item = event.getOre().getItem();
-		if (item == null)
-		{
-			IC2.log.warn(LogCategory.Recipe, "Found null item ore dict registration.", new Throwable());
-		} else
-		{
-			for (MachineRecipeHelper<?, ?> manager : watchingManagers)
-			{
-				manager.onOreRegister(item, event.getName());
-			}
-		}
 	}
 }

@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:ic2/build_generator/root",
+  "display": {
+    "icon": {
+      "item": "ic2:extractor"
+    },
+    "title": {
+      "translate": "advancements.ic2.buildExtractor"
+    },
+    "description": {
+      "translate": "advancements.ic2.buildExtractor.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "ic2:extractor": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:extractor"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "ic2:extractor"
+    ]
+  ]
+}

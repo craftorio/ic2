@@ -1,0 +1,20 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "GAG",
+    "GGG",
+    "GAG"
+  ],
+  "key": {
+    "G": {
+      "item": "minecraft:glass"
+    },
+    "A": {
+      "item": "ic2:alloy"
+    }
+  },
+  "result": {
+    "item": "ic2:reinforced_glass",
+    "count": 7
+  }
+}

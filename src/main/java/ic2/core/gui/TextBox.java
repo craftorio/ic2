@@ -2,15 +2,19 @@ package ic2.core.gui;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-import ic2.core.GuiIC2;
+import com.mojang.blaze3d.platform.GlStateManager.LogicOp;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.VertexFormat.Mode;
+import ic2.core.Ic2Gui;
+import ic2.core.proxy.SideProxyClient;
 import ic2.core.util.Util;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.GlStateManager.LogicOp;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.ChatAllowedCharacters;
+import net.minecraft.SharedConstants;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.GameRenderer;
 
 public class TextBox extends GuiElement<TextBox>
 {
@@ -29,22 +33,22 @@ public class TextBox extends GuiElement<TextBox>
 	protected static final int disabledColour = 7368816;
 	protected static final int invalidColour = -3092272;
 
-	public TextBox(GuiIC2<?> gui, int x, int y, int width, int height)
+	public TextBox(Ic2Gui<?> gui, int x, int y, int width, int height)
 	{
 		this(gui, x, y, width, height, "");
 	}
 
-	public TextBox(GuiIC2<?> gui, int x, int y, int width, int height, String text)
+	public TextBox(Ic2Gui<?> gui, int x, int y, int width, int height, String text)
 	{
 		this(gui, x, y, width, height, text, true);
 	}
 
-	public TextBox(GuiIC2<?> gui, int x, int y, int width, int height, boolean drawBackground)
+	public TextBox(Ic2Gui<?> gui, int x, int y, int width, int height, boolean drawBackground)
 	{
 		this(gui, x, y, width, height, "", drawBackground);
 	}
 
-	public TextBox(GuiIC2<?> gui, int x, int y, int width, int height, String text, boolean drawBackground)
+	public TextBox(Ic2Gui<?> gui, int x, int y, int width, int height, String text, boolean drawBackground)
 	{
 		super(gui, x, y, width, height);
 		this.text = text;
@@ -142,27 +146,27 @@ public class TextBox extends GuiElement<TextBox>
 	}
 
 	@Override
-	public void drawBackground(int mouseX, int mouseY)
+	public void drawBackground(PoseStack matrices, int mouseX, int mouseY)
 	{
-		super.drawBackground(mouseX, mouseY);
+		super.drawBackground(matrices, mouseX, mouseY);
 		if (this.drawBackground)
 		{
-			this.gui.drawColoredRect(this.x - 1, this.y - 1, this.width + 2, this.height + 2, -6250336);
-			this.gui.drawColoredRect(this.x, this.y, this.width, this.height, -16777216);
+			this.gui.drawColoredRect(matrices, this.x - 1, this.y - 1, this.width + 2, this.height + 2, -6250336);
+			this.gui.drawColoredRect(matrices, this.x, this.y, this.width, this.height, -16777216);
 		}
 	}
 
 	@Override
-	public void drawForeground(int mouseX, int mouseY)
+	public void drawForeground(PoseStack matrices, int mouseX, int mouseY)
 	{
-		super.drawForeground(mouseX, mouseY);
+		super.drawForeground(matrices, mouseX, mouseY);
 		int colour = this.willDraw() ? 14737632 : 7368816;
 		int textOffset = this.cursor - this.scrollOffset;
 		int selectionOffset = this.selectionEnd - this.scrollOffset;
 		String text = this.gui.trimStringToWidth(this.text.substring(this.scrollOffset), this.drawBackground ? this.width - 8 : this.width);
 		boolean validOffset = textOffset >= 0 && textOffset <= text.length();
-		int xStartPos = (this.drawBackground ? this.x + 4 : this.x) - this.gui.getGuiLeft();
-		int yPos = (this.drawBackground ? this.y + (this.height - 8) / 2 : this.y) - this.gui.getGuiTop();
+		int xStartPos = (this.drawBackground ? this.x + 4 : this.x) - this.gui.getX();
+		int yPos = (this.drawBackground ? this.y + (this.height - 8) / 2 : this.y) - this.gui.getY();
 		int xPos = xStartPos;
 		if (selectionOffset > text.length())
 		{
@@ -171,7 +175,7 @@ public class TextBox extends GuiElement<TextBox>
 
 		if (!text.isEmpty())
 		{
-			xPos = this.gui.drawString(xStartPos, yPos, validOffset ? text.substring(0, textOffset) : text, colour, true);
+			xPos = this.gui.drawString(matrices, xStartPos, yPos, validOffset ? text.substring(0, textOffset) : text, colour, true);
 		}
 
 		boolean inStringOrFull = this.cursor < this.text.length() || this.text.length() >= this.maxTextLength;
@@ -187,17 +191,17 @@ public class TextBox extends GuiElement<TextBox>
 
 		if (!text.isEmpty() && validOffset && textOffset < text.length())
 		{
-			xPos = this.gui.drawString(xPos, yPos, text.substring(textOffset), colour, true);
+			xPos = this.gui.drawString(matrices, xPos, yPos, text.substring(textOffset), colour, true);
 		}
 
 		if (this.focused && this.cursorTick / 6 % 2 == 0 && validOffset)
 		{
 			if (inStringOrFull)
 			{
-				this.gui.drawColoredRect(xCursorPos, yPos - 1, 1, 10, -3092272);
+				this.gui.drawColoredRect(matrices, xCursorPos, yPos - 1, 1, 10, -3092272);
 			} else
 			{
-				this.gui.drawString(xCursorPos, yPos, "_", colour, true);
+				this.gui.drawString(matrices, xCursorPos, yPos, "_", colour, true);
 			}
 		}
 
@@ -224,10 +228,10 @@ public class TextBox extends GuiElement<TextBox>
 			endY = temp;
 		}
 
-		startX += this.gui.getGuiLeft();
-		endX += this.gui.getGuiLeft();
-		startY += this.gui.getGuiTop();
-		endY += this.gui.getGuiTop();
+		startX += this.gui.getX();
+		endX += this.gui.getX();
+		startY += this.gui.getY();
+		endY += this.gui.getY();
 		if (endX > this.x + this.width)
 		{
 			endX = this.x + this.width;
@@ -238,20 +242,22 @@ public class TextBox extends GuiElement<TextBox>
 			startX = this.x + this.width;
 		}
 
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder vertexbuffer = tessellator.getBuffer();
-		GlStateManager.color(0.0F, 0.0F, 255.0F, 255.0F);
-		GlStateManager.disableTexture2D();
-		GlStateManager.enableColorLogic();
-		GlStateManager.colorLogicOp(LogicOp.OR_REVERSE);
-		vertexbuffer.begin(7, DefaultVertexFormats.POSITION);
-		vertexbuffer.pos(startX, endY, 0.0).endVertex();
-		vertexbuffer.pos(endX, endY, 0.0).endVertex();
-		vertexbuffer.pos(endX, startY, 0.0).endVertex();
-		vertexbuffer.pos(startX, startY, 0.0).endVertex();
-		tessellator.draw();
-		GlStateManager.disableColorLogic();
-		GlStateManager.enableTexture2D();
+		Tesselator tessellator = Tesselator.m_85913_();
+		BufferBuilder buffer = tessellator.m_85915_();
+		RenderSystem.m_157427_(GameRenderer::m_172808_);
+		RenderSystem.m_157429_(0.0F, 0.0F, 1.0F, 1.0F);
+		RenderSystem.m_69472_();
+		RenderSystem.m_69479_();
+		RenderSystem.m_69835_(LogicOp.OR_REVERSE);
+		buffer.m_166779_(Mode.QUADS, DefaultVertexFormat.f_85814_);
+		buffer.m_5483_(startX, endY, 0.0).m_5752_();
+		buffer.m_5483_(endX, endY, 0.0).m_5752_();
+		buffer.m_5483_(endX, startY, 0.0).m_5752_();
+		buffer.m_5483_(startX, startY, 0.0).m_5752_();
+		tessellator.m_85914_();
+		RenderSystem.m_157429_(1.0F, 1.0F, 1.0F, 1.0F);
+		RenderSystem.m_69462_();
+		RenderSystem.m_69493_();
 	}
 
 	@Override
@@ -281,22 +287,22 @@ public class TextBox extends GuiElement<TextBox>
 			return super.onKeyTyped(typedChar, keyCode);
 		}
 
-		if (GuiScreen.isKeyComboCtrlA(keyCode))
+		if (Screen.m_96634_(keyCode))
 		{
 			this.setCursorPositionEnd();
 			this.setSelectionPos(0);
-		} else if (GuiScreen.isKeyComboCtrlC(keyCode))
+		} else if (Screen.m_96632_(keyCode))
 		{
-			GuiScreen.setClipboardString(this.getSelectedText());
-		} else if (GuiScreen.isKeyComboCtrlV(keyCode))
+			SideProxyClient.mc.f_91068_.m_90911_(this.getSelectedText());
+		} else if (Screen.m_96630_(keyCode))
 		{
 			if (this.willDraw())
 			{
-				this.writeText(GuiScreen.getClipboardString());
+				this.writeText(SideProxyClient.mc.f_91068_.m_90876_());
 			}
-		} else if (GuiScreen.isKeyComboCtrlX(keyCode))
+		} else if (Screen.m_96628_(keyCode))
 		{
-			GuiScreen.setClipboardString(this.getSelectedText());
+			SideProxyClient.mc.f_91068_.m_90911_(this.getSelectedText());
 			if (this.willDraw())
 			{
 				this.writeText("");
@@ -305,8 +311,8 @@ public class TextBox extends GuiElement<TextBox>
 		{
 			switch (keyCode)
 			{
-				case 14:
-					if (GuiScreen.isCtrlKeyDown())
+				case 259:
+					if (Screen.m_96637_())
 					{
 						if (this.willDraw())
 						{
@@ -317,62 +323,21 @@ public class TextBox extends GuiElement<TextBox>
 						this.deleteFromCursor(-1);
 					}
 					break;
-				case 199:
-					if (GuiScreen.isShiftKeyDown())
+				case 260:
+				case 264:
+				case 265:
+				case 266:
+				case 267:
+				default:
+					if (!SharedConstants.m_136188_(typedChar) || !this.willDraw())
 					{
-						this.setSelectionPos(0);
-					} else
-					{
-						this.setCursorPositionStart();
+						return super.onKeyTyped(typedChar, keyCode);
 					}
+
+					this.writeText(String.valueOf(typedChar));
 					break;
-				case 203:
-					if (GuiScreen.isShiftKeyDown())
-					{
-						if (GuiScreen.isCtrlKeyDown())
-						{
-							this.setSelectionPos(this.getNthWordFromPos(-1, this.selectionEnd));
-						} else
-						{
-							this.setSelectionPos(this.selectionEnd - 1);
-						}
-					} else if (GuiScreen.isCtrlKeyDown())
-					{
-						this.setCursorPosition(this.getNthWordFromCursor(-1));
-					} else
-					{
-						this.moveCursorBy(-1);
-					}
-					break;
-				case 205:
-					if (GuiScreen.isShiftKeyDown())
-					{
-						if (GuiScreen.isCtrlKeyDown())
-						{
-							this.setSelectionPos(this.getNthWordFromPos(1, this.selectionEnd));
-						} else
-						{
-							this.setSelectionPos(this.selectionEnd + 1);
-						}
-					} else if (GuiScreen.isCtrlKeyDown())
-					{
-						this.setCursorPosition(this.getNthWordFromCursor(1));
-					} else
-					{
-						this.moveCursorBy(1);
-					}
-					break;
-				case 207:
-					if (GuiScreen.isShiftKeyDown())
-					{
-						this.setSelectionPos(this.text.length());
-					} else
-					{
-						this.setCursorPositionEnd();
-					}
-					break;
-				case 211:
-					if (GuiScreen.isCtrlKeyDown())
+				case 261:
+					if (Screen.m_96637_())
 					{
 						if (this.willDraw())
 						{
@@ -383,13 +348,59 @@ public class TextBox extends GuiElement<TextBox>
 						this.deleteFromCursor(1);
 					}
 					break;
-				default:
-					if (!ChatAllowedCharacters.isAllowedCharacter(typedChar) || !this.willDraw())
+				case 262:
+					if (Screen.m_96638_())
 					{
-						return super.onKeyTyped(typedChar, keyCode);
+						if (Screen.m_96637_())
+						{
+							this.setSelectionPos(this.getNthWordFromPos(1, this.selectionEnd));
+						} else
+						{
+							this.setSelectionPos(this.selectionEnd + 1);
+						}
+					} else if (Screen.m_96637_())
+					{
+						this.setCursorPosition(this.getNthWordFromCursor(1));
+					} else
+					{
+						this.moveCursorBy(1);
 					}
-
-					this.writeText(String.valueOf(typedChar));
+					break;
+				case 263:
+					if (Screen.m_96638_())
+					{
+						if (Screen.m_96637_())
+						{
+							this.setSelectionPos(this.getNthWordFromPos(-1, this.selectionEnd));
+						} else
+						{
+							this.setSelectionPos(this.selectionEnd - 1);
+						}
+					} else if (Screen.m_96637_())
+					{
+						this.setCursorPosition(this.getNthWordFromCursor(-1));
+					} else
+					{
+						this.moveCursorBy(-1);
+					}
+					break;
+				case 268:
+					if (Screen.m_96638_())
+					{
+						this.setSelectionPos(0);
+					} else
+					{
+						this.setCursorPositionStart();
+					}
+					break;
+				case 269:
+					if (Screen.m_96638_())
+					{
+						this.setSelectionPos(this.text.length());
+					} else
+					{
+						this.setCursorPositionEnd();
+					}
 			}
 		}
 
@@ -399,7 +410,7 @@ public class TextBox extends GuiElement<TextBox>
 	public void writeText(String textToWrite)
 	{
 		StringBuilder newText = new StringBuilder();
-		String cleanString = ChatAllowedCharacters.filterAllowedCharacters(textToWrite);
+		String cleanString = SharedConstants.m_136190_(textToWrite);
 		int start = Math.min(this.cursor, this.selectionEnd);
 		int end = Math.max(this.cursor, this.selectionEnd);
 		int insertionPoint = this.maxTextLength - this.text.length() - (start - end);

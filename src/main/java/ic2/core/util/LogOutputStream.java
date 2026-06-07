@@ -4,7 +4,6 @@ import ic2.core.IC2;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.CharacterCodingException;
@@ -85,7 +84,7 @@ class LogOutputStream extends OutputStream
 
 	private void runDecoder()
 	{
-		((Buffer) this.inputBuffer).flip();
+		this.inputBuffer.flip();
 
 		CoderResult result;
 		do
@@ -119,7 +118,7 @@ class LogOutputStream extends OutputStream
 					}
 				}
 
-				((Buffer) this.outputBuffer).rewind();
+				this.outputBuffer.rewind();
 			}
 		} while (result.isOverflow());
 
@@ -128,7 +127,7 @@ class LogOutputStream extends OutputStream
 			this.inputBuffer.compact();
 		} else
 		{
-			((Buffer) this.inputBuffer).clear();
+			this.inputBuffer.clear();
 		}
 	}
 }

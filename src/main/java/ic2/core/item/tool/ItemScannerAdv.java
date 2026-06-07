@@ -1,14 +1,14 @@
 package ic2.core.item.tool;
 
 import ic2.api.item.ElectricItem;
-import ic2.core.ref.ItemName;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item.Properties;
 
 public class ItemScannerAdv extends ItemScanner
 {
-	public ItemScannerAdv()
+	public ItemScannerAdv(Properties settings)
 	{
-		super(ItemName.advanced_scanner, 1000000.0, 512.0, 2);
+		super(settings, 1000000.0, 512.0, 2);
 	}
 
 	@Override

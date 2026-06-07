@@ -4,63 +4,67 @@ import ic2.api.network.ClientModifiable;
 import ic2.core.ContainerBase;
 import ic2.core.IC2;
 import ic2.core.IHasGui;
-import ic2.core.block.TileEntityInventory;
 import ic2.core.block.invslot.InvSlot;
 import ic2.core.block.machine.container.ContainerWeightedItemDistributor;
-import ic2.core.block.machine.gui.GuiWeightedItemDistributor;
+import ic2.core.block.tileentity.TileEntityInventory;
+import ic2.core.item.EnvItemHandler;
+import ic2.core.network.GrowingBuffer;
 import ic2.core.profile.NotClassic;
+import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.util.StackUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 
 @NotClassic
 public class TileEntityWeightedItemDistributor extends TileEntityInventory implements IHasGui, IWeightedDistributor
 {
 	@ClientModifiable
-	protected final List<EnumFacing> priority = new ArrayList<>(5);
+	protected List<Direction> priority = new ArrayList<>(5);
 	public final InvSlot buffer = new InvSlot(this, "buffer", InvSlot.Access.I, 9);
 
-	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
+	public TileEntityWeightedItemDistributor(BlockPos pos, BlockState state)
 	{
-		super.writeToNBT(nbt);
+		super(Ic2BlockEntities.WEIGHTED_ITEM_DISTRIBUTOR, pos, state);
+	}
+
+	@Override
+	public void load(CompoundTag nbt)
+	{
+		super.load(nbt);
+		int[] indexes = nbt.m_128465_("priority");
+		if (indexes.length > 0)
+		{
+			for (int index : indexes)
+			{
+				this.priority.add(Direction.m_122376_(index));
+			}
+		}
+	}
+
+	@Override
+	public void saveAdditional(CompoundTag nbt)
+	{
+		super.saveAdditional(nbt);
 		if (!this.priority.isEmpty())
 		{
 			int[] indexes = new int[this.priority.size()];
 
 			for (int i = 0; i < indexes.length; i++)
 			{
-				indexes[i] = this.priority.get(i).getIndex();
+				indexes[i] = this.priority.get(i).m_122411_();
 			}
 
-			nbt.setIntArray("priority", indexes);
-		}
-
-		return nbt;
-	}
-
-	@Override
-	public void readFromNBT(NBTTagCompound nbt)
-	{
-		super.readFromNBT(nbt);
-		int[] indexes = nbt.getIntArray("priority");
-		if (indexes.length > 0)
-		{
-			for (int index : indexes)
-			{
-				this.priority.add(EnumFacing.getFront(index));
-			}
+			nbt.m_128385_("priority", indexes);
 		}
 	}
 
@@ -80,15 +84,15 @@ public class TileEntityWeightedItemDistributor extends TileEntityInventory imple
 	}
 
 	@Override
-	protected void setFacing(EnumFacing facing)
+	protected void setFacing(Level world, Direction facing)
 	{
-		super.setFacing(facing);
+		super.setFacing(world, facing);
 		this.updateConnectivity();
 	}
 
 	protected void updateConnectivity()
 	{
-		if (!this.getWorld().isRemote && !this.priority.isEmpty() && this.priority.remove(this.getFacing()))
+		if (!this.getLevel().isClientSide && !this.priority.isEmpty() && this.priority.remove(this.getFacing()))
 		{
 			this.updatePriority(true);
 		}
@@ -100,14 +104,13 @@ public class TileEntityWeightedItemDistributor extends TileEntityInventory imple
 		super.updateEntityServer();
 		if (!this.priority.isEmpty() && !this.buffer.isEmpty())
 		{
-			World world = this.getWorld();
+			Level world = this.getLevel();
 			boolean hasChanged = false;
 
-			for (EnumFacing facing : this.priority)
+			for (Direction facing : this.priority)
 			{
-				TileEntity te = world.getTileEntity(this.pos.offset(facing));
-				EnumFacing side = facing.getOpposite();
-				if (StackUtil.isInventoryTile(te, side))
+				EnvItemHandler.AdjacentInventory inv = StackUtil.ENV.getAdjacentInventory(this, facing);
+				if (inv != null)
 				{
 					boolean empty = true;
 
@@ -117,10 +120,10 @@ public class TileEntityWeightedItemDistributor extends TileEntityInventory imple
 						{
 							ItemStack stack = this.buffer.get(index);
 							ItemStack transferStack = StackUtil.copy(stack);
-							int amount = StackUtil.putInInventory(te, side, transferStack, true);
+							int amount = StackUtil.ENV.deposit(inv, transferStack, true);
 							if (amount > 0)
 							{
-								amount = StackUtil.putInInventory(te, side, transferStack, false);
+								amount = StackUtil.ENV.deposit(inv, transferStack, false);
 								stack = StackUtil.decSize(stack, amount);
 								this.buffer.put(index, stack);
 								hasChanged = true;
@@ -138,27 +141,25 @@ public class TileEntityWeightedItemDistributor extends TileEntityInventory imple
 
 			if (hasChanged)
 			{
-				this.markDirty();
+				this.setChanged();
 			}
 		}
 	}
 
 	@Override
-	public ContainerBase<?> getGuiContainer(EntityPlayer player)
+	public ContainerBase<?> createServerScreenHandler(int syncId, Player player)
 	{
-		return new ContainerWeightedItemDistributor(player, this);
+		return new ContainerWeightedItemDistributor(syncId, player.getInventory(), this);
 	}
 
-	@SideOnly(Side.CLIENT)
 	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
-		return new GuiWeightedItemDistributor(new ContainerWeightedItemDistributor(player, this));
+		return new ContainerWeightedItemDistributor(syncId, inventory, this);
 	}
 
-	@SideOnly(Side.CLIENT)
 	@Override
-	public List<EnumFacing> getPriority()
+	public List<Direction> getPriority()
 	{
 		return this.priority;
 	}
@@ -167,10 +168,5 @@ public class TileEntityWeightedItemDistributor extends TileEntityInventory imple
 	public void updatePriority(boolean server)
 	{
 		IC2.network.get(server).updateTileEntityField(this, "priority");
-	}
-
-	@Override
-	public void onGuiClosed(EntityPlayer player)
-	{
 	}
 }

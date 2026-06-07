@@ -1,8 +1,0 @@
-package ic2.core.block.steam;
-
-import net.minecraft.util.EnumFacing;
-
-public interface IForceProvider
-{
-	int getProvidedForce(EnumFacing var1);
-}

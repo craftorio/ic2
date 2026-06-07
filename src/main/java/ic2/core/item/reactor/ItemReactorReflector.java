@@ -2,14 +2,14 @@ package ic2.core.item.reactor;
 
 import ic2.api.reactor.IReactor;
 import ic2.api.reactor.IReactorComponent;
-import ic2.core.ref.ItemName;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item.Properties;
 
 public class ItemReactorReflector extends AbstractDamageableReactorComponent
 {
-	public ItemReactorReflector(ItemName name, int maxDamage)
+	public ItemReactorReflector(Properties settings, int maxDamage)
 	{
-		super(name, maxDamage);
+		super(settings, maxDamage);
 	}
 
 	@Override
@@ -19,12 +19,12 @@ public class ItemReactorReflector extends AbstractDamageableReactorComponent
 		{
 			IReactorComponent source = (IReactorComponent) pulsingStack.getItem();
 			source.acceptUraniumPulse(pulsingStack, reactor, stack, pulseX, pulseY, youX, youY, heatrun);
-		} else if (this.getCustomDamage(stack) + 1 >= this.getMaxCustomDamage(stack))
+		} else if (this.getUse(stack) + 1 >= this.getMaxUse())
 		{
 			reactor.setItemAt(youX, youY, null);
 		} else
 		{
-			this.setCustomDamage(stack, this.getCustomDamage(stack) + 1);
+			this.incrementUse(stack);
 		}
 
 		return true;

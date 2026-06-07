@@ -1,29 +1,39 @@
 package ic2.core.uu;
 
 import ic2.core.util.StackUtil;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import ic2.core.util.Util;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 class LeanItemStack
 {
 	private final Item item;
-	private final int meta;
-	private final NBTTagCompound nbt;
+	private final CompoundTag nbt;
 	private final int size;
 	private int hashCode;
 
+	public LeanItemStack(Item item)
+	{
+		this(item, 1);
+	}
+
+	public LeanItemStack(Item item, int size)
+	{
+		this(item, null, size);
+	}
+
 	public LeanItemStack(ItemStack stack)
 	{
-		this(stack.getItem(), StackUtil.getRawMeta(stack), stack.getTagCompound(), StackUtil.getSize(stack));
+		this(stack.getItem(), stack.getTag(), StackUtil.getSize(stack));
 	}
 
 	public LeanItemStack(ItemStack stack, int size)
 	{
-		this(stack.getItem(), StackUtil.getRawMeta(stack), stack.getTagCompound(), size);
+		this(stack.getItem(), stack.getTag(), size);
 	}
 
-	public LeanItemStack(Item item, int meta, NBTTagCompound nbt, int size)
+	public LeanItemStack(Item item, CompoundTag nbt, int size)
 	{
 		if (item == null)
 		{
@@ -31,7 +41,6 @@ class LeanItemStack
 		}
 
 		this.item = item;
-		this.meta = meta;
 		this.nbt = nbt;
 		this.size = size;
 	}
@@ -41,12 +50,7 @@ class LeanItemStack
 		return this.item;
 	}
 
-	public int getMeta()
-	{
-		return this.meta;
-	}
-
-	public NBTTagCompound getNbt()
+	public CompoundTag getNbt()
 	{
 		return this.nbt;
 	}
@@ -59,12 +63,12 @@ class LeanItemStack
 	@Override
 	public String toString()
 	{
-		return String.format("%dx%s@%d", this.size, this.item.getRegistryName(), this.meta);
+		return String.format("%dx%s", this.size, Util.getName(this.item));
 	}
 
 	public boolean hasSameItem(LeanItemStack o)
 	{
-		return this.item == o.item && (this.meta == o.meta || !this.item.getHasSubtypes()) && StackUtil.checkNbtEquality(this.nbt, o.nbt);
+		return this.item == o.item && StackUtil.checkNbtEquality(this.nbt, o.nbt);
 	}
 
 	public LeanItemStack copy()
@@ -74,7 +78,7 @@ class LeanItemStack
 
 	public LeanItemStack copyWithSize(int newSize)
 	{
-		LeanItemStack ret = new LeanItemStack(this.item, this.meta, this.nbt, newSize);
+		LeanItemStack ret = new LeanItemStack(this.item, this.nbt, newSize);
 		ret.hashCode = this.hashCode;
 		return ret;
 	}
@@ -86,21 +90,17 @@ class LeanItemStack
 			return StackUtil.emptyStack;
 		}
 
-		ItemStack ret = new ItemStack(this.item, this.size, this.meta);
-		ret.setTagCompound(this.nbt);
+		ItemStack ret = new ItemStack(this.item, this.size);
+		ret.m_41751_(this.nbt);
 		return ret;
 	}
 
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (!(obj instanceof LeanItemStack))
-		{
-			return false;
-		}
-
-		LeanItemStack o = (LeanItemStack) obj;
-		return this.item == o.item && this.meta == o.meta && (this.nbt == null && o.nbt == null || this.nbt != null && o.nbt != null && this.nbt.equals(o.nbt));
+		return !(obj instanceof LeanItemStack o)
+			? false
+			: this.item == o.item && (this.nbt == null && o.nbt == null || this.nbt != null && o.nbt != null && this.nbt.equals(o.nbt));
 	}
 
 	@Override
@@ -117,10 +117,9 @@ class LeanItemStack
 	private int calculateHashCode()
 	{
 		int ret = System.identityHashCode(this.item);
-		ret = ret * 31 + this.meta;
 		if (this.nbt != null)
 		{
-			ret = ret * 61 + this.nbt.hashCode();
+			ret = ret * 31 + this.nbt.hashCode();
 		}
 
 		if (ret == 0)

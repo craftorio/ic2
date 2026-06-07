@@ -6,30 +6,37 @@ import ic2.api.network.INetworkTileEntityEventListener;
 import ic2.core.ContainerBase;
 import ic2.core.IC2;
 import ic2.core.IHasGui;
-import ic2.core.WorldData;
-import ic2.core.block.TileEntityInventory;
 import ic2.core.block.invslot.InvSlot;
 import ic2.core.block.invslot.InvSlotConsumableLinked;
 import ic2.core.block.invslot.InvSlotOutput;
-import ic2.core.item.upgrade.ItemUpgradeModule;
-import ic2.core.ref.ItemName;
+import ic2.core.block.tileentity.TileEntityInventory;
+import ic2.core.event.WorldData;
+import ic2.core.network.GrowingBuffer;
+import ic2.core.ref.Ic2BlockEntities;
+import ic2.core.ref.Ic2Items;
+import ic2.core.ref.Ic2SoundEvents;
 import ic2.core.util.LogCategory;
 import ic2.core.util.StackUtil;
 import ic2.core.util.Util;
 
+import java.io.IOException;
 import java.util.List;
 
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTUtil;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.Container;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public class TileEntityTradeOMat
 	extends TileEntityInventory
@@ -50,8 +57,9 @@ public class TileEntityTradeOMat
 	public final InvSlotConsumableLinked inputSlot;
 	public final InvSlotOutput outputSlot;
 
-	public TileEntityTradeOMat()
+	public TileEntityTradeOMat(BlockPos pos, BlockState state)
 	{
+		super(Ic2BlockEntities.TRADE_O_MAT, pos, state);
 		this.ticker = IC2.random.nextInt(64);
 		this.demandSlot = new InvSlot(this, "demand", InvSlot.Access.NONE, 1);
 		this.offerSlot = new InvSlot(this, "offer", InvSlot.Access.NONE, 1);
@@ -60,39 +68,37 @@ public class TileEntityTradeOMat
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound nbt)
+	public void load(CompoundTag nbt)
 	{
-		super.readFromNBT(nbt);
-		if (nbt.hasKey("ownerGameProfile"))
+		super.load(nbt);
+		if (nbt.contains("ownerGameProfile"))
 		{
-			this.owner = NBTUtil.readGameProfileFromNBT(nbt.getCompoundTag("ownerGameProfile"));
+			this.owner = NbtUtils.readGameProfile(nbt.getCompound("ownerGameProfile"));
 		}
 
-		this.totalTradeCount = nbt.getInteger("totalTradeCount");
-		if (nbt.hasKey("infinite"))
+		this.totalTradeCount = nbt.getInt("totalTradeCount");
+		if (nbt.contains("infinite"))
 		{
 			this.infinite = nbt.getBoolean("infinite");
 		}
 	}
 
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
+	public void saveAdditional(CompoundTag nbt)
 	{
-		super.writeToNBT(nbt);
+		super.saveAdditional(nbt);
 		if (this.owner != null)
 		{
-			NBTTagCompound ownerNbt = new NBTTagCompound();
-			NBTUtil.writeGameProfile(ownerNbt, this.owner);
-			nbt.setTag("ownerGameProfile", ownerNbt);
+			CompoundTag ownerNbt = new CompoundTag();
+			NbtUtils.writeGameProfile(ownerNbt, this.owner);
+			nbt.put("ownerGameProfile", ownerNbt);
 		}
 
-		nbt.setInteger("totalTradeCount", this.totalTradeCount);
+		nbt.putInt("totalTradeCount", this.totalTradeCount);
 		if (this.infinite)
 		{
-			nbt.setBoolean("infinite", this.infinite);
+			nbt.putBoolean("infinite", this.infinite);
 		}
-
-		return nbt;
 	}
 
 	@Override
@@ -118,11 +124,11 @@ public class TileEntityTradeOMat
 		if (wireless)
 		{
 			this.setActive(true);
-			WorldData.get(this.world).tradeMarket.registerTradeOMat(this);
+			WorldData.get(this.level).tradeMarket.registerTradeOMat(this);
 		} else
 		{
 			this.setActive(false);
-			WorldData.get(this.world).tradeMarket.unregisterTradeOMat(this);
+			WorldData.get(this.level).tradeMarket.unregisterTradeOMat(this);
 		}
 
 		return true;
@@ -144,58 +150,72 @@ public class TileEntityTradeOMat
 
 	private void trade()
 	{
-		ItemStack tradedIn = this.inputSlot.consumeLinked(true);
-		if (!StackUtil.isEmpty(tradedIn))
+		if (this.level != null)
 		{
-			ItemStack offer = this.offerSlot.get();
-			if (!StackUtil.isEmpty(offer))
+			ItemStack tradedIn = this.inputSlot.consumeLinked(true);
+			if (!StackUtil.isEmpty(tradedIn))
 			{
-				if (this.outputSlot.canAdd(offer))
+				ItemStack offer = this.offerSlot.get();
+				if (!StackUtil.isEmpty(offer))
 				{
-					if (this.infinite)
+					if (this.outputSlot.canAdd(offer))
 					{
-						this.inputSlot.consumeLinked(false);
-						this.outputSlot.add(offer);
-					} else
-					{
-						int amount = StackUtil.fetch(this, offer, true);
-						if (amount != StackUtil.getSize(offer))
+						if (this.infinite)
 						{
-							return;
+							this.inputSlot.consumeLinked(false);
+							this.outputSlot.add(offer);
+						} else
+						{
+							int amount = StackUtil.fetch(this, offer, true);
+							if (amount != StackUtil.getSize(offer))
+							{
+								return;
+							}
+
+							int transferredOut = StackUtil.distribute(this, tradedIn, true);
+							if (transferredOut != StackUtil.getSize(tradedIn))
+							{
+								return;
+							}
+
+							amount = StackUtil.fetch(this, offer, false);
+							if (amount == 0)
+							{
+								return;
+							}
+
+							if (amount != StackUtil.getSize(offer))
+							{
+								IC2.log
+									.warn(
+										LogCategory.Block,
+										"The Trade-O-Mat at %s received an inconsistent result from an adjacent trade supply inventory, the %s items will be lost.",
+										Util.formatPosition(this),
+										amount
+									);
+								return;
+							}
+
+							StackUtil.distribute(this, this.inputSlot.consumeLinked(false), false);
+							this.outputSlot.add(offer);
+							this.stock--;
 						}
 
-						int transferredOut = StackUtil.distribute(this, tradedIn, true);
-						if (transferredOut != StackUtil.getSize(tradedIn))
-						{
-							return;
-						}
-
-						amount = StackUtil.fetch(this, offer, false);
-						if (amount == 0)
-						{
-							return;
-						}
-
-						if (amount != StackUtil.getSize(offer))
-						{
-							IC2.log
-								.warn(
-									LogCategory.Block,
-									"The Trade-O-Mat at %s received an inconsistent result from an adjacent trade supply inventory, the %s items will be lost.",
-									Util.formatPosition(this),
-									amount
-								);
-							return;
-						}
-
-						StackUtil.distribute(this, this.inputSlot.consumeLinked(false), false);
-						this.outputSlot.add(offer);
-						this.stock--;
+						this.totalTradeCount++;
+						IC2.network.get(true).initiateTileEntityEvent(this, 0, true);
+						this.level
+							.playLocalSound(
+								this.worldPosition.getX(),
+								this.worldPosition.getY(),
+								this.worldPosition.getZ(),
+								Ic2SoundEvents.MACHINE_OMAT_OPERATE,
+								SoundSource.BLOCKS,
+								1.0F,
+								1.0F,
+								true
+							);
+						this.setChanged();
 					}
-
-					this.totalTradeCount++;
-					IC2.network.get(true).initiateTileEntityEvent(this, 0, true);
-					this.markDirty();
 				}
 			}
 		}
@@ -205,31 +225,41 @@ public class TileEntityTradeOMat
 	protected void onLoaded()
 	{
 		super.onLoaded();
-		if (IC2.platform.isSimulating())
+		if (this.level == null)
 		{
-			this.updateStock();
-			if (this.isWireless())
+			IC2.log.error(LogCategory.Block, "World object is null while trade-o-mat block entity at: \"" + this.worldPosition.toString() + "\" is loaded");
+		} else
+		{
+			if (!this.level.isClientSide)
 			{
-				WorldData.get(this.world).tradeMarket.registerTradeOMat(this);
+				this.updateStock();
+				if (this.isWireless())
+				{
+					WorldData.get(this.level).tradeMarket.registerTradeOMat(this);
+				}
 			}
 		}
 	}
 
 	@Override
-	protected boolean onActivated(EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ)
+	protected InteractionResult onActivated(Player player, InteractionHand hand, Direction side, Vec3 hit)
 	{
-		if (!this.isWireless()
-			&& StackUtil.consume(player, hand, StackUtil.sameStack(ItemName.upgrade.getItemStack(ItemUpgradeModule.UpgradeType.remote_interface)), 1))
+		if (!this.isWireless() && StackUtil.consume(player, hand, StackUtil.sameItem(Ic2Items.REMOTE_INTERFACE_UPGRADE), 1))
 		{
-			if (!this.getWorld().isRemote)
+			if (this.level == null)
+			{
+				IC2.log.error(LogCategory.Block, "World object is null while trade-o-mat block entity at: \"" + this.worldPosition.toString() + "\" is activated");
+			}
+
+			if (!this.level.isClientSide)
 			{
 				this.setWireless(true);
 			}
 
-			return true;
+			return InteractionResult.CONSUME;
 		} else
 		{
-			return super.onActivated(player, hand, side, hitX, hitY, hitZ);
+			return super.onActivated(player, hand, side, hit);
 		}
 	}
 
@@ -249,14 +279,19 @@ public class TileEntityTradeOMat
 	protected void onUnloaded()
 	{
 		super.onUnloaded();
-		if (!this.getWorld().isRemote && this.isWireless())
+		if (this.level == null)
 		{
-			WorldData.get(this.world).tradeMarket.unregisterTradeOMat(this);
+			IC2.log.error(LogCategory.Block, "World object is null while trade-o-mat block entity at: \"" + this.worldPosition.toString() + "\" is unloaded");
+		}
+
+		if (!this.level.isClientSide && this.isWireless())
+		{
+			WorldData.get(this.level).tradeMarket.unregisterTradeOMat(this);
 		}
 	}
 
 	@Override
-	public boolean wrenchCanRemove(EntityPlayer player)
+	public boolean wrenchCanRemove(Player player)
 	{
 		return this.permitsAccess(player.getGameProfile());
 	}
@@ -267,7 +302,7 @@ public class TileEntityTradeOMat
 		List<ItemStack> drops = super.getAuxDrops(fortune);
 		if (this.isWireless())
 		{
-			drops.add(ItemName.upgrade.getItemStack(ItemUpgradeModule.UpgradeType.remote_interface));
+			drops.add(new ItemStack(Ic2Items.REMOTE_INTERFACE_UPGRADE));
 		}
 
 		return drops;
@@ -280,7 +315,7 @@ public class TileEntityTradeOMat
 	}
 
 	@Override
-	public IInventory getPrivilegedInventory(GameProfile accessor)
+	public Container getPrivilegedInventory(GameProfile accessor)
 	{
 		return this;
 	}
@@ -304,22 +339,34 @@ public class TileEntityTradeOMat
 	}
 
 	@Override
-	public ContainerBase<TileEntityTradeOMat> getGuiContainer(EntityPlayer player)
+	public ContainerBase<?> createServerScreenHandler(int syncId, Player player)
 	{
-		return this.permitsAccess(player.getGameProfile()) ? new ContainerTradeOMatOpen(player, this) : new ContainerTradeOMatClosed(player, this);
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
-	{
-		return !isAdmin && !this.permitsAccess(player.getGameProfile())
-			? new GuiTradeOMatClosed(new ContainerTradeOMatClosed(player, this))
-			: new GuiTradeOMatOpen(new ContainerTradeOMatOpen(player, this), isAdmin);
+		return this.permitsAccess(player.getGameProfile())
+			? new ContainerTradeOMatOpen(syncId, player.getInventory(), this, this.canToggleInfinite(player))
+			: new ContainerTradeOMatClosed(syncId, player.getInventory(), this);
 	}
 
 	@Override
-	public void onGuiClosed(EntityPlayer player)
+	public void writeScreenOpenData(Player player, InteractionHand hand, GrowingBuffer buffer) throws IOException
+	{
+		boolean open = this.permitsAccess(player.getGameProfile());
+		buffer.writeBoolean(open);
+		if (open)
+		{
+			buffer.writeBoolean(this.canToggleInfinite(player));
+		}
+	}
+
+	@Override
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
+	{
+		return data.readBoolean()
+			? new ContainerTradeOMatOpen(syncId, inventory, this, data.readBoolean())
+			: new ContainerTradeOMatClosed(syncId, inventory, this);
+	}
+
+	@Override
+	public void onScreenClosed(Player player)
 	{
 	}
 
@@ -328,27 +375,24 @@ public class TileEntityTradeOMat
 	{
 		switch (event)
 		{
-			case 0:
-				IC2.audioManager.playOnce(this, "Machines/o-mat.ogg");
-				break;
 			default:
-				IC2.platform
+				IC2.sideProxy
 					.displayError(
 						"An unknown event type was received over multiplayer.\nThis could happen due to corrupted data or a bug.\n\n(Technical information: event ID "
 							+ event
 							+ ", tile entity below)\nT: "
 							+ this
 							+ " ("
-							+ this.pos
+							+ this.worldPosition
 							+ ")"
 					);
 		}
 	}
 
 	@Override
-	public void onNetworkEvent(EntityPlayer player, int event)
+	public void onNetworkEvent(Player player, int event)
 	{
-		if (event == 0 && this.getWorld().getMinecraftServer().getPlayerList().canSendCommands(player.getGameProfile()))
+		if (event == 0 && this.canToggleInfinite(player))
 		{
 			this.infinite = !this.infinite;
 			if (!this.infinite)
@@ -356,5 +400,11 @@ public class TileEntityTradeOMat
 				this.updateStock();
 			}
 		}
+	}
+
+	private boolean canToggleInfinite(Player player)
+	{
+		MinecraftServer server = player.m_20194_();
+		return server != null && server.getPlayerList().isOp(player.getGameProfile());
 	}
 }

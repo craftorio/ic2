@@ -1,52 +1,57 @@
 package ic2.core.block.machine.gui;
 
-import ic2.core.GuiIC2;
+import com.mojang.blaze3d.vertex.PoseStack;
 import ic2.core.IC2;
+import ic2.core.Ic2Gui;
 import ic2.core.block.machine.container.ContainerFluidDistributor;
 import ic2.core.gui.TankGauge;
 import ic2.core.init.Localization;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
 
-import java.io.IOException;
-
-import net.minecraft.util.ResourceLocation;
-
-public class GuiFluidDistributor extends GuiIC2<ContainerFluidDistributor>
+public class GuiFluidDistributor extends Ic2Gui<ContainerFluidDistributor>
 {
-	public GuiFluidDistributor(ContainerFluidDistributor container)
+	public GuiFluidDistributor(ContainerFluidDistributor container, Inventory playerInventory, Component title)
 	{
-		super(container, 184);
+		super(container, playerInventory, title, 184);
 		this.addElement(TankGauge.createPlain(this, 29, 38, 55, 47, container.base.fluidTank));
 	}
 
 	@Override
-	protected void drawForegroundLayer(int mouseX, int mouseY)
+	protected void drawForegroundLayer(PoseStack matrices, int mouseX, int mouseY)
 	{
-		super.drawForegroundLayer(mouseX, mouseY);
-		this.fontRenderer.drawString(Localization.translate("ic2.FluidDistributor.gui.mode.info"), 112, 47, 5752026);
-		if (this.container.base.getActive())
+		super.drawForegroundLayer(matrices, mouseX, mouseY);
+		this.drawString(matrices, 112, 56, Localization.translate("ic2.FluidDistributor.gui.mode.info"), 5752026);
+		if (((ContainerFluidDistributor) this.menu).base.getActive())
 		{
-			this.fontRenderer.drawString(Localization.translate("ic2.FluidDistributor.gui.mode.concentrate"), 95, 71, 5752026);
+			this.drawString(matrices, 95, 80, Localization.translate("ic2.FluidDistributor.gui.mode.concentrate"), 5752026);
 		} else
 		{
-			this.fontRenderer.drawString(Localization.translate("ic2.FluidDistributor.gui.mode.distribute"), 95, 71, 5752026);
+			this.drawString(matrices, 95, 80, Localization.translate("ic2.FluidDistributor.gui.mode.distribute"), 5752026);
 		}
 	}
 
 	@Override
-	protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
+	public boolean m_6375_(double mouseX, double mouseY, int mouseButton)
 	{
-		super.mouseClicked(mouseX, mouseY, mouseButton);
-		mouseX -= this.guiLeft;
-		mouseY -= this.guiTop;
-		if (mouseX >= 117 && mouseY >= 58 && mouseX <= 135 && mouseY <= 66)
+		mouseX -= this.f_97735_;
+		mouseY -= this.f_97736_;
+		if (mouseX >= 117.0 && mouseY >= 58.0 && mouseX <= 135.0 && mouseY <= 66.0)
 		{
-			IC2.network.get(false).initiateClientTileEntityEvent(this.container.base, 1);
+			IC2.network.get(false).initiateClientTileEntityEvent(((ContainerFluidDistributor) this.menu).base, 1);
+			return true;
+		} else
+		{
+			mouseX += this.f_97735_;
+			mouseY += this.f_97736_;
+			return super.m_6375_(mouseX, mouseY, mouseButton);
 		}
 	}
 
 	@Override
 	protected ResourceLocation getTexture()
 	{
-		return new ResourceLocation("ic2", "textures/gui/GUIFluidDistributor.png");
+		return ResourceLocation.fromNamespaceAndPath("ic2", "textures/gui/guifluiddistributor.png");
 	}
 }

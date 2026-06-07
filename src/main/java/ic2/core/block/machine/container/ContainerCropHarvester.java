@@ -1,29 +1,30 @@
 package ic2.core.block.machine.container;
 
 import ic2.core.block.machine.tileentity.TileEntityCropHarvester;
+import ic2.core.ref.Ic2ScreenHandlers;
 import ic2.core.slot.SlotInvSlot;
 
 import java.util.List;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.entity.player.Inventory;
 
 public class ContainerCropHarvester extends ContainerElectricMachine<TileEntityCropHarvester>
 {
-	public ContainerCropHarvester(EntityPlayer player, TileEntityCropHarvester base)
+	public ContainerCropHarvester(int syncId, Inventory playerInventory, TileEntityCropHarvester base)
 	{
-		super(player, base, 166, 16, 53);
+		super(Ic2ScreenHandlers.CROP_HARVESTER, syncId, playerInventory, base, 166, 16, 53);
 
 		for (int y = 0; y < base.contentSlot.size() / 5; y++)
 		{
 			for (int x = 0; x < 5; x++)
 			{
-				this.addSlotToContainer(new SlotInvSlot(base.contentSlot, x + y * 5, 48 + x * 18, 17 + y * 18));
+				this.m_38897_(new SlotInvSlot(base.contentSlot, x + y * 5, 48 + x * 18, 17 + y * 18));
 			}
 		}
 
 		for (int i = 0; i < 4; i++)
 		{
-			this.addSlotToContainer(new SlotInvSlot(base.upgradeSlot, i, 152, 8 + i * 18));
+			this.m_38897_(new SlotInvSlot(base.upgradeSlot, i, 152, 8 + i * 18));
 		}
 	}
 

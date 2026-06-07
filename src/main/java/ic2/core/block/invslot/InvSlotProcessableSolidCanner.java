@@ -3,7 +3,7 @@ package ic2.core.block.invslot;
 import ic2.api.recipe.ICannerBottleRecipeManager;
 import ic2.api.recipe.Recipes;
 import ic2.core.block.machine.tileentity.TileEntitySolidCanner;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 public class InvSlotProcessableSolidCanner extends InvSlotProcessable<ICannerBottleRecipeManager.Input, ItemStack, ICannerBottleRecipeManager.RawInput>
 {

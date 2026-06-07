@@ -2,16 +2,17 @@ package ic2.core.block.machine.container;
 
 import ic2.core.ContainerBase;
 import ic2.core.block.machine.tileentity.TileEntitySteamGenerator;
+import ic2.core.ref.Ic2ScreenHandlers;
 
 import java.util.List;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.entity.player.Inventory;
 
 public class ContainerSteamGenerator extends ContainerBase<TileEntitySteamGenerator>
 {
-	public ContainerSteamGenerator(EntityPlayer player, TileEntitySteamGenerator te)
+	public ContainerSteamGenerator(int syncId, Inventory playerInventory, TileEntitySteamGenerator te)
 	{
-		super(te);
+		super(Ic2ScreenHandlers.STEAM_GENERATOR, syncId, playerInventory, te);
 	}
 
 	@Override

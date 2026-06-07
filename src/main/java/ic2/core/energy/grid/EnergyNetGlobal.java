@@ -6,8 +6,8 @@ import ic2.api.energy.NodeStats;
 import ic2.api.energy.tile.IEnergyTile;
 import ic2.api.info.ILocatable;
 import ic2.core.IC2;
-import ic2.core.WorldData;
 import ic2.core.energy.leg.EnergyCalculatorLeg;
+import ic2.core.event.WorldData;
 import ic2.core.util.LogCategory;
 import ic2.core.util.Util;
 
@@ -15,9 +15,9 @@ import java.io.PrintStream;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class EnergyNetGlobal implements IEnergyNet
 {
@@ -31,7 +31,6 @@ public class EnergyNetGlobal implements IEnergyNet
 		}
 
 		calculator = new EnergyCalculatorLeg();
-		EventHandler.init();
 		return new EnergyNetGlobal();
 	}
 
@@ -40,7 +39,7 @@ public class EnergyNetGlobal implements IEnergyNet
 	}
 
 	@Override
-	public IEnergyTile getTile(World world, BlockPos pos)
+	public IEnergyTile getTile(Level world, BlockPos pos)
 	{
 		if (world == null)
 		{
@@ -55,7 +54,7 @@ public class EnergyNetGlobal implements IEnergyNet
 	}
 
 	@Override
-	public IEnergyTile getSubTile(World world, BlockPos pos)
+	public IEnergyTile getSubTile(Level world, BlockPos pos)
 	{
 		if (world == null)
 		{
@@ -70,18 +69,18 @@ public class EnergyNetGlobal implements IEnergyNet
 	}
 
 	@Override
-	public <T extends TileEntity & IEnergyTile> void addTile(T tile)
+	public <T extends BlockEntity & IEnergyTile> void addBlockEntityTile(T tile)
 	{
 		if (tile == null)
 		{
 			throw new NullPointerException("null tile");
 		}
 
-		addTile(tile, tile.getWorld(), tile.getPos());
+		addTile(tile, tile.getLevel(), tile.getBlockPos());
 	}
 
 	@Override
-	public <T extends ILocatable & IEnergyTile> void addTile(T tile)
+	public <T extends ILocatable & IEnergyTile> void addLocatableTile(T tile)
 	{
 		if (tile == null)
 		{
@@ -91,19 +90,7 @@ public class EnergyNetGlobal implements IEnergyNet
 		addTile(tile, tile.getWorldObj(), tile.getPosition());
 	}
 
-	public void addTile(IEnergyTile tile)
-	{
-		if (tile == null)
-		{
-			throw new NullPointerException("null tile");
-		}
-
-		World world = this.getWorld(tile);
-		BlockPos pos = this.getPos(tile);
-		addTile(tile, world, pos);
-	}
-
-	private static void addTile(IEnergyTile tile, World world, BlockPos pos)
+	private static void addTile(IEnergyTile tile, Level world, BlockPos pos)
 	{
 		if (EnergyNetSettings.logEnetApiAccessTraces)
 		{
@@ -124,7 +111,7 @@ public class EnergyNetGlobal implements IEnergyNet
 			throw new NullPointerException("null tile");
 		}
 
-		World world = this.getWorld(tile);
+		Level world = this.getWorld(tile);
 		BlockPos pos = this.getPos(tile);
 		if (EnergyNetSettings.logEnetApiAccessTraces)
 		{
@@ -138,7 +125,7 @@ public class EnergyNetGlobal implements IEnergyNet
 	}
 
 	@Override
-	public World getWorld(IEnergyTile tile)
+	public Level getWorld(IEnergyTile tile)
 	{
 		if (tile == null)
 		{
@@ -146,9 +133,9 @@ public class EnergyNetGlobal implements IEnergyNet
 		} else if (tile instanceof ILocatable)
 		{
 			return ((ILocatable) tile).getWorldObj();
-		} else if (tile instanceof TileEntity)
+		} else if (tile instanceof BlockEntity)
 		{
-			return ((TileEntity) tile).getWorld();
+			return ((BlockEntity) tile).getLevel();
 		} else
 		{
 			throw new UnsupportedOperationException("unlocatable tile type: " + tile.getClass().getName());
@@ -164,9 +151,9 @@ public class EnergyNetGlobal implements IEnergyNet
 		} else if (tile instanceof ILocatable)
 		{
 			return ((ILocatable) tile).getPosition();
-		} else if (tile instanceof TileEntity)
+		} else if (tile instanceof BlockEntity)
 		{
-			return ((TileEntity) tile).getPos();
+			return ((BlockEntity) tile).getBlockPos();
 		} else
 		{
 			throw new UnsupportedOperationException("unlocatable tile type: " + tile.getClass().getName());
@@ -180,7 +167,12 @@ public class EnergyNetGlobal implements IEnergyNet
 	}
 
 	@Override
-	public boolean dumpDebugInfo(World world, BlockPos pos, PrintStream console, PrintStream chat)
+	public int getAdjacentConnections(IEnergyTile tile)
+	{
+		return getLocal(this.getWorld(tile)).getAdjacentConnections(tile);
+	}
+
+	public boolean dumpDebugInfo(Level world, BlockPos pos, PrintStream console, PrintStream chat)
 	{
 		return getLocal(world).dumpDebugInfo(pos, console, chat);
 	}
@@ -228,14 +220,14 @@ public class EnergyNetGlobal implements IEnergyNet
 		return calculator;
 	}
 
-	public static EnergyNetLocal getLocal(World world)
+	public static EnergyNetLocal getLocal(Level world)
 	{
-		if (world.isRemote)
+		if (world.isClientSide)
 		{
 			throw new IllegalStateException("not applicable clientside");
 		}
 
-		assert world.getMinecraftServer().isCallingFromMinecraftThread();
+		assert world.getServer().m_18695_();
 		return WorldData.get(world).energyNet;
 	}
 }

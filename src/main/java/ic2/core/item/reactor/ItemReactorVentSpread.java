@@ -2,16 +2,16 @@ package ic2.core.item.reactor;
 
 import ic2.api.reactor.IReactor;
 import ic2.api.reactor.IReactorComponent;
-import ic2.core.ref.ItemName;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item.Properties;
 
 public class ItemReactorVentSpread extends AbstractReactorComponent
 {
 	public final int sideVent;
 
-	public ItemReactorVentSpread(ItemName name, int sidevent)
+	public ItemReactorVentSpread(Properties settings, int sidevent)
 	{
-		super(name);
+		super(settings);
 		this.sideVent = sidevent;
 	}
 

@@ -1,14 +1,15 @@
 package ic2.core.gui;
 
-import ic2.core.GuiIC2;
+import com.mojang.blaze3d.vertex.PoseStack;
+import ic2.core.Ic2Gui;
 import ic2.core.util.StackUtil;
 
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import net.minecraft.inventory.Slot;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.Slot;
 
 public class SlotGrid extends GuiElement<SlotGrid>
 {
@@ -16,22 +17,22 @@ public class SlotGrid extends GuiElement<SlotGrid>
 	private final int border;
 	private final int spacing;
 
-	public SlotGrid(GuiIC2<?> gui, int x, int y, SlotGrid.SlotStyle style)
+	public SlotGrid(Ic2Gui<?> gui, int x, int y, SlotGrid.SlotStyle style)
 	{
 		this(gui, x, y, 1, 1, style);
 	}
 
-	public SlotGrid(GuiIC2<?> gui, int x, int y, int xCount, int yCount, SlotGrid.SlotStyle style)
+	public SlotGrid(Ic2Gui<?> gui, int x, int y, int xCount, int yCount, SlotGrid.SlotStyle style)
 	{
 		this(gui, x, y, xCount, yCount, style, 0, 0);
 	}
 
-	public SlotGrid(GuiIC2<?> gui, int x, int y, SlotGrid.SlotStyle style, int border)
+	public SlotGrid(Ic2Gui<?> gui, int x, int y, SlotGrid.SlotStyle style, int border)
 	{
 		this(gui, x, y, 1, 1, style, border, 0);
 	}
 
-	public SlotGrid(GuiIC2<?> gui, int x, int y, int xCount, int yCount, SlotGrid.SlotStyle style, int border, int spacing)
+	public SlotGrid(Ic2Gui<?> gui, int x, int y, int xCount, int yCount, SlotGrid.SlotStyle style, int border, int spacing)
 	{
 		super(
 			gui, x - border, y - border, xCount * style.width + 2 * border + (xCount - 1) * spacing, yCount * style.height + 2 * border + (yCount - 1) * spacing
@@ -42,9 +43,9 @@ public class SlotGrid extends GuiElement<SlotGrid>
 	}
 
 	@Override
-	public void drawBackground(int mouseX, int mouseY)
+	public void drawBackground(PoseStack matrices, int mouseX, int mouseY)
 	{
-		super.drawBackground(mouseX, mouseY);
+		super.drawBackground(matrices, mouseX, mouseY);
 		if (this.style.background != null)
 		{
 			bindTexture(this.style.background);
@@ -59,7 +60,7 @@ public class SlotGrid extends GuiElement<SlotGrid>
 			{
 				for (int cx = startX; cx < maxX; cx += xStep)
 				{
-					this.gui.drawTexturedRect(cx, cy, this.style.width, this.style.height, this.style.u, this.style.v);
+					this.gui.drawTexturedRect(matrices, cx, cy, this.style.width, this.style.height, this.style.u, this.style.v);
 				}
 			}
 		}
@@ -68,13 +69,13 @@ public class SlotGrid extends GuiElement<SlotGrid>
 	@Override
 	protected boolean suppressTooltip(int mouseX, int mouseY)
 	{
-		if (!StackUtil.isEmpty(this.gui.mc.player.inventory.getItemStack()))
+		if (!StackUtil.isEmpty(this.gui.getContainer().m_142621_()))
 		{
 			return false;
 		}
 
-		Slot slot = this.gui.getSlotUnderMouse();
-		return slot != null && slot.getHasStack();
+		Slot slot = this.gui.getFocusedSlot();
+		return slot != null && slot.m_6657_();
 	}
 
 	public static final class SlotStyle

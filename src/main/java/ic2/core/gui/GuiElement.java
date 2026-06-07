@@ -1,31 +1,37 @@
 package ic2.core.gui;
 
-import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
-import ic2.core.GuiIC2;
+import com.mojang.blaze3d.vertex.PoseStack;
+import ic2.core.Ic2Gui;
 import ic2.core.gui.dynamic.TextProvider;
-import ic2.core.init.Localization;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Supplier;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.Container;
+import net.minecraft.world.inventory.InventoryMenu;
 
 public abstract class GuiElement<T extends GuiElement<T>>
 {
 	protected static final int hoverColor = -2130706433;
-	public static final ResourceLocation commonTexture = new ResourceLocation("ic2", "textures/gui/common.png");
-	private static final Map<Class<?>, GuiElement.Subscriptions> SUBSCRIPTIONS = new HashMap<>();
-	protected final GuiIC2<?> gui;
+	public static final ResourceLocation commonTexture = ResourceLocation.fromNamespaceAndPath("ic2", "textures/gui/common.png");
+	private static final Map<Class<?>, Set<GuiElement.ImplementedMethod>> IMPLEMENTED_METHOD_CACHE = new IdentityHashMap<>();
+	protected final Ic2Gui<?> gui;
 	protected int x;
 	protected int y;
 	protected int width;
@@ -33,7 +39,7 @@ public abstract class GuiElement<T extends GuiElement<T>>
 	private IEnableHandler enableHandler;
 	private Supplier<String> tooltipProvider;
 
-	protected GuiElement(GuiIC2<?> gui, int x, int y, int width, int height)
+	protected GuiElement(Ic2Gui<?> gui, int x, int y, int width, int height)
 	{
 		if (width < 0)
 		{
@@ -83,18 +89,18 @@ public abstract class GuiElement<T extends GuiElement<T>>
 	{
 	}
 
-	public void drawBackground(int mouseX, int mouseY)
+	public void drawBackground(PoseStack matrices, int mouseX, int mouseY)
 	{
 	}
 
-	public void drawForeground(int mouseX, int mouseY)
+	public void drawForeground(PoseStack matrices, int mouseX, int mouseY)
 	{
 		if (this.contains(mouseX, mouseY) && !this.suppressTooltip(mouseX, mouseY))
 		{
-			List<String> lines = this.getToolTip();
+			List<Component> lines = this.getToolTip();
 			if (this.tooltipProvider != null)
 			{
-				String tooltip = (String) this.tooltipProvider.get();
+				String tooltip = this.tooltipProvider.get();
 				if (tooltip != null && !tooltip.isEmpty())
 				{
 					addLines(lines, tooltip);
@@ -108,7 +114,7 @@ public abstract class GuiElement<T extends GuiElement<T>>
 		}
 	}
 
-	private static void addLines(List<String> list, String str)
+	private static void addLines(List<Component> list, String str)
 	{
 		int startPos = 0;
 
@@ -138,12 +144,12 @@ public abstract class GuiElement<T extends GuiElement<T>>
 		return false;
 	}
 
-	public boolean onMouseDrag(int mouseX, int mouseY, MouseButton button, long timeFromLastClick, boolean onThis)
+	public boolean onMouseDrag(int mouseX, int mouseY, MouseButton button, boolean onThis)
 	{
-		return onThis && this.onMouseDrag(mouseX, mouseY, button, timeFromLastClick);
+		return onThis && this.onMouseDrag(mouseX, mouseY, button);
 	}
 
-	protected boolean onMouseDrag(int mouseX, int mouseY, MouseButton button, long timeFromLastClick)
+	protected boolean onMouseDrag(int mouseX, int mouseY, MouseButton button)
 	{
 		return false;
 	}
@@ -172,17 +178,17 @@ public abstract class GuiElement<T extends GuiElement<T>>
 		return false;
 	}
 
-	protected List<String> getToolTip()
+	protected List<Component> getToolTip()
 	{
 		return new ArrayList<>();
 	}
 
-	protected static String processText(String text)
+	protected static Component processText(String text)
 	{
-		return Localization.translate(text);
+		return Component.m_237115_(text);
 	}
 
-	protected final IInventory getBase()
+	protected final Container getBase()
 	{
 		return this.gui.getContainer().base;
 	}
@@ -190,151 +196,83 @@ public abstract class GuiElement<T extends GuiElement<T>>
 	protected final Map<String, TextProvider.ITextProvider> getTokens()
 	{
 		Map<String, TextProvider.ITextProvider> ret = new HashMap<>();
-		ret.put("name", TextProvider.ofTranslated(this.getBase().getName()));
+		ret.put("name", TextProvider.of(this.gui.m_96636_()));
 		return ret;
 	}
 
 	protected static void bindTexture(ResourceLocation texture)
 	{
-		Minecraft.getMinecraft().renderEngine.bindTexture(texture);
+		Ic2Gui.bindTexture(texture);
 	}
 
 	public static void bindCommonTexture()
 	{
-		Minecraft.getMinecraft().renderEngine.bindTexture(commonTexture);
+		Ic2Gui.bindTexture(commonTexture);
 	}
 
 	protected static void bindBlockTexture()
 	{
-		Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+		Ic2Gui.bindTexture(InventoryMenu.f_39692_);
 	}
 
-	protected static TextureMap getBlockTextureMap()
+	protected static TextureAtlas getBlockTextureMap()
 	{
-		return Minecraft.getMinecraft().getTextureMapBlocks();
+		return (TextureAtlas) Minecraft.m_91087_().m_91097_().m_118506_(InventoryMenu.f_39692_);
 	}
 
-	private static final GuiElement.Method hasMethod(Class<?> cls, String name, Class<?>... params)
-	{
-		try
-		{
-			return !cls.getDeclaredMethod(name, params).isAnnotationPresent(GuiElement.SkippedMethod.class)
-				? GuiElement.Method.PRESENT
-				: GuiElement.Method.SKIPPED;
-		} catch (NoSuchMethodException e)
-		{
-			return GuiElement.Method.MISSING;
-		}
-	}
-
-	public final GuiElement.Subscriptions getSubscriptions()
+	public final Set<GuiElement.ImplementedMethod> getImplementedMethods()
 	{
 		Class<?> cls = this.getClass();
-		GuiElement.Subscriptions subscriptions = SUBSCRIPTIONS.get(cls);
-		if (subscriptions == null)
+		Set<GuiElement.ImplementedMethod> ret = IMPLEMENTED_METHOD_CACHE.get(cls);
+		if (ret == null)
 		{
-			GuiElement.Method tick = GuiElement.Method.MISSING;
-			GuiElement.Method background = GuiElement.Method.MISSING;
-			GuiElement.Method mouseClick = GuiElement.Method.MISSING;
-			GuiElement.Method mouseDrag = GuiElement.Method.MISSING;
-			GuiElement.Method mouseRelease = GuiElement.Method.MISSING;
-			GuiElement.Method mouseScroll = GuiElement.Method.MISSING;
+			ret = EnumSet.noneOf(GuiElement.ImplementedMethod.class);
 
-			GuiElement.Method key;
-			for (key = GuiElement.Method.MISSING;
-			     cls != GuiElement.class
-				     && (
-				     !tick.hasSeen()
-					     || !background.hasSeen()
-					     || !mouseClick.hasSeen()
-					     || !mouseDrag.hasSeen()
-					     || !mouseRelease.hasSeen()
-					     || !mouseScroll.hasSeen()
-					     || !key.hasSeen()
-			     );
-			     cls = cls.getSuperclass()
-			)
+			for (Class<?> curCls = cls; curCls != GuiElement.class; curCls = curCls.getSuperclass())
 			{
-				if (!tick.hasSeen())
+				for (Method method : curCls.getDeclaredMethods())
 				{
-					tick = hasMethod(cls, "tick");
-				}
-
-				if (!background.hasSeen())
-				{
-					background = hasMethod(cls, "drawBackground", int.class, int.class);
-				}
-
-				if (!mouseClick.hasSeen())
-				{
-					mouseClick = hasMethod(cls, "onMouseClick", int.class, int.class, MouseButton.class);
-				}
-
-				if (!mouseClick.hasSeen())
-				{
-					mouseClick = hasMethod(cls, "onMouseClick", int.class, int.class, MouseButton.class, boolean.class);
-				}
-
-				if (!mouseDrag.hasSeen())
-				{
-					mouseDrag = hasMethod(cls, "onMouseDrag", int.class, int.class, MouseButton.class, long.class);
-				}
-
-				if (!mouseDrag.hasSeen())
-				{
-					mouseDrag = hasMethod(cls, "onMouseDrag", int.class, int.class, MouseButton.class, long.class, boolean.class);
-				}
-
-				if (!mouseRelease.hasSeen())
-				{
-					mouseRelease = hasMethod(cls, "onMouseRelease", int.class, int.class, MouseButton.class);
-				}
-
-				if (!mouseRelease.hasSeen())
-				{
-					mouseRelease = hasMethod(cls, "onMouseRelease", int.class, int.class, MouseButton.class, boolean.class);
-				}
-
-				if (!mouseScroll.hasSeen())
-				{
-					mouseScroll = hasMethod(cls, "onMouseScroll", int.class, int.class, ScrollDirection.class);
-				}
-
-				if (!key.hasSeen())
-				{
-					key = hasMethod(cls, "onKeyTyped", char.class, int.class);
+					if ((method.getModifiers() & 10) == 0)
+					{
+						GuiElement.ImplementedMethod implMethod = GuiElement.ImplementedMethod.LOOKUP.get(method.getName());
+						if (implMethod != null && !ret.contains(implMethod) && !method.isAnnotationPresent(GuiElement.SkippedMethod.class))
+						{
+							ret.add(implMethod);
+						}
+					}
 				}
 			}
 
-			subscriptions = new GuiElement.Subscriptions(
-				tick.isPresent(),
-				background.isPresent(),
-				mouseClick.isPresent(),
-				mouseDrag.isPresent(),
-				mouseRelease.isPresent(),
-				mouseScroll.isPresent(),
-				key.isPresent()
-			);
-			SUBSCRIPTIONS.put(this.getClass(), subscriptions);
+			IMPLEMENTED_METHOD_CACHE.put(cls, ret);
 		}
 
-		return subscriptions;
+		return ret;
 	}
 
-	private enum Method
+	public enum ImplementedMethod
 	{
-		PRESENT,
-		SKIPPED,
-		MISSING;
+		tick,
+		drawBackground,
+		drawForeground,
+		onMouseClick,
+		onMouseDrag,
+		onMouseRelease,
+		onMouseScroll,
+		onKeyTyped;
 
-		boolean hasSeen()
-		{
-			return this != MISSING;
-		}
+		static final Map<String, GuiElement.ImplementedMethod> LOOKUP = createLookup();
 
-		boolean isPresent()
+		private static Map<String, GuiElement.ImplementedMethod> createLookup()
 		{
-			return this == PRESENT;
+			GuiElement.ImplementedMethod[] values = values();
+			Map<String, GuiElement.ImplementedMethod> ret = new HashMap<>(values.length);
+
+			for (GuiElement.ImplementedMethod m : values)
+			{
+				ret.put(m.name(), m);
+			}
+
+			return ret;
 		}
 	}
 
@@ -342,42 +280,5 @@ public abstract class GuiElement<T extends GuiElement<T>>
 	@Target(ElementType.METHOD)
 	protected @interface SkippedMethod
 	{
-	}
-
-	public static final class Subscriptions
-	{
-		public final boolean tick;
-		public final boolean background;
-		public final boolean mouseClick;
-		public final boolean mouseDrag;
-		public final boolean mouseRelease;
-		public final boolean mouseScroll;
-		public final boolean key;
-
-		Subscriptions(boolean tick, boolean background, boolean mouseClick, boolean mouseDrag, boolean mouseRelease, boolean mouseScroll, boolean key)
-		{
-			this.tick = tick;
-			this.background = background;
-			this.mouseClick = mouseClick;
-			this.mouseDrag = mouseDrag;
-			this.mouseRelease = mouseRelease;
-			this.mouseScroll = mouseScroll;
-			this.key = key;
-		}
-
-		@Override
-		public String toString()
-		{
-			return String.format(
-				"tick: %s, background: %s, mouseClick: %s, mouseDrag: %s, mouseRelease: %s, mouseScroll: %s, key: %s",
-				this.tick,
-				this.background,
-				this.mouseClick,
-				this.mouseDrag,
-				this.mouseRelease,
-				this.mouseScroll,
-				this.key
-			);
-		}
 	}
 }

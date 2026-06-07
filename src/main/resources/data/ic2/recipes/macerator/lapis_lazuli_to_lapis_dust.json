@@ -1,0 +1,9 @@
+{
+  "type": "ic2:macerator",
+  "ingredient": {
+    "item": "minecraft:lapis_lazuli"
+  },
+  "result": {
+    "item": "ic2:lapis_dust"
+  }
+}

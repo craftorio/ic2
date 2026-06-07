@@ -10,43 +10,41 @@ import ic2.core.ContainerBase;
 import ic2.core.IC2;
 import ic2.core.IHasGui;
 import ic2.core.block.IInventorySlotHolder;
-import ic2.core.block.TileEntityInventory;
 import ic2.core.block.comp.Fluids;
 import ic2.core.block.comp.Redstone;
 import ic2.core.block.invslot.InvSlotConsumableLiquidByList;
 import ic2.core.block.invslot.InvSlotOutput;
 import ic2.core.block.invslot.InvSlotProcessableGeneric;
 import ic2.core.block.invslot.InvSlotUpgrade;
+import ic2.core.block.tileentity.TileEntityInventory;
+import ic2.core.fluid.Ic2FluidTank;
 import ic2.core.gui.dynamic.DynamicContainer;
-import ic2.core.gui.dynamic.DynamicGui;
-import ic2.core.gui.dynamic.GuiParser;
 import ic2.core.gui.dynamic.IGuiValueProvider;
-import ic2.core.item.type.IngotResourceType;
+import ic2.core.network.GrowingBuffer;
 import ic2.core.network.GuiSynced;
 import ic2.core.profile.NotClassic;
-import ic2.core.recipe.BasicMachineRecipeManager;
-import ic2.core.ref.FluidName;
-import ic2.core.ref.ItemName;
+import ic2.core.ref.Ic2BlockEntities;
+import ic2.core.ref.Ic2Fluids;
+import ic2.core.ref.Ic2Items;
 
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Set;
 
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraftforge.fluids.FluidTank;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 @NotClassic
 public class TileEntityBlastFurnace extends TileEntityInventory implements IUpgradableBlock, IHasGui, IGuiValueProvider
 {
 	public int heat = 0;
-	public static final int maxHeat = 50000;
+	public static int maxHeat = 50000;
 	@GuiSynced
 	public float guiHeat;
 	protected final Redstone redstone;
@@ -59,30 +57,26 @@ public class TileEntityBlastFurnace extends TileEntityInventory implements IUpgr
 	public final InvSlotOutput outputSlot = new InvSlotOutput(this, "output", 2)
 	{
 		@Override
-		public void onPickupFromSlot(EntityPlayer player, ItemStack stack)
+		public void onPickupFromSlot(Player player, ItemStack stack)
 		{
-			if (player != null && ItemName.ingot.getItemStack(IngotResourceType.steel).isItemEqual(stack))
+			if (player != null && stack.getItem() == Ic2Items.STEEL_INGOT)
 			{
 				IC2.achievements.issueAchievement(player, "acquireRefinedIron");
 			}
 		}
 	};
-	public final InvSlotConsumableLiquidByList tankInputSlot = new InvSlotConsumableLiquidByList(this, "cellInput", 1, FluidName.air.getInstance());
+	public final InvSlotConsumableLiquidByList tankInputSlot = new InvSlotConsumableLiquidByList(this, "cellInput", 1, Ic2Fluids.AIR.still);
 	public final InvSlotOutput tankOutputSlot = new InvSlotOutput(this, "cellOutput", 1);
 	public final InvSlotUpgrade upgradeSlot = new InvSlotUpgrade(this, "upgrade", 2);
 	@GuiSynced
-	public final FluidTank fluidTank;
+	public final Ic2FluidTank fluidTank;
 
-	public TileEntityBlastFurnace()
+	public TileEntityBlastFurnace(BlockPos pos, BlockState state)
 	{
+		super(Ic2BlockEntities.BLAST_FURNACE, pos, state);
 		this.redstone = this.addComponent(new Redstone(this));
 		this.fluids = this.addComponent(new Fluids(this));
-		this.fluidTank = this.fluids.addTankInsert("fluid", 8000, Fluids.fluidPredicate(FluidName.air.getInstance()));
-	}
-
-	public static void init()
-	{
-		Recipes.blastfurnace = new BasicMachineRecipeManager();
+		this.fluidTank = this.fluids.addTankInsert("fluid", 8000, Fluids.fluidPredicate(Ic2Fluids.AIR.still));
 	}
 
 	@Override
@@ -95,14 +89,14 @@ public class TileEntityBlastFurnace extends TileEntityInventory implements IUpgr
 		if (result != null && this.isHot())
 		{
 			this.setActive(true);
-			if (result.getRecipe().getMetaData().getInteger("fluid") <= this.fluidTank.getFluidAmount())
+			if (result.getRecipe().getMetaData().getInt("fluid") <= this.fluidTank.getFluidAmount())
 			{
 				this.progress++;
-				this.fluidTank.drainInternal(result.getRecipe().getMetaData().getInteger("fluid"), true);
+				this.fluidTank.drainMbUnchecked(result.getRecipe().getMetaData().getInt("fluid"), false);
 			}
 
-			this.progressNeeded = result.getRecipe().getMetaData().getInteger("duration");
-			if (this.progress >= result.getRecipe().getMetaData().getInteger("duration"))
+			this.progressNeeded = result.getRecipe().getMetaData().getInt("duration");
+			if (this.progress >= result.getRecipe().getMetaData().getInt("duration"))
 			{
 				this.operateOnce(result, result.getOutput());
 				needsInvUpdate = true;
@@ -128,7 +122,7 @@ public class TileEntityBlastFurnace extends TileEntityInventory implements IUpgr
 		this.guiHeat = (float) this.heat / maxHeat;
 		if (needsInvUpdate)
 		{
-			super.markDirty();
+			super.setChanged();
 		}
 	}
 
@@ -162,20 +156,19 @@ public class TileEntityBlastFurnace extends TileEntityInventory implements IUpgr
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound nbt)
+	public void load(CompoundTag nbt)
 	{
-		super.readFromNBT(nbt);
-		this.heat = nbt.getInteger("heat");
-		this.progress = nbt.getInteger("progress");
+		super.load(nbt);
+		this.heat = nbt.getInt("heat");
+		this.progress = nbt.getInt("progress");
 	}
 
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
+	public void saveAdditional(CompoundTag nbt)
 	{
-		super.writeToNBT(nbt);
-		nbt.setInteger("heat", this.heat);
-		nbt.setInteger("progress", this.progress);
-		return nbt;
+		super.saveAdditional(nbt);
+		nbt.putInt("heat", this.heat);
+		nbt.putInt("progress", this.progress);
 	}
 
 	private void heatup()
@@ -193,11 +186,11 @@ public class TileEntityBlastFurnace extends TileEntityInventory implements IUpgr
 
 		if (heatRequested > 0)
 		{
-			EnumFacing dir = this.getFacing();
-			TileEntity te = this.getWorld().getTileEntity(this.pos.offset(dir));
+			Direction dir = this.getFacing();
+			BlockEntity te = this.getLevel().getBlockEntity(this.worldPosition.relative(dir));
 			if (te instanceof IHeatSource)
 			{
-				gainhU = ((IHeatSource) te).drawHeat(dir.getOpposite(), heatRequested, false);
+				gainhU = ((IHeatSource) te).drawHeat(dir.m_122424_(), heatRequested, false);
 				this.heat += gainhU;
 			}
 
@@ -217,21 +210,15 @@ public class TileEntityBlastFurnace extends TileEntityInventory implements IUpgr
 	}
 
 	@Override
-	public ContainerBase<TileEntityBlastFurnace> getGuiContainer(EntityPlayer player)
+	public ContainerBase<?> createServerScreenHandler(int syncId, Player player)
 	{
-		return DynamicContainer.create(this, player, GuiParser.parse(this.teBlock));
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
-	{
-		return DynamicGui.<TileEntityBlastFurnace>create(this, player, GuiParser.parse(this.teBlock));
+		return DynamicContainer.create(syncId, player.getInventory(), this);
 	}
 
 	@Override
-	public void onGuiClosed(EntityPlayer player)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
+		return DynamicContainer.create(syncId, inventory, this);
 	}
 
 	@Override

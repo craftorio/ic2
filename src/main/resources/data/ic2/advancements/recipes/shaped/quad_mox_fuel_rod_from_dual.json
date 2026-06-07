@@ -1,0 +1,56 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_dual_mox_fuel_rod": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:dual_mox_fuel_rod"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_plates/copper": {
+      "conditions": {
+        "items": [
+          {
+            "tag": "forge:plates/copper"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_plates/iron": {
+      "conditions": {
+        "items": [
+          {
+            "tag": "forge:plates/iron"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "ic2:shaped/quad_mox_fuel_rod_from_dual"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_dual_mox_fuel_rod",
+      "has_plates/iron",
+      "has_plates/copper",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "ic2:shaped/quad_mox_fuel_rod_from_dual"
+    ]
+  }
+}

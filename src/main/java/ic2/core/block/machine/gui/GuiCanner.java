@@ -1,8 +1,9 @@
 package ic2.core.block.machine.gui;
 
 import com.google.common.base.Supplier;
-import ic2.core.GuiIC2;
+import com.mojang.blaze3d.vertex.PoseStack;
 import ic2.core.IC2;
+import ic2.core.Ic2Gui;
 import ic2.core.block.machine.container.ContainerCanner;
 import ic2.core.block.machine.tileentity.TileEntityCanner;
 import ic2.core.gui.CustomButton;
@@ -12,38 +13,37 @@ import ic2.core.gui.IEnableHandler;
 import ic2.core.gui.INumericValueHandler;
 import ic2.core.gui.RecipeButton;
 import ic2.core.gui.TankGauge;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
 
-@SideOnly(Side.CLIENT)
-public class GuiCanner extends GuiIC2<ContainerCanner>
+public class GuiCanner extends Ic2Gui<ContainerCanner>
 {
-	public static final ResourceLocation texture = new ResourceLocation("ic2", "textures/gui/GUICanner.png");
+	public static final ResourceLocation texture = IC2.getIdentifier("textures/gui/guicanner.png");
 
-	public GuiCanner(ContainerCanner container)
+	public GuiCanner(ContainerCanner container, Inventory playerInventory, Component title)
 	{
-		super(container, 184);
+		super(container, playerInventory, title, 184);
 		this.addElement(EnergyGauge.asBolt(this, 12, 62, container.base));
 		CycleHandler cycleHandler = new CycleHandler(176, 18, 226, 32, 14, true, 4, new INumericValueHandler()
 		{
 			@Override
 			public int getValue()
 			{
-				return GuiCanner.this.container.base.getMode().ordinal();
+				return ((ContainerCanner) GuiCanner.this.menu).base.getMode().ordinal();
 			}
 
 			@Override
 			public void onChange(int value)
 			{
-				IC2.network.get(false).initiateClientTileEntityEvent(GuiCanner.this.container.base, 0 + value);
+				IC2.network.get(false).initiateClientTileEntityEvent(((ContainerCanner) GuiCanner.this.menu).base, 0 + value);
 			}
 		});
 		this.addElement(new CustomButton(this, 63, 81, 50, 14, cycleHandler, texture, cycleHandler).withTooltip(new Supplier<String>()
 		{
 			public String get()
 			{
-				switch (GuiCanner.this.container.base.getMode())
+				switch (((ContainerCanner) GuiCanner.this.menu).base.getMode())
 				{
 					case BottleSolid:
 						return "ic2.Canner.gui.switch.BottleSolid";
@@ -70,7 +70,7 @@ public class GuiCanner extends GuiIC2<ContainerCanner>
 					@Override
 					public boolean isEnabled()
 					{
-						return GuiCanner.this.container.base.getMode() == mode;
+						return ((ContainerCanner) GuiCanner.this.menu).base.getMode() == mode;
 					}
 				}));
 			}
@@ -78,30 +78,30 @@ public class GuiCanner extends GuiIC2<ContainerCanner>
 	}
 
 	@Override
-	protected void drawGuiContainerBackgroundLayer(float f, int x, int y)
+	protected void m_7286_(PoseStack matrices, float delta, int mouseX, int mouseY)
 	{
-		super.drawGuiContainerBackgroundLayer(f, x, y);
+		super.m_7286_(matrices, delta, mouseX, mouseY);
 		this.bindTexture();
-		switch (this.container.base.getMode())
+		switch (((ContainerCanner) this.menu).base.getMode())
 		{
 			case BottleSolid:
-				this.drawTexturedRect(59.0, 53.0, 9.0, 18.0, 3.0, 4.0);
-				this.drawTexturedRect(99.0, 53.0, 18.0, 23.0, 3.0, 4.0);
+				this.drawTexturedRect(matrices, 59.0, 53.0, 9.0, 18.0, 3.0, 4.0);
+				this.drawTexturedRect(matrices, 99.0, 53.0, 18.0, 23.0, 3.0, 4.0);
 				break;
 			case EmptyLiquid:
-				this.drawTexturedRect(71.0, 43.0, 26.0, 18.0, 196.0, 0.0);
-				this.drawTexturedRect(59.0, 53.0, 9.0, 18.0, 3.0, 4.0);
+				this.drawTexturedRect(matrices, 71.0, 43.0, 26.0, 18.0, 196.0, 0.0);
+				this.drawTexturedRect(matrices, 59.0, 53.0, 9.0, 18.0, 3.0, 4.0);
 				break;
 			case BottleLiquid:
-				this.drawTexturedRect(99.0, 53.0, 18.0, 23.0, 3.0, 4.0);
-				this.drawTexturedRect(71.0, 43.0, 26.0, 18.0, 196.0, 0.0);
+				this.drawTexturedRect(matrices, 99.0, 53.0, 18.0, 23.0, 3.0, 4.0);
+				this.drawTexturedRect(matrices, 71.0, 43.0, 26.0, 18.0, 196.0, 0.0);
 			case EnrichLiquid:
 		}
 
-		int progressSize = Math.round(this.container.base.getProgress() * 23.0F);
+		int progressSize = Math.round(((ContainerCanner) this.menu).base.getProgress() * 23.0F);
 		if (progressSize > 0)
 		{
-			this.drawTexturedRect(74.0, 22.0, progressSize, 14.0, 233.0, 0.0);
+			this.drawTexturedRect(matrices, 74.0, 22.0, progressSize, 14.0, 233.0, 0.0);
 		}
 	}
 

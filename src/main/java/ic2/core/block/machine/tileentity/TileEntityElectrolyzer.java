@@ -5,50 +5,41 @@ import ic2.api.recipe.Recipes;
 import ic2.api.upgrade.IUpgradableBlock;
 import ic2.api.upgrade.UpgradableProperty;
 import ic2.core.ContainerBase;
-import ic2.core.IC2;
 import ic2.core.IHasGui;
-import ic2.core.block.TileEntityInventory;
 import ic2.core.block.comp.Fluids;
 import ic2.core.block.invslot.InvSlotUpgrade;
 import ic2.core.block.machine.container.ContainerElectrolyzer;
-import ic2.core.block.machine.gui.GuiElectrolyzer;
+import ic2.core.fluid.Ic2FluidStack;
+import ic2.core.fluid.Ic2FluidTank;
 import ic2.core.gui.CustomGauge;
+import ic2.core.network.GrowingBuffer;
 import ic2.core.recipe.ElectrolyzerRecipeManager;
-import ic2.core.ref.FluidName;
-import ic2.core.ref.TeBlock;
+import ic2.core.ref.Ic2BlockEntities;
+import ic2.core.ref.Ic2Fluids;
 import ic2.core.util.LiquidUtil;
 
 import java.util.EnumSet;
 import java.util.Set;
 
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraftforge.fluids.FluidRegistry;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidTank;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
-@TeBlock.Delegated(current = TileEntityElectrolyzer.class, old = TileEntityClassicElectrolyzer.class)
 public class TileEntityElectrolyzer extends TileEntityElectricMachine implements IUpgradableBlock, IHasGui, CustomGauge.IGaugeRatioProvider
 {
 	protected int progress = 0;
 	protected IElectrolyzerRecipeManager.ElectrolyzerRecipe recipe = null;
-	protected final FluidTank input;
+	protected Ic2FluidTank input;
 	public final InvSlotUpgrade upgradeSlot;
 	protected final Fluids fluids = this.addComponent(new Fluids(this));
 
-	public static Class<? extends TileEntityInventory> delegate()
+	public TileEntityElectrolyzer(BlockPos pos, BlockState state)
 	{
-		return IC2.version.isClassic() ? TileEntityClassicElectrolyzer.class : TileEntityElectrolyzer.class;
-	}
-
-	public TileEntityElectrolyzer()
-	{
-		super(32000, 2);
+		super(Ic2BlockEntities.ELECTROLYZER, pos, state, 32000, 2);
 		this.input = this.fluids.addTankInsert("input", 8000, Fluids.fluidPredicate(Recipes.electrolyzer));
 		this.upgradeSlot = new InvSlotUpgrade(this, "upgradeSlot", 4);
 	}
@@ -58,27 +49,26 @@ public class TileEntityElectrolyzer extends TileEntityElectricMachine implements
 		Recipes.electrolyzer = new ElectrolyzerRecipeManager();
 		Recipes.electrolyzer
 			.addRecipe(
-				FluidRegistry.WATER.getName(),
+				net.minecraft.world.level.material.Fluids.f_76193_,
 				40,
 				32,
-				new IElectrolyzerRecipeManager.ElectrolyzerOutput(FluidName.hydrogen.getName(), 26, EnumFacing.DOWN),
-				new IElectrolyzerRecipeManager.ElectrolyzerOutput(FluidName.oxygen.getName(), 13, EnumFacing.UP)
+				new IElectrolyzerRecipeManager.ElectrolyzerOutput(Ic2Fluids.HYDROGEN.still, 26, Direction.DOWN),
+				new IElectrolyzerRecipeManager.ElectrolyzerOutput(Ic2Fluids.OXYGEN.still, 13, Direction.UP)
 			);
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound nbt)
+	public void load(CompoundTag nbt)
 	{
-		super.readFromNBT(nbt);
-		this.progress = nbt.getInteger("progress");
+		super.load(nbt);
+		this.progress = nbt.getInt("progress");
 	}
 
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
+	public void saveAdditional(CompoundTag nbt)
 	{
-		super.writeToNBT(nbt);
-		nbt.setInteger("progress", this.progress);
-		return nbt;
+		super.saveAdditional(nbt);
+		nbt.putInt("progress", this.progress);
 	}
 
 	@Override
@@ -107,18 +97,18 @@ public class TileEntityElectrolyzer extends TileEntityElectricMachine implements
 		needsInvUpdate |= this.upgradeSlot.tickNoMark();
 		if (needsInvUpdate)
 		{
-			super.markDirty();
+			super.setChanged();
 		}
 	}
 
 	protected boolean canOperate()
 	{
-		if (this.input.getFluid() == null)
+		if (this.input.isEmpty())
 		{
 			return false;
 		}
 
-		this.recipe = Recipes.electrolyzer.getElectrolysisInformation(this.input.getFluid().getFluid());
+		this.recipe = Recipes.electrolyzer.getElectrolysisInformation(this.input.getFluidStack().getFluid());
 		if (this.recipe != null && !(this.energy.getEnergy() < this.recipe.EUaTick) && this.input.getFluidAmount() >= this.recipe.inputAmount)
 		{
 			for (IElectrolyzerRecipeManager.ElectrolyzerOutput output : this.recipe.outputs)
@@ -139,7 +129,7 @@ public class TileEntityElectrolyzer extends TileEntityElectricMachine implements
 	protected void operate()
 	{
 		assert this.recipe != null;
-		this.input.drainInternal(this.recipe.inputAmount, true);
+		this.input.drainMbUnchecked(this.recipe.inputAmount, false);
 
 		for (IElectrolyzerRecipeManager.ElectrolyzerOutput output : this.recipe.outputs)
 		{
@@ -147,15 +137,15 @@ public class TileEntityElectrolyzer extends TileEntityElectricMachine implements
 		}
 	}
 
-	protected boolean canFillTank(EnumFacing facing, FluidStack fluid)
+	protected boolean canFillTank(Direction facing, Ic2FluidStack fluid)
 	{
-		TileEntity te = this.getWorld().getTileEntity(this.pos.offset(facing));
-		return te instanceof TileEntityTank ? LiquidUtil.fillTile(te, facing, fluid, true) == fluid.amount : false;
+		BlockEntity te = this.getLevel().getBlockEntity(this.worldPosition.relative(facing));
+		return te instanceof TileEntityTank ? LiquidUtil.fillTile(te, facing, fluid, true) == fluid.getAmountMb() : false;
 	}
 
-	protected void fillTank(EnumFacing facing, FluidStack fluid)
+	protected void fillTank(Direction facing, Ic2FluidStack fluid)
 	{
-		TileEntity te = this.getWorld().getTileEntity(this.pos.offset(facing));
+		BlockEntity te = this.getLevel().getBlockEntity(this.worldPosition.relative(facing));
 		if (te instanceof TileEntityTank)
 		{
 			LiquidUtil.fillTile(te, facing, fluid, false);
@@ -181,24 +171,18 @@ public class TileEntityElectrolyzer extends TileEntityElectricMachine implements
 	}
 
 	@Override
-	public ContainerBase<TileEntityElectrolyzer> getGuiContainer(EntityPlayer player)
+	public ContainerBase<?> createServerScreenHandler(int syncId, Player player)
 	{
-		return new ContainerElectrolyzer(player, this);
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
-	{
-		return new GuiElectrolyzer(new ContainerElectrolyzer(player, this));
+		return new ContainerElectrolyzer(syncId, player.getInventory(), this);
 	}
 
 	@Override
-	public void onGuiClosed(EntityPlayer player)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
+		return new ContainerElectrolyzer(syncId, inventory, this);
 	}
 
-	public FluidTank getInput()
+	public Ic2FluidTank getInput()
 	{
 		return this.input;
 	}

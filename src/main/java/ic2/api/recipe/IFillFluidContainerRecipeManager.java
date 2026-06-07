@@ -1,11 +1,11 @@
 package ic2.api.recipe;
 
 import ic2.api.util.FluidContainerOutputMode;
+import ic2.core.fluid.Ic2FluidStack;
 
 import java.util.Collection;
 
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
+import net.minecraft.world.item.ItemStack;
 
 public interface IFillFluidContainerRecipeManager extends IMachineRecipeManager<Void, Collection<ItemStack>, IFillFluidContainerRecipeManager.Input>
 {
@@ -16,9 +16,9 @@ public interface IFillFluidContainerRecipeManager extends IMachineRecipeManager<
 	class Input
 	{
 		public final ItemStack container;
-		public final FluidStack fluid;
+		public final Ic2FluidStack fluid;
 
-		public Input(ItemStack container, FluidStack fluid)
+		public Input(ItemStack container, Ic2FluidStack fluid)
 		{
 			this.container = container;
 			this.fluid = fluid;

@@ -1,8 +1,7 @@
 package ic2.core.block.personal;
 
 import com.mojang.authlib.GameProfile;
-import ic2.api.energy.event.EnergyTileLoadEvent;
-import ic2.api.energy.event.EnergyTileUnloadEvent;
+import ic2.api.energy.EnergyNet;
 import ic2.api.energy.tile.IEnergyAcceptor;
 import ic2.api.energy.tile.IEnergyEmitter;
 import ic2.api.energy.tile.IEnergySink;
@@ -13,29 +12,32 @@ import ic2.api.upgrade.UpgradableProperty;
 import ic2.core.ContainerBase;
 import ic2.core.IC2;
 import ic2.core.IHasGui;
-import ic2.core.block.TileEntityInventory;
 import ic2.core.block.invslot.InvSlot;
 import ic2.core.block.invslot.InvSlotCharge;
 import ic2.core.block.invslot.InvSlotConsumableLinked;
 import ic2.core.block.invslot.InvSlotUpgrade;
+import ic2.core.block.tileentity.TileEntityInventory;
+import ic2.core.network.GrowingBuffer;
+import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.util.StackUtil;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTUtil;
-import net.minecraft.util.EnumFacing;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.world.Container;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class TileEntityEnergyOMat
 	extends TileEntityInventory
@@ -58,46 +60,50 @@ public class TileEntityEnergyOMat
 	public final InvSlotCharge chargeSlot = new InvSlotCharge(this, 1);
 	public final InvSlotUpgrade upgradeSlot = new InvSlotUpgrade(this, "upgrade", 1);
 
-	@Override
-	public void readFromNBT(NBTTagCompound nbttagcompound)
+	public TileEntityEnergyOMat(BlockPos pos, BlockState state)
 	{
-		super.readFromNBT(nbttagcompound);
-		if (nbttagcompound.hasKey("ownerGameProfile"))
+		super(Ic2BlockEntities.ENERGY_O_MAT, pos, state);
+	}
+
+	@Override
+	public void load(CompoundTag nbt)
+	{
+		super.load(nbt);
+		if (nbt.contains("ownerGameProfile"))
 		{
-			this.owner = NBTUtil.readGameProfileFromNBT(nbttagcompound.getCompoundTag("ownerGameProfile"));
+			this.owner = NbtUtils.readGameProfile(nbt.getCompound("ownerGameProfile"));
 		}
 
-		this.euOffer = nbttagcompound.getInteger("euOffer");
-		this.paidFor = nbttagcompound.getInteger("paidFor");
+		this.euOffer = nbt.getInt("euOffer");
+		this.paidFor = nbt.getInt("paidFor");
 
 		try
 		{
-			this.euBuffer = nbttagcompound.getDouble("euBuffer");
+			this.euBuffer = nbt.getDouble("euBuffer");
 		} catch (Exception e)
 		{
-			this.euBuffer = nbttagcompound.getInteger("euBuffer");
+			this.euBuffer = nbt.getInt("euBuffer");
 		}
 	}
 
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
+	public void saveAdditional(CompoundTag nbt)
 	{
-		super.writeToNBT(nbt);
+		super.saveAdditional(nbt);
 		if (this.owner != null)
 		{
-			NBTTagCompound ownerNbt = new NBTTagCompound();
-			NBTUtil.writeGameProfile(ownerNbt, this.owner);
-			nbt.setTag("ownerGameProfile", ownerNbt);
+			CompoundTag ownerNbt = new CompoundTag();
+			NbtUtils.writeGameProfile(ownerNbt, this.owner);
+			nbt.put("ownerGameProfile", ownerNbt);
 		}
 
-		nbt.setInteger("euOffer", this.euOffer);
-		nbt.setInteger("paidFor", this.paidFor);
-		nbt.setDouble("euBuffer", this.euBuffer);
-		return nbt;
+		nbt.putInt("euOffer", this.euOffer);
+		nbt.putInt("paidFor", this.paidFor);
+		nbt.putDouble("euBuffer", this.euBuffer);
 	}
 
 	@Override
-	public boolean wrenchCanRemove(EntityPlayer player)
+	public boolean wrenchCanRemove(Player player)
 	{
 		return this.permitsAccess(player.getGameProfile());
 	}
@@ -106,9 +112,9 @@ public class TileEntityEnergyOMat
 	protected void onLoaded()
 	{
 		super.onLoaded();
-		if (!this.getWorld().isRemote)
+		if (!this.getLevel().isClientSide)
 		{
-			MinecraftForge.EVENT_BUS.post(new EnergyTileLoadEvent(this));
+			EnergyNet.instance.addBlockEntityTile(this);
 			this.addedToEnergyNet = true;
 		}
 	}
@@ -116,9 +122,9 @@ public class TileEntityEnergyOMat
 	@Override
 	protected void onUnloaded()
 	{
-		if (IC2.platform.isSimulating() && this.addedToEnergyNet)
+		if (IC2.sideProxy.isSimulating() && this.addedToEnergyNet)
 		{
-			MinecraftForge.EVENT_BUS.post(new EnergyTileUnloadEvent(this));
+			EnergyNet.instance.removeTile(this);
 			this.addedToEnergyNet = false;
 		}
 
@@ -164,7 +170,7 @@ public class TileEntityEnergyOMat
 
 		if (invChanged)
 		{
-			this.markDirty();
+			this.setChanged();
 		}
 	}
 
@@ -175,7 +181,7 @@ public class TileEntityEnergyOMat
 	}
 
 	@Override
-	public IInventory getPrivilegedInventory(GameProfile accessor)
+	public Container getPrivilegedInventory(GameProfile accessor)
 	{
 		return this;
 	}
@@ -208,24 +214,24 @@ public class TileEntityEnergyOMat
 	}
 
 	@Override
-	protected boolean canSetFacingWrench(EnumFacing facing, EntityPlayer player)
+	protected boolean canSetFacingWrench(Direction facing, Player player)
 	{
 		return player != null && this.permitsAccess(player.getGameProfile()) ? super.canSetFacingWrench(facing, player) : false;
 	}
 
 	@Override
-	public boolean acceptsEnergyFrom(IEnergyEmitter emitter, EnumFacing direction)
+	public boolean acceptsEnergyFrom(IEnergyEmitter emitter, Direction direction)
 	{
 		return !this.facingMatchesDirection(direction);
 	}
 
-	public boolean facingMatchesDirection(EnumFacing direction)
+	public boolean facingMatchesDirection(Direction direction)
 	{
 		return direction == this.getFacing();
 	}
 
 	@Override
-	public boolean emitsEnergyTo(IEnergyAcceptor receiver, EnumFacing direction)
+	public boolean emitsEnergyTo(IEnergyAcceptor receiver, Direction direction)
 	{
 		return this.facingMatchesDirection(direction);
 	}
@@ -249,7 +255,7 @@ public class TileEntityEnergyOMat
 	}
 
 	@Override
-	public double injectEnergy(EnumFacing directionFrom, double amount, double voltage)
+	public double injectEnergy(Direction directionFrom, double amount, double voltage)
 	{
 		double toAdd = Math.min(Math.min(amount, this.paidFor), this.euBufferMax - this.euBuffer);
 		this.paidFor = (int) (this.paidFor - toAdd);
@@ -270,27 +276,27 @@ public class TileEntityEnergyOMat
 	}
 
 	@Override
-	public ContainerBase<TileEntityEnergyOMat> getGuiContainer(EntityPlayer player)
+	public ContainerBase<?> createServerScreenHandler(int syncId, Player player)
 	{
-		return this.permitsAccess(player.getGameProfile()) ? new ContainerEnergyOMatOpen(player, this) : new ContainerEnergyOMatClosed(player, this);
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
-	{
-		return !isAdmin && !this.permitsAccess(player.getGameProfile())
-			? new GuiEnergyOMatClosed(new ContainerEnergyOMatClosed(player, this))
-			: new GuiEnergyOMatOpen(new ContainerEnergyOMatOpen(player, this));
+		return this.permitsAccess(player.getGameProfile())
+			? new ContainerEnergyOMatOpen(syncId, player.getInventory(), this)
+			: new ContainerEnergyOMatClosed(syncId, player.getInventory(), this);
 	}
 
 	@Override
-	public void onGuiClosed(EntityPlayer player)
+	public void writeScreenOpenData(Player player, InteractionHand hand, GrowingBuffer buffer) throws IOException
 	{
+		buffer.writeBoolean(this.permitsAccess(player.getGameProfile()));
 	}
 
 	@Override
-	public void onNetworkEvent(EntityPlayer player, int event)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
+	{
+		return data.readBoolean() ? new ContainerEnergyOMatOpen(syncId, inventory, this) : new ContainerEnergyOMatClosed(syncId, inventory, this);
+	}
+
+	@Override
+	public void onNetworkEvent(Player player, int event)
 	{
 		if (this.permitsAccess(player.getGameProfile()))
 		{

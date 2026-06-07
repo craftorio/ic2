@@ -2,11 +2,12 @@ package ic2.core.slot;
 
 import ic2.core.util.StackUtil;
 import ic2.core.util.Util;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.ClickType;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
 public class SlotHologramSlot extends Slot
 {
@@ -17,7 +18,7 @@ public class SlotHologramSlot extends Slot
 
 	public SlotHologramSlot(ItemStack[] stacks, int index, int x, int y, int stackSizeLimit, SlotHologramSlot.ChangeCallback changeCallback)
 	{
-		super(null, 0, x, y);
+		super(new SlotHologramSlot.DummyInventory(), 0, x, y);
 		if (index >= stacks.length)
 		{
 			throw new ArrayIndexOutOfBoundsException(index);
@@ -29,32 +30,32 @@ public class SlotHologramSlot extends Slot
 		this.changeCallback = changeCallback;
 	}
 
-	public boolean canTakeStack(EntityPlayer player)
+	public boolean m_8010_(Player player)
 	{
 		return false;
 	}
 
-	public int getSlotStackLimit()
+	public int m_6641_()
 	{
 		return this.stackSizeLimit;
 	}
 
-	public boolean isItemValid(ItemStack stack)
+	public boolean m_5857_(ItemStack stack)
 	{
 		return false;
 	}
 
-	public ItemStack getStack()
+	public ItemStack m_7993_()
 	{
 		return StackUtil.wrapEmpty(this.stacks[this.index]);
 	}
 
-	public void putStack(ItemStack stack)
+	public void m_5852_(ItemStack stack)
 	{
 		this.stacks[this.index] = stack;
 	}
 
-	public void onSlotChanged()
+	public void m_6654_()
 	{
 		if (Util.inDev())
 		{
@@ -67,31 +68,26 @@ public class SlotHologramSlot extends Slot
 		}
 	}
 
-	public ItemStack decrStackSize(int amount)
+	public ItemStack m_6201_(int amount)
 	{
 		return StackUtil.emptyStack;
 	}
 
-	public boolean isHere(IInventory inventory, int index)
+	public ItemStack slotClick(int button, ClickType clickType, Player player, AbstractContainerMenu screenHandler)
 	{
-		return false;
-	}
-
-	public ItemStack slotClick(int dragType, ClickType clickType, EntityPlayer player)
-	{
-		if (Util.inDev() && player.getEntityWorld().isRemote)
+		if (Util.inDev() && player.getCommandSenderWorld().isClientSide)
 		{
-			System.out.printf("dragType=%d clickType=%s stack=%s%n", dragType, clickType, player.inventory.getItemStack());
+			System.out.printf("button=%d clickType=%s stack=%s%n", button, clickType, screenHandler.m_142621_());
 		}
 
-		if (clickType == ClickType.PICKUP && (dragType == 0 || dragType == 1))
+		if (clickType == ClickType.PICKUP && (button == 0 || button == 1))
 		{
-			ItemStack playerStack = player.inventory.getItemStack();
+			ItemStack playerStack = screenHandler.m_142621_();
 			ItemStack slotStack = this.stacks[this.index];
 			if (!StackUtil.isEmpty(playerStack))
 			{
 				int curSize = StackUtil.getSize(slotStack);
-				int extraSize = dragType == 0 ? StackUtil.getSize(playerStack) : 1;
+				int extraSize = button == 0 ? StackUtil.getSize(playerStack) : 1;
 				int limit = Math.min(playerStack.getMaxStackSize(), this.stackSizeLimit);
 				if (curSize + extraSize > limit)
 				{
@@ -115,7 +111,7 @@ public class SlotHologramSlot extends Slot
 				}
 			} else if (!StackUtil.isEmpty(slotStack))
 			{
-				if (dragType == 0)
+				if (button == 0)
 				{
 					this.stacks[this.index] = StackUtil.emptyStack;
 				} else
@@ -131,7 +127,7 @@ public class SlotHologramSlot extends Slot
 				}
 			}
 
-			this.onSlotChanged();
+			this.m_6654_();
 		}
 
 		return StackUtil.emptyStack;
@@ -140,5 +136,50 @@ public class SlotHologramSlot extends Slot
 	public interface ChangeCallback
 	{
 		void onChanged(int var1);
+	}
+
+	private static final class DummyInventory implements Container
+	{
+		public int getContainerSize()
+		{
+			return 1;
+		}
+
+		public boolean isEmpty()
+		{
+			return false;
+		}
+
+		public ItemStack getItem(int slot)
+		{
+			return StackUtil.emptyStack;
+		}
+
+		public ItemStack removeItem(int slot, int amount)
+		{
+			return StackUtil.emptyStack;
+		}
+
+		public ItemStack removeItemNoUpdate(int slot)
+		{
+			return StackUtil.emptyStack;
+		}
+
+		public void setItem(int slot, ItemStack stack)
+		{
+		}
+
+		public void setChanged()
+		{
+		}
+
+		public boolean stillValid(Player player)
+		{
+			return true;
+		}
+
+		public void clearContent()
+		{
+		}
 	}
 }

@@ -1,0 +1,15 @@
+{
+  "type": "ic2:canner_bottle",
+  "container_ingredient": {
+    "item": "ic2:tin_can",
+    "count": 2
+  },
+  "fill_ingredient": {
+    "item": "minecraft:rotten_flesh",
+    "count": 2
+  },
+  "result": {
+    "item": "ic2:filled_tin_can",
+    "count": 2
+  }
+}

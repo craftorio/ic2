@@ -3,7 +3,6 @@ package ic2.core.block.machine.tileentity;
 import ic2.api.upgrade.IUpgradableBlock;
 import ic2.api.upgrade.UpgradableProperty;
 import ic2.core.ContainerBase;
-import ic2.core.IC2;
 import ic2.core.IHasGui;
 import ic2.core.block.comp.Fluids;
 import ic2.core.block.invslot.InvSlot;
@@ -14,30 +13,25 @@ import ic2.core.block.invslot.InvSlotConsumableLiquidByTank;
 import ic2.core.block.invslot.InvSlotOutput;
 import ic2.core.block.invslot.InvSlotUpgrade;
 import ic2.core.block.machine.container.ContainerCropmatron;
-import ic2.core.block.machine.gui.GuiCropmatron;
 import ic2.core.crop.TileEntityCrop;
-import ic2.core.item.type.CropResItemType;
-import ic2.core.ref.FluidName;
-import ic2.core.ref.ItemName;
-import ic2.core.ref.TeBlock;
+import ic2.core.fluid.Ic2FluidTank;
+import ic2.core.network.GrowingBuffer;
+import ic2.core.ref.Ic2BlockEntities;
+import ic2.core.ref.Ic2Fluids;
+import ic2.core.ref.Ic2Items;
 
 import java.util.EnumSet;
 import java.util.Set;
 
-import net.minecraft.block.BlockFarmland;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.fluids.FluidRegistry;
-import net.minecraftforge.fluids.FluidTank;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.FarmBlock;
+import net.minecraft.world.level.block.state.BlockState;
 
-@TeBlock.Delegated(current = TileEntityCropmatron.class, old = TileEntityClassicCropmatron.class)
 public class TileEntityCropmatron extends TileEntityElectricMachine implements IHasGui, IUpgradableBlock
 {
 	public final InvSlotUpgrade upgradeSlot;
@@ -49,21 +43,16 @@ public class TileEntityCropmatron extends TileEntityElectricMachine implements I
 	public final InvSlotOutput exOutputSlot;
 	public final InvSlotConsumableLiquidByTank wasserinputSlot;
 	public final InvSlotConsumableLiquidByTank exInputSlot;
-	protected final FluidTank waterTank;
-	protected final FluidTank exTank;
+	protected final Ic2FluidTank waterTank;
+	protected final Ic2FluidTank exTank;
 	protected final Fluids fluids = this.addComponent(new Fluids(this));
 
-	public static Class<? extends TileEntityElectricMachine> delegate()
+	public TileEntityCropmatron(BlockPos pos, BlockState state)
 	{
-		return IC2.version.isClassic() ? TileEntityClassicCropmatron.class : TileEntityCropmatron.class;
-	}
-
-	public TileEntityCropmatron()
-	{
-		super(10000, 1);
-		this.waterTank = this.fluids.addTankInsert("waterTank", 2000, Fluids.fluidPredicate(FluidRegistry.WATER));
-		this.exTank = this.fluids.addTankInsert("exTank", 2000, Fluids.fluidPredicate(FluidName.weed_ex.getInstance()));
-		this.fertilizerSlot = new InvSlotConsumableItemStack(this, "fertilizer", 7, ItemName.crop_res.getItemStack(CropResItemType.fertilizer));
+		super(Ic2BlockEntities.CROPMATRON, pos, state, 10000, 1);
+		this.waterTank = this.fluids.addTankInsert("waterTank", 2000, Fluids.fluidPredicate(net.minecraft.world.level.material.Fluids.f_76193_));
+		this.exTank = this.fluids.addTankInsert("exTank", 2000, Fluids.fluidPredicate(Ic2Fluids.WEED_EX.still));
+		this.fertilizerSlot = new InvSlotConsumableItemStack(this, "fertilizer", 7, new ItemStack(Ic2Items.FERTILIZER));
 		this.wasserinputSlot = new InvSlotConsumableLiquidByTank(
 			this, "wasserinputSlot", InvSlot.Access.I, 1, InvSlot.InvSide.TOP, InvSlotConsumableLiquid.OpType.Drain, this.waterTank
 		);
@@ -83,7 +72,7 @@ public class TileEntityCropmatron extends TileEntityElectricMachine implements I
 		this.wasserinputSlot.processIntoTank(this.waterTank, this.wasseroutputSlot);
 		this.exInputSlot.processIntoTank(this.exTank, this.exOutputSlot);
 		this.fertilizerSlot.organize();
-		if (this.world.getTotalWorldTime() % 10L == 0L && this.energy.getEnergy() >= 31.0)
+		if (this.level.getGameTime() % 10L == 0L && this.energy.getEnergy() >= 31.0)
 		{
 			this.scan();
 		}
@@ -108,27 +97,28 @@ public class TileEntityCropmatron extends TileEntityElectricMachine implements I
 		}
 
 		this.energy.useEnergy(1.0);
-		BlockPos scan = this.pos.add(this.scanX, this.scanY, this.scanZ);
-		TileEntity te = this.getWorld().getTileEntity(scan);
-		if (te instanceof TileEntityCrop)
+		BlockPos scan = this.worldPosition.offset(this.scanX, this.scanY, this.scanZ);
+		if (this.getLevel().getBlockEntity(scan) instanceof TileEntityCrop crop)
 		{
-			TileEntityCrop crop = (TileEntityCrop) te;
 			if (!this.fertilizerSlot.isEmpty() && this.fertilizerSlot.consume(1, true, false) != null && crop.applyFertilizer(false))
 			{
 				this.energy.useEnergy(10.0);
 				this.fertilizerSlot.consume(1);
 			}
 
-			if (this.waterTank.getFluidAmount() > 0 && crop.applyHydration(this.getWaterTank()))
+			int amount;
+			if (!this.waterTank.isEmpty() && (amount = crop.applyHydration(this.waterTank.getFluidAmount(), false)) > 0)
 			{
+				this.waterTank.drainMb(amount, false);
 				this.energy.useEnergy(10.0);
 			}
 
-			if (this.exTank.getFluidAmount() > 0 && crop.applyWeedEx(this.getExTank(), false))
+			if (!this.exTank.isEmpty() && (amount = crop.applyWeedEx(this.exTank.getFluidAmount(), false, false, false)) > 0)
 			{
+				this.exTank.drainMb(amount, false);
 				this.energy.useEnergy(10.0);
 			}
-		} else if (this.waterTank.getFluidAmount() > 0 && this.tryHydrateFarmland(scan))
+		} else if (!this.waterTank.isEmpty() && this.tryHydrateFarmland(scan))
 		{
 			this.energy.useEnergy(10.0);
 		}
@@ -136,16 +126,16 @@ public class TileEntityCropmatron extends TileEntityElectricMachine implements I
 
 	private boolean tryHydrateFarmland(BlockPos pos)
 	{
-		World world = this.getWorld();
-		IBlockState state = world.getBlockState(pos);
+		Level world = this.getLevel();
+		BlockState state = world.getBlockState(pos);
 		int hydration;
-		if (state.getBlock() == Blocks.FARMLAND && (hydration = (Integer) state.getValue(BlockFarmland.MOISTURE)) < 7)
+		if (state.getBlock() == Blocks.f_50093_ && (hydration = (Integer) state.getValue(FarmBlock.f_53243_)) < 7)
 		{
 			int drainAmount = Math.min(this.waterTank.getFluidAmount(), 7 - hydration);
 			assert drainAmount > 0;
 			assert drainAmount <= 7;
-			this.waterTank.drainInternal(drainAmount, true);
-			world.setBlockState(pos, state.withProperty(BlockFarmland.MOISTURE, hydration + drainAmount), 2);
+			this.waterTank.drainMbUnchecked(drainAmount, false);
+			world.m_7731_(pos, (BlockState) state.setValue(FarmBlock.f_53243_, hydration + drainAmount), 2);
 			return true;
 		} else
 		{
@@ -172,29 +162,23 @@ public class TileEntityCropmatron extends TileEntityElectricMachine implements I
 	}
 
 	@Override
-	public ContainerBase<TileEntityCropmatron> getGuiContainer(EntityPlayer player)
+	public ContainerBase<TileEntityCropmatron> createServerScreenHandler(int syncId, Player player)
 	{
-		return new ContainerCropmatron(player, this);
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
-	{
-		return new GuiCropmatron(new ContainerCropmatron(player, this));
+		return new ContainerCropmatron(syncId, player.getInventory(), this);
 	}
 
 	@Override
-	public void onGuiClosed(EntityPlayer player)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
+		return new ContainerCropmatron(syncId, inventory, this);
 	}
 
-	public FluidTank getWaterTank()
+	public Ic2FluidTank getWaterTank()
 	{
 		return this.waterTank;
 	}
 
-	public FluidTank getExTank()
+	public Ic2FluidTank getExTank()
 	{
 		return this.exTank;
 	}

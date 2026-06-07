@@ -1,18 +1,18 @@
 package ic2.core.item.upgrade;
 
-import ic2.core.GuiIC2;
+import ic2.core.Ic2Gui;
 import ic2.core.gui.IEnableHandler;
 import ic2.core.gui.TextBox;
 
 class MoveableTextBox extends TextBox
 {
 	private IEnableHandler moveHandler;
-	protected final int normalX;
-	protected final int normalY;
-	protected final int shiftedX;
-	protected final int shiftedY;
+	protected int normalX;
+	protected int normalY;
+	protected int shiftedX;
+	protected int shiftedY;
 
-	public MoveableTextBox(GuiIC2<?> gui, int normalX, int normalY, int shiftedX, int shiftedY, int width, int height, String text)
+	public MoveableTextBox(Ic2Gui<?> gui, int normalX, int normalY, int shiftedX, int shiftedY, int width, int height, String text)
 	{
 		super(gui, normalX, normalY, width, height, text);
 		this.normalX = normalX;

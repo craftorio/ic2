@@ -1,6 +1,5 @@
 package ic2.core.uu;
 
-import ic2.api.recipe.Recipes;
 import ic2.core.IC2;
 import ic2.core.init.MainConfig;
 import ic2.core.util.Config;
@@ -12,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 public class UuIndex
 {
@@ -58,22 +57,6 @@ public class UuIndex
 
 	public void init()
 	{
-		this.addResolver(new VanillaSmeltingResolver());
-		this.addResolver(new RecipeResolver());
-		this.addResolver(new MachineRecipeResolver(Recipes.macerator));
-		this.addResolver(new MachineRecipeResolver(Recipes.extractor));
-		this.addResolver(new MachineRecipeResolver(Recipes.compressor));
-		this.addResolver(new MachineRecipeResolver(Recipes.centrifuge));
-		this.addResolver(new MachineRecipeResolver(Recipes.blockcutter));
-		this.addResolver(new MachineRecipeResolver(Recipes.blastfurnace));
-		this.addResolver(new MachineRecipeResolver(Recipes.metalformerExtruding));
-		this.addResolver(new MachineRecipeResolver(Recipes.metalformerCutting));
-		this.addResolver(new MachineRecipeResolver(Recipes.metalformerRolling));
-		this.addResolver(new MachineRecipeResolver(Recipes.oreWashing));
-		this.addResolver(new CannerBottleSolidResolver());
-		this.addResolver(new ScrapBoxResolver());
-		this.addResolver(new ManualRecipeResolver());
-		this.addResolver(new RecyclerResolver());
 	}
 
 	public void refresh(boolean reset)

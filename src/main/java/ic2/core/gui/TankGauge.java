@@ -1,15 +1,18 @@
 package ic2.core.gui;
 
-import ic2.core.GuiIC2;
+import com.mojang.blaze3d.vertex.PoseStack;
+import ic2.core.Ic2Gui;
+import ic2.core.fluid.Ic2FluidStack;
+import ic2.core.fluid.Ic2FluidTank;
 import ic2.core.init.Localization;
+import ic2.core.proxy.SideProxyClient;
 import ic2.core.util.Util;
 
 import java.util.List;
 
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.IFluidTank;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.material.Fluid;
 
 public class TankGauge extends GuiElement<TankGauge>
 {
@@ -23,25 +26,25 @@ public class TankGauge extends GuiElement<TankGauge>
 	public static final int fluidOffsetY = 4;
 	public static final int fluidNetWidth = 12;
 	public static final int fluidNetHeight = 47;
-	private final IFluidTank tank;
+	private final Ic2FluidTank tank;
 	private final TankGauge.TankGuiStyle style;
 
-	public static TankGauge createNormal(GuiIC2<?> gui, int x, int y, IFluidTank tank)
+	public static TankGauge createNormal(Ic2Gui<?> gui, int x, int y, Ic2FluidTank tank)
 	{
 		return new TankGauge(gui, x, y, 20, 55, tank, TankGauge.TankGuiStyle.Normal);
 	}
 
-	public static TankGauge createPlain(GuiIC2<?> gui, int x, int y, int width, int height, IFluidTank tank)
+	public static TankGauge createPlain(Ic2Gui<?> gui, int x, int y, int width, int height, Ic2FluidTank tank)
 	{
 		return new TankGauge(gui, x, y, width, height, tank, TankGauge.TankGuiStyle.Plain);
 	}
 
-	public static TankGauge createBorderless(GuiIC2<?> gui, int x, int y, IFluidTank tank, boolean mirrored)
+	public static TankGauge createBorderless(Ic2Gui<?> gui, int x, int y, Ic2FluidTank tank, boolean mirrored)
 	{
 		return new TankGauge(gui, x, y, 12, 47, tank, mirrored ? TankGauge.TankGuiStyle.BorderlessMirrored : TankGauge.TankGuiStyle.Borderless);
 	}
 
-	private TankGauge(GuiIC2<?> gui, int x, int y, int width, int height, IFluidTank tank, TankGauge.TankGuiStyle style)
+	private TankGauge(Ic2Gui<?> gui, int x, int y, int width, int height, Ic2FluidTank tank, TankGauge.TankGuiStyle style)
 	{
 		super(gui, x, y, width, height);
 		if (tank == null)
@@ -54,15 +57,15 @@ public class TankGauge extends GuiElement<TankGauge>
 	}
 
 	@Override
-	public void drawBackground(int mouseX, int mouseY)
+	public void drawBackground(PoseStack matrices, int mouseX, int mouseY)
 	{
 		bindCommonTexture();
-		FluidStack fs = this.tank.getFluid();
-		if (fs != null && fs.amount > 0)
+		Ic2FluidStack fs = this.tank.getFluidStack();
+		if (fs != null && !fs.isEmpty())
 		{
 			if (this.style.withBorder)
 			{
-				this.gui.drawTexturedRect(this.x, this.y, this.width, this.height, 6.0, 100.0);
+				this.gui.drawTexturedRect(matrices, this.x, this.y, this.width, this.height, 6.0, 100.0);
 			}
 
 			int fluidX = this.x;
@@ -77,12 +80,11 @@ public class TankGauge extends GuiElement<TankGauge>
 				fluidHeight = 47;
 			}
 
-			Fluid fluid = fs.getFluid();
-			TextureAtlasSprite sprite = fluid != null ? getBlockTextureMap().getAtlasSprite(fluid.getStill(fs).toString()) : null;
-			int color = fluid != null ? fluid.getColor(fs) : -1;
-			double renderHeight = fluidHeight * Util.limit((double) fs.amount / this.tank.getCapacity(), 0.0, 1.0);
+			TextureAtlasSprite sprite = SideProxyClient.envProxy.getFluidStillSprite(fs);
+			int color = SideProxyClient.envProxy.getFluidColor(fs);
+			double renderHeight = fluidHeight * Util.limit((double) fs.getAmountMb() / this.tank.getCapacity(), 0.0, 1.0);
 			bindBlockTexture();
-			this.gui.drawSprite(fluidX, fluidY + fluidHeight - renderHeight, fluidWidth, renderHeight, sprite, color, 1.0, false, true);
+			this.gui.drawSprite(matrices, fluidX, fluidY + fluidHeight - renderHeight, fluidWidth, renderHeight, sprite, color, 1.0, false, true);
 			if (this.style.withGauge)
 			{
 				bindCommonTexture();
@@ -94,35 +96,37 @@ public class TankGauge extends GuiElement<TankGauge>
 					gaugeY -= 4;
 				}
 
-				this.gui.drawTexturedRect(gaugeX, gaugeY, 20.0, 55.0, 38.0, 100.0, this.style.mirrorGauge);
+				this.gui.drawTexturedRect(matrices, gaugeX, gaugeY, 20.0, 55.0, 38.0, 100.0, this.style.mirrorGauge);
 			}
 		} else if (this.style.withBorder)
 		{
-			this.gui.drawTexturedRect(this.x, this.y, this.width, this.height, 70.0, 100.0, this.style.mirrorGauge);
+			this.gui.drawTexturedRect(matrices, this.x, this.y, this.width, this.height, 70.0, 100.0, this.style.mirrorGauge);
 		} else if (this.style.withGauge)
 		{
-			this.gui.drawTexturedRect(this.x, this.y, this.width, this.height, 74.0, 104.0, this.style.mirrorGauge);
+			this.gui.drawTexturedRect(matrices, this.x, this.y, this.width, this.height, 74.0, 104.0, this.style.mirrorGauge);
 		}
 	}
 
 	@Override
-	protected List<String> getToolTip()
+	protected List<Component> getToolTip()
 	{
-		List<String> ret = super.getToolTip();
-		FluidStack fs = this.tank.getFluid();
-		if (fs != null && fs.amount > 0)
+		List<Component> ret = super.getToolTip();
+		Ic2FluidStack fs = this.tank.getFluidStack();
+		if (fs != null && !fs.isEmpty())
 		{
 			Fluid fluid = fs.getFluid();
 			if (fluid != null)
 			{
-				ret.add(fluid.getLocalizedName(fs) + ": " + fs.amount + " " + Localization.translate("ic2.generic.text.mb"));
+				ret.add(
+					Component.m_237113_(SideProxyClient.envProxy.getFluidName(fs) + ": " + fs.getAmountMb() + " " + Localization.translate("ic2.generic.text.mb"))
+				);
 			} else
 			{
-				ret.add("invalid fluid stack");
+				ret.add(Component.m_237113_("invalid fluid stack"));
 			}
 		} else
 		{
-			ret.add(Localization.translate("ic2.generic.text.empty"));
+			ret.add(Component.m_237115_("ic2.generic.text.empty"));
 		}
 
 		return ret;

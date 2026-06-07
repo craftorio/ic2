@@ -7,10 +7,11 @@ import ic2.api.recipe.MachineRecipeResult;
 import ic2.api.recipe.Recipes;
 import ic2.api.util.FluidContainerOutputMode;
 import ic2.core.block.machine.tileentity.TileEntityCanner;
+import ic2.core.fluid.Ic2FluidStack;
+import ic2.core.fluid.Ic2FluidTank;
 import ic2.core.util.StackUtil;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidTank;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 public class InvSlotProcessableCanner extends InvSlotProcessable<Object, Object, Object>
 {
@@ -46,10 +47,10 @@ public class InvSlotProcessableCanner extends InvSlotProcessable<Object, Object,
 			((TileEntityCanner) this.base).canInputSlot.clear();
 		}
 
-		FluidStack fluid = ((TileEntityCanner) this.base).inputTank.getFluid();
-		if (fluid != null && fluid.amount <= 0)
+		Ic2FluidStack fluid = ((TileEntityCanner) this.base).inputTank.getFluidStack();
+		if (fluid != null && fluid.isEmpty())
 		{
-			((TileEntityCanner) this.base).inputTank.setFluid(null);
+			((TileEntityCanner) this.base).inputTank.setFluidStack(null);
 		}
 	}
 
@@ -77,7 +78,7 @@ public class InvSlotProcessableCanner extends InvSlotProcessable<Object, Object,
 	protected void setInput(Object rawInput)
 	{
 		InvSlotConsumableCanner canInputSlot = ((TileEntityCanner) this.base).canInputSlot;
-		FluidTank tank = ((TileEntityCanner) this.base).inputTank;
+		Ic2FluidTank tank = ((TileEntityCanner) this.base).inputTank;
 		switch (((TileEntityCanner) this.base).getMode())
 		{
 			case BottleSolid:
@@ -91,14 +92,14 @@ public class InvSlotProcessableCanner extends InvSlotProcessable<Object, Object,
 			{
 				ICannerEnrichRecipeManager.RawInput input = (ICannerEnrichRecipeManager.RawInput) rawInput;
 				this.put(input.additive);
-				tank.drain(input.fluid == null ? tank.getFluidAmount() : tank.getFluidAmount() - input.fluid.amount, true);
+				tank.drainMbUnchecked(input.fluid == null ? tank.getFluidAmount() : tank.getFluidAmount() - input.fluid.getAmountMb(), false);
 				break;
 			}
 			case BottleLiquid:
 			{
 				IFillFluidContainerRecipeManager.Input input = (IFillFluidContainerRecipeManager.Input) rawInput;
 				canInputSlot.put(input.container);
-				tank.drain(input.fluid == null ? tank.getFluidAmount() : tank.getFluidAmount() - input.fluid.amount, true);
+				tank.drainMbUnchecked(input.fluid == null ? tank.getFluidAmount() : tank.getFluidAmount() - input.fluid.getAmountMb(), false);
 				break;
 			}
 			case EmptyLiquid:
@@ -123,16 +124,17 @@ public class InvSlotProcessableCanner extends InvSlotProcessable<Object, Object,
 
 	protected MachineRecipeResult<Object, Object, Object> getOutput(Object input, boolean forAccept)
 	{
+		Level world = this.base.getParent().getLevel();
 		switch (((TileEntityCanner) this.base).getMode())
 		{
 			case BottleSolid:
-				return (MachineRecipeResult) Recipes.cannerBottle.apply((ICannerBottleRecipeManager.RawInput) input, forAccept);
+				return Recipes.cannerBottle.get(world).apply((ICannerBottleRecipeManager.RawInput) input, forAccept);
 			case EnrichLiquid:
-				return (MachineRecipeResult) Recipes.cannerEnrich.apply((ICannerEnrichRecipeManager.RawInput) input, forAccept);
+				return Recipes.cannerEnrich.get(world).apply((ICannerEnrichRecipeManager.RawInput) input, forAccept);
 			case BottleLiquid:
-				return (MachineRecipeResult) Recipes.fillFluidContainer.apply((IFillFluidContainerRecipeManager.Input) input, FluidContainerOutputMode.EmptyFullToOutput, forAccept);
+				return Recipes.fillFluidContainer.apply((IFillFluidContainerRecipeManager.Input) input, FluidContainerOutputMode.EmptyFullToOutput, forAccept);
 			case EmptyLiquid:
-				return (MachineRecipeResult) Recipes.emptyFluidContainer
+				return Recipes.emptyFluidContainer
 					.apply(
 						(ItemStack) input, this.getTankFluid() == null ? null : this.getTankFluid().getFluid(), FluidContainerOutputMode.EmptyFullToOutput, forAccept
 					);
@@ -142,8 +144,8 @@ public class InvSlotProcessableCanner extends InvSlotProcessable<Object, Object,
 		}
 	}
 
-	private FluidStack getTankFluid()
+	private Ic2FluidStack getTankFluid()
 	{
-		return ((TileEntityCanner) this.base).inputTank.getFluid();
+		return ((TileEntityCanner) this.base).inputTank.getFluidStack();
 	}
 }

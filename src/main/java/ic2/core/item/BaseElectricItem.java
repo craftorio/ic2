@@ -3,35 +3,29 @@ package ic2.core.item;
 import ic2.api.item.ElectricItem;
 import ic2.api.item.IElectricItem;
 import ic2.api.item.IItemHudInfo;
-import ic2.core.IC2;
-import ic2.core.init.MainConfig;
-import ic2.core.ref.ItemName;
-import ic2.core.util.ConfigUtil;
-import ic2.core.util.LogCategory;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
+import net.minecraft.core.NonNullList;
+import net.minecraft.util.Mth;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item.Properties;
 
-public abstract class BaseElectricItem extends ItemIC2 implements IPseudoDamageItem, IElectricItem, IItemHudInfo
+public abstract class BaseElectricItem extends Item implements IElectricItem, IItemHudInfo
 {
-	public static final boolean logIncorrectItemDamaging = ConfigUtil.getBool(MainConfig.get(), "debug/logIncorrectItemDamaging");
 	protected final double maxCharge;
 	protected final double transferLimit;
 	protected final int tier;
 
-	public BaseElectricItem(ItemName name, double maxCharge, double transferLimit, int tier)
+	public BaseElectricItem(Properties settings, double maxCharge, double transferLimit, int tier)
 	{
-		super(name);
+		super(settings);
 		this.maxCharge = maxCharge;
 		this.transferLimit = transferLimit;
 		this.tier = tier;
-		this.setMaxDamage(27);
-		this.setMaxStackSize(1);
-		this.setNoRepair();
 	}
 
 	@Override
@@ -66,26 +60,26 @@ public abstract class BaseElectricItem extends ItemIC2 implements IPseudoDamageI
 		return info;
 	}
 
-	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems)
+	public void m_6787_(CreativeModeTab tab, NonNullList<ItemStack> subItems)
 	{
-		if (this.isInCreativeTab(tab))
+		if (this.m_220152_(tab))
 		{
 			ElectricItemManager.addChargeVariants(this, subItems);
 		}
 	}
 
-	public void setDamage(ItemStack stack, int damage)
+	public boolean m_142522_(ItemStack stack)
 	{
-		int prev = this.getDamage(stack);
-		if (damage != prev && logIncorrectItemDamaging)
-		{
-			IC2.log.warn(LogCategory.Armor, new Throwable(), "Detected invalid armor damage application (%d):", damage - prev);
-		}
+		return ElectricItem.manager.getCharge(stack) <= ElectricItem.manager.getMaxCharge(stack);
 	}
 
-	@Override
-	public void setStackDamage(ItemStack stack, int damage)
+	public int m_142158_(ItemStack stack)
 	{
-		super.setDamage(stack, damage);
+		return (int) Math.round(ElectricItem.manager.getStackChargeLevel(stack) * 13.0);
+	}
+
+	public int m_142159_(ItemStack stack)
+	{
+		return Mth.m_14169_((float) (ElectricItem.manager.getStackChargeLevel(stack) / 3.0), 1.0F, 1.0F);
 	}
 }

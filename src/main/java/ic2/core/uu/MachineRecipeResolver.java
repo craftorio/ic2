@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 public class MachineRecipeResolver implements IRecipeResolver
 {
@@ -37,7 +37,7 @@ public class MachineRecipeResolver implements IRecipeResolver
 		{
 			try
 			{
-				List<List<LeanItemStack>> inputs = RecipeUtil.convertIngredients(recipe.getInput().getInputs());
+				List<List<LeanItemStack>> inputs = RecipeUtil.convertInputs(recipe.getInput().getInputs());
 				List<LeanItemStack> outputs = RecipeUtil.convertOutputs(recipe.getOutput());
 				ret.add(new RecipeTransformation(14.0, inputs, outputs));
 			} catch (IllegalArgumentException e)

@@ -1,9 +1,8 @@
 package ic2.core.block.machine.gui;
 
 import com.google.common.base.Supplier;
-import ic2.core.GuiIC2;
+import ic2.core.Ic2Gui;
 import ic2.core.block.machine.container.ContainerMetalFormer;
-import ic2.core.block.wiring.CableType;
 import ic2.core.gui.CustomGauge;
 import ic2.core.gui.EnergyGauge;
 import ic2.core.gui.Gauge;
@@ -11,18 +10,17 @@ import ic2.core.gui.IEnableHandler;
 import ic2.core.gui.RecipeButton;
 import ic2.core.gui.VanillaButton;
 import ic2.core.init.Localization;
-import ic2.core.ref.ItemName;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import ic2.core.ref.Ic2Items;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
 
-@SideOnly(Side.CLIENT)
-public class GuiMetalFormer extends GuiIC2<ContainerMetalFormer>
+public class GuiMetalFormer extends Ic2Gui<ContainerMetalFormer>
 {
-	public GuiMetalFormer(final ContainerMetalFormer container)
+	public GuiMetalFormer(ContainerMetalFormer container, Inventory playerInventory, Component title)
 	{
-		super(container);
+		super(container, playerInventory, title);
 		this.addElement(EnergyGauge.asBolt(this, 20, 37, container.base));
 		this.addElement(CustomGauge.create(this, 52, 39, new CustomGauge.IGaugeRatioProvider()
 		{
@@ -39,11 +37,11 @@ public class GuiMetalFormer extends GuiIC2<ContainerMetalFormer>
 				switch (container.base.getMode())
 				{
 					case 0:
-						return ItemName.cable.getItemStack(CableType.copper);
+						return new ItemStack(Ic2Items.COPPER_CABLE);
 					case 1:
-						return ItemName.forge_hammer.getItemStack();
+						return new ItemStack(Ic2Items.FORGE_HAMMER);
 					case 2:
-						return ItemName.cutter.getItemStack();
+						return new ItemStack(Ic2Items.CUTTER);
 					default:
 						return null;
 				}
@@ -85,6 +83,6 @@ public class GuiMetalFormer extends GuiIC2<ContainerMetalFormer>
 	@Override
 	protected ResourceLocation getTexture()
 	{
-		return new ResourceLocation("ic2", "textures/gui/GUIMetalFormer.png");
+		return ResourceLocation.fromNamespaceAndPath("ic2", "textures/gui/guimetalformer.png");
 	}
 }

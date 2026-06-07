@@ -1,6 +1,6 @@
 package ic2.api.crops;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 public interface ICropSeed
 {

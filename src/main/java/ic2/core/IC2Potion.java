@@ -1,42 +1,28 @@
 package ic2.core;
 
-import java.util.Arrays;
-import java.util.List;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.LivingEntity;
 
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.item.ItemStack;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionEffect;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
-
-public class IC2Potion extends Potion
+public class Ic2Potion extends MobEffect
 {
-	public static IC2Potion radiation;
-	private final List<ItemStack> curativeItems;
+	public static Ic2Potion radiation;
 
-	public static void init()
+	public Ic2Potion(MobEffectCategory type, int liquidColor)
 	{
-		radiation.setPotionName("ic2.potion.radiation");
-		radiation.setIconIndex(6, 0);
-		radiation.setEffectiveness(0.25);
+		super(type, liquidColor);
 	}
 
-	public IC2Potion(String name, boolean badEffect, int liquidColor, ItemStack... curativeItems)
-	{
-		super(badEffect, liquidColor);
-		this.curativeItems = Arrays.asList(curativeItems);
-		ForgeRegistries.POTIONS.register(this.setRegistryName(name));
-	}
-
-	public void performEffect(EntityLivingBase entity, int amplifier)
+	public void m_6742_(LivingEntity entity, int amplifier)
 	{
 		if (this == radiation)
 		{
-			entity.attackEntityFrom(IC2DamageSource.radiation, amplifier / 100 + 0.5F);
+			entity.hurt(Ic2DamageSource.radiation, amplifier / 100 + 0.5F);
 		}
 	}
 
-	public boolean isReady(int duration, int amplifier)
+	public boolean m_6584_(int duration, int amplifier)
 	{
 		if (this == radiation)
 		{
@@ -48,10 +34,9 @@ public class IC2Potion extends Potion
 		}
 	}
 
-	public void applyTo(EntityLivingBase entity, int duration, int amplifier)
+	public void applyTo(LivingEntity entity, int duration, int amplifier)
 	{
-		PotionEffect effect = new PotionEffect(radiation, duration, amplifier);
-		effect.setCurativeItems(this.curativeItems);
-		entity.addPotionEffect(effect);
+		MobEffectInstance effect = new MobEffectInstance(radiation, duration, amplifier);
+		entity.m_7292_(effect);
 	}
 }

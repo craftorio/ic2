@@ -1,0 +1,22 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "PCP",
+    "BBB",
+    "PPP"
+  ],
+  "key": {
+    "P": {
+      "tag": "minecraft:planks"
+    },
+    "C": {
+      "item": "ic2:insulated_tin_cable"
+    },
+    "B": {
+      "item": "ic2:re_battery"
+    }
+  },
+  "result": {
+    "item": "ic2:batbox"
+  }
+}

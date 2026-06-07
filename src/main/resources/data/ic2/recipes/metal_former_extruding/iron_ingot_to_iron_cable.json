@@ -1,0 +1,10 @@
+{
+  "type": "ic2:metal_former_extruding",
+  "ingredient": {
+    "item": "minecraft:iron_ingot"
+  },
+  "result": {
+    "item": "ic2:iron_cable",
+    "count": 4
+  }
+}

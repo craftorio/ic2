@@ -5,20 +5,20 @@ import ic2.api.energy.tile.IEnergyAcceptor;
 import ic2.api.energy.tile.IEnergySource;
 import ic2.core.ContainerBase;
 import ic2.core.IHasGui;
-import ic2.core.block.TileEntityInventory;
+import ic2.core.block.tileentity.TileEntityInventory;
 import ic2.core.gui.dynamic.DynamicContainer;
-import ic2.core.gui.dynamic.DynamicGui;
-import ic2.core.gui.dynamic.GuiParser;
+import ic2.core.network.GrowingBuffer;
 import ic2.core.network.GuiSynced;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.EnumFacing;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 
 public abstract class TileEntityConversionGenerator extends TileEntityInventory implements IHasGui, IEnergySource
 {
@@ -29,6 +29,11 @@ public abstract class TileEntityConversionGenerator extends TileEntityInventory 
 	private double maxProduction;
 	private double production;
 	private boolean registeredToEnet;
+
+	public TileEntityConversionGenerator(BlockEntityType<? extends TileEntityConversionGenerator> type, BlockPos pos, BlockState state)
+	{
+		super(type, pos, state);
+	}
 
 	@Override
 	protected void updateEntityServer()
@@ -43,7 +48,7 @@ public abstract class TileEntityConversionGenerator extends TileEntityInventory 
 	protected void onUnloaded()
 	{
 		super.onUnloaded();
-		if (this.registeredToEnet && !this.world.isRemote)
+		if (this.registeredToEnet && !this.level.isClientSide)
 		{
 			EnergyNet.instance.removeTile(this);
 			this.registeredToEnet = false;
@@ -54,9 +59,9 @@ public abstract class TileEntityConversionGenerator extends TileEntityInventory 
 	protected void onLoaded()
 	{
 		super.onLoaded();
-		if (!this.registeredToEnet && !this.world.isRemote)
+		if (!this.registeredToEnet && !this.level.isClientSide)
 		{
-			EnergyNet.instance.addTile(this);
+			EnergyNet.instance.addBlockEntityTile(this);
 			this.registeredToEnet = true;
 		}
 	}
@@ -72,21 +77,15 @@ public abstract class TileEntityConversionGenerator extends TileEntityInventory 
 	}
 
 	@Override
-	public ContainerBase<TileEntityConversionGenerator> getGuiContainer(EntityPlayer player)
+	public ContainerBase<?> createServerScreenHandler(int syncId, Player player)
 	{
-		return DynamicContainer.create(this, player, GuiParser.parse(this.teBlock));
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
-	{
-		return DynamicGui.<TileEntityConversionGenerator>create(this, player, GuiParser.parse(this.teBlock));
+		return DynamicContainer.create(syncId, player.getInventory(), this);
 	}
 
 	@Override
-	public void onGuiClosed(EntityPlayer player)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
+		return DynamicContainer.create(syncId, inventory, this);
 	}
 
 	protected abstract int getEnergyAvailable();
@@ -115,7 +114,7 @@ public abstract class TileEntityConversionGenerator extends TileEntityInventory 
 	}
 
 	@Override
-	public boolean emitsEnergyTo(IEnergyAcceptor receiver, EnumFacing side)
+	public boolean emitsEnergyTo(IEnergyAcceptor receiver, Direction side)
 	{
 		return side != this.getFacing();
 	}

@@ -1,9 +1,9 @@
 package ic2.api.network;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 
 public interface INetworkItemEventListener
 {
-	void onNetworkEvent(ItemStack var1, EntityPlayer var2, int var3);
+	void onNetworkEvent(ItemStack var1, Player var2, int var3);
 }

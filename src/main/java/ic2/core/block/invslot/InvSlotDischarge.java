@@ -5,8 +5,8 @@ import ic2.api.info.Info;
 import ic2.api.item.ElectricItem;
 import ic2.core.block.IInventorySlotHolder;
 import ic2.core.util.StackUtil;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 public class InvSlotDischarge extends InvSlot implements IDischargingSlot
 {
@@ -40,7 +40,8 @@ public class InvSlotDischarge extends InvSlot implements IDischargingSlot
 		{
 			return stack.getItem() == Items.REDSTONE && !this.allowRedstoneDust
 				? false
-				: Info.itemInfo.getEnergyValue(stack) > 0.0 || ElectricItem.manager.discharge(stack, Double.POSITIVE_INFINITY, this.tier, true, true, true) > 0.0;
+				: Info.getItemInfo().getEnergyValue(stack) > 0.0
+				  || ElectricItem.manager.discharge(stack, Double.POSITIVE_INFINITY, this.tier, true, true, true) > 0.0;
 		}
 	}
 
@@ -61,7 +62,7 @@ public class InvSlotDischarge extends InvSlot implements IDischargingSlot
 		double realAmount = ElectricItem.manager.discharge(stack, amount, this.tier, ignoreLimit, true, false);
 		if (realAmount <= 0.0)
 		{
-			realAmount = Info.itemInfo.getEnergyValue(stack);
+			realAmount = Info.getItemInfo().getEnergyValue(stack);
 			if (realAmount <= 0.0)
 			{
 				return 0.0;

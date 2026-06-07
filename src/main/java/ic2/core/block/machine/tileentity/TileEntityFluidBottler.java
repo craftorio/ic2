@@ -12,21 +12,22 @@ import ic2.core.block.invslot.InvSlot;
 import ic2.core.block.invslot.InvSlotConsumableLiquid;
 import ic2.core.block.invslot.InvSlotConsumableLiquidByTank;
 import ic2.core.block.machine.container.ContainerFluidBottler;
-import ic2.core.block.machine.gui.GuiFluidBottler;
+import ic2.core.fluid.Ic2FluidStack;
+import ic2.core.fluid.Ic2FluidTank;
+import ic2.core.network.GrowingBuffer;
 import ic2.core.network.GuiSynced;
 import ic2.core.profile.NotClassic;
+import ic2.core.ref.Ic2BlockEntities;
 
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Set;
 
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidTank;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 
 @NotClassic
 public class TileEntityFluidBottler extends TileEntityStandardMachine<Void, Object, Object>
@@ -34,12 +35,12 @@ public class TileEntityFluidBottler extends TileEntityStandardMachine<Void, Obje
 	public final InvSlotConsumableLiquid drainInputSlot;
 	public final InvSlotConsumableLiquid fillInputSlot;
 	@GuiSynced
-	public final FluidTank fluidTank;
+	public final Ic2FluidTank fluidTank;
 	protected final Fluids fluids = this.addComponent(new Fluids(this));
 
-	public TileEntityFluidBottler()
+	public TileEntityFluidBottler(BlockPos pos, BlockState state)
 	{
-		super(2, 100, 1);
+		super(Ic2BlockEntities.FLUID_BOTTLER, pos, state, 2, 100, 1);
 		this.fluidTank = this.fluids.addTank("fluidTank", 8000);
 		this.drainInputSlot = new InvSlotConsumableLiquidByTank(
 			this, "drainInput", InvSlot.Access.I, 1, InvSlot.InvSide.TOP, InvSlotConsumableLiquid.OpType.Drain, this.fluidTank
@@ -63,58 +64,55 @@ public class TileEntityFluidBottler extends TileEntityStandardMachine<Void, Obje
 		if (result.getOutput() instanceof IEmptyFluidContainerRecipeManager.Output)
 		{
 			this.drainInputSlot.put((ItemStack) result.getAdjustedInput());
-			FluidStack fs = ((IEmptyFluidContainerRecipeManager.Output) result.getOutput()).fluid;
-			this.fluidTank.fill(fs, true);
+			Ic2FluidStack fs = ((IEmptyFluidContainerRecipeManager.Output) result.getOutput()).fluid;
+			this.fluidTank.fillMbUnchecked(fs, false);
 		} else
 		{
 			IFillFluidContainerRecipeManager.Input adjInput = (IFillFluidContainerRecipeManager.Input) result.getAdjustedInput();
 			this.fillInputSlot.put(adjInput.container);
-			this.fluidTank.drain(adjInput.fluid == null ? this.fluidTank.getFluidAmount() : this.fluidTank.getFluidAmount() - adjInput.fluid.amount, true);
+			this.fluidTank
+				.drainMbUnchecked(adjInput.fluid == null ? this.fluidTank.getFluidAmount() : this.fluidTank.getFluidAmount() - adjInput.fluid.getAmountMb(), false);
 		}
 
 		this.outputSlot.add(processResult);
 	}
 
 	@Override
-	public MachineRecipeResult<Void, Object, Object> getOutput()
+	public MachineRecipeResult<Void, Object, Object> getRecipeResult()
 	{
 		MachineRecipeResult<Void, IEmptyFluidContainerRecipeManager.Output, ItemStack> emptyRes = Recipes.emptyFluidContainer
 			.apply(
 				this.drainInputSlot.get(),
-				this.fluidTank.getFluid() == null ? null : this.fluidTank.getFluid().getFluid(),
+				this.fluidTank.isEmpty() ? null : this.fluidTank.getFluidStack().getFluid(),
 				FluidContainerOutputMode.EmptyFullToOutput,
 				false
 			);
 		if (emptyRes != null
-			&& emptyRes.getOutput().fluid.amount <= this.fluidTank.getCapacity() - this.fluidTank.getFluidAmount()
+			&& emptyRes.getOutput().fluid.getAmountMb() <= this.fluidTank.getCapacity() - this.fluidTank.getFluidAmount()
 			&& this.outputSlot.canAdd(emptyRes.getOutput().container))
 		{
-			return (MachineRecipeResult) emptyRes;
+			return emptyRes;
 		}
 
 		MachineRecipeResult<Void, Collection<ItemStack>, IFillFluidContainerRecipeManager.Input> fillRes = Recipes.fillFluidContainer
 			.apply(
-				new IFillFluidContainerRecipeManager.Input(this.fillInputSlot.get(), this.fluidTank.getFluid()), FluidContainerOutputMode.EmptyFullToOutput, false
+				new IFillFluidContainerRecipeManager.Input(this.fillInputSlot.get(), this.fluidTank.getFluidStack()),
+				FluidContainerOutputMode.EmptyFullToOutput,
+				false
 			);
-		return fillRes != null && this.outputSlot.canAdd(fillRes.getOutput()) ? (MachineRecipeResult) fillRes : null;
+		return fillRes != null && this.outputSlot.canAdd(fillRes.getOutput()) ? fillRes : null;
 	}
 
 	@Override
-	public ContainerBase<TileEntityFluidBottler> getGuiContainer(EntityPlayer player)
+	public ContainerBase<?> createServerScreenHandler(int syncId, Player player)
 	{
-		return new ContainerFluidBottler(player, this);
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
-	{
-		return new GuiFluidBottler(new ContainerFluidBottler(player, this));
+		return new ContainerFluidBottler(syncId, player.getInventory(), this);
 	}
 
 	@Override
-	public void onGuiClosed(EntityPlayer player)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
+		return new ContainerFluidBottler(syncId, inventory, this);
 	}
 
 	@Override

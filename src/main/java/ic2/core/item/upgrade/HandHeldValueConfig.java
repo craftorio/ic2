@@ -11,18 +11,21 @@ import ic2.core.gui.IClickHandler;
 import ic2.core.gui.IEnableHandler;
 import ic2.core.gui.MouseButton;
 import ic2.core.gui.SlotGrid;
-import ic2.core.gui.Text;
 import ic2.core.gui.TextBox;
+import ic2.core.gui.TextLabel;
 import ic2.core.gui.VanillaButton;
 import ic2.core.gui.dynamic.TextProvider;
 import ic2.core.init.Localization;
 import ic2.core.item.ContainerHandHeldInventory;
+import ic2.core.network.GrowingBuffer;
+import ic2.core.ref.Ic2ScreenHandlers;
 import ic2.core.slot.SlotHologramSlot;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+
+
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 
 public class HandHeldValueConfig extends HandHeldUpgradeOption
 {
@@ -35,7 +38,7 @@ public class HandHeldValueConfig extends HandHeldUpgradeOption
 	public HandHeldValueConfig(HandHeldAdvancedUpgrade upgradeGUI, String type)
 	{
 		super(upgradeGUI, type);
-		Settings settings = new Settings(this.getNBT());
+		UpgradeSettings settings = new UpgradeSettings(this.getNBT());
 		this.initialComparisonType = settings.comparison;
 		this.initialNormalBox = settings.mainBox;
 		this.initialExtraBox = settings.extraBox;
@@ -44,16 +47,15 @@ public class HandHeldValueConfig extends HandHeldUpgradeOption
 	}
 
 	@Override
-	public ContainerBase<?> getGuiContainer(EntityPlayer player)
+	public ContainerBase<?> createServerScreenHandler(int syncId, Player player)
 	{
-		return new HandHeldValueConfig.ContainerValueConfig();
+		return new HandHeldValueConfig.ContainerValueConfig(syncId);
 	}
 
-	@SideOnly(Side.CLIENT)
 	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
-		return new HandHeldValueConfig.GuiValueConfig();
+		return new HandHeldValueConfig.ContainerValueConfig(syncId);
 	}
 
 	public class ContainerValueConfig extends ContainerHandHeldInventory<HandHeldValueConfig>
@@ -69,22 +71,22 @@ public class HandHeldValueConfig extends HandHeldUpgradeOption
 		@ClientModifiable
 		protected ComparisonSettings extraSetting = HandHeldValueConfig.this.initialExtraSetting;
 
-		public ContainerValueConfig()
+		public ContainerValueConfig(int syncId)
 		{
-			super(HandHeldValueConfig.this);
-			this.addPlayerInventorySlots(HandHeldValueConfig.this.player, 166);
+			super(Ic2ScreenHandlers.ADVANCED_UPGRADE_VALUE_CONFIG, syncId, HandHeldValueConfig.this);
+			this.addPlayerInventorySlots(this.player.getInventory(), 166);
 
 			for (byte slot = 0; slot < 9; slot++)
 			{
-				this.addSlotToContainer(new SlotHologramSlot(HandHeldValueConfig.this.inventory, slot, 8 + 18 * slot, 8, 1, HandHeldValueConfig.this.makeSaveCallback()));
+				this.m_38897_(new SlotHologramSlot(HandHeldValueConfig.this.inventory, slot, 8 + 18 * slot, 8, 1, HandHeldValueConfig.this.makeSaveCallback()));
 			}
 		}
 
 		@Override
-		public void onContainerClosed(EntityPlayer player)
+		public void removed(Player player)
 		{
-			NBTTagCompound nbt = HandHeldValueConfig.this.getNBT();
-			nbt.setBoolean("active", this.comparisonType.enabled());
+			CompoundTag nbt = HandHeldValueConfig.this.getNBT();
+			nbt.putBoolean("active", this.comparisonType.enabled());
 			ComparisonType saveType = this.comparisonType;
 			switch (this.comparisonType)
 			{
@@ -94,8 +96,8 @@ public class HandHeldValueConfig extends HandHeldUpgradeOption
 						saveType = ComparisonType.DIRECT;
 					} else
 					{
-						nbt.setString("normal", this.normalBox);
-						nbt.setByte("normalComp", this.normalSetting.getForNBT());
+						nbt.m_128359_("normal", this.normalBox);
+						nbt.putByte("normalComp", this.normalSetting.getForNBT());
 					}
 				case RANGE:
 					if (this.normalBox.isEmpty())
@@ -106,58 +108,62 @@ public class HandHeldValueConfig extends HandHeldUpgradeOption
 						} else
 						{
 							saveType = ComparisonType.COMPARISON;
-							nbt.setString("normal", this.extraBox);
-							nbt.setByte("normalComp", this.extraSetting.getForNBT());
+							nbt.m_128359_("normal", this.extraBox);
+							nbt.putByte("normalComp", this.extraSetting.getForNBT());
 						}
 					} else
 					{
-						nbt.setString("normal", this.normalBox);
-						nbt.setByte("normalComp", this.normalSetting.getForNBT());
+						nbt.m_128359_("normal", this.normalBox);
+						nbt.putByte("normalComp", this.normalSetting.getForNBT());
 						if (this.extraBox.isEmpty())
 						{
 							saveType = ComparisonType.COMPARISON;
 						} else
 						{
-							nbt.setString("extra", this.extraBox);
-							nbt.setByte("extraComp", this.extraSetting.getForNBT());
+							nbt.m_128359_("extra", this.extraBox);
+							nbt.putByte("extraComp", this.extraSetting.getForNBT());
 						}
 					}
 				default:
-					nbt.setByte("type", saveType.getForNBT());
-					super.onContainerClosed(player);
+					nbt.putByte("type", saveType.getForNBT());
+					super.removed(player);
 			}
 		}
 	}
 
-	@SideOnly(Side.CLIENT)
-	public class GuiValueConfig extends GuiDefaultBackground<HandHeldValueConfig.ContainerValueConfig>
+	@OnlyIn(Dist.CLIENT)
+	public static class GuiValueConfig extends GuiDefaultBackground<HandHeldValueConfig.ContainerValueConfig>
 	{
-		public GuiValueConfig()
+		public GuiValueConfig(HandHeldValueConfig.ContainerValueConfig container, Inventory playerInventory, Component title)
 		{
-			super(HandHeldValueConfig.this.new ContainerValueConfig());
-			this.addElement(HandHeldValueConfig.this.getBackButton(this, 10, 62));
-			this.addElement(new VanillaButton(this, 10, 25, 75, 15, new EnumCycleHandler<ComparisonType>(ComparisonType.VALUES, this.container.comparisonType)
+			super(container, playerInventory, title);
+			this.addElement(container.base.getBackButton(this, 10, 62));
+			this.addElement(new VanillaButton(this, 10, 25, 75, 15, new EnumCycleHandler<ComparisonType>(ComparisonType.VALUES, container.comparisonType)
 			{
 				@Override
 				public void onClick(MouseButton button)
 				{
 					super.onClick(button);
-					GuiValueConfig.this.container.comparisonType = this.getCurrentValue();
-					IC2.network.get(false).sendContainerField(GuiValueConfig.this.container, "comparisonType");
+					((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).comparisonType = this.getCurrentValue();
+					IC2.network.get(false).sendContainerField((ContainerBase<?>) GuiValueConfig.this.menu, "comparisonType");
 				}
 			}).withText(new Supplier<String>()
 			{
 				public String get()
 				{
-					return Localization.translate(GuiValueConfig.this.container.comparisonType.name);
+					return Localization.translate(((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).comparisonType.name);
 				}
 			}).withTooltip(new Supplier<String>()
 			{
-				private final String name = Localization.translate("ic2.upgrade.advancedGUI." + HandHeldValueConfig.this.getName());
+				private final String name;
+
+				{
+					this.name = Localization.translate("ic2.upgrade.advancedGUI." + container.base.name);
+				}
 
 				public String get()
 				{
-					return Localization.translate(GuiValueConfig.this.container.comparisonType.name + ".desc", this.name);
+					return Localization.translate(((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).comparisonType.name + ".desc", this.name);
 				}
 			}));
 			IEnableHandler rangeEnabled = new IEnableHandler()
@@ -165,7 +171,7 @@ public class HandHeldValueConfig extends HandHeldUpgradeOption
 				@Override
 				public boolean isEnabled()
 				{
-					return GuiValueConfig.this.container.comparisonType == ComparisonType.RANGE;
+					return ((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).comparisonType == ComparisonType.RANGE;
 				}
 			};
 			IEnableHandler filtersEnabled = new IEnableHandler()
@@ -173,7 +179,7 @@ public class HandHeldValueConfig extends HandHeldUpgradeOption
 				@Override
 				public boolean isEnabled()
 				{
-					return !GuiValueConfig.this.container.comparisonType.ignoreFilters();
+					return !((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).comparisonType.ignoreFilters();
 				}
 			};
 			this.addElement(
@@ -185,32 +191,33 @@ public class HandHeldValueConfig extends HandHeldUpgradeOption
 					43,
 					17,
 					15,
-					new EnumCycleHandler<ComparisonSettings>(ComparisonSettings.VALUES, this.container.normalSetting)
+					new EnumCycleHandler<ComparisonSettings>(ComparisonSettings.VALUES, container.normalSetting)
 					{
 						@Override
 						public void onClick(MouseButton button)
 						{
 							super.onClick(button);
-							GuiValueConfig.this.container.normalSetting = this.getCurrentValue();
-							IC2.network.get(false).sendContainerField(GuiValueConfig.this.container, "normalSetting");
+							((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).normalSetting = this.getCurrentValue();
+							IC2.network.get(false).sendContainerField((ContainerBase<?>) GuiValueConfig.this.menu, "normalSetting");
 							switch ((ComparisonSettings) this.getCurrentValue())
 							{
 								case LESS:
 								case LESS_OR_EQUAL:
-									if (GuiValueConfig.this.container.extraSetting != ComparisonSettings.LESS
-										&& GuiValueConfig.this.container.extraSetting != ComparisonSettings.LESS_OR_EQUAL)
+									if (((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).extraSetting != ComparisonSettings.LESS
+										&& ((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).extraSetting != ComparisonSettings.LESS_OR_EQUAL)
 									{
-										GuiValueConfig.this.container.extraSetting = ComparisonSettings.LESS;
-										IC2.network.get(false).sendContainerField(GuiValueConfig.this.container, "extraSetting");
+										((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).extraSetting = ComparisonSettings.LESS;
+										IC2.network.get(false).sendContainerField((ContainerBase<?>) GuiValueConfig.this.menu, "extraSetting");
 									}
 									break;
 								case GREATER:
 								case GREATER_OR_EQUAL:
-									if (GuiValueConfig.this.container.extraSetting != ComparisonSettings.GREATER
-										&& GuiValueConfig.this.container.extraSetting != ComparisonSettings.GREATER_OR_EQUAL)
+									if (((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).extraSetting != ComparisonSettings.GREATER
+										&& ((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).extraSetting
+										!= ComparisonSettings.GREATER_OR_EQUAL)
 									{
-										GuiValueConfig.this.container.extraSetting = ComparisonSettings.GREATER;
-										IC2.network.get(false).sendContainerField(GuiValueConfig.this.container, "extraSetting");
+										((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).extraSetting = ComparisonSettings.GREATER;
+										IC2.network.get(false).sendContainerField((ContainerBase<?>) GuiValueConfig.this.menu, "extraSetting");
 									}
 									break;
 								default:
@@ -225,66 +232,80 @@ public class HandHeldValueConfig extends HandHeldUpgradeOption
 					{
 						public String get()
 						{
-							return GuiValueConfig.this.container.normalSetting.symbol;
+							return ((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).normalSetting.symbol;
 						}
 					})
 					.withTooltip(new Supplier<String>()
 					{
 						public String get()
 						{
-							return Localization.translate(GuiValueConfig.this.container.normalSetting.name);
+							return Localization.translate(((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).normalSetting.name);
 						}
 					})
 			);
-			this.addElement(new VanillaButton(this, 105, 43, 17, 15, new IClickHandler()
-			{
-				@Override
-				public void onClick(MouseButton button)
-				{
-					if (button == MouseButton.left || button == MouseButton.right)
+			this.addElement(
+				new VanillaButton(
+					this,
+					105,
+					43,
+					17,
+					15,
+					new IClickHandler()
 					{
-						switch (GuiValueConfig.this.container.normalSetting)
+						@Override
+						public void onClick(MouseButton button)
 						{
-							case LESS:
-							case LESS_OR_EQUAL:
-								if (GuiValueConfig.this.container.extraSetting == ComparisonSettings.LESS)
+							if (button == MouseButton.left || button == MouseButton.right)
+							{
+								switch (((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).normalSetting)
 								{
-									GuiValueConfig.this.container.extraSetting = ComparisonSettings.LESS_OR_EQUAL;
-								} else
-								{
-									GuiValueConfig.this.container.extraSetting = ComparisonSettings.LESS;
+									case LESS:
+									case LESS_OR_EQUAL:
+										if (((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).extraSetting == ComparisonSettings.LESS)
+										{
+											((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).extraSetting = ComparisonSettings.LESS_OR_EQUAL;
+										} else
+										{
+											((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).extraSetting = ComparisonSettings.LESS;
+										}
+										break;
+									case GREATER:
+									case GREATER_OR_EQUAL:
+										if (((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).extraSetting == ComparisonSettings.GREATER)
+										{
+											((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).extraSetting = ComparisonSettings.GREATER_OR_EQUAL;
+										} else
+										{
+											((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).extraSetting = ComparisonSettings.GREATER;
+										}
+										break;
+									default:
+										throw new IllegalStateException(
+											"Unexpected other setting: " + ((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).normalSetting
+										);
 								}
-								break;
-							case GREATER:
-							case GREATER_OR_EQUAL:
-								if (GuiValueConfig.this.container.extraSetting == ComparisonSettings.GREATER)
-								{
-									GuiValueConfig.this.container.extraSetting = ComparisonSettings.GREATER_OR_EQUAL;
-								} else
-								{
-									GuiValueConfig.this.container.extraSetting = ComparisonSettings.GREATER;
-								}
-								break;
-							default:
-								throw new IllegalStateException("Unexpected other setting: " + GuiValueConfig.this.container.normalSetting);
-						}
 
-						IC2.network.get(false).sendContainerField(GuiValueConfig.this.container, "extraSetting");
+								IC2.network.get(false).sendContainerField((ContainerBase<?>) GuiValueConfig.this.menu, "extraSetting");
+							}
+						}
 					}
-				}
-			}).withEnableHandler(rangeEnabled).withText(new Supplier<String>()
-			{
-				public String get()
-				{
-					return GuiValueConfig.this.container.extraSetting.symbol;
-				}
-			}).withTooltip(new Supplier<String>()
-			{
-				public String get()
-				{
-					return Localization.translate(GuiValueConfig.this.container.extraSetting.name);
-				}
-			}));
+				)
+					.withEnableHandler(rangeEnabled)
+					.withText(new Supplier<String>()
+					{
+						public String get()
+						{
+							return ((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).extraSetting.symbol;
+						}
+					})
+					.withTooltip(new Supplier<String>()
+					{
+						public String get()
+						{
+							return Localization.translate(((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).extraSetting.name);
+						}
+					})
+			);
 			Predicate<String> numberOnly = new Predicate<String>()
 			{
 				public boolean apply(String input)
@@ -298,27 +319,32 @@ public class HandHeldValueConfig extends HandHeldUpgradeOption
 					}
 				}
 			};
-			final MoveableTextBox textBox = new MoveableTextBox(this, 40, 43, 25, 43, 30, 15, this.container.normalBox);
+			final MoveableTextBox textBox = new MoveableTextBox(this, 40, 43, 25, 43, 30, 15, ((HandHeldValueConfig.ContainerValueConfig) this.menu).normalBox);
 			this.addElement(textBox.withMoveHandler(rangeEnabled).withTextWatcher(new TextBox.ITextBoxWatcher()
 			{
 				@Override
 				public void onChanged(String oldValue, String newValue)
 				{
-					GuiValueConfig.this.container.normalBox = newValue;
-					IC2.network.get(false).sendContainerField(GuiValueConfig.this.container, "normalBox");
+					((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).normalBox = newValue;
+					IC2.network.get(false).sendContainerField((ContainerBase<?>) GuiValueConfig.this.menu, "normalBox");
 				}
 			}).withTextValidator(numberOnly).withEnableHandler(filtersEnabled));
-			this.addElement(new TextBox(this, 125, 43, 30, 15, this.container.extraBox).withTextWatcher(new TextBox.ITextBoxWatcher()
-			{
-				@Override
-				public void onChanged(String oldValue, String newValue)
-				{
-					GuiValueConfig.this.container.extraBox = newValue;
-					IC2.network.get(false).sendContainerField(GuiValueConfig.this.container, "extraBox");
-				}
-			}).withTextValidator(numberOnly).withEnableHandler(rangeEnabled));
 			this.addElement(
-				Text.create(this, 100, 47, TextProvider.ofTranslated("ic2.upgrade.advancedGUI." + HandHeldValueConfig.this.getName()), 4210752, false)
+				new TextBox(this, 125, 43, 30, 15, ((HandHeldValueConfig.ContainerValueConfig) this.menu).extraBox)
+					.withTextWatcher(new TextBox.ITextBoxWatcher()
+					{
+						@Override
+						public void onChanged(String oldValue, String newValue)
+						{
+							((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).extraBox = newValue;
+							IC2.network.get(false).sendContainerField((ContainerBase<?>) GuiValueConfig.this.menu, "extraBox");
+						}
+					})
+					.withTextValidator(numberOnly)
+					.withEnableHandler(rangeEnabled)
+			);
+			this.addElement(
+				TextLabel.create(this, 100, 47, TextProvider.ofTranslated("ic2.upgrade.advancedGUI." + container.base.name), 4210752, false)
 					.withEnableHandler(new IEnableHandler()
 					{
 						@Override
@@ -329,7 +355,7 @@ public class HandHeldValueConfig extends HandHeldUpgradeOption
 					})
 			);
 			this.addElement(
-				Text.create(this, 80, 47, TextProvider.ofTranslated("ic2.upgrade.advancedGUI." + HandHeldValueConfig.this.getName()), 4210752, false)
+				TextLabel.create(this, 80, 47, TextProvider.ofTranslated("ic2.upgrade.advancedGUI." + container.base.name), 4210752, false)
 					.withEnableHandler(new IEnableHandler()
 					{
 						@Override

@@ -9,300 +9,195 @@ import ic2.api.item.ISpecialElectricItem;
 import ic2.api.reactor.IReactor;
 import ic2.api.tile.IEnergyStorage;
 import ic2.core.IC2;
-import ic2.core.block.TileEntityBlock;
 import ic2.core.block.comp.Energy;
 import ic2.core.block.comp.Redstone;
 import ic2.core.block.comp.TileEntityComponent;
 import ic2.core.block.generator.tileentity.TileEntityBaseGenerator;
 import ic2.core.block.personal.IPersonalBlock;
+import ic2.core.block.tileentity.Ic2TileEntity;
 import ic2.core.crop.TileEntityCrop;
+import ic2.core.energy.grid.EnergyNetGlobal;
 import ic2.core.item.InfiniteElectricItemManager;
-import ic2.core.item.ItemIC2;
-import ic2.core.ref.ItemName;
-import ic2.core.util.LogCategory;
+import ic2.core.item.PriorityUsableItem;
 import ic2.core.util.StackUtil;
 import ic2.core.util.Util;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileDescriptor;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.ITickable;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.util.math.RayTraceResult.Type;
-import net.minecraft.world.World;
-import net.minecraftforge.fluids.FluidTank;
-import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item.Properties;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.phys.Vec3;
 
-public class ItemDebug extends ItemIC2 implements ISpecialElectricItem, IBoxable
+public class ItemDebug extends Item implements PriorityUsableItem, ISpecialElectricItem, IBoxable
 {
 	private static IElectricItemManager manager = null;
 
-	public ItemDebug()
+	public ItemDebug(Properties settings)
 	{
-		super(ItemName.debug_item);
-		this.setHasSubtypes(false);
-		if (!Util.inDev())
-		{
-			this.setCreativeTab(null);
-		}
+		super(settings);
 	}
 
-	public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand)
+	@Override
+	public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context)
 	{
-		NBTTagCompound nbtData = StackUtil.getOrCreateNbtData(StackUtil.get(player, hand));
-		int modeIdx = nbtData.getInteger("mode");
-		if (modeIdx < 0 || modeIdx >= ItemDebug.Mode.modes.length)
-		{
-			modeIdx = 0;
-		}
-
-		ItemDebug.Mode mode = ItemDebug.Mode.modes[modeIdx];
+		Level world = context.m_43725_();
+		BlockPos pos = context.m_8083_();
+		Player player = context.m_43723_();
+		ItemDebug.Mode mode = getMode(stack);
 		if (IC2.keyboard.isModeSwitchKeyDown(player))
 		{
-			if (!world.isRemote)
+			if (!world.isClientSide)
 			{
 				mode = ItemDebug.Mode.modes[(mode.ordinal() + 1) % ItemDebug.Mode.modes.length];
-				nbtData.setInteger("mode", mode.ordinal());
-				IC2.platform.messagePlayer(player, "Debug Item Mode: " + mode.getName());
-				return EnumActionResult.SUCCESS;
+				setMode(stack, mode);
+				IC2.sideProxy.messagePlayer(player, "Debug Item Mode: " + mode.getName());
+				return InteractionResult.SUCCESS;
 			} else
 			{
-				return EnumActionResult.PASS;
+				return InteractionResult.PASS;
 			}
 		} else
 		{
-			TileEntity tileentity = world.getTileEntity(pos);
+			BlockEntity tileentity = world.getBlockEntity(pos);
 			if (tileentity instanceof IDebuggable)
 			{
-				if (world.isRemote)
+				if (world.isClientSide)
 				{
-					return EnumActionResult.PASS;
+					return InteractionResult.PASS;
 				}
 
 				IDebuggable dbg = (IDebuggable) tileentity;
-				if (dbg.isDebuggable() && !world.isRemote)
+				if (dbg.isDebuggable() && !world.isClientSide)
 				{
-					IC2.platform.messagePlayer(player, dbg.getDebugText());
+					IC2.sideProxy.messagePlayer(player, dbg.getDebugText());
 				}
 
-				return world.isRemote ? EnumActionResult.PASS : EnumActionResult.SUCCESS;
+				return world.isClientSide ? InteractionResult.PASS : InteractionResult.SUCCESS;
 			} else
 			{
-				ByteArrayOutputStream consoleBuffer = new ByteArrayOutputStream();
-				PrintStream console = new PrintStream(consoleBuffer);
-				ByteArrayOutputStream chatBuffer = new ByteArrayOutputStream();
-				PrintStream chat = new PrintStream(chatBuffer);
+				ItemDebug.Output output = new ItemDebug.Output();
 				switch (mode)
 				{
 					case InterfacesFields:
 					case InterfacesFieldsRetrace:
-						RayTraceResult position;
-						if (mode == ItemDebug.Mode.InterfacesFields)
+						String plat = getPlatform(world);
+						BlockState state = world.getBlockState(pos);
+						Block block = state.getBlock();
+						BlockEntity te = world.getBlockEntity(pos);
+						output.both("[%s] block state: %s%nname: %s%ncls: %s%nbe: %s", plat, state, block.m_7705_(), block.getClass().getName(), te);
+						if (te != null)
 						{
-							position = new RayTraceResult(Type.BLOCK, new Vec3d(hitX, hitY, hitX), side, pos);
-						} else
-						{
-							position = this.rayTrace(world, player, true);
-							if (position == null)
-							{
-								return EnumActionResult.PASS;
-							}
+							output.part("[%s] interfaces:", plat);
+							Class<?> c = te.getClass();
 
-							RayTraceResult entityPosition = Util.traceEntities(player, position.hitVec, true);
-							if (entityPosition != null)
+							do
 							{
-								position = entityPosition;
-							}
-						}
-
-						String plat;
-						if (FMLCommonHandler.instance().getSide().isClient())
-						{
-							if (!world.isRemote)
-							{
-								plat = "sp server";
-							} else if (player.getServer() == null)
-							{
-								plat = "mp client";
-							} else
-							{
-								plat = "sp client";
-							}
-						} else
-						{
-							plat = "mp server";
-						}
-
-						if (position.typeOfHit == Type.BLOCK)
-						{
-							pos = position.getBlockPos();
-							IBlockState state = world.getBlockState(pos);
-							Block block = state.getBlock();
-							TileEntity te = world.getTileEntity(pos);
-							String message = String.format(
-								"[%s] block state: %s%nname: %s%ncls: %s%nte: %s",
-								plat,
-								state.getActualState(world, pos),
-								block.getUnlocalizedName(),
-								block.getClass().getName(),
-								te
-							);
-							chat.println(message);
-							console.println(message);
-							if (te != null)
-							{
-								message = "[" + plat + "] interfaces:";
-								Class<?> c = te.getClass();
-
-								do
+								for (Class<?> i : c.getInterfaces())
 								{
-									for (Class<?> i : c.getInterfaces())
-									{
-										message = message + " " + i.getName();
-									}
+									output.part(' ').part(i.getName());
+								}
 
-									c = c.getSuperclass();
-								} while (c != null);
+								c = c.getSuperclass();
+							} while (c != null);
 
-								chat.println(message);
-								console.println(message);
-							}
+							output.partToConsole();
+						}
 
-							console.println("block fields:");
-							dumpObjectFields(console, block);
-							if (te != null)
-							{
-								console.println();
-								console.println("tile entity fields:");
-								dumpObjectFields(console, te);
-							}
-						} else
+						output.console("block fields:");
+						dumpObjectFields(block, output);
+						if (te != null)
 						{
-							if (position.typeOfHit != Type.ENTITY)
-							{
-								return EnumActionResult.PASS;
-							}
-
-							String message = "[" + plat + "] entity: " + position.entityHit;
-							chat.println(message);
-							console.println(message);
-							if (position.entityHit instanceof EntityItem)
-							{
-								ItemStack entStack = ((EntityItem) position.entityHit).getItem();
-								String name = Util.getName(entStack.getItem()).toString();
-								message = "["
-									+ plat
-									+ "] item id: "
-									+ name
-									+ " meta: "
-									+ entStack.getItemDamage()
-									+ " size: "
-									+ StackUtil.getSize(entStack)
-									+ " name: "
-									+ entStack.getUnlocalizedName();
-								chat.println(message);
-								console.println(message);
-								console.println("NBT: " + entStack.getTagCompound());
-							}
+							output.console("");
+							output.console("tile entity fields:");
+							dumpObjectFields(te, output);
 						}
 						break;
 					case TileData:
-						if (world.isRemote)
+						if (world.isClientSide)
 						{
-							return EnumActionResult.PASS;
+							return InteractionResult.PASS;
 						}
 
-						TileEntity tileEntity = world.getTileEntity(pos);
-						if (tileEntity instanceof TileEntityBlock)
+						BlockEntity tileEntity = world.getBlockEntity(pos);
+						if (tileEntity instanceof Ic2TileEntity te)
 						{
-							TileEntityBlock te = (TileEntityBlock) tileEntity;
-							chat.println("Block: Active=" + te.getActive() + " Facing=" + te.getFacing());
+							output.chat("Block: Active=%b Facing=%s", te.getActive(), te.getFacing());
 
 							for (TileEntityComponent comp : te.getComponents())
 							{
-								if (comp instanceof Energy)
+								if (comp instanceof Energy energy)
 								{
-									Energy energy = (Energy) comp;
-									chat.printf("Energy: %.2f / %.2f%n", energy.getEnergy(), energy.getCapacity());
-								} else if (comp instanceof Redstone)
+									output.chat("Energy: %.2f / %.2f", energy.getEnergy(), energy.getCapacity());
+								} else if (comp instanceof Redstone redstone)
 								{
-									Redstone redstone = (Redstone) comp;
-									chat.printf("Redstone: %d%n", redstone.getRedstoneInput());
+									output.chat("Redstone: %d", redstone.getRedstoneInput());
 								}
 							}
 						}
 
-						if (tileEntity instanceof TileEntityBaseGenerator)
+						if (tileEntity instanceof TileEntityBaseGenerator te)
 						{
-							TileEntityBaseGenerator te = (TileEntityBaseGenerator) tileEntity;
-							chat.println("BaseGen: Fuel=" + te.fuel);
+							output.chat("BaseGen: Fuel=%d", te.fuel);
 						}
 
-						if (tileEntity instanceof IEnergyStorage)
+						if (tileEntity instanceof IEnergyStorage te)
 						{
-							IEnergyStorage te = (IEnergyStorage) tileEntity;
-							chat.println("EnergyStorage: Stored=" + te.getStored());
+							output.chat("EnergyStorage: Stored=%d", te.getStored());
 						}
 
-						if (tileEntity instanceof IReactor)
+						if (tileEntity instanceof IReactor te)
 						{
-							IReactor te = (IReactor) tileEntity;
-							chat.println(
-								"Reactor: Heat="
-									+ te.getHeat()
-									+ " MaxHeat="
-									+ te.getMaxHeat()
-									+ " HEM="
-									+ te.getHeatEffectModifier()
-									+ " Output="
-									+ te.getReactorEnergyOutput()
+							output.chat(
+								"Reactor: Heat=%d MaxHeat=%d HEM=%f Output=%f", te.getHeat(), te.getMaxHeat(), te.getHeatEffectModifier(), te.getReactorEnergyOutput()
 							);
 						}
 
-						if (tileEntity instanceof IPersonalBlock)
+						if (tileEntity instanceof IPersonalBlock te)
 						{
-							IPersonalBlock te = (IPersonalBlock) tileEntity;
-							chat.println("PersonalBlock: CanAccess=" + te.permitsAccess(player.getGameProfile()));
+							output.chat("PersonalBlock: CanAccess=%b", te.permitsAccess(player.getGameProfile()));
 						}
 
-						if (tileEntity instanceof TileEntityCrop)
+						if (tileEntity instanceof TileEntityCrop te)
 						{
-							TileEntityCrop te = (TileEntityCrop) tileEntity;
 							CropCard crop = te.getCrop();
 							String id = crop != null ? crop.getOwner() + ":" + crop.getId() : "none";
-							chat.printf(
+							output.chat(
 								"Crop: Crop=%s Size=%d Growth=%d Gain=%d Resistance=%d Nutrients=%d Water=%d GrowthPoints=%d%n Cross=%b",
 								id,
-								te.getCurrentSize(),
+								te.getCurrentAge(),
 								te.getStatGrowth(),
 								te.getStatGain(),
 								te.getStatResistance(),
@@ -314,142 +209,234 @@ public class ItemDebug extends ItemIC2 implements ISpecialElectricItem, IBoxable
 						}
 						break;
 					case EnergyNet:
-						if (world.isRemote)
+						if (world.isClientSide)
 						{
-							return EnumActionResult.PASS;
+							return InteractionResult.PASS;
 						}
 
-						if (!EnergyNet.instance.dumpDebugInfo(world, pos, console, chat))
+						ByteArrayOutputStream consoleBuffer = new ByteArrayOutputStream();
+						PrintStream consoleStream = new PrintStream(consoleBuffer, false, StandardCharsets.UTF_8);
+						ByteArrayOutputStream chatBuffer = new ByteArrayOutputStream();
+						PrintStream chatStream = new PrintStream(consoleBuffer, false, StandardCharsets.UTF_8);
+						if (!((EnergyNetGlobal) EnergyNet.instance).dumpDebugInfo(world, pos, consoleStream, chatStream))
 						{
-							return EnumActionResult.PASS;
+							return InteractionResult.PASS;
+						}
+
+						chatStream.flush();
+						consoleStream.flush();
+						if (consoleBuffer.size() > 0)
+						{
+							output.console(consoleBuffer.toString(StandardCharsets.UTF_8).stripTrailing());
+						}
+
+						if (chatBuffer.size() > 0)
+						{
+							output.chat(chatBuffer.toString(StandardCharsets.UTF_8).stripTrailing());
 						}
 						break;
 					case Accelerate:
 					case AccelerateX100:
-						if (world.isRemote)
+						if (world.isClientSide)
 						{
-							return EnumActionResult.PASS;
+							return InteractionResult.PASS;
 						}
 
-						TileEntity te = world.getTileEntity(pos);
-						int count = mode == ItemDebug.Mode.Accelerate ? 1000 : 100000;
-						if (te == null)
-						{
-							IBlockState state = world.getBlockState(pos);
-							if (state.getBlock().getTickRandomly())
-							{
-								chat.println("Running" + count + " ticks on " + state.getBlock() + "(" + pos + ").");
-
-								int i;
-								for (i = 0; i < count && world.getBlockState(pos) == state; i++)
-								{
-									state.getBlock().randomTick(world, pos, state, itemRand);
-								}
-
-								if (i != count)
-								{
-									chat.println("Ran " + i + " ticks before a state change.");
-								}
-							}
-						} else if (te instanceof ITickable)
-						{
-							ITickable tickable = (ITickable) te;
-							chat.println("Running " + count + " ticks on " + te + ".");
-							int changes = 0;
-							int interruptCount = -1;
-
-							for (int i = 0; i < count; i++)
-							{
-								if (te.isInvalid())
-								{
-									changes++;
-									te = world.getTileEntity(pos);
-									if (!(te instanceof ITickable) || te.isInvalid())
-									{
-										interruptCount = i;
-										break;
-									}
-
-									tickable = (ITickable) te;
-								}
-
-								tickable.update();
-							}
-
-							if (changes > 0)
-							{
-								if (interruptCount != -1)
-								{
-									chat.println("The tile entity changed " + changes + " time(s), interrupted after " + interruptCount + " updates.");
-								} else
-								{
-									chat.println("The tile entity changed " + changes + " time(s).");
-								}
-							}
-						}
+						accelerate(world, pos, mode == ItemDebug.Mode.Accelerate ? 1000 : 100000, output);
 				}
 
-				console.flush();
-				chat.flush();
-				if (world.isRemote)
-				{
-					try
-					{
-						consoleBuffer.writeTo(new FileOutputStream(FileDescriptor.out));
-					} catch (IOException e)
-					{
-						IC2.log.warn(LogCategory.Item, e, "Stdout write failed.");
-					}
-
-					for (String line : chatBuffer.toString().split("[\\r\\n]+"))
-					{
-						IC2.platform.messagePlayer(player, line);
-					}
-				} else if (player instanceof EntityPlayerMP)
-				{
-					try
-					{
-						IC2.network.get(true).sendConsole((EntityPlayerMP) player, consoleBuffer.toString("UTF-8"));
-						IC2.network.get(true).sendChat((EntityPlayerMP) player, chatBuffer.toString("UTF-8"));
-					} catch (UnsupportedEncodingException e)
-					{
-						IC2.log.warn(LogCategory.Item, e, "String encoding failed.");
-					}
-				}
-
-				return world.isRemote ? EnumActionResult.PASS : EnumActionResult.SUCCESS;
+				output.flush(player);
+				return world.isClientSide ? InteractionResult.PASS : InteractionResult.SUCCESS;
 			}
 		}
 	}
 
-	private static void dumpObjectFields(PrintStream ps, Object o)
+	private static boolean accelerate(Level world, BlockPos pos, int count, ItemDebug.Output output)
 	{
-		Class<?> fieldDeclaringClass = o.getClass();
+		BlockState state = world.getBlockState(pos);
+		BlockEntity be;
+		if (state.m_155947_() && (be = world.getBlockEntity(pos)) != null)
+		{
+			BlockEntityTicker ticker = state.m_155944_(world, be.m_58903_());
+			if (ticker == null)
+			{
+				return false;
+			}
+
+			output.chat("Running %s ticks on %s.", count, be);
+			int changes = 0;
+			int interruptCount = -1;
+
+			for (int i = 0; i < count; i++)
+			{
+				if (be.isRemoved())
+				{
+					changes++;
+					state = world.getBlockState(pos);
+					if (!state.m_155947_() || (be = world.getBlockEntity(pos)) == null || be.isRemoved() || (ticker = state.m_155944_(world, be.m_58903_())) == null)
+					{
+						interruptCount = i;
+						break;
+					}
+				}
+
+				ticker.m_155252_(world, pos, state, be);
+			}
+
+			if (changes > 0)
+			{
+				if (interruptCount != -1)
+				{
+					output.chat("The tile entity changed %d time(s), interrupted after %d updates.", changes, interruptCount);
+				} else
+				{
+					output.chat("The tile entity changed %d time(s).", changes);
+				}
+			}
+
+			return true;
+		} else
+		{
+			if (!state.m_60823_())
+			{
+				return false;
+			}
+
+			output.chat("Running up to %d ticks on % (%s).", count, state.getBlock(), pos);
+
+			for (int i = 0; i < count && world.getBlockState(pos) == state; i++)
+			{
+				state.m_222972_((ServerLevel) world, pos, IC2.random);
+				if (world.getBlockState(pos) != state)
+				{
+					output.chat("Ran %d ticks before a state change.", i);
+					break;
+				}
+			}
+
+			return true;
+		}
+	}
+
+	public InteractionResult m_6880_(ItemStack stack, Player user, LivingEntity entity, InteractionHand hand)
+	{
+		return handleEntity(stack, user, entity);
+	}
+
+	private static InteractionResult handleEntity(ItemStack stack, Player player, Entity entity)
+	{
+		ItemDebug.Mode mode = getMode(stack);
+		if (mode != ItemDebug.Mode.InterfacesFieldsRetrace)
+		{
+			return InteractionResult.PASS;
+		}
+
+		Level world = player.m_9236_();
+		ItemDebug.Output output = new ItemDebug.Output();
+		String plat = getPlatform(world);
+		output.both("[%s] entity: %s", output, entity);
+		if (entity instanceof ItemEntity)
+		{
+			ItemStack entStack = ((ItemEntity) entity).m_32055_();
+			String name = Util.getName(entStack.getItem()).toString();
+			output.both("[%s] item id: %s size: %s name: %s", plat, name, StackUtil.getSize(entStack), entStack.m_41778_());
+			output.console("NBT: %s", entStack.getTag());
+		}
+
+		output.flush(player);
+		return world.isClientSide ? InteractionResult.PASS : InteractionResult.SUCCESS;
+	}
+
+	private static ItemDebug.Mode getMode(ItemStack stack)
+	{
+		CompoundTag nbt = stack.getTag();
+		int modeIdx = nbt != null ? nbt.getInt("mode") : 0;
+		if (modeIdx < 0 || modeIdx >= ItemDebug.Mode.modes.length)
+		{
+			modeIdx = 0;
+		}
+
+		return ItemDebug.Mode.modes[modeIdx];
+	}
+
+	private static void setMode(ItemStack stack, ItemDebug.Mode mode)
+	{
+		stack.m_41784_().putInt("mode", mode.ordinal());
+	}
+
+	private static String getPlatform(Level world)
+	{
+		if (IC2.envProxy.isClientEnv())
+		{
+			if (!world.isClientSide)
+			{
+				return "sp server";
+			} else
+			{
+				return world.getServer() == null ? "mp client" : "sp client";
+			}
+		} else
+		{
+			return "mp server";
+		}
+	}
+
+	private static void dumpObjectFields(Object o, ItemDebug.Output output)
+	{
+		List<Class<?>> classes = new ArrayList<>();
+		Class<?> cls = o.getClass();
 
 		do
 		{
+			classes.add(cls);
+		} while ((cls = cls.getSuperclass()) != null);
+
+		for (int clsIdx = classes.size() - 1; clsIdx >= 0; clsIdx--)
+		{
+			Class<?> fieldDeclaringClass = classes.get(clsIdx);
 			Field[] fields = fieldDeclaringClass.getDeclaredFields();
+			boolean printedHeader = false;
 
 			for (Field field : fields)
 			{
-				if ((field.getModifiers() & 8) == 0 || fieldDeclaringClass != Block.class && fieldDeclaringClass != TileEntity.class)
+				Class<?> type = field.getType();
+				int modifiers = field.getModifiers();
+				if (!Modifier.isStatic(modifiers)
+					|| fieldDeclaringClass != Block.class
+					&& fieldDeclaringClass != BlockEntity.class
+					&& fieldDeclaringClass != Ic2TileEntity.class
+					&& (!Modifier.isFinal(modifiers) || !type.isPrimitive() && type != String.class && !Property.class.isAssignableFrom(type)))
 				{
-					boolean accessible = field.isAccessible();
-					field.setAccessible(true);
+					if (!printedHeader)
+					{
+						output.console(fieldDeclaringClass.getName());
+						printedHeader = true;
+					}
 
 					Object value;
 					try
 					{
+						boolean accessible = field.isAccessible();
+						field.setAccessible(true);
 						value = field.get(o);
-					} catch (IllegalAccessException e)
+						field.setAccessible(accessible);
+					} catch (ReflectiveOperationException e)
 					{
 						value = "<can't access>";
 					}
 
-					ps.println(field.getName() + " class: " + fieldDeclaringClass.getName() + " type: " + field.getType());
-					ps.printf(
-						"  identity hash: %x hash: %x modifiers: %x%n", System.identityHashCode(value), value == null ? 0 : value.hashCode(), field.getModifiers()
-					);
+					output.console("  %s type: %s", field.getName(), type.getName());
+					if (!isSelfDescribingClass(type))
+					{
+						output.part("    identity hash: %x hash: %x modifiers: %x", System.identityHashCode(value), value == null ? 0 : value.hashCode(), modifiers);
+						if (value != null && value.getClass() != type)
+						{
+							output.part(" class: %s", value.getClass().getName());
+						}
+
+						output.partToConsole();
+					}
+
 					if (value != null && field.getType().isArray())
 					{
 						List<Object> array = new ArrayList<>();
@@ -464,42 +451,39 @@ public class ItemDebug extends ItemIC2 implements ISpecialElectricItem, IBoxable
 
 					if (value instanceof Iterable)
 					{
-						ps.println("  values (" + (value instanceof Collection ? ((Collection) value).size() : "?") + "):");
+						output.part("    values (%s):", value instanceof Collection ? ((Collection) value).size() : "?");
 						int i = 0;
 
 						for (Object o2 : (Iterable) value)
 						{
-							ps.print("    [" + i++ + "] ");
-							dumpValueString(o2, field, "      ", ps);
+							output.part("      [%d] ", i++);
+							dumpValueString(o2, field, "        ", output);
 						}
 					} else if (value instanceof Map)
 					{
-						ps.println("  values (" + ((Map) value).size() + "):");
+						output.console("    values (%s):", ((Map) value).size());
 
-						for (Entry<?, ?> entry : ((Map<?, ?>) value).entrySet())
+						for (Entry<?, ?> entry : ((Map) value).entrySet())
 						{
-							ps.print("    " + entry.getKey() + ": ");
-							dumpValueString(entry.getValue(), field, "      ", ps);
+							output.part("      %s: ", entry.getKey());
+							dumpValueString(entry.getValue(), field, "        ", output);
 						}
 					} else
 					{
-						ps.print("  value: ");
-						dumpValueString(value, field, "    ", ps);
+						output.part("    value: ");
+						dumpValueString(value, field, "      ", output);
 					}
-
-					field.setAccessible(accessible);
 				}
 			}
-
-			fieldDeclaringClass = fieldDeclaringClass.getSuperclass();
-		} while (fieldDeclaringClass != null);
+		}
 	}
 
-	private static void dumpValueString(Object o, Field parentField, String prefix, PrintStream out)
+	private static void dumpValueString(Object o, Field parentField, String prefix, ItemDebug.Output output)
 	{
 		if (o == null)
 		{
-			out.println("<null>");
+			output.part("<null>");
+			output.partToConsole();
 		} else
 		{
 			String ret;
@@ -535,32 +519,20 @@ public class ItemDebug extends ItemIC2 implements ISpecialElectricItem, IBoxable
 				ret = ret.substring(0, 90) + "... (" + (ret.length() - 90) + " more)";
 			}
 
-			out.println(ret);
-			if (o instanceof FluidTank && IC2.platform.isSimulating())
-			{
-				System.out.println();
-			}
-
+			output.part(ret);
+			output.partToConsole();
 			if (!Modifier.isStatic(parentField.getModifiers())
 				&& !parentField.isSynthetic()
 				&& !o.getClass().isArray()
-				&& !o.getClass().isEnum()
-				&& !o.getClass().isPrimitive()
 				&& !(o instanceof Iterable)
-				&& !(o instanceof Class)
-				&& !(o instanceof String))
+				&& !isSelfDescribingClass(o.getClass()))
 			{
-				if (o instanceof World)
+				if (o instanceof Level)
 				{
-					out.println(prefix + " dim: " + ((World) o).provider.getDimension());
-				} else if (!(o instanceof BlockStateContainer)
-					&& !(o instanceof Block)
-					&& !(o instanceof TileEntity)
-					&& !(o instanceof Item)
+					output.console("%s dim: %s", prefix, Util.getDimId((Level) o));
+				} else if (!(o instanceof StateDefinition)
+					&& !(o instanceof BlockEntity)
 					&& !(o instanceof ItemStack)
-					&& !(o instanceof Vec3i)
-					&& !(o instanceof Vec3d)
-					&& !(o instanceof NBTBase)
 					&& !o.getClass().getName().startsWith("java."))
 				{
 					for (Class<?> fieldDeclaringClass = o.getClass();
@@ -591,13 +563,29 @@ public class ItemDebug extends ItemIC2 implements ISpecialElectricItem, IBoxable
 									valStr = toStringLimited(val, 100);
 								}
 
-								out.println(prefix + field.getName() + ": " + valStr);
+								output.console("%s%s: %s", prefix, field.getName(), valStr);
 							}
 						}
 					}
 				}
 			}
 		}
+	}
+
+	private static boolean isSelfDescribingClass(Class<?> cls)
+	{
+		return cls.isPrimitive()
+			|| cls.isEnum()
+			|| cls == Class.class
+			|| cls == String.class
+			|| cls == BlockState.class
+			|| cls == ResourceLocation.class
+			|| Tag.class.isAssignableFrom(cls)
+			|| Vec3i.class.isAssignableFrom(cls)
+			|| Vec3.class.isAssignableFrom(cls)
+			|| Block.class.isAssignableFrom(cls)
+			|| Item.class.isAssignableFrom(cls)
+			|| Fluid.class.isAssignableFrom(cls);
 	}
 
 	private static String toStringLimited(Object o, int limit)
@@ -658,6 +646,109 @@ public class ItemDebug extends ItemIC2 implements ISpecialElectricItem, IBoxable
 		String getName()
 		{
 			return this.name;
+		}
+	}
+
+	private static class Output
+	{
+		private final StringBuilder chatSb = new StringBuilder();
+		private final StringBuilder consoleSb = new StringBuilder();
+		private final StringBuilder partSb = new StringBuilder();
+
+		public void chat(CharSequence line)
+		{
+			if (!this.chatSb.isEmpty())
+			{
+				this.chatSb.append('\n');
+			}
+
+			this.chatSb.append(line);
+		}
+
+		public void chat(String format, Object... args)
+		{
+			this.chat(String.format(format, args));
+		}
+
+		public void console(CharSequence line)
+		{
+			if (!this.consoleSb.isEmpty())
+			{
+				this.consoleSb.append('\n');
+			}
+
+			this.consoleSb.append(line);
+		}
+
+		public void console(String format, Object... args)
+		{
+			this.console(String.format(format, args));
+		}
+
+		public void both(CharSequence line)
+		{
+			this.chat(line);
+			this.console(line);
+		}
+
+		public void both(String format, Object... args)
+		{
+			this.both(String.format(format, args));
+		}
+
+		public ItemDebug.Output part(CharSequence line)
+		{
+			this.partSb.append(line);
+			return this;
+		}
+
+		public ItemDebug.Output part(char c)
+		{
+			this.partSb.append(c);
+			return this;
+		}
+
+		public ItemDebug.Output part(String format, Object... args)
+		{
+			return this.part(String.format(format, args));
+		}
+
+		public void partToChat()
+		{
+			this.chat(this.partSb);
+			this.partSb.setLength(0);
+		}
+
+		public void partToConsole()
+		{
+			this.console(this.partSb);
+			this.partSb.setLength(0);
+		}
+
+		public void partToBoth()
+		{
+			this.both(this.partSb);
+			this.partSb.setLength(0);
+		}
+
+		void flush(Player player)
+		{
+			if (player.m_9236_().isClientSide)
+			{
+				System.out.println(this.consoleSb);
+
+				for (String line : this.chatSb.toString().split("[\\r\\n]+"))
+				{
+					IC2.sideProxy.messagePlayer(player, line);
+				}
+			} else if (player instanceof ServerPlayer)
+			{
+				IC2.network.get(true).sendConsole((ServerPlayer) player, this.consoleSb.toString());
+				IC2.network.get(true).sendChat((ServerPlayer) player, this.chatSb.toString());
+			}
+
+			this.chatSb.setLength(0);
+			this.consoleSb.setLength(0);
 		}
 	}
 }

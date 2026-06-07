@@ -1,85 +1,42 @@
 package ic2.core.model;
 
-import ic2.core.block.state.ISkippableProperty;
-
-import java.util.Map;
-import java.util.Map.Entry;
-
-import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.block.model.ModelManager;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.client.renderer.block.statemap.DefaultStateMapper;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.renderer.block.BlockModelShaper;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.ModelManager;
+import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class ModelUtil
 {
-	private static final DefaultStateMapper defaultStateMapper = new DefaultStateMapper();
-	private static final DefaultStateMapper skippingStateMapper = new DefaultStateMapper()
-	{
-		public String getPropertyString(Map<IProperty<?>, Comparable<?>> values)
-		{
-			StringBuilder propString = new StringBuilder();
-
-			for (Entry<IProperty<?>, Comparable<?>> entry : values.entrySet())
-			{
-				IProperty<?> prop = entry.getKey();
-				if (!(prop instanceof ISkippableProperty))
-				{
-					if (propString.length() != 0)
-					{
-						propString.append(',');
-					}
-
-					propString.append(prop.getName());
-					propString.append('=');
-					propString.append(this.getPropertyName(prop, entry.getValue()));
-				}
-			}
-
-			return propString.length() == 0 ? "normal" : propString.toString();
-		}
-
-		private <T extends Comparable<T>> String getPropertyName(IProperty<T> property, Comparable<?> value)
-		{
-			return property.getName((T) value);
-		}
-	};
-
-	public static ModelResourceLocation getModelLocation(ResourceLocation loc, IBlockState state)
+	public static ModelResourceLocation getModelLocation(ResourceLocation loc, BlockState state)
 	{
 		return new ModelResourceLocation(loc, getVariant(state));
 	}
 
-	public static ModelResourceLocation getTEBlockModelLocation(ResourceLocation loc, IBlockState state)
+	public static String getVariant(BlockState state)
 	{
-		return new ModelResourceLocation(loc, skippingStateMapper.getPropertyString(state.getProperties()));
+		return BlockModelShaper.m_110887_(state.m_61148_());
 	}
 
-	public static String getVariant(IBlockState state)
+	public static BakedModel getMissingModel()
 	{
-		return defaultStateMapper.getPropertyString(state.getProperties());
+		return getModelManager().m_119409_();
 	}
 
-	public static IBakedModel getMissingModel()
+	public static BakedModel getModel(ModelResourceLocation loc)
 	{
-		return getModelManager().getMissingModel();
+		return getModelManager().m_119422_(loc);
 	}
 
-	public static IBakedModel getModel(ModelResourceLocation loc)
+	public static BakedModel getBlockModel(BlockState state)
 	{
-		return getModelManager().getModel(loc);
-	}
-
-	public static IBakedModel getBlockModel(IBlockState state)
-	{
-		return Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(state);
+		return Minecraft.m_91087_().m_91289_().m_110907_().m_110893_(state);
 	}
 
 	private static ModelManager getModelManager()
 	{
-		return Minecraft.getMinecraft().getRenderItem().getItemModelMesher().getModelManager();
+		return Minecraft.m_91087_().m_91291_().m_115103_().m_109393_();
 	}
 }

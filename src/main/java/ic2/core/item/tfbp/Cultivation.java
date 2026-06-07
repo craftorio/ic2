@@ -1,57 +1,61 @@
 package ic2.core.item.tfbp;
 
 import ic2.core.block.machine.tileentity.TileEntityTerra;
-import ic2.core.ref.BlockName;
+import ic2.core.ref.Ic2Blocks;
+import ic2.core.util.Util;
 
 import java.util.ArrayList;
-import java.util.Random;
+import java.util.List;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockCrops;
-import net.minecraft.block.BlockDirectional;
-import net.minecraft.block.BlockDoublePlant;
-import net.minecraft.block.BlockSapling;
-import net.minecraft.block.BlockTallGrass;
-import net.minecraft.block.BlockDoublePlant.EnumBlockHalf;
-import net.minecraft.block.BlockDoublePlant.EnumPlantType;
-import net.minecraft.block.BlockTallGrass.EnumType;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.CropBlock;
+import net.minecraft.world.level.block.DirectionalBlock;
+import net.minecraft.world.level.block.DoublePlantBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 
-class Cultivation extends TerraformerBase
+public class Cultivation extends TerraformerBase
 {
-	static final ArrayList<IBlockState> plants = new ArrayList<>();
+	static List<BlockState> plants = new ArrayList<>();
 
 	@Override
 	void init()
 	{
-		plants.add(Blocks.TALLGRASS.getDefaultState().withProperty(BlockTallGrass.TYPE, EnumType.GRASS));
-		plants.add(Blocks.TALLGRASS.getDefaultState().withProperty(BlockTallGrass.TYPE, EnumType.GRASS));
-		plants.add(Blocks.TALLGRASS.getDefaultState().withProperty(BlockTallGrass.TYPE, EnumType.FERN));
-		plants.add(Blocks.RED_FLOWER.getDefaultState());
-		plants.add(Blocks.YELLOW_FLOWER.getDefaultState());
-		plants.add(Blocks.DOUBLE_PLANT.getDefaultState().withProperty(BlockDoublePlant.VARIANT, EnumPlantType.GRASS));
-		plants.add(Blocks.DOUBLE_PLANT.getDefaultState().withProperty(BlockDoublePlant.VARIANT, EnumPlantType.ROSE));
-		plants.add(Blocks.DOUBLE_PLANT.getDefaultState().withProperty(BlockDoublePlant.VARIANT, EnumPlantType.SUNFLOWER));
+		plants.add(Blocks.f_50359_.defaultBlockState());
+		plants.add(Blocks.f_50359_.defaultBlockState());
+		plants.add(Blocks.f_50035_.defaultBlockState());
+		plants.add(Blocks.f_50112_.defaultBlockState());
+		plants.add(Blocks.f_50111_.defaultBlockState());
+		plants.add(Blocks.f_50359_.defaultBlockState());
+		plants.add(Blocks.f_50357_.defaultBlockState());
+		plants.add(Blocks.f_50355_.defaultBlockState());
 
-		for (net.minecraft.block.BlockPlanks.EnumType type : BlockSapling.TYPE.getAllowedValues())
+		for (Holder<Block> entry : Registry.BLOCK.m_206058_(BlockTags.f_13104_))
 		{
-			plants.add(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, type));
+			Block block = (Block) entry.m_203334_();
+			if (isVanilla(block))
+			{
+				plants.add(block.defaultBlockState());
+			}
 		}
 
-		plants.add(Blocks.WHEAT.getDefaultState());
-		plants.add(Blocks.RED_MUSHROOM.getDefaultState());
-		plants.add(Blocks.BROWN_MUSHROOM.getDefaultState());
-		plants.add(Blocks.PUMPKIN.getDefaultState());
-		plants.add(Blocks.MELON_BLOCK.getDefaultState());
-		plants.add(BlockName.sapling.getInstance().getDefaultState());
+		plants.add(Blocks.f_50092_.defaultBlockState());
+		plants.add(Blocks.f_50073_.defaultBlockState());
+		plants.add(Blocks.f_50072_.defaultBlockState());
+		plants.add(Blocks.f_50133_.defaultBlockState());
+		plants.add(Blocks.f_50186_.defaultBlockState());
+		plants.add(Ic2Blocks.RUBBER_SAPLING.defaultBlockState());
 	}
 
 	@Override
-	boolean terraform(World world, BlockPos pos)
+	boolean terraform(Level world, BlockPos pos)
 	{
 		pos = TileEntityTerra.getFirstSolidBlockFrom(world, pos, 10);
 		if (pos == null)
@@ -59,58 +63,55 @@ class Cultivation extends TerraformerBase
 			return false;
 		}
 
-		if (TileEntityTerra.switchGround(world, pos, Blocks.SAND, Blocks.DIRT.getDefaultState(), true))
+		if (TileEntityTerra.switchGround(world, pos, Blocks.f_49992_, Blocks.f_50493_.defaultBlockState(), true))
 		{
 			return true;
 		}
 
-		if (TileEntityTerra.switchGround(world, pos, Blocks.END_STONE, Blocks.DIRT.getDefaultState(), true))
+		if (TileEntityTerra.switchGround(world, pos, Blocks.f_50259_, Blocks.f_50493_.defaultBlockState(), true))
 		{
 			int i = 4;
 
-			while (--i > 0 && TileEntityTerra.switchGround(world, pos, Blocks.END_STONE, Blocks.DIRT.getDefaultState(), true))
+			while (--i > 0 && TileEntityTerra.switchGround(world, pos, Blocks.f_50259_, Blocks.f_50493_.defaultBlockState(), true))
 			{
 			}
 		}
 
 		Block block = world.getBlockState(pos).getBlock();
-		if (block == Blocks.DIRT)
+		if (block == Blocks.f_50493_)
 		{
-			world.setBlockState(pos, Blocks.GRASS.getDefaultState());
+			world.setBlockAndUpdate(pos, Blocks.f_50034_.defaultBlockState());
 			return true;
 		} else
 		{
-			return block == Blocks.GRASS ? growPlantsOn(world, pos) : false;
+			return block == Blocks.f_50034_ ? growPlantsOn(world, pos) : false;
 		}
 	}
 
-	private static boolean growPlantsOn(World world, BlockPos pos)
+	private static boolean growPlantsOn(Level world, BlockPos pos)
 	{
-		BlockPos above = pos.up();
-		IBlockState state = world.getBlockState(above);
+		BlockPos above = pos.m_7494_();
+		BlockState state = world.getBlockState(above);
 		Block block = state.getBlock();
-		if (block.isAir(state, world, above) || block == Blocks.TALLGRASS && world.rand.nextInt(4) == 0)
+		if (state.isAir() || block == Blocks.f_50359_ && world.random.nextInt(4) == 0)
 		{
-			IBlockState plant = pickRandomPlant(world.rand);
-			if (plant.getProperties().containsKey(BlockDirectional.FACING))
+			BlockState plant = pickRandomPlant(world.random);
+			if (plant.m_61148_().containsKey(DirectionalBlock.f_52588_))
 			{
-				plant = plant.withProperty(
-					BlockDirectional.FACING, EnumFacing.HORIZONTALS[world.rand.nextInt(EnumFacing.HORIZONTALS.length)]
-				);
+				plant = (BlockState) plant.setValue(DirectionalBlock.f_52588_, Util.HORIZONTAL_DIRS[world.random.nextInt(Util.HORIZONTAL_DIRS.length)]);
 			}
 
-			if (plant.getBlock() instanceof BlockCrops)
+			if (plant.getBlock() instanceof CropBlock)
 			{
-				world.setBlockState(pos, Blocks.FARMLAND.getDefaultState());
-			} else if (plant.getBlock() == Blocks.DOUBLE_PLANT)
+				world.setBlockAndUpdate(pos, Blocks.f_50093_.defaultBlockState());
+			} else if (plant.getBlock() instanceof DoublePlantBlock)
 			{
-				plant = plant.withProperty(BlockDoublePlant.HALF, EnumBlockHalf.LOWER);
-				world.setBlockState(above, plant.withProperty(BlockDoublePlant.HALF, EnumBlockHalf.LOWER));
-				world.setBlockState(above.up(), plant.withProperty(BlockDoublePlant.HALF, EnumBlockHalf.UPPER));
+				world.setBlockAndUpdate(above, (BlockState) plant.setValue(DoublePlantBlock.f_52858_, DoubleBlockHalf.LOWER));
+				world.setBlockAndUpdate(above.m_7494_(), (BlockState) plant.setValue(DoublePlantBlock.f_52858_, DoubleBlockHalf.UPPER));
 				return true;
 			}
 
-			world.setBlockState(above, plant);
+			world.setBlockAndUpdate(above, plant);
 			return true;
 		} else
 		{
@@ -118,7 +119,7 @@ class Cultivation extends TerraformerBase
 		}
 	}
 
-	private static IBlockState pickRandomPlant(Random random)
+	private static BlockState pickRandomPlant(RandomSource random)
 	{
 		return plants.get(random.nextInt(plants.size()));
 	}

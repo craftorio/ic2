@@ -1,29 +1,13 @@
 package ic2.core.ref;
 
-import net.minecraft.block.material.MapColor;
-import net.minecraft.block.material.Material;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.level.material.Material.Builder;
 
-public class IC2Material extends Material
+public class IC2Material
 {
-	public static final IC2Material MACHINE = new IC2Material("ic2_material_machine", true, true);
-	public static final IC2Material PIPE = new IC2Material("ic2_material_pipe", true, true);
-	public static final IC2Material CABLE = new IC2Material("ic2_material_cable", false, true);
-	public final String name;
-
-	public IC2Material(String name, boolean requiresTool, boolean immovableMobility)
-	{
-		super(MapColor.IRON);
-		this.name = name;
-		if (requiresTool)
-		{
-			this.setRequiresTool();
-		}
-
-		if (immovableMobility)
-		{
-			this.setImmovableMobility();
-		}
-
-		this.setAdventureModeExempt();
-	}
+	public static final Material MACHINE = new Builder(MaterialColor.f_76420_).m_76359_();
+	public static final Material PIPE = new Builder(MaterialColor.f_76420_).m_76359_();
+	public static final Material CABLE = new Builder(MaterialColor.f_76365_).m_76359_();
+	public static final Material STEAM = new Builder(MaterialColor.f_76420_).m_76354_().m_76353_().m_76356_().m_76350_().m_76359_();
 }

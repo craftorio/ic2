@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
+import net.minecraft.network.chat.Component;
+
 public class TextProvider
 {
 	public static TextProvider.ITextProvider of(String text)
@@ -20,7 +22,7 @@ public class TextProvider
 		return text.isEmpty() ? new TextProvider.ConstantEmpty() : new TextProvider.Constant(text);
 	}
 
-	public static TextProvider.ITextProvider of(final Supplier<String> supplier)
+	public static TextProvider.ITextProvider of(Supplier<String> supplier)
 	{
 		return new TextProvider.AbstractTextProvider()
 		{
@@ -36,6 +38,11 @@ public class TextProvider
 				return (String) supplier.get();
 			}
 		};
+	}
+
+	public static TextProvider.ITextProvider of(Component text)
+	{
+		return new TextProvider.Translate(new TextProvider.Constant(text.getString()));
 	}
 
 	public static TextProvider.ITextProvider ofTranslated(String key)
@@ -348,10 +355,6 @@ public class TextProvider
 
 	private abstract static class AbstractTextProvider implements TextProvider.ITextProvider
 	{
-		private AbstractTextProvider()
-		{
-		}
-
 		@Override
 		public final String get(Object base, Map<String, TextProvider.ITextProvider> tokens)
 		{
@@ -394,10 +397,6 @@ public class TextProvider
 
 	private static class ConstantEmpty extends TextProvider.AbstractTextProvider
 	{
-		private ConstantEmpty()
-		{
-		}
-
 		@Override
 		public String getRaw(Object base, Map<String, TextProvider.ITextProvider> tokens)
 		{

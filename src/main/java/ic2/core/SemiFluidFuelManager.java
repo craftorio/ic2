@@ -3,67 +3,48 @@ package ic2.core;
 import ic2.api.recipe.ISemiFluidFuelManager;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraft.world.level.material.Fluid;
 
 public class SemiFluidFuelManager implements ISemiFluidFuelManager
 {
-	private final Map<String, ISemiFluidFuelManager.FuelProperty> fuelProperties = new HashMap<>();
+	private final Map<Fluid, ISemiFluidFuelManager.BurnProperty> burnProperties = new IdentityHashMap<>();
 
 	@Override
-	public void addFluid(String fluidName, long energyPerMb, long energyPerTick)
+	public void addFluid(Fluid fluid, int amount, double power)
 	{
-		if (this.fuelProperties.containsKey(fluidName))
+		if (this.burnProperties.containsKey(fluid))
 		{
-			throw new RuntimeException("The fluid " + fluidName + " does already have a fuel property assigned.");
+			throw new RuntimeException("The fluid " + fluid + " does already have a burn property assigned.");
 		}
 
-		this.fuelProperties.put(fluidName, new ISemiFluidFuelManager.FuelProperty(energyPerMb, energyPerTick));
+		this.burnProperties.put(fluid, new ISemiFluidFuelManager.BurnProperty(amount, power));
 	}
 
 	@Override
-	public void removeFluid(String fluidName)
+	public ISemiFluidFuelManager.BurnProperty getBurnProperty(Fluid fluid)
 	{
-		this.fuelProperties.remove(fluidName);
-	}
-
-	@Override
-	public ISemiFluidFuelManager.FuelProperty getFuelProperty(Fluid fluid)
-	{
-		return fluid == null ? null : this.fuelProperties.get(fluid.getName());
+		return fluid == null ? null : this.burnProperties.get(fluid);
 	}
 
 	@Override
 	public boolean acceptsFluid(Fluid fluid)
 	{
-		return fluid != null && this.fuelProperties.containsKey(fluid.getName());
+		return fluid != null && this.burnProperties.containsKey(fluid);
 	}
 
 	@Override
 	public Set<Fluid> getAcceptedFluids()
 	{
-		Set<Fluid> ret = new HashSet<>(this.fuelProperties.size() * 2, 0.5F);
-
-		for (String fluidName : this.fuelProperties.keySet())
-		{
-			Fluid fluid = FluidRegistry.getFluid(fluidName);
-			if (fluid != null)
-			{
-				ret.add(fluid);
-			}
-		}
-
-		return ret;
+		return Collections.unmodifiableSet(this.burnProperties.keySet());
 	}
 
 	@Override
-	public Map<String, ISemiFluidFuelManager.FuelProperty> getFuelProperties()
+	public Map<Fluid, ISemiFluidFuelManager.BurnProperty> getBurnProperties()
 	{
-		return Collections.unmodifiableMap(this.fuelProperties);
+		return Collections.unmodifiableMap(this.burnProperties);
 	}
 }

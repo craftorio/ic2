@@ -1,0 +1,25 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    " c ",
+    "CEB",
+    " c "
+  ],
+  "key": {
+    "E": {
+      "item": "ic2:mv_transformer"
+    },
+    "c": {
+      "item": "ic2:double_insulated_gold_cable"
+    },
+    "B": {
+      "item": "ic2:advanced_re_battery"
+    },
+    "C": {
+      "item": "ic2:circuit"
+    }
+  },
+  "result": {
+    "item": "ic2:hv_transformer"
+  }
+}

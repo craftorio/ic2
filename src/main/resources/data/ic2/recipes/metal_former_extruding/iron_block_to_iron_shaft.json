@@ -1,0 +1,9 @@
+{
+  "type": "ic2:metal_former_extruding",
+  "ingredient": {
+    "item": "minecraft:iron_block"
+  },
+  "result": {
+    "item": "ic2:iron_shaft"
+  }
+}

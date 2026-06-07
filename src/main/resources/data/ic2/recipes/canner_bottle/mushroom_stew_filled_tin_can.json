@@ -1,0 +1,14 @@
+{
+  "type": "ic2:canner_bottle",
+  "container_ingredient": {
+    "item": "ic2:tin_can",
+    "count": 6
+  },
+  "fill_ingredient": {
+    "item": "minecraft:mushroom_stew"
+  },
+  "result": {
+    "item": "ic2:filled_tin_can",
+    "count": 6
+  }
+}

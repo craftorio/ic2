@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gui width="176" height="219">
-    <image x="0" y="0" src="textures/gui/GUINuke"/>
+    <image x="0" y="0" src="ic2:textures/gui/guinuke.png"/>
 
     <slot name="insideSlot" x="78" y="61"/>
 

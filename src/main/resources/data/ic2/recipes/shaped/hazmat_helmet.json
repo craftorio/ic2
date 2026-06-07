@@ -1,0 +1,25 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    " O ",
+    "RGR",
+    "R#R"
+  ],
+  "key": {
+    "R": {
+      "item": "ic2:rubber"
+    },
+    "G": {
+      "item": "minecraft:glass"
+    },
+    "#": {
+      "item": "minecraft:iron_bars"
+    },
+    "O": {
+      "item": "minecraft:orange_dye"
+    }
+  },
+  "result": {
+    "item": "ic2:hazmat_helmet"
+  }
+}

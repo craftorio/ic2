@@ -4,17 +4,17 @@ import ic2.api.energy.EnergyNet;
 import ic2.api.energy.tile.IEnergySink;
 import ic2.api.energy.tile.IEnergySource;
 import ic2.api.info.ILocatable;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 public abstract class BasicSinkSource extends BasicEnergyTile implements IEnergySink, IEnergySource
 {
 	protected int sinkTier;
 	protected int sourceTier;
 
-	public BasicSinkSource(TileEntity parent, double capacity, int sinkTier, int sourceTier)
+	public BasicSinkSource(BlockEntity parent, double capacity, int sinkTier, int sourceTier)
 	{
 		super(parent, capacity);
 		if (sinkTier < 0)
@@ -58,7 +58,7 @@ public abstract class BasicSinkSource extends BasicEnergyTile implements IEnergy
 		}
 	}
 
-	public BasicSinkSource(World world, BlockPos pos, double capacity, int sinkTier, int sourceTier)
+	public BasicSinkSource(Level world, BlockPos pos, double capacity, int sinkTier, int sourceTier)
 	{
 		super(world, pos, capacity);
 		if (sinkTier < 0)
@@ -113,7 +113,7 @@ public abstract class BasicSinkSource extends BasicEnergyTile implements IEnergy
 	}
 
 	@Override
-	public double injectEnergy(EnumFacing directionFrom, double amount, double voltage)
+	public double injectEnergy(Direction directionFrom, double amount, double voltage)
 	{
 		this.setEnergyStored(this.getEnergyStored() + amount);
 		return 0.0;

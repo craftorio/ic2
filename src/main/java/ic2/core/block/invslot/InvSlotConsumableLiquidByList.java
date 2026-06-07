@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import net.minecraftforge.fluids.Fluid;
+import net.minecraft.world.level.material.Fluid;
 
 public class InvSlotConsumableLiquidByList extends InvSlotConsumableLiquid
 {

@@ -1,26 +1,26 @@
 package ic2.api.item;
 
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.inventory.EntityEquipmentSlot;
-import net.minecraft.inventory.EntityEquipmentSlot.Type;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.EquipmentSlot.Type;
+import net.minecraft.world.item.ItemStack;
 
 public interface IHazmatLike
 {
-	boolean addsProtection(EntityLivingBase var1, EntityEquipmentSlot var2, ItemStack var3);
+	boolean addsProtection(LivingEntity var1, EquipmentSlot var2, ItemStack var3);
 
-	default boolean fullyProtects(EntityLivingBase entity, EntityEquipmentSlot slot, ItemStack stack)
+	default boolean fullyProtects(LivingEntity entity, EquipmentSlot slot, ItemStack stack)
 	{
 		return false;
 	}
 
-	static boolean hasCompleteHazmat(EntityLivingBase living)
+	static boolean hasCompleteHazmat(LivingEntity living)
 	{
-		for (EntityEquipmentSlot slot : EntityEquipmentSlot.values())
+		for (EquipmentSlot slot : EquipmentSlot.values())
 		{
-			if (slot.getSlotType() == Type.ARMOR)
+			if (slot.m_20743_() == Type.ARMOR)
 			{
-				ItemStack stack = living.getItemStackFromSlot(slot);
+				ItemStack stack = living.m_6844_(slot);
 				if (stack == null || !(stack.getItem() instanceof IHazmatLike))
 				{
 					return false;

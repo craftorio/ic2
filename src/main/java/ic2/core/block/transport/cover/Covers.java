@@ -1,70 +1,70 @@
 package ic2.core.block.transport.cover;
 
 import ic2.core.IC2;
-import ic2.core.block.TileEntityBlock;
 import ic2.core.block.comp.TileEntityComponent;
+import ic2.core.block.tileentity.Ic2TileEntity;
 import ic2.core.util.LogCategory;
 import ic2.core.util.StackUtil;
 import ic2.core.util.Util;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.world.item.ItemStack;
 
 public class Covers extends TileEntityComponent
 {
-	protected final ItemStack[] covers = new ItemStack[6];
+	protected ItemStack[] covers = new ItemStack[6];
 
-	public Covers(TileEntityBlock parent)
+	public Covers(Ic2TileEntity parent)
 	{
 		super(parent);
 	}
 
-	public void addCover(EnumFacing side, ItemStack cover)
+	public void addCover(Direction side, ItemStack cover)
 	{
 		if (StackUtil.isEmpty(this.covers[side.ordinal()]))
 		{
-			ItemStack ret = cover.copy();
-			NBTTagCompound nbtTagCompound = StackUtil.getOrCreateNbtData(ret);
-			nbtTagCompound.setByte("side", (byte) side.ordinal());
+			ItemStack ret = cover.m_41777_();
+			CompoundTag nbtTagCompound = StackUtil.getOrCreateNbtData(ret);
+			nbtTagCompound.putByte("side", (byte) side.ordinal());
 			this.covers[side.ordinal()] = ret;
 		}
 	}
 
-	public ItemStack removeCover(EnumFacing side)
+	public ItemStack removeCover(Direction side)
 	{
 		ItemStack ret = this.covers[side.ordinal()];
-		ret.setTagCompound(null);
+		ret.m_41751_(null);
 		this.covers[side.ordinal()] = null;
 		return ret;
 	}
 
-	public boolean hasCover(EnumFacing side)
+	public boolean hasCover(Direction side)
 	{
 		return !StackUtil.isEmpty(this.covers[side.ordinal()]);
 	}
 
-	public ICoverItem getCoverItem(EnumFacing side)
+	public ICoverItem getCoverItem(Direction side)
 	{
 		ItemStack stack = this.covers[side.ordinal()];
 		return StackUtil.isEmpty(stack) ? null : (ICoverItem) stack.getItem();
 	}
 
 	@Override
-	public void readFromNbt(NBTTagCompound nbt)
+	public void readFromNbt(CompoundTag nbt)
 	{
-		NBTTagList coversTag = nbt.getTagList("covers", 10);
+		ListTag coversTag = nbt.m_128437_("covers", 10);
 
-		for (int i = 0; i < coversTag.tagCount(); i++)
+		for (int i = 0; i < coversTag.size(); i++)
 		{
-			NBTTagCompound coverTag = coversTag.getCompoundTagAt(i);
+			CompoundTag coverTag = coversTag.m_128728_(i);
 			int index = coverTag.getByte("facing") & 255;
 			if (index >= this.covers.length)
 			{
 				IC2.log.error(LogCategory.Block, "Can't load cover for %s, index %d is out of bounds.", Util.toString(this.parent), index);
 			} else
 			{
-				ItemStack cover = new ItemStack(coverTag);
+				ItemStack cover = ItemStack.m_41712_(coverTag);
 				if (StackUtil.isEmpty(cover))
 				{
 					IC2.log
@@ -99,37 +99,37 @@ public class Covers extends TileEntityComponent
 	}
 
 	@Override
-	public NBTTagCompound writeToNbt()
+	public CompoundTag writeToNbt()
 	{
-		NBTTagCompound ret = new NBTTagCompound();
-		NBTTagList coversTag = new NBTTagList();
+		CompoundTag ret = new CompoundTag();
+		ListTag coversTag = new ListTag();
 
-		for (EnumFacing facing : EnumFacing.VALUES)
+		for (Direction facing : Util.ALL_DIRS)
 		{
 			ItemStack cover = this.covers[facing.ordinal()];
 			if (!StackUtil.isEmpty(cover))
 			{
-				NBTTagCompound coverTag = new NBTTagCompound();
-				coverTag.setByte("facing", (byte) facing.ordinal());
-				cover.writeToNBT(coverTag);
-				coversTag.appendTag(coverTag);
+				CompoundTag coverTag = new CompoundTag();
+				coverTag.putByte("facing", (byte) facing.ordinal());
+				cover.m_41739_(coverTag);
+				coversTag.add(coverTag);
 			}
 		}
 
-		ret.setTag("covers", coversTag);
+		ret.put("covers", coversTag);
 		return ret;
 	}
 
 	@Override
 	public boolean enableWorldTick()
 	{
-		return !this.parent.getWorld().isRemote;
+		return !this.parent.getLevel().isClientSide;
 	}
 
 	@Override
 	public void onWorldTick()
 	{
-		for (EnumFacing facing : EnumFacing.VALUES)
+		for (Direction facing : Util.ALL_DIRS)
 		{
 			if (!StackUtil.isEmpty(this.covers[facing.ordinal()]))
 			{

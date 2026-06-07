@@ -1,6 +1,6 @@
 package ic2.api.energy.tile;
 
-import net.minecraft.util.EnumFacing;
+import net.minecraft.core.Direction;
 
 public interface IEnergySink extends IEnergyAcceptor
 {
@@ -8,5 +8,5 @@ public interface IEnergySink extends IEnergyAcceptor
 
 	int getSinkTier();
 
-	double injectEnergy(EnumFacing var1, double var2, double var4);
+	double injectEnergy(Direction var1, double var2, double var4);
 }

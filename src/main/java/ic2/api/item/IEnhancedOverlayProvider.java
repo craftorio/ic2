@@ -1,12 +1,12 @@
 package ic2.api.item;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 public interface IEnhancedOverlayProvider
 {
-	boolean providesEnhancedOverlay(World var1, BlockPos var2, EnumFacing var3, EntityPlayer var4, ItemStack var5);
+	boolean providesEnhancedOverlay(Level var1, BlockPos var2, Direction var3, Player var4, ItemStack var5);
 }

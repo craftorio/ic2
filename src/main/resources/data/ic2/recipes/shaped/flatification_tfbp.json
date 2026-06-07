@@ -1,0 +1,19 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    " D ",
+    "D#D",
+    " D "
+  ],
+  "key": {
+    "#": {
+      "item": "ic2:blank_tfbp"
+    },
+    "D": {
+      "item": "minecraft:dirt"
+    }
+  },
+  "result": {
+    "item": "ic2:flatification_tfbp"
+  }
+}

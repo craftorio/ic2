@@ -1,61 +1,36 @@
 package ic2.core.block.reactor.tileentity;
 
 import ic2.core.profile.NotClassic;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.world.World;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.wrapper.InvWrapper;
+import ic2.core.ref.Ic2BlockEntities;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.Container;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 @NotClassic
-public class TileEntityReactorAccessHatch extends TileEntityReactorVessel implements IInventory
+public class TileEntityReactorAccessHatch extends TileEntityReactorVessel implements Container
 {
-	private IItemHandler itemHandler;
+	public TileEntityReactorAccessHatch(BlockPos pos, BlockState state)
+	{
+		super(Ic2BlockEntities.REACTOR_ACCESS_HATCH, pos, state);
+	}
 
 	@Override
-	protected boolean onActivated(EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ)
+	protected InteractionResult onActivated(Player player, InteractionHand hand, Direction side, Vec3 hit)
 	{
 		TileEntityNuclearReactorElectric reactor = this.getReactorInstance();
-		if (reactor != null)
-		{
-			World world = this.getWorld();
-			return reactor.getBlockType()
-				.onBlockActivated(world, reactor.getPos(), world.getBlockState(reactor.getPos()), player, hand, side, hitX, hitY, hitZ);
-		} else
-		{
-			return false;
-		}
+		return reactor != null ? reactor.onActivated(player, hand, side, hit) : InteractionResult.PASS;
 	}
 
-	public String getName()
+	public int getContainerSize()
 	{
 		TileEntityNuclearReactorElectric reactor = this.getReactorInstance();
-		return reactor != null ? reactor.getName() : "<null>";
-	}
-
-	public boolean hasCustomName()
-	{
-		TileEntityNuclearReactorElectric reactor = this.getReactorInstance();
-		return reactor != null ? reactor.hasCustomName() : false;
-	}
-
-	public ITextComponent getDisplayName()
-	{
-		TileEntityNuclearReactorElectric reactor = this.getReactorInstance();
-		return (ITextComponent) (reactor != null ? reactor.getDisplayName() : new TextComponentString("<null>"));
-	}
-
-	public int getSizeInventory()
-	{
-		TileEntityNuclearReactorElectric reactor = this.getReactorInstance();
-		return reactor != null ? reactor.getSizeInventory() : 0;
+		return reactor != null ? reactor.getContainerSize() : 0;
 	}
 
 	public boolean isEmpty()
@@ -64,119 +39,75 @@ public class TileEntityReactorAccessHatch extends TileEntityReactorVessel implem
 		return reactor != null ? reactor.isEmpty() : true;
 	}
 
-	public ItemStack getStackInSlot(int index)
+	public ItemStack getItem(int index)
 	{
 		TileEntityNuclearReactorElectric reactor = this.getReactorInstance();
-		return reactor != null ? reactor.getStackInSlot(index) : null;
+		return reactor != null ? reactor.getItem(index) : null;
 	}
 
-	public ItemStack decrStackSize(int index, int count)
+	public ItemStack removeItem(int index, int count)
 	{
 		TileEntityNuclearReactorElectric reactor = this.getReactorInstance();
-		return reactor != null ? reactor.decrStackSize(index, count) : null;
+		return reactor != null ? reactor.removeItem(index, count) : null;
 	}
 
-	public ItemStack removeStackFromSlot(int index)
+	public ItemStack removeItemNoUpdate(int index)
 	{
 		TileEntityNuclearReactorElectric reactor = this.getReactorInstance();
-		return reactor != null ? reactor.removeStackFromSlot(index) : null;
+		return reactor != null ? reactor.removeItemNoUpdate(index) : null;
 	}
 
-	public void setInventorySlotContents(int index, ItemStack stack)
-	{
-		TileEntityNuclearReactorElectric reactor = this.getReactorInstance();
-		if (reactor != null)
-		{
-			reactor.setInventorySlotContents(index, stack);
-		}
-	}
-
-	public int getInventoryStackLimit()
-	{
-		TileEntityNuclearReactorElectric reactor = this.getReactorInstance();
-		return reactor != null ? reactor.getInventoryStackLimit() : 0;
-	}
-
-	public boolean isUsableByPlayer(EntityPlayer player)
-	{
-		TileEntityNuclearReactorElectric reactor = this.getReactorInstance();
-		return reactor != null ? reactor.isUsableByPlayer(player) : false;
-	}
-
-	public void openInventory(EntityPlayer player)
+	public void setItem(int index, ItemStack stack)
 	{
 		TileEntityNuclearReactorElectric reactor = this.getReactorInstance();
 		if (reactor != null)
 		{
-			reactor.openInventory(player);
+			reactor.setItem(index, stack);
 		}
 	}
 
-	public void closeInventory(EntityPlayer player)
+	public int getMaxStackSize()
+	{
+		TileEntityNuclearReactorElectric reactor = this.getReactorInstance();
+		return reactor != null ? reactor.getMaxStackSize() : 0;
+	}
+
+	public boolean stillValid(Player player)
+	{
+		TileEntityNuclearReactorElectric reactor = this.getReactorInstance();
+		return reactor != null ? reactor.stillValid(player) : false;
+	}
+
+	public void startOpen(Player player)
 	{
 		TileEntityNuclearReactorElectric reactor = this.getReactorInstance();
 		if (reactor != null)
 		{
-			reactor.closeInventory(player);
+			reactor.startOpen(player);
 		}
 	}
 
-	public boolean isItemValidForSlot(int index, ItemStack stack)
-	{
-		TileEntityNuclearReactorElectric reactor = this.getReactorInstance();
-		return reactor != null ? reactor.isItemValidForSlot(index, stack) : false;
-	}
-
-	public int getField(int id)
-	{
-		TileEntityNuclearReactorElectric reactor = this.getReactorInstance();
-		return reactor != null ? reactor.getField(id) : 0;
-	}
-
-	public void setField(int id, int value)
+	public void stopOpen(Player player)
 	{
 		TileEntityNuclearReactorElectric reactor = this.getReactorInstance();
 		if (reactor != null)
 		{
-			reactor.setField(id, value);
+			reactor.stopOpen(player);
 		}
 	}
 
-	public int getFieldCount()
+	public boolean canPlaceItem(int index, ItemStack stack)
 	{
 		TileEntityNuclearReactorElectric reactor = this.getReactorInstance();
-		return reactor != null ? reactor.getFieldCount() : 0;
+		return reactor != null ? reactor.canPlaceItem(index, stack) : false;
 	}
 
-	public void clear()
+	public void clearContent()
 	{
 		TileEntityNuclearReactorElectric reactor = this.getReactorInstance();
 		if (reactor != null)
 		{
-			reactor.clear();
-		}
-	}
-
-	@Override
-	public boolean hasCapability(Capability<?> capability, EnumFacing facing)
-	{
-		return capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY || super.hasCapability(capability, facing);
-	}
-
-	@Override
-	public <T> T getCapability(Capability<T> capability, EnumFacing facing)
-	{
-		if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
-		{
-			if (this.itemHandler == null)
-			{
-				this.itemHandler = new InvWrapper(this);
-			}
-
-			return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(this.itemHandler);
-		} else
-		{
-			return super.getCapability(capability, facing);
+			reactor.clearContent();
 		}
 	}
 }

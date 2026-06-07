@@ -1,21 +1,21 @@
 package ic2.api.energy.tile;
 
-import net.minecraft.util.EnumFacing;
+import net.minecraft.core.Direction;
 
 public interface IHeatSource
 {
 	@Deprecated
-	int maxrequestHeatTick(EnumFacing var1);
+	int maxrequestHeatTick(Direction var1);
 
-	default int getConnectionBandwidth(EnumFacing side)
+	default int getConnectionBandwidth(Direction side)
 	{
 		return this.maxrequestHeatTick(side);
 	}
 
 	@Deprecated
-	int requestHeat(EnumFacing var1, int var2);
+	int requestHeat(Direction var1, int var2);
 
-	default int drawHeat(EnumFacing side, int request, boolean simulate)
+	default int drawHeat(Direction side, int request, boolean simulate)
 	{
 		return !simulate ? this.requestHeat(side, request) : this.maxrequestHeatTick(side);
 	}

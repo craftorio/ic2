@@ -1,36 +1,41 @@
 package ic2.core.item.tool;
 
-import ic2.api.event.LaserEvent;
-import ic2.api.item.ElectricItem;
 import ic2.api.network.INetworkItemEventListener;
 import ic2.core.IC2;
-import ic2.core.audio.PositionSpec;
+import ic2.core.entity.LaserBulletEntity;
 import ic2.core.init.Localization;
-import ic2.core.ref.ItemName;
+import ic2.core.item.PriorityUsableItem;
+import ic2.core.ref.Ic2SoundEvents;
 import ic2.core.util.StackUtil;
 import ic2.core.util.Util;
 import ic2.core.util.Vector3;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.EnumRarity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.Item.Properties;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
-public class ItemToolMiningLaser extends ItemElectricTool implements INetworkItemEventListener
+public class ItemToolMiningLaser extends ItemElectricTool implements INetworkItemEventListener, PriorityUsableItem
 {
 	private static final int EventShotMining = 0;
 	private static final int EventShotLowFocus = 1;
@@ -41,21 +46,27 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
 	private static final int EventShotExplosive = 6;
 	private static final int EventShot3x3 = 7;
 
-	public ItemToolMiningLaser()
+	public ItemToolMiningLaser(Properties settings)
 	{
-		super(ItemName.mining_laser, 100);
+		super(settings, 100);
 		this.maxCharge = 300000;
 		this.transferLimit = 512;
 		this.tier = 3;
 	}
 
-	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, World world, List<String> list, ITooltipFlag par4)
+	@Override
+	public boolean m_142522_(ItemStack stack)
 	{
-		super.addInformation(stack, world, list, par4);
-		NBTTagCompound nbtData = StackUtil.getOrCreateNbtData(stack);
+		return !stack.m_41786_().getString().equals("ic2:tab_icon");
+	}
+
+	@Override
+	public void m_7373_(ItemStack stack, Level world, List<Component> list, TooltipFlag par4)
+	{
+		super.m_7373_(stack, world, list, par4);
+		CompoundTag nbtData = StackUtil.getOrCreateNbtData(stack);
 		String mode;
-		switch (nbtData.getInteger("laserSetting"))
+		switch (nbtData.getInt("laserSetting"))
 		{
 			case 0:
 				mode = Localization.translate("ic2.tooltip.mode.mining");
@@ -85,42 +96,41 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
 				return;
 		}
 
-		list.add(Localization.translate("ic2.tooltip.mode", mode));
+		list.add(Component.m_237110_("ic2.tooltip.mode", new Object[] { mode }));
 	}
 
 	@Override
 	public List<String> getHudInfo(ItemStack stack, boolean advanced)
 	{
-		List<String> info = new LinkedList<>();
-		NBTTagCompound nbtData = StackUtil.getOrCreateNbtData(stack);
-		String mode = Localization.translate(getModeString(nbtData.getInteger("laserSetting")));
-		info.addAll(super.getHudInfo(stack, advanced));
+		CompoundTag nbtData = StackUtil.getOrCreateNbtData(stack);
+		String mode = Localization.translate(getModeString(nbtData.getInt("laserSetting")));
+		List<String> info = new LinkedList<>(super.getHudInfo(stack, advanced));
 		info.add(Localization.translate("ic2.tooltip.mode", mode));
 		return info;
 	}
 
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand)
+	public InteractionResultHolder<ItemStack> m_7203_(Level world, Player player, InteractionHand hand)
 	{
 		ItemStack stack = StackUtil.get(player, hand);
-		if (!IC2.platform.isSimulating())
+		if (!IC2.sideProxy.isSimulating())
 		{
-			return new ActionResult(EnumActionResult.PASS, stack);
+			return new InteractionResultHolder(InteractionResult.PASS, stack);
 		}
 
-		NBTTagCompound nbtData = StackUtil.getOrCreateNbtData(stack);
-		int laserSetting = nbtData.getInteger("laserSetting");
+		CompoundTag nbtData = StackUtil.getOrCreateNbtData(stack);
+		int laserSetting = nbtData.getInt("laserSetting");
 		if (IC2.keyboard.isModeSwitchKeyDown(player))
 		{
 			laserSetting = (laserSetting + 1) % 8;
-			nbtData.setInteger("laserSetting", laserSetting);
-			IC2.platform.messagePlayer(player, "ic2.tooltip.mode", getModeString(laserSetting));
+			nbtData.putInt("laserSetting", laserSetting);
+			IC2.sideProxy.messagePlayer(player, "ic2.tooltip.mode", getModeString(laserSetting));
 		} else
 		{
 			int consume = new int[] { 1250, 100, 5000, 0, 2500, 10000, 5000, 7500 }[laserSetting];
-			if (!ElectricItem.manager.use(stack, consume, player))
+			if (!this.consumeEnergy(stack, consume, player))
 			{
-				return new ActionResult(EnumActionResult.FAIL, stack);
+				return new InteractionResultHolder(InteractionResult.FAIL, stack);
 			}
 
 			switch (laserSetting)
@@ -157,7 +167,7 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
 					Vector3 right = look.copy().cross(Vector3.UP);
 					if (right.lengthSquared() < 1.0E-4)
 					{
-						double angle = Math.toRadians(player.rotationYaw) - (Math.PI / 2);
+						double angle = Math.toRadians(player.m_146908_()) - (Math.PI / 2);
 						right.set(Math.sin(angle), 0.0, -Math.cos(angle));
 					} else
 					{
@@ -188,38 +198,46 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
 			}
 		}
 
-		return super.onItemRightClick(world, player, hand);
+		return super.m_7203_(world, player, hand);
 	}
 
-	public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand)
+	@Override
+	public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context)
 	{
-		if (world.isRemote)
+		Level world = context.m_43725_();
+		Player player = context.m_43723_();
+		BlockPos pos = context.m_8083_();
+		if (world.isClientSide)
 		{
-			return EnumActionResult.PASS;
+			return InteractionResult.PASS;
 		}
 
-		ItemStack stack = StackUtil.get(player, hand);
-		NBTTagCompound nbtData = StackUtil.getOrCreateNbtData(stack);
-		if (!IC2.keyboard.isModeSwitchKeyDown(player) && (nbtData.getInteger("laserSetting") == 3 || nbtData.getInteger("laserSetting") == 7))
+		if (player == null)
+		{
+			return InteractionResult.PASS;
+		}
+
+		CompoundTag nbtData = StackUtil.getOrCreateNbtData(stack);
+		if (!IC2.keyboard.isModeSwitchKeyDown(player) && (nbtData.getInt("laserSetting") == 3 || nbtData.getInt("laserSetting") == 7))
 		{
 			Vector3 dir = Util.getLook(player);
 			double angle = dir.dot(Vector3.UP);
 			if (Math.abs(angle) < 1.0 / Math.sqrt(2.0))
 			{
-				if (ElectricItem.manager.use(stack, 3000.0, player))
+				if (this.consumeEnergy(stack, 3000.0, player))
 				{
 					dir.y = 0.0;
 					dir.normalize();
 					Vector3 start = Util.getEyePosition(player);
 					start.y = pos.getY() + 0.5;
 					start = adjustStartPos(start, dir);
-					if (nbtData.getInteger("laserSetting") == 3)
+					if (nbtData.getInt("laserSetting") == 3)
 					{
 						if (this.shootLaser(stack, world, start, dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false))
 						{
 							IC2.network.get(true).initiateItemEvent(player, stack, 3, true);
 						}
-					} else if (nbtData.getInteger("laserSetting") == 7
+					} else if (nbtData.getInt("laserSetting") == 7
 						&& this.shootLaser(stack, world, start, dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false))
 					{
 						this.shootLaser(
@@ -228,7 +246,7 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
 						this.shootLaser(
 							stack, world, new Vector3(start.x, start.y + 1.0, start.z), dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false
 						);
-						if (player.getHorizontalFacing().equals(EnumFacing.SOUTH) || player.getHorizontalFacing().equals(EnumFacing.NORTH))
+						if (player.m_6350_().equals(Direction.SOUTH) || player.m_6350_().equals(Direction.NORTH))
 						{
 							this.shootLaser(
 								stack, world, new Vector3(start.x - 1.0, start.y, start.z), dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false
@@ -286,7 +304,7 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
 							);
 						}
 
-						if (player.getHorizontalFacing().equals(EnumFacing.EAST) || player.getHorizontalFacing().equals(EnumFacing.WEST))
+						if (player.m_6350_().equals(Direction.EAST) || player.m_6350_().equals(Direction.WEST))
 						{
 							this.shootLaser(
 								stack, world, new Vector3(start.x, start.y, start.z - 1.0), dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false
@@ -347,9 +365,9 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
 						IC2.network.get(true).initiateItemEvent(player, stack, 7, true);
 					}
 				}
-			} else if (nbtData.getInteger("laserSetting") == 7)
+			} else if (nbtData.getInt("laserSetting") == 7)
 			{
-				if (ElectricItem.manager.use(stack, 3000.0, player))
+				if (this.consumeEnergy(stack, 3000.0, player))
 				{
 					dir.x = 0.0;
 					dir.z = 0.0;
@@ -425,11 +443,11 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
 				}
 			} else
 			{
-				IC2.platform.messagePlayer(player, "Mining laser aiming angle too steep");
+				IC2.sideProxy.messagePlayer(player, "Mining laser aiming angle too steep");
 			}
 		}
 
-		return EnumActionResult.FAIL;
+		return InteractionResult.FAIL;
 	}
 
 	private static Vector3 adjustStartPos(Vector3 pos, Vector3 dir)
@@ -437,14 +455,21 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
 		return pos.addScaled(dir, 0.2);
 	}
 
-	public boolean shootLaser(ItemStack stack, World world, EntityLivingBase owner, float range, float power, int blockBreaks, boolean explosive, boolean smelt)
+	private void setLaserVelocity(Projectile laser, Entity shooter, Vector3 direction, float speed, float divergence)
+	{
+		laser.m_6686_(direction.x, direction.y, direction.z, speed, divergence);
+		Vec3 vec3d = shooter.m_20184_();
+		laser.m_20256_(laser.m_20184_().m_82520_(vec3d.f_82479_, shooter.m_20096_() ? 0.0 : vec3d.f_82480_, vec3d.f_82481_));
+	}
+
+	public boolean shootLaser(ItemStack stack, Level world, LivingEntity owner, float range, float power, int blockBreaks, boolean explosive, boolean smelt)
 	{
 		Vector3 dir = Util.getLook(owner);
 		return this.shootLaser(stack, world, dir, owner, range, power, blockBreaks, explosive, smelt);
 	}
 
 	public boolean shootLaser(
-		ItemStack stack, World world, Vector3 dir, EntityLivingBase owner, float range, float power, int blockBreaks, boolean explosive, boolean smelt
+		ItemStack stack, Level world, Vector3 dir, LivingEntity owner, float range, float power, int blockBreaks, boolean explosive, boolean smelt
 	)
 	{
 		Vector3 start = adjustStartPos(Util.getEyePosition(owner), dir);
@@ -452,92 +477,64 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
 	}
 
 	public boolean shootLaser(
-		ItemStack stack,
-		World world,
-		Vector3 start,
-		Vector3 dir,
-		EntityLivingBase owner,
-		float range,
-		float power,
-		int blockBreaks,
-		boolean explosive,
-		boolean smelt
+		ItemStack stack, Level world, Vector3 start, Vector3 dir, LivingEntity owner, float range, float power, int blockBreaks, boolean explosive, boolean smelt
 	)
 	{
-		EntityMiningLaser entity = new EntityMiningLaser(world, start, dir, owner, range, power, blockBreaks, explosive);
-		LaserEvent.LaserShootEvent event = new LaserEvent.LaserShootEvent(world, entity, owner, range, power, blockBreaks, explosive, smelt, stack);
-		MinecraftForge.EVENT_BUS.post(event);
-		if (event.isCanceled())
-		{
-			return false;
-		}
-
-		entity.copyDataFromEvent(event);
-		world.spawnEntity(entity);
+		LaserBulletEntity entity = new LaserBulletEntity(world, start, dir, owner, range, power, blockBreaks, explosive);
+		entity.init(owner, range, power, blockBreaks, explosive, smelt, true);
+		this.setLaserVelocity(entity, owner, dir, 3.0F, 1.0F);
+		world.addFreshEntity(entity);
 		return true;
 	}
 
-	@SideOnly(Side.CLIENT)
-	@Override
-	public EnumRarity getRarity(ItemStack stack)
+	public Rarity m_41460_(ItemStack stack)
 	{
-		return EnumRarity.UNCOMMON;
+		return Rarity.UNCOMMON;
+	}
+
+	private void playShotSound(Player player, SoundEvent soundEvent)
+	{
+		player.m_6330_(soundEvent, SoundSource.PLAYERS, 1.0F, 1.0F);
 	}
 
 	@Override
-	public void onNetworkEvent(ItemStack stack, EntityPlayer player, int event)
+	public void onNetworkEvent(ItemStack stack, Player player, int event)
 	{
 		switch (event)
 		{
 			case 0:
-				IC2.audioManager.playOnce(player, PositionSpec.Hand, "Tools/MiningLaser/MiningLaser.ogg", true, IC2.audioManager.getDefaultVolume());
+			case 3:
+			case 4:
+				this.playShotSound(player, Ic2SoundEvents.ITEM_LASER_SHOOT);
 				break;
 			case 1:
-				IC2.audioManager.playOnce(player, PositionSpec.Hand, "Tools/MiningLaser/MiningLaserLowFocus.ogg", true, IC2.audioManager.getDefaultVolume());
+				this.playShotSound(player, Ic2SoundEvents.ITEM_LASER_LOW_FOCUS);
 				break;
 			case 2:
-				IC2.audioManager.playOnce(player, PositionSpec.Hand, "Tools/MiningLaser/MiningLaserLongRange.ogg", true, IC2.audioManager.getDefaultVolume());
-				break;
-			case 3:
-				IC2.audioManager.playOnce(player, PositionSpec.Hand, "Tools/MiningLaser/MiningLaser.ogg", true, IC2.audioManager.getDefaultVolume());
-				break;
-			case 4:
-				IC2.audioManager.playOnce(player, PositionSpec.Hand, "Tools/MiningLaser/MiningLaser.ogg", true, IC2.audioManager.getDefaultVolume());
+				this.playShotSound(player, Ic2SoundEvents.ITEM_LASER_LONG_RANGE);
 				break;
 			case 5:
-				IC2.audioManager.playOnce(player, PositionSpec.Hand, "Tools/MiningLaser/MiningLaserScatter.ogg", true, IC2.audioManager.getDefaultVolume());
+			case 7:
+				this.playShotSound(player, Ic2SoundEvents.ITEM_LASER_SCATTER);
 				break;
 			case 6:
-				IC2.audioManager.playOnce(player, PositionSpec.Hand, "Tools/MiningLaser/MiningLaserExplosive.ogg", true, IC2.audioManager.getDefaultVolume());
-				break;
-			case 7:
-				IC2.audioManager.playOnce(player, PositionSpec.Hand, "Tools/MiningLaser/MiningLaserScatter.ogg", true, IC2.audioManager.getDefaultVolume());
+				this.playShotSound(player, Ic2SoundEvents.ITEM_LASER_EXPLOSIVE);
 		}
 	}
 
 	private static String getModeString(int mode)
 	{
-		switch (mode)
+		return switch (mode)
 		{
-			case 0:
-				return "ic2.tooltip.mode.mining";
-			case 1:
-				return "ic2.tooltip.mode.lowFocus";
-			case 2:
-				return "ic2.tooltip.mode.longRange";
-			case 3:
-				return "ic2.tooltip.mode.horizontal";
-			case 4:
-				return "ic2.tooltip.mode.superHeat";
-			case 5:
-				return "ic2.tooltip.mode.scatter";
-			case 6:
-				return "ic2.tooltip.mode.explosive";
-			case 7:
-				return "ic2.tooltip.mode.3x3";
-			default:
-				assert false;
-				return "";
-		}
+			case 0 -> "ic2.tooltip.mode.mining";
+			case 1 -> "ic2.tooltip.mode.lowFocus";
+			case 2 -> "ic2.tooltip.mode.longRange";
+			case 3 -> "ic2.tooltip.mode.horizontal";
+			case 4 -> "ic2.tooltip.mode.superHeat";
+			case 5 -> "ic2.tooltip.mode.scatter";
+			case 6 -> "ic2.tooltip.mode.explosive";
+			case 7 -> "ic2.tooltip.mode.3x3";
+			default -> throw new NoSuchElementException("No such mode: " + mode);
+		};
 	}
 }

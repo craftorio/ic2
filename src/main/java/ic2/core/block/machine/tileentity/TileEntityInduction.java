@@ -1,36 +1,34 @@
 package ic2.core.block.machine.tileentity;
 
-import ic2.api.network.INetworkTileEntityEventListener;
 import ic2.api.recipe.MachineRecipeResult;
 import ic2.api.upgrade.IUpgradableBlock;
 import ic2.api.upgrade.UpgradableProperty;
 import ic2.core.ContainerBase;
 import ic2.core.IC2;
 import ic2.core.IHasGui;
-import ic2.core.audio.AudioSource;
-import ic2.core.audio.FutureSound;
-import ic2.core.audio.PositionSpec;
 import ic2.core.block.comp.Redstone;
 import ic2.core.block.invslot.InvSlotOutput;
 import ic2.core.block.invslot.InvSlotProcessableSmelting;
 import ic2.core.block.invslot.InvSlotUpgrade;
 import ic2.core.gui.dynamic.DynamicContainer;
-import ic2.core.gui.dynamic.DynamicGui;
-import ic2.core.gui.dynamic.GuiParser;
 import ic2.core.gui.dynamic.IGuiValueProvider;
+import ic2.core.network.GrowingBuffer;
 import ic2.core.network.GuiSynced;
+import ic2.core.ref.Ic2BlockEntities;
+import ic2.core.ref.Ic2SoundEvents;
 
 import java.util.EnumSet;
 import java.util.Set;
 
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 
-public class TileEntityInduction extends TileEntityElectricMachine implements IHasGui, IUpgradableBlock, IGuiValueProvider, INetworkTileEntityEventListener
+public class TileEntityInduction extends TileEntityElectricMachine implements IHasGui, IUpgradableBlock, IGuiValueProvider
 {
 	private static final short maxHeat = 10000;
 	public final InvSlotProcessableSmelting inputSlotA;
@@ -39,17 +37,14 @@ public class TileEntityInduction extends TileEntityElectricMachine implements IH
 	public final InvSlotOutput outputSlotA;
 	public final InvSlotOutput outputSlotB;
 	protected final Redstone redstone;
-	protected AudioSource audioSource;
-	protected FutureSound startingSound;
-	protected String finishingSound;
 	@GuiSynced
 	public short heat = 0;
 	@GuiSynced
 	public short progress = 0;
 
-	public TileEntityInduction()
+	public TileEntityInduction(BlockPos pos, BlockState state)
 	{
-		super(10000, 2);
+		super(Ic2BlockEntities.INDUCTION_FURNACE, pos, state, 10000, 2);
 		this.inputSlotA = new InvSlotProcessableSmelting(this, "inputA", 1);
 		this.inputSlotB = new InvSlotProcessableSmelting(this, "inputB", 1);
 		this.outputSlotA = new InvSlotOutput(this, "outputA", 1);
@@ -60,50 +55,19 @@ public class TileEntityInduction extends TileEntityElectricMachine implements IH
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound nbt)
+	public void load(CompoundTag nbt)
 	{
-		super.readFromNBT(nbt);
+		super.load(nbt);
 		this.heat = nbt.getShort("heat");
 		this.progress = nbt.getShort("progress");
 	}
 
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
+	public void saveAdditional(CompoundTag nbt)
 	{
-		super.writeToNBT(nbt);
-		nbt.setShort("heat", this.heat);
-		nbt.setShort("progress", this.progress);
-		return nbt;
-	}
-
-	@Override
-	protected void onUnloaded()
-	{
-		super.onUnloaded();
-		if (IC2.platform.isRendering())
-		{
-			if (this.startingSound != null)
-			{
-				if (!this.startingSound.isComplete())
-				{
-					this.startingSound.cancel();
-				}
-
-				this.startingSound = null;
-			}
-
-			if (this.finishingSound != null)
-			{
-				IC2.audioManager.removeSource(this.finishingSound);
-				this.finishingSound = null;
-			}
-
-			if (this.audioSource != null)
-			{
-				IC2.audioManager.removeSources(this);
-				this.audioSource = null;
-			}
-		}
+		super.saveAdditional(nbt);
+		nbt.putShort("heat", this.heat);
+		nbt.putShort("progress", this.progress);
 	}
 
 	@Override
@@ -150,6 +114,7 @@ public class TileEntityInduction extends TileEntityElectricMachine implements IH
 
 				newActive = false;
 				IC2.network.get(true).initiateTileEntityEvent(this, 1, true);
+				this.shutdown(true);
 			}
 		} else if (canOperate)
 		{
@@ -157,6 +122,7 @@ public class TileEntityInduction extends TileEntityElectricMachine implements IH
 			{
 				newActive = true;
 				IC2.network.get(true).initiateTileEntityEvent(this, 0, true);
+				this.activate(false);
 			}
 		} else
 		{
@@ -166,6 +132,7 @@ public class TileEntityInduction extends TileEntityElectricMachine implements IH
 			}
 
 			this.progress = 0;
+			this.shutdown(false);
 		}
 
 		if (newActive && canOperate)
@@ -177,18 +144,13 @@ public class TileEntityInduction extends TileEntityElectricMachine implements IH
 		needsInvUpdate |= this.upgradeSlot.tickNoMark();
 		if (needsInvUpdate)
 		{
-			this.markDirty();
-		}
-
-		if (newActive != this.getActive())
-		{
-			this.setActive(newActive);
+			this.setChanged();
 		}
 	}
 
 	public String getHeat()
 	{
-		return "" + this.heat * 100 / 10000 + "%";
+		return this.heat * 100 / 10000 + "%";
 	}
 
 	public int gaugeProgressScaled(int i)
@@ -229,21 +191,15 @@ public class TileEntityInduction extends TileEntityElectricMachine implements IH
 	}
 
 	@Override
-	public ContainerBase<TileEntityInduction> getGuiContainer(EntityPlayer player)
+	public ContainerBase<?> createServerScreenHandler(int syncId, Player player)
 	{
-		return DynamicContainer.create(this, player, GuiParser.parse(this.teBlock));
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
-	{
-		return DynamicGui.<TileEntityInduction>create(this, player, GuiParser.parse(this.teBlock));
+		return DynamicContainer.create(syncId, player.getInventory(), this);
 	}
 
 	@Override
-	public void onGuiClosed(EntityPlayer player)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
+		return DynamicContainer.create(syncId, inventory, this);
 	}
 
 	@Override
@@ -276,67 +232,27 @@ public class TileEntityInduction extends TileEntityElectricMachine implements IH
 		}
 	}
 
-	public String getStartingSoundFile()
+	@Override
+	public SoundEvent getStartSoundEvent()
 	{
-		return "Machines/Induction Furnace/InductionStart.ogg";
-	}
-
-	public String getStartSoundFile()
-	{
-		return "Machines/Induction Furnace/InductionLoop.ogg";
-	}
-
-	public String getInterruptSoundFile()
-	{
-		return "Machines/Induction Furnace/InductionStop.ogg";
+		return Ic2SoundEvents.MACHINE_FURNACE_INDUCTION_START;
 	}
 
 	@Override
-	public void onNetworkEvent(int event)
+	public SoundEvent getStopSoundEvent()
 	{
-		if (this.audioSource == null && this.getStartSoundFile() != null)
-		{
-			this.audioSource = IC2.audioManager
-				.createSource(this, PositionSpec.Center, this.getStartSoundFile(), true, false, IC2.audioManager.getDefaultVolume());
-		}
+		return Ic2SoundEvents.MACHINE_FURNACE_INDUCTION_STOP;
+	}
 
-		switch (event)
-		{
-			case 0:
-				if (this.startingSound == null)
-				{
-					if (this.finishingSound != null)
-					{
-						IC2.audioManager.removeSource(this.finishingSound);
-						this.finishingSound = null;
-					}
+	@Override
+	public SoundEvent getLoopingSoundEvent()
+	{
+		return Ic2SoundEvents.MACHINE_FURNACE_INDUCTION_LOOP;
+	}
 
-					String source = IC2.audioManager.playOnce(this, PositionSpec.Center, this.getStartingSoundFile(), false, IC2.audioManager.getDefaultVolume());
-					if (this.audioSource != null)
-					{
-						IC2.audioManager.chainSource(source, this.startingSound = new FutureSound(this.audioSource::play));
-					}
-				}
-				break;
-			case 1:
-			case 3:
-				if (this.audioSource != null)
-				{
-					this.audioSource.stop();
-					if (this.startingSound != null)
-					{
-						if (!this.startingSound.isComplete())
-						{
-							this.startingSound.cancel();
-						}
-
-						this.startingSound = null;
-					}
-
-					this.finishingSound = IC2.audioManager
-						.playOnce(this, PositionSpec.Center, this.getInterruptSoundFile(), false, IC2.audioManager.getDefaultVolume());
-				}
-			case 2:
-		}
+	@Override
+	public SoundEvent getInterruptSoundEvent()
+	{
+		return Ic2SoundEvents.MACHINE_INTERRUPT1;
 	}
 }

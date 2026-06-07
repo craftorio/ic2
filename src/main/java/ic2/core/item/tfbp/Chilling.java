@@ -1,18 +1,19 @@
 package ic2.core.item.tfbp;
 
 import ic2.core.block.machine.tileentity.TileEntityTerra;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockSnow;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import ic2.core.util.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SnowLayerBlock;
+import net.minecraft.world.level.block.state.BlockState;
 
-class Chilling extends TerraformerBase
+public class Chilling extends TerraformerBase
 {
 	@Override
-	boolean terraform(World world, BlockPos pos)
+	boolean terraform(Level world, BlockPos pos)
 	{
 		pos = TileEntityTerra.getFirstBlockFrom(world, pos, 10);
 		if (pos == null)
@@ -20,55 +21,54 @@ class Chilling extends TerraformerBase
 			return false;
 		}
 
-		IBlockState state = world.getBlockState(pos);
+		BlockState state = world.getBlockState(pos);
 		Block block = state.getBlock();
-		if (block != Blocks.WATER && block != Blocks.FLOWING_WATER)
+		if (block == Blocks.f_49990_)
 		{
-			if (block == Blocks.ICE)
-			{
-				BlockPos below = pos.down();
-				Block blockBelow = world.getBlockState(below).getBlock();
-				if (blockBelow == Blocks.WATER || blockBelow == Blocks.FLOWING_WATER)
-				{
-					world.setBlockState(below, Blocks.ICE.getDefaultState());
-					return true;
-				}
-			} else if (block == Blocks.SNOW_LAYER)
-			{
-				if (isSurroundedBySnow(world, pos))
-				{
-					world.setBlockState(pos, Blocks.SNOW.getDefaultState());
-					return true;
-				}
-
-				int size = (Integer) state.getValue(BlockSnow.LAYERS);
-				if (BlockSnow.LAYERS.getAllowedValues().contains(size + 1))
-				{
-					world.setBlockState(pos, state.withProperty(BlockSnow.LAYERS, size + 1));
-					return true;
-				}
-			}
-
-			pos = pos.up();
-			if (!Blocks.SNOW_LAYER.canPlaceBlockAt(world, pos) && block != Blocks.ICE)
-			{
-				return false;
-			}
-
-			world.setBlockState(pos, Blocks.SNOW_LAYER.getDefaultState());
-			return true;
-		} else
-		{
-			world.setBlockState(pos, Blocks.ICE.getDefaultState());
+			world.setBlockAndUpdate(pos, Blocks.f_50126_.defaultBlockState());
 			return true;
 		}
+
+		if (block == Blocks.f_50126_)
+		{
+			BlockPos below = pos.m_7495_();
+			Block blockBelow = world.getBlockState(below).getBlock();
+			if (blockBelow == Blocks.f_49990_)
+			{
+				world.setBlockAndUpdate(below, Blocks.f_50126_.defaultBlockState());
+				return true;
+			}
+		} else if (block == Blocks.f_50125_)
+		{
+			if (isSurroundedBySnow(world, pos))
+			{
+				world.setBlockAndUpdate(pos, Blocks.f_50127_.defaultBlockState());
+				return true;
+			}
+
+			int size = (Integer) state.getValue(SnowLayerBlock.f_56581_);
+			if (SnowLayerBlock.f_56581_.m_6908_().contains(size + 1))
+			{
+				world.setBlockAndUpdate(pos, (BlockState) state.setValue(SnowLayerBlock.f_56581_, size + 1));
+				return true;
+			}
+		}
+
+		pos = pos.m_7494_();
+		if (!Blocks.f_50125_.defaultBlockState().m_60710_(world, pos) && block != Blocks.f_50126_)
+		{
+			return false;
+		}
+
+		world.setBlockAndUpdate(pos, Blocks.f_50125_.defaultBlockState());
+		return true;
 	}
 
-	private static boolean isSurroundedBySnow(World world, BlockPos pos)
+	private static boolean isSurroundedBySnow(Level world, BlockPos pos)
 	{
-		for (EnumFacing dir : EnumFacing.HORIZONTALS)
+		for (Direction dir : Util.HORIZONTAL_DIRS)
 		{
-			if (!isSnowHere(world, pos.offset(dir)))
+			if (!isSnowHere(world, pos.relative(dir)))
 			{
 				return false;
 			}
@@ -77,19 +77,19 @@ class Chilling extends TerraformerBase
 		return true;
 	}
 
-	private static boolean isSnowHere(World world, BlockPos pos)
+	private static boolean isSnowHere(Level world, BlockPos pos)
 	{
 		int prevY = pos.getY();
 		pos = TileEntityTerra.getFirstBlockFrom(world, pos, 16);
 		if (pos != null && prevY <= pos.getY())
 		{
 			Block block = world.getBlockState(pos).getBlock();
-			if (block != Blocks.SNOW && block != Blocks.SNOW_LAYER)
+			if (block != Blocks.f_50127_ && block != Blocks.f_50125_)
 			{
-				pos = pos.up();
-				if (Blocks.SNOW_LAYER.canPlaceBlockAt(world, pos) || block == Blocks.ICE)
+				pos = pos.m_7494_();
+				if (Blocks.f_50125_.defaultBlockState().m_60710_(world, pos) || block == Blocks.f_50126_)
 				{
-					world.setBlockState(pos, Blocks.SNOW_LAYER.getDefaultState());
+					world.setBlockAndUpdate(pos, Blocks.f_50125_.defaultBlockState());
 				}
 
 				return false;

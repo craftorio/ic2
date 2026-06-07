@@ -2,26 +2,27 @@ package ic2.core.crop.cropcard;
 
 import ic2.api.crops.CropProperties;
 import ic2.api.crops.ICropTile;
-import ic2.core.crop.IC2CropCard;
-import net.minecraft.item.ItemStack;
+import ic2.api.crops.ICropType;
+import ic2.core.crop.CropBase;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
 
-public class CropBaseMushroom extends IC2CropCard
+public class CropBaseMushroom extends CropBase
 {
-	protected final String cropId;
 	protected final String[] cropAttributes;
-	protected final ItemStack cropDrop;
+	protected final Block cropBlock;
 
-	public CropBaseMushroom(String cropId, String[] cropAttributes, ItemStack cropDrop)
+	public CropBaseMushroom(ICropType cropType, Block cropBlock, String[] cropAttributes, ItemStack cropDrop)
 	{
-		this.cropId = cropId;
+		super(cropType, cropDrop);
 		this.cropAttributes = cropAttributes;
-		this.cropDrop = cropDrop;
+		this.cropBlock = cropBlock;
 	}
 
 	@Override
-	public String getId()
+	public Block getCropBlock()
 	{
-		return this.cropId;
+		return this.cropBlock;
 	}
 
 	@Override
@@ -37,21 +38,9 @@ public class CropBaseMushroom extends IC2CropCard
 	}
 
 	@Override
-	public int getMaxSize()
-	{
-		return 3;
-	}
-
-	@Override
-	public boolean canGrow(ICropTile crop)
-	{
-		return crop.getCurrentSize() < this.getMaxSize() && crop.getStorageWater() > 0;
-	}
-
-	@Override
 	public ItemStack getGain(ICropTile crop)
 	{
-		return this.cropDrop.copy();
+		return this.cropDrop.m_41777_();
 	}
 
 	@Override

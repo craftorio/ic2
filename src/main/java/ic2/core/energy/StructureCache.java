@@ -1,8 +1,5 @@
 package ic2.core.energy;
 
-import ic2.shades.org.ejml.data.DenseMatrix64F;
-import ic2.shades.org.ejml.interfaces.linsol.LinearSolver;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -10,10 +7,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.interfaces.linsol.LinearSolverDense;
+
 public class StructureCache
 {
 	private static final int maxSize = 32;
-	final Map<StructureCache.Key, StructureCache.Data> entries = new HashMap<>();
+	Map<StructureCache.Key, StructureCache.Data> entries = new HashMap<>();
 	int hits = 0;
 	int misses = 0;
 
@@ -75,10 +75,10 @@ public class StructureCache
 		boolean isInitialized = false;
 		Map<Integer, Node> optimizedNodes;
 		List<Node> activeNodes;
-		DenseMatrix64F networkMatrix;
-		DenseMatrix64F sourceMatrix;
-		DenseMatrix64F resultMatrix;
-		LinearSolver<DenseMatrix64F> solver;
+		DMatrixRMaj networkMatrix;
+		DMatrixRMaj sourceMatrix;
+		DMatrixRMaj resultMatrix;
+		LinearSolverDense<DMatrixRMaj> solver;
 		int queries = 0;
 	}
 
@@ -111,13 +111,7 @@ public class StructureCache
 		@Override
 		public boolean equals(Object o)
 		{
-			if (!(o instanceof StructureCache.Key))
-			{
-				return false;
-			}
-
-			StructureCache.Key key = (StructureCache.Key) o;
-			return key.activeSources.equals(this.activeSources) && key.activeSinks.equals(this.activeSinks);
+			return !(o instanceof StructureCache.Key key) ? false : key.activeSources.equals(this.activeSources) && key.activeSinks.equals(this.activeSinks);
 		}
 	}
 }

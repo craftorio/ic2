@@ -3,24 +3,24 @@ package ic2.core.block.heatgenerator.tileentity;
 import ic2.core.ContainerBase;
 import ic2.core.IC2;
 import ic2.core.IHasGui;
-import ic2.core.block.TileEntityHeatSourceInventory;
 import ic2.core.block.invslot.InvSlotConsumableFuel;
 import ic2.core.block.invslot.InvSlotOutput;
+import ic2.core.block.tileentity.TileEntityHeatSourceInventory;
 import ic2.core.gui.dynamic.DynamicContainer;
-import ic2.core.gui.dynamic.DynamicGui;
-import ic2.core.gui.dynamic.GuiParser;
 import ic2.core.gui.dynamic.IGuiValueProvider;
 import ic2.core.init.MainConfig;
-import ic2.core.item.type.MiscResourceType;
+import ic2.core.network.GrowingBuffer;
 import ic2.core.network.GuiSynced;
 import ic2.core.profile.NotClassic;
-import ic2.core.ref.ItemName;
+import ic2.core.ref.Ic2BlockEntities;
+import ic2.core.ref.Ic2Items;
 import ic2.core.util.ConfigUtil;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 
 @NotClassic
 public class TileEntitySolidHeatGenerator extends TileEntityHeatSourceInventory implements IHasGui, IGuiValueProvider
@@ -36,8 +36,9 @@ public class TileEntitySolidHeatGenerator extends TileEntityHeatSourceInventory 
 	public final InvSlotOutput outputslot = new InvSlotOutput(this, "output", 1);
 	public static final int emittedHU = Math.round(20.0F * ConfigUtil.getFloat(MainConfig.get(), "balance/energy/heatgenerator/solid"));
 
-	public TileEntitySolidHeatGenerator()
+	public TileEntitySolidHeatGenerator(BlockPos pos, BlockState state)
 	{
+		super(Ic2BlockEntities.SOLID_HEAT_GENERATOR, pos, state);
 		this.ticksSinceLastActiveUpdate = IC2.random.nextInt(256);
 	}
 
@@ -54,7 +55,7 @@ public class TileEntitySolidHeatGenerator extends TileEntityHeatSourceInventory 
 		boolean newActive = this.gainheat();
 		if (needsInvUpdate)
 		{
-			this.markDirty();
+			this.setChanged();
 		}
 
 		if (!this.delayActiveUpdate())
@@ -88,7 +89,7 @@ public class TileEntitySolidHeatGenerator extends TileEntityHeatSourceInventory 
 			this.fuel--;
 			if (this.fuel == 0 && (int) (Math.random() * 2.0) == 1)
 			{
-				this.outputslot.add(ItemName.misc_resource.getItemStack(MiscResourceType.ashes));
+				this.outputslot.add(new ItemStack(Ic2Items.ASHES));
 			}
 
 			return true;
@@ -104,18 +105,17 @@ public class TileEntitySolidHeatGenerator extends TileEntityHeatSourceInventory 
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound nbt)
+	public void load(CompoundTag nbt)
 	{
-		super.readFromNBT(nbt);
-		this.fuel = nbt.getInteger("fuel");
+		super.load(nbt);
+		this.fuel = nbt.getInt("fuel");
 	}
 
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
+	public void saveAdditional(CompoundTag nbt)
 	{
-		super.writeToNBT(nbt);
-		nbt.setInteger("fuel", this.fuel);
-		return nbt;
+		super.saveAdditional(nbt);
+		nbt.putInt("fuel", this.fuel);
 	}
 
 	public boolean delayActiveUpdate()
@@ -125,7 +125,7 @@ public class TileEntitySolidHeatGenerator extends TileEntityHeatSourceInventory 
 
 	public boolean gainFuel()
 	{
-		if (this.outputslot.canAdd(ItemName.misc_resource.getItemStack(MiscResourceType.ashes)))
+		if (this.outputslot.canAdd(new ItemStack(Ic2Items.ASHES)))
 		{
 			int fuelValue = this.fuelSlot.consumeFuel() / 4;
 			if (fuelValue == 0)
@@ -169,21 +169,15 @@ public class TileEntitySolidHeatGenerator extends TileEntityHeatSourceInventory 
 	}
 
 	@Override
-	public ContainerBase<TileEntitySolidHeatGenerator> getGuiContainer(EntityPlayer player)
+	public ContainerBase<?> createServerScreenHandler(int syncId, Player player)
 	{
-		return DynamicContainer.create(this, player, GuiParser.parse(this.teBlock));
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
-	{
-		return DynamicGui.<TileEntitySolidHeatGenerator>create(this, player, GuiParser.parse(this.teBlock));
+		return DynamicContainer.create(syncId, player.getInventory(), this);
 	}
 
 	@Override
-	public void onGuiClosed(EntityPlayer player)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
+		return DynamicContainer.create(syncId, inventory, this);
 	}
 
 	@Override

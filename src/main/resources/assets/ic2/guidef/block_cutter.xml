@@ -13,7 +13,7 @@
         <button type="recipe" x="86" y="33" width="15" height="19" event="block_cutter"></button>
         <only if="isBladeTooWeak">
             <tooltip text="ic2.BlockCutter.gui.bladeTooWeak">
-                <image x="63" y="54" src="ic2:textures/gui/GUIBlockCutter" width="30" height="26" basesize="256" u="176"
+                <image x="63" y="54" src="ic2:textures/gui/guiblockcutter" width="30" height="26" basesize="256" u="176"
                        v="34"/>
             </tooltip>
         </only>

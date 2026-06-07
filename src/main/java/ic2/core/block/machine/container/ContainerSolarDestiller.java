@@ -2,25 +2,26 @@ package ic2.core.block.machine.container;
 
 import ic2.core.ContainerFullInv;
 import ic2.core.block.machine.tileentity.TileEntitySolarDestiller;
+import ic2.core.ref.Ic2ScreenHandlers;
 import ic2.core.slot.SlotInvSlot;
 
 import java.util.List;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.entity.player.Inventory;
 
 public class ContainerSolarDestiller extends ContainerFullInv<TileEntitySolarDestiller>
 {
-	public ContainerSolarDestiller(EntityPlayer player, TileEntitySolarDestiller tileEntite)
+	public ContainerSolarDestiller(int syncId, Inventory playerInventory, TileEntitySolarDestiller be)
 	{
-		super(player, tileEntite, 184);
-		this.addSlotToContainer(new SlotInvSlot(tileEntite.waterinputSlot, 0, 17, 27));
-		this.addSlotToContainer(new SlotInvSlot(tileEntite.destiwaterinputSlot, 0, 136, 64));
-		this.addSlotToContainer(new SlotInvSlot(tileEntite.wateroutputSlot, 0, 17, 45));
-		this.addSlotToContainer(new SlotInvSlot(tileEntite.destiwateroutputSlott, 0, 136, 82));
+		super(Ic2ScreenHandlers.SOLAR_DISTILLER, syncId, playerInventory, be, 184);
+		this.m_38897_(new SlotInvSlot(be.waterinputSlot, 0, 17, 27));
+		this.m_38897_(new SlotInvSlot(be.destiwaterinputSlot, 0, 136, 64));
+		this.m_38897_(new SlotInvSlot(be.wateroutputSlot, 0, 17, 45));
+		this.m_38897_(new SlotInvSlot(be.destiwateroutputSlott, 0, 136, 82));
 
 		for (int i = 0; i < 2; i++)
 		{
-			this.addSlotToContainer(new SlotInvSlot(tileEntite.upgradeSlot, i, 152, 8 + i * 18));
+			this.m_38897_(new SlotInvSlot(be.upgradeSlot, i, 152, 8 + i * 18));
 		}
 	}
 

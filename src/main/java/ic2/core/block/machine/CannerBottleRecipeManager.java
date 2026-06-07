@@ -13,14 +13,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
 
 public class CannerBottleRecipeManager implements ICannerBottleRecipeManager
 {
 	private final List<MachineRecipe<ICannerBottleRecipeManager.Input, ItemStack>> recipes = new ArrayList<>();
 
-	@Override
 	public boolean addRecipe(IRecipeInput container, IRecipeInput fill, ItemStack output, boolean replace)
 	{
 		return this.addRecipe(new ICannerBottleRecipeManager.Input(container, fill), output, null, replace);
@@ -36,7 +35,7 @@ public class CannerBottleRecipeManager implements ICannerBottleRecipeManager
 		}
 	}
 
-	public boolean addRecipe(ICannerBottleRecipeManager.Input input, ItemStack output, NBTTagCompound metadata, boolean replace)
+	public boolean addRecipe(ICannerBottleRecipeManager.Input input, ItemStack output, CompoundTag metadata, boolean replace)
 	{
 		Iterator<MachineRecipe<ICannerBottleRecipeManager.Input, ItemStack>> it = this.recipes.iterator();
 
@@ -129,10 +128,10 @@ public class CannerBottleRecipeManager implements ICannerBottleRecipeManager
 				{
 					if (!StackUtil.isEmpty(container))
 					{
-						container.shrink(recipeInput.container.getAmount());
+						container.m_41774_(recipeInput.container.getAmount());
 					}
 
-					fill.shrink(recipeInput.fill.getAmount());
+					fill.m_41774_(recipeInput.fill.getAmount());
 				}
 
 				new RecipeOutput(null, recipe.getOutput());

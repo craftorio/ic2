@@ -9,21 +9,24 @@ import ic2.core.IHasGui;
 import ic2.core.block.invslot.InvSlot;
 import ic2.core.block.invslot.InvSlotUpgrade;
 import ic2.core.block.machine.container.ContainerSortingMachine;
-import ic2.core.block.machine.gui.GuiSortingMachine;
+import ic2.core.item.EnvItemHandler;
+import ic2.core.network.GrowingBuffer;
 import ic2.core.profile.NotClassic;
+import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.util.StackUtil;
+import ic2.core.util.Util;
 
 import java.util.EnumSet;
 import java.util.Set;
 
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.EnumFacing;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 
 @NotClassic
 public class TileEntitySortingMachine extends TileEntityElectricMachine implements IHasGui, INetworkClientTileEntityEventListener, IUpgradableBlock
@@ -32,65 +35,64 @@ public class TileEntitySortingMachine extends TileEntityElectricMachine implemen
 	public final InvSlotUpgrade upgradeSlot;
 	public final InvSlot buffer;
 	private final ItemStack[][] filters;
-	public EnumFacing defaultRoute = EnumFacing.DOWN;
+	public Direction defaultRoute = Direction.DOWN;
 
-	public TileEntitySortingMachine()
+	public TileEntitySortingMachine(BlockPos pos, BlockState state)
 	{
-		super(15000, 2, false);
+		super(Ic2BlockEntities.SORTING_MACHINE, pos, state, 15000, 2, false);
 		this.upgradeSlot = new InvSlotUpgrade(this, "upgrade", 3);
 		this.buffer = new InvSlot(this, "Buffer", InvSlot.Access.IO, 11);
 		this.filters = new ItemStack[6][7];
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound nbt)
+	public void load(CompoundTag nbt)
 	{
-		super.readFromNBT(nbt);
-		NBTTagList filtersTag = nbt.getTagList("filters", 10);
+		super.load(nbt);
+		ListTag filtersTag = nbt.m_128437_("filters", 10);
 
-		for (int i = 0; i < filtersTag.tagCount(); i++)
+		for (int i = 0; i < filtersTag.size(); i++)
 		{
-			NBTTagCompound filterTag = filtersTag.getCompoundTagAt(i);
+			CompoundTag filterTag = filtersTag.m_128728_(i);
 			int index = filterTag.getByte("index") & 255;
-			ItemStack stack = new ItemStack(filterTag);
+			ItemStack stack = ItemStack.m_41712_(filterTag);
 			this.filters[index / 7][index % 7] = stack;
 		}
 
 		int defaultRouteIdx = nbt.getByte("defaultroute");
-		if (defaultRouteIdx >= 0 && defaultRouteIdx < EnumFacing.VALUES.length)
+		if (defaultRouteIdx >= 0 && defaultRouteIdx < Util.ALL_DIRS.length)
 		{
-			this.defaultRoute = EnumFacing.VALUES[defaultRouteIdx];
+			this.defaultRoute = Util.ALL_DIRS[defaultRouteIdx];
 		}
 	}
 
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
+	public void saveAdditional(CompoundTag nbt)
 	{
-		super.writeToNBT(nbt);
-		NBTTagList filtersTag = new NBTTagList();
+		super.saveAdditional(nbt);
+		ListTag filtersTag = new ListTag();
 
 		for (int i = 0; i < 42; i++)
 		{
 			ItemStack stack = this.filters[i / 7][i % 7];
 			if (stack != null)
 			{
-				NBTTagCompound contentTag = new NBTTagCompound();
-				contentTag.setByte("index", (byte) i);
-				stack.writeToNBT(contentTag);
-				filtersTag.appendTag(contentTag);
+				CompoundTag contentTag = new CompoundTag();
+				contentTag.putByte("index", (byte) i);
+				stack.m_41739_(contentTag);
+				filtersTag.add(contentTag);
 			}
 		}
 
-		nbt.setTag("filters", filtersTag);
-		nbt.setByte("defaultroute", (byte) this.defaultRoute.ordinal());
-		return nbt;
+		nbt.put("filters", filtersTag);
+		nbt.putByte("defaultroute", (byte) this.defaultRoute.ordinal());
 	}
 
 	@Override
 	protected void onLoaded()
 	{
 		super.onLoaded();
-		if (IC2.platform.isSimulating())
+		if (IC2.sideProxy.isSimulating())
 		{
 			this.setUpgradableBlock();
 		}
@@ -112,11 +114,11 @@ public class TileEntitySortingMachine extends TileEntityElectricMachine implemen
 			ItemStack stack = this.buffer.get(index);
 			if (!StackUtil.isEmpty(stack))
 			{
-				for (StackUtil.AdjacentInv inv : StackUtil.getAdjacentInventories(this))
+				for (EnvItemHandler.AdjacentInventory inv : StackUtil.ENV.getAdjacentInventories(this))
 				{
-					if (inv.dir != this.defaultRoute)
+					if (inv.getSide() != this.defaultRoute)
 					{
-						for (ItemStack filterStack : this.getFilterSlots(inv.dir))
+						for (ItemStack filterStack : this.getFilterSlots(inv.getSide()))
 						{
 							if (!StackUtil.isEmpty(filterStack))
 							{
@@ -126,10 +128,10 @@ public class TileEntitySortingMachine extends TileEntityElectricMachine implemen
 									&& this.energy.canUseEnergy(filterSize * 20))
 								{
 									ItemStack transferStack = StackUtil.copyWithSize(stack, filterSize);
-									int amount = StackUtil.putInInventory(inv.te, inv.dir, transferStack, true);
+									int amount = StackUtil.ENV.deposit(inv, transferStack, true);
 									if (amount == filterSize)
 									{
-										amount = StackUtil.putInInventory(inv.te, inv.dir, transferStack, false);
+										amount = StackUtil.ENV.deposit(inv, transferStack, false);
 										stack = StackUtil.decSize(stack, amount);
 										this.buffer.put(index, stack);
 										this.energy.useEnergy(amount * 20);
@@ -180,7 +182,7 @@ public class TileEntitySortingMachine extends TileEntityElectricMachine implemen
 
 							if (!inFilter)
 							{
-								int amountx = StackUtil.putInInventory(inv.te, inv.dir, StackUtil.copyWithSize(stack, 1), false);
+								int amountx = StackUtil.ENV.deposit(inv, StackUtil.copyWithSize(stack, 1), false);
 								if (amountx > 0)
 								{
 									stack = StackUtil.decSize(stack, amountx);
@@ -201,30 +203,24 @@ public class TileEntitySortingMachine extends TileEntityElectricMachine implemen
 	}
 
 	@Override
-	public void onNetworkEvent(EntityPlayer player, int event)
+	public void onNetworkEvent(Player player, int event)
 	{
 		if (event >= 0 && event <= 5)
 		{
-			this.defaultRoute = EnumFacing.VALUES[event];
+			this.defaultRoute = Util.ALL_DIRS[event];
 		}
 	}
 
 	@Override
-	public ContainerBase<TileEntitySortingMachine> getGuiContainer(EntityPlayer player)
+	public ContainerBase<?> createServerScreenHandler(int syncId, Player player)
 	{
-		return new ContainerSortingMachine(player, this);
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
-	{
-		return new GuiSortingMachine(new ContainerSortingMachine(player, this));
+		return new ContainerSortingMachine(syncId, player.getInventory(), this);
 	}
 
 	@Override
-	public void onGuiClosed(EntityPlayer player)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
+		return new ContainerSortingMachine(syncId, inventory, this);
 	}
 
 	@Override
@@ -234,10 +230,10 @@ public class TileEntitySortingMachine extends TileEntityElectricMachine implemen
 	}
 
 	@Override
-	public void markDirty()
+	public void setChanged()
 	{
-		super.markDirty();
-		if (IC2.platform.isSimulating())
+		super.setChanged();
+		if (IC2.sideProxy.isSimulating())
 		{
 			this.setUpgradableBlock();
 		}
@@ -260,7 +256,7 @@ public class TileEntitySortingMachine extends TileEntityElectricMachine implemen
 		return this.energy.useEnergy(amount);
 	}
 
-	public ItemStack[] getFilterSlots(EnumFacing side)
+	public ItemStack[] getFilterSlots(Direction side)
 	{
 		return this.filters[side.ordinal()];
 	}

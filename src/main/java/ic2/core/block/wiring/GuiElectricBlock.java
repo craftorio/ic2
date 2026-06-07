@@ -1,24 +1,24 @@
 package ic2.core.block.wiring;
 
 import com.google.common.base.Supplier;
-import ic2.core.GuiIC2;
+import com.mojang.blaze3d.vertex.PoseStack;
+import ic2.core.Ic2Gui;
 import ic2.core.gui.EnergyGauge;
 import ic2.core.gui.VanillaButton;
 import ic2.core.init.Localization;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
-@SideOnly(Side.CLIENT)
-public class GuiElectricBlock extends GuiIC2<ContainerElectricBlock>
+public class GuiElectricBlock extends Ic2Gui<ContainerElectricBlock>
 {
-	private static final ResourceLocation background = new ResourceLocation("ic2", "textures/gui/GUIElectricBlock.png");
+	private static final ResourceLocation background = ResourceLocation.fromNamespaceAndPath("ic2", "textures/gui/guielectricblock.png");
 
-	public GuiElectricBlock(final ContainerElectricBlock container)
+	public GuiElectricBlock(ContainerElectricBlock container, Inventory playerInventory, Component title)
 	{
-		super(container, 196);
+		super(container, playerInventory, title, 196);
 		this.addElement(EnergyGauge.asBar(this, 79, 38, container.base));
 		this.addElement(new VanillaButton(this, 152, 4, 20, 20, this.createEventSender(0)).withIcon(new Supplier<ItemStack>()
 		{
@@ -36,16 +36,16 @@ public class GuiElectricBlock extends GuiIC2<ContainerElectricBlock>
 	}
 
 	@Override
-	protected void drawForegroundLayer(int mouseX, int mouseY)
+	protected void drawForegroundLayer(PoseStack matrices, int mouseX, int mouseY)
 	{
-		super.drawForegroundLayer(mouseX, mouseY);
-		this.fontRenderer.drawString(Localization.translate("ic2.EUStorage.gui.info.armor"), 8, this.ySize - 126 + 3, 4210752);
-		this.fontRenderer.drawString(Localization.translate("ic2.EUStorage.gui.info.level"), 79, 25, 4210752);
-		int e = (int) Math.min(this.container.base.energy.getEnergy(), this.container.base.energy.getCapacity());
-		this.fontRenderer.drawString(" " + e, 110, 35, 4210752);
-		this.fontRenderer.drawString("/" + (int) this.container.base.energy.getCapacity(), 110, 45, 4210752);
-		String output = Localization.translate("ic2.EUStorage.gui.info.output", this.container.base.output);
-		this.fontRenderer.drawString(output, 85, 60, 4210752);
+		super.drawForegroundLayer(matrices, mouseX, mouseY);
+		this.drawString(matrices, 8, 74, Localization.translate("ic2.EUStorage.gui.info.armor"), 4210752);
+		this.drawString(matrices, 79, 40, Localization.translate("ic2.EUStorage.gui.info.level"), 4210752);
+		int e = (int) Math.min(((ContainerElectricBlock) this.menu).base.energy.getEnergy(), ((ContainerElectricBlock) this.menu).base.energy.getCapacity());
+		this.drawString(matrices, 110, 50, " " + e, 4210752);
+		this.drawString(matrices, 110, 60, "/" + (int) ((ContainerElectricBlock) this.menu).base.energy.getCapacity(), 4210752);
+		String output = Localization.translate("ic2.EUStorage.gui.info.output", ((ContainerElectricBlock) this.menu).base.getOutput());
+		this.drawString(matrices, 85, 75, output, 4210752);
 	}
 
 	@Override

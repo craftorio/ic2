@@ -2,35 +2,36 @@ package ic2.core.block.machine.container;
 
 import ic2.core.ContainerFullInv;
 import ic2.core.block.machine.tileentity.TileEntityLiquidHeatExchanger;
+import ic2.core.ref.Ic2ScreenHandlers;
 import ic2.core.slot.SlotInvSlot;
 
 import java.util.List;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.entity.player.Inventory;
 
 public class ContainerLiquidHeatExchanger extends ContainerFullInv<TileEntityLiquidHeatExchanger>
 {
-	public ContainerLiquidHeatExchanger(EntityPlayer player, TileEntityLiquidHeatExchanger tileEntite)
+	public ContainerLiquidHeatExchanger(int syncId, Inventory playerInventory, TileEntityLiquidHeatExchanger be)
 	{
-		super(player, tileEntite, 204);
-		this.addSlotToContainer(new SlotInvSlot(tileEntite.hotfluidinputSlot, 0, 8, 103));
-		this.addSlotToContainer(new SlotInvSlot(tileEntite.cooloutputSlot, 0, 152, 103));
-		this.addSlotToContainer(new SlotInvSlot(tileEntite.coolfluidinputSlot, 0, 134, 103));
-		this.addSlotToContainer(new SlotInvSlot(tileEntite.hotoutputSlot, 0, 26, 103));
+		super(Ic2ScreenHandlers.LIQUID_HEAT_EXCHANGER, syncId, playerInventory, be, 204);
+		this.m_38897_(new SlotInvSlot(be.hotfluidinputSlot, 0, 8, 103));
+		this.m_38897_(new SlotInvSlot(be.cooloutputSlot, 0, 152, 103));
+		this.m_38897_(new SlotInvSlot(be.coolfluidinputSlot, 0, 134, 103));
+		this.m_38897_(new SlotInvSlot(be.hotoutputSlot, 0, 26, 103));
 
 		for (int i = 0; i < 3; i++)
 		{
-			this.addSlotToContainer(new SlotInvSlot(tileEntite.upgradeSlot, i, 62 + i * 18, 103));
+			this.m_38897_(new SlotInvSlot(be.upgradeSlot, i, 62 + i * 18, 103));
 		}
 
 		for (int i = 0; i < 5; i++)
 		{
-			this.addSlotToContainer(new SlotInvSlot(tileEntite.heatexchangerslots, i, 46 + i * 17, 50));
+			this.m_38897_(new SlotInvSlot(be.heatexchangerslots, i, 46 + i * 17, 50));
 		}
 
 		for (int i = 5; i < 10; i++)
 		{
-			this.addSlotToContainer(new SlotInvSlot(tileEntite.heatexchangerslots, i, 46 + (i - 5) * 17, 72));
+			this.m_38897_(new SlotInvSlot(be.heatexchangerslots, i, 46 + (i - 5) * 17, 72));
 		}
 	}
 

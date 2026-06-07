@@ -1,17 +1,17 @@
 package ic2.core.item.reactor;
 
 import ic2.api.reactor.IReactor;
-import ic2.core.ref.ItemName;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item.Properties;
 
 public class ItemReactorVent extends ItemReactorHeatStorage
 {
 	public final int selfVent;
 	public final int reactorVent;
 
-	public ItemReactorVent(ItemName name, int heatStorage, int selfvent, int reactorvent)
+	public ItemReactorVent(Properties settings, int heatStorage, int selfvent, int reactorvent)
 	{
-		super(name, heatStorage);
+		super(settings, heatStorage);
 		this.selfVent = selfvent;
 		this.reactorVent = reactorvent;
 	}

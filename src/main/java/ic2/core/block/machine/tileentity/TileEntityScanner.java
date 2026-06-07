@@ -9,22 +9,24 @@ import ic2.core.block.invslot.InvSlotConsumable;
 import ic2.core.block.invslot.InvSlotConsumableId;
 import ic2.core.block.invslot.InvSlotScannable;
 import ic2.core.block.machine.container.ContainerScanner;
-import ic2.core.block.machine.gui.GuiScanner;
 import ic2.core.item.ItemCrystalMemory;
+import ic2.core.network.GrowingBuffer;
 import ic2.core.profile.NotClassic;
-import ic2.core.ref.ItemName;
+import ic2.core.ref.Ic2BlockEntities;
+import ic2.core.ref.Ic2Items;
 import ic2.core.util.StackUtil;
+import ic2.core.util.Util;
 import ic2.core.uu.UuGraph;
 import ic2.core.uu.UuIndex;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 @NotClassic
 public class TileEntityScanner extends TileEntityElectricMachine implements IHasGui, INetworkClientTileEntityEventListener
@@ -40,11 +42,11 @@ public class TileEntityScanner extends TileEntityElectricMachine implements IHas
 	public double patternUu;
 	public double patternEu;
 
-	public TileEntityScanner()
+	public TileEntityScanner(BlockPos pos, BlockState state)
 	{
-		super(512000, 4);
+		super(Ic2BlockEntities.UU_SCANNER, pos, state, 512000, 4);
 		this.inputSlot = new InvSlotScannable(this, "input", 1);
-		this.diskSlot = new InvSlotConsumableId(this, "disk", InvSlot.Access.IO, 1, InvSlot.InvSide.ANY, ItemName.crystal_memory.getInstance());
+		this.diskSlot = new InvSlotConsumableId(this, "disk", InvSlot.Access.IO, 1, InvSlot.InvSide.ANY, Ic2Items.CRYSTAL_MEMORY);
 	}
 
 	@Override
@@ -88,7 +90,7 @@ public class TileEntityScanner extends TileEntityElectricMachine implements IHas
 							{
 								this.state = TileEntityScanner.State.COMPLETED;
 								this.inputSlot.consume(1, false, true);
-								this.markDirty();
+								this.setChanged();
 							} else
 							{
 								this.state = TileEntityScanner.State.FAILED;
@@ -176,67 +178,60 @@ public class TileEntityScanner extends TileEntityElectricMachine implements IHas
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound nbttagcompound)
+	public void load(CompoundTag nbt)
 	{
-		super.readFromNBT(nbttagcompound);
-		this.progress = nbttagcompound.getInteger("progress");
-		NBTTagCompound contentTag = nbttagcompound.getCompoundTag("currentStack");
-		this.currentStack = new ItemStack(contentTag);
-		contentTag = nbttagcompound.getCompoundTag("pattern");
-		this.pattern = new ItemStack(contentTag);
-		int stateIdx = nbttagcompound.getInteger("state");
+		super.load(nbt);
+		this.progress = nbt.getInt("progress");
+		CompoundTag contentTag = nbt.getCompound("currentStack");
+		this.currentStack = ItemStack.m_41712_(contentTag);
+		contentTag = nbt.getCompound("pattern");
+		this.pattern = ItemStack.m_41712_(contentTag);
+		int stateIdx = nbt.getInt("state");
 		this.state = stateIdx < TileEntityScanner.State.values().length ? TileEntityScanner.State.values()[stateIdx] : TileEntityScanner.State.IDLE;
 		this.refreshInfo();
 	}
 
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
+	public void saveAdditional(CompoundTag nbt)
 	{
-		super.writeToNBT(nbt);
-		nbt.setInteger("progress", this.progress);
+		super.saveAdditional(nbt);
+		nbt.putInt("progress", this.progress);
 		if (!StackUtil.isEmpty(this.currentStack))
 		{
-			NBTTagCompound contentTag = new NBTTagCompound();
-			this.currentStack.writeToNBT(contentTag);
-			nbt.setTag("currentStack", contentTag);
+			CompoundTag contentTag = new CompoundTag();
+			this.currentStack.m_41739_(contentTag);
+			nbt.put("currentStack", contentTag);
 		}
 
 		if (!StackUtil.isEmpty(this.pattern))
 		{
-			NBTTagCompound contentTag = new NBTTagCompound();
-			this.pattern.writeToNBT(contentTag);
-			nbt.setTag("pattern", contentTag);
+			CompoundTag contentTag = new CompoundTag();
+			this.pattern.m_41739_(contentTag);
+			nbt.put("pattern", contentTag);
 		}
 
-		nbt.setInteger("state", this.state.ordinal());
-		return nbt;
+		nbt.putInt("state", this.state.ordinal());
 	}
 
 	@Override
-	public ContainerBase<TileEntityScanner> getGuiContainer(EntityPlayer player)
+	public ContainerBase<?> createServerScreenHandler(int syncId, Player player)
 	{
-		return new ContainerScanner(player, this);
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
-	{
-		return new GuiScanner(new ContainerScanner(player, this));
+		return new ContainerScanner(syncId, player.getInventory(), this);
 	}
 
 	@Override
-	public void onGuiClosed(EntityPlayer player)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
+		return new ContainerScanner(syncId, inventory, this);
 	}
 
 	public IPatternStorage getPatternStorage()
 	{
-		World world = this.getWorld();
+		Level world = this.getLevel();
 
-		for (EnumFacing dir : EnumFacing.VALUES)
+		for (Direction dir : Util.ALL_DIRS)
 		{
-			TileEntity target = world.getTileEntity(this.pos.offset(dir));
+			BlockEntity target = world.getBlockEntity(this.worldPosition.relative(dir));
 			if (target instanceof IPatternStorage)
 			{
 				return (IPatternStorage) target;
@@ -263,7 +258,7 @@ public class TileEntityScanner extends TileEntityElectricMachine implements IHas
 	}
 
 	@Override
-	public void onNetworkEvent(EntityPlayer player, int event)
+	public void onNetworkEvent(Player player, int event)
 	{
 		switch (event)
 		{

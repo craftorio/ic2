@@ -1,12 +1,15 @@
 package ic2.core.block.comp;
 
-import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import ic2.api.recipe.ILiquidAcceptManager;
-import ic2.core.block.TileEntityBlock;
 import ic2.core.block.invslot.InvSlot;
+import ic2.core.block.tileentity.Ic2TileEntity;
+import ic2.core.fluid.FluidTankInfo;
+import ic2.core.fluid.Ic2FluidStack;
+import ic2.core.fluid.Ic2FluidTank;
+import ic2.core.util.Util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,23 +17,19 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.function.Predicate;
 
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidTank;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidTankProperties;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.material.Fluid;
 
 public class Fluids extends TileEntityComponent
 {
 	protected final List<Fluids.InternalFluidTank> managedTanks = new ArrayList<>();
 	protected final List<Supplier<? extends Collection<Fluids.InternalFluidTank>>> unmanagedTanks = new ArrayList<>();
 
-	public Fluids(TileEntityBlock parent)
+	public Fluids(Ic2TileEntity parent)
 	{
 		super(parent);
 	}
@@ -97,7 +96,7 @@ public class Fluids extends TileEntityComponent
 	}
 
 	public Fluids.InternalFluidTank addTank(
-		String name, int capacity, Collection<EnumFacing> inputSides, Collection<EnumFacing> outputSides, Predicate<Fluid> acceptedFluids
+		String name, int capacity, Collection<Direction> inputSides, Collection<Direction> outputSides, Predicate<Fluid> acceptedFluids
 	)
 	{
 		return this.addTank(new Fluids.InternalFluidTank(name, inputSides, outputSides, acceptedFluids, capacity));
@@ -131,14 +130,14 @@ public class Fluids extends TileEntityComponent
 		);
 	}
 
-	public void changeConnectivity(Fluids.InternalFluidTank tank, Collection<EnumFacing> inputSides, Collection<EnumFacing> outputSides)
+	public void changeConnectivity(Fluids.InternalFluidTank tank, Collection<Direction> inputSides, Collection<Direction> outputSides)
 	{
 		assert this.managedTanks.contains(tank);
 		tank.inputSides = inputSides;
 		tank.outputSides = outputSides;
 	}
 
-	public FluidTank getFluidTank(String name)
+	public Ic2FluidTank getFluidTank(String name)
 	{
 		for (Fluids.InternalFluidTank tank : this.getAllTanks())
 		{
@@ -152,47 +151,172 @@ public class Fluids extends TileEntityComponent
 	}
 
 	@Override
-	public void readFromNbt(NBTTagCompound nbt)
+	public void readFromNbt(CompoundTag nbt)
 	{
 		for (Fluids.InternalFluidTank tank : this.managedTanks)
 		{
-			if (nbt.hasKey(tank.identifier, 10))
+			if (nbt.contains(tank.identifier, 10))
 			{
-				tank.readFromNBT(nbt.getCompoundTag(tank.identifier));
+				tank.fromNbt(nbt.getCompound(tank.identifier));
 			}
 		}
 	}
 
 	@Override
-	public NBTTagCompound writeToNbt()
+	public CompoundTag writeToNbt()
 	{
-		NBTTagCompound nbt = new NBTTagCompound();
+		CompoundTag nbt = new CompoundTag();
 
 		for (Fluids.InternalFluidTank tank : this.managedTanks)
 		{
-			NBTTagCompound subTag = new NBTTagCompound();
-			subTag = tank.writeToNBT(subTag);
-			nbt.setTag(tank.identifier, subTag);
+			CompoundTag subTag = new CompoundTag();
+			tank.toNbt(subTag);
+			nbt.put(tank.identifier, subTag);
 		}
 
 		return nbt;
 	}
 
-	@Override
-	public Collection<? extends Capability<?>> getProvidedCapabilities(EnumFacing side)
+	public FluidTankInfo[] getTankInfos()
 	{
-		return Collections.singleton(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
+		if (this.managedTanks.isEmpty())
+		{
+			return null;
+		}
+
+		FluidTankInfo[] ret = new FluidTankInfo[this.managedTanks.size()];
+		int writeIdx = 0;
+
+		for (Fluids.InternalFluidTank tank : this.managedTanks)
+		{
+			int drainSideMask = 0;
+			int fillSideMask = 0;
+
+			for (Direction side : Util.ALL_DIRS)
+			{
+				int mask = 1 << side.ordinal();
+				if (tank.canDrain(side))
+				{
+					drainSideMask |= mask;
+				}
+
+				if (tank.canFill(side))
+				{
+					fillSideMask |= mask;
+				}
+			}
+
+			if ((drainSideMask | fillSideMask) != 0)
+			{
+				ret[writeIdx++] = new FluidTankInfo(drainSideMask, fillSideMask, tank.getCapacity(), tank.getFluidStack());
+			}
+		}
+
+		if (writeIdx == 0)
+		{
+			return null;
+		}
+
+		if (writeIdx != ret.length)
+		{
+			ret = Arrays.copyOf(ret, writeIdx);
+		}
+
+		return ret;
 	}
 
-	@Override
-	public <T> T getCapability(Capability<T> cap, EnumFacing side)
+	public Ic2FluidStack drainMb(Direction side, int amount, boolean simulate)
 	{
-		return (T) (cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY ? new Fluids.FluidHandler(side) : super.getCapability(cap, side));
+		if (amount <= 0)
+		{
+			return Ic2FluidStack.EMPTY;
+		}
+
+		for (Fluids.InternalFluidTank tank : this.getAllTanks())
+		{
+			if (tank.canDrain(side))
+			{
+				Ic2FluidStack fs = tank.drainMb(amount, true);
+				if (fs != null && !fs.isEmpty())
+				{
+					fs.setAmountMb(amount);
+					amount = this.drainMb(side, fs, simulate);
+					fs.setAmountMb(amount);
+					return fs;
+				}
+			}
+		}
+
+		return Ic2FluidStack.EMPTY;
+	}
+
+	public int drainMb(Direction side, Ic2FluidStack drainFs, boolean simulate)
+	{
+		if (drainFs != null && !drainFs.isEmpty())
+		{
+			int initialAmount = drainFs.getAmountMb();
+
+			for (Fluids.InternalFluidTank tank : this.getAllTanks())
+			{
+				if (tank.canDrain(side))
+				{
+					int drained = tank.drainMb(drainFs, simulate);
+					if (drained > 0)
+					{
+						assert drained <= drainFs.getAmountMb();
+						drainFs.decreaseMb(drained);
+						if (drainFs.isEmpty())
+						{
+							break;
+						}
+					}
+				}
+			}
+
+			int ret = initialAmount - drainFs.getAmountMb();
+			drainFs.setAmountMb(initialAmount);
+			return ret;
+		} else
+		{
+			return 0;
+		}
+	}
+
+	public int fillMb(Direction side, Ic2FluidStack fillFs, boolean simulate)
+	{
+		if (fillFs != null && !fillFs.isEmpty())
+		{
+			int initialAmount = fillFs.getAmountMb();
+
+			for (Fluids.InternalFluidTank tank : this.getAllTanks())
+			{
+				if (tank.canFill(fillFs.getFluid(), side))
+				{
+					int filled = tank.fillMb(fillFs, simulate);
+					if (filled > 0)
+					{
+						assert filled <= fillFs.getAmountMb();
+						fillFs.decreaseMb(filled);
+						if (fillFs.isEmpty())
+						{
+							break;
+						}
+					}
+				}
+			}
+
+			int ret = initialAmount - fillFs.getAmountMb();
+			fillFs.setAmountMb(initialAmount);
+			return ret;
+		} else
+		{
+			return 0;
+		}
 	}
 
 	public static Predicate<Fluid> fluidPredicate(Fluid... fluids)
 	{
-		final Collection<Fluid> acceptedFluids;
+		Collection<Fluid> acceptedFluids;
 		if (fluids.length > 10)
 		{
 			acceptedFluids = new HashSet<>(Arrays.asList(fluids));
@@ -201,24 +325,17 @@ public class Fluids extends TileEntityComponent
 			acceptedFluids = Arrays.asList(fluids);
 		}
 
-		return new Predicate<Fluid>()
-		{
-			public boolean apply(Fluid fluid)
-			{
-				return acceptedFluids.contains(fluid);
-			}
-		};
+		return acceptedFluids::contains;
 	}
 
-	public static Predicate<Fluid> fluidPredicate(final ILiquidAcceptManager manager)
+	public static Predicate<Fluid> fluidPredicate(TagKey<Fluid> tag)
 	{
-		return new Predicate<Fluid>()
-		{
-			public boolean apply(Fluid fluid)
-			{
-				return manager.acceptsFluid(fluid);
-			}
-		};
+		return f -> f.m_205067_(tag);
+	}
+
+	public static Predicate<Fluid> fluidPredicate(ILiquidAcceptManager manager)
+	{
+		return manager::acceptsFluid;
 	}
 
 	public Iterable<Fluids.InternalFluidTank> getAllTanks()
@@ -239,123 +356,15 @@ public class Fluids extends TileEntityComponent
 		return tanks;
 	}
 
-	private class FluidHandler implements IFluidHandler
-	{
-		private final EnumFacing side;
-
-		FluidHandler(EnumFacing side)
-		{
-			this.side = side;
-		}
-
-		@Override
-		public IFluidTankProperties[] getTankProperties()
-		{
-			List<IFluidTankProperties> props = new ArrayList<>(Fluids.this.managedTanks.size());
-
-			for (Fluids.InternalFluidTank tank : Fluids.this.getAllTanks())
-			{
-				if (tank.canFill(this.side) || tank.canDrain(this.side))
-				{
-					props.add(tank.getTankProperties(this.side));
-				}
-			}
-
-			return props.toArray(new IFluidTankProperties[0]);
-		}
-
-		@Override
-		public int fill(FluidStack resource, boolean doFill)
-		{
-			if (resource != null && resource.amount > 0)
-			{
-				int total = 0;
-				FluidStack missing = resource.copy();
-
-				for (Fluids.InternalFluidTank tank : Fluids.this.getAllTanks())
-				{
-					if (tank.canFill(this.side))
-					{
-						total += tank.fill(missing, doFill);
-						missing.amount = resource.amount - total;
-						if (missing.amount <= 0)
-						{
-							break;
-						}
-					}
-				}
-
-				return total;
-			} else
-			{
-				return 0;
-			}
-		}
-
-		@Override
-		public FluidStack drain(FluidStack resource, boolean doDrain)
-		{
-			if (resource != null && resource.amount > 0)
-			{
-				FluidStack ret = new FluidStack(resource.getFluid(), 0);
-
-				for (Fluids.InternalFluidTank tank : Fluids.this.getAllTanks())
-				{
-					if (tank.canDrain(this.side))
-					{
-						FluidStack inTank = tank.getFluid();
-						if (inTank != null && inTank.getFluid() == resource.getFluid())
-						{
-							FluidStack add = tank.drain(resource.amount - ret.amount, doDrain);
-							if (add != null)
-							{
-								assert add.getFluid() == resource.getFluid();
-								ret.amount = ret.amount + add.amount;
-								if (ret.amount >= resource.amount)
-								{
-									break;
-								}
-							}
-						}
-					}
-				}
-
-				return ret.amount == 0 ? null : ret;
-			} else
-			{
-				return null;
-			}
-		}
-
-		@Override
-		public FluidStack drain(int maxDrain, boolean doDrain)
-		{
-			for (Fluids.InternalFluidTank tank : Fluids.this.getAllTanks())
-			{
-				if (tank.canDrain(this.side))
-				{
-					FluidStack stack = tank.drain(maxDrain, false);
-					if (stack != null)
-					{
-						stack.amount = maxDrain;
-						return this.drain(stack, doDrain);
-					}
-				}
-			}
-
-			return null;
-		}
-	}
-
-	public static class InternalFluidTank extends FluidTank
+	public static class InternalFluidTank extends Ic2FluidTank
 	{
 		protected final String identifier;
 		private final Predicate<Fluid> acceptedFluids;
-		private Collection<EnumFacing> inputSides;
-		private Collection<EnumFacing> outputSides;
+		private Collection<Direction> inputSides;
+		private Collection<Direction> outputSides;
 
 		protected InternalFluidTank(
-			String identifier, Collection<EnumFacing> inputSides, Collection<EnumFacing> outputSides, Predicate<Fluid> acceptedFluids, int capacity
+			String identifier, Collection<Direction> inputSides, Collection<Direction> outputSides, Predicate<Fluid> acceptedFluids, int capacity
 		)
 		{
 			super(capacity);
@@ -366,75 +375,22 @@ public class Fluids extends TileEntityComponent
 		}
 
 		@Override
-		public boolean canFillFluidType(FluidStack fluid)
+		public boolean canFill(Fluid fluid)
 		{
-			return fluid != null && this.acceptsFluid(fluid.getFluid());
+			return fluid != null && this.acceptedFluids.test(fluid);
 		}
 
-		@Override
-		public boolean canDrainFluidType(FluidStack fluid)
-		{
-			return fluid != null && this.acceptsFluid(fluid.getFluid());
-		}
-
-		public boolean acceptsFluid(Fluid fluid)
-		{
-			return this.acceptedFluids.apply(fluid);
-		}
-
-		IFluidTankProperties getTankProperties(final EnumFacing side)
-		{
-			assert side == null || this.inputSides.contains(side) || this.outputSides.contains(side);
-			return new IFluidTankProperties()
-			{
-				@Override
-				public FluidStack getContents()
-				{
-					return InternalFluidTank.this.getFluid();
-				}
-
-				@Override
-				public int getCapacity()
-				{
-					return InternalFluidTank.this.capacity;
-				}
-
-				@Override
-				public boolean canFillFluidType(FluidStack fluidStack)
-				{
-					return fluidStack != null && fluidStack.amount > 0
-						? InternalFluidTank.this.acceptsFluid(fluidStack.getFluid()) && (side == null || InternalFluidTank.this.canFill(side))
-						: false;
-				}
-
-				@Override
-				public boolean canFill()
-				{
-					return InternalFluidTank.this.canFill(side);
-				}
-
-				@Override
-				public boolean canDrainFluidType(FluidStack fluidStack)
-				{
-					return fluidStack != null && fluidStack.amount > 0
-						? InternalFluidTank.this.acceptsFluid(fluidStack.getFluid()) && (side == null || InternalFluidTank.this.canDrain(side))
-						: false;
-				}
-
-				@Override
-				public boolean canDrain()
-				{
-					return InternalFluidTank.this.canDrain(side);
-				}
-			};
-		}
-
-		public boolean canFill(EnumFacing side)
+		public boolean canFill(Direction side)
 		{
 			return this.inputSides.contains(side);
 		}
 
-		public boolean canDrain(EnumFacing side)
+		public boolean canFill(Fluid fluid, Direction side)
+		{
+			return this.canFill(fluid) && this.canFill(side);
+		}
+
+		public boolean canDrain(Direction side)
 		{
 			return this.outputSides.contains(side);
 		}

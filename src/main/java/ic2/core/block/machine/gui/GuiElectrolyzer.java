@@ -1,167 +1,58 @@
 package ic2.core.block.machine.gui;
 
-import ic2.core.GuiIC2;
+import ic2.core.IC2;
+import ic2.core.Ic2Gui;
 import ic2.core.block.machine.container.ContainerElectrolyzer;
 import ic2.core.gui.CustomGauge;
-import ic2.core.gui.ElectrolyzerTankController;
+import ic2.core.gui.ElectrolyzerTank;
 import ic2.core.gui.EnergyGauge;
-import ic2.core.gui.FluidSlot;
 import ic2.core.gui.Gauge;
 import ic2.core.gui.GuiElement;
-import ic2.core.gui.IEnableHandler;
 import ic2.core.gui.RecipeButton;
-import ic2.core.init.Localization;
-import ic2.core.ref.TeBlock;
+import ic2.core.gui.TankFluidSlot;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidTankInfo;
-import net.minecraftforge.fluids.IFluidTank;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
-
-@SideOnly(Side.CLIENT)
-public class GuiElectrolyzer extends GuiIC2<ContainerElectrolyzer>
+public class GuiElectrolyzer extends Ic2Gui<ContainerElectrolyzer>
 {
-	private static final ResourceLocation background = new ResourceLocation("ic2", "textures/gui/GUIElectrolyzer.png");
+	private static final ResourceLocation background = IC2.getIdentifier("textures/gui/guielectrolyzer.png");
 
-	public GuiElectrolyzer(ContainerElectrolyzer container)
+	public GuiElectrolyzer(ContainerElectrolyzer container, Inventory playerInventory, Component title)
 	{
-		super(container);
+		super(container, playerInventory, title);
 		this.addElement(EnergyGauge.asBolt(this, 12, 44, container.base));
 		int controllerX = 36;
 		int controllerY = 16;
-		this.addElement(FluidSlot.createFluidSlot(this, 78, 16, container.base.getInput()));
-		GuiElectrolyzer.ElectrolyzerFluidTank[] tanks = new GuiElectrolyzer.ElectrolyzerFluidTank[5];
+		this.addElement(TankFluidSlot.createFluidSlot(this, 78, 16, container.base.getInput()));
+		ElectrolyzerTank[] tanks = new ElectrolyzerTank[5];
 
-		for (int i = 0; i < 5; i++)
+		for (int i = 0; i < tanks.length; i++)
 		{
-			final GuiElectrolyzer.ElectrolyzerFluidTank tank = new GuiElectrolyzer.ElectrolyzerFluidTank();
-			this.addElement(new FluidSlot(this, 36 + 21 * i, 61, 18, 18, tank)
-			{
-				@Override
-				protected List<String> getToolTip()
-				{
-					List<String> ret = new ArrayList<>(3);
-					FluidStack fluid = tank.getFluid();
-					if (fluid != null)
-					{
-						Fluid liquid = fluid.getFluid();
-						if (liquid != null)
-						{
-							ret.add(liquid.getLocalizedName(fluid));
-							ret.add("Amount: " + fluid.amount + ' ' + Localization.translate("ic2.generic.text.mb"));
-							ret.add("Output Tank: " + StringUtils.capitalize(tank.getSide().getName()));
-						} else
-						{
-							ret.add("Invalid FluidStack instance.");
-						}
-					}
-
-					return ret;
-				}
-			});
-			tanks[i] = tank;
+			ElectrolyzerTank controller = tanks[i] = new ElectrolyzerTank(this, 36 + 21 * i, 61, i);
+			this.addElement(controller);
 		}
 
-		ElectrolyzerTankController controller = new ElectrolyzerTankController(this, 36, 16, tanks);
-		this.addElement(controller);
 		GuiElement<?> last = null;
 
 		for (GuiElectrolyzer.ElectrolyzerGauges gauge : GuiElectrolyzer.ElectrolyzerGauges.values())
 		{
-			this.addElement(
-				last = new CustomGauge(this, 36 + gauge.offset, 36, container.base, gauge.properties)
-					.withEnableHandler(getEnableHandler(controller, gauge.ordinal() + 1))
-			);
+			int id = gauge.ordinal();
+			last = new CustomGauge(this, 36 + gauge.offset, 36, container.base, gauge.properties).withEnableHandler(() -> tanks[id].isActive());
+			this.addElement(last);
 		}
 
 		if (RecipeButton.canUse())
 		{
 			assert last != null;
-			this.addElement(new RecipeButton(last, new String[] { TeBlock.electrolyzer.getName() }));
+			this.addElement(new RecipeButton(last, new String[] { "electrolyzer" }));
 		}
-	}
-
-	private static IEnableHandler getEnableHandler(final ElectrolyzerTankController controller, final int tank)
-	{
-		return new IEnableHandler()
-		{
-			@Override
-			public boolean isEnabled()
-			{
-				return controller.getLastRecipeLength() == tank;
-			}
-		};
 	}
 
 	@Override
 	protected ResourceLocation getTexture()
 	{
 		return background;
-	}
-
-	public static class ElectrolyzerFluidTank implements IFluidTank
-	{
-		private Pair<FluidStack, EnumFacing> fluid;
-
-		public void clear()
-		{
-			this.fluid = null;
-		}
-
-		public void setPair(Pair<FluidStack, EnumFacing> pair)
-		{
-			this.fluid = pair;
-		}
-
-		public EnumFacing getSide()
-		{
-			return this.fluid == null ? null : (EnumFacing) this.fluid.getRight();
-		}
-
-		@Override
-		public FluidStack getFluid()
-		{
-			return this.fluid == null ? null : (FluidStack) this.fluid.getLeft();
-		}
-
-		@Override
-		public int getFluidAmount()
-		{
-			return this.fluid == null ? null : ((FluidStack) this.fluid.getLeft()).amount;
-		}
-
-		@Override
-		public int getCapacity()
-		{
-			throw new UnsupportedOperationException("Not this");
-		}
-
-		@Override
-		public FluidTankInfo getInfo()
-		{
-			throw new UnsupportedOperationException("Not this");
-		}
-
-		@Override
-		public int fill(FluidStack resource, boolean doFill)
-		{
-			throw new UnsupportedOperationException("Not this");
-		}
-
-		@Override
-		public FluidStack drain(int maxDrain, boolean doDrain)
-		{
-			throw new UnsupportedOperationException("Not this");
-		}
 	}
 
 	public enum ElectrolyzerGauges

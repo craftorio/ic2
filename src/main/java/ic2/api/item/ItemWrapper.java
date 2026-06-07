@@ -2,9 +2,9 @@ package ic2.api.item;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 public class ItemWrapper
 {
@@ -36,7 +36,7 @@ public class ItemWrapper
 		metalArmorItems.put(item, armor);
 	}
 
-	public static boolean isMetalArmor(ItemStack stack, EntityPlayer player)
+	public static boolean isMetalArmor(ItemStack stack, Player player)
 	{
 		Item item = stack.getItem();
 

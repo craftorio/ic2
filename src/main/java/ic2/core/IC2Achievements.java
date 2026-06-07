@@ -1,10 +1,10 @@
 package ic2.core;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.entity.player.Player;
 
-public class IC2Achievements
+public class Ic2Achievements
 {
-	public void issueAchievement(EntityPlayer entityplayer, String textId)
+	public void issueAchievement(Player entityplayer, String textId)
 	{
 	}
 }

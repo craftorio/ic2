@@ -1,20 +1,23 @@
 package ic2.core.item.upgrade;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import ic2.core.ContainerBase;
 import ic2.core.gui.GuiDefaultBackground;
 import ic2.core.gui.MouseButton;
 import ic2.core.gui.ScrollableList;
 import ic2.core.gui.SlotGrid;
 import ic2.core.item.ContainerHandHeldInventory;
+import ic2.core.network.GrowingBuffer;
+import ic2.core.ref.Ic2ScreenHandlers;
 import ic2.core.slot.SlotHologramSlot;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 
 public class HandHeldOre extends HandHeldUpgradeOption
 {
@@ -24,47 +27,46 @@ public class HandHeldOre extends HandHeldUpgradeOption
 	}
 
 	@Override
-	public ContainerBase<?> getGuiContainer(EntityPlayer player)
+	public ContainerBase<?> createServerScreenHandler(int syncId, Player player)
 	{
-		return new HandHeldOre.ContainerEditOre();
+		return new HandHeldOre.ContainerEditOre(syncId);
 	}
 
-	@SideOnly(Side.CLIENT)
 	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
-		return new HandHeldOre.GuiEditOre();
+		return new HandHeldOre.ContainerEditOre(syncId);
 	}
 
 	public class ContainerEditOre extends ContainerHandHeldInventory<HandHeldOre>
 	{
 		static final int HEIGHT = 200;
 
-		public ContainerEditOre()
+		public ContainerEditOre(int syncId)
 		{
-			super(HandHeldOre.this);
-			this.addPlayerInventorySlots(HandHeldOre.this.player, 200);
+			super(Ic2ScreenHandlers.ADVANCED_UPGRADE_EDIT_ORE, syncId, HandHeldOre.this);
+			this.addPlayerInventorySlots(this.player.getInventory(), 200);
 
 			for (byte slot = 0; slot < 9; slot++)
 			{
-				this.addSlotToContainer(new SlotHologramSlot(HandHeldOre.this.inventory, slot, 8 + 18 * slot, 8, 1, HandHeldOre.this.makeSaveCallback()));
+				this.m_38897_(new SlotHologramSlot(HandHeldOre.this.inventory, slot, 8 + 18 * slot, 8, 1, HandHeldOre.this.makeSaveCallback()));
 			}
 		}
 
 		@Override
-		public void onContainerClosed(EntityPlayer player)
+		public void removed(Player player)
 		{
-			super.onContainerClosed(player);
+			super.removed(player);
 		}
 	}
 
-	@SideOnly(Side.CLIENT)
-	public class GuiEditOre extends GuiDefaultBackground<HandHeldOre.ContainerEditOre>
+	@OnlyIn(Dist.CLIENT)
+	public static class GuiEditOre extends GuiDefaultBackground<HandHeldOre.ContainerEditOre>
 	{
-		public GuiEditOre()
+		public GuiEditOre(HandHeldOre.ContainerEditOre container, Inventory playerInventory, Component title)
 		{
-			super(HandHeldOre.this.new ContainerEditOre(), 200);
-			this.addElement(HandHeldOre.this.getBackButton(this, 10, 96));
+			super(container, playerInventory, title, 200);
+			this.addElement(container.base.getBackButton(this, 10, 96));
 			List<ScrollableList.IListItem> items = new ArrayList<>();
 
 			for (String name : new String[] { "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten" })
@@ -88,14 +90,16 @@ public class HandHeldOre extends HandHeldUpgradeOption
 			}
 
 			@Override
-			public void onClick(MouseButton button)
+			public void draw(PoseStack matrices, int xOffset, int yOffset, int width, int height, int mouseX, int mouseY)
 			{
-				System.out.println(this.number + " clicked with " + button);
+				GuiEditOre.this.drawString(matrices, xOffset + 2, yOffset + 1, "Thing " + this.number, 16777215, false);
 			}
 
-			public String getName()
+			@Override
+			public boolean onClick(MouseButton button, int mouseX, int mouseY)
 			{
-				return "Thing " + this.number;
+				System.out.println(this.number + " clicked with " + button);
+				return false;
 			}
 		}
 	}

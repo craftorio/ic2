@@ -7,7 +7,6 @@ public enum LogCategory
 	Audio,
 	Block,
 	Component,
-	Crop,
 	EnergyNet,
 	Item,
 	Network,

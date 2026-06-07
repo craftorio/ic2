@@ -1,15 +1,17 @@
 package ic2.core.block.kineticgenerator.gui;
 
-import ic2.core.GuiIC2;
+import ic2.core.Ic2Gui;
 import ic2.core.block.kineticgenerator.container.ContainerStirlingKineticGenerator;
 import ic2.core.gui.TankGauge;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
 
-public class GuiStirlingKineticGenerator extends GuiIC2<ContainerStirlingKineticGenerator>
+public class GuiStirlingKineticGenerator extends Ic2Gui<ContainerStirlingKineticGenerator>
 {
-	public GuiStirlingKineticGenerator(ContainerStirlingKineticGenerator container)
+	public GuiStirlingKineticGenerator(ContainerStirlingKineticGenerator container, Inventory playerInventory, Component title)
 	{
-		super(container, 204);
+		super(container, playerInventory, title, 204);
 		this.addElement(TankGauge.createPlain(this, 19, 47, 12, 44, container.base.getInputTank()));
 		this.addElement(TankGauge.createPlain(this, 145, 47, 12, 44, container.base.getOutputTank()));
 	}
@@ -17,6 +19,6 @@ public class GuiStirlingKineticGenerator extends GuiIC2<ContainerStirlingKinetic
 	@Override
 	protected ResourceLocation getTexture()
 	{
-		return new ResourceLocation("ic2", "textures/gui/GUIStirlingKineticGenerator.png");
+		return ResourceLocation.fromNamespaceAndPath("ic2", "textures/gui/guistirlingkineticgenerator.png");
 	}
 }

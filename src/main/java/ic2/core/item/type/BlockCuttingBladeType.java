@@ -1,6 +1,6 @@
 package ic2.core.item.type;
 
-import ic2.core.block.state.IIdProvider;
+import ic2.api.block.IIdProvider;
 import ic2.core.profile.NotClassic;
 
 @NotClassic

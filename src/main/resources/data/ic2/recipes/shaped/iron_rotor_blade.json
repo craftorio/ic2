@@ -1,0 +1,19 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "PSP",
+    "PSP",
+    "PSP"
+  ],
+  "key": {
+    "P": {
+      "tag": "forge:plates/iron"
+    },
+    "S": {
+      "item": "minecraft:iron_ingot"
+    }
+  },
+  "result": {
+    "item": "ic2:iron_rotor_blade"
+  }
+}

@@ -1,8 +1,6 @@
 package ic2.core.block.comp;
 
 import ic2.api.energy.EnergyNet;
-import ic2.api.energy.event.EnergyTileLoadEvent;
-import ic2.api.energy.event.EnergyTileUnloadEvent;
 import ic2.api.energy.tile.IChargingSlot;
 import ic2.api.energy.tile.IDischargingSlot;
 import ic2.api.energy.tile.IEnergyAcceptor;
@@ -10,9 +8,10 @@ import ic2.api.energy.tile.IEnergyEmitter;
 import ic2.api.energy.tile.IEnergySink;
 import ic2.api.energy.tile.IEnergyTile;
 import ic2.api.energy.tile.IMultiEnergySource;
+import ic2.api.info.ILocatable;
 import ic2.core.IC2;
-import ic2.core.block.TileEntityBlock;
 import ic2.core.block.invslot.InvSlot;
+import ic2.core.block.tileentity.Ic2TileEntity;
 import ic2.core.network.GrowingBuffer;
 import ic2.core.util.LogCategory;
 import ic2.core.util.Util;
@@ -24,11 +23,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraftforge.common.MinecraftForge;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.Level;
 
 public class Energy extends TileEntityComponent
 {
@@ -37,8 +36,8 @@ public class Energy extends TileEntityComponent
 	private double storage;
 	private int sinkTier;
 	private int sourceTier;
-	private Set<EnumFacing> sinkDirections;
-	private Set<EnumFacing> sourceDirections;
+	private Set<Direction> sinkDirections;
+	private Set<Direction> sourceDirections;
 	private List<InvSlot> managedSlots;
 	private boolean multiSource = false;
 	private int sourcePackets = 1;
@@ -48,44 +47,38 @@ public class Energy extends TileEntityComponent
 	private boolean sendingSidabled;
 	private final boolean fullEnergy;
 
-	public static Energy asBasicSink(TileEntityBlock parent, double capacity)
+	public static Energy asBasicSink(Ic2TileEntity parent, double capacity)
 	{
 		return asBasicSink(parent, capacity, 1);
 	}
 
-	public static Energy asBasicSink(TileEntityBlock parent, double capacity, int tier)
+	public static Energy asBasicSink(Ic2TileEntity parent, double capacity, int tier)
 	{
 		return new Energy(parent, capacity, Util.allFacings, Collections.emptySet(), tier);
 	}
 
-	public static Energy asBasicSource(TileEntityBlock parent, double capacity)
+	public static Energy asBasicSource(Ic2TileEntity parent, double capacity)
 	{
 		return asBasicSource(parent, capacity, 1);
 	}
 
-	public static Energy asBasicSource(TileEntityBlock parent, double capacity, int tier)
+	public static Energy asBasicSource(Ic2TileEntity parent, double capacity, int tier)
 	{
 		return new Energy(parent, capacity, Collections.emptySet(), Util.allFacings, tier);
 	}
 
-	public Energy(TileEntityBlock parent, double capacity)
+	public Energy(Ic2TileEntity parent, double capacity)
 	{
 		this(parent, capacity, Collections.emptySet(), Collections.emptySet(), 1);
 	}
 
-	public Energy(TileEntityBlock parent, double capacity, Set<EnumFacing> sinkDirections, Set<EnumFacing> sourceDirections, int tier)
+	public Energy(Ic2TileEntity parent, double capacity, Set<Direction> sinkDirections, Set<Direction> sourceDirections, int tier)
 	{
 		this(parent, capacity, sinkDirections, sourceDirections, tier, tier, false);
 	}
 
 	public Energy(
-		TileEntityBlock parent,
-		double capacity,
-		Set<EnumFacing> sinkDirections,
-		Set<EnumFacing> sourceDirections,
-		int sinkTier,
-		int sourceTier,
-		boolean fullEnergy
+		Ic2TileEntity parent, double capacity, Set<Direction> sinkDirections, Set<Direction> sourceDirections, int sinkTier, int sourceTier, boolean fullEnergy
 	)
 	{
 		super(parent);
@@ -125,16 +118,16 @@ public class Energy extends TileEntityComponent
 	}
 
 	@Override
-	public void readFromNbt(NBTTagCompound nbt)
+	public void readFromNbt(CompoundTag nbt)
 	{
 		this.storage = nbt.getDouble("storage");
 	}
 
 	@Override
-	public NBTTagCompound writeToNbt()
+	public CompoundTag writeToNbt()
 	{
-		NBTTagCompound ret = new NBTTagCompound();
-		ret.setDouble("storage", this.storage);
+		CompoundTag ret = new CompoundTag();
+		ret.putDouble("storage", this.storage);
 		return ret;
 	}
 
@@ -142,7 +135,7 @@ public class Energy extends TileEntityComponent
 	public void onLoaded()
 	{
 		assert this.delegate == null;
-		if (!this.parent.getWorld().isRemote)
+		if (!this.parent.getLevel().isClientSide)
 		{
 			if (this.sinkDirections.isEmpty() && this.sourceDirections.isEmpty())
 			{
@@ -158,7 +151,7 @@ public class Energy extends TileEntityComponent
 				}
 
 				this.createDelegate();
-				MinecraftForge.EVENT_BUS.post(new EnergyTileLoadEvent(this.delegate));
+				EnergyNet.instance.addLocatableTile(this.delegate);
 			}
 
 			this.loaded = true;
@@ -175,17 +168,14 @@ public class Energy extends TileEntityComponent
 		assert !this.sinkDirections.isEmpty() || !this.sourceDirections.isEmpty();
 		if (this.sinkDirections.isEmpty())
 		{
-			this.delegate = new Energy.EnergyNetDelegateSource();
+			this.delegate = new Energy.EnergyNetDelegateSource(this.parent);
 		} else if (this.sourceDirections.isEmpty())
 		{
-			this.delegate = new Energy.EnergyNetDelegateSink();
+			this.delegate = new Energy.EnergyNetDelegateSink(this.parent);
 		} else
 		{
-			this.delegate = new Energy.EnergyNetDelegateDual();
+			this.delegate = new Energy.EnergyNetDelegateDual(this.parent);
 		}
-
-		this.delegate.setWorld(this.parent.getWorld());
-		this.delegate.setPos(this.parent.getPos());
 	}
 
 	@Override
@@ -198,7 +188,7 @@ public class Energy extends TileEntityComponent
 				IC2.log.debug(LogCategory.Component, "Energy onUnloaded for %s at %s.", this.parent, Util.formatPosition(this.parent));
 			}
 
-			MinecraftForge.EVENT_BUS.post(new EnergyTileUnloadEvent(this.delegate));
+			EnergyNet.instance.removeTile(this.delegate);
 			this.delegate = null;
 		} else if (debugLoad)
 		{
@@ -209,7 +199,7 @@ public class Energy extends TileEntityComponent
 	}
 
 	@Override
-	public void onContainerUpdate(EntityPlayerMP player)
+	public void onContainerUpdate(ServerPlayer player)
 	{
 		GrowingBuffer buffer = new GrowingBuffer(16);
 		buffer.writeDouble(this.capacity);
@@ -228,7 +218,7 @@ public class Energy extends TileEntityComponent
 	@Override
 	public boolean enableWorldTick()
 	{
-		return !this.parent.getWorld().isRemote && this.managedSlots != null;
+		return !this.parent.getLevel().isClientSide && this.managedSlots != null;
 	}
 
 	@Override
@@ -377,7 +367,7 @@ public class Energy extends TileEntityComponent
 		return this.sourcePackets;
 	}
 
-	public void setDirections(Set<EnumFacing> sinkDirections, Set<EnumFacing> sourceDirections)
+	public void setDirections(Set<Direction> sinkDirections, Set<Direction> sourceDirections)
 	{
 		if (sinkDirections.equals(this.sinkDirections) && sourceDirections.equals(this.sourceDirections))
 		{
@@ -402,8 +392,8 @@ public class Energy extends TileEntityComponent
 					IC2.log.debug(LogCategory.Component, "Energy setDirections unload for %s at %s.", this.parent, Util.formatPosition(this.parent));
 				}
 
-				assert !this.parent.getWorld().isRemote;
-				MinecraftForge.EVENT_BUS.post(new EnergyTileUnloadEvent(this.delegate));
+				assert !this.parent.getLevel().isClientSide;
+				EnergyNet.instance.removeTile(this.delegate);
 			}
 
 			this.sinkDirections = sinkDirections;
@@ -431,8 +421,8 @@ public class Energy extends TileEntityComponent
 						);
 				}
 
-				assert !this.parent.getWorld().isRemote;
-				MinecraftForge.EVENT_BUS.post(new EnergyTileLoadEvent(this.delegate));
+				assert !this.parent.getLevel().isClientSide;
+				EnergyNet.instance.addLocatableTile(this.delegate);
 			} else if (debugLoad)
 			{
 				IC2.log
@@ -449,12 +439,12 @@ public class Energy extends TileEntityComponent
 		}
 	}
 
-	public Set<EnumFacing> getSourceDirs()
+	public Set<Direction> getSourceDirs()
 	{
 		return Collections.unmodifiableSet(this.sourceDirections);
 	}
 
-	public Set<EnumFacing> getSinkDirs()
+	public Set<Direction> getSinkDirs()
 	{
 		return Collections.unmodifiableSet(this.sinkDirections);
 	}
@@ -482,27 +472,43 @@ public class Energy extends TileEntityComponent
 			: this.sourcePackets;
 	}
 
-	private abstract class EnergyNetDelegate extends TileEntity implements IEnergyTile
+	private abstract class EnergyNetDelegate implements ILocatable, IEnergyTile
 	{
-		private EnergyNetDelegate()
+		private final Ic2TileEntity parent;
+
+		protected EnergyNetDelegate(Ic2TileEntity parent)
 		{
+			this.parent = parent;
+		}
+
+		@Override
+		public Level getWorldObj()
+		{
+			return this.parent.getLevel();
+		}
+
+		@Override
+		public BlockPos getPosition()
+		{
+			return this.parent.getBlockPos();
 		}
 	}
 
 	private class EnergyNetDelegateDual extends Energy.EnergyNetDelegate implements IEnergySink, IMultiEnergySource
 	{
-		private EnergyNetDelegateDual()
+		protected EnergyNetDelegateDual(Ic2TileEntity parent)
 		{
+			super(parent);
 		}
 
 		@Override
-		public boolean acceptsEnergyFrom(IEnergyEmitter emitter, EnumFacing dir)
+		public boolean acceptsEnergyFrom(IEnergyEmitter emitter, Direction dir)
 		{
 			return Energy.this.sinkDirections.contains(dir);
 		}
 
 		@Override
-		public boolean emitsEnergyTo(IEnergyAcceptor receiver, EnumFacing dir)
+		public boolean emitsEnergyTo(IEnergyAcceptor receiver, Direction dir)
 		{
 			return Energy.this.sourceDirections.contains(dir);
 		}
@@ -534,9 +540,9 @@ public class Energy extends TileEntityComponent
 		}
 
 		@Override
-		public double injectEnergy(EnumFacing directionFrom, double amount, double voltage)
+		public double injectEnergy(Direction directionFrom, double amount, double voltage)
 		{
-			Energy.this.storage = Energy.this.storage + amount;
+			Energy.this.storage += amount;
 			return 0.0;
 		}
 
@@ -544,7 +550,7 @@ public class Energy extends TileEntityComponent
 		public void drawEnergy(double amount)
 		{
 			assert amount <= Energy.this.storage;
-			Energy.this.storage = Energy.this.storage - amount;
+			Energy.this.storage -= amount;
 		}
 
 		@Override
@@ -562,8 +568,9 @@ public class Energy extends TileEntityComponent
 
 	private class EnergyNetDelegateSink extends Energy.EnergyNetDelegate implements IEnergySink
 	{
-		private EnergyNetDelegateSink()
+		protected EnergyNetDelegateSink(Ic2TileEntity parent)
 		{
+			super(parent);
 		}
 
 		@Override
@@ -573,7 +580,7 @@ public class Energy extends TileEntityComponent
 		}
 
 		@Override
-		public boolean acceptsEnergyFrom(IEnergyEmitter emitter, EnumFacing dir)
+		public boolean acceptsEnergyFrom(IEnergyEmitter emitter, Direction dir)
 		{
 			return Energy.this.sinkDirections.contains(dir);
 		}
@@ -586,17 +593,18 @@ public class Energy extends TileEntityComponent
 		}
 
 		@Override
-		public double injectEnergy(EnumFacing directionFrom, double amount, double voltage)
+		public double injectEnergy(Direction directionFrom, double amount, double voltage)
 		{
-			Energy.this.storage = Energy.this.storage + amount;
+			Energy.this.storage += amount;
 			return 0.0;
 		}
 	}
 
 	private class EnergyNetDelegateSource extends Energy.EnergyNetDelegate implements IMultiEnergySource
 	{
-		private EnergyNetDelegateSource()
+		protected EnergyNetDelegateSource(Ic2TileEntity parent)
 		{
+			super(parent);
 		}
 
 		@Override
@@ -606,7 +614,7 @@ public class Energy extends TileEntityComponent
 		}
 
 		@Override
-		public boolean emitsEnergyTo(IEnergyAcceptor receiver, EnumFacing dir)
+		public boolean emitsEnergyTo(IEnergyAcceptor receiver, Direction dir)
 		{
 			return Energy.this.sourceDirections.contains(dir);
 		}
@@ -622,7 +630,7 @@ public class Energy extends TileEntityComponent
 		public void drawEnergy(double amount)
 		{
 			assert amount <= Energy.this.storage;
-			Energy.this.storage = Energy.this.storage - amount;
+			Energy.this.storage -= amount;
 		}
 
 		@Override

@@ -1,16 +1,16 @@
 package ic2.core.block.invslot;
 
 import ic2.core.block.IInventorySlotHolder;
+import ic2.core.fluid.Ic2FluidStack;
+import ic2.core.fluid.Ic2FluidTank;
 
 import java.util.Arrays;
 
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.IFluidTank;
+import net.minecraft.world.level.material.Fluid;
 
 public class InvSlotConsumableLiquidByTank extends InvSlotConsumableLiquid
 {
-	public final IFluidTank tank;
+	public final Ic2FluidTank tank;
 
 	public InvSlotConsumableLiquidByTank(
 		IInventorySlotHolder<?> base1,
@@ -19,7 +19,7 @@ public class InvSlotConsumableLiquidByTank extends InvSlotConsumableLiquid
 		int count,
 		InvSlot.InvSide preferredSide1,
 		InvSlotConsumableLiquid.OpType opType,
-		IFluidTank tank1
+		Ic2FluidTank tank1
 	)
 	{
 		super(base1, name1, access1, count, preferredSide1, opType);
@@ -29,14 +29,13 @@ public class InvSlotConsumableLiquidByTank extends InvSlotConsumableLiquid
 	@Override
 	protected boolean acceptsLiquid(Fluid fluid)
 	{
-		FluidStack fs = this.tank.getFluid();
-		return fs == null || fs.getFluid() == fluid;
+		return this.tank.isEmpty() || this.tank.hasExactFluid(fluid);
 	}
 
 	@Override
 	protected Iterable<Fluid> getPossibleFluids()
 	{
-		FluidStack fs = this.tank.getFluid();
-		return fs == null ? null : Arrays.asList(fs.getFluid());
+		Ic2FluidStack fs = this.tank.getFluidStack();
+		return fs != null ? Arrays.asList(fs.getFluid()) : null;
 	}
 }

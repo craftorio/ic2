@@ -7,12 +7,12 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.server.level.ServerPlayer;
 
 public class TeUpdateDataServer
 {
 	private final Set<String> globalFields = new HashSet<>();
-	private final Map<EntityPlayerMP, Set<String>> playerFieldMap = new IdentityHashMap<>();
+	private final Map<ServerPlayer, Set<String>> playerFieldMap = new IdentityHashMap<>();
 
 	TeUpdateDataServer()
 	{
@@ -32,7 +32,7 @@ public class TeUpdateDataServer
 		}
 	}
 
-	void addPlayerField(String name, EntityPlayerMP player)
+	void addPlayerField(String name, ServerPlayer player)
 	{
 		if (!this.globalFields.contains(name))
 		{
@@ -52,7 +52,7 @@ public class TeUpdateDataServer
 		return this.globalFields;
 	}
 
-	Collection<String> getPlayerFields(EntityPlayerMP player)
+	Collection<String> getPlayerFields(ServerPlayer player)
 	{
 		Set<String> ret = this.playerFieldMap.get(player);
 		return ret == null ? Collections.emptyList() : ret;

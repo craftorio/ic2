@@ -1,8 +1,8 @@
 package ic2.core.block.machine.gui;
 
 import com.google.common.base.Supplier;
-import ic2.core.GuiIC2;
 import ic2.core.IC2;
+import ic2.core.Ic2Gui;
 import ic2.core.block.machine.container.ContainerSteamGenerator;
 import ic2.core.gui.CustomButton;
 import ic2.core.gui.Gauge;
@@ -10,37 +10,45 @@ import ic2.core.gui.IClickHandler;
 import ic2.core.gui.LinkedGauge;
 import ic2.core.gui.MouseButton;
 import ic2.core.gui.TankGauge;
-import ic2.core.gui.Text;
+import ic2.core.gui.TextLabel;
 import ic2.core.gui.dynamic.TextProvider;
 import ic2.core.init.Localization;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
 
-public class GuiSteamGenerator extends GuiIC2<ContainerSteamGenerator>
+public class GuiSteamGenerator extends Ic2Gui<ContainerSteamGenerator>
 {
-	private static final ResourceLocation BACKGROUND = new ResourceLocation("ic2", "textures/gui/GUISteamGenerator.png");
+	private static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath("ic2", "textures/gui/guisteamgenerator.png");
 
-	public GuiSteamGenerator(ContainerSteamGenerator container)
+	public GuiSteamGenerator(ContainerSteamGenerator container, Inventory playerInventory, Component title)
 	{
-		super(container, 220);
+		super(container, playerInventory, title, 220);
 		this.addElement(TankGauge.createPlain(this, 10, 155, 75, 47, container.base.waterTank));
 		this.addElement(new LinkedGauge(this, 13, 70, container.base, "heat", Gauge.GaugeStyle.HeatSteamGenerator).withTooltip(new Supplier<String>()
 		{
 			public String get()
 			{
-				return Localization.translate("ic2.SteamGenerator.gui.systemheat", GuiSteamGenerator.this.container.base.getSystemHeat());
+				return Localization.translate("ic2.SteamGenerator.gui.systemheat", ((ContainerSteamGenerator) GuiSteamGenerator.this.menu).base.getSystemHeat());
 			}
 		}));
 		this.addElement(
-			new LinkedGauge(this, 155, 61, container.base, "calcification", Gauge.GaugeStyle.CalcificationSteamGenerator).withTooltip(new Supplier<String>()
-			{
-				public String get()
-				{
-					return Localization.translate("ic2.SteamGenerator.gui.calcification", GuiSteamGenerator.this.container.base.getCalcification()) + '%';
-				}
-			})
+			new LinkedGauge(this, 155, 61, container.base, "calcification", Gauge.GaugeStyle.CalcificationSteamGenerator)
+				.withTooltip(
+					new Supplier<String>()
+					{
+						public String get()
+						{
+							return Localization.translate(
+								"ic2.SteamGenerator.gui.calcification", ((ContainerSteamGenerator) GuiSteamGenerator.this.menu).base.getCalcification()
+							)
+								+ "%";
+						}
+					}
+				)
 		);
 		this.addElement(
-			Text.create(
+			TextLabel.create(
 					this,
 					91,
 					172,
@@ -51,7 +59,7 @@ public class GuiSteamGenerator extends GuiIC2<ContainerSteamGenerator>
 						{
 							public String get()
 							{
-								return GuiSteamGenerator.this.container.base.getInputMB()
+								return ((ContainerSteamGenerator) GuiSteamGenerator.this.menu).base.getInputMB()
 									+ Localization.translate("ic2.generic.text.mb")
 									+ Localization.translate("ic2.generic.text.tick");
 							}
@@ -64,22 +72,42 @@ public class GuiSteamGenerator extends GuiIC2<ContainerSteamGenerator>
 				)
 				.withTooltip("ic2.SteamGenerator.gui.info.waterinput")
 		);
-		this.addElement(Text.create(this, 31, 133, 111, 13, TextProvider.of(new Supplier<String>()
+		this.addElement(TextLabel.create(this, 31, 133, 111, 13, TextProvider.of(new Supplier<String>()
 		{
 			public String get()
 			{
-				return Localization.translate("ic2.SteamGenerator.gui.heatInput", GuiSteamGenerator.this.container.base.getHeatInput());
+				return Localization.translate("ic2.SteamGenerator.gui.heatInput", ((ContainerSteamGenerator) GuiSteamGenerator.this.menu).base.getHeatInput());
 			}
 		}), 2157374, false, 4, 0, false, true).withTooltip("ic2.SteamGenerator.gui.info.heatinput"));
-		this.addElement(Text.create(this, 22, 35, 42, 13, TextProvider.of(new Supplier<String>()
-		{
-			public String get()
-			{
-				return Localization.translate("ic2.SteamGenerator.gui.pressurevalve", GuiSteamGenerator.this.container.base.getPressure());
-			}
-		}), 2157374, false, 4, 0, false, true).withTooltip("ic2.SteamGenerator.gui.info.pressvalve"));
 		this.addElement(
-			Text.create(
+			TextLabel.create(
+					this,
+					22,
+					35,
+					42,
+					13,
+					TextProvider.of(
+						new Supplier<String>()
+						{
+							public String get()
+							{
+								return Localization.translate(
+									"ic2.SteamGenerator.gui.pressurevalve", ((ContainerSteamGenerator) GuiSteamGenerator.this.menu).base.getPressure()
+								);
+							}
+						}
+					),
+					2157374,
+					false,
+					4,
+					0,
+					false,
+					true
+				)
+				.withTooltip("ic2.SteamGenerator.gui.info.pressvalve")
+		);
+		this.addElement(
+			TextLabel.create(
 					this,
 					66,
 					25,
@@ -90,7 +118,7 @@ public class GuiSteamGenerator extends GuiIC2<ContainerSteamGenerator>
 						{
 							public String get()
 							{
-								return GuiSteamGenerator.this.container.base.getOutputMB()
+								return ((ContainerSteamGenerator) GuiSteamGenerator.this.menu).base.getOutputMB()
 									+ Localization.translate("ic2.generic.text.mb")
 									+ Localization.translate("ic2.generic.text.tick");
 							}
@@ -105,11 +133,11 @@ public class GuiSteamGenerator extends GuiIC2<ContainerSteamGenerator>
 				)
 				.withTooltip("ic2.SteamGenerator.gui.info.fluidoutput")
 		);
-		this.addElement(Text.create(this, 66, 45, 100, 13, TextProvider.of(new Supplier<String>()
+		this.addElement(TextLabel.create(this, 66, 45, 100, 13, TextProvider.of(new Supplier<String>()
 		{
 			public String get()
 			{
-				return Localization.translate(GuiSteamGenerator.this.container.base.getOutputFluidName());
+				return Localization.translate(((ContainerSteamGenerator) GuiSteamGenerator.this.menu).base.getOutputFluidName());
 			}
 		}), 2157374, false, 4, 0, false, true));
 
@@ -145,7 +173,7 @@ public class GuiSteamGenerator extends GuiIC2<ContainerSteamGenerator>
 				{
 					if (button == MouseButton.left)
 					{
-						IC2.network.get(false).initiateClientTileEntityEvent(GuiSteamGenerator.this.container.base, event);
+						IC2.network.get(false).initiateClientTileEntityEvent(((ContainerSteamGenerator) GuiSteamGenerator.this.menu).base, event);
 					}
 				}
 			});

@@ -1,0 +1,20 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "PPP",
+    "sss",
+    "PPP"
+  ],
+  "key": {
+    "P": {
+      "tag": "forge:plates/iron"
+    },
+    "s": {
+      "item": "ic2:iron_fence"
+    }
+  },
+  "result": {
+    "item": "ic2:iron_scaffold",
+    "count": 16
+  }
+}

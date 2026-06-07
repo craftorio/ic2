@@ -1,6 +1,6 @@
 package ic2.api.tile;
 
-import net.minecraft.util.EnumFacing;
+import net.minecraft.core.Direction;
 
 public interface IEnergyStorage
 {
@@ -16,5 +16,5 @@ public interface IEnergyStorage
 
 	double getOutputEnergyUnitsPerTick();
 
-	boolean isTeleporterCompatible(EnumFacing var1);
+	boolean isTeleporterCompatible(Direction var1);
 }

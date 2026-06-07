@@ -13,7 +13,7 @@ import java.util.Arrays;
 
 public class GrowingBuffer extends OutputStream implements IGrowingBuffer
 {
-	private static final byte[] emptyBuffer = new byte[0];
+	private static byte[] emptyBuffer = new byte[0];
 	private static final Charset utf8 = Charset.forName("UTF-8");
 	private byte[] buffer;
 	private int pos;
@@ -122,6 +122,16 @@ public class GrowingBuffer extends OutputStream implements IGrowingBuffer
 			target.ensureCapacity(len);
 			System.arraycopy(this.buffer, this.pos, target.buffer, target.pos, len);
 			target.pos += len;
+			this.pos += len;
+		}
+	}
+
+	public void writeTo(ByteBuf buf)
+	{
+		int len = this.altPos - this.pos;
+		if (len > 0)
+		{
+			buf.writeBytes(this.buffer, this.pos, len);
 			this.pos += len;
 		}
 	}

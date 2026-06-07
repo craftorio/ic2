@@ -8,14 +8,16 @@ import ic2.core.block.comp.Redstone;
 import ic2.core.block.invslot.InvSlotProcessableGeneric;
 import ic2.core.network.GuiSynced;
 import ic2.core.profile.NotClassic;
-import ic2.core.recipe.BasicMachineRecipeManager;
+import ic2.core.ref.Ic2BlockEntities;
 
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Set;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 
 @NotClassic
 public class TileEntityCentrifuge extends TileEntityStandardMachine<IRecipeInput, Collection<ItemStack>, ItemStack>
@@ -27,31 +29,25 @@ public class TileEntityCentrifuge extends TileEntityStandardMachine<IRecipeInput
 	@GuiSynced
 	public short workheat = 5000;
 
-	public TileEntityCentrifuge()
+	public TileEntityCentrifuge(BlockPos pos, BlockState state)
 	{
-		super(48, 500, 3, 2);
+		super(Ic2BlockEntities.CENTRIFUGE, pos, state, 48, 500, 3, 2);
 		this.inputSlot = new InvSlotProcessableGeneric(this, "input", 1, Recipes.centrifuge);
 		this.redstone = this.addComponent(new Redstone(this));
 	}
 
-	public static void init()
-	{
-		Recipes.centrifuge = new BasicMachineRecipeManager();
-	}
-
 	@Override
-	public void readFromNBT(NBTTagCompound nbt)
+	public void load(CompoundTag nbt)
 	{
-		super.readFromNBT(nbt);
+		super.load(nbt);
 		this.heat = nbt.getShort("heat");
 	}
 
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
+	public void saveAdditional(CompoundTag nbt)
 	{
-		super.writeToNBT(nbt);
-		nbt.setShort("heat", this.heat);
-		return nbt;
+		super.saveAdditional(nbt);
+		nbt.putShort("heat", this.heat);
 	}
 
 	public double getHeatRatio()
@@ -74,7 +70,7 @@ public class TileEntityCentrifuge extends TileEntityStandardMachine<IRecipeInput
 		if (this.energy.canUseEnergy(1.0))
 		{
 			short heatRequested = -32768;
-			MachineRecipeResult<? extends IRecipeInput, ? extends Collection<ItemStack>, ? extends ItemStack> output = super.getOutput();
+			MachineRecipeResult<? extends IRecipeInput, ? extends Collection<ItemStack>, ? extends ItemStack> output = super.getRecipeResult();
 			if (output != null && !this.redstone.hasRedstoneInput())
 			{
 				heatRequested = min((short) 5000, output.getRecipe().getMetaData().getShort("minHeat"));
@@ -106,9 +102,9 @@ public class TileEntityCentrifuge extends TileEntityStandardMachine<IRecipeInput
 	}
 
 	@Override
-	public MachineRecipeResult<IRecipeInput, Collection<ItemStack>, ItemStack> getOutput()
+	public MachineRecipeResult<IRecipeInput, Collection<ItemStack>, ItemStack> getRecipeResult()
 	{
-		MachineRecipeResult<IRecipeInput, Collection<ItemStack>, ItemStack> ret = super.getOutput();
+		MachineRecipeResult<IRecipeInput, Collection<ItemStack>, ItemStack> ret = super.getRecipeResult();
 		if (ret != null)
 		{
 			if (ret.getRecipe().getMetaData() == null)
@@ -116,7 +112,7 @@ public class TileEntityCentrifuge extends TileEntityStandardMachine<IRecipeInput
 				return null;
 			}
 
-			if (ret.getRecipe().getMetaData().getInteger("minHeat") > this.heat)
+			if (ret.getRecipe().getMetaData().getInt("minHeat") > this.heat)
 			{
 				return null;
 			}

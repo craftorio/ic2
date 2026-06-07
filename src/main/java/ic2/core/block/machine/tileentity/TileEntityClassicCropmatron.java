@@ -5,35 +5,28 @@ import ic2.core.IHasGui;
 import ic2.core.block.invslot.InvSlotConsumable;
 import ic2.core.block.invslot.InvSlotConsumableItemStack;
 import ic2.core.block.machine.container.ContainerClassicCropmatron;
-import ic2.core.block.machine.gui.GuiClassicCropmatron;
 import ic2.core.crop.TileEntityCrop;
-import ic2.core.item.type.CellType;
-import ic2.core.item.type.CropResItemType;
-import ic2.core.ref.ItemName;
-import ic2.core.ref.TeBlock;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import ic2.core.network.GrowingBuffer;
+import ic2.core.ref.Ic2BlockEntities;
+import ic2.core.ref.Ic2Items;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 
-@TeBlock.Delegated(current = TileEntityCropmatron.class, old = TileEntityClassicCropmatron.class)
 public class TileEntityClassicCropmatron extends TileEntityElectricMachine implements IHasGui
 {
 	public int scanX = -4;
 	public int scanY = -1;
 	public int scanZ = -4;
-	public final InvSlotConsumable fertilizerSlot = new InvSlotConsumableItemStack(
-		this, "fertilizer", 3, ItemName.crop_res.getItemStack(CropResItemType.fertilizer)
-	);
-	public final InvSlotConsumable hydrationSlot = new InvSlotConsumableItemStack(this, "hydration", 3, ItemName.cell.getItemStack(CellType.hydration));
-	public final InvSlotConsumable weedExSlot = new InvSlotConsumableItemStack(this, "weedEx", 3, ItemName.cell.getItemStack(CellType.weed_ex));
+	public final InvSlotConsumable fertilizerSlot = new InvSlotConsumableItemStack(this, "fertilizer", 3, new ItemStack(Ic2Items.FERTILIZER));
+	public final InvSlotConsumable hydrationSlot = new InvSlotConsumableItemStack(this, "hydration", 3, new ItemStack(Ic2Items.HYDRATION_CELL));
+	public final InvSlotConsumable weedExSlot = new InvSlotConsumableItemStack(this, "weedEx", 3, new ItemStack(Ic2Items.WEED_EX_CELL));
 
-	public TileEntityClassicCropmatron()
+	public TileEntityClassicCropmatron(BlockPos pos, BlockState state)
 	{
-		super(1000, 1);
+		super(Ic2BlockEntities.CLASSIC_CROPMATRON, pos, state, 1000, 1);
 	}
 
 	@Override
@@ -68,25 +61,21 @@ public class TileEntityClassicCropmatron extends TileEntityElectricMachine imple
 		}
 
 		this.energy.useEnergy(1.0);
-		BlockPos scan = this.pos.add(this.scanX, this.scanY, this.scanZ);
-		TileEntity te = this.getWorld().getTileEntity(scan);
-		if (te instanceof TileEntityCrop)
+		BlockPos scan = this.worldPosition.offset(this.scanX, this.scanY, this.scanZ);
+		if (this.getLevel().getBlockEntity(scan) instanceof TileEntityCrop crop)
 		{
-			TileEntityCrop crop = (TileEntityCrop) te;
 			if (!this.fertilizerSlot.isEmpty() && crop.applyFertilizer(false))
 			{
 				this.energy.useEnergy(10.0);
 				this.fertilizerSlot.consume(1);
 			}
 
-			if (!this.hydrationSlot.isEmpty()
-				&& CellType.hydration.doCropAction(this.hydrationSlot.get(0), stack -> this.hydrationSlot.put(0, stack), crop, false) == EnumActionResult.SUCCESS)
+			if (!this.hydrationSlot.isEmpty() && Ic2Items.HYDRATION_CELL.useOnCrop(this.hydrationSlot.get(0), crop, false))
 			{
 				this.energy.useEnergy(10.0);
 			}
 
-			if (!this.weedExSlot.isEmpty()
-				&& CellType.weed_ex.doCropAction(this.weedExSlot.get(0), stack -> this.weedExSlot.put(0, stack), crop, false) == EnumActionResult.SUCCESS)
+			if (!this.weedExSlot.isEmpty() && Ic2Items.WEED_EX_CELL.useOnCrop(this.weedExSlot.get(0), crop, false))
 			{
 				this.energy.useEnergy(10.0);
 			}
@@ -94,20 +83,14 @@ public class TileEntityClassicCropmatron extends TileEntityElectricMachine imple
 	}
 
 	@Override
-	public ContainerBase<?> getGuiContainer(EntityPlayer player)
+	public ContainerBase<TileEntityClassicCropmatron> createServerScreenHandler(int syncId, Player player)
 	{
-		return new ContainerClassicCropmatron(player, this);
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
-	{
-		return new GuiClassicCropmatron(new ContainerClassicCropmatron(player, this));
+		return new ContainerClassicCropmatron(syncId, player.getInventory(), this);
 	}
 
 	@Override
-	public void onGuiClosed(EntityPlayer entityPlayer)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
+		return new ContainerClassicCropmatron(syncId, inventory, this);
 	}
 }

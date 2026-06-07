@@ -1,0 +1,16 @@
+{
+  "type": "ic2:blast_furnace",
+  "ingredient": {
+    "item": "minecraft:iron_ore"
+  },
+  "result": [
+    {
+      "item": "ic2:steel_ingot"
+    },
+    {
+      "item": "ic2:slag"
+    }
+  ],
+  "fluid": 1,
+  "duration": 6000
+}

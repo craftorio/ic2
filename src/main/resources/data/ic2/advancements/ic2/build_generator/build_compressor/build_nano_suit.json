@@ -1,0 +1,40 @@
+{
+  "parent": "ic2:ic2/build_generator/build_compressor/build_energy_crystal",
+  "display": {
+    "icon": {
+      "item": "ic2:nano_chestplate"
+    },
+    "title": {
+      "translate": "advancements.ic2.buildNanoSuit"
+    },
+    "description": {
+      "translate": "advancements.ic2.buildNanoSuit.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "ic2:nano_suit": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:nano_leggings",
+              "ic2:nano_chestplate",
+              "ic2:nano_helmet",
+              "ic2:nano_boots"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "ic2:nano_suit"
+    ]
+  ]
+}

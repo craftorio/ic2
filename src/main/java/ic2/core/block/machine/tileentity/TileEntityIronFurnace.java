@@ -3,40 +3,39 @@ package ic2.core.block.machine.tileentity;
 import ic2.api.network.INetworkClientTileEntityEventListener;
 import ic2.api.recipe.MachineRecipeResult;
 import ic2.core.ContainerBase;
-import ic2.core.IC2;
 import ic2.core.IHasGui;
-import ic2.core.audio.AudioSource;
-import ic2.core.audio.PositionSpec;
-import ic2.core.block.TileEntityInventory;
 import ic2.core.block.invslot.InvSlotConsumableFuel;
 import ic2.core.block.invslot.InvSlotOutput;
 import ic2.core.block.invslot.InvSlotProcessableSmelting;
+import ic2.core.block.tileentity.TileEntityBase;
 import ic2.core.gui.dynamic.DynamicContainer;
-import ic2.core.gui.dynamic.DynamicGui;
-import ic2.core.gui.dynamic.GuiParser;
 import ic2.core.gui.dynamic.IGuiValueProvider;
+import ic2.core.network.GrowingBuffer;
 import ic2.core.network.GuiSynced;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.item.EntityXPOrb;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.SoundEvents;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.EnumFacing.Axis;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import ic2.core.ref.Ic2BlockEntities;
+import ic2.core.ref.Ic2SoundEvents;
+import ic2.core.util.ParticleUtil;
 
-public class TileEntityIronFurnace extends TileEntityInventory implements IHasGui, IGuiValueProvider, INetworkClientTileEntityEventListener
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.ExperienceOrb;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+
+public class TileEntityIronFurnace extends TileEntityBase implements IHasGui, IGuiValueProvider, INetworkClientTileEntityEventListener
 {
 	public final InvSlotProcessableSmelting inputSlot;
 	public final InvSlotOutput outputSlot;
 	public final InvSlotConsumableFuel fuelSlot;
-	protected AudioSource audioSource;
 	@GuiSynced
 	public int fuel = 0;
 	@GuiSynced
@@ -46,44 +45,32 @@ public class TileEntityIronFurnace extends TileEntityInventory implements IHasGu
 	protected double xp = 0.0;
 	public static final short operationLength = 160;
 
-	public TileEntityIronFurnace()
+	public TileEntityIronFurnace(BlockPos pos, BlockState state)
 	{
+		super(Ic2BlockEntities.IRON_FURNACE, pos, state);
 		this.inputSlot = new InvSlotProcessableSmelting(this, "input", 1);
 		this.outputSlot = new InvSlotOutput(this, "output", 1);
 		this.fuelSlot = new InvSlotConsumableFuel(this, "fuel", 1, true);
 	}
 
 	@Override
-	protected void onUnloaded()
+	public void load(CompoundTag nbt)
 	{
-		if (IC2.platform.isRendering() && this.audioSource != null)
-		{
-			IC2.audioManager.removeSources(this);
-			this.audioSource = null;
-		}
-
-		super.onUnloaded();
-	}
-
-	@Override
-	public void readFromNBT(NBTTagCompound nbt)
-	{
-		super.readFromNBT(nbt);
-		this.fuel = nbt.getInteger("fuel");
-		this.totalFuel = nbt.getInteger("totalFuel");
+		super.load(nbt);
+		this.fuel = nbt.getInt("fuel");
+		this.totalFuel = nbt.getInt("totalFuel");
 		this.progress = nbt.getShort("progress");
 		this.xp = nbt.getDouble("xp");
 	}
 
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
+	public void saveAdditional(CompoundTag nbt)
 	{
-		super.writeToNBT(nbt);
-		nbt.setInteger("fuel", this.fuel);
-		nbt.setInteger("totalFuel", this.totalFuel);
-		nbt.setShort("progress", this.progress);
-		nbt.setDouble("xp", this.xp);
-		return nbt;
+		super.saveAdditional(nbt);
+		nbt.putInt("fuel", this.fuel);
+		nbt.putInt("totalFuel", this.totalFuel);
+		nbt.putShort("progress", this.progress);
+		nbt.putDouble("xp", this.xp);
 	}
 
 	@Override
@@ -117,35 +104,35 @@ public class TileEntityIronFurnace extends TileEntityInventory implements IHasGu
 		if (this.fuel > 0)
 		{
 			this.fuel--;
-			this.setActive(true);
+			this.activate(false);
 		} else
 		{
-			this.setActive(false);
+			this.shutdown(false);
 		}
 
 		if (needsInvUpdate)
 		{
-			this.markDirty();
+			this.setChanged();
 		}
 	}
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	protected void updateEntityClient()
 	{
 		super.updateEntityClient();
 		if (this.getActive())
 		{
-			World world = this.getWorld();
-			showFlames(world, this.pos, this.getFacing());
-			if (world.rand.nextDouble() < 0.1)
+			Level world = this.getLevel();
+			ParticleUtil.showFurnaceFlames(world, this.worldPosition, this.getFacing());
+			if (world.random.nextDouble() < 0.1)
 			{
-				world.playSound(
-					this.pos.getX() + 0.5,
-					this.pos.getY(),
-					this.pos.getZ() + 0.5,
-					SoundEvents.BLOCK_FURNACE_FIRE_CRACKLE,
-					SoundCategory.BLOCKS,
+				world.playLocalSound(
+					this.worldPosition.getX() + 0.5,
+					this.worldPosition.getY(),
+					this.worldPosition.getZ() + 0.5,
+					SoundEvents.FURNACE_FIRE_CRACKLE,
+					SoundSource.BLOCKS,
 					1.0F,
 					1.0F,
 					false
@@ -154,32 +141,9 @@ public class TileEntityIronFurnace extends TileEntityInventory implements IHasGu
 		}
 	}
 
-	public static void showFlames(World world, BlockPos pos, EnumFacing facing)
+	public static double spawnXP(Player player, double xp)
 	{
-		if (world.rand.nextInt(8) == 0)
-		{
-			double width = 0.625;
-			double height = 0.375;
-			double depthOffset = 0.02;
-			double x = pos.getX() + (facing.getFrontOffsetX() * 1.04 + 1.0) / 2.0;
-			double y = pos.getY() + world.rand.nextFloat() * 0.375;
-			double z = pos.getZ() + (facing.getFrontOffsetZ() * 1.04 + 1.0) / 2.0;
-			if (facing.getAxis() == Axis.X)
-			{
-				z += world.rand.nextFloat() * 0.625 - 0.3125;
-			} else
-			{
-				x += world.rand.nextFloat() * 0.625 - 0.3125;
-			}
-
-			world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, x, y, z, 0.0, 0.0, 0.0, new int[0]);
-			world.spawnParticle(EnumParticleTypes.FLAME, x, y, z, 0.0, 0.0, 0.0, new int[0]);
-		}
-	}
-
-	public static double spawnXP(EntityPlayer player, double xp)
-	{
-		World world = player.getEntityWorld();
+		Level world = player.getCommandSenderWorld();
 		long balls = (long) Math.floor(xp);
 
 		while (balls > 0L)
@@ -187,14 +151,14 @@ public class TileEntityIronFurnace extends TileEntityInventory implements IHasGu
 			int amount;
 			if (balls < 2477L)
 			{
-				amount = EntityXPOrb.getXPSplit((int) balls);
+				amount = ExperienceOrb.getExperienceValue((int) balls);
 			} else
 			{
 				amount = 2477;
 			}
 
 			balls -= amount;
-			world.spawnEntity(new EntityXPOrb(world, player.posX, player.posY + 0.5, player.posZ + 0.5, amount));
+			world.addFreshEntity(new ExperienceOrb(world, player.getX(), player.getY() + 0.5, player.getZ() + 0.5, amount));
 		}
 
 		return xp - Math.floor(xp);
@@ -226,21 +190,15 @@ public class TileEntityIronFurnace extends TileEntityInventory implements IHasGu
 	}
 
 	@Override
-	public ContainerBase<TileEntityIronFurnace> getGuiContainer(EntityPlayer player)
+	public ContainerBase<?> createServerScreenHandler(int syncId, Player player)
 	{
-		return DynamicContainer.create(this, player, GuiParser.parse(this.teBlock));
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
-	{
-		return DynamicGui.<TileEntityIronFurnace>create(this, player, GuiParser.parse(this.teBlock));
+		return DynamicContainer.create(syncId, player.getInventory(), this);
 	}
 
 	@Override
-	public void onGuiClosed(EntityPlayer player)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
+		return DynamicContainer.create(syncId, inventory, this);
 	}
 
 	@Override
@@ -259,38 +217,18 @@ public class TileEntityIronFurnace extends TileEntityInventory implements IHasGu
 	}
 
 	@Override
-	public void onNetworkEvent(EntityPlayer player, int event)
+	public void onNetworkEvent(Player player, int event)
 	{
 		if (event == 0)
 		{
-			assert !this.getWorld().isRemote;
+			assert !this.getLevel().isClientSide;
 			this.xp = spawnXP(player, this.xp);
 		}
 	}
 
 	@Override
-	public void onNetworkUpdate(String field)
+	public SoundEvent getLoopingSoundEvent()
 	{
-		if (field.equals("active"))
-		{
-			if (this.audioSource == null)
-			{
-				this.audioSource = IC2.audioManager
-					.createSource(this, PositionSpec.Center, "Machines/IronFurnaceOp.ogg", true, false, IC2.audioManager.getDefaultVolume());
-			}
-
-			if (this.getActive())
-			{
-				if (this.audioSource != null)
-				{
-					this.audioSource.play();
-				}
-			} else if (this.audioSource != null)
-			{
-				this.audioSource.stop();
-			}
-		}
-
-		super.onNetworkUpdate(field);
+		return Ic2SoundEvents.MACHINE_FURNACE_IRON_OPERATE;
 	}
 }

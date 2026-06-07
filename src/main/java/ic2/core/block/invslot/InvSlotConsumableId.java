@@ -6,8 +6,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 public class InvSlotConsumableId extends InvSlotConsumable
 {

@@ -1,24 +1,26 @@
 package ic2.core.block.kineticgenerator.gui;
 
 import com.google.common.base.Supplier;
-import ic2.core.GuiIC2;
+import ic2.core.Ic2Gui;
 import ic2.core.block.kineticgenerator.container.ContainerWindKineticGenerator;
 import ic2.core.gui.IEnableHandler;
 import ic2.core.gui.Image;
-import ic2.core.gui.Text;
+import ic2.core.gui.TextLabel;
 import ic2.core.gui.dynamic.TextProvider;
 import ic2.core.init.Localization;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
 
-public class GuiWindKineticGenerator extends GuiIC2<ContainerWindKineticGenerator>
+public class GuiWindKineticGenerator extends Ic2Gui<ContainerWindKineticGenerator>
 {
-	private static final ResourceLocation background = new ResourceLocation("ic2", "textures/gui/GUIWindKineticGenerator.png");
+	private static final ResourceLocation background = ResourceLocation.fromNamespaceAndPath("ic2", "textures/gui/guiwindkineticgenerator.png");
 
-	public GuiWindKineticGenerator(final ContainerWindKineticGenerator container)
+	public GuiWindKineticGenerator(ContainerWindKineticGenerator container, Inventory playerInventory, Component title)
 	{
-		super(container);
+		super(container, playerInventory, title);
 		this.addElement(
-			Text.create(
+			TextLabel.create(
 				this,
 				17,
 				48,
@@ -53,7 +55,7 @@ public class GuiWindKineticGenerator extends GuiIC2<ContainerWindKineticGenerato
 			)
 		);
 		this.addElement(
-			Text.create(
+			TextLabel.create(
 				this,
 				17,
 				66,

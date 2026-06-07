@@ -1,0 +1,14 @@
+{
+  "type": "ic2:shapeless",
+  "ingredients": [
+    {
+      "item": "minecraft:iron_ingot"
+    },
+    {
+      "tag": "ic2:forge_hammers"
+    }
+  ],
+  "result": {
+    "item": "ic2:iron_plate"
+  }
+}

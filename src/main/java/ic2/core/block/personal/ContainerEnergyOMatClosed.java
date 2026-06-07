@@ -1,24 +1,35 @@
 package ic2.core.block.personal;
 
 import ic2.core.ContainerFullInv;
+import ic2.core.ref.Ic2ScreenHandlers;
 import ic2.core.slot.SlotInvSlot;
 import ic2.core.slot.SlotInvSlotReadOnly;
 
 import java.util.List;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IContainerListener;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.DataSlot;
 
 public class ContainerEnergyOMatClosed extends ContainerFullInv<TileEntityEnergyOMat>
 {
-	private int lastTier = -1;
-
-	public ContainerEnergyOMatClosed(EntityPlayer player, TileEntityEnergyOMat tileEntity1)
+	public ContainerEnergyOMatClosed(int syncId, Inventory playerInventory, TileEntityEnergyOMat be)
 	{
-		super(player, tileEntity1, 166);
-		this.addSlotToContainer(new SlotInvSlotReadOnly(tileEntity1.demandSlot, 0, 50, 17));
-		this.addSlotToContainer(new SlotInvSlot(tileEntity1.inputSlot, 0, 143, 17));
-		this.addSlotToContainer(new SlotInvSlot(tileEntity1.chargeSlot, 0, 143, 53));
+		super(Ic2ScreenHandlers.ENERGY_O_MAT_CLOSED, syncId, playerInventory, be, 166);
+		this.m_38897_(new SlotInvSlotReadOnly(be.demandSlot, 0, 50, 17));
+		this.m_38897_(new SlotInvSlot(be.inputSlot, 0, 143, 17));
+		this.m_38897_(new SlotInvSlot(be.chargeSlot, 0, 143, 53));
+		this.m_38895_(new DataSlot()
+		{
+			public int m_6501_()
+			{
+				return ContainerEnergyOMatClosed.this.base.chargeSlot.tier;
+			}
+
+			public void m_6422_(int value)
+			{
+				ContainerEnergyOMatClosed.this.base.chargeSlot.tier = value;
+			}
+		});
 	}
 
 	@Override
@@ -28,31 +39,5 @@ public class ContainerEnergyOMatClosed extends ContainerFullInv<TileEntityEnergy
 		ret.add("paidFor");
 		ret.add("euOffer");
 		return ret;
-	}
-
-	@Override
-	public void detectAndSendChanges()
-	{
-		super.detectAndSendChanges();
-
-		for (IContainerListener listener : this.listeners)
-		{
-			if (this.base.chargeSlot.tier != this.lastTier)
-			{
-				listener.sendWindowProperty(this, 0, this.base.chargeSlot.tier);
-			}
-		}
-
-		this.lastTier = this.base.chargeSlot.tier;
-	}
-
-	public void updateProgressBar(int index, int value)
-	{
-		super.updateProgressBar(index, value);
-		switch (index)
-		{
-			case 0:
-				this.base.chargeSlot.tier = value;
-		}
 	}
 }

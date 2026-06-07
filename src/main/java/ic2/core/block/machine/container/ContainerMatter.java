@@ -2,24 +2,25 @@ package ic2.core.block.machine.container;
 
 import ic2.core.ContainerFullInv;
 import ic2.core.block.machine.tileentity.TileEntityMatter;
+import ic2.core.ref.Ic2ScreenHandlers;
 import ic2.core.slot.SlotInvSlot;
 
 import java.util.List;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.entity.player.Inventory;
 
 public class ContainerMatter extends ContainerFullInv<TileEntityMatter>
 {
-	public ContainerMatter(EntityPlayer player, TileEntityMatter tileEntity1)
+	public ContainerMatter(int syncId, Inventory playerInventory, TileEntityMatter be)
 	{
-		super(player, tileEntity1, 166);
-		this.addSlotToContainer(new SlotInvSlot(tileEntity1.amplifierSlot, 0, 72, 40));
-		this.addSlotToContainer(new SlotInvSlot(tileEntity1.outputSlot, 0, 125, 59));
-		this.addSlotToContainer(new SlotInvSlot(tileEntity1.containerslot, 0, 125, 23));
+		super(Ic2ScreenHandlers.MATTER_GENERATOR, syncId, playerInventory, be, 166);
+		this.m_38897_(new SlotInvSlot(be.amplifierSlot, 0, 72, 40));
+		this.m_38897_(new SlotInvSlot(be.outputSlot, 0, 125, 59));
+		this.m_38897_(new SlotInvSlot(be.containerslot, 0, 125, 23));
 
 		for (int i = 0; i < 4; i++)
 		{
-			this.addSlotToContainer(new SlotInvSlot(tileEntity1.upgradeSlot, i, 152, 8 + i * 18));
+			this.m_38897_(new SlotInvSlot(be.upgradeSlot, i, 152, 8 + i * 18));
 		}
 	}
 

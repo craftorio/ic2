@@ -2,10 +2,10 @@ package ic2.core.slot;
 
 import ic2.core.block.invslot.InvSlot;
 import ic2.core.util.StackUtil;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
 public class SlotInvSlot extends Slot
 {
@@ -14,28 +14,28 @@ public class SlotInvSlot extends Slot
 
 	public SlotInvSlot(InvSlot invSlot, int index, int x, int y)
 	{
-		super((IInventory) invSlot.base.getParent(), invSlot.base.getBaseIndex(invSlot) + index, x, y);
+		super((Container) invSlot.base.getParent(), invSlot.base.getBaseIndex(invSlot) + index, x, y);
 		this.invSlot = invSlot;
 		this.index = index;
 	}
 
-	public boolean isItemValid(ItemStack stack)
+	public boolean m_5857_(ItemStack stack)
 	{
 		return this.invSlot.accepts(stack);
 	}
 
-	public ItemStack getStack()
+	public ItemStack m_7993_()
 	{
 		return this.invSlot.get(this.index);
 	}
 
-	public void putStack(ItemStack stack)
+	public void m_5852_(ItemStack stack)
 	{
 		this.invSlot.put(this.index, stack);
-		this.onSlotChanged();
+		this.m_6654_();
 	}
 
-	public ItemStack decrStackSize(int amount)
+	public ItemStack m_6201_(int amount)
 	{
 		if (amount <= 0)
 		{
@@ -60,30 +60,18 @@ public class SlotInvSlot extends Slot
 			this.invSlot.put(this.index, StackUtil.decSize(stack, amount));
 		}
 
-		this.onSlotChanged();
+		this.m_6654_();
 		return ret;
 	}
 
-	public boolean isHere(IInventory inventory, int index)
-	{
-		if (inventory != this.invSlot.base)
-		{
-			return false;
-		}
-
-		int baseIndex = this.invSlot.base.getBaseIndex(this.invSlot);
-		return baseIndex == -1 ? false : baseIndex + this.index == index;
-	}
-
-	public int getSlotStackLimit()
+	public int m_6641_()
 	{
 		return this.invSlot.getStackSizeLimit();
 	}
 
-	public ItemStack onTake(EntityPlayer player, ItemStack stack)
+	public void m_142406_(Player player, ItemStack stack)
 	{
-		stack = super.onTake(player, stack);
+		super.m_142406_(player, stack);
 		this.invSlot.onPickupFromSlot(player, stack);
-		return stack;
 	}
 }

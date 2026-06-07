@@ -1,22 +1,22 @@
 package ic2.core.block.machine.gui;
 
 import com.google.common.base.Supplier;
-import ic2.core.GuiIC2;
+import com.mojang.blaze3d.vertex.PoseStack;
+import ic2.core.Ic2Gui;
 import ic2.core.block.machine.container.ContainerAdvMiner;
 import ic2.core.gui.BasicButton;
 import ic2.core.gui.EnergyGauge;
 import ic2.core.init.Localization;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
 
-@SideOnly(Side.CLIENT)
-public class GuiAdvMiner extends GuiIC2<ContainerAdvMiner>
+public class GuiAdvMiner extends Ic2Gui<ContainerAdvMiner>
 {
-	public GuiAdvMiner(final ContainerAdvMiner container)
+	public GuiAdvMiner(ContainerAdvMiner container, Inventory playerInventory, Component title)
 	{
-		super(container, 203);
+		super(container, playerInventory, title, 203);
 		this.addElement(EnergyGauge.asBolt(this, 12, 55, container.base));
 		this.addElement(
 			BasicButton.create(this, 133, 101, this.createEventSender(0), BasicButton.ButtonStyle.AdvMinerReset).withTooltip("ic2.AdvMiner.gui.switch.reset")
@@ -36,40 +36,40 @@ public class GuiAdvMiner extends GuiIC2<ContainerAdvMiner>
 	}
 
 	@Override
-	protected void drawForegroundLayer(int mouseX, int mouseY)
+	protected void drawForegroundLayer(PoseStack matrices, int mouseX, int mouseY)
 	{
-		BlockPos target = this.container.base.getMineTarget();
+		BlockPos target = ((ContainerAdvMiner) this.menu).base.getMineTarget();
 		if (target != null)
 		{
-			BlockPos pos = this.container.base.getPos();
-			this.fontRenderer
-				.drawString(
-					Localization.translate(
-						"ic2.AdvMiner.gui.info.minelevel",
-						target.getX() - pos.getX(),
-						target.getZ() - pos.getZ(),
-						target.getY() - pos.getY()
-					),
-					28,
-					105,
-					2157374
-				);
+			BlockPos pos = ((ContainerAdvMiner) this.menu).base.getBlockPos();
+			this.drawString(
+				matrices,
+				28,
+				104,
+				Localization.translate(
+					"ic2.AdvMiner.gui.info.minelevel",
+					target.getX() - pos.getX(),
+					target.getZ() - pos.getZ(),
+					target.getY() - pos.getY()
+				),
+				2157374
+			);
 		}
 
-		if (this.container.base.blacklist)
+		if (((ContainerAdvMiner) this.menu).base.blacklist)
 		{
-			this.fontRenderer.drawString(Localization.translate("ic2.AdvMiner.gui.mode.blacklist"), 40, 31, 2157374);
+			this.drawString(matrices, 40, 30, Localization.translate("ic2.AdvMiner.gui.mode.blacklist"), 2157374);
 		} else
 		{
-			this.fontRenderer.drawString(Localization.translate("ic2.AdvMiner.gui.mode.whitelist"), 40, 31, 2157374);
+			this.drawString(matrices, 40, 30, Localization.translate("ic2.AdvMiner.gui.mode.whitelist"), 2157374);
 		}
 
-		super.drawForegroundLayer(mouseX, mouseY);
+		super.drawForegroundLayer(matrices, mouseX, mouseY);
 	}
 
 	@Override
 	public ResourceLocation getTexture()
 	{
-		return new ResourceLocation("ic2", "textures/gui/GUIAdvMiner.png");
+		return ResourceLocation.fromNamespaceAndPath("ic2", "textures/gui/guiadvminer.png");
 	}
 }

@@ -4,16 +4,16 @@ import ic2.api.energy.EnergyNet;
 import ic2.api.energy.tile.IEnergyAcceptor;
 import ic2.api.energy.tile.IEnergySource;
 import ic2.api.info.ILocatable;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class BasicSource extends BasicEnergyTile implements IEnergySource
 {
 	protected int tier;
 
-	public BasicSource(TileEntity parent, double capacity, int tier)
+	public BasicSource(BlockEntity parent, double capacity, int tier)
 	{
 		super(parent, capacity);
 		if (tier < 0)
@@ -45,7 +45,7 @@ public class BasicSource extends BasicEnergyTile implements IEnergySource
 		}
 	}
 
-	public BasicSource(World world, BlockPos pos, double capacity, int tier)
+	public BasicSource(Level world, BlockPos pos, double capacity, int tier)
 	{
 		super(world, pos, capacity);
 		if (tier < 0)
@@ -78,7 +78,7 @@ public class BasicSource extends BasicEnergyTile implements IEnergySource
 	}
 
 	@Override
-	public boolean emitsEnergyTo(IEnergyAcceptor receiver, EnumFacing direction)
+	public boolean emitsEnergyTo(IEnergyAcceptor receiver, Direction direction)
 	{
 		return true;
 	}

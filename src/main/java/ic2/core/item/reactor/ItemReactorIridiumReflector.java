@@ -3,15 +3,15 @@ package ic2.core.item.reactor;
 import ic2.api.reactor.IReactor;
 import ic2.api.reactor.IReactorComponent;
 import ic2.core.profile.NotClassic;
-import ic2.core.ref.ItemName;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item.Properties;
 
 @NotClassic
 public class ItemReactorIridiumReflector extends AbstractReactorComponent
 {
-	public ItemReactorIridiumReflector(ItemName name)
+	public ItemReactorIridiumReflector(Properties settings)
 	{
-		super(name);
+		super(settings);
 	}
 
 	@Override

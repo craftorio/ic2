@@ -1,7 +1,7 @@
 package ic2.core.block.machine.gui;
 
 import com.google.common.base.Supplier;
-import ic2.core.GuiIC2;
+import ic2.core.Ic2Gui;
 import ic2.core.block.machine.container.ContainerCondenser;
 import ic2.core.gui.EnergyGauge;
 import ic2.core.gui.Gauge;
@@ -9,15 +9,17 @@ import ic2.core.gui.LinkedGauge;
 import ic2.core.gui.SlotGrid;
 import ic2.core.gui.TankGauge;
 import ic2.core.init.Localization;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
 
-public class GuiCondenser extends GuiIC2<ContainerCondenser>
+public class GuiCondenser extends Ic2Gui<ContainerCondenser>
 {
-	private static final ResourceLocation BACKGROUND = new ResourceLocation("ic2", "textures/gui/GUICondenser.png");
+	private static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath("ic2", "textures/gui/guicondenser.png");
 
-	public GuiCondenser(final ContainerCondenser container)
+	public GuiCondenser(ContainerCondenser container, Inventory playerInventory, Component title)
 	{
-		super(container, 184);
+		super(container, playerInventory, title, 184);
 		Supplier<String> ventTooltipSupplier = new Supplier<String>()
 		{
 			public String get()

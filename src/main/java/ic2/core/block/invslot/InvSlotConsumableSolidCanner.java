@@ -3,7 +3,7 @@ package ic2.core.block.invslot;
 import ic2.api.recipe.ICannerBottleRecipeManager;
 import ic2.api.recipe.Recipes;
 import ic2.core.block.machine.tileentity.TileEntitySolidCanner;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 public class InvSlotConsumableSolidCanner extends InvSlotConsumableLiquid
 {
@@ -15,6 +15,9 @@ public class InvSlotConsumableSolidCanner extends InvSlotConsumableLiquid
 	@Override
 	public boolean accepts(ItemStack stack)
 	{
-		return Recipes.cannerBottle.apply(new ICannerBottleRecipeManager.RawInput(stack, ((TileEntitySolidCanner) this.base).inputSlot.get()), true) != null;
+		return Recipes.cannerBottle
+			.get(this.base.getParent().getLevel())
+			.apply(new ICannerBottleRecipeManager.RawInput(stack, ((TileEntitySolidCanner) this.base).inputSlot.get()), true)
+			!= null;
 	}
 }

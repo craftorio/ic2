@@ -2,25 +2,26 @@ package ic2.core.item.tfbp;
 
 import ic2.core.block.machine.tileentity.TileEntityTerra;
 import ic2.core.util.BiomeUtil;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockMushroom;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Biomes;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.BlockPos.MutableBlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.MushroomBlock;
+import net.minecraft.world.level.block.state.BlockState;
 
-class Mushroom extends TerraformerBase
+public class Mushroom extends TerraformerBase
 {
 	@Override
-	boolean terraform(World world, BlockPos pos)
+	boolean terraform(Level world, BlockPos pos)
 	{
 		pos = TileEntityTerra.getFirstSolidBlockFrom(world, pos, 20);
-		return pos == null ? false : growBlockWithDependancy(world, pos, Blocks.BROWN_MUSHROOM_BLOCK, Blocks.BROWN_MUSHROOM);
+		return pos == null ? false : growBlockWithDependancy(world, pos, Blocks.f_50180_, Blocks.f_50072_);
 	}
 
-	private static boolean growBlockWithDependancy(World world, BlockPos pos, Block target, Block dependancy)
+	private static boolean growBlockWithDependancy(Level world, BlockPos pos, Block target, Block dependancy)
 	{
 		MutableBlockPos cPos = new MutableBlockPos();
 
@@ -38,32 +39,32 @@ class Mushroom extends TerraformerBase
 					{
 						if (ym > pos.getY() - 2)
 						{
-							cPos.setPos(xm, ym, zm);
-							IBlockState state = world.getBlockState(cPos);
+							cPos.set(xm, ym, zm);
+							BlockState state = world.getBlockState(cPos);
 							Block block = state.getBlock();
-							if (dependancy == Blocks.MYCELIUM)
+							if (dependancy == Blocks.f_50195_)
 							{
-								if (block != dependancy && block != Blocks.BROWN_MUSHROOM_BLOCK && block != Blocks.RED_MUSHROOM_BLOCK)
+								if (block != dependancy && block != Blocks.f_50180_ && block != Blocks.f_50181_)
 								{
-									if (!block.isAir(state, world, cPos) && (block == Blocks.DIRT || block == Blocks.GRASS))
+									if (!state.isAir() && (block == Blocks.f_50493_ || block == Blocks.f_50034_))
 									{
 										BlockPos dstPos = new BlockPos(cPos);
-										world.setBlockState(dstPos, dependancy.getDefaultState());
-										BiomeUtil.setBiome(world, dstPos, Biomes.MUSHROOM_ISLAND);
+										world.setBlockAndUpdate(dstPos, dependancy.defaultBlockState());
+										BiomeUtil.setBiome(world, dstPos, BiomeUtil.getBiome(world, Biomes.f_48215_));
 										return true;
 									}
 									break label116;
 								}
 							} else
 							{
-								if (dependancy != Blocks.BROWN_MUSHROOM)
+								if (dependancy != Blocks.f_50072_)
 								{
 									break label116;
 								}
 
-								if (block != Blocks.BROWN_MUSHROOM && block != Blocks.RED_MUSHROOM)
+								if (block != Blocks.f_50072_ && block != Blocks.f_50073_)
 								{
-									if (!block.isAir(state, world, cPos) && growBlockWithDependancy(world, cPos, Blocks.BROWN_MUSHROOM, Blocks.MYCELIUM))
+									if (!state.isAir() && growBlockWithDependancy(world, cPos, Blocks.f_50072_, Blocks.f_50195_))
 									{
 										return true;
 									}
@@ -81,53 +82,53 @@ class Mushroom extends TerraformerBase
 			}
 		}
 
-		if (target == Blocks.BROWN_MUSHROOM)
+		if (target == Blocks.f_50072_)
 		{
 			Block base = world.getBlockState(pos).getBlock();
-			if (base != Blocks.MYCELIUM)
+			if (base != Blocks.f_50195_)
 			{
-				if (base != Blocks.BROWN_MUSHROOM_BLOCK && base != Blocks.RED_MUSHROOM_BLOCK)
+				if (base != Blocks.f_50180_ && base != Blocks.f_50181_)
 				{
 					return false;
 				}
 
-				world.setBlockState(pos, Blocks.MYCELIUM.getDefaultState());
+				world.setBlockAndUpdate(pos, Blocks.f_50195_.defaultBlockState());
 			}
 
-			BlockPos above = pos.up();
-			IBlockState state = world.getBlockState(above);
+			BlockPos above = pos.m_7494_();
+			BlockState state = world.getBlockState(above);
 			Block block = state.getBlock();
-			if (!block.isAir(state, world, above) && block != Blocks.TALLGRASS)
+			if (!state.isAir() && block != Blocks.f_50359_)
 			{
 				return false;
 			}
 
-			Block shroom = world.rand.nextBoolean() ? Blocks.BROWN_MUSHROOM : Blocks.RED_MUSHROOM;
-			world.setBlockState(above, shroom.getDefaultState());
+			Block shroom = world.random.m_188499_() ? Blocks.f_50072_ : Blocks.f_50073_;
+			world.setBlockAndUpdate(above, shroom.defaultBlockState());
 			return true;
 		} else
 		{
-			if (target == Blocks.BROWN_MUSHROOM_BLOCK)
+			if (target == Blocks.f_50180_)
 			{
-				BlockPos above = pos.up();
-				IBlockState state = world.getBlockState(above);
+				BlockPos above = pos.m_7494_();
+				BlockState state = world.getBlockState(above);
 				Block base = state.getBlock();
-				if (base != Blocks.BROWN_MUSHROOM && base != Blocks.RED_MUSHROOM)
+				if (base != Blocks.f_50072_ && base != Blocks.f_50073_)
 				{
 					return false;
 				}
 
-				if (((BlockMushroom) base).generateBigMushroom(world, above, state, world.rand))
+				if (((MushroomBlock) base).m_221773_((ServerLevel) world, pos, state, world.random))
 				{
 					for (int xm = pos.getX() - 1; xm < pos.getX() + 1; xm++)
 					{
 						for (int zm = pos.getZ() - 1; zm < pos.getZ() + 1; zm++)
 						{
-							cPos.setPos(xm, above.getY(), zm);
+							cPos.set(xm, above.getY(), zm);
 							Block block = world.getBlockState(cPos).getBlock();
-							if (block == Blocks.BROWN_MUSHROOM || block == Blocks.RED_MUSHROOM)
+							if (block == Blocks.f_50072_ || block == Blocks.f_50073_)
 							{
-								world.setBlockToAir(new BlockPos(cPos));
+								world.removeBlock(new BlockPos(cPos), false);
 							}
 						}
 					}

@@ -1,11 +1,10 @@
 package ic2.core.block.transport.cover;
 
-import java.util.Collection;
+import ic2.core.fluid.Ic2FluidStack;
+
 import java.util.Set;
 
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.fluids.FluidStack;
+import net.minecraft.world.item.ItemStack;
 
 public interface ICoverItem
 {
@@ -15,11 +14,9 @@ public interface ICoverItem
 
 	boolean allowsInput(ItemStack var1);
 
-	boolean allowsInput(FluidStack var1);
+	boolean allowsInput(Ic2FluidStack var1);
 
 	boolean allowsOutput(ItemStack var1);
 
-	boolean allowsOutput(FluidStack var1);
-
-	Collection<? extends Capability<?>> getProvidedCapabilities();
+	boolean allowsOutput(Ic2FluidStack var1);
 }

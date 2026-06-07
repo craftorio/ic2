@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
 
 public class BasicListRecipeManager extends MachineRecipeHelper<IRecipeInput, Object> implements IListRecipeManager
 {
@@ -53,7 +53,7 @@ public class BasicListRecipeManager extends MachineRecipeHelper<IRecipeInput, Ob
 		return this.recipes.keySet().iterator();
 	}
 
-	public boolean addRecipe(IRecipeInput input, Object output, NBTTagCompound metadata, boolean replace)
+	public boolean addRecipe(IRecipeInput input, Object output, CompoundTag metadata, boolean replace)
 	{
 		for (ItemStack is : input.getInputs())
 		{

@@ -7,7 +7,6 @@ import ic2.api.upgrade.IUpgradableBlock;
 import ic2.api.upgrade.UpgradableProperty;
 import ic2.core.ContainerBase;
 import ic2.core.IHasGui;
-import ic2.core.block.TileEntityInventory;
 import ic2.core.block.comp.Fluids;
 import ic2.core.block.invslot.InvSlot;
 import ic2.core.block.invslot.InvSlotConsumableLiquid;
@@ -16,33 +15,35 @@ import ic2.core.block.invslot.InvSlotConsumableLiquidByTank;
 import ic2.core.block.invslot.InvSlotOutput;
 import ic2.core.block.invslot.InvSlotUpgrade;
 import ic2.core.block.machine.container.ContainerFermenter;
-import ic2.core.block.machine.gui.GuiFermenter;
+import ic2.core.block.tileentity.TileEntityInventory;
+import ic2.core.fluid.Ic2FluidTank;
 import ic2.core.gui.dynamic.IGuiValueProvider;
 import ic2.core.init.MainConfig;
-import ic2.core.item.type.CropResItemType;
+import ic2.core.network.GrowingBuffer;
 import ic2.core.profile.NotClassic;
 import ic2.core.recipe.FermenterRecipeManager;
-import ic2.core.ref.FluidName;
-import ic2.core.ref.ItemName;
+import ic2.core.ref.Ic2BlockEntities;
+import ic2.core.ref.Ic2Fluids;
+import ic2.core.ref.Ic2Items;
 import ic2.core.util.ConfigUtil;
 
 import java.util.EnumSet;
 import java.util.Set;
 
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraftforge.fluids.FluidTank;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 @NotClassic
 public class TileEntityFermenter extends TileEntityInventory implements IHasGui, IGuiValueProvider, IUpgradableBlock
 {
-	private final FluidTank inputTank;
-	private final FluidTank outputTank;
+	private final Ic2FluidTank inputTank;
+	private final Ic2FluidTank outputTank;
 	public final InvSlotConsumableLiquidByManager fluidInputCellInSlot;
 	public final InvSlotConsumableLiquidByTank fluidOutputCellInSlot;
 	public final InvSlotOutput fluidInputCellOutSlot;
@@ -55,8 +56,9 @@ public class TileEntityFermenter extends TileEntityInventory implements IHasGui,
 	private final int maxProgress = ConfigUtil.getInt(MainConfig.get(), "balance/fermenter/biomass_per_fertilizier");
 	private boolean newActive = false;
 
-	public TileEntityFermenter()
+	public TileEntityFermenter(BlockPos pos, BlockState state)
 	{
+		super(Ic2BlockEntities.FERMENTER, pos, state);
 		this.fluids = this.addComponent(new Fluids(this));
 		this.outputTank = this.fluids.addTankExtract("output", 2000);
 		this.inputTank = this.fluids.addTankInsert("input", 10000, Fluids.fluidPredicate(Recipes.fermenter));
@@ -77,33 +79,32 @@ public class TileEntityFermenter extends TileEntityInventory implements IHasGui,
 		Recipes.fermenter = new FermenterRecipeManager();
 		Recipes.fermenter
 			.addRecipe(
-				FluidName.biomass.getName(),
+				Ic2Fluids.BIOMASS.still,
 				ConfigUtil.getInt(MainConfig.get(), "balance/fermenter/need_amount_biomass_per_run"),
 				ConfigUtil.getInt(MainConfig.get(), "balance/fermenter/hU_per_run"),
-				FluidName.biogas.getName(),
+				Ic2Fluids.BIOGAS.still,
 				ConfigUtil.getInt(MainConfig.get(), "balance/fermenter/output_amount_biogas_per_run")
 			);
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound nbttagcompound)
+	public void load(CompoundTag nbt)
 	{
-		super.readFromNBT(nbttagcompound);
-		this.inputTank.readFromNBT(nbttagcompound.getCompoundTag("inputTank"));
-		this.outputTank.readFromNBT(nbttagcompound.getCompoundTag("outputTank"));
-		this.progress = nbttagcompound.getInteger("progress");
-		this.heatBuffer = nbttagcompound.getInteger("heatBuffer");
+		super.load(nbt);
+		this.inputTank.fromNbt(nbt.getCompound("inputTank"));
+		this.outputTank.fromNbt(nbt.getCompound("outputTank"));
+		this.progress = nbt.getInt("progress");
+		this.heatBuffer = nbt.getInt("heatBuffer");
 	}
 
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
+	public void saveAdditional(CompoundTag nbt)
 	{
-		super.writeToNBT(nbt);
-		nbt.setTag("inputTank", this.inputTank.writeToNBT(new NBTTagCompound()));
-		nbt.setTag("outputTank", this.outputTank.writeToNBT(new NBTTagCompound()));
-		nbt.setInteger("progress", this.progress);
-		nbt.setInteger("heatBuffer", this.heatBuffer);
-		return nbt;
+		super.saveAdditional(nbt);
+		nbt.put("inputTank", this.inputTank.toNbt(new CompoundTag()));
+		nbt.put("outputTank", this.outputTank.toNbt(new CompoundTag()));
+		nbt.putInt("progress", this.progress);
+		nbt.putInt("heatBuffer", this.heatBuffer);
 	}
 
 	@Override
@@ -125,25 +126,25 @@ public class TileEntityFermenter extends TileEntityInventory implements IHasGui,
 	{
 		if (this.progress >= this.maxProgress)
 		{
-			this.fertiliserSlot.add(ItemName.crop_res.getItemStack(CropResItemType.fertilizer));
+			this.fertiliserSlot.add(new ItemStack(Ic2Items.FERTILIZER));
 			this.progress = 0;
 		}
 
-		EnumFacing dir = this.getFacing();
-		TileEntity te = this.getWorld().getTileEntity(this.pos.offset(dir));
-		if (te instanceof IHeatSource && this.inputTank.getFluid() != null)
+		Direction dir = this.getFacing();
+		BlockEntity te = this.getLevel().getBlockEntity(this.worldPosition.relative(dir));
+		if (te instanceof IHeatSource && !this.inputTank.isEmpty())
 		{
-			IFermenterRecipeManager.FermentationProperty fp = Recipes.fermenter.getFermentationInformation(this.inputTank.getFluid().getFluid());
+			IFermenterRecipeManager.FermentationProperty fp = Recipes.fermenter.getFermentationInformation(this.inputTank.getFluidStack().getFluid());
 			if (fp != null
 				&& this.inputTank.getFluidAmount() >= fp.inputAmount
 				&& fp.outputAmount <= this.outputTank.getCapacity() - this.outputTank.getFluidAmount())
 			{
-				this.heatBuffer = this.heatBuffer + ((IHeatSource) te).drawHeat(dir.getOpposite(), 100, false);
+				this.heatBuffer = this.heatBuffer + ((IHeatSource) te).drawHeat(dir.m_122424_(), 100, false);
 				if (this.heatBuffer >= fp.heat)
 				{
 					this.heatBuffer = this.heatBuffer - fp.heat;
-					this.inputTank.drainInternal(fp.inputAmount, true);
-					this.outputTank.fillInternal(fp.getOutput(), true);
+					this.inputTank.drainMbUnchecked(fp.inputAmount, false);
+					this.outputTank.fillMbUnchecked(fp.getOutput(), false);
 					this.progress = this.progress + fp.inputAmount;
 				}
 
@@ -155,21 +156,15 @@ public class TileEntityFermenter extends TileEntityInventory implements IHasGui,
 	}
 
 	@Override
-	public ContainerBase<TileEntityFermenter> getGuiContainer(EntityPlayer player)
+	public ContainerBase<TileEntityFermenter> createServerScreenHandler(int syncId, Player player)
 	{
-		return new ContainerFermenter(player, this);
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
-	{
-		return new GuiFermenter(new ContainerFermenter(player, this));
+		return new ContainerFermenter(syncId, player.getInventory(), this);
 	}
 
 	@Override
-	public void onGuiClosed(EntityPlayer player)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
+		return new ContainerFermenter(syncId, inventory, this);
 	}
 
 	@Override
@@ -183,9 +178,9 @@ public class TileEntityFermenter extends TileEntityInventory implements IHasGui,
 			}
 
 			double maxHeatBuff = ConfigUtil.getInt(MainConfig.get(), "balance/fermenter/hU_per_run");
-			if (this.inputTank.getFluid() != null)
+			if (!this.inputTank.isEmpty())
 			{
-				IFermenterRecipeManager.FermentationProperty fp = Recipes.fermenter.getFermentationInformation(this.inputTank.getFluid().getFluid());
+				IFermenterRecipeManager.FermentationProperty fp = Recipes.fermenter.getFermentationInformation(this.inputTank.getFluidStack().getFluid());
 				if (fp != null)
 				{
 					maxHeatBuff = fp.heat;
@@ -207,14 +202,14 @@ public class TileEntityFermenter extends TileEntityInventory implements IHasGui,
 		switch (tank)
 		{
 			case 0:
-				if (this.inputTank.getFluidAmount() <= 0)
+				if (this.inputTank.isEmpty())
 				{
 					return 0;
 				}
 
 				return this.inputTank.getFluidAmount() * i / this.inputTank.getCapacity();
 			case 1:
-				if (this.outputTank.getFluidAmount() <= 0)
+				if (this.outputTank.isEmpty())
 				{
 					return 0;
 				}
@@ -225,12 +220,12 @@ public class TileEntityFermenter extends TileEntityInventory implements IHasGui,
 		}
 	}
 
-	public FluidTank getInputTank()
+	public Ic2FluidTank getInputTank()
 	{
 		return this.inputTank;
 	}
 
-	public FluidTank getOutputTank()
+	public Ic2FluidTank getOutputTank()
 	{
 		return this.outputTank;
 	}

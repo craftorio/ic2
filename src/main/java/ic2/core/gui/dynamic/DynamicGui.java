@@ -1,19 +1,17 @@
 package ic2.core.gui.dynamic;
 
-import com.google.common.base.Suppliers;
 import ic2.api.network.INetworkClientTileEntityEventListener;
 import ic2.core.ContainerBase;
-import ic2.core.GuiIC2;
 import ic2.core.IC2;
+import ic2.core.Ic2Gui;
 import ic2.core.block.IInventorySlotHolder;
-import ic2.core.block.TileEntityBlock;
 import ic2.core.block.comp.Energy;
 import ic2.core.block.comp.Fluids;
 import ic2.core.block.invslot.InvSlot;
+import ic2.core.block.tileentity.Ic2TileEntity;
 import ic2.core.gui.Button;
 import ic2.core.gui.CustomButton;
 import ic2.core.gui.EnergyGauge;
-import ic2.core.gui.FluidSlot;
 import ic2.core.gui.GuiDefaultBackground;
 import ic2.core.gui.GuiElement;
 import ic2.core.gui.IClickHandler;
@@ -22,38 +20,33 @@ import ic2.core.gui.LinkedGauge;
 import ic2.core.gui.MouseButton;
 import ic2.core.gui.RecipeButton;
 import ic2.core.gui.SlotGrid;
+import ic2.core.gui.TankFluidSlot;
 import ic2.core.gui.TankGauge;
-import ic2.core.gui.Text;
+import ic2.core.gui.TextLabel;
 import ic2.core.gui.VanillaButton;
 import ic2.core.item.tool.HandHeldInventory;
 import ic2.core.util.LogCategory;
 
 import java.util.Collections;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Inventory;
 
-public class DynamicGui<T extends ContainerBase<? extends IInventory>> extends GuiDefaultBackground<T>
+public class DynamicGui<T extends Container> extends GuiDefaultBackground<DynamicContainer<T>>
 {
-	public static <T extends IInventory> DynamicGui<ContainerBase<T>> create(T base, EntityPlayer player, GuiParser.GuiNode guiNode)
+	public static <T extends Container> DynamicGui<T> create(DynamicContainer<T> container, Inventory playerInventory, Component title)
 	{
-		DynamicContainer<T> container = DynamicContainer.create(base, player, guiNode);
-		return new DynamicGui(player, container, guiNode);
+		return new DynamicGui<>(container, playerInventory, title);
 	}
 
-	public static <T extends HandHeldInventory> DynamicGui<ContainerBase<T>> create(T base, EntityPlayer player, GuiParser.GuiNode guiNode)
+	protected DynamicGui(DynamicContainer<T> container, Inventory playerInventory, Component title)
 	{
-		DynamicHandHeldContainer<T> container = DynamicHandHeldContainer.create(base, player, guiNode);
-		return new DynamicGui(player, container, guiNode);
+		super(container, playerInventory, title, container.guiNode.width, container.guiNode.height);
+		this.initializeWidgets(playerInventory, container.guiNode);
 	}
 
-	protected DynamicGui(EntityPlayer player, T container, GuiParser.GuiNode guiNode)
-	{
-		super(container, guiNode.width, guiNode.height);
-		this.initializeWidgets(player, guiNode);
-	}
-
-	private void initializeWidgets(EntityPlayer player, GuiParser.ParentNode parentNode)
+	private void initializeWidgets(Inventory playerInventory, GuiParser.ParentNode parentNode)
 	{
 		for (GuiParser.Node rawNode : parentNode.getNodes())
 		{
@@ -74,10 +67,10 @@ public class DynamicGui<T extends ContainerBase<? extends IInventory>> extends G
 				{
 					GuiParser.ButtonNode node = (GuiParser.ButtonNode) rawNode;
 					if (node.type != GuiParser.ButtonNode.ButtonType.RECIPE
-						&& !(this.container.base instanceof INetworkClientTileEntityEventListener)
+						&& !(((DynamicContainer) this.menu).base instanceof INetworkClientTileEntityEventListener)
 						&& !this.isHandHeldGUI())
 					{
-						throw new RuntimeException("Invalid base " + this.container.base + " for button elements");
+						throw new RuntimeException("Invalid base " + ((DynamicContainer) this.menu).base + " for button elements");
 					}
 
 					Button<?> button = null;
@@ -101,14 +94,13 @@ public class DynamicGui<T extends ContainerBase<? extends IInventory>> extends G
 
 					if (button != null)
 					{
-						String text = node.text
-							.get(this.container.base, Collections.singletonMap("name", TextProvider.ofTranslated(this.container.base.getName())));
+						String text = node.text.get(((DynamicContainer) this.menu).base, Collections.singletonMap("name", TextProvider.of(this.f_96539_)));
 						if (node.icon == null)
 						{
 							button = button.withText(text);
 						} else
 						{
-							button.withIcon(Suppliers.ofInstance(node.icon));
+							button.withIcon(() -> node.icon);
 							button.withTooltip(text);
 						}
 
@@ -118,38 +110,39 @@ public class DynamicGui<T extends ContainerBase<? extends IInventory>> extends G
 				}
 				case energygauge:
 				{
-					if (!(this.container.base instanceof TileEntityBlock) || !((TileEntityBlock) this.container.base).hasComponent(Energy.class))
+					if (!(((DynamicContainer) this.menu).base instanceof Ic2TileEntity)
+						|| !((Ic2TileEntity) ((DynamicContainer) this.menu).base).hasComponent(Energy.class))
 					{
-						throw new RuntimeException("invalid base " + this.container.base + " for energygauge elements");
+						throw new RuntimeException("invalid base " + ((DynamicContainer) this.menu).base + " for energygauge elements");
 					}
 
 					GuiParser.EnergyGaugeNode node = (GuiParser.EnergyGaugeNode) rawNode;
-					parentNode.addElement(this, new EnergyGauge(this, node.x, node.y, (TileEntityBlock) this.container.base, node.style));
+					parentNode.addElement(this, new EnergyGauge(this, node.x, node.y, (Ic2TileEntity) ((DynamicContainer) this.menu).base, node.style));
 					break;
 				}
 				case gauge:
 				{
-					if (!(this.container.base instanceof IGuiValueProvider))
+					if (!(((DynamicContainer) this.menu).base instanceof IGuiValueProvider))
 					{
-						throw new RuntimeException("invalid base " + this.container.base + " for gauge elements");
+						throw new RuntimeException("invalid base " + ((DynamicContainer) this.menu).base + " for gauge elements");
 					}
 
 					GuiParser.GaugeNode node = (GuiParser.GaugeNode) rawNode;
 					final boolean isActiveLinked = node.activeLinked;
-					if (isActiveLinked && !(this.container.base instanceof IGuiValueProvider.IActiveGuiValueProvider))
+					if (isActiveLinked && !(((DynamicContainer) this.menu).base instanceof IGuiValueProvider.IActiveGuiValueProvider))
 					{
-						throw new RuntimeException("Invalid base " + this.container.base + " for active linked gauge elements");
+						throw new RuntimeException("Invalid base " + ((DynamicContainer) this.menu).base + " for active linked gauge elements");
 					}
 
 					parentNode.addElement(
 						this,
-						new LinkedGauge(this, node.x, node.y, (IGuiValueProvider) this.container.base, node.name, node.style)
+						new LinkedGauge(this, node.x, node.y, (IGuiValueProvider) ((DynamicContainer) this.menu).base, node.name, node.style)
 						{
 							@Override
 							protected boolean isActive(double ratio)
 							{
 								return isActiveLinked
-									? ((IGuiValueProvider.IActiveGuiValueProvider) DynamicGui.this.container.base).isGuiValueActive(this.name)
+									? ((IGuiValueProvider.IActiveGuiValueProvider) ((DynamicContainer) DynamicGui.this.menu).base).isGuiValueActive(this.name)
 									: super.isActive(ratio);
 							}
 						}
@@ -172,9 +165,7 @@ public class DynamicGui<T extends ContainerBase<? extends IInventory>> extends G
 					parentNode.addElement(this, new SlotGrid(this, node.x, node.y + node.hotbarOffset, 9, 1, node.style, 0, node.spacing));
 					if (node.showTitle)
 					{
-						parentNode.addElement(
-							this, Text.create(this, node.x + 1, node.y - 10, TextProvider.ofTranslated(player.inventory.getName()), 4210752, false)
-						);
+						parentNode.addElement(this, TextLabel.create(this, node.x + 1, node.y - 10, TextProvider.of(playerInventory.m_7755_()), 4210752, false));
 					}
 					break;
 				}
@@ -187,16 +178,16 @@ public class DynamicGui<T extends ContainerBase<? extends IInventory>> extends G
 				}
 				case slotgrid:
 				{
-					if (!(this.container.base instanceof IInventorySlotHolder))
+					if (!(((DynamicContainer) this.menu).base instanceof IInventorySlotHolder))
 					{
-						throw new RuntimeException("Invalid base " + this.container.base + " for slot elements");
+						throw new RuntimeException("Invalid base " + ((DynamicContainer) this.menu).base + " for slot elements");
 					}
 
 					GuiParser.SlotGridNode node = (GuiParser.SlotGridNode) rawNode;
-					InvSlot slot = ((IInventorySlotHolder) this.container.base).getInventorySlot(node.name);
+					InvSlot slot = ((IInventorySlotHolder) ((DynamicContainer) this.menu).base).getInventorySlot(node.name);
 					if (slot == null)
 					{
-						throw new RuntimeException("Invalid InvSlot name " + node.name + " for base " + this.container.base);
+						throw new RuntimeException("Invalid InvSlot name " + node.name + " for base " + ((DynamicContainer) this.menu).base);
 					}
 
 					int size = slot.size();
@@ -208,108 +199,71 @@ public class DynamicGui<T extends ContainerBase<? extends IInventory>> extends G
 					break;
 				}
 				case text:
-				{
-					GuiParser.TextNode nodex = (GuiParser.TextNode) rawNode;
-					int x;
-					switch (nodex.align)
-					{
-						case Start:
-							x = nodex.x;
-							break;
-						case Center:
-							x = nodex.x + this.xSize / 2;
-							break;
-						case End:
-							x = nodex.x + this.xSize;
-							break;
-						default:
-							throw new IllegalArgumentException("invalid alignment: " + nodex.align);
-					}
+					GuiParser.TextNode node = (GuiParser.TextNode) rawNode;
 
-					Text text;
-					if (nodex.rightAligned)
+					int var18 = switch (node.align)
 					{
-						text = Text.createRightAligned(
-							this,
-							x,
-							nodex.y,
-							nodex.width,
-							nodex.height,
-							nodex.text,
-							nodex.color,
-							nodex.shadow,
-							nodex.xOffset,
-							nodex.yOffset,
-							nodex.centerX,
-							nodex.centerY
+						case Start -> node.x;
+						case Center -> node.x + this.imageWidth / 2;
+						case End -> node.x + this.imageWidth;
+						default -> throw new IllegalArgumentException("invalid alignment: " + node.align);
+					};
+					TextLabel text;
+					if (node.rightAligned)
+					{
+						text = TextLabel.createRightAligned(
+							this, var18, node.y, node.width, node.height, node.text, node.color, node.shadow, node.xOffset, node.yOffset, node.centerX, node.centerY
 						);
 					} else
 					{
-						text = Text.create(
-							this,
-							x,
-							nodex.y,
-							nodex.width,
-							nodex.height,
-							nodex.text,
-							nodex.color,
-							nodex.shadow,
-							nodex.xOffset,
-							nodex.yOffset,
-							nodex.centerX,
-							nodex.centerY
+						text = TextLabel.create(
+							this, var18, node.y, node.width, node.height, node.text, node.color, node.shadow, node.xOffset, node.yOffset, node.centerX, node.centerY
 						);
 					}
 
 					parentNode.addElement(this, text);
 					break;
-				}
 				case fluidtank:
-				{
-					if (!(this.container.base instanceof TileEntityBlock) || !((TileEntityBlock) this.container.base).hasComponent(Fluids.class))
+					if (!(((DynamicContainer) this.menu).base instanceof Ic2TileEntity)
+						|| !((Ic2TileEntity) ((DynamicContainer) this.menu).base).hasComponent(Fluids.class))
 					{
-						throw new RuntimeException("invalid base " + this.container.base + " for tank elements");
+						throw new RuntimeException("invalid base " + ((DynamicContainer) this.menu).base + " for tank elements");
 					}
 
-					GuiParser.FluidTankNode nodex = (GuiParser.FluidTankNode) rawNode;
-					Fluids fluids = ((TileEntityBlock) this.container.base).getComponent(Fluids.class);
-					TankGauge tankGauge;
-					switch (nodex.type)
-					{
-						case NORMAL:
-							tankGauge = TankGauge.createNormal(this, nodex.x, nodex.y, fluids.getFluidTank(nodex.name));
-							break;
-						case PLAIN:
-							tankGauge = TankGauge.createPlain(this, nodex.x, nodex.y, nodex.width, nodex.height, fluids.getFluidTank(nodex.name));
-							break;
-						case BORDERLESS:
-							tankGauge = TankGauge.createBorderless(this, nodex.x, nodex.y, fluids.getFluidTank(nodex.name), nodex.mirrored);
-							break;
-						default:
-							throw new IllegalStateException("Unexpected type " + nodex.type);
-					}
+					GuiParser.FluidTankNode node = (GuiParser.FluidTankNode) rawNode;
+					Fluids fluids = ((Ic2TileEntity) ((DynamicContainer) this.menu).base).getComponent(Fluids.class);
 
-					parentNode.addElement(this, tankGauge);
+					parentNode.addElement(this, switch (node.type)
+					{
+						case NORMAL -> TankGauge.createNormal(this, node.x, node.y, fluids.getFluidTank(node.name));
+						case PLAIN ->
+							TankGauge.createPlain(this, node.x, node.y, node.width, node.height, fluids.getFluidTank(node.name));
+						case BORDERLESS ->
+							TankGauge.createBorderless(this, node.x, node.y, fluids.getFluidTank(node.name), node.mirrored);
+						default -> throw new IllegalStateException("Unexpected type " + node.type);
+					});
 					break;
-				}
 				case fluidslot:
 				{
-					if (!(this.container.base instanceof TileEntityBlock) || !((TileEntityBlock) this.container.base).hasComponent(Fluids.class))
+					if (!(((DynamicContainer) this.menu).base instanceof Ic2TileEntity)
+						|| !((Ic2TileEntity) ((DynamicContainer) this.menu).base).hasComponent(Fluids.class))
 					{
-						throw new RuntimeException("invalid base " + this.container.base + " for tank elements");
+						throw new RuntimeException("invalid base " + ((DynamicContainer) this.menu).base + " for tank elements");
 					}
 
 					GuiParser.FluidSlotNode node = (GuiParser.FluidSlotNode) rawNode;
 					parentNode.addElement(
 						this,
-						FluidSlot.createFluidSlot(this, node.x, node.y, ((TileEntityBlock) this.container.base).getComponent(Fluids.class).getFluidTank(node.name))
+						TankFluidSlot.createFluidSlot(
+							this, node.x, node.y, ((Ic2TileEntity) ((DynamicContainer) this.menu).base).getComponent(Fluids.class).getFluidTank(node.name)
+						)
 					);
 				}
 			}
 
 			if (rawNode instanceof GuiParser.ParentNode)
 			{
-				this.initializeWidgets(player, (GuiParser.ParentNode) rawNode);
+				this.initializeWidgets(playerInventory, (GuiParser.ParentNode) rawNode);
 			}
 		}
 	}
@@ -333,8 +287,8 @@ public class DynamicGui<T extends ContainerBase<? extends IInventory>> extends G
 				@Override
 				public void onClick(MouseButton button)
 				{
-					IC2.network.get(false).sendContainerEvent(DynamicGui.this.container, eventName);
-					((HandHeldInventory) DynamicGui.this.container.base).onEvent(eventName);
+					IC2.network.get(false).sendContainerEvent((ContainerBase<?>) DynamicGui.this.menu, eventName);
+					((HandHeldInventory) ((DynamicContainer) DynamicGui.this.menu).base).onEvent(eventName);
 				}
 			};
 		} else
@@ -346,7 +300,7 @@ public class DynamicGui<T extends ContainerBase<? extends IInventory>> extends G
 
 	protected boolean isHandHeldGUI()
 	{
-		return this.container.base instanceof HandHeldInventory;
+		return ((DynamicContainer) this.menu).base instanceof HandHeldInventory;
 	}
 
 	@Override

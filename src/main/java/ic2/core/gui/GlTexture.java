@@ -1,5 +1,7 @@
 package ic2.core.gui;
 
+import com.mojang.blaze3d.platform.TextureUtil;
+import com.mojang.blaze3d.systems.RenderSystem;
 import ic2.core.IC2;
 import ic2.core.util.LogCategory;
 
@@ -7,20 +9,22 @@ import java.awt.image.BufferedImage;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.Buffer;
+import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import javax.imageio.ImageIO;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GLAllocation;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.resources.IReloadableResourceManager;
-import net.minecraft.client.resources.IResource;
-import net.minecraft.client.resources.IResourceManager;
-import net.minecraft.client.resources.IResourceManagerReloadListener;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.PreparableReloadListener;
+import net.minecraft.server.packs.resources.ReloadableResourceManager;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.PreparableReloadListener.PreparationBarrier;
+import net.minecraft.util.profiling.ProfilerFiller;
 import org.lwjgl.opengl.GL11;
 
 public class GlTexture implements Closeable
@@ -35,24 +39,35 @@ public class GlTexture implements Closeable
 
 	public static void init()
 	{
-		IResourceManager manager = Minecraft.getMinecraft().getResourceManager();
-		if (manager instanceof IReloadableResourceManager)
+		ResourceManager manager = Minecraft.m_91087_().m_91098_();
+		if (manager instanceof ReloadableResourceManager)
 		{
-			((IReloadableResourceManager) manager).registerReloadListener(new IResourceManagerReloadListener()
-			{
-				public void onResourceManagerReload(IResourceManager manager)
-				{
-					for (GlTexture texture : GlTexture.textures.values())
+			((ReloadableResourceManager) manager)
+				.m_7217_(
+					new PreparableReloadListener()
 					{
-						if (texture != null)
+						public CompletableFuture<Void> m_5540_(
+							PreparationBarrier synchronizer,
+							ResourceManager managerx,
+							ProfilerFiller prepareProfiler,
+							ProfilerFiller applyProfiler,
+							Executor prepareExecutor,
+							Executor applyExecutor
+						)
 						{
-							texture.close();
+							for (GlTexture texture : GlTexture.textures.values())
+							{
+								if (texture != null)
+								{
+									texture.close();
+								}
+							}
+
+							GlTexture.textures.clear();
+							return CompletableFuture.completedFuture(null);
 						}
 					}
-
-					GlTexture.textures.clear();
-				}
-			});
+				);
 		} else
 		{
 			IC2.log.warn(LogCategory.General, "The resource manager {} is not reloadable.", manager);
@@ -69,7 +84,7 @@ public class GlTexture implements Closeable
 	{
 		try
 		{
-			texture.load(Minecraft.getMinecraft().getResourceManager());
+			texture.load(Minecraft.m_91087_().m_91098_());
 		} catch (IOException e)
 		{
 			IC2.log.warn(LogCategory.General, "Can't load texture %s", identifier);
@@ -86,11 +101,11 @@ public class GlTexture implements Closeable
 		this.loc = loc;
 	}
 
-	protected void load(IResourceManager manager) throws IOException
+	protected void load(ResourceManager manager) throws IOException
 	{
-		IResource resource = manager.getResource(this.loc);
+		Resource resource = manager.m_215593_(this.loc);
 
-		try (InputStream is = resource.getInputStream())
+		try (InputStream is = resource.m_215507_())
 		{
 			this.load(ImageIO.read(is));
 		}
@@ -102,12 +117,12 @@ public class GlTexture implements Closeable
 		this.height = img.getHeight();
 		this.canvasWidth = Integer.highestOneBit((this.width - 1) * 2);
 		this.canvasHeight = Integer.highestOneBit((this.height - 1) * 2);
-		this.textureId = GlStateManager.generateTexture();
-		IntBuffer buffer = GLAllocation.createDirectIntBuffer(this.canvasWidth * this.canvasHeight);
+		this.textureId = TextureUtil.m_85280_();
+		IntBuffer buffer = ByteBuffer.allocateDirect(this.canvasWidth * this.canvasHeight * 4).asIntBuffer();
 		int[] tmp = new int[this.canvasWidth * this.canvasHeight];
 		img.getRGB(0, 0, this.width, this.height, tmp, 0, this.canvasWidth);
 		buffer.put(tmp);
-		((Buffer) buffer).flip();
+		buffer.flip();
 		this.bind();
 		GL11.glTexParameteri(3553, 33085, 0);
 		GL11.glTexParameterf(3553, 33082, 0.0F);
@@ -124,7 +139,7 @@ public class GlTexture implements Closeable
 	{
 		if (this.textureId != 0)
 		{
-			GlStateManager.deleteTexture(this.textureId);
+			TextureUtil.m_85281_(this.textureId);
 			this.textureId = 0;
 		}
 	}
@@ -136,7 +151,7 @@ public class GlTexture implements Closeable
 			throw new IllegalStateException("uninitialized texture");
 		}
 
-		GlStateManager.bindTexture(this.textureId);
+		RenderSystem.m_69396_(this.textureId);
 	}
 
 	public int getWidth()

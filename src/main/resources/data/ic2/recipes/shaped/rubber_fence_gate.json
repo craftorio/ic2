@@ -1,0 +1,18 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "IPI",
+    "IPI"
+  ],
+  "key": {
+    "P": {
+      "item": "ic2:rubber_planks"
+    },
+    "I": {
+      "item": "minecraft:stick"
+    }
+  },
+  "result": {
+    "item": "ic2:rubber_fence_gate"
+  }
+}

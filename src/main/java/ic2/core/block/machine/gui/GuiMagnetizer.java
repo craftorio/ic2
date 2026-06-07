@@ -1,39 +1,39 @@
 package ic2.core.block.machine.gui;
 
-import ic2.core.GuiIC2;
-import ic2.core.block.BlockIC2Fence;
+import com.mojang.blaze3d.vertex.PoseStack;
+import ic2.core.Ic2Gui;
+import ic2.core.block.inherit.Ic2FenceBlock;
 import ic2.core.block.machine.container.ContainerMagnetizer;
 import ic2.core.gui.EnergyGauge;
 import ic2.core.init.Localization;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
 
-@SideOnly(Side.CLIENT)
-public class GuiMagnetizer extends GuiIC2<ContainerMagnetizer>
+public class GuiMagnetizer extends Ic2Gui<ContainerMagnetizer>
 {
-	public GuiMagnetizer(ContainerMagnetizer container)
+	public GuiMagnetizer(ContainerMagnetizer container, Inventory playerInventory, Component title)
 	{
-		super(container);
+		super(container, playerInventory, title);
 		this.addElement(EnergyGauge.asBolt(this, 11, 28, container.base));
 	}
 
 	@Override
 	protected ResourceLocation getTexture()
 	{
-		return new ResourceLocation("ic2", "textures/gui/GUIMagnetizer.png");
+		return ResourceLocation.fromNamespaceAndPath("ic2", "textures/gui/guimagnetizer.png");
 	}
 
 	@Override
-	protected void drawForegroundLayer(int mouseX, int mouseY)
+	protected void drawForegroundLayer(PoseStack matrices, int mouseX, int mouseY)
 	{
-		super.drawForegroundLayer(mouseX, mouseY);
-		if (BlockIC2Fence.hasMetalShoes(this.container.player))
+		super.drawForegroundLayer(matrices, mouseX, mouseY);
+		if (Ic2FenceBlock.hasMetalShoes(((ContainerMagnetizer) this.menu).getPlayer()))
 		{
-			this.fontRenderer.drawString(Localization.translate("ic2.Magnetizer.gui.hasMetalShoes"), 18, 66, 4259648);
+			this.drawString(matrices, 18, 66, Localization.translate("ic2.Magnetizer.gui.hasMetalShoes"), 4259648);
 		} else
 		{
-			this.fontRenderer.drawString(Localization.translate("ic2.Magnetizer.gui.noMetalShoes"), 18, 66, 16728128);
+			this.drawString(matrices, 18, 66, Localization.translate("ic2.Magnetizer.gui.noMetalShoes"), 16728128);
 		}
 	}
 }

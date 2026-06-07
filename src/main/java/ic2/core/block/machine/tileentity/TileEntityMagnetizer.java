@@ -7,34 +7,37 @@ import ic2.core.IHasGui;
 import ic2.core.block.comp.Redstone;
 import ic2.core.block.invslot.InvSlotUpgrade;
 import ic2.core.block.machine.container.ContainerMagnetizer;
-import ic2.core.block.machine.gui.GuiMagnetizer;
+import ic2.core.network.GrowingBuffer;
+import ic2.core.ref.Ic2BlockEntities;
 
 import java.util.EnumSet;
 import java.util.Set;
 
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class TileEntityMagnetizer extends TileEntityElectricMachine implements IHasGui, IUpgradableBlock
 {
-	public final InvSlotUpgrade upgradeSlot = new InvSlotUpgrade(this, "upgrade", 4);
+	public InvSlotUpgrade upgradeSlot = new InvSlotUpgrade(this, "upgrade", 4);
 	public static final int defaultMaxEnergy = 100;
 	public static final int defaultTier = 1;
 	private static final double boostEnergy = 2.0;
 	protected final Redstone redstone = this.addComponent(new Redstone(this));
 
-	public TileEntityMagnetizer()
+	public TileEntityMagnetizer(BlockPos pos, BlockState state)
 	{
-		super(100, 1);
+		super(Ic2BlockEntities.MAGNETIZER, pos, state, 100, 1);
 	}
 
 	@Override
-	public void markDirty()
+	public void setChanged()
 	{
-		super.markDirty();
-		if (!this.getWorld().isRemote)
+		super.setChanged();
+		Level world = this.getLevel();
+		if (world != null && !world.isClientSide)
 		{
 			this.setOverclockRates();
 		}
@@ -55,21 +58,15 @@ public class TileEntityMagnetizer extends TileEntityElectricMachine implements I
 	}
 
 	@Override
-	public ContainerBase<?> getGuiContainer(EntityPlayer player)
+	public ContainerBase<?> createServerScreenHandler(int syncId, Player player)
 	{
-		return new ContainerMagnetizer(player, this);
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
-	{
-		return new GuiMagnetizer(new ContainerMagnetizer(player, this));
+		return new ContainerMagnetizer(syncId, player.getInventory(), this);
 	}
 
 	@Override
-	public void onGuiClosed(EntityPlayer player)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
+		return new ContainerMagnetizer(syncId, inventory, this);
 	}
 
 	@Override

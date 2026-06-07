@@ -8,8 +8,8 @@ import ic2.core.energy.grid.NodeLink;
 
 import java.util.List;
 
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 
 class EnergyPath
 {
@@ -17,7 +17,7 @@ class EnergyPath
 	final Node target;
 	final List<Node> conductors;
 	final double loss;
-	final EnumFacing targetDirection;
+	final Direction targetDirection;
 	final double minEffectEnergy;
 	final double minInsulationEnergyAbsorption;
 	final double minInsulationBreakdownEnergy;

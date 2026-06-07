@@ -1,21 +1,22 @@
 package ic2.core.block.machine.container;
 
 import ic2.core.block.machine.tileentity.TileEntityElectrolyzer;
+import ic2.core.ref.Ic2ScreenHandlers;
 import ic2.core.slot.SlotInvSlot;
 
 import java.util.List;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.entity.player.Inventory;
 
 public class ContainerElectrolyzer extends ContainerElectricMachine<TileEntityElectrolyzer>
 {
-	public ContainerElectrolyzer(EntityPlayer player, TileEntityElectrolyzer tileEntity)
+	public ContainerElectrolyzer(int syncId, Inventory playerInventory, TileEntityElectrolyzer tileEntity)
 	{
-		super(player, tileEntity, 166, 8, 62);
+		super(Ic2ScreenHandlers.ELECTROLYZER, syncId, playerInventory, tileEntity, 166, 8, 62);
 
 		for (int i = 0; i < 4; i++)
 		{
-			this.addSlotToContainer(new SlotInvSlot(tileEntity.upgradeSlot, i, 152, 8 + i * 18));
+			this.m_38897_(new SlotInvSlot(tileEntity.upgradeSlot, i, 152, 8 + i * 18));
 		}
 	}
 

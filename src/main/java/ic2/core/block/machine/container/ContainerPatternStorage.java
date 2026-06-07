@@ -2,18 +2,19 @@ package ic2.core.block.machine.container;
 
 import ic2.core.ContainerFullInv;
 import ic2.core.block.machine.tileentity.TileEntityPatternStorage;
+import ic2.core.ref.Ic2ScreenHandlers;
 import ic2.core.slot.SlotInvSlot;
 
 import java.util.List;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.entity.player.Inventory;
 
 public class ContainerPatternStorage extends ContainerFullInv<TileEntityPatternStorage>
 {
-	public ContainerPatternStorage(EntityPlayer player, TileEntityPatternStorage tileEntity1)
+	public ContainerPatternStorage(int syncId, Inventory playerInventory, TileEntityPatternStorage be)
 	{
-		super(player, tileEntity1, 166);
-		this.addSlotToContainer(new SlotInvSlot(tileEntity1.diskSlot, 0, 18, 20));
+		super(Ic2ScreenHandlers.PATTERN_STORAGE, syncId, playerInventory, be, 166);
+		this.m_38897_(new SlotInvSlot(be.diskSlot, 0, 18, 20));
 	}
 
 	@Override

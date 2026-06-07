@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:ic2/build_generator/root",
+  "display": {
+    "icon": {
+      "item": "ic2:drill"
+    },
+    "title": {
+      "translate": "advancements.ic2.buildDrill"
+    },
+    "description": {
+      "translate": "advancements.ic2.buildDrill.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "ic2:drill": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:drill"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "ic2:drill"
+    ]
+  ]
+}

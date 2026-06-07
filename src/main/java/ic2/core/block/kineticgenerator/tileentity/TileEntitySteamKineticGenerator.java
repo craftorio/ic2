@@ -4,49 +4,48 @@ import ic2.api.energy.tile.IKineticSource;
 import ic2.api.upgrade.IUpgradableBlock;
 import ic2.api.upgrade.UpgradableProperty;
 import ic2.core.ContainerBase;
-import ic2.core.ExplosionIC2;
 import ic2.core.IC2;
 import ic2.core.IHasGui;
-import ic2.core.block.TileEntityInventory;
+import ic2.core.Ic2Explosion;
 import ic2.core.block.comp.Fluids;
 import ic2.core.block.invslot.InvSlotConsumable;
 import ic2.core.block.invslot.InvSlotConsumableItemStack;
 import ic2.core.block.invslot.InvSlotUpgrade;
 import ic2.core.block.kineticgenerator.container.ContainerSteamKineticGenerator;
-import ic2.core.block.kineticgenerator.gui.GuiSteamKineticGenerator;
 import ic2.core.block.machine.tileentity.TileEntityCondenser;
+import ic2.core.block.tileentity.TileEntityInventory;
+import ic2.core.fluid.Ic2FluidStack;
+import ic2.core.fluid.Ic2FluidTank;
 import ic2.core.init.MainConfig;
-import ic2.core.item.type.CraftingItemType;
+import ic2.core.network.GrowingBuffer;
 import ic2.core.profile.NotClassic;
-import ic2.core.ref.FluidName;
-import ic2.core.ref.ItemName;
+import ic2.core.ref.Ic2BlockEntities;
+import ic2.core.ref.Ic2Fluids;
+import ic2.core.ref.Ic2Items;
 import ic2.core.util.ConfigUtil;
 import ic2.core.util.LiquidUtil;
+import ic2.core.util.Util;
 
 import java.util.EnumSet;
 import java.util.Set;
 
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.world.World;
-import net.minecraftforge.fluids.FluidRegistry;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidTank;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 @NotClassic
 public class TileEntitySteamKineticGenerator extends TileEntityInventory implements IKineticSource, IHasGui, IUpgradableBlock
 {
-	protected final FluidTank steamTank;
-	protected final FluidTank distilledWaterTank;
+	protected final Ic2FluidTank steamTank;
+	protected final Ic2FluidTank distilledWaterTank;
 	public final InvSlotUpgrade upgradeSlot = new InvSlotUpgrade(this, "upgrade", 1);
-	public final InvSlotConsumable turbineSlot = new InvSlotConsumableItemStack(
-		this, "Turbineslot", 1, ItemName.crafting.getItemStack(CraftingItemType.steam_turbine)
-	);
+	public final InvSlotConsumable turbineSlot = new InvSlotConsumableItemStack(this, "Turbineslot", 1, new ItemStack(Ic2Items.STEAM_TURBINE));
 	private static final float outputModifier = ConfigUtil.getFloat(MainConfig.get(), "balance/energy/kineticgenerator/steam");
 	private int kUoutput;
 	private boolean ventingSteam;
@@ -56,14 +55,14 @@ public class TileEntitySteamKineticGenerator extends TileEntityInventory impleme
 	private int updateTicker = IC2.random.nextInt(this.getTickRate());
 	protected final Fluids fluids;
 
-	public TileEntitySteamKineticGenerator()
+	public TileEntitySteamKineticGenerator(BlockPos pos, BlockState state)
 	{
+		super(Ic2BlockEntities.STEAM_KINETIC_GENERATOR, pos, state);
 		this.turbineSlot.setStackSizeLimit(1);
 		this.fluids = this.addComponent(new Fluids(this));
-		this.steamTank = this.fluids
-			.addTankInsert("steamTank", 21000, Fluids.fluidPredicate(FluidName.steam.getInstance(), FluidName.superheated_steam.getInstance()));
+		this.steamTank = this.fluids.addTankInsert("steamTank", 21000, Fluids.fluidPredicate(Ic2Fluids.STEAM.still, Ic2Fluids.SUPERHEATED_STEAM.still));
 		this.distilledWaterTank = this.fluids
-			.addTank("distilledWaterTank", 1000, Fluids.fluidPredicate(FluidName.distilled_water.getInstance(), FluidRegistry.WATER));
+			.addTank("distilledWaterTank", 1000, Fluids.fluidPredicate(Ic2Fluids.DISTILLED_WATER.still, net.minecraft.world.level.material.Fluids.f_76193_));
 	}
 
 	@Override
@@ -84,7 +83,7 @@ public class TileEntitySteamKineticGenerator extends TileEntityInventory impleme
 				needsInvUpdate = true;
 			}
 
-			boolean hotSteam = this.steamTank.getFluid().getFluid() == FluidName.superheated_steam.getInstance();
+			boolean hotSteam = this.steamTank.hasExactFluid(Ic2Fluids.SUPERHEATED_STEAM.still);
 			boolean turbineDoneWork = this.turbineDoWork(hotSteam);
 			if (this.updateTicker++ >= this.getTickRate())
 			{
@@ -105,7 +104,7 @@ public class TileEntitySteamKineticGenerator extends TileEntityInventory impleme
 		needsInvUpdate |= this.upgradeSlot.tickNoMark();
 		if (needsInvUpdate)
 		{
-			super.markDirty();
+			super.setChanged();
 		}
 	}
 
@@ -113,7 +112,7 @@ public class TileEntitySteamKineticGenerator extends TileEntityInventory impleme
 	{
 		int amount = this.steamTank.getFluidAmount();
 		assert amount > 0;
-		this.steamTank.drainInternal(amount, true);
+		this.steamTank.drainMbUnchecked(amount, false);
 		int KUWorkbuffer = amount * 2 * (hotSteam ? 2 : 1);
 		if (hotSteam)
 		{
@@ -146,10 +145,10 @@ public class TileEntitySteamKineticGenerator extends TileEntityInventory impleme
 		this.kUoutput = (int) (rawOutput * throttle * outputModifier);
 		if (this.condensationProgress >= 100)
 		{
-			if (this.distilledWaterTank.fillInternal(new FluidStack(FluidName.distilled_water.getInstance(), 1), false) == 1)
+			if (this.distilledWaterTank.fillMbUnchecked(Ic2FluidStack.create(Ic2Fluids.DISTILLED_WATER.still, 1), true) == 1)
 			{
 				this.condensationProgress -= 100;
-				this.distilledWaterTank.fillInternal(new FluidStack(FluidName.distilled_water.getInstance(), 1), true);
+				this.distilledWaterTank.fillMbUnchecked(Ic2FluidStack.create(Ic2Fluids.DISTILLED_WATER.still, 1), false);
 			} else
 			{
 				this.isTurbineFilledWithWater = true;
@@ -161,14 +160,14 @@ public class TileEntitySteamKineticGenerator extends TileEntityInventory impleme
 
 	private void outputSteam(int amount, boolean hotSteam)
 	{
-		World world = this.getWorld();
+		Level world = this.getLevel();
 
-		for (EnumFacing dir : EnumFacing.VALUES)
+		for (Direction dir : Util.ALL_DIRS)
 		{
-			TileEntity te = world.getTileEntity(this.pos.offset(dir));
+			BlockEntity te = world.getBlockEntity(this.worldPosition.relative(dir));
 			if (te instanceof TileEntityCondenser || hotSteam && te instanceof TileEntitySteamKineticGenerator)
 			{
-				int transAmount = LiquidUtil.fillTile(te, dir.getOpposite(), new FluidStack(FluidName.steam.getInstance(), amount), false);
+				int transAmount = LiquidUtil.fillTile(te, dir.m_122424_(), Ic2FluidStack.create(Ic2Fluids.STEAM.still, amount), false);
 				if (transAmount > 0)
 				{
 					amount -= transAmount;
@@ -183,9 +182,9 @@ public class TileEntitySteamKineticGenerator extends TileEntityInventory impleme
 		if (amount > 0)
 		{
 			this.ventingSteam = true;
-			if (world.rand.nextInt(10) == 0)
+			if (world.random.nextInt(10) == 0)
 			{
-				new ExplosionIC2(world, null, this.pos, 1, 1.0F, ExplosionIC2.Type.Heat).doExplosion();
+				new Ic2Explosion(world, null, this.worldPosition, 1, 1.0F, Ic2Explosion.Type.Heat).doExplosion();
 			}
 		} else
 		{
@@ -199,60 +198,53 @@ public class TileEntitySteamKineticGenerator extends TileEntityInventory impleme
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound nbt)
+	public void load(CompoundTag nbt)
 	{
-		super.readFromNBT(nbt);
-		this.condensationProgress = nbt.getInteger("condensationprogress");
+		super.load(nbt);
+		this.condensationProgress = nbt.getInt("condensationprogress");
 	}
 
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
+	public void saveAdditional(CompoundTag nbt)
 	{
-		super.writeToNBT(nbt);
-		nbt.setInteger("condensationprogress", this.condensationProgress);
-		return nbt;
+		super.saveAdditional(nbt);
+		nbt.putInt("condensationprogress", this.condensationProgress);
 	}
 
 	@Override
-	public ContainerBase<TileEntitySteamKineticGenerator> getGuiContainer(EntityPlayer player)
+	public ContainerBase<TileEntitySteamKineticGenerator> createServerScreenHandler(int syncId, Player player)
 	{
-		return new ContainerSteamKineticGenerator(player, this);
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
-	{
-		return new GuiSteamKineticGenerator(new ContainerSteamKineticGenerator(player, this));
+		return new ContainerSteamKineticGenerator(syncId, player.getInventory(), this);
 	}
 
 	@Override
-	public int maxrequestkineticenergyTick(EnumFacing directionFrom)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
+	{
+		return new ContainerSteamKineticGenerator(syncId, inventory, this);
+	}
+
+	@Override
+	public int maxrequestkineticenergyTick(Direction directionFrom)
 	{
 		return this.getConnectionBandwidth(directionFrom);
 	}
 
 	@Override
-	public int getConnectionBandwidth(EnumFacing side)
+	public int getConnectionBandwidth(Direction side)
 	{
 		return side == this.getFacing() ? this.kUoutput : 0;
 	}
 
 	@Override
-	public int requestkineticenergy(EnumFacing directionFrom, int requestkineticenergy)
+	public int requestkineticenergy(Direction directionFrom, int requestkineticenergy)
 	{
 		return this.drawKineticEnergy(directionFrom, requestkineticenergy, false);
 	}
 
 	@Override
-	public int drawKineticEnergy(EnumFacing side, int request, boolean simulate)
+	public int drawKineticEnergy(Direction side, int request, boolean simulate)
 	{
 		return side == this.getFacing() ? this.kUoutput : 0;
-	}
-
-	@Override
-	public void onGuiClosed(EntityPlayer player)
-	{
 	}
 
 	public int gaugeLiquidScaled(int i, int tank)
@@ -279,7 +271,7 @@ public class TileEntitySteamKineticGenerator extends TileEntityInventory impleme
 		return this.distilledWaterTank.getFluidAmount();
 	}
 
-	public FluidTank getDistilledWaterTank()
+	public Ic2FluidTank getDistilledWaterTank()
 	{
 		return this.distilledWaterTank;
 	}

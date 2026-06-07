@@ -1,31 +1,31 @@
 package ic2.core.item.reactor;
 
 import ic2.api.reactor.IReactor;
-import ic2.core.ref.ItemName;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item.Properties;
 
 public class ItemReactorCondensator extends AbstractDamageableReactorComponent
 {
-	public ItemReactorCondensator(ItemName name, int maxdmg)
+	public ItemReactorCondensator(Properties settings, int maxdmg)
 	{
-		super(name, maxdmg);
+		super(settings, maxdmg);
 	}
 
 	@Override
 	public boolean canStoreHeat(ItemStack stack, IReactor reactor, int x, int y)
 	{
-		return this.getCurrentHeat(stack) < this.getMaxCustomDamage(stack);
+		return this.getCurrentHeat(stack) < this.getMaxHeat(stack, reactor, x, y);
 	}
 
 	@Override
 	public int getMaxHeat(ItemStack stack, IReactor reactor, int x, int y)
 	{
-		return this.getMaxCustomDamage(stack);
+		return this.getMaxUse();
 	}
 
 	private int getCurrentHeat(ItemStack stack)
 	{
-		return this.getCustomDamage(stack);
+		return this.getUse(stack);
 	}
 
 	@Override
@@ -39,7 +39,7 @@ public class ItemReactorCondensator extends AbstractDamageableReactorComponent
 		int currentHeat = this.getCurrentHeat(stack);
 		int amount = Math.min(heat, this.getMaxHeat(stack, reactor, x, y) - currentHeat);
 		heat -= amount;
-		this.setCustomDamage(stack, currentHeat + amount);
+		this.setUse(stack, currentHeat + amount);
 		return heat;
 	}
 }

@@ -1,51 +1,43 @@
 package ic2.core.recipe;
 
-import com.google.common.collect.Iterables;
 import ic2.api.recipe.IMachineRecipeManager;
 import ic2.api.recipe.IRecipeInput;
 import ic2.api.recipe.MachineRecipe;
 import ic2.api.recipe.MachineRecipeResult;
 import ic2.api.recipe.Recipes;
+import ic2.core.IC2;
 import ic2.core.util.StackUtil;
 
 import java.util.Collection;
 import java.util.Collections;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.FurnaceRecipes;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.SmeltingRecipe;
 
 public class SmeltingRecipeManager implements IMachineRecipeManager<ItemStack, ItemStack, ItemStack>
 {
-	public boolean addRecipe(ItemStack input, ItemStack output, NBTTagCompound metadata, boolean replace)
-	{
-		FurnaceRecipes recipes = FurnaceRecipes.instance();
-		if (!StackUtil.isEmpty(recipes.getSmeltingResult(input)) && !replace)
-		{
-			return false;
-		}
-
-		float experience = metadata != null && metadata.hasKey("experience") ? metadata.getFloat("experience") : 0.0F;
-		if (experience < 0.0F)
-		{
-			throw new IllegalArgumentException("Negative xp for " + StackUtil.toStringSafe(input) + " -> " + StackUtil.toStringSafe(output));
-		}
-
-		recipes.addSmeltingRecipe(input, output, experience);
-		return true;
-	}
-
 	public MachineRecipeResult<ItemStack, ItemStack, ItemStack> apply(ItemStack input, boolean acceptTest)
 	{
-		FurnaceRecipes recipes = FurnaceRecipes.instance();
-		ItemStack output = recipes.getSmeltingResult(input);
+		SmeltingRecipe recipe = (SmeltingRecipe) IC2.sideProxy
+			.getRecipeManager()
+			.m_44015_(RecipeType.f_44108_, new SimpleContainer(new ItemStack[] { input }), null)
+			.orElse(null);
+		if (recipe == null)
+		{
+			return null;
+		}
+
+		ItemStack output = recipe.m_8043_();
 		if (StackUtil.isEmpty(output))
 		{
 			return null;
 		}
 
-		NBTTagCompound nbt = new NBTTagCompound();
-		nbt.setFloat("experience", recipes.getSmeltingExperience(output) * StackUtil.getSize(output));
+		CompoundTag nbt = new CompoundTag();
+		nbt.m_128350_("experience", recipe.m_43750_() * StackUtil.getSize(output));
 		return new MachineRecipe<>(input, output, nbt).getResult(StackUtil.copyShrunk(input, 1));
 	}
 
@@ -65,19 +57,6 @@ public class SmeltingRecipeManager implements IMachineRecipeManager<ItemStack, I
 	{
 		INSTANCE;
 
-		public boolean addRecipe(IRecipeInput input, Collection<ItemStack> output, NBTTagCompound metadata, boolean replace)
-		{
-			ItemStack realOutput = (ItemStack) Iterables.getOnlyElement(output);
-			boolean ret = false;
-
-			for (ItemStack stack : input.getInputs())
-			{
-				ret |= Recipes.furnace.addRecipe(stack, realOutput, metadata, replace);
-			}
-
-			return ret;
-		}
-
 		public MachineRecipeResult<IRecipeInput, Collection<ItemStack>, ItemStack> apply(ItemStack input, boolean acceptTest)
 		{
 			MachineRecipeResult<ItemStack, ItemStack, ItemStack> normal = Recipes.furnace.apply(input, acceptTest);
@@ -89,7 +68,7 @@ public class SmeltingRecipeManager implements IMachineRecipeManager<ItemStack, I
 			MachineRecipe<ItemStack, ItemStack> result = normal.getRecipe();
 			IRecipeInput resultIn = Recipes.inputFactory.forStack(result.getInput());
 			Collection<ItemStack> resultOut = Collections.singletonList(result.getOutput());
-			NBTTagCompound resultNBT = result.getMetaData();
+			CompoundTag resultNBT = result.getMetaData();
 			return new MachineRecipe<>(resultIn, resultOut, resultNBT).getResult(normal.getAdjustedInput());
 		}
 

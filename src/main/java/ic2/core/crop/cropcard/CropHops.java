@@ -2,17 +2,24 @@ package ic2.core.crop.cropcard;
 
 import ic2.api.crops.CropProperties;
 import ic2.api.crops.ICropTile;
-import ic2.core.crop.IC2CropCard;
-import ic2.core.item.type.CropResItemType;
-import ic2.core.ref.ItemName;
-import net.minecraft.item.ItemStack;
+import ic2.api.crops.ICropType;
+import ic2.core.crop.Ic2CropCard;
+import ic2.core.ref.Ic2Blocks;
+import ic2.core.ref.Ic2Items;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
 
-public class CropHops extends IC2CropCard
+public class CropHops extends Ic2CropCard
 {
-	@Override
-	public String getId()
+	public CropHops(ICropType cropType)
 	{
-		return "hops";
+		super(cropType);
+	}
+
+	@Override
+	public Block getCropBlock()
+	{
+		return Ic2Blocks.HOPS_CROP;
 	}
 
 	@Override
@@ -28,12 +35,6 @@ public class CropHops extends IC2CropCard
 	}
 
 	@Override
-	public int getMaxSize()
-	{
-		return 7;
-	}
-
-	@Override
 	public int getGrowthDuration(ICropTile crop)
 	{
 		return 600;
@@ -42,18 +43,18 @@ public class CropHops extends IC2CropCard
 	@Override
 	public boolean canGrow(ICropTile crop)
 	{
-		return crop.getCurrentSize() < 7 && crop.getLightLevel() >= 9;
+		return crop.getCurrentAge() < this.getMaxAge() && crop.getLightLevel() >= 9;
 	}
 
 	@Override
 	public ItemStack getGain(ICropTile crop)
 	{
-		return ItemName.crop_res.getItemStack(CropResItemType.hops);
+		return new ItemStack(Ic2Items.HOPS);
 	}
 
 	@Override
-	public int getSizeAfterHarvest(ICropTile crop)
+	public int getAgeAfterHarvest(ICropTile crop)
 	{
-		return 3;
+		return 2;
 	}
 }

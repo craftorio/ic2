@@ -1,0 +1,16 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "RRR",
+    "RRR"
+  ],
+  "key": {
+    "R": {
+      "item": "ic2:rubber"
+    }
+  },
+  "result": {
+    "item": "ic2:rubber_sheet",
+    "count": 3
+  }
+}

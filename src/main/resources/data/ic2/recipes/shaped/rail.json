@@ -1,0 +1,21 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "B B",
+    "BsB",
+    "B B"
+  ],
+  "key": {
+    "B": {
+      "tag": "forge:ingots/bronze"
+    },
+    "s": {
+      "item": "minecraft:stick"
+    }
+  },
+  "hidden": true,
+  "result": {
+    "item": "minecraft:rail",
+    "count": 8
+  }
+}

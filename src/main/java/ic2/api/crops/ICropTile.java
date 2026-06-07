@@ -4,11 +4,12 @@ import ic2.api.info.ILocatable;
 
 import java.util.List;
 
-import net.minecraft.block.Block;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 
 public interface ICropTile extends ILocatable
 {
@@ -16,9 +17,9 @@ public interface ICropTile extends ILocatable
 
 	void setCrop(CropCard var1);
 
-	int getCurrentSize();
+	int getCurrentAge();
 
-	void setCurrentSize(int var1);
+	void setCurrentAge(int var1);
 
 	int getStatGrowth();
 
@@ -56,7 +57,7 @@ public interface ICropTile extends ILocatable
 
 	void setCrossingBase(boolean var1);
 
-	NBTTagCompound getCustomData();
+	CompoundTag getCustomData();
 
 	int getTerrainHumidity();
 
@@ -65,7 +66,7 @@ public interface ICropTile extends ILocatable
 	int getTerrainAirQuality();
 
 	@Deprecated
-	World getWorld();
+	Level getWorld();
 
 	@Deprecated
 	BlockPos getLocation();
@@ -84,7 +85,7 @@ public interface ICropTile extends ILocatable
 
 	boolean isBlockBelow(Block var1);
 
-	boolean isBlockBelow(String var1);
+	boolean isBlockBelow(TagKey<Block> var1);
 
 	ItemStack generateSeeds(CropCard var1, int var2, int var3, int var4, int var5);
 }

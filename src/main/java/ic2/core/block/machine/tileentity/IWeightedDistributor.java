@@ -2,17 +2,14 @@ package ic2.core.block.machine.tileentity;
 
 import java.util.List;
 
-import net.minecraft.inventory.IInventory;
-import net.minecraft.util.EnumFacing;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.Direction;
+import net.minecraft.world.Container;
 
-public interface IWeightedDistributor extends IInventory
+public interface IWeightedDistributor extends Container
 {
-	EnumFacing getFacing();
+	Direction getFacing();
 
-	@SideOnly(Side.CLIENT)
-	List<EnumFacing> getPriority();
+	List<Direction> getPriority();
 
 	void updatePriority(boolean var1);
 }

@@ -1,0 +1,15 @@
+{
+  "type": "ic2:centrifuge",
+  "ingredient": {
+    "item": "ic2:purified_iron"
+  },
+  "result": [
+    {
+      "item": "ic2:iron_dust"
+    },
+    {
+      "item": "ic2:small_gold_dust"
+    }
+  ],
+  "minHeat": 1500
+}

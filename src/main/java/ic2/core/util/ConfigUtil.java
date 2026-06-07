@@ -3,8 +3,6 @@ package ic2.core.util;
 import ic2.api.recipe.IRecipeInput;
 import ic2.api.recipe.Recipes;
 import ic2.core.IC2;
-import ic2.core.ref.IMultiBlock;
-import ic2.core.ref.IMultiItem;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -12,10 +10,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.material.Fluid;
 
 public class ConfigUtil
 {
@@ -199,7 +197,7 @@ public class ConfigUtil
 
 	private static ItemStack asStack(String str, boolean checkAmount) throws ParseException
 	{
-		String[] parts = str.split("(?=(@|#|\\*))");
+		String[] parts = str.split("(?=(\\*))");
 		String itemName = parts[0];
 		Item item = Util.getItem(itemName);
 		if (item == null)
@@ -213,31 +211,7 @@ public class ConfigUtil
 		for (int i = 1; i < parts.length; i++)
 		{
 			String tmp = parts[i];
-			if (tmp.startsWith("@"))
-			{
-				if (i + 1 < parts.length && parts[i + 1].equals("*"))
-				{
-					stack = new ItemStack(item, 1, 32767);
-					i++;
-				} else
-				{
-					stack = new ItemStack(item, 1, Integer.parseInt(tmp.substring(1)));
-				}
-			} else if (tmp.startsWith("#"))
-			{
-				if (item instanceof IMultiItem)
-				{
-					stack = ((IMultiItem) item).getItemStack(tmp.substring(1));
-				} else
-				{
-					if (!(item instanceof ItemBlock) || !(((ItemBlock) item).getBlock() instanceof IMultiBlock))
-					{
-						throw new ParseException("# is not supported on non-IC2-Items: " + str, 0);
-					}
-
-					stack = ((IMultiBlock) ((ItemBlock) item).getBlock()).getItemStack(tmp.substring(1));
-				}
-			} else if (tmp.startsWith("*"))
+			if (tmp.startsWith("*"))
 			{
 				if (!checkAmount)
 				{
@@ -279,28 +253,6 @@ public class ConfigUtil
 			ret = ret + "*" + StackUtil.getSize(stack);
 		}
 
-		if (stack.getItem() instanceof IMultiItem)
-		{
-			String variant = ((IMultiItem) stack.getItem()).getVariant(stack);
-			if (variant != null)
-			{
-				ret = ret + "#" + variant;
-			}
-		} else if (stack.getItem() instanceof ItemBlock && ((ItemBlock) stack.getItem()).getBlock() instanceof IMultiBlock)
-		{
-			String variant = ((IMultiBlock) ((ItemBlock) stack.getItem()).getBlock()).getVariant(stack);
-			if (variant != null)
-			{
-				ret = ret + "#" + variant;
-			}
-		} else if (stack.getItemDamage() == 32767)
-		{
-			ret = ret + "@*";
-		} else if (stack.getItemDamage() != 0)
-		{
-			ret = ret + "@" + stack.getItemDamage();
-		}
-
 		return ret;
 	}
 
@@ -322,31 +274,20 @@ public class ConfigUtil
 
 	private static IRecipeInput asRecipeInput(String str, boolean checkAmount) throws ParseException
 	{
-		String[] parts = str.split("(?=(@|#|\\*))");
+		String[] parts = str.split("(?=(\\*))");
 		String itemName = parts[0];
-		if (!itemName.startsWith("OreDict:") && !itemName.startsWith("Fluid:"))
+		if (!itemName.startsWith("Tag:") && !itemName.startsWith("Fluid:"))
 		{
 			ItemStack stack = asStack(str, checkAmount);
 			return stack == null ? null : Recipes.inputFactory.forStack(stack);
 		}
 
 		Integer amount = null;
-		Integer meta = null;
 
 		for (int i = 1; i < parts.length; i++)
 		{
 			String tmp = parts[i];
-			if (tmp.startsWith("@"))
-			{
-				if (i + 1 < parts.length && parts[i + 1].equals("*"))
-				{
-					meta = 32767;
-					i++;
-				} else
-				{
-					meta = Integer.parseInt(tmp.substring(1));
-				}
-			} else if (tmp.startsWith("*"))
+			if (tmp.startsWith("*"))
 			{
 				if (!checkAmount)
 				{
@@ -357,16 +298,14 @@ public class ConfigUtil
 			}
 		}
 
-		if (itemName.startsWith("OreDict:"))
+		if (itemName.startsWith("Tag:"))
 		{
 			if (amount == null)
 			{
 				amount = 1;
 			}
 
-			return meta == null
-				? Recipes.inputFactory.forOreDict(itemName.substring("OreDict:".length()), amount)
-				: Recipes.inputFactory.forOreDict(itemName.substring("OreDict:".length()), amount, meta);
+			return Recipes.inputFactory.forTag(itemName.substring("Tag:".length()), amount);
 		} else if (itemName.startsWith("Fluid:"))
 		{
 			if (amount == null)
@@ -374,7 +313,9 @@ public class ConfigUtil
 				amount = 1000;
 			}
 
-			return Recipes.inputFactory.forFluidContainer(FluidRegistry.getFluid(itemName.substring("Fluid:".length())), amount);
+			ResourceLocation id = ResourceLocation.fromNamespaceAndPath(itemName.substring("Fluid:".length()));
+			Fluid fluid = Util.getFluid(id);
+			return fluid == null ? null : Recipes.inputFactory.forFluidContainer(fluid, amount);
 		} else
 		{
 			return null;
@@ -393,7 +334,7 @@ public class ConfigUtil
 
 	private static void displayError(Config.ParseException e, String key)
 	{
-		IC2.platform
+		IC2.sideProxy
 			.displayError(
 				"The IC2 config file contains an invalid entry for %s.\n\n%s%s",
 				key,

@@ -1,15 +1,15 @@
 package ic2.core.energy;
 
-import net.minecraft.util.EnumFacing;
+import net.minecraft.core.Direction;
 
 class Change
 {
 	Node node;
-	final EnumFacing dir;
+	final Direction dir;
 	private double amount;
 	private double voltage;
 
-	Change(Node node, EnumFacing dir, double amount, double voltage)
+	Change(Node node, Direction dir, double amount, double voltage)
 	{
 		this.node = node;
 		this.dir = dir;

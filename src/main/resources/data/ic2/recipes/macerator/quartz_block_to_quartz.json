@@ -1,0 +1,10 @@
+{
+  "type": "ic2:macerator",
+  "ingredient": {
+    "item": "minecraft:quartz_block"
+  },
+  "result": {
+    "item": "minecraft:quartz",
+    "count": 4
+  }
+}

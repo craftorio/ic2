@@ -2,23 +2,24 @@ package ic2.core.crop.cropcard;
 
 import ic2.api.crops.CropProperties;
 import ic2.api.crops.ICropTile;
+import ic2.api.crops.ICropType;
 import ic2.core.crop.CropVanilla;
-import net.minecraft.block.BlockCrops;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
+import ic2.core.ref.Ic2Blocks;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
 
 public class CropWheat extends CropVanilla
 {
-	public CropWheat()
+	public CropWheat(ICropType cropType)
 	{
-		super((BlockCrops) Blocks.WHEAT);
+		super(cropType);
 	}
 
 	@Override
-	public String getId()
+	public Block getCropBlock()
 	{
-		return "wheat";
+		return Ic2Blocks.WHEAT_CROP;
 	}
 
 	@Override
@@ -36,17 +37,17 @@ public class CropWheat extends CropVanilla
 	@Override
 	public ItemStack getProduct()
 	{
-		return new ItemStack(Items.WHEAT, 1);
+		return new ItemStack(Items.f_42405_, 1);
 	}
 
 	@Override
 	public ItemStack getSeeds()
 	{
-		return new ItemStack(Items.WHEAT_SEEDS);
+		return new ItemStack(Items.f_42404_);
 	}
 
 	@Override
-	public int getSizeAfterHarvest(ICropTile crop)
+	public int getAgeAfterHarvest(ICropTile crop)
 	{
 		return 2;
 	}

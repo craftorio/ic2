@@ -2,17 +2,25 @@ package ic2.core.crop.cropcard;
 
 import ic2.api.crops.CropProperties;
 import ic2.api.crops.ICropTile;
-import ic2.core.crop.IC2CropCard;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
+import ic2.api.crops.ICropType;
+import ic2.core.crop.Ic2CropCard;
+import ic2.core.ref.Ic2Blocks;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
 
-public class CropWeed extends IC2CropCard
+public class CropWeed extends Ic2CropCard
 {
-	@Override
-	public String getId()
+	public CropWeed(ICropType cropType)
 	{
-		return "weed";
+		super(cropType);
+	}
+
+	@Override
+	public Block getCropBlock()
+	{
+		return Ic2Blocks.WEED_CROP;
 	}
 
 	@Override
@@ -28,20 +36,15 @@ public class CropWeed extends IC2CropCard
 	}
 
 	@Override
-	public int getMaxSize()
-	{
-		return 5;
-	}
-
-	@Override
-	public int getOptimalHarvestSize(ICropTile crop)
+	public int getOptimalHarvestAge(ICropTile crop)
 	{
 		return 1;
 	}
 
 	@Override
-	public void onLeftClick(ICropTile crop, EntityPlayer player)
+	public boolean onLeftClick(ICropTile crop, Player player)
 	{
+		return false;
 	}
 
 	@Override

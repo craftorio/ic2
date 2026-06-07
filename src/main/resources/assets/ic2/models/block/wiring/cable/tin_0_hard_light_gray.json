@@ -1,0 +1,7 @@
+{
+  "loader": "ic2:cable",
+  "type": "tin",
+  "insulation": 0,
+  "foam": "hard_light_gray",
+  "active": false
+}

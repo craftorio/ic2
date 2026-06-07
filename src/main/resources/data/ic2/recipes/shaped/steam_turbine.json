@@ -1,0 +1,15 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "AAA"
+  ],
+  "key": {
+    "A": {
+      "item": "ic2:steam_turbine_blade"
+    }
+  },
+  "group": "steam_turbine",
+  "result": {
+    "item": "ic2:steam_turbine"
+  }
+}

@@ -1,6 +1,6 @@
 package ic2.core.block.comp;
 
-import ic2.core.block.TileEntityBlock;
+import ic2.core.block.tileentity.Ic2TileEntity;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -9,9 +9,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import net.minecraft.block.Block;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 
 public class Redstone extends TileEntityComponent
 {
@@ -20,7 +20,7 @@ public class Redstone extends TileEntityComponent
 	private Set<Redstone.IRedstoneModifier> modifiers;
 	private Redstone.LinkHandler outboundLink;
 
-	public Redstone(TileEntityBlock parent)
+	public Redstone(Ic2TileEntity parent)
 	{
 		super(parent);
 	}
@@ -49,10 +49,10 @@ public class Redstone extends TileEntityComponent
 
 	public void update()
 	{
-		World world = this.parent.getWorld();
+		Level world = this.parent.getLevel();
 		if (world != null)
 		{
-			int input = world.isBlockIndirectlyGettingPowered(this.parent.getPos());
+			int input = world.m_46755_(this.parent.getBlockPos());
 			if (this.modifiers != null)
 			{
 				for (Redstone.IRedstoneModifier modifier : this.modifiers)

@@ -1,28 +1,42 @@
 package ic2.core.block.heatgenerator.gui;
 
-import ic2.core.GuiIC2;
+import com.mojang.blaze3d.vertex.PoseStack;
+import ic2.core.Ic2Gui;
 import ic2.core.block.heatgenerator.container.ContainerFluidHeatGenerator;
 import ic2.core.gui.TankGauge;
 import ic2.core.init.Localization;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
 
-public class GuiFluidHeatGenerator extends GuiIC2<ContainerFluidHeatGenerator>
+public class GuiFluidHeatGenerator extends Ic2Gui<ContainerFluidHeatGenerator>
 {
-	private static final ResourceLocation background = new ResourceLocation("ic2", "textures/gui/GUIFluidHeatGenerator.png");
+	private static final ResourceLocation background = ResourceLocation.fromNamespaceAndPath("ic2", "textures/gui/guifluidheatgenerator.png");
 
-	public GuiFluidHeatGenerator(ContainerFluidHeatGenerator container)
+	public GuiFluidHeatGenerator(ContainerFluidHeatGenerator container, Inventory playerInventory, Component title)
 	{
-		super(container);
+		super(container, playerInventory, title);
 		this.addElement(TankGauge.createNormal(this, 70, 20, container.base.getFluidTank()));
 	}
 
 	@Override
-	protected void drawForegroundLayer(int mouseX, int mouseY)
+	protected void drawForegroundLayer(PoseStack matrices, int mouseX, int mouseY)
 	{
-		super.drawForegroundLayer(mouseX, mouseY);
-		this.fontRenderer.drawString(Localization.translate("ic2.FluidHeatGenerator.gui.info.Emit") + this.container.base.gettransmitHeat(), 96, 33, 5752026);
-		this.fontRenderer
-			.drawString(Localization.translate("ic2.FluidHeatGenerator.gui.info.MaxEmit") + this.container.base.getMaxHeatEmittedPerTick(), 96, 52, 5752026);
+		super.drawForegroundLayer(matrices, mouseX, mouseY);
+		this.drawString(
+			matrices,
+			96,
+			33,
+			Localization.translate("ic2.FluidHeatGenerator.gui.info.Emit") + ((ContainerFluidHeatGenerator) this.menu).base.gettransmitHeat(),
+			5752026
+		);
+		this.drawString(
+			matrices,
+			96,
+			52,
+			Localization.translate("ic2.FluidHeatGenerator.gui.info.MaxEmit") + ((ContainerFluidHeatGenerator) this.menu).base.getMaxHeatEmittedPerTick(),
+			5752026
+		);
 	}
 
 	@Override

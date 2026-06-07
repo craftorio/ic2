@@ -1,0 +1,12 @@
+{
+  "type": "ic2:shapeless",
+  "ingredients": [
+    {
+      "item": "ic2:plutonium"
+    }
+  ],
+  "result": {
+    "item": "ic2:small_plutonium",
+    "count": 9
+  }
+}

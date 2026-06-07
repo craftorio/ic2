@@ -1,17 +1,17 @@
 package ic2.core.item.reactor;
 
 import ic2.api.reactor.IReactor;
-import ic2.core.item.type.NuclearResourceType;
 import ic2.core.profile.NotExperimental;
-import ic2.core.ref.ItemName;
-import net.minecraft.item.ItemStack;
+import ic2.core.ref.Ic2Items;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item.Properties;
 
 @NotExperimental
 public class ItemReactorDepletedUranium extends AbstractDamageableReactorComponent
 {
-	public ItemReactorDepletedUranium()
+	public ItemReactorDepletedUranium(Properties settings)
 	{
-		super(ItemName.depleted_isotope_fuel_rod, 10000);
+		super(settings, 10000);
 	}
 
 	@Override
@@ -19,13 +19,13 @@ public class ItemReactorDepletedUranium extends AbstractDamageableReactorCompone
 	{
 		if (heatrun)
 		{
-			int myLevel = this.getCustomDamage(stack) + 1 + reactor.getHeat() / 3000;
-			if (myLevel >= this.getMaxCustomDamage(stack))
+			int myLevel = this.getUse(stack) + 1 + reactor.getHeat() / 3000;
+			if (myLevel >= this.getMaxUse())
 			{
-				reactor.setItemAt(youX, youY, ItemName.nuclear.getItemStack(NuclearResourceType.re_enriched_uranium));
+				reactor.setItemAt(youX, youY, new ItemStack(Ic2Items.RE_ENRICHED_URANIUM));
 			} else
 			{
-				this.setCustomDamage(stack, myLevel);
+				this.setUse(stack, myLevel);
 			}
 		}
 
@@ -33,8 +33,8 @@ public class ItemReactorDepletedUranium extends AbstractDamageableReactorCompone
 	}
 
 	@Override
-	public double getDurabilityForDisplay(ItemStack stack)
+	public double getUseFraction(ItemStack stack)
 	{
-		return 1.0 - super.getDurabilityForDisplay(stack);
+		return 1.0 - super.getUseFraction(stack);
 	}
 }

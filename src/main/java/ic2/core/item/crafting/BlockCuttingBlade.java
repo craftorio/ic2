@@ -1,67 +1,53 @@
 package ic2.core.item.crafting;
 
 import ic2.api.item.IBlockCuttingBlade;
-import ic2.core.init.Localization;
-import ic2.core.item.ItemMulti;
 import ic2.core.item.type.BlockCuttingBladeType;
-import ic2.core.ref.ItemName;
 
 import java.util.List;
 
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.Item.Properties;
+import net.minecraft.world.level.Level;
 
-public class BlockCuttingBlade extends ItemMulti<BlockCuttingBladeType> implements IBlockCuttingBlade
+public class BlockCuttingBlade extends Item implements IBlockCuttingBlade
 {
-	public BlockCuttingBlade()
+	private final BlockCuttingBladeType type;
+
+	public BlockCuttingBlade(Properties settings, BlockCuttingBladeType type)
 	{
-		super(ItemName.block_cutting_blade, BlockCuttingBladeType.class);
+		super(settings);
+		this.type = type;
 	}
 
 	@Override
 	public int getHardness(ItemStack stack)
 	{
-		BlockCuttingBladeType blade = this.getType(stack);
-		if (blade == null)
+		return switch (this.type)
 		{
-			return 0;
-		}
-
-		switch (blade)
-		{
-			case iron:
-				return 3;
-			case steel:
-				return 6;
-			case diamond:
-				return 9;
-			default:
-				return 0;
-		}
+			case iron -> 3;
+			case steel -> 6;
+			case diamond -> 9;
+			default -> 0;
+		};
 	}
 
-	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced)
+	public void m_7373_(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag advanced)
 	{
-		BlockCuttingBladeType blade = this.getType(stack);
-		if (blade != null)
+		switch (this.type)
 		{
-			switch (blade)
-			{
-				case iron:
-					tooltip.add(Localization.translate("ic2.IronBlockCuttingBlade.info"));
-					break;
-				case steel:
-					tooltip.add(Localization.translate("ic2.AdvIronBlockCuttingBlade.info"));
-					break;
-				case diamond:
-					tooltip.add(Localization.translate("ic2.DiamondBlockCuttingBlade.info"));
-			}
-
-			tooltip.add(Localization.translate("ic2.CuttingBlade.hardness", this.getHardness(stack)));
+			case iron:
+				tooltip.add(Component.m_237115_("ic2.IronBlockCuttingBlade.info"));
+				break;
+			case steel:
+				tooltip.add(Component.m_237115_("ic2.AdvIronBlockCuttingBlade.info"));
+				break;
+			case diamond:
+				tooltip.add(Component.m_237115_("ic2.DiamondBlockCuttingBlade.info"));
 		}
+
+		tooltip.add(Component.m_237110_("ic2.CuttingBlade.hardness", new Object[] { this.getHardness(stack) }));
 	}
 }

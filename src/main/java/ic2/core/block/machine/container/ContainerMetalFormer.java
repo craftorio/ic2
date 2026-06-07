@@ -1,16 +1,17 @@
 package ic2.core.block.machine.container;
 
 import ic2.core.block.machine.tileentity.TileEntityMetalFormer;
+import ic2.core.ref.Ic2ScreenHandlers;
 
 import java.util.List;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.entity.player.Inventory;
 
 public class ContainerMetalFormer extends ContainerStandardMachine<TileEntityMetalFormer>
 {
-	public ContainerMetalFormer(EntityPlayer player, TileEntityMetalFormer tileEntity1)
+	public ContainerMetalFormer(int syncId, Inventory playerInventory, TileEntityMetalFormer be)
 	{
-		super(player, tileEntity1, 166, 17, 53, 17, 17, 116, 35, 152, 8);
+		super(Ic2ScreenHandlers.METAL_FORMER, syncId, playerInventory, be, 166, 17, 53, 17, 17, 116, 35, 152, 8);
 	}
 
 	@Override

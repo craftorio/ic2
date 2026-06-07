@@ -1,0 +1,10 @@
+{
+  "type": "ic2:macerator",
+  "ingredient": {
+    "item": "minecraft:pumpkin",
+    "count": 8
+  },
+  "result": {
+    "item": "ic2:bio_chaff"
+  }
+}

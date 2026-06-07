@@ -1,197 +1,253 @@
 package ic2.core;
 
-import java.util.ArrayList;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
+import ic2.core.event.WorldData;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.longs.LongIterator;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
+import it.unimi.dsi.fastutil.longs.LongSet;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap.Entry;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTTagLong;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeChunkManager;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import java.util.Comparator;
+import java.util.Set;
 
-public final class ChunkLoaderLogic implements ForgeChunkManager.LoadingCallback
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.TicketType;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.saveddata.SavedData;
+
+public final class ChunkLoaderLogic
 {
-	private static ChunkLoaderLogic instance;
-	private final Map<World, List<ForgeChunkManager.Ticket>> tickets = new IdentityHashMap<>();
+	private static final String savedStateId = IC2.getIdentifier("loaded_chunks").toString().replace(':', '_');
+	private static final TicketType<ChunkPos> ticketType = TicketType.m_9462_(
+		IC2.getIdentifier("chunk_loader").toString(), Comparator.comparingLong(ChunkPos::m_45588_)
+	);
 
-	ChunkLoaderLogic()
+	public static void addChunkLoader(ServerLevel world, BlockPos pos, LongSet chunks)
 	{
-		if (instance != null)
+		long loaderChunk = ChunkPos.m_151388_(pos);
+		if (!chunks.contains(loaderChunk))
 		{
-			throw new IllegalStateException();
+			throw new IllegalArgumentException("missing own position");
 		}
 
-		instance = this;
-		MinecraftForge.EVENT_BUS.register(this);
-		ForgeChunkManager.setForcedChunkLoadingCallback(IC2.getInstance(), this);
-	}
+		ChunkLoaderLogic.SavedState state = (ChunkLoaderLogic.SavedState) world.m_8895_()
+			.m_164861_(ChunkLoaderLogic.SavedState::new, ChunkLoaderLogic.SavedState::new, savedStateId);
+		((Set) state.chunksToChunkLoaders.computeIfAbsent(loaderChunk, ignore -> new ObjectOpenHashSet(1))).add(pos);
+		WorldData worldData = WorldData.get(world);
+		LongIterator var7 = chunks.iterator();
 
-	private List<ForgeChunkManager.Ticket> getTicketsForWorld(World world)
-	{
-		if (world.isRemote)
+		while (var7.hasNext())
 		{
-			return null;
-		}
-
-		if (!this.tickets.containsKey(world))
-		{
-			this.tickets.put(world, new ArrayList<>());
-		}
-
-		return this.tickets.get(world);
-	}
-
-	@SubscribeEvent
-	public void unloadWorld(WorldEvent.Unload event)
-	{
-		if (!event.getWorld().isRemote)
-		{
-			if (this.tickets.containsKey(event.getWorld()))
+			long chunk = (Long) var7.next();
+			Set<BlockPos> loaders = (Set<BlockPos>) worldData.loadedChunks.computeIfAbsent(chunk, ignore -> new ObjectOpenHashSet(1));
+			if (loaders.isEmpty())
 			{
-				this.tickets.remove(event.getWorld());
-			}
-		}
-	}
-
-	public void ticketsLoaded(List<ForgeChunkManager.Ticket> tickets, World world)
-	{
-		List<ForgeChunkManager.Ticket> worldTickets = this.getTicketsForWorld(world);
-
-		for (ForgeChunkManager.Ticket ticket : tickets)
-		{
-			worldTickets.add(ticket);
-			NBTTagList list = ticket.getModData().getTagList("loadedChunks", 4);
-
-			for (int i = 0; i < list.tagCount(); i++)
-			{
-				NBTTagLong value = (NBTTagLong) list.get(i);
-				ForgeChunkManager.forceChunk(ticket, deserialize(value.getLong()));
+				addChunkTicket(world, new ChunkPos(chunk));
 			}
 
-			ChunkPos mainChunk = getChunkCoords(this.getPosFromTicket(ticket));
-			if (!ticket.getChunkList().contains(mainChunk))
-			{
-				ForgeChunkManager.forceChunk(ticket, mainChunk);
-			}
+			loaders.add(pos);
 		}
+
+		worldData.chunkLoaders.put(pos, new LongOpenHashSet(chunks));
 	}
 
-	public ForgeChunkManager.Ticket getTicket(World world, BlockPos pos, boolean create)
+	public static void removeChunkLoader(ServerLevel world, BlockPos pos)
 	{
-		if (world.isRemote)
+		ChunkLoaderLogic.SavedState state = (ChunkLoaderLogic.SavedState) world.m_8895_().m_164858_(ChunkLoaderLogic.SavedState::new, savedStateId);
+		if (state != null)
 		{
-			return null;
-		}
-
-		List<ForgeChunkManager.Ticket> ticketList = this.getTicketsForWorld(world);
-		if (ticketList == null)
-		{
-			throw new IllegalStateException();
-		}
-
-		for (ForgeChunkManager.Ticket ticket : ticketList)
-		{
-			if (pos.equals(this.getPosFromTicket(ticket)))
+			long chunkPos = ChunkPos.m_151388_(pos);
+			Set<BlockPos> positions = (Set<BlockPos>) state.chunksToChunkLoaders.get(chunkPos);
+			if (positions != null && positions.remove(pos) && positions.isEmpty())
 			{
-				return ticket;
+				state.chunksToChunkLoaders.remove(chunkPos);
 			}
 		}
 
-		return create ? this.createTicket(world, pos) : null;
-	}
-
-	public ForgeChunkManager.Ticket createTicket(World world, BlockPos pos)
-	{
-		assert this.getTicket(world, pos, false) == null;
-		ForgeChunkManager.Ticket ticket = ForgeChunkManager.requestTicket(IC2.getInstance(), world, ForgeChunkManager.Type.NORMAL);
-		ticket.getModData().setInteger("x", pos.getX());
-		ticket.getModData().setInteger("y", pos.getY());
-		ticket.getModData().setInteger("z", pos.getZ());
-		this.getTicketsForWorld(world).add(ticket);
-		this.addChunkToTicket(ticket, getChunkCoords(pos));
-		return ticket;
-	}
-
-	public void addChunkToTicket(ForgeChunkManager.Ticket ticket, ChunkPos chunk)
-	{
-		if (!ticket.getChunkList().contains(chunk))
+		WorldData worldData = WorldData.get(world, false);
+		if (worldData != null)
 		{
-			ForgeChunkManager.forceChunk(ticket, chunk);
-			ForgeChunkManager.reorderChunk(ticket, getChunkCoords(this.getPosFromTicket(ticket)));
-			NBTTagList list = ticket.getModData().getTagList("loadedChunks", 4);
-			if (!ticket.getModData().hasKey("loadedChunks", 9))
-			{
-				ticket.getModData().setTag("loadedChunks", list);
-			}
-
-			ticket.getModData().setTag("loadedChunks", list);
-			list.appendTag(new NBTTagLong(chunk.x & 4294967295L | (chunk.z & 4294967295L) << 32));
+			disableChunkLoader(world, pos, worldData);
 		}
 	}
 
-	public void removeChunkFromTicket(ForgeChunkManager.Ticket ticket, ChunkPos chunk)
+	private static void disableChunkLoader(ServerLevel world, BlockPos pos, WorldData worldData)
 	{
-		if (!getChunkCoords(this.getPosFromTicket(ticket)).equals(chunk))
+		LongSet positions = (LongSet) worldData.chunkLoaders.remove(pos);
+		if (positions != null)
 		{
-			ForgeChunkManager.unforceChunk(ticket, chunk);
-			NBTTagList list = ticket.getModData().getTagList("loadedChunks", 4);
-			long serializedChunk = serialize(chunk);
+			LongIterator var4 = positions.iterator();
 
-			for (int i = 0; i < list.tagCount(); i++)
+			while (var4.hasNext())
 			{
-				NBTTagLong pos = (NBTTagLong) list.get(i);
-				if (pos.getLong() == serializedChunk)
+				long chunkPos = (Long) var4.next();
+				Set<BlockPos> loaders = (Set<BlockPos>) worldData.loadedChunks.get(chunkPos);
+				if (loaders != null && loaders.remove(pos) && loaders.isEmpty())
 				{
-					list.removeTag(i--);
+					worldData.loadedChunks.remove(chunkPos);
+					removeChunkTicket(world, new ChunkPos(chunkPos));
 				}
 			}
 		}
 	}
 
-	public void removeTicket(World world, BlockPos pos)
+	public static void updateChunkLoader(ServerLevel world, BlockPos pos, LongSet chunks)
 	{
-		this.removeTicket(this.getTicket(world, pos, false));
+		long loaderChunk = ChunkPos.m_151388_(pos);
+		if (!chunks.contains(loaderChunk))
+		{
+			throw new IllegalArgumentException("missing own position");
+		}
+
+		WorldData worldData = WorldData.get(world);
+		LongSet prev = (LongSet) worldData.chunkLoaders.get(pos);
+		if (prev == null)
+		{
+			addChunkLoader(world, pos, chunks);
+		} else
+		{
+			LongIterator it = prev.longIterator();
+
+			while (it.hasNext())
+			{
+				long chunk = it.nextLong();
+				if (!chunks.contains(chunk))
+				{
+					it.remove();
+					Set<BlockPos> loaders = (Set<BlockPos>) worldData.loadedChunks.get(chunk);
+					loaders.remove(pos);
+					if (loaders.isEmpty())
+					{
+						removeChunkTicket(world, new ChunkPos(chunk));
+						worldData.loadedChunks.remove(chunk);
+					}
+				}
+			}
+
+			it = chunks.iterator();
+
+			while (it.hasNext())
+			{
+				long chunk = (Long) it.next();
+				if (prev.add(chunk))
+				{
+					Set<BlockPos> loaders = (Set<BlockPos>) worldData.loadedChunks.computeIfAbsent(chunk, ignore -> new ObjectOpenHashSet());
+					if (loaders.isEmpty())
+					{
+						addChunkTicket(world, new ChunkPos(chunk));
+					}
+
+					loaders.add(pos);
+				}
+			}
+		}
 	}
 
-	public void removeTicket(ForgeChunkManager.Ticket ticket)
+	public static void onWorldLoad(ServerLevel world)
 	{
-		ForgeChunkManager.releaseTicket(ticket);
-		this.getTicketsForWorld(ticket.world).remove(ticket);
+		ChunkLoaderLogic.SavedState state = (ChunkLoaderLogic.SavedState) world.m_8895_().m_164858_(ChunkLoaderLogic.SavedState::new, savedStateId);
+		if (state != null && !state.chunksToChunkLoaders.isEmpty())
+		{
+			WorldData worldData = WorldData.get(world);
+			ObjectIterator var3 = state.chunksToChunkLoaders.long2ObjectEntrySet().iterator();
+
+			while (var3.hasNext())
+			{
+				Entry<Set<BlockPos>> entry = (Entry<Set<BlockPos>>) var3.next();
+				long chunkPos = entry.getLongKey();
+				Set<BlockPos> loaders = (Set<BlockPos>) entry.getValue();
+				worldData.loadedChunks.put(chunkPos, new ObjectOpenHashSet(loaders));
+
+				for (BlockPos pos : loaders)
+				{
+					((LongSet) worldData.chunkLoaders.computeIfAbsent(pos, ignore -> new LongOpenHashSet(1))).add(chunkPos);
+				}
+
+				addChunkTicket(world, new ChunkPos(chunkPos));
+			}
+		}
 	}
 
-	public int getMaxChunksPerTicket()
+	public static void onChunkUnload(LevelChunk chunk)
 	{
-		return ForgeChunkManager.getMaxChunkDepthFor("ic2");
+		assert !chunk.m_62953_().isClientSide;
+		ServerLevel world = (ServerLevel) chunk.m_62953_();
+		ChunkLoaderLogic.SavedState state = (ChunkLoaderLogic.SavedState) world.m_8895_().m_164858_(ChunkLoaderLogic.SavedState::new, savedStateId);
+		if (state != null && !state.chunksToChunkLoaders.isEmpty())
+		{
+			Set<BlockPos> loaders = (Set<BlockPos>) state.chunksToChunkLoaders.get(chunk.m_7697_().m_45588_());
+			if (loaders != null && !loaders.isEmpty())
+			{
+				WorldData worldData = WorldData.get(world, false);
+				if (worldData != null)
+				{
+					for (BlockPos pos : loaders)
+					{
+						disableChunkLoader(world, pos, worldData);
+					}
+				}
+			}
+		}
 	}
 
-	private BlockPos getPosFromTicket(ForgeChunkManager.Ticket ticket)
+	private static void addChunkTicket(ServerLevel world, ChunkPos pos)
 	{
-		return new BlockPos(ticket.getModData().getInteger("x"), ticket.getModData().getInteger("y"), ticket.getModData().getInteger("z"));
+		world.m_7726_().m_8387_(ticketType, pos, 2, pos);
 	}
 
-	public static ChunkLoaderLogic getInstance()
+	private static void removeChunkTicket(ServerLevel world, ChunkPos pos)
 	{
-		return instance;
+		world.m_7726_().m_8438_(ticketType, pos, 2, pos);
 	}
 
-	public static long serialize(ChunkPos chunk)
+	private static final class SavedState extends SavedData
 	{
-		return chunk.x & 4294967295L | (chunk.z & 4294967295L) << 32;
-	}
+		final Long2ObjectMap<Set<BlockPos>> chunksToChunkLoaders = new Long2ObjectOpenHashMap();
 
-	public static ChunkPos deserialize(long value)
-	{
-		return new ChunkPos((int) (value & -1L), (int) (value >> 32));
-	}
+		SavedState()
+		{
+		}
 
-	public static ChunkPos getChunkCoords(BlockPos pos)
-	{
-		return new ChunkPos(pos.getX() >> 4, pos.getZ() >> 4);
+		SavedState(CompoundTag nbt)
+		{
+			ListTag loaders = nbt.m_128437_("loaders", 10);
+
+			for (int i = 0; i < loaders.size(); i++)
+			{
+				CompoundTag contentTag = loaders.m_128728_(i);
+				BlockPos pos = new BlockPos(contentTag.getInt("x"), contentTag.getInt("y"), contentTag.getInt("z"));
+				((Set) this.chunksToChunkLoaders.computeIfAbsent(ChunkPos.m_151388_(pos), ignore -> new ObjectOpenHashSet(1))).add(pos);
+			}
+		}
+
+		public CompoundTag m_7176_(CompoundTag nbt)
+		{
+			ListTag loaders = new ListTag();
+			nbt.put("loaders", loaders);
+			ObjectIterator var3 = this.chunksToChunkLoaders.values().iterator();
+
+			while (var3.hasNext())
+			{
+				Set<BlockPos> positions = (Set<BlockPos>) var3.next();
+
+				for (BlockPos pos : positions)
+				{
+					CompoundTag contentTag = new CompoundTag();
+					loaders.add(contentTag);
+					contentTag.putInt("x", pos.getX());
+					contentTag.putInt("y", pos.getY());
+					contentTag.putInt("z", pos.getZ());
+				}
+			}
+
+			return nbt;
+		}
 	}
 }

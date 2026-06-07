@@ -2,22 +2,23 @@ package ic2.core.block.machine.container;
 
 import ic2.core.ContainerFullInv;
 import ic2.core.block.machine.tileentity.TileEntityChunkloader;
+import ic2.core.ref.Ic2ScreenHandlers;
 import ic2.core.slot.SlotInvSlot;
 
 import java.util.List;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.entity.player.Inventory;
 
 public class ContainerChunkLoader extends ContainerFullInv<TileEntityChunkloader>
 {
-	public ContainerChunkLoader(EntityPlayer player, TileEntityChunkloader base1)
+	public ContainerChunkLoader(int syncId, Inventory playerInventory, TileEntityChunkloader be)
 	{
-		super(player, base1, 250);
-		this.addSlotToContainer(new SlotInvSlot(base1.dischargeSlot, 0, 8, 143));
+		super(Ic2ScreenHandlers.CHUNK_LOADER, syncId, playerInventory, be, 250);
+		this.m_38897_(new SlotInvSlot(be.dischargeSlot, 0, 8, 143));
 
-		for (int i = 0; i < base1.upgradeSlot.size(); i++)
+		for (int i = 0; i < be.upgradeSlot.size(); i++)
 		{
-			this.addSlotToContainer(new SlotInvSlot(base1.upgradeSlot, i, 8, 44 + 18 * i));
+			this.m_38897_(new SlotInvSlot(be.upgradeSlot, i, 8, 44 + 18 * i));
 		}
 	}
 

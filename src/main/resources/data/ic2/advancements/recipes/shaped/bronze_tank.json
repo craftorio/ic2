@@ -1,0 +1,45 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_empty_cell": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:empty_cell"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_plates/bronze": {
+      "conditions": {
+        "items": [
+          {
+            "tag": "forge:plates/bronze"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "ic2:shaped/bronze_tank"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_empty_cell",
+      "has_plates/bronze",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "ic2:shaped/bronze_tank"
+    ]
+  }
+}

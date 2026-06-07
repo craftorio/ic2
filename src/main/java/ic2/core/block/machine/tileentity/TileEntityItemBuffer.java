@@ -5,22 +5,23 @@ import ic2.api.upgrade.IUpgradeItem;
 import ic2.api.upgrade.UpgradableProperty;
 import ic2.core.ContainerBase;
 import ic2.core.IHasGui;
-import ic2.core.block.TileEntityInventory;
 import ic2.core.block.invslot.InvSlot;
 import ic2.core.block.invslot.InvSlotUpgrade;
 import ic2.core.block.machine.container.ContainerItemBuffer;
-import ic2.core.block.machine.gui.GuiItemBuffer;
+import ic2.core.block.tileentity.TileEntityInventory;
+import ic2.core.network.GrowingBuffer;
 import ic2.core.profile.NotClassic;
+import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.util.StackUtil;
 
 import java.util.EnumSet;
 import java.util.Set;
 
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 
 @NotClassic
 public class TileEntityItemBuffer extends TileEntityInventory implements IHasGui, IUpgradableBlock
@@ -30,8 +31,9 @@ public class TileEntityItemBuffer extends TileEntityInventory implements IHasGui
 	public final InvSlotUpgrade upgradeSlot;
 	private boolean tick = true;
 
-	public TileEntityItemBuffer()
+	public TileEntityItemBuffer(BlockPos pos, BlockState state)
 	{
+		super(Ic2BlockEntities.ITEM_BUFFER, pos, state);
 		this.rightcontentSlot = new InvSlot(this, "rightcontent", InvSlot.Access.IO, 24, InvSlot.InvSide.SIDE);
 		this.leftcontentSlot = new InvSlot(this, "leftcontent", InvSlot.Access.IO, 24, InvSlot.InvSide.NOTSIDE);
 		this.upgradeSlot = new InvSlotUpgrade(this, "upgrade", 2);
@@ -50,11 +52,11 @@ public class TileEntityItemBuffer extends TileEntityInventory implements IHasGui
 			{
 				if (((IUpgradeItem) upgradeleft.getItem()).onTick(upgradeleft, this))
 				{
-					super.markDirty();
+					super.setChanged();
 				}
 			} else if (((IUpgradeItem) upgraderight.getItem()).onTick(upgraderight, this))
 			{
-				super.markDirty();
+				super.setChanged();
 			}
 
 			this.tick = !this.tick;
@@ -65,7 +67,7 @@ public class TileEntityItemBuffer extends TileEntityInventory implements IHasGui
 				this.tick = true;
 				if (((IUpgradeItem) upgradeleft.getItem()).onTick(upgradeleft, this))
 				{
-					super.markDirty();
+					super.setChanged();
 				}
 			}
 
@@ -74,34 +76,28 @@ public class TileEntityItemBuffer extends TileEntityInventory implements IHasGui
 				this.tick = false;
 				if (((IUpgradeItem) upgraderight.getItem()).onTick(upgraderight, this))
 				{
-					super.markDirty();
+					super.setChanged();
 				}
 			}
 		}
 	}
 
 	@Override
-	public ContainerBase<TileEntityItemBuffer> getGuiContainer(EntityPlayer player)
+	public ContainerBase<?> createServerScreenHandler(int syncId, Player player)
 	{
-		return new ContainerItemBuffer(player, this);
+		return new ContainerItemBuffer(syncId, player.getInventory(), this);
 	}
 
-	@SideOnly(Side.CLIENT)
 	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
-		return new GuiItemBuffer(new ContainerItemBuffer(player, this));
+		return new ContainerItemBuffer(syncId, inventory, this);
 	}
 
 	@Override
 	public Set<UpgradableProperty> getUpgradableProperties()
 	{
 		return EnumSet.of(UpgradableProperty.ItemProducing);
-	}
-
-	@Override
-	public void onGuiClosed(EntityPlayer player)
-	{
 	}
 
 	@Override

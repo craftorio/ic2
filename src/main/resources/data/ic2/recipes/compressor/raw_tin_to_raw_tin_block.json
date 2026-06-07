@@ -1,0 +1,10 @@
+{
+  "type": "ic2:compressor",
+  "ingredient": {
+    "item": "ic2:raw_tin",
+    "count": 9
+  },
+  "result": {
+    "item": "ic2:raw_tin_block"
+  }
+}

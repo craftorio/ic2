@@ -1,0 +1,43 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_ingots/plutonium": {
+      "conditions": {
+        "items": [
+          {
+            "tag": "forge:ingots/plutonium"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_ingots/uranium": {
+      "conditions": {
+        "items": [
+          {
+            "tag": "forge:ingots/uranium"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "ic2:shaped/mox_4"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_ingots/uranium",
+      "has_ingots/plutonium",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "ic2:shaped/mox_4"
+    ]
+  }
+}

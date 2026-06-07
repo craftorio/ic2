@@ -1,22 +1,23 @@
 package ic2.core.block.personal;
 
 import ic2.core.ContainerFullInv;
+import ic2.core.ref.Ic2ScreenHandlers;
 import ic2.core.slot.SlotInvSlot;
 import ic2.core.slot.SlotInvSlotReadOnly;
 
 import java.util.List;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.entity.player.Inventory;
 
 public class ContainerTradeOMatClosed extends ContainerFullInv<TileEntityTradeOMat>
 {
-	public ContainerTradeOMatClosed(EntityPlayer player, TileEntityTradeOMat tileEntity1)
+	public ContainerTradeOMatClosed(int syncId, Inventory playerInventory, TileEntityTradeOMat be)
 	{
-		super(player, tileEntity1, 166);
-		this.addSlotToContainer(new SlotInvSlotReadOnly(tileEntity1.demandSlot, 0, 50, 19));
-		this.addSlotToContainer(new SlotInvSlotReadOnly(tileEntity1.offerSlot, 0, 50, 38));
-		this.addSlotToContainer(new SlotInvSlot(tileEntity1.inputSlot, 0, 143, 17));
-		this.addSlotToContainer(new SlotInvSlot(tileEntity1.outputSlot, 0, 143, 53));
+		super(Ic2ScreenHandlers.TRADE_O_MAT_CLOSED, syncId, playerInventory, be, 166);
+		this.m_38897_(new SlotInvSlotReadOnly(be.demandSlot, 0, 50, 19));
+		this.m_38897_(new SlotInvSlotReadOnly(be.offerSlot, 0, 50, 38));
+		this.m_38897_(new SlotInvSlot(be.inputSlot, 0, 143, 17));
+		this.m_38897_(new SlotInvSlot(be.outputSlot, 0, 143, 53));
 	}
 
 	@Override

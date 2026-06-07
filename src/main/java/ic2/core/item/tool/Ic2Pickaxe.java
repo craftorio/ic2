@@ -1,62 +1,13 @@
 package ic2.core.item.tool;
 
-import ic2.core.IC2;
-import ic2.core.init.BlocksItems;
-import ic2.core.init.Localization;
-import ic2.core.item.ItemIC2;
-import ic2.core.ref.IItemModelProvider;
-import ic2.core.ref.ItemName;
-import ic2.core.util.Util;
-import net.minecraft.item.ItemPickaxe;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Item.ToolMaterial;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.world.item.PickaxeItem;
+import net.minecraft.world.item.Tier;
+import net.minecraft.world.item.Item.Properties;
 
-public class Ic2Pickaxe extends ItemPickaxe implements IItemModelProvider
+public class Ic2Pickaxe extends PickaxeItem
 {
-	private final Object repairMaterial;
-
-	public Ic2Pickaxe(ToolMaterial material)
+	public Ic2Pickaxe(Tier material, int attackDamage, float attackSpeed, Properties settings)
 	{
-		super(material);
-		this.efficiency = 5.0F;
-		this.repairMaterial = "ingotBronze";
-		this.setUnlocalizedName(ItemName.bronze_pickaxe.name());
-		this.setCreativeTab(IC2.tabIC2);
-		BlocksItems.registerItem(this, IC2.getIdentifier(ItemName.bronze_pickaxe.name()));
-		ItemName.bronze_pickaxe.setInstance(this);
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public void registerModels(ItemName name)
-	{
-		ItemIC2.registerModel(this, 0, name, null);
-	}
-
-	public String getUnlocalizedName()
-	{
-		return "ic2." + super.getUnlocalizedName().substring(5);
-	}
-
-	public String getUnlocalizedName(ItemStack stack)
-	{
-		return this.getUnlocalizedName();
-	}
-
-	public String getUnlocalizedNameInefficiently(ItemStack stack)
-	{
-		return this.getUnlocalizedName(stack);
-	}
-
-	public String getItemStackDisplayName(ItemStack stack)
-	{
-		return Localization.translate(this.getUnlocalizedName(stack));
-	}
-
-	public boolean getIsRepairable(ItemStack stack1, ItemStack stack2)
-	{
-		return stack2 != null && Util.matchesOD(stack2, this.repairMaterial);
+		super(material, attackDamage, attackSpeed, settings);
 	}
 }

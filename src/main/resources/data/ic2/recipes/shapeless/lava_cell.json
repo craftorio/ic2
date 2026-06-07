@@ -1,0 +1,14 @@
+{
+  "type": "ic2:shapeless",
+  "ingredients": [
+    {
+      "item": "ic2:empty_cell"
+    },
+    {
+      "item": "minecraft:lava_bucket"
+    }
+  ],
+  "result": {
+    "item": "ic2:lava_cell"
+  }
+}

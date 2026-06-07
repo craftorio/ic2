@@ -1,19 +1,25 @@
 package ic2.core.block.generator.tileentity;
 
-import ic2.core.ContainerBase;
 import ic2.core.IC2;
 import ic2.core.WindSim;
-import ic2.core.WorldData;
+import ic2.core.event.WorldData;
 import ic2.core.gui.dynamic.IGuiValueProvider;
 import ic2.core.init.MainConfig;
 import ic2.core.network.GuiSynced;
+import ic2.core.ref.Ic2BlockEntities;
+import ic2.core.ref.Ic2SoundEvents;
 import ic2.core.util.ConfigUtil;
 import ic2.core.util.StackUtil;
 import ic2.core.util.Util;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
+
+import java.util.List;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class TileEntityWindGenerator extends TileEntityBaseRotorGenerator implements IGuiValueProvider.IActiveGuiValueProvider
 {
@@ -22,14 +28,13 @@ public class TileEntityWindGenerator extends TileEntityBaseRotorGenerator implem
 	private static final double safeWindRatio = 0.5;
 	private static final int tickRate = 128;
 	private int ticker = IC2.random.nextInt(128);
-	private static boolean hasAdded = false;
 	private int obstructedBlockCount;
 	@GuiSynced
 	private double overheatRatio;
 
-	public TileEntityWindGenerator()
+	public TileEntityWindGenerator(BlockPos pos, BlockState state)
 	{
-		super(4.0, 1, 32, 2);
+		super(Ic2BlockEntities.WIND_GENERATOR, pos, state, 4.0, 1, 32, 2);
 	}
 
 	@Override
@@ -56,9 +61,9 @@ public class TileEntityWindGenerator extends TileEntityBaseRotorGenerator implem
 				return false;
 			}
 
-			World world = this.getWorld();
+			Level world = this.getLevel();
 			WindSim windSim = WorldData.get(world).windSim;
-			double wind = windSim.getWindAt(this.pos.getY()) * (1.0 - this.obstructedBlockCount / 567.0);
+			double wind = windSim.getWindAt(this.worldPosition.getY()) * (1.0 - this.obstructedBlockCount / 567.0);
 			if (wind <= 0.0)
 			{
 				return false;
@@ -66,13 +71,13 @@ public class TileEntityWindGenerator extends TileEntityBaseRotorGenerator implem
 
 			double windRatio = wind / windSim.getMaxWind();
 			this.overheatRatio = Math.max(0.0, (windRatio - 0.5) / 0.5);
-			if (wind > windSim.getMaxWind() * 0.5 && world.rand.nextInt(5000) <= this.production - 5.0)
+			if (wind > windSim.getMaxWind() * 0.5 && world.random.nextInt(5000) <= this.production - 5.0)
 			{
-				if (Util.harvestBlock(world, this.pos))
+				if (Util.harvestBlock(world, this.worldPosition))
 				{
-					for (int i = world.rand.nextInt(5); i > 0; i--)
+					for (int i = world.random.nextInt(5); i > 0; i--)
 					{
-						StackUtil.dropAsEntity(world, this.pos, new ItemStack(Items.IRON_INGOT));
+						StackUtil.dropAsEntity(world, this.worldPosition, new ItemStack(Items.f_42416_));
 					}
 				}
 
@@ -93,7 +98,7 @@ public class TileEntityWindGenerator extends TileEntityBaseRotorGenerator implem
 
 	public void updateObscuratedBlockCount()
 	{
-		World world = this.getWorld();
+		Level world = this.getLevel();
 		int count = -1;
 
 		for (int x = -4; x < 5; x++)
@@ -102,7 +107,7 @@ public class TileEntityWindGenerator extends TileEntityBaseRotorGenerator implem
 			{
 				for (int z = -4; z < 5; z++)
 				{
-					if (!world.isAirBlock(this.pos.add(x, y, z)))
+					if (!world.m_46859_(this.worldPosition.offset(x, y, z)))
 					{
 						count++;
 					}
@@ -125,9 +130,9 @@ public class TileEntityWindGenerator extends TileEntityBaseRotorGenerator implem
 	}
 
 	@Override
-	public String getOperationSoundFile()
+	public SoundEvent getLoopingSoundEvent()
 	{
-		return "Generators/WindGenLoop.ogg";
+		return Ic2SoundEvents.GENERATOR_WIND_LOOP;
 	}
 
 	@Override
@@ -143,15 +148,10 @@ public class TileEntityWindGenerator extends TileEntityBaseRotorGenerator implem
 	}
 
 	@Override
-	public ContainerBase<? extends TileEntityBaseGenerator> getGuiContainer(EntityPlayer player)
+	public List<String> getNetworkedFields()
 	{
-		ContainerBase<? extends TileEntityBaseGenerator> ret = super.getGuiContainer(player);
-		if (!hasAdded)
-		{
-			hasAdded = ret.getNetworkedFields().add("production");
-		}
-
-		assert ret.getNetworkedFields().contains("production");
+		List<String> ret = super.getNetworkedFields();
+		ret.add("production");
 		return ret;
 	}
 

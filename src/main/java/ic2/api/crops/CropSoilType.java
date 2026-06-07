@@ -1,21 +1,24 @@
 package ic2.api.crops;
 
-import javax.annotation.Nonnull;
-
-import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 
 public enum CropSoilType
 {
-	FARMLAND(Blocks.FARMLAND),
-	MYCELIUM(Blocks.MYCELIUM),
-	SAND(Blocks.SAND),
-	SOULSAND(Blocks.SOUL_SAND);
+	FARMLAND(Blocks.f_50093_),
+	MYCELIUM(Blocks.f_50195_),
+	SAND(Blocks.f_49992_),
+	SOULSAND(Blocks.f_50135_);
 
 	private final Block block;
 
-	CropSoilType(@Nonnull Block block)
+	CropSoilType(Block block)
 	{
+		if (block == null)
+		{
+			throw new NullPointerException("null block");
+		}
+
 		this.block = block;
 	}
 
@@ -24,7 +27,7 @@ public enum CropSoilType
 		return this.block;
 	}
 
-	public static boolean contais(Block block)
+	public static boolean contains(Block block)
 	{
 		for (CropSoilType aux : values())
 		{

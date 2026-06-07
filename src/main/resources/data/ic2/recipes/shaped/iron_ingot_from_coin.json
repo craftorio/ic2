@@ -1,0 +1,18 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "III",
+    "I I",
+    "III"
+  ],
+  "key": {
+    "I": {
+      "item": "ic2:coin"
+    }
+  },
+  "group": "iron_ingot",
+  "result": {
+    "item": "minecraft:iron_ingot",
+    "count": 2
+  }
+}

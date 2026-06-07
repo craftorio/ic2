@@ -1,8 +1,8 @@
 package ic2.core.item;
 
 import ic2.api.item.IElectricItemManager;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
 
 public class InfiniteElectricItemManager implements IElectricItemManager
 {
@@ -25,6 +25,12 @@ public class InfiniteElectricItemManager implements IElectricItemManager
 	}
 
 	@Override
+	public double getStackCharge(ItemStack stack)
+	{
+		return Double.POSITIVE_INFINITY;
+	}
+
+	@Override
 	public double getMaxCharge(ItemStack stack)
 	{
 		return Double.POSITIVE_INFINITY;
@@ -37,13 +43,13 @@ public class InfiniteElectricItemManager implements IElectricItemManager
 	}
 
 	@Override
-	public boolean use(ItemStack stack, double amount, EntityLivingBase entity)
+	public boolean use(ItemStack stack, double amount, LivingEntity entity)
 	{
 		return true;
 	}
 
 	@Override
-	public void chargeFromArmor(ItemStack stack, EntityLivingBase entity)
+	public void chargeFromArmor(ItemStack stack, LivingEntity entity)
 	{
 	}
 

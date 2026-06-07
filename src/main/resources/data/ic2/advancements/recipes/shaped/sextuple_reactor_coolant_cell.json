@@ -1,0 +1,56 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_plates/iron": {
+      "conditions": {
+        "items": [
+          {
+            "tag": "forge:plates/iron"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_plates/tin": {
+      "conditions": {
+        "items": [
+          {
+            "tag": "forge:plates/tin"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "ic2:shaped/sextuple_reactor_coolant_cell"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    },
+    "has_triple_reactor_coolant_cell": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:triple_reactor_coolant_cell"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "requirements": [
+    [
+      "has_triple_reactor_coolant_cell",
+      "has_plates/tin",
+      "has_plates/iron",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "ic2:shaped/sextuple_reactor_coolant_cell"
+    ]
+  }
+}

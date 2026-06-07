@@ -75,7 +75,7 @@ public class MainConfig
 
 	private static File getFile()
 	{
-		File folder = new File(IC2.platform.getMinecraftDir(), "config");
+		File folder = new File(IC2.sideProxy.getMinecraftDir(), "config");
 		folder.mkdirs();
 		return new File(folder, "IC2.ini");
 	}

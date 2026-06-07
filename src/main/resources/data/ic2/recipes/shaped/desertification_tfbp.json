@@ -1,0 +1,19 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    " S ",
+    "S#S",
+    " S "
+  ],
+  "key": {
+    "#": {
+      "item": "ic2:blank_tfbp"
+    },
+    "S": {
+      "item": "minecraft:sand"
+    }
+  },
+  "result": {
+    "item": "ic2:desertification_tfbp"
+  }
+}

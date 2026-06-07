@@ -1,0 +1,10 @@
+{
+  "type": "ic2:metal_former_rolling",
+  "ingredient": {
+    "tag": "forge:plates/lead"
+  },
+  "result": {
+    "item": "ic2:lead_casing",
+    "count": 2
+  }
+}

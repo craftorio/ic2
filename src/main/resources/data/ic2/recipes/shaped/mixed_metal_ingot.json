@@ -1,0 +1,23 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "III",
+    "BBB",
+    "TTT"
+  ],
+  "key": {
+    "I": {
+      "tag": "forge:plates/iron"
+    },
+    "B": {
+      "tag": "forge:plates/bronze"
+    },
+    "T": {
+      "tag": "forge:plates/tin"
+    }
+  },
+  "result": {
+    "item": "ic2:mixed_metal_ingot",
+    "count": 2
+  }
+}

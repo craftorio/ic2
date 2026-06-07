@@ -2,24 +2,25 @@ package ic2.core.item;
 
 import ic2.core.ContainerBase;
 import ic2.core.item.tool.HandHeldInventory;
-import ic2.core.util.StackUtil;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.inventory.ClickType;
-import net.minecraft.inventory.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.play.server.SPacketHeldItemChange;
+import net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
 public class ContainerHandHeldInventory<T extends HandHeldInventory> extends ContainerBase<T>
 {
-	public ContainerHandHeldInventory(T inventory)
+	public ContainerHandHeldInventory(MenuType<?> type, int syncId, T inventory)
 	{
-		super(inventory);
+		super(type, syncId, inventory.player.getInventory(), inventory);
 	}
 
 	@Override
-	public ItemStack slotClick(int slot, int button, ClickType type, EntityPlayer player)
+	public void m_150399_(int slot, int button, ClickType type, Player player)
 	{
+		ItemStack stack = null;
 		boolean closeGUI = false;
 		switch (type)
 		{
@@ -28,67 +29,65 @@ public class ContainerHandHeldInventory<T extends HandHeldInventory> extends Con
 			case QUICK_CRAFT:
 				break;
 			case PICKUP:
-				if (slot >= 0 && slot < this.inventorySlots.size())
+			case THROW:
+				if (slot >= 0 && slot < this.f_38839_.size())
 				{
-					closeGUI = this.base.isThisContainer(((Slot) this.inventorySlots.get(slot)).getStack());
+					stack = ((Slot) this.f_38839_.get(slot)).m_7993_();
+					closeGUI = this.base.isThisContainer(stack);
 				}
 				break;
 			case QUICK_MOVE:
-				if (slot >= 0 && slot < this.inventorySlots.size() && this.base.isThisContainer(((Slot) this.inventorySlots.get(slot)).getStack()))
+				if (slot >= 0 && slot < this.f_38839_.size() && this.base.isThisContainer(((Slot) this.f_38839_.get(slot)).m_7993_()))
 				{
-					return StackUtil.emptyStack;
+					return;
 				}
 				break;
 			case SWAP:
-				assert slot >= 0 && slot < this.inventorySlots.size();
-				assert this.getSlotFromInventory(player.inventory, button) != null;
-				boolean swapOut = this.base.isThisContainer(this.getSlotFromInventory(player.inventory, button).getStack());
-				boolean swapTo = this.base.isThisContainer(((Slot) this.inventorySlots.get(slot)).getStack());
-				if (swapOut || swapTo)
+				assert slot >= 0 && slot < this.f_38839_.size();
+				int playerInxSlotIdx = this.m_182417_(player.getInventory(), button).orElse(-1);
+				assert playerInxSlotIdx >= 0;
+				int newSlot = -1;
+				if (this.base.isThisContainer(player.getInventory().getItem(button)))
 				{
-					for (int i = 0; i < 9; i++)
+					Slot targetSlot = (Slot) this.f_38839_.get(slot);
+					int targetIdx = targetSlot.m_150661_();
+					if (targetSlot.f_40218_ == player.getInventory() && targetIdx >= 0 && targetIdx < 9)
 					{
-						if (swapOut && slot == this.getSlotFromInventory(player.inventory, i).slotNumber || swapTo && button == i)
-						{
-							if (player instanceof EntityPlayerMP)
-							{
-								((EntityPlayerMP) player).connection.sendPacket(new SPacketHeldItemChange(i));
-							}
-							break;
-						}
+						newSlot = targetIdx;
 					}
-				}
-				break;
-			case THROW:
-				if (slot >= 0 && slot < this.inventorySlots.size())
+				} else if (this.base.isThisContainer(((Slot) this.f_38839_.get(slot)).m_7993_()))
 				{
-					closeGUI = this.base.isThisContainer(((Slot) this.inventorySlots.get(slot)).getStack());
+					newSlot = button;
+				}
+
+				if (newSlot >= 0 && player instanceof ServerPlayer)
+				{
+					((ServerPlayer) player).f_8906_.m_9829_(new ClientboundSetCarriedItemPacket(newSlot));
 				}
 				break;
 			default:
 				throw new RuntimeException("Unexpected ClickType: " + type);
 		}
 
-		ItemStack stack = super.slotClick(slot, button, type, player);
-		if (closeGUI && !player.getEntityWorld().isRemote)
+		super.m_150399_(slot, button, type, player);
+		if (closeGUI && !player.getCommandSenderWorld().isClientSide)
 		{
+			assert stack != null;
 			this.base.saveAsThrown(stack);
-			player.closeScreen();
+			((ServerPlayer) player).m_6915_();
 		} else if (type == ClickType.CLONE)
 		{
-			ItemStack held = player.inventory.getItemStack();
+			ItemStack held = this.m_142621_();
 			if (this.base.isThisContainer(held))
 			{
-				held.getTagCompound().removeTag("uid");
+				held.getTag().m_128473_("uid");
 			}
 		}
-
-		return stack;
 	}
 
-	public void onContainerClosed(EntityPlayer player)
+	public void removed(Player player)
 	{
-		this.base.onGuiClosed(player);
-		super.onContainerClosed(player);
+		this.base.onScreenClosed(player);
+		super.removed(player);
 	}
 }

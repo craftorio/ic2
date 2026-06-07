@@ -1,7 +1,7 @@
 package ic2.core.block.invslot;
 
 import ic2.core.block.reactor.tileentity.TileEntityNuclearReactorElectric;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 public class InvSlotReactor extends InvSlot
 {

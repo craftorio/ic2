@@ -5,15 +5,15 @@ import com.google.common.collect.UnmodifiableIterator;
 
 import java.util.Map.Entry;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.Property;
 
 public class BlockStateUtil
 {
-	public static String getVariantString(IBlockState state)
+	public static String getVariantString(BlockState state)
 	{
-		ImmutableMap<IProperty<?>, Comparable<?>> properties = state.getProperties();
+		ImmutableMap<Property<?>, Comparable<?>> properties = state.m_61148_();
 		if (properties.isEmpty())
 		{
 			return "normal";
@@ -24,24 +24,24 @@ public class BlockStateUtil
 
 		while (var3.hasNext())
 		{
-			Entry<IProperty<?>, Comparable<?>> entry = (Entry<IProperty<?>, Comparable<?>>) var3.next();
-			IProperty property = entry.getKey();
+			Entry<Property<?>, Comparable<?>> entry = (Entry<Property<?>, Comparable<?>>) var3.next();
+			Property property = entry.getKey();
 			if (ret.length() > 0)
 			{
 				ret.append(',');
 			}
 
-			ret.append(property.getName());
+			ret.append(property.m_61708_());
 			ret.append('=');
-			ret.append(property.getName(entry.getValue()));
+			ret.append(property.m_6940_(entry.getValue()));
 		}
 
 		return ret.toString();
 	}
 
-	public static IBlockState getState(Block block, String variant)
+	public static BlockState getState(Block block, String variant)
 	{
-		IBlockState ret = block.getDefaultState();
+		BlockState ret = block.defaultBlockState();
 		if (!variant.isEmpty() && !variant.equals("normal"))
 		{
 			int pos = 0;
@@ -73,15 +73,15 @@ public class BlockStateUtil
 		}
 	}
 
-	private static <T extends Comparable<T>> IBlockState applyProperty(IBlockState state, String name, String value)
+	private static <T extends Comparable<T>> BlockState applyProperty(BlockState state, String name, String value)
 	{
-		IProperty<T> property = null;
+		Property<T> property = null;
 
-		for (IProperty<?> cProperty : state.getPropertyKeys())
+		for (Property<?> cProperty : state.m_61147_())
 		{
-			if (cProperty.getName().equals(name))
+			if (cProperty.m_61708_().equals(name))
 			{
-				property = (IProperty<T>) cProperty;
+				property = (Property<T>) cProperty;
 				break;
 			}
 		}
@@ -91,11 +91,11 @@ public class BlockStateUtil
 			return state;
 		}
 
-		for (T cValue : property.getAllowedValues())
+		for (T cValue : property.m_6908_())
 		{
-			if (value.equals(property.getName(cValue)))
+			if (value.equals(property.m_6940_(cValue)))
 			{
-				return state.withProperty(property, cValue);
+				return (BlockState) state.setValue(property, cValue);
 			}
 		}
 

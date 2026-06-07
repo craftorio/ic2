@@ -2,19 +2,20 @@ package ic2.core.energy;
 
 import ic2.api.energy.EnergyNet;
 import ic2.api.energy.tile.IEnergyTile;
+import ic2.core.util.Util;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 
 class NodeLink
 {
 	Node nodeA;
 	Node nodeB;
-	EnumFacing dirFromA;
-	EnumFacing dirFromB;
+	Direction dirFromA;
+	Direction dirFromB;
 	double loss;
 	List<Node> skippedNodes = new ArrayList<>();
 
@@ -30,7 +31,7 @@ class NodeLink
 		this.skippedNodes.addAll(link.skippedNodes);
 	}
 
-	private NodeLink(Node nodeA1, Node nodeB1, double loss1, EnumFacing dirFromA, EnumFacing dirFromB)
+	private NodeLink(Node nodeA1, Node nodeB1, double loss1, Direction dirFromA, Direction dirFromB)
 	{
 		assert nodeA1 != nodeB1;
 		this.nodeA = nodeA1;
@@ -66,7 +67,7 @@ class NodeLink
 		}
 	}
 
-	EnumFacing getDirFrom(Node node)
+	Direction getDirFrom(Node node)
 	{
 		if (this.nodeA == node)
 		{
@@ -98,14 +99,14 @@ class NodeLink
 		{
 			for (IEnergyTile posB : this.nodeB.tile.subTiles)
 			{
-				BlockPos delta = EnergyNet.instance.getPos(posA).subtract(EnergyNet.instance.getPos(posB));
+				BlockPos delta = EnergyNet.instance.getPos(posA).m_121996_(EnergyNet.instance.getPos(posB));
 
-				for (EnumFacing dir : EnumFacing.VALUES)
+				for (Direction dir : Util.ALL_DIRS)
 				{
-					if (dir.getFrontOffsetX() == delta.getX() && dir.getFrontOffsetY() == delta.getY() && dir.getFrontOffsetZ() == delta.getZ())
+					if (dir.m_122429_() == delta.getX() && dir.m_122430_() == delta.getY() && dir.m_122431_() == delta.getZ())
 					{
 						this.dirFromA = dir;
-						this.dirFromB = dir.getOpposite();
+						this.dirFromB = dir.m_122424_();
 						return;
 					}
 				}

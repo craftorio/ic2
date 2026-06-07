@@ -5,30 +5,30 @@ import ic2.api.item.IElectricItem;
 import ic2.api.item.IItemHudInfo;
 import ic2.core.IC2;
 import ic2.core.item.ElectricItemManager;
-import ic2.core.ref.ItemName;
+import ic2.core.ref.Ic2ArmorMaterials;
 import ic2.core.util.StackUtil;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.MobEffects;
-import net.minecraft.inventory.EntityEquipmentSlot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item.Properties;
+import net.minecraft.world.level.Level;
 
-public class ItemArmorNightvisionGoggles extends ItemArmorUtility implements IElectricItem, IItemHudInfo
+public class ItemArmorNightVisionGoggles extends ItemArmorUtility implements IElectricItem, IItemHudInfo
 {
-	public ItemArmorNightvisionGoggles()
+	public ItemArmorNightVisionGoggles(Properties settings)
 	{
-		super(ItemName.nightvision_goggles, "nightvision", EntityEquipmentSlot.HEAD);
-		this.setMaxDamage(27);
-		this.setNoRepair();
+		super(Ic2ArmorMaterials.NIGHT_VISION_GOGGLES, settings, EquipmentSlot.HEAD);
 	}
 
 	@Override
@@ -63,66 +63,65 @@ public class ItemArmorNightvisionGoggles extends ItemArmorUtility implements IEl
 		return info;
 	}
 
-	public void onArmorTick(World world, EntityPlayer player, ItemStack stack)
+	public void m_6883_(ItemStack stack, Level world, Entity entity, int slot, boolean selected)
 	{
-		NBTTagCompound nbtData = StackUtil.getOrCreateNbtData(stack);
-		boolean active = nbtData.getBoolean("active");
-		byte toggleTimer = nbtData.getByte("toggleTimer");
-		if (IC2.keyboard.isAltKeyDown(player) && IC2.keyboard.isModeSwitchKeyDown(player) && toggleTimer == 0)
+		super.m_6883_(stack, world, entity, slot, selected);
+		if (entity instanceof Player player)
 		{
-			toggleTimer = 10;
-			active = !active;
-			if (IC2.platform.isSimulating())
+			if (slot == this.f_40377_.m_20749_())
 			{
-				nbtData.setBoolean("active", active);
-				if (active)
+				CompoundTag nbtData = StackUtil.getOrCreateNbtData(stack);
+				boolean active = nbtData.getBoolean("active");
+				byte toggleTimer = nbtData.getByte("toggleTimer");
+				if (IC2.keyboard.isAltKeyDown(player) && IC2.keyboard.isModeSwitchKeyDown(player) && toggleTimer == 0)
 				{
-					IC2.platform.messagePlayer(player, "Nightvision enabled.");
-				} else
+					toggleTimer = 10;
+					active = !active;
+					if (IC2.sideProxy.isSimulating())
+					{
+						nbtData.putBoolean("active", active);
+						if (active)
+						{
+							IC2.sideProxy.messagePlayer(player, "Nightvision enabled.");
+						} else
+						{
+							IC2.sideProxy.messagePlayer(player, "Nightvision disabled.");
+						}
+					}
+				}
+
+				if (IC2.sideProxy.isSimulating() && toggleTimer > 0)
 				{
-					IC2.platform.messagePlayer(player, "Nightvision disabled.");
+					nbtData.putByte("toggleTimer", --toggleTimer);
+				}
+
+				if (active && IC2.sideProxy.isSimulating())
+				{
+					int skylight = player.getCommandSenderWorld().m_46803_(new BlockPos(player.m_20182_()));
+					if (skylight <= 8 && ElectricItem.manager.use(stack, 1.0, player))
+					{
+						player.m_7292_(new MobEffectInstance(MobEffects.f_19611_, 300, 0, true, true));
+						return;
+					}
+				}
+
+				if (IC2.sideProxy.isSimulating())
+				{
+					player.m_21195_(MobEffects.f_19611_);
 				}
 			}
 		}
-
-		if (IC2.platform.isSimulating() && toggleTimer > 0)
-		{
-			nbtData.setByte("toggleTimer", --toggleTimer);
-		}
-
-		boolean ret = false;
-		if (active && IC2.platform.isSimulating() && ElectricItem.manager.use(stack, 1.0, player))
-		{
-			int skylight = player.getEntityWorld().getLightFromNeighbors(new BlockPos(player));
-			if (skylight > 8)
-			{
-				IC2.platform.removePotion(player, MobEffects.NIGHT_VISION);
-				player.addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, 100, 0, true, true));
-			} else
-			{
-				IC2.platform.removePotion(player, MobEffects.BLINDNESS);
-				player.addPotionEffect(new PotionEffect(MobEffects.NIGHT_VISION, 300, 0, true, true));
-			}
-
-			ret = true;
-		}
-
-		if (ret)
-		{
-			player.inventoryContainer.detectAndSendChanges();
-		}
 	}
 
-	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems)
+	public void m_6787_(CreativeModeTab tab, NonNullList<ItemStack> subItems)
 	{
-		if (this.isInCreativeTab(tab))
+		if (this.m_220152_(tab))
 		{
 			ElectricItemManager.addChargeVariants(this, subItems);
 		}
 	}
 
-	@Override
-	public boolean getIsRepairable(ItemStack par1ItemStack, ItemStack par2ItemStack)
+	public boolean m_6832_(ItemStack par1ItemStack, ItemStack par2ItemStack)
 	{
 		return false;
 	}

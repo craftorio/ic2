@@ -1,0 +1,9 @@
+{
+  "type": "ic2:macerator",
+  "ingredient": {
+    "item": "minecraft:poisonous_potato"
+  },
+  "result": {
+    "item": "ic2:grin_powder"
+  }
+}

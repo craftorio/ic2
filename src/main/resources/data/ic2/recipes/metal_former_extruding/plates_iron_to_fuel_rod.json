@@ -1,0 +1,9 @@
+{
+  "type": "ic2:metal_former_extruding",
+  "ingredient": {
+    "tag": "forge:plates/iron"
+  },
+  "result": {
+    "item": "ic2:fuel_rod"
+  }
+}

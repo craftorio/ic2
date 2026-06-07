@@ -1,10 +1,10 @@
 package ic2.core.block.comp;
 
-import ic2.core.block.TileEntityBlock;
+import ic2.core.block.tileentity.Ic2TileEntity;
 
 public class ComparatorEmitter extends BasicRedstoneComponent
 {
-	public ComparatorEmitter(TileEntityBlock parent)
+	public ComparatorEmitter(Ic2TileEntity parent)
 	{
 		super(parent);
 	}
@@ -12,6 +12,6 @@ public class ComparatorEmitter extends BasicRedstoneComponent
 	@Override
 	public void onChange()
 	{
-		this.parent.getWorld().updateComparatorOutputLevel(this.parent.getPos(), this.parent.getBlockType());
+		this.parent.getLevel().m_46717_(this.parent.getBlockPos(), this.parent.getBlockState().getBlock());
 	}
 }

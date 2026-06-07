@@ -1,0 +1,11 @@
+{
+  "type": "ic2:shapeless",
+  "ingredients": [
+    {
+      "item": "ic2:coffee_beans"
+    }
+  ],
+  "result": {
+    "item": "ic2:coffee_powder"
+  }
+}

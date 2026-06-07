@@ -1,6 +1,6 @@
 package ic2.core.item.armor.jetpack;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 public interface IJetpack
 {

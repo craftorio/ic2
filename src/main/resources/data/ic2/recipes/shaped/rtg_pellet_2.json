@@ -1,0 +1,20 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "RAR",
+    "RAR",
+    "RAR"
+  ],
+  "key": {
+    "R": {
+      "item": "ic2:dense_iron_plate"
+    },
+    "A": {
+      "tag": "forge:ingots/plutonium"
+    }
+  },
+  "group": "rtg_pellet",
+  "result": {
+    "item": "ic2:rtg_pellet"
+  }
+}

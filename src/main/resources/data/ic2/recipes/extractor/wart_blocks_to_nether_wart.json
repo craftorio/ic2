@@ -1,0 +1,10 @@
+{
+  "type": "ic2:extractor",
+  "ingredient": {
+    "tag": "minecraft:wart_blocks"
+  },
+  "result": {
+    "item": "minecraft:nether_wart",
+    "count": 9
+  }
+}

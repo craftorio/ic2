@@ -2,9 +2,7 @@ package ic2.core.block.machine.tileentity;
 
 import ic2.api.network.INetworkClientTileEntityEventListener;
 import ic2.api.recipe.IEmptyFluidContainerRecipeManager;
-import ic2.api.recipe.IRecipeInput;
 import ic2.api.recipe.MachineRecipeResult;
-import ic2.api.recipe.Recipes;
 import ic2.api.upgrade.UpgradableProperty;
 import ic2.api.util.FluidContainerOutputMode;
 import ic2.core.ContainerBase;
@@ -13,18 +11,13 @@ import ic2.core.block.comp.Fluids;
 import ic2.core.block.invslot.InvSlotConsumableCanner;
 import ic2.core.block.invslot.InvSlotConsumableLiquid;
 import ic2.core.block.invslot.InvSlotProcessableCanner;
-import ic2.core.block.machine.CannerBottleRecipeManager;
-import ic2.core.block.machine.CannerEnrichRecipeManager;
 import ic2.core.block.machine.container.ContainerCanner;
-import ic2.core.block.machine.gui.GuiCanner;
-import ic2.core.item.type.CraftingItemType;
-import ic2.core.item.type.DustResourceType;
-import ic2.core.item.type.NuclearResourceType;
-import ic2.core.ref.FluidName;
-import ic2.core.ref.ItemName;
-import ic2.core.ref.TeBlock;
+import ic2.core.fluid.Ic2FluidStack;
+import ic2.core.fluid.Ic2FluidTank;
+import ic2.core.network.GrowingBuffer;
+import ic2.core.ref.Ic2BlockEntities;
+import ic2.core.ref.Ic2SoundEvents;
 import ic2.core.util.LiquidUtil;
-import ic2.core.util.StackUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,37 +26,27 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidRegistry;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidTank;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 
-@TeBlock.Delegated(current = TileEntityCanner.class, old = TileEntityClassicCanner.class)
 public class TileEntityCanner extends TileEntityStandardMachine<Object, Object, Object> implements INetworkClientTileEntityEventListener
 {
 	private TileEntityCanner.Mode mode = TileEntityCanner.Mode.BottleSolid;
 	public static final int eventSetModeBase = 0;
 	public static final int eventSwapTanks = 0 + TileEntityCanner.Mode.values.length + 1;
-	public final FluidTank inputTank;
-	public final FluidTank outputTank;
+	public final Ic2FluidTank inputTank;
+	public final Ic2FluidTank outputTank;
 	public final InvSlotConsumableCanner canInputSlot;
 	protected final Fluids fluids;
 
-	public static Class<? extends TileEntityElectricMachine> delegate()
+	public TileEntityCanner(BlockPos pos, BlockState state)
 	{
-		return IC2.version.isClassic() ? TileEntityClassicCanner.class : TileEntityCanner.class;
-	}
-
-	public TileEntityCanner()
-	{
-		super(4, 200, 1);
+		super(Ic2BlockEntities.CANNER, pos, state, 4, 200, 1);
 		this.inputSlot = new InvSlotProcessableCanner(this, "input", 1);
 		this.canInputSlot = new InvSlotConsumableCanner(this, "canInput", 1);
 		this.fluids = this.addComponent(new Fluids(this));
@@ -71,100 +54,18 @@ public class TileEntityCanner extends TileEntityStandardMachine<Object, Object, 
 		this.outputTank = this.fluids.addTankExtract("outputTank", 8000);
 	}
 
-	public static void init()
+	@Override
+	public void load(CompoundTag nbt)
 	{
-		Recipes.cannerBottle = new CannerBottleRecipeManager();
-		Recipes.cannerEnrich = new CannerEnrichRecipeManager();
-		ItemStack fuelRod = ItemName.crafting.getItemStack(CraftingItemType.fuel_rod);
-		addBottleRecipe(fuelRod, ItemName.nuclear.getItemStack(NuclearResourceType.uranium), ItemName.uranium_fuel_rod.getItemStack());
-		addBottleRecipe(fuelRod, ItemName.nuclear.getItemStack(NuclearResourceType.mox), ItemName.mox_fuel_rod.getItemStack());
-		ItemStack tinCan = ItemName.crafting.getItemStack(CraftingItemType.tin_can);
-		ItemStack filledTinCan = ItemName.filled_tin_can.getItemStack();
-		addBottleRecipe(tinCan, new ItemStack(Items.POTATO), filledTinCan);
-		addBottleRecipe(tinCan, 2, new ItemStack(Items.COOKIE), StackUtil.copyWithSize(filledTinCan, 2));
-		addBottleRecipe(tinCan, 2, new ItemStack(Items.MELON), StackUtil.copyWithSize(filledTinCan, 2));
-		addBottleRecipe(tinCan, 2, new ItemStack(Items.FISH), StackUtil.copyWithSize(filledTinCan, 2));
-		addBottleRecipe(tinCan, 2, new ItemStack(Items.CHICKEN), StackUtil.copyWithSize(filledTinCan, 2));
-		addBottleRecipe(tinCan, 3, new ItemStack(Items.PORKCHOP), StackUtil.copyWithSize(filledTinCan, 3));
-		addBottleRecipe(tinCan, 3, new ItemStack(Items.BEEF), StackUtil.copyWithSize(filledTinCan, 3));
-		addBottleRecipe(tinCan, 4, new ItemStack(Items.APPLE), StackUtil.copyWithSize(filledTinCan, 4));
-		addBottleRecipe(tinCan, 4, new ItemStack(Items.CARROT), StackUtil.copyWithSize(filledTinCan, 4));
-		addBottleRecipe(tinCan, 5, new ItemStack(Items.BREAD), StackUtil.copyWithSize(filledTinCan, 5));
-		addBottleRecipe(tinCan, 5, new ItemStack(Items.COOKED_FISH), StackUtil.copyWithSize(filledTinCan, 5));
-		addBottleRecipe(tinCan, 6, new ItemStack(Items.COOKED_CHICKEN), StackUtil.copyWithSize(filledTinCan, 6));
-		addBottleRecipe(tinCan, 6, new ItemStack(Items.BAKED_POTATO), StackUtil.copyWithSize(filledTinCan, 6));
-		addBottleRecipe(tinCan, 6, new ItemStack(Items.MUSHROOM_STEW), StackUtil.copyWithSize(filledTinCan, 6));
-		addBottleRecipe(tinCan, 6, new ItemStack(Items.PUMPKIN_PIE), StackUtil.copyWithSize(filledTinCan, 6));
-		addBottleRecipe(tinCan, 8, new ItemStack(Items.COOKED_PORKCHOP), StackUtil.copyWithSize(filledTinCan, 8));
-		addBottleRecipe(tinCan, 8, new ItemStack(Items.COOKED_BEEF), StackUtil.copyWithSize(filledTinCan, 8));
-		addBottleRecipe(tinCan, 12, new ItemStack(Items.CAKE), StackUtil.copyWithSize(filledTinCan, 12));
-		addBottleRecipe(tinCan, new ItemStack(Items.POISONOUS_POTATO), 2, filledTinCan);
-		addBottleRecipe(tinCan, new ItemStack(Items.ROTTEN_FLESH), 2, filledTinCan);
-		addEnrichRecipe(FluidRegistry.WATER, ItemName.dust.getItemStack(DustResourceType.milk), FluidName.milk.getInstance());
-		addEnrichRecipe(FluidRegistry.WATER, ItemName.crafting.getItemStack(CraftingItemType.cf_powder), FluidName.construction_foam.getInstance());
-		addEnrichRecipe(FluidRegistry.WATER, Recipes.inputFactory.forOreDict("dustLapis", 8), FluidName.coolant.getInstance());
-		addEnrichRecipe(FluidName.distilled_water.getInstance(), Recipes.inputFactory.forOreDict("dustLapis", 1), FluidName.coolant.getInstance());
-		addEnrichRecipe(FluidRegistry.WATER, ItemName.crafting.getItemStack(CraftingItemType.bio_chaff), FluidName.biomass.getInstance());
-		addEnrichRecipe(
-			new FluidStack(FluidRegistry.WATER, 6000),
-			Recipes.inputFactory.forStack(new ItemStack(Items.STICK)),
-			new FluidStack(FluidName.hot_water.getInstance(), 1000)
-		);
-	}
-
-	public static void addBottleRecipe(ItemStack container, int conamount, ItemStack fill, int fillamount, ItemStack output)
-	{
-		addBottleRecipe(Recipes.inputFactory.forStack(container, conamount), Recipes.inputFactory.forStack(fill, fillamount), output);
-	}
-
-	public static void addBottleRecipe(ItemStack container, ItemStack fill, int fillamount, ItemStack output)
-	{
-		addBottleRecipe(Recipes.inputFactory.forStack(container, 1), Recipes.inputFactory.forStack(fill, fillamount), output);
-	}
-
-	public static void addBottleRecipe(ItemStack container, int conamount, ItemStack fill, ItemStack output)
-	{
-		addBottleRecipe(Recipes.inputFactory.forStack(container, conamount), Recipes.inputFactory.forStack(fill, 1), output);
-	}
-
-	public static void addBottleRecipe(ItemStack container, ItemStack fill, ItemStack output)
-	{
-		addBottleRecipe(Recipes.inputFactory.forStack(container, 1), Recipes.inputFactory.forStack(fill, 1), output);
-	}
-
-	public static void addBottleRecipe(IRecipeInput container, IRecipeInput fill, ItemStack output)
-	{
-		Recipes.cannerBottle.addRecipe(container, fill, output);
-	}
-
-	public static void addEnrichRecipe(Fluid input, ItemStack additive, Fluid output)
-	{
-		addEnrichRecipe(new FluidStack(input, 1000), Recipes.inputFactory.forStack(additive, 1), new FluidStack(output, 1000));
-	}
-
-	public static void addEnrichRecipe(Fluid input, IRecipeInput additive, Fluid output)
-	{
-		addEnrichRecipe(new FluidStack(input, 1000), additive, new FluidStack(output, 1000));
-	}
-
-	public static void addEnrichRecipe(FluidStack input, IRecipeInput additive, FluidStack output)
-	{
-		Recipes.cannerEnrich.addRecipe(input, additive, output);
+		super.load(nbt);
+		this.setMode(TileEntityCanner.Mode.values[nbt.getInt("mode")]);
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound nbt)
+	public void saveAdditional(CompoundTag nbt)
 	{
-		super.readFromNBT(nbt);
-		this.setMode(TileEntityCanner.Mode.values[nbt.getInteger("mode")]);
-	}
-
-	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
-	{
-		super.writeToNBT(nbt);
-		nbt.setInteger("mode", this.mode.ordinal());
-		return nbt;
+		super.saveAdditional(nbt);
+		nbt.putInt("mode", this.mode.ordinal());
 	}
 
 	@Override
@@ -174,10 +75,10 @@ public class TileEntityCanner extends TileEntityStandardMachine<Object, Object, 
 		if (this.mode == TileEntityCanner.Mode.EmptyLiquid)
 		{
 			IEmptyFluidContainerRecipeManager.Output output = (IEmptyFluidContainerRecipeManager.Output) result.getOutput();
-			this.getOutputTank().fill(output.fluid, true);
+			this.getOutputTank().fillMbUnchecked(output.fluid, false);
 		} else if (this.mode == TileEntityCanner.Mode.EnrichLiquid)
 		{
-			FluidStack output = ((FluidStack) result.getOutput()).copy();
+			Ic2FluidStack output = ((Ic2FluidStack) result.getOutput()).copy();
 			LiquidUtil.FluidOperationResult outcome;
 			if (!this.canInputSlot.isEmpty())
 			{
@@ -197,13 +98,13 @@ public class TileEntityCanner extends TileEntityStandardMachine<Object, Object, 
 								this.outputSlot.add(outcome.extraOutput);
 							}
 
-							output.amount = output.amount - outcome.fluidChange.amount;
+							output.setAmountMb(output.getAmountMb() - outcome.fluidChange.getAmountMb());
 						}
 					}
-				} while (outcome != null && output.amount > 0);
+				} while (outcome != null && !output.isEmpty());
 			}
 
-			this.getOutputTank().fill(output, true);
+			this.getOutputTank().fillMbUnchecked(output, false);
 		}
 	}
 
@@ -213,7 +114,7 @@ public class TileEntityCanner extends TileEntityStandardMachine<Object, Object, 
 		if (output instanceof ItemStack)
 		{
 			return Collections.singletonList((ItemStack) output);
-		} else if (output instanceof FluidStack)
+		} else if (output instanceof Ic2FluidStack)
 		{
 			return Collections.emptyList();
 		} else
@@ -225,7 +126,7 @@ public class TileEntityCanner extends TileEntityStandardMachine<Object, Object, 
 	}
 
 	@Override
-	public MachineRecipeResult<Object, Object, Object> getOutput()
+	public MachineRecipeResult<Object, Object, Object> getRecipeResult()
 	{
 		if (this.mode != TileEntityCanner.Mode.EmptyLiquid && this.mode != TileEntityCanner.Mode.BottleLiquid)
 		{
@@ -252,13 +153,13 @@ public class TileEntityCanner extends TileEntityStandardMachine<Object, Object, 
 		if (this.mode == TileEntityCanner.Mode.EmptyLiquid)
 		{
 			IEmptyFluidContainerRecipeManager.Output output = (IEmptyFluidContainerRecipeManager.Output) result.getOutput();
-			if (this.getOutputTank().fill(output.fluid, false) != output.fluid.amount)
+			if (this.getOutputTank().fillMbUnchecked(output.fluid, true) != output.fluid.getAmountMb())
 			{
 				return null;
 			}
 		} else if (this.mode == TileEntityCanner.Mode.EnrichLiquid)
 		{
-			FluidStack output = ((FluidStack) result.getOutput()).copy();
+			Ic2FluidStack output = ((Ic2FluidStack) result.getOutput()).copy();
 			LiquidUtil.FluidOperationResult outcome;
 			if (!this.canInputSlot.isEmpty())
 			{
@@ -272,13 +173,13 @@ public class TileEntityCanner extends TileEntityStandardMachine<Object, Object, 
 							outcome = null;
 						} else
 						{
-							output.amount = output.amount - outcome.fluidChange.amount;
+							output.setAmountMb(output.getAmountMb() - outcome.fluidChange.getAmountMb());
 						}
 					}
-				} while (outcome != null && output.amount > 0);
+				} while (outcome != null && !output.isEmpty());
 			}
 
-			if (this.getOutputTank().fill(output, false) != output.amount)
+			if (this.getOutputTank().fillMbUnchecked(output, true) != output.getAmountMb())
 			{
 				return null;
 			}
@@ -287,12 +188,12 @@ public class TileEntityCanner extends TileEntityStandardMachine<Object, Object, 
 		return result;
 	}
 
-	public FluidTank getInputTank()
+	public Ic2FluidTank getInputTank()
 	{
 		return this.inputTank;
 	}
 
-	public FluidTank getOutputTank()
+	public Ic2FluidTank getOutputTank()
 	{
 		return this.outputTank;
 	}
@@ -307,44 +208,36 @@ public class TileEntityCanner extends TileEntityStandardMachine<Object, Object, 
 	}
 
 	@Override
-	public String getStartSoundFile()
+	public SoundEvent getLoopingSoundEvent()
 	{
-		switch (this.mode)
+		return switch (this.mode)
 		{
-			case BottleSolid:
-			case BottleLiquid:
-			case EmptyLiquid:
-			case EnrichLiquid:
-			default:
-				return null;
-		}
+			case BottleSolid, BottleLiquid -> Ic2SoundEvents.MACHINE_CANNER_OPERATE;
+			case EmptyLiquid -> Ic2SoundEvents.MACHINE_CANNER_REVERSE;
+			default -> null;
+		};
 	}
 
 	@Override
-	public String getInterruptSoundFile()
+	public SoundEvent getInterruptSoundEvent()
 	{
-		switch (this.mode)
+		return switch (this.mode)
 		{
-			case BottleSolid:
-			case BottleLiquid:
-			case EmptyLiquid:
-			case EnrichLiquid:
-			default:
-				return null;
-		}
+			case BottleSolid, BottleLiquid, EmptyLiquid -> Ic2SoundEvents.MACHINE_INTERRUPT1;
+			default -> null;
+		};
 	}
 
 	@Override
-	public ContainerBase<TileEntityCanner> getGuiContainer(EntityPlayer player)
+	public ContainerBase<TileEntityCanner> createServerScreenHandler(int syncId, Player player)
 	{
-		return new ContainerCanner(player, this);
+		return new ContainerCanner(syncId, player.getInventory(), this);
 	}
 
-	@SideOnly(Side.CLIENT)
 	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
-		return new GuiCanner(new ContainerCanner(player, this));
+		return new ContainerCanner(syncId, inventory, this);
 	}
 
 	@Override
@@ -358,7 +251,7 @@ public class TileEntityCanner extends TileEntityStandardMachine<Object, Object, 
 	}
 
 	@Override
-	public void onNetworkEvent(EntityPlayer player, int event)
+	public void onNetworkEvent(Player player, int event)
 	{
 		if (event >= 0 && event < 0 + TileEntityCanner.Mode.values.length)
 		{
@@ -392,17 +285,9 @@ public class TileEntityCanner extends TileEntityStandardMachine<Object, Object, 
 				this.canInputSlot.setOpType(InvSlotConsumableLiquid.OpType.Both);
 		}
 
-		if (IC2.platform.isRendering())
+		if (IC2.sideProxy.isRendering())
 		{
-			if (this.audioSource != null)
-			{
-				this.audioSource.stop();
-			}
-
-			if (this.getStartSoundFile() != null)
-			{
-				this.audioSource = IC2.audioManager.createSource(this, this.getStartSoundFile());
-			}
+			this.stopLoopingSound();
 		}
 	}
 
@@ -413,10 +298,10 @@ public class TileEntityCanner extends TileEntityStandardMachine<Object, Object, 
 			return false;
 		}
 
-		FluidStack inputStack = this.inputTank.getFluid();
-		FluidStack outputStack = this.outputTank.getFluid();
-		this.inputTank.setFluid(outputStack);
-		this.outputTank.setFluid(inputStack);
+		Ic2FluidStack inputStack = this.inputTank.getFluidStack();
+		Ic2FluidStack outputStack = this.outputTank.getFluidStack();
+		this.inputTank.setFluidStack(outputStack);
+		this.outputTank.setFluidStack(inputStack);
 		return true;
 	}
 

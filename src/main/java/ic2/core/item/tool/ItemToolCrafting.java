@@ -2,35 +2,31 @@ package ic2.core.item.tool;
 
 import ic2.api.item.IBoxable;
 import ic2.api.item.IItemHudInfo;
-import ic2.core.IC2;
 import ic2.core.init.Localization;
-import ic2.core.item.ItemIC2;
-import ic2.core.ref.ItemName;
-import ic2.core.util.StackUtil;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.Item.Properties;
+import net.minecraft.world.level.Level;
 
-public abstract class ItemToolCrafting extends ItemIC2 implements IBoxable, IItemHudInfo
+public class ItemToolCrafting extends Item implements IBoxable, IItemHudInfo
 {
-	public ItemToolCrafting(ItemName name, int maximumUses)
+	public static final String TOOLTIP_USES_LEFT = "ic2.tooltip.tool.uses_left";
+
+	public ItemToolCrafting(Properties settings)
 	{
-		super(name);
-		this.setMaxDamage(maximumUses - 1);
-		this.setMaxStackSize(1);
-		this.canRepair = false;
+		super(settings);
 	}
 
-	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced)
+	public void m_7373_(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag advanced)
 	{
-		tooltip.add(Localization.translate("ic2.item.ItemTool.tooltip.UsesLeft", getRemainingUses(stack)));
+		tooltip.add(Component.m_237110_("ic2.tooltip.tool.uses_left", new Object[] { getRemainingUses(stack) }));
 	}
 
 	@Override
@@ -43,18 +39,12 @@ public abstract class ItemToolCrafting extends ItemIC2 implements IBoxable, IIte
 	public List<String> getHudInfo(ItemStack stack, boolean advanced)
 	{
 		List<String> info = new LinkedList<>();
-		info.add(Localization.translate("ic2.item.ItemTool.tooltip.UsesLeft", getRemainingUses(stack)));
+		info.add(Localization.translate("ic2.tooltip.tool.uses_left", getRemainingUses(stack)).formatted(ChatFormatting.GRAY));
 		return info;
 	}
 
-	public boolean hasContainerItem(ItemStack stack)
+	protected static int getRemainingUses(ItemStack stack)
 	{
-		return true;
-	}
-
-	public ItemStack getContainerItem(ItemStack stack)
-	{
-		ItemStack ret = stack.copy();
-		return ret.attemptDamageItem(1, IC2.random, null) ? StackUtil.emptyStack : ret;
+		return stack.m_41776_() - stack.getDamageValue();
 	}
 }

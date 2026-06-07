@@ -1,0 +1,19 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    " C ",
+    "CGC",
+    " C "
+  ],
+  "key": {
+    "C": {
+      "item": "ic2:tin_casing"
+    },
+    "G": {
+      "item": "minecraft:glass_pane"
+    }
+  },
+  "result": {
+    "item": "ic2:empty_cell"
+  }
+}

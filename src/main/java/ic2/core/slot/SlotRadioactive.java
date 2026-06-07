@@ -1,18 +1,18 @@
 package ic2.core.slot;
 
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.Container;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
 public class SlotRadioactive extends Slot
 {
-	public SlotRadioactive(IInventory inventory, int index, int x, int y)
+	public SlotRadioactive(Container inventory, int index, int x, int y)
 	{
 		super(inventory, index, x, y);
 	}
 
-	public boolean isItemValid(ItemStack stack)
+	public boolean m_5857_(ItemStack stack)
 	{
-		return this.inventory.isItemValidForSlot(this.slotNumber, stack);
+		return this.f_40218_.canPlaceItem(this.m_150661_(), stack);
 	}
 }

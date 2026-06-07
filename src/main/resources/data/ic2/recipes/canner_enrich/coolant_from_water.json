@@ -1,0 +1,15 @@
+{
+  "type": "ic2:canner_enrich",
+  "input_ingredient": {
+    "fluid": "minecraft:water",
+    "amount": 1000
+  },
+  "additive_ingredient": {
+    "tag": "forge:dusts/lapis",
+    "count": 8
+  },
+  "result": {
+    "fluid": "ic2:coolant",
+    "amount": 1000
+  }
+}

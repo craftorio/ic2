@@ -1,0 +1,10 @@
+{
+  "type": "ic2:extractor",
+  "ingredient": {
+    "item": "minecraft:gilded_blackstone"
+  },
+  "result": {
+    "item": "minecraft:gold_nugget",
+    "count": 4
+  }
+}

@@ -4,11 +4,13 @@ import com.mojang.authlib.GameProfile;
 import ic2.core.ContainerBase;
 import ic2.core.IC2;
 import ic2.core.IHasGui;
-import ic2.core.block.TileEntityInventory;
 import ic2.core.block.invslot.InvSlot;
+import ic2.core.block.tileentity.TileEntityInventory;
 import ic2.core.gui.dynamic.DynamicContainer;
-import ic2.core.gui.dynamic.DynamicGui;
 import ic2.core.gui.dynamic.GuiParser;
+import ic2.core.network.GrowingBuffer;
+import ic2.core.ref.Ic2BlockEntities;
+import ic2.core.ref.Ic2ScreenHandlers;
 import ic2.core.util.DelegatingInventory;
 import ic2.core.util.StackUtil;
 import ic2.core.util.Util;
@@ -19,64 +21,69 @@ import java.util.List;
 import java.util.Set;
 import java.util.WeakHashMap;
 
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.SoundEvents;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTUtil;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.Container;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class TileEntityPersonalChest extends TileEntityInventory implements IPersonalBlock, IHasGui
 {
 	private GameProfile owner = null;
 	private static final int openingSteps = 10;
-	private static final List<AxisAlignedBB> aabbs = Arrays.asList(new AxisAlignedBB(0.0625, 0.0, 0.0625, 0.9375, 1.0, 0.9375));
+	private static final List<AABB> aabbs = Arrays.asList(new AABB(0.0625, 0.0, 0.0625, 0.9375, 1.0, 0.9375));
 	public final InvSlot contentSlot;
-	private final Set<EntityPlayer> usingPlayers = Collections.newSetFromMap(new WeakHashMap<>());
+	private final Set<Player> usingPlayers = Collections.newSetFromMap(new WeakHashMap<>());
 	private int usingPlayerCount;
 	private byte lidAngle;
 	private byte prevLidAngle;
 
-	public TileEntityPersonalChest()
+	public TileEntityPersonalChest(BlockPos pos, BlockState state)
 	{
+		super(Ic2BlockEntities.PERSONAL_CHEST, pos, state);
 		this.contentSlot = new InvSlot(this, "content", InvSlot.Access.NONE, 54);
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound nbt)
+	public void load(CompoundTag nbt)
 	{
-		super.readFromNBT(nbt);
-		if (nbt.hasKey("ownerGameProfile"))
+		super.load(nbt);
+		if (nbt.contains("ownerGameProfile"))
 		{
-			this.owner = NBTUtil.readGameProfileFromNBT(nbt.getCompoundTag("ownerGameProfile"));
+			this.owner = NbtUtils.readGameProfile(nbt.getCompound("ownerGameProfile"));
 		}
 	}
 
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
+	public void saveAdditional(CompoundTag nbt)
 	{
-		super.writeToNBT(nbt);
+		super.saveAdditional(nbt);
 		if (this.owner != null)
 		{
-			NBTTagCompound ownerNbt = new NBTTagCompound();
-			NBTUtil.writeGameProfile(ownerNbt, this.owner);
-			nbt.setTag("ownerGameProfile", ownerNbt);
+			CompoundTag ownerNbt = new CompoundTag();
+			NbtUtils.writeGameProfile(ownerNbt, this.owner);
+			nbt.put("ownerGameProfile", ownerNbt);
 		}
-
-		return nbt;
 	}
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	protected void updateEntityClient()
 	{
@@ -84,8 +91,8 @@ public class TileEntityPersonalChest extends TileEntityInventory implements IPer
 		this.prevLidAngle = this.lidAngle;
 		if (this.usingPlayerCount > 0 && this.lidAngle <= 0)
 		{
-			World world = this.getWorld();
-			world.playSound(null, this.pos, SoundEvents.BLOCK_CHEST_OPEN, SoundCategory.BLOCKS, 0.5F, world.rand.nextFloat() * 0.1F + 0.9F);
+			Level world = this.getLevel();
+			world.playSound(null, this.worldPosition, SoundEvents.CHEST_OPEN, SoundSource.BLOCKS, 0.5F, world.random.nextFloat() * 0.1F + 0.9F);
 		}
 
 		if (this.usingPlayerCount == 0 && this.lidAngle > 0 || this.usingPlayerCount > 0 && this.lidAngle < 10)
@@ -101,24 +108,22 @@ public class TileEntityPersonalChest extends TileEntityInventory implements IPer
 			int closeThreshold = 5;
 			if (this.lidAngle < closeThreshold && this.prevLidAngle >= closeThreshold)
 			{
-				World world = this.getWorld();
-				world.playSound(
-					null, this.pos, SoundEvents.BLOCK_CHEST_CLOSE, SoundCategory.BLOCKS, 0.5F, world.rand.nextFloat() * 0.1F + 0.9F
-				);
+				Level world = this.getLevel();
+				world.playSound(null, this.worldPosition, SoundEvents.CHEST_CLOSE, SoundSource.BLOCKS, 0.5F, world.random.nextFloat() * 0.1F + 0.9F);
 			}
 		}
 	}
 
 	@Override
-	protected List<AxisAlignedBB> getAabbs(boolean forCollision)
+	protected List<AABB> getAabbs(boolean forCollision)
 	{
 		return aabbs;
 	}
 
 	@Override
-	public void openInventory(EntityPlayer player)
+	public void startOpen(Player player)
 	{
-		if (!this.getWorld().isRemote)
+		if (!this.getLevel().isClientSide)
 		{
 			this.usingPlayers.add(player);
 			this.updateUsingPlayerCount();
@@ -126,9 +131,9 @@ public class TileEntityPersonalChest extends TileEntityInventory implements IPer
 	}
 
 	@Override
-	public void closeInventory(EntityPlayer player)
+	public void stopOpen(Player player)
 	{
-		if (!this.getWorld().isRemote)
+		if (!this.getLevel().isClientSide)
 		{
 			this.usingPlayers.remove(player);
 			this.updateUsingPlayerCount();
@@ -151,15 +156,15 @@ public class TileEntityPersonalChest extends TileEntityInventory implements IPer
 	}
 
 	@Override
-	public boolean wrenchCanRemove(EntityPlayer player)
+	public boolean wrenchCanRemove(Player player)
 	{
 		if (!this.permitsAccess(player.getGameProfile()))
 		{
-			IC2.platform.messagePlayer(player, "This safe is owned by " + this.owner.getName());
+			IC2.sideProxy.messagePlayer(player, "This safe is owned by " + this.owner.getName());
 			return false;
 		} else if (!this.contentSlot.isEmpty())
 		{
-			IC2.platform.messagePlayer(player, "Can't wrench non-empty safe");
+			IC2.sideProxy.messagePlayer(player, "Can't wrench non-empty safe");
 			return false;
 		} else
 		{
@@ -174,26 +179,26 @@ public class TileEntityPersonalChest extends TileEntityInventory implements IPer
 	}
 
 	@Override
-	public IInventory getPrivilegedInventory(GameProfile accessor)
+	public Container getPrivilegedInventory(GameProfile accessor)
 	{
-		return (IInventory) (!this.permitsAccess(accessor) ? this : new DelegatingInventory(this)
+		return (Container) (!this.permitsAccess(accessor) ? this : new DelegatingInventory(this)
 		{
 			@Override
-			public int getSizeInventory()
+			public int getContainerSize()
 			{
 				return TileEntityPersonalChest.this.contentSlot.size();
 			}
 
 			@Override
-			public ItemStack getStackInSlot(int index)
+			public ItemStack getItem(int index)
 			{
 				return TileEntityPersonalChest.this.contentSlot.get(index);
 			}
 
 			@Override
-			public ItemStack decrStackSize(int index, int amount)
+			public ItemStack removeItem(int index, int amount)
 			{
-				ItemStack stack = this.getStackInSlot(index);
+				ItemStack stack = this.getItem(index);
 				if (StackUtil.isEmpty(stack))
 				{
 					return StackUtil.emptyStack;
@@ -201,7 +206,7 @@ public class TileEntityPersonalChest extends TileEntityInventory implements IPer
 
 				if (amount >= StackUtil.getSize(stack))
 				{
-					this.setInventorySlotContents(index, StackUtil.emptyStack);
+					this.setItem(index, StackUtil.emptyStack);
 					return stack;
 				}
 
@@ -214,46 +219,46 @@ public class TileEntityPersonalChest extends TileEntityInventory implements IPer
 					}
 
 					stack = StackUtil.decSize(stack, amount);
-					this.setInventorySlotContents(index, stack);
+					this.setItem(index, stack);
 				}
 
 				return StackUtil.copyWithSize(stack, amount);
 			}
 
 			@Override
-			public ItemStack removeStackFromSlot(int index)
+			public ItemStack removeItemNoUpdate(int index)
 			{
-				ItemStack ret = this.getStackInSlot(index);
+				ItemStack ret = this.getItem(index);
 				if (!StackUtil.isEmpty(ret))
 				{
-					this.setInventorySlotContents(index, StackUtil.emptyStack);
+					this.setItem(index, StackUtil.emptyStack);
 				}
 
 				return ret;
 			}
 
 			@Override
-			public void setInventorySlotContents(int index, ItemStack stack)
+			public void setItem(int index, ItemStack stack)
 			{
 				TileEntityPersonalChest.this.contentSlot.put(index, stack);
-				this.markDirty();
+				this.setChanged();
 			}
 
 			@Override
-			public int getInventoryStackLimit()
+			public int getMaxStackSize()
 			{
 				return TileEntityPersonalChest.this.contentSlot.getStackSizeLimit();
 			}
 
 			@Override
-			public boolean isItemValidForSlot(int index, ItemStack stack)
+			public boolean canPlaceItem(int index, ItemStack stack)
 			{
 				return TileEntityPersonalChest.this.contentSlot.accepts(stack);
 			}
 		});
 	}
 
-	public static <T extends TileEntity & IPersonalBlock> boolean checkAccess(T te, GameProfile profile)
+	public static <T extends BlockEntity & IPersonalBlock> boolean checkAccess(T te, GameProfile profile)
 	{
 		if (profile == null)
 		{
@@ -261,7 +266,7 @@ public class TileEntityPersonalChest extends TileEntityInventory implements IPer
 		}
 
 		GameProfile teOwner = te.getOwner();
-		if (!te.getWorld().isRemote)
+		if (!te.getLevel().isClientSide)
 		{
 			if (teOwner == null)
 			{
@@ -270,7 +275,7 @@ public class TileEntityPersonalChest extends TileEntityInventory implements IPer
 				return true;
 			}
 
-			if (te.getWorld().getMinecraftServer().getPlayerList().canSendCommands(profile))
+			if (te.getLevel().getServer().getPlayerList().isOp(profile))
 			{
 				return true;
 			}
@@ -301,43 +306,44 @@ public class TileEntityPersonalChest extends TileEntityInventory implements IPer
 	}
 
 	@Override
-	protected boolean onActivated(EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ)
+	protected InteractionResult onActivated(Player player, InteractionHand hand, Direction side, Vec3 hit)
 	{
-		if (!this.getWorld().isRemote && !this.permitsAccess(player.getGameProfile()))
+		if (!this.getLevel().isClientSide && !this.permitsAccess(player.getGameProfile()))
 		{
-			IC2.platform.messagePlayer(player, "This safe is owned by " + this.getOwner().getName());
-			return false;
+			IC2.sideProxy.messagePlayer(player, "This safe is owned by " + this.getOwner().getName());
+			return InteractionResult.FAIL;
 		} else
 		{
-			return super.onActivated(player, hand, side, hitX, hitY, hitZ);
+			return super.onActivated(player, hand, side, hit);
 		}
 	}
 
 	@Override
-	public ContainerBase<TileEntityPersonalChest> getGuiContainer(EntityPlayer player)
+	public ContainerBase<?> createServerScreenHandler(int syncId, Player player)
 	{
-		this.openInventory(player);
-		return new DynamicContainer<TileEntityPersonalChest>(this, player, GuiParser.parse(this.teBlock))
+		this.startOpen(player);
+		return new DynamicContainer<TileEntityInventory>(
+			Ic2ScreenHandlers.DYNAMIC_BE, syncId, player.getInventory(), this, GuiParser.parse(Util.getName(this.getBlockType()), this.getClass())
+		)
 		{
-			public void onContainerClosed(EntityPlayer player)
+			public void removed(Player player)
 			{
-				this.base.onGuiClosed(player);
-				super.onContainerClosed(player);
+				this.base.stopOpen(player);
+				super.removed(player);
 			}
 		};
 	}
 
-	@SideOnly(Side.CLIENT)
 	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
-		return DynamicGui.<TileEntityPersonalChest>create(this, player, GuiParser.parse(this.teBlock));
+		return DynamicContainer.create(syncId, inventory, this);
 	}
 
 	@Override
-	public void onGuiClosed(EntityPlayer player)
+	public void onScreenClosed(Player player)
 	{
-		this.closeInventory(player);
+		this.stopOpen(player);
 	}
 
 	public float getLidAngle(float partialTicks)

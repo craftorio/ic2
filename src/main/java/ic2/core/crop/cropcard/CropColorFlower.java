@@ -2,33 +2,39 @@ package ic2.core.crop.cropcard;
 
 import ic2.api.crops.CropProperties;
 import ic2.api.crops.ICropTile;
-import ic2.core.crop.IC2CropCard;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
+import ic2.api.crops.ICropType;
+import ic2.core.crop.Ic2CropCard;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.DyeItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
 
-public class CropColorFlower extends IC2CropCard
+public class CropColorFlower extends Ic2CropCard
 {
-	public final String name;
-	public final String[] attributes;
-	public final int color;
+	public String name;
+	public Block cropBlock;
+	public String[] attributes;
+	public DyeColor color;
 
-	public CropColorFlower(String n, String[] a, int c)
+	public CropColorFlower(ICropType cropType, Block cropBlock, String[] attributes, DyeColor color)
 	{
-		this.name = n;
-		this.attributes = a;
-		this.color = c;
+		super(cropType);
+		this.name = cropType.getName();
+		this.cropBlock = cropBlock;
+		this.attributes = attributes;
+		this.color = color;
+	}
+
+	@Override
+	public Block getCropBlock()
+	{
+		return this.cropBlock;
 	}
 
 	@Override
 	public String getDiscoveredBy()
 	{
 		return !this.name.equals("dandelion") && !this.name.equals("rose") ? "Alblaka" : "Notch";
-	}
-
-	@Override
-	public String getId()
-	{
-		return this.name;
 	}
 
 	@Override
@@ -44,44 +50,26 @@ public class CropColorFlower extends IC2CropCard
 	}
 
 	@Override
-	public int getMaxSize()
-	{
-		return 4;
-	}
-
-	@Override
 	public boolean canGrow(ICropTile crop)
 	{
-		return crop.getCurrentSize() <= 3 && crop.getLightLevel() >= 12;
-	}
-
-	@Override
-	public boolean canBeHarvested(ICropTile crop)
-	{
-		return crop.getCurrentSize() == 4;
-	}
-
-	@Override
-	public int getOptimalHarvestSize(ICropTile crop)
-	{
-		return 4;
+		return crop.getCurrentAge() <= this.getMaxAge() - 1 && crop.getLightLevel() >= 12;
 	}
 
 	@Override
 	public ItemStack getGain(ICropTile crop)
 	{
-		return new ItemStack(Items.DYE, 1, this.color);
+		return new ItemStack(DyeItem.m_41082_(this.color));
 	}
 
 	@Override
-	public int getSizeAfterHarvest(ICropTile crop)
+	public int getAgeAfterHarvest(ICropTile crop)
 	{
-		return 3;
+		return this.getMaxAge() - 1;
 	}
 
 	@Override
 	public int getGrowthDuration(ICropTile crop)
 	{
-		return crop.getCurrentSize() == 3 ? 600 : 400;
+		return crop.getCurrentAge() == this.getMaxAge() - 1 ? 600 : 400;
 	}
 }

@@ -4,38 +4,33 @@ import ic2.api.crops.CropCard;
 import ic2.api.crops.Crops;
 import ic2.api.crops.ICropSeed;
 import ic2.core.crop.TileEntityCrop;
-import ic2.core.crop.cropcard.GenericCropCard;
-import ic2.core.init.Localization;
-import ic2.core.ref.ItemName;
+import ic2.core.ref.Ic2Items;
 import ic2.core.util.StackUtil;
 
 import java.util.List;
 
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ItemCropSeed extends ItemIC2 implements ICropSeed
+import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.Item.Properties;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+
+public class ItemCropSeed extends Item implements ICropSeed
 {
-	public ItemCropSeed()
+	public ItemCropSeed(Properties settings)
 	{
-		super(ItemName.crop_seed_bag);
-		this.setMaxStackSize(1);
+		super(settings);
 	}
 
-	@Override
-	public String getUnlocalizedName(ItemStack itemstack)
+	public String m_5671_(ItemStack itemstack)
 	{
 		if (itemstack == null)
 		{
@@ -54,74 +49,53 @@ public class ItemCropSeed extends ItemIC2 implements ICropSeed
 		}
 	}
 
-	@Override
-	public String getItemStackDisplayName(ItemStack stack)
+	public Component m_7626_(ItemStack stack)
 	{
 		CropCard crop = Crops.instance.getCropCard(stack);
-		return Localization.translate(crop == null ? "ic2.crop.seeds" : crop.getSeedType(), super.getItemStackDisplayName(stack));
+		return Component.m_237110_(crop == null ? "ic2.crop.seeds" : crop.getSeedType(), new Object[] { super.m_7626_(stack) });
 	}
 
-	public boolean isDamageable()
-	{
-		return true;
-	}
-
-	public boolean isRepairable()
-	{
-		return false;
-	}
-
-	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, World world, List<String> info, ITooltipFlag debugTooltips)
+	@OnlyIn(Dist.CLIENT)
+	public void m_7373_(ItemStack stack, Level world, List<Component> info, TooltipFlag debugTooltips)
 	{
 		if (this.getScannedFromStack(stack) >= 4)
 		{
-			info.add("§2Gr§7 " + this.getGrowthFromStack(stack));
-			info.add("§6Ga§7 " + this.getGainFromStack(stack));
-			info.add("§3Re§7 " + this.getResistanceFromStack(stack));
-		}
-
-		if (this.getScannedFromStack(stack) >= 1)
-		{
-			CropCard cropCard = this.getCropFromStack(stack);
-			if (cropCard instanceof GenericCropCard)
-			{
-				info.addAll(((GenericCropCard) cropCard).getInformation());
-			}
+			info.add(Component.m_237113_("§2Gr§7 " + this.getGrowthFromStack(stack)));
+			info.add(Component.m_237113_("§6Ga§7 " + this.getGainFromStack(stack)));
+			info.add(Component.m_237113_("§3Re§7 " + this.getResistanceFromStack(stack)));
 		}
 	}
 
-	public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float a, float b, float c)
+	public InteractionResult m_6225_(UseOnContext context)
 	{
-		TileEntity te = world.getTileEntity(pos);
-		if (te instanceof TileEntityCrop)
+		if (context.m_43725_().getBlockEntity(context.m_8083_()) instanceof TileEntityCrop crop)
 		{
-			TileEntityCrop crop = (TileEntityCrop) te;
-			ItemStack stack = StackUtil.get(player, hand);
+			ItemStack stack = context.m_43722_();
 			if (crop.tryPlantIn(
 				Crops.instance.getCropCard(stack),
-				1,
+				0,
 				this.getGrowthFromStack(stack),
 				this.getGainFromStack(stack),
 				this.getResistanceFromStack(stack),
 				this.getScannedFromStack(stack)
 			))
 			{
-				if (!player.capabilities.isCreativeMode)
+				Player player = context.m_43723_();
+				if (!player.m_150110_().f_35937_)
 				{
-					player.inventory.mainInventory.set(player.inventory.currentItem, StackUtil.emptyStack);
+					player.getInventory().f_35974_.set(player.getInventory().f_35977_, StackUtil.emptyStack);
 				}
 
-				return EnumActionResult.SUCCESS;
+				return InteractionResult.SUCCESS;
 			}
 		}
 
-		return EnumActionResult.PASS;
+		return InteractionResult.PASS;
 	}
 
-	public void getSubItems(CreativeTabs tabs, NonNullList<ItemStack> items)
+	public void m_6787_(CreativeModeTab tabs, NonNullList<ItemStack> items)
 	{
-		if (this.isInCreativeTab(tabs))
+		if (this.m_220152_(tabs))
 		{
 			for (CropCard crop : Crops.instance.getCrops())
 			{
@@ -132,26 +106,26 @@ public class ItemCropSeed extends ItemIC2 implements ICropSeed
 
 	public static ItemStack generateItemStackFromValues(CropCard crop, int statGrowth, int statGain, int statResistance, int scan)
 	{
-		ItemStack stack = ItemName.crop_seed_bag.getItemStack();
-		NBTTagCompound tag = new NBTTagCompound();
-		tag.setString("owner", crop.getOwner());
-		tag.setString("id", crop.getId());
-		tag.setByte("growth", (byte) statGrowth);
-		tag.setByte("gain", (byte) statGain);
-		tag.setByte("resistance", (byte) statResistance);
-		tag.setByte("scan", (byte) scan);
-		stack.setTagCompound(tag);
+		ItemStack stack = new ItemStack(Ic2Items.CROP_SEED_BACK);
+		CompoundTag tag = new CompoundTag();
+		tag.m_128359_("owner", crop.getOwner());
+		tag.m_128359_("id", crop.getId());
+		tag.putByte("growth", (byte) statGrowth);
+		tag.putByte("gain", (byte) statGain);
+		tag.putByte("resistance", (byte) statResistance);
+		tag.putByte("scan", (byte) scan);
+		stack.m_41751_(tag);
 		return stack;
 	}
 
 	@Override
 	public CropCard getCropFromStack(ItemStack is)
 	{
-		NBTTagCompound nbt = is.getTagCompound();
-		if (nbt != null && nbt.hasKey("owner", 8) && nbt.hasKey("id", 8))
+		CompoundTag nbt = is.getTag();
+		if (nbt != null && nbt.contains("owner", 8) && nbt.contains("id", 8))
 		{
-			String owner = nbt.getString("owner");
-			String id = nbt.getString("id");
+			String owner = nbt.m_128461_("owner");
+			String id = nbt.m_128461_("id");
 			return Crops.instance.getCropCard(owner, id);
 		} else
 		{
@@ -162,79 +136,89 @@ public class ItemCropSeed extends ItemIC2 implements ICropSeed
 	@Override
 	public void setCropFromStack(ItemStack is, CropCard crop)
 	{
-		if (is.getTagCompound() != null)
+		CompoundTag nbt = is.getTag();
+		if (nbt != null)
 		{
-			is.getTagCompound().setString("owner", crop.getOwner());
-			is.getTagCompound().setString("id", crop.getId());
+			nbt.m_128359_("owner", crop.getOwner());
+			nbt.m_128359_("id", crop.getId());
 		}
 	}
 
 	@Override
 	public int getGrowthFromStack(ItemStack is)
 	{
-		return is.getTagCompound() == null ? -1 : is.getTagCompound().getByte("growth");
+		CompoundTag nbt = is.getTag();
+		return nbt == null ? -1 : nbt.getByte("growth");
 	}
 
 	@Override
 	public void setGrowthFromStack(ItemStack is, int value)
 	{
-		if (is.getTagCompound() != null)
+		CompoundTag nbt = is.getTag();
+		if (nbt != null)
 		{
-			is.getTagCompound().setByte("growth", (byte) value);
+			nbt.putByte("growth", (byte) value);
 		}
 	}
 
 	@Override
 	public int getGainFromStack(ItemStack is)
 	{
-		return is.getTagCompound() == null ? -1 : is.getTagCompound().getByte("gain");
+		CompoundTag nbt = is.getTag();
+		return nbt == null ? -1 : nbt.getByte("gain");
 	}
 
 	@Override
 	public void setGainFromStack(ItemStack is, int value)
 	{
-		if (is.getTagCompound() != null)
+		CompoundTag nbt = is.getTag();
+		if (nbt != null)
 		{
-			is.getTagCompound().setByte("gain", (byte) value);
+			nbt.putByte("gain", (byte) value);
 		}
 	}
 
 	@Override
 	public int getResistanceFromStack(ItemStack is)
 	{
-		return is.getTagCompound() == null ? -1 : is.getTagCompound().getByte("resistance");
+		CompoundTag nbt = is.getTag();
+		return nbt == null ? -1 : nbt.getByte("resistance");
 	}
 
 	@Override
 	public void setResistanceFromStack(ItemStack is, int value)
 	{
-		if (is.getTagCompound() != null)
+		CompoundTag nbt = is.getTag();
+		if (nbt != null)
 		{
-			is.getTagCompound().setByte("resistance", (byte) value);
+			nbt.putByte("resistance", (byte) value);
 		}
 	}
 
 	@Override
 	public int getScannedFromStack(ItemStack is)
 	{
-		return is.getTagCompound() == null ? -1 : is.getTagCompound().getByte("scan");
+		CompoundTag nbt = is.getTag();
+		return nbt == null ? -1 : nbt.getByte("scan");
 	}
 
 	@Override
 	public void setScannedFromStack(ItemStack is, int value)
 	{
-		if (is.getTagCompound() != null)
+		CompoundTag nbt = is.getTag();
+		if (nbt != null)
 		{
-			is.getTagCompound().setByte("scan", (byte) value);
+			nbt.putByte("scan", (byte) value);
 		}
 	}
 
 	@Override
 	public void incrementScannedFromStack(ItemStack is)
 	{
-		if (is.getTagCompound() != null)
+		CompoundTag nbt = is.getTag();
+		if (nbt != null)
 		{
-			is.getTagCompound().setByte("scan", (byte) (this.getScannedFromStack(is) + 1));
+			nbt.putByte("scan", (byte) (this.getScannedFromStack(is) + 1));
 		}
 	}
 }

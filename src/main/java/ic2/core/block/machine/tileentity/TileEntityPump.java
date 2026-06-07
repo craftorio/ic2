@@ -5,36 +5,35 @@ import ic2.api.upgrade.UpgradableProperty;
 import ic2.core.ContainerBase;
 import ic2.core.IC2;
 import ic2.core.IHasGui;
-import ic2.core.audio.AudioSource;
-import ic2.core.audio.PositionSpec;
 import ic2.core.block.comp.Fluids;
 import ic2.core.block.invslot.InvSlot;
 import ic2.core.block.invslot.InvSlotConsumableLiquid;
 import ic2.core.block.invslot.InvSlotOutput;
 import ic2.core.block.invslot.InvSlotUpgrade;
+import ic2.core.fluid.Ic2FluidStack;
+import ic2.core.fluid.Ic2FluidTank;
 import ic2.core.gui.dynamic.DynamicContainer;
-import ic2.core.gui.dynamic.DynamicGui;
-import ic2.core.gui.dynamic.GuiParser;
 import ic2.core.gui.dynamic.IGuiValueProvider;
+import ic2.core.network.GrowingBuffer;
 import ic2.core.network.GuiSynced;
+import ic2.core.ref.Ic2BlockEntities;
+import ic2.core.sound.Sound;
 import ic2.core.util.LiquidUtil;
 import ic2.core.util.PumpUtil;
 import ic2.core.util.Util;
 
 import java.util.EnumSet;
+import java.util.Objects;
 import java.util.Set;
 
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidTank;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class TileEntityPump extends TileEntityElectricMachine implements IHasGui, IUpgradableBlock, IGuiValueProvider
 {
@@ -44,23 +43,23 @@ public class TileEntityPump extends TileEntityElectricMachine implements IHasGui
 	public final int defaultEnergyStorage;
 	public final int defaultEnergyConsume;
 	public final int defaultOperationLength;
-	private AudioSource audioSource;
+	private Sound sound;
 	private TileEntityMiner miner = null;
 	public boolean redstonePowered = false;
 	public final InvSlotConsumableLiquid containerSlot;
 	public final InvSlotOutput outputSlot;
 	public final InvSlotUpgrade upgradeSlot;
 	@GuiSynced
-	protected final FluidTank fluidTank;
+	protected final Ic2FluidTank fluidTank;
 	public short progress = 0;
 	public int operationLength;
 	@GuiSynced
 	public float guiProgress;
 	protected final Fluids fluids;
 
-	public TileEntityPump()
+	public TileEntityPump(BlockPos pos, BlockState state)
 	{
-		super(20, 1);
+		super(Ic2BlockEntities.PUMP, pos, state, 20, 1);
 		this.containerSlot = new InvSlotConsumableLiquid(this, "input", InvSlot.Access.I, 1, InvSlot.InvSide.TOP, InvSlotConsumableLiquid.OpType.Fill);
 		this.outputSlot = new InvSlotOutput(this, "output", 1, InvSlot.InvSide.SIDE);
 		this.upgradeSlot = new InvSlotUpgrade(this, "upgrade", 4);
@@ -76,7 +75,7 @@ public class TileEntityPump extends TileEntityElectricMachine implements IHasGui
 	protected void onLoaded()
 	{
 		super.onLoaded();
-		if (!this.getWorld().isRemote)
+		if (!Objects.requireNonNull(this.getLevel()).isClientSide)
 		{
 			this.setUpgradestat();
 		}
@@ -85,10 +84,10 @@ public class TileEntityPump extends TileEntityElectricMachine implements IHasGui
 	@Override
 	protected void onUnloaded()
 	{
-		if (IC2.platform.isRendering() && this.audioSource != null)
+		if (IC2.sideProxy.isRendering() && this.sound != null)
 		{
-			IC2.audioManager.removeSources(this);
-			this.audioSource = null;
+			IC2.soundManager.removeSound(this, this.sound);
+			this.sound = null;
 		}
 
 		this.miner = null;
@@ -96,18 +95,17 @@ public class TileEntityPump extends TileEntityElectricMachine implements IHasGui
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound nbt)
+	public void load(CompoundTag nbt)
 	{
-		super.readFromNBT(nbt);
+		super.load(nbt);
 		this.progress = nbt.getShort("progress");
 	}
 
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
+	public void saveAdditional(CompoundTag nbt)
 	{
-		super.writeToNBT(nbt);
-		nbt.setShort("progress", this.progress);
-		return nbt;
+		super.saveAdditional(nbt);
+		nbt.putShort("progress", this.progress);
 	}
 
 	@Override
@@ -115,7 +113,7 @@ public class TileEntityPump extends TileEntityElectricMachine implements IHasGui
 	{
 		super.updateEntityServer();
 		boolean needsInvUpdate = false;
-		if (this.canoperate() && this.energy.getEnergy() >= this.energyConsume * this.operationLength)
+		if (this.canOperate() && this.energy.getEnergy() >= this.energyConsume * this.operationLength)
 		{
 			if (this.progress < this.operationLength)
 			{
@@ -127,10 +125,10 @@ public class TileEntityPump extends TileEntityElectricMachine implements IHasGui
 				this.operate(false);
 			}
 
-			this.setActive(true);
+			this.activate(false);
 		} else
 		{
-			this.setActive(false);
+			this.shutdown(false);
 		}
 
 		needsInvUpdate |= this.containerSlot.processFromTank(this.fluidTank, this.outputSlot);
@@ -138,25 +136,29 @@ public class TileEntityPump extends TileEntityElectricMachine implements IHasGui
 		this.guiProgress = (float) this.progress / this.operationLength;
 		if (needsInvUpdate)
 		{
-			super.markDirty();
+			super.setChanged();
 		}
 	}
 
-	public boolean canoperate()
+	public boolean canOperate()
 	{
 		return this.operate(true);
 	}
 
 	public boolean operate(boolean sim)
 	{
-		if (this.miner == null || this.miner.isInvalid())
+		if (this.miner == null || this.miner.isRemoved())
 		{
 			this.miner = null;
-			World world = this.getWorld();
-
-			for (EnumFacing dir : Util.downSideFacings)
+			Level world = this.getLevel();
+			if (world == null)
 			{
-				TileEntity te = world.getTileEntity(this.pos.offset(dir));
+				return false;
+			}
+
+			for (Direction dir : Util.downSideFacings)
+			{
+				BlockEntity te = world.getBlockEntity(this.worldPosition.relative(dir));
 				if (te instanceof TileEntityMiner)
 				{
 					this.miner = (TileEntityMiner) te;
@@ -165,7 +167,7 @@ public class TileEntityPump extends TileEntityElectricMachine implements IHasGui
 			}
 		}
 
-		FluidStack liquid = null;
+		Ic2FluidStack liquid = null;
 		if (this.miner != null)
 		{
 			if (this.miner.canProvideLiquid)
@@ -174,15 +176,15 @@ public class TileEntityPump extends TileEntityElectricMachine implements IHasGui
 			}
 		} else
 		{
-			EnumFacing dir = this.getFacing();
-			liquid = this.pump(this.pos.offset(dir), sim, this.miner);
+			Direction dir = this.getFacing();
+			liquid = this.pump(this.worldPosition.relative(dir), sim, this.miner);
 		}
 
-		if (liquid != null && this.fluidTank.fillInternal(liquid, false) > 0)
+		if (liquid != null && this.fluidTank.fillMbUnchecked(liquid, true) > 0)
 		{
 			if (!sim)
 			{
-				this.fluidTank.fillInternal(liquid, true);
+				this.fluidTank.fillMbUnchecked(liquid, false);
 			}
 
 			return true;
@@ -192,22 +194,28 @@ public class TileEntityPump extends TileEntityElectricMachine implements IHasGui
 		}
 	}
 
-	public FluidStack pump(BlockPos startPos, boolean sim, TileEntityMiner miner)
+	public Ic2FluidStack pump(BlockPos startPos, boolean sim, TileEntityMiner miner)
 	{
-		World world = this.getWorld();
+		Level world = this.getLevel();
+		if (world == null)
+		{
+			return null;
+		}
+
 		int freeSpace = this.fluidTank.getCapacity() - this.fluidTank.getFluidAmount();
 		if (miner == null && freeSpace > 0)
 		{
-			TileEntity te = world.getTileEntity(startPos);
-			EnumFacing side = this.getFacing().getOpposite();
-			if (te != null && LiquidUtil.isFluidTile(te, side))
+			BlockEntity te = world.getBlockEntity(startPos);
+			BlockState state = world.getBlockState(startPos);
+			Direction side = this.getFacing().m_122424_();
+			if (LiquidUtil.isFluidTile(state, te, side))
 			{
 				if (freeSpace > 1000)
 				{
 					freeSpace = 1000;
 				}
 
-				return LiquidUtil.drainTile(te, side, freeSpace, sim);
+				return LiquidUtil.drainTile(state, world, startPos, side, freeSpace, sim);
 			}
 		}
 
@@ -225,7 +233,7 @@ public class TileEntityPump extends TileEntityElectricMachine implements IHasGui
 
 			if (cPos != null)
 			{
-				return LiquidUtil.drainBlock(world, cPos, sim);
+				return LiquidUtil.drainWorldFluidBlock(world, cPos, sim);
 			}
 		}
 
@@ -233,10 +241,10 @@ public class TileEntityPump extends TileEntityElectricMachine implements IHasGui
 	}
 
 	@Override
-	public void markDirty()
+	public void setChanged()
 	{
-		super.markDirty();
-		if (IC2.platform.isSimulating())
+		super.setChanged();
+		if (IC2.sideProxy.isSimulating())
 		{
 			this.setUpgradestat();
 		}
@@ -279,47 +287,15 @@ public class TileEntityPump extends TileEntityElectricMachine implements IHasGui
 	}
 
 	@Override
-	public ContainerBase<TileEntityPump> getGuiContainer(EntityPlayer player)
+	public ContainerBase<?> createServerScreenHandler(int syncId, Player player)
 	{
-		return DynamicContainer.create(this, player, GuiParser.parse(this.teBlock));
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
-	{
-		return DynamicGui.<TileEntityPump>create(this, player, GuiParser.parse(this.teBlock));
+		return DynamicContainer.create(syncId, player.getInventory(), this);
 	}
 
 	@Override
-	public void onGuiClosed(EntityPlayer player)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
-	}
-
-	@Override
-	public void onNetworkUpdate(String field)
-	{
-		if (field.equals("active"))
-		{
-			if (this.audioSource == null)
-			{
-				this.audioSource = IC2.audioManager
-					.createSource(this, PositionSpec.Center, "Machines/PumpOp.ogg", true, false, IC2.audioManager.getDefaultVolume());
-			}
-
-			if (this.getActive())
-			{
-				if (this.audioSource != null)
-				{
-					this.audioSource.play();
-				}
-			} else if (this.audioSource != null)
-			{
-				this.audioSource.stop();
-			}
-		}
-
-		super.onNetworkUpdate(field);
+		return DynamicContainer.create(syncId, inventory, this);
 	}
 
 	@Override

@@ -1,6 +1,6 @@
 package ic2.api.upgrade;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 public interface IRedstoneSensitiveUpgrade extends IUpgradeItem
 {

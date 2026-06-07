@@ -1,0 +1,9 @@
+{
+  "type": "ic2:macerator",
+  "ingredient": {
+    "item": "minecraft:soul_soil"
+  },
+  "result": {
+    "item": "minecraft:soul_sand"
+  }
+}

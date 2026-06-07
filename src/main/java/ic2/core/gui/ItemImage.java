@@ -1,31 +1,31 @@
 package ic2.core.gui;
 
-import com.google.common.base.Supplier;
-import ic2.core.GuiIC2;
+import com.mojang.blaze3d.vertex.PoseStack;
+import ic2.core.Ic2Gui;
 import ic2.core.util.StackUtil;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.item.ItemStack;
+
+import java.util.function.Supplier;
+
+import net.minecraft.world.item.ItemStack;
 
 public class ItemImage extends GuiElement<ItemImage>
 {
 	private final Supplier<ItemStack> itemSupplier;
 
-	public ItemImage(GuiIC2<?> gui, int x, int y, Supplier<ItemStack> itemSupplier)
+	public ItemImage(Ic2Gui<?> gui, int x, int y, Supplier<ItemStack> itemSupplier)
 	{
 		super(gui, x, y, 16, 16);
 		this.itemSupplier = itemSupplier;
 	}
 
 	@Override
-	public void drawBackground(int mouseX, int mouseY)
+	public void drawBackground(PoseStack matrices, int mouseX, int mouseY)
 	{
-		super.drawBackground(mouseX, mouseY);
-		ItemStack stack = (ItemStack) this.itemSupplier.get();
+		super.drawBackground(matrices, mouseX, mouseY);
+		ItemStack stack = this.itemSupplier.get();
 		if (!StackUtil.isEmpty(stack))
 		{
-			RenderHelper.enableGUIStandardItemLighting();
 			this.gui.drawItem(this.x, this.y, stack);
-			RenderHelper.disableStandardItemLighting();
 		}
 	}
 }

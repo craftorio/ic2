@@ -3,68 +3,45 @@ package ic2.core.block.machine.tileentity;
 import ic2.core.ContainerBase;
 import ic2.core.IC2;
 import ic2.core.IHasGui;
-import ic2.core.audio.AudioSource;
-import ic2.core.block.TileEntityInventory;
 import ic2.core.block.comp.Energy;
 import ic2.core.block.invslot.InvSlot;
-import ic2.core.block.invslot.InvSlotConsumableItemStack;
-import ic2.core.block.wiring.TileEntityElectricBlock;
+import ic2.core.block.invslot.InvSlotConsumable;
+import ic2.core.block.invslot.InvSlotConsumableId;
+import ic2.core.block.tileentity.TileEntityBase;
+import ic2.core.block.wiring.tileentity.TileEntityElectricBlock;
 import ic2.core.gui.dynamic.DynamicContainer;
-import ic2.core.gui.dynamic.DynamicGui;
-import ic2.core.gui.dynamic.GuiParser;
-import ic2.core.item.type.CellType;
+import ic2.core.network.GrowingBuffer;
 import ic2.core.network.GuiSynced;
-import ic2.core.ref.ItemName;
-import ic2.core.ref.TeBlock;
+import ic2.core.ref.Ic2BlockEntities;
+import ic2.core.ref.Ic2Items;
+import ic2.core.ref.Ic2SoundEvents;
 import ic2.core.util.StackUtil;
 import ic2.core.util.Util;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
-@TeBlock.Delegated(current = TileEntityElectrolyzer.class, old = TileEntityClassicElectrolyzer.class)
-public class TileEntityClassicElectrolyzer extends TileEntityInventory implements IHasGui
+public class TileEntityClassicElectrolyzer extends TileEntityBase implements IHasGui
 {
 	public TileEntityElectricBlock mfe = null;
 	public int ticker = IC2.random.nextInt(16);
-	public final InvSlotConsumableItemStack waterSlot = new InvSlotConsumableItemStack(
-		this, "water", InvSlot.Access.IO, 1, InvSlot.InvSide.TOP, ItemName.cell.getItemStack(CellType.water)
+	public final InvSlotConsumable waterSlot = new InvSlotConsumableId(this, "water", InvSlot.Access.IO, 1, InvSlot.InvSide.TOP, Ic2Items.WATER_CELL);
+	public final InvSlotConsumable hydrogenSlot = new InvSlotConsumableId(
+		this, "hydrogen", InvSlot.Access.IO, 1, InvSlot.InvSide.BOTTOM, Ic2Items.ELECTROLYZED_WATER_CELL
 	);
-	public final InvSlotConsumableItemStack hydrogenSlot = new InvSlotConsumableItemStack(
-		this, "hydrogen", InvSlot.Access.IO, 1, InvSlot.InvSide.BOTTOM, ItemName.cell.getItemStack(CellType.electrolyzed_water)
-	);
-	protected AudioSource audio;
 	@GuiSynced
 	protected final Energy energy = this.addComponent(new Energy(this, 20000.0, Util.noFacings, Util.noFacings, 1));
 
-	public TileEntityClassicElectrolyzer()
+	public TileEntityClassicElectrolyzer(BlockPos pos, BlockState state)
 	{
+		super(Ic2BlockEntities.CLASSIC_ELECTROLYZER, pos, state);
 		this.comparator.setUpdate(this.energy::getComparatorValue);
-	}
-
-	@Override
-	protected void onLoaded()
-	{
-		super.onLoaded();
-		if (this.getWorld().isRemote)
-		{
-			this.audio = IC2.audioManager.createSource(this, "Machines/ElectrolyzerLoop.ogg");
-		}
-	}
-
-	@Override
-	protected void onUnloaded()
-	{
-		super.onUnloaded();
-		if (this.audio != null)
-		{
-			IC2.audioManager.removeSources(this);
-			this.audio = null;
-		}
 	}
 
 	@Override
@@ -92,26 +69,18 @@ public class TileEntityClassicElectrolyzer extends TileEntityInventory implement
 				turnActive = true;
 			}
 
-			this.setActive(turnActive);
+			this.setActiveState(turnActive, false);
 			if (needsInvUpdate)
 			{
-				this.markDirty();
+				this.setChanged();
 			}
 		}
 	}
 
 	@Override
-	protected void updateEntityClient()
+	public SoundEvent getLoopingSoundEvent()
 	{
-		super.updateEntityClient();
-		if (this.ticker++ % 32 == 0 && this.audio != null)
-		{
-			this.audio.stop();
-			if (this.getActive())
-			{
-				this.audio.play();
-			}
-		}
+		return Ic2SoundEvents.MACHINE_ELECTROLYZER_LOOP;
 	}
 
 	public boolean shouldDrain()
@@ -137,8 +106,7 @@ public class TileEntityClassicElectrolyzer extends TileEntityInventory implement
 	{
 		return this.hydrogenSlot.consume(1, true, false) != null
 			&& (
-			this.waterSlot.isEmpty()
-				|| StackUtil.getSize(this.waterSlot.get()) < Math.min(this.waterSlot.getStackSizeLimit(), this.waterSlot.get().getMaxStackSize())
+			this.waterSlot.isEmpty() || StackUtil.getSize(this.waterSlot.get()) < Math.min(this.waterSlot.getStackSizeLimit(), this.waterSlot.get().getMaxStackSize())
 		);
 	}
 
@@ -156,7 +124,7 @@ public class TileEntityClassicElectrolyzer extends TileEntityInventory implement
 			this.waterSlot.consume(1);
 			if (this.hydrogenSlot.isEmpty())
 			{
-				this.hydrogenSlot.put(ItemName.cell.getItemStack(CellType.electrolyzed_water));
+				this.hydrogenSlot.put(new ItemStack(Ic2Items.ELECTROLYZED_WATER_CELL));
 			} else
 			{
 				this.hydrogenSlot.put(StackUtil.incSize(this.hydrogenSlot.get()));
@@ -183,7 +151,7 @@ public class TileEntityClassicElectrolyzer extends TileEntityInventory implement
 		this.hydrogenSlot.consume(1);
 		if (this.waterSlot.isEmpty())
 		{
-			this.waterSlot.put(ItemName.cell.getItemStack(CellType.water));
+			this.waterSlot.put(new ItemStack(Ic2Items.WATER_CELL));
 		} else
 		{
 			this.waterSlot.put(StackUtil.incSize(this.waterSlot.get()));
@@ -194,26 +162,22 @@ public class TileEntityClassicElectrolyzer extends TileEntityInventory implement
 
 	public int processRate()
 	{
-		switch (this.mfe.energy.getSinkTier())
+		return switch (this.mfe.energy.getSinkTier())
 		{
-			case 2:
-				return 8;
-			case 3:
-				return 32;
-			case 4:
-				return 128;
-			default:
-				return 2;
-		}
+			case 2 -> 8;
+			case 3 -> 32;
+			case 4 -> 128;
+			default -> 2;
+		};
 	}
 
 	public TileEntityElectricBlock lookForMFE()
 	{
-		World world = this.getWorld();
+		Level world = this.getLevel();
 
-		for (EnumFacing dir : EnumFacing.VALUES)
+		for (Direction dir : Util.ALL_DIRS)
 		{
-			TileEntity te = world.getTileEntity(this.pos.offset(dir));
+			BlockEntity te = world.getBlockEntity(this.worldPosition.relative(dir));
 			if (te instanceof TileEntityElectricBlock)
 			{
 				return (TileEntityElectricBlock) te;
@@ -224,20 +188,14 @@ public class TileEntityClassicElectrolyzer extends TileEntityInventory implement
 	}
 
 	@Override
-	public ContainerBase<?> getGuiContainer(EntityPlayer player)
+	public ContainerBase<?> createServerScreenHandler(int syncId, Player player)
 	{
-		return DynamicContainer.create(this, player, GuiParser.parse(this.teBlock));
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
-	{
-		return DynamicGui.<TileEntityClassicElectrolyzer>create(this, player, GuiParser.parse(this.teBlock));
+		return DynamicContainer.create(syncId, player.getInventory(), this);
 	}
 
 	@Override
-	public void onGuiClosed(EntityPlayer player)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
+		return DynamicContainer.create(syncId, inventory, this);
 	}
 }

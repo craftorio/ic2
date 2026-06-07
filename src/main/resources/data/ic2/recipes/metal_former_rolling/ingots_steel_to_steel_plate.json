@@ -1,0 +1,9 @@
+{
+  "type": "ic2:metal_former_rolling",
+  "ingredient": {
+    "tag": "forge:ingots/steel"
+  },
+  "result": {
+    "item": "ic2:steel_plate"
+  }
+}

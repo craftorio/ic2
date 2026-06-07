@@ -1,0 +1,7 @@
+{
+  "loader": "ic2:cable",
+  "type": "detector",
+  "insulation": 0,
+  "foam": "none",
+  "active": false
+}

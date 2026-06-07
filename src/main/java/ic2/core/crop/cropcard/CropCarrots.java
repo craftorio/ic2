@@ -1,21 +1,24 @@
 package ic2.core.crop.cropcard;
 
 import ic2.api.crops.CropProperties;
+import ic2.api.crops.ICropType;
 import ic2.core.crop.CropVanilla;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
+import ic2.core.ref.Ic2Blocks;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
 
 public class CropCarrots extends CropVanilla
 {
-	public CropCarrots()
+	public CropCarrots(ICropType cropType)
 	{
-		super(3);
+		super(cropType);
 	}
 
 	@Override
-	public String getId()
+	public Block getCropBlock()
 	{
-		return "carrots";
+		return Ic2Blocks.CARROTS_CROP;
 	}
 
 	@Override
@@ -33,12 +36,12 @@ public class CropCarrots extends CropVanilla
 	@Override
 	public ItemStack getProduct()
 	{
-		return new ItemStack(Items.CARROT);
+		return new ItemStack(Items.f_42619_);
 	}
 
 	@Override
 	public ItemStack getSeeds()
 	{
-		return new ItemStack(Items.CARROT);
+		return new ItemStack(Items.f_42619_);
 	}
 }

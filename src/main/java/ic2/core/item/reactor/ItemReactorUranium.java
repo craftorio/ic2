@@ -2,49 +2,33 @@ package ic2.core.item.reactor;
 
 import ic2.api.reactor.IReactor;
 import ic2.api.reactor.IReactorComponent;
-import ic2.core.IC2Potion;
+import ic2.core.Ic2Potion;
 import ic2.core.item.armor.ItemArmorHazmat;
-import ic2.core.item.type.NuclearResourceType;
-import ic2.core.ref.ItemName;
+import ic2.core.ref.Ic2Items;
 
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Queue;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item.Properties;
+import net.minecraft.world.level.Level;
 
 public class ItemReactorUranium extends AbstractDamageableReactorComponent
 {
 	public final int numberOfCells;
 
-	public ItemReactorUranium(ItemName name, int cells)
+	public ItemReactorUranium(Properties settings, int cells)
 	{
-		this(name, cells, 20000);
+		this(settings, cells, 20000);
 	}
 
-	protected ItemReactorUranium(ItemName name, int cells, int duration)
+	protected ItemReactorUranium(Properties settings, int cells, int duration)
 	{
-		super(name, duration);
-		this.setMaxStackSize(64);
+		super(settings, duration);
 		this.numberOfCells = cells;
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public void registerModels(ItemName name)
-	{
-		this.registerModel(0, name, null);
-		this.registerModel(1, name, null);
-	}
-
-	public int getMetadata(ItemStack stack)
-	{
-		return this.getCustomDamage(stack) > 0 ? 1 : 0;
 	}
 
 	@Override
@@ -99,12 +83,12 @@ public class ItemReactorUranium extends AbstractDamageableReactorComponent
 				}
 			}
 
-			if (!heatRun && this.getCustomDamage(stack) >= this.getMaxCustomDamage(stack) - 1)
+			if (!heatRun && this.getUse(stack) >= this.getMaxUse() - 1)
 			{
 				reactor.setItemAt(x, y, this.getDepletedStack(stack, reactor));
 			} else if (!heatRun)
 			{
-				this.applyCustomDamage(stack, 1, null);
+				this.incrementUse(stack);
 			}
 		}
 	}
@@ -116,23 +100,13 @@ public class ItemReactorUranium extends AbstractDamageableReactorComponent
 
 	protected ItemStack getDepletedStack(ItemStack stack, IReactor reactor)
 	{
-		ItemStack ret;
-		switch (this.numberOfCells)
+		return new ItemStack(switch (this.numberOfCells)
 		{
-			case 1:
-				ret = ItemName.nuclear.getItemStack(NuclearResourceType.depleted_uranium);
-				break;
-			case 2:
-				ret = ItemName.nuclear.getItemStack(NuclearResourceType.depleted_dual_uranium);
-				break;
-			case 3:
-			default:
-				throw new RuntimeException("invalid cell count: " + this.numberOfCells);
-			case 4:
-				ret = ItemName.nuclear.getItemStack(NuclearResourceType.depleted_quad_uranium);
-		}
-
-		return ret.copy();
+			case 1 -> Ic2Items.DEPLETED_URANIUM_FUEL_ROD;
+			case 2 -> Ic2Items.DEPLETED_DUAL_URANIUM_FUEL_ROD;
+			default -> throw new RuntimeException("invalid cell count: " + this.numberOfCells);
+			case 4 -> Ic2Items.DEPLETED_QUAD_URANIUM_FUEL_ROD;
+		});
 	}
 
 	protected static int checkPulseable(IReactor reactor, int x, int y, ItemStack stack, int mex, int mey, boolean heatrun)
@@ -176,15 +150,11 @@ public class ItemReactorUranium extends AbstractDamageableReactorComponent
 		return 2 * this.numberOfCells;
 	}
 
-	public void onUpdate(ItemStack stack, World world, Entity entity, int slotIndex, boolean isCurrentItem)
+	public void m_6883_(ItemStack stack, Level world, Entity entity, int slotIndex, boolean isCurrentItem)
 	{
-		if (entity instanceof EntityLivingBase)
+		if (entity instanceof LivingEntity entityLiving && !ItemArmorHazmat.hasCompleteHazmat(entityLiving))
 		{
-			EntityLivingBase entityLiving = (EntityLivingBase) entity;
-			if (!ItemArmorHazmat.hasCompleteHazmat(entityLiving))
-			{
-				IC2Potion.radiation.applyTo(entityLiving, 200, 100);
-			}
+			Ic2Potion.radiation.applyTo(entityLiving, 200, 100);
 		}
 	}
 

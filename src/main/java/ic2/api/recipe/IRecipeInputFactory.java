@@ -1,34 +1,25 @@
 package ic2.api.recipe;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraftforge.fluids.Fluid;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.material.Fluid;
 
+@Deprecated(forRemoval = true)
 public interface IRecipeInputFactory
 {
+	IRecipeInput forItem(ItemLike var1);
+
 	IRecipeInput forStack(ItemStack var1);
 
 	IRecipeInput forStack(ItemStack var1, int var2);
 
-	IRecipeInput forExactStack(ItemStack var1);
-
-	IRecipeInput forExactStack(ItemStack var1, int var2);
-
-	IRecipeInput forOreDict(String var1);
-
-	IRecipeInput forOreDict(String var1, int var2);
-
-	IRecipeInput forOreDict(String var1, int var2, int var3);
-
-	IRecipeInput forFluidContainer(Fluid var1);
+	IRecipeInput forTag(String var1, int var2);
 
 	IRecipeInput forFluidContainer(Fluid var1, int var2);
 
-	IRecipeInput forAny(IRecipeInput... var1);
+	IRecipeInput forIngredient(Ingredient var1, int var2);
 
-	IRecipeInput forAny(Iterable<IRecipeInput> var1);
-
-	IRecipeInput forIngredient(Ingredient var1);
-
+	@Deprecated
 	Ingredient getIngredient(IRecipeInput var1);
 }

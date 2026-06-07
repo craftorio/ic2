@@ -3,10 +3,10 @@ package ic2.api.crops;
 public class BaseSeed
 {
 	public final CropCard crop;
-	public final int size;
-	public final int statGrowth;
-	public final int statGain;
-	public final int statResistance;
+	public int size;
+	public int statGrowth;
+	public int statGain;
+	public int statResistance;
 
 	public BaseSeed(CropCard crop, int size, int statGrowth, int statGain, int statResistance)
 	{

@@ -1,0 +1,22 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "R",
+    "G",
+    "C"
+  ],
+  "key": {
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "G": {
+      "item": "ic2:grin_powder"
+    },
+    "C": {
+      "item": "ic2:empty_cell"
+    }
+  },
+  "result": {
+    "item": "ic2:weed_ex_cell"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    " U ",
+    "CIC",
+    " U "
+  ],
+  "key": {
+    "U": {
+      "item": "ic2:dual_mox_fuel_rod"
+    },
+    "I": {
+      "tag": "forge:plates/iron"
+    },
+    "C": {
+      "tag": "forge:plates/copper"
+    }
+  },
+  "group": "quad_mox_fuel_rod",
+  "result": {
+    "item": "ic2:quad_mox_fuel_rod"
+  }
+}

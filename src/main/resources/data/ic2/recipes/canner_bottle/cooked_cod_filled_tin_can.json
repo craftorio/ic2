@@ -1,0 +1,14 @@
+{
+  "type": "ic2:canner_bottle",
+  "container_ingredient": {
+    "item": "ic2:tin_can",
+    "count": 5
+  },
+  "fill_ingredient": {
+    "item": "minecraft:cooked_cod"
+  },
+  "result": {
+    "item": "ic2:filled_tin_can",
+    "count": 5
+  }
+}

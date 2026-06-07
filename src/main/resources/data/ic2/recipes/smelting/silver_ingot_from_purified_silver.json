@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:smelting",
+  "group": "silver_ingot",
+  "ingredient": {
+    "item": "ic2:purified_silver"
+  },
+  "result": "ic2:silver_ingot",
+  "experience": 0.0,
+  "cookingtime": 200
+}

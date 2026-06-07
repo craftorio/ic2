@@ -2,29 +2,30 @@ package ic2.core.block.heatgenerator.container;
 
 import ic2.core.ContainerFullInv;
 import ic2.core.block.heatgenerator.tileentity.TileEntityElectricHeatGenerator;
+import ic2.core.ref.Ic2ScreenHandlers;
 import ic2.core.slot.SlotInvSlot;
 
 import java.util.List;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.entity.player.Inventory;
 
 public class ContainerElectricHeatGenerator extends ContainerFullInv<TileEntityElectricHeatGenerator>
 {
-	public ContainerElectricHeatGenerator(EntityPlayer player, TileEntityElectricHeatGenerator tileEntity1)
+	public ContainerElectricHeatGenerator(int syncId, Inventory playerInventory, TileEntityElectricHeatGenerator be)
 	{
-		super(player, tileEntity1, 166);
+		super(Ic2ScreenHandlers.ELECTRIC_HEAT_GENERATOR, syncId, playerInventory, be, 166);
 
 		for (int i = 0; i < 5; i++)
 		{
-			this.addSlotToContainer(new SlotInvSlot(tileEntity1.coilSlot, i, 44 + i * 18, 27));
+			this.m_38897_(new SlotInvSlot(be.coilSlot, i, 44 + i * 18, 27));
 		}
 
 		for (int i = 5; i < 10; i++)
 		{
-			this.addSlotToContainer(new SlotInvSlot(tileEntity1.coilSlot, i, 44 + (i - 5) * 18, 45));
+			this.m_38897_(new SlotInvSlot(be.coilSlot, i, 44 + (i - 5) * 18, 45));
 		}
 
-		this.addSlotToContainer(new SlotInvSlot(tileEntity1.dischargeSlot, 0, 8, 62));
+		this.m_38897_(new SlotInvSlot(be.dischargeSlot, 0, 8, 62));
 	}
 
 	@Override

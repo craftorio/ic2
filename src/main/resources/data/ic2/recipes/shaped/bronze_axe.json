@@ -1,0 +1,19 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "BB",
+    "SB",
+    "S "
+  ],
+  "key": {
+    "B": {
+      "tag": "forge:ingots/bronze"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    }
+  },
+  "result": {
+    "item": "ic2:bronze_axe"
+  }
+}

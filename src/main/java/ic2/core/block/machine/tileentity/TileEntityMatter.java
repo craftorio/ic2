@@ -10,8 +10,6 @@ import ic2.api.upgrade.UpgradableProperty;
 import ic2.core.ContainerBase;
 import ic2.core.IC2;
 import ic2.core.IHasGui;
-import ic2.core.audio.AudioSource;
-import ic2.core.audio.PositionSpec;
 import ic2.core.block.IInventorySlotHolder;
 import ic2.core.block.comp.Fluids;
 import ic2.core.block.comp.Redstone;
@@ -22,14 +20,16 @@ import ic2.core.block.invslot.InvSlotOutput;
 import ic2.core.block.invslot.InvSlotProcessable;
 import ic2.core.block.invslot.InvSlotUpgrade;
 import ic2.core.block.machine.container.ContainerMatter;
-import ic2.core.block.machine.gui.GuiMatter;
+import ic2.core.fluid.Ic2FluidStack;
+import ic2.core.fluid.Ic2FluidTank;
 import ic2.core.init.MainConfig;
-import ic2.core.item.type.CraftingItemType;
+import ic2.core.network.GrowingBuffer;
 import ic2.core.network.GuiSynced;
 import ic2.core.profile.NotClassic;
 import ic2.core.recipe.MatterAmplifierRecipeManager;
-import ic2.core.ref.FluidName;
-import ic2.core.ref.ItemName;
+import ic2.core.ref.Ic2BlockEntities;
+import ic2.core.ref.Ic2Fluids;
+import ic2.core.ref.Ic2Items;
 import ic2.core.util.ConfigUtil;
 
 import java.util.ArrayList;
@@ -37,14 +37,12 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidTank;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 
 @NotClassic
 public class TileEntityMatter extends TileEntityElectricMachine implements IHasGui, IUpgradableBlock, IExplosionPowerOverride
@@ -58,11 +56,9 @@ public class TileEntityMatter extends TileEntityElectricMachine implements IHasG
 	private int state = 0;
 	private int prevState = 0;
 	public boolean redstonePowered = false;
-	private AudioSource audioSource;
-	private AudioSource audioSourceScrap;
 	public final InvSlotUpgrade upgradeSlot;
 	public final InvSlotProcessable<IRecipeInput, Integer, ItemStack> amplifierSlot = new InvSlotProcessable<IRecipeInput, Integer, ItemStack>(
-		this, "scrap", 1, Recipes.matterAmplifier
+		this, "scrap", 1, Recipes.matterFabricator
 	)
 	{
 		protected ItemStack getInput(ItemStack stack)
@@ -77,28 +73,23 @@ public class TileEntityMatter extends TileEntityElectricMachine implements IHasG
 	};
 	public final InvSlotOutput outputSlot = new InvSlotOutput(this, "output", 1);
 	public final InvSlotConsumableLiquid containerslot = new InvSlotConsumableLiquidByList(
-		this, "container", InvSlot.Access.I, 1, InvSlot.InvSide.TOP, InvSlotConsumableLiquid.OpType.Fill, FluidName.uu_matter.getInstance()
+		this, "container", InvSlot.Access.I, 1, InvSlot.InvSide.TOP, InvSlotConsumableLiquid.OpType.Fill, Ic2Fluids.UU_MATTER.still
 	);
 	@GuiSynced
-	public final FluidTank fluidTank;
+	public final Ic2FluidTank fluidTank;
 	protected final Redstone redstone;
 	protected final Fluids fluids;
 
-	public TileEntityMatter()
+	public TileEntityMatter(BlockPos pos, BlockState state)
 	{
-		super(Math.round(1000000.0F * ConfigUtil.getFloat(MainConfig.get(), "balance/uuEnergyFactor")), DEFAULT_TIER);
+		super(
+			Ic2BlockEntities.MATTER_GENERATOR, pos, state, Math.round(1000000.0F * ConfigUtil.getFloat(MainConfig.get(), "balance/uuEnergyFactor")), DEFAULT_TIER
+		);
 		this.upgradeSlot = new InvSlotUpgrade(this, "upgrade", 4);
 		this.redstone = this.addComponent(new Redstone(this));
-		this.redstone.subscribe(new Redstone.IRedstoneChangeHandler()
-		{
-			@Override
-			public void onRedstoneChange(int newLevel)
-			{
-				TileEntityMatter.this.energy.setEnabled(newLevel == 0);
-			}
-		});
+		this.redstone.subscribe(newLevel -> this.energy.setEnabled(newLevel == 0));
 		this.fluids = this.addComponent(new Fluids(this));
-		this.fluidTank = this.fluids.addTank("fluidTank", 8000, Fluids.fluidPredicate(FluidName.uu_matter.getInstance()));
+		this.fluidTank = this.fluids.addTank("fluidTank", 8000, Fluids.fluidPredicate(Ic2Fluids.UU_MATTER.still));
 		this.comparator.setUpdate(() ->
 		{
 			int count = calcRedstoneFromInvSlots(this.amplifierSlot);
@@ -115,8 +106,8 @@ public class TileEntityMatter extends TileEntityElectricMachine implements IHasG
 	public static void init()
 	{
 		Recipes.matterAmplifier = new MatterAmplifierRecipeManager();
-		addAmplifier(ItemName.crafting.getItemStack(CraftingItemType.scrap), 1, 5000);
-		addAmplifier(ItemName.crafting.getItemStack(CraftingItemType.scrap_box), 1, 45000);
+		addAmplifier(new ItemStack(Ic2Items.SCRAP), 1, 5000);
+		addAmplifier(new ItemStack(Ic2Items.SCRAP_BOX), 1, 45000);
 	}
 
 	public static void addAmplifier(ItemStack input, int amount, int amplification)
@@ -124,54 +115,34 @@ public class TileEntityMatter extends TileEntityElectricMachine implements IHasG
 		addAmplifier(Recipes.inputFactory.forStack(input, amount), amplification);
 	}
 
-	public static void addAmplifier(String input, int amount, int amplification)
-	{
-		addAmplifier(Recipes.inputFactory.forOreDict(input, amount), amplification);
-	}
-
 	public static void addAmplifier(IRecipeInput input, int amplification)
 	{
-		Recipes.matterAmplifier.addRecipe(input, amplification, null, false);
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound nbt)
+	public void load(CompoundTag nbt)
 	{
-		super.readFromNBT(nbt);
-		this.scrap = nbt.getInteger("scrap");
+		super.load(nbt);
+		this.scrap = nbt.getInt("scrap");
 		this.lastEnergy = nbt.getDouble("lastEnergy");
 	}
 
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
+	public void saveAdditional(CompoundTag nbt)
 	{
-		super.writeToNBT(nbt);
-		nbt.setInteger("scrap", this.scrap);
-		nbt.setDouble("lastEnergy", this.lastEnergy);
-		return nbt;
+		super.saveAdditional(nbt);
+		nbt.putInt("scrap", this.scrap);
+		nbt.putDouble("lastEnergy", this.lastEnergy);
 	}
 
 	@Override
 	protected void onLoaded()
 	{
 		super.onLoaded();
-		if (!this.getWorld().isRemote)
+		if (!this.getLevel().isClientSide)
 		{
 			this.setUpgradestat();
 		}
-	}
-
-	@Override
-	protected void onUnloaded()
-	{
-		if (IC2.platform.isRendering() && this.audioSource != null)
-		{
-			IC2.audioManager.removeSources(this);
-			this.audioSource = null;
-			this.audioSourceScrap = null;
-		}
-
-		super.onUnloaded();
 	}
 
 	@Override
@@ -183,22 +154,20 @@ public class TileEntityMatter extends TileEntityElectricMachine implements IHasG
 		needsInvUpdate |= this.upgradeSlot.tickNoMark();
 		if (!this.redstone.hasRedstoneInput() && !(this.energy.getEnergy() <= 0.0))
 		{
+			boolean playSubSound = false;
 			if (this.scrap > 0)
 			{
 				double bonus = Math.min(this.scrap, this.energy.getEnergy() - this.lastEnergy);
 				if (bonus > 0.0)
 				{
 					this.energy.forceAddEnergy(5.0 * bonus);
-					this.scrap = (int) (this.scrap - bonus);
+					this.scrap -= (int) bonus;
 				}
 
-				this.setState(2);
-			} else
-			{
-				this.setState(1);
+				playSubSound = true;
 			}
 
-			this.setActive(true);
+			this.activate(playSubSound);
 			if (this.scrap < 10000)
 			{
 				MachineRecipeResult<IRecipeInput, Integer, ItemStack> recipe = this.amplifierSlot.process();
@@ -218,7 +187,7 @@ public class TileEntityMatter extends TileEntityElectricMachine implements IHasG
 			this.lastEnergy = this.energy.getEnergy();
 			if (needsInvUpdate)
 			{
-				this.markDirty();
+				this.setChanged();
 			}
 		} else
 		{
@@ -245,7 +214,7 @@ public class TileEntityMatter extends TileEntityElectricMachine implements IHasG
 			return false;
 		}
 
-		this.fluidTank.fillInternal(new FluidStack(FluidName.uu_matter.getInstance(), 1), true);
+		this.fluidTank.fillMbUnchecked(Ic2FluidStack.create(Ic2Fluids.UU_MATTER.still, 1), false);
 		this.energy.useEnergy(this.energy.getCapacity());
 		return true;
 	}
@@ -253,25 +222,19 @@ public class TileEntityMatter extends TileEntityElectricMachine implements IHasG
 	public String getProgressAsString()
 	{
 		int p = (int) Math.min(100.0 * this.energy.getFillRatio(), 100.0);
-		return "" + p + "%";
+		return p + "%";
 	}
 
 	@Override
-	public ContainerBase<TileEntityMatter> getGuiContainer(EntityPlayer player)
+	public ContainerBase<?> createServerScreenHandler(int syncId, Player player)
 	{
-		return new ContainerMatter(player, this);
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
-	{
-		return new GuiMatter(new ContainerMatter(player, this));
+		return new ContainerMatter(syncId, player.getInventory(), this);
 	}
 
 	@Override
-	public void onGuiClosed(EntityPlayer player)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
+		return new ContainerMatter(syncId, inventory, this);
 	}
 
 	private void setState(int aState)
@@ -295,77 +258,10 @@ public class TileEntityMatter extends TileEntityElectricMachine implements IHasG
 	}
 
 	@Override
-	public void onNetworkUpdate(String field)
+	public void setChanged()
 	{
-		if (field.equals("state") && this.prevState != this.state)
-		{
-			switch (this.state)
-			{
-				case 0:
-					if (this.audioSource != null)
-					{
-						this.audioSource.stop();
-					}
-
-					if (this.audioSourceScrap != null)
-					{
-						this.audioSourceScrap.stop();
-					}
-					break;
-				case 1:
-					if (this.audioSource == null)
-					{
-						this.audioSource = IC2.audioManager
-							.createSource(this, PositionSpec.Center, "Generators/MassFabricator/MassFabLoop.ogg", true, false, IC2.audioManager.getDefaultVolume());
-					}
-
-					if (this.audioSource != null)
-					{
-						this.audioSource.play();
-					}
-
-					if (this.audioSourceScrap != null)
-					{
-						this.audioSourceScrap.stop();
-					}
-					break;
-				case 2:
-					if (this.audioSource == null)
-					{
-						this.audioSource = IC2.audioManager
-							.createSource(this, PositionSpec.Center, "Generators/MassFabricator/MassFabLoop.ogg", true, false, IC2.audioManager.getDefaultVolume());
-					}
-
-					if (this.audioSourceScrap == null)
-					{
-						this.audioSourceScrap = IC2.audioManager
-							.createSource(
-								this, PositionSpec.Center, "Generators/MassFabricator/MassFabScrapSolo.ogg", true, false, IC2.audioManager.getDefaultVolume()
-							);
-					}
-
-					if (this.audioSource != null)
-					{
-						this.audioSource.play();
-					}
-
-					if (this.audioSourceScrap != null)
-					{
-						this.audioSourceScrap.play();
-					}
-			}
-
-			this.prevState = this.state;
-		}
-
-		super.onNetworkUpdate(field);
-	}
-
-	@Override
-	public void markDirty()
-	{
-		super.markDirty();
-		if (IC2.platform.isSimulating())
+		super.setChanged();
+		if (IC2.sideProxy.isSimulating())
 		{
 			this.setUpgradestat();
 		}

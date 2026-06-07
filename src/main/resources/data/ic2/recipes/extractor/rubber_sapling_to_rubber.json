@@ -1,0 +1,9 @@
+{
+  "type": "ic2:extractor",
+  "ingredient": {
+    "item": "ic2:rubber_sapling"
+  },
+  "result": {
+    "item": "ic2:rubber"
+  }
+}

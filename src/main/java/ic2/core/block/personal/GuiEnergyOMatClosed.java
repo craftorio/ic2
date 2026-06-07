@@ -1,30 +1,36 @@
 package ic2.core.block.personal;
 
-import ic2.core.GuiIC2;
+import com.mojang.blaze3d.vertex.PoseStack;
+import ic2.core.Ic2Gui;
 import ic2.core.init.Localization;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
 
-@SideOnly(Side.CLIENT)
-public class GuiEnergyOMatClosed extends GuiIC2<ContainerEnergyOMatClosed>
+public class GuiEnergyOMatClosed extends Ic2Gui<ContainerEnergyOMatClosed>
 {
-	private static final ResourceLocation background = new ResourceLocation("ic2", "textures/gui/GUIEnergyOMatClosed.png");
+	private static final ResourceLocation background = ResourceLocation.fromNamespaceAndPath("ic2", "textures/gui/guienergyomatclosed.png");
 
-	public GuiEnergyOMatClosed(ContainerEnergyOMatClosed container)
+	public GuiEnergyOMatClosed(ContainerEnergyOMatClosed container, Inventory playerInventory, Component title)
 	{
-		super(container);
+		super(container, playerInventory, title);
 	}
 
 	@Override
-	protected void drawForegroundLayer(int mouseX, int mouseY)
+	protected void drawForegroundLayer(PoseStack matrices, int mouseX, int mouseY)
 	{
-		super.drawForegroundLayer(mouseX, mouseY);
-		this.fontRenderer.drawString(Localization.translate("container.inventory"), 8, this.ySize - 96 + 2, 4210752);
-		this.fontRenderer.drawString(Localization.translate("ic2.container.personalTrader.want"), 12, 21, 4210752);
-		this.fontRenderer.drawString(Localization.translate("ic2.container.personalTrader.offer"), 12, 39, 4210752);
-		this.fontRenderer.drawString(this.container.base.euOffer + " EU", 50, 39, 4210752);
-		this.fontRenderer.drawString(Localization.translate("ic2.container.personalTraderEnergy.paidFor", this.container.base.paidFor), 12, 57, 4210752);
+		super.drawForegroundLayer(matrices, mouseX, mouseY);
+		this.drawString(matrices, 8, this.imageHeight - 96 + 2, Localization.translate("container.inventory"), 4210752);
+		this.drawString(matrices, 12, 21, Localization.translate("ic2.container.personalTrader.want"), 4210752);
+		this.drawString(matrices, 12, 39, Localization.translate("ic2.container.personalTrader.offer"), 4210752);
+		this.drawString(matrices, 50, 39, ((ContainerEnergyOMatClosed) this.menu).base.euOffer + " EU", 4210752);
+		this.drawString(
+			matrices,
+			12,
+			57,
+			Localization.translate("ic2.container.personalTraderEnergy.paidFor", ((ContainerEnergyOMatClosed) this.menu).base.paidFor),
+			4210752
+		);
 	}
 
 	@Override

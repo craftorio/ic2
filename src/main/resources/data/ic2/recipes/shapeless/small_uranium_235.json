@@ -1,0 +1,12 @@
+{
+  "type": "ic2:shapeless",
+  "ingredients": [
+    {
+      "item": "ic2:uranium_235"
+    }
+  ],
+  "result": {
+    "item": "ic2:small_uranium_235",
+    "count": 9
+  }
+}

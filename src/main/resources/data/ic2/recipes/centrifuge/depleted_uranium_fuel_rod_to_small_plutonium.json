@@ -1,0 +1,19 @@
+{
+  "type": "ic2:centrifuge",
+  "ingredient": {
+    "item": "ic2:depleted_uranium_fuel_rod"
+  },
+  "result": [
+    {
+      "item": "ic2:small_plutonium"
+    },
+    {
+      "item": "ic2:uranium_238",
+      "count": 4
+    },
+    {
+      "item": "ic2:iron_dust"
+    }
+  ],
+  "minHeat": 4000
+}

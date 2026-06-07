@@ -1,0 +1,43 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_dusts/copper": {
+      "conditions": {
+        "items": [
+          {
+            "tag": "forge:dusts/copper"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_dusts/tin": {
+      "conditions": {
+        "items": [
+          {
+            "tag": "forge:dusts/tin"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "ic2:shaped/small_iron_dust_2"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_dusts/copper",
+      "has_dusts/tin",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "ic2:shaped/small_iron_dust_2"
+    ]
+  }
+}

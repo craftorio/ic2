@@ -9,13 +9,6 @@ import ic2.core.energy.grid.GridInfo;
 import ic2.core.energy.grid.NodeType;
 import ic2.core.util.LogCategory;
 import ic2.core.util.Util;
-import ic2.shades.org.ejml.alg.dense.linsol.LinearSolver_B64_to_D64;
-import ic2.shades.org.ejml.data.Complex64F;
-import ic2.shades.org.ejml.data.DenseMatrix64F;
-import ic2.shades.org.ejml.factory.DecompositionFactory;
-import ic2.shades.org.ejml.factory.LinearSolverFactory;
-import ic2.shades.org.ejml.interfaces.decomposition.EigenDecomposition;
-import ic2.shades.org.ejml.ops.MatrixIO;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -37,9 +30,15 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.RunnableFuture;
 
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import org.apache.logging.log4j.Level;
+import org.ejml.data.Complex_F64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
+import org.ejml.dense.row.factory.LinearSolverFactory_DDRM;
+import org.ejml.interfaces.decomposition.EigenDecomposition_F64;
+import org.ejml.ops.MatrixIO;
 
 class Grid
 {
@@ -423,7 +422,7 @@ class Grid
 
 		if (run)
 		{
-			RunnableFuture<Iterable<Node>> task = IC2.getInstance().threadPool.makeTask(new GridCalculation(this));
+			RunnableFuture<Iterable<Node>> task = IC2.threadPool.makeTask(new GridCalculation(this));
 			this.calculation = task;
 			return task;
 		} else
@@ -440,7 +439,7 @@ class Grid
 			{
 				for (Node node : this.calculation.get())
 				{
-					EnumFacing dir;
+					Direction dir;
 					if (!node.links.isEmpty())
 					{
 						dir = node.links.get(0).getDirFrom(node);
@@ -558,15 +557,15 @@ class Grid
 			this.optimize(data);
 			determineEmittingNodes(data);
 			int size = data.activeNodes.size();
-			data.networkMatrix = new DenseMatrix64F(size, size);
-			data.sourceMatrix = new DenseMatrix64F(size, 1);
-			data.resultMatrix = new DenseMatrix64F(size, 1);
-			data.solver = LinearSolverFactory.symmPosDef(size);
+			data.networkMatrix = new DMatrixRMaj(size, size);
+			data.sourceMatrix = new DMatrixRMaj(size, 1);
+			data.resultMatrix = new DMatrixRMaj(size, 1);
+			data.solver = LinearSolverFactory_DDRM.symmPosDef(size);
 			if (!EnergyNetLocal.useLinearTransferModel)
 			{
 				populateNetworkMatrix(data);
 				initializeSolver(data);
-				if (data.solver instanceof LinearSolver_B64_to_D64)
+				if (!data.solver.modifiesA())
 				{
 					data.networkMatrix = null;
 				}
@@ -613,7 +612,7 @@ class Grid
 				populateNetworkMatrix(data);
 			}
 
-			data.solver = LinearSolverFactory.linear(size);
+			data.solver = LinearSolverFactory_DDRM.linear(size);
 			if (!data.solver.setA(data.networkMatrix))
 			{
 				if (data.solver.modifiesA())
@@ -621,7 +620,7 @@ class Grid
 					populateNetworkMatrix(data);
 				}
 
-				EigenDecomposition<DenseMatrix64F> ed = DecompositionFactory.eig(size, false);
+				EigenDecomposition_F64<DMatrixRMaj> ed = DecompositionFactory_DDRM.eig(size, false);
 				if (ed.decompose(data.networkMatrix))
 				{
 					int complex = size;
@@ -630,7 +629,7 @@ class Grid
 
 					for (int i = 0; i < size; i++)
 					{
-						Complex64F ev = ed.getEigenvalue(i);
+						Complex_F64 ev = ed.getEigenvalue(i);
 						if (ev.isReal())
 						{
 							complex--;
@@ -704,21 +703,21 @@ class Grid
 					}
 					break;
 				case Sink:
-					double sinkCurrent;
+					double current;
 					if (EnergyNetLocal.useLinearTransferModel)
 					{
-						sinkCurrent = node.getVoltage() / node.getResistance();
-						node.setAmount(node.getVoltage() * sinkCurrent);
+						current = node.getVoltage() / node.getResistance();
+						node.setAmount(node.getVoltage() * current);
 					} else
 					{
-						sinkCurrent = node.getVoltage();
-						node.setAmount(sinkCurrent);
+						current = node.getVoltage();
+						node.setAmount(current);
 					}
 
 					assert node.getAmount() >= 0.0;
 					if (EnergyNetGlobal.debugGrid)
 					{
-						IC2.log.debug(LogCategory.EnergyNet, "%d %s %f EU, %f V, %f A.", this.uid, node, node.getAmount(), node.getVoltage(), sinkCurrent);
+						IC2.log.debug(LogCategory.EnergyNet, "%d %s %f EU, %f V, %f A.", this.uid, node, node.getAmount(), node.getVoltage(), current);
 					}
 				case Conductor:
 			}
@@ -874,6 +873,9 @@ class Grid
 			}
 		}
 
+		return;
+
+		throw new AssertionError();
 	}
 
 	private void optimize(StructureCache.Data data)
@@ -1277,7 +1279,7 @@ class Grid
 		}
 	}
 
-	private static void printMatrix(DenseMatrix64F matrix, PrintStream ps)
+	private static void printMatrix(DMatrixRMaj matrix, PrintStream ps)
 	{
 		if (matrix == null)
 		{

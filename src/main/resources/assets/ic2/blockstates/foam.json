@@ -1,19 +1,10 @@
 {
-  "forge_marker": 1,
-  "defaults": {
-    "transform": "forge:default-block"
-  },
   "variants": {
-    "type": {
-      "normal": {
-        "model": "ic2:cf/foam"
-      },
-      "reinforced": {
-        "model": "ic2:cf/reinforced_foam"
-      }
+    "type=normal": {
+      "model": "ic2:block/cf/foam"
     },
-    "inventory": [
-      {}
-    ]
+    "type=reinforced": {
+      "model": "ic2:block/cf/reinforced_foam"
+    }
   }
 }

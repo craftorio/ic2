@@ -13,28 +13,30 @@ import ic2.core.block.invslot.InvSlotConsumableLiquidByList;
 import ic2.core.block.invslot.InvSlotOutput;
 import ic2.core.block.invslot.InvSlotUpgrade;
 import ic2.core.block.machine.container.ContainerReplicator;
-import ic2.core.block.machine.gui.GuiReplicator;
+import ic2.core.fluid.Ic2FluidStack;
+import ic2.core.fluid.Ic2FluidTank;
+import ic2.core.network.GrowingBuffer;
 import ic2.core.network.GuiSynced;
 import ic2.core.profile.NotClassic;
-import ic2.core.ref.FluidName;
+import ic2.core.ref.Ic2BlockEntities;
+import ic2.core.ref.Ic2Fluids;
 import ic2.core.util.StackUtil;
+import ic2.core.util.Util;
 import ic2.core.uu.UuIndex;
 
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.world.World;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidTank;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 @NotClassic
 public class TileEntityReplicator extends TileEntityElectricMachine implements IHasGui, IUpgradableBlock, INetworkClientTileEntityEventListener
@@ -53,18 +55,18 @@ public class TileEntityReplicator extends TileEntityElectricMachine implements I
 	public int maxIndex;
 	public double patternUu;
 	public double patternEu;
-	public final InvSlotConsumableLiquid fluidSlot = new InvSlotConsumableLiquidByList(this, "fluid", 1, FluidName.uu_matter.getInstance());
+	public final InvSlotConsumableLiquid fluidSlot = new InvSlotConsumableLiquidByList(this, "fluid", 1, Ic2Fluids.UU_MATTER.still);
 	public final InvSlotOutput cellSlot = new InvSlotOutput(this, "cell", 1);
 	public final InvSlotOutput outputSlot = new InvSlotOutput(this, "output", 1);
 	public final InvSlotUpgrade upgradeSlot = new InvSlotUpgrade(this, "upgrade", 4);
 	@GuiSynced
-	public final FluidTank fluidTank;
+	public final Ic2FluidTank fluidTank;
 	protected final Fluids fluids = this.addComponent(new Fluids(this));
 
-	public TileEntityReplicator()
+	public TileEntityReplicator(BlockPos pos, BlockState state)
 	{
-		super(2000000, 4);
-		this.fluidTank = this.fluids.addTank("fluidTank", 16000, Fluids.fluidPredicate(FluidName.uu_matter.getInstance()));
+		super(Ic2BlockEntities.REPLICATOR, pos, state, 2000000, 4);
+		this.fluidTank = this.fluids.addTank("fluidTank", 16000, Fluids.fluidPredicate(Ic2Fluids.UU_MATTER.still));
 	}
 
 	@Override
@@ -123,7 +125,7 @@ public class TileEntityReplicator extends TileEntityElectricMachine implements I
 		needsInvUpdate |= this.upgradeSlot.tickNoMark();
 		if (needsInvUpdate)
 		{
-			this.markDirty();
+			this.setChanged();
 		}
 	}
 
@@ -137,11 +139,11 @@ public class TileEntityReplicator extends TileEntityElectricMachine implements I
 
 		amount -= this.extraUuStored;
 		int toDrain = (int) Math.ceil(amount * 1000.0);
-		FluidStack drained = this.fluidTank.drainInternal(toDrain, false);
-		if (drained != null && drained.getFluid() == FluidName.uu_matter.getInstance() && drained.amount == toDrain)
+		Ic2FluidStack drained = this.fluidTank.drainMbUnchecked(toDrain, true);
+		if (drained != null && drained.getFluid() == Ic2Fluids.UU_MATTER.still && drained.getAmountMb() == toDrain)
 		{
-			this.fluidTank.drainInternal(toDrain, true);
-			amount -= drained.amount / 1000.0;
+			this.fluidTank.drainMbUnchecked(toDrain, false);
+			amount -= drained.getAmountMb() / 1000.0;
 			if (amount < 0.0)
 			{
 				this.extraUuStored = -amount;
@@ -197,11 +199,11 @@ public class TileEntityReplicator extends TileEntityElectricMachine implements I
 
 	public IPatternStorage getPatternStorage()
 	{
-		World world = this.getWorld();
+		Level world = this.getLevel();
 
-		for (EnumFacing dir : EnumFacing.VALUES)
+		for (Direction dir : Util.ALL_DIRS)
 		{
-			TileEntity target = world.getTileEntity(this.pos.offset(dir));
+			BlockEntity target = world.getBlockEntity(this.worldPosition.relative(dir));
 			if (target instanceof IPatternStorage)
 			{
 				return (IPatternStorage) target;
@@ -226,24 +228,23 @@ public class TileEntityReplicator extends TileEntityElectricMachine implements I
 		return ret > 2.147483647E9 ? Integer.MAX_VALUE : (int) ret;
 	}
 
-	@SideOnly(Side.CLIENT)
 	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
+	public ContainerBase<?> createServerScreenHandler(int syncId, Player player)
 	{
-		return new GuiReplicator(new ContainerReplicator(player, this));
+		return new ContainerReplicator(syncId, player.getInventory(), this);
 	}
 
 	@Override
-	public ContainerBase<TileEntityReplicator> getGuiContainer(EntityPlayer player)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
-		return new ContainerReplicator(player, this);
+		return new ContainerReplicator(syncId, inventory, this);
 	}
 
 	@Override
 	protected void onLoaded()
 	{
 		super.onLoaded();
-		if (IC2.platform.isSimulating())
+		if (IC2.sideProxy.isSimulating())
 		{
 			this.setOverclockRates();
 			this.refreshInfo();
@@ -251,10 +252,10 @@ public class TileEntityReplicator extends TileEntityElectricMachine implements I
 	}
 
 	@Override
-	public void markDirty()
+	public void setChanged()
 	{
-		super.markDirty();
-		if (IC2.platform.isSimulating())
+		super.setChanged();
+		if (IC2.sideProxy.isSimulating())
 		{
 			this.setOverclockRates();
 		}
@@ -266,38 +267,36 @@ public class TileEntityReplicator extends TileEntityElectricMachine implements I
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound nbt)
+	public void load(CompoundTag nbt)
 	{
-		super.readFromNBT(nbt);
+		super.load(nbt);
 		this.extraUuStored = nbt.getDouble("extraUuStored");
 		this.uuProcessed = nbt.getDouble("uuProcessed");
-		this.index = nbt.getInteger("index");
-		int modeIdx = nbt.getInteger("mode");
+		this.index = nbt.getInt("index");
+		int modeIdx = nbt.getInt("mode");
 		this.mode = modeIdx < TileEntityReplicator.Mode.values().length ? TileEntityReplicator.Mode.values()[modeIdx] : TileEntityReplicator.Mode.STOPPED;
-		NBTTagCompound contentTag = nbt.getCompoundTag("pattern");
-		this.pattern = new ItemStack(contentTag);
+		CompoundTag contentTag = nbt.getCompound("pattern");
+		this.pattern = ItemStack.m_41712_(contentTag);
 	}
 
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
+	public void saveAdditional(CompoundTag nbt)
 	{
-		super.writeToNBT(nbt);
-		nbt.setDouble("extraUuStored", this.extraUuStored);
-		nbt.setDouble("uuProcessed", this.uuProcessed);
-		nbt.setInteger("index", this.index);
-		nbt.setInteger("mode", this.mode.ordinal());
+		super.saveAdditional(nbt);
+		nbt.putDouble("extraUuStored", this.extraUuStored);
+		nbt.putDouble("uuProcessed", this.uuProcessed);
+		nbt.putInt("index", this.index);
+		nbt.putInt("mode", this.mode.ordinal());
 		if (this.pattern != null)
 		{
-			NBTTagCompound contentTag = new NBTTagCompound();
-			this.pattern.writeToNBT(contentTag);
-			nbt.setTag("pattern", contentTag);
+			CompoundTag contentTag = new CompoundTag();
+			this.pattern.m_41739_(contentTag);
+			nbt.put("pattern", contentTag);
 		}
-
-		return nbt;
 	}
 
 	@Override
-	public void onNetworkEvent(EntityPlayer player, int event)
+	public void onNetworkEvent(Player player, int event)
 	{
 		switch (event)
 		{
@@ -362,11 +361,6 @@ public class TileEntityReplicator extends TileEntityElectricMachine implements I
 					}
 				}
 		}
-	}
-
-	@Override
-	public void onGuiClosed(EntityPlayer player)
-	{
 	}
 
 	@Override

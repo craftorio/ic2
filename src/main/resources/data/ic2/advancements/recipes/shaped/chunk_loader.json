@@ -1,0 +1,84 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_circuit": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:circuit"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_ender_pearl": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:ender_pearl"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_lapis_lazuli": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:lapis_lazuli"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_machine": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:machine"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_plates/tin": {
+      "conditions": {
+        "items": [
+          {
+            "tag": "forge:plates/tin"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "ic2:shaped/chunk_loader"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_plates/tin",
+      "has_ender_pearl",
+      "has_lapis_lazuli",
+      "has_machine",
+      "has_circuit",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "ic2:shaped/chunk_loader"
+    ]
+  }
+}

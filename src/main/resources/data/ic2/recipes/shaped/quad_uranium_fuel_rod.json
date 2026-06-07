@@ -1,0 +1,23 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "UIU",
+    "CIC",
+    "UIU"
+  ],
+  "key": {
+    "U": {
+      "item": "ic2:uranium_fuel_rod"
+    },
+    "I": {
+      "tag": "forge:plates/iron"
+    },
+    "C": {
+      "tag": "forge:plates/copper"
+    }
+  },
+  "group": "quad_uranium_fuel_rod",
+  "result": {
+    "item": "ic2:quad_uranium_fuel_rod"
+  }
+}

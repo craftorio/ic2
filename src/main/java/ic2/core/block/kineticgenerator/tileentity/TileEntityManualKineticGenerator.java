@@ -1,24 +1,34 @@
 package ic2.core.block.kineticgenerator.tileentity;
 
 import ic2.api.energy.tile.IKineticSource;
-import ic2.core.block.TileEntityBlock;
+import ic2.core.block.tileentity.Ic2TileEntity;
 import ic2.core.init.MainConfig;
 import ic2.core.profile.NotClassic;
+import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.util.ConfigUtil;
 import ic2.core.util.Util;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 @NotClassic
-public class TileEntityManualKineticGenerator extends TileEntityBlock implements IKineticSource
+public class TileEntityManualKineticGenerator extends Ic2TileEntity implements IKineticSource
 {
 	public int clicks;
 	public static final int maxClicksPerTick = 10;
 	public final int maxKU = 1000;
 	public int currentKU;
 	private static final float outputModifier = Math.round(ConfigUtil.getFloat(MainConfig.get(), "balance/energy/kineticgenerator/manual"));
+
+	public TileEntityManualKineticGenerator(BlockPos pos, BlockState state)
+	{
+		super(Ic2BlockEntities.MANUAL_KINETIC_GENERATOR, pos, state);
+	}
 
 	@Override
 	protected void updateEntityServer()
@@ -28,17 +38,17 @@ public class TileEntityManualKineticGenerator extends TileEntityBlock implements
 	}
 
 	@Override
-	protected boolean onActivated(EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ)
+	protected InteractionResult onActivated(Player player, InteractionHand hand, Direction side, Vec3 hit)
 	{
 		this.playerClicked(player);
-		return true;
+		return InteractionResult.SUCCESS;
 	}
 
-	private void playerClicked(EntityPlayer player)
+	private void playerClicked(Player player)
 	{
-		if (player.getFoodStats().getFoodLevel() > 6)
+		if (player.m_36324_().m_38702_() > 6)
 		{
-			if (player instanceof EntityPlayerMP)
+			if (player instanceof ServerPlayer)
 			{
 				if (this.clicks < 10)
 				{
@@ -53,7 +63,7 @@ public class TileEntityManualKineticGenerator extends TileEntityBlock implements
 
 					ku = (int) (ku * outputModifier);
 					this.currentKU = Math.min(this.currentKU + ku, 1000);
-					player.addExhaustion(0.25F);
+					player.m_36399_(0.25F);
 					this.clicks++;
 				}
 			}
@@ -61,25 +71,25 @@ public class TileEntityManualKineticGenerator extends TileEntityBlock implements
 	}
 
 	@Override
-	public int maxrequestkineticenergyTick(EnumFacing directionFrom)
+	public int maxrequestkineticenergyTick(Direction directionFrom)
 	{
 		return this.drawKineticEnergy(directionFrom, Integer.MAX_VALUE, true);
 	}
 
 	@Override
-	public int getConnectionBandwidth(EnumFacing side)
+	public int getConnectionBandwidth(Direction side)
 	{
 		return 1000;
 	}
 
 	@Override
-	public int requestkineticenergy(EnumFacing directionFrom, int requestkineticenergy)
+	public int requestkineticenergy(Direction directionFrom, int requestkineticenergy)
 	{
 		return this.drawKineticEnergy(directionFrom, requestkineticenergy, false);
 	}
 
 	@Override
-	public int drawKineticEnergy(EnumFacing side, int request, boolean simulate)
+	public int drawKineticEnergy(Direction side, int request, boolean simulate)
 	{
 		int max = Math.min(this.currentKU, request);
 		if (!simulate)

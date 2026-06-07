@@ -1,0 +1,40 @@
+{
+  "parent": "ic2:ic2/build_generator/build_compressor/build_nuclear_reactor",
+  "display": {
+    "icon": {
+      "item": "ic2:reactor_chamber"
+    },
+    "title": {
+      "translate": "advancements.ic2.makeNuclearReactorExplode"
+    },
+    "description": {
+      "translate": "advancements.ic2.makeNuclearReactorExplode.desc"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "ic2:make_nuclear_reactor_explode": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:reactor_chamber"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "ic2:make_nuclear_reactor_explode"
+    ]
+  ],
+  "rewards": {
+    "experience": 150
+  }
+}

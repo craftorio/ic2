@@ -1,0 +1,17 @@
+{
+  "type": "ic2:shapeless",
+  "ingredients": [
+    {
+      "item": "ic2:reactor_plating"
+    },
+    {
+      "item": "ic2:alloy"
+    },
+    {
+      "item": "ic2:alloy"
+    }
+  ],
+  "result": {
+    "item": "ic2:containment_reactor_plating"
+  }
+}

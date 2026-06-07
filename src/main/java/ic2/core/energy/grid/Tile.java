@@ -10,12 +10,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
-public class Tile
+public final class Tile
 {
 	private final IEnergyTile mainTile;
 	final List<IEnergyTile> subTiles;
@@ -140,14 +140,14 @@ public class Tile
 	public String toString()
 	{
 		String ret = getTeClassName(this.mainTile);
-		World world = EnergyNet.instance.getWorld(this.mainTile);
-		MinecraftServer server = world.getMinecraftServer();
-		if (server != null && server.isCallingFromMinecraftThread())
+		Level world = EnergyNet.instance.getWorld(this.mainTile);
+		MinecraftServer server = world.getServer();
+		if (server != null && server.m_18695_())
 		{
 			BlockPos pos = EnergyNet.instance.getPos(this.mainTile);
-			if (world.isBlockLoaded(pos))
+			if (world.isLoaded(pos))
 			{
-				TileEntity te = world.getTileEntity(pos);
+				BlockEntity te = world.getBlockEntity(pos);
 				if (te != null)
 				{
 					ret = ret + "|" + getTeClassName(te);

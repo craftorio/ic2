@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:ic2/root",
+  "display": {
+    "icon": {
+      "item": "ic2:resin"
+    },
+    "title": {
+      "translate": "advancements.ic2.acquireResin"
+    },
+    "description": {
+      "translate": "advancements.ic2.acquireResin.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "ic2:resin": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:resin"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "ic2:resin"
+    ]
+  ]
+}

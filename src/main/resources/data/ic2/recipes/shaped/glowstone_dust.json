@@ -1,0 +1,20 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "RGR",
+    "GRG",
+    "RGR"
+  ],
+  "key": {
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "G": {
+      "tag": "forge:dusts/gold"
+    }
+  },
+  "hidden": true,
+  "result": {
+    "item": "minecraft:glowstone_dust"
+  }
+}

@@ -1,17 +1,17 @@
 package ic2.core.item.reactor;
 
 import ic2.api.reactor.IReactor;
-import ic2.core.item.type.NuclearResourceType;
 import ic2.core.profile.NotClassic;
-import ic2.core.ref.ItemName;
-import net.minecraft.item.ItemStack;
+import ic2.core.ref.Ic2Items;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item.Properties;
 
 @NotClassic
 public class ItemReactorMOX extends ItemReactorUranium
 {
-	public ItemReactorMOX(ItemName name, int cells)
+	public ItemReactorMOX(Properties settings, int cells)
 	{
-		super(name, cells, 10000);
+		super(settings, cells, 10000);
 	}
 
 	@Override
@@ -32,23 +32,13 @@ public class ItemReactorMOX extends ItemReactorUranium
 	@Override
 	protected ItemStack getDepletedStack(ItemStack stack, IReactor reactor)
 	{
-		ItemStack ret;
-		switch (this.numberOfCells)
+		return new ItemStack(switch (this.numberOfCells)
 		{
-			case 1:
-				ret = ItemName.nuclear.getItemStack(NuclearResourceType.depleted_mox);
-				break;
-			case 2:
-				ret = ItemName.nuclear.getItemStack(NuclearResourceType.depleted_dual_mox);
-				break;
-			case 3:
-			default:
-				throw new RuntimeException("invalid cell count: " + this.numberOfCells);
-			case 4:
-				ret = ItemName.nuclear.getItemStack(NuclearResourceType.depleted_quad_mox);
-		}
-
-		return ret.copy();
+			case 1 -> Ic2Items.DEPLETED_MOX_FUEL_ROD;
+			case 2 -> Ic2Items.DEPLETED_DUAL_MOX_FUEL_ROD;
+			default -> throw new RuntimeException("invalid cell count: " + this.numberOfCells);
+			case 4 -> Ic2Items.DEPLETED_QUAD_MOX_FUEL_ROD;
+		});
 	}
 
 	@Override

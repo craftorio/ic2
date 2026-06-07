@@ -1,0 +1,29 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    " I ",
+    "ACA",
+    "HWH"
+  ],
+  "key": {
+    "H": {
+      "item": "ic2:forge_hammer"
+    },
+    "W": {
+      "item": "ic2:wrench"
+    },
+    "C": {
+      "item": "ic2:advanced_machine"
+    },
+    "A": {
+      "item": "ic2:advanced_circuit"
+    },
+    "I": {
+      "item": "ic2:industrial_workbench"
+    }
+  },
+  "consuming": true,
+  "result": {
+    "item": "ic2:batch_crafter"
+  }
+}

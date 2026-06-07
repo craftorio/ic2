@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:smelting",
+  "group": "lead_ingot",
+  "ingredient": {
+    "item": "ic2:crushed_lead"
+  },
+  "result": "ic2:lead_ingot",
+  "experience": 0.0,
+  "cookingtime": 200
+}

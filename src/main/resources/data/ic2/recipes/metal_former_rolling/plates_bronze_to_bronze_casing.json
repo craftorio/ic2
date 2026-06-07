@@ -1,0 +1,10 @@
+{
+  "type": "ic2:metal_former_rolling",
+  "ingredient": {
+    "tag": "forge:plates/bronze"
+  },
+  "result": {
+    "item": "ic2:bronze_casing",
+    "count": 2
+  }
+}

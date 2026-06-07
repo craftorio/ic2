@@ -1,11 +1,12 @@
 package ic2.core.block.invslot;
 
+import ic2.core.IC2;
 import ic2.core.block.IInventorySlotHolder;
 import ic2.core.item.DamageHandler;
 import ic2.core.util.StackUtil;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 public abstract class InvSlotConsumable extends InvSlot
 {
@@ -43,7 +44,7 @@ public abstract class InvSlotConsumable extends InvSlot
 			if (StackUtil.getSize(stack) >= 1
 				&& this.accepts(stack)
 				&& (ret == null || StackUtil.checkItemEqualityStrict(stack, ret))
-				&& (StackUtil.getSize(stack) == 1 || consumeContainers || !stack.getItem().hasContainerItem(stack)))
+				&& (StackUtil.getSize(stack) == 1 || consumeContainers || !IC2.envProxy.hasRecipeRemainder(stack)))
 			{
 				int currentAmount = Math.min(amount, StackUtil.getSize(stack));
 				amount -= currentAmount;
@@ -51,10 +52,10 @@ public abstract class InvSlotConsumable extends InvSlot
 				{
 					if (StackUtil.getSize(stack) == currentAmount)
 					{
-						if (!consumeContainers && stack.getItem().hasContainerItem(stack))
+						if (!consumeContainers && IC2.envProxy.hasRecipeRemainder(stack))
 						{
-							ItemStack container = stack.getItem().getContainerItem(stack);
-							if (container != null && container.isItemStackDamageable() && DamageHandler.getDamage(container) > DamageHandler.getMaxDamage(container))
+							ItemStack container = IC2.envProxy.getRecipeRemainder(stack);
+							if (container != null && container.m_41763_() && DamageHandler.getDamage(container) > DamageHandler.getMaxDamage(container))
 							{
 								container = null;
 							}
@@ -93,7 +94,7 @@ public abstract class InvSlotConsumable extends InvSlot
 		return this.damage(amount, simulate, null);
 	}
 
-	public int damage(int amount, boolean simulate, EntityLivingBase src)
+	public int damage(int amount, boolean simulate, LivingEntity src)
 	{
 		int damageApplied = 0;
 		ItemStack target = null;
@@ -104,16 +105,16 @@ public abstract class InvSlotConsumable extends InvSlot
 			if (!StackUtil.isEmpty(stack))
 			{
 				Item item = stack.getItem();
-				if (this.accepts(stack) && item.isDamageable() && (target == null || item == target.getItem() && ItemStack.areItemStackTagsEqual(stack, target)))
+				if (this.accepts(stack) && item.m_41465_() && (target == null || item == target.getItem() && ItemStack.m_41658_(stack, target)))
 				{
 					if (target == null)
 					{
-						target = stack.copy();
+						target = stack.m_41777_();
 					}
 
 					if (simulate)
 					{
-						stack = stack.copy();
+						stack = stack.m_41777_();
 					}
 
 					int maxDamage = DamageHandler.getMaxDamage(stack);
@@ -121,7 +122,7 @@ public abstract class InvSlotConsumable extends InvSlot
 					do
 					{
 						int currentAmount = Math.min(amount, maxDamage - DamageHandler.getDamage(stack));
-						DamageHandler.damage(stack, currentAmount, src);
+						DamageHandler.damage(stack, currentAmount, src, null);
 						damageApplied += currentAmount;
 						amount -= currentAmount;
 						if (DamageHandler.getDamage(stack) >= maxDamage)

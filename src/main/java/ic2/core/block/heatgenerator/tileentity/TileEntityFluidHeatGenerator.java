@@ -5,25 +5,27 @@ import ic2.api.recipe.Recipes;
 import ic2.core.ContainerBase;
 import ic2.core.FluidHeatManager;
 import ic2.core.IHasGui;
-import ic2.core.block.TileEntityHeatSourceInventory;
 import ic2.core.block.comp.Fluids;
 import ic2.core.block.heatgenerator.container.ContainerFluidHeatGenerator;
-import ic2.core.block.heatgenerator.gui.GuiFluidHeatGenerator;
 import ic2.core.block.invslot.InvSlotConsumableLiquid;
 import ic2.core.block.invslot.InvSlotConsumableLiquidByManager;
 import ic2.core.block.invslot.InvSlotOutput;
+import ic2.core.block.tileentity.TileEntityHeatSourceInventory;
+import ic2.core.fluid.Ic2FluidStack;
+import ic2.core.fluid.Ic2FluidTank;
 import ic2.core.init.MainConfig;
+import ic2.core.network.GrowingBuffer;
 import ic2.core.network.GuiSynced;
 import ic2.core.profile.NotClassic;
+import ic2.core.ref.Ic2BlockEntities;
+import ic2.core.ref.Ic2Fluids;
 import ic2.core.util.ConfigUtil;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidTank;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
 
 @NotClassic
 public class TileEntityFluidHeatGenerator extends TileEntityHeatSourceInventory implements IHasGui
@@ -31,15 +33,16 @@ public class TileEntityFluidHeatGenerator extends TileEntityHeatSourceInventory 
 	public final InvSlotConsumableLiquid fluidSlot;
 	public final InvSlotOutput outputSlot;
 	@GuiSynced
-	protected final FluidTank fluidTank;
+	protected final Ic2FluidTank fluidTank;
 	private short ticker = 0;
 	protected int burnAmount = 0;
 	protected int production = 0;
 	boolean newActive = false;
 	protected final Fluids fluids;
 
-	public TileEntityFluidHeatGenerator()
+	public TileEntityFluidHeatGenerator(BlockPos pos, BlockState state)
 	{
+		super(Ic2BlockEntities.FLUID_HEAT_GENERATOR, pos, state);
 		this.fluidSlot = new InvSlotConsumableLiquidByManager(this, "fluidSlot", 1, Recipes.fluidHeatGenerator);
 		this.outputSlot = new InvSlotOutput(this, "output", 1);
 		this.fluids = this.addComponent(new Fluids(this));
@@ -58,7 +61,7 @@ public class TileEntityFluidHeatGenerator extends TileEntityHeatSourceInventory 
 
 		if (needsInvUpdate)
 		{
-			this.markDirty();
+			this.setChanged();
 		}
 
 		if (this.getActive() != this.newActive)
@@ -75,52 +78,31 @@ public class TileEntityFluidHeatGenerator extends TileEntityHeatSourceInventory 
 	public static void init()
 	{
 		Recipes.fluidHeatGenerator = new FluidHeatManager();
-		if (ConfigUtil.getFloat(MainConfig.get(), "balance/energy/generator/semiFluidOil") > 0.0F)
-		{
-			addFuel("oil", 10, Math.round(32.0F * ConfigUtil.getFloat(MainConfig.get(), "balance/energy/heatgenerator/semiFluidOil")));
-		}
-
-		if (ConfigUtil.getFloat(MainConfig.get(), "balance/energy/generator/semiFluidFuel") > 0.0F)
-		{
-			addFuel("fuel", 5, Math.round(768.0F * ConfigUtil.getFloat(MainConfig.get(), "balance/energy/heatgenerator/semiFluidFuel")));
-		}
-
-		if (ConfigUtil.getFloat(MainConfig.get(), "balance/energy/generator/semiFluidBiomass") > 0.0F)
-		{
-			addFuel("biomass", 20, Math.round(16.0F * ConfigUtil.getFloat(MainConfig.get(), "balance/energy/heatgenerator/semiFluidBiomass")));
-		}
-
-		if (ConfigUtil.getFloat(MainConfig.get(), "balance/energy/generator/semiFluidBioethanol") > 0.0F)
-		{
-			addFuel("bio.ethanol", 10, Math.round(32.0F * ConfigUtil.getFloat(MainConfig.get(), "balance/energy/heatgenerator/semiFluidBioethanol")));
-		}
-
 		if (ConfigUtil.getFloat(MainConfig.get(), "balance/energy/generator/semiFluidBiogas") > 0.0F)
 		{
-			addFuel("ic2biogas", 10, Math.round(32.0F * ConfigUtil.getFloat(MainConfig.get(), "balance/energy/heatgenerator/semiFluidBiogas")));
+			addFuel(Ic2Fluids.BIOGAS.still, 10, Math.round(32.0F * ConfigUtil.getFloat(MainConfig.get(), "balance/energy/heatgenerator/semiFluidBiogas")));
 		}
 	}
 
-	public static void addFuel(String fluidName, int amount, int heat)
+	public static void addFuel(Fluid fluid, int amount, int heat)
 	{
-		Recipes.fluidHeatGenerator.addFluid(fluidName, amount, heat);
+		Recipes.fluidHeatGenerator.addFluid(fluid, amount, heat);
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound nbttagcompound)
+	public void load(CompoundTag nbt)
 	{
-		super.readFromNBT(nbttagcompound);
-		this.fluidTank.readFromNBT(nbttagcompound.getCompoundTag("fluidTank"));
+		super.load(nbt);
+		this.fluidTank.fromNbt(nbt.getCompound("fluidTank"));
 	}
 
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
+	public void saveAdditional(CompoundTag nbt)
 	{
-		super.writeToNBT(nbt);
-		NBTTagCompound fluidTankTag = new NBTTagCompound();
-		this.fluidTank.writeToNBT(fluidTankTag);
-		nbt.setTag("fluidTank", fluidTankTag);
-		return nbt;
+		super.saveAdditional(nbt);
+		CompoundTag fluidTankTag = new CompoundTag();
+		this.fluidTank.toNbt(fluidTankTag);
+		nbt.put("fluidTank", fluidTankTag);
 	}
 
 	@Override
@@ -130,7 +112,7 @@ public class TileEntityFluidHeatGenerator extends TileEntityHeatSourceInventory 
 		{
 			if (this.ticker >= 19)
 			{
-				this.getFluidTank().drain(this.burnAmount, true);
+				this.fluidTank.drainMbUnchecked(this.burnAmount, false);
 				this.ticker = 0;
 			} else
 			{
@@ -153,26 +135,20 @@ public class TileEntityFluidHeatGenerator extends TileEntityHeatSourceInventory 
 	}
 
 	@Override
-	public ContainerBase<TileEntityFluidHeatGenerator> getGuiContainer(EntityPlayer player)
+	public ContainerBase<TileEntityFluidHeatGenerator> createServerScreenHandler(int syncId, Player player)
 	{
-		return new ContainerFluidHeatGenerator(player, this);
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
-	{
-		return new GuiFluidHeatGenerator(new ContainerFluidHeatGenerator(player, this));
+		return new ContainerFluidHeatGenerator(syncId, player.getInventory(), this);
 	}
 
 	@Override
-	public void onGuiClosed(EntityPlayer player)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
+		return new ContainerFluidHeatGenerator(syncId, inventory, this);
 	}
 
 	protected int calcHeatProduction()
 	{
-		if (this.fluidTank.getFluid() != null && this.getFluidfromTank() != null)
+		if (!this.fluidTank.isEmpty() && this.getFluidfromTank() != null)
 		{
 			IFluidHeatManager.BurnProperty property = Recipes.fluidHeatGenerator.getBurnProperty(this.getFluidfromTank());
 			if (property != null)
@@ -199,14 +175,14 @@ public class TileEntityFluidHeatGenerator extends TileEntityHeatSourceInventory 
 		this.burnAmount = 0;
 	}
 
-	public FluidTank getFluidTank()
+	public Ic2FluidTank getFluidTank()
 	{
 		return this.fluidTank;
 	}
 
-	public FluidStack getFluidStackfromTank()
+	public Ic2FluidStack getFluidStackfromTank()
 	{
-		return this.getFluidTank().getFluid();
+		return this.fluidTank.getFluidStack();
 	}
 
 	public Fluid getFluidfromTank()
@@ -216,22 +192,22 @@ public class TileEntityFluidHeatGenerator extends TileEntityHeatSourceInventory 
 
 	public int getTankAmount()
 	{
-		return this.getFluidTank().getFluidAmount();
+		return this.fluidTank.getFluidAmount();
 	}
 
 	public int gaugeLiquidScaled(int i)
 	{
-		return this.getFluidTank().getFluidAmount() <= 0 ? 0 : this.getFluidTank().getFluidAmount() * i / this.getFluidTank().getCapacity();
+		return this.fluidTank.getFluidAmount() <= 0 ? 0 : this.fluidTank.getFluidAmount() * i / this.fluidTank.getCapacity();
 	}
 
 	public boolean needsFluid()
 	{
-		return this.getFluidTank().getFluidAmount() <= this.getFluidTank().getCapacity();
+		return this.fluidTank.getFluidAmount() <= this.fluidTank.getCapacity();
 	}
 
 	protected boolean gainFuel()
 	{
-		if (this.fluidTank.getFluid() != null)
+		if (!this.fluidTank.isEmpty())
 		{
 			this.calcHeatProduction();
 			this.calcBurnAmount();

@@ -1,0 +1,8 @@
+{
+  "type": "forge:add_features",
+  "biomes": "#minecraft:is_jungle",
+  "features": [
+    "ic2:trees_rubber_jungle"
+  ],
+  "step": "vegetal_decoration"
+}

@@ -9,34 +9,36 @@ import ic2.api.upgrade.UpgradableProperty;
 import ic2.core.ContainerBase;
 import ic2.core.IHasGui;
 import ic2.core.block.IInventorySlotHolder;
+import ic2.core.block.SimpleCraftingInventory;
 import ic2.core.block.invslot.InvSlot;
 import ic2.core.block.invslot.InvSlotOutput;
 import ic2.core.block.invslot.InvSlotUpgrade;
 import ic2.core.block.machine.container.ContainerBatchCrafter;
-import ic2.core.block.machine.gui.GuiBatchCrafter;
 import ic2.core.gui.dynamic.IGuiValueProvider;
+import ic2.core.network.GrowingBuffer;
 import ic2.core.profile.NotClassic;
-import ic2.core.util.InventorySlotCrafting;
+import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.util.StackUtil;
 import ic2.core.util.Tuple;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.InventoryCrafting;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.CraftingManager;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 
 @NotClassic
 public class TileEntityBatchCrafter
@@ -63,41 +65,8 @@ public class TileEntityBatchCrafter
 	public final InvSlotOutput craftingOutput = new InvSlotOutput(this, "output", 1, InvSlot.InvSide.SIDE);
 	public final InvSlotOutput containerOutput = new InvSlotOutput(this, "containersOut", this.craftingGrid.length, InvSlot.InvSide.NOTSIDE);
 	public final InvSlotUpgrade upgradeSlot = new InvSlotUpgrade(this, "upgrade", 4);
-	protected final InventoryCrafting crafting = new InventorySlotCrafting(3, 3)
-	{
-		@Override
-		protected ItemStack get(int index)
-		{
-			return StackUtil.wrapEmpty(TileEntityBatchCrafter.this.craftingGrid[index]);
-		}
-
-		@Override
-		protected void put(int index, ItemStack stack)
-		{
-			TileEntityBatchCrafter.this.craftingGrid[index] = stack;
-		}
-
-		@Override
-		public boolean isEmpty()
-		{
-			for (ItemStack stack : TileEntityBatchCrafter.this.craftingGrid)
-			{
-				if (!StackUtil.isEmpty(stack))
-				{
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-		@Override
-		public void clear()
-		{
-			Arrays.fill(TileEntityBatchCrafter.this.craftingGrid, StackUtil.emptyStack);
-		}
-	};
-	public final InventoryCrafting ingredients = new InventorySlotCrafting(3, 3)
+	protected final CraftingContainer crafting = new SimpleCraftingInventory.ArrayCraftingInventory(this.craftingGrid, 3);
+	public final CraftingContainer ingredients = new SimpleCraftingInventory(3, 3)
 	{
 		@Override
 		protected ItemStack get(int index)
@@ -106,42 +75,13 @@ public class TileEntityBatchCrafter
 		}
 
 		@Override
-		protected void put(int index, ItemStack stack)
+		protected void set(int index, ItemStack stack)
 		{
 			TileEntityBatchCrafter.this.ingredientsRow[index].put(stack);
 		}
-
-		@Override
-		public boolean isEmpty()
-		{
-			for (InvSlot slot : TileEntityBatchCrafter.this.ingredientsRow)
-			{
-				if (!slot.isEmpty())
-				{
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-		@Override
-		public void clear()
-		{
-			for (InvSlot slot : TileEntityBatchCrafter.this.ingredientsRow)
-			{
-				slot.clear();
-			}
-		}
 	};
-	public final Predicate<Tuple.T2<ItemStack, Integer>> acceptPredicate = new Predicate<Tuple.T2<ItemStack, Integer>>()
-	{
-		public boolean apply(Tuple.T2<ItemStack, Integer> input)
-		{
-			return TileEntityBatchCrafter.this.ingredientsRow[input.b].accepts(input.a);
-		}
-	};
-	protected IRecipe recipe = null;
+	public final Predicate<Tuple.T2<ItemStack, Integer>> acceptPredicate = input -> this.ingredientsRow[(Integer) input.b].accepts((ItemStack) input.a);
+	protected CraftingRecipe recipe = null;
 	protected boolean canCraft = false;
 	protected boolean newChange = true;
 	protected boolean attemptToBalance = false;
@@ -152,19 +92,24 @@ public class TileEntityBatchCrafter
 	protected short progress = 0;
 	protected float guiProgress = 0.0F;
 
-	public TileEntityBatchCrafter()
+	public TileEntityBatchCrafter(BlockPos pos, BlockState state)
 	{
-		super(20000, 1);
+		this(Ic2BlockEntities.BATCH_CRAFTER, pos, state);
+	}
+
+	protected TileEntityBatchCrafter(BlockEntityType<? extends TileEntityBatchCrafter> type, BlockPos pos, BlockState state)
+	{
+		super(type, pos, state, 20000, 1);
 
 		for (int i = 0; i < this.ingredientsRow.length; i++)
 		{
 			final int slot = i;
-			this.ingredientsRow[slot] = new InvSlot(this, "ingredient[" + slot + ']', InvSlot.Access.I, 1)
+			this.ingredientsRow[slot] = new InvSlot(this, "ingredient[" + slot + "]", InvSlot.Access.I, 1)
 			{
 				@Override
 				public boolean accepts(ItemStack ingredient)
 				{
-					IRecipe recipe = TileEntityBatchCrafter.this.world.isRemote
+					CraftingRecipe recipe = TileEntityBatchCrafter.this.level.isClientSide
 						? TileEntityBatchCrafter.this.findRecipe()
 						: TileEntityBatchCrafter.this.recipe;
 					if (recipe == null)
@@ -172,13 +117,13 @@ public class TileEntityBatchCrafter
 						return false;
 					}
 
-					assert recipe.matches(TileEntityBatchCrafter.this.crafting, TileEntityBatchCrafter.this.world);
+					assert recipe.m_5818_(TileEntityBatchCrafter.this.crafting, TileEntityBatchCrafter.this.level);
 					ItemStack recipeStack = TileEntityBatchCrafter.this.craftingGrid[slot];
 
 					try
 					{
 						TileEntityBatchCrafter.this.craftingGrid[slot] = ingredient;
-						return recipe.matches(TileEntityBatchCrafter.this.crafting, TileEntityBatchCrafter.this.world);
+						return recipe.m_5818_(TileEntityBatchCrafter.this.crafting, TileEntityBatchCrafter.this.level);
 					} finally
 					{
 						TileEntityBatchCrafter.this.craftingGrid[slot] = recipeStack;
@@ -201,56 +146,69 @@ public class TileEntityBatchCrafter
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound nbt)
+	public void load(CompoundTag nbt)
 	{
-		super.readFromNBT(nbt);
+		super.load(nbt);
 		this.progress = nbt.getShort("progress");
-		NBTTagList grid = nbt.getTagList("grid", 10);
+		ListTag grid = nbt.m_128437_("grid", 10);
 
-		for (int i = 0; i < grid.tagCount(); i++)
+		for (int i = 0; i < grid.size(); i++)
 		{
-			NBTTagCompound contentTag = grid.getCompoundTagAt(i);
-			this.craftingGrid[contentTag.getByte("index")] = new ItemStack(contentTag);
+			CompoundTag contentTag = grid.m_128728_(i);
+			this.craftingGrid[contentTag.getByte("index")] = ItemStack.m_41712_(contentTag);
 		}
 	}
 
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
+	public void saveAdditional(CompoundTag nbt)
 	{
-		super.writeToNBT(nbt);
-		nbt.setShort("progress", this.progress);
-		NBTTagList grid = new NBTTagList();
+		super.saveAdditional(nbt);
+		nbt.putShort("progress", this.progress);
+		ListTag grid = new ListTag();
 
 		for (byte i = 0; i < this.craftingGrid.length; i++)
 		{
 			ItemStack content = this.craftingGrid[i];
 			if (!StackUtil.isEmpty(content))
 			{
-				NBTTagCompound contentTag = new NBTTagCompound();
-				contentTag.setByte("index", i);
-				content.writeToNBT(contentTag);
-				grid.appendTag(contentTag);
+				CompoundTag contentTag = new CompoundTag();
+				contentTag.putByte("index", i);
+				content.m_41739_(contentTag);
+				grid.add(contentTag);
 			}
 		}
 
-		nbt.setTag("grid", grid);
-		return nbt;
+		nbt.put("grid", grid);
 	}
 
-	protected IRecipe findRecipe()
+	protected CraftingRecipe findRecipe()
 	{
-		World world = this.getWorld();
-		return CraftingManager.findMatchingRecipe(this.crafting, world);
+		Level world = this.getLevel();
+		MinecraftServer server = world.getServer();
+		return server == null ? null : (CraftingRecipe) server.m_129894_().m_44015_(RecipeType.f_44107_, this.crafting, world).orElse(null);
+	}
+
+	protected CraftingRecipe findCraftingRecipe()
+	{
+		Level world = this.getLevel();
+		MinecraftServer server = world.getServer();
+		return server == null ? null : (CraftingRecipe) server.m_129894_().m_44015_(RecipeType.f_44107_, this.ingredients, world).orElse(null);
+	}
+
+	public ItemStack getCraftingRecipeOutput()
+	{
+		CraftingRecipe craftingRecipe = this.findCraftingRecipe();
+		return craftingRecipe != null ? craftingRecipe.m_5874_(this.ingredients) : StackUtil.emptyStack;
 	}
 
 	public void matrixChange(int slot)
 	{
-		if (this.recipe == null || !this.recipe.matches(this.crafting, this.getWorld()))
+		if (this.recipe == null || !this.recipe.m_5818_(this.crafting, this.getLevel()))
 		{
 			this.recipe = this.findRecipe();
 		}
 
-		this.recipeOutput = this.recipe != null ? this.recipe.getCraftingResult(this.crafting) : StackUtil.emptyStack;
+		this.recipeOutput = this.recipe != null ? this.recipe.m_5874_(this.crafting) : StackUtil.emptyStack;
 		this.newChange = true;
 	}
 
@@ -263,7 +221,7 @@ public class TileEntityBatchCrafter
 	protected void onLoaded()
 	{
 		super.onLoaded();
-		if (!this.getWorld().isRemote)
+		if (!this.getLevel().isClientSide)
 		{
 			this.setOverclockRates();
 			this.matrixChange(-1);
@@ -271,10 +229,10 @@ public class TileEntityBatchCrafter
 	}
 
 	@Override
-	public void markDirty()
+	public void setChanged()
 	{
-		super.markDirty();
-		if (!this.getWorld().isRemote)
+		super.setChanged();
+		if (!this.getLevel().isClientSide)
 		{
 			this.setOverclockRates();
 			this.attemptToBalance = true;
@@ -302,12 +260,13 @@ public class TileEntityBatchCrafter
 			this.newChange = false;
 		}
 
-		if (this.canCraft && this.craftingOutput.canAdd(this.recipeOutput) && this.energy.useEnergy(this.energyConsume))
+		ItemStack recipeOutput = this.getCraftingRecipeOutput();
+		if (this.canCraft && this.craftingOutput.canAdd(recipeOutput) && this.energy.useEnergy(this.energyConsume))
 		{
 			this.setActive(true);
 			if (++this.progress >= this.operationLength)
 			{
-				this.doCrafting();
+				this.doCrafting(recipeOutput);
 				needsInvUpdate = true;
 				this.newChange = true;
 				this.progress = 0;
@@ -326,7 +285,7 @@ public class TileEntityBatchCrafter
 		this.guiProgress = (float) this.progress / this.operationLength;
 		if (needsInvUpdate)
 		{
-			super.markDirty();
+			super.setChanged();
 		}
 	}
 
@@ -335,9 +294,19 @@ public class TileEntityBatchCrafter
 		return this.recipe != null;
 	}
 
+	public boolean hasCraftingRecipe()
+	{
+		return this.findCraftingRecipe() != null;
+	}
+
 	public boolean canCraft()
 	{
 		if (!this.hasRecipe())
+		{
+			return false;
+		}
+
+		if (!this.hasCraftingRecipe())
 		{
 			return false;
 		}
@@ -353,11 +322,11 @@ public class TileEntityBatchCrafter
 		return true;
 	}
 
-	protected void doCrafting()
+	protected void doCrafting(ItemStack recipeOutput)
 	{
 		for (int operation = 0; operation < this.operationsPerTick; operation++)
 		{
-			List<ItemStack> outputs = Collections.singletonList(this.recipeOutput);
+			List<ItemStack> outputs = Collections.singletonList(recipeOutput);
 
 			for (ItemStack stack : this.upgradeSlot)
 			{
@@ -367,21 +336,21 @@ public class TileEntityBatchCrafter
 				}
 			}
 
-			this.craft();
-			if (!this.hasRecipe() || !this.craftingOutput.canAdd(this.recipeOutput))
+			this.craft(recipeOutput);
+			if (!this.hasRecipe() || !this.hasCraftingRecipe() || !this.craftingOutput.canAdd(recipeOutput))
 			{
 				break;
 			}
 		}
 	}
 
-	protected void craft()
+	protected void craft(ItemStack recipeOutput)
 	{
 		assert this.hasRecipe();
-		assert this.craftingOutput.canAdd(this.recipeOutput);
-		this.craftingOutput.add(this.recipeOutput);
-		List<ItemStack> stacks = this.recipe.getRemainingItems(this.ingredients);
-		World world = this.getWorld();
+		assert this.craftingOutput.canAdd(recipeOutput);
+		this.craftingOutput.add(recipeOutput);
+		List<ItemStack> stacks = this.findCraftingRecipe().m_7457_(this.ingredients);
+		Level world = this.getLevel();
 
 		for (int slot = 0; slot < this.ingredientsRow.length; slot++)
 		{
@@ -406,7 +375,7 @@ public class TileEntityBatchCrafter
 					this.containerOutput.add(newStack);
 				} else
 				{
-					StackUtil.dropAsEntity(world, this.pos, newStack);
+					StackUtil.dropAsEntity(world, this.worldPosition, newStack);
 				}
 			}
 		}
@@ -419,7 +388,7 @@ public class TileEntityBatchCrafter
 				this.containerOutput.add(newStack);
 			} else
 			{
-				StackUtil.dropAsEntity(world, this.pos, newStack);
+				StackUtil.dropAsEntity(world, this.worldPosition, newStack);
 			}
 		}
 	}
@@ -439,7 +408,7 @@ public class TileEntityBatchCrafter
 	}
 
 	@Override
-	public void onNetworkEvent(EntityPlayer player, int event)
+	public void onNetworkEvent(Player player, int event)
 	{
 		switch (event)
 		{
@@ -467,21 +436,15 @@ public class TileEntityBatchCrafter
 	}
 
 	@Override
-	public ContainerBase<?> getGuiContainer(EntityPlayer player)
+	public ContainerBase<?> createServerScreenHandler(int syncId, Player player)
 	{
-		return new ContainerBatchCrafter(player, this);
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
-	{
-		return new GuiBatchCrafter(new ContainerBatchCrafter(player, this));
+		return new ContainerBatchCrafter(syncId, player.getInventory(), this);
 	}
 
 	@Override
-	public void onGuiClosed(EntityPlayer player)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
+		return new ContainerBatchCrafter(syncId, inventory, this);
 	}
 
 	@Override

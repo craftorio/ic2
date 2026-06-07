@@ -1,0 +1,22 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "#I#",
+    "IMI",
+    "#I#"
+  ],
+  "key": {
+    "M": {
+      "item": "ic2:electric_motor"
+    },
+    "I": {
+      "tag": "forge:plates/iron"
+    },
+    "#": {
+      "item": "minecraft:iron_bars"
+    }
+  },
+  "result": {
+    "item": "ic2:heat_vent"
+  }
+}

@@ -2,35 +2,37 @@ package ic2.core.block.heatgenerator.tileentity;
 
 import ic2.core.ContainerBase;
 import ic2.core.IHasGui;
-import ic2.core.block.TileEntityHeatSourceInventory;
 import ic2.core.block.comp.Energy;
 import ic2.core.block.heatgenerator.container.ContainerElectricHeatGenerator;
-import ic2.core.block.heatgenerator.gui.GuiElectricHeatGenerator;
 import ic2.core.block.invslot.InvSlot;
 import ic2.core.block.invslot.InvSlotConsumable;
 import ic2.core.block.invslot.InvSlotConsumableItemStack;
 import ic2.core.block.invslot.InvSlotDischarge;
+import ic2.core.block.tileentity.TileEntityHeatSourceInventory;
 import ic2.core.init.MainConfig;
-import ic2.core.item.type.CraftingItemType;
+import ic2.core.network.GrowingBuffer;
 import ic2.core.profile.NotClassic;
-import ic2.core.ref.ItemName;
+import ic2.core.ref.Ic2BlockEntities;
+import ic2.core.ref.Ic2Items;
 import ic2.core.util.ConfigUtil;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 
 @NotClassic
 public class TileEntityElectricHeatGenerator extends TileEntityHeatSourceInventory implements IHasGui
 {
 	private boolean newActive;
 	public final InvSlotDischarge dischargeSlot;
-	public final InvSlotConsumable coilSlot = new InvSlotConsumableItemStack(this, "CoilSlot", 10, ItemName.crafting.getItemStack(CraftingItemType.coil));
+	public final InvSlotConsumable coilSlot = new InvSlotConsumableItemStack(this, "CoilSlot", 10, new ItemStack(Ic2Items.COIL));
 	protected final Energy energy;
 	public static final double outputMultiplier = ConfigUtil.getFloat(MainConfig.get(), "balance/energy/heatgenerator/electric");
 
-	public TileEntityElectricHeatGenerator()
+	public TileEntityElectricHeatGenerator(BlockPos pos, BlockState state)
 	{
+		super(Ic2BlockEntities.ELECTRIC_HEAT_GENERATOR, pos, state);
 		this.coilSlot.setStackSizeLimit(1);
 		this.dischargeSlot = new InvSlotDischarge(this, InvSlot.Access.NONE, 4);
 		this.energy = this.addComponent(Energy.asBasicSink(this, 10000.0, 4).addManagedSlot(this.dischargeSlot));
@@ -48,21 +50,15 @@ public class TileEntityElectricHeatGenerator extends TileEntityHeatSourceInvento
 	}
 
 	@Override
-	public ContainerBase<TileEntityElectricHeatGenerator> getGuiContainer(EntityPlayer player)
+	public ContainerBase<TileEntityElectricHeatGenerator> createServerScreenHandler(int syncId, Player player)
 	{
-		return new ContainerElectricHeatGenerator(player, this);
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
-	{
-		return new GuiElectricHeatGenerator(new ContainerElectricHeatGenerator(player, this));
+		return new ContainerElectricHeatGenerator(syncId, player.getInventory(), this);
 	}
 
 	@Override
-	public void onGuiClosed(EntityPlayer player)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
+		return new ContainerElectricHeatGenerator(syncId, inventory, this);
 	}
 
 	@Override

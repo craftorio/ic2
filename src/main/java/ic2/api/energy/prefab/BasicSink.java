@@ -3,16 +3,16 @@ package ic2.api.energy.prefab;
 import ic2.api.energy.tile.IEnergyEmitter;
 import ic2.api.energy.tile.IEnergySink;
 import ic2.api.info.ILocatable;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class BasicSink extends BasicEnergyTile implements IEnergySink
 {
 	protected int tier;
 
-	public BasicSink(TileEntity parent, double capacity, int tier)
+	public BasicSink(BlockEntity parent, double capacity, int tier)
 	{
 		super(parent, capacity);
 		if (tier < 0)
@@ -34,7 +34,7 @@ public class BasicSink extends BasicEnergyTile implements IEnergySink
 		this.tier = tier;
 	}
 
-	public BasicSink(World world, BlockPos pos, double capacity, int tier)
+	public BasicSink(Level world, BlockPos pos, double capacity, int tier)
 	{
 		super(world, pos, capacity);
 		if (tier < 0)
@@ -56,7 +56,7 @@ public class BasicSink extends BasicEnergyTile implements IEnergySink
 	}
 
 	@Override
-	public boolean acceptsEnergyFrom(IEnergyEmitter emitter, EnumFacing direction)
+	public boolean acceptsEnergyFrom(IEnergyEmitter emitter, Direction direction)
 	{
 		return true;
 	}
@@ -68,7 +68,7 @@ public class BasicSink extends BasicEnergyTile implements IEnergySink
 	}
 
 	@Override
-	public double injectEnergy(EnumFacing directionFrom, double amount, double voltage)
+	public double injectEnergy(Direction directionFrom, double amount, double voltage)
 	{
 		this.setEnergyStored(this.getEnergyStored() + amount);
 		return 0.0;

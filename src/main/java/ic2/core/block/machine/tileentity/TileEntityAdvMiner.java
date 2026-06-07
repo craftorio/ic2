@@ -5,20 +5,23 @@ import ic2.api.network.INetworkClientTileEntityEventListener;
 import ic2.api.upgrade.IUpgradableBlock;
 import ic2.api.upgrade.UpgradableProperty;
 import ic2.core.ContainerBase;
+import ic2.core.IC2;
 import ic2.core.IHasGui;
 import ic2.core.block.comp.Redstone;
 import ic2.core.block.invslot.InvSlot;
 import ic2.core.block.invslot.InvSlotConsumableId;
 import ic2.core.block.invslot.InvSlotUpgrade;
 import ic2.core.block.machine.container.ContainerAdvMiner;
-import ic2.core.block.machine.gui.GuiAdvMiner;
+import ic2.core.block.tileentity.Ic2TileEntityBlock;
+import ic2.core.fluid.FluidHandler;
 import ic2.core.init.MainConfig;
 import ic2.core.init.OreValues;
 import ic2.core.item.tool.ItemScanner;
 import ic2.core.item.tool.ItemScannerAdv;
+import ic2.core.network.GrowingBuffer;
 import ic2.core.profile.NotClassic;
-import ic2.core.ref.ItemName;
-import ic2.core.ref.TeBlock;
+import ic2.core.ref.Ic2BlockEntities;
+import ic2.core.ref.Ic2Items;
 import ic2.core.util.ConfigUtil;
 import ic2.core.util.StackUtil;
 
@@ -27,22 +30,19 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockDynamicLiquid;
-import net.minecraft.block.BlockStaticLiquid;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.fluids.IFluidBlock;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos.MutableBlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.BucketPickup;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.state.BlockState;
 
 @NotClassic
 public class TileEntityAdvMiner extends TileEntityElectricMachine implements IHasGui, INetworkClientTileEntityEventListener, IUpgradableBlock
@@ -58,20 +58,20 @@ public class TileEntityAdvMiner extends TileEntityElectricMachine implements IHa
 	private BlockPos mineTarget;
 	private short ticker = 0;
 	public final InvSlotConsumableId scannerSlot = new InvSlotConsumableId(
-		this, "scanner", InvSlot.Access.IO, 1, InvSlot.InvSide.BOTTOM, ItemName.scanner.getInstance(), ItemName.advanced_scanner.getInstance()
+		this, "scanner", InvSlot.Access.IO, 1, InvSlot.InvSide.BOTTOM, Ic2Items.SCANNER, Ic2Items.ADVANCED_SCANNER
 	);
 	public final InvSlotUpgrade upgradeSlot = new InvSlotUpgrade(this, "upgrade", 4);
 	public final InvSlot filterSlot = new InvSlot(this, "list", null, 15);
 	protected final Redstone redstone;
 
-	public TileEntityAdvMiner()
+	public TileEntityAdvMiner(BlockPos pos, BlockState state)
 	{
-		this(Math.min(2 + ConfigUtil.getInt(MainConfig.get(), "balance/minerDischargeTier"), 5));
+		this(pos, state, Math.min(2 + ConfigUtil.getInt(MainConfig.get(), "balance/minerDischargeTier"), 5));
 	}
 
-	public TileEntityAdvMiner(int tier)
+	public TileEntityAdvMiner(BlockPos pos, BlockState state, int tier)
 	{
-		super(4000000, tier);
+		super(Ic2BlockEntities.ADVANCED_MINER, pos, state, 4000000, tier);
 		this.defaultTier = tier;
 		this.workTick = 20;
 		this.redstone = this.addComponent(new Redstone(this));
@@ -81,19 +81,19 @@ public class TileEntityAdvMiner extends TileEntityElectricMachine implements IHa
 	protected void onLoaded()
 	{
 		super.onLoaded();
-		if (!this.getWorld().isRemote)
+		if (!this.getLevel().isClientSide)
 		{
-			this.setUpgradestat();
+			this.setUpgradeStat();
 		}
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound nbt)
+	public void load(CompoundTag nbt)
 	{
-		super.readFromNBT(nbt);
-		if (nbt.hasKey("mineTargetX"))
+		super.load(nbt);
+		if (nbt.contains("mineTargetX"))
 		{
-			this.mineTarget = new BlockPos(nbt.getInteger("mineTargetX"), nbt.getInteger("mineTargetY"), nbt.getInteger("mineTargetZ"));
+			this.mineTarget = new BlockPos(nbt.getInt("mineTargetX"), nbt.getInt("mineTargetY"), nbt.getInt("mineTargetZ"));
 		}
 
 		this.blacklist = nbt.getBoolean("blacklist");
@@ -101,28 +101,27 @@ public class TileEntityAdvMiner extends TileEntityElectricMachine implements IHa
 	}
 
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
+	public void saveAdditional(CompoundTag nbt)
 	{
-		super.writeToNBT(nbt);
+		super.saveAdditional(nbt);
 		if (this.mineTarget != null)
 		{
-			nbt.setInteger("mineTargetX", this.mineTarget.getX());
-			nbt.setInteger("mineTargetY", this.mineTarget.getY());
-			nbt.setInteger("mineTargetZ", this.mineTarget.getZ());
+			nbt.putInt("mineTargetX", this.mineTarget.getX());
+			nbt.putInt("mineTargetY", this.mineTarget.getY());
+			nbt.putInt("mineTargetZ", this.mineTarget.getZ());
 		}
 
-		nbt.setBoolean("blacklist", this.blacklist);
-		nbt.setBoolean("silkTouch", this.silkTouch);
-		return nbt;
+		nbt.putBoolean("blacklist", this.blacklist);
+		nbt.putBoolean("silkTouch", this.silkTouch);
 	}
 
 	@Override
-	public void markDirty()
+	public void setChanged()
 	{
-		super.markDirty();
-		if (!this.getWorld().isRemote)
+		super.setChanged();
+		if (!this.getLevel().isClientSide)
 		{
-			this.setUpgradestat();
+			this.setUpgradeStat();
 		}
 	}
 
@@ -133,7 +132,7 @@ public class TileEntityAdvMiner extends TileEntityElectricMachine implements IHa
 		this.chargeTool();
 		if (this.work())
 		{
-			super.markDirty();
+			super.setChanged();
 			this.setActive(true);
 		} else
 		{
@@ -143,6 +142,13 @@ public class TileEntityAdvMiner extends TileEntityElectricMachine implements IHa
 
 	private boolean work()
 	{
+		Level world = this.getLevel();
+		if (world == null)
+		{
+			return false;
+		}
+
+		int yMin = IC2.getWorldMinHeight(world);
 		if (!this.energy.canUseEnergy(512.0))
 		{
 			return false;
@@ -153,7 +159,7 @@ public class TileEntityAdvMiner extends TileEntityElectricMachine implements IHa
 			return false;
 		}
 
-		if (this.mineTarget != null && this.mineTarget.getY() < 0)
+		if (this.mineTarget != null && this.mineTarget.getY() < yMin)
 		{
 			return false;
 		}
@@ -181,33 +187,28 @@ public class TileEntityAdvMiner extends TileEntityElectricMachine implements IHa
 
 			if (this.mineTarget == null)
 			{
-				this.mineTarget = new BlockPos(
-					this.pos.getX() - range - 1, this.pos.getY() - 1, this.pos.getZ() - range
-				);
-				if (this.mineTarget.getY() < 0)
+				this.mineTarget = new BlockPos(this.worldPosition.getX() - range - 1, this.worldPosition.getY() - 1, this.worldPosition.getZ() - range);
+				if (this.mineTarget.getY() < yMin)
 				{
 					return false;
 				}
 			}
 
 			int blockScanCount = this.maxBlockScanCount;
-			World world = this.getWorld();
 			MutableBlockPos scanPos = new MutableBlockPos(this.mineTarget.getX(), this.mineTarget.getY(), this.mineTarget.getZ());
 
 			do
 			{
-				if (scanPos.getX() < this.pos.getX() + range)
+				if (scanPos.getX() < this.worldPosition.getX() + range)
 				{
 					scanPos = new MutableBlockPos(scanPos.getX() + 1, scanPos.getY(), scanPos.getZ());
-				} else if (scanPos.getZ() < this.pos.getZ() + range)
+				} else if (scanPos.getZ() < this.worldPosition.getZ() + range)
 				{
-					scanPos = new MutableBlockPos(this.pos.getX() - range, scanPos.getY(), scanPos.getZ() + 1);
+					scanPos = new MutableBlockPos(this.worldPosition.getX() - range, scanPos.getY(), scanPos.getZ() + 1);
 				} else
 				{
-					scanPos = new MutableBlockPos(
-						this.pos.getX() - range, scanPos.getY() - 1, this.pos.getZ() - range
-					);
-					if (scanPos.getY() < 0)
+					scanPos = new MutableBlockPos(this.worldPosition.getX() - range, scanPos.getY() - 1, this.worldPosition.getZ() - range);
+					if (scanPos.getY() < yMin)
 					{
 						this.mineTarget = new BlockPos(scanPos);
 						return true;
@@ -215,9 +216,9 @@ public class TileEntityAdvMiner extends TileEntityElectricMachine implements IHa
 				}
 
 				ElectricItem.manager.discharge(scanner, 64.0, Integer.MAX_VALUE, true, false, false);
-				IBlockState state = world.getBlockState(scanPos);
+				BlockState state = world.getBlockState(scanPos);
 				Block block = state.getBlock();
-				if (!block.isAir(state, world, scanPos) && this.canMine(scanPos, block, state))
+				if (!state.isAir() && this.canMine(scanPos, block, state))
 				{
 					this.mineTarget = new BlockPos(scanPos);
 					this.doMine(this.mineTarget, block, state);
@@ -242,20 +243,20 @@ public class TileEntityAdvMiner extends TileEntityElectricMachine implements IHa
 		}
 	}
 
-	public void doMine(BlockPos pos, Block block, IBlockState state)
+	public void doMine(BlockPos pos, Block block, BlockState state)
 	{
-		World world = this.getWorld();
+		Level world = this.getLevel();
 		StackUtil.distributeDrops(this, new ArrayList<>(StackUtil.getDrops(world, pos, state, null, 0, this.silkTouch)));
-		world.setBlockToAir(pos);
+		world.removeBlock(pos, false);
 		this.energy.useEnergy(512.0);
 	}
 
-	public boolean canMine(BlockPos pos, Block block, IBlockState state)
+	public boolean canMine(BlockPos pos, Block block, BlockState state)
 	{
-		if (!(block instanceof IFluidBlock) && !(block instanceof BlockStaticLiquid) && !(block instanceof BlockDynamicLiquid))
+		if (!(block instanceof BucketPickup) && FluidHandler.getWorldFluid(state) == null)
 		{
-			World world = this.getWorld();
-			if (state.getBlockHardness(world, pos) < 0.0F)
+			Level world = this.getLevel();
+			if (state.getDestroySpeed(world, pos) < 0.0F)
 			{
 				return false;
 			}
@@ -266,7 +267,7 @@ public class TileEntityAdvMiner extends TileEntityElectricMachine implements IHa
 				return false;
 			}
 
-			if (block.hasTileEntity(state) && OreValues.get(drops) <= 0)
+			if (block instanceof EntityBlock && OreValues.get(drops) <= 0)
 			{
 				return false;
 			}
@@ -307,7 +308,7 @@ public class TileEntityAdvMiner extends TileEntityElectricMachine implements IHa
 	}
 
 	@Override
-	public void onNetworkEvent(EntityPlayer player, int event)
+	public void onNetworkEvent(Player player, int event)
 	{
 		switch (event)
 		{
@@ -328,7 +329,7 @@ public class TileEntityAdvMiner extends TileEntityElectricMachine implements IHa
 		}
 	}
 
-	public void setUpgradestat()
+	public void setUpgradeStat()
 	{
 		this.upgradeSlot.onChanged();
 		int tier = this.upgradeSlot.getTier(this.defaultTier);
@@ -338,21 +339,15 @@ public class TileEntityAdvMiner extends TileEntityElectricMachine implements IHa
 	}
 
 	@Override
-	public ContainerBase<TileEntityAdvMiner> getGuiContainer(EntityPlayer player)
+	public ContainerBase<TileEntityAdvMiner> createServerScreenHandler(int syncId, Player player)
 	{
-		return new ContainerAdvMiner(player, this);
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
-	{
-		return new GuiAdvMiner(new ContainerAdvMiner(player, this));
+		return new ContainerAdvMiner(syncId, player.getInventory(), this);
 	}
 
 	@Override
-	public void onGuiClosed(EntityPlayer player)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
+		return new ContainerAdvMiner(syncId, inventory, this);
 	}
 
 	@Override
@@ -373,27 +368,27 @@ public class TileEntityAdvMiner extends TileEntityElectricMachine implements IHa
 	}
 
 	@Override
-	public void onPlaced(ItemStack stack, EntityLivingBase placer, EnumFacing facing)
+	public void onPlaced(ItemStack stack, LivingEntity placer, Direction facing)
 	{
 		super.onPlaced(stack, placer, facing);
-		if (!this.getWorld().isRemote)
+		if (!this.getLevel().isClientSide)
 		{
-			NBTTagCompound nbt = StackUtil.getOrCreateNbtData(stack);
+			CompoundTag nbt = StackUtil.getOrCreateNbtData(stack);
 			this.energy.addEnergy(nbt.getDouble("energy"));
 		}
 	}
 
 	@Override
-	protected ItemStack adjustDrop(ItemStack drop, boolean wrench)
+	public ItemStack adjustDrop(ItemStack drop, boolean wrench)
 	{
 		drop = super.adjustDrop(drop, wrench);
-		if (wrench || this.teBlock.getDefaultDrop() == TeBlock.DefaultDrop.Self)
+		if (wrench || this.teBlock.getDefaultDrop() == Ic2TileEntityBlock.DefaultDrop.Self)
 		{
 			double retainedRatio = ConfigUtil.getDouble(MainConfig.get(), "balance/energyRetainedInStorageBlockDrops");
 			if (retainedRatio > 0.0)
 			{
-				NBTTagCompound nbt = StackUtil.getOrCreateNbtData(drop);
-				nbt.setDouble("energy", this.energy.getEnergy() * retainedRatio);
+				CompoundTag nbt = StackUtil.getOrCreateNbtData(drop);
+				nbt.putDouble("energy", this.energy.getEnergy() * retainedRatio);
 			}
 		}
 

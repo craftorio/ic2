@@ -2,18 +2,26 @@ package ic2.core.crop.cropcard;
 
 import ic2.api.crops.CropProperties;
 import ic2.api.crops.ICropTile;
-import ic2.core.crop.IC2CropCard;
-import ic2.core.crop.IC2Crops;
-import ic2.core.ref.ItemName;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemStack;
+import ic2.api.crops.ICropType;
+import ic2.core.crop.Ic2CropCard;
+import ic2.core.crop.Ic2Crops;
+import ic2.core.ref.Ic2Blocks;
+import ic2.core.ref.Ic2Items;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 
-public class CropTerraWart extends IC2CropCard
+public class CropTerraWart extends Ic2CropCard
 {
-	@Override
-	public String getId()
+	public CropTerraWart(ICropType cropType)
 	{
-		return "terra_wart";
+		super(cropType);
+	}
+
+	@Override
+	public Block getCropBlock()
+	{
+		return Ic2Blocks.TERRA_WART_CROP;
 	}
 
 	@Override
@@ -29,12 +37,6 @@ public class CropTerraWart extends IC2CropCard
 	}
 
 	@Override
-	public int getMaxSize()
-	{
-		return 3;
-	}
-
-	@Override
 	public double dropGainChance()
 	{
 		return 0.8;
@@ -43,21 +45,21 @@ public class CropTerraWart extends IC2CropCard
 	@Override
 	public ItemStack getGain(ICropTile crop)
 	{
-		return ItemName.terra_wart.getItemStack();
+		return new ItemStack(Ic2Items.TERRA_WART);
 	}
 
 	@Override
 	public void tick(ICropTile crop)
 	{
-		if (crop.isBlockBelow(Blocks.SNOW))
+		if (crop.isBlockBelow(Blocks.f_50125_))
 		{
 			if (this.canGrow(crop))
 			{
 				crop.setGrowthPoints(crop.getGrowthPoints() + 100);
 			}
-		} else if (crop.isBlockBelow(Blocks.SOUL_SAND) && crop.getWorldObj().rand.nextInt(300) == 0)
+		} else if (crop.isBlockBelow(Blocks.f_50135_) && crop.getWorldObj().random.nextInt(300) == 0)
 		{
-			crop.setCrop(IC2Crops.cropNetherWart);
+			crop.setCrop(Ic2Crops.cropNetherWart);
 		}
 	}
 

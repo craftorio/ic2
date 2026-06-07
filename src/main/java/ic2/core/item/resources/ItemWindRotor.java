@@ -3,23 +3,23 @@ package ic2.core.item.resources;
 import ic2.api.item.IKineticRotor;
 import ic2.core.block.kineticgenerator.gui.GuiWaterKineticGenerator;
 import ic2.core.block.kineticgenerator.gui.GuiWindKineticGenerator;
-import ic2.core.init.Localization;
-import ic2.core.item.ItemGradualInt;
 import ic2.core.profile.NotClassic;
-import ic2.core.ref.ItemName;
 
 import java.util.List;
 
+
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.Item.Properties;
+import net.minecraft.world.level.Level;
 
 @NotClassic
-public class ItemWindRotor extends ItemGradualInt implements IKineticRotor
+public class ItemWindRotor extends Item implements IKineticRotor
 {
 	private final int maxWindStrength;
 	private final int minWindStrength;
@@ -28,34 +28,35 @@ public class ItemWindRotor extends ItemGradualInt implements IKineticRotor
 	private final ResourceLocation renderTexture;
 	private final boolean water;
 
-	public ItemWindRotor(ItemName name, int Radius, int durability, float efficiency, int minWindStrength, int maxWindStrength, ResourceLocation RenderTexture)
+	public ItemWindRotor(
+		Properties settings, int Radius, boolean water, float efficiency, int minWindStrength, int maxWindStrength, ResourceLocation RenderTexture
+	)
 	{
-		super(name, durability);
-		this.setMaxStackSize(1);
+		super(settings);
 		this.radius = Radius;
 		this.efficiency = efficiency;
 		this.renderTexture = RenderTexture;
 		this.minWindStrength = minWindStrength;
 		this.maxWindStrength = maxWindStrength;
-		this.water = name != ItemName.rotor_wood;
+		this.water = water;
 	}
 
-	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced)
+	@OnlyIn(Dist.CLIENT)
+	public void m_7373_(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag advanced)
 	{
-		tooltip.add(Localization.translate("ic2.itemrotor.wind.info", this.minWindStrength, this.maxWindStrength));
+		tooltip.add(Component.m_237110_("ic2.itemrotor.wind.info", new Object[] { this.minWindStrength, this.maxWindStrength }).m_130940_(ChatFormatting.GRAY));
 		IKineticRotor.GearboxType type = null;
-		if (Minecraft.getMinecraft().currentScreen instanceof GuiWaterKineticGenerator)
+		if (Minecraft.m_91087_().f_91080_ instanceof GuiWaterKineticGenerator)
 		{
 			type = IKineticRotor.GearboxType.WATER;
-		} else if (Minecraft.getMinecraft().currentScreen instanceof GuiWindKineticGenerator)
+		} else if (Minecraft.m_91087_().f_91080_ instanceof GuiWindKineticGenerator)
 		{
 			type = IKineticRotor.GearboxType.WIND;
 		}
 
 		if (type != null)
 		{
-			tooltip.add(Localization.translate("ic2.itemrotor.fitsin." + this.isAcceptedType(stack, type)));
+			tooltip.add(Component.m_237115_("ic2.itemrotor.fitsin." + this.isAcceptedType(stack, type)).m_130940_(ChatFormatting.GRAY));
 		}
 	}
 

@@ -5,18 +5,21 @@ import ic2.core.slot.SlotInvSlot;
 
 import java.util.List;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.MenuType;
 
 public class ContainerStandardMachine<T extends TileEntityStandardMachine<?, ?, ?>> extends ContainerElectricMachine<T>
 {
-	public ContainerStandardMachine(EntityPlayer player, T tileEntity1)
+	public ContainerStandardMachine(MenuType<? extends ContainerStandardMachine<T>> type, int syncId, Inventory playerInventory, T base)
 	{
-		this(player, tileEntity1, 166, 56, 53, 56, 17, 116, 35, 152, 8);
+		this(type, syncId, playerInventory, base, 166, 56, 53, 56, 17, 116, 35, 152, 8);
 	}
 
 	public ContainerStandardMachine(
-		EntityPlayer player,
-		T tileEntity1,
+		MenuType<? extends ContainerStandardMachine<T>> type,
+		int syncId,
+		Inventory playerInventory,
+		T base,
 		int height,
 		int dischargeX,
 		int dischargeY,
@@ -28,20 +31,20 @@ public class ContainerStandardMachine<T extends TileEntityStandardMachine<?, ?, 
 		int upgradeY
 	)
 	{
-		super(player, tileEntity1, height, dischargeX, dischargeY);
-		if (tileEntity1.inputSlot != null)
+		super(type, syncId, playerInventory, base, height, dischargeX, dischargeY);
+		if (base.inputSlot != null)
 		{
-			this.addSlotToContainer(new SlotInvSlot(tileEntity1.inputSlot, 0, inputX, inputY));
+			this.m_38897_(new SlotInvSlot(base.inputSlot, 0, inputX, inputY));
 		}
 
-		if (tileEntity1.outputSlot != null)
+		if (base.outputSlot != null)
 		{
-			this.addSlotToContainer(new SlotInvSlot(tileEntity1.outputSlot, 0, outputX, outputY));
+			this.m_38897_(new SlotInvSlot(base.outputSlot, 0, outputX, outputY));
 		}
 
 		for (int i = 0; i < 4; i++)
 		{
-			this.addSlotToContainer(new SlotInvSlot(tileEntity1.upgradeSlot, i, upgradeX, upgradeY + i * 18));
+			this.m_38897_(new SlotInvSlot(base.upgradeSlot, i, upgradeX, upgradeY + i * 18));
 		}
 	}
 

@@ -1,50 +1,53 @@
 package ic2.core.item.tfbp;
 
 import ic2.core.block.machine.tileentity.TileEntityTerra;
-import ic2.core.ref.BlockName;
+import ic2.core.ref.Ic2Blocks;
 
 import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.Set;
 
-import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 
-class Flatification extends TerraformerBase
+public class Flatification extends TerraformerBase
 {
-	static final Set<Block> removable = Collections.newSetFromMap(new IdentityHashMap<>());
+	static Set<Block> removable = Collections.newSetFromMap(new IdentityHashMap<>());
 
 	@Override
 	void init()
 	{
-		removable.add(Blocks.SNOW);
-		removable.add(Blocks.ICE);
-		removable.add(Blocks.GRASS);
-		removable.add(Blocks.STONE);
-		removable.add(Blocks.GRAVEL);
-		removable.add(Blocks.SAND);
-		removable.add(Blocks.DIRT);
-		removable.add(Blocks.LEAVES);
-		removable.add(Blocks.LEAVES2);
-		removable.add(Blocks.LOG);
-		removable.add(Blocks.TALLGRASS);
-		removable.add(Blocks.RED_FLOWER);
-		removable.add(Blocks.YELLOW_FLOWER);
-		removable.add(Blocks.SAPLING);
-		removable.add(Blocks.WHEAT);
-		removable.add(Blocks.RED_MUSHROOM);
-		removable.add(Blocks.BROWN_MUSHROOM);
-		removable.add(Blocks.PUMPKIN);
-		removable.add(Blocks.MELON_BLOCK);
-		removable.add(BlockName.leaves.getInstance());
-		removable.add(BlockName.sapling.getInstance());
-		removable.add(BlockName.rubber_wood.getInstance());
+		removable.add(Blocks.f_50125_);
+		removable.add(Blocks.f_50126_);
+		removable.add(Blocks.f_50034_);
+		removable.add(Blocks.f_50069_);
+		removable.add(Blocks.f_49994_);
+		removable.add(Blocks.f_49992_);
+		removable.add(Blocks.f_50493_);
+		removable.add(Blocks.f_50050_);
+		removable.add(Blocks.f_50051_);
+		removable.add(Blocks.f_50052_);
+		removable.add(Blocks.f_50053_);
+		removable.add(Blocks.f_50054_);
+		removable.add(Blocks.f_50055_);
+		removable.add(Blocks.f_50359_);
+		removable.add(Blocks.f_50112_);
+		removable.add(Blocks.f_50111_);
+		removable.add(Blocks.f_50092_);
+		removable.add(Blocks.f_50073_);
+		removable.add(Blocks.f_50072_);
+		removable.add(Blocks.f_50133_);
+		removable.add(Blocks.f_50186_);
+		removable.add(Ic2Blocks.RUBBER_LEAVES);
+		removable.add(Ic2Blocks.RUBBER_SAPLING);
+		removable.add(Ic2Blocks.RUBBER_LOG);
 	}
 
 	@Override
-	boolean terraform(World world, BlockPos pos)
+	boolean terraform(Level world, BlockPos pos)
 	{
 		BlockPos workPos = TileEntityTerra.getFirstBlockFrom(world, pos, 20);
 		if (workPos == null)
@@ -52,9 +55,9 @@ class Flatification extends TerraformerBase
 			return false;
 		}
 
-		if (world.getBlockState(workPos).getBlock() == Blocks.SNOW_LAYER)
+		if (world.getBlockState(workPos).getBlock() == Blocks.f_50125_)
 		{
-			workPos = workPos.down();
+			workPos = workPos.m_7495_();
 		}
 
 		if (pos.getY() == workPos.getY())
@@ -62,11 +65,11 @@ class Flatification extends TerraformerBase
 			return false;
 		} else if (workPos.getY() < pos.getY())
 		{
-			world.setBlockState(workPos.up(), Blocks.DIRT.getDefaultState());
+			world.setBlockAndUpdate(workPos.m_7494_(), Blocks.f_50493_.defaultBlockState());
 			return true;
 		} else if (canRemove(world.getBlockState(workPos).getBlock()))
 		{
-			world.setBlockToAir(workPos);
+			world.removeBlock(workPos, false);
 			return true;
 		} else
 		{
@@ -76,6 +79,6 @@ class Flatification extends TerraformerBase
 
 	private static boolean canRemove(Block block)
 	{
-		return removable.contains(block);
+		return removable.contains(block) || block.m_204297_().m_203656_(BlockTags.f_13104_) || block.m_204297_().m_203656_(BlockTags.f_13106_);
 	}
 }

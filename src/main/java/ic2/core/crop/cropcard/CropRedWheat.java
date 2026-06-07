@@ -2,17 +2,25 @@ package ic2.core.crop.cropcard;
 
 import ic2.api.crops.CropProperties;
 import ic2.api.crops.ICropTile;
-import ic2.core.crop.IC2CropCard;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
+import ic2.api.crops.ICropType;
+import ic2.core.crop.Ic2CropCard;
+import ic2.core.ref.Ic2Blocks;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
 
-public class CropRedWheat extends IC2CropCard
+public class CropRedWheat extends Ic2CropCard
 {
-	@Override
-	public String getId()
+	public CropRedWheat(ICropType cropType)
 	{
-		return "redwheat";
+		super(cropType);
+	}
+
+	@Override
+	public Block getCropBlock()
+	{
+		return Ic2Blocks.RED_WHEAT_CROP;
 	}
 
 	@Override
@@ -34,21 +42,9 @@ public class CropRedWheat extends IC2CropCard
 	}
 
 	@Override
-	public int getMaxSize()
-	{
-		return 7;
-	}
-
-	@Override
 	public boolean canGrow(ICropTile crop)
 	{
-		return crop.getCurrentSize() < 7 && crop.getLightLevel() <= 10 && crop.getLightLevel() >= 5;
-	}
-
-	@Override
-	public boolean canBeHarvested(ICropTile crop)
-	{
-		return crop.getCurrentSize() == 7;
+		return crop.getCurrentAge() < this.getMaxAge() && crop.getLightLevel() <= 10 && crop.getLightLevel() >= 5;
 	}
 
 	@Override
@@ -58,24 +54,30 @@ public class CropRedWheat extends IC2CropCard
 	}
 
 	@Override
-	public int getOptimalHarvestSize(ICropTile crop)
-	{
-		return 7;
-	}
-
-	@Override
 	public ItemStack getGain(ICropTile crop)
 	{
 		BlockPos coords = crop.getPosition();
-		return crop.getWorldObj().isBlockIndirectlyGettingPowered(coords) <= 0 && !crop.getWorldObj().rand.nextBoolean()
-			? new ItemStack(Items.WHEAT, 1)
+		return crop.getWorldObj().m_46755_(coords) <= 0 && !crop.getWorldObj().random.m_188499_()
+			? new ItemStack(Items.f_42405_, 1)
 			: new ItemStack(Items.REDSTONE, 1);
+	}
+
+	@Override
+	public boolean isRedstoneSignalEmitter(ICropTile crop)
+	{
+		return true;
+	}
+
+	@Override
+	public int getEmittedRedstoneSignal(ICropTile crop)
+	{
+		return crop.getCurrentAge() == this.getMaxAge() ? 15 : 0;
 	}
 
 	@Override
 	public int getEmittedLight(ICropTile crop)
 	{
-		return crop.getCurrentSize() == 7 ? 7 : 0;
+		return crop.getCurrentAge() == this.getMaxAge() ? 7 : 0;
 	}
 
 	@Override
@@ -85,8 +87,8 @@ public class CropRedWheat extends IC2CropCard
 	}
 
 	@Override
-	public int getSizeAfterHarvest(ICropTile crop)
+	public int getAgeAfterHarvest(ICropTile crop)
 	{
-		return 2;
+		return 1;
 	}
 }

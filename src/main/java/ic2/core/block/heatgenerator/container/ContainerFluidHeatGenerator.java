@@ -2,19 +2,20 @@ package ic2.core.block.heatgenerator.container;
 
 import ic2.core.ContainerFullInv;
 import ic2.core.block.heatgenerator.tileentity.TileEntityFluidHeatGenerator;
+import ic2.core.ref.Ic2ScreenHandlers;
 import ic2.core.slot.SlotInvSlot;
 
 import java.util.List;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.entity.player.Inventory;
 
 public class ContainerFluidHeatGenerator extends ContainerFullInv<TileEntityFluidHeatGenerator>
 {
-	public ContainerFluidHeatGenerator(EntityPlayer player, TileEntityFluidHeatGenerator tileEntity1)
+	public ContainerFluidHeatGenerator(int syncId, Inventory playerInventory, TileEntityFluidHeatGenerator be)
 	{
-		super(player, tileEntity1, 166);
-		this.addSlotToContainer(new SlotInvSlot(tileEntity1.fluidSlot, 0, 27, 21));
-		this.addSlotToContainer(new SlotInvSlot(tileEntity1.outputSlot, 0, 27, 54));
+		super(Ic2ScreenHandlers.FLUID_HEAT_GENERATOR, syncId, playerInventory, be, 166);
+		this.m_38897_(new SlotInvSlot(be.fluidSlot, 0, 27, 21));
+		this.m_38897_(new SlotInvSlot(be.outputSlot, 0, 27, 54));
 	}
 
 	@Override

@@ -1,6 +1,6 @@
 package ic2.core.block.comp;
 
-import ic2.core.block.TileEntityBlock;
+import ic2.core.block.tileentity.Ic2TileEntity;
 
 import java.util.function.IntSupplier;
 
@@ -9,7 +9,7 @@ public abstract class BasicRedstoneComponent extends TileEntityComponent
 	private int level;
 	private IntSupplier update;
 
-	public BasicRedstoneComponent(TileEntityBlock parent)
+	public BasicRedstoneComponent(Ic2TileEntity parent)
 	{
 		super(parent);
 	}

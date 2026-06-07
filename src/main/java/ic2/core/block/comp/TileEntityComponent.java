@@ -1,40 +1,36 @@
 package ic2.core.block.comp;
 
 import ic2.core.IC2;
-import ic2.core.block.TileEntityBlock;
+import ic2.core.block.tileentity.Ic2TileEntity;
 import ic2.core.network.GrowingBuffer;
 
 import java.io.DataInput;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
 
-import net.minecraft.block.Block;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.common.capabilities.Capability;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.block.Block;
 
 public abstract class TileEntityComponent
 {
-	protected final TileEntityBlock parent;
+	protected final Ic2TileEntity parent;
 
-	public TileEntityComponent(TileEntityBlock parent)
+	public TileEntityComponent(Ic2TileEntity parent)
 	{
 		this.parent = parent;
 	}
 
-	public TileEntityBlock getParent()
+	public Ic2TileEntity getParent()
 	{
 		return this.parent;
 	}
 
-	public void readFromNbt(NBTTagCompound nbt)
+	public void readFromNbt(CompoundTag nbt)
 	{
 	}
 
-	public NBTTagCompound writeToNbt()
+	public CompoundTag writeToNbt()
 	{
 		return null;
 	}
@@ -51,7 +47,7 @@ public abstract class TileEntityComponent
 	{
 	}
 
-	public void onContainerUpdate(EntityPlayerMP player)
+	public void onContainerUpdate(ServerPlayer player)
 	{
 	}
 
@@ -68,18 +64,8 @@ public abstract class TileEntityComponent
 	{
 	}
 
-	protected void setNetworkUpdate(EntityPlayerMP player, GrowingBuffer data)
+	protected void setNetworkUpdate(ServerPlayer player, GrowingBuffer data)
 	{
 		IC2.network.get(true).sendComponentUpdate(this.parent, Components.getId((Class<? extends TileEntityComponent>) this.getClass()), player, data);
-	}
-
-	public Collection<? extends Capability<?>> getProvidedCapabilities(EnumFacing side)
-	{
-		return Collections.emptySet();
-	}
-
-	public <T> T getCapability(Capability<T> cap, EnumFacing side)
-	{
-		return null;
 	}
 }

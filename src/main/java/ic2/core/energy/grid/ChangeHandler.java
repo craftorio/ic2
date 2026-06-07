@@ -21,16 +21,16 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 class ChangeHandler
 {
 	static boolean prepareSync(EnergyNetLocal enet, GridChange change)
 	{
-		World world = enet.getWorld();
+		Level world = enet.getWorld();
 		GridChange.Type type = change.type;
 		IEnergyTile ioTile = change.ioTile;
 		BlockPos pos = change.pos;
@@ -50,7 +50,7 @@ class ChangeHandler
 			}
 
 			return false;
-		} else if (type != GridChange.Type.REMOVAL && !world.isBlockLoaded(pos))
+		} else if (type != GridChange.Type.REMOVAL && !world.isLoaded(pos))
 		{
 			if (EnergyNetSettings.logGridUpdateIssues)
 			{
@@ -58,7 +58,7 @@ class ChangeHandler
 			}
 
 			return false;
-		} else if (type != GridChange.Type.REMOVAL && ioTile instanceof TileEntity && ((TileEntity) ioTile).isInvalid())
+		} else if (type != GridChange.Type.REMOVAL && ioTile instanceof BlockEntity && ((BlockEntity) ioTile).isRemoved())
 		{
 			if (EnergyNetSettings.logGridUpdateIssues)
 			{
@@ -177,7 +177,6 @@ class ChangeHandler
 			{
 				BlockPos subPos = EnergyNet.instance.getPos(subTile);
 				enet.registeredTiles.put(subPos, tile);
-				enet.addPositionToNotify(subPos);
 			}
 
 			addTileToGrids(enet, tile);
@@ -205,9 +204,9 @@ class ChangeHandler
 
 			for (IEnergyTile subTile : tile.subTiles)
 			{
-				for (EnumFacing dir : EnumFacing.VALUES)
+				for (Direction dir : Util.ALL_DIRS)
 				{
-					BlockPos coords = EnergyNet.instance.getPos(subTile).offset(dir);
+					BlockPos coords = EnergyNet.instance.getPos(subTile).relative(dir);
 					Tile neighborTile = enet.registeredTiles.get(coords);
 					if (neighborTile != null && neighborTile != node.tile)
 					{
@@ -223,7 +222,7 @@ class ChangeHandler
 									IEnergyTile neighborSubTe = neighborTile.getSubTileAt(coords);
 									IEnergyAcceptor acceptor = (IEnergyAcceptor) (neighborSubTe instanceof IEnergyAcceptor ? neighborSubTe : neighborIoTile);
 									canEmit = emitter.emitsEnergyTo((IEnergyAcceptor) neighborIoTile, dir)
-										&& acceptor.acceptsEnergyFrom((IEnergyEmitter) ioTile, dir.getOpposite());
+										&& acceptor.acceptsEnergyFrom((IEnergyEmitter) ioTile, dir.m_122424_());
 								}
 
 								boolean canAccept = false;
@@ -233,7 +232,7 @@ class ChangeHandler
 									IEnergyTile neighborSubTe = neighborTile.getSubTileAt(coords);
 									IEnergyEmitter emitter = (IEnergyEmitter) (neighborSubTe instanceof IEnergyEmitter ? neighborSubTe : neighborIoTile);
 									canAccept = acceptor.acceptsEnergyFrom((IEnergyEmitter) neighborIoTile, dir)
-										&& emitter.emitsEnergyTo((IEnergyAcceptor) ioTile, dir.getOpposite());
+										&& emitter.emitsEnergyTo((IEnergyAcceptor) ioTile, dir.m_122424_());
 								}
 
 								if (canEmit || canAccept)
@@ -427,6 +426,13 @@ class ChangeHandler
 							assert currentNode.getGrid() != null;
 						}
 				}
+
+				enet.addTileToNotify(ioTile);
+
+				for (Node neighbor : neighbors)
+				{
+					enet.addTileToNotify(neighbor.getTile().getMainTile());
+				}
 			}
 		}
 
@@ -462,10 +468,10 @@ class ChangeHandler
 			{
 				BlockPos subPos = EnergyNet.instance.getPos(subTile);
 				enet.registeredTiles.remove(subPos);
-				enet.addPositionToNotify(subPos);
 			}
 
 			removeTileFromGrids(tile);
+			enet.removeTileToNotify(ioTile);
 
 			for (IEnergyNetEventReceiver receiver : EnergyNetGlobal.getEventReceivers())
 			{

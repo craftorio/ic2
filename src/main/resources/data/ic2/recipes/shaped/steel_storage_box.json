@@ -1,0 +1,19 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "PCP",
+    "C C",
+    "PCP"
+  ],
+  "key": {
+    "P": {
+      "tag": "forge:plates/steel"
+    },
+    "C": {
+      "item": "ic2:steel_casing"
+    }
+  },
+  "result": {
+    "item": "ic2:steel_storage_box"
+  }
+}

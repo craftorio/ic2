@@ -2,7 +2,7 @@ package ic2.core.block.invslot;
 
 import ic2.api.recipe.ILiquidAcceptManager;
 import ic2.core.block.IInventorySlotHolder;
-import net.minecraftforge.fluids.Fluid;
+import net.minecraft.world.level.material.Fluid;
 
 public class InvSlotConsumableLiquidByManager extends InvSlotConsumableLiquid
 {

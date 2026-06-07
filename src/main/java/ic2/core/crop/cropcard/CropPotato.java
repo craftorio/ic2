@@ -2,17 +2,25 @@ package ic2.core.crop.cropcard;
 
 import ic2.api.crops.CropProperties;
 import ic2.api.crops.ICropTile;
+import ic2.api.crops.ICropType;
 import ic2.core.IC2;
-import ic2.core.crop.IC2CropCard;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
+import ic2.core.crop.Ic2CropCard;
+import ic2.core.ref.Ic2Blocks;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
 
-public class CropPotato extends IC2CropCard
+public class CropPotato extends Ic2CropCard
 {
-	@Override
-	public String getId()
+	public CropPotato(ICropType cropType)
 	{
-		return "potato";
+		super(cropType);
+	}
+
+	@Override
+	public Block getCropBlock()
+	{
+		return Ic2Blocks.CARROTS_CROP;
 	}
 
 	@Override
@@ -28,44 +36,32 @@ public class CropPotato extends IC2CropCard
 	}
 
 	@Override
-	public int getMaxSize()
-	{
-		return 4;
-	}
-
-	@Override
 	public boolean canGrow(ICropTile crop)
 	{
-		return crop.getCurrentSize() < 4 && crop.getLightLevel() >= 9;
+		return crop.getCurrentAge() < 4 && crop.getLightLevel() >= 9;
 	}
 
 	@Override
-	public int getOptimalHarvestSize(ICropTile crop)
+	public int getOptimalHarvestAge(ICropTile crop)
 	{
-		return 3;
+		return this.getMaxAge() - 1;
 	}
 
 	@Override
 	public boolean canBeHarvested(ICropTile crop)
 	{
-		return crop.getCurrentSize() >= 3;
+		return crop.getCurrentAge() >= this.getMaxAge() - 1;
 	}
 
 	@Override
 	public ItemStack getGain(ICropTile crop)
 	{
-		if (crop.getCurrentSize() >= 4 && IC2.random.nextInt(20) <= 0)
+		if (crop.getCurrentAge() >= this.getMaxAge() && IC2.random.nextInt(20) <= 0)
 		{
-			return new ItemStack(Items.POISONOUS_POTATO);
+			return new ItemStack(Items.f_42675_);
 		} else
 		{
-			return crop.getCurrentSize() >= 3 ? new ItemStack(Items.POTATO) : null;
+			return crop.getCurrentAge() >= this.getMaxAge() - 1 ? new ItemStack(Items.f_42620_) : null;
 		}
-	}
-
-	@Override
-	public int getSizeAfterHarvest(ICropTile crop)
-	{
-		return 1;
 	}
 }

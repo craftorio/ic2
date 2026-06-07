@@ -2,46 +2,56 @@ package ic2.core.crop.cropcard;
 
 import ic2.api.crops.CropProperties;
 import ic2.api.crops.ICropTile;
+import ic2.api.crops.ICropType;
 import ic2.api.item.ItemWrapper;
 import ic2.core.IC2;
-import ic2.core.IC2DamageSource;
-import ic2.core.crop.IC2CropCard;
+import ic2.core.Ic2DamageSource;
+import ic2.core.crop.Ic2CropCard;
+import ic2.core.proxy.EnvProxy;
+import ic2.core.ref.Ic2Blocks;
 import ic2.core.util.BiomeUtil;
 import ic2.core.util.StackUtil;
 
 import java.util.Collections;
 import java.util.List;
 
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.init.MobEffects;
-import net.minecraft.init.SoundEvents;
-import net.minecraft.item.ItemStack;
-import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.biome.Biome;
-import net.minecraftforge.common.BiomeDictionary;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntitySelector;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.AABB;
 
-public class CropEating extends IC2CropCard
+public class CropEating extends Ic2CropCard
 {
 	private final double movementMultiplier = 0.5;
 	private final double length = 1.0;
-	private static final IC2DamageSource damage = new IC2DamageSource("cropEating");
+	private static final Ic2DamageSource damage = new Ic2DamageSource("cropEating");
+
+	public CropEating(ICropType cropType)
+	{
+		super(cropType);
+	}
+
+	@Override
+	public Block getCropBlock()
+	{
+		return Ic2Blocks.EATING_PLANT_CROP;
+	}
 
 	@Override
 	public String getDiscoveredBy()
 	{
 		return "Hasudako";
-	}
-
-	@Override
-	public String getId()
-	{
-		return "eatingplant";
 	}
 
 	@Override
@@ -57,41 +67,35 @@ public class CropEating extends IC2CropCard
 	}
 
 	@Override
-	public int getMaxSize()
-	{
-		return 6;
-	}
-
-	@Override
 	public boolean canGrow(ICropTile crop)
 	{
-		return crop.getCurrentSize() < 3
+		return crop.getCurrentAge() < 2
 			? crop.getLightLevel() > 10
-			: crop.isBlockBelow(Blocks.LAVA) && crop.getCurrentSize() < this.getMaxSize() && crop.getLightLevel() > 10;
+			: crop.isBlockBelow(Blocks.f_49991_) && crop.getCurrentAge() < this.getMaxAge() && crop.getLightLevel() > 10;
 	}
 
 	@Override
-	public int getOptimalHarvestSize(ICropTile crop)
+	public int getOptimalHarvestAge(ICropTile crop)
 	{
-		return 4;
+		return this.getMaxAge() - 2;
 	}
 
 	@Override
 	public boolean canBeHarvested(ICropTile crop)
 	{
-		return crop.getCurrentSize() >= 4 && crop.getCurrentSize() < 6;
+		return crop.getCurrentAge() >= this.getOptimalHarvestAge(crop) && crop.getCurrentAge() < this.getMaxAge();
 	}
 
 	@Override
 	public ItemStack getGain(ICropTile crop)
 	{
-		return crop.getCurrentSize() >= 4 && crop.getCurrentSize() < 6 ? new ItemStack(Blocks.CACTUS) : null;
+		return this.canBeHarvested(crop) ? new ItemStack(Blocks.f_50128_) : null;
 	}
 
 	@Override
 	public void tick(ICropTile crop)
 	{
-		if (crop.getCurrentSize() != 1)
+		if (crop.getCurrentAge() != 0)
 		{
 			BlockPos coords = crop.getPosition();
 			double xcentered = coords.getX() + 0.5;
@@ -99,36 +103,31 @@ public class CropEating extends IC2CropCard
 			double zcentered = coords.getZ() + 0.5;
 			if (crop.getCustomData().getBoolean("eaten"))
 			{
-				StackUtil.dropAsEntity(crop.getWorldObj(), coords, new ItemStack(Items.ROTTEN_FLESH));
-				crop.getCustomData().setBoolean("eaten", false);
+				StackUtil.dropAsEntity(crop.getWorldObj(), coords, new ItemStack(Items.f_42583_));
+				crop.getCustomData().putBoolean("eaten", false);
 			}
 
-			List<EntityLivingBase> list = crop.getWorldObj()
-				.getEntitiesWithinAABB(
-					EntityLivingBase.class,
-					new AxisAlignedBB(xcentered - 1.0, coords.getY(), zcentered - 1.0, xcentered + 1.0, coords.getY() + 1.0 + 1.0, zcentered + 1.0)
+			List<LivingEntity> list = crop.getWorldObj()
+				.getEntitiesOfClass(
+					LivingEntity.class,
+					new AABB(xcentered - 1.0, coords.getY(), zcentered - 1.0, xcentered + 1.0, coords.getY() + 1.0 + 1.0, zcentered + 1.0),
+					EntitySelector.NO_CREATIVE_OR_SPECTATOR
 				);
 			if (!list.isEmpty())
 			{
 				Collections.shuffle(list);
 
-				for (EntityLivingBase entity : list)
+				for (LivingEntity entity : list)
 				{
-					if (!(entity instanceof EntityPlayer) || !((EntityPlayer) entity).capabilities.isCreativeMode)
+					if (!(entity instanceof Player) || !((Player) entity).m_150110_().f_35937_)
 					{
-						entity.motionX = (xcentered - entity.posX) * 0.5;
-						entity.motionZ = (zcentered - entity.posZ) * 0.5;
-						if (entity.motionY > -0.05)
-						{
-							entity.motionY = -0.05;
-						}
-
-						entity.attackEntityFrom(damage, crop.getCurrentSize() * 2.0F);
+						entity.m_20334_((xcentered - entity.getX()) * 0.5, Math.min(entity.m_20184_().m_7098_(), -0.05), (zcentered - entity.getZ()) * 0.5);
+						entity.hurt(damage, (crop.getCurrentAge() + 1) * 2.0F);
 						if (!hasMetalAromor(entity))
 						{
-							entity.addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 64, 50));
-							entity.addPotionEffect(new PotionEffect(MobEffects.INVISIBILITY, 64, 0));
-							entity.addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, 64, 0));
+							entity.m_7292_(new MobEffectInstance(MobEffects.f_19597_, 64, 50));
+							entity.m_7292_(new MobEffectInstance(MobEffects.f_19609_, 64, 0));
+							entity.m_7292_(new MobEffectInstance(MobEffects.f_19610_, 64, 0));
 						}
 
 						if (this.canGrow(crop))
@@ -137,10 +136,8 @@ public class CropEating extends IC2CropCard
 						}
 
 						crop.getWorldObj()
-							.playSound(
-								null, xcentered, ycentered, zcentered, SoundEvents.ENTITY_GENERIC_EAT, SoundCategory.BLOCKS, 1.0F, IC2.random.nextFloat() * 0.1F + 0.9F
-							);
-						crop.getCustomData().setBoolean("eaten", true);
+							.m_6263_(null, xcentered, ycentered, zcentered, SoundEvents.f_11912_, SoundSource.BLOCKS, 1.0F, IC2.random.nextFloat() * 0.1F + 0.9F);
+						crop.getCustomData().putBoolean("eaten", true);
 						break;
 					}
 				}
@@ -159,8 +156,8 @@ public class CropEating extends IC2CropCard
 	{
 		float multiplier = 1.0F;
 		BlockPos coords = crop.getPosition();
-		Biome biome = BiomeUtil.getBiome(crop.getWorldObj(), coords);
-		if (BiomeDictionary.hasType(biome, BiomeDictionary.Type.SWAMP) || BiomeDictionary.hasType(biome, BiomeDictionary.Type.MOUNTAIN))
+		Holder<Biome> biome = BiomeUtil.getBiome(crop.getWorldObj(), coords);
+		if (IC2.envProxy.biomeHasType(biome, EnvProxy.BiomeType.SWAMP) || IC2.envProxy.biomeHasType(biome, EnvProxy.BiomeType.MOUNTAIN))
 		{
 			multiplier /= 1.5F;
 		}
@@ -169,23 +166,22 @@ public class CropEating extends IC2CropCard
 		return (int) (super.getGrowthDuration(crop) * multiplier);
 	}
 
-	private static boolean hasMetalAromor(EntityLivingBase entity)
+	private static boolean hasMetalAromor(LivingEntity entity)
 	{
-		if (!(entity instanceof EntityPlayer))
+		if (!(entity instanceof Player player))
 		{
 			return false;
-		}
-
-		EntityPlayer player = (EntityPlayer) entity;
-
-		for (ItemStack stack : player.inventory.armorInventory)
+		} else
 		{
-			if (stack != null && ItemWrapper.isMetalArmor(stack, player))
+			for (ItemStack stack : player.getInventory().f_35975_)
 			{
-				return true;
+				if (stack != null && ItemWrapper.isMetalArmor(stack, player))
+				{
+					return true;
+				}
 			}
-		}
 
-		return false;
+			return false;
+		}
 	}
 }

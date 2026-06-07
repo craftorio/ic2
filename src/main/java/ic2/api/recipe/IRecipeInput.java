@@ -2,9 +2,11 @@ package ic2.api.recipe;
 
 import java.util.List;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import org.jetbrains.annotations.ApiStatus.NonExtendable;
 
+@NonExtendable
 public interface IRecipeInput
 {
 	boolean matches(ItemStack var1);
@@ -15,6 +17,6 @@ public interface IRecipeInput
 
 	default Ingredient getIngredient()
 	{
-		return Recipes.inputFactory.getIngredient(this);
+		return Ingredient.m_43921_(this.getInputs().stream());
 	}
 }

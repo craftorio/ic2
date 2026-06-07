@@ -3,161 +3,106 @@ package ic2.core.item.tool;
 import com.google.common.collect.UnmodifiableIterator;
 import ic2.api.item.IBoxable;
 import ic2.core.IC2;
-import ic2.core.audio.PositionSpec;
-import ic2.core.block.state.EnumProperty;
-import ic2.core.init.Localization;
-import ic2.core.item.ItemIC2;
-import ic2.core.ref.IMultiItem;
-import ic2.core.ref.ItemName;
+import ic2.core.ref.Ic2Items;
+import ic2.core.ref.Ic2SoundEvents;
 import ic2.core.util.Ic2Color;
 import ic2.core.util.StackUtil;
-import ic2.core.util.Util;
+import ic2.core.util.VanillaColorBlockId;
 
-import java.util.EnumSet;
 import java.util.List;
-import java.util.Set;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockColored;
-import net.minecraft.block.BlockStainedGlass;
-import net.minecraft.block.BlockStainedGlassPane;
-import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.renderer.ItemMeshDefinition;
-import net.minecraft.client.renderer.block.model.ModelBakery;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.passive.EntitySheep;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.item.EnumDyeColor;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.animal.Sheep;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item.Properties;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BannerBlock;
+import net.minecraft.world.level.block.BedBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.ConcretePowderBlock;
+import net.minecraft.world.level.block.GlazedTerracottaBlock;
+import net.minecraft.world.level.block.ShulkerBoxBlock;
+import net.minecraft.world.level.block.StainedGlassBlock;
+import net.minecraft.world.level.block.StainedGlassPaneBlock;
+import net.minecraft.world.level.block.WallBannerBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.Property;
 
-public class ItemToolPainter extends ItemIC2 implements IMultiItem<Ic2Color>, IBoxable
+public class ItemToolPainter extends ItemToolCrafting implements IBoxable
 {
-	private static final EnumProperty<Ic2Color> typeProperty = new EnumProperty<>("type", Ic2Color.class);
+	Ic2Color color = null;
 	private static final int maxDamage = 32;
 
-	public ItemToolPainter()
+	public ItemToolPainter(Properties settings, Ic2Color color)
 	{
-		super(ItemName.painter);
-		this.setMaxDamage(31);
-		this.setMaxStackSize(1);
-		this.setHasSubtypes(true);
-		MinecraftForge.EVENT_BUS.register(this);
+		super(settings);
+		this.color = color;
 	}
 
-	@SideOnly(Side.CLIENT)
-	@Override
-	public void registerModels(final ItemName name)
+	public InteractionResult m_6225_(UseOnContext context)
 	{
-		ModelLoader.setCustomMeshDefinition(this, new ItemMeshDefinition()
+		if (this.color == null)
 		{
-			public ModelResourceLocation getModelLocation(ItemStack stack)
-			{
-				Ic2Color color = ItemToolPainter.this.getColor(stack);
-				return ItemIC2.getModelLocation(name, color != null ? color.getName() : null);
-			}
-		});
-		ModelBakery.registerItemVariants(this, new ResourceLocation[] { getModelLocation(name, null) });
-
-		for (Ic2Color type : typeProperty.getAllowedValues())
-		{
-			ModelBakery.registerItemVariants(this, new ResourceLocation[] { getModelLocation(name, type.getName()) });
-		}
-	}
-
-	public int getDamage(ItemStack stack)
-	{
-		int rawDamage = super.getDamage(stack);
-		return rawDamage == 0 ? 0 : (rawDamage - 1) / Ic2Color.values.length;
-	}
-
-	public boolean isDamaged(ItemStack stack)
-	{
-		return this.getDamage(stack) > 0;
-	}
-
-	public void setDamage(ItemStack stack, int damage)
-	{
-		int oldRawDamage = super.getDamage(stack);
-		if (oldRawDamage != 0)
-		{
-			int oldDamage = this.getDamage(stack);
-			int newDamage = Util.limit(damage, 0, 32);
-			super.setDamage(stack, oldRawDamage + (newDamage - oldDamage) * Ic2Color.values.length);
-		}
-	}
-
-	public int getMetadata(ItemStack stack)
-	{
-		int rawDamage = super.getDamage(stack);
-		return rawDamage != 0 && rawDamage != 32767 ? (rawDamage - 1) % Ic2Color.values.length + 1 : rawDamage;
-	}
-
-	public Ic2Color getColor(ItemStack stack)
-	{
-		int meta = this.getMetadata(stack);
-		return meta == 0 ? null : Ic2Color.values[meta - 1];
-	}
-
-	public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand)
-	{
-		ItemStack stack = StackUtil.get(player, hand);
-		Ic2Color color = this.getColor(stack);
-		if (color == null)
-		{
-			return EnumActionResult.PASS;
+			return InteractionResult.PASS;
 		}
 
-		IBlockState state = world.getBlockState(pos);
+		ItemStack stack = context.m_43722_();
+		Level world = context.m_43725_();
+		BlockPos pos = context.m_8083_();
+		Player player = context.m_43723_();
+		InteractionHand hand = context.m_43724_();
+		if (!(stack.getItem() instanceof ItemToolPainter))
+		{
+			return InteractionResult.PASS;
+		}
+
+		BlockState state = world.getBlockState(pos);
 		Block block = state.getBlock();
-		if (!block.recolorBlock(world, pos, side, color.mcColor) && !this.colorBlock(world, pos, block, state, color.mcColor))
+		if (this.colorBlock(world, pos, block, state, this.color))
 		{
-			return EnumActionResult.PASS;
-		}
+			this.damagePainter(stack, player, hand, this.color);
+			if (world.isClientSide && player != null)
+			{
+				player.m_5496_(Ic2SoundEvents.ITEM_PAINTER_USE, 1.0F, 1.0F);
+			}
 
-		this.damagePainter(player, hand, color);
-		if (world.isRemote)
+			return world.isClientSide ? InteractionResult.PASS : InteractionResult.SUCCESS;
+		} else
 		{
-			IC2.audioManager.playOnce(player, PositionSpec.Hand, "Tools/Painter.ogg", true, IC2.audioManager.getDefaultVolume());
+			return InteractionResult.PASS;
 		}
-
-		return world.isRemote ? EnumActionResult.PASS : EnumActionResult.SUCCESS;
 	}
 
-	private boolean colorBlock(World world, BlockPos pos, Block block, IBlockState state, EnumDyeColor newColor)
+	private boolean colorBlock(Level world, BlockPos pos, Block block, BlockState state, Ic2Color color)
 	{
-		UnmodifiableIterator var6 = state.getProperties().keySet().iterator();
+		DyeColor newColor = color.dyeColor;
+		UnmodifiableIterator tagList = state.m_61148_().keySet().iterator();
 
-		while (var6.hasNext())
+		while (tagList.hasNext())
 		{
-			IProperty<?> property = (IProperty<?>) var6.next();
-			if (property.getValueClass() == EnumDyeColor.class)
+			Property<?> property = (Property<?>) tagList.next();
+			if (property.m_61709_() == DyeColor.class)
 			{
-				IProperty<EnumDyeColor> typedProperty = (IProperty<EnumDyeColor>) property;
-				EnumDyeColor oldColor = (EnumDyeColor) state.getValue(typedProperty);
-				if (oldColor != newColor && typedProperty.getAllowedValues().contains(newColor))
+				Property<DyeColor> typedProperty = (Property<DyeColor>) property;
+				DyeColor oldColor = (DyeColor) state.getValue(typedProperty);
+				if (oldColor != newColor && typedProperty.m_6908_().contains(newColor))
 				{
-					world.setBlockState(pos, state.withProperty(typedProperty, newColor));
+					world.setBlockAndUpdate(pos, (BlockState) state.setValue(typedProperty, newColor));
 					return true;
 				}
 
@@ -165,187 +110,202 @@ public class ItemToolPainter extends ItemIC2 implements IMultiItem<Ic2Color>, IB
 			}
 		}
 
-		if (block == Blocks.HARDENED_CLAY)
-		{
-			world.setBlockState(pos, Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, newColor));
-			return true;
-		} else if (block == Blocks.GLASS)
-		{
-			world.setBlockState(pos, Blocks.STAINED_GLASS.getDefaultState().withProperty(BlockStainedGlass.COLOR, newColor));
-			return true;
-		} else if (block == Blocks.GLASS_PANE)
-		{
-			world.setBlockState(pos, Blocks.STAINED_GLASS_PANE.getDefaultState().withProperty(BlockStainedGlassPane.COLOR, newColor));
-			return true;
-		} else
+		if (!canColor(block, color.dyeColor))
 		{
 			return false;
 		}
-	}
 
-	@SubscribeEvent
-	public void onEntityInteract(PlayerInteractEvent.EntityInteract event)
-	{
-		EntityPlayer player = event.getEntityPlayer();
-		if (!player.getEntityWorld().isRemote)
+		List<TagKey<Block>> tagListx = block.defaultBlockState().m_204343_().toList();
+		if (tagListx.contains(BlockTags.f_13089_))
 		{
-			Entity entity = event.getEntity();
-			ItemStack stack = player.getActiveItemStack();
-			if (!StackUtil.isEmpty(stack) && stack.getItem() == this)
+			world.setBlockAndUpdate(pos, getColorBlockState(color.dyeColor, VanillaColorBlockId.WOOL));
+			return true;
+		}
+
+		if (block instanceof StainedGlassBlock || block.defaultBlockState().m_60713_(Blocks.f_50058_))
+		{
+			world.setBlockAndUpdate(pos, getColorBlockState(color.dyeColor, VanillaColorBlockId.STAINED_GLASS));
+			return true;
+		}
+
+		if (block instanceof StainedGlassPaneBlock || block.defaultBlockState().m_60713_(Blocks.f_50185_))
+		{
+			world.setBlockAndUpdate(pos, getBlockStateWithProperties(color.dyeColor, VanillaColorBlockId.STAINED_GLASS_PANE, state));
+			return true;
+		}
+
+		if (tagListx.contains(BlockTags.f_13038_))
+		{
+			BedBlock bedBlock = (BedBlock) block;
+			BlockPos bedBlockPos2 = pos.relative(BedBlock.m_49557_(state));
+			BlockState bedBlockState2 = world.getBlockState(bedBlockPos2);
+			if (bedBlockState2.m_60713_(bedBlock))
 			{
-				Ic2Color color = this.getColor(stack);
-				if (color != null)
+				world.m_7731_(pos, Blocks.f_50016_.defaultBlockState(), 48);
+				world.m_7731_(bedBlockPos2, Blocks.f_50016_.defaultBlockState(), 48);
+				world.setBlockAndUpdate(pos, getBlockStateWithProperties(color.dyeColor, VanillaColorBlockId.BED, state));
+				world.setBlockAndUpdate(bedBlockPos2, getBlockStateWithProperties(color.dyeColor, VanillaColorBlockId.BED, bedBlockState2));
+			}
+
+			return true;
+		} else
+		{
+			if (tagListx.contains(BlockTags.f_144265_))
+			{
+				world.setBlockAndUpdate(pos, getBlockStateWithProperties(color.dyeColor, VanillaColorBlockId.CANDLE, state));
+				return true;
+			}
+
+			if (block instanceof BannerBlock)
+			{
+				world.setBlockAndUpdate(pos, getBlockStateWithProperties(color.dyeColor, VanillaColorBlockId.BANNER, state));
+				return true;
+			}
+
+			if (block instanceof WallBannerBlock)
+			{
+				world.setBlockAndUpdate(pos, getBlockStateWithProperties(color.dyeColor, VanillaColorBlockId.WALL_BANNER, state));
+				return true;
+			}
+
+			if (tagListx.contains(BlockTags.f_198156_))
+			{
+				world.setBlockAndUpdate(pos, getColorBlockState(color.dyeColor, VanillaColorBlockId.TERRACOTTA));
+				return true;
+			}
+
+			if (block instanceof GlazedTerracottaBlock)
+			{
+				world.setBlockAndUpdate(pos, getBlockStateWithProperties(color.dyeColor, VanillaColorBlockId.GLAZED_TERRACOTTA, state));
+				return true;
+			}
+
+			if (block instanceof ConcretePowderBlock)
+			{
+				world.setBlockAndUpdate(pos, getColorBlockState(color.dyeColor, VanillaColorBlockId.CONCRETE_POWDER));
+				return true;
+			}
+
+			if (tagListx.contains(BlockTags.f_215838_))
+			{
+				world.setBlockAndUpdate(pos, getColorBlockState(color.dyeColor, VanillaColorBlockId.CARPET));
+				return true;
+			}
+
+			if (tagListx.contains(BlockTags.f_13083_))
+			{
+				BlockEntity shulkerBlockEntity = world.getBlockEntity(pos);
+				if (shulkerBlockEntity == null)
 				{
-					if (entity instanceof EntitySheep)
-					{
-						EntitySheep sheep = (EntitySheep) entity;
-						if (sheep.getFleeceColor() != color.mcColor)
-						{
-							((EntitySheep) entity).setFleeceColor(color.mcColor);
-							this.damagePainter(player, event.getHand(), color);
-							event.setCanceled(true);
-						}
-					}
+					return false;
+				}
+
+				CompoundTag shulkerNbt = shulkerBlockEntity.m_187481_();
+				BlockState newShulkerBoxState = ShulkerBoxBlock.m_56190_(color.dyeColor).m_152465_(state);
+				world.setBlockAndUpdate(pos, newShulkerBoxState);
+				BlockEntity newShulkerBlockEntity = BlockEntity.m_155241_(pos, newShulkerBoxState, shulkerNbt);
+				world.m_151523_(newShulkerBlockEntity);
+				return true;
+			} else
+			{
+				ResourceLocation identifier = Registry.BLOCK.getKey(block);
+				if (identifier.m_135827_().equals("minecraft") && identifier.m_135815_().contains("concrete"))
+				{
+					world.setBlockAndUpdate(pos, getColorBlockState(color.dyeColor, VanillaColorBlockId.CONCRETE));
+					return true;
+				} else
+				{
+					return false;
 				}
 			}
 		}
 	}
 
-	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand)
+	public static boolean canColor(Block block, DyeColor color)
+	{
+		ResourceLocation identifier = Registry.BLOCK.getKey(block);
+		return !identifier.m_135815_().contains(color.m_41065_());
+	}
+
+	public static BlockState getColorBlockState(DyeColor color, VanillaColorBlockId vanillaColorBlock)
+	{
+		ResourceLocation identifier = ResourceLocation.fromNamespaceAndPath("minecraft", color.m_41065_() + "_" + vanillaColorBlock.id);
+		return ((Block) Registry.BLOCK.m_7745_(identifier)).defaultBlockState();
+	}
+
+	public static BlockState getBlockStateWithProperties(DyeColor color, VanillaColorBlockId vanillaColorBlock, BlockState state)
+	{
+		ResourceLocation identifier = ResourceLocation.fromNamespaceAndPath("minecraft", color.m_41065_() + "_" + vanillaColorBlock.id);
+		return ((Block) Registry.BLOCK.m_7745_(identifier)).m_152465_(state);
+	}
+
+	public InteractionResult m_6880_(ItemStack stack, Player user, LivingEntity entity, InteractionHand hand)
+	{
+		if (this.color == null)
+		{
+			return InteractionResult.PASS;
+		} else if (entity instanceof Sheep sheep && sheep.m_29874_() != this.color.dyeColor)
+		{
+			sheep.m_29855_(this.color.dyeColor);
+			this.damagePainter(stack, user, user.m_7655_(), this.color);
+			return InteractionResult.SUCCESS;
+		} else
+		{
+			return InteractionResult.PASS;
+		}
+	}
+
+	public InteractionResultHolder<ItemStack> m_7203_(Level world, Player player, InteractionHand hand)
 	{
 		ItemStack stack = StackUtil.get(player, hand);
-		if (!world.isRemote && IC2.keyboard.isModeSwitchKeyDown(player))
+		if (!world.isClientSide && IC2.keyboard.isModeSwitchKeyDown(player))
 		{
-			NBTTagCompound nbtData = StackUtil.getOrCreateNbtData(stack);
+			CompoundTag nbtData = StackUtil.getOrCreateNbtData(stack);
 			boolean newValue = !nbtData.getBoolean("autoRefill");
-			nbtData.setBoolean("autoRefill", newValue);
+			nbtData.putBoolean("autoRefill", newValue);
 			if (newValue)
 			{
-				IC2.platform.messagePlayer(player, "Painter automatic refill mode enabled");
+				IC2.sideProxy.messagePlayer(player, "Painter automatic refill mode enabled");
 			} else
 			{
-				IC2.platform.messagePlayer(player, "Painter automatic refill mode disabled");
+				IC2.sideProxy.messagePlayer(player, "Painter automatic refill mode disabled");
 			}
 
-			return new ActionResult(EnumActionResult.SUCCESS, stack);
+			return new InteractionResultHolder(InteractionResult.SUCCESS, stack);
 		} else
 		{
-			return new ActionResult(EnumActionResult.PASS, stack);
+			return new InteractionResultHolder(InteractionResult.PASS, stack);
 		}
 	}
 
-	@Override
-	public String getUnlocalizedName(ItemStack stack)
-	{
-		Ic2Color color = this.getColor(stack);
-		return color == null ? this.getUnlocalizedName() : this.getUnlocalizedName() + "." + color.getName();
-	}
-
-	public final void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems)
-	{
-		if (this.isInCreativeTab(tab))
-		{
-			subItems.add(this.getItemStackUnchecked(null));
-
-			for (Ic2Color type : typeProperty.getAllowedValues())
-			{
-				subItems.add(this.getItemStackUnchecked(type));
-			}
-		}
-	}
-
-	@Override
-	public Set<Ic2Color> getAllTypes()
-	{
-		return EnumSet.allOf(Ic2Color.class);
-	}
-
-	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced)
-	{
-		Ic2Color color = this.getColor(stack);
-		if (color != null)
-		{
-			ItemStack dyeStack = new ItemStack(Items.DYE, 1, color.mcColor.getDyeDamage());
-			tooltip.add(Localization.translate(Items.DYE.getUnlocalizedName(dyeStack) + ".name"));
-		}
-	}
-
-	public void damagePainter(EntityPlayer player, EnumHand hand, Ic2Color color)
+	public void damagePainter(ItemStack stack, Player player, InteractionHand hand, Ic2Color color)
 	{
 		assert color != null;
-		ItemStack stack = StackUtil.get(player, hand);
-		if (stack.getItemDamage() >= stack.getMaxDamage())
+		stack.m_220157_(1, player.m_217043_(), player instanceof ServerPlayer ? (ServerPlayer) player : null);
+		if (stack.getDamageValue() >= stack.m_41776_())
 		{
-			NBTTagCompound nbtData = StackUtil.getOrCreateNbtData(stack);
-			if (nbtData.getBoolean("autoRefill") && StackUtil.consumeFromPlayerInventory(player, StackUtil.oreDict(color.oreDictDyeName), 1, false))
+			CompoundTag nbtData = StackUtil.getOrCreateNbtData(stack);
+			if (!nbtData.getBoolean("autoRefill"))
 			{
-				this.setDamage(stack, 0);
+				player.m_21008_(hand, new ItemStack(Ic2Items.PAINTER, 1));
+				return;
+			}
+
+			ItemStack consumedStack = StackUtil.consumeFromPlayerInventoryAndGet(player, StackUtil.sameItem(stack.getItem()), 1, true);
+			if (consumedStack.m_41619_())
+			{
+				player.m_21008_(hand, new ItemStack(Ic2Items.PAINTER, 1));
 			} else
 			{
-				super.setDamage(stack, 0);
+				player.m_21008_(hand, consumedStack);
+				StackUtil.addToPlayerInventory(player, new ItemStack(Ic2Items.PAINTER, 1));
 			}
-		} else
-		{
-			stack.damageItem(1, player);
 		}
-	}
-
-	public ItemStack getItemStack(Ic2Color type)
-	{
-		if (type != null && !typeProperty.getAllowedValues().contains(type))
-		{
-			throw new IllegalArgumentException("invalid property value " + type + " for property " + typeProperty);
-		} else
-		{
-			return this.getItemStackUnchecked(type);
-		}
-	}
-
-	private ItemStack getItemStackUnchecked(Ic2Color type)
-	{
-		return type == null ? new ItemStack(this) : new ItemStack(this, 1, 1 + type.getId());
-	}
-
-	@Override
-	public ItemStack getItemStack(String variant)
-	{
-		Ic2Color type;
-		if (variant != null && !variant.isEmpty())
-		{
-			type = typeProperty.getValue(variant);
-			if (type == null)
-			{
-				throw new IllegalArgumentException("invalid variant " + variant + " for " + this);
-			}
-		} else
-		{
-			type = null;
-		}
-
-		return this.getItemStackUnchecked(type);
-	}
-
-	@Override
-	public String getVariant(ItemStack stack)
-	{
-		if (stack == null)
-		{
-			throw new NullPointerException("null stack");
-		}
-
-		if (stack.getItem() != this)
-		{
-			throw new IllegalArgumentException("The stack " + stack + " doesn't match " + this);
-		}
-
-		Ic2Color color = this.getColor(stack);
-		return color == null ? null : color.getName();
 	}
 
 	@Override
 	public boolean canBeStoredInToolbox(ItemStack itemstack)
 	{
-		return true;
+		return super.canBeStoredInToolbox(itemstack);
 	}
 }

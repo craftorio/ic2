@@ -1,0 +1,73 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_advanced_machine": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:advanced_machine"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_blank_tfbp": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:blank_tfbp"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_dirt": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:dirt"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_glowstone_dust": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:glowstone_dust"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "ic2:shaped/terraformer"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_blank_tfbp",
+      "has_glowstone_dust",
+      "has_dirt",
+      "has_advanced_machine",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "ic2:shaped/terraformer"
+    ]
+  }
+}

@@ -4,58 +4,62 @@ import ic2.api.network.ClientModifiable;
 import ic2.core.ContainerBase;
 import ic2.core.IC2;
 import ic2.core.block.machine.container.ContainerWeightedFluidDistributor;
-import ic2.core.block.machine.gui.GuiWeightedFluidDistributor;
+import ic2.core.network.GrowingBuffer;
 import ic2.core.profile.NotClassic;
+import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.util.LiquidUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 @NotClassic
 public class TileEntityWeightedFluidDistributor extends TileEntityFluidDistributor implements IWeightedDistributor
 {
 	@ClientModifiable
-	protected final List<EnumFacing> priority = new ArrayList<>(5);
+	protected List<Direction> priority = new ArrayList<>(5);
+
+	public TileEntityWeightedFluidDistributor(BlockPos pos, BlockState state)
+	{
+		super(Ic2BlockEntities.WEIGHTED_FLUID_DISTRIBUTOR, pos, state);
+	}
 
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
+	public void load(CompoundTag nbt)
 	{
-		super.writeToNBT(nbt);
+		super.load(nbt);
+		int[] indexes = nbt.m_128465_("priority");
+		if (indexes.length > 0)
+		{
+			for (int index : indexes)
+			{
+				this.priority.add(Direction.m_122376_(index));
+			}
+		}
+	}
+
+	@Override
+	public void saveAdditional(CompoundTag nbt)
+	{
+		super.saveAdditional(nbt);
 		if (!this.priority.isEmpty())
 		{
 			int[] indexes = new int[this.priority.size()];
 
 			for (int i = 0; i < indexes.length; i++)
 			{
-				indexes[i] = this.priority.get(i).getIndex();
+				indexes[i] = this.priority.get(i).m_122411_();
 			}
 
-			nbt.setIntArray("priority", indexes);
-		}
-
-		return nbt;
-	}
-
-	@Override
-	public void readFromNBT(NBTTagCompound nbt)
-	{
-		super.readFromNBT(nbt);
-		int[] indexes = nbt.getIntArray("priority");
-		if (indexes.length > 0)
-		{
-			for (int index : indexes)
-			{
-				this.priority.add(EnumFacing.getFront(index));
-			}
+			nbt.m_128385_("priority", indexes);
 		}
 	}
 
@@ -70,7 +74,7 @@ public class TileEntityWeightedFluidDistributor extends TileEntityFluidDistribut
 	@Override
 	protected void updateConnectivity()
 	{
-		if (!this.getWorld().isRemote && !this.priority.isEmpty() && this.priority.remove(this.getFacing()))
+		if (!this.getLevel().isClientSide && !this.priority.isEmpty() && this.priority.remove(this.getFacing()))
 		{
 			this.updatePriority(true);
 		}
@@ -85,18 +89,18 @@ public class TileEntityWeightedFluidDistributor extends TileEntityFluidDistribut
 		{
 			int tankAmount = this.fluidTank.getFluidAmount();
 
-			for (EnumFacing dir : this.priority)
+			for (Direction dir : this.priority)
 			{
 				assert dir != this.getFacing();
-				TileEntity target = this.world.getTileEntity(this.pos.offset(dir));
-				EnumFacing side = dir.getOpposite();
+				BlockEntity target = this.level.getBlockEntity(this.worldPosition.relative(dir));
+				Direction side = dir.m_122424_();
 				if (LiquidUtil.isFluidTile(target, side))
 				{
-					int amount = LiquidUtil.fillTile(target, side, this.fluidTank.getFluid(), false);
+					int amount = LiquidUtil.fillTile(target, side, this.fluidTank.getFluidStack(), false);
 					if (amount > 0)
 					{
 						tankAmount -= amount;
-						this.fluidTank.drainInternal(amount, true);
+						this.fluidTank.drainMbUnchecked(amount, false);
 						if (tankAmount <= 0)
 						{
 							break;
@@ -108,21 +112,19 @@ public class TileEntityWeightedFluidDistributor extends TileEntityFluidDistribut
 	}
 
 	@Override
-	public ContainerBase<?> getGuiContainer(EntityPlayer player)
+	public ContainerBase<?> createServerScreenHandler(int syncId, Player player)
 	{
-		return new ContainerWeightedFluidDistributor(player, this);
+		return new ContainerWeightedFluidDistributor(syncId, player.getInventory(), this);
 	}
 
-	@SideOnly(Side.CLIENT)
 	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
-		return new GuiWeightedFluidDistributor(new ContainerWeightedFluidDistributor(player, this));
+		return new ContainerWeightedFluidDistributor(syncId, inventory, this);
 	}
 
-	@SideOnly(Side.CLIENT)
 	@Override
-	public List<EnumFacing> getPriority()
+	public List<Direction> getPriority()
 	{
 		return this.priority;
 	}
@@ -134,10 +136,10 @@ public class TileEntityWeightedFluidDistributor extends TileEntityFluidDistribut
 	}
 
 	@Override
-	public void onNetworkEvent(EntityPlayer player, int event)
+	public void onNetworkEvent(Player player, int event)
 	{
 		int position = event / 10;
-		EnumFacing facing = EnumFacing.getFront(event % 10 & 6);
+		Direction facing = Direction.m_122376_(event % 10 & 6);
 		assert position >= 0 && position <= this.priority.size() : "Position was " + position;
 		assert facing != this.getFacing();
 		if (position == this.priority.size())

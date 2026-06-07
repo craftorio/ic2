@@ -1,12 +1,11 @@
 package ic2.core.gui.dynamic;
 
-import ic2.core.block.ITeBlock;
 import ic2.core.gui.EnergyGauge;
 import ic2.core.gui.Gauge;
 import ic2.core.gui.GuiElement;
 import ic2.core.gui.IEnableHandler;
 import ic2.core.gui.SlotGrid;
-import ic2.core.gui.Text;
+import ic2.core.gui.TextLabel;
 import ic2.core.util.ConfigUtil;
 import ic2.core.util.Tuple;
 import ic2.core.util.XmlUtil;
@@ -26,12 +25,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.relauncher.Side;
-import org.lwjgl.input.Mouse;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -40,37 +36,34 @@ import org.xml.sax.helpers.DefaultHandler;
 
 public class GuiParser
 {
-	public static GuiParser.GuiNode parse(ITeBlock teBlock)
+	public static GuiParser.GuiNode parse(ResourceLocation id, Class<?> baseClass)
 	{
-		ResourceLocation loc = new ResourceLocation(teBlock.getIdentifier().getResourceDomain(), "guidef/" + teBlock.getName() + ".xml");
+		String fileLoc = String.format("/assets/%s/guidef/%s.xml", id.m_135827_(), id.m_135815_());
+		InputStream is = null;
 
 		try
 		{
-			return parse(loc, teBlock.getTeClass());
-		} catch (Exception e)
-		{
-			throw new RuntimeException(e);
-		}
-	}
+			is = GuiParser.class.getResourceAsStream(fileLoc);
+			if (is == null)
+			{
+				throw new FileNotFoundException("Could not load " + fileLoc + " from the classpath.");
+			}
 
-	public static GuiParser.GuiNode parse(ResourceLocation location, Class<?> baseClass) throws IOException, SAXException
-	{
-		String fileLoc = "/assets/" + location.getResourceDomain() + '/' + location.getResourcePath();
-		InputStream is = GuiParser.class.getResourceAsStream(fileLoc);
-		if (is == null)
-		{
-			throw new FileNotFoundException("Could not load " + fileLoc + " from the classpath.");
-		}
-
-		try
-		{
 			is = new BufferedInputStream(is);
 			return parse(is, baseClass);
+		} catch (Exception e)
+		{
+			throw new RuntimeException("Error reading/parsing GUI definition " + id + " from " + fileLoc, e);
 		} finally
 		{
-			if (is != null)
+			try
 			{
-				is.close();
+				if (is != null)
+				{
+					is.close();
+				}
+			} catch (IOException var12)
+			{
 			}
 		}
 	}
@@ -104,7 +97,7 @@ public class GuiParser
 		@Override
 		protected boolean isKeyDown()
 		{
-			return GuiScreen.isAltKeyDown();
+			return Screen.m_96639_();
 		}
 	}
 
@@ -187,11 +180,6 @@ public class GuiParser
 		@Override
 		public void setContent(String content) throws SAXException
 		{
-			if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
-			{
-				Mouse.setGrabbed(false);
-			}
-
 			this.text = TextProvider.parse(content, this.parent.getBaseClass());
 		}
 
@@ -227,7 +215,7 @@ public class GuiParser
 		@Override
 		protected boolean isKeyDown()
 		{
-			return GuiScreen.isCtrlKeyDown();
+			return Screen.m_96637_();
 		}
 	}
 
@@ -477,7 +465,7 @@ public class GuiParser
 				file = file + ".png";
 			}
 
-			this.src = new ResourceLocation(domain, file);
+			this.src = ResourceLocation.fromNamespaceAndPath(domain, file);
 		}
 
 		@Override
@@ -605,7 +593,7 @@ public class GuiParser
 		fluidtank,
 		fluidslot;
 
-		private static final Map<String, GuiParser.NodeType> map = getMap();
+		private static Map<String, GuiParser.NodeType> map = getMap();
 
 		public static GuiParser.NodeType get(String name)
 		{
@@ -866,7 +854,7 @@ public class GuiParser
 		@Override
 		protected boolean isKeyDown()
 		{
-			return GuiScreen.isShiftKeyDown();
+			return Screen.m_96638_();
 		}
 	}
 
@@ -1015,7 +1003,7 @@ public class GuiParser
 		public final boolean centerX;
 		public final boolean centerY;
 		public final boolean rightAligned;
-		public final Text.TextAlignment align;
+		public final TextLabel.TextAlignment align;
 		public final int color;
 		public final boolean shadow;
 		public TextProvider.ITextProvider text;
@@ -1030,13 +1018,13 @@ public class GuiParser
 			this.xOffset = XmlUtil.getIntAttr(attributes, "xoffset", 0);
 			this.yOffset = XmlUtil.getIntAttr(attributes, "yoffset", 0);
 			String alignName = XmlUtil.getAttr(attributes, "align", "start");
-			this.align = Text.TextAlignment.get(alignName);
+			this.align = TextLabel.TextAlignment.get(alignName);
 			if (this.align == null)
 			{
 				throw new SAXException("invalid alignment: " + alignName);
 			}
 
-			String center = XmlUtil.getAttr(attributes, "center", this.align == Text.TextAlignment.Center ? "x" : "");
+			String center = XmlUtil.getAttr(attributes, "center", this.align == TextLabel.TextAlignment.Center ? "x" : "");
 			this.centerX = center.indexOf(120) != -1;
 			this.centerY = center.indexOf(121) != -1;
 			this.rightAligned = XmlUtil.getBoolAttr(attributes, "right", false);
@@ -1053,11 +1041,6 @@ public class GuiParser
 		@Override
 		public void setContent(String content) throws SAXException
 		{
-			if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
-			{
-				Mouse.setGrabbed(false);
-			}
-
 			this.text = TextProvider.parse(content, this.parent.getBaseClass());
 		}
 	}

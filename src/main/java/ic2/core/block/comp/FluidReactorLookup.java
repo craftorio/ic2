@@ -1,30 +1,31 @@
 package ic2.core.block.comp;
 
-import ic2.core.block.TileEntityBlock;
 import ic2.core.block.reactor.tileentity.TileEntityNuclearReactorElectric;
-import ic2.core.util.WorldSearchUtil;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import ic2.core.block.tileentity.Ic2TileEntity;
+import ic2.core.util.Util;
+import ic2.core.util.WorldUtil;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class FluidReactorLookup extends TileEntityComponent
 {
 	private TileEntityNuclearReactorElectric reactor;
 	private long lastReactorUpdate;
 
-	public FluidReactorLookup(TileEntityBlock parent)
+	public FluidReactorLookup(Ic2TileEntity parent)
 	{
 		super(parent);
 	}
 
 	public TileEntityNuclearReactorElectric getReactor()
 	{
-		long time = this.parent.getWorld().getTotalWorldTime();
+		long time = this.parent.getLevel().getGameTime();
 		if (time != this.lastReactorUpdate)
 		{
 			this.updateReactor();
 			this.lastReactorUpdate = time;
-		} else if (this.reactor != null && (this.reactor.isInvalid() || !this.reactor.isFluidCooled()))
+		} else if (this.reactor != null && (this.reactor.isRemoved() || !this.reactor.isFluidCooled()))
 		{
 			this.reactor = null;
 		}
@@ -35,20 +36,20 @@ public class FluidReactorLookup extends TileEntityComponent
 	private void updateReactor()
 	{
 		int dist = 2;
-		World world = this.parent.getWorld();
-		BlockPos pos = this.parent.getPos();
-		if (!world.isAreaLoaded(pos, 2))
+		Level world = this.parent.getLevel();
+		BlockPos pos = this.parent.getBlockPos();
+		if (!Util.isAreaLoaded(world, pos, 2))
 		{
 			this.reactor = null;
 		} else
 		{
 			if (this.reactor != null
-				&& !this.reactor.isInvalid()
+				&& !this.reactor.isRemoved()
 				&& this.reactor.isFluidCooled()
-				&& this.reactor.getWorld() == world
-				&& world.getTileEntity(this.reactor.getPos()) == this.reactor)
+				&& this.reactor.getLevel() == world
+				&& world.getBlockEntity(this.reactor.getBlockPos()) == this.reactor)
 			{
-				BlockPos reactorPos = this.reactor.getPos();
+				BlockPos reactorPos = this.reactor.getBlockPos();
 				int dx = Math.abs(pos.getX() - reactorPos.getX());
 				int dy = Math.abs(pos.getY() - reactorPos.getY());
 				int dz = Math.abs(pos.getZ() - reactorPos.getZ());
@@ -59,22 +60,19 @@ public class FluidReactorLookup extends TileEntityComponent
 			}
 
 			this.reactor = null;
-			WorldSearchUtil.findTileEntities(world, pos, 2, new WorldSearchUtil.ITileEntityResultHandler()
+			WorldUtil.findTileEntities(world, pos, 2, new WorldUtil.ITileEntityResultHandler()
 			{
 				@Override
-				public boolean onMatch(TileEntity te)
+				public boolean onMatch(BlockEntity te)
 				{
-					if (te instanceof TileEntityNuclearReactorElectric)
+					if (te instanceof TileEntityNuclearReactorElectric cReactor && cReactor.isFluidCooled())
 					{
-						TileEntityNuclearReactorElectric cReactor = (TileEntityNuclearReactorElectric) te;
-						if (cReactor.isFluidCooled())
-						{
-							FluidReactorLookup.this.reactor = cReactor;
-							return true;
-						}
+						FluidReactorLookup.this.reactor = cReactor;
+						return true;
+					} else
+					{
+						return false;
 					}
-
-					return false;
 				}
 			});
 		}

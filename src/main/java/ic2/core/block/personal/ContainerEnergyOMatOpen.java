@@ -1,24 +1,35 @@
 package ic2.core.block.personal;
 
 import ic2.core.ContainerFullInv;
+import ic2.core.ref.Ic2ScreenHandlers;
 import ic2.core.slot.SlotInvSlot;
 
 import java.util.List;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IContainerListener;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.DataSlot;
 
 public class ContainerEnergyOMatOpen extends ContainerFullInv<TileEntityEnergyOMat>
 {
-	private int lastTier = -1;
-
-	public ContainerEnergyOMatOpen(EntityPlayer player, TileEntityEnergyOMat tileEntity1)
+	public ContainerEnergyOMatOpen(int syncId, Inventory playerInventory, TileEntityEnergyOMat be)
 	{
-		super(player, tileEntity1, 166);
-		this.addSlotToContainer(new SlotInvSlot(tileEntity1.demandSlot, 0, 24, 17));
-		this.addSlotToContainer(new SlotInvSlot(tileEntity1.upgradeSlot, 0, 24, 53));
-		this.addSlotToContainer(new SlotInvSlot(tileEntity1.inputSlot, 0, 60, 17));
-		this.addSlotToContainer(new SlotInvSlot(tileEntity1.chargeSlot, 0, 60, 53));
+		super(Ic2ScreenHandlers.ENERGY_O_MAT_OPEN, syncId, playerInventory, be, 166);
+		this.m_38897_(new SlotInvSlot(be.demandSlot, 0, 24, 17));
+		this.m_38897_(new SlotInvSlot(be.upgradeSlot, 0, 24, 53));
+		this.m_38897_(new SlotInvSlot(be.inputSlot, 0, 60, 17));
+		this.m_38897_(new SlotInvSlot(be.chargeSlot, 0, 60, 53));
+		this.m_38895_(new DataSlot()
+		{
+			public int m_6501_()
+			{
+				return ContainerEnergyOMatOpen.this.base.chargeSlot.tier;
+			}
+
+			public void m_6422_(int value)
+			{
+				ContainerEnergyOMatOpen.this.base.chargeSlot.tier = value;
+			}
+		});
 	}
 
 	@Override
@@ -29,31 +40,5 @@ public class ContainerEnergyOMatOpen extends ContainerFullInv<TileEntityEnergyOM
 		ret.add("euBuffer");
 		ret.add("euOffer");
 		return ret;
-	}
-
-	@Override
-	public void detectAndSendChanges()
-	{
-		super.detectAndSendChanges();
-
-		for (IContainerListener listener : this.listeners)
-		{
-			if (this.base.chargeSlot.tier != this.lastTier)
-			{
-				listener.sendWindowProperty(this, 0, this.base.chargeSlot.tier);
-			}
-		}
-
-		this.lastTier = this.base.chargeSlot.tier;
-	}
-
-	public void updateProgressBar(int index, int value)
-	{
-		super.updateProgressBar(index, value);
-		switch (index)
-		{
-			case 0:
-				this.base.chargeSlot.tier = value;
-		}
 	}
 }

@@ -1,38 +1,27 @@
 package ic2.core.item.upgrade;
 
-import com.google.common.base.Supplier;
 import ic2.api.network.ClientModifiable;
 import ic2.core.ContainerBase;
 import ic2.core.IC2;
 import ic2.core.IHasGui;
-import ic2.core.gui.EnumCycleHandler;
-import ic2.core.gui.MouseButton;
-import ic2.core.gui.VanillaButton;
-import ic2.core.gui.dynamic.DynamicGui;
 import ic2.core.gui.dynamic.DynamicHandHeldContainer;
 import ic2.core.gui.dynamic.GuiParser;
 import ic2.core.gui.dynamic.IGuiConditionProvider;
 import ic2.core.gui.dynamic.IHolographicSlotProvider;
-import ic2.core.init.Localization;
 import ic2.core.item.ContainerHandHeldInventory;
 import ic2.core.item.tool.HandHeldInventory;
+import ic2.core.network.GrowingBuffer;
 import ic2.core.network.GuiSynced;
+import ic2.core.ref.Ic2ScreenHandlers;
 import ic2.core.util.LogCategory;
-import ic2.core.util.ReflectionUtil;
 import ic2.core.util.StackUtil;
 import ic2.core.util.Util;
-
-import java.io.IOException;
-
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import org.xml.sax.SAXException;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 
 public class HandHeldAdvancedUpgrade extends HandHeldInventory implements IHolographicSlotProvider, IGuiConditionProvider
 {
@@ -42,32 +31,30 @@ public class HandHeldAdvancedUpgrade extends HandHeldInventory implements IHolog
 	protected boolean energy;
 	@ClientModifiable
 	protected NbtSettings nbt;
-	private static final byte META_GUI = 0;
-	private static final byte DAMAGE_GUI = 1;
-	private static final byte ENERGY_GUI = 2;
-	private static final byte ORE_GUI = 3;
-	private static final ResourceLocation GUI_XML = new ResourceLocation("ic2", "guidef/advanced_upgrade.xml");
+	private static final int META_GUI = 0;
+	private static final int DAMAGE_GUI = 1;
+	private static final int ENERGY_GUI = 2;
+	private static final int ORE_GUI = 3;
+	private static final ResourceLocation GUI_XML = IC2.getIdentifier("advanced_upgrade");
 
-	private static ItemStack checkContainerStack(EntityPlayer player, ItemStack containerStack)
+	private static ItemStack checkContainerStack(Player player, ItemStack containerStack)
 	{
-		if (!player.getEntityWorld().isRemote
-			&& player.openContainer instanceof ContainerHandHeldInventory
-			&& ((ContainerHandHeldInventory) player.openContainer).base instanceof HandHeldUpgradeOption)
+		if (!player.getCommandSenderWorld().isClientSide
+			&& player.f_36096_ instanceof ContainerHandHeldInventory
+			&& ((ContainerHandHeldInventory) player.f_36096_).base instanceof HandHeldUpgradeOption)
 		{
 			addMaintainedPlayer(player);
-			return ReflectionUtil.getFieldValue(
-				ReflectionUtil.getField(HandHeldInventory.class, ItemStack.class), ((ContainerHandHeldInventory) player.openContainer).base
-			);
+			return ((HandHeldInventory) ((ContainerHandHeldInventory) player.f_36096_).base).getContainerStack();
 		} else
 		{
 			return containerStack;
 		}
 	}
 
-	public HandHeldAdvancedUpgrade(EntityPlayer player, ItemStack containerStack)
+	public HandHeldAdvancedUpgrade(Player player, InteractionHand hand, ItemStack containerStack)
 	{
-		super(player, checkContainerStack(player, containerStack), 9);
-		NBTTagCompound nbt = StackUtil.getOrCreateNbtData(containerStack);
+		super(player, hand, checkContainerStack(player, containerStack), 9);
+		CompoundTag nbt = StackUtil.getOrCreateNbtData(containerStack);
 		this.meta = readTag(nbt, "meta");
 		this.nbt = NbtSettings.getFromNBT(getTag(nbt, "nbt").getByte("type"));
 		this.energy = readTag(nbt, "energy");
@@ -77,48 +64,48 @@ public class HandHeldAdvancedUpgrade extends HandHeldInventory implements IHolog
 	protected void save()
 	{
 		super.save();
-		if (IC2.platform.isSimulating())
+		if (IC2.sideProxy.isSimulating())
 		{
-			NBTTagCompound nbt = this.containerStack.getTagCompound();
+			CompoundTag nbt = this.containerStack.getTag();
 			assert nbt != null;
 			writeTag(nbt, "meta", this.meta);
-			NBTTagCompound tag = getTag(nbt, "nbt");
-			tag.setBoolean("active", this.nbt.enabled());
-			tag.setByte("type", this.nbt.getForNBT());
-			nbt.setTag("nbtSettings", tag);
+			CompoundTag tag = getTag(nbt, "nbt");
+			tag.putBoolean("active", this.nbt.enabled());
+			tag.putByte("type", this.nbt.getForNBT());
+			nbt.put("nbtSettings", tag);
 			writeTag(nbt, "energy", this.energy);
 		}
 	}
 
-	public static NBTTagCompound getTag(NBTTagCompound nbt, String name)
+	public static CompoundTag getTag(CompoundTag nbt, String name)
 	{
-		return nbt.getCompoundTag(name + "Settings");
+		return nbt.getCompound(name + "Settings");
 	}
 
-	protected static boolean readTag(NBTTagCompound nbt, String name)
+	protected static boolean readTag(CompoundTag nbt, String name)
 	{
 		return getTag(nbt, name).getBoolean("active");
 	}
 
-	protected static void writeTag(NBTTagCompound nbt, String name, boolean active)
+	protected static void writeTag(CompoundTag nbt, String name, boolean active)
 	{
-		NBTTagCompound tag = getTag(nbt, name);
-		tag.setBoolean("active", active);
-		nbt.setTag(name + "Settings", tag);
+		CompoundTag tag = getTag(nbt, name);
+		tag.putBoolean("active", active);
+		nbt.put(name + "Settings", tag);
 	}
 
-	static IHasGui delegate(EntityPlayer player, ItemStack stack, int ID)
+	static IHasGui delegate(Player player, InteractionHand hand, ItemStack stack, int ID)
 	{
 		switch (ID)
 		{
 			case 0:
-				return new HandHeldValueConfig(new HandHeldAdvancedUpgrade(player, stack), "meta");
+				return new HandHeldValueConfig(new HandHeldAdvancedUpgrade(player, hand, stack), "meta");
 			case 1:
 				return null;
 			case 2:
-				return new HandHeldValueConfig(new HandHeldAdvancedUpgrade(player, stack), "energy");
+				return new HandHeldValueConfig(new HandHeldAdvancedUpgrade(player, hand, stack), "energy");
 			case 3:
-				return new HandHeldOre(new HandHeldAdvancedUpgrade(player, stack));
+				return new HandHeldOre(new HandHeldAdvancedUpgrade(player, hand, stack));
 			default:
 				IC2.log.warn(LogCategory.Network, "Unexpected delegate ID: " + ID);
 				return null;
@@ -126,84 +113,30 @@ public class HandHeldAdvancedUpgrade extends HandHeldInventory implements IHolog
 	}
 
 	@Override
-	public ContainerBase<?> getGuiContainer(EntityPlayer player)
+	public ContainerBase<?> createServerScreenHandler(int syncId, Player player)
 	{
-		return DynamicHandHeldContainer.create(this, player, this.getNode());
+		return DynamicHandHeldContainer.create(Ic2ScreenHandlers.ADVANCED_UPGRADE, syncId, player.getInventory(), this, this.getNode());
 	}
 
-	@SideOnly(Side.CLIENT)
 	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
-		final DynamicGui<?> gui = DynamicGui.create(this, player, this.getNode());
-		if (Util.inDev())
-		{
-			gui.addElement(
-				new VanillaButton(gui, 10, 62, 50, 20, new EnumCycleHandler<NbtSettings>(NbtSettings.VALUES, this.nbt)
-				{
-					@Override
-					public void onClick(MouseButton button)
-					{
-						super.onClick(button);
-						HandHeldAdvancedUpgrade.this.nbt = this.getCurrentValue();
-						IC2.network.get(false).sendHandHeldInvField(gui.getContainer(), "nbt");
-					}
-				})
-					.withText("ic2.upgrade.advancedGUI.nbt")
-					.withTooltip(
-						new Supplier<String>()
-						{
-							private final String NBT = Localization.translate("ic2.upgrade.advancedGUI.nbt");
-
-							public String get()
-							{
-								return Localization.translate(
-									"ic2.upgrade.advancedGUI.nbt.desc",
-									Localization.translate(HandHeldAdvancedUpgrade.this.nbt.name),
-									TextFormatting.GRAY,
-									Localization.translate(HandHeldAdvancedUpgrade.this.nbt.name + ".desc", this.NBT)
-								);
-							}
-						}
-					)
-			);
-		}
-
-		return gui;
+		return DynamicHandHeldContainer.create(Ic2ScreenHandlers.ADVANCED_UPGRADE, syncId, this.player.getInventory(), this, this.getNode());
 	}
 
 	protected GuiParser.GuiNode getNode()
 	{
-		try
-		{
-			return GuiParser.parse(GUI_XML, HandHeldAdvancedUpgrade.class);
-		} catch (SAXException e)
-		{
-			throw new RuntimeException("XML Exception opening Advanced Upgrade GUI", e);
-		} catch (IOException e)
-		{
-			throw new RuntimeException("IO Exception opening Advanced Upgrade GUI", e);
-		}
+		return GuiParser.parse(GUI_XML, HandHeldAdvancedUpgrade.class);
 	}
 
-	public boolean hasCustomName()
-	{
-		return false;
-	}
-
-	public String getName()
-	{
-		return this.containerStack.getUnlocalizedName();
-	}
-
-	EntityPlayer getPlayer()
+	Player getPlayer()
 	{
 		return this.player;
 	}
 
-	ItemStack getContainerStack()
+	InteractionHand getHand()
 	{
-		return this.containerStack;
+		return this.hand;
 	}
 
 	@Override
@@ -263,7 +196,7 @@ public class HandHeldAdvancedUpgrade extends HandHeldInventory implements IHolog
 				this.meta = !this.meta;
 			} else
 			{
-				this.launchGUI(new HandHeldValueConfig(this, "meta"), 0);
+				new HandHeldValueConfig(this, "meta").openManagedItem(this.player, this.hand, 0);
 			}
 		} else if ("energy".equals(event))
 		{
@@ -272,24 +205,15 @@ public class HandHeldAdvancedUpgrade extends HandHeldInventory implements IHolog
 				this.energy = !this.energy;
 			} else
 			{
-				this.launchGUI(new HandHeldValueConfig(this, "energy"), 2);
+				new HandHeldValueConfig(this, "energy").openManagedItem(this.player, this.hand, 2);
 			}
 		} else if ("ore".equals(event))
 		{
 			assert dev;
-			this.launchGUI(new HandHeldOre(this), 3);
+			new HandHeldOre(this).openManagedItem(this.player, this.hand, 3);
 		} else
 		{
 			super.onEvent(event);
-		}
-	}
-
-	protected void launchGUI(IHasGui gui, int ID)
-	{
-		if (!this.player.getEntityWorld().isRemote)
-		{
-			HandHeldInventory.addMaintainedPlayer(this.player);
-			IC2.platform.launchSubGui(this.player, gui, ID);
 		}
 	}
 }

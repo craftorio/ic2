@@ -1,28 +1,23 @@
 package ic2.core.util;
 
 import ic2.core.IC2;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.RayTraceResult.Type;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.HitResult.Type;
 
 public class RotationUtil
 {
-	public static EnumFacing rotateByRay(RayTraceResult ray)
+	public static Direction rotateByRay(BlockHitResult ray)
 	{
-		assert ray.typeOfHit == Type.BLOCK;
-		Vec3d hit = ray.hitVec;
-		BlockPos pos = ray.getBlockPos();
-		return rotateByHit(
-			ray.sideHit,
-			(float) hit.x - pos.getX(),
-			(float) hit.y - pos.getY(),
-			(float) hit.z - pos.getZ()
-		);
+		assert ray.m_6662_() == Type.BLOCK;
+		Vec3 hit = ray.m_82450_();
+		BlockPos pos = ray.m_82425_();
+		return rotateByHit(ray.m_82434_(), (float) hit.f_82479_ - pos.getX(), (float) hit.f_82480_ - pos.getY(), (float) hit.f_82481_ - pos.getZ());
 	}
 
-	public static EnumFacing rotateByHit(EnumFacing facingHit, float hitX, float hitY, float hitZ)
+	public static Direction rotateByHit(Direction facingHit, float hitX, float hitY, float hitZ)
 	{
 		switch (facingHit)
 		{
@@ -31,35 +26,35 @@ public class RotationUtil
 				{
 					if (hitZ > 0.25F && hitZ < 0.75F)
 					{
-						return EnumFacing.WEST;
+						return Direction.WEST;
 					}
 
-					return EnumFacing.UP;
+					return Direction.UP;
 				}
 
 				if (hitX > 0.25F && hitX < 0.75F)
 				{
 					if (hitZ <= 0.25F)
 					{
-						return EnumFacing.NORTH;
+						return Direction.NORTH;
 					}
 
 					if (hitZ >= 0.75F)
 					{
-						return EnumFacing.SOUTH;
+						return Direction.SOUTH;
 					}
 
-					return EnumFacing.DOWN;
+					return Direction.DOWN;
 				}
 
 				if (hitX >= 0.75F)
 				{
 					if (hitZ > 0.25F && hitZ < 0.75F)
 					{
-						return EnumFacing.EAST;
+						return Direction.EAST;
 					}
 
-					return EnumFacing.UP;
+					return Direction.UP;
 				}
 				break;
 			case UP:
@@ -67,35 +62,35 @@ public class RotationUtil
 				{
 					if (hitZ > 0.25F && hitZ < 0.75F)
 					{
-						return EnumFacing.WEST;
+						return Direction.WEST;
 					}
 
-					return EnumFacing.DOWN;
+					return Direction.DOWN;
 				}
 
 				if (hitX > 0.25F && hitX < 0.75F)
 				{
 					if (hitZ <= 0.25F)
 					{
-						return EnumFacing.NORTH;
+						return Direction.NORTH;
 					}
 
 					if (hitZ >= 0.75F)
 					{
-						return EnumFacing.SOUTH;
+						return Direction.SOUTH;
 					}
 
-					return EnumFacing.UP;
+					return Direction.UP;
 				}
 
 				if (hitX >= 0.75F)
 				{
 					if (hitZ > 0.25F && hitZ < 0.75F)
 					{
-						return EnumFacing.EAST;
+						return Direction.EAST;
 					}
 
-					return EnumFacing.DOWN;
+					return Direction.DOWN;
 				}
 				break;
 			case NORTH:
@@ -103,35 +98,35 @@ public class RotationUtil
 				{
 					if (hitY > 0.25F && hitY < 0.75F)
 					{
-						return EnumFacing.WEST;
+						return Direction.WEST;
 					}
 
-					return EnumFacing.SOUTH;
+					return Direction.SOUTH;
 				}
 
 				if (hitX > 0.25F && hitX < 0.75F)
 				{
 					if (hitY <= 0.25F)
 					{
-						return EnumFacing.DOWN;
+						return Direction.DOWN;
 					}
 
 					if (hitY >= 0.75F)
 					{
-						return EnumFacing.UP;
+						return Direction.UP;
 					}
 
-					return EnumFacing.NORTH;
+					return Direction.NORTH;
 				}
 
 				if (hitX >= 0.75F)
 				{
 					if (hitY > 0.25F && hitY < 0.75F)
 					{
-						return EnumFacing.EAST;
+						return Direction.EAST;
 					}
 
-					return EnumFacing.SOUTH;
+					return Direction.SOUTH;
 				}
 				break;
 			case SOUTH:
@@ -139,35 +134,35 @@ public class RotationUtil
 				{
 					if (hitY > 0.25F && hitY < 0.75F)
 					{
-						return EnumFacing.WEST;
+						return Direction.WEST;
 					}
 
-					return EnumFacing.NORTH;
+					return Direction.NORTH;
 				}
 
 				if (hitX > 0.25F && hitX < 0.75F)
 				{
 					if (hitY <= 0.25F)
 					{
-						return EnumFacing.DOWN;
+						return Direction.DOWN;
 					}
 
 					if (hitY >= 0.75F)
 					{
-						return EnumFacing.UP;
+						return Direction.UP;
 					}
 
-					return EnumFacing.SOUTH;
+					return Direction.SOUTH;
 				}
 
 				if (hitX >= 0.75F)
 				{
 					if (hitY > 0.25F && hitY < 0.75F)
 					{
-						return EnumFacing.EAST;
+						return Direction.EAST;
 					}
 
-					return EnumFacing.NORTH;
+					return Direction.NORTH;
 				}
 				break;
 			case WEST:
@@ -175,35 +170,35 @@ public class RotationUtil
 				{
 					if (hitY > 0.25F && hitY < 0.75F)
 					{
-						return EnumFacing.NORTH;
+						return Direction.NORTH;
 					}
 
-					return EnumFacing.EAST;
+					return Direction.EAST;
 				}
 
 				if (hitZ > 0.25F && hitZ < 0.75F)
 				{
 					if (hitY <= 0.25F)
 					{
-						return EnumFacing.DOWN;
+						return Direction.DOWN;
 					}
 
 					if (hitY >= 0.75F)
 					{
-						return EnumFacing.UP;
+						return Direction.UP;
 					}
 
-					return EnumFacing.WEST;
+					return Direction.WEST;
 				}
 
 				if (hitZ >= 0.75F)
 				{
 					if (hitY > 0.25F && hitY < 0.75F)
 					{
-						return EnumFacing.SOUTH;
+						return Direction.SOUTH;
 					}
 
-					return EnumFacing.EAST;
+					return Direction.EAST;
 				}
 				break;
 			case EAST:
@@ -211,35 +206,35 @@ public class RotationUtil
 				{
 					if (hitY > 0.25F && hitY < 0.75F)
 					{
-						return EnumFacing.NORTH;
+						return Direction.NORTH;
 					}
 
-					return EnumFacing.WEST;
+					return Direction.WEST;
 				}
 
 				if (hitZ > 0.25F && hitZ < 0.75F)
 				{
 					if (hitY <= 0.25F)
 					{
-						return EnumFacing.DOWN;
+						return Direction.DOWN;
 					}
 
 					if (hitY >= 0.75F)
 					{
-						return EnumFacing.UP;
+						return Direction.UP;
 					}
 
-					return EnumFacing.EAST;
+					return Direction.EAST;
 				}
 
 				if (hitZ >= 0.75F)
 				{
 					if (hitY > 0.25F && hitY < 0.75F)
 					{
-						return EnumFacing.SOUTH;
+						return Direction.SOUTH;
 					}
 
-					return EnumFacing.WEST;
+					return Direction.WEST;
 				}
 		}
 

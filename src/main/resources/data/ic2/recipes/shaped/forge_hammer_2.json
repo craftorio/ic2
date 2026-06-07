@@ -1,0 +1,20 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    " II",
+    "SSI",
+    " II"
+  ],
+  "key": {
+    "S": {
+      "item": "minecraft:stick"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    }
+  },
+  "group": "forge_hammer",
+  "result": {
+    "item": "ic2:forge_hammer"
+  }
+}

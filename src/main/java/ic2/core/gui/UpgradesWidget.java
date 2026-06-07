@@ -1,17 +1,18 @@
 package ic2.core.gui;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import ic2.api.upgrade.IUpgradableBlock;
 import ic2.api.upgrade.IUpgradeItem;
 import ic2.api.upgrade.UpgradableProperty;
 import ic2.api.upgrade.UpgradeRegistry;
-import ic2.core.GuiIC2;
-import ic2.core.init.Localization;
+import ic2.core.Ic2Gui;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
 
 public class UpgradesWidget extends GuiElement<UpgradesWidget>
 {
@@ -21,28 +22,28 @@ public class UpgradesWidget extends GuiElement<UpgradesWidget>
 	private static final int iWidth = 10;
 	private static final int iHeight = 10;
 
-	public UpgradesWidget(GuiIC2<?> gui, int x, int y, IUpgradableBlock te)
+	public UpgradesWidget(Ic2Gui<?> gui, int x, int y, IUpgradableBlock te)
 	{
 		super(gui, x, y, 10, 10);
 		this.compatibleUpgrades = getCompatibleUpgrades(te);
 	}
 
 	@Override
-	public void drawBackground(int mouseX, int mouseY)
+	public void drawBackground(PoseStack matrices, int mouseX, int mouseY)
 	{
 		bindCommonTexture();
-		this.gui.drawTexturedRect(this.x, this.y, this.width, this.height, 96.0, 128.0);
+		this.gui.drawTexturedRect(matrices, this.x, this.y, this.width, this.height, 96.0, 128.0);
 	}
 
 	@Override
-	protected List<String> getToolTip()
+	protected List<Component> getToolTip()
 	{
-		List<String> ret = super.getToolTip();
-		ret.add(Localization.translate("ic2.generic.text.upgrade"));
+		List<Component> ret = super.getToolTip();
+		ret.add(Component.m_237115_("ic2.generic.text.upgrade"));
 
 		for (ItemStack itemstack : this.compatibleUpgrades)
 		{
-			ret.add(itemstack.getDisplayName());
+			ret.add(itemstack.m_41786_());
 		}
 
 		return ret;

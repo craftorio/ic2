@@ -1,12 +1,12 @@
 package ic2.core.gui;
 
-import ic2.core.GuiIC2;
+import ic2.core.Ic2Gui;
 
 public class StickyVanillaButton extends VanillaButton
 {
 	protected boolean isOn = false;
 
-	public StickyVanillaButton(GuiIC2<?> gui, int x, int y, int width, int height, IClickHandler handler)
+	public StickyVanillaButton(Ic2Gui<?> gui, int x, int y, int width, int height, IClickHandler handler)
 	{
 		super(gui, x, y, width, height, handler);
 	}

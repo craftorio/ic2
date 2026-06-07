@@ -2,8 +2,8 @@ package ic2.core.slot;
 
 import ic2.core.block.invslot.InvSlot;
 import ic2.core.util.StackUtil;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 
 public class SlotInvSlotReadOnly extends SlotInvSlot
 {
@@ -13,24 +13,23 @@ public class SlotInvSlotReadOnly extends SlotInvSlot
 	}
 
 	@Override
-	public boolean isItemValid(ItemStack stack)
+	public boolean m_5857_(ItemStack stack)
 	{
 		return false;
 	}
 
 	@Override
-	public ItemStack onTake(EntityPlayer player, ItemStack stack)
+	public void m_142406_(Player player, ItemStack stack)
 	{
-		return stack;
 	}
 
-	public boolean canTakeStack(EntityPlayer player)
+	public boolean m_8010_(Player player)
 	{
 		return false;
 	}
 
 	@Override
-	public ItemStack decrStackSize(int par1)
+	public ItemStack m_6201_(int par1)
 	{
 		return StackUtil.emptyStack;
 	}

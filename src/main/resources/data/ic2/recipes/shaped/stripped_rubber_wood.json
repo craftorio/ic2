@@ -1,0 +1,16 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "LL",
+    "LL"
+  ],
+  "key": {
+    "L": {
+      "item": "ic2:stripped_rubber_log"
+    }
+  },
+  "result": {
+    "item": "ic2:stripped_rubber_wood",
+    "count": 3
+  }
+}

@@ -3,108 +3,178 @@ package ic2.core.item.tool;
 import ic2.api.item.ElectricItem;
 import ic2.api.item.IElectricItem;
 import ic2.api.item.IItemHudInfo;
+import ic2.api.network.INetworkItemEventListener;
 import ic2.core.IC2;
-import ic2.core.audio.AudioSource;
-import ic2.core.audio.PositionSpec;
 import ic2.core.init.Localization;
-import ic2.core.item.BaseElectricItem;
 import ic2.core.item.ElectricItemManager;
-import ic2.core.item.IPseudoDamageItem;
-import ic2.core.item.ItemToolIC2;
-import ic2.core.ref.ItemName;
-import ic2.core.util.LogCategory;
+import ic2.core.item.ElectricItemTooltipHandler;
+import ic2.core.ref.Ic2BlockTags;
+import ic2.core.ref.Ic2SoundEvents;
+import ic2.core.sound.Sound;
 import ic2.core.util.StackUtil;
+import ic2.core.util.Util;
 
+import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.EntityEquipmentSlot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.NonNullList;
+import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.TagKey;
+import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.DiggerItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Tier;
+import net.minecraft.world.item.Tiers;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.Item.Properties;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
 
-public abstract class ItemElectricTool extends ItemToolIC2 implements IPseudoDamageItem, IElectricItem, IItemHudInfo
+public abstract class ItemElectricTool extends DiggerItem implements IElectricItem, INetworkItemEventListener, IItemHudInfo
 {
-	public final double operationEnergyCost;
+	public double operationEnergyCost;
+	private final Collection<TagKey<Block>> effectiveBlocks;
 	public int maxCharge;
 	public int transferLimit;
 	public int tier;
-	protected AudioSource audioSource;
+	protected Sound idleSound;
+	protected Sound startSound;
+	protected Sound stopSound;
 	protected boolean wasEquipped;
 
-	protected ItemElectricTool(ItemName name, int operationEnergyCost)
+	protected ItemElectricTool(Properties settings, int operationEnergyCost)
 	{
-		this(name, operationEnergyCost, HarvestLevel.Iron, Collections.emptySet());
+		this(settings, operationEnergyCost, Tiers.IRON, Collections.emptyList());
 	}
 
-	protected ItemElectricTool(ItemName name, int operationEnergyCost, HarvestLevel harvestLevel, Set<? extends IToolClass> toolClasses)
+	protected ItemElectricTool(Properties settings, int operationEnergyCost, Tier material, Collection<TagKey<Block>> effectiveBlocks)
 	{
-		this(name, 2.0F, -3.0F, operationEnergyCost, harvestLevel, toolClasses, new HashSet<>());
+		this(settings, 2.0F, -3.0F, operationEnergyCost, material, effectiveBlocks);
 	}
 
 	private ItemElectricTool(
-		ItemName name,
-		float damage,
-		float speed,
-		int operationEnergyCost,
-		HarvestLevel harvestLevel,
-		Set<? extends IToolClass> toolClasses,
-		Set<Block> mineableBlocks
+		Properties settings, float attackDamage, float attackSpeed, int operationEnergyCost, Tier material, Collection<TagKey<Block>> effectiveBlocks
 	)
 	{
-		super(name, damage, speed, harvestLevel, toolClasses, mineableBlocks);
+		super(attackDamage, attackSpeed, material, effectiveBlocks.isEmpty() ? Ic2BlockTags.EMPTY : effectiveBlocks.iterator().next(), settings);
 		this.operationEnergyCost = operationEnergyCost;
-		this.setMaxDamage(27);
-		this.setNoRepair();
+		this.effectiveBlocks = effectiveBlocks;
 	}
 
-	public EnumActionResult onItemUse(
-		EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float xOffset, float yOffset, float zOffset
-	)
+	public static boolean consumeEnergy(ItemStack stack, double amount, int tier, LivingEntity entity)
 	{
-		ElectricItem.manager.use(StackUtil.get(player, hand), 0.0, player);
-		return super.onItemUse(player, world, pos, hand, side, xOffset, yOffset, zOffset);
-	}
+		if (!(stack.getItem() instanceof IElectricItem))
+		{
+			return false;
+		}
 
-	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand)
-	{
-		ElectricItem.manager.use(StackUtil.get(player, hand), 0.0, player);
-		return super.onItemRightClick(world, player, hand);
+		if (!ElectricItem.manager.canUse(stack, amount))
+		{
+			return false;
+		}
+
+		boolean isConsumed;
+		if (entity == null)
+		{
+			isConsumed = Util.isSimilar(ElectricItem.manager.discharge(stack, amount, tier, true, false, false), amount);
+		} else
+		{
+			isConsumed = ElectricItem.manager.use(stack, amount, entity);
+		}
+
+		if (ElectricItem.manager.getCharge(stack) <= 0.0 && entity instanceof Player player)
+		{
+			IC2.network.get(true).initiateItemEvent(player, stack, 0, true);
+		}
+
+		return isConsumed;
 	}
 
 	@Override
-	public float getDestroySpeed(ItemStack stack, IBlockState state)
+	public void onNetworkEvent(ItemStack stack, Player player, int event)
 	{
-		return !ElectricItem.manager.canUse(stack, this.operationEnergyCost) ? 1.0F : super.getDestroySpeed(stack, state);
+		player.m_5496_(this.getShutdownSound(), 1.0F, 1.0F);
 	}
 
-	public boolean hitEntity(ItemStack itemstack, EntityLivingBase entityliving, EntityLivingBase entityliving1)
+	public boolean consumeEnergy(ItemStack stack, double amount, LivingEntity entity)
+	{
+		return consumeEnergy(stack, amount, this.tier, entity);
+	}
+
+	@Override
+	public List<String> getHudInfo(ItemStack stack, boolean advanced)
+	{
+		List<String> info = new LinkedList<>();
+		info.add(ElectricItem.manager.getToolTip(stack));
+		info.add(Localization.translate("ic2.item.tooltip.PowerTier", this.tier));
+		return info;
+	}
+
+	public InteractionResult m_6225_(UseOnContext context)
+	{
+		ElectricItem.manager.use(context.m_43722_(), 0.0, context.m_43723_());
+		return super.m_6225_(context);
+	}
+
+	public InteractionResultHolder<ItemStack> m_7203_(Level world, Player player, InteractionHand hand)
+	{
+		ElectricItem.manager.use(StackUtil.get(player, hand), 0.0, player);
+		return super.m_7203_(world, player, hand);
+	}
+
+	public float m_8102_(ItemStack stack, BlockState state)
+	{
+		return this.isEffective(state) && ElectricItem.manager.canUse(stack, this.operationEnergyCost) ? this.f_40980_ : 1.0F;
+	}
+
+	public boolean m_8096_(BlockState state)
+	{
+		int level = this.m_43314_().m_6604_();
+		return (level >= 3 || !state.m_204336_(BlockTags.f_144284_))
+			&& (level >= 2 || !state.m_204336_(BlockTags.f_144285_))
+			&& (level >= 1 || !state.m_204336_(BlockTags.f_144286_))
+			? this.isEffective(state)
+			: false;
+	}
+
+	private boolean isEffective(BlockState state)
+	{
+		for (TagKey<Block> tag : this.effectiveBlocks)
+		{
+			if (state.m_204336_(tag))
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public boolean m_7579_(ItemStack itemstack, LivingEntity entityliving, LivingEntity entityliving1)
 	{
 		return true;
 	}
 
-	public int getItemEnchantability()
+	public int m_6473_()
 	{
 		return 0;
-	}
-
-	public boolean isRepairable()
-	{
-		return false;
 	}
 
 	@Override
@@ -131,47 +201,32 @@ public abstract class ItemElectricTool extends ItemToolIC2 implements IPseudoDam
 		return this.transferLimit;
 	}
 
-	public boolean onBlockDestroyed(ItemStack stack, World world, IBlockState state, BlockPos pos, EntityLivingBase user)
+	public boolean m_6813_(ItemStack stack, Level world, BlockState state, BlockPos pos, LivingEntity user)
 	{
-		if (state.getBlockHardness(world, pos) != 0.0F)
+		if (state.getDestroySpeed(world, pos) != 0.0F)
 		{
-			if (user != null)
-			{
-				ElectricItem.manager.use(stack, this.operationEnergyCost, user);
-			} else
-			{
-				ElectricItem.manager.discharge(stack, this.operationEnergyCost, this.tier, true, false, false);
-			}
+			this.consumeEnergy(stack, this.operationEnergyCost, user);
 		}
 
 		return true;
 	}
 
-	public boolean getIsRepairable(ItemStack par1ItemStack, ItemStack par2ItemStack)
+	public boolean m_8120_(ItemStack stack)
 	{
 		return false;
 	}
 
-	public boolean isBookEnchantable(ItemStack itemstack1, ItemStack itemstack2)
+	public void m_6787_(CreativeModeTab tab, NonNullList<ItemStack> subItems)
 	{
-		return false;
-	}
-
-	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems)
-	{
-		if (this.isInCreativeTab(tab))
+		if (this.m_220152_(tab))
 		{
 			ElectricItemManager.addChargeVariants(this, subItems);
 		}
 	}
 
-	@Override
-	public List<String> getHudInfo(ItemStack stack, boolean advanced)
+	public void m_7373_(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag context)
 	{
-		List<String> info = new LinkedList<>();
-		info.add(ElectricItem.manager.getToolTip(stack));
-		info.add(Localization.translate("ic2.item.tooltip.PowerTier", this.tier));
-		return info;
+		ElectricItemTooltipHandler.addTooltip(stack, tooltip);
 	}
 
 	protected ItemStack getItemStack(double charge)
@@ -181,100 +236,126 @@ public abstract class ItemElectricTool extends ItemToolIC2 implements IPseudoDam
 		return ret;
 	}
 
-	public void onUpdate(ItemStack itemstack, World world, Entity entity, int i, boolean flag)
+	public void m_6883_(ItemStack itemstack, Level world, Entity entity, int i, boolean flag)
 	{
-		boolean isEquipped = flag && entity instanceof EntityLivingBase;
-		if (IC2.platform.isRendering())
+		boolean isEquipped = flag && entity instanceof LivingEntity;
+		if (IC2.sideProxy.isRendering())
 		{
 			if (isEquipped && !this.wasEquipped)
 			{
-				if (this.audioSource == null)
+				this.initSound((LivingEntity) entity, itemstack);
+				if (this.idleSound != null)
 				{
-					String sound = this.getIdleSound((EntityLivingBase) entity, itemstack);
-					if (sound != null)
-					{
-						this.audioSource = IC2.audioManager.createSource(entity, PositionSpec.Hand, sound, true, false, IC2.audioManager.getDefaultVolume());
-					}
+					this.idleSound.play();
 				}
 
-				if (this.audioSource != null)
+				if (this.startSound != null)
 				{
-					this.audioSource.play();
+					this.startSound.playOnce();
 				}
-
-				String initSound = this.getStartSound((EntityLivingBase) entity, itemstack);
-				if (initSound != null)
-				{
-					IC2.audioManager.playOnce(entity, PositionSpec.Hand, initSound, true, IC2.audioManager.getDefaultVolume());
-				}
-			} else if (!isEquipped && this.audioSource != null)
+			} else if (!isEquipped && this.idleSound != null && entity instanceof LivingEntity theEntity)
 			{
-				if (entity instanceof EntityLivingBase)
+				ItemStack stack = theEntity.m_6844_(EquipmentSlot.MAINHAND);
+				if (stack == null || stack.getItem() != this || stack == itemstack)
 				{
-					EntityLivingBase theEntity = (EntityLivingBase) entity;
-					ItemStack stack = theEntity.getItemStackFromSlot(EntityEquipmentSlot.MAINHAND);
-					if (stack == null || stack.getItem() != this || stack == itemstack)
+					if (this.stopSound != null)
 					{
-						this.removeAudioSource();
-						String sound = this.getStopSound(theEntity, itemstack);
-						if (sound != null)
-						{
-							IC2.audioManager.playOnce(entity, PositionSpec.Hand, sound, true, IC2.audioManager.getDefaultVolume());
-						}
+						this.stopSound.playOnce();
 					}
+
+					this.clearSound(theEntity);
 				}
-			} else if (this.audioSource != null)
-			{
-				this.audioSource.updatePosition();
 			}
 
 			this.wasEquipped = isEquipped;
 		}
 	}
 
-	protected void removeAudioSource()
+	protected void initSound(LivingEntity entity, ItemStack stack)
 	{
-		if (this.audioSource != null)
+		SoundEvent idleEvent;
+		if (this.idleSound == null && (idleEvent = this.getIdleSound(entity, stack)) != null)
 		{
-			this.audioSource.stop();
-			this.audioSource.remove();
-			this.audioSource = null;
+			this.idleSound = IC2.soundManager.createSound(entity, idleEvent, SoundSource.PLAYERS, entity, 1.0F, 1.0F);
+		}
+
+		SoundEvent startEvent;
+		if (this.startSound == null && (startEvent = this.getStartSound(entity, stack)) != null)
+		{
+			this.stopSound = IC2.soundManager.createSound(entity, startEvent, SoundSource.PLAYERS, entity, 1.0F, 1.0F);
+		}
+
+		SoundEvent stopEvent;
+		if (this.stopSound == null && (stopEvent = this.getStopSound(entity, stack)) != null)
+		{
+			this.stopSound = IC2.soundManager.createSound(entity, stopEvent, SoundSource.PLAYERS, entity, 1.0F, 1.0F);
 		}
 	}
 
-	public boolean onDroppedByPlayer(ItemStack item, EntityPlayer player)
+	protected void clearSound(LivingEntity entity)
 	{
-		this.removeAudioSource();
+		if (this.idleSound != null)
+		{
+			IC2.soundManager.removeSound(entity, this.idleSound);
+			this.idleSound = null;
+		}
+
+		if (this.startSound != null)
+		{
+			IC2.soundManager.removeSound(entity, this.startSound);
+			this.startSound = null;
+		}
+
+		if (this.stopSound != null)
+		{
+			IC2.soundManager.removeSound(entity, this.stopSound);
+			this.stopSound = null;
+		}
+	}
+
+	public boolean onDroppedByPlayer(ItemStack stack, Player player)
+	{
+		this.clearSound(player);
 		return true;
 	}
 
-	protected String getIdleSound(EntityLivingBase player, ItemStack stack)
+	protected SoundEvent getIdleSound(LivingEntity player, ItemStack stack)
 	{
 		return null;
 	}
 
-	protected String getStopSound(EntityLivingBase player, ItemStack stack)
+	protected SoundEvent getStopSound(LivingEntity player, ItemStack stack)
 	{
 		return null;
 	}
 
-	protected String getStartSound(EntityLivingBase player, ItemStack stack)
+	protected SoundEvent getStartSound(LivingEntity player, ItemStack stack)
 	{
 		return null;
 	}
 
-	public void setDamage(ItemStack stack, int damage)
+	public SoundEvent getShutdownSound()
 	{
-		int prev = this.getDamage(stack);
-		if (damage != prev && BaseElectricItem.logIncorrectItemDamaging)
-		{
-			IC2.log.warn(LogCategory.Armor, new Throwable(), "Detected invalid armor damage application (%d):", damage - prev);
-		}
+		return Ic2SoundEvents.ITEM_ELECTRIC_SHUTDOWN;
 	}
 
-	@Override
-	public void setStackDamage(ItemStack stack, int damage)
+	public boolean m_142522_(ItemStack stack)
 	{
-		super.setDamage(stack, damage);
+		return true;
+	}
+
+	public int m_142158_(ItemStack stack)
+	{
+		return (int) Math.round(ElectricItem.manager.getChargeLevel(stack) * 13.0);
+	}
+
+	public int m_142159_(ItemStack stack)
+	{
+		return Mth.m_14169_((float) (ElectricItem.manager.getChargeLevel(stack) / 3.0), 1.0F, 1.0F);
+	}
+
+	public boolean canUse(ItemStack stack)
+	{
+		return ElectricItem.manager.canUse(stack, this.operationEnergyCost);
 	}
 }

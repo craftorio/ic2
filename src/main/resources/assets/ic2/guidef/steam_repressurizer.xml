@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gui width="176" height="166">
-    <image x="0" y="0" width="176" height="166" src="textures/gui/GUISteamRepressurizer"/>
+    <image x="0" y="0" width="176" height="166" src="textures/gui/guisteamrepressurizer"/>
     <text y="6" align="center">%name%</text>
 
     <fluidtank name="input" type="plain" x="15" y="19" width="38" height="47"/>

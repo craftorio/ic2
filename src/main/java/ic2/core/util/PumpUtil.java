@@ -1,97 +1,98 @@
 package ic2.core.util;
 
+import ic2.core.fluid.FluidHandler;
+
 import java.util.HashSet;
 import java.util.Set;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockLiquid;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.fluids.IFluidBlock;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.BlockPos.MutableBlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class PumpUtil
 {
-	private static int moveUp(World world, MutableBlockPos pos)
+	private static int moveUp(Level world, MutableBlockPos pos)
 	{
-		pos.setPos(pos.getX(), pos.getY() + 1, pos.getZ());
+		pos.set(pos.getX(), pos.getY() + 1, pos.getZ());
 		int newDecay = getFlowDecay(world, pos);
 		if (newDecay >= 0)
 		{
 			return newDecay;
 		}
 
-		pos.setPos(pos.getX() + 1, pos.getY(), pos.getZ());
+		pos.set(pos.getX() + 1, pos.getY(), pos.getZ());
 		newDecay = getFlowDecay(world, pos);
 		if (newDecay >= 0)
 		{
 			return newDecay;
 		}
 
-		pos.setPos(pos.getX() - 2, pos.getY(), pos.getZ());
+		pos.set(pos.getX() - 2, pos.getY(), pos.getZ());
 		newDecay = getFlowDecay(world, pos);
 		if (newDecay >= 0)
 		{
 			return newDecay;
 		}
 
-		pos.setPos(pos.getX() + 1, pos.getY(), pos.getZ() + 1);
+		pos.set(pos.getX() + 1, pos.getY(), pos.getZ() + 1);
 		newDecay = getFlowDecay(world, pos);
 		if (newDecay >= 0)
 		{
 			return newDecay;
 		}
 
-		pos.setPos(pos.getX(), pos.getY(), pos.getZ() - 2);
+		pos.set(pos.getX(), pos.getY(), pos.getZ() - 2);
 		newDecay = getFlowDecay(world, pos);
 		if (newDecay >= 0)
 		{
 			return newDecay;
 		}
 
-		pos.setPos(pos.getX(), pos.getY() - 1, pos.getZ() + 1);
+		pos.set(pos.getX(), pos.getY() - 1, pos.getZ() + 1);
 		return -1;
 	}
 
-	private static int moveSideways(World world, MutableBlockPos pos, int decay)
+	private static int moveSideways(Level world, MutableBlockPos pos, int decay)
 	{
-		pos.setPos(pos.getX() - 1, pos.getY(), pos.getZ());
+		pos.set(pos.getX() - 1, pos.getY(), pos.getZ());
 		int newDecay = getFlowDecay(world, pos);
 		if (newDecay >= 0 && newDecay < decay)
 		{
 			return newDecay;
 		}
 
-		pos.setPos(pos.getX() + 1, pos.getY(), pos.getZ() + 1);
+		pos.set(pos.getX() + 1, pos.getY(), pos.getZ() + 1);
 		newDecay = getFlowDecay(world, pos);
 		if (newDecay >= 0 && newDecay < decay)
 		{
 			return newDecay;
 		}
 
-		pos.setPos(pos.getX(), pos.getY(), pos.getZ() - 2);
+		pos.set(pos.getX(), pos.getY(), pos.getZ() - 2);
 		newDecay = getFlowDecay(world, pos);
 		if (newDecay >= 0 && newDecay < decay)
 		{
 			return newDecay;
 		}
 
-		pos.setPos(pos.getX() + 1, pos.getY(), pos.getZ() + 1);
+		pos.set(pos.getX() + 1, pos.getY(), pos.getZ() + 1);
 		newDecay = getFlowDecay(world, pos);
 		if (newDecay >= 0 && newDecay < decay)
 		{
 			return newDecay;
 		}
 
-		pos.setPos(pos.getX() - 1, pos.getY(), pos.getZ());
+		pos.set(pos.getX() - 1, pos.getY(), pos.getZ());
 		return -1;
 	}
 
-	public static BlockPos searchFluidSource(World world, BlockPos startPos)
+	public static BlockPos searchFluidSource(Level world, BlockPos startPos)
 	{
 		MutableBlockPos pos = new MutableBlockPos();
-		pos.setPos(startPos.getX(), startPos.getY(), startPos.getZ());
+		pos.set(startPos.getX(), startPos.getY(), startPos.getZ());
 		int decay = getFlowDecay(world, pos);
 
 		for (int i = 0; i < 64; i++)
@@ -114,12 +115,12 @@ public class PumpUtil
 
 		while (i < 64)
 		{
-			label88:
+			label85:
 			{
-				label106:
+				label103:
 				{
 					visited.add(new BlockPos(pos));
-					pos.setPos(pos.getX() - 1, pos.getY(), pos.getZ());
+					pos.set(pos.getX() - 1, pos.getY(), pos.getZ());
 					if (!visited.contains(pos))
 					{
 						int newDecay = getFlowDecay(world, pos);
@@ -129,11 +130,11 @@ public class PumpUtil
 							{
 								return pos;
 							}
-							break label106;
+							break label103;
 						}
 					}
 
-					pos.setPos(pos.getX() + 1, pos.getY(), pos.getZ() + 1);
+					pos.set(pos.getX() + 1, pos.getY(), pos.getZ() + 1);
 					if (!visited.contains(pos))
 					{
 						int newDecay = getFlowDecay(world, pos);
@@ -143,11 +144,11 @@ public class PumpUtil
 							{
 								return pos;
 							}
-							break label106;
+							break label103;
 						}
 					}
 
-					pos.setPos(pos.getX(), pos.getY(), pos.getZ() - 2);
+					pos.set(pos.getX(), pos.getY(), pos.getZ() - 2);
 					if (!visited.contains(pos))
 					{
 						int newDecay = getFlowDecay(world, pos);
@@ -157,20 +158,20 @@ public class PumpUtil
 							{
 								return pos;
 							}
-							break label106;
+							break label103;
 						}
 					}
 
-					pos.setPos(pos.getX() + 1, pos.getY(), pos.getZ() + 1);
+					pos.set(pos.getX() + 1, pos.getY(), pos.getZ() + 1);
 					if (visited.contains(pos))
 					{
-						break label88;
+						break label85;
 					}
 
 					int newDecay = getFlowDecay(world, pos);
 					if (newDecay < 0)
 					{
-						break label88;
+						break label85;
 					}
 
 					if (newDecay == 0)
@@ -183,7 +184,7 @@ public class PumpUtil
 				continue;
 			}
 
-			pos.setPos(pos.getX() - 1, pos.getY(), pos.getZ());
+			pos.set(pos.getX() - 1, pos.getY(), pos.getZ());
 			break;
 		}
 
@@ -193,8 +194,8 @@ public class PumpUtil
 		{
 			for (int iz = -2; iz <= 2; iz++)
 			{
-				cPos.setPos(pos.getX() + ix, pos.getY(), pos.getZ() + iz);
-				IBlockState state = world.getBlockState(cPos);
+				cPos.set(pos.getX() + ix, pos.getY(), pos.getZ() + iz);
+				BlockState state = world.getBlockState(cPos);
 				decay = getFlowDecay(state, world, cPos);
 				if (decay >= 0)
 				{
@@ -203,12 +204,9 @@ public class PumpUtil
 						return cPos;
 					}
 
-					if (decay >= 1 && decay < 7 && state.getBlock() instanceof BlockLiquid)
+					if (decay >= 7 || !(state.getBlock() instanceof LiquidBlock))
 					{
-						world.setBlockState(cPos, state.withProperty(BlockLiquid.LEVEL, decay + 1));
-					} else
-					{
-						world.setBlockToAir(cPos);
+						world.removeBlock(cPos, false);
 					}
 				}
 			}
@@ -217,28 +215,22 @@ public class PumpUtil
 		return null;
 	}
 
-	protected static int getFlowDecay(World world, BlockPos pos)
+	protected static int getFlowDecay(Level world, BlockPos pos)
 	{
-		IBlockState state = world.getBlockState(pos);
+		BlockState state = world.getBlockState(pos);
 		return getFlowDecay(state, world, pos);
 	}
 
-	protected static int getFlowDecay(IBlockState state, World world, BlockPos pos)
+	protected static int getFlowDecay(BlockState state, Level world, BlockPos pos)
 	{
 		Block block = state.getBlock();
-		if (block instanceof IFluidBlock)
+		int level = FluidHandler.getWorldFluidLevel(state, world, pos);
+		if (level >= 0)
 		{
-			IFluidBlock fb = (IFluidBlock) block;
-			if (fb.canDrain(world, pos))
-			{
-				return 0;
-			}
-
-			float level = Math.abs(fb.getFilledPercentage(world, pos));
-			return 7 - Util.limit(Math.round(6.0F * level), 0, 6);
+			return level;
 		} else
 		{
-			return block instanceof BlockLiquid ? (Integer) state.getValue(BlockLiquid.LEVEL) : -1;
+			return block instanceof LiquidBlock ? (Integer) state.getValue(LiquidBlock.f_54688_) : -1;
 		}
 	}
 

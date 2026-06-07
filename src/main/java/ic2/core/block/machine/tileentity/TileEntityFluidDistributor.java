@@ -3,17 +3,20 @@ package ic2.core.block.machine.tileentity;
 import ic2.api.network.INetworkClientTileEntityEventListener;
 import ic2.core.ContainerBase;
 import ic2.core.IHasGui;
-import ic2.core.block.TileEntityInventory;
 import ic2.core.block.comp.Fluids;
 import ic2.core.block.invslot.InvSlot;
 import ic2.core.block.invslot.InvSlotConsumableLiquid;
 import ic2.core.block.invslot.InvSlotConsumableLiquidByTank;
 import ic2.core.block.invslot.InvSlotOutput;
 import ic2.core.block.machine.container.ContainerFluidDistributor;
-import ic2.core.block.machine.gui.GuiFluidDistributor;
+import ic2.core.block.tileentity.TileEntityInventory;
+import ic2.core.fluid.Ic2FluidStack;
+import ic2.core.network.GrowingBuffer;
 import ic2.core.network.GuiSynced;
 import ic2.core.profile.NotClassic;
+import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.util.LiquidUtil;
+import ic2.core.util.Util;
 
 import java.util.Collections;
 import java.util.EnumMap;
@@ -22,14 +25,14 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.world.World;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 
 @NotClassic
 public class TileEntityFluidDistributor extends TileEntityInventory implements IHasGui, INetworkClientTileEntityEventListener
@@ -40,8 +43,14 @@ public class TileEntityFluidDistributor extends TileEntityInventory implements I
 	public final Fluids.InternalFluidTank fluidTank;
 	protected final Fluids fluids = this.addComponent(new Fluids(this));
 
-	public TileEntityFluidDistributor()
+	public TileEntityFluidDistributor(BlockPos pos, BlockState state)
 	{
+		this(Ic2BlockEntities.FLUID_DISTRIBUTOR, pos, state);
+	}
+
+	protected TileEntityFluidDistributor(BlockEntityType<? extends TileEntityFluidDistributor> type, BlockPos pos, BlockState state)
+	{
+		super(type, pos, state);
 		this.fluidTank = this.fluids.addTank("fluidTank", 1000);
 		this.inputSlot = new InvSlotConsumableLiquidByTank(
 			this, "inputSlot", InvSlot.Access.I, 1, InvSlot.InvSide.BOTTOM, InvSlotConsumableLiquid.OpType.Fill, this.fluidTank
@@ -64,15 +73,15 @@ public class TileEntityFluidDistributor extends TileEntityInventory implements I
 	}
 
 	@Override
-	public void setFacing(EnumFacing facing)
+	protected void setFacing(Level world, Direction facing)
 	{
-		super.setFacing(facing);
+		super.setFacing(world, facing);
 		this.updateConnectivity();
 	}
 
 	protected void updateConnectivity()
 	{
-		EnumSet<EnumFacing> acceptingSides = EnumSet.of(this.getFacing());
+		EnumSet<Direction> acceptingSides = EnumSet.of(this.getFacing());
 		if (this.getActive())
 		{
 			acceptingSides = EnumSet.complementOf(acceptingSides);
@@ -94,33 +103,33 @@ public class TileEntityFluidDistributor extends TileEntityInventory implements I
 
 	protected void moveFluid()
 	{
-		World world = this.getWorld();
+		Level world = this.getLevel();
 		if (this.getActive())
 		{
-			TileEntity target = world.getTileEntity(this.pos.offset(this.getFacing()));
-			EnumFacing side = this.getFacing().getOpposite();
+			BlockEntity target = world.getBlockEntity(this.worldPosition.relative(this.getFacing()));
+			Direction side = this.getFacing().m_122424_();
 			if (LiquidUtil.isFluidTile(target, side))
 			{
-				int amount = LiquidUtil.fillTile(target, side, this.fluidTank.getFluid(), false);
+				int amount = LiquidUtil.fillTile(target, side, this.fluidTank.getFluidStack(), false);
 				if (amount > 0)
 				{
-					this.fluidTank.drainInternal(amount, true);
+					this.fluidTank.drainMbUnchecked(amount, false);
 				}
 			}
 		} else
 		{
-			Map<EnumFacing, TileEntity> acceptingNeighbors = new EnumMap<>(EnumFacing.class);
+			Map<Direction, BlockEntity> acceptingNeighbors = new EnumMap<>(Direction.class);
 			int acceptedVolume = 0;
 
-			for (EnumFacing dir : EnumFacing.VALUES)
+			for (Direction dir : Util.ALL_DIRS)
 			{
 				if (dir != this.getFacing())
 				{
-					TileEntity target = world.getTileEntity(this.pos.offset(dir));
-					EnumFacing side = dir.getOpposite();
+					BlockEntity target = world.getBlockEntity(this.worldPosition.relative(dir));
+					Direction side = dir.m_122424_();
 					if (LiquidUtil.isFluidTile(target, side))
 					{
-						int amount = LiquidUtil.fillTile(target, side, this.fluidTank.getFluid(), true);
+						int amount = LiquidUtil.fillTile(target, side, this.fluidTank.getFluidStack(), true);
 						if (amount > 0)
 						{
 							acceptingNeighbors.put(dir, target);
@@ -141,54 +150,54 @@ public class TileEntityFluidDistributor extends TileEntityInventory implements I
 				amount /= acceptingNeighbors.size();
 				if (amount <= 0)
 				{
-					for (Entry<EnumFacing, TileEntity> entry : acceptingNeighbors.entrySet())
+					for (Entry<Direction, BlockEntity> entry : acceptingNeighbors.entrySet())
 					{
-						TileEntity target = entry.getValue();
-						EnumFacing side = entry.getKey().getOpposite();
-						FluidStack fs = this.fluidTank.getFluid();
+						BlockEntity target = entry.getValue();
+						Direction side = entry.getKey().m_122424_();
+						Ic2FluidStack fs = this.fluidTank.getFluidStack();
 						if (fs == null)
 						{
 							return;
 						}
 
 						fs = fs.copy();
-						fs.amount = Math.min(acceptedVolume, fs.amount);
-						if (fs.amount <= 0)
+						fs.setAmountMb(Math.min(acceptedVolume, fs.getAmountMb()));
+						if (fs.isEmpty())
 						{
 							return;
 						}
 
 						int cAmount = LiquidUtil.fillTile(target, side, fs, false);
-						this.fluidTank.drainInternal(cAmount, true);
+						this.fluidTank.drainMbUnchecked(cAmount, false);
 						acceptedVolume -= cAmount;
 					}
 					break;
 				}
 
-				Iterator<Entry<EnumFacing, TileEntity>> it = acceptingNeighbors.entrySet().iterator();
+				Iterator<Entry<Direction, BlockEntity>> it = acceptingNeighbors.entrySet().iterator();
 
 				while (it.hasNext())
 				{
-					Entry<EnumFacing, TileEntity> entry = it.next();
-					TileEntity target = entry.getValue();
-					EnumFacing side = entry.getKey().getOpposite();
-					FluidStack fs = this.fluidTank.getFluid();
+					Entry<Direction, BlockEntity> entry = it.next();
+					BlockEntity target = entry.getValue();
+					Direction side = entry.getKey().m_122424_();
+					Ic2FluidStack fs = this.fluidTank.getFluidStack();
 					if (fs == null)
 					{
 						break;
 					}
 
 					fs = fs.copy();
-					if (fs.amount <= 0)
+					if (fs.isEmpty())
 					{
 						break;
 					}
 
-					fs.amount = Math.min(amount, fs.amount);
+					fs.setAmountMb(Math.min(amount, fs.getAmountMb()));
 					int cAmount = LiquidUtil.fillTile(target, side, fs, false);
-					this.fluidTank.drainInternal(cAmount, true);
+					this.fluidTank.drainMbUnchecked(cAmount, false);
 					acceptedVolume -= cAmount;
-					if (cAmount < fs.amount)
+					if (cAmount < fs.getAmountMb())
 					{
 						it.remove();
 					}
@@ -198,26 +207,20 @@ public class TileEntityFluidDistributor extends TileEntityInventory implements I
 	}
 
 	@Override
-	public void onNetworkEvent(EntityPlayer player, int event)
+	public void onNetworkEvent(Player player, int event)
 	{
 		this.setActive(!this.getActive());
 	}
 
 	@Override
-	public ContainerBase<?> getGuiContainer(EntityPlayer player)
+	public ContainerBase<?> createServerScreenHandler(int syncId, Player player)
 	{
-		return new ContainerFluidDistributor(player, this);
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
-	{
-		return new GuiFluidDistributor(new ContainerFluidDistributor(player, this));
+		return new ContainerFluidDistributor(syncId, player.getInventory(), this);
 	}
 
 	@Override
-	public void onGuiClosed(EntityPlayer player)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
+		return new ContainerFluidDistributor(syncId, inventory, this);
 	}
 }

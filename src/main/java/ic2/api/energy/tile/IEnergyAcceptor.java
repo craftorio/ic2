@@ -1,8 +1,8 @@
 package ic2.api.energy.tile;
 
-import net.minecraft.util.EnumFacing;
+import net.minecraft.core.Direction;
 
 public interface IEnergyAcceptor extends IEnergyTile
 {
-	boolean acceptsEnergyFrom(IEnergyEmitter var1, EnumFacing var2);
+	boolean acceptsEnergyFrom(IEnergyEmitter var1, Direction var2);
 }

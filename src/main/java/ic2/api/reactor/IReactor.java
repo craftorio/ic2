@@ -1,12 +1,12 @@
 package ic2.api.reactor;
 
 import ic2.api.info.ILocatable;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 public interface IReactor extends ILocatable
 {
-	TileEntity getCoreTe();
+	BlockEntity getCoreTe();
 
 	int getHeat();
 

@@ -1,0 +1,19 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "ILI",
+    "ILI",
+    "ILI"
+  ],
+  "key": {
+    "I": {
+      "tag": "forge:plates/iron"
+    },
+    "L": {
+      "tag": "forge:plates/lead"
+    }
+  },
+  "result": {
+    "item": "ic2:reinforced_door"
+  }
+}

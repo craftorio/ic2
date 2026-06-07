@@ -13,11 +13,11 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 
 public class InvSlot implements Iterable<ItemStack>
 {
@@ -60,14 +60,14 @@ public class InvSlot implements Iterable<ItemStack>
 		this.preferredSide = InvSlot.InvSide.ANY;
 	}
 
-	public void readFromNbt(NBTTagCompound nbt)
+	public void readFromNbt(CompoundTag nbt)
 	{
 		this.clear();
-		NBTTagList contentsTag = nbt.getTagList("Contents", 10);
+		ListTag contentsTag = nbt.m_128437_("Contents", 10);
 
-		for (int i = 0; i < contentsTag.tagCount(); i++)
+		for (int i = 0; i < contentsTag.size(); i++)
 		{
-			NBTTagCompound contentTag = contentsTag.getCompoundTagAt(i);
+			CompoundTag contentTag = contentsTag.m_128728_(i);
 			int index = contentTag.getByte("Index") & 255;
 			if (index >= this.size())
 			{
@@ -81,7 +81,7 @@ public class InvSlot implements Iterable<ItemStack>
 					);
 			} else
 			{
-				ItemStack stack = new ItemStack(contentTag);
+				ItemStack stack = ItemStack.m_41712_(contentTag);
 				if (StackUtil.isEmpty(stack))
 				{
 					IC2.log
@@ -119,23 +119,23 @@ public class InvSlot implements Iterable<ItemStack>
 		this.onChanged();
 	}
 
-	public void writeToNbt(NBTTagCompound nbt)
+	public void writeToNbt(CompoundTag nbt)
 	{
-		NBTTagList contentsTag = new NBTTagList();
+		ListTag contentsTag = new ListTag();
 
 		for (int i = 0; i < this.contents.length; i++)
 		{
 			ItemStack content = this.contents[i];
 			if (!StackUtil.isEmpty(content))
 			{
-				NBTTagCompound contentTag = new NBTTagCompound();
-				contentTag.setByte("Index", (byte) i);
-				content.writeToNBT(contentTag);
-				contentsTag.appendTag(contentTag);
+				CompoundTag contentTag = new CompoundTag();
+				contentTag.putByte("Index", (byte) i);
+				content.m_41739_(contentTag);
+				contentsTag.add(contentTag);
 			}
 		}
 
-		nbt.setTag("Contents", contentsTag);
+		nbt.put("Contents", contentsTag);
 	}
 
 	public int size()
@@ -328,7 +328,7 @@ public class InvSlot implements Iterable<ItemStack>
 		for (int i = 0; i < this.contents.length; i++)
 		{
 			ItemStack content = this.contents[i];
-			ret[i] = StackUtil.isEmpty(content) ? StackUtil.emptyStack : content.copy();
+			ret[i] = StackUtil.isEmpty(content) ? StackUtil.emptyStack : content.m_41777_();
 		}
 
 		return ret;
@@ -347,7 +347,7 @@ public class InvSlot implements Iterable<ItemStack>
 		}
 	}
 
-	public void onPickupFromSlot(EntityPlayer player, ItemStack stack)
+	public void onPickupFromSlot(Player player, ItemStack stack)
 	{
 	}
 
@@ -371,33 +371,33 @@ public class InvSlot implements Iterable<ItemStack>
 
 	public enum InvSide
 	{
-		ANY(EnumFacing.DOWN, EnumFacing.UP, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.WEST, EnumFacing.EAST),
-		TOP(EnumFacing.UP),
-		BOTTOM(EnumFacing.DOWN),
-		SIDE(EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.WEST, EnumFacing.EAST),
+		ANY(Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST),
+		TOP(Direction.UP),
+		BOTTOM(Direction.DOWN),
+		SIDE(Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST),
 		NOTSIDE();
 
-		private final Set<EnumFacing> acceptedSides;
+		private Set<Direction> acceptedSides;
 
-		InvSide(EnumFacing... sides)
+		InvSide(Direction... sides)
 		{
 			if (sides.length == 0)
 			{
 				this.acceptedSides = Collections.emptySet();
 			} else
 			{
-				Set<EnumFacing> acceptedSides = EnumSet.noneOf(EnumFacing.class);
+				Set<Direction> acceptedSides = EnumSet.noneOf(Direction.class);
 				acceptedSides.addAll(Arrays.asList(sides));
 				this.acceptedSides = Collections.unmodifiableSet(acceptedSides);
 			}
 		}
 
-		public boolean matches(EnumFacing side)
+		public boolean matches(Direction side)
 		{
 			return this.acceptedSides.contains(side);
 		}
 
-		public Set<EnumFacing> getAcceptedSides()
+		public Set<Direction> getAcceptedSides()
 		{
 			return this.acceptedSides;
 		}

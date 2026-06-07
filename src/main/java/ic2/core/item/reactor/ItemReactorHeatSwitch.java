@@ -2,20 +2,20 @@ package ic2.core.item.reactor;
 
 import ic2.api.reactor.IReactor;
 import ic2.api.reactor.IReactorComponent;
-import ic2.core.ref.ItemName;
 
 import java.util.ArrayList;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item.Properties;
 
 public class ItemReactorHeatSwitch extends ItemReactorHeatStorage
 {
 	public final int switchSide;
 	public final int switchReactor;
 
-	public ItemReactorHeatSwitch(ItemName name, int heatStorage, int switchside, int switchreactor)
+	public ItemReactorHeatSwitch(Properties settings, int heatStorage, int switchside, int switchreactor)
 	{
-		super(name, heatStorage);
+		super(settings, heatStorage);
 		this.switchSide = switchside;
 		this.switchReactor = switchreactor;
 	}
@@ -145,9 +145,9 @@ public class ItemReactorHeatSwitch extends ItemReactorHeatStorage
 
 	private class ItemStackCoord
 	{
-		public final ItemStack stack;
-		public final int x;
-		public final int y;
+		public ItemStack stack;
+		public int x;
+		public int y;
 
 		public ItemStackCoord(ItemStack stack1, int x1, int y1)
 		{

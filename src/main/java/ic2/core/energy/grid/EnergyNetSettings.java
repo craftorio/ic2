@@ -9,7 +9,7 @@ public class EnergyNetSettings
 	public static final boolean logEnetApiAccessTraces = ConfigUtil.getBool(MainConfig.get(), "debug/logEnetApiAccessTraces");
 	public static boolean logGridUpdateIssues = ConfigUtil.getBool(MainConfig.get(), "debug/logGridUpdateIssues");
 	public static boolean logGridUpdatesVerbose = ConfigUtil.getBool(MainConfig.get(), "debug/logGridUpdatesVerbose");
-	public static final boolean logGridCalculationIssues = ConfigUtil.getBool(MainConfig.get(), "debug/logGridCalculationIssues");
+	public static boolean logGridCalculationIssues = ConfigUtil.getBool(MainConfig.get(), "debug/logGridCalculationIssues");
 	public static final boolean logGridUpdatePerformance = false;
 	public static final boolean logGridCalculationPerformance = false;
 	public static final boolean roundLossDown = ConfigUtil.getBool(MainConfig.get(), "misc/roundEnetLoss");

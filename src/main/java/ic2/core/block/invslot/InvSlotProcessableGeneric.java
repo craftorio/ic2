@@ -2,16 +2,20 @@ package ic2.core.block.invslot;
 
 import ic2.api.recipe.IMachineRecipeManager;
 import ic2.api.recipe.IRecipeInput;
+import ic2.api.recipe.Recipes;
 import ic2.core.block.IInventorySlotHolder;
 
 import java.util.Collection;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 public class InvSlotProcessableGeneric extends InvSlotProcessable<IRecipeInput, Collection<ItemStack>, ItemStack>
 {
 	public InvSlotProcessableGeneric(
-		IInventorySlotHolder<?> base, String name, int count, IMachineRecipeManager<IRecipeInput, Collection<ItemStack>, ItemStack> recipeManager
+		IInventorySlotHolder<?> base,
+		String name,
+		int count,
+		Recipes.IGetter<? extends IMachineRecipeManager<IRecipeInput, Collection<ItemStack>, ItemStack>> recipeManager
 	)
 	{
 		super(base, name, count, recipeManager);

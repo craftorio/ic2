@@ -1,22 +1,22 @@
 package ic2.core;
 
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.EntityDamageSource;
-import net.minecraft.world.Explosion;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.EntityDamageSource;
+import net.minecraft.world.entity.LivingEntity;
 
-public class IC2DamageSource extends DamageSource
+public class Ic2DamageSource extends DamageSource
 {
-	public static final IC2DamageSource electricity = new IC2DamageSource("electricity");
-	public static final IC2DamageSource nuke = (IC2DamageSource) new IC2DamageSource("nuke").setExplosion();
-	public static final IC2DamageSource radiation = (IC2DamageSource) new IC2DamageSource("radiation").setDamageBypassesArmor();
+	public static Ic2DamageSource electricity = new Ic2DamageSource("electricity");
+	public static Ic2DamageSource nuke = (Ic2DamageSource) new Ic2DamageSource("nuke").m_19375_();
+	public static Ic2DamageSource radiation = (Ic2DamageSource) new Ic2DamageSource("radiation").m_19380_();
 
-	public IC2DamageSource(String s)
+	public Ic2DamageSource(String s)
 	{
 		super(s);
 	}
 
-	public static DamageSource getNukeSource(Explosion explosion)
+	public static DamageSource getNukeSource(LivingEntity igniter)
 	{
-		return explosion != null && explosion.getExplosivePlacedBy() != null ? new EntityDamageSource("nuke.player", explosion.getExplosivePlacedBy()).setExplosion() : nuke;
+		return igniter != null ? new EntityDamageSource("nuke.player", igniter).m_19375_() : nuke;
 	}
 }

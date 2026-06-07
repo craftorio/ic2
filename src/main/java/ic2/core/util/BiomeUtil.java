@@ -1,39 +1,93 @@
 package ic2.core.util;
 
-import net.minecraft.init.Biomes;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
-import net.minecraftforge.common.BiomeDictionary;
+import ic2.core.IC2;
+import ic2.core.proxy.EnvProxy;
+
+import java.lang.reflect.Field;
+import java.util.Objects;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerChunkCache;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.ChunkSource;
+import net.minecraft.world.level.chunk.ChunkStatus;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.chunk.LevelChunkSection;
+import net.minecraft.world.level.chunk.PalettedContainer;
 
 public final class BiomeUtil
 {
-	public static Biome getOriginalBiome(World world, BlockPos pos)
+	private static final Field field_ChunkSection_biomeContainer = ReflectionUtil.getField(LevelChunkSection.class, "biomeContainer", "field_34556", "f_187995_");
+
+	public static Biome getBiome(Level world, ResourceKey<Biome> key)
 	{
-		return world.getBiomeProvider().getBiome(pos, Biomes.PLAINS);
+		return (Biome) world.m_5962_().m_175515_(Registry.f_122885_).m_6246_(key);
 	}
 
-	public static Biome getBiome(World world, BlockPos pos)
+	public static Holder<Biome> getOriginalBiome(LevelReader world, BlockPos pos)
 	{
-		return world.getBiome(pos);
+		return world.m_203675_(pos.getX(), pos.getY(), pos.getZ());
 	}
 
-	public static void setBiome(World world, BlockPos pos, Biome biome)
+	public static Holder<Biome> getBiome(LevelReader world, BlockPos pos)
 	{
-		byte[] biomeArray = world.getChunkFromBlockCoords(pos).getBiomeArray();
-		int index = (pos.getZ() & 15) << 4 | pos.getX() & 15;
-		biomeArray[index] = (byte) Biome.getIdForBiome(biome);
+		return world.m_204166_(pos);
 	}
 
-	public static int getBiomeTemperature(World world, BlockPos pos)
+	public static void setBiome(LevelReader world, BlockPos pos, Biome biome)
 	{
-		Biome biome = getBiome(world, pos);
-		if (BiomeDictionary.hasType(biome, BiomeDictionary.Type.HOT))
+		Objects.requireNonNull(biome, "null biome");
+		int x = pos.getX() >> 4;
+		int z = pos.getZ() >> 4;
+		ChunkAccess chunk = world.m_46819_(x, z, ChunkStatus.f_62317_);
+
+		for (LevelChunkSection section : chunk.m_7103_())
+		{
+			PalettedContainer<Biome> biomeContainer = ReflectionUtil.getFieldValue(field_ChunkSection_biomeContainer, section);
+
+			for (int y = 0; y < 3; y++)
+			{
+				biomeContainer.m_156470_(x >> 2, y, z >> 2, biome);
+			}
+		}
+	}
+
+	public static void setBiomeAndNotify(Level world, BlockPos pos, Biome biome)
+	{
+		setBiome(world, pos, biome);
+		ChunkSource chunkManager = world.m_7726_();
+		if (chunkManager instanceof ServerChunkCache)
+		{
+			LevelChunk chunk = world.m_46745_(pos);
+			ClientboundLevelChunkWithLightPacket packet = new ClientboundLevelChunkWithLightPacket(
+				chunk, ((ServerLevel) world).m_7726_().m_7827_(), null, null, true
+			);
+			((ServerChunkCache) chunkManager).f_8325_.m_183262_(chunk.m_7697_(), false).forEach(player -> player.f_8906_.m_9829_(packet));
+			chunk.m_8092_(true);
+		} else
+		{
+			assert !world.isClientSide : "Can't notify a server of a client side biome change";
+			world.m_46745_(pos).m_8092_(true);
+		}
+	}
+
+	public static int getBiomeTemperature(Level world, BlockPos pos)
+	{
+		Holder<Biome> biome = getBiome(world, pos);
+		if (IC2.envProxy.biomeHasType(biome, EnvProxy.BiomeType.HOT))
 		{
 			return 45;
 		} else
 		{
-			return BiomeDictionary.hasType(biome, BiomeDictionary.Type.COLD) ? 0 : 25;
+			return IC2.envProxy.biomeHasType(biome, EnvProxy.BiomeType.COLD) ? 0 : 25;
 		}
 	}
 }

@@ -2,28 +2,26 @@ package ic2.core.item.tool;
 
 import ic2.core.IC2;
 import ic2.core.block.machine.tileentity.TileEntityTeleporter;
-import ic2.core.init.Localization;
-import ic2.core.item.ItemIC2;
-import ic2.core.ref.ItemName;
 import ic2.core.util.StackUtil;
 
 import java.util.List;
 
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.Item.Properties;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
-public class ItemFrequencyTransmitter extends ItemIC2
+public class ItemFrequencyTransmitter extends Item
 {
 	private static final String targetSetNbt = "targetSet";
 	private static final String targetJustSetNbt = "targetJustSet";
@@ -31,100 +29,103 @@ public class ItemFrequencyTransmitter extends ItemIC2
 	private static final String targetYNbt = "targetY";
 	private static final String targetZNbt = "targetZ";
 
-	public ItemFrequencyTransmitter()
+	public ItemFrequencyTransmitter(Properties settings)
 	{
-		super(ItemName.frequency_transmitter);
-		this.maxStackSize = 1;
+		super(settings);
 	}
 
-	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand)
+	public InteractionResultHolder<ItemStack> m_7203_(Level world, Player player, InteractionHand hand)
 	{
 		ItemStack stack = StackUtil.get(player, hand);
-		if (IC2.platform.isSimulating())
+		if (IC2.sideProxy.isSimulating())
 		{
-			NBTTagCompound nbtData = StackUtil.getOrCreateNbtData(stack);
+			CompoundTag nbtData = StackUtil.getOrCreateNbtData(stack);
 			boolean hadJustSet = nbtData.getBoolean("targetJustSet");
 			if (nbtData.getBoolean("targetSet") && !hadJustSet)
 			{
-				nbtData.setBoolean("targetSet", false);
-				IC2.platform.messagePlayer(player, "Frequency Transmitter unlinked");
+				nbtData.putBoolean("targetSet", false);
+				IC2.sideProxy.messagePlayer(player, "Frequency Transmitter unlinked");
 			}
 
 			if (hadJustSet)
 			{
-				nbtData.setBoolean("targetJustSet", false);
+				nbtData.putBoolean("targetJustSet", false);
 			}
 		}
 
-		return new ActionResult(EnumActionResult.SUCCESS, stack);
+		return new InteractionResultHolder(InteractionResult.SUCCESS, stack);
 	}
 
-	public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand)
+	public InteractionResult m_6225_(UseOnContext context)
 	{
-		if (world.isRemote)
+		Level world = context.m_43725_();
+		Player player = context.m_43723_();
+		BlockPos pos = context.m_8083_();
+		InteractionHand hand = context.m_43724_();
+		if (player == null)
 		{
-			return EnumActionResult.PASS;
-		}
-
-		TileEntity te = world.getTileEntity(pos);
-		if (!(te instanceof TileEntityTeleporter))
+			return InteractionResult.PASS;
+		} else if (world.isClientSide)
 		{
-			return EnumActionResult.PASS;
-		}
-
-		TileEntityTeleporter tp = (TileEntityTeleporter) te;
-		NBTTagCompound nbtData = StackUtil.getOrCreateNbtData(StackUtil.get(player, hand));
-		boolean targetSet = nbtData.getBoolean("targetSet");
-		boolean justSetTarget = true;
-		BlockPos target = new BlockPos(nbtData.getInteger("targetX"), nbtData.getInteger("targetY"), nbtData.getInteger("targetZ"));
-		if (!targetSet)
+			return InteractionResult.PASS;
+		} else if (!(world.getBlockEntity(pos) instanceof TileEntityTeleporter tp))
 		{
-			targetSet = true;
-			target = tp.getPos();
-			IC2.platform.messagePlayer(player, "Frequency Transmitter linked to Teleporter.");
-		} else if (tp.getPos().equals(target))
-		{
-			IC2.platform.messagePlayer(player, "Can't link Teleporter to itself.");
-		} else if (tp.hasTarget() && tp.getTarget().equals(target))
-		{
-			IC2.platform.messagePlayer(player, "Teleportation link unchanged.");
+			return InteractionResult.PASS;
 		} else
 		{
-			TileEntity targetTe = world.getTileEntity(target);
-			if (targetTe instanceof TileEntityTeleporter)
+			CompoundTag nbtData = StackUtil.getOrCreateNbtData(StackUtil.get(player, hand));
+			boolean targetSet = nbtData.getBoolean("targetSet");
+			boolean justSetTarget = true;
+			BlockPos target = new BlockPos(nbtData.getInt("targetX"), nbtData.getInt("targetY"), nbtData.getInt("targetZ"));
+			if (!targetSet)
 			{
-				tp.setTarget(target);
-				((TileEntityTeleporter) targetTe).setTarget(pos);
-				IC2.platform.messagePlayer(player, "Teleportation link established.");
+				targetSet = true;
+				target = tp.getBlockPos();
+				IC2.sideProxy.messagePlayer(player, "Frequency Transmitter linked to Teleporter.");
+			} else if (tp.getBlockPos().equals(target))
+			{
+				IC2.sideProxy.messagePlayer(player, "Can't link Teleporter to itself.");
+			} else if (tp.hasTarget() && tp.getTarget().equals(target))
+			{
+				IC2.sideProxy.messagePlayer(player, "Teleportation link unchanged.");
 			} else
 			{
-				justSetTarget = false;
-				targetSet = false;
+				BlockEntity targetTe = world.getBlockEntity(target);
+				if (targetTe instanceof TileEntityTeleporter)
+				{
+					tp.setTarget(target);
+					((TileEntityTeleporter) targetTe).setTarget(pos);
+					IC2.sideProxy.messagePlayer(player, "Teleportation link established.");
+				} else
+				{
+					justSetTarget = false;
+					targetSet = false;
+				}
 			}
-		}
 
-		nbtData.setBoolean("targetSet", targetSet);
-		nbtData.setBoolean("targetJustSet", justSetTarget);
-		nbtData.setInteger("targetX", target.getX());
-		nbtData.setInteger("targetY", target.getY());
-		nbtData.setInteger("targetZ", target.getZ());
-		return EnumActionResult.SUCCESS;
+			nbtData.putBoolean("targetSet", targetSet);
+			nbtData.putBoolean("targetJustSet", justSetTarget);
+			nbtData.putInt("targetX", target.getX());
+			nbtData.putInt("targetY", target.getY());
+			nbtData.putInt("targetZ", target.getZ());
+			return InteractionResult.SUCCESS;
+		}
 	}
 
-	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced)
+	public void m_7373_(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag advanced)
 	{
-		NBTTagCompound nbtData = StackUtil.getOrCreateNbtData(stack);
+		CompoundTag nbtData = StackUtil.getOrCreateNbtData(stack);
 		if (nbtData.getBoolean("targetSet"))
 		{
 			tooltip.add(
-				Localization.translate(
-					"ic2.frequency_transmitter.tooltip.target", nbtData.getInteger("targetX"), nbtData.getInteger("targetY"), nbtData.getInteger("targetZ")
+				Component.m_237110_(
+					"ic2.frequency_transmitter.tooltip.target",
+					new Object[] { nbtData.getInt("targetX"), nbtData.getInt("targetY"), nbtData.getInt("targetZ") }
 				)
 			);
 		} else
 		{
-			tooltip.add(Localization.translate("ic2.frequency_transmitter.tooltip.blank"));
+			tooltip.add(Component.m_237115_("ic2.frequency_transmitter.tooltip.blank"));
 		}
 	}
 }

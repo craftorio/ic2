@@ -604,13 +604,13 @@ public class Config
 				{
 					if (i > 0)
 					{
-						ret = ret + ',';
+						ret = ret + ",";
 					}
 
 					ret = ret + String.format("0x%x", Integer.valueOf(c));
 					if (i < len - 1)
 					{
-						ret = ret + ',';
+						ret = ret + ",";
 					}
 				}
 			}
@@ -622,7 +622,7 @@ public class Config
 	public static class Value
 	{
 		public final String name;
-		public final String comment;
+		public String comment;
 		public String value;
 		private final int line;
 		private Number numberCache;

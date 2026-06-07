@@ -1,64 +1,64 @@
 package ic2.api.network;
 
-import ic2.api.info.Info;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.ModContainer;
-import net.minecraftforge.fml.relauncher.Side;
+import ic2.api.util.CoreAccessRef;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 public final class NetworkHelper
 {
 	private static INetworkManager serverInstance;
 	private static INetworkManager clientInstance;
 
-	public static void updateTileEntityField(TileEntity te, String field)
+	public static void updateTileEntityField(BlockEntity te, String field)
 	{
-		getNetworkManager(FMLCommonHandler.instance().getEffectiveSide()).updateTileEntityField(te, field);
+		getNetworkManager(te.getLevel().isClientSide).updateTileEntityField(te, field);
 	}
 
-	public static void initiateTileEntityEvent(TileEntity te, int event, boolean limitRange)
+	public static void initiateTileEntityEvent(BlockEntity te, int event, boolean limitRange)
 	{
-		getNetworkManager(FMLCommonHandler.instance().getEffectiveSide()).initiateTileEntityEvent(te, event, limitRange);
+		getNetworkManager(te.getLevel().isClientSide).initiateTileEntityEvent(te, event, limitRange);
 	}
 
-	public static void initiateItemEvent(EntityPlayer player, ItemStack stack, int event, boolean limitRange)
+	public static void initiateItemEvent(Player player, ItemStack stack, int event, boolean limitRange)
 	{
-		getNetworkManager(FMLCommonHandler.instance().getEffectiveSide()).initiateItemEvent(player, stack, event, limitRange);
+		getNetworkManager(player.getCommandSenderWorld().isClientSide).initiateItemEvent(player, stack, event, limitRange);
 	}
 
-	public static void sendInitialData(TileEntity te)
+	public static void sendInitialData(BlockEntity te)
 	{
-		getNetworkManager(FMLCommonHandler.instance().getEffectiveSide()).sendInitialData(te);
+		getNetworkManager(te.getLevel().isClientSide).sendInitialData(te);
 	}
 
-	public static void initiateClientTileEntityEvent(TileEntity te, int event)
+	public static void initiateClientTileEntityEvent(BlockEntity te, int event)
 	{
-		getNetworkManager(FMLCommonHandler.instance().getEffectiveSide()).initiateClientTileEntityEvent(te, event);
+		getNetworkManager(te.getLevel().isClientSide).initiateClientTileEntityEvent(te, event);
 	}
 
 	public static void initiateClientItemEvent(ItemStack stack, int event)
 	{
-		getNetworkManager(FMLCommonHandler.instance().getEffectiveSide()).initiateClientItemEvent(stack, event);
+		getNetworkManager(true).initiateClientItemEvent(stack, event);
 	}
 
-	public static INetworkManager getNetworkManager(Side side)
+	public static INetworkManager getNetworkManager(boolean forClient)
 	{
-		return side.isClient() ? clientInstance : serverInstance;
-	}
-
-	public static void setInstance(INetworkManager server, INetworkManager client)
-	{
-		ModContainer mc = Loader.instance().activeModContainer();
-		if (mc != null && Info.MOD_ID.equals(mc.getModId()))
+		INetworkManager ret;
+		if (forClient)
 		{
-			serverInstance = server;
-			clientInstance = client;
+			ret = clientInstance;
+			if (ret == null)
+			{
+				clientInstance = ret = CoreAccessRef.get().getClientNetworkManager();
+			}
 		} else
 		{
-			throw new IllegalAccessError();
+			ret = serverInstance;
+			if (ret == null)
+			{
+				serverInstance = ret = CoreAccessRef.get().getServerNetworkManager();
+			}
 		}
+
+		return ret;
 	}
 }

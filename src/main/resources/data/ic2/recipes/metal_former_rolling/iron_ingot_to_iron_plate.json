@@ -1,0 +1,9 @@
+{
+  "type": "ic2:metal_former_rolling",
+  "ingredient": {
+    "item": "minecraft:iron_ingot"
+  },
+  "result": {
+    "item": "ic2:iron_plate"
+  }
+}

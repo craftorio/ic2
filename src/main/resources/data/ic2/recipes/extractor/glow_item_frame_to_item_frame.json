@@ -1,0 +1,9 @@
+{
+  "type": "ic2:extractor",
+  "ingredient": {
+    "item": "minecraft:glow_item_frame"
+  },
+  "result": {
+    "item": "minecraft:item_frame"
+  }
+}

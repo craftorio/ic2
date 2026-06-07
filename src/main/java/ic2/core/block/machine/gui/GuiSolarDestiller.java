@@ -1,36 +1,36 @@
 package ic2.core.block.machine.gui;
 
-import ic2.core.GuiIC2;
+import com.mojang.blaze3d.vertex.PoseStack;
+import ic2.core.Ic2Gui;
 import ic2.core.block.machine.container.ContainerSolarDestiller;
 import ic2.core.gui.TankGauge;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
 
-@SideOnly(Side.CLIENT)
-public class GuiSolarDestiller extends GuiIC2<ContainerSolarDestiller>
+public class GuiSolarDestiller extends Ic2Gui<ContainerSolarDestiller>
 {
-	public GuiSolarDestiller(ContainerSolarDestiller container)
+	public GuiSolarDestiller(ContainerSolarDestiller container, Inventory playerInventory, Component title)
 	{
-		super(container, 184);
+		super(container, playerInventory, title, 184);
 		this.addElement(TankGauge.createPlain(this, 37, 43, 53, 18, container.base.inputTank));
 		this.addElement(TankGauge.createPlain(this, 115, 55, 17, 43, container.base.outputTank));
 	}
 
 	@Override
-	protected void drawGuiContainerBackgroundLayer(float f, int x, int y)
+	protected void m_7286_(PoseStack matrices, float delta, int mouseX, int mouseY)
 	{
-		super.drawGuiContainerBackgroundLayer(f, x, y);
+		super.m_7286_(matrices, delta, mouseX, mouseY);
 		this.bindTexture();
-		if (this.container.base.canWork())
+		if (((ContainerSolarDestiller) this.menu).base.canWork())
 		{
-			this.drawTexturedModalRect(this.guiLeft + 36, this.guiTop + 26, 0, 184, 97, 29);
+			this.drawTexturedRect(matrices, this.f_97735_ + 36, this.f_97736_ + 26, 0.0, 184.0, 97.0, 29.0);
 		}
 	}
 
 	@Override
 	protected ResourceLocation getTexture()
 	{
-		return new ResourceLocation("ic2", "textures/gui/GUISolarDestiller.png");
+		return ResourceLocation.fromNamespaceAndPath("ic2", "textures/gui/guisolardestiller.png");
 	}
 }

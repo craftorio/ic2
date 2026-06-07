@@ -1,0 +1,9 @@
+{
+  "type": "ic2:macerator",
+  "ingredient": {
+    "item": "minecraft:cobblestone"
+  },
+  "result": {
+    "item": "minecraft:sand"
+  }
+}

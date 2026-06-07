@@ -1,0 +1,37 @@
+{
+  "display": {
+    "icon": {
+      "item": "ic2:wrench"
+    },
+    "title": {
+      "translate": "advancements.ic2.root"
+    },
+    "description": {
+      "translate": "advancements.ic2.root.desc"
+    },
+    "frame": "task",
+    "background": "ic2:textures/blocks/machine/chunk_loader_bottom.png",
+    "show_toast": false,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "ic2:root": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:crafting_table"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "ic2:root"
+    ]
+  ]
+}

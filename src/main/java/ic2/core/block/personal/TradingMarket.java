@@ -10,16 +10,16 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 public class TradingMarket
 {
-	private final World world;
+	private final Level world;
 	private final Set<BlockPos> traders = new HashSet<>();
 	private final List<TradingMarket.MarketWatcher> watchers = new ArrayList<>(1);
 
-	public TradingMarket(final World world)
+	public TradingMarket(Level world)
 	{
 		this.world = world;
 		this.watchers.add(new TradingMarket.MarketWatcher()
@@ -43,13 +43,13 @@ public class TradingMarket
 				@Override
 				public void onAdd(BlockPos pos)
 				{
-					IC2.log.info(LogCategory.Block, "Market registration at " + Util.formatPosition(world.getTileEntity(pos)));
+					IC2.log.info(LogCategory.Block, "Market registration at " + Util.formatPosition(world.getBlockEntity(pos)));
 				}
 
 				@Override
 				public void onRemove(BlockPos pos)
 				{
-					IC2.log.info(LogCategory.Block, "Market removal at " + Util.formatPosition(world.getTileEntity(pos)));
+					IC2.log.info(LogCategory.Block, "Market removal at " + Util.formatPosition(world.getBlockEntity(pos)));
 				}
 			});
 		}
@@ -57,24 +57,24 @@ public class TradingMarket
 
 	public void registerTradeOMat(TileEntityTradeOMat tradeOMat)
 	{
-		assert tradeOMat.hasWorld() && !tradeOMat.getWorld().isRemote;
-		assert tradeOMat.getWorld() == this.world;
-		assert !this.traders.contains(tradeOMat.getPos());
+		assert tradeOMat.m_58898_() && !tradeOMat.getLevel().isClientSide;
+		assert tradeOMat.getLevel() == this.world;
+		assert !this.traders.contains(tradeOMat.getBlockPos());
 
 		for (TradingMarket.MarketWatcher watcher : this.watchers)
 		{
-			watcher.onAdd(tradeOMat.getPos());
+			watcher.onAdd(tradeOMat.getBlockPos());
 		}
 	}
 
 	public void unregisterTradeOMat(TileEntityTradeOMat tradeOMat)
 	{
-		assert tradeOMat.hasWorld() && !tradeOMat.getWorld().isRemote;
-		assert this.traders.contains(tradeOMat.getPos());
+		assert tradeOMat.m_58898_() && !tradeOMat.getLevel().isClientSide;
+		assert this.traders.contains(tradeOMat.getBlockPos());
 
 		for (TradingMarket.MarketWatcher watcher : this.watchers)
 		{
-			watcher.onRemove(tradeOMat.getPos());
+			watcher.onRemove(tradeOMat.getBlockPos());
 		}
 	}
 
@@ -93,7 +93,7 @@ public class TradingMarket
 	public Stream<BlockPos> tradersAround(BlockPos position, int radius)
 	{
 		long squareRadius = radius * radius;
-		return this.traders.stream().filter(pos -> position.distanceSq(pos) <= squareRadius);
+		return this.traders.stream().filter(pos -> position.m_123331_(pos) <= squareRadius);
 	}
 
 	public interface MarketWatcher

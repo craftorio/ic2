@@ -2,7 +2,7 @@ package ic2.api.recipe;
 
 import java.util.Set;
 
-import net.minecraftforge.fluids.Fluid;
+import net.minecraft.world.level.material.Fluid;
 
 public interface ILiquidAcceptManager
 {

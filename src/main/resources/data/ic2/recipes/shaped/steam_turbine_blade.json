@@ -1,0 +1,19 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "AAA",
+    "ABA",
+    "AAA"
+  ],
+  "key": {
+    "A": {
+      "tag": "forge:plates/steel"
+    },
+    "B": {
+      "tag": "forge:ingots/steel"
+    }
+  },
+  "result": {
+    "item": "ic2:steam_turbine_blade"
+  }
+}

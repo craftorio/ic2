@@ -1,0 +1,17 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "PP",
+    "PP",
+    "PP"
+  ],
+  "key": {
+    "P": {
+      "item": "ic2:rubber_planks"
+    }
+  },
+  "result": {
+    "item": "ic2:rubber_door",
+    "count": 3
+  }
+}

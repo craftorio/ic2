@@ -1,60 +1,23 @@
 package ic2.core.item;
 
 import ic2.api.item.ElectricItem;
-import ic2.core.ref.ItemName;
+import ic2.api.network.INetworkItemEventListener;
+import ic2.core.IC2;
+import ic2.core.ref.Ic2SoundEvents;
 import ic2.core.util.StackUtil;
-import ic2.core.util.Util;
-import net.minecraft.client.renderer.ItemMeshDefinition;
-import net.minecraft.client.renderer.block.model.ModelBakery;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
-import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item.Properties;
+import net.minecraft.world.level.Level;
 
-public class ItemBattery extends BaseElectricItem
+public class ItemBattery extends BaseElectricItem implements INetworkItemEventListener
 {
-	private static final int maxLevel = 4;
-
-	public ItemBattery(ItemName name, double maxCharge, double transferLimit, int tier)
+	public ItemBattery(Properties settings, double maxCharge, double transferLimit, int tier)
 	{
-		super(name, maxCharge, transferLimit, tier);
-		this.setMaxStackSize(16);
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public void registerModels(final ItemName name)
-	{
-		ModelLoader.setCustomMeshDefinition(this, new ItemMeshDefinition()
-		{
-			public ModelResourceLocation getModelLocation(ItemStack stack)
-			{
-				int damage = stack.getItemDamage();
-				int maxDamage = stack.getMaxDamage() - 1;
-				int level;
-				if (maxDamage > 0)
-				{
-					level = Util.limit((damage * ItemBattery.maxLevel + maxDamage / 2) / maxDamage, 0, ItemBattery.maxLevel);
-				} else
-				{
-					level = 0;
-				}
-
-				return ItemIC2.getModelLocation(name, Integer.toString(ItemBattery.maxLevel - level));
-			}
-		});
-
-		for (int level = 0; level <= maxLevel; level++)
-		{
-			ModelBakery.registerItemVariants(this, new ResourceLocation[] { getModelLocation(name, Integer.toString(level)) });
-		}
+		super(settings, maxCharge, transferLimit, tier);
 	}
 
 	@Override
@@ -63,10 +26,10 @@ public class ItemBattery extends BaseElectricItem
 		return true;
 	}
 
-	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand)
+	public InteractionResultHolder<ItemStack> m_7203_(Level world, Player player, InteractionHand hand)
 	{
 		ItemStack stack = StackUtil.get(player, hand);
-		if (!world.isRemote && StackUtil.getSize(stack) == 1)
+		if (!world.isClientSide && StackUtil.getSize(stack) == 1)
 		{
 			if (ElectricItem.manager.getCharge(stack) > 0.0)
 			{
@@ -74,7 +37,7 @@ public class ItemBattery extends BaseElectricItem
 
 				for (int i = 0; i < 9; i++)
 				{
-					ItemStack target = (ItemStack) player.inventory.mainInventory.get(i);
+					ItemStack target = (ItemStack) player.getInventory().f_35974_.get(i);
 					if (target != null
 						&& target != stack
 						&& !(ElectricItem.manager.discharge(target, Double.POSITIVE_INFINITY, Integer.MAX_VALUE, true, true, true) > 0.0))
@@ -92,16 +55,23 @@ public class ItemBattery extends BaseElectricItem
 					}
 				}
 
-				if (transferred && !world.isRemote)
+				if (transferred && !world.isClientSide)
 				{
-					player.openContainer.detectAndSendChanges();
+					player.f_36096_.m_38946_();
+					IC2.network.get(true).initiateItemEvent(player, stack, 0, true);
 				}
 			}
 
-			return new ActionResult(EnumActionResult.SUCCESS, stack);
+			return new InteractionResultHolder(InteractionResult.SUCCESS, stack);
 		} else
 		{
-			return new ActionResult(EnumActionResult.PASS, stack);
+			return new InteractionResultHolder(InteractionResult.PASS, stack);
 		}
+	}
+
+	@Override
+	public void onNetworkEvent(ItemStack stack, Player player, int event)
+	{
+		player.m_5496_(Ic2SoundEvents.ITEM_BATTERY_USE, 1.0F, 1.0F);
 	}
 }

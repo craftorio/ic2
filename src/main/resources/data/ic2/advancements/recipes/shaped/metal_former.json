@@ -1,0 +1,73 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_circuit": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:circuit"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_coil": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:coil"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_machine": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:machine"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "ic2:shaped/metal_former"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    },
+    "has_tool_box": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:tool_box"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "requirements": [
+    [
+      "has_circuit",
+      "has_tool_box",
+      "has_machine",
+      "has_coil",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "ic2:shaped/metal_former"
+    ]
+  }
+}

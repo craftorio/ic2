@@ -2,18 +2,26 @@ package ic2.core.crop.cropcard;
 
 import ic2.api.crops.CropProperties;
 import ic2.api.crops.ICropTile;
-import ic2.core.crop.IC2CropCard;
-import ic2.core.crop.IC2Crops;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
+import ic2.api.crops.ICropType;
+import ic2.core.crop.Ic2CropCard;
+import ic2.core.crop.Ic2Crops;
+import ic2.core.ref.Ic2Blocks;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 
-public class CropNetherWart extends IC2CropCard
+public class CropNetherWart extends Ic2CropCard
 {
-	@Override
-	public String getId()
+	public CropNetherWart(ICropType cropType)
 	{
-		return "nether_wart";
+		super(cropType);
+	}
+
+	@Override
+	public Block getCropBlock()
+	{
+		return Ic2Blocks.NETHER_WART_CROP;
 	}
 
 	@Override
@@ -35,12 +43,6 @@ public class CropNetherWart extends IC2CropCard
 	}
 
 	@Override
-	public int getMaxSize()
-	{
-		return 3;
-	}
-
-	@Override
 	public double dropGainChance()
 	{
 		return 2.0;
@@ -49,21 +51,21 @@ public class CropNetherWart extends IC2CropCard
 	@Override
 	public ItemStack getGain(ICropTile crop)
 	{
-		return new ItemStack(Items.NETHER_WART, 1);
+		return new ItemStack(Items.f_42588_, 1);
 	}
 
 	@Override
 	public void tick(ICropTile crop)
 	{
-		if (crop.isBlockBelow(Blocks.SOUL_SAND))
+		if (crop.isBlockBelow(Blocks.f_50135_))
 		{
 			if (this.canGrow(crop))
 			{
 				crop.setGrowthPoints(crop.getGrowthPoints() + 100);
 			}
-		} else if (crop.isBlockBelow(Blocks.SNOW) && crop.getWorldObj().rand.nextInt(300) == 0)
+		} else if (crop.isBlockBelow(Blocks.f_50125_) && crop.getWorldObj().random.nextInt(300) == 0)
 		{
-			crop.setCrop(IC2Crops.cropTerraWart);
+			crop.setCrop(Ic2Crops.cropTerraWart);
 		}
 	}
 

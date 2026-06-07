@@ -1,17 +1,17 @@
 package ic2.core.item.tfbp;
 
 import ic2.core.block.machine.tileentity.TileEntityTerra;
-import ic2.core.ref.BlockName;
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 
-class Desertification extends TerraformerBase
+public class Desertification extends TerraformerBase
 {
 	@Override
-	boolean terraform(World world, BlockPos pos)
+	boolean terraform(Level world, BlockPos pos)
 	{
 		pos = TileEntityTerra.getFirstBlockFrom(world, pos, 10);
 		if (pos == null)
@@ -19,33 +19,27 @@ class Desertification extends TerraformerBase
 			return false;
 		}
 
-		IBlockState sand = Blocks.SAND.getDefaultState();
-		if (!TileEntityTerra.switchGround(world, pos, Blocks.DIRT, sand, false)
-			&& !TileEntityTerra.switchGround(world, pos, Blocks.GRASS, sand, false)
-			&& !TileEntityTerra.switchGround(world, pos, Blocks.FARMLAND, sand, false))
+		BlockState sand = Blocks.f_49992_.defaultBlockState();
+		if (!TileEntityTerra.switchGround(world, pos, Blocks.f_50493_, sand, false)
+			&& !TileEntityTerra.switchGround(world, pos, Blocks.f_50034_, sand, false)
+			&& !TileEntityTerra.switchGround(world, pos, Blocks.f_50093_, sand, false))
 		{
-			Block block = world.getBlockState(pos).getBlock();
-			if (block == Blocks.WATER
-				|| block == Blocks.FLOWING_WATER
-				|| block == Blocks.SNOW_LAYER
-				|| block == Blocks.LEAVES
-				|| block == Blocks.LEAVES2
-				|| block == BlockName.leaves.getInstance()
-				|| isPlant(block))
+			BlockState state = world.getBlockState(pos);
+			Block block = state.getBlock();
+			if (block == Blocks.f_49990_ || block == Blocks.f_50125_ || state.m_204336_(BlockTags.f_13035_) || isPlant(block))
 			{
-				world.setBlockToAir(pos);
-				if (isPlant(world.getBlockState(pos.up()).getBlock()))
+				world.removeBlock(pos, false);
+				if (isPlant(world.getBlockState(pos.m_7494_()).getBlock()))
 				{
-					world.setBlockToAir(pos.up());
+					world.removeBlock(pos.m_7494_(), false);
 				}
 
 				return true;
-			} else if (block != Blocks.ICE && block != Blocks.SNOW)
+			} else if (block != Blocks.f_50126_ && block != Blocks.f_50125_)
 			{
-				if ((block == Blocks.PLANKS || block == Blocks.LOG || block == BlockName.rubber_wood.getInstance())
-					&& world.rand.nextInt(15) == 0)
+				if ((state.m_204336_(BlockTags.f_13090_) || state.m_204336_(BlockTags.f_13105_)) && world.random.nextInt(15) == 0)
 				{
-					world.setBlockState(pos, Blocks.FIRE.getDefaultState());
+					world.setBlockAndUpdate(pos, Blocks.FIRE.defaultBlockState());
 					return true;
 				} else
 				{
@@ -53,19 +47,19 @@ class Desertification extends TerraformerBase
 				}
 			} else
 			{
-				world.setBlockState(pos, Blocks.FLOWING_WATER.getDefaultState());
+				world.setBlockAndUpdate(pos, Blocks.f_49990_.defaultBlockState());
 				return true;
 			}
 		} else
 		{
-			TileEntityTerra.switchGround(world, pos, Blocks.DIRT, sand, false);
+			TileEntityTerra.switchGround(world, pos, Blocks.f_50493_, sand, false);
 			return true;
 		}
 	}
 
 	private static boolean isPlant(Block block)
 	{
-		for (IBlockState state : Cultivation.plants)
+		for (BlockState state : Cultivation.plants)
 		{
 			if (state.getBlock() == block)
 			{
@@ -73,6 +67,8 @@ class Desertification extends TerraformerBase
 			}
 		}
 
-		return false;
+		return block.m_204297_().m_203656_(BlockTags.f_13104_)
+			|| block.m_204297_().m_203656_(BlockTags.f_13073_)
+			|| block.m_204297_().m_203656_(BlockTags.f_13041_);
 	}
 }

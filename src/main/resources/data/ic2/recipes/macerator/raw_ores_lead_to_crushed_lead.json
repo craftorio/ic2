@@ -1,0 +1,10 @@
+{
+  "type": "ic2:macerator",
+  "ingredient": {
+    "tag": "forge:raw_ores/lead"
+  },
+  "result": {
+    "item": "ic2:crushed_lead",
+    "count": 2
+  }
+}

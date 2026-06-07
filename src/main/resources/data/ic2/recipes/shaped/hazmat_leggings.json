@@ -1,0 +1,19 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "ROR",
+    "R R",
+    "R R"
+  ],
+  "key": {
+    "R": {
+      "item": "ic2:rubber"
+    },
+    "O": {
+      "item": "minecraft:orange_dye"
+    }
+  },
+  "result": {
+    "item": "ic2:hazmat_leggings"
+  }
+}

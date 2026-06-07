@@ -1,0 +1,47 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_carbon_mesh": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:carbon_mesh"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_carbon_plate": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:carbon_plate"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "ic2:shaped/carbon_rotor_blade"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_carbon_plate",
+      "has_carbon_mesh",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "ic2:shaped/carbon_rotor_blade"
+    ]
+  }
+}

@@ -9,10 +9,10 @@ import ic2.api.energy.tile.IEnergySource;
 import ic2.api.energy.tile.IEnergyTile;
 import ic2.api.energy.tile.IMetaDelegate;
 import ic2.core.IC2;
-import ic2.core.TickHandler;
 import ic2.core.energy.grid.GridInfo;
 import ic2.core.energy.grid.IEnergyCalculator;
 import ic2.core.energy.grid.NodeType;
+import ic2.core.event.TickHandler;
 import ic2.core.init.MainConfig;
 import ic2.core.util.ConfigUtil;
 import ic2.core.util.LogCategory;
@@ -32,12 +32,11 @@ import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.Map.Entry;
 
-import net.minecraft.block.Block;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.common.DimensionManager;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 public final class EnergyNetLocal implements IEnergyCalculator
 {
@@ -49,9 +48,9 @@ public final class EnergyNetLocal implements IEnergyCalculator
 	public static final boolean enableCache = true;
 	private static int nextGridUid = 0;
 	private static int nextNodeUid = 0;
-	private final World world;
+	private final Level world;
 	protected final Set<Grid> grids = new HashSet<>();
-	protected final List<Change> changes = new ArrayList<>();
+	protected List<Change> changes = new ArrayList<>();
 	private final Map<BlockPos, Tile> registeredTiles = new HashMap<>();
 	private final Map<IEnergyTile, Integer> pendingAdds = new WeakHashMap<>();
 	private final Set<Tile> removedTiles = new HashSet<>();
@@ -117,7 +116,7 @@ public final class EnergyNetLocal implements IEnergyCalculator
 					mainTile,
 					retry,
 					EnergyNet.instance.getWorld(mainTile),
-					EnergyNet.instance.getWorld(mainTile).getChunkFromBlockCoords(EnergyNet.instance.getPos(mainTile)),
+					EnergyNet.instance.getWorld(mainTile).m_46745_(EnergyNet.instance.getPos(mainTile)),
 					this
 				);
 		}
@@ -127,10 +126,10 @@ public final class EnergyNetLocal implements IEnergyCalculator
 			IC2.log.warn(LogCategory.EnergyNet, "EnergyNet.addTile: %s doesn't implement its advertised interfaces completely.", mainTile);
 		}
 
-		if (mainTile instanceof TileEntity && ((TileEntity) mainTile).isInvalid())
+		if (mainTile instanceof BlockEntity && ((BlockEntity) mainTile).isRemoved())
 		{
 			this.logWarn("EnergyNet.addTile: " + mainTile + " is invalid (TileEntity.isInvalid()), aborting");
-		} else if (this.world != DimensionManager.getWorld(this.world.provider.getDimension()))
+		} else if (this.world != IC2.sideProxy.getWorld(this.world.getServer(), Util.getDimId(this.world)))
 		{
 			this.logDebug("EnergyNet.addTile: " + mainTile + " is in an unloaded world, aborting");
 		} else if (this.locked)
@@ -157,7 +156,7 @@ public final class EnergyNetLocal implements IEnergyCalculator
 			while (it.hasNext())
 			{
 				IEnergyTile subTile = it.next();
-				BlockPos pos = EnergyNet.instance.getPos(subTile).toImmutable();
+				BlockPos pos = EnergyNet.instance.getPos(subTile).m_7949_();
 				Tile conflicting = this.registeredTiles.get(pos);
 				boolean abort = false;
 				if (conflicting != null)
@@ -168,7 +167,7 @@ public final class EnergyNetLocal implements IEnergyCalculator
 					} else if (retry < 2)
 					{
 						this.pendingAdds.put(mainTile, retry + 1);
-					} else if ((!(conflicting.mainTile instanceof TileEntity) || !((TileEntity) mainTile).isInvalid()) && !EnergyNetGlobal.replaceConflicting)
+					} else if ((!(conflicting.mainTile instanceof BlockEntity) || !((BlockEntity) mainTile).isRemoved()) && !EnergyNetGlobal.replaceConflicting)
 					{
 						this.logWarn(
 							"EnergyNet.addTileEntity: "
@@ -189,7 +188,7 @@ public final class EnergyNetLocal implements IEnergyCalculator
 								+ ") is conflicting with "
 								+ conflicting.mainTile
 								+ " (invalid="
-								+ (conflicting.mainTile instanceof TileEntity && ((TileEntity) conflicting.mainTile).isInvalid())
+								+ (conflicting.mainTile instanceof BlockEntity && ((BlockEntity) conflicting.mainTile).isRemoved())
 								+ ") using the same position, which is abandoned (prev. te not removed), replacing"
 						);
 						this.removeTile(conflicting.mainTile);
@@ -202,7 +201,7 @@ public final class EnergyNetLocal implements IEnergyCalculator
 					}
 				}
 
-				if (!abort && !this.world.isBlockLoaded(pos))
+				if (!abort && !this.world.isLoaded(pos))
 				{
 					if (retry < 1)
 					{
@@ -250,23 +249,23 @@ public final class EnergyNetLocal implements IEnergyCalculator
 
 		for (IEnergyTile subTile : excluded)
 		{
-			excludedPositions.add(EnergyNet.instance.getPos(subTile).toImmutable());
+			excludedPositions.add(EnergyNet.instance.getPos(subTile).m_7949_());
 		}
 
 		Block block = this.world.getBlockState(pos).getBlock();
 		int ocx = pos.getX() >> 4;
 		int ocz = pos.getZ() >> 4;
 
-		for (EnumFacing dir : EnumFacing.VALUES)
+		for (Direction dir : Util.ALL_DIRS)
 		{
-			BlockPos cPos = pos.offset(dir);
+			BlockPos cPos = pos.relative(dir);
 			if (!excludedPositions.contains(cPos))
 			{
 				int ccx = cPos.getX() >> 4;
 				int ccz = cPos.getZ() >> 4;
-				if (dir.getAxis().isVertical() || ccx == ocx && ccz == ocz || this.world.isBlockLoaded(cPos))
+				if (dir.m_122434_().m_122478_() || ccx == ocx && ccz == ocz || this.world.isLoaded(cPos))
 				{
-					this.world.getBlockState(cPos).neighborChanged(this.world, cPos, block, pos);
+					this.world.getBlockState(cPos).m_60690_(this.world, cPos, block, pos, false);
 				}
 			}
 		}
@@ -287,7 +286,7 @@ public final class EnergyNetLocal implements IEnergyCalculator
 					"EnergyNet.removeTile(%s), world=%s, chunk=%s, this=%s",
 					mainTile,
 					EnergyNet.instance.getWorld(mainTile),
-					EnergyNet.instance.getWorld(mainTile).getChunkFromBlockCoords(EnergyNet.instance.getPos(mainTile)),
+					EnergyNet.instance.getWorld(mainTile).m_46745_(EnergyNet.instance.getPos(mainTile)),
 					this
 				);
 		}
@@ -340,7 +339,7 @@ public final class EnergyNetLocal implements IEnergyCalculator
 				}
 
 				this.registeredTiles.remove(pos);
-				if (this.world.isBlockLoaded(pos))
+				if (this.world.isLoaded(pos))
 				{
 					this.notifyLoadedNeighbors(pos, tile.subTiles);
 				}
@@ -348,9 +347,9 @@ public final class EnergyNetLocal implements IEnergyCalculator
 		}
 	}
 
-	protected double getTotalEnergyEmitted(TileEntity tileEntity)
+	protected double getTotalEnergyEmitted(BlockEntity tileEntity)
 	{
-		BlockPos coords = new BlockPos(tileEntity.getPos());
+		BlockPos coords = new BlockPos(tileEntity.getBlockPos());
 		Tile tile = this.registeredTiles.get(coords);
 		if (tile == null)
 		{
@@ -368,9 +367,9 @@ public final class EnergyNetLocal implements IEnergyCalculator
 		return ret;
 	}
 
-	protected double getTotalEnergySunken(TileEntity tileEntity)
+	protected double getTotalEnergySunken(BlockEntity tileEntity)
 	{
-		BlockPos coords = new BlockPos(tileEntity.getPos());
+		BlockPos coords = new BlockPos(tileEntity.getBlockPos());
 		Tile tile = this.registeredTiles.get(coords);
 		if (tile == null)
 		{
@@ -461,7 +460,7 @@ public final class EnergyNetLocal implements IEnergyCalculator
 
 	protected void onTickEnd()
 	{
-		if (IC2.platform.isSimulating())
+		if (IC2.sideProxy.isSimulating())
 		{
 			this.locked = true;
 
@@ -502,12 +501,12 @@ public final class EnergyNetLocal implements IEnergyCalculator
 				}
 			}
 
-			IC2.getInstance().threadPool.executeAll(tasks);
+			IC2.threadPool.executeAll(tasks);
 			this.locked = false;
 		}
 	}
 
-	protected void addChange(Node node, EnumFacing dir, double amount, double voltage)
+	protected void addChange(Node node, Direction dir, double amount, double voltage)
 	{
 		this.changes.add(new Change(node, dir, amount, voltage));
 	}
@@ -537,9 +536,9 @@ public final class EnergyNetLocal implements IEnergyCalculator
 
 			for (IEnergyTile subTile : tile.subTiles)
 			{
-				for (EnumFacing dir : EnumFacing.VALUES)
+				for (Direction dir : Util.ALL_DIRS)
 				{
-					BlockPos coords = EnergyNet.instance.getPos(subTile).offset(dir);
+					BlockPos coords = EnergyNet.instance.getPos(subTile).relative(dir);
 					Tile neighborTile = this.registeredTiles.get(coords);
 					if (neighborTile != null && neighborTile != node.tile)
 					{
@@ -554,7 +553,7 @@ public final class EnergyNetLocal implements IEnergyCalculator
 									IEnergyTile neighborSubTe = neighborTile.getSubTileAt(coords);
 									IEnergyAcceptor acceptor = (IEnergyAcceptor) (neighborSubTe instanceof IEnergyAcceptor ? neighborSubTe : neighbor.tile.mainTile);
 									canEmit = emitter.emitsEnergyTo((IEnergyAcceptor) neighbor.tile.mainTile, dir)
-										&& acceptor.acceptsEnergyFrom((IEnergyEmitter) node.tile.mainTile, dir.getOpposite());
+										&& acceptor.acceptsEnergyFrom((IEnergyEmitter) node.tile.mainTile, dir.m_122424_());
 								}
 
 								boolean canAccept = false;
@@ -564,7 +563,7 @@ public final class EnergyNetLocal implements IEnergyCalculator
 									IEnergyTile neighborSubTe = neighborTile.getSubTileAt(coords);
 									IEnergyEmitter emitter = (IEnergyEmitter) (neighborSubTe instanceof IEnergyEmitter ? neighborSubTe : neighbor.tile.mainTile);
 									canAccept = acceptor.acceptsEnergyFrom((IEnergyEmitter) neighbor.tile.mainTile, dir)
-										&& emitter.emitsEnergyTo((IEnergyAcceptor) node.tile.mainTile, dir.getOpposite());
+										&& emitter.emitsEnergyTo((IEnergyAcceptor) node.tile.mainTile, dir.m_122424_());
 								}
 
 								if (canEmit || canAccept)

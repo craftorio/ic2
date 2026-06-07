@@ -1,34 +1,29 @@
 package ic2.core.item.armor;
 
+import ic2.core.fluid.Ic2FluidStack;
 import ic2.core.item.armor.jetpack.IJetpack;
-import ic2.core.ref.FluidName;
-import ic2.core.ref.ItemName;
-import ic2.core.util.Util;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.capability.IFluidHandlerItem;
+import ic2.core.ref.Ic2ArmorMaterials;
+import ic2.core.ref.Ic2Fluids;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item.Properties;
 
 public class ItemArmorJetpack extends ItemArmorFluidTank implements IJetpack
 {
-	public ItemArmorJetpack()
+	public ItemArmorJetpack(Properties settings)
 	{
-		super(ItemName.jetpack, "jetpack", FluidName.biogas.getInstance(), 30000);
+		super(Ic2ArmorMaterials.JET_PACK, settings, Ic2Fluids.BIOGAS.still, 30000);
 	}
 
-	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems)
+	public void m_6787_(CreativeModeTab group, NonNullList<ItemStack> stacks)
 	{
-		if (this.isInCreativeTab(tab))
+		if (this.m_220152_(group))
 		{
-			ItemStack stack = new ItemStack(this, 1);
+			ItemStack stack = new ItemStack(this);
 			this.filltank(stack);
-			stack.setItemDamage(1);
-			subItems.add(stack);
-			stack = new ItemStack(this, 1);
-			stack.setItemDamage(this.getMaxDamage(stack));
-			subItems.add(stack);
+			stacks.add(stack);
+			stacks.add(new ItemStack(this));
 		}
 	}
 
@@ -38,21 +33,16 @@ public class ItemArmorJetpack extends ItemArmorFluidTank implements IJetpack
 		if (this.isEmpty(pack))
 		{
 			return false;
-		} else
-		{
-			IFluidHandlerItem handler = FluidUtil.getFluidHandler(pack);
-			assert handler != null;
-			FluidStack drained = handler.drain(amount, false);
-			if (drained != null && drained.amount >= amount)
-			{
-				handler.drain(amount, true);
-				this.Updatedamage(pack);
-				return true;
-			} else
-			{
-				return false;
-			}
 		}
+
+		Ic2FluidStack fs = this.drainMb(pack, amount, true, null);
+		if (fs.getAmountMb() < amount)
+		{
+			return false;
+		}
+
+		this.drainMb(pack, amount, false, null);
+		return true;
 	}
 
 	@Override
@@ -89,11 +79,5 @@ public class ItemArmorJetpack extends ItemArmorFluidTank implements IJetpack
 	public float getWorldHeightDivisor(ItemStack stack)
 	{
 		return 1.0F;
-	}
-
-	@Override
-	public int getBarPercent(ItemStack stack)
-	{
-		return (int) Util.map(this.getCharge(stack), this.getMaxCharge(stack), 100.0);
 	}
 }

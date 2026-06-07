@@ -12,22 +12,23 @@ import ic2.core.block.invslot.InvSlotConsumableLiquidByTank;
 import ic2.core.block.invslot.InvSlotOutput;
 import ic2.core.block.invslot.InvSlotUpgrade;
 import ic2.core.block.machine.container.ContainerCondenser;
-import ic2.core.block.machine.gui.GuiCondenser;
+import ic2.core.fluid.Ic2FluidStack;
+import ic2.core.fluid.Ic2FluidTank;
 import ic2.core.gui.dynamic.IGuiValueProvider;
+import ic2.core.network.GrowingBuffer;
 import ic2.core.profile.NotClassic;
-import ic2.core.ref.FluidName;
-import ic2.core.ref.ItemName;
+import ic2.core.ref.Ic2BlockEntities;
+import ic2.core.ref.Ic2Fluids;
+import ic2.core.ref.Ic2Items;
 
 import java.util.EnumSet;
 import java.util.Set;
 
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidTank;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.state.BlockState;
 
 @NotClassic
 public class TileEntityCondenser extends TileEntityElectricMachine implements IHasGui, IGuiValueProvider, IUpgradableBlock
@@ -37,49 +38,47 @@ public class TileEntityCondenser extends TileEntityElectricMachine implements IH
 	public final short ventEUCost = 2;
 	public int progress = 0;
 	public final int maxProgress = 10000;
-	private final FluidTank inputTank;
-	private final FluidTank outputTank;
+	private final Ic2FluidTank inputTank;
+	private final Ic2FluidTank outputTank;
 	public final InvSlotConsumableLiquidByTank waterInputSlot;
 	public final InvSlotOutput waterOutputSlot;
 	public final InvSlotConsumableId ventSlots;
 	public final InvSlotUpgrade upgradeSlot;
 	protected final Fluids fluids = this.addComponent(new Fluids(this));
 
-	public TileEntityCondenser()
+	public TileEntityCondenser(BlockPos pos, BlockState state)
 	{
-		super(100000, 3);
-		this.inputTank = this.fluids
-			.addTankInsert("inputTank", 100000, Fluids.fluidPredicate(FluidName.steam.getInstance(), FluidName.superheated_steam.getInstance()));
+		super(Ic2BlockEntities.CONDENSER, pos, state, 100000, 3);
+		this.inputTank = this.fluids.addTankInsert("inputTank", 100000, Fluids.fluidPredicate(Ic2Fluids.STEAM.still, Ic2Fluids.SUPERHEATED_STEAM.still));
 		this.outputTank = this.fluids.addTankExtract("outputTank", 1000);
 		this.waterInputSlot = new InvSlotConsumableLiquidByTank(
 			this, "waterInputSlot", InvSlot.Access.I, 1, InvSlot.InvSide.BOTTOM, InvSlotConsumableLiquid.OpType.Fill, this.outputTank
 		);
 		this.waterOutputSlot = new InvSlotOutput(this, "waterOutputSlot", 1);
-		this.ventSlots = new InvSlotConsumableId(this, "ventSlots", 4, ItemName.heat_vent.getInstance());
+		this.ventSlots = new InvSlotConsumableId(this, "ventSlots", 4, Ic2Items.HEAT_VENT);
 		this.ventSlots.setStackSizeLimit(1);
 		this.upgradeSlot = new InvSlotUpgrade(this, "upgradeSlot", 1);
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound nbttagcompound)
+	public void load(CompoundTag nbt)
 	{
-		super.readFromNBT(nbttagcompound);
-		this.progress = nbttagcompound.getInteger("progress");
+		super.load(nbt);
+		this.progress = nbt.getInt("progress");
 	}
 
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
+	public void saveAdditional(CompoundTag nbt)
 	{
-		super.writeToNBT(nbt);
-		nbt.setInteger("progress", this.progress);
-		return nbt;
+		super.saveAdditional(nbt);
+		nbt.putInt("progress", this.progress);
 	}
 
 	@Override
 	protected void onLoaded()
 	{
 		super.onLoaded();
-		if (!this.getWorld().isRemote)
+		if (!this.getLevel().isClientSide)
 		{
 			this.updateTier();
 		}
@@ -101,10 +100,10 @@ public class TileEntityCondenser extends TileEntityElectricMachine implements IH
 	}
 
 	@Override
-	public void markDirty()
+	public void setChanged()
 	{
-		super.markDirty();
-		if (!this.getWorld().isRemote)
+		super.setChanged();
+		if (!this.getLevel().isClientSide)
 		{
 			this.updateTier();
 		}
@@ -119,7 +118,7 @@ public class TileEntityCondenser extends TileEntityElectricMachine implements IH
 		this.work();
 		if (this.upgradeSlot.tickNoMark())
 		{
-			super.markDirty();
+			super.setChanged();
 		}
 	}
 
@@ -129,7 +128,7 @@ public class TileEntityCondenser extends TileEntityElectricMachine implements IH
 		{
 			if (this.progress >= 10000)
 			{
-				this.outputTank.fillInternal(new FluidStack(FluidName.distilled_water.getInstance(), 100), true);
+				this.outputTank.fillMbUnchecked(Ic2FluidStack.create(Ic2Fluids.DISTILLED_WATER.still, 100), false);
 				this.progress -= 10000;
 			}
 
@@ -139,7 +138,7 @@ public class TileEntityCondenser extends TileEntityElectricMachine implements IH
 				int drain = 100 + vents * 100;
 				if (this.energy.useEnergy(vents * 2))
 				{
-					this.progress = this.progress + this.inputTank.drainInternal(drain, true).amount;
+					this.progress = this.progress + this.inputTank.drainMbUnchecked(drain, false).getAmountMb();
 				}
 			}
 		}
@@ -154,21 +153,15 @@ public class TileEntityCondenser extends TileEntityElectricMachine implements IH
 	}
 
 	@Override
-	public ContainerBase<TileEntityCondenser> getGuiContainer(EntityPlayer player)
+	public ContainerBase<TileEntityCondenser> createServerScreenHandler(int syncId, Player player)
 	{
-		return new ContainerCondenser(player, this);
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
-	{
-		return new GuiCondenser(new ContainerCondenser(player, this));
+		return new ContainerCondenser(syncId, player.getInventory(), this);
 	}
 
 	@Override
-	public void onGuiClosed(EntityPlayer player)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
+		return new ContainerCondenser(syncId, inventory, this);
 	}
 
 	@Override
@@ -206,12 +199,12 @@ public class TileEntityCondenser extends TileEntityElectricMachine implements IH
 		}
 	}
 
-	public FluidTank getInputTank()
+	public Ic2FluidTank getInputTank()
 	{
 		return this.inputTank;
 	}
 
-	public FluidTank getOutputTank()
+	public Ic2FluidTank getOutputTank()
 	{
 		return this.outputTank;
 	}

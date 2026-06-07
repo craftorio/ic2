@@ -1,6 +1,6 @@
 package ic2.core.util;
 
-import net.minecraftforge.fml.common.FMLCommonHandler;
+import ic2.core.IC2;
 
 public final class SideGateway<T>
 {
@@ -11,7 +11,7 @@ public final class SideGateway<T>
 	{
 		try
 		{
-			if (FMLCommonHandler.instance().getSide().isClient())
+			if (IC2.envProxy.isClientEnv())
 			{
 				this.clientInstance = (T) Class.forName(clientClass).newInstance();
 			} else

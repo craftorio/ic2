@@ -3,9 +3,9 @@ package ic2.core.item.reactor;
 import ic2.api.reactor.IReactor;
 import ic2.api.reactor.IReactorComponent;
 import ic2.core.profile.NotExperimental;
-import ic2.core.ref.ItemName;
 import ic2.core.util.StackUtil;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item.Properties;
 
 @NotExperimental
 public class ItemReactorHeatpack extends AbstractReactorComponent
@@ -13,9 +13,9 @@ public class ItemReactorHeatpack extends AbstractReactorComponent
 	protected final int maxPer;
 	protected final int heatPer;
 
-	public ItemReactorHeatpack(int maxPer, int heatPer)
+	public ItemReactorHeatpack(Properties settings, int maxPer, int heatPer)
 	{
-		super(ItemName.heatpack);
+		super(settings);
 		this.maxPer = maxPer;
 		this.heatPer = heatPer;
 	}

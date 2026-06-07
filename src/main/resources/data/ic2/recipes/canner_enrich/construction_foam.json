@@ -1,0 +1,14 @@
+{
+  "type": "ic2:canner_enrich",
+  "input_ingredient": {
+    "fluid": "minecraft:water",
+    "amount": 1000
+  },
+  "additive_ingredient": {
+    "item": "ic2:cf_powder"
+  },
+  "result": {
+    "fluid": "ic2:construction_foam",
+    "amount": 1000
+  }
+}

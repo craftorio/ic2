@@ -1,0 +1,10 @@
+{
+  "type": "ic2:macerator",
+  "ingredient": {
+    "item": "minecraft:bone"
+  },
+  "result": {
+    "item": "minecraft:white_dye",
+    "count": 4
+  }
+}

@@ -1,15 +1,18 @@
 package ic2.core.block.reactor.tileentity;
 
 import ic2.core.profile.NotClassic;
-import ic2.core.ref.ItemName;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemStack;
+import ic2.core.ref.Ic2BlockEntities;
+import ic2.core.ref.Ic2Items;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 
 @NotClassic
 public class TileEntityRCI_RSH extends TileEntityAbstractRCI
 {
-	public TileEntityRCI_RSH()
+	public TileEntityRCI_RSH(BlockPos pos, BlockState state)
 	{
-		super(ItemName.rsh_condensator.getItemStack(), new ItemStack(Blocks.REDSTONE_BLOCK));
+		super(Ic2BlockEntities.RCI_RSH, pos, state, new ItemStack(Ic2Items.RSH_CONDENSATOR), new ItemStack(Blocks.f_50330_));
 	}
 }

@@ -1,0 +1,22 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    " I ",
+    "IdI",
+    " C "
+  ],
+  "key": {
+    "I": {
+      "item": "ic2:iridium"
+    },
+    "d": {
+      "item": "ic2:diamond_drill"
+    },
+    "C": {
+      "item": "ic2:energy_crystal"
+    }
+  },
+  "result": {
+    "item": "ic2:iridium_drill"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "#V#",
+    "#D#",
+    "#V#"
+  ],
+  "key": {
+    "V": {
+      "item": "ic2:heat_vent"
+    },
+    "#": {
+      "item": "minecraft:iron_bars"
+    },
+    "D": {
+      "tag": "forge:gems/diamond"
+    }
+  },
+  "result": {
+    "item": "ic2:advanced_heat_vent"
+  }
+}

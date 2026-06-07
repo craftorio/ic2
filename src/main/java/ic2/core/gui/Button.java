@@ -1,12 +1,15 @@
 package ic2.core.gui;
 
-import com.google.common.base.Supplier;
-import ic2.core.GuiIC2;
+import com.mojang.blaze3d.vertex.PoseStack;
+import ic2.core.Ic2Gui;
 import ic2.core.init.Localization;
-import net.minecraft.client.audio.PositionedSoundRecord;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.init.SoundEvents;
-import net.minecraft.item.ItemStack;
+import ic2.core.proxy.SideProxyClient;
+
+import java.util.function.Supplier;
+
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.item.ItemStack;
 
 public abstract class Button<T extends Button<T>> extends GuiElement<T>
 {
@@ -15,13 +18,13 @@ public abstract class Button<T extends Button<T>> extends GuiElement<T>
 	private Supplier<String> textProvider;
 	private Supplier<ItemStack> iconProvider;
 
-	protected Button(GuiIC2<?> gui, int x, int y, int width, int height, IClickHandler handler)
+	protected Button(Ic2Gui<?> gui, int x, int y, int width, int height, IClickHandler handler)
 	{
 		super(gui, x, y, width, height);
 		this.handler = handler;
 	}
 
-	public T withText(final String text)
+	public T withText(String text)
 	{
 		return this.withText(new Supplier<String>()
 		{
@@ -50,24 +53,22 @@ public abstract class Button<T extends Button<T>> extends GuiElement<T>
 	}
 
 	@Override
-	public void drawBackground(int mouseX, int mouseY)
+	public void drawBackground(PoseStack matrices, int mouseX, int mouseY)
 	{
 		if (this.textProvider != null)
 		{
-			String text = (String) this.textProvider.get();
+			String text = this.textProvider.get();
 			if (text != null && !text.isEmpty())
 			{
 				text = Localization.translate(text);
-				this.gui.drawXYCenteredString(this.x + this.width / 2, this.y + this.height / 2, text, this.getTextColor(mouseX, mouseY), true);
+				this.gui.drawXYCenteredString(matrices, this.x + this.width / 2, this.y + this.height / 2, text, this.getTextColor(mouseX, mouseY), true);
 			}
 		} else if (this.iconProvider != null)
 		{
-			ItemStack stack = (ItemStack) this.iconProvider.get();
+			ItemStack stack = this.iconProvider.get();
 			if (stack != null && stack.getItem() != null)
 			{
-				RenderHelper.enableGUIStandardItemLighting();
 				this.gui.drawItem(this.x + (this.width - 16) / 2, this.y + (this.height - 16) / 2, stack);
-				RenderHelper.disableStandardItemLighting();
 			}
 		}
 	}
@@ -75,7 +76,7 @@ public abstract class Button<T extends Button<T>> extends GuiElement<T>
 	@Override
 	protected boolean onMouseClick(int mouseX, int mouseY, MouseButton button)
 	{
-		this.gui.mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+		SideProxyClient.mc.m_91106_().m_120367_(SimpleSoundInstance.m_119752_(SoundEvents.f_12490_, 1.0F));
 		this.handler.onClick(button);
 		return false;
 	}

@@ -1,24 +1,26 @@
 package ic2.core.block.kineticgenerator.gui;
 
 import com.google.common.base.Supplier;
-import ic2.core.GuiIC2;
+import ic2.core.Ic2Gui;
 import ic2.core.block.kineticgenerator.container.ContainerSteamKineticGenerator;
 import ic2.core.gui.IEnableHandler;
 import ic2.core.gui.Image;
 import ic2.core.gui.SlotGrid;
 import ic2.core.gui.TankGauge;
-import ic2.core.gui.Text;
+import ic2.core.gui.TextLabel;
 import ic2.core.gui.dynamic.TextProvider;
 import ic2.core.init.Localization;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
 
-public class GuiSteamKineticGenerator extends GuiIC2<ContainerSteamKineticGenerator>
+public class GuiSteamKineticGenerator extends Ic2Gui<ContainerSteamKineticGenerator>
 {
-	private static final ResourceLocation TEXTURE = new ResourceLocation("ic2", "textures/gui/GUISteamKineticGenerator.png");
+	private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath("ic2", "textures/gui/guisteamkineticgenerator.png");
 
-	public GuiSteamKineticGenerator(final ContainerSteamKineticGenerator container)
+	public GuiSteamKineticGenerator(ContainerSteamKineticGenerator container, Inventory playerInventory, Component title)
 	{
-		super(container);
+		super(container, playerInventory, title);
 		this.addElement(TankGauge.createPlain(this, 75, 21, 26, 26, container.base.getDistilledWaterTank()));
 		this.addElement(new SlotGrid(this, 80, 26, SlotGrid.SlotStyle.Plain).withTooltip(new Supplier<String>()
 		{
@@ -43,7 +45,7 @@ public class GuiSteamKineticGenerator extends GuiIC2<ContainerSteamKineticGenera
 				return container.base.hasTurbine() && container.base.isThrottled();
 			}
 		}).withTooltip("ic2.SteamKineticGenerator.gui.condensationwarrning"));
-		this.addElement(Text.create(this, 8, 51, 160, 13, TextProvider.of(new Supplier<String>()
+		this.addElement(TextLabel.create(this, 8, 51, 160, 13, TextProvider.of(new Supplier<String>()
 		{
 			public String get()
 			{
@@ -63,14 +65,8 @@ public class GuiSteamKineticGenerator extends GuiIC2<ContainerSteamKineticGenera
 					return container.base.getActive() ? "ic2.SteamKineticGenerator.gui.aktive" : "ic2.SteamKineticGenerator.gui.waiting";
 				}
 			}
-		}), new Supplier<Integer>()
-		{
-			public Integer get()
-			{
-				return container.base.hasTurbine() && !container.base.isTurbineBlockedByWater() ? 2157374 : 14946604;
-			}
-		}, false, 4, 0, false, true));
-		this.addElement(Text.create(this, 8, 68, 160, 13, TextProvider.of(new Supplier<String>()
+		}), () -> container.base.hasTurbine() && !container.base.isTurbineBlockedByWater() ? 2157374 : 14946604, false, 4, 0, false, true));
+		this.addElement(TextLabel.create(this, 8, 68, 160, 13, TextProvider.of(new Supplier<String>()
 		{
 			public String get()
 			{

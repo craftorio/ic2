@@ -1,0 +1,19 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "CcC",
+    "C C",
+    "C C"
+  ],
+  "key": {
+    "C": {
+      "item": "ic2:carbon_plate"
+    },
+    "c": {
+      "item": "ic2:energy_crystal"
+    }
+  },
+  "result": {
+    "item": "ic2:nano_leggings"
+  }
+}

@@ -1,44 +1,33 @@
 package ic2.core.item.tool;
 
 import ic2.core.ContainerBase;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import ic2.core.network.GrowingBuffer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 
 public class HandHeldScanner extends HandHeldInventory
 {
-	final ItemStack itemScanner;
-	final EntityPlayer player;
+	ItemStack itemScanner;
+	Player player;
 
-	public HandHeldScanner(EntityPlayer player, ItemStack itemScanner)
+	public HandHeldScanner(Player player, InteractionHand hand, ItemStack itemScanner)
 	{
-		super(player, itemScanner, 0);
+		super(player, hand, itemScanner, 0);
 		this.itemScanner = itemScanner;
 		this.player = player;
 	}
 
 	@Override
-	public ContainerBase<HandHeldScanner> getGuiContainer(EntityPlayer player)
+	public ContainerBase<?> createServerScreenHandler(int syncId, Player player)
 	{
-		return new ContainerToolScanner(player, this);
+		return new ContainerToolScanner(syncId, player.getInventory(), this);
 	}
 
-	@SideOnly(Side.CLIENT)
 	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
-		return new GuiToolScanner(new ContainerToolScanner(player, this));
-	}
-
-	public String getName()
-	{
-		return this.itemScanner.getUnlocalizedName();
-	}
-
-	public boolean hasCustomName()
-	{
-		return false;
+		return new ContainerToolScanner(syncId, inventory, this);
 	}
 }

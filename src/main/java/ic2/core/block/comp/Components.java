@@ -1,6 +1,5 @@
 package ic2.core.block.comp;
 
-import ic2.core.block.steam.ProcessingComponent;
 import ic2.core.block.transport.cover.Covers;
 
 import java.util.HashMap;
@@ -22,7 +21,6 @@ public class Components
 		register(Redstone.class, "redstone");
 		register(RedstoneEmitter.class, "redstoneEmitter");
 		register(ComparatorEmitter.class, "comparatorEmitter");
-		register(ProcessingComponent.class, "processingComponent");
 		register(Covers.class, "covers");
 	}
 

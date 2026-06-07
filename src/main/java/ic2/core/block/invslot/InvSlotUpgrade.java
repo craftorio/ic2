@@ -18,8 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 public class InvSlotUpgrade extends InvSlot
 {
@@ -36,7 +35,7 @@ public class InvSlotUpgrade extends InvSlot
 
 	public static InvSlotUpgrade createUnchecked(IInventorySlotHolder<?> base, String name, int count)
 	{
-		return new InvSlotUpgrade((IInventorySlotHolder<?> & IUpgradableBlock) base, name, count);
+		return new InvSlotUpgrade(base, name, count);
 	}
 
 	public <T extends IInventorySlotHolder<?> & IUpgradableBlock> InvSlotUpgrade(T base, String name, int count)
@@ -48,14 +47,7 @@ public class InvSlotUpgrade extends InvSlot
 	@Override
 	public boolean accepts(ItemStack stack)
 	{
-		Item rawItem = stack.getItem();
-		if (!(rawItem instanceof IUpgradeItem))
-		{
-			return false;
-		}
-
-		IUpgradeItem item = (IUpgradeItem) rawItem;
-		return item.isSuitableFor(stack, ((IUpgradableBlock) this.base).getUpgradableProperties());
+		return !(stack.getItem() instanceof IUpgradeItem item) ? false : item.isSuitableFor(stack, ((IUpgradableBlock) this.base).getUpgradableProperties());
 	}
 
 	@Override
@@ -112,9 +104,8 @@ public class InvSlotUpgrade extends InvSlot
 
 		for (TileEntityComponent component : this.base.getParent().getComponents())
 		{
-			if (component instanceof Redstone)
+			if (component instanceof Redstone rs)
 			{
-				Redstone rs = (Redstone) component;
 				rs.removeRedstoneModifiers(this.redstoneModifiers);
 				rs.addRedstoneModifiers(newRedstoneModifiers);
 				rs.update();
@@ -224,7 +215,7 @@ public class InvSlotUpgrade extends InvSlot
 	{
 		if (this.tickNoMark())
 		{
-			this.base.getParent().markDirty();
+			this.base.getParent().setChanged();
 		}
 	}
 
@@ -237,7 +228,7 @@ public class InvSlotUpgrade extends InvSlot
 		UpgradeRedstoneModifier(IRedstoneSensitiveUpgrade upgrade, ItemStack stack, IUpgradableBlock block)
 		{
 			this.upgrade = upgrade;
-			this.stack = stack.copy();
+			this.stack = stack.m_41777_();
 			this.block = block;
 		}
 

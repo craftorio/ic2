@@ -1,0 +1,22 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    " B ",
+    "III",
+    " F "
+  ],
+  "key": {
+    "B": {
+      "item": "ic2:re_battery"
+    },
+    "F": {
+      "item": "ic2:iron_furnace"
+    },
+    "I": {
+      "tag": "forge:plates/iron"
+    }
+  },
+  "result": {
+    "item": "ic2:generator"
+  }
+}

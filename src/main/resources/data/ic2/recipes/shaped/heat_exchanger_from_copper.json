@@ -1,0 +1,22 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "CcC",
+    "TCT",
+    "CTC"
+  ],
+  "key": {
+    "c": {
+      "item": "ic2:circuit"
+    },
+    "T": {
+      "tag": "forge:plates/tin"
+    },
+    "C": {
+      "tag": "forge:plates/copper"
+    }
+  },
+  "result": {
+    "item": "ic2:heat_exchanger"
+  }
+}

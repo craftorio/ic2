@@ -1,0 +1,20 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "VVV",
+    "VCV",
+    "VVV"
+  ],
+  "key": {
+    "V": {
+      "item": "ic2:reactor_vessel"
+    },
+    "C": {
+      "item": "ic2:empty_cell"
+    }
+  },
+  "consuming": true,
+  "result": {
+    "item": "ic2:reactor_fluid_port"
+  }
+}

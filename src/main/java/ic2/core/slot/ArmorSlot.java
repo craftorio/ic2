@@ -4,15 +4,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import net.minecraft.inventory.EntityEquipmentSlot;
-import net.minecraft.inventory.EntityEquipmentSlot.Type;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.EquipmentSlot.Type;
 
 public class ArmorSlot
 {
-	private static final EntityEquipmentSlot[] armorSlots = getArmorSlots();
-	private static final List<EntityEquipmentSlot> armorSlotList = Collections.unmodifiableList(Arrays.asList(armorSlots));
+	private static final EquipmentSlot[] armorSlots = getArmorSlots();
+	private static final List<EquipmentSlot> armorSlotList = Collections.unmodifiableList(Arrays.asList(armorSlots));
 
-	public static EntityEquipmentSlot get(int index)
+	public static EquipmentSlot get(int index)
 	{
 		return armorSlots[index];
 	}
@@ -22,31 +22,31 @@ public class ArmorSlot
 		return armorSlots.length;
 	}
 
-	public static Iterable<EntityEquipmentSlot> getAll()
+	public static Iterable<EquipmentSlot> getAll()
 	{
 		return armorSlotList;
 	}
 
-	private static EntityEquipmentSlot[] getArmorSlots()
+	private static EquipmentSlot[] getArmorSlots()
 	{
-		EntityEquipmentSlot[] values = EntityEquipmentSlot.values();
+		EquipmentSlot[] values = EquipmentSlot.values();
 		int count = 0;
 
-		for (EntityEquipmentSlot slot : values)
+		for (EquipmentSlot slot : values)
 		{
-			if (slot.getSlotType() == Type.ARMOR)
+			if (slot.m_20743_() == Type.ARMOR)
 			{
 				count++;
 			}
 		}
 
-		EntityEquipmentSlot[] ret = new EntityEquipmentSlot[count];
+		EquipmentSlot[] ret = new EquipmentSlot[count];
 
 		for (int i = 0; i < ret.length; i++)
 		{
-			for (EntityEquipmentSlot slot : values)
+			for (EquipmentSlot slot : values)
 			{
-				if (slot.getSlotType() == Type.ARMOR && slot.getIndex() == i)
+				if (slot.m_20743_() == Type.ARMOR && slot.m_20749_() == i)
 				{
 					ret[i] = slot;
 					break;

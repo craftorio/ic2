@@ -1,7 +1,7 @@
 package ic2.api.item;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 
 public interface IKineticRotor
 {

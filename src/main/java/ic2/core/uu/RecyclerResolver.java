@@ -2,8 +2,7 @@ package ic2.core.uu;
 
 import ic2.api.recipe.Recipes;
 import ic2.core.block.machine.tileentity.TileEntityRecycler;
-import ic2.core.item.type.CraftingItemType;
-import ic2.core.ref.ItemName;
+import ic2.core.ref.Ic2Items;
 import ic2.core.util.StackUtil;
 
 import java.util.ArrayList;
@@ -11,7 +10,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 public class RecyclerResolver implements ILateRecipeResolver
 {
@@ -31,8 +30,6 @@ public class RecyclerResolver implements ILateRecipeResolver
 			}
 		}
 
-		return Arrays.asList(
-			new RecipeTransformation(transformCost, Collections.singletonList(input), new LeanItemStack(ItemName.crafting.getItemStack(CraftingItemType.scrap)))
-		);
+		return Arrays.asList(new RecipeTransformation(transformCost, Collections.singletonList(input), new LeanItemStack(Ic2Items.SCRAP)));
 	}
 }

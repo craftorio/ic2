@@ -1,12 +1,23 @@
 package ic2.core.crop;
 
 import ic2.api.crops.ICropTile;
+import ic2.api.crops.ICropType;
+
+import java.util.List;
+
+import net.minecraft.resources.ResourceLocation;
 
 public abstract class CropVanillaStem extends CropVanilla
 {
-	protected CropVanillaStem(int maxAge)
+	public CropVanillaStem(ICropType cropType)
 	{
-		super(maxAge);
+		super(cropType);
+	}
+
+	@Override
+	public List<ResourceLocation> getTexturesLocation()
+	{
+		return this.getDefaultTexturesLocation();
 	}
 
 	@Override
@@ -16,8 +27,8 @@ public abstract class CropVanillaStem extends CropVanilla
 	}
 
 	@Override
-	public int getSizeAfterHarvest(ICropTile crop)
+	public int getAgeAfterHarvest(ICropTile crop)
 	{
-		return this.maxAge - 1;
+		return this.getMaxAge() - 1;
 	}
 }

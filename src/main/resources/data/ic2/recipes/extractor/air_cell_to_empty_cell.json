@@ -1,0 +1,9 @@
+{
+  "type": "ic2:extractor",
+  "ingredient": {
+    "item": "ic2:air_cell"
+  },
+  "result": {
+    "item": "ic2:empty_cell"
+  }
+}

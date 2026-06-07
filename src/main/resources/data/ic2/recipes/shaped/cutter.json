@@ -1,0 +1,19 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "A A",
+    " A ",
+    "I I"
+  ],
+  "key": {
+    "A": {
+      "tag": "forge:plates/iron"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    }
+  },
+  "result": {
+    "item": "ic2:cutter"
+  }
+}

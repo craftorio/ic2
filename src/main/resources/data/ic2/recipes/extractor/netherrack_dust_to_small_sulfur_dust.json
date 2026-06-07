@@ -1,0 +1,9 @@
+{
+  "type": "ic2:extractor",
+  "ingredient": {
+    "item": "ic2:netherrack_dust"
+  },
+  "result": {
+    "item": "ic2:small_sulfur_dust"
+  }
+}

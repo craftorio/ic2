@@ -1,0 +1,73 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_circuit": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:circuit"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_electric_motor": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:electric_motor"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_empty_cell": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:empty_cell"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_iron_casing": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:iron_casing"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "ic2:shaped/fluid_regulator"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_iron_casing",
+      "has_empty_cell",
+      "has_electric_motor",
+      "has_circuit",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "ic2:shaped/fluid_regulator"
+    ]
+  }
+}

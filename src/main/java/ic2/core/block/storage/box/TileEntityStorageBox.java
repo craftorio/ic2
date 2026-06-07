@@ -2,34 +2,36 @@ package ic2.core.block.storage.box;
 
 import ic2.core.ContainerBase;
 import ic2.core.IHasGui;
-import ic2.core.block.TileEntityInventory;
 import ic2.core.block.invslot.InvSlot;
+import ic2.core.block.tileentity.TileEntityInventory;
 import ic2.core.gui.dynamic.DynamicContainer;
-import ic2.core.gui.dynamic.DynamicGui;
-import ic2.core.gui.dynamic.GuiParser;
+import ic2.core.network.GrowingBuffer;
 import ic2.core.util.StackUtil;
 
 import java.util.Collections;
 import java.util.List;
 
-import net.minecraft.block.SoundType;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public abstract class TileEntityStorageBox extends TileEntityInventory implements IHasGui
 {
 	protected final InvSlot inventory;
 
-	public TileEntityStorageBox(int inventorySize)
+	public TileEntityStorageBox(BlockEntityType<? extends TileEntityStorageBox> type, BlockPos pos, BlockState state, int inventorySize)
 	{
+		super(type, pos, state);
 		this.inventory = new InvSlot(this, "inventory", InvSlot.Access.IO, inventorySize, InvSlot.InvSide.ANY);
 	}
 
@@ -40,20 +42,20 @@ public abstract class TileEntityStorageBox extends TileEntityInventory implement
 	}
 
 	@Override
-	public void onPlaced(ItemStack stack, EntityLivingBase placer, EnumFacing facing)
+	public void onPlaced(ItemStack stack, LivingEntity placer, Direction facing)
 	{
 		super.onPlaced(stack, placer, facing);
-		if (!this.getWorld().isRemote)
+		if (!this.getLevel().isClientSide)
 		{
-			NBTTagCompound nbt = StackUtil.getOrCreateNbtData(stack);
+			CompoundTag nbt = StackUtil.getOrCreateNbtData(stack);
 			this.inventory.readFromNbt(nbt);
 		}
 	}
 
 	@Override
-	protected ItemStack adjustDrop(ItemStack drop, boolean wrench)
+	public ItemStack adjustDrop(ItemStack drop, boolean wrench)
 	{
-		NBTTagCompound nbt = StackUtil.getOrCreateNbtData(drop);
+		CompoundTag nbt = StackUtil.getOrCreateNbtData(drop);
 		if (!this.inventory.isEmpty())
 		{
 			this.inventory.writeToNbt(nbt);
@@ -62,35 +64,23 @@ public abstract class TileEntityStorageBox extends TileEntityInventory implement
 		return drop;
 	}
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
-	public void addInformation(ItemStack stack, List<String> info, ITooltipFlag advanced)
+	public void addInformation(ItemStack stack, List<String> info, TooltipFlag advanced)
 	{
 		info.add("Stores items even when broken");
 		info.add("Inventory size: " + this.inventory.size());
 	}
 
 	@Override
-	protected SoundType getBlockSound(Entity entity)
+	public ContainerBase<?> createServerScreenHandler(int syncId, Player player)
 	{
-		return SoundType.METAL;
+		return DynamicContainer.create(syncId, player.getInventory(), this);
 	}
 
 	@Override
-	public ContainerBase<? extends TileEntityStorageBox> getGuiContainer(EntityPlayer player)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
-		return DynamicContainer.create(this, player, GuiParser.parse(this.teBlock));
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
-	{
-		return DynamicGui.<TileEntityStorageBox>create(this, player, GuiParser.parse(this.teBlock));
-	}
-
-	@Override
-	public void onGuiClosed(EntityPlayer player)
-	{
+		return DynamicContainer.create(syncId, inventory, this);
 	}
 }

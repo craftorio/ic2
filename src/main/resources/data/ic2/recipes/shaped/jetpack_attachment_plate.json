@@ -1,0 +1,25 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "IAI",
+    "CRC",
+    "IAI"
+  ],
+  "key": {
+    "R": {
+      "tag": "forge:plates/steel"
+    },
+    "A": {
+      "item": "ic2:alloy"
+    },
+    "C": {
+      "item": "ic2:carbon_plate"
+    },
+    "I": {
+      "tag": "forge:nuggets/iridium"
+    }
+  },
+  "result": {
+    "item": "ic2:jetpack_attachment_plate"
+  }
+}

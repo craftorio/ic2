@@ -4,11 +4,11 @@ import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.Set;
 
-import net.minecraft.block.Block;
+import net.minecraft.world.level.block.Block;
 
 public final class ExplosionWhitelist
 {
-	private static final Set<Block> whitelist = Collections.newSetFromMap(new IdentityHashMap<>());
+	private static Set<Block> whitelist = Collections.newSetFromMap(new IdentityHashMap<>());
 
 	public static void addWhitelistedBlock(Block block)
 	{

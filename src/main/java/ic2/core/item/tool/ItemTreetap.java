@@ -1,67 +1,66 @@
 package ic2.core.item.tool;
 
 import ic2.api.item.IBoxable;
-import ic2.core.IC2;
-import ic2.core.audio.PositionSpec;
-import ic2.core.block.BlockRubWood;
-import ic2.core.item.ItemIC2;
-import ic2.core.item.type.MiscResourceType;
-import ic2.core.ref.BlockName;
-import ic2.core.ref.ItemName;
+import ic2.core.block.misc.RubberLogBlock;
+import ic2.core.ref.Ic2Blocks;
+import ic2.core.ref.Ic2GameEvents;
+import ic2.core.ref.Ic2Items;
+import ic2.core.ref.Ic2SoundEvents;
 import ic2.core.util.StackUtil;
 
 import java.util.List;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item.Properties;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.gameevent.GameEvent.Context;
 
-public class ItemTreetap extends ItemIC2 implements IBoxable
+public class ItemTreetap extends Item implements IBoxable
 {
-	public ItemTreetap()
+	public ItemTreetap(Properties settings)
 	{
-		super(ItemName.treetap);
-		this.setMaxStackSize(1);
-		this.setMaxDamage(16);
+		super(settings);
 	}
 
-	public EnumActionResult onItemUse(
-		EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float xOffset, float yOffset, float zOffset
-	)
+	public InteractionResult m_6225_(UseOnContext context)
 	{
-		IBlockState state = world.getBlockState(pos);
+		Level world = context.m_43725_();
+		BlockPos pos = context.m_8083_();
+		BlockState state = world.getBlockState(pos);
 		Block block = state.getBlock();
-		if (block == BlockName.rubber_wood.getInstance())
+		if (block == Ic2Blocks.RUBBER_LOG)
 		{
-			if (attemptExtract(player, world, pos, side, state, null))
+			Player player = context.m_43723_();
+			if (attemptExtract(player, world, pos, context.m_43719_(), state, null, false))
 			{
-				if (!world.isRemote)
-				{
-					StackUtil.damage(player, hand, StackUtil.anyStack, 1);
-				}
-
-				return EnumActionResult.SUCCESS;
+				StackUtil.damage(player, context.m_43724_(), StackUtil.anyStack, 1);
+				return InteractionResult.SUCCESS;
 			} else
 			{
-				return EnumActionResult.FAIL;
+				return InteractionResult.FAIL;
 			}
 		} else
 		{
-			return EnumActionResult.PASS;
+			return InteractionResult.PASS;
 		}
 	}
 
-	public static boolean attemptExtract(EntityPlayer player, World world, BlockPos pos, EnumFacing side, IBlockState state, List<ItemStack> stacks)
+	public static boolean attemptExtract(Player player, Level world, BlockPos pos, Direction side, BlockState state, List<ItemStack> stacks, boolean isElectric)
 	{
-		assert state.getBlock() == BlockName.rubber_wood.getInstance();
-		BlockRubWood.RubberWoodState rwState = (BlockRubWood.RubberWoodState) state.getValue(BlockRubWood.stateProperty);
+		assert state.getBlock() == Ic2Blocks.RUBBER_LOG;
+		RubberLogBlock.RubberWoodState rwState = (RubberLogBlock.RubberWoodState) state.getValue(RubberLogBlock.stateProperty);
 		if (rwState.isPlain() || rwState.facing != side)
 		{
 			return false;
@@ -69,75 +68,71 @@ public class ItemTreetap extends ItemIC2 implements IBoxable
 
 		if (rwState.wet)
 		{
-			if (!world.isRemote)
+			if (!world.isClientSide)
 			{
-				world.setBlockState(pos, state.withProperty(BlockRubWood.stateProperty, rwState.getDry()));
+				world.setBlockAndUpdate(pos, (BlockState) state.setValue(RubberLogBlock.stateProperty, rwState.getDry()));
 				if (stacks != null)
 				{
-					stacks.add(StackUtil.copyWithSize(ItemName.misc_resource.getItemStack(MiscResourceType.resin), world.rand.nextInt(3) + 1));
+					stacks.add(StackUtil.copyWithSize(new ItemStack(Ic2Items.RESIN), world.random.nextInt(3) + 1));
 				} else
 				{
-					ejectResin(world, pos, side, world.rand.nextInt(3) + 1);
-				}
-
-				if (player != null)
-				{
-					IC2.achievements.issueAchievement(player, "acquireResin");
+					ejectResin(world, pos, side, world.random.nextInt(3) + 1);
 				}
 			}
 
-			if (world.isRemote && player != null)
-			{
-				IC2.audioManager.playOnce(player, PositionSpec.Hand, "Tools/Treetap.ogg", true, IC2.audioManager.getDefaultVolume());
-			}
-
+			triggerToolUseEvent(world, pos, player, state, isElectric);
 			return true;
 		} else
 		{
-			if (!world.isRemote && world.rand.nextInt(5) == 0)
+			boolean ret = false;
+			if (!world.isClientSide)
 			{
-				world.setBlockState(pos, state.withProperty(BlockRubWood.stateProperty, BlockRubWood.RubberWoodState.plain_y));
-			}
+				if (world.random.nextInt(5) == 0)
+				{
+					world.setBlockAndUpdate(pos, (BlockState) state.setValue(RubberLogBlock.stateProperty, RubberLogBlock.RubberWoodState.plain));
+					triggerToolUseEvent(world, pos, player, state, isElectric);
+					ret = true;
+				}
 
-			if (world.rand.nextInt(5) == 0)
-			{
-				if (!world.isRemote)
+				if (world.random.nextInt(5) == 0)
 				{
 					ejectResin(world, pos, side, 1);
 					if (stacks != null)
 					{
-						stacks.add(ItemName.misc_resource.getItemStack(MiscResourceType.resin));
+						stacks.add(new ItemStack(Ic2Items.RESIN));
 					} else
 					{
 						ejectResin(world, pos, side, 1);
 					}
-				}
 
-				if (world.isRemote && player != null)
-				{
-					IC2.audioManager.playOnce(player, PositionSpec.Hand, "Tools/Treetap.ogg", true, IC2.audioManager.getDefaultVolume());
+					triggerToolUseEvent(world, pos, player, state, isElectric);
+					ret = true;
 				}
-
-				return true;
-			} else
-			{
-				return false;
 			}
+
+			return ret;
 		}
 	}
 
-	private static void ejectResin(World world, BlockPos pos, EnumFacing side, int quantity)
+	private static void triggerToolUseEvent(Level world, BlockPos pos, Player player, BlockState state, boolean isElectric)
+	{
+		player.m_6330_(getToolUseSound(isElectric), SoundSource.PLAYERS, 1.0F, 1.0F);
+		world.m_220407_(GameEvent.f_157792_, pos, Context.m_223719_(player, state));
+		world.m_220407_(Ic2GameEvents.TOOL_USE, pos, Context.m_223719_(player, null));
+	}
+
+	private static void ejectResin(Level world, BlockPos pos, Direction side, int quantity)
 	{
 		double ejectBias = 0.3;
-		double ejectX = pos.getX() + 0.5 + side.getFrontOffsetX() * 0.3;
-		double ejectY = pos.getY() + 0.5 + side.getFrontOffsetY() * 0.3;
-		double ejectZ = pos.getZ() + 0.5 + side.getFrontOffsetZ() * 0.3;
+		double ejectX = pos.getX() + 0.5 + side.m_122429_() * 0.3;
+		double ejectY = pos.getY() + 0.5 + side.m_122430_() * 0.3;
+		double ejectZ = pos.getZ() + 0.5 + side.m_122431_() * 0.3;
 
 		for (int i = 0; i < quantity; i++)
 		{
-			EntityItem entityitem = new EntityItem(world, ejectX, ejectY, ejectZ, ItemName.misc_resource.getItemStack(MiscResourceType.resin));
-			entityitem.setDefaultPickupDelay();
-			world.spawnEntity(entityitem);
+			ItemEntity entityitem = new ItemEntity(world, ejectX, ejectY, ejectZ, new ItemStack(Ic2Items.RESIN));
+			entityitem.m_32060_();
+			world.addFreshEntity(entityitem);
 		}
 	}
 
@@ -145,5 +140,10 @@ public class ItemTreetap extends ItemIC2 implements IBoxable
 	public boolean canBeStoredInToolbox(ItemStack itemstack)
 	{
 		return true;
+	}
+
+	public static SoundEvent getToolUseSound(boolean isElectric)
+	{
+		return isElectric ? Ic2SoundEvents.ITEM_TREETAP_ELECTRIC_USE : Ic2SoundEvents.ITEM_TREETAP_USE;
 	}
 }

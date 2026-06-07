@@ -1,58 +1,53 @@
 package ic2.core.block.machine.tileentity;
 
-import ic2.api.network.INetworkTileEntityEventListener;
 import ic2.api.recipe.ICannerBottleRecipeManager;
 import ic2.api.recipe.MachineRecipeResult;
 import ic2.api.recipe.Recipes;
 import ic2.core.ContainerBase;
-import ic2.core.IC2;
 import ic2.core.IHasGui;
-import ic2.core.audio.AudioSource;
-import ic2.core.audio.PositionSpec;
 import ic2.core.block.IInventorySlotHolder;
 import ic2.core.block.invslot.InvSlot;
 import ic2.core.block.invslot.InvSlotConsumable;
 import ic2.core.block.invslot.InvSlotConsumableItemStack;
 import ic2.core.block.invslot.InvSlotOutput;
 import ic2.core.block.machine.container.ContainerClassicCanner;
-import ic2.core.block.machine.gui.GuiClassicCanner;
+import ic2.core.fluid.Ic2FluidStack;
 import ic2.core.gui.dynamic.IGuiValueProvider;
-import ic2.core.item.type.CellType;
-import ic2.core.item.type.CraftingItemType;
-import ic2.core.ref.ItemName;
-import ic2.core.ref.TeBlock;
+import ic2.core.item.armor.ItemArmorFluidTank;
+import ic2.core.network.GrowingBuffer;
+import ic2.core.ref.Ic2BlockEntities;
+import ic2.core.ref.Ic2Fluids;
+import ic2.core.ref.Ic2Items;
+import ic2.core.ref.Ic2SoundEvents;
 import ic2.core.util.StackUtil;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.state.BlockState;
 
-@TeBlock.Delegated(current = TileEntityCanner.class, old = TileEntityClassicCanner.class)
-public class TileEntityClassicCanner extends TileEntityElectricMachine implements IHasGui, IGuiValueProvider, INetworkTileEntityEventListener
+public class TileEntityClassicCanner extends TileEntityElectricMachine implements IHasGui, IGuiValueProvider
 {
 	public short progress = 0;
-	public final int energyConsume;
-	public final int operationLength;
+	public int energyConsume;
+	public int operationLength;
 	private int fuelQuality = 0;
 	protected TileEntityClassicCanner.Mode mode;
-	protected AudioSource audioSource;
 	public final InvSlot resInputSlot;
 	public final InvSlotConsumable inputSlot;
 	public final InvSlotOutput outputSlot;
 
-	public TileEntityClassicCanner()
+	public TileEntityClassicCanner(BlockPos pos, BlockState state)
 	{
-		super(600, 1);
+		super(Ic2BlockEntities.CLASSIC_CANNER, pos, state, 600, 1);
 		this.energyConsume = 1;
 		this.operationLength = 600;
 		this.resInputSlot = new InvSlot(this, "input", InvSlot.Access.I, 1);
-		this.inputSlot = new InvSlotConsumableItemStack(
-			this, "canInput", 1, ItemName.crafting.getItemStack(CraftingItemType.tin_can), ItemName.crafting.getItemStack(CraftingItemType.empty_fuel_can)
-		)
+		this.inputSlot = new InvSlotConsumableItemStack(this, "canInput", 1, new ItemStack(Ic2Items.TIN_CAN), new ItemStack(Ic2Items.EMPTY_FUEL_CAN))
 		{
 			@Override
 			public boolean accepts(ItemStack stack)
@@ -63,7 +58,7 @@ public class TileEntityClassicCanner extends TileEntityElectricMachine implement
 				}
 
 				Item item = stack.getItem();
-				return item != ItemName.jetpack.getInstance() && item != ItemName.cf_pack.getInstance() ? super.accepts(stack) : true;
+				return item != Ic2Items.JETPACK && item != Ic2Items.CF_PACK ? super.accepts(stack) : true;
 			}
 
 			@Override
@@ -77,29 +72,17 @@ public class TileEntityClassicCanner extends TileEntityElectricMachine implement
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound nbt)
+	public void load(CompoundTag nbt)
 	{
-		super.readFromNBT(nbt);
-		this.fuelQuality = nbt.getInteger("fuelQuality");
+		super.load(nbt);
+		this.fuelQuality = nbt.getInt("fuelQuality");
 	}
 
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
+	public void saveAdditional(CompoundTag nbt)
 	{
-		super.writeToNBT(nbt);
-		nbt.setInteger("fuelQuality", this.fuelQuality);
-		return nbt;
-	}
-
-	@Override
-	protected void onUnloaded()
-	{
-		super.onUnloaded();
-		if (IC2.platform.isRendering() && this.audioSource != null)
-		{
-			IC2.audioManager.removeSources(this);
-			this.audioSource = null;
-		}
+		super.saveAdditional(nbt);
+		nbt.putInt("fuelQuality", this.fuelQuality);
 	}
 
 	@Override
@@ -110,7 +93,7 @@ public class TileEntityClassicCanner extends TileEntityElectricMachine implement
 			int l = this.operationLength;
 			if (this.mode == TileEntityClassicCanner.Mode.FOOD && !this.resInputSlot.isEmpty())
 			{
-				int food = getFoodValue(this.resInputSlot.get());
+				int food = this.getFoodValue(this.resInputSlot.get());
 				if (food > 0)
 				{
 					l = 50 * food;
@@ -137,14 +120,9 @@ public class TileEntityClassicCanner extends TileEntityElectricMachine implement
 		boolean canOperate = this.canOperate();
 		if (canOperate && this.energy.useEnergy(this.energyConsume))
 		{
-			this.setActive(true);
-			if (this.progress == 0)
-			{
-				IC2.network.get(true).initiateTileEntityEvent(this, 0, true);
-			}
-
+			this.activate(false);
 			this.progress++;
-			if (this.mode == TileEntityClassicCanner.Mode.FOOD && this.progress >= getFoodValue(this.resInputSlot.get()) * 50
+			if (this.mode == TileEntityClassicCanner.Mode.FOOD && this.progress >= this.getFoodValue(this.resInputSlot.get()) * 50
 				|| this.mode == TileEntityClassicCanner.Mode.FUEL && this.progress > 0 && this.progress % 100 == 0
 				|| this.mode == TileEntityClassicCanner.Mode.CF && this.progress >= 50)
 			{
@@ -159,17 +137,12 @@ public class TileEntityClassicCanner extends TileEntityElectricMachine implement
 				}
 
 				needsInvUpdate = true;
-				IC2.network.get(true).initiateTileEntityEvent(this, 2, true);
-			} else if (this.progress % 50 == 0)
-			{
-				IC2.network.get(true).initiateTileEntityEvent(this, 2, true);
-				IC2.network.get(true).initiateTileEntityEvent(this, 0, true);
 			}
 		} else
 		{
-			if (this.getActive() && this.progress > 0)
+			if (this.getActive())
 			{
-				IC2.network.get(true).initiateTileEntityEvent(this, 1, true);
+				this.shutdown(this.progress > 0);
 			}
 
 			if (!canOperate && this.mode != TileEntityClassicCanner.Mode.FUEL)
@@ -177,13 +150,11 @@ public class TileEntityClassicCanner extends TileEntityElectricMachine implement
 				this.fuelQuality = 0;
 				this.progress = 0;
 			}
-
-			this.setActive(false);
 		}
 
 		if (needsInvUpdate)
 		{
-			this.markDirty();
+			this.setChanged();
 		}
 	}
 
@@ -193,6 +164,7 @@ public class TileEntityClassicCanner extends TileEntityElectricMachine implement
 		{
 			case FOOD:
 				MachineRecipeResult<ICannerBottleRecipeManager.Input, ItemStack, ICannerBottleRecipeManager.RawInput> result = Recipes.cannerBottle
+					.get(this.level)
 					.apply(new ICannerBottleRecipeManager.RawInput(this.inputSlot.get(), this.resInputSlot.get()), false);
 				this.outputSlot.add(result.getOutput());
 				ICannerBottleRecipeManager.RawInput newInput = result.getAdjustedInput();
@@ -205,32 +177,27 @@ public class TileEntityClassicCanner extends TileEntityElectricMachine implement
 				this.fuelQuality += fuel;
 				if (!incremental)
 				{
-					if (StackUtil.checkItemEquality(this.inputSlot.get(), ItemName.crafting.getItemStack(CraftingItemType.empty_fuel_can)))
+					if (StackUtil.checkItemEquality(this.inputSlot.get(), new ItemStack(Ic2Items.EMPTY_FUEL_CAN)))
 					{
 						this.inputSlot.consume(1);
-						ItemStack resultx = ItemName.filled_fuel_can.getItemStack();
-						NBTTagCompound data = StackUtil.getOrCreateNbtData(resultx);
-						data.setInteger("value", this.fuelQuality);
+						ItemStack resultx = new ItemStack(Ic2Items.FILLED_FUEL_CAN);
+						CompoundTag data = StackUtil.getOrCreateNbtData(resultx);
+						data.putInt("value", this.fuelQuality);
 						this.outputSlot.add(resultx);
 					} else
 					{
-						int damage = this.inputSlot.get().getItemDamage();
-						damage -= this.fuelQuality;
-						if (damage < 1)
-						{
-							damage = 1;
-						}
-
+						ItemStack stack = this.inputSlot.get();
+						((ItemArmorFluidTank) stack.getItem()).fillMb(stack, Ic2FluidStack.create(Ic2Fluids.BIOGAS.still, this.fuelQuality), false, null);
 						this.inputSlot.clear();
-						this.outputSlot.add(new ItemStack(ItemName.jetpack.getInstance(), 1, damage));
+						this.outputSlot.add(stack);
 					}
 				}
 				break;
 			case CF:
 				this.resInputSlot.put(StackUtil.decSize(this.resInputSlot.get()));
 				ItemStack cfPack = this.inputSlot.get();
-				cfPack.setItemDamage(cfPack.getItemDamage() + 2);
-				if (!this.resInputSlot.isEmpty() && cfPack.getItemDamage() <= cfPack.getMaxDamage() - 2)
+				cfPack.m_41721_(cfPack.getDamageValue() + 2);
+				if (!this.resInputSlot.isEmpty() && cfPack.getDamageValue() <= cfPack.m_41776_() - 2)
 				{
 					this.inputSlot.put(cfPack);
 				} else
@@ -251,13 +218,16 @@ public class TileEntityClassicCanner extends TileEntityElectricMachine implement
 			switch (this.mode)
 			{
 				case FOOD:
-					return Recipes.cannerBottle.apply(new ICannerBottleRecipeManager.RawInput(this.inputSlot.get(), this.resInputSlot.get()), false) != null;
+					return Recipes.cannerBottle
+						.get(this.level)
+						.apply(new ICannerBottleRecipeManager.RawInput(this.inputSlot.get(), this.resInputSlot.get()), false)
+						!= null;
 				case FUEL:
 					int fuel = this.getFuelValue(this.resInputSlot.get());
-					return fuel > 0 && this.outputSlot.canAdd(ItemName.jetpack.getItemStack());
+					return fuel > 0 && this.outputSlot.canAdd(new ItemStack(Ic2Items.JETPACK));
 				case CF:
 					ItemStack cfPack = this.inputSlot.get();
-					return cfPack.getItemDamage() <= cfPack.getMaxDamage() - 2 && getPelletValue(this.resInputSlot.get()) > 0 && this.outputSlot.canAdd(cfPack);
+					return cfPack.getDamageValue() <= cfPack.m_41776_() - 2 && getPelletValue(this.resInputSlot.get()) > 0 && this.outputSlot.canAdd(cfPack);
 				default:
 					assert false;
 					return false;
@@ -273,18 +243,18 @@ public class TileEntityClassicCanner extends TileEntityElectricMachine implement
 		if (!this.inputSlot.isEmpty())
 		{
 			ItemStack input = this.inputSlot.get();
-			if (StackUtil.checkItemEquality(input, ItemName.crafting.getItemStack(CraftingItemType.tin_can)))
+			Item item = input.getItem();
+			if (item == Ic2Items.TIN_CAN)
 			{
 				return TileEntityClassicCanner.Mode.FOOD;
 			}
 
-			if (StackUtil.checkItemEquality(input, ItemName.crafting.getItemStack(CraftingItemType.empty_fuel_can))
-				|| input.getItem() == ItemName.jetpack.getInstance())
+			if (item == Ic2Items.EMPTY_FUEL_CAN || item == Ic2Items.JETPACK)
 			{
 				return TileEntityClassicCanner.Mode.FUEL;
 			}
 
-			if (input.getItem() == ItemName.cf_pack.getInstance())
+			if (item == Ic2Items.CF_PACK)
 			{
 				return TileEntityClassicCanner.Mode.CF;
 			}
@@ -293,13 +263,11 @@ public class TileEntityClassicCanner extends TileEntityElectricMachine implement
 		return TileEntityClassicCanner.Mode.NONE;
 	}
 
-	public static int getFoodValue(ItemStack stack)
+	public int getFoodValue(ItemStack stack)
 	{
 		MachineRecipeResult<ICannerBottleRecipeManager.Input, ItemStack, ICannerBottleRecipeManager.RawInput> result = Recipes.cannerBottle
-			.apply(
-				new ICannerBottleRecipeManager.RawInput(StackUtil.copyWithSize(ItemName.crafting.getItemStack(CraftingItemType.tin_can), Integer.MAX_VALUE), stack),
-				false
-			);
+			.get(this.level)
+			.apply(new ICannerBottleRecipeManager.RawInput(new ItemStack(Ic2Items.TIN_CAN, Integer.MAX_VALUE), stack), false);
 		return result == null ? 0 : StackUtil.getSize(result.getOutput());
 	}
 
@@ -308,92 +276,61 @@ public class TileEntityClassicCanner extends TileEntityElectricMachine implement
 		if (StackUtil.isEmpty(stack))
 		{
 			return 0;
-		} else if (StackUtil.checkItemEquality(stack, ItemName.cell.getItemStack(CellType.coalfuel)))
-		{
-			return 2548;
-		} else if (StackUtil.checkItemEquality(stack, ItemName.cell.getItemStack(CellType.biofuel)))
-		{
-			return 868;
-		} else if (stack.getItem() == Items.REDSTONE && this.fuelQuality > 0)
-		{
-			return (int) (this.fuelQuality * 0.2);
-		} else if (stack.getItem() == Items.GLOWSTONE_DUST && this.fuelQuality > 0)
-		{
-			return (int) (this.fuelQuality * 0.3);
 		} else
 		{
-			return stack.getItem() == Items.GUNPOWDER && this.fuelQuality > 0 ? (int) (this.fuelQuality * 0.4) : 0;
+			Item item = stack.getItem();
+			if (item == Ic2Items.COALFUEL_CELL)
+			{
+				return 2548;
+			} else if (item == Ic2Items.BIOFUEL_CELL)
+			{
+				return 868;
+			} else if (item == Items.REDSTONE && this.fuelQuality > 0)
+			{
+				return (int) (this.fuelQuality * 0.2);
+			} else if (item == Items.f_42525_ && this.fuelQuality > 0)
+			{
+				return (int) (this.fuelQuality * 0.3);
+			} else
+			{
+				return item == Items.f_42403_ && this.fuelQuality > 0 ? (int) (this.fuelQuality * 0.4) : 0;
+			}
 		}
 	}
 
-	public static int getPelletValue(ItemStack item)
+	public static int getPelletValue(ItemStack stack)
 	{
-		if (StackUtil.isEmpty(item))
+		if (StackUtil.isEmpty(stack))
 		{
 			return 0;
 		} else
 		{
-			return StackUtil.checkItemEquality(item, ItemName.crafting.getItemStack(CraftingItemType.pellet)) ? StackUtil.getSize(item) : 0;
+			return stack.getItem() == Ic2Items.PELLET ? StackUtil.getSize(stack) : 0;
 		}
 	}
 
 	@Override
-	public ContainerBase<?> getGuiContainer(EntityPlayer player)
+	public ContainerBase<TileEntityClassicCanner> createServerScreenHandler(int syncId, Player player)
 	{
-		return new ContainerClassicCanner(player, this);
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
-	{
-		return new GuiClassicCanner(new ContainerClassicCanner(player, this));
+		return new ContainerClassicCanner(syncId, player.getInventory(), this);
 	}
 
 	@Override
-	public void onGuiClosed(EntityPlayer entityPlayer)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
-	}
-
-	public String getStartSoundFile()
-	{
-		return "Machines/CannerOp.ogg";
-	}
-
-	public String getInterruptSoundFile()
-	{
-		return "Machines/InterruptOne.ogg";
+		return new ContainerClassicCanner(syncId, inventory, this);
 	}
 
 	@Override
-	public void onNetworkEvent(int event)
+	public SoundEvent getLoopingSoundEvent()
 	{
-		if (this.audioSource == null)
-		{
-			this.audioSource = IC2.audioManager.createSource(this, this.getStartSoundFile());
-		}
+		return Ic2SoundEvents.MACHINE_CANNER_OPERATE;
+	}
 
-		switch (event)
-		{
-			case 0:
-				if (this.audioSource != null)
-				{
-					this.audioSource.play();
-				}
-				break;
-			case 1:
-				if (this.audioSource != null)
-				{
-					this.audioSource.stop();
-					IC2.audioManager.playOnce(this, PositionSpec.Center, this.getInterruptSoundFile(), false, IC2.audioManager.getDefaultVolume());
-				}
-				break;
-			case 2:
-				if (this.audioSource != null)
-				{
-					this.audioSource.stop();
-				}
-		}
+	@Override
+	public SoundEvent getInterruptSoundEvent()
+	{
+		return Ic2SoundEvents.MACHINE_INTERRUPT1;
 	}
 
 	private enum Mode

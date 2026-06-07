@@ -1,23 +1,21 @@
 package ic2.core.recipe;
 
 import ic2.api.recipe.IFermenterRecipeManager;
+import ic2.core.fluid.Ic2FluidStack;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidRegistry;
-import net.minecraftforge.fluids.FluidStack;
+import net.minecraft.world.level.material.Fluid;
 
 public class FermenterRecipeManager implements IFermenterRecipeManager
 {
-	private final Map<String, IFermenterRecipeManager.FermentationProperty> fluidMap = new HashMap<>();
+	private final Map<Fluid, IFermenterRecipeManager.FermentationProperty> fluidMap = new IdentityHashMap<>();
 
 	@Override
-	public void addRecipe(String input, int inputAmount, int heat, String output, int outputAmount)
+	public void addRecipe(Fluid input, int inputAmount, int heat, Fluid output, int outputAmount)
 	{
 		if (this.fluidMap.containsKey(input))
 		{
@@ -30,11 +28,11 @@ public class FermenterRecipeManager implements IFermenterRecipeManager
 	@Override
 	public IFermenterRecipeManager.FermentationProperty getFermentationInformation(Fluid fluid)
 	{
-		return fluid == null ? null : this.fluidMap.get(fluid.getName());
+		return fluid == null ? null : this.fluidMap.get(fluid);
 	}
 
 	@Override
-	public FluidStack getOutput(Fluid input)
+	public Ic2FluidStack getOutput(Fluid input)
 	{
 		IFermenterRecipeManager.FermentationProperty fp = this.getFermentationInformation(input);
 		if (fp == null)
@@ -42,35 +40,24 @@ public class FermenterRecipeManager implements IFermenterRecipeManager
 			return null;
 		} else
 		{
-			return FluidRegistry.getFluid(fp.output) == null ? null : new FluidStack(FluidRegistry.getFluid(fp.output), fp.outputAmount);
+			return fp.output == null ? null : Ic2FluidStack.create(fp.output, fp.outputAmount);
 		}
 	}
 
 	@Override
 	public boolean acceptsFluid(Fluid fluid)
 	{
-		return fluid != null && this.fluidMap.containsKey(fluid.getName());
+		return fluid != null && this.fluidMap.containsKey(fluid);
 	}
 
 	@Override
 	public Set<Fluid> getAcceptedFluids()
 	{
-		Set<Fluid> ret = new HashSet<>(this.fluidMap.size() * 2, 0.5F);
-
-		for (String fluidName : this.fluidMap.keySet())
-		{
-			Fluid fluid = FluidRegistry.getFluid(fluidName);
-			if (fluid != null)
-			{
-				ret.add(fluid);
-			}
-		}
-
-		return ret;
+		return Collections.unmodifiableSet(this.fluidMap.keySet());
 	}
 
 	@Override
-	public Map<String, IFermenterRecipeManager.FermentationProperty> getRecipeMap()
+	public Map<Fluid, IFermenterRecipeManager.FermentationProperty> getRecipeMap()
 	{
 		return Collections.unmodifiableMap(this.fluidMap);
 	}

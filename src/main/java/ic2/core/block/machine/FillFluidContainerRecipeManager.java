@@ -4,19 +4,19 @@ import ic2.api.recipe.IFillFluidContainerRecipeManager;
 import ic2.api.recipe.MachineRecipe;
 import ic2.api.recipe.MachineRecipeResult;
 import ic2.api.util.FluidContainerOutputMode;
+import ic2.core.fluid.Ic2FluidStack;
 import ic2.core.util.LiquidUtil;
 import ic2.core.util.StackUtil;
 
 import java.util.Collection;
 import java.util.Collections;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.fluids.FluidStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
 
 public class FillFluidContainerRecipeManager implements IFillFluidContainerRecipeManager
 {
-	public boolean addRecipe(Void input, Collection<ItemStack> output, NBTTagCompound metadata, boolean replace)
+	public boolean addRecipe(Void input, Collection<ItemStack> output, CompoundTag metadata, boolean replace)
 	{
 		return false;
 	}
@@ -35,7 +35,7 @@ public class FillFluidContainerRecipeManager implements IFillFluidContainerRecip
 	{
 		if (!StackUtil.isEmpty(input.container) && input.fluid != null)
 		{
-			if (input.fluid.amount <= 0)
+			if (input.fluid.isEmpty())
 			{
 				return null;
 			}
@@ -47,10 +47,10 @@ public class FillFluidContainerRecipeManager implements IFillFluidContainerRecip
 			}
 
 			Collection<ItemStack> output = StackUtil.isEmpty(result.extraOutput) ? Collections.emptyList() : Collections.singletonList(result.extraOutput);
-			FluidStack changedFluid = result.fluidChange.amount >= input.fluid.amount
+			Ic2FluidStack changedFluid = result.fluidChange.getAmountMb() >= input.fluid.getAmountMb()
 				? null
-				: new FluidStack(input.fluid, input.fluid.amount - result.fluidChange.amount);
-			return (MachineRecipeResult) new MachineRecipe<>(null, output).getResult(new IFillFluidContainerRecipeManager.Input(result.inPlaceOutput, changedFluid));
+				: input.fluid.copyWithAmountMb(input.fluid.getAmountMb() - result.fluidChange.getAmountMb());
+			return new MachineRecipe<>(null, output).getResult(new IFillFluidContainerRecipeManager.Input(result.inPlaceOutput, changedFluid));
 		} else if (!acceptTest)
 		{
 			return null;
@@ -61,7 +61,7 @@ public class FillFluidContainerRecipeManager implements IFillFluidContainerRecip
 		{
 			return !StackUtil.isEmpty(input.container) && !LiquidUtil.isFillableFluidContainer(input.container)
 				? null
-				: (MachineRecipeResult) new MachineRecipe<>(null, Collections.emptyList()).getResult(input);
+				: new MachineRecipe<>(null, Collections.emptyList()).getResult(input);
 		}
 	}
 

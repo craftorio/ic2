@@ -1,21 +1,37 @@
 package ic2.core.crop;
 
 import ic2.api.crops.ICropTile;
-import net.minecraft.block.BlockCrops;
-import net.minecraft.item.ItemStack;
+import ic2.api.crops.ICropType;
 
-public abstract class CropVanilla extends IC2CropCard
+import java.util.ArrayList;
+import java.util.List;
+
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+
+public abstract class CropVanilla extends Ic2CropCard
 {
-	protected final int maxAge;
-
-	protected CropVanilla(BlockCrops block)
+	public CropVanilla(ICropType cropType)
 	{
-		this(block.getMaxAge());
+		super(cropType);
 	}
 
-	protected CropVanilla(int maxAge)
+	protected List<ResourceLocation> getDefaultTexturesLocation()
 	{
-		this.maxAge = maxAge;
+		return super.getTexturesLocation();
+	}
+
+	@Override
+	public List<ResourceLocation> getTexturesLocation()
+	{
+		List<ResourceLocation> ret = new ArrayList<>(this.getMaxAge());
+
+		for (int size = 1; size <= this.getMaxAge(); size++)
+		{
+			ret.add(ResourceLocation.fromNamespaceAndPath("blocks/" + this.getId() + "_stage_" + size));
+		}
+
+		return ret;
 	}
 
 	@Override
@@ -25,15 +41,9 @@ public abstract class CropVanilla extends IC2CropCard
 	}
 
 	@Override
-	public int getMaxSize()
-	{
-		return this.maxAge;
-	}
-
-	@Override
 	public boolean canGrow(ICropTile crop)
 	{
-		return crop.getCurrentSize() < this.getMaxSize() && crop.getLightLevel() >= 9;
+		return crop.getCurrentAge() < this.getMaxAge() && crop.getLightLevel() >= 9;
 	}
 
 	protected abstract ItemStack getSeeds();

@@ -1,37 +1,29 @@
 package ic2.core.util;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.ITextComponent;
+import java.util.Set;
 
-public class DelegatingInventory implements IInventory
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+
+public class DelegatingInventory implements Container
 {
-	private final IInventory parent;
+	private final Container parent;
 
-	public DelegatingInventory(IInventory parent)
+	public DelegatingInventory(Container parent)
 	{
 		this.parent = parent;
 	}
 
-	public String getName()
+	public void clearContent()
 	{
-		return this.parent.getName();
+		this.parent.clearContent();
 	}
 
-	public boolean hasCustomName()
+	public int getContainerSize()
 	{
-		return this.parent.hasCustomName();
-	}
-
-	public ITextComponent getDisplayName()
-	{
-		return this.parent.getDisplayName();
-	}
-
-	public int getSizeInventory()
-	{
-		return this.parent.getSizeInventory();
+		return this.parent.getContainerSize();
 	}
 
 	public boolean isEmpty()
@@ -39,73 +31,63 @@ public class DelegatingInventory implements IInventory
 		return this.parent.isEmpty();
 	}
 
-	public ItemStack getStackInSlot(int index)
+	public ItemStack getItem(int slot)
 	{
-		return this.parent.getStackInSlot(index);
+		return this.parent.getItem(slot);
 	}
 
-	public ItemStack decrStackSize(int index, int count)
+	public ItemStack removeItem(int slot, int amount)
 	{
-		return this.parent.decrStackSize(index, count);
+		return this.parent.removeItem(slot, amount);
 	}
 
-	public ItemStack removeStackFromSlot(int index)
+	public ItemStack removeItemNoUpdate(int slot)
 	{
-		return this.parent.removeStackFromSlot(index);
+		return this.parent.removeItemNoUpdate(slot);
 	}
 
-	public void setInventorySlotContents(int index, ItemStack stack)
+	public void setItem(int slot, ItemStack stack)
 	{
-		this.parent.setInventorySlotContents(index, stack);
+		this.parent.setItem(slot, stack);
 	}
 
-	public int getInventoryStackLimit()
+	public int getMaxStackSize()
 	{
-		return this.parent.getInventoryStackLimit();
+		return this.parent.getMaxStackSize();
 	}
 
-	public void markDirty()
+	public void setChanged()
 	{
-		this.parent.markDirty();
+		this.parent.setChanged();
 	}
 
-	public boolean isUsableByPlayer(EntityPlayer player)
+	public boolean stillValid(Player player)
 	{
-		return this.parent.isUsableByPlayer(player);
+		return this.parent.stillValid(player);
 	}
 
-	public void openInventory(EntityPlayer player)
+	public void startOpen(Player player)
 	{
-		this.parent.openInventory(player);
+		this.parent.startOpen(player);
 	}
 
-	public void closeInventory(EntityPlayer player)
+	public void stopOpen(Player player)
 	{
-		this.parent.closeInventory(player);
+		this.parent.stopOpen(player);
 	}
 
-	public boolean isItemValidForSlot(int index, ItemStack stack)
+	public boolean canPlaceItem(int slot, ItemStack stack)
 	{
-		return this.parent.isItemValidForSlot(index, stack);
+		return this.parent.canPlaceItem(slot, stack);
 	}
 
-	public int getField(int id)
+	public int m_18947_(Item item)
 	{
-		return this.parent.getField(id);
+		return this.parent.m_18947_(item);
 	}
 
-	public void setField(int id, int value)
+	public boolean m_18949_(Set<Item> items)
 	{
-		this.parent.setField(id, value);
-	}
-
-	public int getFieldCount()
-	{
-		return this.parent.getFieldCount();
-	}
-
-	public void clear()
-	{
-		this.parent.clear();
+		return this.parent.m_18949_(items);
 	}
 }

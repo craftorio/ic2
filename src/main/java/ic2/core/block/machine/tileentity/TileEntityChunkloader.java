@@ -1,6 +1,5 @@
 package ic2.core.block.machine.tileentity;
 
-import com.google.common.collect.ImmutableSet;
 import ic2.api.network.INetworkClientTileEntityEventListener;
 import ic2.api.upgrade.IUpgradableBlock;
 import ic2.api.upgrade.UpgradableProperty;
@@ -8,51 +7,54 @@ import ic2.core.ChunkLoaderLogic;
 import ic2.core.ContainerBase;
 import ic2.core.IC2;
 import ic2.core.IHasGui;
-import ic2.core.block.TileEntityInventory;
 import ic2.core.block.comp.Energy;
 import ic2.core.block.invslot.InvSlot;
 import ic2.core.block.invslot.InvSlotDischarge;
 import ic2.core.block.invslot.InvSlotUpgrade;
 import ic2.core.block.machine.container.ContainerChunkLoader;
-import ic2.core.block.machine.gui.GuiChunkLoader;
+import ic2.core.block.tileentity.TileEntityInventory;
 import ic2.core.init.MainConfig;
+import ic2.core.network.GrowingBuffer;
 import ic2.core.profile.NotClassic;
+import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.util.ConfigUtil;
 import ic2.core.util.LogCategory;
+import it.unimi.dsi.fastutil.longs.LongIterator;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
+import it.unimi.dsi.fastutil.longs.LongSet;
 
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.Set;
 
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTTagLong;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeChunkManager;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.LongTag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 
 @NotClassic
 public class TileEntityChunkloader extends TileEntityInventory implements INetworkClientTileEntityEventListener, IHasGui, IUpgradableBlock
 {
-	private ForgeChunkManager.Ticket ticket;
-	private final Set<ChunkPos> loadedChunks = new HashSet<>();
+	private final LongSet loadedChunks = new LongOpenHashSet();
 	public final InvSlotUpgrade upgradeSlot;
 	public final InvSlotDischarge dischargeSlot;
 	public final Energy energy;
 	private static final int defaultTier = 1;
 	private static final int defaultEnergyStorage = 2500;
+	private static final int range = 4;
 	private final double euPerChunk = ConfigUtil.getFloat(MainConfig.get(), "balance/euPerChunk");
 
-	public TileEntityChunkloader()
+	public TileEntityChunkloader(BlockPos pos, BlockState state)
 	{
+		super(Ic2BlockEntities.CHUNK_LOADER, pos, state);
 		this.upgradeSlot = new InvSlotUpgrade(this, "upgrade", 4);
 		this.dischargeSlot = new InvSlotDischarge(this, InvSlot.Access.IO, 1, true, InvSlot.InvSide.ANY);
 		this.energy = this.addComponent(Energy.asBasicSink(this, 2500.0, 1).addManagedSlot(this.dischargeSlot));
@@ -72,63 +74,45 @@ public class TileEntityChunkloader extends TileEntityInventory implements INetwo
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound nbt)
+	public void load(CompoundTag nbt)
 	{
-		super.readFromNBT(nbt);
-		NBTTagList list = nbt.getTagList("loadedChunks", 4);
+		super.load(nbt);
+		ListTag list = nbt.m_128437_("loadedChunks", 4);
 		this.loadedChunks.clear();
 
-		for (int i = 0; i < list.tagCount(); i++)
+		for (int i = 0; i < list.size(); i++)
 		{
-			NBTTagLong currentNBT = (NBTTagLong) list.get(i);
-			long value = currentNBT.getLong();
-			this.loadedChunks.add(ChunkLoaderLogic.deserialize(value));
+			this.loadedChunks.add(((LongTag) list.get(i)).m_7046_());
 		}
 	}
 
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
+	public void saveAdditional(CompoundTag nbt)
 	{
-		super.writeToNBT(nbt);
-		NBTTagList list = new NBTTagList();
-		nbt.setTag("loadedChunks", list);
+		super.saveAdditional(nbt);
+		ListTag list = new ListTag();
+		nbt.put("loadedChunks", list);
+		LongIterator var3 = this.loadedChunks.iterator();
 
-		for (ChunkPos chunk : this.loadedChunks)
+		while (var3.hasNext())
 		{
-			list.appendTag(new NBTTagLong(ChunkLoaderLogic.serialize(chunk)));
+			long pos = (Long) var3.next();
+			list.add(LongTag.m_128882_(pos));
 		}
-
-		return nbt;
 	}
 
 	@Override
 	public void setActive(boolean active)
 	{
-		World world = this.getWorld();
-		if (!world.isRemote && this.getActive() != active)
+		Level world = this.getLevel();
+		if (!world.isClientSide && this.getActive() != active)
 		{
 			if (active)
 			{
-				if (this.ticket != null)
-				{
-					throw new IllegalStateException("Cannot activate ChunkLoader: " + this.pos + " " + this.ticket);
-				}
-
-				this.ticket = ChunkLoaderLogic.getInstance().createTicket(world, this.pos);
-
-				for (ChunkPos coords : this.loadedChunks)
-				{
-					ChunkLoaderLogic.getInstance().addChunkToTicket(this.ticket, coords);
-				}
+				ChunkLoaderLogic.addChunkLoader((ServerLevel) world, this.worldPosition, this.loadedChunks);
 			} else
 			{
-				if (this.ticket == null)
-				{
-					throw new IllegalStateException("Cannot deactivate ChunkLoader: " + this.pos + " " + this.ticket);
-				}
-
-				ChunkLoaderLogic.getInstance().removeTicket(this.ticket);
-				this.ticket = null;
+				ChunkLoaderLogic.removeChunkLoader((ServerLevel) world, this.worldPosition);
 			}
 		}
 
@@ -139,62 +123,39 @@ public class TileEntityChunkloader extends TileEntityInventory implements INetwo
 	public void onLoaded()
 	{
 		super.onLoaded();
-		World world = this.getWorld();
-		if (!world.isRemote)
+		Level world = this.getLevel();
+		if (!world.isClientSide)
 		{
-			this.ticket = ChunkLoaderLogic.getInstance().getTicket(world, this.pos, false);
-			if (this.ticket != null)
-			{
-				this.loadedChunks.clear();
-				this.loadedChunks.addAll(this.ticket.getChunkList());
-			}
-
-			super.setActive(this.ticket != null);
 			this.setOverclockRates();
+			if (this.getActive())
+			{
+				ChunkLoaderLogic.addChunkLoader((ServerLevel) world, this.worldPosition, this.loadedChunks);
+			}
 		}
 	}
 
 	@Override
-	protected void onUnloaded()
-	{
-		super.onUnloaded();
-		this.ticket = null;
-	}
-
-	@Override
-	public void onPlaced(ItemStack stack, EntityLivingBase placer, EnumFacing facing)
+	public void onPlaced(ItemStack stack, LivingEntity placer, Direction facing)
 	{
 		super.onPlaced(stack, placer, facing);
-		this.loadedChunks.add(ChunkLoaderLogic.getChunkCoords(this.pos));
+		this.loadedChunks.add(ChunkPos.m_151388_(this.worldPosition));
 	}
 
 	@Override
-	protected boolean onActivated(EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ)
+	public ContainerBase<?> createServerScreenHandler(int syncId, Player player)
 	{
-		return this.getWorld().isRemote ? true : IC2.platform.launchGui(player, this);
+		return new ContainerChunkLoader(syncId, player.getInventory(), this);
 	}
 
 	@Override
-	public ContainerBase<TileEntityChunkloader> getGuiContainer(EntityPlayer player)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
-		return new ContainerChunkLoader(player, this);
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
-	{
-		return new GuiChunkLoader(new ContainerChunkLoader(player, this));
-	}
-
-	@Override
-	public void onGuiClosed(EntityPlayer player)
-	{
+		return new ContainerChunkLoader(syncId, inventory, this);
 	}
 
 	public void addChunkToLoaded(ChunkPos chunk)
 	{
-		if (this.getWorld().isRemote)
+		if (this.level.isClientSide)
 		{
 			new RuntimeException("Something tried to change the ChunkLoaderState on the client.").printStackTrace();
 		} else if (!this.isChunkInRange(chunk))
@@ -202,57 +163,55 @@ public class TileEntityChunkloader extends TileEntityInventory implements INetwo
 			IC2.log.warn(LogCategory.Block, "Trying to add a Chunk to loaded, however the chunk is too far away. Aborting.");
 		} else
 		{
-			if (this.getLoadedChunks().size() < ChunkLoaderLogic.getInstance().getMaxChunksPerTicket())
+			if (this.loadedChunks.add(chunk.m_45588_()))
 			{
-				if (this.ticket != null)
-				{
-					ChunkLoaderLogic.getInstance().addChunkToTicket(this.ticket, chunk);
-				}
-
-				this.loadedChunks.add(chunk);
-				this.markDirty();
+				ChunkLoaderLogic.updateChunkLoader((ServerLevel) this.level, this.worldPosition, this.loadedChunks);
+				this.setChanged();
 			}
 		}
 	}
 
 	public void removeChunkFromLoaded(ChunkPos chunk)
 	{
-		if (this.getWorld().isRemote)
+		if (this.level.isClientSide)
 		{
 			new RuntimeException("Something tried to change the ChunkLoaderState on the client.").printStackTrace();
-		} else if (!ChunkLoaderLogic.getChunkCoords(this.pos).equals(chunk))
+		} else if (ChunkPos.m_151388_(this.worldPosition) != chunk.m_45588_())
 		{
-			if (this.ticket != null)
+			if (this.loadedChunks.remove(chunk.m_45588_()))
 			{
-				ChunkLoaderLogic.getInstance().removeChunkFromTicket(this.ticket, chunk);
+				ChunkLoaderLogic.updateChunkLoader((ServerLevel) this.level, this.worldPosition, this.loadedChunks);
+				this.setChanged();
 			}
-
-			this.loadedChunks.remove(chunk);
-			this.markDirty();
 		}
 	}
 
-	public ImmutableSet<ChunkPos> getLoadedChunks()
+	public LongSet getLoadedChunks()
 	{
-		return ImmutableSet.copyOf(this.loadedChunks);
+		return this.loadedChunks;
 	}
 
 	public boolean isChunkInRange(ChunkPos chunk)
 	{
-		ChunkPos mainChunk = ChunkLoaderLogic.getChunkCoords(this.pos);
-		return Math.abs(chunk.x - mainChunk.x) <= 4 && Math.abs(chunk.z - mainChunk.z) <= 4;
+		ChunkPos mainChunk = new ChunkPos(this.worldPosition);
+		return Math.abs(chunk.f_45578_ - mainChunk.f_45578_) <= 4 && Math.abs(chunk.f_45579_ - mainChunk.f_45579_) <= 4;
+	}
+
+	public int getMaxChunks()
+	{
+		return 9;
 	}
 
 	@Override
-	public void onNetworkEvent(EntityPlayer player, int event)
+	public void onNetworkEvent(Player player, int event)
 	{
 		int x = (event & 15) - 8;
 		int z = (event >> 4 & 15) - 8;
-		ChunkPos mainChunk = ChunkLoaderLogic.getChunkCoords(this.pos);
-		ChunkPos chunk = new ChunkPos(mainChunk.x + x, mainChunk.z + z);
+		ChunkPos mainChunk = new ChunkPos(this.worldPosition);
+		ChunkPos chunk = new ChunkPos(mainChunk.f_45578_ + x, mainChunk.f_45579_ + z);
 		if (this.isChunkInRange(chunk))
 		{
-			if (this.getLoadedChunks().contains(chunk))
+			if (this.getLoadedChunks().contains(chunk.m_45588_()))
 			{
 				this.removeChunkFromLoaded(chunk);
 			} else
@@ -266,11 +225,7 @@ public class TileEntityChunkloader extends TileEntityInventory implements INetwo
 	protected void onBlockBreak()
 	{
 		super.onBlockBreak();
-		if (this.ticket != null)
-		{
-			ChunkLoaderLogic.getInstance().removeTicket(this.ticket);
-			this.ticket = null;
-		}
+		ChunkLoaderLogic.removeChunkLoader((ServerLevel) this.level, this.worldPosition);
 	}
 
 	@Override
@@ -301,10 +256,10 @@ public class TileEntityChunkloader extends TileEntityInventory implements INetwo
 	}
 
 	@Override
-	public void markDirty()
+	public void setChanged()
 	{
-		super.markDirty();
-		if (IC2.platform.isSimulating())
+		super.setChanged();
+		if (IC2.sideProxy.isSimulating())
 		{
 			this.setOverclockRates();
 		}

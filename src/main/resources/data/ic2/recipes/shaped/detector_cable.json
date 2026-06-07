@@ -1,0 +1,22 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    " C ",
+    "RIR",
+    " R "
+  ],
+  "key": {
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "I": {
+      "item": "ic2:triple_insulated_iron_cable"
+    },
+    "C": {
+      "item": "ic2:circuit"
+    }
+  },
+  "result": {
+    "item": "ic2:detector_cable"
+  }
+}

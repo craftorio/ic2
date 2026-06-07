@@ -5,7 +5,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
 
 class RecipeUtil
 {
@@ -32,9 +33,27 @@ class RecipeUtil
 		return ret;
 	}
 
-	public static List<List<LeanItemStack>> convertIngredients(List<ItemStack> x)
+	public static List<List<LeanItemStack>> convertInputs(List<ItemStack> x)
 	{
 		return Collections.singletonList(convertOutputs(x));
+	}
+
+	public static List<List<LeanItemStack>> convertIngredients(List<Ingredient> x)
+	{
+		List<List<LeanItemStack>> ret = new ArrayList<>(x.size());
+
+		for (Ingredient ingredient : x)
+		{
+			ItemStack[] stacks = ingredient.m_43908_();
+			List<LeanItemStack> res = new ArrayList<>(stacks.length);
+
+			for (ItemStack stack : stacks)
+			{
+				res.add(new LeanItemStack(stack));
+			}
+		}
+
+		return ret;
 	}
 
 	public static List<LeanItemStack> convertOutputs(Collection<ItemStack> x)

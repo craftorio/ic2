@@ -1,6 +1,6 @@
 {
-  "parent": "block/cube_all",
+  "parent": "block/crop",
   "textures": {
-    "all": "ic2:blocks/crop/shining_2"
+    "crop": "ic2:blocks/crop/shining_2"
   }
 }

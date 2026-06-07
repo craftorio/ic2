@@ -1,12 +1,10 @@
 {
-  "parent": "block/cube",
+  "parent": "minecraft:block/orientable_with_bottom",
   "textures": {
-    "particle": "ic2:blocks/machine/processing/basic/macerator_leftrightback",
-    "down": "ic2:blocks/machine/processing/basic/macerator_bottom",
-    "up": "ic2:blocks/machine/processing/basic/macerator_top",
-    "north": "ic2:blocks/machine/processing/basic/macerator_front",
-    "east": "ic2:blocks/machine/processing/basic/macerator_leftrightback",
-    "south": "ic2:blocks/machine/processing/basic/macerator_leftrightback",
-    "west": "ic2:blocks/machine/processing/basic/macerator_leftrightback"
+    "particle": "ic2:blocks/general/machine_side",
+    "front": "ic2:blocks/machine/processing/basic/macerator_front",
+    "top": "ic2:blocks/machine/processing/basic/macerator_top",
+    "bottom": "ic2:blocks/general/machine_bottom",
+    "side": "ic2:blocks/general/machine_side"
   }
 }

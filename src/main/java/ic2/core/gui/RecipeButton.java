@@ -1,10 +1,12 @@
 package ic2.core.gui;
 
 import com.google.common.base.Function;
-import ic2.core.GuiIC2;
-import ic2.core.init.Localization;
+import com.mojang.blaze3d.vertex.PoseStack;
+import ic2.core.Ic2Gui;
 
 import java.util.List;
+
+import net.minecraft.network.chat.Component;
 
 public class RecipeButton extends Button<RecipeButton>
 {
@@ -20,22 +22,22 @@ public class RecipeButton extends Button<RecipeButton>
 		this(wrapping.gui, wrapping.x, wrapping.y, wrapping.width, wrapping.height, categories);
 	}
 
-	public RecipeButton(GuiIC2<?> gui, int x, int y, int width, int height, String[] categories)
+	public RecipeButton(Ic2Gui<?> gui, int x, int y, int width, int height, String[] categories)
 	{
 		super(gui, x, y, width, height, (IClickHandler) jeiRecipeListOpener.apply(categories));
 	}
 
 	@Override
-	protected List<String> getToolTip()
+	protected List<Component> getToolTip()
 	{
-		List<String> ret = super.getToolTip();
-		ret.add(Localization.translate("ic2.jei.recipes"));
+		List<Component> ret = super.getToolTip();
+		ret.add(Component.m_237115_("ic2.jei.recipes"));
 		return ret;
 	}
 
 	@GuiElement.SkippedMethod
 	@Override
-	public void drawBackground(int mouseX, int mouseY)
+	public void drawBackground(PoseStack matrices, int mouseX, int mouseY)
 	{
 	}
 }

@@ -4,30 +4,31 @@ import ic2.api.network.INetworkClientTileEntityEventListener;
 import ic2.api.recipe.IPatternStorage;
 import ic2.core.ContainerBase;
 import ic2.core.IHasGui;
-import ic2.core.block.TileEntityInventory;
 import ic2.core.block.invslot.InvSlot;
 import ic2.core.block.invslot.InvSlotConsumableId;
 import ic2.core.block.machine.container.ContainerPatternStorage;
-import ic2.core.block.machine.gui.GuiPatternStorage;
+import ic2.core.block.tileentity.Ic2TileEntityBlock;
+import ic2.core.block.tileentity.TileEntityInventory;
 import ic2.core.item.ItemCrystalMemory;
+import ic2.core.network.GrowingBuffer;
 import ic2.core.profile.NotClassic;
-import ic2.core.ref.ItemName;
-import ic2.core.ref.TeBlock;
+import ic2.core.ref.Ic2BlockEntities;
+import ic2.core.ref.Ic2Items;
 import ic2.core.util.StackUtil;
 import ic2.core.uu.UuIndex;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.EnumFacing;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 
 @NotClassic
 public class TileEntityPatternStorage extends TileEntityInventory implements IHasGui, INetworkClientTileEntityEventListener, IPatternStorage
@@ -40,93 +41,92 @@ public class TileEntityPatternStorage extends TileEntityInventory implements IHa
 	public double patternUu;
 	public double patternEu;
 
-	public TileEntityPatternStorage()
+	public TileEntityPatternStorage(BlockPos pos, BlockState state)
 	{
-		this.diskSlot = new InvSlotConsumableId(this, "SaveSlot", InvSlot.Access.IO, 1, InvSlot.InvSide.ANY, ItemName.crystal_memory.getInstance());
+		super(Ic2BlockEntities.PATTERN_STORAGE, pos, state);
+		this.diskSlot = new InvSlotConsumableId(this, "SaveSlot", InvSlot.Access.IO, 1, InvSlot.InvSide.ANY, Ic2Items.CRYSTAL_MEMORY);
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound nbttagcompound)
+	public void load(CompoundTag nbt)
 	{
-		super.readFromNBT(nbttagcompound);
-		this.readContents(nbttagcompound);
+		super.load(nbt);
+		this.readContents(nbt);
 	}
 
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
+	public void saveAdditional(CompoundTag nbt)
 	{
-		super.writeToNBT(nbt);
+		super.saveAdditional(nbt);
 		this.writeContentsAsNbtList(nbt);
-		return nbt;
 	}
 
 	@Override
-	public void onPlaced(ItemStack stack, EntityLivingBase placer, EnumFacing facing)
+	public void onPlaced(ItemStack stack, LivingEntity placer, Direction facing)
 	{
 		super.onPlaced(stack, placer, facing);
-		if (!this.getWorld().isRemote)
+		if (!this.getLevel().isClientSide)
 		{
-			NBTTagCompound nbt = StackUtil.getOrCreateNbtData(stack);
+			CompoundTag nbt = StackUtil.getOrCreateNbtData(stack);
 			this.readContents(nbt);
 		}
 	}
 
 	@Override
-	protected ItemStack adjustDrop(ItemStack drop, boolean wrench)
+	public ItemStack adjustDrop(ItemStack drop, boolean wrench)
 	{
 		drop = super.adjustDrop(drop, wrench);
-		if (wrench || this.teBlock.getDefaultDrop() == TeBlock.DefaultDrop.Self)
+		if (wrench || this.teBlock.getDefaultDrop() == Ic2TileEntityBlock.DefaultDrop.Self)
 		{
-			NBTTagCompound nbt = StackUtil.getOrCreateNbtData(drop);
+			CompoundTag nbt = StackUtil.getOrCreateNbtData(drop);
 			this.writeContentsAsNbtList(nbt);
 		}
 
 		return drop;
 	}
 
-	public void readContents(NBTTagCompound nbt)
+	public void readContents(CompoundTag nbt)
 	{
-		NBTTagList patternList = nbt.getTagList("patterns", 10);
+		ListTag patternList = nbt.m_128437_("patterns", 10);
 
-		for (int i = 0; i < patternList.tagCount(); i++)
+		for (int i = 0; i < patternList.size(); i++)
 		{
-			NBTTagCompound contentTag = patternList.getCompoundTagAt(i);
-			ItemStack Item = new ItemStack(contentTag);
+			CompoundTag contentTag = patternList.m_128728_(i);
+			ItemStack Item = ItemStack.m_41712_(contentTag);
 			this.addPattern(Item);
 		}
 
 		this.refreshInfo();
 	}
 
-	private void writeContentsAsNbtList(NBTTagCompound nbt)
+	private void writeContentsAsNbtList(CompoundTag nbt)
 	{
-		NBTTagList list = new NBTTagList();
+		ListTag list = new ListTag();
 
 		for (ItemStack stack : this.patterns)
 		{
-			NBTTagCompound contentTag = new NBTTagCompound();
-			stack.writeToNBT(contentTag);
-			list.appendTag(contentTag);
+			CompoundTag contentTag = new CompoundTag();
+			stack.m_41739_(contentTag);
+			list.add(contentTag);
 		}
 
-		nbt.setTag("patterns", list);
+		nbt.put("patterns", list);
 	}
 
 	@Override
-	public ContainerBase<TileEntityPatternStorage> getGuiContainer(EntityPlayer player)
+	public ContainerBase<?> createServerScreenHandler(int syncId, Player player)
 	{
-		return new ContainerPatternStorage(player, this);
+		return new ContainerPatternStorage(syncId, player.getInventory(), this);
 	}
 
-	@SideOnly(Side.CLIENT)
 	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
-		return new GuiPatternStorage(new ContainerPatternStorage(player, this));
+		return new ContainerPatternStorage(syncId, inventory, this);
 	}
 
 	@Override
-	public void onNetworkEvent(EntityPlayer player, int event)
+	public void onNetworkEvent(Player player, int event)
 	{
 		switch (event)
 		{
@@ -200,11 +200,6 @@ public class TileEntityPatternStorage extends TileEntityInventory implements IHa
 			this.pattern = this.patterns.get(this.index);
 			this.patternUu = UuIndex.instance.getInBuckets(this.pattern);
 		}
-	}
-
-	@Override
-	public void onGuiClosed(EntityPlayer player)
-	{
 	}
 
 	@Override

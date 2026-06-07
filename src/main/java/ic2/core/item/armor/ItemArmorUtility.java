@@ -1,43 +1,14 @@
 package ic2.core.item.armor;
 
-import ic2.core.ref.ItemName;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.EntityEquipmentSlot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemArmor.ArmorMaterial;
-import net.minecraft.util.DamageSource;
-import net.minecraftforge.common.ISpecialArmor;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.Item.Properties;
 
-public class ItemArmorUtility extends ItemArmorIC2 implements ISpecialArmor
+public class ItemArmorUtility extends ArmorItem
 {
-	public ItemArmorUtility(ItemName name, String armorName, EntityEquipmentSlot type)
+	public ItemArmorUtility(ArmorMaterial material, Properties settings, EquipmentSlot type)
 	{
-		super(name, ArmorMaterial.DIAMOND, armorName, type, null);
-	}
-
-	public int getItemEnchantability()
-	{
-		return 0;
-	}
-
-	@Override
-	public boolean getIsRepairable(ItemStack par1ItemStack, ItemStack par2ItemStack)
-	{
-		return false;
-	}
-
-	public ISpecialArmor.ArmorProperties getProperties(EntityLivingBase player, ItemStack armor, DamageSource source, double damage, int slot)
-	{
-		return new ISpecialArmor.ArmorProperties(0, 0.0, 0);
-	}
-
-	public int getArmorDisplay(EntityPlayer player, ItemStack armor, int slot)
-	{
-		return 0;
-	}
-
-	public void damageArmor(EntityLivingBase entity, ItemStack stack, DamageSource source, int damage, int slot)
-	{
+		super(material, type, settings);
 	}
 }

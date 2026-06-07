@@ -1,0 +1,20 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "T T",
+    " L ",
+    "T T"
+  ],
+  "key": {
+    "L": {
+      "item": "minecraft:lever"
+    },
+    "T": {
+      "tag": "forge:plates/tin"
+    }
+  },
+  "group": "redstone_inverter_upgrade",
+  "result": {
+    "item": "ic2:redstone_inverter_upgrade"
+  }
+}

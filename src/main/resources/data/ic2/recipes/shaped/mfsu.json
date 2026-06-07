@@ -1,0 +1,25 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "LCL",
+    "LML",
+    "LAL"
+  ],
+  "key": {
+    "M": {
+      "item": "ic2:mfe"
+    },
+    "A": {
+      "item": "ic2:advanced_machine"
+    },
+    "C": {
+      "item": "ic2:advanced_circuit"
+    },
+    "L": {
+      "item": "ic2:lapotron_crystal"
+    }
+  },
+  "result": {
+    "item": "ic2:mfsu"
+  }
+}

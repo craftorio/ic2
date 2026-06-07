@@ -1,5 +1,5 @@
 {
-  "parent": "block/cube",
+  "parent": "block/cube_bottom_top",
   "textures": {
     "side": "ic2:blocks/machine/resource/cropmatron_sides",
     "bottom": "ic2:blocks/machine/resource/cropmatron_bottom",

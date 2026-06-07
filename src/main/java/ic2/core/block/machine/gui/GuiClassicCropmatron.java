@@ -1,20 +1,19 @@
 package ic2.core.block.machine.gui;
 
-import ic2.core.GuiIC2;
+import ic2.core.Ic2Gui;
 import ic2.core.block.machine.container.ContainerClassicCropmatron;
 import ic2.core.gui.EnergyGauge;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
 
-@SideOnly(Side.CLIENT)
-public class GuiClassicCropmatron extends GuiIC2<ContainerClassicCropmatron>
+public class GuiClassicCropmatron extends Ic2Gui<ContainerClassicCropmatron>
 {
-	private static final ResourceLocation background = new ResourceLocation("ic2", "textures/gui/GUI_Cropmatron_Classic.png");
+	private static final ResourceLocation background = ResourceLocation.fromNamespaceAndPath("ic2", "textures/gui/gui_cropmatron_classic.png");
 
-	public GuiClassicCropmatron(ContainerClassicCropmatron container)
+	public GuiClassicCropmatron(ContainerClassicCropmatron container, Inventory playerInventory, Component title)
 	{
-		super(container);
+		super(container, playerInventory, title);
 		this.addElement(EnergyGauge.asBolt(this, 29, 39, container.base));
 	}
 

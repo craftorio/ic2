@@ -1,0 +1,26 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "TTT",
+    "#X#",
+    "#R#"
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:cobblestone"
+    },
+    "X": {
+      "tag": "forge:ingots/bronze"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "T": {
+      "tag": "minecraft:planks"
+    }
+  },
+  "hidden": true,
+  "result": {
+    "item": "minecraft:piston"
+  }
+}

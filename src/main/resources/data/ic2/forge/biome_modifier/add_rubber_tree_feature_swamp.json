@@ -1,0 +1,8 @@
+{
+  "type": "forge:add_features",
+  "biomes": "#forge:is_swamp",
+  "features": [
+    "ic2:trees_rubber_swamp"
+  ],
+  "step": "vegetal_decoration"
+}

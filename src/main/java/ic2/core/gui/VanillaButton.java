@@ -1,12 +1,13 @@
 package ic2.core.gui;
 
-import ic2.core.GuiIC2;
-import net.minecraft.util.ResourceLocation;
+import com.mojang.blaze3d.vertex.PoseStack;
+import ic2.core.Ic2Gui;
+import net.minecraft.resources.ResourceLocation;
 
 public class VanillaButton extends Button<VanillaButton>
 {
 	protected IEnableHandler disableHandler;
-	private static final ResourceLocation texture = new ResourceLocation("textures/gui/widgets.png");
+	private static final ResourceLocation texture = ResourceLocation.fromNamespaceAndPath("textures/gui/widgets.png");
 	private static final int uNormal = 0;
 	private static final int vNormal = 66;
 	private static final int uHover = 0;
@@ -23,7 +24,7 @@ public class VanillaButton extends Button<VanillaButton>
 	private static final int colorHover = 16777120;
 	private static final int colorDisabled = 10526880;
 
-	public VanillaButton(GuiIC2<?> gui, int x, int y, int width, int height, IClickHandler handler)
+	public VanillaButton(Ic2Gui<?> gui, int x, int y, int width, int height, IClickHandler handler)
 	{
 		super(gui, x, y, width, height, handler);
 	}
@@ -40,7 +41,7 @@ public class VanillaButton extends Button<VanillaButton>
 	}
 
 	@Override
-	public void drawBackground(int mouseX, int mouseY)
+	public void drawBackground(PoseStack matrices, int mouseX, int mouseY)
 	{
 		bindTexture(texture);
 		int u;
@@ -76,23 +77,23 @@ public class VanillaButton extends Button<VanillaButton>
 		int cx = this.x;
 		int remainingWidth = this.width;
 		int cWidth = Math.min(remainingWidth, 200) - minRight;
-		drawVerticalPiece(this.gui, cx, this.y, cWidth, this.height, u, v);
+		drawVerticalPiece(this.gui, matrices, cx, this.y, cWidth, this.height, u, v);
 		cx += cWidth;
 		remainingWidth -= cWidth;
 
 		while (remainingWidth > 200 - minLeft)
 		{
 			cWidth = Math.min(remainingWidth, 200 - minLeft) - minRight;
-			drawVerticalPiece(this.gui, cx, this.y, cWidth, this.height, u + minLeft, v);
+			drawVerticalPiece(this.gui, matrices, cx, this.y, cWidth, this.height, u + minLeft, v);
 			cx += cWidth;
 			remainingWidth -= cWidth;
 		}
 
-		drawVerticalPiece(this.gui, cx, this.y, remainingWidth, this.height, u + 200 - remainingWidth, v);
-		super.drawBackground(mouseX, mouseY);
+		drawVerticalPiece(this.gui, matrices, cx, this.y, remainingWidth, this.height, u + 200 - remainingWidth, v);
+		super.drawBackground(matrices, mouseX, mouseY);
 	}
 
-	private static void drawVerticalPiece(GuiIC2<?> gui, int x, int y, int width, int height, int u, int v)
+	private static void drawVerticalPiece(Ic2Gui<?> gui, PoseStack matrices, int x, int y, int width, int height, int u, int v)
 	{
 		int minTop = 2;
 		int minBottom = 3;
@@ -109,19 +110,19 @@ public class VanillaButton extends Button<VanillaButton>
 		}
 
 		int cHeight = Math.min(height, 20) - minBottom;
-		gui.drawTexturedRect(x, y, width, cHeight, u, v);
+		gui.drawTexturedRect(matrices, x, y, width, cHeight, u, v);
 		y += cHeight;
 		height -= cHeight;
 
 		while (height > 20 - minTop)
 		{
 			cHeight = Math.min(height, 20 - minTop) - minBottom;
-			gui.drawTexturedRect(x, y, width, cHeight, u, v + minTop);
+			gui.drawTexturedRect(matrices, x, y, width, cHeight, u, v + minTop);
 			y += cHeight;
 			height -= cHeight;
 		}
 
-		gui.drawTexturedRect(x, y, width, height, u, v + 20 - height);
+		gui.drawTexturedRect(matrices, x, y, width, height, u, v + 20 - height);
 	}
 
 	protected boolean isActive(int mouseX, int mouseY)

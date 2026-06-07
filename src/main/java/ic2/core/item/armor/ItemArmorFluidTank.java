@@ -1,91 +1,61 @@
 package ic2.core.item.armor;
 
-import com.google.common.base.Function;
 import ic2.api.item.IItemHudInfo;
-import ic2.api.item.IItemHudProvider;
+import ic2.core.fluid.Ic2FluidStack;
+import ic2.core.fluid.StandardFluidItem;
 import ic2.core.init.Localization;
-import ic2.core.item.capability.CapabilityFluidHandlerItem;
-import ic2.core.ref.ItemName;
-import ic2.core.util.StackUtil;
-import ic2.core.util.Util;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
 
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.inventory.EntityEquipmentSlot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.World;
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandlerItem;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.Registry;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.Item.Properties;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.material.Fluid;
 
-public abstract class ItemArmorFluidTank extends ItemArmorUtility implements IItemHudInfo, IItemHudProvider.IItemHudBarProvider
+public abstract class ItemArmorFluidTank extends ItemArmorUtility implements StandardFluidItem, IItemHudInfo
 {
 	protected final int capacity;
 	protected final Fluid allowfluid;
 
-	public ItemArmorFluidTank(ItemName name, String armorName, Fluid allowfluid, int capacity)
+	public ItemArmorFluidTank(ArmorMaterial material, Properties settings, Fluid allowfluid, int capacity)
 	{
-		super(name, armorName, EntityEquipmentSlot.CHEST);
-		this.setMaxDamage(27);
-		this.setMaxStackSize(1);
+		super(material, settings, EquipmentSlot.CHEST);
 		this.capacity = capacity;
 		this.allowfluid = allowfluid;
-		this.addCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, new Function<ItemStack, IFluidHandlerItem>()
-		{
-			public IFluidHandlerItem apply(@Nullable ItemStack stack)
-			{
-				return new CapabilityFluidHandlerItem(stack, ItemArmorFluidTank.this.capacity)
-				{
-					@Override
-					public boolean canFillFluidType(FluidStack fluid)
-					{
-						return fluid != null && fluid.getFluid() == ItemArmorFluidTank.this.allowfluid;
-					}
+	}
 
-					@Override
-					public boolean canDrainFluidType(FluidStack fluid)
-					{
-						return fluid != null && fluid.getFluid() == ItemArmorFluidTank.this.allowfluid;
-					}
+	@Override
+	public int getCapacityMb(ItemStack stack)
+	{
+		return this.capacity;
+	}
 
-					public ItemStack getContainer()
-					{
-						ItemStack ret = super.getContainer();
-						ItemArmorFluidTank.this.Updatedamage(ret);
-						return ret;
-					}
-				};
-			}
-		});
+	@Override
+	public boolean canFill(ItemStack stack, Ic2FluidStack fs)
+	{
+		return fs.getFluid() == this.allowfluid;
 	}
 
 	public void filltank(ItemStack stack)
 	{
-		NBTTagCompound nbtTagCompound = StackUtil.getOrCreateNbtData(stack);
-		NBTTagCompound fluidTag = nbtTagCompound.getCompoundTag("Fluid");
-		FluidStack fs = new FluidStack(this.allowfluid, this.capacity);
-		fs.writeToNBT(fluidTag);
-		nbtTagCompound.setTag("Fluid", fluidTag);
+		this.fillMb(stack, Ic2FluidStack.create(this.allowfluid, Integer.MAX_VALUE), false, null);
 	}
 
 	public double getCharge(ItemStack stack)
 	{
-		FluidStack fs = FluidUtil.getFluidContained(stack);
-		if (fs == null)
-		{
-			return 0.0;
-		}
+		return Ic2FluidStack.get(stack).getAmountMb();
+	}
 
-		double ret = fs.amount;
-		return ret > 0.0 ? ret : 0.0;
+	private double getChargeLevel(ItemStack stack)
+	{
+		return this.getCharge(stack) / this.capacity;
 	}
 
 	public double getMaxCharge(ItemStack stack)
@@ -93,54 +63,49 @@ public abstract class ItemArmorFluidTank extends ItemArmorUtility implements IIt
 		return this.capacity;
 	}
 
-	protected void Updatedamage(ItemStack stack)
-	{
-		stack.setItemDamage(stack.getMaxDamage() - 1 - (int) Util.map(this.getCharge(stack), this.getMaxCharge(stack), stack.getMaxDamage() - 2));
-	}
-
 	public boolean isEmpty(ItemStack stack)
 	{
-		return FluidUtil.getFluidContained(stack) == null;
+		return Ic2FluidStack.get(stack).isEmpty();
 	}
 
-	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced)
+	public void m_7373_(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag advanced)
 	{
-		super.addInformation(stack, world, tooltip, advanced);
-		FluidStack fs = FluidUtil.getFluidContained(stack);
-		if (fs != null)
-		{
-			tooltip.add("< " + fs.getLocalizedName() + ", " + fs.amount + " mB >");
-		} else
-		{
-			tooltip.add(Localization.translate("ic2.item.FluidContainer.Empty"));
-		}
+		super.m_7373_(stack, world, tooltip, advanced);
+		tooltip.add(Component.m_237113_(getContentDescription(stack)));
 	}
 
-	@Override
-	public int getBarPercent(ItemStack stack)
+	public boolean m_142522_(ItemStack stack)
 	{
-		return this.getMaxDamage(stack) - this.getDamage(stack) * 100 / this.getMaxDamage(stack);
+		return true;
+	}
+
+	public int m_142158_(ItemStack stack)
+	{
+		return (int) Math.round(this.getChargeLevel(stack) * 13.0);
+	}
+
+	public int m_142159_(ItemStack stack)
+	{
+		return Mth.m_14169_((float) (this.getChargeLevel(stack) / 3.0), 1.0F, 1.0F);
 	}
 
 	@Override
 	public List<String> getHudInfo(ItemStack stack, boolean advanced)
 	{
-		List<String> info = new LinkedList<>();
-		FluidStack fs = FluidUtil.getFluidContained(stack);
-		if (fs != null)
-		{
-			info.add("< " + fs.getLocalizedName() + ", " + fs.amount + " mB >");
-		} else
-		{
-			info.add(Localization.translate("ic2.item.FluidContainer.Empty"));
-		}
-
+		List<String> info = new ArrayList<>();
+		info.add(getContentDescription(stack));
 		return info;
 	}
 
-	@Override
-	public boolean getIsRepairable(ItemStack par1ItemStack, ItemStack par2ItemStack)
+	private static String getContentDescription(ItemStack stack)
+	{
+		Ic2FluidStack fs = Ic2FluidStack.get(stack);
+		return !fs.isEmpty()
+			? String.format("< %s, %d mB >", Registry.f_122822_.getKey(fs.getFluid()), fs.getAmountMb())
+			: Localization.translate("ic2.item.FluidContainer.Empty");
+	}
+
+	public boolean m_6832_(ItemStack par1ItemStack, ItemStack par2ItemStack)
 	{
 		return false;
 	}

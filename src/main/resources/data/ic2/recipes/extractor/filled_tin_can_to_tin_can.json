@@ -1,0 +1,9 @@
+{
+  "type": "ic2:extractor",
+  "ingredient": {
+    "item": "ic2:filled_tin_can"
+  },
+  "result": {
+    "item": "ic2:tin_can"
+  }
+}

@@ -1,28 +1,36 @@
 package ic2.core.block.machine.tileentity;
 
+import com.mojang.math.Vector3f;
 import ic2.core.IC2;
-import ic2.core.IC2DamageSource;
-import ic2.core.block.TileEntityBlock;
+import ic2.core.Ic2DamageSource;
 import ic2.core.block.comp.Energy;
 import ic2.core.block.comp.Redstone;
+import ic2.core.block.tileentity.Ic2TileEntity;
 import ic2.core.item.armor.ItemArmorHazmat;
+import ic2.core.ref.Ic2BlockEntities;
 
-import java.util.Random;
+import java.util.List;
 
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.EntitySelector;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 
-public class TileEntityTesla extends TileEntityBlock
+public class TileEntityTesla extends Ic2TileEntity
 {
+	private static final DustParticleOptions effect = new DustParticleOptions(new Vector3f(0.1F, 0.1F, 1.0F), 1.0F);
 	protected final Redstone redstone;
 	protected final Energy energy;
 	private int ticker = IC2.random.nextInt(32);
 
-	public TileEntityTesla()
+	public TileEntityTesla(BlockPos pos, BlockState state)
 	{
+		super(Ic2BlockEntities.TESLA_COIL, pos, state);
 		this.redstone = this.addComponent(new Redstone(this));
 		this.energy = this.addComponent(Energy.asBasicSink(this, 10000.0, 2));
 	}
@@ -38,58 +46,69 @@ public class TileEntityTesla extends TileEntityBlock
 				int damage = (int) this.energy.getEnergy() / 400;
 				if (damage > 0 && this.shock(damage))
 				{
+					System.out.println(damage);
 					this.energy.useEnergy(damage * 400);
 				}
 			}
 		}
 	}
 
-	protected boolean shock(int damage)
+	protected boolean shock(int totalDamage)
 	{
 		int r = 4;
-		World world = this.getWorld();
-
-		for (EntityLivingBase entity : world.getEntitiesWithinAABB(
-			EntityLivingBase.class,
-			new AxisAlignedBB(
-				this.pos.getX() - 4,
-				this.pos.getY() - 4,
-				this.pos.getZ() - 4,
-				this.pos.getX() + 4 + 1,
-				this.pos.getY() + 4 + 1,
-				this.pos.getZ() + 4 + 1
-			)
-		))
+		Level world = this.getLevel();
+		if (world == null)
 		{
-			if (!ItemArmorHazmat.hasCompleteHazmat(entity) && entity.attackEntityFrom(IC2DamageSource.electricity, damage))
+			return false;
+		}
+
+		List<LivingEntity> entities = world.getEntitiesOfClass(
+			LivingEntity.class,
+			new AABB(
+				this.worldPosition.getX() - 4,
+				this.worldPosition.getY() - 4,
+				this.worldPosition.getZ() - 4,
+				this.worldPosition.getX() + 4 + 1,
+				this.worldPosition.getY() + 4 + 1,
+				this.worldPosition.getZ() + 4 + 1
+			),
+			EntitySelector.NO_CREATIVE_OR_SPECTATOR
+		);
+		if (entities.size() == 0)
+		{
+			return false;
+		}
+
+		boolean isShocked = false;
+		int damage = totalDamage / entities.size();
+
+		for (LivingEntity entity : entities)
+		{
+			if (!ItemArmorHazmat.hasCompleteHazmat(entity) && entity.hurt(Ic2DamageSource.electricity, damage))
 			{
-				if (world instanceof WorldServer)
+				if (world instanceof ServerLevel worldServer)
 				{
-					WorldServer worldServer = (WorldServer) world;
-					Random rnd = world.rand;
+					RandomSource rnd = world.random;
+					System.out.println(entity);
 
 					for (int i = 0; i < damage; i++)
 					{
-						worldServer.spawnParticle(
-							EnumParticleTypes.REDSTONE,
-							true,
-							entity.posX + rnd.nextFloat() - 0.5,
-							entity.posY + rnd.nextFloat() * 2.0F - 1.0,
-							entity.posZ + rnd.nextFloat() - 0.5,
-							0,
-							0.1,
-							0.1,
-							1.0,
-							1.0,
-							new int[0]
+						worldServer.addParticle(
+							effect,
+							entity.getX() + rnd.nextFloat() - 0.5,
+							entity.getY() + rnd.nextFloat() * 2.0F - 1.0,
+							entity.getZ() + rnd.nextFloat() - 0.5,
+							0.0,
+							0.0,
+							0.0
 						);
 					}
 				}
 
-				return true;
+				isShocked = true;
 			}
 		}
 
-		return false;
+		return isShocked;
 	}
 }

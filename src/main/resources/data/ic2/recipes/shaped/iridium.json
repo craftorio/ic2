@@ -1,0 +1,22 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "IAI",
+    "ADA",
+    "IAI"
+  ],
+  "key": {
+    "I": {
+      "item": "ic2:iridium_ore"
+    },
+    "A": {
+      "item": "ic2:alloy"
+    },
+    "D": {
+      "tag": "forge:gems/diamond"
+    }
+  },
+  "result": {
+    "item": "ic2:iridium"
+  }
+}

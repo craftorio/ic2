@@ -1,10 +1,9 @@
 package ic2.core.block.machine.gui;
 
-import com.google.common.base.Predicate;
-import com.google.common.base.Supplier;
-import ic2.core.GuiIC2;
+import ic2.core.ContainerBase;
 import ic2.core.IC2;
 import ic2.core.IHasGui;
+import ic2.core.Ic2Gui;
 import ic2.core.block.machine.container.ContainerIndustrialWorkbench;
 import ic2.core.block.machine.tileentity.TileEntityIndustrialWorkbench;
 import ic2.core.block.personal.IPersonalBlock;
@@ -17,29 +16,32 @@ import ic2.core.gui.Image;
 import ic2.core.gui.MouseButton;
 import ic2.core.gui.VanillaButton;
 import ic2.core.init.Localization;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.client.event.GuiOpenEvent;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import ic2.core.proxy.SideProxyClient;
+import ic2.core.util.StackUtil;
+import ic2.core.util.Util;
 
-@SideOnly(Side.CLIENT)
-public class GuiIndustrialWorkbench extends GuiIC2<ContainerIndustrialWorkbench>
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+
+public class GuiIndustrialWorkbench extends Ic2Gui<ContainerIndustrialWorkbench>
 {
-	public static Predicate<GuiScreen> jeiScreenRecipesGuiCheck;
-	private static final ResourceLocation TEXTURE = new ResourceLocation("ic2", "textures/gui/GUIIndustrialWorkbench.png");
+	public static Predicate<Screen> jeiScreenRecipesGuiCheck;
+	private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath("ic2", "textures/gui/guiindustrialworkbench.png");
 
-	public GuiIndustrialWorkbench(ContainerIndustrialWorkbench container)
+	public GuiIndustrialWorkbench(ContainerIndustrialWorkbench container, Inventory playerInventory, Component title)
 	{
-		super(container, 194, 228);
+		super(container, playerInventory, title, 194, 228);
 		this.addElement((new Area(this, 173, 3, 18, 108)
 		{
 			@Override
@@ -57,13 +59,13 @@ public class GuiIndustrialWorkbench extends GuiIC2<ContainerIndustrialWorkbench>
 			}
 		}).withTooltip("ic2.IndustrialWorkbench.gui.adjacent"));
 
-		for (final EnumFacing side : EnumFacing.VALUES)
+		for (final Direction side : Util.ALL_DIRS)
 		{
 			this.addElement(
 				new CustomButton(
 					this,
 					173,
-					3 + (side.getIndex() + 5) % 6 * 18,
+					3 + (side.m_122411_() + 5) % 6 * 18,
 					18,
 					18,
 					new IClickHandler()
@@ -74,32 +76,34 @@ public class GuiIndustrialWorkbench extends GuiIC2<ContainerIndustrialWorkbench>
 						@Override
 						public void onClick(MouseButton button)
 						{
-							TileEntityIndustrialWorkbench base = GuiIndustrialWorkbench.this.container.base;
-							assert base.hasWorld();
-							TileEntity neighbour = base.getWorld().getTileEntity(base.getPos().offset(side));
+							TileEntityIndustrialWorkbench base = ((ContainerIndustrialWorkbench) GuiIndustrialWorkbench.this.menu).base;
+							assert base.m_58898_();
+							BlockEntity neighbour = base.getLevel().getBlockEntity(base.getBlockPos().relative(side));
 							assert neighbour instanceof IHasGui;
 							if (neighbour instanceof IPersonalBlock
-								&& !((IPersonalBlock) neighbour).permitsAccess(GuiIndustrialWorkbench.this.container.player.getGameProfile()))
+								&& !((IPersonalBlock) neighbour)
+								.permitsAccess(((ContainerIndustrialWorkbench) GuiIndustrialWorkbench.this.menu).player.getGameProfile()))
 							{
-								IC2.platform
-									.messagePlayer(GuiIndustrialWorkbench.this.container.player, "Owned by " + ((IPersonalBlock) neighbour).getOwner().getName());
+								IC2.sideProxy
+									.messagePlayer(
+										((ContainerIndustrialWorkbench) GuiIndustrialWorkbench.this.menu).player,
+										"Owned by " + ((IPersonalBlock) neighbour).getOwner().getName()
+									);
 							} else
 							{
+								GuiIndustrialWorkbench.closeHandler = this::onScreenClose;
 								IC2.network.get(false).requestGUI((IHasGui) neighbour);
-								MinecraftForge.EVENT_BUS.register(this);
 							}
 						}
 
-						@SubscribeEvent
-						public void waitForClose(GuiOpenEvent event)
+						private void onScreenClose()
 						{
-							if (!this.keepOpen(event.getGui()))
+							if (!this.keepOpen(SideProxyClient.mc.f_91080_))
 							{
 								if (!this.firstOpen)
 								{
-									IC2.network.get(false).requestGUI(GuiIndustrialWorkbench.this.container.base);
-									event.setGui(GuiIndustrialWorkbench.this);
-									MinecraftForge.EVENT_BUS.unregister(this);
+									GuiIndustrialWorkbench.closeHandler = null;
+									IC2.network.get(false).requestGUI(((ContainerIndustrialWorkbench) GuiIndustrialWorkbench.this.menu).base);
 								} else
 								{
 									this.firstOpen = false;
@@ -107,12 +111,12 @@ public class GuiIndustrialWorkbench extends GuiIC2<ContainerIndustrialWorkbench>
 							}
 						}
 
-						private boolean keepOpen(GuiScreen screen)
+						private boolean keepOpen(Screen screen)
 						{
 							if (GuiIndustrialWorkbench.jeiScreenRecipesGuiCheck == null)
 							{
 								return false;
-							} else if (GuiIndustrialWorkbench.jeiScreenRecipesGuiCheck.apply(screen))
+							} else if (GuiIndustrialWorkbench.jeiScreenRecipesGuiCheck.test(screen))
 							{
 								this.jei = true;
 								return true;
@@ -132,58 +136,53 @@ public class GuiIndustrialWorkbench extends GuiIC2<ContainerIndustrialWorkbench>
 						@Override
 						public boolean isEnabled()
 						{
-							TileEntityIndustrialWorkbench base = GuiIndustrialWorkbench.this.container.base;
-							return base.hasWorld() && base.getWorld().getTileEntity(base.getPos().offset(side)) instanceof IHasGui;
+							TileEntityIndustrialWorkbench base = ((ContainerIndustrialWorkbench) GuiIndustrialWorkbench.this.menu).base;
+							return base.m_58898_() && base.getLevel().getBlockEntity(base.getBlockPos().relative(side)) instanceof IHasGui;
 						}
 					})
 					.withIcon(new Supplier<ItemStack>()
 					{
 						public ItemStack get()
 						{
-							TileEntityIndustrialWorkbench base = GuiIndustrialWorkbench.this.container.base;
-							assert base.hasWorld();
-							BlockPos pos = base.getPos().offset(side);
-							IBlockState state = base.getWorld().getBlockState(pos);
-							return state.getBlock().getPickBlock(state, null, base.getWorld(), pos, GuiIndustrialWorkbench.this.container.player);
+							TileEntityIndustrialWorkbench base = ((ContainerIndustrialWorkbench) GuiIndustrialWorkbench.this.menu).base;
+							assert base.m_58898_();
+							BlockPos pos = base.getBlockPos().relative(side);
+							BlockState state = base.getLevel().getBlockState(pos);
+							return StackUtil.getPickStack(base.getLevel(), pos, state, ((ContainerIndustrialWorkbench) GuiIndustrialWorkbench.this.menu).player);
 						}
 					})
-					.withTooltip(
-						new Supplier<String>()
+					.withTooltip(new Supplier<String>()
+					{
+						private String getSideName()
 						{
-							private String getSideName()
+							switch (side)
 							{
-								switch (side)
-								{
-									case WEST:
-										return "ic2.dir.West";
-									case EAST:
-										return "ic2.dir.East";
-									case DOWN:
-										return "ic2.dir.Bottom";
-									case UP:
-										return "ic2.dir.Top";
-									case NORTH:
-										return "ic2.dir.North";
-									case SOUTH:
-										return "ic2.dir.South";
-									default:
-										throw new IllegalStateException("Unexpected direction: " + side);
-								}
-							}
-
-							public String get()
-							{
-								TileEntityIndustrialWorkbench base = GuiIndustrialWorkbench.this.container.base;
-								assert base.hasWorld();
-								TileEntity neighbour = base.getWorld().getTileEntity(base.getPos().offset(side));
-								assert neighbour instanceof IHasGui;
-								return Localization.translate(((IHasGui) neighbour).getName())
-									+ '\n'
-									+ TextFormatting.DARK_GRAY
-									+ Localization.translate(this.getSideName());
+								case WEST:
+									return "ic2.dir.West";
+								case EAST:
+									return "ic2.dir.East";
+								case DOWN:
+									return "ic2.dir.Bottom";
+								case UP:
+									return "ic2.dir.Top";
+								case NORTH:
+									return "ic2.dir.North";
+								case SOUTH:
+									return "ic2.dir.South";
+								default:
+									throw new IllegalStateException("Unexpected direction: " + side);
 							}
 						}
-					)
+
+						public String get()
+						{
+							TileEntityIndustrialWorkbench base = ((ContainerIndustrialWorkbench) GuiIndustrialWorkbench.this.menu).base;
+							assert base.m_58898_();
+							BlockEntity neighbour = base.getLevel().getBlockEntity(base.getBlockPos().relative(side));
+							assert neighbour instanceof IHasGui;
+							return IHasGui.getBeName(neighbour).getString() + "\n" + ChatFormatting.DARK_GRAY + Localization.translate(this.getSideName());
+						}
+					})
 			);
 		}
 
@@ -194,7 +193,7 @@ public class GuiIndustrialWorkbench extends GuiIC2<ContainerIndustrialWorkbench>
 			@Override
 			public void onClick(MouseButton button)
 			{
-				IC2.network.get(false).sendContainerEvent(GuiIndustrialWorkbench.this.container, "clear");
+				IC2.network.get(false).sendContainerEvent((ContainerBase<?>) GuiIndustrialWorkbench.this.menu, "clear");
 			}
 		}).withTooltip("Clear"));
 		this.addElement(Image.create(this, 94, 43, 14, 14, GuiElement.commonTexture, 256, 256, 210, 47, 224, 61));

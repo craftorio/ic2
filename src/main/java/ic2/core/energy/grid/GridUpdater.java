@@ -46,7 +46,7 @@ class GridUpdater implements Runnable
 		}
 
 		this.prepareUpdate();
-		IC2.getInstance().threadPool.execute(this);
+		IC2.threadPool.execute(this);
 	}
 
 	void startTransferCalc()
@@ -80,7 +80,7 @@ class GridUpdater implements Runnable
 					}
 
 					task.grid = grid;
-					IC2.getInstance().threadPool.execute(task);
+					IC2.threadPool.execute(task);
 				} else
 				{
 					this.pendingCalculations.decrementAndGet();
@@ -186,7 +186,7 @@ class GridUpdater implements Runnable
 				{
 					GridUpdater.GridUpdateTask task = new GridUpdater.GridUpdateTask();
 					task.grid = dirtyGrids.get(i);
-					IC2.getInstance().threadPool.execute(task);
+					IC2.threadPool.execute(task);
 				}
 			}
 
@@ -213,10 +213,6 @@ class GridUpdater implements Runnable
 	{
 		Grid grid;
 
-		private GridCalcTask()
-		{
-		}
-
 		@Override
 		public void run()
 		{
@@ -229,10 +225,6 @@ class GridUpdater implements Runnable
 	private class GridUpdateTask implements Runnable
 	{
 		Grid grid;
-
-		private GridUpdateTask()
-		{
-		}
 
 		@Override
 		public void run()

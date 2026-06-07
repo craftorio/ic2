@@ -1,0 +1,19 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "SOS",
+    "OSO",
+    "SOS"
+  ],
+  "key": {
+    "O": {
+      "tag": "forge:dusts/obsidian"
+    },
+    "S": {
+      "item": "ic2:silicon_dioxide_dust"
+    }
+  },
+  "result": {
+    "item": "ic2:raw_crystal_memory"
+  }
+}

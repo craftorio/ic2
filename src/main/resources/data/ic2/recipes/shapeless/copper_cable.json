@@ -1,0 +1,15 @@
+{
+  "type": "ic2:shapeless",
+  "ingredients": [
+    {
+      "tag": "forge:plates/copper"
+    },
+    {
+      "tag": "ic2:wire_cutters"
+    }
+  ],
+  "result": {
+    "item": "ic2:copper_cable",
+    "count": 2
+  }
+}

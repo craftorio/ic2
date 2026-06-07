@@ -5,53 +5,50 @@ import ic2.api.item.IMiningDrill;
 import ic2.api.upgrade.IUpgradableBlock;
 import ic2.api.upgrade.UpgradableProperty;
 import ic2.core.ContainerBase;
-import ic2.core.IC2;
 import ic2.core.IHasGui;
 import ic2.core.Ic2Player;
-import ic2.core.InvSlotConsumableBlock;
-import ic2.core.audio.AudioSource;
-import ic2.core.audio.PositionSpec;
 import ic2.core.block.IInventorySlotHolder;
 import ic2.core.block.invslot.InvSlot;
 import ic2.core.block.invslot.InvSlotConsumable;
+import ic2.core.block.invslot.InvSlotConsumableBlock;
 import ic2.core.block.invslot.InvSlotConsumableClass;
 import ic2.core.block.invslot.InvSlotConsumableId;
 import ic2.core.block.invslot.InvSlotUpgrade;
-import ic2.core.block.machine.BlockMiningPipe;
 import ic2.core.block.machine.container.ContainerMiner;
-import ic2.core.block.machine.gui.GuiMiner;
+import ic2.core.fluid.FluidHandler;
 import ic2.core.init.MainConfig;
 import ic2.core.init.OreValues;
 import ic2.core.item.tool.ItemScanner;
-import ic2.core.ref.BlockName;
-import ic2.core.ref.ItemName;
+import ic2.core.network.GrowingBuffer;
+import ic2.core.ref.Ic2BlockEntities;
+import ic2.core.ref.Ic2BlockTags;
+import ic2.core.ref.Ic2Blocks;
+import ic2.core.ref.Ic2Items;
+import ic2.core.ref.Ic2SoundEvents;
 import ic2.core.util.ConfigUtil;
-import ic2.core.util.Ic2BlockPos;
 import ic2.core.util.LiquidUtil;
 import ic2.core.util.StackUtil;
+import ic2.core.util.Util;
 
 import java.util.EnumSet;
 import java.util.Set;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.fluids.IFluidBlock;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos.MutableBlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.DirectionalPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class TileEntityMiner extends TileEntityElectricMachine implements IHasGui, IUpgradableBlock
 {
@@ -61,10 +58,9 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
 	private int scanRange = 0;
 	private int lastX;
 	private int lastZ;
-	public final boolean pumpMode = false;
+	public boolean pumpMode = false;
 	public boolean canProvideLiquid = false;
 	public BlockPos liquidPos;
-	private AudioSource audioSource;
 	public final InvSlot buffer;
 	public final InvSlotUpgrade upgradeSlot;
 	public final InvSlotConsumable drillSlot;
@@ -72,9 +68,9 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
 	public final InvSlotConsumable scannerSlot;
 	boolean tickingUpgrades = false;
 
-	public TileEntityMiner()
+	public TileEntityMiner(BlockPos pos, BlockState state)
 	{
-		super(1000, ConfigUtil.getInt(MainConfig.get(), "balance/minerDischargeTier"), false);
+		super(Ic2BlockEntities.MINER, pos, state, 1000, ConfigUtil.getInt(MainConfig.get(), "balance/minerDischargeTier"), false);
 		this.drillSlot = new InvSlotConsumableClass(this, "drill", InvSlot.Access.IO, 1, InvSlot.InvSide.TOP, IMiningDrill.class)
 		{
 			@Override
@@ -91,9 +87,7 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
 				return !TileEntityMiner.this.tickingUpgrades && super.canOutput();
 			}
 		};
-		this.scannerSlot = new InvSlotConsumableId(
-			this, "scanner", InvSlot.Access.IO, 1, InvSlot.InvSide.BOTTOM, ItemName.scanner.getInstance(), ItemName.advanced_scanner.getInstance()
-		)
+		this.scannerSlot = new InvSlotConsumableId(this, "scanner", InvSlot.Access.IO, 1, InvSlot.InvSide.BOTTOM, Ic2Items.SCANNER, Ic2Items.ADVANCED_SCANNER)
 		{
 			@Override
 			public boolean canOutput()
@@ -110,38 +104,25 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
 	{
 		super.onLoaded();
 		this.scannedLevel = -1;
-		this.lastX = this.pos.getX();
-		this.lastZ = this.pos.getZ();
+		this.lastX = this.worldPosition.getX();
+		this.lastZ = this.worldPosition.getZ();
 		this.canProvideLiquid = false;
 	}
 
 	@Override
-	protected void onUnloaded()
+	public void load(CompoundTag nbt)
 	{
-		if (IC2.platform.isRendering() && this.audioSource != null)
-		{
-			IC2.audioManager.removeSources(this);
-			this.audioSource = null;
-		}
-
-		super.onUnloaded();
+		super.load(nbt);
+		this.lastMode = TileEntityMiner.Mode.values()[nbt.getInt("lastMode")];
+		this.progress = nbt.getInt("progress");
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound nbtTagCompound)
+	public void saveAdditional(CompoundTag nbt)
 	{
-		super.readFromNBT(nbtTagCompound);
-		this.lastMode = TileEntityMiner.Mode.values()[nbtTagCompound.getInteger("lastMode")];
-		this.progress = nbtTagCompound.getInteger("progress");
-	}
-
-	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
-	{
-		super.writeToNBT(nbt);
-		nbt.setInteger("lastMode", this.lastMode.ordinal());
-		nbt.setInteger("progress", this.progress);
-		return nbt;
+		super.saveAdditional(nbt);
+		nbt.putInt("lastMode", this.lastMode.ordinal());
+		nbt.putInt("progress", this.progress);
 	}
 
 	@Override
@@ -154,11 +135,11 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
 		this.tickingUpgrades = false;
 		if (this.work())
 		{
-			this.markDirty();
-			this.setActive(true);
+			this.setChanged();
+			this.activate(false);
 		} else
 		{
-			this.setActive(false);
+			this.shutdown(false);
 		}
 	}
 
@@ -177,25 +158,25 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
 
 	private boolean work()
 	{
-		Ic2BlockPos operatingPos = this.getOperationPos();
+		MutableBlockPos operatingPos = this.getOperationPos();
 		if (this.drillSlot.isEmpty())
 		{
 			return this.withDrawPipe(operatingPos);
 		}
 
-		if (!operatingPos.isBelowMap())
+		if (operatingPos.getY() >= this.level.m_141937_())
 		{
-			World world = this.getWorld();
-			IBlockState state = world.getBlockState(operatingPos);
-			if (state != BlockName.mining_pipe.getBlockState(BlockMiningPipe.MiningPipeType.tip))
+			Level world = this.getLevel();
+			BlockState state = world.getBlockState(operatingPos);
+			if (state.getBlock() != Ic2Blocks.MINING_PIPE_TIP)
 			{
-				return operatingPos.getY() > 0 ? this.digDown(operatingPos, state, false) : false;
+				return operatingPos.getY() > world.m_141937_() ? this.digDown(operatingPos, state, false) : false;
 			} else
 			{
 				TileEntityMiner.MineResult result = this.mineLevel(operatingPos.getY());
 				if (result == TileEntityMiner.MineResult.Done)
 				{
-					operatingPos.moveDown();
+					operatingPos.m_122173_(Direction.DOWN);
 					state = world.getBlockState(operatingPos);
 					return this.digDown(operatingPos, state, true);
 				} else
@@ -209,27 +190,28 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
 		}
 	}
 
-	private Ic2BlockPos getOperationPos()
+	private MutableBlockPos getOperationPos()
 	{
-		Ic2BlockPos ret = new Ic2BlockPos(this.pos).moveDown();
-		World world = this.getWorld();
-		IBlockState pipeState = BlockName.mining_pipe.getBlockState(BlockMiningPipe.MiningPipeType.pipe);
+		MutableBlockPos ret = this.worldPosition.m_122032_().m_122173_(Direction.DOWN);
+		Level world = this.getLevel();
+		int bottom = world.m_141937_();
+		BlockState pipeState = Ic2Blocks.MINING_PIPE.defaultBlockState();
 
-		while (!ret.isBelowMap())
+		while (ret.getY() >= bottom)
 		{
-			IBlockState state = ret.getBlockState(world);
+			BlockState state = world.getBlockState(ret);
 			if (state != pipeState)
 			{
 				return ret;
 			}
 
-			ret.moveDown();
+			ret.m_122173_(Direction.DOWN);
 		}
 
 		return ret;
 	}
 
-	private boolean withDrawPipe(Ic2BlockPos operatingPos)
+	private boolean withDrawPipe(MutableBlockPos operatingPos)
 	{
 		if (this.lastMode != TileEntityMiner.Mode.Withdraw)
 		{
@@ -237,13 +219,12 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
 			this.progress = 0;
 		}
 
-		if (operatingPos.isBelowMap()
-			|| this.getWorld().getBlockState(operatingPos) != BlockName.mining_pipe.getBlockState(BlockMiningPipe.MiningPipeType.tip))
+		if (operatingPos.getY() < this.level.m_141937_() || this.level.getBlockState(operatingPos).getBlock() != Ic2Blocks.MINING_PIPE_TIP)
 		{
-			operatingPos.moveUp();
+			operatingPos.m_122173_(Direction.UP);
 		}
 
-		if (operatingPos.getY() != this.pos.getY() && this.energy.getEnergy() >= 3.0)
+		if (operatingPos.getY() != this.worldPosition.getY() && this.energy.getEnergy() >= 3.0)
 		{
 			if (this.progress < 20)
 			{
@@ -262,45 +243,36 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
 		}
 	}
 
-	private void removePipe(Ic2BlockPos operatingPos)
+	private void removePipe(MutableBlockPos operatingPos)
 	{
-		World world = this.getWorld();
-		world.setBlockToAir(operatingPos);
-		this.storeDrop(BlockName.mining_pipe.getItemStack(BlockMiningPipe.MiningPipeType.pipe));
+		Level world = this.getLevel();
+		world.removeBlock(operatingPos, false);
+		this.storeDrop(new ItemStack(Ic2Items.MINING_PIPE));
 		ItemStack pipe = this.pipeSlot.consume(1, true, false);
-		if (pipe != null && !StackUtil.checkItemEquality(pipe, BlockName.mining_pipe.getItemStack(BlockMiningPipe.MiningPipeType.pipe)))
+		if (pipe != null && pipe.getItem() != Ic2Items.MINING_PIPE)
 		{
 			ItemStack filler = this.pipeSlot.consume(1);
 			Item fillerItem = filler.getItem();
-			EntityPlayer player = Ic2Player.get(world);
-			player.setHeldItem(EnumHand.MAIN_HAND, filler);
-
-			try
+			if (fillerItem instanceof BlockItem)
 			{
-				if (fillerItem instanceof ItemBlock)
-				{
-					((ItemBlock) fillerItem).onItemUse(player, world, operatingPos.up(), EnumHand.MAIN_HAND, EnumFacing.DOWN, 0.0F, 0.0F, 0.0F);
-				}
-			} finally
-			{
-				player.setHeldItem(EnumHand.MAIN_HAND, StackUtil.emptyStack);
+				((BlockItem) fillerItem).m_40576_(new DirectionalPlaceContext(world, operatingPos.m_7494_(), Direction.DOWN, filler, Direction.UP));
 			}
 		}
 	}
 
-	private boolean digDown(Ic2BlockPos operatingPos, IBlockState state, boolean removeTipAbove)
+	private boolean digDown(MutableBlockPos operatingPos, BlockState state, boolean removeTipAbove)
 	{
 		ItemStack pipe = this.pipeSlot.consume(1, true, false);
-		if (pipe == null || !StackUtil.checkItemEquality(pipe, BlockName.mining_pipe.getItemStack(BlockMiningPipe.MiningPipeType.pipe)))
+		if (pipe == null || pipe.getItem() != Ic2Items.MINING_PIPE)
 		{
 			return false;
 		}
 
-		if (operatingPos.isBelowMap())
+		if (operatingPos.getY() < this.level.m_141937_())
 		{
 			if (removeTipAbove)
 			{
-				this.getWorld().setBlockState(operatingPos.setY(0), BlockName.mining_pipe.getBlockState(BlockMiningPipe.MiningPipeType.pipe));
+				this.getLevel().setBlockAndUpdate(operatingPos.m_142448_(this.level.m_141937_()), Ic2Blocks.MINING_PIPE.defaultBlockState());
 			}
 
 			return false;
@@ -313,11 +285,11 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
 				{
 					if (removeTipAbove)
 					{
-						this.getWorld().setBlockState(operatingPos.up(), BlockName.mining_pipe.getBlockState(BlockMiningPipe.MiningPipeType.pipe));
+						this.getLevel().setBlockAndUpdate(operatingPos.m_7494_(), Ic2Blocks.MINING_PIPE.defaultBlockState());
 					}
 
 					this.pipeSlot.consume(1);
-					this.getWorld().setBlockState(operatingPos, BlockName.mining_pipe.getBlockState(BlockMiningPipe.MiningPipeType.tip));
+					this.getLevel().setBlockAndUpdate(operatingPos, Ic2Blocks.MINING_PIPE_TIP.defaultBlockState());
 				}
 
 				return true;
@@ -325,7 +297,7 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
 			{
 				if (removeTipAbove)
 				{
-					this.getWorld().setBlockState(operatingPos.moveUp(), BlockName.mining_pipe.getBlockState(BlockMiningPipe.MiningPipeType.pipe));
+					this.getLevel().setBlockAndUpdate(operatingPos.m_122173_(Direction.UP), Ic2Blocks.MINING_PIPE.defaultBlockState());
 				}
 
 				return false;
@@ -352,17 +324,21 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
 
 		this.scannedLevel = y;
 		MutableBlockPos target = new MutableBlockPos();
-		World world = this.getWorld();
-		EntityPlayer player = Ic2Player.get(world);
+		Level world = this.getLevel();
+		Player player = Ic2Player.get(world);
 
-		for (int x = this.pos.getX() - this.scanRange; x <= this.pos.getX() + this.scanRange; x++)
+		for (int x = this.worldPosition.getX() - this.scanRange; x <= this.worldPosition.getX() + this.scanRange; x++)
 		{
-			for (int z = this.pos.getZ() - this.scanRange; z <= this.pos.getZ() + this.scanRange; z++)
+			for (int z = this.worldPosition.getZ() - this.scanRange; z <= this.worldPosition.getZ() + this.scanRange; z++)
 			{
-				target.setPos(x, y, z);
-				IBlockState state = world.getBlockState(target);
+				target.set(x, y, z);
+				BlockState state = world.getBlockState(target);
 				boolean isValidTarget = false;
-				if ((OreValues.get(StackUtil.getDrops(world, target, state, 0)) > 0 || OreValues.get(StackUtil.getPickStack(world, target, state, player)) > 0)
+				if ((
+					state.m_204336_(Ic2BlockTags.ORES)
+						|| OreValues.get(StackUtil.getDrops(world, target, state, 0)) > 0
+						|| OreValues.get(StackUtil.getPickStack(world, target, state, player)) > 0
+				)
 					&& this.canMine(target, state))
 				{
 					isValidTarget = true;
@@ -396,14 +372,14 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
 
 	private TileEntityMiner.MineResult mineTowards(BlockPos dst)
 	{
-		int dx = Math.abs(dst.getX() - this.pos.getX());
-		int sx = this.pos.getX() < dst.getX() ? 1 : -1;
-		int dz = -Math.abs(dst.getZ() - this.pos.getZ());
-		int sz = this.pos.getZ() < dst.getZ() ? 1 : -1;
+		int dx = Math.abs(dst.getX() - this.worldPosition.getX());
+		int sx = this.worldPosition.getX() < dst.getX() ? 1 : -1;
+		int dz = -Math.abs(dst.getZ() - this.worldPosition.getZ());
+		int sz = this.worldPosition.getZ() < dst.getZ() ? 1 : -1;
 		int err = dx + dz;
 		MutableBlockPos target = new MutableBlockPos();
-		int cx = this.pos.getX();
-		int cz = this.pos.getZ();
+		int cx = this.worldPosition.getX();
+		int cz = this.worldPosition.getZ();
 
 		while (cx != dst.getX() || cz != dst.getZ())
 		{
@@ -419,14 +395,14 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
 				cz += sz;
 			}
 
-			target.setPos(cx, dst.getY(), cz);
-			World world = this.getWorld();
-			IBlockState state = world.getBlockState(target);
+			target.set(cx, dst.getY(), cz);
+			Level world = this.getLevel();
+			BlockState state = world.getBlockState(target);
 			boolean isBlocking = false;
 			if (isCurrentPos)
 			{
 				isBlocking = true;
-			} else if (!state.getBlock().isAir(state, world, target))
+			} else if (!state.isAir())
 			{
 				LiquidUtil.LiquidData liquid = LiquidUtil.getLiquid(world, target);
 				if (liquid == null || liquid.isSource || this.pumpMode && this.canPump(target))
@@ -448,17 +424,17 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
 			}
 		}
 
-		this.lastX = this.pos.getX();
-		this.lastZ = this.pos.getZ();
+		this.lastX = this.worldPosition.getX();
+		this.lastZ = this.worldPosition.getZ();
 		return TileEntityMiner.MineResult.Done;
 	}
 
-	private TileEntityMiner.MineResult mineBlock(BlockPos target, IBlockState state)
+	private TileEntityMiner.MineResult mineBlock(BlockPos target, BlockState state)
 	{
-		World world = this.getWorld();
+		Level world = this.getLevel();
 		Block block = state.getBlock();
 		boolean isAirBlock = true;
-		if (!block.isAir(state, world, target))
+		if (!state.isAir())
 		{
 			isAirBlock = false;
 			LiquidUtil.LiquidData liquidData = LiquidUtil.getLiquid(world, target);
@@ -477,6 +453,7 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
 		}
 
 		this.canProvideLiquid = false;
+		Item drillItem = this.drillSlot.get().getItem();
 		int energyPerTick;
 		int duration;
 		TileEntityMiner.Mode mode;
@@ -485,24 +462,24 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
 			mode = TileEntityMiner.Mode.MineAir;
 			energyPerTick = 3;
 			duration = 20;
-		} else if (this.drillSlot.get().getItem() == ItemName.drill.getInstance())
+		} else if (drillItem == Ic2Items.DRILL)
 		{
 			mode = TileEntityMiner.Mode.MineDrill;
 			energyPerTick = 6;
 			duration = 200;
-		} else if (this.drillSlot.get().getItem() == ItemName.diamond_drill.getInstance())
+		} else if (drillItem == Ic2Items.DIAMOND_DRILL)
 		{
 			mode = TileEntityMiner.Mode.MineDDrill;
 			energyPerTick = 20;
 			duration = 50;
-		} else if (this.drillSlot.get().getItem() == ItemName.iridium_drill.getInstance())
+		} else if (drillItem == Ic2Items.IRIDIUM_DRILL)
 		{
 			mode = TileEntityMiner.Mode.MineIDrill;
 			energyPerTick = 200;
 			duration = 20;
 		} else
 		{
-			if (!(this.drillSlot.get().getItem() instanceof IMiningDrill))
+			if (!(drillItem instanceof IMiningDrill))
 			{
 				throw new IllegalStateException("invalid drill: " + this.drillSlot.get());
 			}
@@ -535,15 +512,15 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
 		return TileEntityMiner.MineResult.Failed_Temp;
 	}
 
-	private boolean harvestBlock(BlockPos target, IBlockState state)
+	private boolean harvestBlock(BlockPos target, BlockState state)
 	{
-		int energyCost = 2 * (this.pos.getY() - target.getY());
+		int energyCost = 2 * (this.worldPosition.getY() - target.getY());
 		if (this.energy.getEnergy() < energyCost)
 		{
 			return false;
 		}
 
-		World world = this.getWorld();
+		Level world = this.getLevel();
 		switch (this.lastMode)
 		{
 			case MineDrill:
@@ -581,18 +558,18 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
 			this.storeDrop(drop);
 		}
 
-		world.setBlockToAir(target);
+		world.removeBlock(target, false);
 		return true;
 	}
 
 	private void storeDrop(ItemStack stack)
 	{
-		if (StackUtil.putInInventory(this, EnumFacing.WEST, stack, true) == 0)
+		if (StackUtil.putInInventory(this, Direction.WEST, stack, true) == 0)
 		{
-			StackUtil.dropAsEntity(this.getWorld(), this.pos, stack);
+			StackUtil.dropAsEntity(this.getLevel(), this.worldPosition, stack);
 		} else
 		{
-			StackUtil.putInInventory(this, EnumFacing.WEST, stack, false);
+			StackUtil.putInInventory(this, Direction.WEST, stack, false);
 		}
 	}
 
@@ -601,50 +578,49 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
 		return false;
 	}
 
-	public boolean canMine(BlockPos target, IBlockState state)
+	public boolean canMine(BlockPos target, BlockState state)
 	{
 		Block block = state.getBlock();
-		if (block.isAir(state, this.getWorld(), target))
+		if (state.isAir())
 		{
 			return true;
-		} else if (block == BlockName.mining_pipe.getInstance() || block == Blocks.CHEST)
+		}
+
+		if (block != Ic2Blocks.MINING_PIPE && block != Ic2Blocks.MINING_PIPE_TIP && block != Blocks.f_50087_)
 		{
-			return false;
-		} else if (block instanceof IFluidBlock && this.isPumpConnected(target))
-		{
-			return true;
-		} else if ((block == Blocks.WATER || block == Blocks.FLOWING_WATER || block == Blocks.LAVA || block == Blocks.FLOWING_LAVA)
-			&& this.isPumpConnected(target))
-		{
-			return true;
-		} else
-		{
-			World world = this.getWorld();
-			if (state.getBlockHardness(world, target) < 0.0F)
-			{
-				return false;
-			} else if (block.canCollideCheck(state, false) && state.getMaterial().isToolNotRequired())
-			{
-				return true;
-			} else if (block == Blocks.WEB)
+			if ((block == Blocks.f_49990_ || block == Blocks.f_49991_ || FluidHandler.getWorldFluid(state) != null) && this.isPumpConnected(target))
 			{
 				return true;
 			} else
 			{
-				return this.drillSlot.isEmpty()
-					? false
-					: ForgeHooks.canToolHarvestBlock(world, target, this.drillSlot.get()) || this.drillSlot.get().canHarvestBlock(state);
+				Level world = this.getLevel();
+				if (state.getDestroySpeed(world, target) < 0.0F)
+				{
+					return false;
+				} else if (!state.m_60834_())
+				{
+					return true;
+				} else if (block == Blocks.f_50033_)
+				{
+					return true;
+				} else
+				{
+					return !this.drillSlot.isEmpty() ? this.drillSlot.get().m_41735_(state) : false;
+				}
 			}
+		} else
+		{
+			return false;
 		}
 	}
 
 	public boolean isPumpConnected(BlockPos target)
 	{
-		World world = this.getWorld();
+		Level world = this.getLevel();
 
-		for (EnumFacing dir : EnumFacing.VALUES)
+		for (Direction dir : Util.ALL_DIRS)
 		{
-			TileEntity te = world.getTileEntity(this.pos.offset(dir));
+			BlockEntity te = world.getBlockEntity(this.worldPosition.relative(dir));
 			if (te instanceof TileEntityPump && ((TileEntityPump) te).pump(target, true, this) != null)
 			{
 				return true;
@@ -656,11 +632,11 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
 
 	public boolean isAnyPumpConnected()
 	{
-		World world = this.getWorld();
+		Level world = this.getLevel();
 
-		for (EnumFacing dir : EnumFacing.VALUES)
+		for (Direction dir : Util.ALL_DIRS)
 		{
-			TileEntity te = world.getTileEntity(this.pos.offset(dir));
+			BlockEntity te = world.getBlockEntity(this.worldPosition.relative(dir));
 			if (te instanceof TileEntityPump)
 			{
 				return true;
@@ -671,47 +647,21 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
 	}
 
 	@Override
-	public ContainerBase<TileEntityMiner> getGuiContainer(EntityPlayer player)
+	public SoundEvent getLoopingSoundEvent()
 	{
-		return new ContainerMiner(player, this);
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
-	{
-		return new GuiMiner(new ContainerMiner(player, this));
+		return Ic2SoundEvents.MACHINE_MINER_OPERATE;
 	}
 
 	@Override
-	public void onGuiClosed(EntityPlayer player)
+	public ContainerBase<TileEntityMiner> createServerScreenHandler(int syncId, Player player)
 	{
+		return new ContainerMiner(syncId, player.getInventory(), this);
 	}
 
 	@Override
-	public void onNetworkUpdate(String field)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
-		if (field.equals("active"))
-		{
-			if (this.audioSource == null)
-			{
-				this.audioSource = IC2.audioManager
-					.createSource(this, PositionSpec.Center, "Machines/MinerOp.ogg", true, false, IC2.audioManager.getDefaultVolume());
-			}
-
-			if (this.getActive())
-			{
-				if (this.audioSource != null)
-				{
-					this.audioSource.play();
-				}
-			} else if (this.audioSource != null)
-			{
-				this.audioSource.stop();
-			}
-		}
-
-		super.onNetworkUpdate(field);
+		return new ContainerMiner(syncId, inventory, this);
 	}
 
 	@Override

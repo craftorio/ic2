@@ -1,0 +1,14 @@
+{
+  "type": "ic2:shapeless",
+  "ingredients": [
+    {
+      "tag": "forge:ingots/tin"
+    },
+    {
+      "tag": "ic2:forge_hammers"
+    }
+  ],
+  "result": {
+    "item": "ic2:tin_plate"
+  }
+}

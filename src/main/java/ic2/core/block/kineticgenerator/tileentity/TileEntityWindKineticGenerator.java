@@ -6,33 +6,34 @@ import ic2.api.tile.IRotorProvider;
 import ic2.core.ContainerBase;
 import ic2.core.IC2;
 import ic2.core.IHasGui;
-import ic2.core.WorldData;
-import ic2.core.block.TileEntityInventory;
 import ic2.core.block.invslot.InvSlot;
 import ic2.core.block.invslot.InvSlotConsumableClass;
 import ic2.core.block.invslot.InvSlotConsumableKineticRotor;
 import ic2.core.block.kineticgenerator.container.ContainerWindKineticGenerator;
-import ic2.core.block.kineticgenerator.gui.GuiWindKineticGenerator;
+import ic2.core.block.tileentity.TileEntityInventory;
+import ic2.core.event.WorldData;
 import ic2.core.init.Localization;
 import ic2.core.init.MainConfig;
+import ic2.core.network.GrowingBuffer;
 import ic2.core.profile.NotClassic;
+import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.util.ConfigUtil;
 import ic2.core.util.StackUtil;
 import ic2.core.util.Util;
 
 import java.util.List;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
-import net.minecraft.world.ChunkCache;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos.MutableBlockPos;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.PathNavigationRegion;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 
 @NotClassic
 public class TileEntityWindKineticGenerator extends TileEntityInventory implements IKineticSource, IRotorProvider, IHasGui
@@ -47,10 +48,11 @@ public class TileEntityWindKineticGenerator extends TileEntityInventory implemen
 	private long lastcheck;
 	private static final double efficiencyRollOffExponent = 2.0;
 	public static final float outputModifier = 10.0F * ConfigUtil.getFloat(MainConfig.get(), "balance/energy/kineticgenerator/wind");
-	private static final ResourceLocation woodenRotorTexture = new ResourceLocation("ic2", "textures/items/rotor/wood_rotor_model.png");
+	private static final ResourceLocation woodenRotorTexture = ResourceLocation.fromNamespaceAndPath("ic2", "textures/items/rotor/wood_rotor_model.png");
 
-	public TileEntityWindKineticGenerator()
+	public TileEntityWindKineticGenerator(BlockPos pos, BlockState state)
 	{
+		super(Ic2BlockEntities.WIND_KINETIC_GENERATOR, pos, state);
 		this.updateTicker = IC2.random.nextInt(this.getTickRate());
 		this.rotorSlot = new InvSlotConsumableKineticRotor(
 			this, "rotorslot", InvSlot.Access.IO, 1, InvSlot.InvSide.ANY, IKineticRotor.GearboxType.WIND, "rotorSlot"
@@ -109,7 +111,7 @@ public class TileEntityWindKineticGenerator extends TileEntityInventory implemen
 
 			if (needsInvUpdate)
 			{
-				this.markDirty();
+				this.setChanged();
 			}
 		}
 	}
@@ -124,19 +126,18 @@ public class TileEntityWindKineticGenerator extends TileEntityInventory implemen
 	}
 
 	@Override
-	public ContainerBase<TileEntityWindKineticGenerator> getGuiContainer(EntityPlayer player)
+	public ContainerBase<TileEntityWindKineticGenerator> createServerScreenHandler(int syncId, Player player)
 	{
-		return new ContainerWindKineticGenerator(player, this);
+		return new ContainerWindKineticGenerator(syncId, player.getInventory(), this);
 	}
 
-	@SideOnly(Side.CLIENT)
 	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
-		return new GuiWindKineticGenerator(new ContainerWindKineticGenerator(player, this));
+		return new ContainerWindKineticGenerator(syncId, inventory, this);
 	}
 
-	public boolean facingMatchesDirection(EnumFacing direction)
+	public boolean facingMatchesDirection(Direction direction)
 	{
 		return direction == this.getFacing();
 	}
@@ -145,39 +146,33 @@ public class TileEntityWindKineticGenerator extends TileEntityInventory implemen
 	{
 		return !this.rotorSlot.isEmpty()
 			? Localization.translate(
-			"ic2.WindKineticGenerator.gui.rotorhealth",
-			(int) (100.0F - (float) this.rotorSlot.get().getItemDamage() / this.rotorSlot.get().getMaxDamage() * 100.0F)
+			"ic2.WindKineticGenerator.gui.rotorhealth", (int) (100.0F - (float) this.rotorSlot.get().getDamageValue() / this.rotorSlot.get().m_41776_() * 100.0F)
 		)
 			: "";
 	}
 
 	@Override
-	public int maxrequestkineticenergyTick(EnumFacing directionFrom)
+	public int maxrequestkineticenergyTick(Direction directionFrom)
 	{
 		return this.getConnectionBandwidth(directionFrom);
 	}
 
 	@Override
-	public int getConnectionBandwidth(EnumFacing side)
+	public int getConnectionBandwidth(Direction side)
 	{
-		return this.facingMatchesDirection(side.getOpposite()) ? this.getKuOutput() : 0;
+		return this.facingMatchesDirection(side.m_122424_()) ? this.getKuOutput() : 0;
 	}
 
 	@Override
-	public int requestkineticenergy(EnumFacing directionFrom, int requestkineticenergy)
+	public int requestkineticenergy(Direction directionFrom, int requestkineticenergy)
 	{
 		return this.drawKineticEnergy(directionFrom, requestkineticenergy, false);
 	}
 
 	@Override
-	public int drawKineticEnergy(EnumFacing side, int request, boolean simulate)
+	public int drawKineticEnergy(Direction side, int request, boolean simulate)
 	{
-		return this.facingMatchesDirection(side.getOpposite()) ? Math.min(request, this.getKuOutput()) : 0;
-	}
-
-	@Override
-	public void onGuiClosed(EntityPlayer player)
-	{
+		return this.facingMatchesDirection(side.m_122424_()) ? Math.min(request, this.getKuOutput()) : 0;
 	}
 
 	public int checkSpace(int length, boolean onlyrotor)
@@ -195,17 +190,17 @@ public class TileEntityWindKineticGenerator extends TileEntityInventory implemen
 			box *= 2;
 		}
 
-		EnumFacing fwdDir = this.getFacing();
-		EnumFacing rightDir = fwdDir.rotateAround(EnumFacing.DOWN.getAxis());
-		int xMaxDist = Math.abs(length * fwdDir.getFrontOffsetX() + box * rightDir.getFrontOffsetX());
-		int zMaxDist = Math.abs(length * fwdDir.getFrontOffsetZ() + box * rightDir.getFrontOffsetZ());
-		ChunkCache chunkCache = new ChunkCache(
-			this.getWorld(), this.pos.add(-xMaxDist, -box, -zMaxDist), this.pos.add(xMaxDist, box, zMaxDist), 0
+		Direction fwdDir = this.getFacing();
+		Direction rightDir = fwdDir.m_175362_(Axis.Y);
+		int xMaxDist = Math.abs(length * fwdDir.m_122429_() + box * rightDir.m_122429_());
+		int zMaxDist = Math.abs(length * fwdDir.m_122431_() + box * rightDir.m_122431_());
+		PathNavigationRegion chunkCache = new PathNavigationRegion(
+			this.getLevel(), this.worldPosition.offset(-xMaxDist, -box, -zMaxDist), this.worldPosition.offset(xMaxDist, box, zMaxDist)
 		);
 		int ret = 0;
-		int xCoord = this.pos.getX();
-		int yCoord = this.pos.getY();
-		int zCoord = this.pos.getZ();
+		int xCoord = this.worldPosition.getX();
+		int yCoord = this.worldPosition.getY();
+		int zCoord = this.worldPosition.getZ();
 		MutableBlockPos pos = new MutableBlockPos();
 
 		for (int up = -box; up <= box; up++)
@@ -218,17 +213,17 @@ public class TileEntityWindKineticGenerator extends TileEntityInventory implemen
 
 				for (int fwd = lentemp - length; fwd <= length; fwd++)
 				{
-					int x = xCoord + fwd * fwdDir.getFrontOffsetX() + right * rightDir.getFrontOffsetX();
-					int z = zCoord + fwd * fwdDir.getFrontOffsetZ() + right * rightDir.getFrontOffsetZ();
-					pos.setPos(x, y, z);
+					int x = xCoord + fwd * fwdDir.m_122429_() + right * rightDir.m_122429_();
+					int z = zCoord + fwd * fwdDir.m_122431_() + right * rightDir.m_122431_();
+					pos.set(x, y, z);
 					assert Math.abs(x - xCoord) <= xMaxDist;
 					assert Math.abs(z - zCoord) <= zMaxDist;
-					IBlockState state = chunkCache.getBlockState(pos);
+					BlockState state = chunkCache.getBlockState(pos);
 					Block block = state.getBlock();
-					if (!block.isAir(state, chunkCache, pos))
+					if (!state.isAir())
 					{
 						occupied = true;
-						if ((up != 0 || right != 0 || fwd != 0) && chunkCache.getTileEntity(pos) instanceof TileEntityWindKineticGenerator && !onlyrotor)
+						if ((up != 0 || right != 0 || fwd != 0) && chunkCache.getBlockEntity(pos) instanceof TileEntityWindKineticGenerator && !onlyrotor)
 						{
 							return -1;
 						}
@@ -271,7 +266,7 @@ public class TileEntityWindKineticGenerator extends TileEntityInventory implemen
 
 	public double calcWindStrength()
 	{
-		double windStr = WorldData.get(this.getWorld()).windSim.getWindAt(this.pos.getY());
+		double windStr = WorldData.get(this.getLevel()).windSim.getWindAt(this.worldPosition.getY());
 		windStr *= 1.0 - Math.pow((double) this.obstructedCrossSection / this.crossSection, 2.0);
 		return Math.max(0.0, windStr);
 	}

@@ -1,13 +1,13 @@
 package ic2.core.network;
 
-import ic2.core.block.TileEntityBlock;
+import ic2.core.block.tileentity.Ic2TileEntityBlock;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 
 class TeUpdateDataClient
 {
@@ -42,7 +42,7 @@ class TeUpdateDataClient
 	{
 		final BlockPos pos;
 		private final List<TeUpdateDataClient.FieldData> fields;
-		Class<? extends TileEntityBlock> teClass;
+		Ic2TileEntityBlock teType;
 
 		private TeData(BlockPos pos, int fieldCount)
 		{
@@ -58,6 +58,11 @@ class TeUpdateDataClient
 		public Collection<TeUpdateDataClient.FieldData> getFields()
 		{
 			return this.fields;
+		}
+
+		public boolean hasClass()
+		{
+			return this.teType != null;
 		}
 	}
 }

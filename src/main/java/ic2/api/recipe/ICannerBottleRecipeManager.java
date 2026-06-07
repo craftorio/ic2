@@ -1,11 +1,9 @@
 package ic2.api.recipe;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 public interface ICannerBottleRecipeManager extends IMachineRecipeManager<ICannerBottleRecipeManager.Input, ItemStack, ICannerBottleRecipeManager.RawInput>
 {
-	boolean addRecipe(IRecipeInput var1, IRecipeInput var2, ItemStack var3, boolean var4);
-
 	@Deprecated
 	void addRecipe(IRecipeInput var1, IRecipeInput var2, ItemStack var3);
 

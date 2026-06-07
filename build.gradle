@@ -1,87 +1,125 @@
-buildscript {
-    repositories {
-        maven { url = 'https://maven.minecraftforge.net/' }
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:3.+'
-    }
-}
-        
-apply plugin: 'net.minecraftforge.gradle'
-
-apply plugin: 'eclipse'
-apply plugin: 'maven-publish'
-
-version = '2.8.222-ex112'
-group = 'ic2'
-archivesBaseName = 'ic2'
-
-sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
-
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8'
+plugins {
+    id 'eclipse'
+    id 'idea'
+    id 'maven-publish'
+    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
 }
 
+version = mod_version
+group = mod_group_id
+
+base {
+    archivesName = mod_id
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 minecraft {
-    mappings channel: 'snapshot', version: '20171003-1.12'
+    mappings channel: mapping_channel, version: mapping_version
+
+    copyIdeResources = true
+
     runs {
-        client {
+        configureEach {
             workingDirectory project.file('run')
-            
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+            property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
+            property 'forge.enabledGameTestNamespaces', mod_id
+
+            mods {
+                "${mod_id}" {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        client {
+            property 'forge.enabledGameTestNamespaces', mod_id
         }
 
         server {
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-            property 'forge.logging.console.level', 'debug'
+            property 'forge.enabledGameTestNamespaces', mod_id
+            args '--nogui'
         }
+
+        gameTestServer {
+            property 'forge.enabledGameTestNamespaces', mod_id
+        }
+
+        data {
+            workingDirectory project.file('run-data')
+            args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+        }
+    }
+}
+
+sourceSets {
+    main {
+        resources { srcDir 'src/generated/resources' }
+        java { exclude 'ic2_old/**' }
     }
 }
 
 repositories {
-    maven { url = "https://mod-buildcraft.com/maven" }
     maven { url = "https://maven.blamejared.com/" }
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2864'
-    compile 'com.mod-buildcraft:buildcraft-all:8.0.0'
-    compileOnly 'mezz.jei:jei_1.12.2:4.16.1.1013'
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    
+    compileOnly "mezz.jei:jei-1.19.2-forge-api:11.8.1.1034"
 }
 
-jar {
-    manifest {
-        attributes([
-            "Specification-Title": "ic2",
-            "Specification-Vendor": "IndustrialCraft 2",
-            "Specification-Version": "1",
-            "Implementation-Title": project.name,
-            "Implementation-Version": "${archiveVersion}",
-            "Implementation-Vendor" :"IndustrialCraft 2",
-            "Implementation-Timestamp": new Date().format("yyyy-MM-dd-HH:mm:ssZ")
-        ])
+tasks.named('processResources', ProcessResources).configure {
+    var replaceProperties = [
+            minecraft_version: minecraft_version, minecraft_version_range: minecraft_version_range,
+            forge_version: forge_version, forge_version_range: forge_version_range,
+            loader_version_range: loader_version_range,
+            mod_id: mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
+            mod_authors: mod_authors, mod_description: mod_description,
+    ]
+    inputs.properties replaceProperties
+
+    filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
+        expand replaceProperties + [project: project]
     }
 }
 
-jar.finalizedBy('reobfJar')
+tasks.named('jar', Jar).configure {
+    manifest {
+        attributes([
+                'Specification-Title'     : mod_id,
+                'Specification-Vendor'    : mod_authors,
+                'Specification-Version'   : '1',
+                'Implementation-Title'    : project.name,
+                'Implementation-Version'  : project.jar.archiveVersion,
+                'Implementation-Vendor'   : mod_authors,
+                'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
+    
+    finalizedBy 'reobfJar'
+}
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
+        register('mavenJava', MavenPublication) {
             artifact jar
         }
     }
     repositories {
         maven {
-            url "file:///${project.projectDir}/mcmodsrepo"
+            url "file://${project.projectDir}/mcmodsrepo"
         }
     }
 }
 
-sourceSets.each {
-    def dir = layout.buildDirectory.file("sourcesSets/$it.name").get().asFile
-    it.output.resourcesDir = dir
-    it.java.outputDir = dir
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
 }

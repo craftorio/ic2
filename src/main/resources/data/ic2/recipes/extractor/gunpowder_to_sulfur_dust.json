@@ -1,0 +1,9 @@
+{
+  "type": "ic2:extractor",
+  "ingredient": {
+    "item": "minecraft:gunpowder"
+  },
+  "result": {
+    "item": "ic2:sulfur_dust"
+  }
+}

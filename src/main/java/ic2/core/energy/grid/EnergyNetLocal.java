@@ -4,7 +4,6 @@ import ic2.api.energy.EnergyNet;
 import ic2.api.energy.NodeStats;
 import ic2.api.energy.tile.IEnergyTile;
 import ic2.core.IC2;
-import ic2.core.ref.BlockName;
 import ic2.core.util.LogCategory;
 import ic2.core.util.Util;
 
@@ -21,18 +20,19 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-import net.minecraft.block.Block;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.SectionPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.chunk.ChunkSource;
 
 public class EnergyNetLocal
 {
 	static final GridChange QUEUE_DELAY_CHANGE = new GridChange(null, null, null);
-	private final World world;
+	private final Level world;
 	private final Queue<GridChange> gridChangesQueue = new ArrayDeque<>();
 	private final Map<IEnergyTile, GridChange> gridAdditionsMap = new IdentityHashMap<>();
-	private final Set<BlockPos> positionsToNotify = new HashSet<>();
+	private final Set<IEnergyTile> ioTilesToNotify = Collections.newSetFromMap(new IdentityHashMap<>());
 	private final GridUpdater updater = new GridUpdater(this);
 	int nextNodeId;
 	int nextGridId;
@@ -41,12 +41,12 @@ public class EnergyNetLocal
 	final Set<Tile> sources = Collections.newSetFromMap(new IdentityHashMap<>());
 	private final List<Grid> grids = new ArrayList<>();
 
-	public static EnergyNetLocal create(World world)
+	public static EnergyNetLocal create(Level world)
 	{
 		return new EnergyNetLocal(world);
 	}
 
-	private EnergyNetLocal(World world)
+	private EnergyNetLocal(Level world)
 	{
 		this.world = world;
 
@@ -173,6 +173,59 @@ public class EnergyNetLocal
 		return tile == null ? null : EnergyNetGlobal.getCalculator().getNodeStats(tile);
 	}
 
+	int getAdjacentConnections(IEnergyTile queryTile)
+	{
+		Tile tile = this.registeredIoTiles.get(queryTile);
+		if (tile == null)
+		{
+			return 0;
+		}
+
+		BlockPos pos = EnergyNet.instance.getPos(queryTile);
+		int ret = 0;
+
+		for (Node node : tile.getNodes())
+		{
+			for (NodeLink link : node.getLinks())
+			{
+				Node neighbor = link.getNeighbor(node);
+
+				for (IEnergyTile neighborTile : neighbor.getTile().getSubTiles())
+				{
+					BlockPos neighborPos = EnergyNet.instance.getPos(neighborTile);
+					Direction dir = getDirBetween(pos, neighborPos);
+					if (dir != null)
+					{
+						ret |= 1 << dir.ordinal();
+					}
+				}
+			}
+		}
+
+		return ret;
+	}
+
+	private static Direction getDirBetween(BlockPos from, BlockPos to)
+	{
+		int dx = to.getX() - from.getX();
+		int dy = to.getY() - from.getY();
+		int dz = to.getZ() - from.getZ();
+		int abs = Math.abs(dx) + Math.abs(dy) + Math.abs(dz);
+		if (abs != 1)
+		{
+			return null;
+		} else if (dx != 0)
+		{
+			return dx > 0 ? Direction.EAST : Direction.WEST;
+		} else if (dy != 0)
+		{
+			return dy > 0 ? Direction.UP : Direction.DOWN;
+		} else
+		{
+			return dz > 0 ? Direction.SOUTH : Direction.NORTH;
+		}
+	}
+
 	public Collection<GridInfo> getGridInfos()
 	{
 		if (this.updater.isInChangeStep())
@@ -220,31 +273,44 @@ public class EnergyNetLocal
 		return true;
 	}
 
-	void onTickStart()
+	public void onTickStart()
 	{
 		if (this.updater.isInChangeStep())
 		{
 			this.updater.awaitCompletion();
-			if (!this.positionsToNotify.isEmpty())
+			if (!this.ioTilesToNotify.isEmpty())
 			{
-				Block block = BlockName.te.getInstance();
+				ChunkSource chunkManager = this.world.m_7726_();
+				int lastX = Integer.MIN_VALUE;
+				int lastZ = Integer.MIN_VALUE;
+				boolean lastLoaded = false;
 
-				for (BlockPos pos : this.positionsToNotify)
+				for (IEnergyTile tile : this.ioTilesToNotify)
 				{
-					if (this.world.isBlockLoaded(pos))
+					BlockPos pos = EnergyNet.instance.getPos(tile);
+					int x = SectionPos.m_123171_(pos.getX());
+					int z = SectionPos.m_123171_(pos.getZ());
+					if (x != lastX || z != lastZ)
 					{
-						this.world.getBlockState(pos).neighborChanged(this.world, pos, block, pos);
+						lastLoaded = chunkManager.m_5563_(x, z);
+						lastX = x;
+						lastZ = z;
+					}
+
+					if (lastLoaded)
+					{
+						tile.onConnectionChange();
 					}
 				}
 
-				this.positionsToNotify.clear();
+				this.ioTilesToNotify.clear();
 			}
 
 			this.updater.startTransferCalc();
 		}
 	}
 
-	void onTickEnd()
+	public void onTickEnd()
 	{
 		this.updater.awaitCompletion();
 		if (!this.gridChangesQueue.isEmpty() && this.gridChangesQueue.peek() != QUEUE_DELAY_CHANGE)
@@ -260,7 +326,7 @@ public class EnergyNetLocal
 		assert this.gridChangesQueue.size() >= 1;
 	}
 
-	public World getWorld()
+	public Level getWorld()
 	{
 		return this.world;
 	}
@@ -275,14 +341,14 @@ public class EnergyNetLocal
 		return this.nextGridId++;
 	}
 
-	void addPositionToNotify(BlockPos pos)
+	void addTileToNotify(IEnergyTile ioTile)
 	{
-		this.positionsToNotify.add(pos);
+		this.ioTilesToNotify.add(ioTile);
+	}
 
-		for (EnumFacing facing : EnumFacing.VALUES)
-		{
-			this.positionsToNotify.add(pos.offset(facing));
-		}
+	void removeTileToNotify(IEnergyTile ioTile)
+	{
+		this.ioTilesToNotify.remove(ioTile);
 	}
 
 	boolean hasGrid(Grid grid)

@@ -1,0 +1,10 @@
+{
+  "type": "ic2:compressor",
+  "ingredient": {
+    "item": "minecraft:ice",
+    "count": 2
+  },
+  "result": {
+    "item": "minecraft:packed_ice"
+  }
+}

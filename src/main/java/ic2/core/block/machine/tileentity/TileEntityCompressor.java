@@ -6,8 +6,10 @@ import ic2.api.recipe.MachineRecipeResult;
 import ic2.api.recipe.Recipes;
 import ic2.api.upgrade.UpgradableProperty;
 import ic2.core.block.invslot.InvSlotProcessableGeneric;
-import ic2.core.recipe.BasicMachineRecipeManager;
+import ic2.core.ref.Ic2BlockEntities;
+import ic2.core.ref.Ic2SoundEvents;
 import ic2.core.util.LiquidUtil;
+import ic2.core.util.Util;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -15,30 +17,26 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 
-import net.minecraft.block.Block;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.fluids.FluidRegistry;
-import net.minecraftforge.fluids.FluidStack;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluids;
 
 public class TileEntityCompressor extends TileEntityStandardMachine<IRecipeInput, Collection<ItemStack>, ItemStack>
 {
 	protected boolean usingPumpRecipe;
 	protected final Set<TileEntityPump> pumps = new HashSet<>(12, 0.5F);
 
-	public TileEntityCompressor()
+	public TileEntityCompressor(BlockPos pos, BlockState state)
 	{
-		super(2, 300, 1);
+		super(Ic2BlockEntities.COMPRESSOR, pos, state, 2, 300, 1);
 		this.inputSlot = new InvSlotProcessableGeneric(this, "input", 1, Recipes.compressor);
-	}
-
-	public static void init()
-	{
-		Recipes.compressor = new BasicMachineRecipeManager();
 	}
 
 	@Override
@@ -57,12 +55,12 @@ public class TileEntityCompressor extends TileEntityStandardMachine<IRecipeInput
 
 	protected void findPumps()
 	{
-		World world = this.getWorld();
+		Level world = this.getLevel();
 		this.pumps.clear();
 
-		for (EnumFacing side : EnumFacing.VALUES)
+		for (Direction side : Util.ALL_DIRS)
 		{
-			TileEntity te = world.getTileEntity(this.pos.offset(side));
+			BlockEntity te = world.getBlockEntity(this.worldPosition.relative(side));
 			if (te instanceof TileEntityPump)
 			{
 				this.pumps.add((TileEntityPump) te);
@@ -71,33 +69,31 @@ public class TileEntityCompressor extends TileEntityStandardMachine<IRecipeInput
 	}
 
 	@Override
-	public MachineRecipeResult<IRecipeInput, Collection<ItemStack>, ItemStack> getOutput()
+	public MachineRecipeResult<IRecipeInput, Collection<ItemStack>, ItemStack> getRecipeResult()
 	{
 		this.usingPumpRecipe = false;
-		MachineRecipeResult<IRecipeInput, Collection<ItemStack>, ItemStack> output = super.getOutput();
+		MachineRecipeResult<IRecipeInput, Collection<ItemStack>, ItemStack> output = super.getRecipeResult();
 		if (output != null)
 		{
 			return output;
 		}
 
-		if (!this.pumps.isEmpty() && this.inputSlot.isEmpty() && this.outputSlot.canAdd(new ItemStack(Items.SNOWBALL)))
+		if (!this.pumps.isEmpty() && this.inputSlot.isEmpty() && this.outputSlot.canAdd(new ItemStack(Items.f_42452_)))
 		{
-			FluidStack fluid = new FluidStack(FluidRegistry.WATER, 1000);
+			int reqAmount = 1000;
 
 			for (TileEntityPump pump : this.pumps)
 			{
-				FluidStack amount = LiquidUtil.drainTile(pump, EnumFacing.UP, FluidRegistry.WATER, fluid.amount, true);
-				if (amount != null)
+				int amount = LiquidUtil.drainTile(pump, Direction.UP, Fluids.f_76193_, reqAmount, true);
+				if (amount > 0)
 				{
-					assert amount.getFluid() == FluidRegistry.WATER;
-					fluid.amount = fluid.amount - amount.amount;
-				}
-
-				if (fluid.amount <= 0)
-				{
-					this.usingPumpRecipe = true;
-					output = (MachineRecipeResult) new MachineRecipe<>(null, Collections.singletonList(new ItemStack(Items.SNOWBALL))).getResult(null);
-					break;
+					reqAmount -= amount;
+					if (reqAmount <= 0)
+					{
+						this.usingPumpRecipe = true;
+						output = new MachineRecipe<>(null, Collections.singletonList(new ItemStack(Items.f_42452_))).getResult(null);
+						break;
+					}
 				}
 			}
 		}
@@ -110,22 +106,22 @@ public class TileEntityCompressor extends TileEntityStandardMachine<IRecipeInput
 	{
 		if (this.usingPumpRecipe)
 		{
-			FluidStack fluid = new FluidStack(FluidRegistry.WATER, 1000);
+			int reqAmount = 1000;
 
 			for (TileEntityPump pump : this.pumps)
 			{
-				FluidStack amount = LiquidUtil.drainTile(pump, EnumFacing.UP, FluidRegistry.WATER, fluid.amount, false);
-				if (amount != null && amount.getFluid() == FluidRegistry.WATER)
+				int amount = LiquidUtil.drainTile(pump, Direction.UP, Fluids.f_76193_, reqAmount, false);
+				if (amount > 0)
 				{
-					fluid.amount = fluid.amount - amount.amount;
-				}
-
-				if (fluid.amount <= 0)
-				{
-					break;
+					reqAmount -= amount;
+					if (reqAmount <= 0)
+					{
+						break;
+					}
 				}
 			}
 
+			assert reqAmount == 0;
 			this.outputSlot.add(processResult);
 		} else
 		{
@@ -134,15 +130,15 @@ public class TileEntityCompressor extends TileEntityStandardMachine<IRecipeInput
 	}
 
 	@Override
-	public String getStartSoundFile()
+	public SoundEvent getLoopingSoundEvent()
 	{
-		return "Machines/CompressorOp.ogg";
+		return Ic2SoundEvents.MACHINE_COMPRESSOR_OPERATE;
 	}
 
 	@Override
-	public String getInterruptSoundFile()
+	public SoundEvent getInterruptSoundEvent()
 	{
-		return "Machines/InterruptOne.ogg";
+		return Ic2SoundEvents.MACHINE_INTERRUPT1;
 	}
 
 	@Override

@@ -22,7 +22,7 @@ public class Tuple
 	public static class T2<TA, TB>
 	{
 		public TA a;
-		public final TB b;
+		public TB b;
 
 		public T2(TA a, TB b)
 		{
@@ -33,9 +33,9 @@ public class Tuple
 
 	public static class T3<TA, TB, TC>
 	{
-		public final TA a;
-		public final TB b;
-		public final TC c;
+		public TA a;
+		public TB b;
+		public TC c;
 
 		public T3(TA a, TB b, TC c)
 		{

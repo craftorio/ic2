@@ -1,0 +1,9 @@
+{
+  "type": "ic2:extractor",
+  "ingredient": {
+    "item": "minecraft:crying_obsidian"
+  },
+  "result": {
+    "item": "minecraft:obsidian"
+  }
+}

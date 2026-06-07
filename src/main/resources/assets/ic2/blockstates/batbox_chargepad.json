@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "active=false": {
+      "model": "ic2:block/wiring/chargepad/batbox_chargepad"
+    },
+    "active=true": {
+      "model": "ic2:block/wiring/chargepad/batbox_chargepad_active"
+    }
+  }
+}

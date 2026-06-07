@@ -1,0 +1,16 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "XXX",
+    "XXX",
+    "XXX"
+  ],
+  "key": {
+    "X": {
+      "item": "ic2:small_lithium_dust"
+    }
+  },
+  "result": {
+    "item": "ic2:lithium_dust"
+  }
+}

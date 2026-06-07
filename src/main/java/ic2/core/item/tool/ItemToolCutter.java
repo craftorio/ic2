@@ -1,58 +1,68 @@
 package ic2.core.item.tool;
 
-import com.google.common.base.Predicate;
 import ic2.api.item.IEnhancedOverlayProvider;
-import ic2.core.IC2;
-import ic2.core.audio.AudioPosition;
-import ic2.core.block.wiring.TileEntityCable;
-import ic2.core.item.type.CraftingItemType;
-import ic2.core.ref.ItemName;
+import ic2.core.block.wiring.CableBlock;
+import ic2.core.ref.Ic2Items;
+import ic2.core.ref.Ic2SoundEvents;
 import ic2.core.util.StackUtil;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+
+import java.util.function.Predicate;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item.Properties;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class ItemToolCutter extends ItemToolCrafting implements IEnhancedOverlayProvider
 {
-	public ItemToolCutter()
+	public ItemToolCutter(Properties settings)
 	{
-		super(ItemName.cutter, 60);
+		super(settings);
 	}
 
-	public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ)
+	public InteractionResult m_6225_(UseOnContext context)
 	{
-		TileEntity te = world.getTileEntity(pos);
-		if (te instanceof TileEntityCable)
+		Level world = context.m_43725_();
+		BlockPos pos = context.m_8083_();
+		BlockState state = world.getBlockState(pos);
+		if (state.getBlock() instanceof CableBlock cable)
 		{
-			TileEntityCable cable = (TileEntityCable) te;
-			Predicate<ItemStack> request = StackUtil.sameStack(ItemName.crafting.getItemStack(CraftingItemType.rubber));
-			if (StackUtil.consumeFromPlayerInventory(player, request, 1, true) && cable.tryAddInsulation())
+			Player player = context.m_43723_();
+			Predicate<ItemStack> request = StackUtil.sameItem(Ic2Items.RUBBER);
+			if (player == null)
+			{
+				return InteractionResult.PASS;
+			}
+
+			if (StackUtil.consumeFromPlayerInventory(player, request, 1, true) && cable.tryAddInsulation(state, world, pos))
 			{
 				StackUtil.consumeFromPlayerInventory(player, request, 1, false);
-				StackUtil.damageOrError(player, hand, 1);
-				return EnumActionResult.SUCCESS;
+				StackUtil.damageOrError(player, context.m_43724_(), 1);
+				return InteractionResult.SUCCESS;
 			}
 		}
 
-		return EnumActionResult.PASS;
+		return InteractionResult.PASS;
 	}
 
-	public boolean removeInsulation(EntityPlayer player, EnumHand hand, TileEntityCable cable)
+	public boolean removeInsulation(Player player, InteractionHand hand, BlockState state, Level world, BlockPos pos)
 	{
-		if (cable.tryRemoveInsulation(true) && StackUtil.damage(player, hand, StackUtil.sameItem(this), 3))
+		CableBlock cable = (CableBlock) state.getBlock();
+		if (cable.tryRemoveInsulation(state, world, pos, true) && StackUtil.damage(player, hand, StackUtil.sameItem(this), 3))
 		{
-			cable.tryRemoveInsulation(false);
-			if (cable.getWorld().isRemote)
+			cable.tryRemoveInsulation(state, world, pos, false);
+			if (world.isClientSide)
 			{
-				IC2.audioManager.playOnce(new AudioPosition(cable.getWorld(), cable.getPos()), "Tools/InsulationCutters.ogg");
+				player.m_5496_(Ic2SoundEvents.ITEM_CUTTER_USE, 1.0F, 1.0F);
 			} else
 			{
-				StackUtil.dropAsEntity(cable.getWorld(), cable.getPos(), ItemName.crafting.getItemStack(CraftingItemType.rubber));
+				StackUtil.dropAsEntity(world, pos, new ItemStack(Ic2Items.RUBBER));
 			}
 
 			return true;
@@ -63,7 +73,7 @@ public class ItemToolCutter extends ItemToolCrafting implements IEnhancedOverlay
 	}
 
 	@Override
-	public boolean providesEnhancedOverlay(World world, BlockPos pos, EnumFacing side, EntityPlayer player, ItemStack stack)
+	public boolean providesEnhancedOverlay(Level world, BlockPos pos, Direction side, Player player, ItemStack stack)
 	{
 		return false;
 	}

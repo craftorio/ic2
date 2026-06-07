@@ -1,0 +1,14 @@
+{
+  "type": "ic2:shapeless",
+  "ingredients": [
+    {
+      "tag": "forge:plates/lead"
+    },
+    {
+      "item": "ic2:alloy"
+    }
+  ],
+  "result": {
+    "item": "ic2:reactor_plating"
+  }
+}

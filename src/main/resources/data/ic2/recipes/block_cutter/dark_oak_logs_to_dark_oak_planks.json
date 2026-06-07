@@ -1,0 +1,11 @@
+{
+  "type": "ic2:block_cutter",
+  "ingredient": {
+    "tag": "minecraft:dark_oak_logs"
+  },
+  "result": {
+    "item": "minecraft:dark_oak_planks",
+    "count": 6
+  },
+  "hardness": 2
+}

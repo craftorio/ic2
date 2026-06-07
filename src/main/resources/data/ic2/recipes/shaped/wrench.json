@@ -1,0 +1,17 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "B B",
+    "BBB",
+    " B "
+  ],
+  "key": {
+    "B": {
+      "tag": "forge:ingots/bronze"
+    }
+  },
+  "group": "wrench",
+  "result": {
+    "item": "ic2:wrench"
+  }
+}

@@ -1,28 +1,28 @@
 package ic2.core.item.tool;
 
-import ic2.core.GuiIC2;
-import ic2.core.gui.Text;
-import ic2.core.ref.ItemName;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import com.mojang.blaze3d.vertex.PoseStack;
+import ic2.core.Ic2Gui;
+import ic2.core.gui.TextLabel;
+import ic2.core.ref.Ic2Items;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
 
-@SideOnly(Side.CLIENT)
-public class GuiToolbox extends GuiIC2<ContainerToolbox>
+public class GuiToolbox extends Ic2Gui<ContainerToolbox>
 {
-	private static final ResourceLocation background = new ResourceLocation("ic2", "textures/gui/GUIToolbox.png");
+	private static final ResourceLocation background = ResourceLocation.fromNamespaceAndPath("ic2", "textures/gui/guitoolbox.png");
 
-	public GuiToolbox(ContainerToolbox container)
+	public GuiToolbox(ContainerToolbox container, Inventory playerInventory, Component title)
 	{
-		super(container);
-		this.addElement(Text.create(this, 65, 11, ItemName.tool_box.getItemStack().getDisplayName(), 0, false));
+		super(container, playerInventory, title);
+		this.addElement(TextLabel.create(this, 65, 11, Ic2Items.TOOL_BOX.m_41466_().getString(), 0, false));
 	}
 
 	@Override
-	protected void drawBackgroundAndTitle(float partialTicks, int mouseX, int mouseY)
+	protected void drawBackgroundAndTitle(PoseStack matrices, float partialTicks, int mouseX, int mouseY)
 	{
 		this.bindTexture();
-		this.drawTexturedModalRect(this.guiLeft, this.guiTop, 0, 0, this.xSize, this.ySize);
+		this.m_93228_(matrices, this.f_97735_, this.f_97736_, 0, 0, this.imageWidth, this.imageHeight);
 	}
 
 	@Override

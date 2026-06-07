@@ -1,16 +1,18 @@
 package ic2.core.block.wiring;
 
 import ic2.core.ContainerFullInv;
+import ic2.core.block.wiring.tileentity.TileEntityTransformer;
+import ic2.core.ref.Ic2ScreenHandlers;
 
 import java.util.List;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.entity.player.Inventory;
 
 public class ContainerTransformer extends ContainerFullInv<TileEntityTransformer>
 {
-	public ContainerTransformer(EntityPlayer player, TileEntityTransformer tileEntity1, int height)
+	public ContainerTransformer(int syncId, Inventory playerInventory, TileEntityTransformer tileEntity1)
 	{
-		super(player, tileEntity1, height);
+		super(Ic2ScreenHandlers.TRANSFORMER, syncId, playerInventory, tileEntity1, 219);
 	}
 
 	@Override

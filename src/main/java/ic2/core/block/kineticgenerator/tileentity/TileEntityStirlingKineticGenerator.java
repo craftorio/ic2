@@ -8,7 +8,6 @@ import ic2.api.upgrade.IUpgradableBlock;
 import ic2.api.upgrade.UpgradableProperty;
 import ic2.core.ContainerBase;
 import ic2.core.IHasGui;
-import ic2.core.block.TileEntityInventory;
 import ic2.core.block.comp.Fluids;
 import ic2.core.block.invslot.InvSlot;
 import ic2.core.block.invslot.InvSlotConsumableLiquid;
@@ -17,33 +16,35 @@ import ic2.core.block.invslot.InvSlotConsumableLiquidByTank;
 import ic2.core.block.invslot.InvSlotOutput;
 import ic2.core.block.invslot.InvSlotUpgrade;
 import ic2.core.block.kineticgenerator.container.ContainerStirlingKineticGenerator;
-import ic2.core.block.kineticgenerator.gui.GuiStirlingKineticGenerator;
+import ic2.core.block.tileentity.TileEntityInventory;
+import ic2.core.fluid.Ic2FluidStack;
+import ic2.core.fluid.Ic2FluidTank;
+import ic2.core.network.GrowingBuffer;
 import ic2.core.profile.NotClassic;
+import ic2.core.ref.Ic2BlockEntities;
+import ic2.core.util.Util;
 
 import java.util.EnumSet;
 import java.util.Set;
 
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.world.World;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidTank;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 
 @NotClassic
 public class TileEntityStirlingKineticGenerator extends TileEntityInventory implements IKineticSource, IUpgradableBlock, IHasGui
 {
-	public final FluidTank inputTank;
-	public final FluidTank outputTank;
+	public Ic2FluidTank inputTank;
+	public Ic2FluidTank outputTank;
 	public InvSlotOutput hotoutputSlot;
-	public final InvSlotOutput cooloutputSlot;
-	public final InvSlotConsumableLiquidByTank hotfluidinputSlot;
-	public final InvSlotConsumableLiquidByManager coolfluidinputSlot;
-	public final InvSlotUpgrade upgradeSlot;
+	public InvSlotOutput cooloutputSlot;
+	public InvSlotConsumableLiquidByTank hotfluidinputSlot;
+	public InvSlotConsumableLiquidByManager coolfluidinputSlot;
+	public InvSlotUpgrade upgradeSlot;
 	private int heatbuffer = 0;
 	private final int maxHeatbuffer;
 	private int kUBuffer;
@@ -55,8 +56,9 @@ public class TileEntityStirlingKineticGenerator extends TileEntityInventory impl
 	private static final int PARTS_LIQUID = 1;
 	private static final int PARTS_TOTAL = 4;
 
-	public TileEntityStirlingKineticGenerator()
+	public TileEntityStirlingKineticGenerator(BlockPos pos, BlockState state)
 	{
+		super(Ic2BlockEntities.STIRLING_KINETIC_GENERATOR, pos, state);
 		this.inputTank = this.fluids.addTankInsert("inputTank", 2000, Fluids.fluidPredicate(Recipes.liquidHeatupManager.getSingleDirectionLiquidManager()));
 		this.outputTank = this.fluids.addTankExtract("outputTank", 2000);
 		this.hotoutputSlot = new InvSlotOutput(this, "hotOutputSlot", 1);
@@ -79,30 +81,29 @@ public class TileEntityStirlingKineticGenerator extends TileEntityInventory impl
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound nbt)
+	public void load(CompoundTag nbt)
 	{
-		super.readFromNBT(nbt);
-		this.inputTank.readFromNBT(nbt.getCompoundTag("inputTank"));
-		this.outputTank.readFromNBT(nbt.getCompoundTag("outputTank"));
-		this.heatbuffer = nbt.getInteger("heatbuffer");
-		this.kUBuffer = nbt.getInteger("kubuffer");
-		this.liquidHeatStored = nbt.getInteger("liquidHeatStored");
+		super.load(nbt);
+		this.inputTank.fromNbt(nbt.getCompound("inputTank"));
+		this.outputTank.fromNbt(nbt.getCompound("outputTank"));
+		this.heatbuffer = nbt.getInt("heatbuffer");
+		this.kUBuffer = nbt.getInt("kubuffer");
+		this.liquidHeatStored = nbt.getInt("liquidHeatStored");
 	}
 
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
+	public void saveAdditional(CompoundTag nbt)
 	{
-		super.writeToNBT(nbt);
-		NBTTagCompound inputTankTag = new NBTTagCompound();
-		this.inputTank.writeToNBT(inputTankTag);
-		nbt.setTag("inputTank", inputTankTag);
-		NBTTagCompound outputTankTag = new NBTTagCompound();
-		this.outputTank.writeToNBT(outputTankTag);
-		nbt.setTag("outputTank", outputTankTag);
-		nbt.setInteger("heatbuffer", this.heatbuffer);
-		nbt.setInteger("kUBuffer", this.kUBuffer);
-		nbt.setInteger("liquidHeatStored", this.liquidHeatStored);
-		return nbt;
+		super.saveAdditional(nbt);
+		CompoundTag inputTankTag = new CompoundTag();
+		this.inputTank.toNbt(inputTankTag);
+		nbt.put("inputTank", inputTankTag);
+		CompoundTag outputTankTag = new CompoundTag();
+		this.outputTank.toNbt(outputTankTag);
+		nbt.put("outputTank", outputTankTag);
+		nbt.putInt("heatbuffer", this.heatbuffer);
+		nbt.putInt("kUBuffer", this.kUBuffer);
+		nbt.putInt("liquidHeatStored", this.liquidHeatStored);
 	}
 
 	@Override
@@ -119,11 +120,12 @@ public class TileEntityStirlingKineticGenerator extends TileEntityInventory impl
 		this.newActive = false;
 		if (this.inputTank.getFluidAmount() > 0
 			&& this.outputTank.getFluidAmount() < this.outputTank.getCapacity()
-			&& Recipes.liquidHeatupManager.getSingleDirectionLiquidManager().acceptsFluid(this.inputTank.getFluid().getFluid())
+			&& Recipes.liquidHeatupManager.getSingleDirectionLiquidManager().acceptsFluid(this.inputTank.getFluidStack().getFluid())
 			&& this.kUBuffer < this.maxkUBuffer)
 		{
-			ILiquidHeatExchangerManager.HeatExchangeProperty property = Recipes.liquidHeatupManager.getHeatExchangeProperty(this.inputTank.getFluid().getFluid());
-			if (this.outputTank.getFluid() == null || new FluidStack(property.outputFluid, 0).isFluidEqual(this.outputTank.getFluid()))
+			ILiquidHeatExchangerManager.HeatExchangeProperty property = Recipes.liquidHeatupManager
+				.getHeatExchangeProperty(this.inputTank.getFluidStack().getFluid());
+			if (this.outputTank.isEmpty() || this.outputTank.hasExactFluid(property.outputFluid))
 			{
 				int heatbufferToUse = this.heatbuffer / 4;
 				heatbufferToUse = Math.min(
@@ -146,11 +148,11 @@ public class TileEntityStirlingKineticGenerator extends TileEntityInventory impl
 				if (this.liquidHeatStored >= property.huPerMB)
 				{
 					int mbToConvert = this.liquidHeatStored / property.huPerMB;
-					mbToConvert = this.inputTank.drainInternal(mbToConvert, false).amount;
-					mbToConvert = this.outputTank.fillInternal(new FluidStack(property.outputFluid, mbToConvert), false);
+					mbToConvert = this.inputTank.drainMbUnchecked(mbToConvert, true).getAmountMb();
+					mbToConvert = this.outputTank.fillMbUnchecked(Ic2FluidStack.create(property.outputFluid, mbToConvert), true);
 					this.liquidHeatStored = this.liquidHeatStored - mbToConvert * property.huPerMB;
-					this.inputTank.drainInternal(mbToConvert, true);
-					this.outputTank.fillInternal(new FluidStack(property.outputFluid, mbToConvert), true);
+					this.inputTank.drainMbUnchecked(mbToConvert, false);
+					this.outputTank.fillMbUnchecked(Ic2FluidStack.create(property.outputFluid, mbToConvert), false);
 				}
 			}
 		}
@@ -170,25 +172,20 @@ public class TileEntityStirlingKineticGenerator extends TileEntityInventory impl
 			return 0;
 		}
 
-		World world = this.getWorld();
+		Level world = this.getLevel();
 		int tmpAmount = amount;
 
-		for (EnumFacing dir : EnumFacing.VALUES)
+		for (Direction dir : Util.ALL_DIRS)
 		{
-			if (dir != this.getFacing())
+			if (dir != this.getFacing() && world.getBlockEntity(this.worldPosition.relative(dir)) instanceof IHeatSource hs)
 			{
-				TileEntity te = world.getTileEntity(this.pos.offset(dir));
-				if (te instanceof IHeatSource)
+				int request = hs.drawHeat(dir.m_122424_(), tmpAmount, true);
+				if (request > 0)
 				{
-					IHeatSource hs = (IHeatSource) te;
-					int request = hs.drawHeat(dir.getOpposite(), tmpAmount, true);
-					if (request > 0)
+					tmpAmount -= hs.drawHeat(dir.m_122424_(), request, false);
+					if (tmpAmount <= 0)
 					{
-						tmpAmount -= hs.drawHeat(dir.getOpposite(), request, false);
-						if (tmpAmount <= 0)
-						{
-							break;
-						}
+						break;
 					}
 				}
 			}
@@ -198,25 +195,25 @@ public class TileEntityStirlingKineticGenerator extends TileEntityInventory impl
 	}
 
 	@Override
-	public int maxrequestkineticenergyTick(EnumFacing directionFrom)
+	public int maxrequestkineticenergyTick(Direction directionFrom)
 	{
 		return Math.min(this.kUBuffer, this.getConnectionBandwidth(directionFrom));
 	}
 
 	@Override
-	public int getConnectionBandwidth(EnumFacing side)
+	public int getConnectionBandwidth(Direction side)
 	{
 		return side != this.getFacing() ? 0 : this.maxkUBuffer;
 	}
 
 	@Override
-	public int requestkineticenergy(EnumFacing directionFrom, int requestkineticenergy)
+	public int requestkineticenergy(Direction directionFrom, int requestkineticenergy)
 	{
 		return this.drawKineticEnergy(directionFrom, requestkineticenergy, false);
 	}
 
 	@Override
-	public int drawKineticEnergy(EnumFacing side, int request, boolean simulate)
+	public int drawKineticEnergy(Direction side, int request, boolean simulate)
 	{
 		if (side != this.getFacing())
 		{
@@ -256,31 +253,25 @@ public class TileEntityStirlingKineticGenerator extends TileEntityInventory impl
 		return true;
 	}
 
-	public FluidTank getInputTank()
+	public Ic2FluidTank getInputTank()
 	{
 		return this.inputTank;
 	}
 
-	public FluidTank getOutputTank()
+	public Ic2FluidTank getOutputTank()
 	{
 		return this.outputTank;
 	}
 
 	@Override
-	public ContainerBase<?> getGuiContainer(EntityPlayer player)
+	public ContainerBase<TileEntityStirlingKineticGenerator> createServerScreenHandler(int syncId, Player player)
 	{
-		return new ContainerStirlingKineticGenerator(player, this);
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
-	{
-		return new GuiStirlingKineticGenerator(new ContainerStirlingKineticGenerator(player, this));
+		return new ContainerStirlingKineticGenerator(syncId, player.getInventory(), this);
 	}
 
 	@Override
-	public void onGuiClosed(EntityPlayer player)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
+		return new ContainerStirlingKineticGenerator(syncId, inventory, this);
 	}
 }

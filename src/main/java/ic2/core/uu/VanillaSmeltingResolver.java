@@ -1,15 +1,13 @@
 package ic2.core.uu;
 
 import ic2.core.IC2;
-import ic2.core.recipe.AdvRecipe;
 import ic2.core.util.LogCategory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map.Entry;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.FurnaceRecipes;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.SmeltingRecipe;
 
 public class VanillaSmeltingResolver implements IRecipeResolver
 {
@@ -20,12 +18,12 @@ public class VanillaSmeltingResolver implements IRecipeResolver
 	{
 		List<RecipeTransformation> ret = new ArrayList<>();
 
-		for (Entry<ItemStack, ItemStack> entry : FurnaceRecipes.instance().getSmeltingList().entrySet())
+		for (SmeltingRecipe recipe : IC2.sideProxy.getRecipeManager().m_44013_(RecipeType.f_44108_))
 		{
 			try
 			{
-				List<List<LeanItemStack>> inputs = RecipeUtil.convertIngredients(AdvRecipe.expand(entry.getKey()));
-				LeanItemStack output = new LeanItemStack(entry.getValue());
+				List<List<LeanItemStack>> inputs = RecipeUtil.convertIngredients(recipe.m_7527_());
+				LeanItemStack output = new LeanItemStack(recipe.m_8043_());
 				ret.add(new RecipeTransformation(14.0, inputs, output));
 			} catch (IllegalArgumentException e)
 			{

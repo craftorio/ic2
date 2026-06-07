@@ -1,49 +1,46 @@
 package ic2.api.recipe;
 
+import ic2.core.fluid.Ic2FluidStack;
+
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
 
-import net.minecraft.util.EnumFacing;
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidRegistry;
-import net.minecraftforge.fluids.FluidStack;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.material.Fluid;
 import org.apache.commons.lang3.tuple.Pair;
 
 public interface IElectrolyzerRecipeManager extends ILiquidAcceptManager
 {
-	void addRecipe(@Nonnull String var1, int var2, int var3, @Nonnull IElectrolyzerRecipeManager.ElectrolyzerOutput... var4);
+	void addRecipe(Fluid var1, int var2, int var3, IElectrolyzerRecipeManager.ElectrolyzerOutput... var4);
 
-	void addRecipe(@Nonnull String var1, int var2, int var3, int var4, @Nonnull IElectrolyzerRecipeManager.ElectrolyzerOutput... var5);
+	void addRecipe(Fluid var1, int var2, int var3, int var4, IElectrolyzerRecipeManager.ElectrolyzerOutput... var5);
 
 	IElectrolyzerRecipeManager.ElectrolyzerRecipe getElectrolysisInformation(Fluid var1);
 
 	IElectrolyzerRecipeManager.ElectrolyzerOutput[] getOutput(Fluid var1);
 
-	Map<String, IElectrolyzerRecipeManager.ElectrolyzerRecipe> getRecipeMap();
+	Map<Fluid, IElectrolyzerRecipeManager.ElectrolyzerRecipe> getRecipeMap();
 
-	@ParametersAreNonnullByDefault
 	final class ElectrolyzerOutput
 	{
-		public final String fluidName;
+		public final Fluid fluid;
 		public final int fluidAmount;
-		public final EnumFacing tankDirection;
+		public final Direction tankDirection;
 
-		public ElectrolyzerOutput(String fluidName, int fluidAmount, EnumFacing tankDirection)
+		public ElectrolyzerOutput(Fluid fluid, int fluidAmount, Direction tankDirection)
 		{
-			this.fluidName = fluidName;
+			this.fluid = fluid;
 			this.fluidAmount = fluidAmount;
 			this.tankDirection = tankDirection;
 		}
 
-		public FluidStack getOutput()
+		public Ic2FluidStack getOutput()
 		{
-			return FluidRegistry.getFluid(this.fluidName) == null ? null : new FluidStack(FluidRegistry.getFluid(this.fluidName), this.fluidAmount);
+			return this.fluid == null ? null : Ic2FluidStack.create(this.fluid, this.fluidAmount);
 		}
 
-		public Pair<FluidStack, EnumFacing> getFullOutput()
+		public Pair<Ic2FluidStack, Direction> getFullOutput()
 		{
 			return Pair.of(this.getOutput(), this.tankDirection);
 		}
@@ -68,13 +65,13 @@ public interface IElectrolyzerRecipeManager extends ILiquidAcceptManager
 		{
 			if (outputs.length >= 1 && outputs.length <= 5)
 			{
-				Set<EnumFacing> directions = new HashSet<>(outputs.length * 2, 0.5F);
+				Set<Direction> directions = new HashSet<>(outputs.length * 2, 0.5F);
 
 				for (IElectrolyzerRecipeManager.ElectrolyzerOutput output : outputs)
 				{
 					if (!directions.add(output.tankDirection))
 					{
-						throw new RuntimeException("Duplicate direction in Electrolzer outputs (" + output.tankDirection + ')');
+						throw new RuntimeException("Duplicate direction in Electrolzer outputs (" + output.tankDirection + ")");
 					}
 				}
 

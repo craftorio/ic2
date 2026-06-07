@@ -1,0 +1,14 @@
+{
+  "type": "ic2:canner_enrich",
+  "input_ingredient": {
+    "fluid": "ic2:distilled_water",
+    "amount": 1000
+  },
+  "additive_ingredient": {
+    "tag": "forge:dusts/lapis"
+  },
+  "result": {
+    "fluid": "ic2:coolant",
+    "amount": 1000
+  }
+}

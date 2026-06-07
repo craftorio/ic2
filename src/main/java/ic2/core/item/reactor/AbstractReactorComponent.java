@@ -2,15 +2,15 @@ package ic2.core.item.reactor;
 
 import ic2.api.reactor.IReactor;
 import ic2.api.reactor.IReactorComponent;
-import ic2.core.item.ItemIC2;
-import ic2.core.ref.ItemName;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item.Properties;
 
-public abstract class AbstractReactorComponent extends ItemIC2 implements IReactorComponent
+public abstract class AbstractReactorComponent extends Item implements IReactorComponent
 {
-	protected AbstractReactorComponent(ItemName name)
+	protected AbstractReactorComponent(Properties settings)
 	{
-		super(name);
+		super(settings);
 	}
 
 	@Override

@@ -1,104 +1,99 @@
 package ic2.core.item.armor;
 
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.ImmutableMultimap.Builder;
 import ic2.api.item.ElectricItem;
 import ic2.api.item.IElectricItem;
-import ic2.api.item.IItemHudInfo;
-import ic2.core.IC2;
-import ic2.core.init.Localization;
-import ic2.core.item.BaseElectricItem;
 import ic2.core.item.ElectricItemManager;
-import ic2.core.item.IPseudoDamageItem;
-import ic2.core.ref.ItemName;
-import ic2.core.util.LogCategory;
+import ic2.core.item.ElectricItemTooltipHandler;
 
-import java.util.LinkedList;
+import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.EntityEquipmentSlot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemArmor.ArmorMaterial;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.NonNullList;
-import net.minecraftforge.common.ISpecialArmor;
+import net.minecraft.core.NonNullList;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.Item.Properties;
+import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
 
-public abstract class ItemArmorElectric extends ItemArmorIC2 implements ISpecialArmor, IPseudoDamageItem, IElectricItem, IItemHudInfo
+public abstract class ItemArmorElectric extends ItemArmorIC2 implements IElectricItem
 {
+	public static final UUID[] MODIFIERS = new UUID[] {
+		UUID.fromString("845DB27C-C624-495F-8C9F-6020A9A58B6B"),
+		UUID.fromString("D8499B04-0E66-4726-AB29-64469D734E0D"),
+		UUID.fromString("9F3D476D-C118-4544-8365-64846904B48E"),
+		UUID.fromString("2AD3F246-FEE1-4E67-B886-69FD380BB150")
+	};
 	protected final double maxCharge;
 	protected final double transferLimit;
 	protected final int tier;
 
-	public ItemArmorElectric(ItemName name, String armorName, EntityEquipmentSlot armorType, double maxCharge, double transferLimit, int tier)
+	public ItemArmorElectric(ArmorMaterial material, EquipmentSlot slot, Properties settings, double maxCharge, double transferLimit, int tier)
 	{
-		super(name, ArmorMaterial.DIAMOND, armorName, armorType, null);
+		super(material, slot, settings);
 		this.maxCharge = maxCharge;
-		this.tier = tier;
 		this.transferLimit = transferLimit;
-		this.setMaxDamage(27);
-		this.setMaxStackSize(1);
-		this.setNoRepair();
+		this.tier = tier;
 	}
 
-	public int getItemEnchantability()
+	public abstract int getEnergyPerDamage();
+
+	public static void damageArmor(Player entity, DamageSource source, float amount)
 	{
-		return 0;
+		if (!(amount <= 0.0F) && !source.m_19379_())
+		{
+			float damage = amount / 4.0F;
+			if (damage < 1.0F)
+			{
+				damage = 1.0F;
+			}
+
+			for (EquipmentSlot slot : EquipmentSlot.values())
+			{
+				ItemStack stack = entity.m_6844_(slot);
+				if (stack.getItem() instanceof ItemArmorElectric electricArmor)
+				{
+					electricArmor.damageArmor(entity, stack, source, damage, slot);
+				}
+			}
+		}
 	}
 
-	public boolean isEnchantable(ItemStack stack)
+	public boolean m_8120_(ItemStack stack)
 	{
 		return false;
 	}
 
-	public boolean isBookEnchantable(ItemStack stack, ItemStack book)
+	public void m_6787_(CreativeModeTab tab, NonNullList<ItemStack> subItems)
 	{
-		return false;
-	}
-
-	@Override
-	public List<String> getHudInfo(ItemStack stack, boolean advanced)
-	{
-		List<String> info = new LinkedList<>();
-		info.add(ElectricItem.manager.getToolTip(stack));
-		info.add(Localization.translate("ic2.item.tooltip.PowerTier", this.tier));
-		return info;
-	}
-
-	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems)
-	{
-		if (this.isInCreativeTab(tab))
+		if (this.m_220152_(tab))
 		{
 			ElectricItemManager.addChargeVariants(this, subItems);
 		}
 	}
 
-	public ISpecialArmor.ArmorProperties getProperties(EntityLivingBase player, ItemStack armor, DamageSource source, double damage, int slot)
+	public void m_7373_(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag context)
 	{
-		if (source.isUnblockable())
-		{
-			return new ISpecialArmor.ArmorProperties(0, 0.0, 0);
-		}
-
-		double absorptionRatio = this.getBaseAbsorptionRatio() * this.getDamageAbsorptionRatio();
-		int energyPerDamage = this.getEnergyPerDamage();
-		int damageLimit = Integer.MAX_VALUE;
-		if (energyPerDamage > 0)
-		{
-			damageLimit = (int) Math.min(damageLimit, 25.0 * ElectricItem.manager.getCharge(armor) / energyPerDamage);
-		}
-
-		return new ISpecialArmor.ArmorProperties(0, absorptionRatio, damageLimit);
+		ElectricItemTooltipHandler.addTooltip(stack, tooltip);
 	}
 
-	public int getArmorDisplay(EntityPlayer player, ItemStack armor, int slot)
-	{
-		return ElectricItem.manager.getCharge(armor) >= this.getEnergyPerDamage()
-			? (int) Math.round(20.0 * this.getBaseAbsorptionRatio() * this.getDamageAbsorptionRatio())
-			: 0;
-	}
-
-	public void damageArmor(EntityLivingBase entity, ItemStack stack, DamageSource source, int damage, int slot)
+	public void damageArmor(LivingEntity entity, ItemStack stack, DamageSource source, double damage, EquipmentSlot slot)
 	{
 		ElectricItem.manager.discharge(stack, damage * this.getEnergyPerDamage(), Integer.MAX_VALUE, true, false, false);
 	}
@@ -127,45 +122,70 @@ public abstract class ItemArmorElectric extends ItemArmorIC2 implements ISpecial
 		return this.transferLimit;
 	}
 
-	@Override
-	public boolean getIsRepairable(ItemStack par1ItemStack, ItemStack par2ItemStack)
+	public boolean m_142522_(ItemStack stack)
 	{
-		return false;
+		return ElectricItem.manager.getChargeLevel(stack) < 1.0;
 	}
 
-	public void setDamage(ItemStack stack, int damage)
+	public int m_142158_(ItemStack stack)
 	{
-		int prev = this.getDamage(stack);
-		if (damage != prev && BaseElectricItem.logIncorrectItemDamaging)
+		return (int) Math.round(ElectricItem.manager.getChargeLevel(stack) * 13.0);
+	}
+
+	public int m_142159_(ItemStack stack)
+	{
+		return Mth.m_14169_((float) (ElectricItem.manager.getChargeLevel(stack) / 3.0), 1.0F, 1.0F);
+	}
+
+	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(ItemStack stack, EquipmentSlot slot)
+	{
+		if (slot != this.f_40377_)
 		{
-			IC2.log.warn(LogCategory.Armor, new Throwable(), "Detected invalid armor damage application (%d):", damage - prev);
+			return this.m_7167_(slot);
 		}
-	}
 
-	@Override
-	public void setStackDamage(ItemStack stack, int damage)
-	{
-		super.setDamage(stack, damage);
-	}
-
-	public abstract double getDamageAbsorptionRatio();
-
-	public abstract int getEnergyPerDamage();
-
-	protected final double getBaseAbsorptionRatio()
-	{
-		switch (this.armorType)
+		boolean hasCharge = ElectricItem.manager.getCharge(stack) >= ((ItemArmorElectric) stack.getItem()).getEnergyPerDamage();
+		if (!hasCharge)
 		{
-			case HEAD:
-				return 0.15;
-			case CHEST:
-				return 0.4;
-			case LEGS:
-				return 0.3;
-			case FEET:
-				return 0.15;
-			default:
-				return 0.0;
+			return this.m_7167_(slot);
 		}
+
+		Item armor = stack.getItem();
+		int protection;
+		if (armor instanceof ItemArmorNanoSuit)
+		{
+			protection = ItemArmorNanoSuit.CHARGED_PROTECTION[slot.m_20749_()];
+		} else
+		{
+			if (!(armor instanceof ItemArmorQuantumSuit))
+			{
+				return this.m_7167_(slot);
+			}
+
+			protection = ItemArmorQuantumSuit.CHARGED_PROTECTION[slot.m_20749_()];
+		}
+
+		Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
+		Attribute attr = Attributes.f_22284_;
+		UUID uuid = MODIFIERS[slot.m_20749_()];
+		Collection<AttributeModifier> plain = this.m_7167_(slot).get(attr);
+		if (plain != null)
+		{
+			for (AttributeModifier modifier : plain)
+			{
+				if (!modifier.m_22209_().equals(uuid))
+				{
+					builder.put(attr, modifier);
+				}
+			}
+		}
+
+		builder.put(attr, new AttributeModifier(uuid, "Armor modifier", protection, Operation.ADDITION));
+		return builder.build();
+	}
+
+	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack)
+	{
+		return this.getAttributeModifiers(stack, slot);
 	}
 }

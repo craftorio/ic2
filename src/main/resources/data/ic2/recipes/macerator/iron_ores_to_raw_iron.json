@@ -1,0 +1,24 @@
+{
+  "type": "ic2:macerator",
+  "ingredient": {
+    "tag": "minecraft:iron_ores"
+  },
+  "weighted": true,
+  "result": [
+    {
+      "item": "minecraft:raw_iron",
+      "count": 2,
+      "weight": 6
+    },
+    {
+      "item": "minecraft:raw_iron",
+      "count": 3,
+      "weight": 2
+    },
+    {
+      "item": "minecraft:raw_iron",
+      "count": 4,
+      "weight": 2
+    }
+  ]
+}

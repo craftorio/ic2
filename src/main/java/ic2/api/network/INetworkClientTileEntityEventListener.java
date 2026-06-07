@@ -1,8 +1,8 @@
 package ic2.api.network;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.entity.player.Player;
 
 public interface INetworkClientTileEntityEventListener
 {
-	void onNetworkEvent(EntityPlayer var1, int var2);
+	void onNetworkEvent(Player var1, int var2);
 }

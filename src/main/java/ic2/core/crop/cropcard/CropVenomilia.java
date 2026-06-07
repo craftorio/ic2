@@ -2,24 +2,31 @@ package ic2.core.crop.cropcard;
 
 import ic2.api.crops.CropProperties;
 import ic2.api.crops.ICropTile;
+import ic2.api.crops.ICropType;
 import ic2.core.IC2;
-import ic2.core.crop.IC2CropCard;
-import ic2.core.item.type.CropResItemType;
-import ic2.core.ref.ItemName;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
-import net.minecraft.init.MobEffects;
-import net.minecraft.item.ItemStack;
-import net.minecraft.potion.PotionEffect;
+import ic2.core.crop.Ic2CropCard;
+import ic2.core.ref.Ic2Blocks;
+import ic2.core.ref.Ic2Items;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
 
-public class CropVenomilia extends IC2CropCard
+public class CropVenomilia extends Ic2CropCard
 {
-	@Override
-	public String getId()
+	public CropVenomilia(ICropType cropType)
 	{
-		return "venomilia";
+		super(cropType);
+	}
+
+	@Override
+	public Block getCropBlock()
+	{
+		return Ic2Blocks.VENOMILIA_CROP;
 	}
 
 	@Override
@@ -41,57 +48,51 @@ public class CropVenomilia extends IC2CropCard
 	}
 
 	@Override
-	public int getMaxSize()
-	{
-		return 6;
-	}
-
-	@Override
 	public boolean canGrow(ICropTile crop)
 	{
-		return crop.getCurrentSize() <= 4 && crop.getLightLevel() >= 12 || crop.getCurrentSize() == 5;
+		return crop.getCurrentAge() <= 3 && crop.getLightLevel() >= 12 || crop.getCurrentAge() == 4;
 	}
 
 	@Override
 	public boolean canBeHarvested(ICropTile crop)
 	{
-		return crop.getCurrentSize() >= 4;
+		return crop.getCurrentAge() >= 3;
 	}
 
 	@Override
-	public int getOptimalHarvestSize(ICropTile crop)
-	{
-		return 4;
-	}
-
-	@Override
-	public ItemStack getGain(ICropTile crop)
-	{
-		if (crop.getCurrentSize() == 5)
-		{
-			return ItemName.crop_res.getItemStack(CropResItemType.grin_powder);
-		} else
-		{
-			return crop.getCurrentSize() >= 4 ? new ItemStack(Items.DYE, 1, 5) : null;
-		}
-	}
-
-	@Override
-	public int getSizeAfterHarvest(ICropTile crop)
+	public int getOptimalHarvestAge(ICropTile crop)
 	{
 		return 3;
 	}
 
 	@Override
-	public int getGrowthDuration(ICropTile crop)
+	public ItemStack getGain(ICropTile crop)
 	{
-		return crop.getCurrentSize() >= 3 ? 600 : 400;
+		if (crop.getCurrentAge() == 4)
+		{
+			return new ItemStack(Ic2Items.GRIN_POWDER);
+		} else
+		{
+			return crop.getCurrentAge() >= 3 ? new ItemStack(Items.f_42493_) : null;
+		}
 	}
 
 	@Override
-	public boolean onRightClick(ICropTile crop, EntityPlayer player)
+	public int getAgeAfterHarvest(ICropTile crop)
 	{
-		if (!player.isSneaking())
+		return 2;
+	}
+
+	@Override
+	public int getGrowthDuration(ICropTile crop)
+	{
+		return crop.getCurrentAge() >= 2 ? 600 : 400;
+	}
+
+	@Override
+	public boolean onRightClick(ICropTile crop, Player player)
+	{
+		if (!player.m_6144_())
 		{
 			this.onEntityCollision(crop, player);
 		}
@@ -100,28 +101,28 @@ public class CropVenomilia extends IC2CropCard
 	}
 
 	@Override
-	public void onLeftClick(ICropTile crop, EntityPlayer player)
+	public boolean onLeftClick(ICropTile crop, Player player)
 	{
-		if (!player.isSneaking())
+		if (!player.m_6144_())
 		{
 			this.onEntityCollision(crop, player);
 		}
 
-		crop.pick();
+		return crop.pick();
 	}
 
 	@Override
 	public boolean onEntityCollision(ICropTile crop, Entity entity)
 	{
-		if (crop.getCurrentSize() == 5 && entity instanceof EntityLivingBase)
+		if (crop.getCurrentAge() == 4 && entity instanceof LivingEntity)
 		{
-			if (entity instanceof EntityPlayer && ((EntityPlayer) entity).isSneaking() && IC2.random.nextInt(50) != 0)
+			if (entity instanceof Player && entity.m_6144_() && IC2.random.nextInt(50) != 0)
 			{
 				return super.onEntityCollision(crop, entity);
 			}
 
-			((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.POISON, (IC2.random.nextInt(10) + 5) * 20, 0));
-			crop.setCurrentSize(4);
+			((LivingEntity) entity).m_7292_(new MobEffectInstance(MobEffects.f_19614_, (IC2.random.nextInt(10) + 5) * 20, 0));
+			crop.setCurrentAge(3);
 			crop.updateState();
 		}
 
@@ -131,6 +132,6 @@ public class CropVenomilia extends IC2CropCard
 	@Override
 	public boolean isWeed(ICropTile crop)
 	{
-		return crop.getCurrentSize() == 5 && crop.getStatGrowth() >= 8;
+		return crop.getCurrentAge() == 4 && crop.getStatGrowth() >= 8;
 	}
 }

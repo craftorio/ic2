@@ -10,24 +10,22 @@ import ic2.core.block.invslot.InvSlotConsumableLiquid;
 import ic2.core.block.invslot.InvSlotConsumableLiquidByList;
 import ic2.core.block.invslot.InvSlotOutput;
 import ic2.core.block.invslot.InvSlotProcessableGeneric;
+import ic2.core.fluid.Ic2FluidTank;
 import ic2.core.gui.dynamic.DynamicContainer;
-import ic2.core.gui.dynamic.DynamicGui;
-import ic2.core.gui.dynamic.GuiParser;
+import ic2.core.network.GrowingBuffer;
 import ic2.core.network.GuiSynced;
 import ic2.core.profile.NotClassic;
-import ic2.core.recipe.BasicMachineRecipeManager;
+import ic2.core.ref.Ic2BlockEntities;
 
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Set;
 
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fluids.FluidRegistry;
-import net.minecraftforge.fluids.FluidTank;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 
 @NotClassic
 public class TileEntityOreWashing extends TileEntityStandardMachine<IRecipeInput, Collection<ItemStack>, ItemStack>
@@ -35,22 +33,17 @@ public class TileEntityOreWashing extends TileEntityStandardMachine<IRecipeInput
 	public final InvSlotConsumableLiquid fluidSlot;
 	public final InvSlotOutput cellSlot;
 	@GuiSynced
-	protected final FluidTank fluidTank;
+	protected final Ic2FluidTank fluidTank;
 	protected final Fluids fluids;
 
-	public TileEntityOreWashing()
+	public TileEntityOreWashing(BlockPos pos, BlockState state)
 	{
-		super(16, 500, 3);
+		super(Ic2BlockEntities.ORE_WASHING_PLANT, pos, state, 16, 500, 3);
 		this.inputSlot = new InvSlotProcessableGeneric(this, "input", 1, Recipes.oreWashing);
-		this.fluidSlot = new InvSlotConsumableLiquidByList(this, "fluid", 1, FluidRegistry.WATER);
+		this.fluidSlot = new InvSlotConsumableLiquidByList(this, "fluid", 1, net.minecraft.world.level.material.Fluids.f_76193_);
 		this.cellSlot = new InvSlotOutput(this, "cell", 1);
 		this.fluids = this.addComponent(new Fluids(this));
-		this.fluidTank = this.fluids.addTankInsert("fluid", 8000, Fluids.fluidPredicate(FluidRegistry.WATER));
-	}
-
-	public static void init()
-	{
-		Recipes.oreWashing = new BasicMachineRecipeManager();
+		this.fluidTank = this.fluids.addTankInsert("fluid", 8000, Fluids.fluidPredicate(net.minecraft.world.level.material.Fluids.f_76193_));
 	}
 
 	@Override
@@ -67,13 +60,13 @@ public class TileEntityOreWashing extends TileEntityStandardMachine<IRecipeInput
 	public void operateOnce(MachineRecipeResult<IRecipeInput, Collection<ItemStack>, ItemStack> output, Collection<ItemStack> processResult)
 	{
 		super.operateOnce(output, processResult);
-		this.fluidTank.drainInternal(output.getRecipe().getMetaData().getInteger("amount"), true);
+		this.fluidTank.drainMbUnchecked(output.getRecipe().getMetaData().getInt("amount"), false);
 	}
 
 	@Override
-	public MachineRecipeResult<IRecipeInput, Collection<ItemStack>, ItemStack> getOutput()
+	public MachineRecipeResult<IRecipeInput, Collection<ItemStack>, ItemStack> getRecipeResult()
 	{
-		MachineRecipeResult<IRecipeInput, Collection<ItemStack>, ItemStack> ret = super.getOutput();
+		MachineRecipeResult<IRecipeInput, Collection<ItemStack>, ItemStack> ret = super.getRecipeResult();
 		if (ret != null)
 		{
 			if (ret.getRecipe().getMetaData() == null)
@@ -81,7 +74,7 @@ public class TileEntityOreWashing extends TileEntityStandardMachine<IRecipeInput
 				return null;
 			}
 
-			if (ret.getRecipe().getMetaData().getInteger("amount") > this.fluidTank.getFluidAmount())
+			if (ret.getRecipe().getMetaData().getInt("amount") > this.fluidTank.getFluidAmount())
 			{
 				return null;
 			}
@@ -95,17 +88,16 @@ public class TileEntityOreWashing extends TileEntityStandardMachine<IRecipeInput
 		return this.fluidSlot.processIntoTank(this.fluidTank, this.cellSlot);
 	}
 
-	@SideOnly(Side.CLIENT)
 	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
+	public ContainerBase<?> createServerScreenHandler(int syncId, Player player)
 	{
-		return DynamicGui.<TileEntityOreWashing>create(this, player, GuiParser.parse(this.teBlock));
+		return DynamicContainer.create(syncId, player.getInventory(), this);
 	}
 
 	@Override
-	public ContainerBase<TileEntityOreWashing> getGuiContainer(EntityPlayer player)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
-		return DynamicContainer.create(this, player, GuiParser.parse(this.teBlock));
+		return DynamicContainer.create(syncId, inventory, this);
 	}
 
 	@Override

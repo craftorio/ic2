@@ -1,24 +1,18 @@
 package ic2.core.block.comp;
 
-import ic2.core.block.TileEntityBlock;
+import ic2.core.block.tileentity.Ic2TileEntity;
 
 import java.util.Set;
 
-import net.minecraft.util.EnumFacing;
+import net.minecraft.core.Direction;
 
 public class Kinetic extends TileEntityComponent
 {
-	private Set<EnumFacing> sinkDirections;
-	private Set<EnumFacing> sourceDirections;
+	private Set<Direction> sinkDirections;
+	private Set<Direction> sourceDirections;
 
 	public Kinetic(
-		TileEntityBlock parent,
-		double capacity,
-		Set<EnumFacing> sinkDirections,
-		Set<EnumFacing> sourceDirections,
-		int sinkTier,
-		int sourceTier,
-		boolean fullEnergy
+		Ic2TileEntity parent, double capacity, Set<Direction> sinkDirections, Set<Direction> sourceDirections, int sinkTier, int sourceTier, boolean fullEnergy
 	)
 	{
 		super(parent);

@@ -1,13 +1,13 @@
 package ic2.core.block.personal;
 
 import com.mojang.authlib.GameProfile;
-import net.minecraft.inventory.IInventory;
+import net.minecraft.world.Container;
 
 public interface IPersonalBlock
 {
 	boolean permitsAccess(GameProfile var1);
 
-	IInventory getPrivilegedInventory(GameProfile var1);
+	Container getPrivilegedInventory(GameProfile var1);
 
 	GameProfile getOwner();
 

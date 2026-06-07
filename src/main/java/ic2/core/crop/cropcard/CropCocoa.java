@@ -2,16 +2,24 @@ package ic2.core.crop.cropcard;
 
 import ic2.api.crops.CropProperties;
 import ic2.api.crops.ICropTile;
-import ic2.core.crop.IC2CropCard;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
+import ic2.api.crops.ICropType;
+import ic2.core.crop.Ic2CropCard;
+import ic2.core.ref.Ic2Blocks;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
 
-public class CropCocoa extends IC2CropCard
+public class CropCocoa extends Ic2CropCard
 {
-	@Override
-	public String getId()
+	public CropCocoa(ICropType cropType)
 	{
-		return "cocoa";
+		super(cropType);
+	}
+
+	@Override
+	public Block getCropBlock()
+	{
+		return Ic2Blocks.COCOA_CROP;
 	}
 
 	@Override
@@ -33,15 +41,9 @@ public class CropCocoa extends IC2CropCard
 	}
 
 	@Override
-	public int getMaxSize()
-	{
-		return 4;
-	}
-
-	@Override
 	public boolean canGrow(ICropTile crop)
 	{
-		return crop.getCurrentSize() <= 3 && crop.getStorageNutrients() >= 3;
+		return crop.getCurrentAge() <= this.getMaxAge() - 1 && crop.getStorageNutrients() >= 3;
 	}
 
 	@Override
@@ -51,32 +53,20 @@ public class CropCocoa extends IC2CropCard
 	}
 
 	@Override
-	public int getOptimalHarvestSize(ICropTile crop)
-	{
-		return 4;
-	}
-
-	@Override
-	public boolean canBeHarvested(ICropTile crop)
-	{
-		return crop.getCurrentSize() == 4;
-	}
-
-	@Override
 	public ItemStack getGain(ICropTile crop)
 	{
-		return new ItemStack(Items.DYE, 1, 3);
+		return new ItemStack(Items.f_42533_);
 	}
 
 	@Override
 	public int getGrowthDuration(ICropTile crop)
 	{
-		return crop.getCurrentSize() == 3 ? 900 : 400;
+		return crop.getCurrentAge() == this.getMaxAge() - 1 ? 900 : 400;
 	}
 
 	@Override
-	public int getSizeAfterHarvest(ICropTile crop)
+	public int getAgeAfterHarvest(ICropTile crop)
 	{
-		return 3;
+		return this.getMaxAge() - 1;
 	}
 }

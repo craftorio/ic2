@@ -2,17 +2,24 @@ package ic2.core.crop.cropcard;
 
 import ic2.api.crops.CropProperties;
 import ic2.api.crops.ICropTile;
-import ic2.core.crop.IC2CropCard;
-import ic2.core.item.type.CropResItemType;
-import ic2.core.ref.ItemName;
-import net.minecraft.item.ItemStack;
+import ic2.api.crops.ICropType;
+import ic2.core.crop.Ic2CropCard;
+import ic2.core.ref.Ic2Blocks;
+import ic2.core.ref.Ic2Items;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
 
-public class CropCoffee extends IC2CropCard
+public class CropCoffee extends Ic2CropCard
 {
-	@Override
-	public String getId()
+	public CropCoffee(ICropType cropType)
 	{
-		return "coffee";
+		super(cropType);
+	}
+
+	@Override
+	public Block getCropBlock()
+	{
+		return Ic2Blocks.COFFEE_CROP;
 	}
 
 	@Override
@@ -34,15 +41,9 @@ public class CropCoffee extends IC2CropCard
 	}
 
 	@Override
-	public int getMaxSize()
-	{
-		return 5;
-	}
-
-	@Override
 	public boolean canGrow(ICropTile crop)
 	{
-		return crop.getCurrentSize() < 5 && crop.getLightLevel() >= 9;
+		return crop.getCurrentAge() < this.getMaxAge() && crop.getLightLevel() >= 9;
 	}
 
 	@Override
@@ -54,30 +55,30 @@ public class CropCoffee extends IC2CropCard
 	@Override
 	public int getGrowthDuration(ICropTile crop)
 	{
-		if (crop.getCurrentSize() == 3)
+		if (crop.getCurrentAge() == this.getMaxAge() - 2)
 		{
 			return (int) (super.getGrowthDuration(crop) * 0.5);
 		} else
 		{
-			return crop.getCurrentSize() == 4 ? (int) (super.getGrowthDuration(crop) * 1.5) : super.getGrowthDuration(crop);
+			return crop.getCurrentAge() == this.getMaxAge() - 3 ? (int) (super.getGrowthDuration(crop) * 1.5) : super.getGrowthDuration(crop);
 		}
 	}
 
 	@Override
 	public boolean canBeHarvested(ICropTile crop)
 	{
-		return crop.getCurrentSize() >= 4;
+		return crop.getCurrentAge() >= this.getMaxAge() - 1;
 	}
 
 	@Override
 	public ItemStack getGain(ICropTile crop)
 	{
-		return crop.getCurrentSize() == 4 ? null : ItemName.crop_res.getItemStack(CropResItemType.coffee_beans);
+		return crop.getCurrentAge() == this.getMaxAge() - 1 ? null : new ItemStack(Ic2Items.COFFEE_BEANS);
 	}
 
 	@Override
-	public int getSizeAfterHarvest(ICropTile crop)
+	public int getAgeAfterHarvest(ICropTile crop)
 	{
-		return 3;
+		return this.getMaxAge() - 2;
 	}
 }

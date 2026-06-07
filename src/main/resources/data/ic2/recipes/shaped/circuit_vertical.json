@@ -1,0 +1,23 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "CRC",
+    "CIC",
+    "CRC"
+  ],
+  "key": {
+    "I": {
+      "tag": "forge:plates/iron"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "C": {
+      "item": "ic2:insulated_copper_cable"
+    }
+  },
+  "group": "circuit",
+  "result": {
+    "item": "ic2:circuit"
+  }
+}

@@ -1,24 +1,25 @@
 package ic2.core.item.tfbp;
 
 import ic2.core.block.machine.tileentity.TileEntityTerra;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockTallGrass;
-import net.minecraft.block.IGrowable;
-import net.minecraft.block.BlockTallGrass.EnumType;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import ic2.core.util.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.BonemealableBlock;
+import net.minecraft.world.level.block.state.BlockState;
 
-class Irrigation extends TerraformerBase
+public class Irrigation extends TerraformerBase
 {
 	@Override
-	boolean terraform(World world, BlockPos pos)
+	boolean terraform(Level world, BlockPos pos)
 	{
-		if (world.rand.nextInt(48000) == 0)
+		if (world.random.nextInt(48000) == 0)
 		{
-			world.getWorldInfo().setRaining(true);
+			world.m_6106_().m_5565_(true);
 			return true;
 		}
 
@@ -28,27 +29,27 @@ class Irrigation extends TerraformerBase
 			return false;
 		}
 
-		if (TileEntityTerra.switchGround(world, pos, Blocks.SAND, Blocks.DIRT.getDefaultState(), true))
+		if (TileEntityTerra.switchGround(world, pos, Blocks.f_49992_, Blocks.f_50493_.defaultBlockState(), true))
 		{
-			TileEntityTerra.switchGround(world, pos, Blocks.SAND, Blocks.DIRT.getDefaultState(), true);
+			TileEntityTerra.switchGround(world, pos, Blocks.f_49992_, Blocks.f_50493_.defaultBlockState(), true);
 			return true;
 		}
 
-		IBlockState state = world.getBlockState(pos);
+		BlockState state = world.getBlockState(pos);
 		Block block = state.getBlock();
-		if (block instanceof IGrowable && ((IGrowable) block).canGrow(world, pos, state, false))
+		if (block instanceof BonemealableBlock && ((BonemealableBlock) block).m_7370_(world, pos, state, false))
 		{
-			((IGrowable) block).grow(world, world.rand, pos, state);
+			((BonemealableBlock) block).m_214148_((ServerLevel) world, world.random, pos, state);
 			return true;
 		}
 
-		if (block != Blocks.TALLGRASS)
+		if (block != Blocks.f_50359_)
 		{
-			if (block == Blocks.LOG || block == Blocks.LOG2)
+			if (state.m_204336_(BlockTags.f_13106_))
 			{
-				BlockPos above = pos.up();
-				world.setBlockState(above, state);
-				IBlockState leaves = getLeaves(world, pos);
+				BlockPos above = pos.m_7494_();
+				world.setBlockAndUpdate(above, state);
+				BlockState leaves = getLeaves(world, pos);
 				if (leaves != null)
 				{
 					createLeaves(world, above, leaves);
@@ -57,7 +58,7 @@ class Irrigation extends TerraformerBase
 				return true;
 			} else if (block == Blocks.FIRE)
 			{
-				world.setBlockToAir(pos);
+				world.removeBlock(pos, false);
 				return true;
 			} else
 			{
@@ -65,20 +66,20 @@ class Irrigation extends TerraformerBase
 			}
 		} else
 		{
-			return spreadGrass(world, pos.north())
-				|| spreadGrass(world, pos.east())
-				|| spreadGrass(world, pos.south())
-				|| spreadGrass(world, pos.west());
+			return spreadGrass(world, pos.m_122012_())
+				|| spreadGrass(world, pos.m_122029_())
+				|| spreadGrass(world, pos.m_122019_())
+				|| spreadGrass(world, pos.m_122024_());
 		}
 	}
 
-	private static IBlockState getLeaves(World world, BlockPos pos)
+	private static BlockState getLeaves(Level world, BlockPos pos)
 	{
-		for (EnumFacing facing : EnumFacing.HORIZONTALS)
+		for (Direction facing : Util.HORIZONTAL_DIRS)
 		{
-			BlockPos cPos = pos.offset(facing);
-			IBlockState state = world.getBlockState(cPos);
-			if (state.getBlock().isLeaves(state, world, cPos))
+			BlockPos cPos = pos.relative(facing);
+			BlockState state = world.getBlockState(cPos);
+			if (state.m_204336_(BlockTags.f_13035_))
 			{
 				return state;
 			}
@@ -87,27 +88,27 @@ class Irrigation extends TerraformerBase
 		return null;
 	}
 
-	private static void createLeaves(World world, BlockPos pos, IBlockState state)
+	private static void createLeaves(Level world, BlockPos pos, BlockState state)
 	{
-		BlockPos above = pos.up();
-		if (world.isAirBlock(above))
+		BlockPos above = pos.m_7494_();
+		if (world.m_46859_(above))
 		{
-			world.setBlockState(above, state);
+			world.setBlockAndUpdate(above, state);
 		}
 
-		for (EnumFacing facing : EnumFacing.HORIZONTALS)
+		for (Direction facing : Util.HORIZONTAL_DIRS)
 		{
-			BlockPos cPos = pos.offset(facing);
-			if (world.isAirBlock(cPos))
+			BlockPos cPos = pos.relative(facing);
+			if (world.m_46859_(cPos))
 			{
-				world.setBlockState(cPos, state);
+				world.setBlockAndUpdate(cPos, state);
 			}
 		}
 	}
 
-	private static boolean spreadGrass(World world, BlockPos pos)
+	private static boolean spreadGrass(Level world, BlockPos pos)
 	{
-		if (world.rand.nextBoolean())
+		if (world.random.m_188499_())
 		{
 			return false;
 		} else
@@ -119,13 +120,13 @@ class Irrigation extends TerraformerBase
 			} else
 			{
 				Block block = world.getBlockState(pos).getBlock();
-				if (block == Blocks.DIRT)
+				if (block == Blocks.f_50493_)
 				{
-					world.setBlockState(pos, Blocks.GRASS.getDefaultState());
+					world.setBlockAndUpdate(pos, Blocks.f_50034_.defaultBlockState());
 					return true;
-				} else if (block == Blocks.GRASS)
+				} else if (block == Blocks.f_50034_)
 				{
-					world.setBlockState(pos.up(), Blocks.TALLGRASS.getDefaultState().withProperty(BlockTallGrass.TYPE, EnumType.GRASS));
+					world.setBlockAndUpdate(pos.m_7494_(), Blocks.f_50359_.defaultBlockState());
 					return true;
 				} else
 				{

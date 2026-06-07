@@ -1,28 +1,26 @@
 package ic2.api.energy.prefab;
 
-import ic2.api.energy.event.EnergyTileLoadEvent;
-import ic2.api.energy.event.EnergyTileUnloadEvent;
+import ic2.api.energy.EnergyNet;
 import ic2.api.energy.tile.IEnergyTile;
 import ic2.api.info.ILocatable;
 import ic2.api.info.Info;
 import ic2.api.item.ElectricItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 abstract class BasicEnergyTile implements ILocatable, IEnergyTile
 {
 	private final Object locationProvider;
-	protected World world;
+	protected Level world;
 	protected BlockPos pos;
 	protected double capacity;
 	protected double energyStored;
 	protected boolean addedToEnet;
 
-	protected BasicEnergyTile(TileEntity parent, double capacity)
+	protected BasicEnergyTile(BlockEntity parent, double capacity)
 	{
 		this((Object) parent, capacity);
 	}
@@ -38,7 +36,7 @@ abstract class BasicEnergyTile implements ILocatable, IEnergyTile
 		this.capacity = capacity;
 	}
 
-	protected BasicEnergyTile(World world, BlockPos pos, double capacity)
+	protected BasicEnergyTile(Level world, BlockPos pos, double capacity)
 	{
 		if (world == null)
 		{
@@ -66,9 +64,9 @@ abstract class BasicEnergyTile implements ILocatable, IEnergyTile
 
 	public void onLoad()
 	{
-		if (!this.addedToEnet && !this.getWorldObj().isRemote && Info.isIc2Available())
+		if (!this.addedToEnet && !this.getWorldObj().isClientSide && Info.isIc2Available())
 		{
-			MinecraftForge.EVENT_BUS.post(new EnergyTileLoadEvent(this));
+			EnergyNet.instance.addLocatableTile(this);
 			this.addedToEnet = true;
 		}
 	}
@@ -80,24 +78,24 @@ abstract class BasicEnergyTile implements ILocatable, IEnergyTile
 
 	public void onChunkUnload()
 	{
-		if (this.addedToEnet && !this.getWorldObj().isRemote && Info.isIc2Available())
+		if (this.addedToEnet && !this.getWorldObj().isClientSide && Info.isIc2Available())
 		{
-			MinecraftForge.EVENT_BUS.post(new EnergyTileUnloadEvent(this));
+			EnergyNet.instance.removeTile(this);
 			this.addedToEnet = false;
 		}
 	}
 
-	public void readFromNBT(NBTTagCompound tag)
+	public void readFromNBT(CompoundTag tag)
 	{
-		NBTTagCompound data = tag.getCompoundTag(this.getNbtTagName());
+		CompoundTag data = tag.getCompound(this.getNbtTagName());
 		this.setEnergyStored(data.getDouble("energy"));
 	}
 
-	public NBTTagCompound writeToNBT(NBTTagCompound tag)
+	public CompoundTag writeToNBT(CompoundTag tag)
 	{
-		NBTTagCompound data = new NBTTagCompound();
-		data.setDouble("energy", this.getEnergyStored());
-		tag.setTag(this.getNbtTagName(), data);
+		CompoundTag data = new CompoundTag();
+		data.putDouble("energy", this.getEnergyStored());
+		tag.put(this.getNbtTagName(), data);
 		return tag;
 	}
 
@@ -128,7 +126,7 @@ abstract class BasicEnergyTile implements ILocatable, IEnergyTile
 
 	public double addEnergy(double amount)
 	{
-		if (this.getWorldObj().isRemote)
+		if (this.getWorldObj().isClientSide)
 		{
 			return 0.0;
 		}
@@ -151,7 +149,7 @@ abstract class BasicEnergyTile implements ILocatable, IEnergyTile
 
 	public boolean useEnergy(double amount)
 	{
-		if (this.canUseEnergy(amount) && !this.getWorldObj().isRemote)
+		if (this.canUseEnergy(amount) && !this.getWorldObj().isClientSide)
 		{
 			this.setEnergyStored(this.getEnergyStored() - amount);
 			return true;
@@ -163,7 +161,7 @@ abstract class BasicEnergyTile implements ILocatable, IEnergyTile
 
 	public boolean charge(ItemStack stack)
 	{
-		if (stack != null && Info.isIc2Available() && !this.getWorldObj().isRemote)
+		if (stack != null && Info.isIc2Available() && !this.getWorldObj().isClientSide)
 		{
 			double energyStored = this.getEnergyStored();
 			double amount = ElectricItem.manager.charge(stack, energyStored, Math.max(this.getSinkTier(), this.getSourceTier()), false, false);
@@ -177,7 +175,7 @@ abstract class BasicEnergyTile implements ILocatable, IEnergyTile
 
 	public boolean discharge(ItemStack stack, double limit)
 	{
-		if (stack != null && Info.isIc2Available() && !this.getWorldObj().isRemote)
+		if (stack != null && Info.isIc2Available() && !this.getWorldObj().isClientSide)
 		{
 			double energyStored = this.getEnergyStored();
 			double amount = this.getCapacity() - energyStored;
@@ -201,7 +199,7 @@ abstract class BasicEnergyTile implements ILocatable, IEnergyTile
 	}
 
 	@Override
-	public World getWorldObj()
+	public Level getWorldObj()
 	{
 		if (this.world == null)
 		{
@@ -224,21 +222,19 @@ abstract class BasicEnergyTile implements ILocatable, IEnergyTile
 
 	private void initLocation()
 	{
-		if (this.locationProvider instanceof ILocatable)
+		if (this.locationProvider instanceof ILocatable provider)
 		{
-			ILocatable provider = (ILocatable) this.locationProvider;
 			this.world = provider.getWorldObj();
 			this.pos = provider.getPosition();
 		} else
 		{
-			if (!(this.locationProvider instanceof TileEntity))
+			if (!(this.locationProvider instanceof BlockEntity provider))
 			{
 				throw new IllegalStateException("no/incompatible location provider");
 			}
 
-			TileEntity provider = (TileEntity) this.locationProvider;
-			this.world = provider.getWorld();
-			this.pos = provider.getPos();
+			this.world = provider.getLevel();
+			this.pos = provider.getBlockPos();
 		}
 	}
 

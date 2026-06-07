@@ -1,0 +1,21 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "TMT",
+    "TCT"
+  ],
+  "key": {
+    "T": {
+      "item": "ic2:treetap"
+    },
+    "M": {
+      "item": "ic2:machine"
+    },
+    "C": {
+      "item": "ic2:circuit"
+    }
+  },
+  "result": {
+    "item": "ic2:extractor"
+  }
+}

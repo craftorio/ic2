@@ -1,7 +1,6 @@
 package ic2.core.block.reactor.tileentity;
 
-import ic2.api.energy.event.EnergyTileLoadEvent;
-import ic2.api.energy.event.EnergyTileUnloadEvent;
+import ic2.api.energy.EnergyNet;
 import ic2.api.energy.tile.IEnergyAcceptor;
 import ic2.api.energy.tile.IEnergySource;
 import ic2.api.energy.tile.IEnergyTile;
@@ -13,13 +12,10 @@ import ic2.api.reactor.IReactorComponent;
 import ic2.api.recipe.ILiquidHeatExchangerManager;
 import ic2.api.recipe.Recipes;
 import ic2.core.ContainerBase;
-import ic2.core.ExplosionIC2;
 import ic2.core.IC2;
-import ic2.core.IC2DamageSource;
 import ic2.core.IHasGui;
-import ic2.core.audio.AudioSource;
-import ic2.core.audio.PositionSpec;
-import ic2.core.block.TileEntityInventory;
+import ic2.core.Ic2DamageSource;
+import ic2.core.Ic2Explosion;
 import ic2.core.block.comp.Fluids;
 import ic2.core.block.comp.Redstone;
 import ic2.core.block.invslot.InvSlot;
@@ -29,56 +25,62 @@ import ic2.core.block.invslot.InvSlotConsumableLiquidByTank;
 import ic2.core.block.invslot.InvSlotOutput;
 import ic2.core.block.invslot.InvSlotReactor;
 import ic2.core.block.reactor.container.ContainerNuclearReactor;
-import ic2.core.block.reactor.gui.GuiNuclearReactor;
-import ic2.core.block.type.ResourceBlock;
+import ic2.core.block.tileentity.TileEntityInventory;
+import ic2.core.fluid.Ic2FluidStack;
+import ic2.core.fluid.Ic2FluidTank;
 import ic2.core.gui.dynamic.IGuiValueProvider;
 import ic2.core.init.MainConfig;
 import ic2.core.item.reactor.ItemReactorHeatStorage;
-import ic2.core.ref.BlockName;
-import ic2.core.ref.TeBlock;
+import ic2.core.network.GrowingBuffer;
+import ic2.core.ref.Ic2BlockEntities;
+import ic2.core.ref.Ic2Blocks;
+import ic2.core.ref.Ic2Items;
+import ic2.core.ref.Ic2SoundEvents;
+import ic2.core.sound.Sound;
 import ic2.core.util.ConfigUtil;
 import ic2.core.util.LogCategory;
 import ic2.core.util.StackUtil;
 import ic2.core.util.Util;
-import ic2.core.util.WorldSearchUtil;
+import ic2.core.util.WorldUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
-import net.minecraft.world.ChunkCache;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidTank;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos.MutableBlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.EntitySelector;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.PathNavigationRegion;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.commons.lang3.mutable.MutableBoolean;
-import org.apache.logging.log4j.Level;
 
 public class TileEntityNuclearReactorElectric extends TileEntityInventory implements IHasGui, IReactor, IEnergySource, IMetaDelegate, IGuiValueProvider
 {
-	public AudioSource audioSourceMain;
-	public AudioSource audioSourceGeiger;
+	public Sound soundMain;
+	public Sound soundGeiger;
 	private float lastOutput = 0.0F;
 	public final Fluids.InternalFluidTank inputTank;
 	public final Fluids.InternalFluidTank outputTank;
@@ -101,8 +103,9 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 	public boolean addedToEnergyNet = false;
 	private static final float huOutputModifier = 40.0F * ConfigUtil.getFloat(MainConfig.get(), "balance/energy/FluidReactor/outputModifier");
 
-	public TileEntityNuclearReactorElectric()
+	public TileEntityNuclearReactorElectric(BlockPos pos, BlockState state)
 	{
+		super(Ic2BlockEntities.NUCLEAR_REACTOR, pos, state);
 		this.updateTicker = IC2.random.nextInt(this.getTickRate());
 		this.fluids = this.addComponent(new Fluids(this));
 		this.inputTank = this.fluids.addTank("inputTank", 10000, InvSlot.Access.NONE, InvSlot.InvSide.ANY, Fluids.fluidPredicate(Recipes.liquidHeatupManager));
@@ -123,10 +126,10 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 	protected void onLoaded()
 	{
 		super.onLoaded();
-		if (!this.getWorld().isRemote && !this.isFluidCooled())
+		if (!this.getLevel().isClientSide && !this.isFluidCooled())
 		{
 			this.refreshChambers();
-			MinecraftForge.EVENT_BUS.post(new EnergyTileLoadEvent(this));
+			EnergyNet.instance.addBlockEntityTile(this);
 			this.addedToEnergyNet = true;
 		}
 
@@ -141,16 +144,16 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 	@Override
 	protected void onUnloaded()
 	{
-		if (IC2.platform.isRendering())
+		if (IC2.sideProxy.isRendering())
 		{
-			IC2.audioManager.removeSources(this);
-			this.audioSourceMain = null;
-			this.audioSourceGeiger = null;
+			IC2.soundManager.removeAllSound(this);
+			this.soundMain = null;
+			this.soundGeiger = null;
 		}
 
-		if (IC2.platform.isSimulating() && this.addedToEnergyNet)
+		if (IC2.sideProxy.isSimulating() && this.addedToEnergyNet)
 		{
-			MinecraftForge.EVENT_BUS.post(new EnergyTileUnloadEvent(this));
+			EnergyNet.instance.removeTile(this);
 			this.addedToEnergyNet = false;
 		}
 
@@ -163,20 +166,19 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound nbt)
+	public void load(CompoundTag nbt)
 	{
-		super.readFromNBT(nbt);
-		this.heat = nbt.getInteger("heat");
+		super.load(nbt);
+		this.heat = nbt.getInt("heat");
 		this.output = nbt.getShort("output");
 	}
 
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
+	public void saveAdditional(CompoundTag nbt)
 	{
-		nbt = super.writeToNBT(nbt);
-		nbt.setInteger("heat", this.heat);
-		nbt.setShort("output", (short) this.getReactorEnergyOutput());
-		return nbt;
+		super.saveAdditional(nbt);
+		nbt.putInt("heat", this.heat);
+		nbt.putShort("output", (short) this.getReactorEnergyOutput());
 	}
 
 	@Override
@@ -195,7 +197,7 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 	}
 
 	@Override
-	public boolean emitsEnergyTo(IEnergyAcceptor receiver, EnumFacing direction)
+	public boolean emitsEnergyTo(IEnergyAcceptor receiver, Direction direction)
 	{
 		return true;
 	}
@@ -232,14 +234,14 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 
 	public void refreshChambers()
 	{
-		World world = this.getWorld();
+		Level world = this.getLevel();
 		List<IEnergyTile> newSubTiles = new ArrayList<>();
 		newSubTiles.add(this);
 
-		for (EnumFacing dir : EnumFacing.VALUES)
+		for (Direction dir : Util.ALL_DIRS)
 		{
-			TileEntity te = world.getTileEntity(this.pos.offset(dir));
-			if (te instanceof TileEntityReactorChamberElectric && !te.isInvalid())
+			BlockEntity te = world.getBlockEntity(this.worldPosition.relative(dir));
+			if (te instanceof TileEntityReactorChamberElectric && !te.isRemoved())
 			{
 				newSubTiles.add((TileEntityReactorChamberElectric) te);
 			}
@@ -249,14 +251,14 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 		{
 			if (this.addedToEnergyNet)
 			{
-				MinecraftForge.EVENT_BUS.post(new EnergyTileUnloadEvent(this));
+				EnergyNet.instance.removeTile(this);
 			}
 
 			this.subTiles.clear();
 			this.subTiles.addAll(newSubTiles);
 			if (this.addedToEnergyNet)
 			{
-				MinecraftForge.EVENT_BUS.post(new EnergyTileLoadEvent(this));
+				EnergyNet.instance.addBlockEntityTile(this);
 			}
 		}
 	}
@@ -267,7 +269,7 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 		super.updateEntityServer();
 		if (this.updateTicker++ % this.getTickRate() == 0)
 		{
-			if (!this.getWorld().isAreaLoaded(this.pos, 8))
+			if (!Util.isAreaLoaded(this.getLevel(), this.worldPosition, 8))
 			{
 				this.output = 0.0F;
 			} else
@@ -294,8 +296,8 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 				if (this.fluidCooled)
 				{
 					this.processfluidsSlots();
-					FluidStack inputFluid = this.inputTank.getFluid();
-					assert inputFluid == null || Recipes.liquidHeatupManager.acceptsFluid(this.inputTank.getFluid().getFluid());
+					Ic2FluidStack inputFluid = this.inputTank.getFluidStack();
+					assert inputFluid == null || Recipes.liquidHeatupManager.acceptsFluid(this.inputTank.getFluidStack().getFluid());
 					int huOtput = (int) (huOutputModifier * this.EmitHeatbuffer);
 					int outputroom = this.outputTank.getCapacity() - this.outputTank.getFluidAmount();
 					this.EmitHeatbuffer = 0;
@@ -303,30 +305,26 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 					{
 						ILiquidHeatExchangerManager.HeatExchangeProperty prop = Recipes.liquidHeatupManager.getHeatExchangeProperty(inputFluid.getFluid());
 						int fluidOutput = huOtput / prop.huPerMB;
-						FluidStack add = new FluidStack(prop.outputFluid, fluidOutput);
-						if (this.outputTank.canFillFluidType(add))
+						Ic2FluidStack draincoolant;
+						if (fluidOutput < outputroom)
 						{
-							FluidStack draincoolant;
-							if (fluidOutput < outputroom)
-							{
-								this.EmitHeatbuffer = (int) (huOtput % prop.huPerMB / huOutputModifier);
-								this.EmitHeat = (int) (huOtput / huOutputModifier);
-								draincoolant = this.inputTank.drainInternal(fluidOutput, false);
-							} else
-							{
-								this.EmitHeat = outputroom * prop.huPerMB;
-								draincoolant = this.inputTank.drainInternal(outputroom, false);
-							}
+							this.EmitHeatbuffer = (int) (huOtput % prop.huPerMB / huOutputModifier);
+							this.EmitHeat = (int) (huOtput / huOutputModifier);
+							draincoolant = this.inputTank.drainMbUnchecked(fluidOutput, true);
+						} else
+						{
+							this.EmitHeat = outputroom * prop.huPerMB;
+							draincoolant = this.inputTank.drainMbUnchecked(outputroom, true);
+						}
 
-							if (draincoolant != null)
-							{
-								this.EmitHeat = draincoolant.amount * prop.huPerMB;
-								huOtput -= this.inputTank.drainInternal(draincoolant.amount, true).amount * prop.huPerMB;
-								this.outputTank.fillInternal(new FluidStack(prop.outputFluid, draincoolant.amount), true);
-							} else
-							{
-								this.EmitHeat = 0;
-							}
+						if (draincoolant != null)
+						{
+							this.EmitHeat = draincoolant.getAmountMb() * prop.huPerMB;
+							huOtput -= this.inputTank.drainMbUnchecked(draincoolant.getAmountMb(), false).getAmountMb() * prop.huPerMB;
+							this.outputTank.fillMbUnchecked(Ic2FluidStack.create(prop.outputFluid, draincoolant.getAmountMb()), false);
+						} else
+						{
+							this.EmitHeat = 0;
 						}
 					} else
 					{
@@ -342,24 +340,24 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 				}
 
 				this.setActive(this.heat >= 1000 || this.output > 0.0F);
-				this.markDirty();
+				this.setChanged();
 			}
 
 			IC2.network.get(true).updateTileEntityField(this, "output");
 		}
 	}
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	protected void updateEntityClient()
 	{
 		super.updateEntityClient();
-		showHeatEffects(this.getWorld(), this.pos, this.heat);
+		showHeatEffects(this.getLevel(), this.worldPosition, this.heat);
 	}
 
-	public static void showHeatEffects(World world, BlockPos pos, int heat)
+	public static void showHeatEffects(Level world, BlockPos pos, int heat)
 	{
-		Random rnd = world.rand;
+		RandomSource rnd = world.random;
 		if (rnd.nextInt(8) == 0)
 		{
 			int puffs = heat / 1000;
@@ -369,15 +367,8 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 
 				for (int n = 0; n < puffs; n++)
 				{
-					world.spawnParticle(
-						EnumParticleTypes.SMOKE_NORMAL,
-						pos.getX() + rnd.nextFloat(),
-						pos.getY() + 0.95F,
-						pos.getZ() + rnd.nextFloat(),
-						0.0,
-						0.0,
-						0.0,
-						new int[0]
+					world.addParticle(
+						ParticleTypes.SMOKE, pos.getX() + rnd.nextFloat(), pos.getY() + 0.95F, pos.getZ() + rnd.nextFloat(), 0.0, 0.0, 0.0
 					);
 				}
 
@@ -385,16 +376,7 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 
 				for (int n = 0; n < puffs; n++)
 				{
-					world.spawnParticle(
-						EnumParticleTypes.FLAME,
-						pos.getX() + rnd.nextFloat(),
-						pos.getY() + 1,
-						pos.getZ() + rnd.nextFloat(),
-						0.0,
-						0.0,
-						0.0,
-						new int[0]
-					);
+					world.addParticle(ParticleTypes.FLAME, pos.getX() + rnd.nextFloat(), pos.getY() + 1, pos.getZ() + rnd.nextFloat(), 0.0, 0.0, 0.0);
 				}
 			}
 		}
@@ -428,10 +410,7 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 			return false;
 		} else
 		{
-			return forInsertion
-				&& this.fluidCooled
-				&& item.getClass() == ItemReactorHeatStorage.class
-				&& ((ItemReactorHeatStorage) item).getCustomDamage(stack) > 0
+			return forInsertion && this.fluidCooled && item.getClass() == ItemReactorHeatStorage.class && stack.getDamageValue() > 0
 				? false
 				: item instanceof IBaseReactorComponent && (!forInsertion || ((IBaseReactorComponent) item).canBePlacedIn(stack, this));
 		}
@@ -439,15 +418,15 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 
 	public void eject(ItemStack drop)
 	{
-		if (IC2.platform.isSimulating() && drop != null)
+		if (IC2.sideProxy.isSimulating() && drop != null)
 		{
-			StackUtil.dropAsEntity(this.getWorld(), this.pos, drop);
+			StackUtil.dropAsEntity(this.getLevel(), this.worldPosition, drop);
 		}
 	}
 
 	public boolean calculateHeatEffects()
 	{
-		if (this.heat >= 4000 && IC2.platform.isSimulating() && !(ConfigUtil.getFloat(MainConfig.get(), "protection/reactorExplosionPowerLimit") <= 0.0F))
+		if (this.heat >= 4000 && IC2.sideProxy.isSimulating() && !(ConfigUtil.getFloat(MainConfig.get(), "protection/reactorExplosionPowerLimit") <= 0.0F))
 		{
 			float power = (float) this.heat / this.maxHeat;
 			if (power >= 1.0F)
@@ -456,70 +435,67 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 				return true;
 			}
 
-			World world = this.getWorld();
-			if (power >= 0.85F && world.rand.nextFloat() <= 0.2F * this.hem)
+			Level world = this.getLevel();
+			if (power >= 0.85F && world.random.nextFloat() <= 0.2F * this.hem)
 			{
 				BlockPos coord = this.getRandCoord(2);
-				IBlockState state = world.getBlockState(coord);
+				BlockState state = world.getBlockState(coord);
 				Block block = state.getBlock();
-				if (block.isAir(state, world, coord))
+				if (state.isAir())
 				{
-					world.setBlockState(coord, Blocks.FIRE.getDefaultState());
-				} else if (state.getBlockHardness(world, coord) >= 0.0F && world.getTileEntity(coord) == null)
+					world.setBlockAndUpdate(coord, Blocks.FIRE.defaultBlockState());
+				} else if (state.getDestroySpeed(world, coord) >= 0.0F && world.getBlockEntity(coord) == null)
 				{
 					Material mat = state.getMaterial();
-					if (mat != Material.ROCK
-						&& mat != Material.IRON
-						&& mat != Material.LAVA
-						&& mat != Material.GROUND
-						&& mat != Material.CLAY)
+					if (mat != Material.STONE && mat != Material.METAL && mat != Material.LAVA && mat != Material.DIRT && mat != Material.CLAY)
 					{
-						world.setBlockState(coord, Blocks.FIRE.getDefaultState());
+						world.setBlockAndUpdate(coord, Blocks.FIRE.defaultBlockState());
 					} else
 					{
-						world.setBlockState(coord, Blocks.FLOWING_LAVA.getDefaultState());
+						world.setBlockAndUpdate(coord, net.minecraft.world.level.material.Fluids.FLOWING_LAVA.defaultFluidState().createLegacyBlock());
 					}
 				}
 			}
 
 			if (power >= 0.7F)
 			{
-				for (EntityLivingBase entity : world.getEntitiesWithinAABB(
-					EntityLivingBase.class,
-					new AxisAlignedBB(
-						this.pos.getX() - 3,
-						this.pos.getY() - 3,
-						this.pos.getZ() - 3,
-						this.pos.getX() + 4,
-						this.pos.getY() + 4,
-						this.pos.getZ() + 4
-					)
+				for (LivingEntity entity : world.getEntitiesOfClass(
+					LivingEntity.class,
+					new AABB(
+						this.worldPosition.getX() - 3,
+						this.worldPosition.getY() - 3,
+						this.worldPosition.getZ() - 3,
+						this.worldPosition.getX() + 4,
+						this.worldPosition.getY() + 4,
+						this.worldPosition.getZ() + 4
+					),
+					EntitySelector.NO_CREATIVE_OR_SPECTATOR
 				))
 				{
-					entity.attackEntityFrom(IC2DamageSource.radiation, (int) (world.rand.nextInt(4) * this.hem));
+					entity.hurt(Ic2DamageSource.radiation, (int) (world.random.nextInt(4) * this.hem));
 				}
 			}
 
-			if (power >= 0.5F && world.rand.nextFloat() <= this.hem)
+			if (power >= 0.5F && world.random.nextFloat() <= this.hem)
 			{
 				BlockPos coord = this.getRandCoord(2);
-				IBlockState state = world.getBlockState(coord);
+				BlockState state = world.getBlockState(coord);
 				if (state.getMaterial() == Material.WATER)
 				{
-					world.setBlockToAir(coord);
+					world.removeBlock(coord, false);
 				}
 			}
 
-			if (power >= 0.4F && world.rand.nextFloat() <= this.hem)
+			if (power >= 0.4F && world.random.nextFloat() <= this.hem)
 			{
 				BlockPos coord = this.getRandCoord(2);
-				if (world.getTileEntity(coord) == null)
+				if (world.getBlockEntity(coord) == null)
 				{
-					IBlockState state = world.getBlockState(coord);
+					BlockState state = world.getBlockState(coord);
 					Material mat = state.getMaterial();
-					if (mat == Material.WOOD || mat == Material.LEAVES || mat == Material.CLOTH)
+					if (mat == Material.WOOD || mat == Material.LEAVES || mat == Material.WOOL)
 					{
-						world.setBlockState(coord, Blocks.FIRE.getDefaultState());
+						world.setBlockAndUpdate(coord, Blocks.FIRE.defaultBlockState());
 					}
 				}
 			}
@@ -538,18 +514,18 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 			return null;
 		}
 
-		World world = this.getWorld();
+		Level world = this.getLevel();
 
 		BlockPos ret;
 		do
 		{
-			ret = this.pos
-				.add(
-					world.rand.nextInt(2 * radius + 1) - radius,
-					world.rand.nextInt(2 * radius + 1) - radius,
-					world.rand.nextInt(2 * radius + 1) - radius
+			ret = this.worldPosition
+				.offset(
+					world.random.nextInt(2 * radius + 1) - radius,
+					world.random.nextInt(2 * radius + 1) - radius,
+					world.random.nextInt(2 * radius + 1) - radius
 				);
-		} while (ret.equals(this.pos));
+		} while (ret.equals(this.worldPosition));
 
 		return ret;
 	}
@@ -583,7 +559,7 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 
 	public int getReactorSize()
 	{
-		World world = this.getWorld();
+		Level world = this.getLevel();
 		if (world == null)
 		{
 			return 9;
@@ -591,9 +567,9 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 
 		int cols = 3;
 
-		for (EnumFacing dir : EnumFacing.VALUES)
+		for (Direction dir : Util.ALL_DIRS)
 		{
-			TileEntity target = world.getTileEntity(this.pos.offset(dir));
+			BlockEntity target = world.getBlockEntity(this.worldPosition.relative(dir));
 			if (target instanceof TileEntityReactorChamberElectric)
 			{
 				cols++;
@@ -615,29 +591,23 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 	}
 
 	@Override
-	protected boolean onActivated(EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ)
+	protected InteractionResult onActivated(Player player, InteractionHand hand, Direction side, Vec3 hit)
 	{
-		return StackUtil.checkItemEquality(StackUtil.get(player, hand), BlockName.te.getItemStack(TeBlock.reactor_chamber))
-			? false
-			: super.onActivated(player, hand, side, hitX, hitY, hitZ);
+		return StackUtil.checkItemEquality(StackUtil.get(player, hand), new ItemStack(Ic2Items.REACTOR_CHAMBER))
+			? InteractionResult.PASS
+			: super.onActivated(player, hand, side, hit);
 	}
 
 	@Override
-	public ContainerBase<TileEntityNuclearReactorElectric> getGuiContainer(EntityPlayer player)
+	public ContainerBase<?> createServerScreenHandler(int syncId, Player player)
 	{
-		return new ContainerNuclearReactor(player, this);
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
-	{
-		return new GuiNuclearReactor(new ContainerNuclearReactor(player, this));
+		return new ContainerNuclearReactor(syncId, player.getInventory(), this);
 	}
 
 	@Override
-	public void onGuiClosed(EntityPlayer player)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
+		return new ContainerNuclearReactor(syncId, inventory, this);
 	}
 
 	@Override
@@ -649,17 +619,14 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 			{
 				if (this.lastOutput <= 0.0F)
 				{
-					if (this.audioSourceMain == null)
+					if (this.soundMain == null)
 					{
-						this.audioSourceMain = IC2.audioManager
-							.createSource(
-								this, PositionSpec.Center, "Generators/NuclearReactor/NuclearReactorLoop.ogg", true, false, IC2.audioManager.getDefaultVolume()
-							);
+						this.soundMain = IC2.soundManager.createSound(this, Ic2SoundEvents.GENERATOR_NUCLEAR_LOOP, SoundSource.BLOCKS, this.getBlockPos(), 1.0F, 1.0F);
 					}
 
-					if (this.audioSourceMain != null)
+					if (this.soundMain != null)
 					{
-						this.audioSourceMain.play();
+						this.soundMain.play();
 					}
 				}
 
@@ -667,58 +634,58 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 				{
 					if (this.lastOutput <= 0.0F || this.lastOutput >= 40.0F)
 					{
-						if (this.audioSourceGeiger != null)
+						if (this.soundGeiger != null)
 						{
-							this.audioSourceGeiger.remove();
+							IC2.soundManager.removeSound(this, this.soundGeiger);
 						}
 
-						this.audioSourceGeiger = IC2.audioManager
-							.createSource(this, PositionSpec.Center, "Generators/NuclearReactor/GeigerLowEU.ogg", true, false, IC2.audioManager.getDefaultVolume());
-						if (this.audioSourceGeiger != null)
+						this.soundGeiger = IC2.soundManager
+							.createSound(this, Ic2SoundEvents.GENERATOR_NUCLEAR_LOW_POWER, SoundSource.BLOCKS, this.getBlockPos(), 1.0F, 1.0F);
+						if (this.soundGeiger != null)
 						{
-							this.audioSourceGeiger.play();
+							this.soundGeiger.play();
 						}
 					}
 				} else if (this.output < 80.0F)
 				{
 					if (this.lastOutput < 40.0F || this.lastOutput >= 80.0F)
 					{
-						if (this.audioSourceGeiger != null)
+						if (this.soundGeiger != null)
 						{
-							this.audioSourceGeiger.remove();
+							IC2.soundManager.removeSound(this, this.soundGeiger);
 						}
 
-						this.audioSourceGeiger = IC2.audioManager
-							.createSource(this, PositionSpec.Center, "Generators/NuclearReactor/GeigerMedEU.ogg", true, false, IC2.audioManager.getDefaultVolume());
-						if (this.audioSourceGeiger != null)
+						this.soundGeiger = IC2.soundManager
+							.createSound(this, Ic2SoundEvents.GENERATOR_NUCLEAR_MEDIUM_POWER, SoundSource.BLOCKS, this.getBlockPos(), 1.0F, 1.0F);
+						if (this.soundGeiger != null)
 						{
-							this.audioSourceGeiger.play();
+							this.soundGeiger.play();
 						}
 					}
 				} else if (this.output >= 80.0F && this.lastOutput < 80.0F)
 				{
-					if (this.audioSourceGeiger != null)
+					if (this.soundGeiger != null)
 					{
-						this.audioSourceGeiger.remove();
+						IC2.soundManager.removeSound(this, this.soundGeiger);
 					}
 
-					this.audioSourceGeiger = IC2.audioManager
-						.createSource(this, PositionSpec.Center, "Generators/NuclearReactor/GeigerHighEU.ogg", true, false, IC2.audioManager.getDefaultVolume());
-					if (this.audioSourceGeiger != null)
+					this.soundGeiger = IC2.soundManager
+						.createSound(this, Ic2SoundEvents.GENERATOR_NUCLEAR_HIGH_POWER, SoundSource.BLOCKS, this.getBlockPos(), 1.0F, 1.0F);
+					if (this.soundGeiger != null)
 					{
-						this.audioSourceGeiger.play();
+						this.soundGeiger.play();
 					}
 				}
 			} else if (this.lastOutput > 0.0F)
 			{
-				if (this.audioSourceMain != null)
+				if (this.soundMain != null)
 				{
-					this.audioSourceMain.stop();
+					this.soundMain.stop();
 				}
 
-				if (this.audioSourceGeiger != null)
+				if (this.soundGeiger != null)
 				{
-					this.audioSourceGeiger.stop();
+					this.soundGeiger.stop();
 				}
 			}
 
@@ -729,7 +696,7 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 	}
 
 	@Override
-	public TileEntity getCoreTe()
+	public BlockEntity getCoreTe()
 	{
 		return this;
 	}
@@ -737,13 +704,13 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 	@Override
 	public BlockPos getPosition()
 	{
-		return this.pos;
+		return this.worldPosition;
 	}
 
 	@Override
-	public World getWorldObj()
+	public Level getWorldObj()
 	{
-		return this.getWorld();
+		return this.getLevel();
 	}
 
 	@Override
@@ -805,21 +772,28 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 		}
 
 		boomPower *= this.hem * boomMod;
-		IC2.log.log(LogCategory.PlayerActivity, Level.INFO, "Nuclear Reactor at %s melted (raw explosion power %f)", Util.formatPosition(this), boomPower);
+		IC2.log
+			.log(
+				LogCategory.PlayerActivity,
+				org.apache.logging.log4j.Level.INFO,
+				"Nuclear Reactor at %s melted (raw explosion power %f)",
+				Util.formatPosition(this),
+				boomPower
+			);
 		boomPower = Math.min(boomPower, ConfigUtil.getFloat(MainConfig.get(), "protection/reactorExplosionPowerLimit"));
-		World world = this.getWorld();
+		Level world = this.getLevel();
 
-		for (EnumFacing dir : EnumFacing.VALUES)
+		for (Direction dir : Util.ALL_DIRS)
 		{
-			TileEntity target = world.getTileEntity(this.pos.offset(dir));
+			BlockEntity target = world.getBlockEntity(this.worldPosition.relative(dir));
 			if (target instanceof TileEntityReactorChamberElectric)
 			{
-				world.setBlockToAir(target.getPos());
+				world.removeBlock(target.getBlockPos(), false);
 			}
 		}
 
-		world.setBlockToAir(this.pos);
-		ExplosionIC2 explosion = new ExplosionIC2(world, null, this.pos, boomPower, 0.01F, ExplosionIC2.Type.Nuclear);
+		world.removeBlock(this.worldPosition, false);
+		Ic2Explosion explosion = new Ic2Explosion(world, null, this.worldPosition, boomPower, 0.01F, Ic2Explosion.Type.Nuclear);
 		explosion.doExplosion();
 	}
 
@@ -873,15 +847,13 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 
 	private void createChamberRedstoneLinks()
 	{
-		World world = this.getWorld();
+		Level world = this.getLevel();
 
-		for (EnumFacing facing : EnumFacing.VALUES)
+		for (Direction facing : Util.ALL_DIRS)
 		{
-			BlockPos cPos = this.pos.offset(facing);
-			TileEntity te = world.getTileEntity(cPos);
-			if (te instanceof TileEntityReactorChamberElectric)
+			BlockPos cPos = this.worldPosition.relative(facing);
+			if (world.getBlockEntity(cPos) instanceof TileEntityReactorChamberElectric chamber)
 			{
-				TileEntityReactorChamberElectric chamber = (TileEntityReactorChamberElectric) te;
 				if (chamber.redstone.isLinked() && chamber.redstone.getLinkReceiver() != this.redstone)
 				{
 					chamber.destoryChamber(true);
@@ -895,10 +867,10 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 
 	private void createCasingRedstoneLinks()
 	{
-		WorldSearchUtil.findTileEntities(this.getWorld(), this.pos, 2, new WorldSearchUtil.ITileEntityResultHandler()
+		WorldUtil.findTileEntities(this.getLevel(), this.worldPosition, 2, new WorldUtil.ITileEntityResultHandler()
 		{
 			@Override
-			public boolean onMatch(TileEntity te)
+			public boolean onMatch(BlockEntity te)
 			{
 				if (te instanceof TileEntityReactorRedstonePort)
 				{
@@ -925,7 +897,7 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 	{
 		if (this.addedToEnergyNet)
 		{
-			MinecraftForge.EVENT_BUS.post(new EnergyTileUnloadEvent(this));
+			EnergyNet.instance.removeTile(this);
 			this.addedToEnergyNet = false;
 		}
 
@@ -938,7 +910,7 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 		if (!this.addedToEnergyNet)
 		{
 			this.refreshChambers();
-			MinecraftForge.EVENT_BUS.post(new EnergyTileLoadEvent(this));
+			EnergyNet.instance.addBlockEntityTile(this);
 			this.addedToEnergyNet = true;
 		}
 
@@ -972,10 +944,10 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 
 		int range = 2;
 		final MutableBoolean foundConflict = new MutableBoolean();
-		WorldSearchUtil.findTileEntities(this.getWorld(), this.pos, 4, new WorldSearchUtil.ITileEntityResultHandler()
+		WorldUtil.findTileEntities(this.getLevel(), this.worldPosition, 4, new WorldUtil.ITileEntityResultHandler()
 		{
 			@Override
-			public boolean onMatch(TileEntity te)
+			public boolean onMatch(BlockEntity te)
 			{
 				if (!(te instanceof TileEntityNuclearReactorElectric))
 				{
@@ -1003,18 +975,18 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 	private boolean hasFluidChamber()
 	{
 		int range = 2;
-		ChunkCache cache = new ChunkCache(this.getWorld(), this.pos.add(-2, -2, -2), this.pos.add(2, 2, 2), 0);
+		PathNavigationRegion cache = new PathNavigationRegion(this.getLevel(), this.worldPosition.offset(-2, -2, -2), this.worldPosition.offset(2, 2, 2));
 		MutableBlockPos cPos = new MutableBlockPos();
 
 		for (int i = 0; i < 2; i++)
 		{
-			int y = this.pos.getY() + 2 * (i * 2 - 1);
+			int y = this.worldPosition.getY() + 2 * (i * 2 - 1);
 
-			for (int z = this.pos.getZ() - 2; z <= this.pos.getZ() + 2; z++)
+			for (int z = this.worldPosition.getZ() - 2; z <= this.worldPosition.getZ() + 2; z++)
 			{
-				for (int x = this.pos.getX() - 2; x <= this.pos.getX() + 2; x++)
+				for (int x = this.worldPosition.getX() - 2; x <= this.worldPosition.getX() + 2; x++)
 				{
-					cPos.setPos(x, y, z);
+					cPos.set(x, y, z);
 					if (!isFluidChamberBlock(cache, cPos))
 					{
 						return false;
@@ -1025,13 +997,13 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 
 		for (int i = 0; i < 2; i++)
 		{
-			int z = this.pos.getZ() + 2 * (i * 2 - 1);
+			int z = this.worldPosition.getZ() + 2 * (i * 2 - 1);
 
-			for (int y = this.pos.getY() - 2 + 1; y <= this.pos.getY() + 2 - 1; y++)
+			for (int y = this.worldPosition.getY() - 2 + 1; y <= this.worldPosition.getY() + 2 - 1; y++)
 			{
-				for (int x = this.pos.getX() - 2; x <= this.pos.getX() + 2; x++)
+				for (int x = this.worldPosition.getX() - 2; x <= this.worldPosition.getX() + 2; x++)
 				{
-					cPos.setPos(x, y, z);
+					cPos.set(x, y, z);
 					if (!isFluidChamberBlock(cache, cPos))
 					{
 						return false;
@@ -1042,13 +1014,13 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 
 		for (int i = 0; i < 2; i++)
 		{
-			int x = this.pos.getX() + 2 * (i * 2 - 1);
+			int x = this.worldPosition.getX() + 2 * (i * 2 - 1);
 
-			for (int y = this.pos.getY() - 2 + 1; y <= this.pos.getY() + 2 - 1; y++)
+			for (int y = this.worldPosition.getY() - 2 + 1; y <= this.worldPosition.getY() + 2 - 1; y++)
 			{
-				for (int z = this.pos.getZ() - 2 + 1; z <= this.pos.getZ() + 2 - 1; z++)
+				for (int z = this.worldPosition.getZ() - 2 + 1; z <= this.worldPosition.getZ() + 2 - 1; z++)
 				{
-					cPos.setPos(x, y, z);
+					cPos.set(x, y, z);
 					if (!isFluidChamberBlock(cache, cPos))
 					{
 						return false;
@@ -1060,15 +1032,15 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 		return true;
 	}
 
-	private static boolean isFluidChamberBlock(IBlockAccess world, BlockPos pos)
+	private static boolean isFluidChamberBlock(BlockGetter world, BlockPos pos)
 	{
-		IBlockState state = world.getBlockState(pos);
-		if (state == BlockName.resource.getBlockState(ResourceBlock.reactor_vessel))
+		BlockState state = world.getBlockState(pos);
+		if (state.getBlock() == Ic2Blocks.REACTOR_VESSEL)
 		{
 			return true;
 		}
 
-		TileEntity te = world.getTileEntity(pos);
+		BlockEntity te = world.getBlockEntity(pos);
 		return te == null ? false : te instanceof IReactorChamber && ((IReactorChamber) te).isWall();
 	}
 
@@ -1107,18 +1079,18 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 		}
 	}
 
-	public FluidTank getinputtank()
+	public Ic2FluidTank getinputtank()
 	{
 		return this.inputTank;
 	}
 
-	public FluidTank getoutputtank()
+	public Ic2FluidTank getoutputtank()
 	{
 		return this.outputTank;
 	}
 
 	@Override
-	public int getInventoryStackLimit()
+	public int getMaxStackSize()
 	{
 		return 1;
 	}

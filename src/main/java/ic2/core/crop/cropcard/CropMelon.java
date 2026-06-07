@@ -2,23 +2,26 @@ package ic2.core.crop.cropcard;
 
 import ic2.api.crops.CropProperties;
 import ic2.api.crops.ICropTile;
+import ic2.api.crops.ICropType;
 import ic2.core.IC2;
 import ic2.core.crop.CropVanillaStem;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
+import ic2.core.ref.Ic2Blocks;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 
 public class CropMelon extends CropVanillaStem
 {
-	public CropMelon()
+	public CropMelon(ICropType cropType)
 	{
-		super(4);
+		super(cropType);
 	}
 
 	@Override
-	public String getId()
+	public Block getCropBlock()
 	{
-		return "melon";
+		return Ic2Blocks.MELON_CROP;
 	}
 
 	@Override
@@ -42,18 +45,18 @@ public class CropMelon extends CropVanillaStem
 	@Override
 	protected ItemStack getProduct()
 	{
-		return IC2.random.nextInt(3) == 0 ? new ItemStack(Blocks.MELON_BLOCK) : new ItemStack(Items.MELON, IC2.random.nextInt(4) + 2);
+		return IC2.random.nextInt(3) == 0 ? new ItemStack(Blocks.f_50186_) : new ItemStack(Items.f_42028_, IC2.random.nextInt(4) + 2);
 	}
 
 	@Override
 	protected ItemStack getSeeds()
 	{
-		return new ItemStack(Items.MELON_SEEDS, IC2.random.nextInt(2) + 1);
+		return new ItemStack(Items.f_42578_, IC2.random.nextInt(2) + 1);
 	}
 
 	@Override
 	public int getGrowthDuration(ICropTile crop)
 	{
-		return crop.getCurrentSize() == 3 ? 700 : 250;
+		return crop.getCurrentAge() == this.getMaxAge() - 1 ? 700 : 250;
 	}
 }

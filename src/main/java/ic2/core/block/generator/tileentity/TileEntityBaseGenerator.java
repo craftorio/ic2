@@ -3,22 +3,20 @@ package ic2.core.block.generator.tileentity;
 import ic2.core.ContainerBase;
 import ic2.core.IC2;
 import ic2.core.IHasGui;
-import ic2.core.audio.AudioSource;
-import ic2.core.audio.PositionSpec;
-import ic2.core.block.TileEntityInventory;
 import ic2.core.block.comp.Energy;
 import ic2.core.block.invslot.InvSlotCharge;
+import ic2.core.block.tileentity.TileEntityBase;
 import ic2.core.gui.dynamic.DynamicContainer;
-import ic2.core.gui.dynamic.DynamicGui;
-import ic2.core.gui.dynamic.GuiParser;
+import ic2.core.network.GrowingBuffer;
 import ic2.core.network.GuiSynced;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 
-public abstract class TileEntityBaseGenerator extends TileEntityInventory implements IHasGui
+public abstract class TileEntityBaseGenerator extends TileEntityBase implements IHasGui
 {
 	public final InvSlotCharge chargeSlot;
 	protected final Energy energy;
@@ -27,10 +25,12 @@ public abstract class TileEntityBaseGenerator extends TileEntityInventory implem
 	protected double production;
 	private int ticksSinceLastActiveUpdate;
 	private int activityMeter = 0;
-	public AudioSource audioSource;
 
-	public TileEntityBaseGenerator(double production, int tier, int maxStorage)
+	public TileEntityBaseGenerator(
+		BlockEntityType<? extends TileEntityBaseGenerator> type, BlockPos pos, BlockState state, double production, int tier, int maxStorage
+	)
 	{
+		super(type, pos, state);
 		this.production = production;
 		this.ticksSinceLastActiveUpdate = IC2.random.nextInt(256);
 		this.chargeSlot = new InvSlotCharge(this, 1);
@@ -38,30 +38,17 @@ public abstract class TileEntityBaseGenerator extends TileEntityInventory implem
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound nbttagcompound)
+	public void load(CompoundTag nbt)
 	{
-		super.readFromNBT(nbttagcompound);
-		this.fuel = nbttagcompound.getInteger("fuel");
+		super.load(nbt);
+		this.fuel = nbt.getInt("fuel");
 	}
 
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
+	public void saveAdditional(CompoundTag nbt)
 	{
-		super.writeToNBT(nbt);
-		nbt.setInteger("fuel", this.fuel);
-		return nbt;
-	}
-
-	@Override
-	protected void onUnloaded()
-	{
-		if (IC2.platform.isRendering() && this.audioSource != null)
-		{
-			IC2.audioManager.removeSources(this);
-			this.audioSource = null;
-		}
-
-		super.onUnloaded();
+		super.saveAdditional(nbt);
+		nbt.putInt("fuel", this.fuel);
 	}
 
 	@Override
@@ -77,17 +64,17 @@ public abstract class TileEntityBaseGenerator extends TileEntityInventory implem
 		boolean newActive = this.gainEnergy();
 		if (needsInvUpdate)
 		{
-			this.markDirty();
+			this.setChanged();
 		}
 
 		if (!this.delayActiveUpdate())
 		{
-			this.setActive(newActive);
+			this.setActiveState(newActive, false);
 		} else
 		{
 			if (this.ticksSinceLastActiveUpdate % 256 == 0)
 			{
-				this.setActive(this.activityMeter > 0);
+				this.setActiveState(this.activityMeter > 0, false);
 				this.activityMeter = 0;
 			}
 
@@ -128,57 +115,26 @@ public abstract class TileEntityBaseGenerator extends TileEntityInventory implem
 
 	public abstract boolean gainFuel();
 
-	public String getOperationSoundFile()
-	{
-		return null;
-	}
-
 	protected boolean delayActiveUpdate()
 	{
 		return false;
 	}
 
 	@Override
-	public void onGuiClosed(EntityPlayer player)
+	public ContainerBase<?> createServerScreenHandler(int syncId, Player player)
 	{
+		return DynamicContainer.create(syncId, player.getInventory(), this);
 	}
 
 	@Override
-	public ContainerBase<? extends TileEntityBaseGenerator> getGuiContainer(EntityPlayer player)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
-		return DynamicContainer.create(this, player, GuiParser.parse(this.teBlock));
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
-	{
-		return DynamicGui.<TileEntityBaseGenerator>create(this, player, GuiParser.parse(this.teBlock));
+		return DynamicContainer.create(syncId, inventory, this);
 	}
 
 	@Override
 	public void onNetworkUpdate(String field)
 	{
-		if (field.equals("active"))
-		{
-			if (this.audioSource == null && this.getOperationSoundFile() != null)
-			{
-				this.audioSource = IC2.audioManager
-					.createSource(this, PositionSpec.Center, this.getOperationSoundFile(), true, false, IC2.audioManager.getDefaultVolume());
-			}
-
-			if (this.getActive())
-			{
-				if (this.audioSource != null)
-				{
-					this.audioSource.play();
-				}
-			} else if (this.audioSource != null)
-			{
-				this.audioSource.stop();
-			}
-		}
-
 		super.onNetworkUpdate(field);
 	}
 }

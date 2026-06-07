@@ -9,45 +9,43 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.IdentityHashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.RayTraceResult.Type;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.EmptyChunk;
-import net.minecraft.world.gen.ChunkProviderServer;
-import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.oredict.OreDictionary;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
 
 public final class Util
 {
-	private static final Map<Class<? extends IBlockAccess>, Field> worldFieldCache = new IdentityHashMap<>();
-	public static final Set<EnumFacing> noFacings = Collections.emptySet();
-	public static final Set<EnumFacing> onlyNorth = Collections.unmodifiableSet(EnumSet.of(EnumFacing.NORTH));
-	public static final Set<EnumFacing> horizontalFacings = Collections.unmodifiableSet(EnumSet.copyOf(Arrays.asList(EnumFacing.HORIZONTALS)));
-	public static final Set<EnumFacing> verticalFacings = Collections.unmodifiableSet(EnumSet.of(EnumFacing.DOWN, EnumFacing.UP));
-	public static final Set<EnumFacing> downSideFacings = Collections.unmodifiableSet(EnumSet.complementOf(EnumSet.of(EnumFacing.UP)));
-	public static final Set<EnumFacing> allFacings = Collections.unmodifiableSet(EnumSet.allOf(EnumFacing.class));
+	public static final Direction[] ALL_DIRS = Direction.values();
+	public static final Direction[] HORIZONTAL_DIRS = Arrays.copyOfRange(ALL_DIRS, 2, 6);
+	public static final Set<Direction> noFacings = Collections.emptySet();
+	public static final Set<Direction> onlyNorth = Collections.unmodifiableSet(EnumSet.of(Direction.NORTH));
+	public static final Set<Direction> horizontalFacings = Collections.unmodifiableSet(EnumSet.copyOf(Arrays.asList(HORIZONTAL_DIRS)));
+	public static final Set<Direction> verticalFacings = Collections.unmodifiableSet(EnumSet.of(Direction.DOWN, Direction.UP));
+	public static final Set<Direction> downSideFacings = Collections.unmodifiableSet(EnumSet.complementOf(EnumSet.of(Direction.UP)));
+	public static final Set<Direction> allFacings = Collections.unmodifiableSet(EnumSet.allOf(Direction.class));
+	public static final InteractionHand[] HANDS = InteractionHand.values();
 	private static final boolean inDev = System.getProperty("INDEV") != null;
 	private static final boolean includeWorldHash = System.getProperty("ic2.debug.includeworldhash") != null;
 	private static final Map<Class<?>, Boolean> checkedClasses = new IdentityHashMap<>();
@@ -203,6 +201,65 @@ public final class Util
 		return ret;
 	}
 
+	public static boolean checkInterfaces(Class<?> cls)
+	{
+		Boolean cached = checkedClasses.get(cls);
+		if (cached != null)
+		{
+			return cached;
+		}
+
+		Set<Class<?>> interfaces = Collections.newSetFromMap(new IdentityHashMap<>());
+		Class<?> c = cls;
+
+		do
+		{
+			for (Class<?> i : c.getInterfaces())
+			{
+				interfaces.add(i);
+			}
+
+			c = c.getSuperclass();
+		} while (c != null);
+
+		boolean result = true;
+
+		for (Class<?> iface : interfaces)
+		{
+			for (Method method : iface.getMethods())
+			{
+				boolean found = false;
+				c = cls;
+
+				do
+				{
+					try
+					{
+						Method match = c.getDeclaredMethod(method.getName(), method.getParameterTypes());
+						if (method.getReturnType().isAssignableFrom(match.getReturnType()))
+						{
+							found = true;
+							break;
+						}
+					} catch (NoSuchMethodException var13)
+					{
+					}
+
+					c = c.getSuperclass();
+				} while (c != null);
+
+				if (!found)
+				{
+					IC2.log.info(LogCategory.General, "Can't find method %s.%s in %s.", method.getDeclaringClass().getName(), method.getName(), cls.getName());
+					result = false;
+				}
+			}
+		}
+
+		checkedClasses.put(cls, result);
+		return result;
+	}
+
 	public static boolean inDev()
 	{
 		return inDev;
@@ -210,52 +267,121 @@ public final class Util
 
 	public static boolean hasAssertions()
 	{
-		boolean ret = false;
+		boolean ret;
 		assert ret = true;
 		return ret;
 	}
 
-	public static boolean matchesOD(ItemStack stack, Object match)
+	public static boolean isCallingFromIc2()
 	{
-		if (!(match instanceof ItemStack))
+		return isCallingFromIc2(1);
+	}
+
+	public static boolean isCallingFromIc2(int extraFrames)
+	{
+		StackTraceElement[] st = Thread.currentThread().getStackTrace();
+		int idx = 2 + extraFrames;
+		return st.length <= idx || st[idx].getClassName().startsWith("ic2.");
+	}
+
+	public static Block getBlock(String name)
+	{
+		if (name == null)
 		{
-			if (match instanceof String)
-			{
-				if (StackUtil.isEmpty(stack))
-				{
-					return false;
-				}
-
-				for (int oreId : OreDictionary.getOreIDs(stack))
-				{
-					if (OreDictionary.getOreName(oreId).equals(match))
-					{
-						return true;
-					}
-				}
-
-				return false;
-			} else
-			{
-				return stack == match;
-			}
+			throw new NullPointerException("null name");
 		} else
 		{
-			return !StackUtil.isEmpty(stack) && stack.isItemEqual((ItemStack) match);
+			return getBlock(ResourceLocation.fromNamespaceAndPath(name));
 		}
 	}
 
-	public static String toString(TileEntity te)
+	public static Block getBlock(ResourceLocation loc)
 	{
-		return te == null ? "null" : toString(te, te.getWorld(), te.getPos());
+		Block ret = (Block) Registry.BLOCK.m_7745_(loc);
+		if (ret != Blocks.f_50016_)
+		{
+			return ret;
+		} else
+		{
+			return loc.m_135827_().equals("minecraft") && loc.m_135815_().equals("air") ? ret : null;
+		}
 	}
 
-	public static String toString(Object o, IBlockAccess world, BlockPos pos)
+	public static boolean canShear(BlockState state)
+	{
+		return state.m_204336_(BlockTags.f_13035_)
+			|| state.m_60713_(Blocks.f_50033_)
+			|| state.m_60713_(Blocks.f_50034_)
+			|| state.m_60713_(Blocks.f_50035_)
+			|| state.m_60713_(Blocks.f_50036_)
+			|| state.m_60713_(Blocks.f_152548_)
+			|| state.m_60713_(Blocks.f_50191_)
+			|| state.m_60713_(Blocks.f_50267_)
+			|| state.m_204336_(BlockTags.f_13089_);
+	}
+
+	public static Vector3 getEyePosition(Entity entity)
+	{
+		return new Vector3(entity.getX(), entity.m_20188_(), entity.getZ());
+	}
+
+	public static ResourceLocation getName(Block block)
+	{
+		return Registry.BLOCK.getKey(block);
+	}
+
+	public static Item getItem(String name)
+	{
+		if (name == null)
+		{
+			throw new NullPointerException("null name");
+		} else
+		{
+			return getItem(ResourceLocation.fromNamespaceAndPath(name));
+		}
+	}
+
+	public static Item getItem(ResourceLocation loc)
+	{
+		return (Item) Registry.f_122827_.m_7745_(loc);
+	}
+
+	public static Vector3 getLook(Entity entity)
+	{
+		return new Vector3(entity.m_20154_());
+	}
+
+	public static ResourceLocation getName(Item item)
+	{
+		return Registry.f_122827_.getKey(item);
+	}
+
+	public static Fluid getFluid(ResourceLocation loc)
+	{
+		return (Fluid) Registry.f_122822_.m_7745_(loc);
+	}
+
+	public static ResourceLocation getName(Fluid fluid)
+	{
+		return Registry.f_122822_.getKey(fluid);
+	}
+
+	public static ResourceLocation getDimId(Level world)
+	{
+		return world.m_46472_().m_135782_();
+	}
+
+	public static String toString(BlockEntity te)
+	{
+		return te == null ? "null" : toString(te, te.getLevel(), te.getBlockPos());
+	}
+
+	public static String toString(Object o, BlockGetter world, BlockPos pos)
 	{
 		return toString(o, world, pos.getX(), pos.getY(), pos.getZ());
 	}
 
-	public static String toString(Object o, IBlockAccess world, int x, int y, int z)
+	public static String toString(Object o, BlockGetter world, int x, int y, int z)
 	{
 		StringBuilder ret = new StringBuilder(64);
 		if (o == null)
@@ -274,31 +400,50 @@ public final class Util
 		return ret.toString();
 	}
 
-	public static String formatPosition(TileEntity te)
+	public static String toCamel(String snakeStr)
 	{
-		return formatPosition(te.getWorld(), te.getPos());
+		String[] snakeStrSplit = snakeStr.split("_");
+		StringBuilder retBuilder = new StringBuilder();
+
+		for (String str : snakeStrSplit)
+		{
+			if (retBuilder.isEmpty())
+			{
+				retBuilder.append(str);
+			} else
+			{
+				retBuilder.append(str.substring(0, 1).toUpperCase()).append(str.substring(1));
+			}
+		}
+
+		return retBuilder.toString();
 	}
 
-	public static String formatPosition(IBlockAccess world, BlockPos pos)
+	public static String formatPosition(BlockEntity te)
+	{
+		return te != null ? formatPosition(te.getLevel(), te.getBlockPos()) : "(null)";
+	}
+
+	public static String formatPosition(BlockGetter world, BlockPos pos)
 	{
 		return formatPosition(world, pos.getX(), pos.getY(), pos.getZ());
 	}
 
-	public static String formatPosition(IBlockAccess world, int x, int y, int z)
+	public static String formatPosition(BlockGetter world, int x, int y, int z)
 	{
-		int dimId;
-		if (world instanceof World && ((World) world).provider != null)
+		ResourceLocation dimId;
+		if (world instanceof Level)
 		{
-			dimId = ((World) world).provider.getDimension();
+			dimId = getDimId((Level) world);
 		} else
 		{
-			dimId = Integer.MIN_VALUE;
+			dimId = null;
 		}
 
-		return !includeWorldHash ? formatPosition(dimId, x, y, z) : String.format("dim %d (@%x): %d/%d/%d", dimId, System.identityHashCode(world), x, y, z);
+		return !includeWorldHash ? formatPosition(dimId, x, y, z) : String.format("dim %s (@%x): %d/%d/%d", dimId, System.identityHashCode(world), x, y, z);
 	}
 
-	public static String formatPosition(int dimId, int x, int y, int z)
+	public static String formatPosition(ResourceLocation dimId, int x, int y, int z)
 	{
 		return "dim " + dimId + ": " + x + "/" + y + "/" + z;
 	}
@@ -479,306 +624,73 @@ public final class Util
 		}
 	}
 
-	public static Vector3 getEyePosition(Entity entity)
-	{
-		return new Vector3(entity.posX, entity.posY + entity.getEyeHeight(), entity.posZ);
-	}
-
-	public static Vector3 getLook(Entity entity)
-	{
-		return new Vector3(entity.getLookVec());
-	}
-
-	public static Vector3 getLookScaled(Entity entity)
-	{
-		return getLook(entity).scale(getReachDistance(entity));
-	}
-
-	public static double getReachDistance(Entity entity)
-	{
-		return entity instanceof EntityPlayerMP ? ((EntityPlayerMP) entity).interactionManager.getBlockReachDistance() : 5.0;
-	}
-
-	public static RayTraceResult traceBlocks(EntityPlayer player, boolean liquid)
-	{
-		return traceBlocks(player, liquid, !liquid, false);
-	}
-
-	public static RayTraceResult traceBlocks(EntityPlayer player, boolean liquid, boolean ignoreBlockWithoutBoundingBox, boolean returnLastUncollidableBlock)
-	{
-		Vector3 start = getEyePosition(player);
-		Vector3 end = getLookScaled(player).add(start);
-		return player.getEntityWorld().rayTraceBlocks(start.toVec3(), end.toVec3(), liquid, ignoreBlockWithoutBoundingBox, returnLastUncollidableBlock);
-	}
-
-	public static RayTraceResult traceEntities(EntityPlayer player, boolean alwaysCollide)
-	{
-		Vector3 start = getEyePosition(player);
-		return traceEntities(player.getEntityWorld(), start.toVec3(), getLookScaled(player).add(start).toVec3(), player, alwaysCollide);
-	}
-
-	public static RayTraceResult traceEntities(EntityPlayer player, Vec3d end, boolean alwaysCollide)
-	{
-		return traceEntities(player.getEntityWorld(), getEyePosition(player).toVec3(), end, player, alwaysCollide);
-	}
-
-	public static RayTraceResult traceEntities(World world, Vec3d start, Vec3d end, Entity exclude, boolean alwaysCollide)
-	{
-		AxisAlignedBB aabb = new AxisAlignedBB(
-			Math.min(start.x, end.x),
-			Math.min(start.y, end.y),
-			Math.min(start.z, end.z),
-			Math.max(start.x, end.x),
-			Math.max(start.y, end.y),
-			Math.max(start.z, end.z)
-		);
-		List<Entity> entities = world.getEntitiesWithinAABBExcludingEntity(exclude, aabb);
-		RayTraceResult closest = null;
-		double minDist = Double.POSITIVE_INFINITY;
-
-		for (Entity entity : entities)
-		{
-			if (alwaysCollide || entity.canBeCollidedWith())
-			{
-				RayTraceResult pos = entity.getEntityBoundingBox().calculateIntercept(start, end);
-				if (pos != null)
-				{
-					double distance = start.squareDistanceTo(pos.hitVec);
-					if (distance < minDist)
-					{
-						pos.entityHit = entity;
-						pos.typeOfHit = Type.ENTITY;
-						minDist = distance;
-						closest = pos;
-					}
-				}
-			}
-		}
-
-		return closest;
-	}
-
-	public static boolean isFakePlayer(EntityPlayer entity, boolean fuzzy)
+	public static boolean isFakePlayer(Player entity, boolean fuzzy)
 	{
 		if (entity == null)
 		{
 			return false;
-		} else if (!(entity instanceof EntityPlayerMP))
+		} else if (!(entity instanceof ServerPlayer))
 		{
 			return true;
 		} else
 		{
-			return fuzzy ? entity instanceof FakePlayer : entity.getClass() != EntityPlayerMP.class;
+			return fuzzy ? IC2.envProxy.isFakePlayer(entity) : entity.getClass() != ServerPlayer.class;
 		}
 	}
 
-	public static World getWorld(IBlockAccess world)
+	public static boolean isAreaLoaded(LevelReader world, BlockPos center, int dist)
 	{
-		if (world == null)
-		{
-			return null;
-		}
-
-		if (world instanceof World)
-		{
-			return (World) world;
-		}
-
-		Class<? extends IBlockAccess> cls = (Class<? extends IBlockAccess>) world.getClass();
-		Field field;
-		synchronized (worldFieldCache)
-		{
-			field = worldFieldCache.get(cls);
-			if (field == null && !worldFieldCache.containsKey(cls))
-			{
-				field = ReflectionUtil.getFieldRecursive(world.getClass(), World.class, false);
-				worldFieldCache.put(cls, field);
-			}
-		}
-
-		if (field != null)
-		{
-			try
-			{
-				return (World) field.get(world);
-			} catch (Exception e)
-			{
-				throw new RuntimeException(e);
-			}
-		} else
-		{
-			return null;
-		}
+		return world.m_151572_(center.getX() - dist, center.getZ() - dist, center.getX() + dist, center.getZ() + dist);
 	}
 
-	public static Chunk getLoadedChunk(World world, int chunkX, int chunkZ)
+	public static boolean harvestBlock(Level world, BlockPos pos)
 	{
-		Chunk chunk = null;
-		if (world.getChunkProvider() instanceof ChunkProviderServer)
-		{
-			ChunkProviderServer cps = (ChunkProviderServer) world.getChunkProvider();
-
-			try
-			{
-				chunk = (Chunk) cps.id2ChunkMap.get(ChunkPos.asLong(chunkX, chunkZ));
-			} catch (NoSuchFieldError e)
-			{
-				if (cps.chunkExists(chunkX, chunkZ))
-				{
-					chunk = cps.provideChunk(chunkX, chunkZ);
-				}
-			}
-		} else
-		{
-			chunk = world.getChunkFromChunkCoords(chunkX, chunkZ);
-		}
-
-		return chunk instanceof EmptyChunk ? null : chunk;
-	}
-
-	public static boolean checkMcCoordBounds(int x, int y, int z)
-	{
-		return checkMcCoordBounds(x, z) && y >= 0 && y < 256;
-	}
-
-	public static boolean checkMcCoordBounds(int x, int z)
-	{
-		return x >= -30000000 && z >= -30000000 && x < 30000000 && z < 30000000;
-	}
-
-	public static boolean checkInterfaces(Class<?> cls)
-	{
-		Boolean cached = checkedClasses.get(cls);
-		if (cached != null)
-		{
-			return cached;
-		}
-
-		Set<Class<?>> interfaces = Collections.newSetFromMap(new IdentityHashMap<>());
-		Class<?> c = cls;
-
-		do
-		{
-			for (Class<?> i : c.getInterfaces())
-			{
-				interfaces.add(i);
-			}
-
-			c = c.getSuperclass();
-		} while (c != null);
-
-		boolean result = true;
-
-		for (Class<?> iface : interfaces)
-		{
-			for (Method method : iface.getMethods())
-			{
-				boolean found = false;
-				c = cls;
-
-				do
-				{
-					try
-					{
-						Method match = c.getDeclaredMethod(method.getName(), method.getParameterTypes());
-						if (method.getReturnType().isAssignableFrom(match.getReturnType()))
-						{
-							found = true;
-							break;
-						}
-					} catch (NoSuchMethodException var13)
-					{
-					}
-
-					c = c.getSuperclass();
-				} while (c != null);
-
-				if (!found)
-				{
-					IC2.log.info(LogCategory.General, "Can't find method %s.%s in %s.", method.getDeclaringClass().getName(), method.getName(), cls.getName());
-					result = false;
-				}
-			}
-		}
-
-		checkedClasses.put(cls, result);
-		return result;
-	}
-
-	public static IBlockState getBlockState(IBlockAccess world, BlockPos pos)
-	{
-		IBlockState state = world.getBlockState(pos);
-		return state.getActualState(world, pos);
-	}
-
-	public static Block getBlock(String name)
-	{
-		if (name == null)
-		{
-			throw new NullPointerException("null name");
-		} else
-		{
-			return getBlock(new ResourceLocation(name));
-		}
-	}
-
-	public static Block getBlock(ResourceLocation loc)
-	{
-		Block ret = (Block) Block.REGISTRY.getObject(loc);
-		if (ret != Blocks.AIR)
-		{
-			return ret;
-		} else
-		{
-			return loc.getResourceDomain().equals("minecraft") && loc.getResourcePath().equals("air") ? ret : null;
-		}
-	}
-
-	public static ResourceLocation getName(Block block)
-	{
-		return (ResourceLocation) Block.REGISTRY.getNameForObject(block);
-	}
-
-	public static Item getItem(String name)
-	{
-		if (name == null)
-		{
-			throw new NullPointerException("null name");
-		} else
-		{
-			return getItem(new ResourceLocation(name));
-		}
-	}
-
-	public static Item getItem(ResourceLocation loc)
-	{
-		return (Item) Item.REGISTRY.getObject(loc);
-	}
-
-	public static ResourceLocation getName(Item item)
-	{
-		return (ResourceLocation) Item.REGISTRY.getNameForObject(item);
-	}
-
-	public static boolean harvestBlock(World world, BlockPos pos)
-	{
-		if (world.isRemote)
+		if (world.isClientSide)
 		{
 			return false;
 		}
 
-		IBlockState state = world.getBlockState(pos);
+		BlockState state = world.getBlockState(pos);
 		Block block = state.getBlock();
-		TileEntity te = world.getTileEntity(pos);
-		EntityPlayer player = Ic2Player.get(world);
-		boolean canHarvest = block.canHarvestBlock(world, pos, player);
-		block.onBlockHarvested(world, pos, state, player);
-		boolean removed = block.removedByPlayer(state, world, pos, player, canHarvest);
-		if (canHarvest && removed)
+		BlockEntity be = world.getBlockEntity(pos);
+		Player player = Ic2Player.get(world);
+		block.m_5707_(world, pos, state, player);
+		if (!world.removeBlock(pos, false))
 		{
-			block.harvestBlock(world, player, pos, state, te, new ItemStack(Items.DIAMOND_PICKAXE));
+			return false;
 		}
 
-		return removed;
+		block.m_6786_(world, pos, state);
+		block.m_6240_(world, player, pos, state, be, new ItemStack(Items.f_42390_));
+		return true;
+	}
+
+	public static boolean matchesOD(ItemStack stack, Object match)
+	{
+		if (!(match instanceof ItemStack))
+		{
+			if (!(match instanceof TagKey<?> tagKey && tagKey.m_207645_(Registry.f_122827_.m_123023_())))
+			{
+				return stack == match;
+			} else
+			{
+				if (StackUtil.isEmpty(stack))
+				{
+					return false;
+				}
+
+				Optional<TagKey<Item>> itemTagKeyOpt = tagKey.m_207647_(Registry.f_122827_.m_123023_());
+				if (itemTagKeyOpt.isEmpty())
+				{
+					return false;
+				}
+
+				TagKey<Item> itemTagKey = itemTagKeyOpt.get();
+				return stack.m_204117_(itemTagKey);
+			}
+		} else
+		{
+			return !StackUtil.isEmpty(stack) && stack.m_41656_((ItemStack) match);
+		}
 	}
 }

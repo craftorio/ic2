@@ -1,12 +1,6 @@
 package ic2.core.block.wiring;
 
-import ic2.core.block.state.IIdProvider;
-import ic2.core.util.Ic2Color;
-
-import java.util.HashMap;
-import java.util.Map;
-
-public enum CableType implements IIdProvider
+public enum CableType
 {
 	copper(1, 1, 0.25F, 0.2, 128),
 	glass(0, 0, 0.25F, 0.025, 8192),
@@ -16,13 +10,13 @@ public enum CableType implements IIdProvider
 	detector(0, Integer.MAX_VALUE, 0.5F, 0.5, 8192),
 	splitter(0, Integer.MAX_VALUE, 0.5F, 0.5, 8192);
 
+	public static final float insulationThickness = 0.0625F;
 	public final int maxInsulation;
 	public final int minColoredInsulation;
 	public final float thickness;
 	public final double loss;
 	public final int capacity;
 	public static final CableType[] values = values();
-	private static final Map<String, CableType> nameMap = new HashMap<>();
 
 	CableType(int maxInsulation, int minColoredInsulation, float thickness, double loss, int capacity)
 	{
@@ -33,47 +27,8 @@ public enum CableType implements IIdProvider
 		this.capacity = capacity;
 	}
 
-	public String getName(int insulation, Ic2Color color)
+	public float getThickness(int insulation)
 	{
-		StringBuilder ret = new StringBuilder(this.getName());
-		ret.append("_cable");
-		if (this.maxInsulation != 0)
-		{
-			ret.append('_');
-			ret.append(insulation);
-		}
-
-		if (insulation >= this.minColoredInsulation && color != null)
-		{
-			ret.append('_');
-			ret.append(color.name());
-		}
-
-		return ret.toString();
-	}
-
-	@Override
-	public String getName()
-	{
-		return this.name();
-	}
-
-	@Override
-	public int getId()
-	{
-		return this.ordinal();
-	}
-
-	public static CableType get(String name)
-	{
-		return nameMap.get(name);
-	}
-
-	static
-	{
-		for (CableType type : values)
-		{
-			nameMap.put(type.getName(), type);
-		}
+		return 0.125F * insulation + this.thickness;
 	}
 }

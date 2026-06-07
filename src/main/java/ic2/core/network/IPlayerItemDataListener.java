@@ -1,8 +1,8 @@
 package ic2.core.network;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.entity.player.Player;
 
 public interface IPlayerItemDataListener
 {
-	void onPlayerItemNetworkData(EntityPlayer var1, int var2, Object... var3);
+	void onPlayerItemNetworkData(Player var1, int var2, Object... var3);
 }

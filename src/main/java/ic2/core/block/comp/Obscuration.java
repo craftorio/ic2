@@ -1,59 +1,54 @@
 package ic2.core.block.comp;
 
-import ic2.api.event.RetextureEvent;
-import ic2.core.block.TileEntityBlock;
 import ic2.core.block.state.BlockStateUtil;
+import ic2.core.block.tileentity.Ic2TileEntity;
 import ic2.core.item.tool.ItemObscurator;
-import ic2.core.ref.BlockName;
 import ic2.core.util.Util;
 
 import java.util.Arrays;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class Obscuration extends TileEntityComponent
 {
 	private final Runnable changeHandler;
 	private Obscuration.ObscurationData[] dataMap;
 
-	public Obscuration(TileEntityBlock parent, Runnable changeHandler)
+	public Obscuration(Ic2TileEntity parent, Runnable changeHandler)
 	{
 		super(parent);
 		this.changeHandler = changeHandler;
 	}
 
 	@Override
-	public void readFromNbt(NBTTagCompound nbt)
+	public void readFromNbt(CompoundTag nbt)
 	{
-		if (!nbt.hasNoTags())
+		if (!nbt.m_128456_())
 		{
-			for (EnumFacing facing : EnumFacing.VALUES)
+			for (Direction facing : Util.ALL_DIRS)
 			{
-				if (nbt.hasKey(facing.getName(), 10))
+				if (nbt.contains(facing.m_7912_(), 10))
 				{
-					NBTTagCompound cNbt = nbt.getCompoundTag(facing.getName());
-					Block block = Util.getBlock(cNbt.getString("block"));
+					CompoundTag cNbt = nbt.getCompound(facing.m_7912_());
+					Block block = Util.getBlock(cNbt.m_128461_("block"));
 					if (block != null)
 					{
-						String variant = cNbt.getString("variant");
-						IBlockState state = BlockStateUtil.getState(block, variant);
+						String variant = cNbt.m_128461_("variant");
+						BlockState state = BlockStateUtil.getState(block, variant);
 						if (state != null)
 						{
 							int rawSide = cNbt.getByte("side");
-							if (rawSide >= 0 && rawSide < EnumFacing.VALUES.length)
+							if (rawSide >= 0 && rawSide < Util.ALL_DIRS.length)
 							{
-								EnumFacing side = EnumFacing.VALUES[rawSide];
-								int[] colorMultipliers = ItemObscurator.internColorMultipliers(cNbt.getIntArray("colorMuls"));
+								Direction side = Util.ALL_DIRS[rawSide];
+								int[] colorMultipliers = ItemObscurator.internColorMultipliers(cNbt.m_128465_("colorMuls"));
 								Obscuration.ObscurationData data = new Obscuration.ObscurationData(state, variant, side, colorMultipliers);
 								if (this.dataMap == null)
 								{
-									this.dataMap = new Obscuration.ObscurationData[EnumFacing.VALUES.length];
+									this.dataMap = new Obscuration.ObscurationData[Util.ALL_DIRS.length];
 								}
 
 								this.dataMap[facing.ordinal()] = data.intern();
@@ -66,33 +61,33 @@ public class Obscuration extends TileEntityComponent
 	}
 
 	@Override
-	public NBTTagCompound writeToNbt()
+	public CompoundTag writeToNbt()
 	{
 		if (this.dataMap == null)
 		{
 			return null;
 		}
 
-		NBTTagCompound ret = new NBTTagCompound();
+		CompoundTag ret = new CompoundTag();
 
-		for (EnumFacing facing : EnumFacing.VALUES)
+		for (Direction facing : Util.ALL_DIRS)
 		{
 			Obscuration.ObscurationData data = this.dataMap[facing.ordinal()];
 			if (data != null)
 			{
-				NBTTagCompound nbt = new NBTTagCompound();
-				nbt.setString("block", Util.getName(data.state.getBlock()).toString());
-				nbt.setString("variant", data.variant);
-				nbt.setByte("side", (byte) data.side.ordinal());
-				nbt.setIntArray("colorMuls", data.colorMultipliers);
-				ret.setTag(facing.getName(), nbt);
+				CompoundTag nbt = new CompoundTag();
+				nbt.m_128359_("block", Util.getName(data.state.getBlock()).toString());
+				nbt.m_128359_("variant", data.variant);
+				nbt.putByte("side", (byte) data.side.ordinal());
+				nbt.m_128385_("colorMuls", data.colorMultipliers);
+				ret.put(facing.m_7912_(), nbt);
 			}
 		}
 
 		return ret;
 	}
 
-	public boolean applyObscuration(EnumFacing side, Obscuration.ObscurationData data)
+	public boolean applyObscuration(Direction side, Obscuration.ObscurationData data)
 	{
 		if (this.dataMap != null && data.equals(this.dataMap[side.ordinal()]))
 		{
@@ -101,7 +96,7 @@ public class Obscuration extends TileEntityComponent
 
 		if (this.dataMap == null)
 		{
-			this.dataMap = new Obscuration.ObscurationData[EnumFacing.VALUES.length];
+			this.dataMap = new Obscuration.ObscurationData[Util.ALL_DIRS.length];
 		}
 
 		this.dataMap[side.ordinal()] = data.intern();
@@ -125,49 +120,14 @@ public class Obscuration extends TileEntityComponent
 		return this.dataMap == null ? null : Arrays.copyOf(this.dataMap, this.dataMap.length);
 	}
 
-	public static class ObscurationComponentEventHandler
-	{
-		public static void init()
-		{
-			new Obscuration.ObscurationComponentEventHandler();
-		}
-
-		private ObscurationComponentEventHandler()
-		{
-			MinecraftForge.EVENT_BUS.register(this);
-		}
-
-		@SubscribeEvent
-		public void onObscuration(RetextureEvent event)
-		{
-			if (event.state.getBlock() == BlockName.te.getInstance())
-			{
-				TileEntity teRaw = event.getWorld().getTileEntity(event.pos);
-				if (teRaw instanceof TileEntityBlock)
-				{
-					Obscuration obscuration = ((TileEntityBlock) teRaw).getComponent(Obscuration.class);
-					if (obscuration != null)
-					{
-						Obscuration.ObscurationData data = new Obscuration.ObscurationData(event.refState, event.refVariant, event.refSide, event.refColorMultipliers);
-						if (obscuration.applyObscuration(event.side, data))
-						{
-							event.applied = true;
-							event.setCanceled(true);
-						}
-					}
-				}
-			}
-		}
-	}
-
 	public static class ObscurationData
 	{
-		public final IBlockState state;
+		public final BlockState state;
 		public final String variant;
-		public final EnumFacing side;
+		public final Direction side;
 		public final int[] colorMultipliers;
 
-		public ObscurationData(IBlockState state, String variant, EnumFacing side, int[] colorMultipliers)
+		public ObscurationData(BlockState state, String variant, Direction side, int[] colorMultipliers)
 		{
 			this.state = state;
 			this.variant = variant;
@@ -181,15 +141,15 @@ public class Obscuration extends TileEntityComponent
 			if (obj == this)
 			{
 				return true;
-			}
-
-			if (!(obj instanceof Obscuration.ObscurationData))
+			} else
 			{
-				return false;
+				return !(obj instanceof Obscuration.ObscurationData o)
+					? false
+					: o.state.equals(this.state)
+					  && o.variant.equals(this.variant)
+					  && o.side == this.side
+					  && Arrays.equals(o.colorMultipliers, this.colorMultipliers);
 			}
-
-			Obscuration.ObscurationData o = (Obscuration.ObscurationData) obj;
-			return o.state.equals(this.state) && o.variant.equals(this.variant) && o.side == this.side && Arrays.equals(o.colorMultipliers, this.colorMultipliers);
 		}
 
 		@Override

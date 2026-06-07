@@ -4,7 +4,7 @@ import ic2.api.energy.tile.IChargingSlot;
 import ic2.api.item.ElectricItem;
 import ic2.core.block.IInventorySlotHolder;
 import ic2.core.util.StackUtil;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 public class InvSlotCharge extends InvSlot implements IChargingSlot
 {

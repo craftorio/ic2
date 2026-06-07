@@ -1,35 +1,35 @@
 package ic2.api.event;
 
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.fml.common.eventhandler.Cancelable;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.event.level.LevelEvent;
+import net.minecraftforge.eventbus.api.Cancelable;
 
 @Cancelable
-public class RetextureEvent extends WorldEvent
+public class RetextureEvent extends LevelEvent
 {
 	public final BlockPos pos;
-	public final IBlockState state;
-	public final EnumFacing side;
-	public final EntityPlayer player;
-	public final IBlockState refState;
+	public final BlockState state;
+	public final Direction side;
+	public final Player player;
+	public final BlockState refState;
 	public final String refVariant;
-	public final EnumFacing refSide;
+	public final Direction refSide;
 	public final int[] refColorMultipliers;
 	public boolean applied = false;
 
 	public RetextureEvent(
-		World world,
+		Level world,
 		BlockPos pos,
-		IBlockState state,
-		EnumFacing side,
-		EntityPlayer player,
-		IBlockState refState,
+		BlockState state,
+		Direction side,
+		Player player,
+		BlockState refState,
 		String refVariant,
-		EnumFacing refSide,
+		Direction refSide,
 		int[] refColorMultipliers
 	)
 	{
@@ -39,7 +39,7 @@ public class RetextureEvent extends WorldEvent
 			throw new NullPointerException("null world");
 		}
 
-		if (world.isRemote)
+		if (world.isClientSide)
 		{
 			throw new IllegalStateException("remote world");
 		}

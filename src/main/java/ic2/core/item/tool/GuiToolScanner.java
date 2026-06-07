@@ -1,55 +1,51 @@
 package ic2.core.item.tool;
 
-import ic2.core.GuiIC2;
+import com.mojang.blaze3d.vertex.PoseStack;
+import ic2.core.Ic2Gui;
 import ic2.core.init.Localization;
 import ic2.core.util.Tuple;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
 
-@SideOnly(Side.CLIENT)
-public class GuiToolScanner extends GuiIC2<ContainerToolScanner>
+public class GuiToolScanner extends Ic2Gui<ContainerToolScanner>
 {
-	public GuiToolScanner(ContainerToolScanner container)
+	public GuiToolScanner(ContainerToolScanner container, Inventory playerInventory, Component title)
 	{
-		super(container, 230);
+		super(container, playerInventory, title, 230);
 	}
 
 	@Override
-	protected void drawForegroundLayer(int mouseX, int mouseY)
+	protected void drawForegroundLayer(PoseStack matrices, int mouseX, int mouseY)
 	{
-		super.drawForegroundLayer(mouseX, mouseY);
-		this.fontRenderer.drawString(Localization.translate("ic2.itemScanner.found"), 10, 20, 2157374);
-		if (this.container.scanResults != null)
+		super.drawForegroundLayer(matrices, mouseX, mouseY);
+		this.drawString(matrices, 10, 20, Localization.translate("ic2.itemScanner.found"), 2157374);
+		if (((ContainerToolScanner) this.menu).scanResults != null)
 		{
 			int count = 0;
 
-			for (Tuple.T2<ItemStack, Integer> result : this.container.scanResults)
+			for (Tuple.T2<ItemStack, Integer> result : ((ContainerToolScanner) this.menu).scanResults)
 			{
-				String name = result.a.getItem().getItemStackDisplayName(result.a);
-				this.fontRenderer.drawString(result.b + "x " + name, 10, 34 + count * 11, 5752026);
+				String name = result.a.getItem().m_7626_(result.a).getString();
+				this.drawString(matrices, 10, 34 + count * 11, result.b + "x " + name, 5752026);
 				if (++count == 10)
 				{
 					break;
 				}
 			}
-
-			RenderHelper.disableStandardItemLighting();
 		}
 	}
 
 	@Override
-	protected void drawGuiContainerBackgroundLayer(float f, int x, int y)
+	protected void m_7286_(PoseStack matrices, float delta, int mouseX, int mouseY)
 	{
-		super.drawGuiContainerBackgroundLayer(f, x, y);
-		if (this.container.scanResults != null)
+		super.m_7286_(matrices, delta, mouseX, mouseY);
+		if (((ContainerToolScanner) this.menu).scanResults != null)
 		{
 			int count = 0;
-			RenderHelper.enableGUIStandardItemLighting();
 
-			for (Tuple.T2<ItemStack, Integer> result : this.container.scanResults)
+			for (Tuple.T2<ItemStack, Integer> result : ((ContainerToolScanner) this.menu).scanResults)
 			{
 				int xPos = 135 + (count & 1) * 15;
 				this.drawItem(xPos, 11 * count + 28, result.a);
@@ -58,14 +54,12 @@ public class GuiToolScanner extends GuiIC2<ContainerToolScanner>
 					break;
 				}
 			}
-
-			RenderHelper.disableStandardItemLighting();
 		}
 	}
 
 	@Override
 	public ResourceLocation getTexture()
 	{
-		return new ResourceLocation("ic2", "textures/gui/GUIToolScanner.png");
+		return ResourceLocation.fromNamespaceAndPath("ic2", "textures/gui/guitoolscanner.png");
 	}
 }

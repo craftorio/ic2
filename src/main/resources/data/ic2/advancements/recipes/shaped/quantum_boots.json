@@ -1,0 +1,73 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_iridium": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:iridium"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_lapotron_crystal": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:lapotron_crystal"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_nano_boots": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:nano_boots"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_rubber_boots": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:rubber_boots"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "ic2:shaped/quantum_boots"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_nano_boots",
+      "has_iridium",
+      "has_lapotron_crystal",
+      "has_rubber_boots",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "ic2:shaped/quantum_boots"
+    ]
+  }
+}

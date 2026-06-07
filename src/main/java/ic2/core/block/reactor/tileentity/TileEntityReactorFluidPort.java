@@ -6,14 +6,14 @@ import ic2.api.upgrade.IUpgradableBlock;
 import ic2.api.upgrade.UpgradableProperty;
 import ic2.core.ContainerBase;
 import ic2.core.IHasGui;
-import ic2.core.block.TileEntityInventory;
 import ic2.core.block.comp.FluidReactorLookup;
 import ic2.core.block.comp.Fluids;
 import ic2.core.block.invslot.InvSlotUpgrade;
+import ic2.core.block.tileentity.TileEntityInventory;
 import ic2.core.gui.dynamic.DynamicContainer;
-import ic2.core.gui.dynamic.DynamicGui;
-import ic2.core.gui.dynamic.GuiParser;
+import ic2.core.network.GrowingBuffer;
 import ic2.core.profile.NotClassic;
+import ic2.core.ref.Ic2BlockEntities;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -21,10 +21,10 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.state.BlockState;
 
 @NotClassic
 public class TileEntityReactorFluidPort extends TileEntityInventory implements IHasGui, IUpgradableBlock, IReactorChamber
@@ -33,8 +33,9 @@ public class TileEntityReactorFluidPort extends TileEntityInventory implements I
 	private final FluidReactorLookup lookup = this.addComponent(new FluidReactorLookup(this));
 	protected final Fluids fluids = this.addComponent(new Fluids(this));
 
-	public TileEntityReactorFluidPort()
+	public TileEntityReactorFluidPort(BlockPos pos, BlockState state)
 	{
+		super(Ic2BlockEntities.REACTOR_FLUID_PORT, pos, state);
 		this.fluids.addUnmanagedTankHook(new Supplier<Collection<Fluids.InternalFluidTank>>()
 		{
 			public Collection<Fluids.InternalFluidTank> get()
@@ -53,21 +54,15 @@ public class TileEntityReactorFluidPort extends TileEntityInventory implements I
 	}
 
 	@Override
-	public ContainerBase<TileEntityReactorFluidPort> getGuiContainer(EntityPlayer player)
+	public ContainerBase<?> createServerScreenHandler(int syncId, Player player)
 	{
-		return DynamicContainer.create(this, player, GuiParser.parse(this.teBlock));
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
-	{
-		return DynamicGui.<TileEntityReactorFluidPort>create(this, player, GuiParser.parse(this.teBlock));
+		return DynamicContainer.create(syncId, player.getInventory(), this);
 	}
 
 	@Override
-	public void onGuiClosed(EntityPlayer player)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
+		return DynamicContainer.create(syncId, inventory, this);
 	}
 
 	@Override

@@ -7,23 +7,24 @@ import ic2.core.IHasGui;
 import ic2.core.block.invslot.InvSlot;
 import ic2.core.block.invslot.InvSlotUpgrade;
 import ic2.core.block.machine.container.ContainerCropHarvester;
-import ic2.core.block.machine.gui.GuiCropHarvester;
 import ic2.core.crop.TileEntityCrop;
+import ic2.core.network.GrowingBuffer;
 import ic2.core.profile.NotClassic;
+import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.util.StackUtil;
 
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 @NotClassic
 public class TileEntityCropHarvester extends TileEntityElectricMachine implements IHasGui, IUpgradableBlock
@@ -34,9 +35,9 @@ public class TileEntityCropHarvester extends TileEntityElectricMachine implement
 	public int scanY = -1;
 	public int scanZ = -4;
 
-	public TileEntityCropHarvester()
+	public TileEntityCropHarvester(BlockPos pos, BlockState state)
 	{
-		super(10000, 1, false);
+		super(Ic2BlockEntities.CROP_HARVESTER, pos, state, 10000, 1, false);
 		this.contentSlot = new InvSlot(this, "content", InvSlot.Access.IO, 15);
 		this.upgradeSlot = new InvSlotUpgrade(this, "upgrade", 4);
 	}
@@ -46,7 +47,7 @@ public class TileEntityCropHarvester extends TileEntityElectricMachine implement
 	{
 		super.updateEntityServer();
 		this.upgradeSlot.tick();
-		if (this.world.getTotalWorldTime() % 10L == 0L && this.energy.getEnergy() >= 21.0)
+		if (this.level.getGameTime() % 10L == 0L && this.energy.getEnergy() >= 21.0)
 		{
 			this.scan();
 		}
@@ -71,18 +72,18 @@ public class TileEntityCropHarvester extends TileEntityElectricMachine implement
 		}
 
 		this.energy.useEnergy(1.0);
-		World world = this.getWorld();
-		TileEntity tileEntity = world.getTileEntity(this.pos.add(this.scanX, this.scanY, this.scanZ));
+		Level world = this.getLevel();
+		BlockEntity tileEntity = world.getBlockEntity(this.worldPosition.offset(this.scanX, this.scanY, this.scanZ));
 		if (tileEntity instanceof TileEntityCrop && !this.isInvFull())
 		{
 			TileEntityCrop crop = (TileEntityCrop) tileEntity;
 			if (crop.getCrop() != null)
 			{
 				List<ItemStack> drops = null;
-				if (crop.getCurrentSize() == crop.getCrop().getOptimalHarvestSize(crop))
+				if (crop.getCurrentAge() == crop.getCrop().getOptimalHarvestAge(crop))
 				{
 					drops = crop.performHarvest();
-				} else if (crop.getCurrentSize() == crop.getCrop().getMaxSize())
+				} else if (crop.getCurrentAge() == crop.getCrop().getMaxAge())
 				{
 					drops = crop.performHarvest();
 				}
@@ -91,12 +92,12 @@ public class TileEntityCropHarvester extends TileEntityElectricMachine implement
 				{
 					drops.forEach(drop ->
 					{
-						if (StackUtil.putInInventory(this, EnumFacing.WEST, drop, true) == 0)
+						if (StackUtil.putInInventory(this, Direction.WEST, drop, true) == 0)
 						{
-							StackUtil.dropAsEntity(world, this.pos, drop);
+							StackUtil.dropAsEntity(world, this.worldPosition, drop);
 						} else
 						{
-							StackUtil.putInInventory(this, EnumFacing.WEST, drop, false);
+							StackUtil.putInInventory(this, Direction.WEST, drop, false);
 						}
 
 						this.energy.useEnergy(20.0);
@@ -139,20 +140,14 @@ public class TileEntityCropHarvester extends TileEntityElectricMachine implement
 	}
 
 	@Override
-	public ContainerBase<TileEntityCropHarvester> getGuiContainer(EntityPlayer player)
+	public ContainerBase<TileEntityCropHarvester> createServerScreenHandler(int syncId, Player player)
 	{
-		return new ContainerCropHarvester(player, this);
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
-	{
-		return new GuiCropHarvester(new ContainerCropHarvester(player, this));
+		return new ContainerCropHarvester(syncId, player.getInventory(), this);
 	}
 
 	@Override
-	public void onGuiClosed(EntityPlayer player)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
+		return new ContainerCropHarvester(syncId, inventory, this);
 	}
 }

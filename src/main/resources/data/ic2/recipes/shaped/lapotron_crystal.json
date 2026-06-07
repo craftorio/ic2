@@ -1,0 +1,22 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "LCL",
+    "LDL",
+    "LCL"
+  ],
+  "key": {
+    "D": {
+      "item": "ic2:energy_crystal"
+    },
+    "C": {
+      "item": "ic2:advanced_circuit"
+    },
+    "L": {
+      "tag": "forge:dusts/lapis"
+    }
+  },
+  "result": {
+    "item": "ic2:lapotron_crystal"
+  }
+}

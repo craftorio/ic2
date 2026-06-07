@@ -3,7 +3,7 @@ package ic2.api.upgrade;
 import java.util.Collection;
 import java.util.Set;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 public interface IUpgradeItem
 {

@@ -2,17 +2,25 @@ package ic2.core.crop.cropcard;
 
 import ic2.api.crops.CropProperties;
 import ic2.api.crops.ICropTile;
-import ic2.core.crop.IC2CropCard;
-import net.minecraft.entity.Entity;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
+import ic2.api.crops.ICropType;
+import ic2.core.crop.Ic2CropCard;
+import ic2.core.ref.Ic2Blocks;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
 
-public class CropReed extends IC2CropCard
+public class CropReed extends Ic2CropCard
 {
-	@Override
-	public String getId()
+	public CropReed(ICropType cropType)
 	{
-		return "reed";
+		super(cropType);
+	}
+
+	@Override
+	public Block getCropBlock()
+	{
+		return Ic2Blocks.REED_CROP;
 	}
 
 	@Override
@@ -34,12 +42,6 @@ public class CropReed extends IC2CropCard
 	}
 
 	@Override
-	public int getMaxSize()
-	{
-		return 3;
-	}
-
-	@Override
 	public int getWeightInfluences(ICropTile crop, int humidity, int nutrients, int air)
 	{
 		return (int) (humidity * 1.2 + nutrients + air * 0.8);
@@ -48,13 +50,13 @@ public class CropReed extends IC2CropCard
 	@Override
 	public boolean canBeHarvested(ICropTile crop)
 	{
-		return crop.getCurrentSize() > 1;
+		return crop.getCurrentAge() > 0;
 	}
 
 	@Override
 	public ItemStack getGain(ICropTile crop)
 	{
-		return new ItemStack(Items.REEDS, crop.getCurrentSize() - 1);
+		return new ItemStack(Items.f_41909_, crop.getCurrentAge());
 	}
 
 	@Override

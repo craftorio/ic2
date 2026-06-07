@@ -1,18 +1,20 @@
 package ic2.core.gui;
 
-import ic2.core.GuiIC2;
+import com.mojang.blaze3d.vertex.PoseStack;
+import ic2.core.IC2;
+import ic2.core.Ic2Gui;
 
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
 public abstract class Gauge<T extends Gauge<T>> extends GuiElement<T>
 {
 	protected final Gauge.GaugeProperties properties;
 
-	protected Gauge(GuiIC2<?> gui, int x, int y, Gauge.GaugeProperties properties)
+	protected Gauge(Ic2Gui<?> gui, int x, int y, Gauge.GaugeProperties properties)
 	{
 		super(gui, x + properties.hoverXOffset, y + properties.hoverYOffset, properties.hoverWidth, properties.hoverHeight);
 		this.properties = properties;
@@ -26,7 +28,7 @@ public abstract class Gauge<T extends Gauge<T>> extends GuiElement<T>
 	}
 
 	@Override
-	public void drawBackground(int mouseX, int mouseY)
+	public void drawBackground(PoseStack matrices, int mouseX, int mouseY)
 	{
 		double ratio = this.getRatio();
 		if (!(ratio <= 0.0) || this.properties.bgWidth > 0)
@@ -39,6 +41,7 @@ public abstract class Gauge<T extends Gauge<T>> extends GuiElement<T>
 				boolean active = this.isActive(ratio);
 				this.gui
 					.drawTexturedRect(
+						matrices,
 						x + this.properties.bgXOffset,
 						y + this.properties.bgYOffset,
 						this.properties.bgWidth,
@@ -86,7 +89,7 @@ public abstract class Gauge<T extends Gauge<T>> extends GuiElement<T>
 					width = renderSize;
 				}
 
-				this.gui.drawTexturedRect(x, y, width, height, u, v);
+				this.gui.drawTexturedRect(matrices, x, y, width, height, u, v);
 			}
 		}
 	}
@@ -345,54 +348,54 @@ public abstract class Gauge<T extends Gauge<T>> extends GuiElement<T>
 		HeatNuclearReactor(
 			new Gauge.GaugePropertyBuilder(0, 243, 100, 13, Gauge.GaugePropertyBuilder.GaugeOrientation.Right)
 				.withHoverBorder(1)
-				.withTexture(new ResourceLocation("ic2", "textures/gui/GUINuclearReactor.png"))
+				.withTexture(IC2.getIdentifier("textures/gui/guinuclearreactor.png"))
 				.build()
 		),
 		HeatSteamGenerator(
 			new Gauge.GaugePropertyBuilder(177, 1, 7, 76, Gauge.GaugePropertyBuilder.GaugeOrientation.Up)
 				.withHoverBorder(1)
-				.withTexture(new ResourceLocation("ic2", "textures/gui/GUISteamGenerator.png"))
+				.withTexture(IC2.getIdentifier("textures/gui/guisteamgenerator.png"))
 				.build()
 		),
 		CalcificationSteamGenerator(
 			new Gauge.GaugePropertyBuilder(187, 1, 7, 58, Gauge.GaugePropertyBuilder.GaugeOrientation.Up)
 				.withHoverBorder(1)
-				.withTexture(new ResourceLocation("ic2", "textures/gui/GUISteamGenerator.png"))
+				.withTexture(IC2.getIdentifier("textures/gui/guisteamgenerator.png"))
 				.build()
 		),
 		ProgressCondenser(
 			new Gauge.GaugePropertyBuilder(1, 185, 82, 7, Gauge.GaugePropertyBuilder.GaugeOrientation.Right)
 				.withHoverBorder(1)
-				.withTexture(new ResourceLocation("ic2", "textures/gui/GUICondenser.png"))
+				.withTexture(IC2.getIdentifier("textures/gui/guicondenser.png"))
 				.build()
 		),
 		HeatFermenter(
 			new Gauge.GaugePropertyBuilder(177, 10, 40, 3, Gauge.GaugePropertyBuilder.GaugeOrientation.Right)
 				.withHoverBorder(1)
-				.withTexture(new ResourceLocation("ic2", "textures/gui/GUIFermenter.png"))
+				.withTexture(IC2.getIdentifier("textures/gui/guifermenter.png"))
 				.build()
 		),
 		ProgressFermenter(
 			new Gauge.GaugePropertyBuilder(177, 1, 40, 7, Gauge.GaugePropertyBuilder.GaugeOrientation.Right)
 				.withHoverBorder(1)
-				.withTexture(new ResourceLocation("ic2", "textures/gui/GUIFermenter.png"))
+				.withTexture(IC2.getIdentifier("textures/gui/guifermenter.png"))
 				.build()
 		),
 		ProgressOreWasher(
 			new Gauge.GaugePropertyBuilder(177, 118, 18, 18, Gauge.GaugePropertyBuilder.GaugeOrientation.Right)
-				.withTexture(new ResourceLocation("ic2", "textures/gui/GUIOreWashingPlant.png"))
+				.withTexture(IC2.getIdentifier("textures/gui/guiorewashingplant.png"))
 				.withBackground(-1, -1, 20, 19, 102, 38)
 				.build()
 		),
 		ProgressBlockCutter(
 			new Gauge.GaugePropertyBuilder(176, 15, 46, 17, Gauge.GaugePropertyBuilder.GaugeOrientation.Right)
-				.withTexture(new ResourceLocation("ic2", "textures/gui/GUIBlockCutter.png"))
+				.withTexture(IC2.getIdentifier("textures/gui/guiblockcutter.png"))
 				.withBackground(55, 33)
 				.build()
 		),
 		ProgressLongArrow(
 			new Gauge.GaugePropertyBuilder(176, 15, 34, 13, Gauge.GaugePropertyBuilder.GaugeOrientation.Right)
-				.withTexture(new ResourceLocation("ic2", "textures/gui/GUI_Canner_Classic.png"))
+				.withTexture(IC2.getIdentifier("textures/gui/gui_canner_classic.png"))
 				.withBackground(74, 36)
 				.build()
 		);
@@ -418,7 +421,7 @@ public abstract class Gauge<T extends Gauge<T>> extends GuiElement<T>
 			assert style != null : "Cannot add null style";
 			if (map.containsKey(name))
 			{
-				throw new RuntimeException("Duplicate style name for " + name + '!');
+				throw new RuntimeException("Duplicate style name for " + name + "!");
 			}
 
 			map.put(name, style);

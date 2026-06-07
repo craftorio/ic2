@@ -1,0 +1,19 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    " S ",
+    "S#S",
+    " S "
+  ],
+  "key": {
+    "#": {
+      "item": "ic2:blank_tfbp"
+    },
+    "S": {
+      "item": "minecraft:snowball"
+    }
+  },
+  "result": {
+    "item": "ic2:chilling_tfbp"
+  }
+}

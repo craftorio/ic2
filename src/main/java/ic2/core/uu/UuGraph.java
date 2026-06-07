@@ -18,8 +18,8 @@ import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Map.Entry;
 import java.util.concurrent.Future;
 
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 public class UuGraph
 {
@@ -55,7 +55,6 @@ public class UuGraph
 		{
 			for (LeanItemStack output : transform.outputs)
 			{
-				assert output.getMeta() != 32767 : output;
 				getInternal(output);
 			}
 		}
@@ -71,7 +70,7 @@ public class UuGraph
 		}
 
 		IC2.log.debug(LogCategory.Uu, "%d UU recipe transformations fetched after %d ms.", transformations.size(), (System.nanoTime() - startTime) / 1000000L);
-		calculation = IC2.getInstance().threadPool.submit(new Runnable()
+		calculation = IC2.threadPool.submit(new Runnable()
 		{
 			@Override
 			public void run()
@@ -83,11 +82,6 @@ public class UuGraph
 
 	public static void set(ItemStack stack, double value)
 	{
-		if (stack.getItemDamage() == 32767)
-		{
-			throw new IllegalArgumentException("setting values for wilcard meta stacks isn't supported.");
-		}
-
 		if (calculation != null)
 		{
 			throw new IllegalStateException("setting values isn't allowed while the calculation is running, set them earlier.");
@@ -112,34 +106,18 @@ public class UuGraph
 		if (exactNode != null)
 		{
 			return exactNode.stack.toMcStack();
-		}
-
-		LeanItemStack search = new LeanItemStack(stack.getItem(), 32767, stack.getTagCompound(), StackUtil.getSize(stack));
-		Collection<UuGraph.Node> nodes = getAll(search);
-		if (nodes.isEmpty())
+		} else
 		{
-			return StackUtil.emptyStack;
-		}
-
-		if (nodes.size() == 1)
-		{
-			return nodes.iterator().next().stack.toMcStack();
-		}
-
-		LeanItemStack ret = null;
-		int minDmgDiff = Integer.MAX_VALUE;
-
-		for (UuGraph.Node node : nodes)
-		{
-			int dmgDiff = Math.abs(StackUtil.getRawMeta(stack) - node.stack.getMeta());
-			if (dmgDiff < minDmgDiff)
+			LeanItemStack search = new LeanItemStack(stack.getItem(), stack.getTag(), StackUtil.getSize(stack));
+			Collection<UuGraph.Node> nodes = getAll(search);
+			if (nodes.isEmpty())
 			{
-				ret = node.stack;
-				minDmgDiff = dmgDiff;
+				return StackUtil.emptyStack;
+			} else
+			{
+				return nodes.size() == 1 ? nodes.iterator().next().stack.toMcStack() : nodes.iterator().next().stack.toMcStack();
 			}
 		}
-
-		return ret.toMcStack();
 	}
 
 	public static Iterator<Entry<ItemStack, Double>> iterator()
@@ -175,7 +153,6 @@ public class UuGraph
 
 	private static UuGraph.Node getInternal(LeanItemStack stack)
 	{
-		assert stack.getMeta() != 32767;
 		stack = stack.copyWithSize(1);
 		UuGraph.Node ret = nodes.get(stack);
 		if (ret == null)
@@ -198,13 +175,7 @@ public class UuGraph
 
 	private static Collection<UuGraph.Node> getAll(LeanItemStack stack)
 	{
-		if (stack.getMeta() != 32767)
-		{
-			return new ArrayList<>(Arrays.asList(getInternal(stack)));
-		}
-
-		Collection<UuGraph.Node> ret = itemNodes.get(stack.getItem());
-		return ret != null ? ret : emptyList;
+		return new ArrayList<>(Arrays.asList(getInternal(stack)));
 	}
 
 	private static void registerTransform(RecipeTransformation transform)
@@ -249,8 +220,8 @@ public class UuGraph
 
 	private static class InitialValue
 	{
-		final LeanItemStack stack;
-		final double value;
+		LeanItemStack stack;
+		double value;
 
 		InitialValue(LeanItemStack stack, double value)
 		{
@@ -267,7 +238,6 @@ public class UuGraph
 
 		Node(LeanItemStack stack)
 		{
-			assert stack.getMeta() != 32767;
 			this.stack = stack;
 		}
 
@@ -332,8 +302,8 @@ public class UuGraph
 
 	private static class NodeTransform
 	{
-		final RecipeTransformation transform;
-		final Set<UuGraph.Node> out = new HashSet<>();
+		RecipeTransformation transform;
+		Set<UuGraph.Node> out = new HashSet<>();
 
 		NodeTransform(RecipeTransformation transform)
 		{
@@ -357,10 +327,6 @@ public class UuGraph
 	private static class ValueIterator implements Iterator<Entry<ItemStack, Double>>
 	{
 		private final Iterator<UuGraph.Node> parentIterator = UuGraph.nodes.values().iterator();
-
-		private ValueIterator()
-		{
-		}
 
 		@Override
 		public boolean hasNext()

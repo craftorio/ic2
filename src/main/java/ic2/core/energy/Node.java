@@ -26,7 +26,7 @@ class Node
 	private double currentIn;
 	private double currentOut;
 	private Grid grid;
-	final List<NodeLink> links = new ArrayList<>();
+	List<NodeLink> links = new ArrayList<>();
 	private final MutableNodeStats lastNodeStats = new MutableNodeStats();
 
 	Node(EnergyNetLocal energyNet, Tile tile1, NodeType nodeType1)

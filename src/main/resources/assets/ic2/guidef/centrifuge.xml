@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gui width="176" height="166">
     <image x="40" y="18" width="80" height="60" basesize="256" u="40" v="18"
-           src="ic2:textures/gui/GUITermalCentrifuge.png"/>
+           src="ic2:textures/gui/guithermalcentrifuge.png"/>
     <text y="6" align="center">%name%</text>
     <slot name="input" x="10" y="17"/>
     <slot name="discharge" x="10" y="53"/>

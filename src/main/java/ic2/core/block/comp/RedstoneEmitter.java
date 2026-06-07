@@ -1,10 +1,10 @@
 package ic2.core.block.comp;
 
-import ic2.core.block.TileEntityBlock;
+import ic2.core.block.tileentity.Ic2TileEntity;
 
 public class RedstoneEmitter extends BasicRedstoneComponent
 {
-	public RedstoneEmitter(TileEntityBlock parent)
+	public RedstoneEmitter(Ic2TileEntity parent)
 	{
 		super(parent);
 	}
@@ -12,6 +12,6 @@ public class RedstoneEmitter extends BasicRedstoneComponent
 	@Override
 	public void onChange()
 	{
-		this.parent.getWorld().notifyNeighborsOfStateChange(this.parent.getPos(), this.parent.getBlockType(), false);
+		this.parent.getLevel().m_46672_(this.parent.getBlockPos(), this.parent.getBlockState().getBlock());
 	}
 }

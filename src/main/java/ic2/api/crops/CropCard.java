@@ -2,20 +2,36 @@ package ic2.api.crops;
 
 import java.util.List;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public abstract class CropCard
 {
-	public abstract String getId();
+	protected final ICropType cropType;
 
-	public abstract String getOwner();
+	public CropCard(ICropType cropType)
+	{
+		this.cropType = cropType;
+	}
+
+	public String getId()
+	{
+		return this.cropType.getName();
+	}
+
+	public String getOwner()
+	{
+		return this.cropType.getOwner();
+	}
+
+	public abstract Block getCropBlock();
 
 	public String getUnlocalizedName()
 	{
@@ -82,7 +98,10 @@ public abstract class CropCard
 		return "ic2.crop.seeds";
 	}
 
-	public abstract int getMaxSize();
+	public int getMaxAge()
+	{
+		return this.cropType.getMaxAge();
+	}
 
 	public int getGrowthDuration(ICropTile cropTile)
 	{
@@ -91,7 +110,7 @@ public abstract class CropCard
 
 	public boolean canGrow(ICropTile cropTile)
 	{
-		return cropTile.getCurrentSize() < this.getMaxSize();
+		return cropTile.getCurrentAge() < this.getMaxAge();
 	}
 
 	public int getWeightInfluences(ICropTile crop, int humidity, int nutrients, int air)
@@ -101,22 +120,22 @@ public abstract class CropCard
 
 	public boolean canCross(ICropTile crop)
 	{
-		return crop.getCurrentSize() >= 3;
+		return crop.getCurrentAge() >= 2;
 	}
 
-	public boolean onRightClick(ICropTile cropTile, EntityPlayer player)
+	public boolean onRightClick(ICropTile cropTile, Player player)
 	{
 		return cropTile.performManualHarvest();
 	}
 
-	public int getOptimalHarvestSize(ICropTile cropTile)
+	public int getOptimalHarvestAge(ICropTile cropTile)
 	{
-		return this.getMaxSize();
+		return this.getMaxAge();
 	}
 
 	public boolean canBeHarvested(ICropTile cropTile)
 	{
-		return cropTile.getCurrentSize() == this.getMaxSize();
+		return cropTile.getCurrentAge() == this.getMaxAge();
 	}
 
 	public double dropGainChance()
@@ -135,25 +154,25 @@ public abstract class CropCard
 		return new ItemStack[] { this.getGain(crop) };
 	}
 
-	public int getSizeAfterHarvest(ICropTile cropTile)
+	public int getAgeAfterHarvest(ICropTile cropTile)
 	{
-		return 1;
+		return 0;
 	}
 
-	public void onLeftClick(ICropTile cropTile, EntityPlayer player)
+	public boolean onLeftClick(ICropTile cropTile, Player player)
 	{
-		cropTile.pick();
+		return cropTile.pick();
 	}
 
 	public float dropSeedChance(ICropTile crop)
 	{
-		if (crop.getCurrentSize() == 1)
+		if (crop.getCurrentAge() == 0)
 		{
 			return 0.0F;
 		}
 
 		float base = 0.5F;
-		if (crop.getCurrentSize() == 2)
+		if (crop.getCurrentAge() == 1)
 		{
 			base /= 2.0F;
 		}
@@ -171,6 +190,24 @@ public abstract class CropCard
 		return crop.generateSeeds(crop.getCrop(), crop.getStatGrowth(), crop.getStatGain(), crop.getStatResistance(), crop.getScanLevel());
 	}
 
+	public void onNeighbourChange(ICropTile crop)
+	{
+	}
+
+	public boolean isRedstoneSignalEmitter(ICropTile cropTile)
+	{
+		return false;
+	}
+
+	public int getEmittedRedstoneSignal(ICropTile cropTile)
+	{
+		return 0;
+	}
+
+	public void onBlockDestroyed(ICropTile crop)
+	{
+	}
+
 	public int getEmittedLight(ICropTile crop)
 	{
 		return 0;
@@ -178,7 +215,7 @@ public abstract class CropCard
 
 	public boolean onEntityCollision(ICropTile crop, Entity entity)
 	{
-		return entity instanceof EntityLivingBase && entity.isSprinting();
+		return entity instanceof LivingEntity && entity.isSprinting();
 	}
 
 	public void tick(ICropTile cropTile)
@@ -187,14 +224,14 @@ public abstract class CropCard
 
 	public boolean isWeed(ICropTile cropTile)
 	{
-		return cropTile.getCurrentSize() >= 2 && (cropTile.getCrop() == Crops.weed || cropTile.getStatGrowth() >= 24);
+		return cropTile.getCurrentAge() >= 1 && (cropTile.getCrop() == Crops.weed || cropTile.getStatGrowth() >= 24);
 	}
 
-	public World getWorld(ICropTile cropTile)
+	public Level getWorld(ICropTile cropTile)
 	{
 		return cropTile.getWorldObj();
 	}
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public abstract List<ResourceLocation> getTexturesLocation();
 }

@@ -9,6 +9,9 @@ import ic2.api.recipe.IElectrolyzerRecipeManager;
 import ic2.core.IC2;
 import ic2.core.block.comp.TileEntityComponent;
 import ic2.core.block.invslot.InvSlot;
+import ic2.core.fluid.FluidHandler;
+import ic2.core.fluid.Ic2FluidStack;
+import ic2.core.fluid.Ic2FluidTank;
 import ic2.core.util.StackUtil;
 import ic2.core.util.Tuple;
 import ic2.core.util.Util;
@@ -23,25 +26,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import net.minecraft.block.Block;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.NBTSizeTracker;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.potion.Potion;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidRegistry;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidTank;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Registry;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtAccounter;
+import net.minecraft.nbt.NbtIo;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ColumnPos;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.phys.Vec3;
 
 public final class DataEncoder
 {
@@ -55,7 +57,7 @@ public final class DataEncoder
 			encode(os, o, true);
 		} catch (IllegalArgumentException e)
 		{
-			IC2.platform.displayError(e, "An unknown data type was attempted to be encoded for sending through\nmultiplayer.\nThis could happen due to a bug.");
+			IC2.sideProxy.displayError(e, "An unknown data type was attempted to be encoded for sending through\nmultiplayer.\nThis could happen due to a bug.");
 		}
 	}
 
@@ -201,17 +203,17 @@ public final class DataEncoder
 				break;
 			case ChunkPos:
 			{
-				ChunkPos pos = (ChunkPos) o;
-				os.writeInt(pos.x);
-				os.writeInt(pos.z);
+				ColumnPos pos = (ColumnPos) o;
+				os.writeInt(pos.f_140723_());
+				os.writeInt(pos.f_140724_());
 				break;
 			}
 			case Collection:
 				encode(os, ((Collection) o).toArray(), false);
 				break;
 			case Component:
-				NBTTagCompound nbt = ((TileEntityComponent) o).writeToNbt();
-				encode(os, nbt == null ? new NBTTagCompound() : nbt, false);
+				CompoundTag nbt = ((TileEntityComponent) o).writeToNbt();
+				encode(os, nbt == null ? new CompoundTag() : nbt, false);
 				break;
 			case CropCard:
 				CropCard cropCard = (CropCard) o;
@@ -231,13 +233,13 @@ public final class DataEncoder
 
 				for (IElectrolyzerRecipeManager.ElectrolyzerOutput output : outputs)
 				{
-					os.writeString(output.fluidName);
+					encode(os, output.fluid, false);
 					os.writeInt(output.fluidAmount);
-					os.writeByte(output.tankDirection.getIndex());
+					os.writeByte(output.tankDirection.m_122411_());
 				}
 				break;
 			case Enchantment:
-				encode(os, Enchantment.REGISTRY.getNameForObject((Enchantment) o), false);
+				encode(os, Registry.f_122825_.getKey((Enchantment) o), false);
 				break;
 			case Enum:
 				os.writeVarInt(((Enum) o).ordinal());
@@ -246,17 +248,17 @@ public final class DataEncoder
 				os.writeFloat((Float) o);
 				break;
 			case Fluid:
-				os.writeString(((Fluid) o).getName());
+				encode(os, Registry.f_122822_.getKey((Fluid) o), false);
 				break;
 			case FluidStack:
-				FluidStack fs = (FluidStack) o;
+				Ic2FluidStack fs = (Ic2FluidStack) o;
 				encode(os, fs.getFluid(), false);
-				os.writeInt(fs.amount);
-				encode(os, fs.tag, true);
+				os.writeInt(fs.getAmountMb());
+				encode(os, FluidHandler.getFluidStackNbt(fs), true);
 				break;
 			case FluidTank:
-				FluidTank tank = (FluidTank) o;
-				encode(os, tank.getFluid(), true);
+				Ic2FluidTank tank = (Ic2FluidTank) o;
+				encode(os, tank.getFluidStack(), true);
 				os.writeInt(tank.getCapacity());
 				break;
 			case GameProfile:
@@ -290,15 +292,14 @@ public final class DataEncoder
 				{
 					os.writeByte(StackUtil.getSize(stack));
 					encode(os, stack.getItem(), false);
-					os.writeShort(stack.getItemDamage());
-					encode(os, stack.getTagCompound(), true);
+					encode(os, stack.getTag(), true);
 				}
 				break;
 			case Long:
 				os.writeLong((Long) o);
 				break;
 			case NBTTagCompound:
-				CompressedStreamTools.write((NBTTagCompound) o, os);
+				NbtIo.m_128941_((CompoundTag) o, os);
 				break;
 			case Null:
 				if (!withType)
@@ -309,12 +310,12 @@ public final class DataEncoder
 			case Object:
 				throw new IllegalArgumentException("unhandled class: " + o.getClass());
 			case Potion:
-				encode(os, Potion.REGISTRY.getNameForObject((Potion) o), false);
+				encode(os, Registry.f_122823_.getKey((MobEffect) o), false);
 				break;
 			case ResourceLocation:
 				ResourceLocation loc = (ResourceLocation) o;
-				os.writeString(loc.getResourceDomain());
-				os.writeString(loc.getResourcePath());
+				os.writeString(loc.m_135827_());
+				os.writeString(loc.m_135815_());
 				break;
 			case Short:
 				os.writeShort((Short) o);
@@ -323,9 +324,9 @@ public final class DataEncoder
 				os.writeString((String) o);
 				break;
 			case TileEntity:
-				TileEntity te = (TileEntity) o;
-				encode(os, te.getWorld(), false);
-				encode(os, te.getPos(), false);
+				BlockEntity te = (BlockEntity) o;
+				encode(os, te.getLevel(), false);
+				encode(os, te.getBlockPos(), false);
 				break;
 			case TupleT2:
 			{
@@ -348,13 +349,13 @@ public final class DataEncoder
 				os.writeLong(uuid.getLeastSignificantBits());
 				break;
 			case Vec3:
-				Vec3d v = (Vec3d) o;
-				os.writeDouble(v.x);
-				os.writeDouble(v.y);
-				os.writeDouble(v.z);
+				Vec3 v = (Vec3) o;
+				os.writeDouble(v.f_82479_);
+				os.writeDouble(v.f_82480_);
+				os.writeDouble(v.f_82481_);
 				break;
 			case World:
-				os.writeInt(((World) o).provider.getDimension());
+				encode(os, Util.getDimId((Level) o), false);
 				break;
 			default:
 				throw new IllegalArgumentException("unhandled type: " + type);
@@ -369,7 +370,7 @@ public final class DataEncoder
 		} catch (IllegalArgumentException e)
 		{
 			String msg = "An unknown data type was received over multiplayer to be decoded.\nThis could happen due to corrupted data or a bug.";
-			IC2.platform.displayError(e, msg);
+			IC2.sideProxy.displayError(e, msg);
 			return null;
 		}
 	}
@@ -399,7 +400,7 @@ public final class DataEncoder
 		return decode(is, type);
 	}
 
-	public static Object decode(final IGrowingBuffer is, DataEncoder.EncodedType type) throws IOException
+	public static Object decode(IGrowingBuffer is, DataEncoder.EncodedType type) throws IOException
 	{
 		switch (type)
 		{
@@ -420,7 +421,7 @@ public final class DataEncoder
 					return new DataEncoder.IResolvableValue<Object>()
 					{
 						@Override
-						public Object get()
+						public Object get(MinecraftServer server)
 						{
 							try
 							{
@@ -465,7 +466,7 @@ public final class DataEncoder
 
 						for (int i = 0; i < len; i++)
 						{
-							Array.set(array, i, constants[(Integer) decode(is, componentType)]);
+							Array.set(array, i, constants[decode(is, componentType)]);
 						}
 					} else
 					{
@@ -503,13 +504,13 @@ public final class DataEncoder
 				return new DataEncoder.IResolvableValue<Object>()
 				{
 					@Override
-					public Object get()
+					public Object get(MinecraftServer server)
 					{
 						Object ret = Array.newInstance(componentClass, len);
 
 						for (int i = 0; i < len; i++)
 						{
-							Array.set(ret, i, DataEncoder.getValue(Array.get(tmpArray, i)));
+							Array.set(ret, i, DataEncoder.getValue(Array.get(tmpArray, i), server));
 						}
 
 						return ret;
@@ -526,7 +527,7 @@ public final class DataEncoder
 			case Character:
 				return is.readChar();
 			case ChunkPos:
-				return new ChunkPos(is.readInt(), is.readInt());
+				return new ColumnPos(is.readInt(), is.readInt());
 			case Collection:
 			{
 				final Object ret = decode(is, DataEncoder.EncodedType.Array);
@@ -534,9 +535,9 @@ public final class DataEncoder
 				{
 					return new DataEncoder.IResolvableValue<List<Object>>()
 					{
-						public List<Object> get()
+						public List<Object> get(MinecraftServer server)
 						{
-							return Arrays.asList((Object[]) ((DataEncoder.IResolvableValue) ret).get());
+							return Arrays.asList((Object[]) ((DataEncoder.IResolvableValue) ret).get(server));
 						}
 					};
 				}
@@ -558,26 +559,34 @@ public final class DataEncoder
 
 				for (byte i = 0; i < max; i++)
 				{
-					outputs[i] = new IElectrolyzerRecipeManager.ElectrolyzerOutput(is.readString(), is.readInt(), EnumFacing.getFront(is.readByte()));
+					outputs[i] = new IElectrolyzerRecipeManager.ElectrolyzerOutput(
+						(Fluid) decode(is, DataEncoder.EncodedType.Fluid), is.readInt(), Direction.m_122376_(is.readByte())
+					);
 				}
 
 				return new IElectrolyzerRecipeManager.ElectrolyzerRecipe(inputAmount, EUaTick, ticksNeeded, outputs);
 			case Enchantment:
-				return Enchantment.REGISTRY.getObject((ResourceLocation) decode(is, DataEncoder.EncodedType.ResourceLocation));
+				return Registry.f_122825_.m_7745_((ResourceLocation) decode(is, DataEncoder.EncodedType.ResourceLocation));
 			case Enum:
 				return is.readVarInt();
 			case Float:
 				return is.readFloat();
 			case Fluid:
-				return FluidRegistry.getFluid(is.readString());
+				return Registry.f_122822_.m_7745_((ResourceLocation) decode(is, DataEncoder.EncodedType.ResourceLocation));
 			case FluidStack:
 			{
-				FluidStack ret = new FluidStack((Fluid) decode(is, DataEncoder.EncodedType.Fluid), is.readInt());
-				ret.tag = (NBTTagCompound) decode(is);
-				return ret;
+				Fluid fluid = (Fluid) decode(is, DataEncoder.EncodedType.Fluid);
+				int amount = is.readInt();
+				CompoundTag nbt = (CompoundTag) decode(is);
+				return FluidHandler.createFluidStackMb(fluid, amount, nbt);
 			}
 			case FluidTank:
-				return new FluidTank((FluidStack) decode(is), is.readInt());
+			{
+				Ic2FluidStack fs = (Ic2FluidStack) decode(is);
+				Ic2FluidTank ret = new Ic2FluidTank(is.readInt());
+				ret.setFluidStack(fs);
+				return ret;
+			}
 			case GameProfile:
 				return new GameProfile((UUID) decode(is), is.readString());
 			case Integer:
@@ -605,37 +614,36 @@ public final class DataEncoder
 				}
 
 				Item item = decode(is, Item.class);
-				int meta = is.readShort();
-				NBTTagCompound nbt = (NBTTagCompound) decode(is);
-				ItemStack ret = new ItemStack(item, size, meta);
-				ret.setTagCompound(nbt);
+				CompoundTag nbt = (CompoundTag) decode(is);
+				ItemStack ret = new ItemStack(item, size);
+				ret.m_41751_(nbt);
 				return ret;
 			}
 			case Long:
 				return is.readLong();
 			case NBTTagCompound:
-				return CompressedStreamTools.read(is, NBTSizeTracker.INFINITE);
+				return NbtIo.m_128934_(is, NbtAccounter.f_128917_);
 			case Null:
 				return null;
 			case Object:
 				return new Object();
 			case Potion:
-				return Potion.REGISTRY.getObject((ResourceLocation) decode(is, DataEncoder.EncodedType.ResourceLocation));
+				return Registry.f_122823_.m_7745_((ResourceLocation) decode(is, DataEncoder.EncodedType.ResourceLocation));
 			case ResourceLocation:
-				return new ResourceLocation(is.readString(), is.readString());
+				return ResourceLocation.fromNamespaceAndPath(is.readString(), is.readString());
 			case Short:
 				return is.readShort();
 			case String:
 				return is.readString();
 			case TileEntity:
-				final DataEncoder.IResolvableValue<World> deferredWorld = (DataEncoder.IResolvableValue<World>) decode(is, DataEncoder.EncodedType.World);
+				final DataEncoder.IResolvableValue<Level> deferredWorld = (DataEncoder.IResolvableValue<Level>) decode(is, DataEncoder.EncodedType.World);
 				final BlockPos pos = (BlockPos) decode(is, DataEncoder.EncodedType.BlockPos);
-				return new DataEncoder.IResolvableValue<TileEntity>()
+				return new DataEncoder.IResolvableValue<BlockEntity>()
 				{
-					public TileEntity get()
+					public BlockEntity get(MinecraftServer server)
 					{
-						World world = deferredWorld.get();
-						return world == null ? null : world.getTileEntity(pos);
+						Level world = deferredWorld.get(server);
+						return world == null ? null : world.getBlockEntity(pos);
 					}
 				};
 			case TupleT2:
@@ -645,14 +653,14 @@ public final class DataEncoder
 			case UUID:
 				return new UUID(is.readLong(), is.readLong());
 			case Vec3:
-				return new Vec3d(is.readDouble(), is.readDouble(), is.readDouble());
+				return new Vec3(is.readDouble(), is.readDouble(), is.readDouble());
 			case World:
-				final int dimensionId = is.readInt();
-				return new DataEncoder.IResolvableValue<World>()
+				final ResourceLocation dimensionId = (ResourceLocation) decode(is, DataEncoder.EncodedType.ResourceLocation);
+				return new DataEncoder.IResolvableValue<Level>()
 				{
-					public World get()
+					public Level get(MinecraftServer server)
 					{
-						return IC2.platform.getWorld(dimensionId);
+						return IC2.sideProxy.getWorld(server, dimensionId);
 					}
 				};
 			default:
@@ -660,9 +668,9 @@ public final class DataEncoder
 		}
 	}
 
-	public static <T> T getValue(Object decoded)
+	public static <T> T getValue(Object decoded, MinecraftServer server)
 	{
-		return (T) (decoded instanceof DataEncoder.IResolvableValue ? ((DataEncoder.IResolvableValue) decoded).get() : decoded);
+		return (T) (decoded instanceof DataEncoder.IResolvableValue ? ((DataEncoder.IResolvableValue) decoded).get(server) : decoded);
 	}
 
 	public static <T> boolean copyValue(T src, T dst)
@@ -678,9 +686,8 @@ public final class DataEncoder
 			ItemStack dstT = (ItemStack) dst;
 			if (srcT.getItem() == dstT.getItem())
 			{
-				dstT.setCount(srcT.getCount());
-				StackUtil.setRawMeta(dstT, StackUtil.getRawMeta(srcT));
-				dstT.setTagCompound(srcT.getTagCompound());
+				dstT.m_41764_(srcT.m_41613_());
+				dstT.m_41751_(srcT.getTag());
 				return true;
 			} else
 			{
@@ -688,11 +695,11 @@ public final class DataEncoder
 			}
 		} else
 		{
-			if (dst instanceof FluidTank)
+			if (dst instanceof Ic2FluidTank)
 			{
-				FluidTank srcT = (FluidTank) src;
-				FluidTank dstT = (FluidTank) dst;
-				dstT.setFluid(srcT.getFluid());
+				Ic2FluidTank srcT = (Ic2FluidTank) src;
+				Ic2FluidTank dstT = (Ic2FluidTank) dst;
+				dstT.setFluidStack(srcT.getFluidStack());
 				dstT.setCapacity(srcT.getCapacity());
 			} else if (dst instanceof InvSlot)
 			{
@@ -712,7 +719,7 @@ public final class DataEncoder
 				}
 			} else if (dst instanceof TileEntityComponent)
 			{
-				NBTTagCompound nbt = (NBTTagCompound) src;
+				CompoundTag nbt = (CompoundTag) src;
 				((TileEntityComponent) dst).readFromNbt(nbt);
 			} else
 			{
@@ -883,7 +890,7 @@ public final class DataEncoder
 					+ customEncoder.getClass().getName()
 					+ " both map for "
 					+ typeBeingEncoded.getName()
-					+ '.'
+					+ "."
 			);
 		}
 	}
@@ -905,20 +912,20 @@ public final class DataEncoder
 		UUID(UUID.class),
 		Block(Block.class),
 		Item(Item.class),
-		TileEntity(TileEntity.class, false),
+		TileEntity(BlockEntity.class, false),
 		ItemStack(ItemStack.class),
-		World(World.class, false),
-		NBTTagCompound(NBTTagCompound.class),
+		World(Level.class, false),
+		NBTTagCompound(CompoundTag.class),
 		ResourceLocation(ResourceLocation.class),
 		GameProfile(GameProfile.class),
-		Potion(Potion.class),
+		Potion(MobEffect.class),
 		Enchantment(Enchantment.class),
 		BlockPos(BlockPos.class),
-		ChunkPos(ChunkPos.class),
-		Vec3(Vec3d.class),
+		ChunkPos(ColumnPos.class),
+		Vec3(Vec3.class),
 		Fluid(Fluid.class),
-		FluidStack(FluidStack.class),
-		FluidTank(FluidTank.class),
+		FluidStack(Ic2FluidStack.class),
+		FluidTank(Ic2FluidTank.class),
 		InvSlot(InvSlot.class),
 		Component(TileEntityComponent.class, false),
 		CropCard(CropCard.class),
@@ -965,6 +972,6 @@ public final class DataEncoder
 
 	private interface IResolvableValue<T>
 	{
-		T get();
+		T get(MinecraftServer var1);
 	}
 }

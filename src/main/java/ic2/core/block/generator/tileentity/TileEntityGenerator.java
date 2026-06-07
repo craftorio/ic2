@@ -1,14 +1,21 @@
 package ic2.core.block.generator.tileentity;
 
 import ic2.core.block.invslot.InvSlotConsumableFuel;
-import ic2.core.block.machine.tileentity.TileEntityIronFurnace;
 import ic2.core.gui.dynamic.IGuiValueProvider;
 import ic2.core.init.MainConfig;
 import ic2.core.network.GuiSynced;
+import ic2.core.ref.Ic2BlockEntities;
+import ic2.core.ref.Ic2SoundEvents;
 import ic2.core.util.ConfigUtil;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import ic2.core.util.ParticleUtil;
+
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class TileEntityGenerator extends TileEntityBaseGenerator implements IGuiValueProvider
 {
@@ -16,20 +23,20 @@ public class TileEntityGenerator extends TileEntityBaseGenerator implements IGui
 	@GuiSynced
 	public int totalFuel = 0;
 
-	public TileEntityGenerator()
+	public TileEntityGenerator(BlockPos pos, BlockState state)
 	{
-		super(Math.round(10.0F * ConfigUtil.getFloat(MainConfig.get(), "balance/energy/generator/generator")), 1, 4000);
+		super(Ic2BlockEntities.GENERATOR, pos, state, Math.round(10.0F * ConfigUtil.getFloat(MainConfig.get(), "balance/energy/generator/generator")), 1, 4000);
 		this.fuelSlot = new InvSlotConsumableFuel(this, "fuel", 1, false);
 	}
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	protected void updateEntityClient()
 	{
 		super.updateEntityClient();
 		if (this.getActive())
 		{
-			TileEntityIronFurnace.showFlames(this.getWorld(), this.pos, this.getFacing());
+			ParticleUtil.showFurnaceFlames(this.getLevel(), this.worldPosition, this.getFacing());
 		}
 	}
 
@@ -59,9 +66,9 @@ public class TileEntityGenerator extends TileEntityBaseGenerator implements IGui
 	}
 
 	@Override
-	public String getOperationSoundFile()
+	public SoundEvent getLoopingSoundEvent()
 	{
-		return "Generators/GeneratorLoop.ogg";
+		return Ic2SoundEvents.GENERATOR_GENERATOR_LOOP;
 	}
 
 	@Override
@@ -77,17 +84,16 @@ public class TileEntityGenerator extends TileEntityBaseGenerator implements IGui
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound nbt)
+	public void load(CompoundTag nbt)
 	{
-		super.readFromNBT(nbt);
-		this.totalFuel = nbt.getInteger("totalFuel");
+		super.load(nbt);
+		this.totalFuel = nbt.getInt("totalFuel");
 	}
 
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
+	public void saveAdditional(CompoundTag nbt)
 	{
-		super.writeToNBT(nbt);
-		nbt.setInteger("totalFuel", this.totalFuel);
-		return nbt;
+		super.saveAdditional(nbt);
+		nbt.putInt("totalFuel", this.totalFuel);
 	}
 }

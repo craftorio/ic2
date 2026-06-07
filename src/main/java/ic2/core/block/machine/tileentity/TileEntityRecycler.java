@@ -10,9 +10,10 @@ import ic2.api.upgrade.UpgradableProperty;
 import ic2.core.IC2;
 import ic2.core.block.invslot.InvSlotProcessableGeneric;
 import ic2.core.init.MainConfig;
-import ic2.core.item.type.CraftingItemType;
 import ic2.core.recipe.BasicListRecipeManager;
-import ic2.core.ref.ItemName;
+import ic2.core.ref.Ic2BlockEntities;
+import ic2.core.ref.Ic2Items;
+import ic2.core.ref.Ic2SoundEvents;
 import ic2.core.util.ConfigUtil;
 import ic2.core.util.StackUtil;
 
@@ -22,15 +23,18 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class TileEntityRecycler extends TileEntityStandardMachine<IRecipeInput, Collection<ItemStack>, ItemStack>
 {
-	public TileEntityRecycler()
+	public TileEntityRecycler(BlockPos pos, BlockState state)
 	{
-		super(1, 45, 1);
-		this.inputSlot = new InvSlotProcessableGeneric(this, "input", 1, Recipes.recycler);
+		super(Ic2BlockEntities.RECYCLER, pos, state, 1, 45, 1);
+		this.inputSlot = new InvSlotProcessableGeneric(this, "input", 1, w -> Recipes.recycler);
 	}
 
 	public static void init()
@@ -59,15 +63,15 @@ public class TileEntityRecycler extends TileEntityStandardMachine<IRecipeInput, 
 	}
 
 	@Override
-	public String getStartSoundFile()
+	public SoundEvent getLoopingSoundEvent()
 	{
-		return "Machines/RecyclerOp.ogg";
+		return Ic2SoundEvents.MACHINE_RECYCLER_OPERATE;
 	}
 
 	@Override
-	public String getInterruptSoundFile()
+	public SoundEvent getInterruptSoundEvent()
 	{
-		return "Machines/InterruptOne.ogg";
+		return Ic2SoundEvents.MACHINE_INTERRUPT1;
 	}
 
 	public static boolean getIsItemBlacklisted(ItemStack aStack)
@@ -103,13 +107,12 @@ public class TileEntityRecycler extends TileEntityStandardMachine<IRecipeInput, 
 		{
 		}
 
-		public boolean addRecipe(IRecipeInput input, Collection<ItemStack> output, NBTTagCompound metadata, boolean replace)
+		public boolean addRecipe(IRecipeInput input, Collection<ItemStack> output, CompoundTag metadata, boolean replace)
 		{
 			return false;
 		}
 
-		@Override
-		public boolean addRecipe(IRecipeInput input, NBTTagCompound metadata, boolean replace, ItemStack... outputs)
+		public boolean addRecipe(IRecipeInput input, CompoundTag metadata, boolean replace, ItemStack... outputs)
 		{
 			return false;
 		}
@@ -125,7 +128,7 @@ public class TileEntityRecycler extends TileEntityStandardMachine<IRecipeInput, 
 			RecipeOutput ret = new RecipeOutput(null, new ArrayList<>(getOutput(input)));
 			if (adjustInput)
 			{
-				input.shrink(1);
+				input.m_41774_(1);
 			}
 
 			return ret;
@@ -133,9 +136,7 @@ public class TileEntityRecycler extends TileEntityStandardMachine<IRecipeInput, 
 
 		private static Collection<ItemStack> getOutput(ItemStack input)
 		{
-			return TileEntityRecycler.getIsItemBlacklisted(input)
-				? Collections.emptyList()
-				: Collections.singletonList(ItemName.crafting.getItemStack(CraftingItemType.scrap));
+			return TileEntityRecycler.getIsItemBlacklisted(input) ? Collections.emptyList() : Collections.singletonList(new ItemStack(Ic2Items.SCRAP));
 		}
 
 		public MachineRecipeResult<IRecipeInput, Collection<ItemStack>, ItemStack> apply(ItemStack input, boolean acceptTest)

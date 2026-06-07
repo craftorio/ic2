@@ -3,29 +3,24 @@ package ic2.core.recipe;
 import ic2.api.recipe.IElectrolyzerRecipeManager;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Set;
-import javax.annotation.Nonnull;
 
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraft.world.level.material.Fluid;
 
 public class ElectrolyzerRecipeManager implements IElectrolyzerRecipeManager
 {
-	private final Map<String, IElectrolyzerRecipeManager.ElectrolyzerRecipe> fluidMap = new HashMap<>();
+	private final Map<Fluid, IElectrolyzerRecipeManager.ElectrolyzerRecipe> fluidMap = new IdentityHashMap<>();
 
 	@Override
-	public void addRecipe(String input, int inputAmount, int EUaTick, IElectrolyzerRecipeManager.ElectrolyzerOutput... outputs)
+	public void addRecipe(Fluid input, int inputAmount, int EUaTick, IElectrolyzerRecipeManager.ElectrolyzerOutput... outputs)
 	{
 		this.addRecipe(input, inputAmount, EUaTick, 200, outputs);
 	}
 
 	@Override
-	public void addRecipe(
-		@Nonnull String input, int inputAmount, int EUaTick, int ticksNeeded, @Nonnull IElectrolyzerRecipeManager.ElectrolyzerOutput... outputs
-	)
+	public void addRecipe(Fluid input, int inputAmount, int EUaTick, int ticksNeeded, IElectrolyzerRecipeManager.ElectrolyzerOutput... outputs)
 	{
 		if (this.fluidMap.containsKey(input))
 		{
@@ -38,7 +33,7 @@ public class ElectrolyzerRecipeManager implements IElectrolyzerRecipeManager
 	@Override
 	public IElectrolyzerRecipeManager.ElectrolyzerRecipe getElectrolysisInformation(Fluid fluid)
 	{
-		return fluid == null ? null : this.fluidMap.get(fluid.getName());
+		return fluid == null ? null : this.fluidMap.get(fluid);
 	}
 
 	@Override
@@ -51,28 +46,17 @@ public class ElectrolyzerRecipeManager implements IElectrolyzerRecipeManager
 	@Override
 	public boolean acceptsFluid(Fluid fluid)
 	{
-		return fluid != null && this.fluidMap.containsKey(fluid.getName());
+		return fluid != null && this.fluidMap.containsKey(fluid);
 	}
 
 	@Override
 	public Set<Fluid> getAcceptedFluids()
 	{
-		Set<Fluid> ret = new HashSet<>(this.fluidMap.size() * 2, 0.5F);
-
-		for (String fluidName : this.fluidMap.keySet())
-		{
-			Fluid fluid = FluidRegistry.getFluid(fluidName);
-			if (fluid != null)
-			{
-				ret.add(fluid);
-			}
-		}
-
-		return ret;
+		return Collections.unmodifiableSet(this.fluidMap.keySet());
 	}
 
 	@Override
-	public Map<String, IElectrolyzerRecipeManager.ElectrolyzerRecipe> getRecipeMap()
+	public Map<Fluid, IElectrolyzerRecipeManager.ElectrolyzerRecipe> getRecipeMap()
 	{
 		return Collections.unmodifiableMap(this.fluidMap);
 	}

@@ -8,45 +8,37 @@ import ic2.api.recipe.Recipes;
 import ic2.core.ContainerBase;
 import ic2.core.IC2;
 import ic2.core.IHasGui;
-import ic2.core.audio.AudioSource;
-import ic2.core.audio.PositionSpec;
 import ic2.core.block.IInventorySlotHolder;
 import ic2.core.block.comp.Redstone;
 import ic2.core.block.invslot.InvSlotOutput;
 import ic2.core.block.invslot.InvSlotProcessable;
 import ic2.core.gui.dynamic.DynamicContainer;
-import ic2.core.gui.dynamic.DynamicGui;
-import ic2.core.gui.dynamic.GuiParser;
 import ic2.core.init.MainConfig;
-import ic2.core.item.type.MiscResourceType;
+import ic2.core.network.GrowingBuffer;
 import ic2.core.network.GuiSynced;
-import ic2.core.ref.ItemName;
-import ic2.core.ref.TeBlock;
+import ic2.core.ref.Ic2BlockEntities;
+import ic2.core.ref.Ic2Items;
+import ic2.core.ref.Ic2SoundEvents;
+import ic2.core.sound.Sound;
 import ic2.core.util.ConfigUtil;
 import ic2.core.util.Util;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 
-@TeBlock.Delegated(current = TileEntityMassFabricator.class, old = TileEntityClassicMassFabricator.class)
 public class TileEntityClassicMassFabricator extends TileEntityElectricMachine implements IHasGui, IExplosionPowerOverride
 {
-	private AudioSource audioSource;
-	private AudioSource audioSourceScrap;
+	private Sound scrapSound;
 	@GuiSynced
 	public int scrap = 0;
 	private double lastEnergy;
-	private final int StateIdle = 0;
-	private final int StateRunning = 1;
-	private final int StateRunningScrap = 2;
-	private int state = 0;
-	private int prevState = 0;
 	public final InvSlotProcessable<IRecipeInput, Integer, ItemStack> amplifierSlot = new InvSlotProcessable<IRecipeInput, Integer, ItemStack>(
-		this, "scrap", 1, Recipes.matterAmplifier
+		this, "scrap", 1, w -> Recipes.matterAmplifier
 	)
 	{
 		protected ItemStack getInput(ItemStack stack)
@@ -62,9 +54,16 @@ public class TileEntityClassicMassFabricator extends TileEntityElectricMachine i
 	public final InvSlotOutput outputSlot = new InvSlotOutput(this, "output", 1);
 	protected final Redstone redstone = this.addComponent(new Redstone(this));
 
-	public TileEntityClassicMassFabricator()
+	public TileEntityClassicMassFabricator(BlockPos pos, BlockState state)
 	{
-		super(Math.round(1000000.0F * ConfigUtil.getFloat(MainConfig.get(), "balance/uuEnergyFactor")), TileEntityMassFabricator.DEFAULT_TIER, false);
+		super(
+			Ic2BlockEntities.CLASSIC_MASS_FABRICATOR,
+			pos,
+			state,
+			Math.round(1000000.0F * ConfigUtil.getFloat(MainConfig.get(), "balance/uuEnergyFactor")),
+			TileEntityMassFabricator.DEFAULT_TIER,
+			false
+		);
 		this.redstone.subscribe(newLevel -> this.energy.setEnabled(newLevel == 0));
 		this.comparator.setUpdate(() ->
 		{
@@ -80,33 +79,19 @@ public class TileEntityClassicMassFabricator extends TileEntityElectricMachine i
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound nbt)
+	public void load(CompoundTag nbt)
 	{
-		super.readFromNBT(nbt);
-		this.scrap = nbt.getInteger("scrap");
+		super.load(nbt);
+		this.scrap = nbt.getInt("scrap");
 		this.lastEnergy = nbt.getDouble("lastEnergy");
 	}
 
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
+	public void saveAdditional(CompoundTag nbt)
 	{
-		super.writeToNBT(nbt);
-		nbt.setInteger("scrap", this.scrap);
-		nbt.setDouble("lastEnergy", this.lastEnergy);
-		return nbt;
-	}
-
-	@Override
-	protected void onUnloaded()
-	{
-		if (this.world.isRemote && (this.audioSource != null || this.audioSourceScrap != null))
-		{
-			IC2.audioManager.removeSources(this);
-			this.audioSource = null;
-			this.audioSourceScrap = null;
-		}
-
-		super.onUnloaded();
+		super.saveAdditional(nbt);
+		nbt.putInt("scrap", this.scrap);
+		nbt.putDouble("lastEnergy", this.lastEnergy);
 	}
 
 	@Override
@@ -116,6 +101,7 @@ public class TileEntityClassicMassFabricator extends TileEntityElectricMachine i
 		boolean needsInvUpdate = false;
 		if (!this.redstone.hasRedstoneInput() && !(this.energy.getEnergy() <= 0.0))
 		{
+			boolean playSubSound = false;
 			if (this.scrap > 0)
 			{
 				double bonus = Math.min(this.scrap, this.energy.getEnergy() - this.lastEnergy);
@@ -125,13 +111,10 @@ public class TileEntityClassicMassFabricator extends TileEntityElectricMachine i
 					this.scrap = (int) (this.scrap - bonus);
 				}
 
-				this.setState(2);
-			} else
-			{
-				this.setState(1);
+				playSubSound = true;
 			}
 
-			this.setActive(true);
+			this.activate(playSubSound);
 			if (this.scrap < 10000)
 			{
 				MachineRecipeResult<IRecipeInput, Integer, ItemStack> recipe = this.amplifierSlot.process();
@@ -150,12 +133,11 @@ public class TileEntityClassicMassFabricator extends TileEntityElectricMachine i
 			this.lastEnergy = this.energy.getEnergy();
 			if (needsInvUpdate)
 			{
-				this.markDirty();
+				this.setChanged();
 			}
 		} else
 		{
-			this.setState(0);
-			this.setActive(false);
+			this.shutdown(false);
 		}
 	}
 
@@ -172,7 +154,7 @@ public class TileEntityClassicMassFabricator extends TileEntityElectricMachine i
 
 	public boolean attemptGeneration()
 	{
-		if (this.outputSlot.add(ItemName.misc_resource.getItemStack(MiscResourceType.matter)) == 0)
+		if (this.outputSlot.add(new ItemStack(Ic2Items.UU_MATTER)) == 0)
 		{
 			this.energy.useEnergy(this.energy.getCapacity());
 			return true;
@@ -182,114 +164,50 @@ public class TileEntityClassicMassFabricator extends TileEntityElectricMachine i
 		}
 	}
 
-	private void setState(int aState)
-	{
-		this.state = aState;
-		if (this.prevState != this.state)
-		{
-			IC2.network.get(true).updateTileEntityField(this, "state");
-		}
-
-		this.prevState = this.state;
-	}
-
 	@Override
-	public void onNetworkUpdate(String field)
+	protected void initSound()
 	{
-		if (field.equals("state") && this.prevState != this.state)
+		super.initSound();
+		if (this.scrapSound == null)
 		{
-			switch (this.state)
-			{
-				case 0:
-					if (this.audioSource != null)
-					{
-						this.audioSource.stop();
-					}
-
-					if (this.audioSourceScrap != null)
-					{
-						this.audioSourceScrap.stop();
-					}
-					break;
-				case 1:
-					if (this.audioSource == null)
-					{
-						this.audioSource = IC2.audioManager
-							.createSource(this, PositionSpec.Center, "Generators/MassFabricator/MassFabLoop.ogg", true, false, IC2.audioManager.getDefaultVolume());
-					}
-
-					if (this.audioSource != null)
-					{
-						this.audioSource.play();
-					}
-
-					if (this.audioSourceScrap != null)
-					{
-						this.audioSourceScrap.stop();
-					}
-					break;
-				case 2:
-					if (this.audioSource == null)
-					{
-						this.audioSource = IC2.audioManager
-							.createSource(this, PositionSpec.Center, "Generators/MassFabricator/MassFabLoop.ogg", true, false, IC2.audioManager.getDefaultVolume());
-					}
-
-					if (this.audioSourceScrap == null)
-					{
-						this.audioSourceScrap = IC2.audioManager
-							.createSource(
-								this, PositionSpec.Center, "Generators/MassFabricator/MassFabScrapSolo.ogg", true, false, IC2.audioManager.getDefaultVolume()
-							);
-					}
-
-					if (this.audioSource != null)
-					{
-						this.audioSource.play();
-					}
-
-					if (this.audioSourceScrap != null)
-					{
-						this.audioSourceScrap.play();
-					}
-			}
-
-			this.prevState = this.state;
-		}
-
-		super.onNetworkUpdate(field);
-	}
-
-	private GuiParser.GuiNode getXML()
-	{
-		ResourceLocation loc = new ResourceLocation(this.teBlock.getIdentifier().getResourceDomain(), "guidef/" + this.teBlock.getName() + "_classic.xml");
-
-		try
-		{
-			return GuiParser.parse(loc, this.teBlock.getTeClass());
-		} catch (Exception e)
-		{
-			throw new RuntimeException(e);
+			this.scrapSound = IC2.soundManager.createSound(this, Ic2SoundEvents.MACHINE_FABRICATOR_SCRAP, SoundSource.BLOCKS, this.worldPosition, 1.0F, 1.0F);
 		}
 	}
 
 	@Override
-	public ContainerBase<?> getGuiContainer(EntityPlayer player)
+	protected void clearSound()
 	{
-		return DynamicContainer.create(this, player, this.getXML());
+		super.clearSound();
+		this.scrapSound = null;
 	}
 
-	@SideOnly(Side.CLIENT)
 	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
+	public SoundEvent getLoopingSoundEvent()
 	{
-		return DynamicGui.<TileEntityClassicMassFabricator>create(this, player, this.getXML());
+		return Ic2SoundEvents.MACHINE_FABRICATOR_LOOP;
+	}
+
+	public void playScrapSound()
+	{
+		this.scrapSound.play();
+	}
+
+	@Override
+	public ContainerBase<?> createServerScreenHandler(int syncId, Player player)
+	{
+		return DynamicContainer.create(syncId, player.getInventory(), this);
+	}
+
+	@Override
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
+	{
+		return DynamicContainer.create(syncId, inventory, this);
 	}
 
 	public String getProgressAsString()
 	{
 		int p = (int) Math.min(100.0 * this.energy.getFillRatio(), 100.0);
-		return "" + p + "%";
+		return p + "%";
 	}
 
 	@Override
@@ -302,11 +220,6 @@ public class TileEntityClassicMassFabricator extends TileEntityElectricMachine i
 		{
 			return "dev".equals(name) ? Util.inDev() : super.getGuiState(name);
 		}
-	}
-
-	@Override
-	public void onGuiClosed(EntityPlayer player)
-	{
 	}
 
 	@Override

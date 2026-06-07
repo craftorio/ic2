@@ -2,9 +2,9 @@ package ic2.core.block.invslot;
 
 import ic2.core.block.IInventorySlotHolder;
 import ic2.core.util.StackUtil;
-import net.minecraft.block.Block;
-import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
 
 public class InvSlotConsumableClass extends InvSlotConsumable
 {
@@ -30,9 +30,7 @@ public class InvSlotConsumableClass extends InvSlotConsumable
 			return false;
 		} else
 		{
-			return stack.getItem() instanceof ItemBlock
-				? this.clazz.isInstance(Block.getBlockFromItem(stack.getItem()))
-				: this.clazz.isInstance(stack.getItem());
+			return stack.getItem() instanceof BlockItem ? this.clazz.isInstance(Block.m_49814_(stack.getItem())) : this.clazz.isInstance(stack.getItem());
 		}
 	}
 }

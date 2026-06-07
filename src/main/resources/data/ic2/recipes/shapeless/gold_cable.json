@@ -1,0 +1,15 @@
+{
+  "type": "ic2:shapeless",
+  "ingredients": [
+    {
+      "tag": "forge:plates/gold"
+    },
+    {
+      "tag": "ic2:wire_cutters"
+    }
+  ],
+  "result": {
+    "item": "ic2:gold_cable",
+    "count": 4
+  }
+}

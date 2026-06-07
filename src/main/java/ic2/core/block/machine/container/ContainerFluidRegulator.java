@@ -1,19 +1,20 @@
 package ic2.core.block.machine.container;
 
 import ic2.core.block.machine.tileentity.TileEntityFluidRegulator;
+import ic2.core.ref.Ic2ScreenHandlers;
 import ic2.core.slot.SlotInvSlot;
 
 import java.util.List;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.entity.player.Inventory;
 
 public class ContainerFluidRegulator extends ContainerElectricMachine<TileEntityFluidRegulator>
 {
-	public ContainerFluidRegulator(EntityPlayer player, TileEntityFluidRegulator tileEntite)
+	public ContainerFluidRegulator(int syncId, Inventory playerInventory, TileEntityFluidRegulator be)
 	{
-		super(player, tileEntite, 184, 8, 57);
-		this.addSlotToContainer(new SlotInvSlot(tileEntite.wasserinputSlot, 0, 58, 53));
-		this.addSlotToContainer(new SlotInvSlot(tileEntite.wasseroutputSlot, 0, 58, 71));
+		super(Ic2ScreenHandlers.FLUID_REGULATOR, syncId, playerInventory, be, 184, 8, 57);
+		this.m_38897_(new SlotInvSlot(be.wasserinputSlot, 0, 58, 53));
+		this.m_38897_(new SlotInvSlot(be.wasseroutputSlot, 0, 58, 71));
 	}
 
 	@Override

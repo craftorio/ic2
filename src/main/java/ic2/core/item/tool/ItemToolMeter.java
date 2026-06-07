@@ -9,56 +9,71 @@ import ic2.api.item.IBoxable;
 import ic2.core.IC2;
 import ic2.core.IHasGui;
 import ic2.core.item.IHandHeldInventory;
-import ic2.core.item.ItemIC2;
-import ic2.core.ref.ItemName;
+import ic2.core.item.PriorityUsableItem;
 import ic2.core.util.StackUtil;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item.Properties;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
 
-public class ItemToolMeter extends ItemIC2 implements IBoxable, IHandHeldInventory
+public class ItemToolMeter extends Item implements IBoxable, IHandHeldInventory, PriorityUsableItem
 {
-	public ItemToolMeter()
+	public ItemToolMeter(Properties settings)
 	{
-		super(ItemName.meter);
-		this.maxStackSize = 1;
-		this.setMaxDamage(0);
+		super(settings);
 	}
 
-	public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand)
+	@Override
+	public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context)
 	{
-		if (world.isRemote)
+		Level world = context.m_43725_();
+		BlockPos pos = context.m_8083_();
+		Player player = context.m_43723_();
+		InteractionHand hand = context.m_43724_();
+		if (world == null)
 		{
-			return EnumActionResult.PASS;
+			return InteractionResult.PASS;
+		}
+
+		if (player == null)
+		{
+			return InteractionResult.PASS;
+		}
+
+		if (world.isClientSide)
+		{
+			return InteractionResult.PASS;
 		}
 
 		IEnergyTile tile = EnergyNet.instance.getTile(world, pos);
 		if (!(tile instanceof IEnergySource) && !(tile instanceof IEnergyConductor) && !(tile instanceof IEnergySink))
 		{
-			IC2.platform.messagePlayer(player, "Not an energy net tile");
-		} else if (IC2.platform.launchGui(player, this.getInventory(player, StackUtil.get(player, hand))))
+			IC2.sideProxy.messagePlayer(player, "Not an energy net tile");
+		} else if (this.getInventory(player, hand, StackUtil.get(player, hand)).openManagedItem(player, hand, null))
 		{
-			ContainerMeter container = (ContainerMeter) player.openContainer;
+			ContainerMeter container = (ContainerMeter) player.f_36096_;
 			container.setUut(tile);
-			return EnumActionResult.SUCCESS;
+			return InteractionResult.SUCCESS;
 		}
 
-		return EnumActionResult.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 
-	public boolean onDroppedByPlayer(ItemStack stack, EntityPlayer player)
+	public boolean onDroppedByPlayer(ItemStack stack, Player player)
 	{
-		if (!player.getEntityWorld().isRemote && !StackUtil.isEmpty(stack) && player.openContainer instanceof ContainerMeter)
+		if (!player.getCommandSenderWorld().isClientSide && !StackUtil.isEmpty(stack) && player.f_36096_ instanceof ContainerMeter)
 		{
-			HandHeldMeter euReader = ((ContainerMeter) player.openContainer).base;
+			HandHeldMeter euReader = ((ContainerMeter) player.f_36096_).base;
 			if (euReader.isThisContainer(stack))
 			{
 				euReader.saveAsThrown(stack);
-				player.closeScreen();
+				((ServerPlayer) player).m_6915_();
 			}
 		}
 
@@ -72,8 +87,8 @@ public class ItemToolMeter extends ItemIC2 implements IBoxable, IHandHeldInvento
 	}
 
 	@Override
-	public IHasGui getInventory(EntityPlayer player, ItemStack stack)
+	public IHasGui getInventory(Player player, InteractionHand hand, ItemStack stack)
 	{
-		return new HandHeldMeter(player, stack);
+		return new HandHeldMeter(player, hand, stack);
 	}
 }

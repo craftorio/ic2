@@ -1,11 +1,11 @@
 package ic2.api.info;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 public interface ILocatable
 {
 	BlockPos getPosition();
 
-	World getWorldObj();
+	Level getWorldObj();
 }

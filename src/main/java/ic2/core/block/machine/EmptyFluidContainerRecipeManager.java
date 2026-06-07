@@ -10,13 +10,13 @@ import ic2.core.util.StackUtil;
 import java.util.Collection;
 import java.util.Collections;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.fluids.Fluid;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.material.Fluid;
 
 public class EmptyFluidContainerRecipeManager implements IEmptyFluidContainerRecipeManager
 {
-	public boolean addRecipe(Void input, IEmptyFluidContainerRecipeManager.Output output, NBTTagCompound metadata, boolean replace)
+	public boolean addRecipe(Void input, IEmptyFluidContainerRecipeManager.Output output, CompoundTag metadata, boolean replace)
 	{
 		return false;
 	}
@@ -43,7 +43,7 @@ public class EmptyFluidContainerRecipeManager implements IEmptyFluidContainerRec
 		}
 
 		Collection<ItemStack> output = StackUtil.isEmpty(result.extraOutput) ? Collections.emptyList() : Collections.singletonList(result.extraOutput);
-		return (MachineRecipeResult) new MachineRecipe<>(null, new IEmptyFluidContainerRecipeManager.Output(output, result.fluidChange)).getResult(result.inPlaceOutput);
+		return new MachineRecipe<>(null, new IEmptyFluidContainerRecipeManager.Output(output, result.fluidChange)).getResult(result.inPlaceOutput);
 	}
 
 	@Override

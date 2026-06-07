@@ -1,47 +1,45 @@
 package ic2.core.util;
 
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 public class ItemComparableItemStack
 {
 	private final Item item;
-	private final int meta;
-	private final NBTTagCompound nbt;
+	private final CompoundTag nbt;
 	private final int hashCode;
 
 	public ItemComparableItemStack(ItemStack stack, boolean copyNbt)
 	{
 		this.item = stack.getItem();
-		this.meta = stack.getHasSubtypes() ? stack.getMetadata() : 0;
-		NBTTagCompound nbt = stack.getTagCompound();
+		CompoundTag nbt = stack.getTag();
 		if (nbt != null)
 		{
-			if (nbt.hasNoTags())
+			if (nbt.m_128456_())
 			{
 				nbt = null;
 			} else
 			{
 				if (copyNbt)
 				{
-					nbt = nbt.copy();
+					nbt = nbt.m_6426_();
 				}
 
 				boolean copied = copyNbt;
 
 				for (String key : StackUtil.ignoredNbtKeys)
 				{
-					if (!copied && nbt.hasKey(key))
+					if (!copied && nbt.contains(key))
 					{
-						nbt = nbt.copy();
+						nbt = nbt.m_6426_();
 						copied = true;
 					}
 
-					nbt.removeTag(key);
+					nbt.m_128473_(key);
 				}
 
-				if (nbt.hasNoTags())
+				if (nbt.m_128456_())
 				{
 					nbt = null;
 				}
@@ -55,31 +53,24 @@ public class ItemComparableItemStack
 	private ItemComparableItemStack(ItemComparableItemStack src)
 	{
 		this.item = src.item;
-		this.meta = src.meta;
-		this.nbt = src.nbt != null ? src.nbt.copy() : null;
+		this.nbt = src.nbt != null ? src.nbt.m_6426_() : null;
 		this.hashCode = src.hashCode;
 	}
 
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (!(obj instanceof ItemComparableItemStack))
+		if (!(obj instanceof ItemComparableItemStack cmp))
+		{
+			return false;
+		} else if (cmp.hashCode != this.hashCode)
 		{
 			return false;
 		} else
 		{
-			ItemComparableItemStack cmp = (ItemComparableItemStack) obj;
-			if (cmp.hashCode != this.hashCode)
-			{
-				return false;
-			} else
-			{
-				return cmp == this
-					? true
-					: cmp.item == this.item
-					  && cmp.meta == this.meta
-					  && (cmp.nbt == null && this.nbt == null || cmp.nbt != null && this.nbt != null && cmp.nbt.equals(this.nbt));
-			}
+			return cmp == this
+				? true
+				: cmp.item == this.item && (cmp.nbt == null && this.nbt == null || cmp.nbt != null && this.nbt != null && cmp.nbt.equals(this.nbt));
 		}
 	}
 
@@ -97,10 +88,9 @@ public class ItemComparableItemStack
 			ret = System.identityHashCode(this.item);
 		}
 
-		ret = ret * 31 + this.meta;
 		if (this.nbt != null)
 		{
-			ret = ret * 61 + this.nbt.hashCode();
+			ret = ret * 31 + this.nbt.hashCode();
 		}
 
 		return ret;
@@ -123,8 +113,8 @@ public class ItemComparableItemStack
 			return null;
 		}
 
-		ItemStack ret = new ItemStack(this.item, size, this.meta);
-		ret.setTagCompound(this.nbt);
+		ItemStack ret = new ItemStack(this.item, size);
+		ret.m_41751_(this.nbt);
 		return ret;
 	}
 }

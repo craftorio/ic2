@@ -2,46 +2,34 @@ package ic2.core.block.machine.tileentity;
 
 import com.google.common.base.Predicate;
 import ic2.api.item.ITerraformingBP;
-import ic2.core.IC2;
-import ic2.core.audio.AudioSource;
-import ic2.core.audio.PositionSpec;
 import ic2.core.block.invslot.InvSlotConsumableClass;
-import ic2.core.util.Ic2BlockPos;
+import ic2.core.ref.Ic2BlockEntities;
+import ic2.core.ref.Ic2SoundEvents;
 import ic2.core.util.StackUtil;
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos.MutableBlockPos;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public class TileEntityTerra extends TileEntityElectricMachine
 {
 	public int failedAttempts = 0;
 	private BlockPos lastPos;
-	public AudioSource audioSource;
 	public int inactiveTicks = 0;
 	public final InvSlotConsumableClass tfbpSlot = new InvSlotConsumableClass(this, "tfbp", 1, ITerraformingBP.class);
 
-	public TileEntityTerra()
+	public TileEntityTerra(BlockPos pos, BlockState state)
 	{
-		super(100000, 4);
-	}
-
-	@Override
-	protected void onUnloaded()
-	{
-		if (IC2.platform.isRendering() && this.audioSource != null)
-		{
-			IC2.audioManager.removeSources(this);
-			this.audioSource = null;
-		}
-
-		super.onUnloaded();
+		super(Ic2BlockEntities.TERRAFORMER, pos, state, 100000, 4);
 	}
 
 	@Override
@@ -56,15 +44,20 @@ public class TileEntityTerra extends TileEntityElectricMachine
 			if (this.energy.getEnergy() >= tfbp.getConsume(stack))
 			{
 				newActive = true;
-				World world = this.getWorld();
+				Level world = this.getLevel();
+				if (world == null)
+				{
+					return;
+				}
+
 				BlockPos nextPos;
 				if (this.lastPos != null)
 				{
 					int range = tfbp.getRange(stack) / 10;
 					nextPos = new BlockPos(
-						this.lastPos.getX() - world.rand.nextInt(range + 1) + world.rand.nextInt(range + 1),
-						this.pos.getY(),
-						this.lastPos.getZ() - world.rand.nextInt(range + 1) + world.rand.nextInt(range + 1)
+						this.lastPos.getX() - world.random.nextInt(range + 1) + world.random.nextInt(range + 1),
+						this.worldPosition.getY(),
+						this.lastPos.getZ() - world.random.nextInt(range + 1) + world.random.nextInt(range + 1)
 					);
 				} else
 				{
@@ -75,9 +68,9 @@ public class TileEntityTerra extends TileEntityElectricMachine
 
 					int range = tfbp.getRange(stack) * (this.failedAttempts + 1) / 5;
 					nextPos = new BlockPos(
-						this.pos.getX() - world.rand.nextInt(range + 1) + world.rand.nextInt(range + 1),
-						this.pos.getY(),
-						this.pos.getZ() - world.rand.nextInt(range + 1) + world.rand.nextInt(range + 1)
+						this.worldPosition.getX() - world.random.nextInt(range + 1) + world.random.nextInt(range + 1),
+						this.worldPosition.getY(),
+						this.worldPosition.getZ() - world.random.nextInt(range + 1) + world.random.nextInt(range + 1)
 					);
 				}
 
@@ -98,22 +91,22 @@ public class TileEntityTerra extends TileEntityElectricMachine
 		if (newActive)
 		{
 			this.inactiveTicks = 0;
-			this.setActive(true);
-		} else if (!newActive && this.getActive() && this.inactiveTicks++ > 30)
+			this.activate(false);
+		} else if (this.getActive() && this.inactiveTicks++ > 30)
 		{
-			this.setActive(false);
+			this.shutdown(false);
 		}
 	}
 
 	@Override
-	public boolean onActivated(final EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ)
+	protected InteractionResult onActivated(Player player, InteractionHand hand, Direction side, Vec3 hit)
 	{
-		final World world = this.getWorld();
-		if (!player.isSneaking() && !world.isRemote)
+		final Level world = this.getLevel();
+		if (!player.m_6144_() && !world.isClientSide)
 		{
 			if (this.ejectBlueprint())
 			{
-				return true;
+				return InteractionResult.SUCCESS;
 			}
 
 			ItemStack stack = StackUtil.consumeAndGet(player, hand, new Predicate<ItemStack>()
@@ -121,17 +114,17 @@ public class TileEntityTerra extends TileEntityElectricMachine
 				public boolean apply(ItemStack input)
 				{
 					Item item = input.getItem();
-					return item instanceof ITerraformingBP && ((ITerraformingBP) item).canInsert(input, player, world, TileEntityTerra.this.pos);
+					return item instanceof ITerraformingBP && ((ITerraformingBP) item).canInsert(input, player, world, TileEntityTerra.this.worldPosition);
 				}
 			}, 1);
 			if (!StackUtil.isEmpty(stack))
 			{
 				this.insertBlueprint(stack);
-				return true;
+				return InteractionResult.SUCCESS;
 			}
 		}
 
-		return true;
+		return InteractionResult.SUCCESS;
 	}
 
 	private boolean ejectBlueprint()
@@ -142,7 +135,7 @@ public class TileEntityTerra extends TileEntityElectricMachine
 			return false;
 		}
 
-		StackUtil.dropAsEntity(this.getWorld(), this.pos, stack);
+		StackUtil.dropAsEntity(this.getLevel(), this.worldPosition, stack);
 		this.tfbpSlot.clear();
 		return true;
 	}
@@ -157,41 +150,42 @@ public class TileEntityTerra extends TileEntityElectricMachine
 		this.tfbpSlot.put(tfbp);
 	}
 
-	public static BlockPos getFirstSolidBlockFrom(World world, BlockPos pos, int yOffset)
-	{
-		Ic2BlockPos ret = new Ic2BlockPos(pos.getX(), pos.getY() + yOffset, pos.getZ());
-
-		while (ret.getY() >= 0)
-		{
-			if (world.isBlockNormalCube(ret, false))
-			{
-				return new BlockPos(ret);
-			}
-
-			ret.moveDown();
-		}
-
-		return null;
-	}
-
-	public static BlockPos getFirstBlockFrom(World world, BlockPos pos, int yOffset)
+	public static BlockPos getFirstSolidBlockFrom(Level world, BlockPos pos, int yOffset)
 	{
 		MutableBlockPos ret = new MutableBlockPos(pos.getX(), pos.getY() + yOffset, pos.getZ());
 
 		while (ret.getY() >= 0)
 		{
-			if (!world.isAirBlock(ret))
+			BlockState state = world.getBlockState(ret);
+			if (state.m_60804_(world, pos))
 			{
-				return new BlockPos(ret);
+				return ret.m_7949_();
 			}
 
-			ret.setPos(ret.getX(), ret.getY() - 1, ret.getZ());
+			ret.m_122173_(Direction.DOWN);
 		}
 
 		return null;
 	}
 
-	public static boolean switchGround(World world, BlockPos pos, Block from, IBlockState to, boolean upwards)
+	public static BlockPos getFirstBlockFrom(Level world, BlockPos pos, int yOffset)
+	{
+		MutableBlockPos ret = new MutableBlockPos(pos.getX(), pos.getY() + yOffset, pos.getZ());
+
+		while (ret.getY() >= 0)
+		{
+			if (!world.m_46859_(ret))
+			{
+				return new BlockPos(ret);
+			}
+
+			ret.m_122173_(Direction.DOWN);
+		}
+
+		return null;
+	}
+
+	public static boolean switchGround(Level world, BlockPos pos, Block from, BlockState to, boolean upwards)
 	{
 		MutableBlockPos cPos = new MutableBlockPos(pos.getX(), pos.getY(), pos.getZ());
 
@@ -203,12 +197,12 @@ public class TileEntityTerra extends TileEntityElectricMachine
 				break;
 			}
 
-			cPos.setPos(cPos.getX(), cPos.getY() - 1, cPos.getZ());
+			cPos.m_122173_(Direction.DOWN);
 		}
 
 		if ((!upwards || cPos.getY() != pos.getY()) && (upwards || cPos.getY() >= 0))
 		{
-			world.setBlockState(upwards ? cPos.up() : new BlockPos(cPos), to);
+			world.setBlockAndUpdate(upwards ? cPos.m_7494_() : new BlockPos(cPos), to);
 			return true;
 		} else
 		{
@@ -217,28 +211,8 @@ public class TileEntityTerra extends TileEntityElectricMachine
 	}
 
 	@Override
-	public void onNetworkUpdate(String field)
+	public SoundEvent getLoopingSoundEvent()
 	{
-		if (field.equals("active"))
-		{
-			if (this.audioSource == null)
-			{
-				this.audioSource = IC2.audioManager
-					.createSource(this, PositionSpec.Center, "Terraformers/TerraformerGenericloop.ogg", true, false, IC2.audioManager.getDefaultVolume());
-			}
-
-			if (this.getActive())
-			{
-				if (this.audioSource != null)
-				{
-					this.audioSource.play();
-				}
-			} else if (this.audioSource != null)
-			{
-				this.audioSource.stop();
-			}
-		}
-
-		super.onNetworkUpdate(field);
+		return Ic2SoundEvents.MACHINE_TERRAFORMER_LOOP;
 	}
 }

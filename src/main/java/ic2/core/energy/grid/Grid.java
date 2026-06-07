@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 
 public class Grid
 {
@@ -133,6 +133,7 @@ public class Grid
 			}
 
 			assert found;
+			this.enet.addTileToNotify(neighbor.getTile().getMainTile());
 			if (neighbor.links.isEmpty() && neighbor.tile.removeExtraNode(neighbor))
 			{
 				if (EnergyNetSettings.logGridUpdatesVerbose)

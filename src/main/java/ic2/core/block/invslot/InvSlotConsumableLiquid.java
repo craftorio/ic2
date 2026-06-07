@@ -2,14 +2,12 @@ package ic2.core.block.invslot;
 
 import ic2.api.util.FluidContainerOutputMode;
 import ic2.core.block.IInventorySlotHolder;
+import ic2.core.fluid.Ic2FluidStack;
+import ic2.core.fluid.Ic2FluidTank;
 import ic2.core.util.LiquidUtil;
 import ic2.core.util.StackUtil;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.IFluidTank;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandlerItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.material.Fluid;
 import org.apache.commons.lang3.mutable.MutableObject;
 
 public class InvSlotConsumableLiquid extends InvSlotConsumable
@@ -44,18 +42,8 @@ public class InvSlotConsumableLiquid extends InvSlotConsumable
 
 		if (this.opType == InvSlotConsumableLiquid.OpType.Drain || this.opType == InvSlotConsumableLiquid.OpType.Both)
 		{
-			FluidStack containerFluid = null;
-			if (stack.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null))
-			{
-				ItemStack singleStack = StackUtil.copyWithSize(stack, 1);
-				IFluidHandlerItem handler = (IFluidHandlerItem) singleStack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null);
-				if (handler != null)
-				{
-					containerFluid = handler.drain(Integer.MAX_VALUE, false);
-				}
-			}
-
-			if (containerFluid != null && containerFluid.amount > 0 && this.acceptsLiquid(containerFluid.getFluid()))
+			Ic2FluidStack fs = Ic2FluidStack.get(stack);
+			if (fs != null && !fs.isEmpty() && this.acceptsLiquid(fs.getFluid()))
 			{
 				return true;
 			}
@@ -65,7 +53,7 @@ public class InvSlotConsumableLiquid extends InvSlotConsumable
 			&& LiquidUtil.isFillableFluidContainer(stack, this.getPossibleFluids());
 	}
 
-	public FluidStack drain(Fluid fluid, int maxAmount, MutableObject<ItemStack> output, boolean simulate)
+	public Ic2FluidStack drain(Fluid fluid, int maxAmount, MutableObject<ItemStack> output, boolean simulate)
 	{
 		output.setValue(null);
 		if (fluid != null && !this.acceptsLiquid(fluid))
@@ -104,10 +92,10 @@ public class InvSlotConsumableLiquid extends InvSlotConsumable
 		return result.fluidChange;
 	}
 
-	public int fill(FluidStack fs, MutableObject<ItemStack> output, boolean simulate)
+	public int fill(Ic2FluidStack fs, MutableObject<ItemStack> output, boolean simulate)
 	{
 		output.setValue(null);
-		if (fs == null || fs.amount <= 0)
+		if (fs == null || fs.isEmpty())
 		{
 			return 0;
 		}
@@ -135,27 +123,27 @@ public class InvSlotConsumableLiquid extends InvSlotConsumable
 			this.put(result.inPlaceOutput);
 		}
 
-		return result.fluidChange.amount;
+		return result.fluidChange.getAmountMb();
 	}
 
-	public boolean transferToTank(IFluidTank tank, MutableObject<ItemStack> output, boolean simulate)
+	public boolean transferToTank(Ic2FluidTank tank, MutableObject<ItemStack> output, boolean simulate)
 	{
 		int space = tank.getCapacity();
 		Fluid fluidRequired = null;
-		FluidStack tankFluid = tank.getFluid();
+		Ic2FluidStack tankFluid = tank.getFluidStack();
 		if (tankFluid != null)
 		{
-			space -= tankFluid.amount;
+			space -= tankFluid.getAmountMb();
 			fluidRequired = tankFluid.getFluid();
 		}
 
-		FluidStack fluid = this.drain(fluidRequired, space, output, true);
+		Ic2FluidStack fluid = this.drain(fluidRequired, space, output, true);
 		if (fluid == null)
 		{
 			return false;
 		}
 
-		int amount = tank.fill(fluid, !simulate);
+		int amount = tank.fillMb(fluid, simulate);
 		if (amount <= 0)
 		{
 			return false;
@@ -169,10 +157,10 @@ public class InvSlotConsumableLiquid extends InvSlotConsumable
 		return true;
 	}
 
-	public boolean transferFromTank(IFluidTank tank, MutableObject<ItemStack> output, boolean simulate)
+	public boolean transferFromTank(Ic2FluidTank tank, MutableObject<ItemStack> output, boolean simulate)
 	{
-		FluidStack tankFluid = tank.drain(tank.getFluidAmount(), false);
-		if (tankFluid != null && tankFluid.amount > 0)
+		Ic2FluidStack tankFluid = tank.drainMb(tank.getFluidAmount(), true);
+		if (tankFluid != null && !tankFluid.isEmpty())
 		{
 			int amount = this.fill(tankFluid, output, simulate);
 			if (amount <= 0)
@@ -182,7 +170,7 @@ public class InvSlotConsumableLiquid extends InvSlotConsumable
 
 			if (!simulate)
 			{
-				tank.drain(amount, true);
+				tank.drainMb(amount, false);
 			}
 
 			return true;
@@ -192,7 +180,7 @@ public class InvSlotConsumableLiquid extends InvSlotConsumable
 		}
 	}
 
-	public boolean processIntoTank(IFluidTank tank, InvSlotOutput outputSlot)
+	public boolean processIntoTank(Ic2FluidTank tank, InvSlotOutput outputSlot)
 	{
 		if (this.isEmpty())
 		{
@@ -213,9 +201,9 @@ public class InvSlotConsumableLiquid extends InvSlotConsumable
 		return wasChange;
 	}
 
-	public boolean processFromTank(IFluidTank tank, InvSlotOutput outputSlot)
+	public boolean processFromTank(Ic2FluidTank tank, InvSlotOutput outputSlot)
 	{
-		if (!this.isEmpty() && tank.getFluidAmount() > 0)
+		if (!this.isEmpty() && !tank.isEmpty())
 		{
 			MutableObject<ItemStack> output = new MutableObject();
 			boolean wasChange = false;

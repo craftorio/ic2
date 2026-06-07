@@ -1,0 +1,12 @@
+{
+  "type": "ic2:canner_bottle",
+  "container_ingredient": {
+    "item": "ic2:fuel_rod"
+  },
+  "fill_ingredient": {
+    "item": "ic2:mox"
+  },
+  "result": {
+    "item": "ic2:mox_fuel_rod"
+  }
+}

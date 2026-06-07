@@ -3,72 +3,78 @@ package ic2.core.block.machine.tileentity;
 import ic2.api.energy.tile.IHeatSource;
 import ic2.core.ContainerBase;
 import ic2.core.IHasGui;
-import ic2.core.block.TileEntityInventory;
 import ic2.core.block.comp.Fluids;
+import ic2.core.block.tileentity.TileEntityInventory;
+import ic2.core.fluid.Ic2FluidStack;
+import ic2.core.fluid.Ic2FluidTank;
 import ic2.core.gui.dynamic.DynamicContainer;
-import ic2.core.gui.dynamic.DynamicGui;
-import ic2.core.gui.dynamic.GuiParser;
 import ic2.core.init.MainConfig;
+import ic2.core.network.GrowingBuffer;
 import ic2.core.network.GuiSynced;
 import ic2.core.profile.NotClassic;
-import ic2.core.ref.FluidName;
+import ic2.core.ref.Ic2BlockEntities;
+import ic2.core.ref.Ic2FluidTags;
+import ic2.core.ref.Ic2Fluids;
 import ic2.core.util.ConfigUtil;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.world.World;
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidRegistry;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidTank;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import ic2.core.util.Util;
+
+import java.util.Iterator;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
 
 @NotClassic
 public class TileEntitySteamRepressurizer extends TileEntityInventory implements IHasGui
 {
+	private static Fluid detectedSteamFluid;
 	protected int currentHeat;
 	@GuiSynced
-	protected final FluidTank output;
+	protected final Ic2FluidTank output;
 	@GuiSynced
-	protected final FluidTank input;
+	protected final Ic2FluidTank input;
 	protected static final int CONSUMPTION = 10;
-	public static final Fluid STEAM = FluidRegistry.getFluid("steam");
 	protected final Fluids fluids = this.addComponent(new Fluids(this));
 
-	public TileEntitySteamRepressurizer()
+	public TileEntitySteamRepressurizer(BlockPos pos, BlockState state)
 	{
-		this.input = this.fluids.addTankInsert("input", 10000, Fluids.fluidPredicate(FluidName.steam.getInstance(), FluidName.superheated_steam.getInstance()));
+		super(Ic2BlockEntities.STEAM_REPRESSURIZER, pos, state);
+		this.input = this.fluids.addTankInsert("input", 10000, Fluids.fluidPredicate(Ic2Fluids.STEAM.still, Ic2Fluids.SUPERHEATED_STEAM.still));
 		this.output = this.fluids.addTankExtract("output", 10000);
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound nbt)
+	public void load(CompoundTag nbt)
 	{
-		super.readFromNBT(nbt);
-		this.currentHeat = nbt.getInteger("heat");
+		super.load(nbt);
+		this.currentHeat = nbt.getInt("heat");
 	}
 
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
+	public void saveAdditional(CompoundTag nbt)
 	{
-		super.writeToNBT(nbt);
-		nbt.setInteger("heat", this.currentHeat);
-		return nbt;
+		super.saveAdditional(nbt);
+		nbt.putInt("heat", this.currentHeat);
 	}
 
 	public static boolean hasSteam()
 	{
-		return STEAM != null;
+		return getSteam() != null;
 	}
 
 	@Override
 	protected void updateEntityServer()
 	{
 		super.updateEntityServer();
-		if (hasSteam())
+		Fluid steam = getSteam();
+		if (steam != null)
 		{
 			if (this.input.getFluidAmount() >= 10)
 			{
@@ -82,8 +88,8 @@ public class TileEntitySteamRepressurizer extends TileEntityInventory implements
 				while (this.currentHeat > 0 && this.input.getFluidAmount() >= 10 && this.canOutput(amount))
 				{
 					this.currentHeat--;
-					this.input.drainInternal(10, true);
-					this.output.fillInternal(new FluidStack(STEAM, amount), true);
+					this.input.drainMbUnchecked(10, false);
+					this.output.fillMbUnchecked(Ic2FluidStack.create(steam, amount), false);
 				}
 			}
 		}
@@ -94,19 +100,17 @@ public class TileEntitySteamRepressurizer extends TileEntityInventory implements
 		int aim = this.input.getFluidAmount() / 10;
 		if (aim > 0)
 		{
-			World world = this.getWorld();
+			Level world = this.getLevel();
 			int targetHeat = aim;
 
-			for (EnumFacing dir : EnumFacing.VALUES)
+			for (Direction dir : Util.ALL_DIRS)
 			{
-				TileEntity target = world.getTileEntity(this.pos.offset(dir));
-				if (target instanceof IHeatSource)
+				if (world.getBlockEntity(this.worldPosition.relative(dir)) instanceof IHeatSource hs)
 				{
-					IHeatSource hs = (IHeatSource) target;
-					int request = hs.drawHeat(dir.getOpposite(), targetHeat, true);
+					int request = hs.drawHeat(dir.m_122424_(), targetHeat, true);
 					if (request > 0)
 					{
-						targetHeat -= hs.drawHeat(dir.getOpposite(), request, false);
+						targetHeat -= hs.drawHeat(dir.m_122424_(), request, false);
 						if (targetHeat <= 0)
 						{
 							break;
@@ -121,12 +125,12 @@ public class TileEntitySteamRepressurizer extends TileEntityInventory implements
 
 	protected int getOutput()
 	{
-		assert this.input.getFluid() != null;
-		Fluid fluid = this.input.getFluid().getFluid();
-		if (fluid == FluidName.steam.getInstance())
+		assert !this.input.isEmpty();
+		Fluid fluid = this.input.getFluidStack().getFluid();
+		if (fluid == Ic2Fluids.STEAM.still)
 		{
 			return ConfigUtil.getInt(MainConfig.get(), "balance/steamRepressurizer/steamPerSteam");
-		} else if (fluid == FluidName.superheated_steam.getInstance())
+		} else if (fluid == Ic2Fluids.SUPERHEATED_STEAM.still)
 		{
 			return ConfigUtil.getInt(MainConfig.get(), "balance/steamRepressurizer/steamPerSuperSteam");
 		} else
@@ -137,30 +141,40 @@ public class TileEntitySteamRepressurizer extends TileEntityInventory implements
 
 	protected boolean canOutput(int amount)
 	{
-		return this.output.fillInternal(new FluidStack(STEAM, amount), false) == amount;
+		return this.output.fillMbUnchecked(Ic2FluidStack.create(getSteam(), amount), true) == amount;
 	}
 
 	@Override
-	public ContainerBase<TileEntitySteamRepressurizer> getGuiContainer(EntityPlayer player)
+	public ContainerBase<?> createServerScreenHandler(int syncId, Player player)
 	{
-		return DynamicContainer.create(this, player, GuiParser.parse(this.teBlock));
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public GuiScreen getGui(EntityPlayer player, boolean isAdmin)
-	{
-		return DynamicGui.<TileEntitySteamRepressurizer>create(this, player, GuiParser.parse(this.teBlock));
+		return DynamicContainer.create(syncId, player.getInventory(), this);
 	}
 
 	@Override
-	public void onGuiClosed(EntityPlayer player)
+	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
+		return DynamicContainer.create(syncId, inventory, this);
 	}
 
 	@Override
 	public boolean getGuiState(String name)
 	{
 		return "valid".equals(name) ? hasSteam() : super.getGuiState(name);
+	}
+
+	private static Fluid getSteam()
+	{
+		Fluid ret = detectedSteamFluid;
+		if (ret == null)
+		{
+			Iterator var1 = Registry.f_122822_.m_206058_(Ic2FluidTags.STEAM).iterator();
+			if (var1.hasNext())
+			{
+				Holder<Fluid> entry = (Holder<Fluid>) var1.next();
+				detectedSteamFluid = ret = (Fluid) entry.m_203334_();
+			}
+		}
+
+		return ret;
 	}
 }

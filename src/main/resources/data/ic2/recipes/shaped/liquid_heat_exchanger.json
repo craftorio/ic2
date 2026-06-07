@@ -1,0 +1,26 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "gCg",
+    "gCg",
+    "IGI"
+  ],
+  "key": {
+    "G": {
+      "item": "ic2:heat_conductor"
+    },
+    "C": {
+      "item": "ic2:empty_cell"
+    },
+    "g": {
+      "item": "minecraft:glass"
+    },
+    "I": {
+      "item": "ic2:iron_casing"
+    }
+  },
+  "consuming": true,
+  "result": {
+    "item": "ic2:liquid_heat_exchanger"
+  }
+}

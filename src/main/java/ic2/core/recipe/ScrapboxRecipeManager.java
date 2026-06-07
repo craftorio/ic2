@@ -7,11 +7,7 @@ import ic2.api.recipe.MachineRecipeResult;
 import ic2.api.recipe.RecipeOutput;
 import ic2.api.recipe.Recipes;
 import ic2.core.IC2;
-import ic2.core.block.type.ResourceBlock;
-import ic2.core.item.type.CraftingItemType;
-import ic2.core.item.type.DustResourceType;
-import ic2.core.ref.BlockName;
-import ic2.core.ref.ItemName;
+import ic2.core.ref.Ic2Items;
 import ic2.core.util.StackUtil;
 
 import java.util.ArrayList;
@@ -22,12 +18,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 
 public final class ScrapboxRecipeManager implements IScrapboxManager
 {
@@ -52,14 +48,14 @@ public final class ScrapboxRecipeManager implements IScrapboxManager
 	{
 	}
 
-	public boolean addRecipe(IRecipeInput input, Collection<ItemStack> output, NBTTagCompound metadata, boolean replace)
+	public boolean addRecipe(IRecipeInput input, Collection<ItemStack> output, CompoundTag metadata, boolean replace)
 	{
-		if (!input.matches(ItemName.crafting.getItemStack(CraftingItemType.scrap_box)))
+		if (!input.matches(new ItemStack(Ic2Items.SCRAP_BOX)))
 		{
 			throw new IllegalArgumentException("currently only scrap boxes are supported");
 		}
 
-		if (metadata != null && metadata.hasKey("weight"))
+		if (metadata != null && metadata.contains("weight"))
 		{
 			if (output.size() != 1)
 			{
@@ -82,15 +78,14 @@ public final class ScrapboxRecipeManager implements IScrapboxManager
 		}
 	}
 
-	@Override
-	public boolean addRecipe(IRecipeInput input, NBTTagCompound metadata, boolean replace, ItemStack... outputs)
+	public boolean addRecipe(IRecipeInput input, CompoundTag metadata, boolean replace, ItemStack... outputs)
 	{
 		return this.addRecipe(input, Arrays.asList(outputs), metadata, replace);
 	}
 
 	public MachineRecipeResult<IRecipeInput, Collection<ItemStack>, ItemStack> apply(ItemStack input, boolean acceptTest)
 	{
-		if (!StackUtil.isEmpty(input) && StackUtil.checkItemEquality(input, ItemName.crafting.getItemStack(CraftingItemType.scrap_box)))
+		if (!StackUtil.isEmpty(input) && input.getItem() == Ic2Items.SCRAP_BOX)
 		{
 			if (this.drops.isEmpty())
 			{
@@ -103,7 +98,7 @@ public final class ScrapboxRecipeManager implements IScrapboxManager
 
 			while (low < high)
 			{
-				int mid = (high + low) / 2;
+				int mid = high + low >>> 1;
 				if (chance < this.drops.get(mid).upperChanceBound)
 				{
 					high = mid;
@@ -113,8 +108,8 @@ public final class ScrapboxRecipeManager implements IScrapboxManager
 				}
 			}
 
-			ItemStack drop = this.drops.get(low).item.copy();
-			return (MachineRecipeResult) new MachineRecipe<>(Recipes.inputFactory.forStack(ItemName.crafting.getItemStack(CraftingItemType.scrap_box)), Collections.singletonList(drop))
+			ItemStack drop = this.drops.get(low).item.m_41777_();
+			return new MachineRecipe<>(Recipes.inputFactory.forItem(Ic2Items.SCRAP_BOX), Collections.singletonList(drop))
 				.getResult(StackUtil.copyShrunk(input, 1));
 		} else
 		{
@@ -141,7 +136,6 @@ public final class ScrapboxRecipeManager implements IScrapboxManager
 		return false;
 	}
 
-	@Override
 	public void addDrop(ItemStack drop, float rawChance)
 	{
 		this.drops.add(new ScrapboxRecipeManager.Drop(drop, rawChance));
@@ -155,7 +149,7 @@ public final class ScrapboxRecipeManager implements IScrapboxManager
 		{
 			if (adjustInput)
 			{
-				input.setCount(StackUtil.getSize(result.getAdjustedInput()));
+				input.m_41764_(StackUtil.getSize(result.getAdjustedInput()));
 			}
 
 			return result.getOutput().iterator().next();
@@ -182,55 +176,55 @@ public final class ScrapboxRecipeManager implements IScrapboxManager
 	{
 		if (IC2.suddenlyHoes)
 		{
-			this.addDrop(Items.WOODEN_HOE, 9001.0F);
+			this.addDrop(Items.f_42424_, 9001.0F);
 		} else
 		{
-			this.addDrop(Items.WOODEN_HOE, 5.01F);
+			this.addDrop(Items.f_42424_, 5.01F);
 		}
 
-		this.addDrop(Blocks.DIRT, 5.0F);
-		this.addDrop(Items.STICK, 4.0F);
-		this.addDrop(Blocks.GRASS, 3.0F);
-		this.addDrop(Blocks.GRAVEL, 3.0F);
-		this.addDrop(Blocks.NETHERRACK, 2.0F);
-		this.addDrop(Items.ROTTEN_FLESH, 2.0F);
-		this.addDrop(Items.APPLE, 1.5F);
-		this.addDrop(Items.BREAD, 1.5F);
-		this.addDrop(ItemName.filled_tin_can.getItemStack(), 1.5F);
-		this.addDrop(Items.WOODEN_SWORD, 1.0F);
-		this.addDrop(Items.WOODEN_SHOVEL, 1.0F);
-		this.addDrop(Items.WOODEN_PICKAXE, 1.0F);
-		this.addDrop(Blocks.SOUL_SAND, 1.0F);
-		this.addDrop(Items.SIGN, 1.0F);
-		this.addDrop(Items.LEATHER, 1.0F);
-		this.addDrop(Items.FEATHER, 1.0F);
-		this.addDrop(Items.BONE, 1.0F);
-		this.addDrop(Items.COOKED_PORKCHOP, 0.9F);
-		this.addDrop(Items.COOKED_BEEF, 0.9F);
-		this.addDrop(Blocks.PUMPKIN, 0.9F);
-		this.addDrop(Items.COOKED_CHICKEN, 0.9F);
-		this.addDrop(Items.MINECART, 0.01F);
+		this.addDrop(Blocks.f_50493_, 5.0F);
+		this.addDrop(Items.f_42398_, 4.0F);
+		this.addDrop(Blocks.f_50034_, 3.0F);
+		this.addDrop(Blocks.f_49994_, 3.0F);
+		this.addDrop(Blocks.f_50134_, 2.0F);
+		this.addDrop(Items.f_42583_, 2.0F);
+		this.addDrop(Items.f_42410_, 1.5F);
+		this.addDrop(Items.f_42406_, 1.5F);
+		this.addDrop(Ic2Items.FILLED_TIN_CAN, 1.5F);
+		this.addDrop(Items.f_42420_, 1.0F);
+		this.addDrop(Items.f_42421_, 1.0F);
+		this.addDrop(Items.f_42422_, 1.0F);
+		this.addDrop(Blocks.f_50135_, 1.0F);
+		this.addDrop(Items.f_42438_, 1.0F);
+		this.addDrop(Items.f_42454_, 1.0F);
+		this.addDrop(Items.f_42402_, 1.0F);
+		this.addDrop(Items.f_42500_, 1.0F);
+		this.addDrop(Items.f_42486_, 0.9F);
+		this.addDrop(Items.f_42580_, 0.9F);
+		this.addDrop(Blocks.f_50133_, 0.9F);
+		this.addDrop(Items.f_42582_, 0.9F);
+		this.addDrop(Items.f_42449_, 0.01F);
 		this.addDrop(Items.REDSTONE, 0.9F);
-		this.addDrop(ItemName.crafting.getItemStack(CraftingItemType.rubber), 0.8F);
-		this.addDrop(Items.GLOWSTONE_DUST, 0.8F);
-		this.addDrop(ItemName.dust.getItemStack(DustResourceType.coal), 0.8F);
-		this.addDrop(ItemName.dust.getItemStack(DustResourceType.copper), 0.8F);
-		this.addDrop(ItemName.dust.getItemStack(DustResourceType.tin), 0.8F);
-		this.addDrop(ItemName.single_use_battery.getItemStack(), 0.7F);
-		this.addDrop(ItemName.dust.getItemStack(DustResourceType.iron), 0.7F);
-		this.addDrop(ItemName.dust.getItemStack(DustResourceType.gold), 0.7F);
-		this.addDrop(Items.SLIME_BALL, 0.6F);
-		this.addDrop(Blocks.IRON_ORE, 0.5F);
-		this.addDrop(Items.GOLDEN_HELMET, 0.01F);
-		this.addDrop(Blocks.GOLD_ORE, 0.5F);
-		this.addDrop(Items.CAKE, 0.5F);
-		this.addDrop(Items.DIAMOND, 0.1F);
-		this.addDrop(Items.EMERALD, 0.05F);
-		this.addDrop(Items.ENDER_PEARL, 0.08F);
-		this.addDrop(Items.BLAZE_ROD, 0.04F);
-		this.addDrop(Items.EGG, 0.8F);
-		this.addDrop(BlockName.resource.getItemStack(ResourceBlock.copper_ore), 0.7F);
-		this.addDrop(BlockName.resource.getItemStack(ResourceBlock.tin_ore), 0.7F);
+		this.addDrop(Ic2Items.RUBBER, 0.8F);
+		this.addDrop(Items.f_42525_, 0.8F);
+		this.addDrop(Ic2Items.COAL_DUST, 0.8F);
+		this.addDrop(Ic2Items.COPPER_DUST, 0.8F);
+		this.addDrop(Ic2Items.TIN_DUST, 0.8F);
+		this.addDrop(Ic2Items.SINGLE_USE_BATTERY, 0.7F);
+		this.addDrop(Ic2Items.IRON_DUST, 0.7F);
+		this.addDrop(Ic2Items.GOLD_DUST, 0.7F);
+		this.addDrop(Items.f_42518_, 0.6F);
+		this.addDrop(Blocks.f_49996_, 0.5F);
+		this.addDrop(Items.f_42476_, 0.01F);
+		this.addDrop(Blocks.f_49995_, 0.5F);
+		this.addDrop(Items.f_42502_, 0.5F);
+		this.addDrop(Items.f_42415_, 0.1F);
+		this.addDrop(Items.f_42616_, 0.05F);
+		this.addDrop(Items.f_42584_, 0.08F);
+		this.addDrop(Items.f_42585_, 0.04F);
+		this.addDrop(Items.f_42521_, 0.8F);
+		this.addDrop(Blocks.f_152505_, 0.7F);
+		this.addDrop(Ic2Items.TIN_ORE, 0.7F);
 	}
 
 	private void addDrop(Block block, float rawChance)

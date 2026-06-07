@@ -1,0 +1,20 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "PUP",
+    "U U",
+    "PUP"
+  ],
+  "key": {
+    "U": {
+      "item": "ic2:empty_cell"
+    },
+    "P": {
+      "tag": "forge:plates/bronze"
+    }
+  },
+  "consuming": true,
+  "result": {
+    "item": "ic2:bronze_tank"
+  }
+}

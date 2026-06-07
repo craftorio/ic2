@@ -2,40 +2,42 @@ package ic2.core.item.tool;
 
 import ic2.api.item.IEnhancedOverlayProvider;
 import ic2.core.IC2;
-import ic2.core.audio.PositionSpec;
 import ic2.core.block.transport.cover.ICoverHolder;
 import ic2.core.init.Localization;
-import ic2.core.item.ItemToolIC2;
-import ic2.core.ref.ItemName;
+import ic2.core.item.PriorityUsableItem;
+import ic2.core.ref.Ic2ItemTags;
+import ic2.core.ref.Ic2SoundEvents;
 import ic2.core.util.RotationUtil;
-import ic2.core.util.StackUtil;
 import ic2.core.util.Util;
 
-import java.util.EnumSet;
 import java.util.List;
-import javax.annotation.Nullable;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
+
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Tier;
+import net.minecraft.world.item.TieredItem;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.Item.Properties;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
-public class ItemToolCrowbar extends ItemToolIC2 implements IEnhancedOverlayProvider
+public class ItemToolCrowbar extends TieredItem implements IEnhancedOverlayProvider, PriorityUsableItem
 {
-	public ItemToolCrowbar()
+	public ItemToolCrowbar(Tier material, Properties settings)
 	{
-		super(ItemName.crowbar, HarvestLevel.Iron, EnumSet.of(ToolClass.Crowbar));
-		this.setMaxDamage(250);
+		super(material, settings);
 	}
 
 	public boolean canTakeDamage(ItemStack stack, int amount)
@@ -43,66 +45,74 @@ public class ItemToolCrowbar extends ItemToolIC2 implements IEnhancedOverlayProv
 		return true;
 	}
 
-	public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand)
+	@Override
+	public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context)
 	{
-		ItemStack stack = StackUtil.get(player, hand);
+		Level world = context.m_43725_();
+		Player player = context.m_43723_();
+		InteractionHand hand = context.m_43724_();
+		BlockPos pos = context.m_8083_();
+		Direction side = context.m_43719_();
+		Vec3 hitPos = context.m_43720_();
 		if (!this.canTakeDamage(stack, 1))
 		{
-			return EnumActionResult.FAIL;
+			return InteractionResult.FAIL;
 		}
 
-		IBlockState state = Util.getBlockState(world, pos);
+		BlockState state = world.getBlockState(pos);
 		Block block = state.getBlock();
-		if (block.isAir(state, world, pos))
+		if (state.isAir())
 		{
-			return EnumActionResult.FAIL;
+			return InteractionResult.FAIL;
 		}
 
-		if (world.getTileEntity(pos) instanceof ICoverHolder)
+		if (world.getBlockEntity(pos) instanceof ICoverHolder target)
 		{
-			ICoverHolder target = (ICoverHolder) world.getTileEntity(pos);
-			EnumFacing selectedFacing = RotationUtil.rotateByHit(side, hitX, hitY, hitZ);
+			Direction selectedFacing = RotationUtil.rotateByHit(side, (float) hitPos.f_82479_, (float) hitPos.f_82480_, (float) hitPos.f_82481_);
 			if (target.canRemoveCover(world, pos, selectedFacing))
 			{
-				if (!world.isRemote)
+				if (!world.isClientSide)
 				{
 					target.removeCover(world, pos, selectedFacing);
-					stack.damageItem(1, player);
+					if (player != null)
+					{
+						stack.m_41622_(1, player, p -> p.m_21190_(hand));
+					}
 				} else
 				{
-					IC2.audioManager.playOnce(player, PositionSpec.Hand, "Tools/Crowbar.ogg", true, IC2.audioManager.getDefaultVolume());
-					IC2.platform.messagePlayer(player, Localization.translate("Attachment removed"));
+					IC2.soundManager.playOnce(Ic2SoundEvents.ITEM_CROWBAR_USE, SoundSource.BLOCKS, 1.0F, 1.0F, player);
+					IC2.sideProxy.messagePlayer(player, Localization.translate("Attachment removed"));
 				}
 			}
 
-			return world.isRemote ? EnumActionResult.PASS : EnumActionResult.SUCCESS;
+			return world.isClientSide ? InteractionResult.PASS : InteractionResult.SUCCESS;
 		} else
 		{
-			return EnumActionResult.FAIL;
+			return InteractionResult.FAIL;
 		}
 	}
 
-	public boolean getIsRepairable(ItemStack toRepair, ItemStack repair)
+	public boolean m_6832_(ItemStack toRepair, ItemStack repair)
 	{
-		return repair != null && Util.matchesOD(repair, "ingotBronze");
+		return repair != null && Util.matchesOD(repair, Ic2ItemTags.BRONZE_INGOTS);
 	}
 
-	public boolean isEnchantable(ItemStack stack)
+	public boolean m_8120_(ItemStack stack)
 	{
 		return false;
 	}
 
-	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> info, ITooltipFlag flagIn)
+	@OnlyIn(Dist.CLIENT)
+	public void m_7373_(ItemStack stack, Level worldIn, List<Component> info, TooltipFlag flagIn)
 	{
-		info.add(Minecraft.getMinecraft().gameSettings.keyBindUseItem.getDisplayName() + ":");
-		info.add(" Remove attachments from blocks");
+		info.add(Component.m_237115_(Minecraft.m_91087_().f_91066_.f_92088_.m_90860_() + ":"));
+		info.add(Component.m_237113_(" Remove attachments from blocks"));
 	}
 
 	@Override
-	public boolean providesEnhancedOverlay(World world, BlockPos pos, EnumFacing side, EntityPlayer player, ItemStack stack)
+	public boolean providesEnhancedOverlay(Level world, BlockPos pos, Direction side, Player player, ItemStack stack)
 	{
-		TileEntity tileEntity = world.getTileEntity(pos);
+		BlockEntity tileEntity = world.getBlockEntity(pos);
 		return tileEntity instanceof ICoverHolder;
 	}
 }

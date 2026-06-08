@@ -1,11 +1,10 @@
 .claude/
 .idea/
 .vscode/
-ic2_old/
-src_1192/
 
 .gradle/
 build/
 run/
+out/
 
 gradle-wrapper.jar

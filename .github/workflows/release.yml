@@ -1,0 +1,52 @@
+# .github/workflows/release.yml
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+      - '2.10.*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5.2.0
+        with:
+          java-version: '17'
+          distribution: 'microsoft'
+
+      - name: Extract version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew build
+        env:
+          MOD_VERSION: ${{ steps.get_version.outputs.VERSION }}
+
+      - name: Determine prerelease
+        id: prerelease
+        run: |
+          if [[ "${{ steps.get_version.outputs.VERSION }}" == *"-release"* ]]; then
+            echo "IS_RELEASE=true" >> $GITHUB_OUTPUT
+          else
+            echo "IS_RELEASE=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: "IndustrialCraft 2 ${{ steps.get_version.outputs.VERSION }}"
+          prerelease: ${{ steps.prerelease.outputs.IS_RELEASE }}
+          files: build/libs/*.jar
+          generate_release_notes: true

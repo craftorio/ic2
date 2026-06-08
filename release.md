@@ -12,22 +12,14 @@
 
 电力喷气背包、储电背包、CESU储电背包、能量水晶储电背包、兰波顿储电背包
 
-## 已知问题
+## 已知问题 (已修复)
 
-注册键 ic2: 已经省略
+以下问题已在后续提交中修复：
 
-- 复合胸甲 alloy_chestplate
-- 建筑泡沫背包 cf_pack
-- 喷气背包 jetpack
-- 防化头盔 hazmat_helmet
-- 防化服 hazmat_chestplate
-- 防化裤 hazmat_leggings
-- 橡胶靴 rubber_boots、
-- 夜视镜 night_vision_goggles
-- 青铜 bronze_\*、纳米 nano_\* 和量子 quantum_\*套装
-
-缺少穿戴模型：物品正常显示，穿戴模型为紫黑。
-
-- 纳米剑 nano_saber
-
-缺少右键使用功能，以及相关模型动画
+- ~~复合胸甲/青铜/纳米/量子套装等盔甲物品穿戴模型紫黑~~ — 修复：`Ic2ArmorMaterials.getName()` 添加 `ic2:` namespace 前缀
+- ~~建筑泡沫背包 cf_pack 穿戴模型紫黑~~
+- ~~喷气背包 jetpack 穿戴模型紫黑~~
+- ~~防化头盔/防化服/防化裤 hazmat_\* 穿戴模型紫黑~~
+- ~~橡胶靴 rubber_boots 穿戴模型紫黑~~
+- ~~夜视镜 night_vision_goggles 穿戴模型紫黑~~
+- ~~纳米剑 nano_saber 缺少右键使用功能和模型动画~~ — 修复：将静态 ticker 改为基于 NBT 的每物品独立计时；客户端右键返回 consume 以提供视觉反馈

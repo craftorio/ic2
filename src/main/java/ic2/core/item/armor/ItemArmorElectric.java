@@ -57,7 +57,7 @@ public abstract class ItemArmorElectric extends ItemArmorIC2 implements IElectri
 
 	public static void damageArmor(Player entity, DamageSource source, float amount)
 	{
-		if (!(amount <= 0.0F) && !source.is(DamageTypeTags.BYPASSES_ENCHANTMENTS))
+		if (source != null && !(amount <= 0.0F) && !source.is(DamageTypeTags.BYPASSES_ENCHANTMENTS))
 		{
 			float damage = amount / 4.0F;
 			if (damage < 1.0F)

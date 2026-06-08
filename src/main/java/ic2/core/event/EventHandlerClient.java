@@ -62,7 +62,7 @@ public class EventHandlerClient
 		SideProxyClient.envProxy
 			.registerModelPredicateProvider(
 				IC2.getIdentifier("nano_saber_active"),
-				(stack, world, entity, seed) -> stack.getItem() instanceof AbstractItemNanoSaber nanoSaber ? nanoSaber.getActiveData() : 0.0F
+				(stack, world, entity, seed) -> stack.getItem() instanceof AbstractItemNanoSaber nanoSaber ? nanoSaber.getActiveData(stack, world) : 0.0F
 			);
 		SideProxyClient.envProxy
 			.registerModelPredicateProvider(

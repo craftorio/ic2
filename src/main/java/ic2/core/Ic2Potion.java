@@ -18,7 +18,11 @@ public class Ic2Potion extends MobEffect
 	{
 		if (this == radiation)
 		{
-			entity.hurt(Ic2DamageSource.radiation, amplifier / 100 + 0.5F);
+			if (Ic2DamageSource.radiation == null)
+		{
+			Ic2DamageSource.init(entity.level().registryAccess());
+		}
+		entity.hurt(Ic2DamageSource.radiation, amplifier / 100 + 0.5F);
 		}
 	}
 

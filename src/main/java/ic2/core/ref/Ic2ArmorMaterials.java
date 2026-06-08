@@ -14,14 +14,14 @@ import net.minecraft.world.level.ItemLike;
 
 public enum Ic2ArmorMaterials implements ArmorMaterial
 {
-	BRONZE("ic2_bronze", 15, new int[] { 2, 5, 6, 2 }, 9, SoundEvents.ARMOR_EQUIP_IRON, 0.0F, 0.0F, () -> Ingredient.of(new ItemLike[] { Ic2Items.BRONZE_INGOT })),
-	ALLOY("ic2_alloy", 50, new int[] { 4, 7, 9, 4 }, 12, SoundEvents.ARMOR_EQUIP_IRON, 2.0F, 0.0F, () -> Ingredient.of(new ItemLike[] { Ic2Items.ALLOY })),
-	NANO_SUIT("ic2_nano", 0, new int[] { 0, 0, 0, 0 }, 0, SoundEvents.ARMOR_EQUIP_IRON, 2.0F, 0.0F, Ingredient::of),
-	QUANTUM_SUIT("ic2_quantum", 0, new int[] { 0, 0, 0, 0 }, 0, SoundEvents.ARMOR_EQUIP_IRON, 2.0F, 0.0F, Ingredient::of),
-	NIGHT_VISION_GOGGLES("ic2_night_vision", 0, new int[] { 3, 0, 0, 0 }, 0, SoundEvents.ARMOR_EQUIP_IRON, 2.0F, 0.0F, Ingredient::of),
-	HAZMAT("ic2_hazmat", SoundEvents.ARMOR_EQUIP_LEATHER),
-	CF_PACK("ic2_cf_pack", SoundEvents.ARMOR_EQUIP_IRON),
-	JET_PACK("ic2_jet_pack", SoundEvents.ARMOR_EQUIP_IRON);
+	BRONZE("ic2:ic2_bronze", 15, new int[] { 2, 5, 6, 2 }, 9, SoundEvents.ARMOR_EQUIP_IRON, 0.0F, 0.0F, () -> Ingredient.of(new ItemLike[] { Ic2Items.BRONZE_INGOT })),
+	ALLOY("ic2:ic2_alloy", 50, new int[] { 4, 7, 9, 4 }, 12, SoundEvents.ARMOR_EQUIP_IRON, 2.0F, 0.0F, () -> Ingredient.of(new ItemLike[] { Ic2Items.ALLOY })),
+	NANO_SUIT("ic2:ic2_nano", 0, new int[] { 0, 0, 0, 0 }, 0, SoundEvents.ARMOR_EQUIP_IRON, 2.0F, 0.0F, Ingredient::of),
+	QUANTUM_SUIT("ic2:ic2_quantum", 0, new int[] { 0, 0, 0, 0 }, 0, SoundEvents.ARMOR_EQUIP_IRON, 2.0F, 0.0F, Ingredient::of),
+	NIGHT_VISION_GOGGLES("ic2:ic2_night_vision", 0, new int[] { 3, 0, 0, 0 }, 0, SoundEvents.ARMOR_EQUIP_IRON, 2.0F, 0.0F, Ingredient::of),
+	HAZMAT("ic2:ic2_hazmat", SoundEvents.ARMOR_EQUIP_LEATHER),
+	CF_PACK("ic2:ic2_cf_pack", SoundEvents.ARMOR_EQUIP_IRON),
+	JET_PACK("ic2:ic2_jet_pack", SoundEvents.ARMOR_EQUIP_IRON);
 
 	private static final int[] BASE_DURABILITY = new int[] { 13, 15, 16, 11 };
 	private final String name;

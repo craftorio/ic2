@@ -34,7 +34,6 @@ import org.jetbrains.annotations.NotNull;
 
 public abstract class AbstractItemNanoSaber extends ItemElectricTool implements ISwingSoundItem
 {
-	public static int ticker = 0;
 	private int soundTicker = 0;
 	public static final int ANIMATION_FRAME = 4;
 
@@ -159,18 +158,21 @@ public abstract class AbstractItemNanoSaber extends ItemElectricTool implements 
 		ItemStack stack = StackUtil.get(player, hand);
 		if (world.isClientSide)
 		{
-			return new InteractionResultHolder(InteractionResult.PASS, stack);
+			return InteractionResultHolder.consume(stack);
 		} else
 		{
 			CompoundTag nbt = StackUtil.getOrCreateNbtData(stack);
 			if (isActive(nbt))
 			{
 				setActive(nbt, false);
-				return new InteractionResultHolder(InteractionResult.SUCCESS, stack);
+				nbt.putLong("activationTick", 0);
+				return InteractionResultHolder.consume(stack);
 			} else if (ElectricItem.manager.canUse(stack, 16.0))
 			{
 				setActive(nbt, true);
-				return new InteractionResultHolder(InteractionResult.SUCCESS, stack);
+				nbt.putLong("activationTick", world.getGameTime());
+				nbt.putInt("energyTick", 0);
+				return InteractionResultHolder.consume(stack);
 			} else
 			{
 				return super.use(world, player, hand);
@@ -185,26 +187,48 @@ public abstract class AbstractItemNanoSaber extends ItemElectricTool implements 
 		CompoundTag nbt = StackUtil.getOrCreateNbtData(stack);
 		if (!isActive(nbt))
 		{
-			ticker = 0;
-		} else
+			return;
+		}
+
+		if (!IC2.sideProxy.isSimulating())
 		{
-			ticker++;
-			if (ticker % 16 == 0 && entity instanceof ServerPlayer)
+			return;
+		}
+
+		int energyTick = nbt.getInt("energyTick");
+		energyTick++;
+		nbt.putInt("energyTick", energyTick);
+
+		if (energyTick % 16 == 0 && entity instanceof ServerPlayer)
+		{
+			if (slot < 9)
 			{
-				if (slot < 9)
-				{
-					this.consumeEnergy(stack, 64.0, (Player) entity);
-				} else if (ticker % 64 == 0)
-				{
-					this.consumeEnergy(stack, 16.0, (Player) entity);
-				}
+				this.consumeEnergy(stack, 64.0, (Player) entity);
+			} else if (energyTick % 64 == 0)
+			{
+				this.consumeEnergy(stack, 16.0, (Player) entity);
 			}
 		}
 	}
 
-	public float getActiveData()
+	public float getActiveData(ItemStack stack, Level world)
 	{
-		return ticker > 0 ? (float) (Math.floor(ticker / 20.0 * 4.0) % 10.0 + 1.0) / 10.0F : 0.0F;
+		if (world == null || !isActive(stack))
+		{
+			return 0.0F;
+		}
+		CompoundTag nbt = StackUtil.getOrCreateNbtData(stack);
+		long activationTick = nbt.getLong("activationTick");
+		if (activationTick == 0)
+		{
+			return 0.0F;
+		}
+		long elapsed = world.getGameTime() - activationTick;
+		if (elapsed < 0)
+		{
+			return 0.0F;
+		}
+		return (float) (Math.floor(elapsed / 5.0) % 10.0 + 1.0) / 10.0F;
 	}
 
 	public Rarity getRarity(ItemStack stack)

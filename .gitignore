@@ -1,6 +1,7 @@
 .claude/
 .idea/
 .vscode/
+ic2_old/
 
 .gradle/
 build/

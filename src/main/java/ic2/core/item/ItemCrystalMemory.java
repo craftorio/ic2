@@ -30,23 +30,23 @@ public class ItemCrystalMemory extends Item
 		super(settings);
 	}
 
-	public void m_7373_(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag advanced)
+	public void appendHoverText(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag advanced)
 	{
 		ItemStack recorded = this.readItemStack(stack);
 		if (!StackUtil.isEmpty(recorded))
 		{
 			tooltip.add(
-				Component.m_237113_(Localization.translate("item.ic2.crystal_memory.tooltip.item") + " " + recorded.m_41786_()).m_130940_(ChatFormatting.GRAY)
+				Component.literal(Localization.translate("item.ic2.crystal_memory.tooltip.item") + " " + recorded.getHoverName()).withStyle(ChatFormatting.GRAY)
 			);
 			tooltip.add(
-				Component.m_237113_(
+				Component.literal(
 						Localization.translate("item.ic2.crystal_memory.tooltip.uu_matter") + " " + Util.toSiString(UuIndex.instance.getInBuckets(recorded), 4) + "B"
 					)
-					.m_130940_(ChatFormatting.GRAY)
+					.withStyle(ChatFormatting.GRAY)
 			);
 		} else
 		{
-			tooltip.add(Component.m_237115_("item.ic2.crystal_memory.tooltip.empty").m_130940_(ChatFormatting.GRAY));
+			tooltip.add(Component.translatable("item.ic2.crystal_memory.tooltip.empty").withStyle(ChatFormatting.GRAY));
 		}
 	}
 
@@ -54,14 +54,14 @@ public class ItemCrystalMemory extends Item
 	{
 		CompoundTag nbt = StackUtil.getOrCreateNbtData(stack);
 		CompoundTag contentTag = nbt.getCompound("Pattern");
-		return ItemStack.m_41712_(contentTag);
+		return ItemStack.of(contentTag);
 	}
 
 	public void writecontentsTag(ItemStack stack, ItemStack recorded)
 	{
 		CompoundTag nbt = StackUtil.getOrCreateNbtData(stack);
 		CompoundTag contentTag = new CompoundTag();
-		recorded.m_41739_(contentTag);
+		recorded.save(contentTag);
 		nbt.put("Pattern", contentTag);
 	}
 }

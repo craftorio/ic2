@@ -18,15 +18,15 @@ public class ItemTinCan extends Item
 		super(settings);
 	}
 
-	public InteractionResultHolder<ItemStack> m_7203_(Level world, Player player, InteractionHand hand)
+	public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand)
 	{
 		ItemStack stack = StackUtil.get(player, hand);
-		return !world.isClientSide && player.m_36324_().m_38721_() ? this.onEaten(player, stack) : new InteractionResultHolder(InteractionResult.PASS, stack);
+		return !world.isClientSide && player.getFoodData().needsFood() ? this.onEaten(player, stack) : new InteractionResultHolder(InteractionResult.PASS, stack);
 	}
 
 	public InteractionResultHolder<ItemStack> onEaten(Player player, ItemStack stack)
 	{
-		int amount = Math.min(StackUtil.getSize(stack), 20 - player.m_36324_().m_38702_());
+		int amount = Math.min(StackUtil.getSize(stack), 20 - player.getFoodData().getFoodLevel());
 		if (amount <= 0)
 		{
 			return new InteractionResultHolder(InteractionResult.PASS, stack);
@@ -35,7 +35,7 @@ public class ItemTinCan extends Item
 			ItemStack emptyStack = new ItemStack(Ic2Items.TIN_CAN, amount);
 			if (StackUtil.storeInventoryItem(emptyStack, player, true))
 			{
-				player.m_36324_().m_38707_(amount, amount);
+				player.getFoodData().eat(amount, amount);
 				stack = StackUtil.decSize(stack, amount);
 				StackUtil.storeInventoryItem(emptyStack, player, false);
 				return new InteractionResultHolder(InteractionResult.SUCCESS, stack);

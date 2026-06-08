@@ -53,15 +53,15 @@ public class ItemArmorNanoSuit extends ItemArmorElectric implements IItemHudProv
 		return true;
 	}
 
-	public void m_6883_(ItemStack stack, Level world, Entity entity, int slot, boolean selected)
+	public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected)
 	{
-		super.m_6883_(stack, world, entity, slot, selected);
+		super.inventoryTick(stack, world, entity, slot, selected);
 		if (entity instanceof Player player)
 		{
 			CompoundTag nbtData = StackUtil.getOrCreateNbtData(stack);
 			byte toggleTimer = nbtData.getByte("toggleTimer");
 			boolean ret = false;
-			if (slot == EquipmentSlot.HEAD.m_20749_())
+			if (slot == EquipmentSlot.HEAD.getIndex())
 			{
 				boolean isNightVisionEnabled = nbtData.getBoolean("Nightvision");
 				short hubmode = nbtData.getShort("HudMode");
@@ -107,23 +107,23 @@ public class ItemArmorNanoSuit extends ItemArmorElectric implements IItemHudProv
 
 				if (isNightVisionEnabled && IC2.sideProxy.isSimulating())
 				{
-					int skylight = player.getCommandSenderWorld().m_46803_(new BlockPos(player.m_20182_()));
+					int skylight = player.getCommandSenderWorld().getMaxLocalRawBrightness(new BlockPos(player.position()));
 					if (skylight <= 8 && ElectricItem.manager.use(stack, 1.0, player))
 					{
-						player.m_7292_(new MobEffectInstance(MobEffects.f_19611_, 300, 0, true, true));
+						player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 300, 0, true, true));
 						return;
 					}
 				}
 
 				if (IC2.sideProxy.isSimulating())
 				{
-					player.m_21195_(MobEffects.f_19611_);
+					player.removeEffect(MobEffects.NIGHT_VISION);
 				}
 			}
 		}
 	}
 
-	public Rarity m_41460_(ItemStack stack)
+	public Rarity getRarity(ItemStack stack)
 	{
 		return Rarity.UNCOMMON;
 	}
@@ -131,7 +131,7 @@ public class ItemArmorNanoSuit extends ItemArmorElectric implements IItemHudProv
 	@Override
 	public boolean doesProvideHUD(ItemStack stack)
 	{
-		return this.f_40377_ == EquipmentSlot.HEAD && ElectricItem.manager.getCharge(stack) > 0.0;
+		return this.slot == EquipmentSlot.HEAD && ElectricItem.manager.getCharge(stack) > 0.0;
 	}
 
 	@Override

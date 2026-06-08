@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 
 public abstract class ExplosiveEntity extends Entity
 {
-	private static final EntityDataAccessor<Integer> FUSE = SynchedEntityData.m_135353_(ExplosiveEntity.class, EntityDataSerializers.f_135028_);
+	private static final EntityDataAccessor<Integer> FUSE = SynchedEntityData.defineId(ExplosiveEntity.class, EntityDataSerializers.INT);
 	private static final int DEFAULT_FUSE = 80;
 	public LivingEntity causingEntity;
 	public float explosivePower = 4.0F;
@@ -45,12 +45,12 @@ public abstract class ExplosiveEntity extends Entity
 	)
 	{
 		this(type, world);
-		this.m_20248_(x, y, z);
+		this.absMoveTo(x, y, z);
 		double angle = (Math.PI * 2) * world.random.nextDouble();
-		this.m_20334_(-Math.sin(angle) * 0.02, 0.2, -Math.cos(angle) * 0.02);
-		this.f_19854_ = x;
-		this.f_19855_ = y;
-		this.f_19856_ = z;
+		this.setDeltaMovement(-Math.sin(angle) * 0.02, 0.2, -Math.cos(angle) * 0.02);
+		this.xo = x;
+		this.yo = y;
+		this.zo = z;
 		this.setFuse(fuse);
 		this.explosivePower = power;
 		this.radiationRange = radiationRange;
@@ -62,48 +62,48 @@ public abstract class ExplosiveEntity extends Entity
 	public ExplosiveEntity(EntityType<? extends Entity> entityType, Level world)
 	{
 		super(entityType, world);
-		this.f_19850_ = true;
+		this.blocksBuilding = true;
 	}
 
-	protected void m_8097_()
+	protected void defineSynchedData()
 	{
-		this.f_19804_.m_135372_(FUSE, 80);
+		this.entityData.define(FUSE, 80);
 	}
 
-	public boolean m_5829_()
+	public boolean canBeCollidedWith()
 	{
-		return !this.m_213877_();
+		return !this.isRemoved();
 	}
 
-	public void m_8119_()
+	public void tick()
 	{
-		if (!this.m_20068_())
+		if (!this.isNoGravity())
 		{
-			this.m_20256_(this.m_20184_().m_82520_(0.0, -0.04, 0.0));
+			this.setDeltaMovement(this.getDeltaMovement().add(0.0, -0.04, 0.0));
 		}
 
-		this.m_6478_(MoverType.SELF, this.m_20184_());
-		this.m_20256_(this.m_20184_().m_82490_(0.98));
-		if (this.f_19861_)
+		this.move(MoverType.SELF, this.getDeltaMovement());
+		this.setDeltaMovement(this.getDeltaMovement().scale(0.98));
+		if (this.onGround)
 		{
-			this.m_20256_(this.m_20184_().m_82542_(0.7, -0.5, 0.7));
+			this.setDeltaMovement(this.getDeltaMovement().multiply(0.7, -0.5, 0.7));
 		}
 
 		int i = this.getFuse() - 1;
 		this.setFuse(i);
 		if (i <= 0)
 		{
-			this.m_146870_();
-			if (!this.f_19853_.isClientSide)
+			this.discard();
+			if (!this.level.isClientSide)
 			{
 				this.explode();
 			}
 		} else
 		{
-			this.m_20073_();
-			if (this.f_19853_.isClientSide)
+			this.updateInWaterStateAndDoFluidPushing();
+			if (this.level.isClientSide)
 			{
-				this.f_19853_.addParticle(ParticleTypes.SMOKE, this.getX(), this.getY() + 0.5, this.getZ(), 0.0, 0.0, 0.0);
+				this.level.addParticle(ParticleTypes.SMOKE, this.getX(), this.getY() + 0.5, this.getZ(), 0.0, 0.0, 0.0);
 			}
 		}
 	}
@@ -131,42 +131,42 @@ public abstract class ExplosiveEntity extends Entity
 		return this.causingEntity;
 	}
 
-	protected MovementEmission m_142319_()
+	protected MovementEmission getMovementEmission()
 	{
 		return MovementEmission.NONE;
 	}
 
-	public boolean m_6087_()
+	public boolean isPickable()
 	{
-		return !this.m_213877_();
+		return !this.isRemoved();
 	}
 
-	protected void m_7380_(CompoundTag nbt)
+	protected void addAdditionalSaveData(CompoundTag nbt)
 	{
 		nbt.putShort("Fuse", (short) this.getFuse());
 	}
 
-	protected void m_7378_(CompoundTag nbt)
+	protected void readAdditionalSaveData(CompoundTag nbt)
 	{
 		this.setFuse(nbt.getShort("Fuse"));
 	}
 
-	protected float m_6380_(Pose pose, EntityDimensions dimensions)
+	protected float getEyeHeight(Pose pose, EntityDimensions dimensions)
 	{
 		return 0.15F;
 	}
 
 	public void setFuse(int fuse)
 	{
-		this.f_19804_.m_135381_(FUSE, fuse);
+		this.entityData.set(FUSE, fuse);
 	}
 
 	public int getFuse()
 	{
-		return (Integer) this.f_19804_.m_135370_(FUSE);
+		return (Integer) this.entityData.get(FUSE);
 	}
 
-	public Packet<?> m_5654_()
+	public Packet<?> getAddEntityPacket()
 	{
 		return new ClientboundAddEntityPacket(this);
 	}

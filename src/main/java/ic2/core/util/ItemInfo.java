@@ -44,7 +44,7 @@ public class ItemInfo implements IInfoProvider
 		}
 
 		Ic2FluidStack liquid = Ic2FluidStack.get(stack);
-		boolean isLava = liquid != null && !liquid.isEmpty() && liquid.getFluid() == Fluids.f_76195_;
+		boolean isLava = liquid != null && !liquid.isEmpty() && liquid.getFluid() == Fluids.LAVA;
 		if (isLava && !allowLava)
 		{
 			return 0;

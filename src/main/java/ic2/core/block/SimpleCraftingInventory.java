@@ -42,7 +42,7 @@ public abstract class SimpleCraftingInventory extends CraftingContainer
 	public ItemStack removeItem(int index, int amount)
 	{
 		ItemStack stack;
-		return index < this.size && amount > 0 && !StackUtil.isEmpty(stack = this.get(index)) ? stack.m_41620_(amount) : StackUtil.emptyStack;
+		return index < this.size && amount > 0 && !StackUtil.isEmpty(stack = this.get(index)) ? stack.split(amount) : StackUtil.emptyStack;
 	}
 
 	public boolean isEmpty()
@@ -66,14 +66,14 @@ public abstract class SimpleCraftingInventory extends CraftingContainer
 		}
 	}
 
-	public void m_5809_(StackedContents finder)
+	public void fillStackedContents(StackedContents finder)
 	{
 		for (int i = 0; i < this.size; i++)
 		{
 			ItemStack stack = this.get(i);
 			if (!StackUtil.isEmpty(stack))
 			{
-				finder.m_36466_(stack);
+				finder.accountSimpleStack(stack);
 			}
 		}
 	}

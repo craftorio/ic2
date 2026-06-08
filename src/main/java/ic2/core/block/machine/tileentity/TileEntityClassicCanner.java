@@ -196,8 +196,8 @@ public class TileEntityClassicCanner extends TileEntityElectricMachine implement
 			case CF:
 				this.resInputSlot.put(StackUtil.decSize(this.resInputSlot.get()));
 				ItemStack cfPack = this.inputSlot.get();
-				cfPack.m_41721_(cfPack.getDamageValue() + 2);
-				if (!this.resInputSlot.isEmpty() && cfPack.getDamageValue() <= cfPack.m_41776_() - 2)
+				cfPack.setDamageValue(cfPack.getDamageValue() + 2);
+				if (!this.resInputSlot.isEmpty() && cfPack.getDamageValue() <= cfPack.getMaxDamage() - 2)
 				{
 					this.inputSlot.put(cfPack);
 				} else
@@ -227,7 +227,7 @@ public class TileEntityClassicCanner extends TileEntityElectricMachine implement
 					return fuel > 0 && this.outputSlot.canAdd(new ItemStack(Ic2Items.JETPACK));
 				case CF:
 					ItemStack cfPack = this.inputSlot.get();
-					return cfPack.getDamageValue() <= cfPack.m_41776_() - 2 && getPelletValue(this.resInputSlot.get()) > 0 && this.outputSlot.canAdd(cfPack);
+					return cfPack.getDamageValue() <= cfPack.getMaxDamage() - 2 && getPelletValue(this.resInputSlot.get()) > 0 && this.outputSlot.canAdd(cfPack);
 				default:
 					assert false;
 					return false;
@@ -288,12 +288,12 @@ public class TileEntityClassicCanner extends TileEntityElectricMachine implement
 			} else if (item == Items.REDSTONE && this.fuelQuality > 0)
 			{
 				return (int) (this.fuelQuality * 0.2);
-			} else if (item == Items.f_42525_ && this.fuelQuality > 0)
+			} else if (item == Items.GLOWSTONE_DUST && this.fuelQuality > 0)
 			{
 				return (int) (this.fuelQuality * 0.3);
 			} else
 			{
-				return item == Items.f_42403_ && this.fuelQuality > 0 ? (int) (this.fuelQuality * 0.4) : 0;
+				return item == Items.GUNPOWDER && this.fuelQuality > 0 ? (int) (this.fuelQuality * 0.4) : 0;
 			}
 		}
 	}

@@ -16,29 +16,29 @@ public class ItemTerraWart extends Item
 		super(settings);
 	}
 
-	public ItemStack m_5922_(ItemStack stack, Level world, LivingEntity player)
+	public ItemStack finishUsingItem(ItemStack stack, Level world, LivingEntity player)
 	{
-		player.m_21195_(MobEffects.f_19604_);
-		player.m_21195_(MobEffects.f_19599_);
-		player.m_21195_(MobEffects.f_19612_);
-		player.m_21195_(MobEffects.f_19597_);
-		player.m_21195_(MobEffects.f_19613_);
-		player.m_21195_(MobEffects.f_19610_);
-		player.m_21195_(MobEffects.f_19614_);
-		player.m_21195_(MobEffects.f_19615_);
-		MobEffectInstance effect = player.m_21124_(Ic2Potion.radiation);
+		player.removeEffect(MobEffects.CONFUSION);
+		player.removeEffect(MobEffects.DIG_SLOWDOWN);
+		player.removeEffect(MobEffects.HUNGER);
+		player.removeEffect(MobEffects.MOVEMENT_SLOWDOWN);
+		player.removeEffect(MobEffects.WEAKNESS);
+		player.removeEffect(MobEffects.BLINDNESS);
+		player.removeEffect(MobEffects.POISON);
+		player.removeEffect(MobEffects.WITHER);
+		MobEffectInstance effect = player.getEffect(Ic2Potion.radiation);
 		if (effect != null)
 		{
-			if (effect.m_19557_() <= 600)
+			if (effect.getDuration() <= 600)
 			{
-				player.m_21195_(Ic2Potion.radiation);
+				player.removeEffect(Ic2Potion.radiation);
 			} else
 			{
-				player.m_21195_(Ic2Potion.radiation);
-				Ic2Potion.radiation.applyTo(player, effect.m_19557_() - 600, effect.m_19564_());
+				player.removeEffect(Ic2Potion.radiation);
+				Ic2Potion.radiation.applyTo(player, effect.getDuration() - 600, effect.getAmplifier());
 			}
 		}
 
-		return super.m_5922_(stack, world, player);
+		return super.finishUsingItem(stack, world, player);
 	}
 }

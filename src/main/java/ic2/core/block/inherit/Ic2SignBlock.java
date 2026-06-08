@@ -15,7 +15,7 @@ public class Ic2SignBlock extends StandingSignBlock
 		super(settings, signType);
 	}
 
-	public BlockEntity m_142194_(BlockPos pos, BlockState state)
+	public BlockEntity newBlockEntity(BlockPos pos, BlockState state)
 	{
 		return new Ic2SignBlockEntity(pos, state);
 	}

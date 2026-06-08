@@ -91,7 +91,7 @@ public class TileEntityReactorChamberElectric extends Ic2TileEntity implements C
 		{
 			Level world = this.getLevel();
 			return reactor.getBlockType()
-				.m_6227_(reactor.getBlockState(), world, reactor.getBlockPos(), player, hand, new BlockHitResult(hit, side, reactor.getBlockPos(), false));
+				.use(reactor.getBlockState(), world, reactor.getBlockPos(), player, hand, new BlockHitResult(hit, side, reactor.getBlockPos(), false));
 		} else
 		{
 			return InteractionResult.PASS;

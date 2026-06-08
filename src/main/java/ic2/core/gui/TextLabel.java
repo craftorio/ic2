@@ -182,7 +182,7 @@ public class TextLabel extends GuiElement<TextLabel>
 	private static int getWidth(Ic2Gui<?> gui, TextProvider.ITextProvider textProvider)
 	{
 		String text = textProvider.get(gui.getContainer().base, TextProvider.emptyTokens());
-		return text.isEmpty() ? 0 : Minecraft.m_91087_().f_91062_.m_92895_(text);
+		return text.isEmpty() ? 0 : Minecraft.getInstance().font.width(text);
 	}
 
 	@Override

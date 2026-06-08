@@ -73,13 +73,13 @@ public class TileEntityLiquidHeatExchanger extends TileEntityHeatSourceInventory
 	public static void init()
 	{
 		Recipes.liquidCooldownManager = new LiquidHeatExchangerManager(false);
-		Recipes.liquidHeatupManager = new LiquidHeatExchangerManager(true);
+		Recipes.liquidHeatUpManager = new LiquidHeatExchangerManager(true);
 		IC2.envProxy
 			.runAfterRegistryInit(
 				() ->
 				{
 					addCooldownRecipe(
-						net.minecraft.world.level.material.Fluids.f_76195_,
+						net.minecraft.world.level.material.Fluids.LAVA,
 						Ic2Fluids.PAHOEHOE_LAVA.still,
 						Math.round(20.0F * ConfigUtil.getFloat(MainConfig.get(), "balance/energy/fluidconversion/heatExchangerLava"))
 					);
@@ -90,7 +90,7 @@ public class TileEntityLiquidHeatExchanger extends TileEntityHeatSourceInventory
 					);
 					addHeatupRecipe(
 						Ic2Fluids.HOT_WATER.still,
-						net.minecraft.world.level.material.Fluids.f_76193_,
+						net.minecraft.world.level.material.Fluids.WATER,
 						Math.round(1.0F * ConfigUtil.getFloat(MainConfig.get(), "balance/energy/fluidconversion/heatExchangerWater"))
 					);
 				}
@@ -105,7 +105,7 @@ public class TileEntityLiquidHeatExchanger extends TileEntityHeatSourceInventory
 
 	public static void addHeatupRecipe(Fluid hotFluid, Fluid coldFluid, int huPerMB)
 	{
-		Recipes.liquidHeatupManager.addFluid(coldFluid, hotFluid, huPerMB);
+		Recipes.liquidHeatUpManager.addFluid(coldFluid, hotFluid, huPerMB);
 	}
 
 	public static void addCooldownRecipe(Fluid hotFluid, Fluid coldFluid, int huPerMB)

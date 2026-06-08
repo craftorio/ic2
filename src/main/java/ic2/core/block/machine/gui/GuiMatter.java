@@ -36,7 +36,7 @@ public class GuiMatter extends Ic2Gui<ContainerMatter>
 	}
 
 	@Override
-	public ResourceLocation getTexture()
+	public ResourceLocation getTextureLocation()
 	{
 		return ResourceLocation.fromNamespaceAndPath("ic2", "textures/gui/guimatter.png");
 	}

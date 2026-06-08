@@ -120,7 +120,7 @@ public abstract class TileEntityInventory extends Ic2TileEntity implements World
 			this.putStackAt(loc, StackUtil.decSize(stack, amount));
 		}
 
-		ItemStack ret = stack.m_41777_();
+		ItemStack ret = stack.copy();
 		return StackUtil.setSize(ret, amount);
 	}
 
@@ -182,7 +182,7 @@ public abstract class TileEntityInventory extends Ic2TileEntity implements World
 
 	public boolean stillValid(Player player)
 	{
-		return !this.isRemoved() && player.m_20275_(this.worldPosition.getX() + 0.5, this.worldPosition.getY() + 0.5, this.worldPosition.getZ() + 0.5) <= 64.0;
+		return !this.isRemoved() && player.distanceToSqr(this.worldPosition.getX() + 0.5, this.worldPosition.getY() + 0.5, this.worldPosition.getZ() + 0.5) <= 64.0;
 	}
 
 	public void startOpen(Player player)
@@ -195,7 +195,7 @@ public abstract class TileEntityInventory extends Ic2TileEntity implements World
 
 	public boolean canPlaceItem(int index, ItemStack stack)
 	{
-		if (stack.m_41619_())
+		if (stack.isEmpty())
 		{
 			return false;
 		}
@@ -204,7 +204,7 @@ public abstract class TileEntityInventory extends Ic2TileEntity implements World
 		return invSlot != null && invSlot.canInput() && invSlot.accepts(stack);
 	}
 
-	public int[] m_7071_(Direction side)
+	public int[] getSlotsForFace(Direction side)
 	{
 		int[] ret = new int[this.getContainerSize()];
 		int i = 0;
@@ -217,7 +217,7 @@ public abstract class TileEntityInventory extends Ic2TileEntity implements World
 		return ret;
 	}
 
-	public boolean m_7155_(int index, ItemStack stack, Direction side)
+	public boolean canPlaceItemThroughFace(int index, ItemStack stack, Direction side)
 	{
 		if (StackUtil.isEmpty(stack))
 		{
@@ -256,7 +256,7 @@ public abstract class TileEntityInventory extends Ic2TileEntity implements World
 		}
 	}
 
-	public boolean m_7157_(int index, ItemStack stack, Direction side)
+	public boolean canTakeItemThroughFace(int index, ItemStack stack, Direction side)
 	{
 		InvSlot targetSlot = this.getInventorySlot(index);
 		if (targetSlot != null && targetSlot.canOutput())
@@ -439,7 +439,7 @@ public abstract class TileEntityInventory extends Ic2TileEntity implements World
 					ItemStack stack = slot.get(i);
 					if (!StackUtil.isEmpty(stack))
 					{
-						used += Math.min(limit, stack.m_41613_() * limit / stack.getMaxStackSize());
+						used += Math.min(limit, stack.getCount() * limit / stack.getMaxStackSize());
 					}
 				}
 			}

@@ -54,18 +54,18 @@ public class ItemToolPainter extends ItemToolCrafting implements IBoxable
 		this.color = color;
 	}
 
-	public InteractionResult m_6225_(UseOnContext context)
+	public InteractionResult useOn(UseOnContext context)
 	{
 		if (this.color == null)
 		{
 			return InteractionResult.PASS;
 		}
 
-		ItemStack stack = context.m_43722_();
-		Level world = context.m_43725_();
-		BlockPos pos = context.m_8083_();
-		Player player = context.m_43723_();
-		InteractionHand hand = context.m_43724_();
+		ItemStack stack = context.getItemInHand();
+		Level world = context.getLevel();
+		BlockPos pos = context.getClickedPos();
+		Player player = context.getPlayer();
+		InteractionHand hand = context.getHand();
 		if (!(stack.getItem() instanceof ItemToolPainter))
 		{
 			return InteractionResult.PASS;
@@ -78,7 +78,7 @@ public class ItemToolPainter extends ItemToolCrafting implements IBoxable
 			this.damagePainter(stack, player, hand, this.color);
 			if (world.isClientSide && player != null)
 			{
-				player.m_5496_(Ic2SoundEvents.ITEM_PAINTER_USE, 1.0F, 1.0F);
+				player.playSound(Ic2SoundEvents.ITEM_PAINTER_USE, 1.0F, 1.0F);
 			}
 
 			return world.isClientSide ? InteractionResult.PASS : InteractionResult.SUCCESS;
@@ -91,16 +91,16 @@ public class ItemToolPainter extends ItemToolCrafting implements IBoxable
 	private boolean colorBlock(Level world, BlockPos pos, Block block, BlockState state, Ic2Color color)
 	{
 		DyeColor newColor = color.dyeColor;
-		UnmodifiableIterator tagList = state.m_61148_().keySet().iterator();
+		UnmodifiableIterator tagList = state.getValues().keySet().iterator();
 
 		while (tagList.hasNext())
 		{
 			Property<?> property = (Property<?>) tagList.next();
-			if (property.m_61709_() == DyeColor.class)
+			if (property.getValueClass() == DyeColor.class)
 			{
 				Property<DyeColor> typedProperty = (Property<DyeColor>) property;
 				DyeColor oldColor = (DyeColor) state.getValue(typedProperty);
-				if (oldColor != newColor && typedProperty.m_6908_().contains(newColor))
+				if (oldColor != newColor && typedProperty.getPossibleValues().contains(newColor))
 				{
 					world.setBlockAndUpdate(pos, (BlockState) state.setValue(typedProperty, newColor));
 					return true;
@@ -115,34 +115,34 @@ public class ItemToolPainter extends ItemToolCrafting implements IBoxable
 			return false;
 		}
 
-		List<TagKey<Block>> tagListx = block.defaultBlockState().m_204343_().toList();
-		if (tagListx.contains(BlockTags.f_13089_))
+		List<TagKey<Block>> tagListx = block.defaultBlockState().getTags().toList();
+		if (tagListx.contains(BlockTags.WOOL))
 		{
 			world.setBlockAndUpdate(pos, getColorBlockState(color.dyeColor, VanillaColorBlockId.WOOL));
 			return true;
 		}
 
-		if (block instanceof StainedGlassBlock || block.defaultBlockState().m_60713_(Blocks.f_50058_))
+		if (block instanceof StainedGlassBlock || block.defaultBlockState().is(Blocks.GLASS))
 		{
 			world.setBlockAndUpdate(pos, getColorBlockState(color.dyeColor, VanillaColorBlockId.STAINED_GLASS));
 			return true;
 		}
 
-		if (block instanceof StainedGlassPaneBlock || block.defaultBlockState().m_60713_(Blocks.f_50185_))
+		if (block instanceof StainedGlassPaneBlock || block.defaultBlockState().is(Blocks.GLASS_PANE))
 		{
 			world.setBlockAndUpdate(pos, getBlockStateWithProperties(color.dyeColor, VanillaColorBlockId.STAINED_GLASS_PANE, state));
 			return true;
 		}
 
-		if (tagListx.contains(BlockTags.f_13038_))
+		if (tagListx.contains(BlockTags.BEDS))
 		{
 			BedBlock bedBlock = (BedBlock) block;
-			BlockPos bedBlockPos2 = pos.relative(BedBlock.m_49557_(state));
+			BlockPos bedBlockPos2 = pos.relative(BedBlock.getConnectedDirection(state));
 			BlockState bedBlockState2 = world.getBlockState(bedBlockPos2);
-			if (bedBlockState2.m_60713_(bedBlock))
+			if (bedBlockState2.is(bedBlock))
 			{
-				world.m_7731_(pos, Blocks.f_50016_.defaultBlockState(), 48);
-				world.m_7731_(bedBlockPos2, Blocks.f_50016_.defaultBlockState(), 48);
+				world.setBlock(pos, Blocks.AIR.defaultBlockState(), 48);
+				world.setBlock(bedBlockPos2, Blocks.AIR.defaultBlockState(), 48);
 				world.setBlockAndUpdate(pos, getBlockStateWithProperties(color.dyeColor, VanillaColorBlockId.BED, state));
 				world.setBlockAndUpdate(bedBlockPos2, getBlockStateWithProperties(color.dyeColor, VanillaColorBlockId.BED, bedBlockState2));
 			}
@@ -150,7 +150,7 @@ public class ItemToolPainter extends ItemToolCrafting implements IBoxable
 			return true;
 		} else
 		{
-			if (tagListx.contains(BlockTags.f_144265_))
+			if (tagListx.contains(BlockTags.CANDLES))
 			{
 				world.setBlockAndUpdate(pos, getBlockStateWithProperties(color.dyeColor, VanillaColorBlockId.CANDLE, state));
 				return true;
@@ -168,7 +168,7 @@ public class ItemToolPainter extends ItemToolCrafting implements IBoxable
 				return true;
 			}
 
-			if (tagListx.contains(BlockTags.f_198156_))
+			if (tagListx.contains(BlockTags.TERRACOTTA))
 			{
 				world.setBlockAndUpdate(pos, getColorBlockState(color.dyeColor, VanillaColorBlockId.TERRACOTTA));
 				return true;
@@ -186,13 +186,13 @@ public class ItemToolPainter extends ItemToolCrafting implements IBoxable
 				return true;
 			}
 
-			if (tagListx.contains(BlockTags.f_215838_))
+			if (tagListx.contains(BlockTags.WOOL_CARPETS))
 			{
 				world.setBlockAndUpdate(pos, getColorBlockState(color.dyeColor, VanillaColorBlockId.CARPET));
 				return true;
 			}
 
-			if (tagListx.contains(BlockTags.f_13083_))
+			if (tagListx.contains(BlockTags.SHULKER_BOXES))
 			{
 				BlockEntity shulkerBlockEntity = world.getBlockEntity(pos);
 				if (shulkerBlockEntity == null)
@@ -200,16 +200,16 @@ public class ItemToolPainter extends ItemToolCrafting implements IBoxable
 					return false;
 				}
 
-				CompoundTag shulkerNbt = shulkerBlockEntity.m_187481_();
-				BlockState newShulkerBoxState = ShulkerBoxBlock.m_56190_(color.dyeColor).m_152465_(state);
+				CompoundTag shulkerNbt = shulkerBlockEntity.saveWithId();
+				BlockState newShulkerBoxState = ShulkerBoxBlock.getBlockByColor(color.dyeColor).withPropertiesOf(state);
 				world.setBlockAndUpdate(pos, newShulkerBoxState);
-				BlockEntity newShulkerBlockEntity = BlockEntity.m_155241_(pos, newShulkerBoxState, shulkerNbt);
-				world.m_151523_(newShulkerBlockEntity);
+				BlockEntity newShulkerBlockEntity = BlockEntity.loadStatic(pos, newShulkerBoxState, shulkerNbt);
+				world.setBlockEntity(newShulkerBlockEntity);
 				return true;
 			} else
 			{
 				ResourceLocation identifier = Registry.BLOCK.getKey(block);
-				if (identifier.m_135827_().equals("minecraft") && identifier.m_135815_().contains("concrete"))
+				if (identifier.getNamespace().equals("minecraft") && identifier.getPath().contains("concrete"))
 				{
 					world.setBlockAndUpdate(pos, getColorBlockState(color.dyeColor, VanillaColorBlockId.CONCRETE));
 					return true;
@@ -224,30 +224,30 @@ public class ItemToolPainter extends ItemToolCrafting implements IBoxable
 	public static boolean canColor(Block block, DyeColor color)
 	{
 		ResourceLocation identifier = Registry.BLOCK.getKey(block);
-		return !identifier.m_135815_().contains(color.m_41065_());
+		return !identifier.getPath().contains(color.getName());
 	}
 
 	public static BlockState getColorBlockState(DyeColor color, VanillaColorBlockId vanillaColorBlock)
 	{
-		ResourceLocation identifier = ResourceLocation.fromNamespaceAndPath("minecraft", color.m_41065_() + "_" + vanillaColorBlock.id);
-		return ((Block) Registry.BLOCK.m_7745_(identifier)).defaultBlockState();
+		ResourceLocation identifier = ResourceLocation.fromNamespaceAndPath("minecraft", color.getName() + "_" + vanillaColorBlock.id);
+		return ((Block) Registry.BLOCK.get(identifier)).defaultBlockState();
 	}
 
 	public static BlockState getBlockStateWithProperties(DyeColor color, VanillaColorBlockId vanillaColorBlock, BlockState state)
 	{
-		ResourceLocation identifier = ResourceLocation.fromNamespaceAndPath("minecraft", color.m_41065_() + "_" + vanillaColorBlock.id);
-		return ((Block) Registry.BLOCK.m_7745_(identifier)).m_152465_(state);
+		ResourceLocation identifier = ResourceLocation.fromNamespaceAndPath("minecraft", color.getName() + "_" + vanillaColorBlock.id);
+		return ((Block) Registry.BLOCK.get(identifier)).withPropertiesOf(state);
 	}
 
-	public InteractionResult m_6880_(ItemStack stack, Player user, LivingEntity entity, InteractionHand hand)
+	public InteractionResult interactLivingEntity(ItemStack stack, Player user, LivingEntity entity, InteractionHand hand)
 	{
 		if (this.color == null)
 		{
 			return InteractionResult.PASS;
-		} else if (entity instanceof Sheep sheep && sheep.m_29874_() != this.color.dyeColor)
+		} else if (entity instanceof Sheep sheep && sheep.getColor() != this.color.dyeColor)
 		{
-			sheep.m_29855_(this.color.dyeColor);
-			this.damagePainter(stack, user, user.m_7655_(), this.color);
+			sheep.setColor(this.color.dyeColor);
+			this.damagePainter(stack, user, user.getUsedItemHand(), this.color);
 			return InteractionResult.SUCCESS;
 		} else
 		{
@@ -255,7 +255,7 @@ public class ItemToolPainter extends ItemToolCrafting implements IBoxable
 		}
 	}
 
-	public InteractionResultHolder<ItemStack> m_7203_(Level world, Player player, InteractionHand hand)
+	public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand)
 	{
 		ItemStack stack = StackUtil.get(player, hand);
 		if (!world.isClientSide && IC2.keyboard.isModeSwitchKeyDown(player))
@@ -281,23 +281,23 @@ public class ItemToolPainter extends ItemToolCrafting implements IBoxable
 	public void damagePainter(ItemStack stack, Player player, InteractionHand hand, Ic2Color color)
 	{
 		assert color != null;
-		stack.m_220157_(1, player.m_217043_(), player instanceof ServerPlayer ? (ServerPlayer) player : null);
-		if (stack.getDamageValue() >= stack.m_41776_())
+		stack.hurt(1, player.getRandom(), player instanceof ServerPlayer ? (ServerPlayer) player : null);
+		if (stack.getDamageValue() >= stack.getMaxDamage())
 		{
 			CompoundTag nbtData = StackUtil.getOrCreateNbtData(stack);
 			if (!nbtData.getBoolean("autoRefill"))
 			{
-				player.m_21008_(hand, new ItemStack(Ic2Items.PAINTER, 1));
+				player.setItemInHand(hand, new ItemStack(Ic2Items.PAINTER, 1));
 				return;
 			}
 
 			ItemStack consumedStack = StackUtil.consumeFromPlayerInventoryAndGet(player, StackUtil.sameItem(stack.getItem()), 1, true);
-			if (consumedStack.m_41619_())
+			if (consumedStack.isEmpty())
 			{
-				player.m_21008_(hand, new ItemStack(Ic2Items.PAINTER, 1));
+				player.setItemInHand(hand, new ItemStack(Ic2Items.PAINTER, 1));
 			} else
 			{
-				player.m_21008_(hand, consumedStack);
+				player.setItemInHand(hand, consumedStack);
 				StackUtil.addToPlayerInventory(player, new ItemStack(Ic2Items.PAINTER, 1));
 			}
 		}

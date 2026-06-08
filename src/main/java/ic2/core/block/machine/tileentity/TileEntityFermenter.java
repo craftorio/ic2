@@ -139,7 +139,7 @@ public class TileEntityFermenter extends TileEntityInventory implements IHasGui,
 				&& this.inputTank.getFluidAmount() >= fp.inputAmount
 				&& fp.outputAmount <= this.outputTank.getCapacity() - this.outputTank.getFluidAmount())
 			{
-				this.heatBuffer = this.heatBuffer + ((IHeatSource) te).drawHeat(dir.m_122424_(), 100, false);
+				this.heatBuffer = this.heatBuffer + ((IHeatSource) te).drawHeat(dir.getOpposite(), 100, false);
 				if (this.heatBuffer >= fp.heat)
 				{
 					this.heatBuffer = this.heatBuffer - fp.heat;

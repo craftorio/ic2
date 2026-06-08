@@ -72,8 +72,9 @@ repositories {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-    
     compileOnly "mezz.jei:jei-1.19.2-forge-api:11.8.1.1034"
+    
+    implementation 'org.ejml:ejml-all:0.45.1'
 }
 
 tasks.named('processResources', ProcessResources).configure {

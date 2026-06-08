@@ -28,7 +28,7 @@ public class ItemToolWrenchElectric extends ItemElectricTool implements Priority
 			return InteractionResult.FAIL;
 		}
 
-		Player player = context.m_43723_();
+		Player player = context.getPlayer();
 		if (player == null)
 		{
 			return InteractionResult.PASS;

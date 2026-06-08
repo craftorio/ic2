@@ -42,10 +42,10 @@ public class ElectricItemManager implements IElectricItemManager
 					tNBT.putDouble("charge", newCharge);
 				} else
 				{
-					tNBT.m_128473_("charge");
-					if (tNBT.m_128456_())
+					tNBT.remove("charge");
+					if (tNBT.isEmpty())
 					{
-						stack.m_41751_(null);
+						stack.setTag(null);
 					}
 				}
 
@@ -109,10 +109,10 @@ public class ElectricItemManager implements IElectricItemManager
 				tNBT.putDouble("charge", newCharge);
 			} else
 			{
-				tNBT.m_128473_("charge");
-				if (tNBT.m_128456_())
+				tNBT.remove("charge");
+				if (tNBT.isEmpty())
 				{
-					stack.m_41751_(null);
+					stack.setTag(null);
 				}
 			}
 
@@ -188,7 +188,7 @@ public class ElectricItemManager implements IElectricItemManager
 
 		for (EquipmentSlot slot : ArmorSlot.getAll())
 		{
-			ItemStack source = entity.m_6844_(slot);
+			ItemStack source = entity.getItemBySlot(slot);
 			if (source != null)
 			{
 				int tier;
@@ -215,7 +215,7 @@ public class ElectricItemManager implements IElectricItemManager
 
 		if (transferred && entity instanceof Player && IC2.sideProxy.isSimulating())
 		{
-			((Player) entity).f_36096_.m_38946_();
+			((Player) entity).containerMenu.broadcastChanges();
 		}
 	}
 

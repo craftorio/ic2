@@ -67,7 +67,7 @@ public class DynamicGui<T extends Container> extends GuiDefaultBackground<Dynami
 				{
 					GuiParser.ButtonNode node = (GuiParser.ButtonNode) rawNode;
 					if (node.type != GuiParser.ButtonNode.ButtonType.RECIPE
-						&& !(((DynamicContainer) this.menu).base instanceof INetworkClientTileEntityEventListener)
+						&& !(this.menu.base instanceof INetworkClientTileEntityEventListener)
 						&& !this.isHandHeldGUI())
 					{
 						throw new RuntimeException("Invalid base " + ((DynamicContainer) this.menu).base + " for button elements");
@@ -94,7 +94,7 @@ public class DynamicGui<T extends Container> extends GuiDefaultBackground<Dynami
 
 					if (button != null)
 					{
-						String text = node.text.get(((DynamicContainer) this.menu).base, Collections.singletonMap("name", TextProvider.of(this.f_96539_)));
+						String text = node.text.get(this.menu.base, Collections.singletonMap("name", TextProvider.of(this.title)));
 						if (node.icon == null)
 						{
 							button = button.withText(text);
@@ -110,39 +110,39 @@ public class DynamicGui<T extends Container> extends GuiDefaultBackground<Dynami
 				}
 				case energygauge:
 				{
-					if (!(((DynamicContainer) this.menu).base instanceof Ic2TileEntity)
-						|| !((Ic2TileEntity) ((DynamicContainer) this.menu).base).hasComponent(Energy.class))
+					if (!(this.menu.base instanceof Ic2TileEntity)
+						|| !((Ic2TileEntity) this.menu.base).hasComponent(Energy.class))
 					{
 						throw new RuntimeException("invalid base " + ((DynamicContainer) this.menu).base + " for energygauge elements");
 					}
 
 					GuiParser.EnergyGaugeNode node = (GuiParser.EnergyGaugeNode) rawNode;
-					parentNode.addElement(this, new EnergyGauge(this, node.x, node.y, (Ic2TileEntity) ((DynamicContainer) this.menu).base, node.style));
+					parentNode.addElement(this, new EnergyGauge(this, node.x, node.y, (Ic2TileEntity) this.menu.base, node.style));
 					break;
 				}
 				case gauge:
 				{
-					if (!(((DynamicContainer) this.menu).base instanceof IGuiValueProvider))
+					if (!(this.menu.base instanceof IGuiValueProvider))
 					{
 						throw new RuntimeException("invalid base " + ((DynamicContainer) this.menu).base + " for gauge elements");
 					}
 
 					GuiParser.GaugeNode node = (GuiParser.GaugeNode) rawNode;
 					final boolean isActiveLinked = node.activeLinked;
-					if (isActiveLinked && !(((DynamicContainer) this.menu).base instanceof IGuiValueProvider.IActiveGuiValueProvider))
+					if (isActiveLinked && !(this.menu.base instanceof IGuiValueProvider.IActiveGuiValueProvider))
 					{
 						throw new RuntimeException("Invalid base " + ((DynamicContainer) this.menu).base + " for active linked gauge elements");
 					}
 
 					parentNode.addElement(
 						this,
-						new LinkedGauge(this, node.x, node.y, (IGuiValueProvider) ((DynamicContainer) this.menu).base, node.name, node.style)
+						new LinkedGauge(this, node.x, node.y, (IGuiValueProvider) this.menu.base, node.name, node.style)
 						{
 							@Override
 							protected boolean isActive(double ratio)
 							{
 								return isActiveLinked
-									? ((IGuiValueProvider.IActiveGuiValueProvider) ((DynamicContainer) DynamicGui.this.menu).base).isGuiValueActive(this.name)
+									? ((IGuiValueProvider.IActiveGuiValueProvider) DynamicGui.this.menu.base).isGuiValueActive(this.name)
 									: super.isActive(ratio);
 							}
 						}
@@ -165,7 +165,7 @@ public class DynamicGui<T extends Container> extends GuiDefaultBackground<Dynami
 					parentNode.addElement(this, new SlotGrid(this, node.x, node.y + node.hotbarOffset, 9, 1, node.style, 0, node.spacing));
 					if (node.showTitle)
 					{
-						parentNode.addElement(this, TextLabel.create(this, node.x + 1, node.y - 10, TextProvider.of(playerInventory.m_7755_()), 4210752, false));
+						parentNode.addElement(this, TextLabel.create(this, node.x + 1, node.y - 10, TextProvider.of(playerInventory.getName()), 4210752, false));
 					}
 					break;
 				}
@@ -178,16 +178,16 @@ public class DynamicGui<T extends Container> extends GuiDefaultBackground<Dynami
 				}
 				case slotgrid:
 				{
-					if (!(((DynamicContainer) this.menu).base instanceof IInventorySlotHolder))
+					if (!(this.menu.base instanceof IInventorySlotHolder))
 					{
-						throw new RuntimeException("Invalid base " + ((DynamicContainer) this.menu).base + " for slot elements");
+						throw new RuntimeException("Invalid base " + ((DynamicContainer<?>) this.menu).base + " for slot elements");
 					}
 
 					GuiParser.SlotGridNode node = (GuiParser.SlotGridNode) rawNode;
-					InvSlot slot = ((IInventorySlotHolder) ((DynamicContainer) this.menu).base).getInventorySlot(node.name);
+					InvSlot slot = ((IInventorySlotHolder) this.menu.base).getInventorySlot(node.name);
 					if (slot == null)
 					{
-						throw new RuntimeException("Invalid InvSlot name " + node.name + " for base " + ((DynamicContainer) this.menu).base);
+						throw new RuntimeException("Invalid InvSlot name " + node.name + " for base " + ((DynamicContainer<?>) this.menu).base);
 					}
 
 					int size = slot.size();
@@ -199,6 +199,7 @@ public class DynamicGui<T extends Container> extends GuiDefaultBackground<Dynami
 					break;
 				}
 				case text:
+				{
 					GuiParser.TextNode node = (GuiParser.TextNode) rawNode;
 
 					int var18 = switch (node.align)
@@ -223,15 +224,17 @@ public class DynamicGui<T extends Container> extends GuiDefaultBackground<Dynami
 
 					parentNode.addElement(this, text);
 					break;
+				}
 				case fluidtank:
-					if (!(((DynamicContainer) this.menu).base instanceof Ic2TileEntity)
-						|| !((Ic2TileEntity) ((DynamicContainer) this.menu).base).hasComponent(Fluids.class))
+				{
+					if (!(this.menu.base instanceof Ic2TileEntity)
+						|| !((Ic2TileEntity) this.menu.base).hasComponent(Fluids.class))
 					{
-						throw new RuntimeException("invalid base " + ((DynamicContainer) this.menu).base + " for tank elements");
+						throw new RuntimeException("invalid base " + ((DynamicContainer<?>) this.menu).base + " for tank elements");
 					}
 
 					GuiParser.FluidTankNode node = (GuiParser.FluidTankNode) rawNode;
-					Fluids fluids = ((Ic2TileEntity) ((DynamicContainer) this.menu).base).getComponent(Fluids.class);
+					Fluids fluids = ((Ic2TileEntity) this.menu.base).getComponent(Fluids.class);
 
 					parentNode.addElement(this, switch (node.type)
 					{
@@ -240,22 +243,22 @@ public class DynamicGui<T extends Container> extends GuiDefaultBackground<Dynami
 							TankGauge.createPlain(this, node.x, node.y, node.width, node.height, fluids.getFluidTank(node.name));
 						case BORDERLESS ->
 							TankGauge.createBorderless(this, node.x, node.y, fluids.getFluidTank(node.name), node.mirrored);
-						default -> throw new IllegalStateException("Unexpected type " + node.type);
 					});
 					break;
+				}
 				case fluidslot:
 				{
-					if (!(((DynamicContainer) this.menu).base instanceof Ic2TileEntity)
-						|| !((Ic2TileEntity) ((DynamicContainer) this.menu).base).hasComponent(Fluids.class))
+					if (!(this.menu.base instanceof Ic2TileEntity)
+						|| !((Ic2TileEntity) this.menu.base).hasComponent(Fluids.class))
 					{
-						throw new RuntimeException("invalid base " + ((DynamicContainer) this.menu).base + " for tank elements");
+						throw new RuntimeException("invalid base " + ((DynamicContainer<?>) this.menu).base + " for tank elements");
 					}
 
 					GuiParser.FluidSlotNode node = (GuiParser.FluidSlotNode) rawNode;
 					parentNode.addElement(
 						this,
 						TankFluidSlot.createFluidSlot(
-							this, node.x, node.y, ((Ic2TileEntity) ((DynamicContainer) this.menu).base).getComponent(Fluids.class).getFluidTank(node.name)
+							this, node.x, node.y, ((Ic2TileEntity) this.menu.base).getComponent(Fluids.class).getFluidTank(node.name)
 						)
 					);
 				}
@@ -282,14 +285,10 @@ public class DynamicGui<T extends Container> extends GuiDefaultBackground<Dynami
 				eventName = eventString;
 			}
 
-			return new IClickHandler()
+			return button ->
 			{
-				@Override
-				public void onClick(MouseButton button)
-				{
-					IC2.network.get(false).sendContainerEvent((ContainerBase<?>) DynamicGui.this.menu, eventName);
-					((HandHeldInventory) ((DynamicContainer) DynamicGui.this.menu).base).onEvent(eventName);
-				}
+				IC2.network.get(false).sendContainerEvent(DynamicGui.this.menu, eventName);
+				((HandHeldInventory) DynamicGui.this.menu.base).onEvent(eventName);
 			};
 		} else
 		{
@@ -300,7 +299,7 @@ public class DynamicGui<T extends Container> extends GuiDefaultBackground<Dynami
 
 	protected boolean isHandHeldGUI()
 	{
-		return ((DynamicContainer) this.menu).base instanceof HandHeldInventory;
+		return this.menu.base instanceof HandHeldInventory;
 	}
 
 	@Override

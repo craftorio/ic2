@@ -71,7 +71,7 @@ public class CropEating extends Ic2CropCard
 	{
 		return crop.getCurrentAge() < 2
 			? crop.getLightLevel() > 10
-			: crop.isBlockBelow(Blocks.f_49991_) && crop.getCurrentAge() < this.getMaxAge() && crop.getLightLevel() > 10;
+			: crop.isBlockBelow(Blocks.LAVA) && crop.getCurrentAge() < this.getMaxAge() && crop.getLightLevel() > 10;
 	}
 
 	@Override
@@ -89,7 +89,7 @@ public class CropEating extends Ic2CropCard
 	@Override
 	public ItemStack getGain(ICropTile crop)
 	{
-		return this.canBeHarvested(crop) ? new ItemStack(Blocks.f_50128_) : null;
+		return this.canBeHarvested(crop) ? new ItemStack(Blocks.CACTUS) : null;
 	}
 
 	@Override
@@ -103,7 +103,7 @@ public class CropEating extends Ic2CropCard
 			double zcentered = coords.getZ() + 0.5;
 			if (crop.getCustomData().getBoolean("eaten"))
 			{
-				StackUtil.dropAsEntity(crop.getWorldObj(), coords, new ItemStack(Items.f_42583_));
+				StackUtil.dropAsEntity(crop.getWorldObj(), coords, new ItemStack(Items.ROTTEN_FLESH));
 				crop.getCustomData().putBoolean("eaten", false);
 			}
 
@@ -119,15 +119,15 @@ public class CropEating extends Ic2CropCard
 
 				for (LivingEntity entity : list)
 				{
-					if (!(entity instanceof Player) || !((Player) entity).m_150110_().f_35937_)
+					if (!(entity instanceof Player) || !((Player) entity).getAbilities().instabuild)
 					{
-						entity.m_20334_((xcentered - entity.getX()) * 0.5, Math.min(entity.m_20184_().m_7098_(), -0.05), (zcentered - entity.getZ()) * 0.5);
+						entity.setDeltaMovement((xcentered - entity.getX()) * 0.5, Math.min(entity.getDeltaMovement().y(), -0.05), (zcentered - entity.getZ()) * 0.5);
 						entity.hurt(damage, (crop.getCurrentAge() + 1) * 2.0F);
 						if (!hasMetalAromor(entity))
 						{
-							entity.m_7292_(new MobEffectInstance(MobEffects.f_19597_, 64, 50));
-							entity.m_7292_(new MobEffectInstance(MobEffects.f_19609_, 64, 0));
-							entity.m_7292_(new MobEffectInstance(MobEffects.f_19610_, 64, 0));
+							entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 64, 50));
+							entity.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 64, 0));
+							entity.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 64, 0));
 						}
 
 						if (this.canGrow(crop))
@@ -136,7 +136,7 @@ public class CropEating extends Ic2CropCard
 						}
 
 						crop.getWorldObj()
-							.m_6263_(null, xcentered, ycentered, zcentered, SoundEvents.f_11912_, SoundSource.BLOCKS, 1.0F, IC2.random.nextFloat() * 0.1F + 0.9F);
+							.playSound(null, xcentered, ycentered, zcentered, SoundEvents.GENERIC_EAT, SoundSource.BLOCKS, 1.0F, IC2.random.nextFloat() * 0.1F + 0.9F);
 						crop.getCustomData().putBoolean("eaten", true);
 						break;
 					}
@@ -173,7 +173,7 @@ public class CropEating extends Ic2CropCard
 			return false;
 		} else
 		{
-			for (ItemStack stack : player.getInventory().f_35975_)
+			for (ItemStack stack : player.getInventory().armor)
 			{
 				if (stack != null && ItemWrapper.isMetalArmor(stack, player))
 				{

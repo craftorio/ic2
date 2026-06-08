@@ -61,11 +61,11 @@ public class ItemObscurator extends BaseElectricItem implements PriorityUsableIt
 	@Override
 	public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context)
 	{
-		Level world = context.m_43725_();
-		BlockPos pos = context.m_8083_();
-		Direction side = context.m_43719_();
-		Player player = context.m_43723_();
-		if (!player.m_6144_() && !world.isClientSide && ElectricItem.manager.canUse(stack, 5000.0))
+		Level world = context.getLevel();
+		BlockPos pos = context.getClickedPos();
+		Direction side = context.getClickedFace();
+		Player player = context.getPlayer();
+		if (!player.isShiftKeyDown() && !world.isClientSide && ElectricItem.manager.canUse(stack, 5000.0))
 		{
 			CompoundTag nbt = StackUtil.getOrCreateNbtData(stack);
 			BlockState refState;
@@ -98,7 +98,7 @@ public class ItemObscurator extends BaseElectricItem implements PriorityUsableIt
 				clear(nbt);
 				return InteractionResult.PASS;
 			}
-		} else if (player.m_6144_() && world.isClientSide && ElectricItem.manager.canUse(stack, 20000.0))
+		} else if (player.isShiftKeyDown() && world.isClientSide && ElectricItem.manager.canUse(stack, 20000.0))
 		{
 			return this.scanBlock(stack, player, world, pos, side) ? InteractionResult.SUCCESS : InteractionResult.PASS;
 		} else
@@ -127,7 +127,7 @@ public class ItemObscurator extends BaseElectricItem implements PriorityUsableIt
 
 		for (int i = 0; i < renderInfo.tints.length; i++)
 		{
-			colorMultipliers[i] = SideProxyClient.mc.m_91298_().m_92577_(state, world, pos, renderInfo.tints[i]);
+			colorMultipliers[i] = SideProxyClient.mc.getBlockColors().getColor(state, world, pos, renderInfo.tints[i]);
 		}
 
 		CompoundTag nbt = StackUtil.getOrCreateNbtData(stack);
@@ -136,7 +136,7 @@ public class ItemObscurator extends BaseElectricItem implements PriorityUsableIt
 			return false;
 		}
 
-		IC2.network.get(false).sendPlayerItemData(player, player.getInventory().f_35977_, state.getBlock(), variant, side, colorMultipliers);
+		IC2.network.get(false).sendPlayerItemData(player, player.getInventory().selected, state.getBlock(), variant, side, colorMultipliers);
 		return true;
 	}
 
@@ -151,7 +151,7 @@ public class ItemObscurator extends BaseElectricItem implements PriorityUsableIt
 				{
 					if (data[3] instanceof int[])
 					{
-						ItemStack stack = (ItemStack) player.getInventory().f_35974_.get(slot);
+						ItemStack stack = (ItemStack) player.getInventory().items.get(slot);
 						if (ElectricItem.manager.use(stack, 20000.0, player))
 						{
 							CompoundTag nbt = StackUtil.getOrCreateNbtData(stack);
@@ -167,7 +167,7 @@ public class ItemObscurator extends BaseElectricItem implements PriorityUsableIt
 
 	public static BlockState getState(CompoundTag nbt)
 	{
-		String blockName = nbt.m_128461_("refBlock");
+		String blockName = nbt.getString("refBlock");
 		if (blockName.isEmpty())
 		{
 			return null;
@@ -185,13 +185,13 @@ public class ItemObscurator extends BaseElectricItem implements PriorityUsableIt
 
 	public static String getVariant(CompoundTag nbt)
 	{
-		return nbt.m_128461_("refVariant");
+		return nbt.getString("refVariant");
 	}
 
 	private static void setState(CompoundTag nbt, Block block, String variant)
 	{
-		nbt.m_128359_("refBlock", Util.getName(block).toString());
-		nbt.m_128359_("refVariant", variant);
+		nbt.putString("refBlock", Util.getName(block).toString());
+		nbt.putString("refVariant", variant);
 	}
 
 	public static Direction getSide(CompoundTag nbt)
@@ -207,7 +207,7 @@ public class ItemObscurator extends BaseElectricItem implements PriorityUsableIt
 
 	public static int[] getColorMultipliers(CompoundTag nbt)
 	{
-		int[] ret = nbt.m_128465_("refColorMuls");
+		int[] ret = nbt.getIntArray("refColorMuls");
 		return ret.length == 0 ? null : internColorMultipliers(ret);
 	}
 
@@ -218,20 +218,20 @@ public class ItemObscurator extends BaseElectricItem implements PriorityUsableIt
 			throw new IllegalArgumentException();
 		}
 
-		nbt.m_128385_("refColorMuls", colorMultipliers);
+		nbt.putIntArray("refColorMuls", colorMultipliers);
 	}
 
 	private static void clear(CompoundTag nbt)
 	{
-		nbt.m_128473_("refBlock");
-		nbt.m_128473_("refVariant");
-		nbt.m_128473_("refSide");
-		nbt.m_128473_("refColorMul");
+		nbt.remove("refBlock");
+		nbt.remove("refVariant");
+		nbt.remove("refSide");
+		nbt.remove("refColorMul");
 	}
 
 	public static ItemObscurator.ObscuredRenderInfo getRenderInfo(BlockState state, Direction side)
 	{
-		if (ItemBlockRenderTypes.m_109282_(state) == RenderType.m_110466_())
+		if (ItemBlockRenderTypes.getChunkRenderType(state) == RenderType.translucent())
 		{
 			return null;
 		}
@@ -242,8 +242,8 @@ public class ItemObscurator extends BaseElectricItem implements PriorityUsableIt
 			return null;
 		}
 
-		RandomSource rand = RandomSource.m_216335_(42L);
-		List<BakedQuad> faceQuads = model.m_213637_(state, side, rand);
+		RandomSource rand = RandomSource.create(42L);
+		List<BakedQuad> faceQuads = model.getQuads(state, side, rand);
 		if (faceQuads.isEmpty())
 		{
 			return null;
@@ -258,9 +258,9 @@ public class ItemObscurator extends BaseElectricItem implements PriorityUsableIt
 		{
 			ClientEnvProxy.QuadData data = SideProxyClient.envProxy.getQuadData(faceQuad);
 			float[] positions = data.positions();
-			int dx = side.m_122429_();
-			int dy = side.m_122430_();
-			int dz = side.m_122431_();
+			int dx = side.getStepX();
+			int dy = side.getStepY();
+			int dz = side.getStepZ();
 			int xS = (dx + 1) / 2;
 			int yS = (dy + 1) / 2;
 			int zS = (dz + 1) / 2;

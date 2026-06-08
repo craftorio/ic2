@@ -22,25 +22,25 @@ public class ItemTreetapElectric extends ItemElectricTool
 	}
 
 	@Override
-	public InteractionResult m_6225_(UseOnContext context)
+	public InteractionResult useOn(UseOnContext context)
 	{
-		Level world = context.m_43725_();
-		BlockPos pos = context.m_8083_();
+		Level world = context.getLevel();
+		BlockPos pos = context.getClickedPos();
 		BlockState state = world.getBlockState(pos);
 		Block block = state.getBlock();
-		ItemStack stack = context.m_43722_();
+		ItemStack stack = context.getItemInHand();
 		if (block == Ic2Blocks.RUBBER_LOG && this.canUse(stack))
 		{
-			Player player = context.m_43723_();
+			Player player = context.getPlayer();
 			if (player == null)
 			{
 				return InteractionResult.PASS;
 			} else
 			{
-				return ItemTreetap.attemptExtract(player, world, pos, context.m_43719_(), state, null, true)
+				return ItemTreetap.attemptExtract(player, world, pos, context.getClickedFace(), state, null, true)
 					&& this.consumeEnergy(stack, this.operationEnergyCost, player)
 					? InteractionResult.SUCCESS
-					: super.m_6225_(context);
+					: super.useOn(context);
 			}
 		} else
 		{

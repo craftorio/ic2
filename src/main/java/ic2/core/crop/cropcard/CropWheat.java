@@ -37,13 +37,13 @@ public class CropWheat extends CropVanilla
 	@Override
 	public ItemStack getProduct()
 	{
-		return new ItemStack(Items.f_42405_, 1);
+		return new ItemStack(Items.WHEAT, 1);
 	}
 
 	@Override
 	public ItemStack getSeeds()
 	{
-		return new ItemStack(Items.f_42404_);
+		return new ItemStack(Items.WHEAT_SEEDS);
 	}
 
 	@Override

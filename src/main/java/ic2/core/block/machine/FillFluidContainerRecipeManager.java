@@ -50,7 +50,7 @@ public class FillFluidContainerRecipeManager implements IFillFluidContainerRecip
 			Ic2FluidStack changedFluid = result.fluidChange.getAmountMb() >= input.fluid.getAmountMb()
 				? null
 				: input.fluid.copyWithAmountMb(input.fluid.getAmountMb() - result.fluidChange.getAmountMb());
-			return new MachineRecipe<>(null, output).getResult(new IFillFluidContainerRecipeManager.Input(result.inPlaceOutput, changedFluid));
+			return (MachineRecipeResult) new MachineRecipe<>(null, output).getResult(new IFillFluidContainerRecipeManager.Input(result.inPlaceOutput, changedFluid));
 		} else if (!acceptTest)
 		{
 			return null;
@@ -61,7 +61,7 @@ public class FillFluidContainerRecipeManager implements IFillFluidContainerRecip
 		{
 			return !StackUtil.isEmpty(input.container) && !LiquidUtil.isFillableFluidContainer(input.container)
 				? null
-				: new MachineRecipe<>(null, Collections.emptyList()).getResult(input);
+				: (MachineRecipeResult) new MachineRecipe<>(null, Collections.emptyList()).getResult(input);
 		}
 	}
 

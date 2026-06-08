@@ -116,7 +116,7 @@ public final class EnergyNetLocal implements IEnergyCalculator
 					mainTile,
 					retry,
 					EnergyNet.instance.getWorld(mainTile),
-					EnergyNet.instance.getWorld(mainTile).m_46745_(EnergyNet.instance.getPos(mainTile)),
+					EnergyNet.instance.getWorld(mainTile).getChunkAt(EnergyNet.instance.getPos(mainTile)),
 					this
 				);
 		}
@@ -156,7 +156,7 @@ public final class EnergyNetLocal implements IEnergyCalculator
 			while (it.hasNext())
 			{
 				IEnergyTile subTile = it.next();
-				BlockPos pos = EnergyNet.instance.getPos(subTile).m_7949_();
+				BlockPos pos = EnergyNet.instance.getPos(subTile).immutable();
 				Tile conflicting = this.registeredTiles.get(pos);
 				boolean abort = false;
 				if (conflicting != null)
@@ -249,7 +249,7 @@ public final class EnergyNetLocal implements IEnergyCalculator
 
 		for (IEnergyTile subTile : excluded)
 		{
-			excludedPositions.add(EnergyNet.instance.getPos(subTile).m_7949_());
+			excludedPositions.add(EnergyNet.instance.getPos(subTile).immutable());
 		}
 
 		Block block = this.world.getBlockState(pos).getBlock();
@@ -263,9 +263,9 @@ public final class EnergyNetLocal implements IEnergyCalculator
 			{
 				int ccx = cPos.getX() >> 4;
 				int ccz = cPos.getZ() >> 4;
-				if (dir.m_122434_().m_122478_() || ccx == ocx && ccz == ocz || this.world.isLoaded(cPos))
+				if (dir.getAxis().isVertical() || ccx == ocx && ccz == ocz || this.world.isLoaded(cPos))
 				{
-					this.world.getBlockState(cPos).m_60690_(this.world, cPos, block, pos, false);
+					this.world.getBlockState(cPos).neighborChanged(this.world, cPos, block, pos, false);
 				}
 			}
 		}
@@ -286,7 +286,7 @@ public final class EnergyNetLocal implements IEnergyCalculator
 					"EnergyNet.removeTile(%s), world=%s, chunk=%s, this=%s",
 					mainTile,
 					EnergyNet.instance.getWorld(mainTile),
-					EnergyNet.instance.getWorld(mainTile).m_46745_(EnergyNet.instance.getPos(mainTile)),
+					EnergyNet.instance.getWorld(mainTile).getChunkAt(EnergyNet.instance.getPos(mainTile)),
 					this
 				);
 		}
@@ -553,7 +553,7 @@ public final class EnergyNetLocal implements IEnergyCalculator
 									IEnergyTile neighborSubTe = neighborTile.getSubTileAt(coords);
 									IEnergyAcceptor acceptor = (IEnergyAcceptor) (neighborSubTe instanceof IEnergyAcceptor ? neighborSubTe : neighbor.tile.mainTile);
 									canEmit = emitter.emitsEnergyTo((IEnergyAcceptor) neighbor.tile.mainTile, dir)
-										&& acceptor.acceptsEnergyFrom((IEnergyEmitter) node.tile.mainTile, dir.m_122424_());
+										&& acceptor.acceptsEnergyFrom((IEnergyEmitter) node.tile.mainTile, dir.getOpposite());
 								}
 
 								boolean canAccept = false;
@@ -563,7 +563,7 @@ public final class EnergyNetLocal implements IEnergyCalculator
 									IEnergyTile neighborSubTe = neighborTile.getSubTileAt(coords);
 									IEnergyEmitter emitter = (IEnergyEmitter) (neighborSubTe instanceof IEnergyEmitter ? neighborSubTe : neighbor.tile.mainTile);
 									canAccept = acceptor.acceptsEnergyFrom((IEnergyEmitter) neighbor.tile.mainTile, dir)
-										&& emitter.emitsEnergyTo((IEnergyAcceptor) node.tile.mainTile, dir.m_122424_());
+										&& emitter.emitsEnergyTo((IEnergyAcceptor) node.tile.mainTile, dir.getOpposite());
 								}
 
 								if (canEmit || canAccept)

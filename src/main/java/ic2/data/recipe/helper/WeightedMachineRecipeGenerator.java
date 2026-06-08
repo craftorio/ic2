@@ -32,7 +32,7 @@ public class WeightedMachineRecipeGenerator extends BasicMachineRecipeGenerator<
 		this.add("%s_to_%s".formatted(path(inputItem), path(weightedItemStacks[0].itemStack.getItem())), json ->
 		{
 			JsonObject input = new JsonObject();
-			input.addProperty("item", Registry.f_122827_.getKey(inputItem.m_5456_()).toString());
+			input.addProperty("item", Registry.ITEM.getKey(inputItem.asItem()).toString());
 			if (inputCount != 1)
 			{
 				input.addProperty("count", inputCount);
@@ -49,7 +49,7 @@ public class WeightedMachineRecipeGenerator extends BasicMachineRecipeGenerator<
 		this.add("%s_to_%s".formatted(path(inputTag), path(stacks[0].itemStack.getItem())), json ->
 		{
 			JsonObject input = new JsonObject();
-			input.addProperty("tag", inputTag.f_203868_().toString());
+			input.addProperty("tag", inputTag.location().toString());
 			if (inputCount != 1)
 			{
 				input.addProperty("count", inputCount);

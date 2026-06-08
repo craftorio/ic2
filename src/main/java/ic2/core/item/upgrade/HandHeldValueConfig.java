@@ -26,6 +26,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class HandHeldValueConfig extends HandHeldUpgradeOption
 {
@@ -78,7 +80,7 @@ public class HandHeldValueConfig extends HandHeldUpgradeOption
 
 			for (byte slot = 0; slot < 9; slot++)
 			{
-				this.m_38897_(new SlotHologramSlot(HandHeldValueConfig.this.inventory, slot, 8 + 18 * slot, 8, 1, HandHeldValueConfig.this.makeSaveCallback()));
+				this.addSlot(new SlotHologramSlot(HandHeldValueConfig.this.inventory, slot, 8 + 18 * slot, 8, 1, HandHeldValueConfig.this.makeSaveCallback()));
 			}
 		}
 
@@ -96,7 +98,7 @@ public class HandHeldValueConfig extends HandHeldUpgradeOption
 						saveType = ComparisonType.DIRECT;
 					} else
 					{
-						nbt.m_128359_("normal", this.normalBox);
+						nbt.putString("normal", this.normalBox);
 						nbt.putByte("normalComp", this.normalSetting.getForNBT());
 					}
 				case RANGE:
@@ -108,19 +110,19 @@ public class HandHeldValueConfig extends HandHeldUpgradeOption
 						} else
 						{
 							saveType = ComparisonType.COMPARISON;
-							nbt.m_128359_("normal", this.extraBox);
+							nbt.putString("normal", this.extraBox);
 							nbt.putByte("normalComp", this.extraSetting.getForNBT());
 						}
 					} else
 					{
-						nbt.m_128359_("normal", this.normalBox);
+						nbt.putString("normal", this.normalBox);
 						nbt.putByte("normalComp", this.normalSetting.getForNBT());
 						if (this.extraBox.isEmpty())
 						{
 							saveType = ComparisonType.COMPARISON;
 						} else
 						{
-							nbt.m_128359_("extra", this.extraBox);
+							nbt.putString("extra", this.extraBox);
 							nbt.putByte("extraComp", this.extraSetting.getForNBT());
 						}
 					}

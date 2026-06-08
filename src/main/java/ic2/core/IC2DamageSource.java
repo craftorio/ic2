@@ -7,8 +7,8 @@ import net.minecraft.world.entity.LivingEntity;
 public class Ic2DamageSource extends DamageSource
 {
 	public static Ic2DamageSource electricity = new Ic2DamageSource("electricity");
-	public static Ic2DamageSource nuke = (Ic2DamageSource) new Ic2DamageSource("nuke").m_19375_();
-	public static Ic2DamageSource radiation = (Ic2DamageSource) new Ic2DamageSource("radiation").m_19380_();
+	public static Ic2DamageSource nuke = (Ic2DamageSource) new Ic2DamageSource("nuke").setExplosion();
+	public static Ic2DamageSource radiation = (Ic2DamageSource) new Ic2DamageSource("radiation").bypassArmor();
 
 	public Ic2DamageSource(String s)
 	{
@@ -17,6 +17,6 @@ public class Ic2DamageSource extends DamageSource
 
 	public static DamageSource getNukeSource(LivingEntity igniter)
 	{
-		return igniter != null ? new EntityDamageSource("nuke.player", igniter).m_19375_() : nuke;
+		return igniter != null ? new EntityDamageSource("nuke.player", igniter).setExplosion() : nuke;
 	}
 }

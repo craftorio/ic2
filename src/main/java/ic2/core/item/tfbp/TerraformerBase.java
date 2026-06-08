@@ -17,6 +17,6 @@ abstract class TerraformerBase
 	protected static boolean isVanilla(Block block)
 	{
 		ResourceLocation id = Util.getName(block);
-		return id != null && id.m_135827_().equals("minecraft");
+		return id != null && id.getNamespace().equals("minecraft");
 	}
 }

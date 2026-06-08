@@ -16,7 +16,7 @@ public class ContainerItemBuffer extends ContainerFullInv<TileEntityItemBuffer>
 		{
 			for (int x = 0; x < 4; x++)
 			{
-				this.m_38897_(new SlotInvSlot(te.leftcontentSlot, x + y * 4, 8 + x * 18, 18 + y * 18));
+				this.addSlot(new SlotInvSlot(te.leftcontentSlot, x + y * 4, 8 + x * 18, 18 + y * 18));
 			}
 		}
 
@@ -24,13 +24,13 @@ public class ContainerItemBuffer extends ContainerFullInv<TileEntityItemBuffer>
 		{
 			for (int x = 0; x < 4; x++)
 			{
-				this.m_38897_(new SlotInvSlot(te.rightcontentSlot, x + y * 4, 98 + x * 18, 18 + y * 18));
+				this.addSlot(new SlotInvSlot(te.rightcontentSlot, x + y * 4, 98 + x * 18, 18 + y * 18));
 			}
 		}
 
 		for (int i = 0; i < 2; i++)
 		{
-			this.m_38897_(new SlotInvSlot(te.upgradeSlot, i, 35 + i * 90, 128));
+			this.addSlot(new SlotInvSlot(te.upgradeSlot, i, 35 + i * 90, 128));
 		}
 	}
 }

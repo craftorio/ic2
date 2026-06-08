@@ -22,6 +22,6 @@ public class RecipeManagerGetter<T> implements Recipes.IGetter<T>
 	@Override
 	public T get(Level world)
 	{
-		return world.m_5776_() ? this.factory.apply(world.m_7465_()) : this.cache.computeIfAbsent(world.m_7465_(), this.factory);
+		return world.isClientSide() ? this.factory.apply(world.getRecipeManager()) : this.cache.computeIfAbsent(world.getRecipeManager(), this.factory);
 	}
 }

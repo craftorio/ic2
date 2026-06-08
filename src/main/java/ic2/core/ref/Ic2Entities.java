@@ -15,22 +15,22 @@ import net.minecraft.world.entity.EntityType.Builder;
 public final class Ic2Entities
 {
 	public static final EntityType<ITntEntity> ITNT = register(
-		"itnt", Builder.m_20704_(ITntEntity::new, MobCategory.MISC).m_20719_().m_20699_(0.98F, 0.98F).m_20702_(10).m_20717_(10)
+		"itnt", Builder.<ITntEntity>of((type, world) -> new ITntEntity(type, world), MobCategory.MISC).fireImmune().sized(0.98F, 0.98F).clientTrackingRange(10).updateInterval(10)
 	);
 	public static final EntityType<NukeEntity> NUKE = register(
-		"nuke", Builder.m_20704_(NukeEntity::new, MobCategory.MISC).m_20719_().m_20699_(0.98F, 0.98F).m_20702_(10).m_20717_(10)
+		"nuke", Builder.<NukeEntity>of((type, world) -> new NukeEntity(type, world), MobCategory.MISC).fireImmune().sized(0.98F, 0.98F).clientTrackingRange(10).updateInterval(10)
 	);
 	public static final EntityType<LaserBulletEntity> LASER_BULLET = register(
-		"laser_bullet", Builder.m_20704_(LaserBulletEntity::new, MobCategory.MISC).m_20719_().m_20699_(0.8F, 0.8F).m_20702_(8).m_20717_(8)
+		"laser_bullet", Builder.<LaserBulletEntity>of((type, world) -> new LaserBulletEntity(type, world), MobCategory.MISC).fireImmune().sized(0.8F, 0.8F).clientTrackingRange(8).updateInterval(8)
 	);
 	public static final EntityType<RubberBoatEntity> RUBBER_BOAT = register(
-		"rubber_boat", Builder.m_20704_(RubberBoatEntity::new, MobCategory.MISC).m_20699_(1.375F, 0.5625F).m_20702_(10)
+		"rubber_boat", Builder.<RubberBoatEntity>of((type, world) -> new RubberBoatEntity(type, world), MobCategory.MISC).sized(1.375F, 0.5625F).clientTrackingRange(10)
 	);
 	public static final EntityType<ElectricBoatEntity> ELECTRIC_BOAT = register(
-		"electric_boat", Builder.m_20704_(ElectricBoatEntity::new, MobCategory.MISC).m_20699_(1.375F, 0.5625F).m_20702_(10)
+		"electric_boat", Builder.<ElectricBoatEntity>of((type, world) -> new ElectricBoatEntity(type, world), MobCategory.MISC).sized(1.375F, 0.5625F).clientTrackingRange(10)
 	);
 	public static final EntityType<CarbonBoatEntity> CARBON_BOAT = register(
-		"carbon_boat", Builder.m_20704_(CarbonBoatEntity::new, MobCategory.MISC).m_20699_(1.375F, 0.5625F).m_20702_(10)
+		"carbon_boat", Builder.<CarbonBoatEntity>of((type, world) -> new CarbonBoatEntity(type, world), MobCategory.MISC).sized(1.375F, 0.5625F).clientTrackingRange(10)
 	);
 
 	public static void init()
@@ -39,7 +39,7 @@ public final class Ic2Entities
 
 	private static <T extends Entity> EntityType<T> register(String name, Builder<T> builder)
 	{
-		EntityType<T> ret = builder.m_20712_(IC2.getIdentifier(name).toString());
+		EntityType<T> ret = builder.build(IC2.getIdentifier(name).toString());
 		IC2.envProxy.registerEntity(IC2.getIdentifier(name), ret);
 		return ret;
 	}

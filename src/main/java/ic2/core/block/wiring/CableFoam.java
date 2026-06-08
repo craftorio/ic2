@@ -78,7 +78,7 @@ public enum CableFoam implements StringRepresentable
 		}
 	}
 
-	public String m_7912_()
+	public String getSerializedName()
 	{
 		return this.name;
 	}

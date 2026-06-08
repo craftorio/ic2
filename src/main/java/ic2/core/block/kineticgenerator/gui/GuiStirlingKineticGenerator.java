@@ -17,7 +17,7 @@ public class GuiStirlingKineticGenerator extends Ic2Gui<ContainerStirlingKinetic
 	}
 
 	@Override
-	protected ResourceLocation getTexture()
+	protected ResourceLocation getTextureLocation()
 	{
 		return ResourceLocation.fromNamespaceAndPath("ic2", "textures/gui/guistirlingkineticgenerator.png");
 	}

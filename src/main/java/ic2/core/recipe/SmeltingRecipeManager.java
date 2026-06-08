@@ -23,21 +23,21 @@ public class SmeltingRecipeManager implements IMachineRecipeManager<ItemStack, I
 	{
 		SmeltingRecipe recipe = (SmeltingRecipe) IC2.sideProxy
 			.getRecipeManager()
-			.m_44015_(RecipeType.f_44108_, new SimpleContainer(new ItemStack[] { input }), null)
+			.getRecipeFor(RecipeType.SMELTING, new SimpleContainer(new ItemStack[] { input }), null)
 			.orElse(null);
 		if (recipe == null)
 		{
 			return null;
 		}
 
-		ItemStack output = recipe.m_8043_();
+		ItemStack output = recipe.getResultItem();
 		if (StackUtil.isEmpty(output))
 		{
 			return null;
 		}
 
 		CompoundTag nbt = new CompoundTag();
-		nbt.m_128350_("experience", recipe.m_43750_() * StackUtil.getSize(output));
+		nbt.putFloat("experience", recipe.getExperience() * StackUtil.getSize(output));
 		return new MachineRecipe<>(input, output, nbt).getResult(StackUtil.copyShrunk(input, 1));
 	}
 

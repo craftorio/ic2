@@ -18,7 +18,7 @@ public class Mushroom extends TerraformerBase
 	boolean terraform(Level world, BlockPos pos)
 	{
 		pos = TileEntityTerra.getFirstSolidBlockFrom(world, pos, 20);
-		return pos == null ? false : growBlockWithDependancy(world, pos, Blocks.f_50180_, Blocks.f_50072_);
+		return pos == null ? false : growBlockWithDependancy(world, pos, Blocks.BROWN_MUSHROOM_BLOCK, Blocks.BROWN_MUSHROOM);
 	}
 
 	private static boolean growBlockWithDependancy(Level world, BlockPos pos, Block target, Block dependancy)
@@ -42,29 +42,29 @@ public class Mushroom extends TerraformerBase
 							cPos.set(xm, ym, zm);
 							BlockState state = world.getBlockState(cPos);
 							Block block = state.getBlock();
-							if (dependancy == Blocks.f_50195_)
+							if (dependancy == Blocks.MYCELIUM)
 							{
-								if (block != dependancy && block != Blocks.f_50180_ && block != Blocks.f_50181_)
+								if (block != dependancy && block != Blocks.BROWN_MUSHROOM_BLOCK && block != Blocks.RED_MUSHROOM_BLOCK)
 								{
-									if (!state.isAir() && (block == Blocks.f_50493_ || block == Blocks.f_50034_))
+									if (!state.isAir() && (block == Blocks.DIRT || block == Blocks.GRASS))
 									{
 										BlockPos dstPos = new BlockPos(cPos);
 										world.setBlockAndUpdate(dstPos, dependancy.defaultBlockState());
-										BiomeUtil.setBiome(world, dstPos, BiomeUtil.getBiome(world, Biomes.f_48215_));
+										BiomeUtil.setBiome(world, dstPos, BiomeUtil.getBiome(world, Biomes.MUSHROOM_FIELDS));
 										return true;
 									}
 									break label116;
 								}
 							} else
 							{
-								if (dependancy != Blocks.f_50072_)
+								if (dependancy != Blocks.BROWN_MUSHROOM)
 								{
 									break label116;
 								}
 
-								if (block != Blocks.f_50072_ && block != Blocks.f_50073_)
+								if (block != Blocks.BROWN_MUSHROOM && block != Blocks.RED_MUSHROOM)
 								{
-									if (!state.isAir() && growBlockWithDependancy(world, cPos, Blocks.f_50072_, Blocks.f_50195_))
+									if (!state.isAir() && growBlockWithDependancy(world, cPos, Blocks.BROWN_MUSHROOM, Blocks.MYCELIUM))
 									{
 										return true;
 									}
@@ -82,43 +82,43 @@ public class Mushroom extends TerraformerBase
 			}
 		}
 
-		if (target == Blocks.f_50072_)
+		if (target == Blocks.BROWN_MUSHROOM)
 		{
 			Block base = world.getBlockState(pos).getBlock();
-			if (base != Blocks.f_50195_)
+			if (base != Blocks.MYCELIUM)
 			{
-				if (base != Blocks.f_50180_ && base != Blocks.f_50181_)
+				if (base != Blocks.BROWN_MUSHROOM_BLOCK && base != Blocks.RED_MUSHROOM_BLOCK)
 				{
 					return false;
 				}
 
-				world.setBlockAndUpdate(pos, Blocks.f_50195_.defaultBlockState());
+				world.setBlockAndUpdate(pos, Blocks.MYCELIUM.defaultBlockState());
 			}
 
-			BlockPos above = pos.m_7494_();
+			BlockPos above = pos.above();
 			BlockState state = world.getBlockState(above);
 			Block block = state.getBlock();
-			if (!state.isAir() && block != Blocks.f_50359_)
+			if (!state.isAir() && block != Blocks.TALL_GRASS)
 			{
 				return false;
 			}
 
-			Block shroom = world.random.m_188499_() ? Blocks.f_50072_ : Blocks.f_50073_;
+			Block shroom = world.random.nextBoolean() ? Blocks.BROWN_MUSHROOM : Blocks.RED_MUSHROOM;
 			world.setBlockAndUpdate(above, shroom.defaultBlockState());
 			return true;
 		} else
 		{
-			if (target == Blocks.f_50180_)
+			if (target == Blocks.BROWN_MUSHROOM_BLOCK)
 			{
-				BlockPos above = pos.m_7494_();
+				BlockPos above = pos.above();
 				BlockState state = world.getBlockState(above);
 				Block base = state.getBlock();
-				if (base != Blocks.f_50072_ && base != Blocks.f_50073_)
+				if (base != Blocks.BROWN_MUSHROOM && base != Blocks.RED_MUSHROOM)
 				{
 					return false;
 				}
 
-				if (((MushroomBlock) base).m_221773_((ServerLevel) world, pos, state, world.random))
+				if (((MushroomBlock) base).growMushroom((ServerLevel) world, pos, state, world.random))
 				{
 					for (int xm = pos.getX() - 1; xm < pos.getX() + 1; xm++)
 					{
@@ -126,7 +126,7 @@ public class Mushroom extends TerraformerBase
 						{
 							cPos.set(xm, above.getY(), zm);
 							Block block = world.getBlockState(cPos).getBlock();
-							if (block == Blocks.f_50072_ || block == Blocks.f_50073_)
+							if (block == Blocks.BROWN_MUSHROOM || block == Blocks.RED_MUSHROOM)
 							{
 								world.removeBlock(new BlockPos(cPos), false);
 							}

@@ -28,34 +28,34 @@ public class ItemDrillIridium extends ItemDrill
 {
 	private static final Tier IRIDIUM_TOOL_MATERIAL = new Tier()
 	{
-		public int m_6609_()
+		public int getUses()
 		{
 			return 3000;
 		}
 
-		public float m_6624_()
+		public float getSpeed()
 		{
 			return 15.0F;
 		}
 
-		public float m_6631_()
+		public float getAttackDamageBonus()
 		{
 			return 5.0F;
 		}
 
-		public int m_6604_()
+		public int getLevel()
 		{
 			return 100;
 		}
 
-		public int m_6601_()
+		public int getEnchantmentValue()
 		{
 			return 20;
 		}
 
-		public Ingredient m_6282_()
+		public Ingredient getRepairIngredient()
 		{
-			return Ingredient.m_43929_(new ItemLike[] { Ic2Items.IRIDIUM });
+			return Ingredient.of(new ItemLike[] { Ic2Items.IRIDIUM });
 		}
 	};
 
@@ -69,37 +69,37 @@ public class ItemDrillIridium extends ItemDrill
 	{
 		ItemStack ret = super.getItemStack(charge);
 		Map<Enchantment, Integer> enchantmentMap = new IdentityHashMap<>();
-		enchantmentMap.put(Enchantments.f_44987_, 3);
-		EnchantmentHelper.m_44865_(enchantmentMap, ret);
+		enchantmentMap.put(Enchantments.BLOCK_FORTUNE, 3);
+		EnchantmentHelper.setEnchantments(enchantmentMap, ret);
 		return ret;
 	}
 
 	@Override
-	public InteractionResultHolder<ItemStack> m_7203_(Level world, Player player, InteractionHand hand)
+	public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand)
 	{
 		if (!world.isClientSide && IC2.keyboard.isModeSwitchKeyDown(player))
 		{
 			Map<Enchantment, Integer> enchantmentMap = new IdentityHashMap<>();
-			enchantmentMap.put(Enchantments.f_44987_, 3);
+			enchantmentMap.put(Enchantments.BLOCK_FORTUNE, 3);
 			ItemStack stack = StackUtil.get(player, hand);
-			if (EnchantmentHelper.m_44843_(Enchantments.f_44985_, stack) == 0)
+			if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, stack) == 0)
 			{
-				enchantmentMap.put(Enchantments.f_44985_, 1);
+				enchantmentMap.put(Enchantments.SILK_TOUCH, 1);
 				IC2.sideProxy.messagePlayer(player, "ic2.tooltip.mode", "ic2.tooltip.mode.silkTouch");
 			} else
 			{
 				IC2.sideProxy.messagePlayer(player, "ic2.tooltip.mode", "ic2.tooltip.mode.normal");
 			}
 
-			EnchantmentHelper.m_44865_(enchantmentMap, stack);
+			EnchantmentHelper.setEnchantments(enchantmentMap, stack);
 		}
 
-		return super.m_7203_(world, player, hand);
+		return super.use(world, player, hand);
 	}
 
 	@Override
-	public InteractionResult m_6225_(UseOnContext context)
+	public InteractionResult useOn(UseOnContext context)
 	{
-		return IC2.keyboard.isModeSwitchKeyDown(context.m_43723_()) ? InteractionResult.PASS : super.m_6225_(context);
+		return IC2.keyboard.isModeSwitchKeyDown(context.getPlayer()) ? InteractionResult.PASS : super.useOn(context);
 	}
 }

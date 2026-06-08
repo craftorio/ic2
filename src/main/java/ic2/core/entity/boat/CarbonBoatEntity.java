@@ -26,7 +26,7 @@ public class CarbonBoatEntity extends AbstractBoatEntity
 		return false;
 	}
 
-	public Item m_38369_()
+	public Item getDropItem()
 	{
 		return Ic2Items.CARBON_BOAT;
 	}

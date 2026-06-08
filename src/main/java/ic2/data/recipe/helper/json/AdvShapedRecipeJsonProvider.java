@@ -23,7 +23,7 @@ public class AdvShapedRecipeJsonProvider extends Ic2RecipeJsonProvider
 	}
 
 	@Override
-	public void m_7917_(JsonObject json)
+	public void serializeRecipeData(JsonObject json)
 	{
 		JsonArray patterns = new JsonArray();
 
@@ -56,7 +56,7 @@ public class AdvShapedRecipeJsonProvider extends Ic2RecipeJsonProvider
 			json.addProperty("group", this.group);
 		}
 
-		super.m_7917_(json);
+		super.serializeRecipeData(json);
 	}
 
 	public AdvShapedRecipeJsonProvider setConsuming(boolean consuming)

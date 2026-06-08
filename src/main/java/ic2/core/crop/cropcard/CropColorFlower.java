@@ -58,7 +58,7 @@ public class CropColorFlower extends Ic2CropCard
 	@Override
 	public ItemStack getGain(ICropTile crop)
 	{
-		return new ItemStack(DyeItem.m_41082_(this.color));
+		return new ItemStack(DyeItem.byColor(this.color));
 	}
 
 	@Override

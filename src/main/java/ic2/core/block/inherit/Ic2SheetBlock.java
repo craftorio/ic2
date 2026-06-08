@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class Ic2SheetBlock extends Block
 {
-	private static final VoxelShape aabb = Shapes.m_83048_(0.0, 0.0, 0.0, 1.0, 0.125, 1.0);
+	private static final VoxelShape aabb = Shapes.box(0.0, 0.0, 0.0, 1.0, 0.125, 1.0);
 	private static final Direction[] positiveHorizontalFacings = new Direction[] { Direction.EAST, Direction.SOUTH };
 
 	public Ic2SheetBlock(Properties settings)
@@ -32,37 +32,37 @@ public class Ic2SheetBlock extends Block
 	}
 
 	@Nullable
-	public BlockState m_5573_(BlockPlaceContext ctx)
+	public BlockState getStateForPlacement(BlockPlaceContext ctx)
 	{
-		Level world = ctx.m_43725_();
+		Level world = ctx.getLevel();
 		if (world == null)
 		{
 			return null;
 		}
 
-		BlockPos pos = ctx.m_8083_();
+		BlockPos pos = ctx.getClickedPos();
 		BlockState state = this.defaultBlockState();
 		return this.isValidPosition(world, pos, state) ? state : null;
 	}
 
-	public VoxelShape m_5940_(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context)
+	public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context)
 	{
 		return aabb;
 	}
 
-	public VoxelShape m_5939_(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context)
+	public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context)
 	{
 		if (state.getBlock() == Ic2Blocks.RESIN_SHEET)
 		{
-			return Shapes.m_83040_();
+			return Shapes.empty();
 		} else
 		{
 			return !(state.getBlock() == Ic2Blocks.WOOL_SHEET && context instanceof EntityCollisionContext entityContext)
-				|| !(entityContext.m_193113_() instanceof Player)
-				|| !entityContext.m_193113_().m_6144_()
-				&& !(entityContext.m_193113_().getY() < pos.getY() + 0.125 - entityContext.m_193113_().f_19793_)
+				|| !(entityContext.getEntity() instanceof Player)
+				|| !entityContext.getEntity().isShiftKeyDown()
+				&& !(entityContext.getEntity().getY() < pos.getY() + 0.125 - entityContext.getEntity().maxUpStep)
 				? aabb
-				: Shapes.m_83040_();
+				: Shapes.empty();
 		}
 	}
 
@@ -81,7 +81,7 @@ public class Ic2SheetBlock extends Block
 		for (Direction facing : Util.HORIZONTAL_DIRS)
 		{
 			state = world.getBlockState(pos.relative(facing));
-			if (state == Ic2Blocks.RUBBER_SHEET.defaultBlockState() || state.getBlock().m_180643_(state, world, pos))
+			if (state == Ic2Blocks.RUBBER_SHEET.defaultBlockState() || state.getBlock().isCollisionShapeFullBlock(state, world, pos))
 			{
 				return true;
 			}
@@ -92,63 +92,63 @@ public class Ic2SheetBlock extends Block
 
 	private boolean isNormalCubeBelow(Level world, BlockPos pos)
 	{
-		pos = pos.m_7495_();
+		pos = pos.below();
 		BlockState state = world.getBlockState(pos);
-		return state.getBlock().m_180643_(state, world, pos);
+		return state.getBlock().isCollisionShapeFullBlock(state, world, pos);
 	}
 
-	public void m_6861_(BlockState state, Level world, BlockPos pos, Block block, BlockPos fromPos, boolean notify)
+	public void neighborChanged(BlockState state, Level world, BlockPos pos, Block block, BlockPos fromPos, boolean notify)
 	{
 		if (!this.isValidPosition(world, pos, state))
 		{
-			Block.m_49892_(state, world, pos, null);
+			Block.dropResources(state, world, pos, null);
 			world.removeBlock(pos, false);
 		}
 	}
 
-	public void m_7892_(BlockState state, Level world, BlockPos pos, Entity entity)
+	public void entityInside(BlockState state, Level world, BlockPos pos, Entity entity)
 	{
 		if (state.getBlock() == Ic2Blocks.RESIN_SHEET)
 		{
-			entity.f_19789_ = (float) (entity.f_19789_ * 0.75);
-			entity.m_20334_(entity.m_20184_().m_7096_() * 0.6, entity.m_20184_().m_7098_() * 0.85, entity.m_20184_().m_7094_() * 0.6);
+			entity.fallDistance = (float) (entity.fallDistance * 0.75);
+			entity.setDeltaMovement(entity.getDeltaMovement().x() * 0.6, entity.getDeltaMovement().y() * 0.85, entity.getDeltaMovement().z() * 0.6);
 		} else if (state.getBlock() == Ic2Blocks.RUBBER_SHEET)
 		{
-			if (!world.m_46859_(pos.m_7495_()))
+			if (!world.isEmptyBlock(pos.below()))
 			{
 				return;
 			}
 
 			if (entity instanceof LivingEntity && !canSupportWeight(world, pos))
 			{
-				world.m_46796_(2001, pos, Block.m_49956_(state));
+				world.levelEvent(2001, pos, Block.getId(state));
 				world.removeBlock(pos, false);
 				return;
 			}
 
-			if (entity.m_20184_().m_7098_() <= -0.4)
+			if (entity.getDeltaMovement().y() <= -0.4)
 			{
-				entity.f_19789_ = 0.0F;
-				entity.m_20334_(entity.m_20184_().m_7096_() * 1.1, entity.m_20184_().m_7098_(), entity.m_20184_().m_7094_() * 1.1);
+				entity.fallDistance = 0.0F;
+				entity.setDeltaMovement(entity.getDeltaMovement().x() * 1.1, entity.getDeltaMovement().y(), entity.getDeltaMovement().z() * 1.1);
 				if (entity instanceof LivingEntity)
 				{
 					if (entity instanceof Player && IC2.keyboard.isJumpKeyDown((Player) entity))
 					{
-						entity.m_20334_(entity.m_20184_().m_7096_(), entity.m_20184_().m_7098_() * -1.3, entity.m_20184_().m_7094_());
-					} else if (entity instanceof Player && entity.m_6144_())
+						entity.setDeltaMovement(entity.getDeltaMovement().x(), entity.getDeltaMovement().y() * -1.3, entity.getDeltaMovement().z());
+					} else if (entity instanceof Player && entity.isShiftKeyDown())
 					{
-						entity.m_20334_(entity.m_20184_().m_7096_(), entity.m_20184_().m_7098_() * -0.1, entity.m_20184_().m_7094_());
+						entity.setDeltaMovement(entity.getDeltaMovement().x(), entity.getDeltaMovement().y() * -0.1, entity.getDeltaMovement().z());
 					} else
 					{
-						entity.m_20334_(entity.m_20184_().m_7096_(), entity.m_20184_().m_7098_() * -0.8, entity.m_20184_().m_7094_());
+						entity.setDeltaMovement(entity.getDeltaMovement().x(), entity.getDeltaMovement().y() * -0.8, entity.getDeltaMovement().z());
 					}
 				} else
 				{
-					entity.m_20334_(entity.m_20184_().m_7096_(), entity.m_20184_().m_7098_() * -0.8, entity.m_20184_().m_7094_());
+					entity.setDeltaMovement(entity.getDeltaMovement().x(), entity.getDeltaMovement().y() * -0.8, entity.getDeltaMovement().z());
 				}
 			} else if (state.getBlock() == Ic2Blocks.WOOL_SHEET)
 			{
-				entity.f_19789_ = (float) (entity.f_19789_ * 0.95);
+				entity.fallDistance = (float) (entity.fallDistance * 0.95);
 			}
 		}
 	}
@@ -162,14 +162,14 @@ public class Ic2SheetBlock extends Block
 		{
 			for (int dir = -1; dir <= 1; dir += 2)
 			{
-				cPos.m_122190_(pos);
+				cPos.set(pos);
 				boolean supported = false;
 
 				for (int i = 0; i < 16; i++)
 				{
-					cPos.m_122175_(axis, dir);
+					cPos.move(axis, dir);
 					BlockState state = world.getBlockState(cPos);
-					if (state.getBlock().m_180643_(state, world, cPos))
+					if (state.getBlock().isCollisionShapeFullBlock(state, world, cPos))
 					{
 						supported = true;
 						break;
@@ -180,15 +180,15 @@ public class Ic2SheetBlock extends Block
 						break;
 					}
 
-					cPos.m_122173_(Direction.DOWN);
+					cPos.move(Direction.DOWN);
 					BlockState baseState = world.getBlockState(cPos);
-					if (baseState.getBlock().m_180643_(baseState, world, cPos))
+					if (baseState.getBlock().isCollisionShapeFullBlock(baseState, world, cPos))
 					{
 						supported = true;
 						break;
 					}
 
-					cPos.m_122173_(Direction.UP);
+					cPos.move(Direction.UP);
 				}
 
 				if (!supported)

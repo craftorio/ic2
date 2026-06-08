@@ -29,28 +29,28 @@ public abstract class Ic2LootTableProvider extends LootTableProvider
 	public Ic2LootTableProvider(DataGenerator dataGenerator)
 	{
 		super(dataGenerator);
-		this.pathResolver = dataGenerator.m_236036_(Target.DATA_PACK, "loot_tables");
+		this.pathResolver = dataGenerator.createPathProvider(Target.DATA_PACK, "loot_tables");
 	}
 
-	public void m_213708_(CachedOutput writer)
+	public void run(CachedOutput writer)
 	{
 		this.generate((id, builder) ->
 		{
-			LootTable table = builder.m_79165_(this.getContextType()).m_79167_();
-			ValidationContext lootTableReporter = new ValidationContext(LootContextParamSets.f_81420_, identifier -> null, identifier -> table);
-			LootTables.m_79202_(lootTableReporter, id, table);
-			Multimap<String, String> multimap = lootTableReporter.m_79352_();
+			LootTable table = builder.setParamSet(this.getContextType()).build();
+			ValidationContext lootTableReporter = new ValidationContext(LootContextParamSets.ALL_PARAMS, identifier -> null, identifier -> table);
+			LootTables.validate(lootTableReporter, id, table);
+			Multimap<String, String> multimap = lootTableReporter.getProblems();
 			if (!multimap.isEmpty())
 			{
 				multimap.forEach((name, message) -> IC2.log.warn(LogCategory.General, "Found validation problem in {}: {}", name, message));
 				throw new IllegalStateException("Failed to validate loot tables, see logs");
 			}
 
-			Path path = this.pathResolver.m_236048_(id);
+			Path path = this.pathResolver.json(id);
 
 			try
 			{
-				DataProvider.m_236072_(writer, LootTables.m_79200_(table), path);
+				DataProvider.saveStable(writer, LootTables.serialize(table), path);
 			} catch (IOException var6)
 			{
 				IC2.log.error(LogCategory.General, "Couldn't save loot table {}", path, var6);

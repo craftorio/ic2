@@ -7,6 +7,8 @@ import ic2.core.profile.NotClassic;
 
 import java.util.List;
 
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -42,21 +44,21 @@ public class ItemWindRotor extends Item implements IKineticRotor
 	}
 
 	@OnlyIn(Dist.CLIENT)
-	public void m_7373_(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag advanced)
+	public void appendHoverText(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag advanced)
 	{
-		tooltip.add(Component.m_237110_("ic2.itemrotor.wind.info", new Object[] { this.minWindStrength, this.maxWindStrength }).m_130940_(ChatFormatting.GRAY));
+		tooltip.add(Component.translatable("ic2.itemrotor.wind.info", new Object[] { this.minWindStrength, this.maxWindStrength }).withStyle(ChatFormatting.GRAY));
 		IKineticRotor.GearboxType type = null;
-		if (Minecraft.m_91087_().f_91080_ instanceof GuiWaterKineticGenerator)
+		if (Minecraft.getInstance().screen instanceof GuiWaterKineticGenerator)
 		{
 			type = IKineticRotor.GearboxType.WATER;
-		} else if (Minecraft.m_91087_().f_91080_ instanceof GuiWindKineticGenerator)
+		} else if (Minecraft.getInstance().screen instanceof GuiWindKineticGenerator)
 		{
 			type = IKineticRotor.GearboxType.WIND;
 		}
 
 		if (type != null)
 		{
-			tooltip.add(Component.m_237115_("ic2.itemrotor.fitsin." + this.isAcceptedType(stack, type)).m_130940_(ChatFormatting.GRAY));
+			tooltip.add(Component.translatable("ic2.itemrotor.fitsin." + this.isAcceptedType(stack, type)).withStyle(ChatFormatting.GRAY));
 		}
 	}
 

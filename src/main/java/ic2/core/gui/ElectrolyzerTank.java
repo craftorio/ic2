@@ -80,7 +80,7 @@ public class ElectrolyzerTank extends AbstractFluidSlot
 		List<Component> ret = super.getToolTip();
 		if (this.output != null)
 		{
-			ret.add(Component.m_237113_("Output Tank: " + StringUtils.capitalize(((Direction) this.output.getRight()).m_7912_())));
+			ret.add(Component.literal("Output Tank: " + StringUtils.capitalize(((Direction) this.output.getRight()).getSerializedName())));
 		}
 
 		return ret;

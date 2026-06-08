@@ -12,6 +12,6 @@ public class Ic2LootNbtProviderTypes
 
 	private static LootNbtProviderType register(String id, Serializer<? extends NbtProvider> jsonSerializer)
 	{
-		return (LootNbtProviderType) Registry.m_122965_(Registry.f_175422_, IC2.getIdentifier(id), new LootNbtProviderType(jsonSerializer));
+		return (LootNbtProviderType) Registry.register(Registry.LOOT_NBT_PROVIDER_TYPE, IC2.getIdentifier(id), new LootNbtProviderType(jsonSerializer));
 	}
 }

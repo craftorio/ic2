@@ -33,8 +33,8 @@ public class Rezepte
 		Recipes.extractor = basicRecipe(Ic2RecipeTypes.EXTRACTOR);
 		Recipes.compressor = basicRecipe(Ic2RecipeTypes.COMPRESSOR);
 		Recipes.centrifuge = basicRecipe(Ic2RecipeTypes.CENTRIFUGE);
-		Recipes.blockcutter = basicRecipe(Ic2RecipeTypes.BLOCK_CUTTER);
-		Recipes.blastfurnace = basicRecipe(Ic2RecipeTypes.BLAST_FURNACE);
+		Recipes.block_cutter = basicRecipe(Ic2RecipeTypes.BLOCK_CUTTER);
+		Recipes.blast_furnace = basicRecipe(Ic2RecipeTypes.BLAST_FURNACE);
 		Recipes.metalformerExtruding = basicRecipe(Ic2RecipeTypes.METAL_FORMER_EXTRUDING);
 		Recipes.metalformerCutting = basicRecipe(Ic2RecipeTypes.METAL_FORMER_CUTTING);
 		Recipes.metalformerRolling = basicRecipe(Ic2RecipeTypes.METAL_FORMER_ROLLING);
@@ -43,7 +43,7 @@ public class Rezepte
 		{
 			MatterAmplifierRecipeManager manager = new MatterAmplifierRecipeManager();
 
-			for (RecipeHolder<IRecipeInput, Integer> holder : recipeManager.m_44013_(Ic2RecipeTypes.MATTER_FABRICATOR))
+			for (RecipeHolder<IRecipeInput, Integer> holder : recipeManager.getAllRecipesFor(Ic2RecipeTypes.MATTER_FABRICATOR))
 			{
 				manager.addRecipe(holder.recipe().getInput(), holder.recipe().getOutput(), null, false);
 			}
@@ -54,7 +54,7 @@ public class Rezepte
 		{
 			CannerBottleRecipeManager manager = new CannerBottleRecipeManager();
 
-			for (RecipeHolder<ICannerBottleRecipeManager.Input, ItemStack> holder : recipeManager.m_44013_(Ic2RecipeTypes.CANNER_BOTTLE))
+			for (RecipeHolder<ICannerBottleRecipeManager.Input, ItemStack> holder : recipeManager.getAllRecipesFor(Ic2RecipeTypes.CANNER_BOTTLE))
 			{
 				manager.addRecipe(holder.recipe().getInput(), holder.recipe().getOutput(), null, false);
 			}
@@ -65,7 +65,7 @@ public class Rezepte
 		{
 			CannerEnrichRecipeManager manager = new CannerEnrichRecipeManager();
 
-			for (RecipeHolder<ICannerEnrichRecipeManager.Input, Ic2FluidStack> holder : recipeManager.m_44013_(Ic2RecipeTypes.CANNER_ENRICH))
+			for (RecipeHolder<ICannerEnrichRecipeManager.Input, Ic2FluidStack> holder : recipeManager.getAllRecipesFor(Ic2RecipeTypes.CANNER_ENRICH))
 			{
 				manager.addRecipe(holder.recipe().getInput(), holder.recipe().getOutput(), null, false);
 			}
@@ -85,7 +85,7 @@ public class Rezepte
 		{
 			BasicMachineRecipeManager manager = new BasicMachineRecipeManager();
 
-			for (RecipeHolder<IRecipeInput, Collection<ItemStack>> holder : recipeManager.m_44013_(recipeType))
+			for (RecipeHolder<IRecipeInput, Collection<ItemStack>> holder : recipeManager.getAllRecipesFor(recipeType))
 			{
 				manager.addRecipe(holder.recipe(), false);
 			}

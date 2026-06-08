@@ -12,6 +12,8 @@ import ic2.core.util.Util;
 
 import java.util.List;
 
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -48,12 +50,12 @@ public class ItemToolCrowbar extends TieredItem implements IEnhancedOverlayProvi
 	@Override
 	public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context)
 	{
-		Level world = context.m_43725_();
-		Player player = context.m_43723_();
-		InteractionHand hand = context.m_43724_();
-		BlockPos pos = context.m_8083_();
-		Direction side = context.m_43719_();
-		Vec3 hitPos = context.m_43720_();
+		Level world = context.getLevel();
+		Player player = context.getPlayer();
+		InteractionHand hand = context.getHand();
+		BlockPos pos = context.getClickedPos();
+		Direction side = context.getClickedFace();
+		Vec3 hitPos = context.getClickLocation();
 		if (!this.canTakeDamage(stack, 1))
 		{
 			return InteractionResult.FAIL;
@@ -68,7 +70,7 @@ public class ItemToolCrowbar extends TieredItem implements IEnhancedOverlayProvi
 
 		if (world.getBlockEntity(pos) instanceof ICoverHolder target)
 		{
-			Direction selectedFacing = RotationUtil.rotateByHit(side, (float) hitPos.f_82479_, (float) hitPos.f_82480_, (float) hitPos.f_82481_);
+			Direction selectedFacing = RotationUtil.rotateByHit(side, (float) hitPos.x, (float) hitPos.y, (float) hitPos.z);
 			if (target.canRemoveCover(world, pos, selectedFacing))
 			{
 				if (!world.isClientSide)
@@ -76,7 +78,7 @@ public class ItemToolCrowbar extends TieredItem implements IEnhancedOverlayProvi
 					target.removeCover(world, pos, selectedFacing);
 					if (player != null)
 					{
-						stack.m_41622_(1, player, p -> p.m_21190_(hand));
+						stack.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(hand));
 					}
 				} else
 				{
@@ -92,21 +94,21 @@ public class ItemToolCrowbar extends TieredItem implements IEnhancedOverlayProvi
 		}
 	}
 
-	public boolean m_6832_(ItemStack toRepair, ItemStack repair)
+	public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair)
 	{
 		return repair != null && Util.matchesOD(repair, Ic2ItemTags.BRONZE_INGOTS);
 	}
 
-	public boolean m_8120_(ItemStack stack)
+	public boolean isEnchantable(ItemStack stack)
 	{
 		return false;
 	}
 
 	@OnlyIn(Dist.CLIENT)
-	public void m_7373_(ItemStack stack, Level worldIn, List<Component> info, TooltipFlag flagIn)
+	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> info, TooltipFlag flagIn)
 	{
-		info.add(Component.m_237115_(Minecraft.m_91087_().f_91066_.f_92088_.m_90860_() + ":"));
-		info.add(Component.m_237113_(" Remove attachments from blocks"));
+		info.add(Component.translatable(Minecraft.getInstance().options.keyRight.getName() + ":"));
+		info.add(Component.literal(" Remove attachments from blocks"));
 	}
 
 	@Override

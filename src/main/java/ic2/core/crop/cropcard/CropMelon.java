@@ -45,13 +45,13 @@ public class CropMelon extends CropVanillaStem
 	@Override
 	protected ItemStack getProduct()
 	{
-		return IC2.random.nextInt(3) == 0 ? new ItemStack(Blocks.f_50186_) : new ItemStack(Items.f_42028_, IC2.random.nextInt(4) + 2);
+		return IC2.random.nextInt(3) == 0 ? new ItemStack(Blocks.MELON) : new ItemStack(Items.MELON, IC2.random.nextInt(4) + 2);
 	}
 
 	@Override
 	protected ItemStack getSeeds()
 	{
-		return new ItemStack(Items.f_42578_, IC2.random.nextInt(2) + 1);
+		return new ItemStack(Items.MELON_SEEDS, IC2.random.nextInt(2) + 1);
 	}
 
 	@Override

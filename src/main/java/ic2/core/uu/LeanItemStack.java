@@ -91,7 +91,7 @@ class LeanItemStack
 		}
 
 		ItemStack ret = new ItemStack(this.item, this.size);
-		ret.m_41751_(this.nbt);
+		ret.setTag(this.nbt);
 		return ret;
 	}
 

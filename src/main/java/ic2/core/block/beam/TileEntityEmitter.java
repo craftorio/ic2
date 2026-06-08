@@ -23,7 +23,7 @@ public class TileEntityEmitter extends TileEntityElectricMachine
 			this.progress++;
 		}
 
-		if (this.progress == 100 && this.getLevel().m_46753_(this.worldPosition))
+		if (this.progress == 100 && this.getLevel().hasNeighborSignal(this.worldPosition))
 		{
 			this.progress = 0;
 			this.getLevel().addFreshEntity(new ParticleEntity(this));

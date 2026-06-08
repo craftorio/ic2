@@ -23,44 +23,44 @@ public class Chilling extends TerraformerBase
 
 		BlockState state = world.getBlockState(pos);
 		Block block = state.getBlock();
-		if (block == Blocks.f_49990_)
+		if (block == Blocks.WATER)
 		{
-			world.setBlockAndUpdate(pos, Blocks.f_50126_.defaultBlockState());
+			world.setBlockAndUpdate(pos, Blocks.ICE.defaultBlockState());
 			return true;
 		}
 
-		if (block == Blocks.f_50126_)
+		if (block == Blocks.ICE)
 		{
-			BlockPos below = pos.m_7495_();
+			BlockPos below = pos.below();
 			Block blockBelow = world.getBlockState(below).getBlock();
-			if (blockBelow == Blocks.f_49990_)
+			if (blockBelow == Blocks.WATER)
 			{
-				world.setBlockAndUpdate(below, Blocks.f_50126_.defaultBlockState());
+				world.setBlockAndUpdate(below, Blocks.ICE.defaultBlockState());
 				return true;
 			}
-		} else if (block == Blocks.f_50125_)
+		} else if (block == Blocks.SNOW)
 		{
 			if (isSurroundedBySnow(world, pos))
 			{
-				world.setBlockAndUpdate(pos, Blocks.f_50127_.defaultBlockState());
+				world.setBlockAndUpdate(pos, Blocks.SNOW_BLOCK.defaultBlockState());
 				return true;
 			}
 
-			int size = (Integer) state.getValue(SnowLayerBlock.f_56581_);
-			if (SnowLayerBlock.f_56581_.m_6908_().contains(size + 1))
+			int size = (Integer) state.getValue(SnowLayerBlock.LAYERS);
+			if (SnowLayerBlock.LAYERS.getPossibleValues().contains(size + 1))
 			{
-				world.setBlockAndUpdate(pos, (BlockState) state.setValue(SnowLayerBlock.f_56581_, size + 1));
+				world.setBlockAndUpdate(pos, (BlockState) state.setValue(SnowLayerBlock.LAYERS, size + 1));
 				return true;
 			}
 		}
 
-		pos = pos.m_7494_();
-		if (!Blocks.f_50125_.defaultBlockState().m_60710_(world, pos) && block != Blocks.f_50126_)
+		pos = pos.above();
+		if (!Blocks.SNOW.defaultBlockState().canSurvive(world, pos) && block != Blocks.ICE)
 		{
 			return false;
 		}
 
-		world.setBlockAndUpdate(pos, Blocks.f_50125_.defaultBlockState());
+		world.setBlockAndUpdate(pos, Blocks.SNOW.defaultBlockState());
 		return true;
 	}
 
@@ -84,12 +84,12 @@ public class Chilling extends TerraformerBase
 		if (pos != null && prevY <= pos.getY())
 		{
 			Block block = world.getBlockState(pos).getBlock();
-			if (block != Blocks.f_50127_ && block != Blocks.f_50125_)
+			if (block != Blocks.SNOW_BLOCK && block != Blocks.SNOW)
 			{
-				pos = pos.m_7494_();
-				if (Blocks.f_50125_.defaultBlockState().m_60710_(world, pos) || block == Blocks.f_50126_)
+				pos = pos.above();
+				if (Blocks.SNOW.defaultBlockState().canSurvive(world, pos) || block == Blocks.ICE)
 				{
-					world.setBlockAndUpdate(pos, Blocks.f_50125_.defaultBlockState());
+					world.setBlockAndUpdate(pos, Blocks.SNOW.defaultBlockState());
 				}
 
 				return false;

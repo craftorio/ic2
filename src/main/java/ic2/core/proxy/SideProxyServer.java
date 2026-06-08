@@ -130,7 +130,7 @@ public final class SideProxyServer implements SideProxy
 		}
 
 		error = "IndustrialCraft 2 Error\n\n == = IndustrialCraft 2 Error = == \n\n" + error + "\n\n == == == == == == == == == == ==\n";
-		error = error.replace("\n", System.getProperty("line.separator"));
+		error = error.replace("\n", System.lineSeparator());
 		throw new RuntimeException(error);
 	}
 
@@ -167,7 +167,7 @@ public final class SideProxyServer implements SideProxy
 	@Override
 	public Level getWorld(MinecraftServer server, ResourceLocation dimId)
 	{
-		for (Level world : server.m_129785_())
+		for (Level world : server.getAllLevels())
 		{
 			if (dimId.equals(Util.getDimId(world)))
 			{
@@ -187,7 +187,7 @@ public final class SideProxyServer implements SideProxy
 	@Override
 	public RecipeManager getRecipeManager()
 	{
-		return IC2.envProxy.getServer().m_129894_();
+		return IC2.envProxy.getServer().getRecipeManager();
 	}
 
 	@Override
@@ -204,13 +204,13 @@ public final class SideProxyServer implements SideProxy
 			Component msg;
 			if (args.length > 0)
 			{
-				msg = Component.m_237110_(message, getMessageComponents(args));
+				msg = Component.translatable(message, (Object) getMessageComponents(args));
 			} else
 			{
-				msg = Component.m_237115_(message);
+				msg = Component.translatable(message);
 			}
 
-			player.m_5661_(msg, false);
+			player.displayClientMessage(msg, false);
 		}
 	}
 
@@ -222,10 +222,10 @@ public final class SideProxyServer implements SideProxy
 		{
 			if (args[i] instanceof String && ((String) args[i]).startsWith("ic2."))
 			{
-				encodedArgs[i] = Component.m_237115_((String) args[i]);
+				encodedArgs[i] = Component.translatable((String) args[i]);
 			} else
 			{
-				encodedArgs[i] = Component.m_237113_(args[i].toString());
+				encodedArgs[i] = Component.literal(args[i].toString());
 			}
 		}
 

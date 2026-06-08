@@ -110,7 +110,7 @@ public abstract class ItemElectricTool extends DiggerItem implements IElectricIt
 	@Override
 	public void onNetworkEvent(ItemStack stack, Player player, int event)
 	{
-		player.m_5496_(this.getShutdownSound(), 1.0F, 1.0F);
+		player.playSound(this.getShutdownSound(), 1.0F, 1.0F);
 	}
 
 	public boolean consumeEnergy(ItemStack stack, double amount, LivingEntity entity)
@@ -127,29 +127,29 @@ public abstract class ItemElectricTool extends DiggerItem implements IElectricIt
 		return info;
 	}
 
-	public InteractionResult m_6225_(UseOnContext context)
+	public InteractionResult useOn(UseOnContext context)
 	{
-		ElectricItem.manager.use(context.m_43722_(), 0.0, context.m_43723_());
-		return super.m_6225_(context);
+		ElectricItem.manager.use(context.getItemInHand(), 0.0, context.getPlayer());
+		return super.useOn(context);
 	}
 
-	public InteractionResultHolder<ItemStack> m_7203_(Level world, Player player, InteractionHand hand)
+	public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand)
 	{
 		ElectricItem.manager.use(StackUtil.get(player, hand), 0.0, player);
-		return super.m_7203_(world, player, hand);
+		return super.use(world, player, hand);
 	}
 
-	public float m_8102_(ItemStack stack, BlockState state)
+	public float getDestroySpeed(ItemStack stack, BlockState state)
 	{
-		return this.isEffective(state) && ElectricItem.manager.canUse(stack, this.operationEnergyCost) ? this.f_40980_ : 1.0F;
+		return this.isEffective(state) && ElectricItem.manager.canUse(stack, this.operationEnergyCost) ? this.speed : 1.0F;
 	}
 
-	public boolean m_8096_(BlockState state)
+	public boolean isCorrectToolForDrops(BlockState state)
 	{
-		int level = this.m_43314_().m_6604_();
-		return (level >= 3 || !state.m_204336_(BlockTags.f_144284_))
-			&& (level >= 2 || !state.m_204336_(BlockTags.f_144285_))
-			&& (level >= 1 || !state.m_204336_(BlockTags.f_144286_))
+		int level = this.getTier().getLevel();
+		return (level >= 3 || !state.is(BlockTags.NEEDS_DIAMOND_TOOL))
+			&& (level >= 2 || !state.is(BlockTags.NEEDS_IRON_TOOL))
+			&& (level >= 1 || !state.is(BlockTags.NEEDS_STONE_TOOL))
 			? this.isEffective(state)
 			: false;
 	}
@@ -158,7 +158,7 @@ public abstract class ItemElectricTool extends DiggerItem implements IElectricIt
 	{
 		for (TagKey<Block> tag : this.effectiveBlocks)
 		{
-			if (state.m_204336_(tag))
+			if (state.is(tag))
 			{
 				return true;
 			}
@@ -167,12 +167,12 @@ public abstract class ItemElectricTool extends DiggerItem implements IElectricIt
 		return false;
 	}
 
-	public boolean m_7579_(ItemStack itemstack, LivingEntity entityliving, LivingEntity entityliving1)
+	public boolean hurtEnemy(ItemStack itemstack, LivingEntity entityliving, LivingEntity entityliving1)
 	{
 		return true;
 	}
 
-	public int m_6473_()
+	public int getEnchantmentValue()
 	{
 		return 0;
 	}
@@ -201,7 +201,7 @@ public abstract class ItemElectricTool extends DiggerItem implements IElectricIt
 		return this.transferLimit;
 	}
 
-	public boolean m_6813_(ItemStack stack, Level world, BlockState state, BlockPos pos, LivingEntity user)
+	public boolean mineBlock(ItemStack stack, Level world, BlockState state, BlockPos pos, LivingEntity user)
 	{
 		if (state.getDestroySpeed(world, pos) != 0.0F)
 		{
@@ -211,20 +211,20 @@ public abstract class ItemElectricTool extends DiggerItem implements IElectricIt
 		return true;
 	}
 
-	public boolean m_8120_(ItemStack stack)
+	public boolean isEnchantable(ItemStack stack)
 	{
 		return false;
 	}
 
-	public void m_6787_(CreativeModeTab tab, NonNullList<ItemStack> subItems)
+	public void fillItemCategory(CreativeModeTab tab, NonNullList<ItemStack> subItems)
 	{
-		if (this.m_220152_(tab))
+		if (this.allowedIn(tab))
 		{
 			ElectricItemManager.addChargeVariants(this, subItems);
 		}
 	}
 
-	public void m_7373_(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag context)
+	public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag context)
 	{
 		ElectricItemTooltipHandler.addTooltip(stack, tooltip);
 	}
@@ -236,7 +236,7 @@ public abstract class ItemElectricTool extends DiggerItem implements IElectricIt
 		return ret;
 	}
 
-	public void m_6883_(ItemStack itemstack, Level world, Entity entity, int i, boolean flag)
+	public void inventoryTick(ItemStack itemstack, Level world, Entity entity, int i, boolean flag)
 	{
 		boolean isEquipped = flag && entity instanceof LivingEntity;
 		if (IC2.sideProxy.isRendering())
@@ -255,7 +255,7 @@ public abstract class ItemElectricTool extends DiggerItem implements IElectricIt
 				}
 			} else if (!isEquipped && this.idleSound != null && entity instanceof LivingEntity theEntity)
 			{
-				ItemStack stack = theEntity.m_6844_(EquipmentSlot.MAINHAND);
+				ItemStack stack = theEntity.getItemBySlot(EquipmentSlot.MAINHAND);
 				if (stack == null || stack.getItem() != this || stack == itemstack)
 				{
 					if (this.stopSound != null)
@@ -339,19 +339,19 @@ public abstract class ItemElectricTool extends DiggerItem implements IElectricIt
 		return Ic2SoundEvents.ITEM_ELECTRIC_SHUTDOWN;
 	}
 
-	public boolean m_142522_(ItemStack stack)
+	public boolean isBarVisible(ItemStack stack)
 	{
 		return true;
 	}
 
-	public int m_142158_(ItemStack stack)
+	public int getBarWidth(ItemStack stack)
 	{
 		return (int) Math.round(ElectricItem.manager.getChargeLevel(stack) * 13.0);
 	}
 
-	public int m_142159_(ItemStack stack)
+	public int getBarColor(ItemStack stack)
 	{
-		return Mth.m_14169_((float) (ElectricItem.manager.getChargeLevel(stack) / 3.0), 1.0F, 1.0F);
+		return Mth.hsvToRgb((float) (ElectricItem.manager.getChargeLevel(stack) / 3.0), 1.0F, 1.0F);
 	}
 
 	public boolean canUse(ItemStack stack)

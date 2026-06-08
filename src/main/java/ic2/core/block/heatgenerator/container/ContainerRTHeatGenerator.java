@@ -17,12 +17,12 @@ public class ContainerRTHeatGenerator extends ContainerFullInv<TileEntityRTHeatG
 
 		for (int i = 0; i < 3; i++)
 		{
-			this.m_38897_(new SlotInvSlot(be.fuelSlot, i, 62 + i * 18, 27));
+			this.addSlot(new SlotInvSlot(be.fuelSlot, i, 62 + i * 18, 27));
 		}
 
 		for (int i = 3; i < 6; i++)
 		{
-			this.m_38897_(new SlotInvSlot(be.fuelSlot, i, 62 + (i - 3) * 18, 45));
+			this.addSlot(new SlotInvSlot(be.fuelSlot, i, 62 + (i - 3) * 18, 45));
 		}
 	}
 

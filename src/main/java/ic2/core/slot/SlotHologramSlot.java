@@ -30,32 +30,32 @@ public class SlotHologramSlot extends Slot
 		this.changeCallback = changeCallback;
 	}
 
-	public boolean m_8010_(Player player)
+	public boolean mayPickup(Player player)
 	{
 		return false;
 	}
 
-	public int m_6641_()
+	public int getMaxStackSize()
 	{
 		return this.stackSizeLimit;
 	}
 
-	public boolean m_5857_(ItemStack stack)
+	public boolean mayPlace(ItemStack stack)
 	{
 		return false;
 	}
 
-	public ItemStack m_7993_()
+	public ItemStack getItem()
 	{
 		return StackUtil.wrapEmpty(this.stacks[this.index]);
 	}
 
-	public void m_5852_(ItemStack stack)
+	public void set(ItemStack stack)
 	{
 		this.stacks[this.index] = stack;
 	}
 
-	public void m_6654_()
+	public void setChanged()
 	{
 		if (Util.inDev())
 		{
@@ -68,7 +68,7 @@ public class SlotHologramSlot extends Slot
 		}
 	}
 
-	public ItemStack m_6201_(int amount)
+	public ItemStack remove(int amount)
 	{
 		return StackUtil.emptyStack;
 	}
@@ -77,12 +77,12 @@ public class SlotHologramSlot extends Slot
 	{
 		if (Util.inDev() && player.getCommandSenderWorld().isClientSide)
 		{
-			System.out.printf("button=%d clickType=%s stack=%s%n", button, clickType, screenHandler.m_142621_());
+			System.out.printf("button=%d clickType=%s stack=%s%n", button, clickType, screenHandler.getCarried());
 		}
 
 		if (clickType == ClickType.PICKUP && (button == 0 || button == 1))
 		{
-			ItemStack playerStack = screenHandler.m_142621_();
+			ItemStack playerStack = screenHandler.getCarried();
 			ItemStack slotStack = this.stacks[this.index];
 			if (!StackUtil.isEmpty(playerStack))
 			{
@@ -127,7 +127,7 @@ public class SlotHologramSlot extends Slot
 				}
 			}
 
-			this.m_6654_();
+			this.setChanged();
 		}
 
 		return StackUtil.emptyStack;

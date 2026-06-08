@@ -13,8 +13,8 @@ public class ContainerScanner extends ContainerElectricMachine<TileEntityScanner
 	public ContainerScanner(int syncId, Inventory playerInventory, TileEntityScanner be)
 	{
 		super(Ic2ScreenHandlers.UU_SCANNER, syncId, playerInventory, be, 166, 8, 43);
-		this.m_38897_(new SlotInvSlot(be.inputSlot, 0, 55, 35));
-		this.m_38897_(new SlotInvSlot(be.diskSlot, 0, 152, 65));
+		this.addSlot(new SlotInvSlot(be.inputSlot, 0, 55, 35));
+		this.addSlot(new SlotInvSlot(be.diskSlot, 0, 152, 65));
 	}
 
 	@Override

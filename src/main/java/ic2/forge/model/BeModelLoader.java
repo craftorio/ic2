@@ -9,7 +9,7 @@ public final class BeModelLoader implements IGeometryLoader<Ic2Model>
 {
 	public Ic2Model read(JsonObject obj, JsonDeserializationContext context)
 	{
-		ResourceLocation id = ResourceLocation.fromNamespaceAndPath(obj.get("id").getAsString());
+		ResourceLocation id = ResourceLocation.parse(obj.get("id").getAsString());
 		return new DynamicBeModelForge(id);
 	}
 }

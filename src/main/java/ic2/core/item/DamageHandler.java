@@ -28,9 +28,9 @@ public class DamageHandler
 				}
 
 				((IPseudoDamageItem) item).setStackDamage(stack, damage);
-			} else if (stack.m_41763_())
+			} else if (stack.isDamageableItem())
 			{
-				stack.m_41721_(damage);
+				stack.setDamageValue(damage);
 			}
 		}
 	}
@@ -38,7 +38,7 @@ public class DamageHandler
 	public static int getMaxDamage(ItemStack stack)
 	{
 		Item item = stack.getItem();
-		return item == null ? 0 : stack.m_41776_();
+		return item == null ? 0 : stack.getMaxDamage();
 	}
 
 	public static boolean damage(ItemStack stack, int damage, LivingEntity src, InteractionHand hand)
@@ -49,17 +49,17 @@ public class DamageHandler
 			return false;
 		} else if (src != null)
 		{
-			stack.m_41622_(damage, src, player ->
+			stack.hurtAndBreak(damage, src, player ->
 			{
 				if (hand != null)
 				{
-					player.m_21190_(hand);
+					player.broadcastBreakEvent(hand);
 				}
 			});
 			return true;
 		} else
 		{
-			return stack.m_220157_(damage, IC2.random, src instanceof ServerPlayer ? (ServerPlayer) src : null);
+			return stack.hurt(damage, IC2.random, src instanceof ServerPlayer ? (ServerPlayer) src : null);
 		}
 	}
 }

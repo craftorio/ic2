@@ -68,25 +68,25 @@ public abstract class ItemArmorFluidTank extends ItemArmorUtility implements Sta
 		return Ic2FluidStack.get(stack).isEmpty();
 	}
 
-	public void m_7373_(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag advanced)
+	public void appendHoverText(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag advanced)
 	{
-		super.m_7373_(stack, world, tooltip, advanced);
-		tooltip.add(Component.m_237113_(getContentDescription(stack)));
+		super.appendHoverText(stack, world, tooltip, advanced);
+		tooltip.add(Component.literal(getContentDescription(stack)));
 	}
 
-	public boolean m_142522_(ItemStack stack)
+	public boolean isBarVisible(ItemStack stack)
 	{
 		return true;
 	}
 
-	public int m_142158_(ItemStack stack)
+	public int getBarWidth(ItemStack stack)
 	{
 		return (int) Math.round(this.getChargeLevel(stack) * 13.0);
 	}
 
-	public int m_142159_(ItemStack stack)
+	public int getBarColor(ItemStack stack)
 	{
-		return Mth.m_14169_((float) (this.getChargeLevel(stack) / 3.0), 1.0F, 1.0F);
+		return Mth.hsvToRgb((float) (this.getChargeLevel(stack) / 3.0), 1.0F, 1.0F);
 	}
 
 	@Override
@@ -101,11 +101,11 @@ public abstract class ItemArmorFluidTank extends ItemArmorUtility implements Sta
 	{
 		Ic2FluidStack fs = Ic2FluidStack.get(stack);
 		return !fs.isEmpty()
-			? String.format("< %s, %d mB >", Registry.f_122822_.getKey(fs.getFluid()), fs.getAmountMb())
+			? String.format("< %s, %d mB >", Registry.FLUID.getKey(fs.getFluid()), fs.getAmountMb())
 			: Localization.translate("ic2.item.FluidContainer.Empty");
 	}
 
-	public boolean m_6832_(ItemStack par1ItemStack, ItemStack par2ItemStack)
+	public boolean isValidRepairItem(ItemStack par1ItemStack, ItemStack par2ItemStack)
 	{
 		return false;
 	}

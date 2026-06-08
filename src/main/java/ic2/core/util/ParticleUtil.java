@@ -15,10 +15,10 @@ public class ParticleUtil
 			double width = 0.625;
 			double height = 0.375;
 			double depthOffset = 0.02;
-			double x = pos.getX() + (facing.m_122429_() * 1.04 + 1.0) / 2.0;
+			double x = pos.getX() + (facing.getStepX() * 1.04 + 1.0) / 2.0;
 			double y = pos.getY() + world.random.nextFloat() * 0.375;
-			double z = pos.getZ() + (facing.m_122431_() * 1.04 + 1.0) / 2.0;
-			if (facing.m_122434_() == Axis.X)
+			double z = pos.getZ() + (facing.getStepZ() * 1.04 + 1.0) / 2.0;
+			if (facing.getAxis() == Axis.X)
 			{
 				z += world.random.nextFloat() * 0.625 - 0.3125;
 			} else

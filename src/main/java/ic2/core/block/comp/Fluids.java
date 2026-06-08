@@ -330,7 +330,7 @@ public class Fluids extends TileEntityComponent
 
 	public static Predicate<Fluid> fluidPredicate(TagKey<Fluid> tag)
 	{
-		return f -> f.m_205067_(tag);
+		return f -> f.is(tag);
 	}
 
 	public static Predicate<Fluid> fluidPredicate(ILiquidAcceptManager manager)

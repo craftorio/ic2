@@ -19,7 +19,7 @@ public class GuiMagnetizer extends Ic2Gui<ContainerMagnetizer>
 	}
 
 	@Override
-	protected ResourceLocation getTexture()
+	protected ResourceLocation getTextureLocation()
 	{
 		return ResourceLocation.fromNamespaceAndPath("ic2", "textures/gui/guimagnetizer.png");
 	}

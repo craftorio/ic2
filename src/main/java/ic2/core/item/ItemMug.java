@@ -26,7 +26,7 @@ public class ItemMug extends Item implements ItemLike
 		this.mugType = mugType;
 	}
 
-	public ItemStack m_5922_(ItemStack stack, Level worldIn, LivingEntity entityLiving)
+	public ItemStack finishUsingItem(ItemStack stack, Level worldIn, LivingEntity entityLiving)
 	{
 		if (!(entityLiving instanceof Player player))
 		{
@@ -57,13 +57,13 @@ public class ItemMug extends Item implements ItemLike
 				}
 
 				int highest = 0;
-				int x = this.amplifyEffect(player, MobEffects.f_19596_, maxAmplifier, extraDuration);
+				int x = this.amplifyEffect(player, MobEffects.MOVEMENT_SPEED, maxAmplifier, extraDuration);
 				if (x > highest)
 				{
 					highest = x;
 				}
 
-				x = this.amplifyEffect(player, MobEffects.f_19598_, maxAmplifier, extraDuration);
+				x = this.amplifyEffect(player, MobEffects.DIG_SPEED, maxAmplifier, extraDuration);
 				if (x > highest)
 				{
 					highest = x;
@@ -76,10 +76,10 @@ public class ItemMug extends Item implements ItemLike
 
 				if (highest >= 3)
 				{
-					player.m_7292_(new MobEffectInstance(MobEffects.f_19604_, (highest - 2) * 200, 0));
+					player.addEffect(new MobEffectInstance(MobEffects.CONFUSION, (highest - 2) * 200, 0));
 					if (highest >= 4)
 					{
-						player.m_7292_(new MobEffectInstance(MobEffects.f_19602_, 1, highest - 3));
+						player.addEffect(new MobEffectInstance(MobEffects.HARM, 1, highest - 3));
 					}
 				}
 
@@ -93,48 +93,48 @@ public class ItemMug extends Item implements ItemLike
 
 	private int amplifyEffect(Player player, MobEffect potion, int maxAmplifier, int extraDuration)
 	{
-		MobEffectInstance eff = player.m_21124_(potion);
+		MobEffectInstance eff = player.getEffect(potion);
 		if (eff != null)
 		{
-			int newAmp = eff.m_19564_();
-			int newDur = eff.m_19557_();
+			int newAmp = eff.getAmplifier();
+			int newDur = eff.getDuration();
 			if (newAmp < maxAmplifier)
 			{
 				newAmp++;
 			}
 
 			newDur += extraDuration;
-			assert potion == eff.m_19544_();
-			player.m_7292_(new MobEffectInstance(potion, newDur, newAmp));
+			assert potion == eff.getEffect();
+			player.addEffect(new MobEffectInstance(potion, newDur, newAmp));
 			return newAmp;
 		} else
 		{
-			player.m_7292_(new MobEffectInstance(potion, 300, 0));
+			player.addEffect(new MobEffectInstance(potion, 300, 0));
 			return 1;
 		}
 	}
 
-	public int m_8105_(ItemStack stack)
+	public int getUseDuration(ItemStack stack)
 	{
 		ItemMug.MugType type = this.getType(stack);
 		return type != null && type != ItemMug.MugType.empty ? 32 : 0;
 	}
 
-	public UseAnim m_6164_(ItemStack stack)
+	public UseAnim getUseAnimation(ItemStack stack)
 	{
 		ItemMug.MugType type = this.getType(stack);
 		return type != null && type != ItemMug.MugType.empty ? UseAnim.DRINK : UseAnim.NONE;
 	}
 
-	public InteractionResultHolder<ItemStack> m_7203_(Level world, Player player, InteractionHand hand)
+	public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand)
 	{
 		ItemMug.MugType type = this.getType(StackUtil.get(player, hand));
 		if (type != null && type != ItemMug.MugType.empty)
 		{
-			player.m_6672_(hand);
+			player.startUsingItem(hand);
 		}
 
-		return super.m_7203_(world, player, hand);
+		return super.use(world, player, hand);
 	}
 
 	private ItemMug.MugType getType(ItemStack stack)

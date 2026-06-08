@@ -39,7 +39,7 @@ public final class RecipeOutput
 			{
 				ItemStack stackA = itA.next();
 				ItemStack stackB = itB.next();
-				if (ItemStack.m_41728_(stackA, stackB))
+				if (ItemStack.matches(stackA, stackB))
 				{
 					return false;
 				}

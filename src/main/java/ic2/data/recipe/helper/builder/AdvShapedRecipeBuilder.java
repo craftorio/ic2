@@ -36,15 +36,15 @@ public class AdvShapedRecipeBuilder extends Ic2RecipeBuilder<AdvShapedRecipeBuil
 
 	public AdvShapedRecipeBuilder key(char key, ItemLike item)
 	{
-		this.key.put(key, new RecipeInputIngredient(Ingredient.m_43929_(new ItemLike[] { item }), 1));
-		this.criterion("has_" + Registry.f_122827_.getKey(item.m_5456_()).m_135815_(), Ic2RecipeProvider.conditionsFromItem(item));
+		this.key.put(key, new RecipeInputIngredient(Ingredient.of(new ItemLike[] { item }), 1));
+		this.criterion("has_" + Registry.ITEM.getKey(item.asItem()).getPath(), Ic2RecipeProvider.conditionsFromItem(item));
 		return this;
 	}
 
 	public AdvShapedRecipeBuilder key(char key, TagKey<Item> tag)
 	{
-		this.key.put(key, new RecipeInputIngredient(Ingredient.m_204132_(tag), 1));
-		this.criterion("has_" + tag.f_203868_().m_135815_(), Ic2RecipeProvider.conditionsFromTag(tag));
+		this.key.put(key, new RecipeInputIngredient(Ingredient.of(tag), 1));
+		this.criterion("has_" + tag.location().getPath(), Ic2RecipeProvider.conditionsFromTag(tag));
 		return this;
 	}
 
@@ -60,7 +60,7 @@ public class AdvShapedRecipeBuilder extends Ic2RecipeBuilder<AdvShapedRecipeBuil
 		input.getInputs().forEach(itemStack ->
 		{
 			Item item = itemStack.getItem();
-			this.criterion("has_" + Registry.f_122827_.getKey(item).m_135815_(), Ic2RecipeProvider.conditionsFromItem(item));
+			this.criterion("has_" + Registry.ITEM.getKey(item).getPath(), Ic2RecipeProvider.conditionsFromItem(item));
 		});
 		return this;
 	}

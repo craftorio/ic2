@@ -42,7 +42,7 @@ public interface StandardFluidItem extends Ic2FluidItem
 			return Ic2FluidStack.EMPTY;
 		}
 
-		if (stack.m_41613_() != 1)
+		if (stack.getCount() != 1)
 		{
 			throw new IllegalArgumentException("invalid stack size");
 		}
@@ -105,7 +105,7 @@ public interface StandardFluidItem extends Ic2FluidItem
 			return 0;
 		}
 
-		if (stack.m_41613_() != 1)
+		if (stack.getCount() != 1)
 		{
 			throw new IllegalArgumentException("invalid stack size");
 		}
@@ -164,7 +164,7 @@ public interface StandardFluidItem extends Ic2FluidItem
 			return 0;
 		}
 
-		if (stack.m_41613_() != 1)
+		if (stack.getCount() != 1)
 		{
 			throw new IllegalArgumentException("invalid stack size");
 		}
@@ -233,7 +233,7 @@ public interface StandardFluidItem extends Ic2FluidItem
 		if (nbt == null)
 		{
 			nbt = new CompoundTag();
-			stack.m_41751_(nbt);
+			stack.setTag(nbt);
 		}
 
 		if (fs != null && !fs.isEmpty())
@@ -243,18 +243,18 @@ public interface StandardFluidItem extends Ic2FluidItem
 			nbt.put("Fluid", fsNbt);
 		} else
 		{
-			nbt.m_128473_("Fluid");
+			nbt.remove("Fluid");
 		}
 	}
 
 	default void updateDamage(ItemStack stack, int amount)
 	{
-		if (stack.m_41763_())
+		if (stack.isDamageableItem())
 		{
-			int maxDmg = stack.m_41776_();
+			int maxDmg = stack.getMaxDamage();
 			if (maxDmg > 2)
 			{
-				stack.m_41721_(maxDmg - 1 - (int) Util.map(amount, this.getCapacityMb(stack), maxDmg - 2));
+				stack.setDamageValue(maxDmg - 1 - (int) Util.map(amount, this.getCapacityMb(stack), maxDmg - 2));
 			}
 		}
 	}

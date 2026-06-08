@@ -222,7 +222,7 @@ class ChangeHandler
 									IEnergyTile neighborSubTe = neighborTile.getSubTileAt(coords);
 									IEnergyAcceptor acceptor = (IEnergyAcceptor) (neighborSubTe instanceof IEnergyAcceptor ? neighborSubTe : neighborIoTile);
 									canEmit = emitter.emitsEnergyTo((IEnergyAcceptor) neighborIoTile, dir)
-										&& acceptor.acceptsEnergyFrom((IEnergyEmitter) ioTile, dir.m_122424_());
+										&& acceptor.acceptsEnergyFrom((IEnergyEmitter) ioTile, dir.getOpposite());
 								}
 
 								boolean canAccept = false;
@@ -232,7 +232,7 @@ class ChangeHandler
 									IEnergyTile neighborSubTe = neighborTile.getSubTileAt(coords);
 									IEnergyEmitter emitter = (IEnergyEmitter) (neighborSubTe instanceof IEnergyEmitter ? neighborSubTe : neighborIoTile);
 									canAccept = acceptor.acceptsEnergyFrom((IEnergyEmitter) neighborIoTile, dir)
-										&& emitter.emitsEnergyTo((IEnergyAcceptor) ioTile, dir.m_122424_());
+										&& emitter.emitsEnergyTo((IEnergyAcceptor) ioTile, dir.getOpposite());
 								}
 
 								if (canEmit || canAccept)

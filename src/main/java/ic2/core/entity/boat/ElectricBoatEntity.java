@@ -30,7 +30,7 @@ public class ElectricBoatEntity extends AbstractBoatEntity
 		super(entityType, world, x, y, z);
 	}
 
-	public Item m_38369_()
+	public Item getDropItem()
 	{
 		return Ic2Items.ELECTRIC_BOAT;
 	}
@@ -47,12 +47,12 @@ public class ElectricBoatEntity extends AbstractBoatEntity
 		return false;
 	}
 
-	public boolean m_5825_()
+	public boolean fireImmune()
 	{
 		return true;
 	}
 
-	public boolean m_6060_()
+	public boolean isOnFire()
 	{
 		return false;
 	}
@@ -68,19 +68,19 @@ public class ElectricBoatEntity extends AbstractBoatEntity
 		return this.accelerated ? 1.5 : 0.25;
 	}
 
-	protected float m_6041_()
+	protected float getBlockSpeedFactor()
 	{
-		return (float) (super.m_6041_() * this.getAccelerationFactor());
+		return (float) (super.getBlockSpeedFactor() * this.getAccelerationFactor());
 	}
 
 	@Override
-	public void m_8119_()
+	public void tick()
 	{
 		this.accelerated = false;
-		Entity driver = this.m_6688_();
+		Entity driver = this.getControllingPassenger();
 		if (driver instanceof Player && IC2.keyboard.isForwardKeyDown((Player) driver))
 		{
-			for (ItemStack stack : ((Player) driver).getInventory().f_35975_)
+			for (ItemStack stack : ((Player) driver).getInventory().armor)
 			{
 				if (!StackUtil.isEmpty(stack) && ElectricItem.manager.discharge(stack, 4.0, Integer.MAX_VALUE, true, true, true) == 4.0)
 				{
@@ -91,6 +91,6 @@ public class ElectricBoatEntity extends AbstractBoatEntity
 			}
 		}
 
-		super.m_8119_();
+		super.tick();
 	}
 }

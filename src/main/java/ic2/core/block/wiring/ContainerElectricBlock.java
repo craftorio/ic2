@@ -19,11 +19,11 @@ public class ContainerElectricBlock extends ContainerFullInv<TileEntityElectricB
 
 		for (int col = 0; col < ArmorSlot.getCount(); col++)
 		{
-			this.m_38897_(new SlotArmor(playerInventory, ArmorSlot.get(col), 8 + col * 18, 84));
+			this.addSlot(new SlotArmor(playerInventory, ArmorSlot.get(col), 8 + col * 18, 84));
 		}
 
-		this.m_38897_(new SlotInvSlot(tileEntity1.chargeSlot, 0, 56, 17));
-		this.m_38897_(new SlotInvSlot(tileEntity1.dischargeSlot, 0, 56, 53));
+		this.addSlot(new SlotInvSlot(tileEntity1.chargeSlot, 0, 56, 17));
+		this.addSlot(new SlotInvSlot(tileEntity1.dischargeSlot, 0, 56, 53));
 	}
 
 	@Override

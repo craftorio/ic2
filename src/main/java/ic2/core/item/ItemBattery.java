@@ -26,7 +26,7 @@ public class ItemBattery extends BaseElectricItem implements INetworkItemEventLi
 		return true;
 	}
 
-	public InteractionResultHolder<ItemStack> m_7203_(Level world, Player player, InteractionHand hand)
+	public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand)
 	{
 		ItemStack stack = StackUtil.get(player, hand);
 		if (!world.isClientSide && StackUtil.getSize(stack) == 1)
@@ -37,7 +37,7 @@ public class ItemBattery extends BaseElectricItem implements INetworkItemEventLi
 
 				for (int i = 0; i < 9; i++)
 				{
-					ItemStack target = (ItemStack) player.getInventory().f_35974_.get(i);
+					ItemStack target = (ItemStack) player.getInventory().items.get(i);
 					if (target != null
 						&& target != stack
 						&& !(ElectricItem.manager.discharge(target, Double.POSITIVE_INFINITY, Integer.MAX_VALUE, true, true, true) > 0.0))
@@ -57,7 +57,7 @@ public class ItemBattery extends BaseElectricItem implements INetworkItemEventLi
 
 				if (transferred && !world.isClientSide)
 				{
-					player.f_36096_.m_38946_();
+					player.containerMenu.broadcastChanges();
 					IC2.network.get(true).initiateItemEvent(player, stack, 0, true);
 				}
 			}
@@ -72,6 +72,6 @@ public class ItemBattery extends BaseElectricItem implements INetworkItemEventLi
 	@Override
 	public void onNetworkEvent(ItemStack stack, Player player, int event)
 	{
-		player.m_5496_(Ic2SoundEvents.ITEM_BATTERY_USE, 1.0F, 1.0F);
+		player.playSound(Ic2SoundEvents.ITEM_BATTERY_USE, 1.0F, 1.0F);
 	}
 }

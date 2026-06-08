@@ -51,7 +51,7 @@ public class GuiLiquidHeatExchanger extends Ic2Gui<ContainerLiquidHeatExchanger>
 	}
 
 	@Override
-	protected ResourceLocation getTexture()
+	protected ResourceLocation getTextureLocation()
 	{
 		return ResourceLocation.fromNamespaceAndPath("ic2", "textures/gui/guiheatsourcefluid.png");
 	}

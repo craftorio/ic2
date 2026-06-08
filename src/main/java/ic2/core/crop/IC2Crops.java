@@ -81,43 +81,43 @@ public class Ic2Crops extends Crops
 	public static CropCard cropCocoa = new CropCocoa(Ic2CropType.cocoa);
 	public static CropCard cropFlax = new CropFlax(Ic2CropType.flax);
 	public static CropCard cropRedMushroom = new CropBaseMushroom(
-		Ic2CropType.redMushroom, Ic2Blocks.RED_MUSHROOM_CROP, new String[] { "Red", "Food", "Mushroom" }, new ItemStack(Blocks.f_50073_)
+		Ic2CropType.redMushroom, Ic2Blocks.RED_MUSHROOM_CROP, new String[] { "Red", "Food", "Mushroom" }, new ItemStack(Blocks.RED_MUSHROOM)
 	);
 	public static CropCard cropBrownMushroom = new CropBaseMushroom(
-		Ic2CropType.brownMushroom, Ic2Blocks.BROWN_MUSHROOM_CROP, new String[] { "Brown", "Food", "Mushroom" }, new ItemStack(Blocks.f_50072_)
+		Ic2CropType.brownMushroom, Ic2Blocks.BROWN_MUSHROOM_CROP, new String[] { "Brown", "Food", "Mushroom" }, new ItemStack(Blocks.BROWN_MUSHROOM)
 	);
 	public static CropCard cropNetherWart = new CropNetherWart(Ic2CropType.netherWart);
 	public static CropCard cropTerraWart = new CropTerraWart(Ic2CropType.terraWart);
 	public static CropCard cropOakSapling = new CropBaseSapling(
-		Ic2CropType.oakSapling, Ic2Blocks.OAK_SAPLING_CROP, "acorns", new ItemStack(Blocks.f_49999_), new ItemStack(Blocks.f_50746_)
+		Ic2CropType.oakSapling, Ic2Blocks.OAK_SAPLING_CROP, "acorns", new ItemStack(Blocks.OAK_LOG), new ItemStack(Blocks.OAK_SAPLING)
 	);
 	public static CropCard cropSpruceSapling = new CropBaseSapling(
-		Ic2CropType.spruceSapling, Ic2Blocks.SPRUCE_SAPLING_CROP, "pine_cones", new ItemStack(Blocks.f_50000_), new ItemStack(Blocks.f_50747_)
+		Ic2CropType.spruceSapling, Ic2Blocks.SPRUCE_SAPLING_CROP, "pine_cones", new ItemStack(Blocks.SPRUCE_LOG), new ItemStack(Blocks.SPRUCE_SAPLING)
 	);
 	public static CropCard cropBirchSapling = new CropBaseSapling(
-		Ic2CropType.birchSapling, Ic2Blocks.BIRCH_SAPLING_CROP, "catkins", new ItemStack(Blocks.f_50001_), new ItemStack(Blocks.f_50748_)
+		Ic2CropType.birchSapling, Ic2Blocks.BIRCH_SAPLING_CROP, "catkins", new ItemStack(Blocks.BIRCH_LOG), new ItemStack(Blocks.BIRCH_SAPLING)
 	);
 	public static CropCard cropJungleSapling = new CropBaseSapling(
-		Ic2CropType.jungleSapling, Ic2Blocks.JUNGLE_SAPLING_CROP, "seedling", new ItemStack(Blocks.f_50002_), new ItemStack(Blocks.f_50749_)
+		Ic2CropType.jungleSapling, Ic2Blocks.JUNGLE_SAPLING_CROP, "seedling", new ItemStack(Blocks.JUNGLE_LOG), new ItemStack(Blocks.JUNGLE_SAPLING)
 	);
 	public static CropCard cropAcaciaSapling = new CropBaseSapling(
-		Ic2CropType.acaciaSapling, Ic2Blocks.ACACIA_SAPLING_CROP, "seedling", new ItemStack(Blocks.f_50003_), new ItemStack(Blocks.f_50750_)
+		Ic2CropType.acaciaSapling, Ic2Blocks.ACACIA_SAPLING_CROP, "seedling", new ItemStack(Blocks.ACACIA_LOG), new ItemStack(Blocks.ACACIA_SAPLING)
 	);
 	public static CropCard cropDarkOakSapling = new CropBaseSapling(
-		Ic2CropType.darkOakSapling, Ic2Blocks.DARK_OAK_SAPLING_CROP, "acorns", new ItemStack(Blocks.f_50004_), new ItemStack(Blocks.f_50751_)
+		Ic2CropType.darkOakSapling, Ic2Blocks.DARK_OAK_SAPLING_CROP, "acorns", new ItemStack(Blocks.DARK_OAK_LOG), new ItemStack(Blocks.DARK_OAK_SAPLING)
 	);
 	public static CropCard cropFerru = new CropBaseMetalCommon(
 		Ic2CropType.ferru,
 		Ic2Blocks.FERRU_CROP,
 		new String[] { "Gray", "Leaves", "Metal" },
-		Arrays.asList(BlockTags.f_144258_, Ic2BlockTags.IRON_BLOCKS),
+		Arrays.asList(BlockTags.IRON_ORES, Ic2BlockTags.IRON_BLOCKS),
 		new ItemStack(Ic2Items.SMALL_IRON_DUST)
 	);
 	public static CropCard cropCyprium = new CropBaseMetalCommon(
 		Ic2CropType.cyprium,
 		Ic2Blocks.CYPRIUM_CROP,
 		new String[] { "Orange", "Leaves", "Metal" },
-		Arrays.asList(BlockTags.f_144264_, Ic2BlockTags.COPPER_BLOCKS),
+		Arrays.asList(BlockTags.COPPER_ORES, Ic2BlockTags.COPPER_BLOCKS),
 		new ItemStack(Ic2Items.SMALL_COPPER_DUST)
 	);
 	public static CropCard cropStagnium = new CropBaseMetalCommon(
@@ -138,7 +138,7 @@ public class Ic2Crops extends Crops
 		Ic2CropType.aurelia,
 		Ic2Blocks.AURELIA_CROP,
 		new String[] { "Gold", "Leaves", "Metal" },
-		Arrays.asList(BlockTags.f_13043_, Ic2BlockTags.GOLD_BLOCKS),
+		Arrays.asList(BlockTags.GOLD_ORES, Ic2BlockTags.GOLD_BLOCKS),
 		new ItemStack(Ic2Items.SMALL_GOLD_DUST)
 	);
 	public static CropCard cropShining = new CropBaseMetalUncommon(
@@ -222,28 +222,28 @@ public class Ic2Crops extends Crops
 
 	public static void registerBaseSeeds()
 	{
-		Crops.instance.registerBaseSeed(new ItemStack(Items.f_42404_), cropWheat, 0, 1, 1, 1);
-		Crops.instance.registerBaseSeed(new ItemStack(Items.f_42577_), cropPumpkin, 0, 1, 1, 1);
-		Crops.instance.registerBaseSeed(new ItemStack(Items.f_42578_), cropMelon, 0, 1, 1, 1);
-		Crops.instance.registerBaseSeed(new ItemStack(Items.f_42588_), cropNetherWart, 0, 1, 1, 1);
+		Crops.instance.registerBaseSeed(new ItemStack(Items.WHEAT_SEEDS), cropWheat, 0, 1, 1, 1);
+		Crops.instance.registerBaseSeed(new ItemStack(Items.PUMPKIN_SEEDS), cropPumpkin, 0, 1, 1, 1);
+		Crops.instance.registerBaseSeed(new ItemStack(Items.MELON_SEEDS), cropMelon, 0, 1, 1, 1);
+		Crops.instance.registerBaseSeed(new ItemStack(Items.NETHER_WART), cropNetherWart, 0, 1, 1, 1);
 		Crops.instance.registerBaseSeed(new ItemStack(Ic2Items.TERRA_WART), cropTerraWart, 0, 1, 1, 1);
 		Crops.instance.registerBaseSeed(new ItemStack(Ic2Items.COFFEE_BEANS), cropCoffee, 0, 1, 1, 1);
-		Crops.instance.registerBaseSeed(new ItemStack(Items.f_41909_), cropReed, 0, 3, 0, 2);
-		Crops.instance.registerBaseSeed(new ItemStack(Items.f_42533_), cropCocoa, 0, 0, 0, 0);
-		Crops.instance.registerBaseSeed(new ItemStack(Items.f_41940_, 4), cropRedFlower, 3, 1, 1, 1);
-		Crops.instance.registerBaseSeed(new ItemStack(Items.f_41939_, 4), cropYellowFlower, 3, 1, 1, 1);
-		Crops.instance.registerBaseSeed(new ItemStack(Items.f_42619_), cropCarrots, 0, 1, 1, 1);
-		Crops.instance.registerBaseSeed(new ItemStack(Items.f_42620_, 1), cropPotato, 0, 1, 1, 1);
-		Crops.instance.registerBaseSeed(new ItemStack(Blocks.f_50072_, 4), cropBrownMushroom, 0, 1, 1, 1);
-		Crops.instance.registerBaseSeed(new ItemStack(Blocks.f_50073_, 4), cropRedMushroom, 0, 1, 1, 1);
-		Crops.instance.registerBaseSeed(new ItemStack(Blocks.f_50128_), cropEatingPlant, 0, 1, 1, 1);
-		Crops.instance.registerBaseSeed(new ItemStack(Items.f_42733_), cropBeetroots, 0, 1, 1, 1);
-		Crops.instance.registerBaseSeed(new ItemStack(Blocks.f_50746_), cropOakSapling, 0, 1, 1, 1);
-		Crops.instance.registerBaseSeed(new ItemStack(Blocks.f_50747_), cropSpruceSapling, 0, 1, 1, 1);
-		Crops.instance.registerBaseSeed(new ItemStack(Blocks.f_50748_), cropBirchSapling, 0, 1, 1, 1);
-		Crops.instance.registerBaseSeed(new ItemStack(Blocks.f_50749_), cropJungleSapling, 0, 1, 1, 1);
-		Crops.instance.registerBaseSeed(new ItemStack(Blocks.f_50750_), cropAcaciaSapling, 0, 1, 1, 1);
-		Crops.instance.registerBaseSeed(new ItemStack(Blocks.f_50751_), cropDarkOakSapling, 0, 1, 1, 1);
+		Crops.instance.registerBaseSeed(new ItemStack(Items.SUGAR_CANE), cropReed, 0, 3, 0, 2);
+		Crops.instance.registerBaseSeed(new ItemStack(Items.COCOA_BEANS), cropCocoa, 0, 0, 0, 0);
+		Crops.instance.registerBaseSeed(new ItemStack(Items.POPPY, 4), cropRedFlower, 3, 1, 1, 1);
+		Crops.instance.registerBaseSeed(new ItemStack(Items.DANDELION, 4), cropYellowFlower, 3, 1, 1, 1);
+		Crops.instance.registerBaseSeed(new ItemStack(Items.CARROT), cropCarrots, 0, 1, 1, 1);
+		Crops.instance.registerBaseSeed(new ItemStack(Items.POTATO, 1), cropPotato, 0, 1, 1, 1);
+		Crops.instance.registerBaseSeed(new ItemStack(Blocks.BROWN_MUSHROOM, 4), cropBrownMushroom, 0, 1, 1, 1);
+		Crops.instance.registerBaseSeed(new ItemStack(Blocks.RED_MUSHROOM, 4), cropRedMushroom, 0, 1, 1, 1);
+		Crops.instance.registerBaseSeed(new ItemStack(Blocks.CACTUS), cropEatingPlant, 0, 1, 1, 1);
+		Crops.instance.registerBaseSeed(new ItemStack(Items.BEETROOT_SEEDS), cropBeetroots, 0, 1, 1, 1);
+		Crops.instance.registerBaseSeed(new ItemStack(Blocks.OAK_SAPLING), cropOakSapling, 0, 1, 1, 1);
+		Crops.instance.registerBaseSeed(new ItemStack(Blocks.SPRUCE_SAPLING), cropSpruceSapling, 0, 1, 1, 1);
+		Crops.instance.registerBaseSeed(new ItemStack(Blocks.BIRCH_SAPLING), cropBirchSapling, 0, 1, 1, 1);
+		Crops.instance.registerBaseSeed(new ItemStack(Blocks.JUNGLE_SAPLING), cropJungleSapling, 0, 1, 1, 1);
+		Crops.instance.registerBaseSeed(new ItemStack(Blocks.ACACIA_SAPLING), cropAcaciaSapling, 0, 1, 1, 1);
+		Crops.instance.registerBaseSeed(new ItemStack(Blocks.DARK_OAK_SAPLING), cropDarkOakSapling, 0, 1, 1, 1);
 	}
 
 	public static void ensureInit()
@@ -306,10 +306,10 @@ public class Ic2Crops extends Crops
 	@Override
 	public CropCard getCropCard(ItemStack stack)
 	{
-		ResourceLocation identifier = Registry.f_122827_.getKey(stack.getItem());
-		if (stack.m_204117_(ItemTags.f_13180_) && identifier.m_135827_().equals("minecraft"))
+		ResourceLocation identifier = Registry.ITEM.getKey(stack.getItem());
+		if (stack.is(ItemTags.SAPLINGS) && identifier.getNamespace().equals("minecraft"))
 		{
-			return this.getCropCard("ic2", identifier.m_135815_());
+			return this.getCropCard("ic2", identifier.getPath());
 		} else
 		{
 			CompoundTag nbt = stack.getTag();
@@ -318,7 +318,7 @@ public class Ic2Crops extends Crops
 				return null;
 			} else
 			{
-				return nbt.contains("owner") && nbt.contains("id") ? this.getCropCard(nbt.m_128461_("owner"), nbt.m_128461_("id")) : null;
+				return nbt.contains("owner") && nbt.contains("id") ? this.getCropCard(nbt.getString("owner"), nbt.getString("id")) : null;
 			}
 		}
 	}
@@ -327,8 +327,8 @@ public class Ic2Crops extends Crops
 	public CropCard getCropCard(Block cropBlock)
 	{
 		ResourceLocation cropIdentifier = Registry.BLOCK.getKey(cropBlock);
-		String cropOwner = cropIdentifier.m_135827_();
-		String cropName = cropIdentifier.m_135815_().replace("_crop", "");
+		String cropOwner = cropIdentifier.getNamespace();
+		String cropName = cropIdentifier.getPath().replace("_crop", "");
 		return this.getCropCard(cropOwner, cropName);
 	}
 
@@ -370,7 +370,7 @@ public class Ic2Crops extends Crops
 					@Override
 					public void remove()
 					{
-						throw new UnsupportedOperationException("This iterator is read-only.");
+						throw new UnsupportedOperationException("This iterator is fromJson-only.");
 					}
 
 					private Iterator<CropCard> getNextIterator()

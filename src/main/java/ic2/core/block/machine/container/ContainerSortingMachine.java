@@ -20,12 +20,12 @@ public class ContainerSortingMachine extends ContainerElectricMachine<TileEntity
 
 		for (int i = 0; i < 3; i++)
 		{
-			this.m_38897_(new SlotInvSlot(be.upgradeSlot, i, 188, 161 + i * 18));
+			this.addSlot(new SlotInvSlot(be.upgradeSlot, i, 188, 161 + i * 18));
 		}
 
 		for (int i = 0; i < 11; i++)
 		{
-			this.m_38897_(new SlotInvSlot(be.buffer, i, 8 + i * 18, 141));
+			this.addSlot(new SlotInvSlot(be.buffer, i, 8 + i * 18, 141));
 		}
 
 		for (int i = 0; i < Util.ALL_DIRS.length; i++)
@@ -35,7 +35,7 @@ public class ContainerSortingMachine extends ContainerElectricMachine<TileEntity
 
 			for (int j = 0; j < filterSlots.length; j++)
 			{
-				this.m_38897_(new SlotHologramSlot(filterSlots, j, 80 + j * 18, 19 + i * 20, 64, null));
+				this.addSlot(new SlotHologramSlot(filterSlots, j, 80 + j * 18, 19 + i * 20, 64, null));
 			}
 		}
 	}

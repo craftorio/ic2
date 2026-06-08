@@ -28,6 +28,6 @@ public enum VanillaColorBlockId
 
 	public boolean test(Block block)
 	{
-		return Registry.BLOCK.getKey(block).m_135815_().contains(this.id);
+		return Registry.BLOCK.getKey(block).getPath().contains(this.id);
 	}
 }

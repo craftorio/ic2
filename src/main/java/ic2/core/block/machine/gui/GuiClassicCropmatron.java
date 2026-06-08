@@ -18,7 +18,7 @@ public class GuiClassicCropmatron extends Ic2Gui<ContainerClassicCropmatron>
 	}
 
 	@Override
-	protected ResourceLocation getTexture()
+	protected ResourceLocation getTextureLocation()
 	{
 		return background;
 	}

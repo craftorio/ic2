@@ -16,9 +16,9 @@ public class ItemCrop extends BlockItem implements IBoxable
 		super(Ic2Blocks.CROP_STICK, settings);
 	}
 
-	protected boolean m_40610_(BlockPlaceContext context, BlockState state)
+	protected boolean canPlace(BlockPlaceContext context, BlockState state)
 	{
-		return CropSoilType.contains(context.m_43725_().getBlockState(context.m_8083_().m_7495_()).getBlock()) && super.m_40610_(context, state);
+		return CropSoilType.contains(context.getLevel().getBlockState(context.getClickedPos().below()).getBlock()) && super.canPlace(context, state);
 	}
 
 	@Override

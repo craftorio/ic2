@@ -138,7 +138,7 @@ public class CannerEnrichRecipeManager implements ICannerEnrichRecipeManager
 		if (adjustInput)
 		{
 			fluid.setAmountMb(result.getAdjustedInput().fluid == null ? 0 : result.getAdjustedInput().fluid.getAmountMb());
-			additive.m_41764_(StackUtil.isEmpty(result.getAdjustedInput().additive) ? 0 : StackUtil.getSize(result.getAdjustedInput().additive));
+			additive.setCount(StackUtil.isEmpty(result.getAdjustedInput().additive) ? 0 : StackUtil.getSize(result.getAdjustedInput().additive));
 		}
 
 		CompoundTag output = new CompoundTag();

@@ -25,20 +25,20 @@ import net.minecraft.world.level.saveddata.SavedData;
 public final class ChunkLoaderLogic
 {
 	private static final String savedStateId = IC2.getIdentifier("loaded_chunks").toString().replace(':', '_');
-	private static final TicketType<ChunkPos> ticketType = TicketType.m_9462_(
-		IC2.getIdentifier("chunk_loader").toString(), Comparator.comparingLong(ChunkPos::m_45588_)
+	private static final TicketType<ChunkPos> ticketType = TicketType.create(
+		IC2.getIdentifier("chunk_loader").toString(), Comparator.comparingLong(ChunkPos::toLong)
 	);
 
 	public static void addChunkLoader(ServerLevel world, BlockPos pos, LongSet chunks)
 	{
-		long loaderChunk = ChunkPos.m_151388_(pos);
+		long loaderChunk = ChunkPos.asLong(pos);
 		if (!chunks.contains(loaderChunk))
 		{
 			throw new IllegalArgumentException("missing own position");
 		}
 
-		ChunkLoaderLogic.SavedState state = (ChunkLoaderLogic.SavedState) world.m_8895_()
-			.m_164861_(ChunkLoaderLogic.SavedState::new, ChunkLoaderLogic.SavedState::new, savedStateId);
+		ChunkLoaderLogic.SavedState state = (ChunkLoaderLogic.SavedState) world.getDataStorage()
+			.computeIfAbsent(ChunkLoaderLogic.SavedState::new, ChunkLoaderLogic.SavedState::new, savedStateId);
 		((Set) state.chunksToChunkLoaders.computeIfAbsent(loaderChunk, ignore -> new ObjectOpenHashSet(1))).add(pos);
 		WorldData worldData = WorldData.get(world);
 		LongIterator var7 = chunks.iterator();
@@ -60,10 +60,10 @@ public final class ChunkLoaderLogic
 
 	public static void removeChunkLoader(ServerLevel world, BlockPos pos)
 	{
-		ChunkLoaderLogic.SavedState state = (ChunkLoaderLogic.SavedState) world.m_8895_().m_164858_(ChunkLoaderLogic.SavedState::new, savedStateId);
+		ChunkLoaderLogic.SavedState state = (ChunkLoaderLogic.SavedState) world.getDataStorage().get(ChunkLoaderLogic.SavedState::new, savedStateId);
 		if (state != null)
 		{
-			long chunkPos = ChunkPos.m_151388_(pos);
+			long chunkPos = ChunkPos.asLong(pos);
 			Set<BlockPos> positions = (Set<BlockPos>) state.chunksToChunkLoaders.get(chunkPos);
 			if (positions != null && positions.remove(pos) && positions.isEmpty())
 			{
@@ -100,7 +100,7 @@ public final class ChunkLoaderLogic
 
 	public static void updateChunkLoader(ServerLevel world, BlockPos pos, LongSet chunks)
 	{
-		long loaderChunk = ChunkPos.m_151388_(pos);
+		long loaderChunk = ChunkPos.asLong(pos);
 		if (!chunks.contains(loaderChunk))
 		{
 			throw new IllegalArgumentException("missing own position");
@@ -152,7 +152,7 @@ public final class ChunkLoaderLogic
 
 	public static void onWorldLoad(ServerLevel world)
 	{
-		ChunkLoaderLogic.SavedState state = (ChunkLoaderLogic.SavedState) world.m_8895_().m_164858_(ChunkLoaderLogic.SavedState::new, savedStateId);
+		ChunkLoaderLogic.SavedState state = (ChunkLoaderLogic.SavedState) world.getDataStorage().get(ChunkLoaderLogic.SavedState::new, savedStateId);
 		if (state != null && !state.chunksToChunkLoaders.isEmpty())
 		{
 			WorldData worldData = WorldData.get(world);
@@ -177,12 +177,12 @@ public final class ChunkLoaderLogic
 
 	public static void onChunkUnload(LevelChunk chunk)
 	{
-		assert !chunk.m_62953_().isClientSide;
-		ServerLevel world = (ServerLevel) chunk.m_62953_();
-		ChunkLoaderLogic.SavedState state = (ChunkLoaderLogic.SavedState) world.m_8895_().m_164858_(ChunkLoaderLogic.SavedState::new, savedStateId);
+		assert !chunk.getLevel().isClientSide;
+		ServerLevel world = (ServerLevel) chunk.getLevel();
+		ChunkLoaderLogic.SavedState state = (ChunkLoaderLogic.SavedState) world.getDataStorage().get(ChunkLoaderLogic.SavedState::new, savedStateId);
 		if (state != null && !state.chunksToChunkLoaders.isEmpty())
 		{
-			Set<BlockPos> loaders = (Set<BlockPos>) state.chunksToChunkLoaders.get(chunk.m_7697_().m_45588_());
+			Set<BlockPos> loaders = (Set<BlockPos>) state.chunksToChunkLoaders.get(chunk.getPos().toLong());
 			if (loaders != null && !loaders.isEmpty())
 			{
 				WorldData worldData = WorldData.get(world, false);
@@ -199,12 +199,12 @@ public final class ChunkLoaderLogic
 
 	private static void addChunkTicket(ServerLevel world, ChunkPos pos)
 	{
-		world.m_7726_().m_8387_(ticketType, pos, 2, pos);
+		world.getChunkSource().addRegionTicket(ticketType, pos, 2, pos);
 	}
 
 	private static void removeChunkTicket(ServerLevel world, ChunkPos pos)
 	{
-		world.m_7726_().m_8438_(ticketType, pos, 2, pos);
+		world.getChunkSource().removeRegionTicket(ticketType, pos, 2, pos);
 	}
 
 	private static final class SavedState extends SavedData
@@ -217,17 +217,17 @@ public final class ChunkLoaderLogic
 
 		SavedState(CompoundTag nbt)
 		{
-			ListTag loaders = nbt.m_128437_("loaders", 10);
+			ListTag loaders = nbt.getList("loaders", 10);
 
 			for (int i = 0; i < loaders.size(); i++)
 			{
-				CompoundTag contentTag = loaders.m_128728_(i);
+				CompoundTag contentTag = loaders.getCompound(i);
 				BlockPos pos = new BlockPos(contentTag.getInt("x"), contentTag.getInt("y"), contentTag.getInt("z"));
-				((Set) this.chunksToChunkLoaders.computeIfAbsent(ChunkPos.m_151388_(pos), ignore -> new ObjectOpenHashSet(1))).add(pos);
+				((Set) this.chunksToChunkLoaders.computeIfAbsent(ChunkPos.asLong(pos), ignore -> new ObjectOpenHashSet(1))).add(pos);
 			}
 		}
 
-		public CompoundTag m_7176_(CompoundTag nbt)
+		public CompoundTag save(CompoundTag nbt)
 		{
 			ListTag loaders = new ListTag();
 			nbt.put("loaders", loaders);

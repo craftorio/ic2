@@ -44,10 +44,10 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class ScaffoldBlock extends Block
 {
-	private static final IRecipeInput stickInput = Recipes.inputFactory.forItem(Items.f_42398_);
+	private static final IRecipeInput stickInput = Recipes.inputFactory.forItem(Items.STICK);
 	private static final Direction[] supportedFacings = new Direction[] { Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST };
 	private static final double border = 0.03125;
-	private static final VoxelShape aabb = Shapes.m_83048_(0.03125, 0.0, 0.03125, 0.96875, 1.0, 0.96875);
+	private static final VoxelShape aabb = Shapes.box(0.03125, 0.0, 0.03125, 0.96875, 1.0, 0.96875);
 	private final int maxDistance;
 
 	public ScaffoldBlock(Properties settings, int maxDistance)
@@ -56,58 +56,58 @@ public class ScaffoldBlock extends Block
 		this.maxDistance = maxDistance;
 	}
 
-	public void m_7892_(BlockState state, Level world, BlockPos pos, Entity rawEntity)
+	public void entityInside(BlockState state, Level world, BlockPos pos, Entity rawEntity)
 	{
 		if (rawEntity instanceof LivingEntity entity)
 		{
-			entity.f_19789_ = 0.0F;
+			entity.fallDistance = 0.0F;
 			double limit = 0.15;
-			Vec3 velocity = entity.m_20184_();
-			double velocityX = Util.limit(velocity.m_7096_(), -limit, limit);
-			double velocityZ = Util.limit(velocity.m_7094_(), -limit, limit);
-			entity.m_20334_(velocityX, velocity.m_7098_(), velocityZ);
-			if (entity.m_6144_() && entity instanceof Player)
+			Vec3 velocity = entity.getDeltaMovement();
+			double velocityX = Util.limit(velocity.x(), -limit, limit);
+			double velocityZ = Util.limit(velocity.z(), -limit, limit);
+			entity.setDeltaMovement(velocityX, velocity.y(), velocityZ);
+			if (entity.isShiftKeyDown() && entity instanceof Player)
 			{
-				if (entity.m_20069_())
+				if (entity.isInWater())
 				{
-					entity.m_20334_(velocityX, 0.02, velocityZ);
+					entity.setDeltaMovement(velocityX, 0.02, velocityZ);
 				} else
 				{
-					entity.m_20334_(velocityX, 0.08, velocityZ);
+					entity.setDeltaMovement(velocityX, 0.08, velocityZ);
 				}
-			} else if (entity.f_19862_ && entity.m_6095_().m_204039_(Ic2EntityTags.SCAFFOLD_CLIMBABLE))
+			} else if (entity.horizontalCollision && entity.getType().is(Ic2EntityTags.SCAFFOLD_CLIMBABLE))
 			{
-				entity.m_20334_(velocityX, 0.2, velocityZ);
+				entity.setDeltaMovement(velocityX, 0.2, velocityZ);
 			} else
 			{
-				entity.m_20334_(velocityX, -0.07, velocityZ);
+				entity.setDeltaMovement(velocityX, -0.07, velocityZ);
 			}
 		}
 	}
 
-	public VoxelShape m_5939_(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context)
+	public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context)
 	{
 		return aabb;
 	}
 
-	public VoxelShape m_5940_(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context)
+	public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context)
 	{
 		return Shapes.block();
 	}
 
-	public VoxelShape m_7947_(BlockState state, BlockGetter world, BlockPos pos)
+	public VoxelShape getBlockSupportShape(BlockState state, BlockGetter world, BlockPos pos)
 	{
 		return Shapes.block();
 	}
 
-	public InteractionResult m_6227_(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit)
+	public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit)
 	{
-		if (player.m_6144_())
+		if (player.isShiftKeyDown())
 		{
 			return InteractionResult.PASS;
 		}
 
-		ItemStack stack = player.m_21120_(hand);
+		ItemStack stack = player.getItemInHand(hand);
 		if (StackUtil.isEmpty(stack))
 		{
 			return InteractionResult.PASS;
@@ -157,32 +157,32 @@ public class ScaffoldBlock extends Block
 		return InteractionResult.SUCCESS;
 	}
 
-	public void m_6256_(BlockState state, Level world, BlockPos pos, Player player)
+	public void attack(BlockState state, Level world, BlockPos pos, Player player)
 	{
 		InteractionHand hand = InteractionHand.MAIN_HAND;
-		ItemStack stack = player.m_21120_(hand);
+		ItemStack stack = player.getItemInHand(hand);
 		if (!StackUtil.isEmpty(stack))
 		{
-			if (StackUtil.checkItemEquality(stack, Item.m_41439_(this)))
+			if (StackUtil.checkItemEquality(stack, Item.byBlock(this)))
 			{
 				while (world.getBlockState(pos).getBlock() == this)
 				{
-					pos = pos.m_7494_();
+					pos = pos.above();
 				}
 
-				if (this.m_7898_(this.defaultBlockState(), world, pos) && pos.getY() < IC2.getWorldMaxHeight(world))
+				if (this.canSurvive(this.defaultBlockState(), world, pos) && pos.getY() < IC2.getWorldMaxHeight(world))
 				{
-					boolean isCreative = player.m_150110_().f_35937_;
+					boolean isCreative = player.getAbilities().instabuild;
 					ItemStack prev = isCreative ? StackUtil.copy(stack) : null;
-					stack.m_41661_(
+					stack.useOn(
 						new BlockPlaceContext(
 							player,
 							hand,
 							stack,
 							new BlockHitResult(
-								new Vec3(0.5, 1.0, 0.5).m_82520_(pos.m_7495_().getX(), pos.m_7495_().getY(), pos.m_7495_().getZ()),
+								new Vec3(0.5, 1.0, 0.5).add(pos.below().getX(), pos.below().getY(), pos.below().getZ()),
 								Direction.UP,
-								pos.m_7495_(),
+								pos.below(),
 								true
 							)
 						)
@@ -199,17 +199,17 @@ public class ScaffoldBlock extends Block
 		}
 	}
 
-	public boolean m_7898_(BlockState state, LevelReader world, BlockPos pos)
+	public boolean canSurvive(BlockState state, LevelReader world, BlockPos pos)
 	{
-		return super.m_7898_(state, world, pos) && this.hasSupport(world, pos, this);
+		return super.canSurvive(state, world, pos) && this.hasSupport(world, pos, this);
 	}
 
-	public void m_6861_(BlockState state, Level world, BlockPos pos, Block block, BlockPos fromPos, boolean notify)
+	public void neighborChanged(BlockState state, Level world, BlockPos pos, Block block, BlockPos fromPos, boolean notify)
 	{
 		this.checkSupport(world, pos);
 	}
 
-	public void m_213898_(BlockState state, ServerLevel world, BlockPos pos, RandomSource random)
+	public void randomTick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random)
 	{
 		if (random.nextInt(8) == 0)
 		{
@@ -221,10 +221,10 @@ public class ScaffoldBlock extends Block
 	{
 		while (world.getBlockState(pos).getBlock() == this)
 		{
-			pos = pos.m_7495_();
+			pos = pos.below();
 		}
 
-		return world.getBlockState(pos).m_60659_(world, pos, Direction.UP, SupportType.FULL);
+		return world.getBlockState(pos).isFaceSturdy(world, pos, Direction.UP, SupportType.FULL);
 	}
 
 	private boolean hasSupport(BlockGetter world, BlockPos start, ScaffoldBlock block)
@@ -244,8 +244,8 @@ public class ScaffoldBlock extends Block
 			{
 				if (support.strength < 0)
 				{
-					world.m_7731_(support.pos, Blocks.f_50016_.defaultBlockState(), 2);
-					Block.m_49950_(support.block.defaultBlockState(), world, support.pos);
+					world.setBlock(support.pos, Blocks.AIR.defaultBlockState(), 2);
+					Block.dropResources(support.block.defaultBlockState(), world, support.pos);
 					droppedAny = true;
 				}
 			}
@@ -256,7 +256,7 @@ public class ScaffoldBlock extends Block
 				{
 					if (support.strength < 0)
 					{
-						world.m_6289_(support.pos, this);
+						world.blockUpdated(support.pos, this);
 					}
 				}
 			}
@@ -286,7 +286,7 @@ public class ScaffoldBlock extends Block
 						ScaffoldBlock.Support cSupport = new ScaffoldBlock.Support(pos, (ScaffoldBlock) block, -1);
 						results.put(pos, cSupport);
 						queue.add(cSupport);
-					} else if (block.m_180643_(state, world, pos))
+					} else if (block.isCollisionShapeFullBlock(state, world, pos))
 					{
 						groundSupports.add(pos);
 					}
@@ -296,7 +296,7 @@ public class ScaffoldBlock extends Block
 
 		for (BlockPos groundPos : groundSupports)
 		{
-			BlockPos pos = groundPos.m_7494_();
+			BlockPos pos = groundPos.above();
 			int propagatedStrength = 0;
 
 			while (true)
@@ -333,7 +333,7 @@ public class ScaffoldBlock extends Block
 					}
 				}
 
-				pos = pos.m_7494_();
+				pos = pos.above();
 			}
 		}
 

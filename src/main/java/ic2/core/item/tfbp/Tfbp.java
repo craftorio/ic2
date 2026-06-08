@@ -56,7 +56,7 @@ public class Tfbp extends Item implements ITerraformingBP
 	@Override
 	public boolean canInsert(ItemStack stack, Player player, Level world, BlockPos pos)
 	{
-		if (this == Ic2Items.CULTIVATION_TFBP && world.m_46472_() == Level.f_46430_)
+		if (this == Ic2Items.CULTIVATION_TFBP && world.dimension() == Level.END)
 		{
 			IC2.achievements.issueAchievement(player, "terraformEndCultivation");
 		}

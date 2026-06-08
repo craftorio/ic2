@@ -13,23 +13,23 @@ public class SlotInvSlotReadOnly extends SlotInvSlot
 	}
 
 	@Override
-	public boolean m_5857_(ItemStack stack)
+	public boolean mayPlace(ItemStack stack)
 	{
 		return false;
 	}
 
 	@Override
-	public void m_142406_(Player player, ItemStack stack)
+	public void onTake(Player player, ItemStack stack)
 	{
 	}
 
-	public boolean m_8010_(Player player)
+	public boolean mayPickup(Player player)
 	{
 		return false;
 	}
 
 	@Override
-	public ItemStack m_6201_(int par1)
+	public ItemStack remove(int par1)
 	{
 		return StackUtil.emptyStack;
 	}

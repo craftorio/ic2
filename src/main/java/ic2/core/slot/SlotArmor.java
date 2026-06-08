@@ -20,18 +20,18 @@ public class SlotArmor extends Slot
 
 	public SlotArmor(Inventory inventory, EquipmentSlot armorType, int x, int y)
 	{
-		super(inventory, 36 + armorType.m_20749_(), x, y);
+		super(inventory, 36 + armorType.getIndex(), x, y);
 		this.armorType = armorType;
 	}
 
-	public boolean m_5857_(ItemStack stack)
+	public boolean mayPlace(ItemStack stack)
 	{
 		Item item = stack.getItem();
-		return item == null ? false : Mob.m_147233_(stack) == this.armorType;
+		return item == null ? false : Mob.getEquipmentSlotForItem(stack) == this.armorType;
 	}
 
-	public Pair<ResourceLocation, ResourceLocation> m_7543_()
+	public Pair<ResourceLocation, ResourceLocation> getNoItemIcon()
 	{
-		return Pair.of(InventoryMenu.f_39692_, EMPTY_ARMOR_SLOT_TEXTURES[this.armorType.m_20749_()]);
+		return Pair.of(InventoryMenu.BLOCK_ATLAS, EMPTY_ARMOR_SLOT_TEXTURES[this.armorType.getIndex()]);
 	}
 }

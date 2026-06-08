@@ -58,7 +58,7 @@ public class CropStickyReed extends Ic2CropCard
 	@Override
 	public ItemStack getGain(ICropTile crop)
 	{
-		return crop.getCurrentAge() <= this.getMaxAge() - 1 ? new ItemStack(Items.f_41909_, crop.getCurrentAge()) : new ItemStack(Ic2Items.RESIN);
+		return crop.getCurrentAge() <= this.getMaxAge() - 1 ? new ItemStack(Items.SUGAR_CANE, crop.getCurrentAge()) : new ItemStack(Ic2Items.RESIN);
 	}
 
 	@Override

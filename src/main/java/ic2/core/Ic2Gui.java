@@ -71,49 +71,49 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 
 	public final T getContainer()
 	{
-		return (T) this.menu;
+		return this.menu;
 	}
 
 	public final int getX()
 	{
-		return this.f_97735_;
+		return this.leftPos;
 	}
 
 	public final int getY()
 	{
-		return this.f_97736_;
+		return this.topPos;
 	}
 
 	public final Slot getFocusedSlot()
 	{
-		return this.f_97734_;
+		return this.hoveredSlot;
 	}
 
-	public void m_7856_()
+	public void init()
 	{
-		super.m_7856_();
+		super.init();
 
 		for (GuiElement<?> element : this.elements)
 		{
 			if (element instanceof IKeyboardDependent)
 			{
-				this.f_96541_.f_91068_.m_90926_(true);
+				this.minecraft.keyboardHandler.setSendRepeatsToGui(true);
 				this.fixKeyEvents = true;
 				break;
 			}
 		}
 	}
 
-	public void m_6305_(PoseStack matrices, int mouseX, int mouseY, float partialTicks)
+	public void render(PoseStack matrices, int mouseX, int mouseY, float partialTicks)
 	{
-		this.m_7333_(matrices);
-		super.m_6305_(matrices, mouseX, mouseY, partialTicks);
-		this.m_7025_(matrices, mouseX, mouseY);
+		this.renderBackground(matrices);
+		super.render(matrices, mouseX, mouseY, partialTicks);
+		this.renderTooltip(matrices, mouseX, mouseY);
 	}
 
-	public void m_181908_()
+	public void containerTick()
 	{
-		super.m_181908_();
+		super.containerTick();
 		if (this.elementMethods.contains(GuiElement.ImplementedMethod.tick))
 		{
 			for (GuiElement<?> element : this.elements)
@@ -126,12 +126,12 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 		}
 	}
 
-	protected void m_7286_(PoseStack matrices, float delta, int mouseX, int mouseY)
+	protected void renderBg(PoseStack matrices, float delta, int mouseX, int mouseY)
 	{
-		mouseX -= this.f_97735_;
-		mouseY -= this.f_97736_;
+		mouseX -= this.leftPos;
+		mouseY -= this.topPos;
 		this.drawBackgroundAndTitle(matrices, delta, mouseX, mouseY);
-		if (((ContainerBase) this.menu).base instanceof IUpgradableBlock)
+		if (this.menu.base instanceof IUpgradableBlock)
 		{
 			bindTexture(ResourceLocation.fromNamespaceAndPath("ic2", "textures/gui/infobutton.png"));
 			this.drawTexturedRect(matrices, 3.0, 3.0, 10.0, 10.0, 0.0, 0.0);
@@ -152,19 +152,19 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 	protected void drawBackgroundAndTitle(PoseStack matrices, float partialTicks, int mouseX, int mouseY)
 	{
 		this.bindTexture();
-		this.m_93228_(matrices, this.f_97735_, this.f_97736_, 0, 0, this.imageWidth, this.imageHeight);
-		this.drawXCenteredString(matrices, this.imageWidth / 2, 6, this.f_96539_, 4210752, false);
+		this.blit(matrices, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
+		this.drawXCenteredString(matrices, this.imageWidth / 2, 6, this.title, 4210752, false);
 	}
 
-	protected final void m_7027_(PoseStack matrices, int mouseX, int mouseY)
+	protected final void renderLabels(PoseStack matrices, int mouseX, int mouseY)
 	{
-		this.drawForegroundLayer(matrices, mouseX - this.f_97735_, mouseY - this.f_97736_);
+		this.drawForegroundLayer(matrices, mouseX - this.leftPos, mouseY - this.topPos);
 		this.flushTooltips(matrices);
 	}
 
 	protected void drawForegroundLayer(PoseStack matrices, int mouseX, int mouseY)
 	{
-		if (((ContainerBase) this.menu).base instanceof IUpgradableBlock)
+		if (this.menu.base instanceof IUpgradableBlock)
 		{
 			this.handleUpgradeTooltip(mouseX, mouseY);
 		}
@@ -184,11 +184,11 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 		if (mouseX >= 0 && mouseX <= 12 && mouseY >= 0 && mouseY <= 12)
 		{
 			List<Component> text = new ArrayList<>();
-			text.add(Component.m_237115_("ic2.generic.text.upgrade"));
+			text.add(Component.translatable("ic2.generic.text.upgrade"));
 
-			for (ItemStack stack : getCompatibleUpgrades((IUpgradableBlock) ((ContainerBase) this.menu).base))
+			for (ItemStack stack : getCompatibleUpgrades((IUpgradableBlock) this.menu.base))
 			{
-				text.add(stack.m_41786_().m_6881_().m_130940_(ChatFormatting.GRAY));
+				text.add(stack.getHoverName().copy().withStyle(ChatFormatting.GRAY));
 			}
 
 			this.drawTooltip(mouseX, mouseY, text);
@@ -212,7 +212,7 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 		return ret;
 	}
 
-	public boolean m_6050_(double mouseX, double mouseY, double scrollDelta)
+	public boolean mouseScrolled(double mouseX, double mouseY, double scrollDelta)
 	{
 		if (this.elementMethods.contains(GuiElement.ImplementedMethod.onMouseScroll))
 		{
@@ -234,10 +234,10 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 			}
 		}
 
-		return super.m_6050_(mouseX, mouseY, scrollDelta);
+		return super.mouseScrolled(mouseX, mouseY, scrollDelta);
 	}
 
-	public boolean m_6375_(double mouseX, double mouseY, int mouseButton)
+	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
 	{
 		if (this.elementMethods.contains(GuiElement.ImplementedMethod.onMouseClick))
 		{
@@ -245,8 +245,8 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 			if (button != null)
 			{
 				boolean handled = false;
-				mouseX -= this.f_97735_;
-				mouseY -= this.f_97736_;
+				mouseX -= this.leftPos;
+				mouseY -= this.topPos;
 
 				for (GuiElement<?> element : this.elements)
 				{
@@ -261,15 +261,15 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 					return true;
 				}
 
-				mouseX += this.f_97735_;
-				mouseY += this.f_97736_;
+				mouseX += this.leftPos;
+				mouseY += this.topPos;
 			}
 		}
 
-		return super.m_6375_(mouseX, mouseY, mouseButton);
+		return super.mouseClicked(mouseX, mouseY, mouseButton);
 	}
 
-	public boolean m_7979_(double mouseX, double mouseY, int clickedMouseButton, double deltaX, double deltaY)
+	public boolean mouseDragged(double mouseX, double mouseY, int clickedMouseButton, double deltaX, double deltaY)
 	{
 		if (this.elementMethods.contains(GuiElement.ImplementedMethod.onMouseDrag))
 		{
@@ -277,8 +277,8 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 			if (button != null)
 			{
 				boolean handled = false;
-				mouseX -= this.f_97735_;
-				mouseY -= this.f_97736_;
+				mouseX -= this.leftPos;
+				mouseY -= this.topPos;
 
 				for (GuiElement<?> element : this.elements)
 				{
@@ -293,15 +293,15 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 					return true;
 				}
 
-				mouseX += this.f_97735_;
-				mouseY += this.f_97736_;
+				mouseX += this.leftPos;
+				mouseY += this.topPos;
 			}
 		}
 
-		return super.m_7979_(mouseX, mouseY, clickedMouseButton, deltaX, deltaY);
+		return super.mouseDragged(mouseX, mouseY, clickedMouseButton, deltaX, deltaY);
 	}
 
-	public boolean m_6348_(double mouseX, double mouseY, int state)
+	public boolean mouseReleased(double mouseX, double mouseY, int state)
 	{
 		if (this.elementMethods.contains(GuiElement.ImplementedMethod.onMouseRelease))
 		{
@@ -309,8 +309,8 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 			if (button != null)
 			{
 				boolean handled = false;
-				mouseX -= this.f_97735_;
-				mouseY -= this.f_97736_;
+				mouseX -= this.leftPos;
+				mouseY -= this.topPos;
 
 				for (GuiElement<?> element : this.elements)
 				{
@@ -325,15 +325,15 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 					return true;
 				}
 
-				mouseX += this.f_97735_;
-				mouseY += this.f_97736_;
+				mouseX += this.leftPos;
+				mouseY += this.topPos;
 			}
 		}
 
-		return super.m_6348_(mouseX, mouseY, state);
+		return super.mouseReleased(mouseX, mouseY, state);
 	}
 
-	public boolean m_5534_(char typedChar, int keyCode)
+	public boolean charTyped(char typedChar, int keyCode)
 	{
 		if (this.elementMethods.contains(GuiElement.ImplementedMethod.onKeyTyped))
 		{
@@ -353,15 +353,15 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 			}
 		}
 
-		return super.m_5534_(typedChar, keyCode);
+		return super.charTyped(typedChar, keyCode);
 	}
 
-	public void m_7861_()
+	public void removed()
 	{
-		super.m_7861_();
+		super.removed();
 		if (this.fixKeyEvents)
 		{
-			this.f_96541_.f_91068_.m_90926_(false);
+			this.minecraft.keyboardHandler.setSendRepeatsToGui(false);
 		}
 
 		if (closeHandler != null)
@@ -384,8 +384,8 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 		PoseStack matrices, double x, double y, double width, double height, double uS, double vS, double uE, double vE, boolean mirrorX
 	)
 	{
-		x += this.f_97735_;
-		y += this.f_97736_;
+		x += this.leftPos;
+		y += this.topPos;
 		double xE = x + width;
 		double yE = y + height;
 		if (mirrorX)
@@ -395,16 +395,16 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 			uE = tmp;
 		}
 
-		Matrix4f matrix = matrices.m_85850_().m_85861_();
-		int z = this.m_93252_();
-		RenderSystem.m_157427_(GameRenderer::m_172817_);
-		BufferBuilder buffer = Tesselator.m_85913_().m_85915_();
-		buffer.m_166779_(Mode.QUADS, DefaultVertexFormat.f_85817_);
-		buffer.m_85982_(matrix, (float) x, (float) y, z).m_7421_((float) uS, (float) vS).m_5752_();
-		buffer.m_85982_(matrix, (float) x, (float) yE, z).m_7421_((float) uS, (float) vE).m_5752_();
-		buffer.m_85982_(matrix, (float) xE, (float) yE, z).m_7421_((float) uE, (float) vE).m_5752_();
-		buffer.m_85982_(matrix, (float) xE, (float) y, z).m_7421_((float) uE, (float) vS).m_5752_();
-		BufferUploader.m_231202_(buffer.m_231175_());
+		Matrix4f matrix = matrices.last().pose();
+		int z = this.getBlitOffset();
+		RenderSystem.setShader(GameRenderer::getPositionTexShader);
+		BufferBuilder buffer = Tesselator.getInstance().getBuilder();
+		buffer.begin(Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+		buffer.vertex(matrix, (float) x, (float) y, z).uv((float) uS, (float) vS).endVertex();
+		buffer.vertex(matrix, (float) x, (float) yE, z).uv((float) uS, (float) vE).endVertex();
+		buffer.vertex(matrix, (float) xE, (float) yE, z).uv((float) uE, (float) vE).endVertex();
+		buffer.vertex(matrix, (float) xE, (float) y, z).uv((float) uE, (float) vS).endVertex();
+		BufferUploader.drawWithShader(buffer.end());
 	}
 
 	public void drawSprite(
@@ -422,25 +422,25 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 	{
 		if (sprite == null)
 		{
-			sprite = ((TextureAtlas) this.f_96541_.m_91097_().m_118506_(InventoryMenu.f_39692_)).m_118316_(MissingTextureAtlasSprite.m_118071_());
+			sprite = ((TextureAtlas) this.minecraft.getTextureManager().getTexture(InventoryMenu.BLOCK_ATLAS)).getSprite(MissingTextureAtlasSprite.getLocation());
 		}
 
-		x += this.f_97735_;
-		y += this.f_97736_;
+		x += this.leftPos;
+		y += this.topPos;
 		scale *= 16.0;
-		double spriteUS = sprite.m_118409_();
-		double spriteVS = sprite.m_118411_();
-		double spriteWidth = sprite.m_118410_() - spriteUS;
-		double spriteHeight = sprite.m_118412_() - spriteVS;
+		double spriteUS = sprite.getU0();
+		double spriteVS = sprite.getV0();
+		double spriteWidth = sprite.getU1() - spriteUS;
+		double spriteHeight = sprite.getV1() - spriteVS;
 		int a = color >>> 24 & 0xFF;
 		int r = color >>> 16 & 0xFF;
 		int g = color >>> 8 & 0xFF;
 		int b = color & 0xFF;
-		Matrix4f matrix = matrices.m_85850_().m_85861_();
-		int z = this.m_93252_();
-		RenderSystem.m_157427_(GameRenderer::m_172820_);
-		BufferBuilder buffer = Tesselator.m_85913_().m_85915_();
-		buffer.m_166779_(Mode.QUADS, DefaultVertexFormat.f_85819_);
+		Matrix4f matrix = matrices.last().pose();
+		int z = this.getBlitOffset();
+		RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+		BufferBuilder buffer = Tesselator.getInstance().getBuilder();
+		buffer.begin(Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
 		double xS = x;
 
 		while (xS < x + width)
@@ -475,74 +475,74 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 
 				double yE = Math.min(yS + maxHeight, y + height);
 				double vE = vS + (yE - yS) / scale * spriteHeight;
-				buffer.m_85982_(matrix, (float) xS, (float) yS, z).m_7421_((float) uS, (float) vS).m_6122_(r, g, b, a).m_5752_();
-				buffer.m_85982_(matrix, (float) xS, (float) yE, z).m_7421_((float) uS, (float) vE).m_6122_(r, g, b, a).m_5752_();
-				buffer.m_85982_(matrix, (float) xE, (float) yE, z).m_7421_((float) uE, (float) vE).m_6122_(r, g, b, a).m_5752_();
-				buffer.m_85982_(matrix, (float) xE, (float) yS, z).m_7421_((float) uE, (float) vS).m_6122_(r, g, b, a).m_5752_();
+				buffer.vertex(matrix, (float) xS, (float) yS, z).uv((float) uS, (float) vS).color(r, g, b, a).endVertex();
+				buffer.vertex(matrix, (float) xS, (float) yE, z).uv((float) uS, (float) vE).color(r, g, b, a).endVertex();
+				buffer.vertex(matrix, (float) xE, (float) yE, z).uv((float) uE, (float) vE).color(r, g, b, a).endVertex();
+				buffer.vertex(matrix, (float) xE, (float) yS, z).uv((float) uE, (float) vS).color(r, g, b, a).endVertex();
 				yS += maxHeight;
 			}
 
 			xS += maxWidth;
 		}
 
-		BufferUploader.m_231202_(buffer.m_231175_());
+		BufferUploader.drawWithShader(buffer.end());
 	}
 
 	public void drawItem(int x, int y, ItemStack stack)
 	{
-		this.f_96542_.m_115123_(stack, this.f_97735_ + x, this.f_97736_ + y);
+		this.itemRenderer.renderGuiItem(stack, this.leftPos + x, this.topPos + y);
 	}
 
 	public void drawItemStack(int x, int y, ItemStack stack)
 	{
 		this.drawItem(x, y, stack);
-		this.f_96542_.m_115174_(this.f_96547_, stack, this.f_97735_ + x, this.f_97736_ + y, null);
+		this.itemRenderer.renderGuiItemDecorations(this.font, stack, this.leftPos + x, this.topPos + y, null);
 	}
 
 	public void drawColoredRect(PoseStack matrices, int x, int y, int width, int height, int color)
 	{
-		x += this.f_97735_;
-		y += this.f_97736_;
+		x += this.leftPos;
+		y += this.topPos;
 		int alpha = color >>> 24;
 		boolean blend = alpha != 255 && alpha != 0;
-		Matrix4f matrix = matrices.m_85850_().m_85861_();
+		Matrix4f matrix = matrices.last().pose();
 		int xE = x + width;
 		int yE = y + height;
-		int z = this.m_93252_();
+		int z = this.getBlitOffset();
 		if (blend)
 		{
-			RenderSystem.m_69478_();
+			RenderSystem.enableBlend();
 		}
 
-		RenderSystem.m_157427_(GameRenderer::m_172811_);
-		BufferBuilder buffer = Tesselator.m_85913_().m_85915_();
-		buffer.m_166779_(Mode.QUADS, DefaultVertexFormat.f_85815_);
-		buffer.m_85982_(matrix, x, y, z).m_193479_(color).m_5752_();
-		buffer.m_85982_(matrix, x, yE, z).m_193479_(color).m_5752_();
-		buffer.m_85982_(matrix, xE, yE, z).m_193479_(color).m_5752_();
-		buffer.m_85982_(matrix, xE, y, z).m_193479_(color).m_5752_();
-		BufferUploader.m_231202_(buffer.m_231175_());
+		RenderSystem.setShader(GameRenderer::getPositionColorShader);
+		BufferBuilder buffer = Tesselator.getInstance().getBuilder();
+		buffer.begin(Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+		buffer.vertex(matrix, x, y, z).color(color).endVertex();
+		buffer.vertex(matrix, x, yE, z).color(color).endVertex();
+		buffer.vertex(matrix, xE, yE, z).color(color).endVertex();
+		buffer.vertex(matrix, xE, y, z).color(color).endVertex();
+		BufferUploader.drawWithShader(buffer.end());
 		if (blend)
 		{
-			RenderSystem.m_69461_();
+			RenderSystem.disableBlend();
 		}
 	}
 
 	public int drawString(PoseStack matrices, int x, int y, String text, int color)
 	{
-		return this.f_96547_.m_92883_(matrices, text, x, y, color);
+		return this.font.draw(matrices, text, x, y, color);
 	}
 
 	public int drawString(PoseStack matrices, int x, int y, String text, int color, boolean shadow)
 	{
 		return !shadow
-			? this.f_96547_.m_92883_(matrices, text, this.f_97735_ + x, this.f_97736_ + y, color) - this.f_97735_
-			: this.f_96547_.m_92750_(matrices, text, this.f_97735_ + x, this.f_97736_ + y, color) - this.f_97735_;
+			? this.font.draw(matrices, text, this.leftPos + x, this.topPos + y, color) - this.leftPos
+			: this.font.drawShadow(matrices, text, this.leftPos + x, this.topPos + y, color) - this.leftPos;
 	}
 
 	public void drawTrimmedString(PoseStack matrices, int x, int y, String text, int maxWidth, int color)
 	{
-		MultiLineLabel.m_94341_(this.f_96547_, Component.m_237113_(text), maxWidth).m_6508_(matrices, x, y, 10, color);
+		MultiLineLabel.create(this.font, Component.literal(text), maxWidth).renderLeftAlignedNoShadow(matrices, x, y, 10, color);
 	}
 
 	public void drawXCenteredString(PoseStack matrices, int x, int y, String text, int color, boolean shadow)
@@ -577,7 +577,7 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 			y -= 4;
 		}
 
-		this.f_96547_.m_92883_(matrices, text, this.f_97735_ + x, this.f_97736_ + y, color);
+		this.font.draw(matrices, text, this.leftPos + x, this.topPos + y, color);
 	}
 
 	public void drawCenteredString(PoseStack matrices, int x, int y, Component text, int color, boolean shadow, boolean centerX, boolean centerY)
@@ -592,27 +592,27 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 			y -= 4;
 		}
 
-		this.f_96547_.m_92889_(matrices, text, this.f_97735_ + x, this.f_97736_ + y, color);
+		this.font.draw(matrices, text, this.leftPos + x, this.topPos + y, color);
 	}
 
 	public int getStringWidth(String text)
 	{
-		return this.f_96547_.m_92895_(text);
+		return this.font.width(text);
 	}
 
 	public int getStringWidth(Component text)
 	{
-		return this.f_96547_.m_92852_(text);
+		return this.font.width(text);
 	}
 
 	public String trimStringToWidth(String text, int width)
 	{
-		return this.f_96547_.m_92837_(text, width, false);
+		return this.font.plainSubstrByWidth(text, width, false);
 	}
 
 	public String trimStringToWidthReverse(String text, int width)
 	{
-		return this.f_96547_.m_92837_(text, width, true);
+		return this.font.plainSubstrByWidth(text, width, true);
 	}
 
 	public void drawTooltip(int x, int y, List<Component> text)
@@ -623,14 +623,14 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 	public void drawTooltip(PoseStack matrices, int x, int y, ItemStack stack)
 	{
 		assert !StackUtil.isEmpty(stack);
-		this.m_6057_(matrices, stack, x, y);
+		this.renderTooltip(matrices, stack, x, y);
 	}
 
 	protected void flushTooltips(PoseStack matrices)
 	{
 		for (Ic2Gui.Tooltip tooltip : this.queuedTooltips)
 		{
-			this.m_169388_(matrices, tooltip.text, Optional.empty(), tooltip.x, tooltip.y);
+			this.renderTooltip(matrices, tooltip.text, Optional.empty(), tooltip.x, tooltip.y);
 		}
 
 		this.queuedTooltips.clear();
@@ -644,24 +644,24 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 
 	protected final void bindTexture()
 	{
-		bindTexture(this.getTexture());
+		bindTexture(this.getTextureLocation());
 	}
 
 	public static void bindTexture(ResourceLocation id)
 	{
-		RenderSystem.m_157456_(0, id);
+		RenderSystem.setShaderTexture(0, id);
 	}
 
 	protected IClickHandler createEventSender(int event)
 	{
-		if (((ContainerBase) this.menu).base instanceof BlockEntity)
+		if (this.menu.base instanceof BlockEntity)
 		{
 			return new IClickHandler()
 			{
 				@Override
 				public void onClick(MouseButton button)
 				{
-					IC2.network.get(false).initiateClientTileEntityEvent((BlockEntity) ((ContainerBase) Ic2Gui.this.menu).base, event);
+					IC2.network.get(false).initiateClientTileEntityEvent((BlockEntity) Ic2Gui.this.menu.base, event);
 				}
 			};
 		} else
@@ -670,19 +670,9 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 		}
 	}
 
-	protected abstract ResourceLocation getTexture();
+	protected abstract ResourceLocation getTextureLocation();
 
-	private static class Tooltip
-	{
-		final int x;
-		final int y;
-		final List<Component> text;
-
-		Tooltip(List<Component> text, int x, int y)
+	private record Tooltip(List<Component> text, int x, int y)
 		{
-			this.text = text;
-			this.x = x;
-			this.y = y;
 		}
-	}
 }

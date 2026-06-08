@@ -185,7 +185,7 @@ public abstract class GuiElement<T extends GuiElement<T>>
 
 	protected static Component processText(String text)
 	{
-		return Component.m_237115_(text);
+		return Component.translatable(text);
 	}
 
 	protected final Container getBase()
@@ -196,7 +196,7 @@ public abstract class GuiElement<T extends GuiElement<T>>
 	protected final Map<String, TextProvider.ITextProvider> getTokens()
 	{
 		Map<String, TextProvider.ITextProvider> ret = new HashMap<>();
-		ret.put("name", TextProvider.of(this.gui.m_96636_()));
+		ret.put("name", TextProvider.of(this.gui.getTitle()));
 		return ret;
 	}
 
@@ -212,12 +212,12 @@ public abstract class GuiElement<T extends GuiElement<T>>
 
 	protected static void bindBlockTexture()
 	{
-		Ic2Gui.bindTexture(InventoryMenu.f_39692_);
+		Ic2Gui.bindTexture(InventoryMenu.BLOCK_ATLAS);
 	}
 
 	protected static TextureAtlas getBlockTextureMap()
 	{
-		return (TextureAtlas) Minecraft.m_91087_().m_91097_().m_118506_(InventoryMenu.f_39692_);
+		return (TextureAtlas) Minecraft.getInstance().getTextureManager().getTexture(InventoryMenu.BLOCK_ATLAS);
 	}
 
 	public final Set<GuiElement.ImplementedMethod> getImplementedMethods()

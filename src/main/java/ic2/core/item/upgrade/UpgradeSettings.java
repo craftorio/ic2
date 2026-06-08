@@ -36,14 +36,14 @@ public class UpgradeSettings
 					this.main = this.extra = ComparisonSettings.DEFAULT;
 					break;
 				case COMPARISON:
-					this.mainBox = nbt.m_128461_("normal");
+					this.mainBox = nbt.getString("normal");
 					this.extraBox = "";
 					this.main = ComparisonSettings.getFromNBT(nbt.getByte("normalComp"));
 					this.extra = ComparisonSettings.DEFAULT;
 					break;
 				case RANGE:
-					this.mainBox = nbt.m_128461_("normal");
-					this.extraBox = nbt.m_128461_("extra");
+					this.mainBox = nbt.getString("normal");
+					this.extraBox = nbt.getString("extra");
 					this.main = ComparisonSettings.getFromNBT(nbt.getByte("normalComp"));
 					this.extra = ComparisonSettings.getFromNBT(nbt.getByte("extraComp"));
 					break;

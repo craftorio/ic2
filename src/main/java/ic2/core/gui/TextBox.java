@@ -242,22 +242,22 @@ public class TextBox extends GuiElement<TextBox>
 			startX = this.x + this.width;
 		}
 
-		Tesselator tessellator = Tesselator.m_85913_();
-		BufferBuilder buffer = tessellator.m_85915_();
-		RenderSystem.m_157427_(GameRenderer::m_172808_);
-		RenderSystem.m_157429_(0.0F, 0.0F, 1.0F, 1.0F);
-		RenderSystem.m_69472_();
-		RenderSystem.m_69479_();
-		RenderSystem.m_69835_(LogicOp.OR_REVERSE);
-		buffer.m_166779_(Mode.QUADS, DefaultVertexFormat.f_85814_);
-		buffer.m_5483_(startX, endY, 0.0).m_5752_();
-		buffer.m_5483_(endX, endY, 0.0).m_5752_();
-		buffer.m_5483_(endX, startY, 0.0).m_5752_();
-		buffer.m_5483_(startX, startY, 0.0).m_5752_();
-		tessellator.m_85914_();
-		RenderSystem.m_157429_(1.0F, 1.0F, 1.0F, 1.0F);
-		RenderSystem.m_69462_();
-		RenderSystem.m_69493_();
+		Tesselator tessellator = Tesselator.getInstance();
+		BufferBuilder buffer = tessellator.getBuilder();
+		RenderSystem.setShader(GameRenderer::getPositionShader);
+		RenderSystem.setShaderColor(0.0F, 0.0F, 1.0F, 1.0F);
+		RenderSystem.disableTexture();
+		RenderSystem.enableColorLogicOp();
+		RenderSystem.logicOp(LogicOp.OR_REVERSE);
+		buffer.begin(Mode.QUADS, DefaultVertexFormat.POSITION);
+		buffer.vertex(startX, endY, 0.0).endVertex();
+		buffer.vertex(endX, endY, 0.0).endVertex();
+		buffer.vertex(endX, startY, 0.0).endVertex();
+		buffer.vertex(startX, startY, 0.0).endVertex();
+		tessellator.end();
+		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+		RenderSystem.disableColorLogicOp();
+		RenderSystem.enableTexture();
 	}
 
 	@Override
@@ -287,22 +287,22 @@ public class TextBox extends GuiElement<TextBox>
 			return super.onKeyTyped(typedChar, keyCode);
 		}
 
-		if (Screen.m_96634_(keyCode))
+		if (Screen.isSelectAll(keyCode))
 		{
 			this.setCursorPositionEnd();
 			this.setSelectionPos(0);
-		} else if (Screen.m_96632_(keyCode))
+		} else if (Screen.isCopy(keyCode))
 		{
-			SideProxyClient.mc.f_91068_.m_90911_(this.getSelectedText());
-		} else if (Screen.m_96630_(keyCode))
+			SideProxyClient.mc.keyboardHandler.setClipboard(this.getSelectedText());
+		} else if (Screen.isPaste(keyCode))
 		{
 			if (this.willDraw())
 			{
-				this.writeText(SideProxyClient.mc.f_91068_.m_90876_());
+				this.writeText(SideProxyClient.mc.keyboardHandler.getClipboard());
 			}
-		} else if (Screen.m_96628_(keyCode))
+		} else if (Screen.isCut(keyCode))
 		{
-			SideProxyClient.mc.f_91068_.m_90911_(this.getSelectedText());
+			SideProxyClient.mc.keyboardHandler.setClipboard(this.getSelectedText());
 			if (this.willDraw())
 			{
 				this.writeText("");
@@ -312,7 +312,7 @@ public class TextBox extends GuiElement<TextBox>
 			switch (keyCode)
 			{
 				case 259:
-					if (Screen.m_96637_())
+					if (Screen.hasControlDown())
 					{
 						if (this.willDraw())
 						{
@@ -329,7 +329,7 @@ public class TextBox extends GuiElement<TextBox>
 				case 266:
 				case 267:
 				default:
-					if (!SharedConstants.m_136188_(typedChar) || !this.willDraw())
+					if (!SharedConstants.isAllowedChatCharacter(typedChar) || !this.willDraw())
 					{
 						return super.onKeyTyped(typedChar, keyCode);
 					}
@@ -337,7 +337,7 @@ public class TextBox extends GuiElement<TextBox>
 					this.writeText(String.valueOf(typedChar));
 					break;
 				case 261:
-					if (Screen.m_96637_())
+					if (Screen.hasControlDown())
 					{
 						if (this.willDraw())
 						{
@@ -349,16 +349,16 @@ public class TextBox extends GuiElement<TextBox>
 					}
 					break;
 				case 262:
-					if (Screen.m_96638_())
+					if (Screen.hasShiftDown())
 					{
-						if (Screen.m_96637_())
+						if (Screen.hasControlDown())
 						{
 							this.setSelectionPos(this.getNthWordFromPos(1, this.selectionEnd));
 						} else
 						{
 							this.setSelectionPos(this.selectionEnd + 1);
 						}
-					} else if (Screen.m_96637_())
+					} else if (Screen.hasControlDown())
 					{
 						this.setCursorPosition(this.getNthWordFromCursor(1));
 					} else
@@ -367,16 +367,16 @@ public class TextBox extends GuiElement<TextBox>
 					}
 					break;
 				case 263:
-					if (Screen.m_96638_())
+					if (Screen.hasShiftDown())
 					{
-						if (Screen.m_96637_())
+						if (Screen.hasControlDown())
 						{
 							this.setSelectionPos(this.getNthWordFromPos(-1, this.selectionEnd));
 						} else
 						{
 							this.setSelectionPos(this.selectionEnd - 1);
 						}
-					} else if (Screen.m_96637_())
+					} else if (Screen.hasControlDown())
 					{
 						this.setCursorPosition(this.getNthWordFromCursor(-1));
 					} else
@@ -385,7 +385,7 @@ public class TextBox extends GuiElement<TextBox>
 					}
 					break;
 				case 268:
-					if (Screen.m_96638_())
+					if (Screen.hasShiftDown())
 					{
 						this.setSelectionPos(0);
 					} else
@@ -394,7 +394,7 @@ public class TextBox extends GuiElement<TextBox>
 					}
 					break;
 				case 269:
-					if (Screen.m_96638_())
+					if (Screen.hasShiftDown())
 					{
 						this.setSelectionPos(this.text.length());
 					} else
@@ -410,7 +410,7 @@ public class TextBox extends GuiElement<TextBox>
 	public void writeText(String textToWrite)
 	{
 		StringBuilder newText = new StringBuilder();
-		String cleanString = SharedConstants.m_136190_(textToWrite);
+		String cleanString = SharedConstants.filterText(textToWrite);
 		int start = Math.min(this.cursor, this.selectionEnd);
 		int end = Math.max(this.cursor, this.selectionEnd);
 		int insertionPoint = this.maxTextLength - this.text.length() - (start - end);

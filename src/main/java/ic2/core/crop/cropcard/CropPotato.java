@@ -58,10 +58,10 @@ public class CropPotato extends Ic2CropCard
 	{
 		if (crop.getCurrentAge() >= this.getMaxAge() && IC2.random.nextInt(20) <= 0)
 		{
-			return new ItemStack(Items.f_42675_);
+			return new ItemStack(Items.POISONOUS_POTATO);
 		} else
 		{
-			return crop.getCurrentAge() >= this.getMaxAge() - 1 ? new ItemStack(Items.f_42620_) : null;
+			return crop.getCurrentAge() >= this.getMaxAge() - 1 ? new ItemStack(Items.POTATO) : null;
 		}
 	}
 }

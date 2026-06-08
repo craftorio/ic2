@@ -51,19 +51,19 @@ public class CropNetherWart extends Ic2CropCard
 	@Override
 	public ItemStack getGain(ICropTile crop)
 	{
-		return new ItemStack(Items.f_42588_, 1);
+		return new ItemStack(Items.NETHER_WART, 1);
 	}
 
 	@Override
 	public void tick(ICropTile crop)
 	{
-		if (crop.isBlockBelow(Blocks.f_50135_))
+		if (crop.isBlockBelow(Blocks.SOUL_SAND))
 		{
 			if (this.canGrow(crop))
 			{
 				crop.setGrowthPoints(crop.getGrowthPoints() + 100);
 			}
-		} else if (crop.isBlockBelow(Blocks.f_50125_) && crop.getWorldObj().random.nextInt(300) == 0)
+		} else if (crop.isBlockBelow(Blocks.SNOW) && crop.getWorldObj().random.nextInt(300) == 0)
 		{
 			crop.setCrop(Ic2Crops.cropTerraWart);
 		}

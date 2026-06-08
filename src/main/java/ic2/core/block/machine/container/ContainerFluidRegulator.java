@@ -13,8 +13,8 @@ public class ContainerFluidRegulator extends ContainerElectricMachine<TileEntity
 	public ContainerFluidRegulator(int syncId, Inventory playerInventory, TileEntityFluidRegulator be)
 	{
 		super(Ic2ScreenHandlers.FLUID_REGULATOR, syncId, playerInventory, be, 184, 8, 57);
-		this.m_38897_(new SlotInvSlot(be.wasserinputSlot, 0, 58, 53));
-		this.m_38897_(new SlotInvSlot(be.wasseroutputSlot, 0, 58, 71));
+		this.addSlot(new SlotInvSlot(be.wasserinputSlot, 0, 58, 53));
+		this.addSlot(new SlotInvSlot(be.wasseroutputSlot, 0, 58, 71));
 	}
 
 	@Override

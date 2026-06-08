@@ -16,17 +16,17 @@ public class ContainerCropmatron extends ContainerElectricMachine<TileEntityCrop
 
 		for (int i = 0; i < base.fertilizerSlot.size(); i++)
 		{
-			this.m_38897_(new SlotInvSlot(base.fertilizerSlot, i, 8 + i * 18, 80));
+			this.addSlot(new SlotInvSlot(base.fertilizerSlot, i, 8 + i * 18, 80));
 		}
 
-		this.m_38897_(new SlotInvSlot(base.exInputSlot, 0, 49, 27));
-		this.m_38897_(new SlotInvSlot(base.exOutputSlot, 0, 67, 27));
-		this.m_38897_(new SlotInvSlot(base.wasserinputSlot, 0, 57, 56));
-		this.m_38897_(new SlotInvSlot(base.wasseroutputSlot, 0, 75, 56));
+		this.addSlot(new SlotInvSlot(base.exInputSlot, 0, 49, 27));
+		this.addSlot(new SlotInvSlot(base.exOutputSlot, 0, 67, 27));
+		this.addSlot(new SlotInvSlot(base.wasserinputSlot, 0, 57, 56));
+		this.addSlot(new SlotInvSlot(base.wasseroutputSlot, 0, 75, 56));
 
 		for (int i = 0; i < 4; i++)
 		{
-			this.m_38897_(new SlotInvSlot(base.upgradeSlot, i, 152, 26 + i * 18));
+			this.addSlot(new SlotInvSlot(base.upgradeSlot, i, 152, 26 + i * 18));
 		}
 	}
 

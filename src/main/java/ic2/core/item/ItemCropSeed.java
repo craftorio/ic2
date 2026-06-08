@@ -9,6 +9,8 @@ import ic2.core.util.StackUtil;
 
 import java.util.List;
 
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
@@ -30,7 +32,7 @@ public class ItemCropSeed extends Item implements ICropSeed
 		super(settings);
 	}
 
-	public String m_5671_(ItemStack itemstack)
+	public String getDescriptionId(ItemStack itemstack)
 	{
 		if (itemstack == null)
 		{
@@ -49,28 +51,28 @@ public class ItemCropSeed extends Item implements ICropSeed
 		}
 	}
 
-	public Component m_7626_(ItemStack stack)
+	public Component getName(ItemStack stack)
 	{
 		CropCard crop = Crops.instance.getCropCard(stack);
-		return Component.m_237110_(crop == null ? "ic2.crop.seeds" : crop.getSeedType(), new Object[] { super.m_7626_(stack) });
+		return Component.translatable(crop == null ? "ic2.crop.seeds" : crop.getSeedType(), new Object[] { super.getName(stack) });
 	}
 
 	@OnlyIn(Dist.CLIENT)
-	public void m_7373_(ItemStack stack, Level world, List<Component> info, TooltipFlag debugTooltips)
+	public void appendHoverText(ItemStack stack, Level world, List<Component> info, TooltipFlag debugTooltips)
 	{
 		if (this.getScannedFromStack(stack) >= 4)
 		{
-			info.add(Component.m_237113_("§2Gr§7 " + this.getGrowthFromStack(stack)));
-			info.add(Component.m_237113_("§6Ga§7 " + this.getGainFromStack(stack)));
-			info.add(Component.m_237113_("§3Re§7 " + this.getResistanceFromStack(stack)));
+			info.add(Component.literal("§2Gr§7 " + this.getGrowthFromStack(stack)));
+			info.add(Component.literal("§6Ga§7 " + this.getGainFromStack(stack)));
+			info.add(Component.literal("§3Re§7 " + this.getResistanceFromStack(stack)));
 		}
 	}
 
-	public InteractionResult m_6225_(UseOnContext context)
+	public InteractionResult useOn(UseOnContext context)
 	{
-		if (context.m_43725_().getBlockEntity(context.m_8083_()) instanceof TileEntityCrop crop)
+		if (context.getLevel().getBlockEntity(context.getClickedPos()) instanceof TileEntityCrop crop)
 		{
-			ItemStack stack = context.m_43722_();
+			ItemStack stack = context.getItemInHand();
 			if (crop.tryPlantIn(
 				Crops.instance.getCropCard(stack),
 				0,
@@ -80,10 +82,10 @@ public class ItemCropSeed extends Item implements ICropSeed
 				this.getScannedFromStack(stack)
 			))
 			{
-				Player player = context.m_43723_();
-				if (!player.m_150110_().f_35937_)
+				Player player = context.getPlayer();
+				if (!player.getAbilities().instabuild)
 				{
-					player.getInventory().f_35974_.set(player.getInventory().f_35977_, StackUtil.emptyStack);
+					player.getInventory().items.set(player.getInventory().selected, StackUtil.emptyStack);
 				}
 
 				return InteractionResult.SUCCESS;
@@ -93,9 +95,9 @@ public class ItemCropSeed extends Item implements ICropSeed
 		return InteractionResult.PASS;
 	}
 
-	public void m_6787_(CreativeModeTab tabs, NonNullList<ItemStack> items)
+	public void fillItemCategory(CreativeModeTab tabs, NonNullList<ItemStack> items)
 	{
-		if (this.m_220152_(tabs))
+		if (this.allowedIn(tabs))
 		{
 			for (CropCard crop : Crops.instance.getCrops())
 			{
@@ -108,13 +110,13 @@ public class ItemCropSeed extends Item implements ICropSeed
 	{
 		ItemStack stack = new ItemStack(Ic2Items.CROP_SEED_BACK);
 		CompoundTag tag = new CompoundTag();
-		tag.m_128359_("owner", crop.getOwner());
-		tag.m_128359_("id", crop.getId());
+		tag.putString("owner", crop.getOwner());
+		tag.putString("id", crop.getId());
 		tag.putByte("growth", (byte) statGrowth);
 		tag.putByte("gain", (byte) statGain);
 		tag.putByte("resistance", (byte) statResistance);
 		tag.putByte("scan", (byte) scan);
-		stack.m_41751_(tag);
+		stack.setTag(tag);
 		return stack;
 	}
 
@@ -124,8 +126,8 @@ public class ItemCropSeed extends Item implements ICropSeed
 		CompoundTag nbt = is.getTag();
 		if (nbt != null && nbt.contains("owner", 8) && nbt.contains("id", 8))
 		{
-			String owner = nbt.m_128461_("owner");
-			String id = nbt.m_128461_("id");
+			String owner = nbt.getString("owner");
+			String id = nbt.getString("id");
 			return Crops.instance.getCropCard(owner, id);
 		} else
 		{
@@ -139,8 +141,8 @@ public class ItemCropSeed extends Item implements ICropSeed
 		CompoundTag nbt = is.getTag();
 		if (nbt != null)
 		{
-			nbt.m_128359_("owner", crop.getOwner());
-			nbt.m_128359_("id", crop.getId());
+			nbt.putString("owner", crop.getOwner());
+			nbt.putString("id", crop.getId());
 		}
 	}
 

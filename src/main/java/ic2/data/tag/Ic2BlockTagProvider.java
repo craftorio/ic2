@@ -29,40 +29,40 @@ public class Ic2BlockTagProvider extends AbstractBlockTagProvider
 
 	protected TagAppender<Block> tag(TagKey<Block> tag)
 	{
-		return this.m_206424_(tag);
+		return this.tag(tag);
 	}
 
-	protected void m_6577_()
+	protected void addTags()
 	{
 		Registry.BLOCK.forEach(block ->
 		{
 			if (block instanceof AbstractCableBlock)
 			{
-				this.tag(Ic2BlockTags.CABLE_CONNECTABLE).m_126582_(block);
+				this.tag(Ic2BlockTags.CABLE_CONNECTABLE).add(block);
 			} else if (block instanceof Ic2TileEntityBlock tileEntityBlock)
 			{
 				if (this.canCableConnect(block))
 				{
 					if (!tileEntityBlock.getTeClass().equals(TileEntityCrop.class))
 					{
-						this.tag(Ic2BlockTags.CABLE_CONNECTABLE).m_126582_(block);
+						this.tag(Ic2BlockTags.CABLE_CONNECTABLE).add(block);
 					}
 				}
 			}
 		});
 		this.tag(Ic2BlockTags.RUBBER_LOGS)
-			.m_126582_(Ic2Blocks.RUBBER_LOG)
-			.m_126582_(Ic2Blocks.RUBBER_WOOD)
-			.m_126582_(Ic2Blocks.STRIPPED_RUBBER_LOG)
-			.m_126582_(Ic2Blocks.STRIPPED_RUBBER_WOOD);
-		this.tag(BlockTags.f_13106_).m_206428_(Ic2BlockTags.RUBBER_LOGS);
-		this.tag(BlockTags.f_13090_).m_126582_(Ic2Blocks.RUBBER_PLANKS);
-		this.tag(BlockTags.f_13105_).m_206428_(Ic2BlockTags.RUBBER_LOGS);
+			.add(Ic2Blocks.RUBBER_LOG)
+			.add(Ic2Blocks.RUBBER_WOOD)
+			.add(Ic2Blocks.STRIPPED_RUBBER_LOG)
+			.add(Ic2Blocks.STRIPPED_RUBBER_WOOD);
+		this.tag(BlockTags.LOGS).addTag(Ic2BlockTags.RUBBER_LOGS);
+		this.tag(BlockTags.PLANKS).add(Ic2Blocks.RUBBER_PLANKS);
+		this.tag(BlockTags.LOGS_THAT_BURN).addTag(Ic2BlockTags.RUBBER_LOGS);
 	}
 
 	public boolean canCableConnect(Block block)
 	{
-		String identifierPath = Registry.BLOCK.getKey(block).m_135815_();
+		String identifierPath = Registry.BLOCK.getKey(block).getPath();
 		return !unconnectableBlockList.contains(block) && !identifierPath.contains("storage_box") && !identifierPath.contains("tank");
 	}
 }

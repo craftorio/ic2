@@ -41,18 +41,18 @@ public abstract class HandHeldInventory implements IHasGui
 			CompoundTag nbt = StackUtil.getOrCreateNbtData(containerStack);
 			if (!nbt.contains("uid", 3))
 			{
-				nbt.putInt("uid", IC2.random.m_188502_());
+				nbt.putInt("uid", IC2.random.nextInt());
 			}
 
-			ListTag contentList = nbt.m_128437_("Items", 10);
+			ListTag contentList = nbt.getList("Items", 10);
 
 			for (int i = 0; i < contentList.size(); i++)
 			{
-				CompoundTag slotNbt = contentList.m_128728_(i);
+				CompoundTag slotNbt = contentList.getCompound(i);
 				int slot = slotNbt.getByte("Slot");
 				if (slot >= 0 && slot < this.inventory.length)
 				{
-					this.inventory[slot] = ItemStack.m_41712_(slotNbt);
+					this.inventory[slot] = ItemStack.of(slotNbt);
 				}
 			}
 		}
@@ -165,7 +165,7 @@ public abstract class HandHeldInventory implements IHasGui
 				PLAYERS_IN_GUI.remove(player);
 			} else
 			{
-				StackUtil.getOrCreateNbtData(this.containerStack).m_128473_("uid");
+				StackUtil.getOrCreateNbtData(this.containerStack).remove("uid");
 			}
 		}
 	}
@@ -195,7 +195,7 @@ public abstract class HandHeldInventory implements IHasGui
 
 	protected int getPlayerInventoryIndex()
 	{
-		ItemStack cursorStack = this.player.f_36096_.m_142621_();
+		ItemStack cursorStack = this.player.containerMenu.getCarried();
 		if (this.isThisContainer(cursorStack))
 		{
 			return -1;
@@ -238,7 +238,7 @@ public abstract class HandHeldInventory implements IHasGui
 					{
 						CompoundTag nbt = new CompoundTag();
 						nbt.putByte("Slot", (byte) i);
-						this.inventory[i].m_41739_(nbt);
+						this.inventory[i].save(nbt);
 						contentList.add(nbt);
 					}
 				}
@@ -251,44 +251,44 @@ public abstract class HandHeldInventory implements IHasGui
 				} catch (IllegalArgumentException e)
 				{
 					CrashReport crash = new CrashReport("Hand held container stack vanished", e);
-					CrashReportCategory category = crash.m_127514_("Container stack");
-					category.m_128159_("Stack", StackUtil.toStringSafe(this.containerStack));
-					category.m_128159_("NBT", this.containerStack.getTag());
-					category.m_128159_("Position", this.getPlayerInventoryIndex());
-					category.m_128159_("Had thrown", dropItself);
-					category = crash.m_127514_("Container info");
-					category.m_128159_("Type", this.getClass().getName());
-					category.m_128159_("Container", this.player.f_36096_ == null ? null : this.player.f_36096_.getClass().getName());
-					if (this.player.f_19853_.isClientSide)
+					CrashReportCategory category = crash.addCategory("Container stack");
+					category.setDetail("Stack", StackUtil.toStringSafe(this.containerStack));
+					category.setDetail("NBT", this.containerStack.getTag());
+					category.setDetail("Position", this.getPlayerInventoryIndex());
+					category.setDetail("Had thrown", dropItself);
+					category = crash.addCategory("Container info");
+					category.setDetail("Type", this.getClass().getName());
+					category.setDetail("Container", this.player.containerMenu == null ? null : this.player.containerMenu.getClass().getName());
+					if (this.player.level.isClientSide)
 					{
-						category.m_128165_("GUI", new CrashReportDetail<String>()
+						category.setDetail("GUI", new CrashReportDetail<String>()
 						{
 							public String call() throws Exception
 							{
-								Screen gui = Minecraft.m_91087_().f_91080_;
+								Screen gui = Minecraft.getInstance().screen;
 								return gui == null ? null : gui.getClass().getName();
 							}
 						});
 					}
 
-					category.m_128159_("Opened by", this.player);
+					category.setDetail("Opened by", this.player);
 					throw new ReportedException(crash);
 				}
 
 				if (dropItself)
 				{
-					StackUtil.dropAsEntity(this.player.getCommandSenderWorld(), this.player.m_20183_(), this.containerStack);
+					StackUtil.dropAsEntity(this.player.getCommandSenderWorld(), this.player.blockPosition(), this.containerStack);
 					this.clearContent();
 				} else
 				{
 					int idx = this.getPlayerInventoryIndex();
 					if (idx < -1)
 					{
-						IC2.log.warn(LogCategory.Item, "Handheld inventory saving failed for player " + this.player.m_5446_().getString() + ".");
+						IC2.log.warn(LogCategory.Item, "Handheld inventory saving failed for player " + this.player.getDisplayName().getString() + ".");
 						this.clearContent();
 					} else if (idx == -1)
 					{
-						this.player.f_36096_.m_142503_(this.containerStack);
+						this.player.containerMenu.setCarried(this.containerStack);
 					} else
 					{
 						this.player.getInventory().setItem(idx, this.containerStack);
@@ -309,7 +309,7 @@ public abstract class HandHeldInventory implements IHasGui
 			{
 				CompoundTag nbt = new CompoundTag();
 				nbt.putByte("Slot", (byte) i);
-				this.inventory[i].m_41739_(nbt);
+				this.inventory[i].save(nbt);
 				contentList.add(nbt);
 			}
 		}

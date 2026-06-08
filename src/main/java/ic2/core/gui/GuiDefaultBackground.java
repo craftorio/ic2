@@ -73,7 +73,7 @@ public abstract class GuiDefaultBackground<T extends ContainerBase<? extends Con
 	}
 
 	@Override
-	protected ResourceLocation getTexture()
+	protected ResourceLocation getTextureLocation()
 	{
 		return null;
 	}

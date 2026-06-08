@@ -20,10 +20,10 @@ public class RecipeResolver implements IRecipeResolver
 	{
 		List<RecipeTransformation> ret = new ArrayList<>();
 
-		for (Recipe<?> irecipe : IC2.sideProxy.getRecipeManager().m_44051_())
+		for (Recipe<?> irecipe : IC2.sideProxy.getRecipeManager().getRecipes())
 		{
-			NonNullList<Ingredient> inputs = irecipe.m_7527_();
-			ItemStack output = irecipe.m_8043_();
+			NonNullList<Ingredient> inputs = irecipe.getIngredients();
+			ItemStack output = irecipe.getResultItem();
 			if (!StackUtil.isEmpty(output) && !inputs.isEmpty())
 			{
 				ret.add(new RecipeTransformation(1.0, toDoubleStackList(inputs), new LeanItemStack(output)));
@@ -39,7 +39,7 @@ public class RecipeResolver implements IRecipeResolver
 
 		for (Ingredient ingredient : list)
 		{
-			ItemStack[] arr = ingredient.m_43908_();
+			ItemStack[] arr = ingredient.getItems();
 			List<LeanItemStack> toAdd = new ArrayList<>(arr.length);
 
 			for (ItemStack stack : arr)

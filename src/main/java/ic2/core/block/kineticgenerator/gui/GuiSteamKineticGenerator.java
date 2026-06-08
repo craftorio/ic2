@@ -83,7 +83,7 @@ public class GuiSteamKineticGenerator extends Ic2Gui<ContainerSteamKineticGenera
 	}
 
 	@Override
-	protected ResourceLocation getTexture()
+	protected ResourceLocation getTextureLocation()
 	{
 		return TEXTURE;
 	}

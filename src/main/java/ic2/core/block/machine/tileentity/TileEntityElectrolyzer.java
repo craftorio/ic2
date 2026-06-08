@@ -49,7 +49,7 @@ public class TileEntityElectrolyzer extends TileEntityElectricMachine implements
 		Recipes.electrolyzer = new ElectrolyzerRecipeManager();
 		Recipes.electrolyzer
 			.addRecipe(
-				net.minecraft.world.level.material.Fluids.f_76193_,
+				net.minecraft.world.level.material.Fluids.WATER,
 				40,
 				32,
 				new IElectrolyzerRecipeManager.ElectrolyzerOutput(Ic2Fluids.HYDROGEN.still, 26, Direction.DOWN),

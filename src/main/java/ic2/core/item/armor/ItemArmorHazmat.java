@@ -27,9 +27,9 @@ public class ItemArmorHazmat extends ItemArmorUtility implements IHazmatLike
 	{
 		for (EquipmentSlot slot : EquipmentSlot.values())
 		{
-			if (slot.m_20743_() == Type.ARMOR)
+			if (slot.getType() == Type.ARMOR)
 			{
-				ItemStack stack = living.m_6844_(slot);
+				ItemStack stack = living.getItemBySlot(slot);
 				if (stack == null || !(stack.getItem() instanceof IHazmatLike))
 				{
 					return false;
@@ -53,11 +53,11 @@ public class ItemArmorHazmat extends ItemArmorUtility implements IHazmatLike
 
 	public static boolean hazmatAbsorbs(DamageSource source)
 	{
-		return source == DamageSource.f_19305_
-			|| source == DamageSource.f_19310_
-			|| source == DamageSource.f_19308_
-			|| source == DamageSource.f_19309_
-			|| source == DamageSource.f_19307_
+		return source == DamageSource.IN_FIRE
+			|| source == DamageSource.IN_WALL
+			|| source == DamageSource.LAVA
+			|| source == DamageSource.HOT_FLOOR
+			|| source == DamageSource.ON_FIRE
 			|| source == Ic2DamageSource.electricity
 			|| source == Ic2DamageSource.radiation;
 	}
@@ -71,9 +71,9 @@ public class ItemArmorHazmat extends ItemArmorUtility implements IHazmatLike
 		} else
 		{
 			int armorDamage = (fallDamage + 1) / 2;
-			if (armorDamage > 0 && armorDamage <= stack.m_41776_() - stack.getDamageValue())
+			if (armorDamage > 0 && armorDamage <= stack.getMaxDamage() - stack.getDamageValue())
 			{
-				stack.m_41622_(armorDamage, entity, player -> player.m_21166_(this.f_40377_));
+				stack.hurtAndBreak(armorDamage, entity, player -> player.broadcastBreakEvent(this.slot));
 				return true;
 			} else
 			{

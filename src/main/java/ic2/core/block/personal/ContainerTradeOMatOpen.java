@@ -16,10 +16,10 @@ public class ContainerTradeOMatOpen extends ContainerFullInv<TileEntityTradeOMat
 	{
 		super(Ic2ScreenHandlers.TRADE_O_MAT_OPEN, syncId, playerInventory, be, 166);
 		this.canToggleInfinite = canToggleInfinite;
-		this.m_38897_(new SlotInvSlot(be.demandSlot, 0, 50, 19));
-		this.m_38897_(new SlotInvSlot(be.offerSlot, 0, 50, 53));
-		this.m_38897_(new SlotInvSlot(be.inputSlot, 0, 80, 19));
-		this.m_38897_(new SlotInvSlot(be.outputSlot, 0, 80, 53));
+		this.addSlot(new SlotInvSlot(be.demandSlot, 0, 50, 19));
+		this.addSlot(new SlotInvSlot(be.offerSlot, 0, 50, 53));
+		this.addSlot(new SlotInvSlot(be.inputSlot, 0, 80, 19));
+		this.addSlot(new SlotInvSlot(be.outputSlot, 0, 80, 53));
 	}
 
 	@Override

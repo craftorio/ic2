@@ -25,6 +25,6 @@ public class InvSlotConsumableTag extends InvSlotConsumable
 	@Override
 	public boolean accepts(ItemStack stack)
 	{
-		return StackUtil.isEmpty(stack) ? false : stack.m_204117_(this.tag);
+		return StackUtil.isEmpty(stack) ? false : stack.is(this.tag);
 	}
 }

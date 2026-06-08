@@ -183,9 +183,9 @@ public class TileEntityScanner extends TileEntityElectricMachine implements IHas
 		super.load(nbt);
 		this.progress = nbt.getInt("progress");
 		CompoundTag contentTag = nbt.getCompound("currentStack");
-		this.currentStack = ItemStack.m_41712_(contentTag);
+		this.currentStack = ItemStack.of(contentTag);
 		contentTag = nbt.getCompound("pattern");
-		this.pattern = ItemStack.m_41712_(contentTag);
+		this.pattern = ItemStack.of(contentTag);
 		int stateIdx = nbt.getInt("state");
 		this.state = stateIdx < TileEntityScanner.State.values().length ? TileEntityScanner.State.values()[stateIdx] : TileEntityScanner.State.IDLE;
 		this.refreshInfo();
@@ -199,14 +199,14 @@ public class TileEntityScanner extends TileEntityElectricMachine implements IHas
 		if (!StackUtil.isEmpty(this.currentStack))
 		{
 			CompoundTag contentTag = new CompoundTag();
-			this.currentStack.m_41739_(contentTag);
+			this.currentStack.save(contentTag);
 			nbt.put("currentStack", contentTag);
 		}
 
 		if (!StackUtil.isEmpty(this.pattern))
 		{
 			CompoundTag contentTag = new CompoundTag();
-			this.pattern.m_41739_(contentTag);
+			this.pattern.save(contentTag);
 			nbt.put("pattern", contentTag);
 		}
 

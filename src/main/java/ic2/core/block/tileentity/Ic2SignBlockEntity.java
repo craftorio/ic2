@@ -13,7 +13,7 @@ public class Ic2SignBlockEntity extends SignBlockEntity
 		super(pos, state);
 	}
 
-	public BlockEntityType<?> m_58903_()
+	public BlockEntityType<?> getType()
 	{
 		return Ic2BlockEntities.SIGN;
 	}

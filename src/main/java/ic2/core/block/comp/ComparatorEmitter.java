@@ -12,6 +12,6 @@ public class ComparatorEmitter extends BasicRedstoneComponent
 	@Override
 	public void onChange()
 	{
-		this.parent.getLevel().m_46717_(this.parent.getBlockPos(), this.parent.getBlockState().getBlock());
+		this.parent.getLevel().updateNeighbourForOutputSignal(this.parent.getBlockPos(), this.parent.getBlockState().getBlock());
 	}
 }

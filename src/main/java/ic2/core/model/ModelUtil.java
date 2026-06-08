@@ -17,26 +17,26 @@ public class ModelUtil
 
 	public static String getVariant(BlockState state)
 	{
-		return BlockModelShaper.m_110887_(state.m_61148_());
+		return BlockModelShaper.statePropertiesToString(state.getValues());
 	}
 
 	public static BakedModel getMissingModel()
 	{
-		return getModelManager().m_119409_();
+		return getModelManager().getMissingModel();
 	}
 
 	public static BakedModel getModel(ModelResourceLocation loc)
 	{
-		return getModelManager().m_119422_(loc);
+		return getModelManager().getModel(loc);
 	}
 
 	public static BakedModel getBlockModel(BlockState state)
 	{
-		return Minecraft.m_91087_().m_91289_().m_110907_().m_110893_(state);
+		return Minecraft.getInstance().getBlockRenderer().getBlockModelShaper().getBlockModel(state);
 	}
 
 	private static ModelManager getModelManager()
 	{
-		return Minecraft.m_91087_().m_91291_().m_115103_().m_109393_();
+		return Minecraft.getInstance().getItemRenderer().getItemModelShaper().getModelManager();
 	}
 }

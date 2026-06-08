@@ -1,25 +1,15 @@
 package ic2.api.entity.boat;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.List;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
-import net.minecraft.network.protocol.game.ServerboundPaddleBoatPacket;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.MoverType;
-import net.minecraft.world.entity.animal.WaterAnimal;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.entity.vehicle.Boat.Status;
 import net.minecraft.world.entity.vehicle.Boat.Type;
@@ -30,7 +20,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
 
 public abstract class AbstractBoatEntity extends Boat
 {
@@ -44,15 +33,15 @@ public abstract class AbstractBoatEntity extends Boat
 	public AbstractBoatEntity(EntityType<? extends AbstractBoatEntity> entityType, Level world, double x, double y, double z)
 	{
 		this(entityType, world);
-		this.m_6034_(x, y, z);
-		this.f_19854_ = x;
-		this.f_19855_ = y;
-		this.f_19856_ = z;
+		this.setPos(x, y, z);
+		this.xo = x;
+		this.yo = y;
+		this.zo = z;
 	}
 
-	public void m_38332_(Type type)
+	public void setType(Type type)
 	{
-		super.m_38332_(Type.OAK);
+		super.setType(Type.OAK);
 	}
 
 	public ItemStack getExtraDropItemStack()
@@ -69,19 +58,19 @@ public abstract class AbstractBoatEntity extends Boat
 
 	public boolean canFloatOn(FluidState fluidState)
 	{
-		return fluidState.m_205070_(FluidTags.f_13131_);
+		return fluidState.is(FluidTags.WATER);
 	}
 
-	protected SoundEvent m_38370_()
+	protected SoundEvent getPaddleSound()
 	{
 		switch (this.checkLocation())
 		{
 			case IN_WATER:
 			case UNDER_WATER:
 			case UNDER_FLOWING_WATER:
-				return SoundEvents.f_11707_;
+				return SoundEvents.BOAT_PADDLE_WATER;
 			case ON_LAND:
-				return SoundEvents.f_11706_;
+				return SoundEvents.BOAT_PADDLE_LAND;
 			default:
 				return null;
 		}
@@ -94,23 +83,23 @@ public abstract class AbstractBoatEntity extends Boat
 		try
 		{
 			Field waterLevelField = boatEntityClass.getDeclaredField("waterLevel");
-			Field nearbySlipperinessField = boatEntityClass.getDeclaredField("nearbySlipperiness");
+			Field landFrictionField = boatEntityClass.getDeclaredField("landFriction");
 			waterLevelField.setAccessible(true);
-			nearbySlipperinessField.setAccessible(true);
+			landFrictionField.setAccessible(true);
 			Status location = this.getUnderWaterLocation();
 			if (location != null)
 			{
-				waterLevelField.set(this, this.m_20191_().maxY);
+				waterLevelField.set(this, this.getBoundingBox().maxY);
 				return location;
 			} else if (this.checkBoatInWater())
 			{
 				return Status.IN_WATER;
 			} else
 			{
-				float f = this.m_38377_();
+				float f = this.getGroundFriction();
 				if (f > 0.0F)
 				{
-					nearbySlipperinessField.set(this, f);
+					landFrictionField.set(this, f);
 					return Status.ON_LAND;
 				} else
 				{
@@ -131,13 +120,13 @@ public abstract class AbstractBoatEntity extends Boat
 		{
 			Field waterLevelField = boatEntityClass.getDeclaredField("waterLevel");
 			waterLevelField.setAccessible(true);
-			AABB box = this.m_20191_();
-			int i = Mth.m_14107_(box.minX);
-			int j = Mth.m_14165_(box.maxX);
-			int k = Mth.m_14107_(box.minY);
-			int l = Mth.m_14165_(box.minY + 0.001);
-			int m = Mth.m_14107_(box.minZ);
-			int n = Mth.m_14165_(box.maxZ);
+			AABB box = this.getBoundingBox();
+			int i = Mth.floor(box.minX);
+			int j = Mth.ceil(box.maxX);
+			int k = Mth.floor(box.minY);
+			int l = Mth.ceil(box.minY + 0.001);
+			int m = Mth.floor(box.minZ);
+			int n = Mth.ceil(box.maxZ);
 			boolean bl = false;
 			waterLevelField.set(this, -Double.MAX_VALUE);
 			MutableBlockPos mutable = new MutableBlockPos();
@@ -149,10 +138,10 @@ public abstract class AbstractBoatEntity extends Boat
 					for (int q = m; q < n; q++)
 					{
 						mutable.set(o, p, q);
-						FluidState fluidState = this.f_19853_.m_6425_(mutable);
+						FluidState fluidState = this.level.getFluidState(mutable);
 						if (this.canFloatOn(fluidState))
 						{
-							float f = p + fluidState.m_76155_(this.f_19853_, mutable);
+							float f = p + fluidState.getHeight(this.level, mutable);
 							waterLevelField.set(this, Math.max(f, (Double) waterLevelField.get(this)));
 							bl |= box.minY < f;
 						}
@@ -169,14 +158,14 @@ public abstract class AbstractBoatEntity extends Boat
 
 	private Status getUnderWaterLocation()
 	{
-		AABB box = this.m_20191_();
+		AABB box = this.getBoundingBox();
 		double d = box.maxY + 0.001;
-		int i = Mth.m_14107_(box.minX);
-		int j = Mth.m_14165_(box.maxX);
-		int k = Mth.m_14107_(box.maxY);
-		int l = Mth.m_14165_(d);
-		int m = Mth.m_14107_(box.minZ);
-		int n = Mth.m_14165_(box.maxZ);
+		int i = Mth.floor(box.minX);
+		int j = Mth.ceil(box.maxX);
+		int k = Mth.floor(box.maxY);
+		int l = Mth.ceil(d);
+		int m = Mth.floor(box.minZ);
+		int n = Mth.ceil(box.maxZ);
 		boolean bl = false;
 		MutableBlockPos mutable = new MutableBlockPos();
 
@@ -187,10 +176,10 @@ public abstract class AbstractBoatEntity extends Boat
 				for (int q = m; q < n; q++)
 				{
 					mutable.set(o, p, q);
-					FluidState fluidState = this.f_19853_.m_6425_(mutable);
-					if (this.canFloatOn(fluidState) && d < mutable.getY() + fluidState.m_76155_(this.f_19853_, mutable))
+					FluidState fluidState = this.level.getFluidState(mutable);
+					if (this.canFloatOn(fluidState) && d < mutable.getY() + fluidState.getHeight(this.level, mutable))
 					{
-						if (!fluidState.m_76170_())
+						if (!fluidState.isSource())
 						{
 							return Status.UNDER_FLOWING_WATER;
 						}
@@ -204,21 +193,21 @@ public abstract class AbstractBoatEntity extends Boat
 		return bl ? Status.UNDER_WATER : null;
 	}
 
-	public float m_38371_()
+	public float getWaterLevelAbove()
 	{
 		Class<Boat> boatEntityClass = Boat.class;
 
 		try
 		{
-			Field fallVelocityField = boatEntityClass.getDeclaredField("fallVelocity");
-			fallVelocityField.setAccessible(true);
-			AABB box = this.m_20191_();
-			int i = Mth.m_14107_(box.minX);
-			int j = Mth.m_14165_(box.maxX);
-			int k = Mth.m_14107_(box.maxY);
-			int l = Mth.m_14165_(box.maxY - (Double) fallVelocityField.get(this));
-			int m = Mth.m_14107_(box.minZ);
-			int n = Mth.m_14165_(box.maxZ);
+			Field lastYdField = boatEntityClass.getDeclaredField("lastYd");
+			lastYdField.setAccessible(true);
+			AABB box = this.getBoundingBox();
+			int i = Mth.floor(box.minX);
+			int j = Mth.ceil(box.maxX);
+			int k = Mth.floor(box.maxY);
+			int l = Mth.ceil(box.maxY - (Double) lastYdField.get(this));
+			int m = Mth.floor(box.minZ);
+			int n = Mth.ceil(box.maxZ);
 			MutableBlockPos mutable = new MutableBlockPos();
 
 			label47:
@@ -231,10 +220,10 @@ public abstract class AbstractBoatEntity extends Boat
 					for (int q = m; q < n; q++)
 					{
 						mutable.set(p, o, q);
-						FluidState fluidState = this.f_19853_.m_6425_(mutable);
+						FluidState fluidState = this.level.getFluidState(mutable);
 						if (this.canFloatOn(fluidState))
 						{
-							f = Math.max(f, fluidState.m_76155_(this.f_19853_, mutable));
+							f = Math.max(f, fluidState.getHeight(this.level, mutable));
 						}
 
 						if (f >= 1.0F)
@@ -257,184 +246,43 @@ public abstract class AbstractBoatEntity extends Boat
 		}
 	}
 
-	private void invokePrivateMethod(Class<Boat> boatEntityClass, String methodName, Object... parameters)
+	public void tick()
 	{
-		try
-		{
-			Class<?>[] parameterTypes = new Class[parameters.length];
-
-			for (int i = 0; i < parameters.length; i++)
-			{
-				parameterTypes[i] = parameters[i].getClass();
-			}
-
-			Method method = boatEntityClass.getDeclaredMethod(methodName, parameterTypes);
-			method.setAccessible(true);
-			method.invoke(this, parameters);
-		} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e)
-		{
-			throw new RuntimeException(e);
-		}
+		super.tick();
 	}
 
-	public void m_8119_()
-	{
-		Class<Boat> boatEntityClass = Boat.class;
-
-		try
-		{
-			Field lastLocationField = boatEntityClass.getDeclaredField("lastLocation");
-			Field locationField = boatEntityClass.getDeclaredField("location");
-			Field ticksUnderwaterField = boatEntityClass.getDeclaredField("ticksUnderwater");
-			Field paddlePhasesField = boatEntityClass.getDeclaredField("paddlePhases");
-			lastLocationField.setAccessible(true);
-			locationField.setAccessible(true);
-			ticksUnderwaterField.setAccessible(true);
-			paddlePhasesField.setAccessible(true);
-			lastLocationField.set(this, locationField.get(this));
-			locationField.set(this, this.checkLocation());
-			Status location = (Status) locationField.get(this);
-			float newTicksUnderWater = (Float) ticksUnderwaterField.get(this) + 1.0F;
-			float[] paddlePhases = (float[]) paddlePhasesField.get(this);
-			ticksUnderwaterField.set(this, location != Status.UNDER_WATER && location != Status.UNDER_FLOWING_WATER ? 0.0F : newTicksUnderWater);
-			float ticksUnderWater = (Float) ticksUnderwaterField.get(this);
-			if (!this.f_19853_.isClientSide && ticksUnderWater >= 60.0F)
-			{
-				this.m_20153_();
-			}
-
-			if (this.m_38385_() > 0)
-			{
-				this.m_38354_(this.m_38385_() - 1);
-			}
-
-			if (this.m_38384_() > 0.0F)
-			{
-				this.m_38311_(this.m_38384_() - 1.0F);
-			}
-
-			this.m_6075_();
-			this.invokePrivateMethod(boatEntityClass, "updatePositionAndRotation");
-			if (this.m_6109_())
-			{
-				if (!(this.m_146895_() instanceof Player))
-				{
-					this.m_38339_(false, false);
-				}
-
-				this.invokePrivateMethod(boatEntityClass, "updateVelocity");
-				if (this.f_19853_.isClientSide)
-				{
-					this.invokePrivateMethod(boatEntityClass, "updatePaddles");
-					this.f_19853_.m_5503_(new ServerboundPaddleBoatPacket(this.m_38313_(0), this.m_38313_(1)));
-				}
-
-				this.m_6478_(MoverType.SELF, this.m_20184_());
-			} else
-			{
-				this.m_20256_(Vec3.f_82478_);
-			}
-
-			this.invokePrivateMethod(boatEntityClass, "handleBubbleColumn");
-
-			for (int i = 0; i <= 1; i++)
-			{
-				if (this.m_38313_(i))
-				{
-					SoundEvent soundEvent;
-					if (!this.m_20067_()
-						&& paddlePhases[i] % (float) (Math.PI * 2) <= (float) (Math.PI / 4)
-						&& (paddlePhases[i] + (float) (Math.PI / 8)) % (float) (Math.PI * 2) >= (float) (Math.PI / 4)
-						&& (soundEvent = this.m_38370_()) != null)
-					{
-						Vec3 vec3d = this.m_20252_(1.0F);
-						double d = i == 1 ? -vec3d.f_82481_ : vec3d.f_82481_;
-						double e = i == 1 ? vec3d.f_82479_ : -vec3d.f_82479_;
-						this.f_19853_
-							.m_6263_(
-								null,
-								this.getX() + d,
-								this.getY(),
-								this.getZ() + e,
-								soundEvent,
-								this.m_5720_(),
-								1.0F,
-								0.8F + 0.4F * this.f_19796_.nextFloat()
-							);
-					}
-
-					paddlePhases[i] += (float) (Math.PI / 8);
-				} else
-				{
-					paddlePhases[i] = 0.0F;
-				}
-			}
-
-			paddlePhasesField.set(this, paddlePhases);
-			this.m_20101_();
-			List<Entity> list = this.f_19853_.m_6249_(this, this.m_20191_().m_82377_(0.2F, -0.01F, 0.2F), EntitySelector.m_20421_(this));
-			if (!list.isEmpty())
-			{
-				boolean bl = !this.f_19853_.isClientSide && !(this.m_6688_() instanceof Player);
-
-				for (Entity entity : list)
-				{
-					if (!entity.m_20363_(this))
-					{
-						if (bl
-							&& this.m_20197_().size() < this.m_213801_()
-							&& !entity.m_20159_()
-							&& entity.m_20205_() < this.m_20205_()
-							&& entity instanceof LivingEntity
-							&& !(entity instanceof WaterAnimal)
-							&& !(entity instanceof Player))
-						{
-							entity.m_20329_(this);
-						} else
-						{
-							this.m_7334_(entity);
-						}
-					}
-				}
-			}
-		} catch (NoSuchFieldException | IllegalAccessException e)
-		{
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected void m_7840_(double heightDifference, boolean onGround, BlockState state, BlockPos landedPosition)
+	protected void checkFallDamage(double heightDifference, boolean onGround, BlockState state, BlockPos landedPosition)
 	{
 		if (onGround && this.brokenByFalling())
 		{
-			super.m_7840_(heightDifference, true, state, landedPosition);
+			super.checkFallDamage(heightDifference, true, state, landedPosition);
 		} else
 		{
 			if (!onGround)
 			{
-				super.m_7840_(heightDifference, false, state, landedPosition);
+				super.checkFallDamage(heightDifference, false, state, landedPosition);
 			}
 		}
 	}
 
-	public ItemEntity m_19998_(ItemLike item)
+	public ItemEntity spawnAtLocation(ItemLike item)
 	{
-		if (item == this.m_38387_().m_38434_())
+		if (item == this.getBoatType().getPlanks())
 		{
-			return this.m_19983_(new ItemStack(this.getOverrideBoatType().getBaseItem()));
-		} else if (item == Items.f_42398_ && !this.isExtraItemDropped)
+			return this.spawnAtLocation(new ItemStack(this.getOverrideBoatType().getBaseItem()));
+		} else if (item == Items.STICK && !this.isExtraItemDropped)
 		{
 			this.isExtraItemDropped = true;
-			return this.m_19983_(this.getExtraDropItemStack());
+			return this.spawnAtLocation(this.getExtraDropItemStack());
 		} else
 		{
-			return super.m_19998_(item);
+			return super.spawnAtLocation(item);
 		}
 	}
 
-	public void m_183634_()
+	public void resetFallDistance()
 	{
-		super.m_183634_();
+		super.resetFallDistance();
 		this.isExtraItemDropped = false;
 	}
 }

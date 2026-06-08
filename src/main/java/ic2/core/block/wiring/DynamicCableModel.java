@@ -42,7 +42,7 @@ public abstract class DynamicCableModel<T, E> implements UnbakedModel, BakedMode
 	private Map<DyeColor, TextureAtlasSprite> sprites;
 	private TextureAtlasSprite blackSprite;
 	private TextureAtlasSprite particleTexture;
-	private final Int2ObjectMap<T> cache = new Int2ObjectOpenHashMap();
+	private final Int2ObjectMap<T> cache = new Int2ObjectOpenHashMap<>();
 	private final StampedLock cacheLock = new StampedLock();
 
 	protected DynamicCableModel(CableType type, int insulation, CableFoam foam, boolean active)
@@ -53,12 +53,12 @@ public abstract class DynamicCableModel<T, E> implements UnbakedModel, BakedMode
 		this.active = active;
 	}
 
-	public Collection<ResourceLocation> m_7970_()
+	public Collection<ResourceLocation> getDependencies()
 	{
 		return Collections.emptyList();
 	}
 
-	public Collection<Material> m_5500_(Function<ResourceLocation, UnbakedModel> unbakedModelGetter, Set<Pair<String, String>> unresolvedTextureReferences)
+	public Collection<Material> getMaterials(Function<ResourceLocation, UnbakedModel> unbakedModelGetter, Set<Pair<String, String>> unresolvedTextureReferences)
 	{
 		if (this.insulation < this.type.minColoredInsulation)
 		{
@@ -85,7 +85,7 @@ public abstract class DynamicCableModel<T, E> implements UnbakedModel, BakedMode
 		if (insulation >= type.minColoredInsulation)
 		{
 			sb.append('_');
-			sb.append(color.m_7912_());
+			sb.append(color.getSerializedName());
 		}
 
 		if (active && (type == CableType.detector || type == CableType.splitter))
@@ -98,11 +98,11 @@ public abstract class DynamicCableModel<T, E> implements UnbakedModel, BakedMode
 
 	private static Material getTextureId(String path)
 	{
-		ResourceLocation atlas = TextureAtlas.f_118259_;
+		ResourceLocation atlas = TextureAtlas.LOCATION_BLOCKS;
 		return new Material(atlas, IC2.getIdentifier(path));
 	}
 
-	public BakedModel m_7611_(ModelBakery loader, Function<Material, TextureAtlasSprite> textureGetter, ModelState rotationContainer, ResourceLocation modelId)
+	public BakedModel bake(ModelBakery loader, Function<Material, TextureAtlasSprite> textureGetter, ModelState rotationContainer, ResourceLocation modelId)
 	{
 		this.blackSprite = textureGetter.apply(getTextureId(this.type, this.insulation, DyeColor.BLACK, this.active));
 		if (!this.foam.isPresent())
@@ -113,7 +113,7 @@ public abstract class DynamicCableModel<T, E> implements UnbakedModel, BakedMode
 			this.particleTexture = textureGetter.apply(getTextureId("blocks/cf/foam"));
 		} else
 		{
-			this.particleTexture = textureGetter.apply(getTextureId("blocks/cf/wall_".concat(this.foam.getColor().m_7912_())));
+			this.particleTexture = textureGetter.apply(getTextureId("blocks/cf/wall_".concat(this.foam.getColor().getSerializedName())));
 		}
 
 		if (this.insulation >= this.type.minColoredInsulation)
@@ -138,44 +138,44 @@ public abstract class DynamicCableModel<T, E> implements UnbakedModel, BakedMode
 		return this;
 	}
 
-	public List<BakedQuad> m_213637_(@Nullable BlockState state, @Nullable Direction side, RandomSource random)
+	public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, RandomSource random)
 	{
 		return Collections.emptyList();
 	}
 
-	public boolean m_7541_()
+	public boolean useAmbientOcclusion()
 	{
 		return true;
 	}
 
-	public boolean m_7539_()
+	public boolean isGui3d()
 	{
 		return true;
 	}
 
-	public boolean m_7547_()
+	public boolean usesBlockLight()
 	{
 		return true;
 	}
 
-	public boolean m_7521_()
+	public boolean isCustomRenderer()
 	{
 		return false;
 	}
 
-	public TextureAtlasSprite m_6160_()
+	public TextureAtlasSprite getParticleIcon()
 	{
 		return this.particleTexture;
 	}
 
-	public ItemTransforms m_7442_()
+	public ItemTransforms getTransforms()
 	{
-		return ItemTransforms.f_111786_;
+		return ItemTransforms.NO_TRANSFORMS;
 	}
 
-	public ItemOverrides m_7343_()
+	public ItemOverrides getOverrides()
 	{
-		return ItemOverrides.f_111734_;
+		return ItemOverrides.EMPTY;
 	}
 
 	protected T getMesh(BlockState state)
@@ -218,7 +218,7 @@ public abstract class DynamicCableModel<T, E> implements UnbakedModel, BakedMode
 				stamp = this.cacheLock.writeLock();
 			}
 
-			prev = (T) this.cache.putIfAbsent(key, var20);
+			prev = this.cache.putIfAbsent(key, (T) var20);
 			return (T) (prev != null ? prev : var20);
 		} finally
 		{
@@ -281,7 +281,7 @@ public abstract class DynamicCableModel<T, E> implements UnbakedModel, BakedMode
 
 					for (Direction side : Util.ALL_DIRS)
 					{
-						if (side.m_122434_() != facing.m_122434_())
+						if (side.getAxis() != facing.getAxis())
 						{
 							this.emitQuad(emitter, side, xS, yS, zS, xE, yE, zE, sprite);
 						}

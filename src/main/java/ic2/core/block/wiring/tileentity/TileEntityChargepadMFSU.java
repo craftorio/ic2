@@ -18,7 +18,7 @@ public class TileEntityChargepadMFSU extends TileEntityChargepadBlock
 	@Override
 	protected void getItems(Player player)
 	{
-		for (ItemStack current : player.getInventory().f_35975_)
+		for (ItemStack current : player.getInventory().armor)
 		{
 			if (current != null)
 			{
@@ -26,7 +26,7 @@ public class TileEntityChargepadMFSU extends TileEntityChargepadBlock
 			}
 		}
 
-		for (ItemStack current : player.getInventory().f_35974_)
+		for (ItemStack current : player.getInventory().items)
 		{
 			if (current != null)
 			{

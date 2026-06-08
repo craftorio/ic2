@@ -50,7 +50,7 @@ public class EventHandlerClient
 		{
 			SideProxyClient.envProxy
 				.registerModelPredicateProvider(
-					IC2.getIdentifier(direction.m_122433_()),
+					IC2.getIdentifier(direction.getName()),
 					(stack, world, entity, seed) -> stack.getItem() instanceof ItemUpgradeModule && ItemUpgradeModule.getDirection(stack) == direction
 						? 1.0F
 						: 0.0F
@@ -73,10 +73,10 @@ public class EventHandlerClient
 					} else
 					{
 						ItemStack mainHandItem;
-						boolean open = player.f_36096_ instanceof ContainerToolbox
+						boolean open = player.containerMenu instanceof ContainerToolbox
 							&& (
-							StackUtil.checkItemEquality(mainHandItem = player.m_21205_(), stack)
-								|| StackUtil.checkItemEquality(player.m_21206_(), stack)
+							StackUtil.checkItemEquality(mainHandItem = player.getMainHandItem(), stack)
+								|| StackUtil.checkItemEquality(player.getOffhandItem(), stack)
 								&& (mainHandItem == null || !(mainHandItem.getItem() instanceof IHandHeldInventory))
 						);
 						return open ? 1.0F : 0.0F;
@@ -100,7 +100,7 @@ public class EventHandlerClient
 	public static float onSetupFogDensity(BlockState state)
 	{
 		Fluid fluid = FluidHandler.getWorldFluid(state);
-		if (fluid != null && "ic2".equals(Registry.f_122822_.getKey(fluid).m_135827_()))
+		if (fluid != null && "ic2".equals(Registry.FLUID.getKey(fluid).getNamespace()))
 		{
 			int density = FluidHandler.getDensity(fluid);
 			return (float) Util.map(Math.abs(density), 20000.0, 2.0);
@@ -113,12 +113,12 @@ public class EventHandlerClient
 	public static int onRenderFogColor(BlockState state)
 	{
 		Fluid fluid = FluidHandler.getWorldFluid(state);
-		return fluid != null && "ic2".equals(Registry.f_122822_.getKey(fluid).m_135827_()) ? FluidHandler.getColor(fluid) : -1;
+		return fluid != null && "ic2".equals(Registry.FLUID.getKey(fluid).getNamespace()) ? FluidHandler.getColor(fluid) : -1;
 	}
 
 	public static void onDrawBlockHighlight(Player player, BlockHitResult target, float partialTicks, PoseStack matrix, MultiBufferSource buffers)
 	{
-		assert target.m_6662_() == Type.BLOCK;
+		assert target.getType() == Type.BLOCK;
 		ItemStack inHand = StackUtil.get(player, InteractionHand.MAIN_HAND);
 		if (inHand.getItem() instanceof IEnhancedOverlayProvider)
 		{
@@ -127,10 +127,10 @@ public class EventHandlerClient
 
 	public static boolean onDrawBlockHighlightLast(Player player, BlockHitResult target, float partialTicks, PoseStack matrix, MultiBufferSource buffers)
 	{
-		assert target.m_6662_() == Type.BLOCK;
+		assert target.getType() == Type.BLOCK;
 		Level world = player.getCommandSenderWorld();
-		BlockPos pos = target.m_82425_();
-		if (!world.m_6857_().m_61937_(pos))
+		BlockPos pos = target.getBlockPos();
+		if (!world.getWorldBorder().isWithinBounds(pos))
 		{
 			return false;
 		}

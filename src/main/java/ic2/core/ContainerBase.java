@@ -34,14 +34,14 @@ public abstract class ContainerBase<T extends Container> extends AbstractContain
 	protected static final int slotSeparator = 4;
 	protected static final int hotbarYOffset = -24;
 	protected static final int inventoryYOffset = -82;
-	private static final Field field_Container_listeners = ReflectionUtil.getField(AbstractContainerMenu.class, "listeners", "field_7765", "f_38848_");
+	private static final Field field_Container_listeners = ReflectionUtil.getField(AbstractContainerMenu.class, "listeners", "field_7765", "containerListeners");
 	protected final Player player;
 	public final T base;
 
 	public ContainerBase(MenuType<?> type, int syncId, Inventory playerInventory, T base)
 	{
 		super(type, syncId);
-		this.player = playerInventory.f_35978_;
+		this.player = playerInventory.player;
 		this.base = base;
 	}
 
@@ -58,37 +58,37 @@ public abstract class ContainerBase<T extends Container> extends AbstractContain
 		{
 			for (int col = 0; col < 9; col++)
 			{
-				this.m_38897_(new Slot(playerInventory, col + row * 9 + 9, xStart + col * 18, height + -82 + row * 18));
+				this.addSlot(new Slot(playerInventory, col + row * 9 + 9, xStart + col * 18, height + -82 + row * 18));
 			}
 		}
 
 		for (int col = 0; col < 9; col++)
 		{
-			this.m_38897_(new Slot(playerInventory, col, xStart + col * 18, height + -24));
+			this.addSlot(new Slot(playerInventory, col, xStart + col * 18, height + -24));
 		}
 	}
 
-	public void m_150399_(int slotIndex, int button, ClickType clickType, Player player)
+	public void clicked(int slotIndex, int button, ClickType clickType, Player player)
 	{
 		Slot slot;
-		if (slotIndex >= 0 && slotIndex < this.f_38839_.size() && (slot = (Slot) this.f_38839_.get(slotIndex)) instanceof SlotHologramSlot)
+		if (slotIndex >= 0 && slotIndex < this.slots.size() && (slot = (Slot) this.slots.get(slotIndex)) instanceof SlotHologramSlot)
 		{
 			((SlotHologramSlot) slot).slotClick(button, clickType, player, this);
 		} else
 		{
-			super.m_150399_(slotIndex, button, clickType, player);
+			super.clicked(slotIndex, button, clickType, player);
 		}
 	}
 
-	public final ItemStack m_7648_(Player player, int sourceSlotIndex)
+	public final ItemStack quickMoveStack(Player player, int sourceSlotIndex)
 	{
-		Slot sourceSlot = (Slot) this.f_38839_.get(sourceSlotIndex);
-		if (sourceSlot != null && sourceSlot.m_6657_())
+		Slot sourceSlot = (Slot) this.slots.get(sourceSlotIndex);
+		if (sourceSlot != null && sourceSlot.hasItem())
 		{
-			ItemStack sourceItemStack = sourceSlot.m_7993_();
+			ItemStack sourceItemStack = sourceSlot.getItem();
 			int oldSourceItemStackSize = StackUtil.getSize(sourceItemStack);
 			ItemStack resultStack;
-			if (sourceSlot.f_40218_ == player.getInventory())
+			if (sourceSlot.container == player.getInventory())
 			{
 				resultStack = this.handlePlayerSlotShiftClick(player, sourceItemStack);
 			} else
@@ -98,15 +98,15 @@ public abstract class ContainerBase<T extends Container> extends AbstractContain
 
 			if (StackUtil.isEmpty(resultStack) || StackUtil.getSize(resultStack) != oldSourceItemStackSize)
 			{
-				sourceSlot.m_5852_(resultStack);
+				sourceSlot.set(resultStack);
 				if (!(sourceSlot instanceof ResultSlot))
 				{
-					sourceSlot.m_142406_(player, sourceItemStack);
+					sourceSlot.onTake(player, sourceItemStack);
 				}
 
 				if (!player.getCommandSenderWorld().isClientSide)
 				{
-					this.m_38946_();
+					this.broadcastChanges();
 				}
 			}
 		}
@@ -118,9 +118,9 @@ public abstract class ContainerBase<T extends Container> extends AbstractContain
 	{
 		for (int run = 0; run < 4 && !StackUtil.isEmpty(sourceItemStack); run++)
 		{
-			for (Slot targetSlot : this.f_38839_)
+			for (Slot targetSlot : this.slots)
 			{
-				if (targetSlot.f_40218_ != player.getInventory() && isValidTargetSlot(targetSlot, sourceItemStack, run % 2 == 1, run < 2))
+				if (targetSlot.container != player.getInventory() && isValidTargetSlot(targetSlot, sourceItemStack, run % 2 == 1, run < 2))
 				{
 					sourceItemStack = this.transfer(sourceItemStack, targetSlot);
 					if (!StackUtil.isEmpty(sourceItemStack))
@@ -139,12 +139,12 @@ public abstract class ContainerBase<T extends Container> extends AbstractContain
 	{
 		for (int run = 0; run < 2 && !StackUtil.isEmpty(sourceItemStack); run++)
 		{
-			ListIterator<Slot> it = this.f_38839_.listIterator(this.f_38839_.size());
+			ListIterator<Slot> it = this.slots.listIterator(this.slots.size());
 
 			while (it.hasPrevious())
 			{
 				Slot targetSlot = it.previous();
-				if (targetSlot.f_40218_ == player.getInventory() && isValidTargetSlot(targetSlot, sourceItemStack, run == 1, false))
+				if (targetSlot.container == player.getInventory() && isValidTargetSlot(targetSlot, sourceItemStack, run == 1, false))
 				{
 					sourceItemStack = this.transfer(sourceItemStack, targetSlot);
 					if (!StackUtil.isEmpty(sourceItemStack))
@@ -164,10 +164,10 @@ public abstract class ContainerBase<T extends Container> extends AbstractContain
 		if (slot instanceof SlotInvSlotReadOnly || slot instanceof SlotHologramSlot)
 		{
 			return false;
-		} else if (!slot.m_5857_(stack))
+		} else if (!slot.mayPlace(stack))
 		{
 			return false;
-		} else if (!allowEmpty && !slot.m_6657_())
+		} else if (!allowEmpty && !slot.hasItem())
 		{
 			return false;
 		} else
@@ -176,14 +176,14 @@ public abstract class ContainerBase<T extends Container> extends AbstractContain
 		}
 	}
 
-	public boolean m_6875_(Player entityplayer)
+	public boolean stillValid(Player entityplayer)
 	{
 		return this.base.stillValid(entityplayer);
 	}
 
-	public void m_38946_()
+	public void broadcastChanges()
 	{
-		super.m_38946_();
+		super.broadcastChanges();
 		if (this.base instanceof BlockEntity)
 		{
 			for (String name : this.getNetworkedFields())
@@ -240,13 +240,13 @@ public abstract class ContainerBase<T extends Container> extends AbstractContain
 			return stack;
 		}
 
-		ItemStack dstStack = dst.m_7993_();
+		ItemStack dstStack = dst.getItem();
 		if (StackUtil.isEmpty(dstStack))
 		{
-			dst.m_5852_(StackUtil.copyWithSize(stack, amount));
+			dst.set(StackUtil.copyWithSize(stack, amount));
 		} else
 		{
-			dst.m_5852_(StackUtil.incSize(dstStack, amount));
+			dst.set(StackUtil.incSize(dstStack, amount));
 		}
 
 		return StackUtil.decSize(stack, amount);
@@ -254,9 +254,9 @@ public abstract class ContainerBase<T extends Container> extends AbstractContain
 
 	private int getTransferAmount(ItemStack stack, Slot dst)
 	{
-		int amount = Math.min(dst.f_40218_.getMaxStackSize(), dst.m_6641_());
-		amount = Math.min(amount, stack.m_41753_() ? stack.getMaxStackSize() : 1);
-		ItemStack dstStack = dst.m_7993_();
+		int amount = Math.min(dst.container.getMaxStackSize(), dst.getMaxStackSize());
+		amount = Math.min(amount, stack.isStackable() ? stack.getMaxStackSize() : 1);
+		ItemStack dstStack = dst.getItem();
 		if (!StackUtil.isEmpty(dstStack))
 		{
 			if (!StackUtil.checkItemEqualityStrict(stack, dstStack))

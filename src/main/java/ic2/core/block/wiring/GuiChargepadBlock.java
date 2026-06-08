@@ -56,7 +56,7 @@ public class GuiChargepadBlock extends Ic2Gui<ContainerChargepadBlock>
 	}
 
 	@Override
-	protected ResourceLocation getTexture()
+	protected ResourceLocation getTextureLocation()
 	{
 		return background;
 	}

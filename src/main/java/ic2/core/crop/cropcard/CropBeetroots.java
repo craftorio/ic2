@@ -36,12 +36,12 @@ public class CropBeetroots extends CropVanilla
 	@Override
 	public ItemStack getProduct()
 	{
-		return new ItemStack(Items.f_42732_, 1);
+		return new ItemStack(Items.BEETROOT, 1);
 	}
 
 	@Override
 	public ItemStack getSeeds()
 	{
-		return new ItemStack(Items.f_42733_);
+		return new ItemStack(Items.BEETROOT_SEEDS);
 	}
 }

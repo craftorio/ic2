@@ -32,12 +32,12 @@ public class ContainerBatchCrafter extends ContainerElectricMachine<TileEntityBa
 		{
 			for (int x = 0; x < 3; x++)
 			{
-				this.m_38897_(new SlotHologramSlot(tileEntity.craftingGrid, x + y * 3, 30 + x * 18, 17 + y * 18, 1, new SlotHologramSlot.ChangeCallback()
+				this.addSlot(new SlotHologramSlot(tileEntity.craftingGrid, x + y * 3, 30 + x * 18, 17 + y * 18, 1, new SlotHologramSlot.ChangeCallback()
 				{
 					@Override
 					public void onChanged(int index)
 					{
-						if (ContainerBatchCrafter.this.base.m_58898_() && !ContainerBatchCrafter.this.base.getLevel().isClientSide)
+						if (ContainerBatchCrafter.this.base.hasLevel() && !ContainerBatchCrafter.this.base.getLevel().isClientSide)
 						{
 							ContainerBatchCrafter.this.base.matrixChange(index);
 						}
@@ -46,17 +46,17 @@ public class ContainerBatchCrafter extends ContainerElectricMachine<TileEntityBa
 			}
 		}
 
-		this.m_38897_(new SlotInvSlot(tileEntity.craftingOutput, 0, 124, 35));
+		this.addSlot(new SlotInvSlot(tileEntity.craftingOutput, 0, 124, 35));
 
 		for (int slot = 0; slot < 9; slot++)
 		{
-			this.indexToSlot.put(slot, this.m_38897_(new SlotInvSlot(tileEntity.ingredientsRow[slot], 0, 8 + slot * 18, 84)).f_40219_);
-			this.m_38897_(new SlotInvSlot(tileEntity.containerOutput, slot, 8 + slot * 18, 102));
+			this.indexToSlot.put(slot, this.addSlot(new SlotInvSlot(tileEntity.ingredientsRow[slot], 0, 8 + slot * 18, 84)).index);
+			this.addSlot(new SlotInvSlot(tileEntity.containerOutput, slot, 8 + slot * 18, 102));
 		}
 
 		for (int slot = 0; slot < 4; slot++)
 		{
-			this.m_38897_(new SlotInvSlot(tileEntity.upgradeSlot, slot, 152, 8 + slot * 18));
+			this.addSlot(new SlotInvSlot(tileEntity.upgradeSlot, slot, 152, 8 + slot * 18));
 		}
 	}
 
@@ -71,7 +71,7 @@ public class ContainerBatchCrafter extends ContainerElectricMachine<TileEntityBa
 		while (iter.hasNext())
 		{
 			int currentSlot = iter.nextInt();
-			((Slot) this.f_38839_.get(this.indexToSlot.get(currentSlot))).m_6654_();
+			((Slot) this.slots.get(this.indexToSlot.get(currentSlot))).setChanged();
 		}
 
 		return changes.a.isEmpty() ? StackUtil.emptyStack : changes.a.get(0);

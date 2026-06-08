@@ -62,13 +62,13 @@ public final class Ic2ItemTags
 
 	private static TagKey<Item> create(String name)
 	{
-		return TagKey.m_203882_(Registry.f_122904_, IC2.getIdentifier(name));
+		return TagKey.create(Registry.ITEM_REGISTRY, IC2.getIdentifier(name));
 	}
 
 	private static TagKey<Item> create(String fabricName, String forgeName)
 	{
-		ResourceLocation id = ResourceLocation.fromNamespaceAndPath(IC2.envProxy.isFabricEnv() ? fabricName : forgeName);
-		return TagKey.m_203882_(Registry.f_122904_, id);
+		ResourceLocation id = ResourceLocation.parse(IC2.envProxy.isFabricEnv() ? fabricName : forgeName);
+		return TagKey.create(Registry.ITEM_REGISTRY, id);
 	}
 
 	private static TagKey<Item> createResource(String material, String form)

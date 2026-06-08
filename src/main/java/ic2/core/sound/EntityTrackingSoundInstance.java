@@ -16,16 +16,16 @@ public class EntityTrackingSoundInstance extends EntityBoundSoundInstance implem
 
 	public EntityTrackingSoundInstance(SoundEvent sound, SoundSource category, float volume, float pitch, Entity entity)
 	{
-		super(sound, category, volume, pitch, entity, IC2.random.m_188505_());
-		this.vanillaManager = Minecraft.m_91087_().m_91106_();
-		this.f_119578_ = true;
+		super(sound, category, volume, pitch, entity, IC2.random.nextLong());
+		this.vanillaManager = Minecraft.getInstance().getSoundManager();
+		this.looping = true;
 		this.entity = entity;
 		this.soundEvent = sound;
 	}
 
 	public void playOnce()
 	{
-		this.entity.m_5496_(this.soundEvent, this.f_119573_, this.f_119574_);
+		this.entity.playSound(this.soundEvent, this.volume, this.pitch);
 	}
 
 	@Override

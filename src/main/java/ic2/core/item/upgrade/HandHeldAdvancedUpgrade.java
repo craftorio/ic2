@@ -40,11 +40,11 @@ public class HandHeldAdvancedUpgrade extends HandHeldInventory implements IHolog
 	private static ItemStack checkContainerStack(Player player, ItemStack containerStack)
 	{
 		if (!player.getCommandSenderWorld().isClientSide
-			&& player.f_36096_ instanceof ContainerHandHeldInventory
-			&& ((ContainerHandHeldInventory) player.f_36096_).base instanceof HandHeldUpgradeOption)
+			&& player.containerMenu instanceof ContainerHandHeldInventory
+			&& ((ContainerHandHeldInventory) player.containerMenu).base instanceof HandHeldUpgradeOption)
 		{
 			addMaintainedPlayer(player);
-			return ((HandHeldInventory) ((ContainerHandHeldInventory) player.f_36096_).base).getContainerStack();
+			return ((HandHeldInventory) ((ContainerHandHeldInventory) player.containerMenu).base).getContainerStack();
 		} else
 		{
 			return containerStack;

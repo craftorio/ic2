@@ -46,14 +46,14 @@ public class TileEntityWall extends Ic2TileEntity
 	public void load(CompoundTag nbt)
 	{
 		super.load(nbt);
-		this.color = DyeColor.m_41053_(nbt.getByte("color"));
+		this.color = DyeColor.byId(nbt.getByte("color"));
 	}
 
 	@Override
 	public void saveAdditional(CompoundTag nbt)
 	{
 		super.saveAdditional(nbt);
-		nbt.putByte("color", (byte) this.color.m_41060_());
+		nbt.putByte("color", (byte) this.color.getId());
 	}
 
 	@Override

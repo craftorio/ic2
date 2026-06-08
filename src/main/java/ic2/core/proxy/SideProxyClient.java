@@ -74,11 +74,8 @@ import java.io.File;
 import java.util.Objects;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.color.block.BlockColor;
-import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.SignRenderer;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -86,18 +83,15 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeManager;
-import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.state.BlockState;
 
 public final class SideProxyClient implements SideProxy
 {
 	public static final ClientEnvProxy envProxy = getEnvProxy();
-	public static final Minecraft mc = Minecraft.m_91087_();
+	public static final Minecraft mc = Minecraft.getInstance();
 	private static final SoundManager soundManager = new SoundManagerClient();
 	private static final Keyboard keyboard = new KeyboardClient();
 
@@ -158,77 +152,65 @@ public final class SideProxyClient implements SideProxy
 		envProxy.registerScreen(Ic2ScreenHandlers.TOOL_BOX, GuiToolbox::new);
 		envProxy.registerScreen(Ic2ScreenHandlers.METER, GuiToolMeter::new);
 		envProxy.registerScreen(Ic2ScreenHandlers.SOLAR_GENERATOR, GuiSolarGenerator::new);
-		envProxy.registerColorProvider(new BlockColor()
-		{
-			public int m_92566_(BlockState state, BlockAndTintGetter world, BlockPos post, int tintIndex)
-			{
-				return 6723908;
-			}
-		}, Ic2Blocks.RUBBER_LEAVES);
-		envProxy.registerColorProvider(new ItemColor()
-		{
-			public int m_92671_(ItemStack var1, int var2)
-			{
-				return 6723908;
-			}
-		}, Ic2Items.RUBBER_LEAVES);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.RUBBER_SAPLING);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.WOODEN_SCAFFOLD, Ic2Blocks.IRON_SCAFFOLD);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.FOAM);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.REINFORCED_GLASS);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.REINFORCED_DOOR);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.COPPER_CABLE);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.INSULATED_COPPER_CABLE);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.TIN_CABLE);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.INSULATED_TIN_CABLE);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.IRON_CABLE);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.INSULATED_IRON_CABLE);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.DOUBLE_INSULATED_IRON_CABLE);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.TRIPLE_INSULATED_IRON_CABLE);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.GOLD_CABLE);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.INSULATED_GOLD_CABLE);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.DOUBLE_INSULATED_GOLD_CABLE);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.GLASS_FIBRE_CABLE);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.DETECTOR_CABLE);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.SPLITTER_CABLE);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.CROP_STICK);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.WEED_CROP);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.WHEAT_CROP);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.CARROTS_CROP);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.POTATO_CROP);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.BEETROOTS_CROP);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.PUMPKIN_CROP);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.MELON_CROP);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.DANDELION_CROP);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.POPPY_CROP);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.BLACKTHORN_CROP);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.TULIP_CROP);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.CYAZINT_CROP);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.VENOMILIA_CROP);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.REED_CROP);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.STICKY_REED_CROP);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.COCOA_CROP);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.FLAX_CROP);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.RED_MUSHROOM_CROP);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.BROWN_MUSHROOM_CROP);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.NETHER_WART_CROP);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.TERRA_WART_CROP);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.OAK_SAPLING_CROP);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.SPRUCE_SAPLING_CROP);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.BIRCH_SAPLING_CROP);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.JUNGLE_SAPLING_CROP);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.ACACIA_SAPLING_CROP);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.DARK_OAK_SAPLING_CROP);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.FERRU_CROP);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.CYPRIUM_CROP);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.STAGNIUM_CROP);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.PLUMBISCUS_CROP);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.AURELIA_CROP);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.SHINING_CROP);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.RED_WHEAT_CROP);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.COFFEE_CROP);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.HOPS_CROP);
-		envProxy.registerBlockLayer(RenderType.m_110457_(), Ic2Blocks.EATING_PLANT_CROP);
+		envProxy.registerColorProvider((state, world, post, tintIndex) -> 6723908, Ic2Blocks.RUBBER_LEAVES);
+		envProxy.registerColorProvider((var1, var2) -> 6723908, Ic2Items.RUBBER_LEAVES);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.RUBBER_SAPLING);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.WOODEN_SCAFFOLD, Ic2Blocks.IRON_SCAFFOLD);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.FOAM);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.REINFORCED_GLASS);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.REINFORCED_DOOR);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.COPPER_CABLE);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.INSULATED_COPPER_CABLE);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.TIN_CABLE);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.INSULATED_TIN_CABLE);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.IRON_CABLE);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.INSULATED_IRON_CABLE);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.DOUBLE_INSULATED_IRON_CABLE);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.TRIPLE_INSULATED_IRON_CABLE);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.GOLD_CABLE);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.INSULATED_GOLD_CABLE);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.DOUBLE_INSULATED_GOLD_CABLE);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.GLASS_FIBRE_CABLE);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.DETECTOR_CABLE);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.SPLITTER_CABLE);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.CROP_STICK);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.WEED_CROP);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.WHEAT_CROP);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.CARROTS_CROP);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.POTATO_CROP);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.BEETROOTS_CROP);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.PUMPKIN_CROP);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.MELON_CROP);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.DANDELION_CROP);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.POPPY_CROP);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.BLACKTHORN_CROP);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.TULIP_CROP);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.CYAZINT_CROP);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.VENOMILIA_CROP);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.REED_CROP);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.STICKY_REED_CROP);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.COCOA_CROP);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.FLAX_CROP);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.RED_MUSHROOM_CROP);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.BROWN_MUSHROOM_CROP);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.NETHER_WART_CROP);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.TERRA_WART_CROP);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.OAK_SAPLING_CROP);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.SPRUCE_SAPLING_CROP);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.BIRCH_SAPLING_CROP);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.JUNGLE_SAPLING_CROP);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.ACACIA_SAPLING_CROP);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.DARK_OAK_SAPLING_CROP);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.FERRU_CROP);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.CYPRIUM_CROP);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.STAGNIUM_CROP);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.PLUMBISCUS_CROP);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.AURELIA_CROP);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.SHINING_CROP);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.RED_WHEAT_CROP);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.COFFEE_CROP);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.HOPS_CROP);
+		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.EATING_PLANT_CROP);
 		this.registerRotorProvider(Ic2BlockEntities.WIND_KINETIC_GENERATOR);
 		this.registerRotorProvider(Ic2BlockEntities.WATER_KINETIC_GENERATOR);
 		this.registerRotorProvider(Ic2BlockEntities.WIND_GENERATOR);
@@ -268,7 +250,7 @@ public final class SideProxyClient implements SideProxy
 	@Override
 	public boolean isRendering()
 	{
-		return Minecraft.m_91087_().m_18695_();
+		return Minecraft.getInstance().isSameThread();
 	}
 
 	@Override
@@ -276,7 +258,7 @@ public final class SideProxyClient implements SideProxy
 	{
 		if (simulating)
 		{
-			MinecraftServer server = mc.m_91092_();
+			MinecraftServer server = mc.getSingleplayerServer();
 			if (server == null)
 			{
 				throw new IllegalStateException("server unavailable");
@@ -309,7 +291,7 @@ public final class SideProxyClient implements SideProxy
 	@Override
 	public Player getPlayerInstance()
 	{
-		return mc.f_91074_;
+		return mc.player;
 	}
 
 	@Override
@@ -317,14 +299,14 @@ public final class SideProxyClient implements SideProxy
 	{
 		if (server == null)
 		{
-			Level ret = mc.f_91073_;
+			Level ret = mc.level;
 			if (ret != null && dimId.equals(Util.getDimId(ret)))
 			{
 				return ret;
 			}
 		} else
 		{
-			for (Level world : server.m_129785_())
+			for (Level world : server.getAllLevels())
 			{
 				if (dimId.equals(Util.getDimId(world)))
 				{
@@ -339,14 +321,14 @@ public final class SideProxyClient implements SideProxy
 	@Override
 	public Level getPlayerWorld()
 	{
-		return mc.f_91073_;
+		return mc.level;
 	}
 
 	@Override
 	public RecipeManager getRecipeManager()
 	{
-		MinecraftServer server = mc.m_91092_();
-		return server != null ? server.m_129894_() : Objects.requireNonNull(mc.m_91403_()).m_105141_();
+		MinecraftServer server = mc.getSingleplayerServer();
+		return server != null ? server.getRecipeManager() : Objects.requireNonNull(mc.getConnection()).getRecipeManager();
 	}
 
 	@Override
@@ -365,7 +347,7 @@ public final class SideProxyClient implements SideProxy
 	@Override
 	public void playSoundOnce(Entity entity, SoundEvent soundEvent, float volume, float pitch)
 	{
-		entity.m_5496_(soundEvent, volume, pitch);
+		entity.playSound(soundEvent, volume, pitch);
 	}
 
 	@Override
@@ -373,15 +355,15 @@ public final class SideProxyClient implements SideProxy
 	{
 		if (player == null)
 		{
-			player = mc.f_91074_;
+			player = mc.player;
 		}
 
 		if (args.length > 0)
 		{
-			player.m_5661_(Component.m_237110_(message, SideProxyServer.getMessageComponents(args)), false);
+			player.displayClientMessage(Component.translatable(message, (Object) SideProxyServer.getMessageComponents(args)), false);
 		} else
 		{
-			player.m_5661_(Component.m_237113_(message), false);
+			player.displayClientMessage(Component.literal(message), false);
 		}
 	}
 

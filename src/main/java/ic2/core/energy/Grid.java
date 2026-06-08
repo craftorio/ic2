@@ -682,6 +682,7 @@ class Grid
 			switch (node.nodeType)
 			{
 				case Source:
+				{
 					double current;
 					if (EnergyNetLocal.useLinearTransferModel)
 					{
@@ -702,7 +703,9 @@ class Grid
 						IC2.log.debug(LogCategory.EnergyNet, "%d %s %f EU, %f V, %f A.", this.uid, node, -node.getAmount(), node.getVoltage(), -current);
 					}
 					break;
+				}
 				case Sink:
+				{
 					double current;
 					if (EnergyNetLocal.useLinearTransferModel)
 					{
@@ -719,7 +722,9 @@ class Grid
 					{
 						IC2.log.debug(LogCategory.EnergyNet, "%d %s %f EU, %f V, %f A.", this.uid, node, node.getAmount(), node.getVoltage(), current);
 					}
+				}
 				case Conductor:
+					break;
 			}
 		}
 
@@ -873,9 +878,6 @@ class Grid
 			}
 		}
 
-		return;
-
-		throw new AssertionError();
 	}
 
 	private void optimize(StructureCache.Data data)

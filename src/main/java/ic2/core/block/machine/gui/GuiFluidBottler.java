@@ -19,21 +19,21 @@ public class GuiFluidBottler extends Ic2Gui<ContainerFluidBottler>
 	}
 
 	@Override
-	protected void m_7286_(PoseStack matrices, float delta, int mouseX, int mouseY)
+	protected void renderBg(PoseStack matrices, float delta, int mouseX, int mouseY)
 	{
-		super.m_7286_(matrices, delta, mouseX, mouseY);
+		super.renderBg(matrices, delta, mouseX, mouseY);
 		this.bindTexture();
 		int progressSize = Math.round(((ContainerFluidBottler) this.menu).base.getProgress() * 16.0F);
 		if (progressSize > 0)
 		{
-			this.drawTexturedRect(matrices, this.f_97735_ + 61, this.f_97736_ + 36, 198.0, 0.0, progressSize, 13.0);
-			this.drawTexturedRect(matrices, this.f_97735_ + 61, this.f_97736_ + 73, 198.0, 0.0, progressSize, 13.0);
-			this.drawTexturedRect(matrices, this.f_97735_ + 99, this.f_97736_ + 55, 198.0, 0.0, progressSize, 13.0);
+			this.drawTexturedRect(matrices, this.leftPos + 61, this.topPos + 36, 198.0, 0.0, progressSize, 13.0);
+			this.drawTexturedRect(matrices, this.leftPos + 61, this.topPos + 73, 198.0, 0.0, progressSize, 13.0);
+			this.drawTexturedRect(matrices, this.leftPos + 99, this.topPos + 55, 198.0, 0.0, progressSize, 13.0);
 		}
 	}
 
 	@Override
-	public ResourceLocation getTexture()
+	public ResourceLocation getTextureLocation()
 	{
 		return ResourceLocation.fromNamespaceAndPath("ic2", "textures/gui/guibottler.png");
 	}

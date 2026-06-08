@@ -24,10 +24,10 @@ public class Ic2BlockNbtProvider implements NbtProvider
 	public static final Ic2BlockNbtProvider BLOCK_NBT = new Ic2BlockNbtProvider();
 
 	@Nullable
-	public Tag m_142301_(LootContext context)
+	public Tag get(LootContext context)
 	{
-		BlockEntity blockEntity = (BlockEntity) context.m_78953_(LootContextParams.f_81462_);
-		BlockState state = (BlockState) context.m_78953_(LootContextParams.f_81461_);
+		BlockEntity blockEntity = context.getParamOrNull(LootContextParams.BLOCK_ENTITY);
+		BlockState state = context.getParamOrNull(LootContextParams.BLOCK_STATE);
 		if (state == null)
 		{
 			return null;
@@ -35,8 +35,8 @@ public class Ic2BlockNbtProvider implements NbtProvider
 
 		if (blockEntity instanceof Ic2TileEntity tileEntity)
 		{
-			ItemStack stack = tileEntity.adjustDrop(state.getBlock().m_5456_().m_7968_(), false);
-			if (stack.m_41782_())
+			ItemStack stack = tileEntity.adjustDrop(state.getBlock().asItem().getDefaultInstance(), false);
+			if (stack.hasTag())
 			{
 				return stack.getTag();
 			}
@@ -45,23 +45,23 @@ public class Ic2BlockNbtProvider implements NbtProvider
 		return null;
 	}
 
-	public Set<LootContextParam<?>> m_142677_()
+	public Set<LootContextParam<?>> getReferencedContextParams()
 	{
 		return ImmutableSet.of();
 	}
 
-	public LootNbtProviderType m_142624_()
+	public LootNbtProviderType getType()
 	{
 		return Ic2LootNbtProviderTypes.BLOCK_NBT;
 	}
 
 	public static class Serializer implements net.minecraft.world.level.storage.loot.Serializer<Ic2BlockNbtProvider>
 	{
-		public void toJson(JsonObject jsonObject, Ic2BlockNbtProvider ic2BlockNbtProvider, JsonSerializationContext jsonSerializationContext)
+		public void serialize(JsonObject jsonObject, Ic2BlockNbtProvider ic2BlockNbtProvider, JsonSerializationContext jsonSerializationContext)
 		{
 		}
 
-		public Ic2BlockNbtProvider fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext)
+		public Ic2BlockNbtProvider deserialize(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext)
 		{
 			return new Ic2BlockNbtProvider();
 		}

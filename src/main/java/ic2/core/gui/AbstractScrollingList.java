@@ -135,10 +135,10 @@ public abstract class AbstractScrollingList<T extends AbstractScrollingList<T, I
 		int bottom = GUIheight + this.y + this.height - 1;
 		int viewWidth = this.width - 7 - 1;
 		int viewHeight = this.height - 2;
-		Window window = SideProxyClient.mc.m_91268_();
-		int scale = (int) window.m_85449_();
+		Window window = SideProxyClient.mc.getWindow();
+		int scale = (int) window.getGuiScale();
 		GL11.glEnable(3089);
-		GL11.glScissor(left * scale, window.m_85444_() - bottom * scale, viewWidth * scale, viewHeight * scale);
+		GL11.glScissor(left * scale, window.getScreenHeight() - bottom * scale, viewWidth * scale, viewHeight * scale);
 	}
 
 	@Override

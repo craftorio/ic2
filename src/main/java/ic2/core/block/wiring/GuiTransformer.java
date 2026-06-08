@@ -61,7 +61,7 @@ public class GuiTransformer extends Ic2Gui<ContainerTransformer>
 	}
 
 	@Override
-	protected ResourceLocation getTexture()
+	protected ResourceLocation getTextureLocation()
 	{
 		return background;
 	}

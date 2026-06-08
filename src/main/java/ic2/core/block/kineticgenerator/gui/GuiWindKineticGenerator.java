@@ -107,7 +107,7 @@ public class GuiWindKineticGenerator extends Ic2Gui<ContainerWindKineticGenerato
 	}
 
 	@Override
-	protected ResourceLocation getTexture()
+	protected ResourceLocation getTextureLocation()
 	{
 		return background;
 	}

@@ -26,7 +26,7 @@ final class ItemFluidCapImpl implements ICapabilityProvider, IFluidHandlerItem, 
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> capability, Direction facing)
 	{
-		return capability == ForgeCapabilities.FLUID_HANDLER_ITEM ? LazyOptional.of(this) : LazyOptional.empty();
+		return capability == ForgeCapabilities.FLUID_HANDLER_ITEM ? (LazyOptional<T>) LazyOptional.of(this) : LazyOptional.empty();
 	}
 
 	@Override
@@ -69,7 +69,7 @@ final class ItemFluidCapImpl implements ICapabilityProvider, IFluidHandlerItem, 
 	@Override
 	public FluidStack drain(int amount, IFluidHandler.FluidAction action)
 	{
-		if (amount > 0 && this.stack.m_41613_() == 1)
+		if (amount > 0 && this.stack.getCount() == 1)
 		{
 			Ic2FluidItem parent = (Ic2FluidItem) this.stack.getItem();
 			return EnvFluidHandlerForge.getForgeFs(parent.drainMb(this.stack, amount, action.simulate(), this));
@@ -82,7 +82,7 @@ final class ItemFluidCapImpl implements ICapabilityProvider, IFluidHandlerItem, 
 	@Override
 	public FluidStack drain(FluidStack resource, IFluidHandler.FluidAction action)
 	{
-		if (resource != null && !resource.isEmpty() && this.stack.m_41613_() == 1)
+		if (resource != null && !resource.isEmpty() && this.stack.getCount() == 1)
 		{
 			Ic2FluidItem parent = (Ic2FluidItem) this.stack.getItem();
 			int amount = parent.drainMb(this.stack, new Ic2FluidStackImpl(resource), action.simulate(), this);
@@ -103,7 +103,7 @@ final class ItemFluidCapImpl implements ICapabilityProvider, IFluidHandlerItem, 
 	@Override
 	public int fill(FluidStack resource, IFluidHandler.FluidAction action)
 	{
-		if (resource != null && !resource.isEmpty() && this.stack.m_41613_() == 1)
+		if (resource != null && !resource.isEmpty() && this.stack.getCount() == 1)
 		{
 			Ic2FluidItem parent = (Ic2FluidItem) this.stack.getItem();
 			return parent.fillMb(this.stack, new Ic2FluidStackImpl(resource), action.simulate(), this);

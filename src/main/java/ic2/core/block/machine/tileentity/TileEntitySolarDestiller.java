@@ -52,10 +52,10 @@ public class TileEntitySolarDestiller extends TileEntityInventory implements IHa
 	public TileEntitySolarDestiller(BlockPos pos, BlockState state)
 	{
 		super(Ic2BlockEntities.SOLAR_DISTILLER, pos, state);
-		this.inputTank = this.fluids.addTankInsert("inputTank", 10000, Fluids.fluidPredicate(net.minecraft.world.level.material.Fluids.f_76193_));
+		this.inputTank = this.fluids.addTankInsert("inputTank", 10000, Fluids.fluidPredicate(net.minecraft.world.level.material.Fluids.WATER));
 		this.outputTank = this.fluids.addTankExtract("outputTank", 10000);
 		this.waterinputSlot = new InvSlotConsumableLiquidByList(
-			this, "waterInput", InvSlot.Access.I, 1, InvSlot.InvSide.TOP, InvSlotConsumableLiquid.OpType.Drain, net.minecraft.world.level.material.Fluids.f_76193_
+			this, "waterInput", InvSlot.Access.I, 1, InvSlot.InvSide.TOP, InvSlotConsumableLiquid.OpType.Drain, net.minecraft.world.level.material.Fluids.WATER
 		);
 		this.destiwaterinputSlot = new InvSlotConsumableLiquidByTank(
 			this, "destilledWaterInput", InvSlot.Access.I, 1, InvSlot.InvSide.BOTTOM, InvSlotConsumableLiquid.OpType.Fill, this.outputTank
@@ -96,7 +96,7 @@ public class TileEntitySolarDestiller extends TileEntityInventory implements IHa
 
 	public void updateSunVisibility()
 	{
-		this.skyLight = TileEntitySolarGenerator.getSkyLight(this.getLevel(), this.worldPosition.m_7494_());
+		this.skyLight = TileEntitySolarGenerator.getSkyLight(this.getLevel(), this.worldPosition.above());
 	}
 
 	@Override

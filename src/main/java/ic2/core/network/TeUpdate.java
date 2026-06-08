@@ -124,7 +124,7 @@ class TeUpdate
 				{
 					String id = ((String) Objects.requireNonNull(value)).split(":")[1];
 					ResourceLocation identifier = IC2.getIdentifier(id);
-					teData.teType = (Ic2TileEntityBlock) Registry.BLOCK.m_7745_(identifier);
+					teData.teType = (Ic2TileEntityBlock) Registry.BLOCK.get(identifier);
 				} else
 				{
 					teData.addField(fieldName, value);
@@ -210,7 +210,7 @@ class TeUpdate
 			if (te.teType != null)
 			{
 				out.append("    TE Type: ");
-				out.append(te.teType.m_49954_());
+				out.append(te.teType.getName());
 				out.append('\n');
 				if (te.teType.getTeClass() != null)
 				{
@@ -233,7 +233,7 @@ class TeUpdate
 
 	private static void apply(TeUpdateDataClient.TeData update, Level world)
 	{
-		if (!world.m_46805_(update.pos))
+		if (!world.hasChunkAt(update.pos))
 		{
 			if (debug)
 			{

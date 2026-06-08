@@ -44,6 +44,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public final class DataEncoder
 {
@@ -99,7 +100,7 @@ public final class DataEncoder
 						{
 							if (value instanceof Enum)
 							{
-								target = ((Enum) value).getDeclaringClass();
+								target = ((Enum<?>) value).getDeclaringClass();
 								isEnum = true;
 							} else if (value != null)
 							{
@@ -135,8 +136,6 @@ public final class DataEncoder
 
 									i++;
 								}
-
-								target = Object.class;
 								break;
 							} else
 							{
@@ -204,12 +203,12 @@ public final class DataEncoder
 			case ChunkPos:
 			{
 				ColumnPos pos = (ColumnPos) o;
-				os.writeInt(pos.f_140723_());
-				os.writeInt(pos.f_140724_());
+				os.writeInt(pos.x());
+				os.writeInt(pos.z());
 				break;
 			}
 			case Collection:
-				encode(os, ((Collection) o).toArray(), false);
+				encode(os, ((Collection<?>) o).toArray(), false);
 				break;
 			case Component:
 				CompoundTag nbt = ((TileEntityComponent) o).writeToNbt();
@@ -235,20 +234,20 @@ public final class DataEncoder
 				{
 					encode(os, output.fluid, false);
 					os.writeInt(output.fluidAmount);
-					os.writeByte(output.tankDirection.m_122411_());
+					os.writeByte(output.tankDirection.get3DDataValue());
 				}
 				break;
 			case Enchantment:
-				encode(os, Registry.f_122825_.getKey((Enchantment) o), false);
+				encode(os, ForgeRegistries.ENCHANTMENTS.getKey((Enchantment) o), false);
 				break;
 			case Enum:
-				os.writeVarInt(((Enum) o).ordinal());
+				os.writeVarInt(((Enum<?>) o).ordinal());
 				break;
 			case Float:
 				os.writeFloat((Float) o);
 				break;
 			case Fluid:
-				encode(os, Registry.f_122822_.getKey((Fluid) o), false);
+				encode(os, ForgeRegistries.FLUIDS.getKey((Fluid) o), false);
 				break;
 			case FluidStack:
 				Ic2FluidStack fs = (Ic2FluidStack) o;
@@ -299,7 +298,7 @@ public final class DataEncoder
 				os.writeLong((Long) o);
 				break;
 			case NBTTagCompound:
-				NbtIo.m_128941_((CompoundTag) o, os);
+				NbtIo.write((CompoundTag) o, os);
 				break;
 			case Null:
 				if (!withType)
@@ -310,12 +309,12 @@ public final class DataEncoder
 			case Object:
 				throw new IllegalArgumentException("unhandled class: " + o.getClass());
 			case Potion:
-				encode(os, Registry.f_122823_.getKey((MobEffect) o), false);
+				encode(os, ForgeRegistries.MOB_EFFECTS.getKey((MobEffect) o), false);
 				break;
 			case ResourceLocation:
 				ResourceLocation loc = (ResourceLocation) o;
-				os.writeString(loc.m_135827_());
-				os.writeString(loc.m_135815_());
+				os.writeString(loc.getNamespace());
+				os.writeString(loc.getPath());
 				break;
 			case Short:
 				os.writeShort((Short) o);
@@ -350,9 +349,9 @@ public final class DataEncoder
 				break;
 			case Vec3:
 				Vec3 v = (Vec3) o;
-				os.writeDouble(v.f_82479_);
-				os.writeDouble(v.f_82480_);
-				os.writeDouble(v.f_82481_);
+				os.writeDouble(v.x);
+				os.writeDouble(v.y);
+				os.writeDouble(v.z);
 				break;
 			case World:
 				encode(os, Util.getDimId((Level) o), false);
@@ -390,7 +389,7 @@ public final class DataEncoder
 	public static <T extends Enum<T>> T decodeEnum(IGrowingBuffer is, Class<T> clazz) throws IOException
 	{
 		int ordinal = (Integer) decode(is, DataEncoder.EncodedType.Enum);
-		T[] values = (T[]) clazz.getEnumConstants();
+		T[] values = clazz.getEnumConstants();
 		return ordinal >= 0 && ordinal < values.length ? values[ordinal] : null;
 	}
 
@@ -418,18 +417,14 @@ public final class DataEncoder
 						return ince.decode(is);
 					}
 
-					return new DataEncoder.IResolvableValue<Object>()
+					return (IResolvableValue<Object>) server ->
 					{
-						@Override
-						public Object get(MinecraftServer server)
+						try
 						{
-							try
-							{
-								return ince.decode(is);
-							} catch (IOException e)
-							{
-								throw new RuntimeException("Unexpected error", e);
-							}
+							return ince.decode(is);
+						} catch (IOException e)
+						{
+							throw new RuntimeException("Unexpected error", e);
 						}
 					};
 				}
@@ -466,7 +461,7 @@ public final class DataEncoder
 
 						for (int i = 0; i < len; i++)
 						{
-							Array.set(array, i, constants[decode(is, componentType)]);
+							Array.set(array, i, constants[(int) decode(is, componentType)]);
 						}
 					} else
 					{
@@ -501,20 +496,16 @@ public final class DataEncoder
 				}
 
 				final Object tmpArray = array;
-				return new DataEncoder.IResolvableValue<Object>()
+				return (IResolvableValue<Object>) server ->
 				{
-					@Override
-					public Object get(MinecraftServer server)
+					Object ret = Array.newInstance(componentClass, len);
+
+					for (int i = 0; i < len; i++)
 					{
-						Object ret = Array.newInstance(componentClass, len);
-
-						for (int i = 0; i < len; i++)
-						{
-							Array.set(ret, i, DataEncoder.getValue(Array.get(tmpArray, i), server));
-						}
-
-						return ret;
+						Array.set(ret, i, DataEncoder.getValue(Array.get(tmpArray, i), server));
 					}
+
+					return ret;
 				};
 			case Block:
 				return Util.getBlock((ResourceLocation) decode(is, DataEncoder.EncodedType.ResourceLocation));
@@ -533,13 +524,8 @@ public final class DataEncoder
 				final Object ret = decode(is, DataEncoder.EncodedType.Array);
 				if (ret instanceof DataEncoder.IResolvableValue)
 				{
-					return new DataEncoder.IResolvableValue<List<Object>>()
-					{
-						public List<Object> get(MinecraftServer server)
-						{
-							return Arrays.asList((Object[]) ((DataEncoder.IResolvableValue) ret).get(server));
-						}
-					};
+					return (IResolvableValue<List<Object>>) server ->
+						Arrays.asList((Object[]) ((IResolvableValue<?>) ret).get(server));
 				}
 
 				return Arrays.asList((Object[]) ret);
@@ -560,19 +546,19 @@ public final class DataEncoder
 				for (byte i = 0; i < max; i++)
 				{
 					outputs[i] = new IElectrolyzerRecipeManager.ElectrolyzerOutput(
-						(Fluid) decode(is, DataEncoder.EncodedType.Fluid), is.readInt(), Direction.m_122376_(is.readByte())
+						(Fluid) decode(is, DataEncoder.EncodedType.Fluid), is.readInt(), Direction.from3DDataValue(is.readByte())
 					);
 				}
 
 				return new IElectrolyzerRecipeManager.ElectrolyzerRecipe(inputAmount, EUaTick, ticksNeeded, outputs);
 			case Enchantment:
-				return Registry.f_122825_.m_7745_((ResourceLocation) decode(is, DataEncoder.EncodedType.ResourceLocation));
+				return ForgeRegistries.ENCHANTMENTS.getValue((ResourceLocation) decode(is, DataEncoder.EncodedType.ResourceLocation));
 			case Enum:
 				return is.readVarInt();
 			case Float:
 				return is.readFloat();
 			case Fluid:
-				return Registry.f_122822_.m_7745_((ResourceLocation) decode(is, DataEncoder.EncodedType.ResourceLocation));
+				return ForgeRegistries.FLUIDS.getValue((ResourceLocation) decode(is, DataEncoder.EncodedType.ResourceLocation));
 			case FluidStack:
 			{
 				Fluid fluid = (Fluid) decode(is, DataEncoder.EncodedType.Fluid);
@@ -616,19 +602,19 @@ public final class DataEncoder
 				Item item = decode(is, Item.class);
 				CompoundTag nbt = (CompoundTag) decode(is);
 				ItemStack ret = new ItemStack(item, size);
-				ret.m_41751_(nbt);
+				ret.setTag(nbt);
 				return ret;
 			}
 			case Long:
 				return is.readLong();
 			case NBTTagCompound:
-				return NbtIo.m_128934_(is, NbtAccounter.f_128917_);
+				return NbtIo.read(is, NbtAccounter.UNLIMITED);
 			case Null:
 				return null;
 			case Object:
 				return new Object();
 			case Potion:
-				return Registry.f_122823_.m_7745_((ResourceLocation) decode(is, DataEncoder.EncodedType.ResourceLocation));
+				return ForgeRegistries.MOB_EFFECTS.getValue((ResourceLocation) decode(is, DataEncoder.EncodedType.ResourceLocation));
 			case ResourceLocation:
 				return ResourceLocation.fromNamespaceAndPath(is.readString(), is.readString());
 			case Short:
@@ -638,13 +624,10 @@ public final class DataEncoder
 			case TileEntity:
 				final DataEncoder.IResolvableValue<Level> deferredWorld = (DataEncoder.IResolvableValue<Level>) decode(is, DataEncoder.EncodedType.World);
 				final BlockPos pos = (BlockPos) decode(is, DataEncoder.EncodedType.BlockPos);
-				return new DataEncoder.IResolvableValue<BlockEntity>()
+				return (IResolvableValue<BlockEntity>) server ->
 				{
-					public BlockEntity get(MinecraftServer server)
-					{
-						Level world = deferredWorld.get(server);
-						return world == null ? null : world.getBlockEntity(pos);
-					}
+					Level world = deferredWorld.get(server);
+					return world == null ? null : world.getBlockEntity(pos);
 				};
 			case TupleT2:
 				return new Tuple.T2<>(decode(is), decode(is));
@@ -656,13 +639,8 @@ public final class DataEncoder
 				return new Vec3(is.readDouble(), is.readDouble(), is.readDouble());
 			case World:
 				final ResourceLocation dimensionId = (ResourceLocation) decode(is, DataEncoder.EncodedType.ResourceLocation);
-				return new DataEncoder.IResolvableValue<Level>()
-				{
-					public Level get(MinecraftServer server)
-					{
-						return IC2.sideProxy.getWorld(server, dimensionId);
-					}
-				};
+				return (IResolvableValue<Level>) server ->
+					IC2.sideProxy.getWorld(server, dimensionId);
 			default:
 				throw new IllegalArgumentException("unhandled type: " + type);
 		}
@@ -680,14 +658,13 @@ public final class DataEncoder
 			return false;
 		}
 
-		if (dst instanceof ItemStack)
+		if (dst instanceof ItemStack dstT)
 		{
 			ItemStack srcT = (ItemStack) src;
-			ItemStack dstT = (ItemStack) dst;
 			if (srcT.getItem() == dstT.getItem())
 			{
-				dstT.m_41764_(srcT.m_41613_());
-				dstT.m_41751_(srcT.getTag());
+				dstT.setCount(srcT.getCount());
+				dstT.setTag(srcT.getTag());
 				return true;
 			} else
 			{
@@ -695,16 +672,14 @@ public final class DataEncoder
 			}
 		} else
 		{
-			if (dst instanceof Ic2FluidTank)
+			if (dst instanceof Ic2FluidTank dstT)
 			{
 				Ic2FluidTank srcT = (Ic2FluidTank) src;
-				Ic2FluidTank dstT = (Ic2FluidTank) dst;
 				dstT.setFluidStack(srcT.getFluidStack());
 				dstT.setCapacity(srcT.getCapacity());
-			} else if (dst instanceof InvSlot)
+			} else if (dst instanceof InvSlot dstT)
 			{
 				InvSlot srcT = (InvSlot) src;
-				InvSlot dstT = (InvSlot) dst;
 				if (srcT.size() != dstT.size())
 				{
 					throw new RuntimeException("Can't sync InvSlots with mismatched sizes.");

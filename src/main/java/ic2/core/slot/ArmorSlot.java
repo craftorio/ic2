@@ -34,7 +34,7 @@ public class ArmorSlot
 
 		for (EquipmentSlot slot : values)
 		{
-			if (slot.m_20743_() == Type.ARMOR)
+			if (slot.getType() == Type.ARMOR)
 			{
 				count++;
 			}
@@ -46,7 +46,7 @@ public class ArmorSlot
 		{
 			for (EquipmentSlot slot : values)
 			{
-				if (slot.m_20743_() == Type.ARMOR && slot.m_20749_() == i)
+				if (slot.getType() == Type.ARMOR && slot.getIndex() == i)
 				{
 					ret[i] = slot;
 					break;

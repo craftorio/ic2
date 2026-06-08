@@ -32,12 +32,12 @@ public class BeamRenderer extends EntityRenderer<ParticleEntity>
 		int green = 255;
 		int blue = 255;
 		int alpha = 255;
-		matrices.m_85836_();
-		matrices.m_85845_(this.f_114476_.m_114470_());
-		VertexConsumer vertexConsumer = vertexConsumers.m_6299_(RenderType.m_110467_(texture));
-		Pose entry = matrices.m_85850_();
-		Matrix4f positionMatrix = entry.m_85861_();
-		Matrix3f normalMatrix = entry.m_85864_();
+		matrices.pushPose();
+		matrices.mulPose(this.entityRenderDispatcher.cameraOrientation());
+		VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RenderType.itemEntityTranslucentCull(texture));
+		Pose entry = matrices.last();
+		Matrix4f positionMatrix = entry.pose();
+		Matrix3f normalMatrix = entry.normal();
 
 		for (int i = 0; i < 4; i++)
 		{
@@ -65,19 +65,19 @@ public class BeamRenderer extends EntityRenderer<ParticleEntity>
 				v = v1;
 			}
 
-			vertexConsumer.m_85982_(positionMatrix, x, y, 0.0F)
-				.m_6122_(red, green, blue, alpha)
-				.m_7421_(u, v)
-				.m_86008_(OverlayTexture.f_118083_)
-				.m_85969_(light)
-				.m_85977_(normalMatrix, 0.0F, 1.0F, 0.0F)
-				.m_5752_();
+			vertexConsumer.vertex(positionMatrix, x, y, 0.0F)
+				.color(red, green, blue, alpha)
+				.uv(u, v)
+				.overlayCoords(OverlayTexture.NO_OVERLAY)
+				.uv2(light)
+				.normal(normalMatrix, 0.0F, 1.0F, 0.0F)
+				.endVertex();
 		}
 
-		matrices.m_85849_();
+		matrices.popPose();
 	}
 
-	public ResourceLocation getTexture(ParticleEntity entity)
+	public ResourceLocation getTextureLocation(ParticleEntity entity)
 	{
 		return texture;
 	}

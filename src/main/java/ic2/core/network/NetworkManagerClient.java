@@ -40,6 +40,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class NetworkManagerClient extends NetworkManager
@@ -127,9 +129,9 @@ public class NetworkManagerClient extends NetworkManager
 				DataEncoder.encode(buffer, te, false);
 			} else
 			{
-				Player player = Minecraft.m_91087_().f_91074_;
-				if ((StackUtil.isEmpty(player.getInventory().m_36056_()) || !(player.getInventory().m_36056_().getItem() instanceof IHandHeldInventory))
-					&& (StackUtil.isEmpty(player.m_21206_()) || !(player.m_21206_().getItem() instanceof IHandHeldInventory)))
+				Player player = Minecraft.getInstance().player;
+				if ((StackUtil.isEmpty(player.getInventory().getSelected()) || !(player.getInventory().getSelected().getItem() instanceof IHandHeldInventory))
+					&& (StackUtil.isEmpty(player.getOffhandItem()) || !(player.getOffhandItem().getItem() instanceof IHandHeldInventory)))
 				{
 					IC2.sideProxy
 						.displayError(
@@ -154,14 +156,14 @@ public class NetworkManagerClient extends NetworkManager
 	@Override
 	public void onPacket(ByteBuf packet, Player player)
 	{
-		assert player == null || player.f_19853_.isClientSide;
+		assert player == null || player.level.isClientSide;
 
 		try
 		{
 			this.onPacketData(GrowingBuffer.wrap(packet), player);
 		} catch (Throwable t)
 		{
-			IC2.log.warn(LogCategory.Network, t, "Network read failed");
+			IC2.log.warn(LogCategory.Network, t, "Network fromJson failed");
 			throw new RuntimeException(t);
 		}
 	}
@@ -259,9 +261,9 @@ public class NetworkManagerClient extends NetworkManager
 									@Override
 									public void run()
 									{
-										Level world = Minecraft.m_91087_().f_91073_;
+										Level world = Minecraft.getInstance().level;
 
-										for (Player player : world.m_6907_())
+										for (Player player : world.players())
 										{
 											if (profile.getId() != null && profile.getId().equals(player.getGameProfile().getId())
 												|| profile.getId() == null && profile.getName().equals(player.getGameProfile().getName()))
@@ -295,41 +297,41 @@ public class NetworkManagerClient extends NetworkManager
 										{
 											case Normal:
 												world.playLocalSound(
-													pos.f_82479_,
-													pos.f_82480_,
-													pos.f_82481_,
-													SoundEvents.f_11913_,
+													pos.x,
+													pos.y,
+													pos.z,
+													SoundEvents.GENERIC_EXPLODE,
 													SoundSource.BLOCKS,
 													4.0F,
 													(1.0F + (world.random.nextFloat() - world.random.nextFloat()) * 0.2F) * 0.7F,
 													true
 												);
-												world.addParticle(ParticleTypes.f_123812_, pos.f_82479_, pos.f_82480_, pos.f_82481_, 0.0, 0.0, 0.0);
+												world.addParticle(ParticleTypes.EXPLOSION_EMITTER, pos.x, pos.y, pos.z, 0.0, 0.0, 0.0);
 												break;
 											case Electrical:
 												world.playLocalSound(
-													pos.f_82479_, pos.f_82480_, pos.f_82481_, Ic2SoundEvents.MACHINE_OVERLOAD, SoundSource.BLOCKS, 1.0F, 1.0F, true
+													pos.x, pos.y, pos.z, Ic2SoundEvents.MACHINE_OVERLOAD, SoundSource.BLOCKS, 1.0F, 1.0F, true
 												);
-												world.addParticle(ParticleTypes.f_123812_, pos.f_82479_, pos.f_82480_, pos.f_82481_, 0.0, 0.0, 0.0);
+												world.addParticle(ParticleTypes.EXPLOSION_EMITTER, pos.x, pos.y, pos.z, 0.0, 0.0, 0.0);
 												break;
 											case Heat:
 												world.playLocalSound(
-													pos.f_82479_,
-													pos.f_82480_,
-													pos.f_82481_,
-													SoundEvents.f_11937_,
+													pos.x,
+													pos.y,
+													pos.z,
+													SoundEvents.FIRE_EXTINGUISH,
 													SoundSource.BLOCKS,
 													4.0F,
 													(1.0F + (world.random.nextFloat() - world.random.nextFloat()) * 0.2F) * 0.7F,
 													true
 												);
-												world.addParticle(ParticleTypes.f_123812_, pos.f_82479_, pos.f_82480_, pos.f_82481_, 0.0, 0.0, 0.0);
+												world.addParticle(ParticleTypes.EXPLOSION_EMITTER, pos.x, pos.y, pos.z, 0.0, 0.0, 0.0);
 												break;
 											case Nuclear:
 												world.playLocalSound(
-													pos.f_82479_, pos.f_82480_, pos.f_82481_, Ic2SoundEvents.BLOCK_NUKE_EXPLODE, SoundSource.BLOCKS, 1.0F, 1.0F, true
+													pos.x, pos.y, pos.z, Ic2SoundEvents.BLOCK_NUKE_EXPLODE, SoundSource.BLOCKS, 1.0F, 1.0F, true
 												);
-												world.addParticle(ParticleTypes.f_123812_, pos.f_82479_, pos.f_82480_, pos.f_82481_, 0.0, 0.0, 0.0);
+												world.addParticle(ParticleTypes.EXPLOSION_EMITTER, pos.x, pos.y, pos.z, 0.0, 0.0, 0.0);
 										}
 									}
 								}
@@ -363,7 +365,7 @@ public class NetworkManagerClient extends NetworkManager
 							@Override
 							public void run()
 							{
-								Level world = Minecraft.m_91087_().f_91073_;
+								Level world = Minecraft.getInstance().level;
 								if (Util.getDimId(world).equals(dimensionId))
 								{
 									BlockEntity teRaw = world.getBlockEntity(pos);
@@ -427,10 +429,10 @@ public class NetworkManagerClient extends NetworkManager
 	@Override
 	protected final void sendC2SPacket(GrowingBuffer buffer)
 	{
-		ClientPacketListener handler = SideProxyClient.mc.m_91403_();
+		ClientPacketListener handler = SideProxyClient.mc.getConnection();
 		if (handler != null)
 		{
-			handler.m_6198_().m_129512_(new ServerboundCustomPayloadPacket(channelId, new FriendlyByteBuf(makePacket(buffer, true))));
+			handler.getConnection().send(new ServerboundCustomPayloadPacket(channelId, new FriendlyByteBuf(makePacket(buffer, true))));
 		}
 	}
 }

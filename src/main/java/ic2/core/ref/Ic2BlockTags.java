@@ -28,7 +28,7 @@ public final class Ic2BlockTags
 
 	private static TagKey<Block> create(String fabricName, String forgeName)
 	{
-		ResourceLocation id = ResourceLocation.fromNamespaceAndPath(IC2.envProxy.isFabricEnv() ? fabricName : forgeName);
-		return TagKey.m_203882_(Registry.f_122901_, id);
+		ResourceLocation id = ResourceLocation.parse(IC2.envProxy.isFabricEnv() ? fabricName : forgeName);
+		return TagKey.create(Registry.BLOCK_REGISTRY, id);
 	}
 }

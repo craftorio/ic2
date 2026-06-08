@@ -280,7 +280,7 @@ public class EnergyNetLocal
 			this.updater.awaitCompletion();
 			if (!this.ioTilesToNotify.isEmpty())
 			{
-				ChunkSource chunkManager = this.world.m_7726_();
+				ChunkSource chunkManager = this.world.getChunkSource();
 				int lastX = Integer.MIN_VALUE;
 				int lastZ = Integer.MIN_VALUE;
 				boolean lastLoaded = false;
@@ -288,11 +288,11 @@ public class EnergyNetLocal
 				for (IEnergyTile tile : this.ioTilesToNotify)
 				{
 					BlockPos pos = EnergyNet.instance.getPos(tile);
-					int x = SectionPos.m_123171_(pos.getX());
-					int z = SectionPos.m_123171_(pos.getZ());
+					int x = SectionPos.blockToSectionCoord(pos.getX());
+					int z = SectionPos.blockToSectionCoord(pos.getZ());
 					if (x != lastX || z != lastZ)
 					{
-						lastLoaded = chunkManager.m_5563_(x, z);
+						lastLoaded = chunkManager.hasChunk(x, z);
 						lastX = x;
 						lastZ = z;
 					}

@@ -79,7 +79,7 @@ public final class ClientEventHandlerForge
 	public void onDrawBlockHighlight(RenderHighlightEvent.Block event)
 	{
 		EventHandlerClient.onDrawBlockHighlight(
-			SideProxyClient.mc.f_91074_, event.getTarget(), event.getPartialTick(), event.getPoseStack(), event.getMultiBufferSource()
+			SideProxyClient.mc.player, event.getTarget(), event.getPartialTick(), event.getPoseStack(), event.getMultiBufferSource()
 		);
 	}
 
@@ -87,7 +87,7 @@ public final class ClientEventHandlerForge
 	public void onDrawBlockHighlightLast(RenderHighlightEvent.Block event)
 	{
 		if (EventHandlerClient.onDrawBlockHighlightLast(
-			SideProxyClient.mc.f_91074_, event.getTarget(), event.getPartialTick(), event.getPoseStack(), event.getMultiBufferSource()
+			SideProxyClient.mc.player, event.getTarget(), event.getPartialTick(), event.getPoseStack(), event.getMultiBufferSource()
 		))
 		{
 			event.setCanceled(true);

@@ -59,7 +59,7 @@ public class ItemToolWrench extends Item implements PriorityUsableItem, IBoxable
 			return InteractionResult.FAIL;
 		}
 
-		Player player = context.m_43723_();
+		Player player = context.getPlayer();
 		if (player == null)
 		{
 			return InteractionResult.PASS;
@@ -73,22 +73,22 @@ public class ItemToolWrench extends Item implements PriorityUsableItem, IBoxable
 			case -1:
 				return InteractionResult.FAIL;
 			default:
-				this.damage(stack, useResult, player, context.m_43724_());
+				this.damage(stack, useResult, player, context.getHand());
 				return InteractionResult.SUCCESS;
 		}
 	}
 
 	public static int onWrenchUse(Player player, ItemStack stack, UseOnContext context, boolean removeBlock)
 	{
-		ItemToolWrench.WrenchResult result = wrenchBlock(context.m_43725_(), context.m_8083_(), context.m_43719_(), player, removeBlock);
+		ItemToolWrench.WrenchResult result = wrenchBlock(context.getLevel(), context.getClickedPos(), context.getClickedFace(), player, removeBlock);
 		if (result != ItemToolWrench.WrenchResult.Nothing)
 		{
-			if (!context.m_43725_().isClientSide)
+			if (!context.getLevel().isClientSide)
 			{
 				return result == ItemToolWrench.WrenchResult.Rotated ? 1 : 10;
 			}
 
-			player.m_5496_(Ic2SoundEvents.ITEM_WRENCH_USE, 1.0F, 1.0F);
+			player.playSound(Ic2SoundEvents.ITEM_WRENCH_USE, 1.0F, 1.0F);
 			return -2;
 		} else
 		{
@@ -111,13 +111,13 @@ public class ItemToolWrench extends Item implements PriorityUsableItem, IBoxable
 			Direction newFacing = currentFacing;
 			if (IC2.keyboard.isAltKeyDown(player))
 			{
-				Axis axis = side.m_122434_();
+				Axis axis = side.getAxis();
 				if (isAltRotationClockwise(side, player))
 				{
-					newFacing = newFacing.m_175362_(axis);
+					newFacing = newFacing.getClockWise(axis);
 				} else
 				{
-					newFacing = newFacing.m_175364_(axis);
+					newFacing = newFacing.getCounterClockWise(axis);
 				}
 			} else
 			{
@@ -136,7 +136,7 @@ public class ItemToolWrench extends Item implements PriorityUsableItem, IBoxable
 					return ItemToolWrench.WrenchResult.Removed;
 				}
 
-				if (player.m_36187_(world, pos, ((ServerPlayer) player).f_8941_.m_9290_()))
+				if (player.blockActionRestricted(world, pos, ((ServerPlayer) player).gameMode.getGameModeForPlayer()))
 				{
 					return ItemToolWrench.WrenchResult.Nothing;
 				}
@@ -156,10 +156,10 @@ public class ItemToolWrench extends Item implements PriorityUsableItem, IBoxable
 						);
 				}
 
-				block.m_5707_(world, pos, state, player);
+				block.playerWillDestroy(world, pos, state, player);
 				if (world.removeBlock(pos, false))
 				{
-					block.m_6786_(world, pos, state);
+					block.destroy(world, pos, state);
 				}
 
 				List<ItemStack> drops = wrenchable.getWrenchDrops(world, pos, state, te, player, 0);
@@ -175,9 +175,9 @@ public class ItemToolWrench extends Item implements PriorityUsableItem, IBoxable
 						.warn(LogCategory.General, "The block %s (te %s) at %s didn't yield any wrench drops.", state, getTeName(te), Util.formatPosition(world, pos));
 				}
 
-				if (!player.m_150110_().f_35937_)
+				if (!player.getAbilities().instabuild)
 				{
-					state.m_222967_((ServerLevel) world, pos, player.m_21211_(), false);
+					state.spawnAfterBreak((ServerLevel) world, pos, player.getUseItem(), false);
 				}
 
 				return ItemToolWrench.WrenchResult.Removed;
@@ -194,22 +194,22 @@ public class ItemToolWrench extends Item implements PriorityUsableItem, IBoxable
 				{
 					rotation = Rotation.COUNTERCLOCKWISE_90;
 				}
-			} else if (side.m_122434_().m_122479_())
+			} else if (side.getAxis().isHorizontal())
 			{
-				Property<?> property = state.getBlock().m_49965_().m_61081_("facing");
+				Property<?> property = state.getBlock().getStateDefinition().getProperty("facing");
 				Direction facing;
 				Direction newFacing;
 				if (property != null
-					&& property.m_61709_() == Direction.class
+					&& property.getValueClass() == Direction.class
 					&& (facing = (Direction) state.getValue(property)) != null
-					&& facing.m_122434_().m_122479_()
+					&& facing.getAxis().isHorizontal()
 					&& (newFacing = getNewFacing(side, player)) != facing
-					&& property.m_6908_().contains(newFacing))
+					&& property.getPossibleValues().contains(newFacing))
 				{
-					if (facing.m_122424_() == newFacing)
+					if (facing.getOpposite() == newFacing)
 					{
 						rotation = Rotation.CLOCKWISE_180;
-					} else if (facing.m_175362_(Axis.Y) == newFacing)
+					} else if (facing.getClockWise(Axis.Y) == newFacing)
 					{
 						rotation = Rotation.CLOCKWISE_90;
 					} else
@@ -232,22 +232,22 @@ public class ItemToolWrench extends Item implements PriorityUsableItem, IBoxable
 
 	private static boolean isAltRotationClockwise(Direction sideHit, Player player)
 	{
-		return sideHit.m_122421_() == AxisDirection.POSITIVE != player.m_6144_();
+		return sideHit.getAxisDirection() == AxisDirection.POSITIVE != player.isShiftKeyDown();
 	}
 
 	private static Direction getNewFacing(Direction sideHit, Player player)
 	{
-		return player.m_6144_() ? sideHit.m_122424_() : sideHit;
+		return player.isShiftKeyDown() ? sideHit.getOpposite() : sideHit;
 	}
 
 	private static String getTeName(BlockEntity te)
 	{
-		return te != null ? Registry.f_122830_.getKey(te.m_58903_()).toString() : "none";
+		return te != null ? Registry.BLOCK_ENTITY_TYPE.getKey(te.getType()).toString() : "none";
 	}
 
 	public void damage(ItemStack is, int damage, Player player, InteractionHand hand)
 	{
-		is.m_41622_(damage, player, p -> p.m_21190_(hand));
+		is.hurtAndBreak(damage, player, p -> p.broadcastBreakEvent(hand));
 	}
 
 	@Override
@@ -256,9 +256,9 @@ public class ItemToolWrench extends Item implements PriorityUsableItem, IBoxable
 		return true;
 	}
 
-	public boolean m_6832_(ItemStack toRepair, ItemStack repair)
+	public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair)
 	{
-		return repair != null && repair.m_204117_(Ic2ItemTags.BRONZE_INGOTS);
+		return repair != null && repair.is(Ic2ItemTags.BRONZE_INGOTS);
 	}
 
 	private enum WrenchResult

@@ -27,7 +27,7 @@ public class RpcHandler
 		Rpc<?> existing;
 		do
 		{
-			existing = pending.putIfAbsent(id = IC2.random.m_188502_(), rpc);
+			existing = pending.putIfAbsent(id = IC2.random.nextInt(), rpc);
 		} while (existing != null);
 
 		IC2.network.get(false).initiateRpc(id, provider, args);
@@ -41,7 +41,7 @@ public class RpcHandler
 		IRpcProvider<?> provider = providers.get(providerClassName);
 		if (provider == null)
 		{
-			IC2.log.warn(LogCategory.Network, "Invalid RPC request from %s.", player.m_7755_());
+			IC2.log.warn(LogCategory.Network, "Invalid RPC request from %s.", player.getName());
 		} else
 		{
 			Object[] args = (Object[]) DataEncoder.decode(is);

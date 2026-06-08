@@ -34,18 +34,18 @@ public class ItemTreetap extends Item implements IBoxable
 		super(settings);
 	}
 
-	public InteractionResult m_6225_(UseOnContext context)
+	public InteractionResult useOn(UseOnContext context)
 	{
-		Level world = context.m_43725_();
-		BlockPos pos = context.m_8083_();
+		Level world = context.getLevel();
+		BlockPos pos = context.getClickedPos();
 		BlockState state = world.getBlockState(pos);
 		Block block = state.getBlock();
 		if (block == Ic2Blocks.RUBBER_LOG)
 		{
-			Player player = context.m_43723_();
-			if (attemptExtract(player, world, pos, context.m_43719_(), state, null, false))
+			Player player = context.getPlayer();
+			if (attemptExtract(player, world, pos, context.getClickedFace(), state, null, false))
 			{
-				StackUtil.damage(player, context.m_43724_(), StackUtil.anyStack, 1);
+				StackUtil.damage(player, context.getHand(), StackUtil.anyStack, 1);
 				return InteractionResult.SUCCESS;
 			} else
 			{
@@ -116,22 +116,22 @@ public class ItemTreetap extends Item implements IBoxable
 
 	private static void triggerToolUseEvent(Level world, BlockPos pos, Player player, BlockState state, boolean isElectric)
 	{
-		player.m_6330_(getToolUseSound(isElectric), SoundSource.PLAYERS, 1.0F, 1.0F);
-		world.m_220407_(GameEvent.f_157792_, pos, Context.m_223719_(player, state));
-		world.m_220407_(Ic2GameEvents.TOOL_USE, pos, Context.m_223719_(player, null));
+		player.playNotifySound(getToolUseSound(isElectric), SoundSource.PLAYERS, 1.0F, 1.0F);
+		world.gameEvent(GameEvent.BLOCK_CHANGE, pos, Context.of(player, state));
+		world.gameEvent(Ic2GameEvents.TOOL_USE, pos, Context.of(player, null));
 	}
 
 	private static void ejectResin(Level world, BlockPos pos, Direction side, int quantity)
 	{
 		double ejectBias = 0.3;
-		double ejectX = pos.getX() + 0.5 + side.m_122429_() * 0.3;
-		double ejectY = pos.getY() + 0.5 + side.m_122430_() * 0.3;
-		double ejectZ = pos.getZ() + 0.5 + side.m_122431_() * 0.3;
+		double ejectX = pos.getX() + 0.5 + side.getStepX() * 0.3;
+		double ejectY = pos.getY() + 0.5 + side.getStepY() * 0.3;
+		double ejectZ = pos.getZ() + 0.5 + side.getStepZ() * 0.3;
 
 		for (int i = 0; i < quantity; i++)
 		{
 			ItemEntity entityitem = new ItemEntity(world, ejectX, ejectY, ejectZ, new ItemStack(Ic2Items.RESIN));
-			entityitem.m_32060_();
+			entityitem.setDefaultPickUpDelay();
 			world.addFreshEntity(entityitem);
 		}
 	}

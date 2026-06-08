@@ -24,7 +24,7 @@ public class ItemNanoSaber extends AbstractItemNanoSaber
 	{
 		if (slot != EquipmentSlot.MAINHAND)
 		{
-			return this.m_7167_(slot);
+			return this.getDefaultAttributeModifiers(slot);
 		}
 
 		int dmg = 4;
@@ -35,8 +35,8 @@ public class ItemNanoSaber extends AbstractItemNanoSaber
 
 		Multimap<String, AttributeModifier> ret = HashMultimap.create();
 		Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
-		builder.put(Attributes.f_22281_, new AttributeModifier(f_41374_, "Tool modifier", dmg, Operation.ADDITION));
-		builder.put(Attributes.f_22283_, new AttributeModifier(f_41375_, "Tool modifier", -3.0, Operation.ADDITION));
+		builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Tool modifier", dmg, Operation.ADDITION));
+		builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Tool modifier", -3.0, Operation.ADDITION));
 		return builder.build();
 	}
 }

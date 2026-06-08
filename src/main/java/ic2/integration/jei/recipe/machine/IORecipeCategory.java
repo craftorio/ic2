@@ -25,7 +25,7 @@ public abstract class IORecipeCategory implements IRecipeCategory<IORecipeWrappe
 
 	public Component getTitle()
 	{
-		return this.getBlockStack().m_41786_();
+		return this.getBlockStack().getHoverName();
 	}
 
 	protected abstract List<SlotPosition> getInputSlotPos();
@@ -66,7 +66,7 @@ public abstract class IORecipeCategory implements IRecipeCategory<IORecipeWrappe
 
 	public ItemStack getBlockStack()
 	{
-		return new ItemStack(this.block.m_5456_());
+		return new ItemStack(this.block.asItem());
 	}
 
 	public IDrawable getIcon()

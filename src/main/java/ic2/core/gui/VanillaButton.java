@@ -7,7 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 public class VanillaButton extends Button<VanillaButton>
 {
 	protected IEnableHandler disableHandler;
-	private static final ResourceLocation texture = ResourceLocation.fromNamespaceAndPath("textures/gui/widgets.png");
+	private static final ResourceLocation texture = ResourceLocation.withDefaultNamespace("textures/gui/widgets.png");
 	private static final int uNormal = 0;
 	private static final int vNormal = 66;
 	private static final int uHover = 0;

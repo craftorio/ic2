@@ -81,7 +81,7 @@ public class GuiMetalFormer extends Ic2Gui<ContainerMetalFormer>
 	}
 
 	@Override
-	protected ResourceLocation getTexture()
+	protected ResourceLocation getTextureLocation()
 	{
 		return ResourceLocation.fromNamespaceAndPath("ic2", "textures/gui/guimetalformer.png");
 	}

@@ -169,18 +169,18 @@ public class AdvRecipe implements Ic2CraftingRecipe
 
 	public boolean matches(CraftingContainer inventorycrafting, Level world)
 	{
-		return this.craft(inventorycrafting) != StackUtil.emptyStack;
+		return this.assemble(inventorycrafting) != StackUtil.emptyStack;
 	}
 
-	public ItemStack craft(CraftingContainer inventorycrafting)
+	public ItemStack assemble(CraftingContainer inventoryCrafting)
 	{
-		int size = inventorycrafting.getContainerSize();
+		int size = inventoryCrafting.getContainerSize();
 		int mask = 0;
 
 		for (int i = 0; i < size; i++)
 		{
 			mask <<= 1;
-			if (!StackUtil.isEmpty(inventorycrafting.getItem(i)))
+			if (!StackUtil.isEmpty(inventoryCrafting.getItem(i)))
 			{
 				mask |= 1;
 			}
@@ -193,7 +193,7 @@ public class AdvRecipe implements Ic2CraftingRecipe
 
 		if (checkMask(mask, this.masks))
 		{
-			ItemStack ret = this.checkItems(inventorycrafting, this.input);
+			ItemStack ret = this.checkItems(inventoryCrafting, this.input);
 			if (!StackUtil.isEmpty(ret))
 			{
 				return ret;
@@ -202,7 +202,7 @@ public class AdvRecipe implements Ic2CraftingRecipe
 
 		if (this.masksMirrored != null && checkMask(mask, this.masksMirrored))
 		{
-			ItemStack ret = this.checkItems(inventorycrafting, this.inputMirrored);
+			ItemStack ret = this.checkItems(inventoryCrafting, this.inputMirrored);
 			if (!StackUtil.isEmpty(ret))
 			{
 				return ret;
@@ -212,7 +212,7 @@ public class AdvRecipe implements Ic2CraftingRecipe
 		return StackUtil.emptyStack;
 	}
 
-	public ItemStack m_8043_()
+	public ItemStack getResultItem()
 	{
 		return this.output;
 	}
@@ -263,17 +263,17 @@ public class AdvRecipe implements Ic2CraftingRecipe
 			i++;
 		}
 
-		ItemStack ret = this.output.m_41777_();
+		ItemStack ret = this.output.copy();
 		ElectricItem.manager.charge(ret, outputCharge, Integer.MAX_VALUE, true, false);
 		return ret;
 	}
 
 	public NonNullList<ItemStack> getRemainder(CraftingContainer inv)
 	{
-		return this.consuming ? NonNullList.m_122780_(inv.getContainerSize(), StackUtil.emptyStack) : Ic2CraftingRecipe.super.m_7457_(inv);
+		return this.consuming ? NonNullList.withSize(inv.getContainerSize(), StackUtil.emptyStack) : Ic2CraftingRecipe.super.getRemainingItems(inv);
 	}
 
-	public boolean m_8004_(int x, int y)
+	public boolean canCraftInDimensions(int x, int y)
 	{
 		return this.inputWidth <= x && this.inputHeight <= y;
 	}
@@ -290,9 +290,9 @@ public class AdvRecipe implements Ic2CraftingRecipe
 		return this.inputHeight;
 	}
 
-	public NonNullList<Ingredient> m_7527_()
+	public NonNullList<Ingredient> getIngredients()
 	{
-		NonNullList<Ingredient> list = NonNullList.m_122779_();
+		NonNullList<Ingredient> list = NonNullList.create();
 		if (!this.hidden)
 		{
 			int mask = this.masks[0];
@@ -305,7 +305,7 @@ public class AdvRecipe implements Ic2CraftingRecipe
 					list.add(this.input[actualIngredient++].getIngredient());
 				} else
 				{
-					list.add(Ingredient.f_43901_);
+					list.add(Ingredient.EMPTY);
 				}
 			}
 		}
@@ -313,39 +313,39 @@ public class AdvRecipe implements Ic2CraftingRecipe
 		return list;
 	}
 
-	public boolean m_5598_()
+	public boolean isSpecial()
 	{
 		return this.hidden;
 	}
 
-	public ResourceLocation m_6423_()
+	public ResourceLocation getId()
 	{
 		return this.id;
 	}
 
-	public RecipeSerializer<?> m_7707_()
+	public RecipeSerializer<?> getSerializer()
 	{
 		return Ic2RecipeSerializers.SHAPED;
 	}
 
 	public static final class Serializer implements RecipeSerializer<AdvRecipe>
 	{
-		public AdvRecipe read(ResourceLocation id, JsonObject json)
+		public AdvRecipe fromJson(ResourceLocation id, JsonObject json)
 		{
-			Map<String, IRecipeInput> symbols = readSymbols(GsonHelper.m_13930_(json, "key"));
-			String[] pattern = getPattern(GsonHelper.m_13933_(json, "pattern"));
+			Map<String, IRecipeInput> symbols = readSymbols(GsonHelper.getAsJsonObject(json, "key"));
+			String[] pattern = getPattern(GsonHelper.getAsJsonArray(json, "pattern"));
 			int width = pattern[0].length();
 			int height = pattern.length;
 			IRecipeInput[] ingredients = createPatternMatrix(pattern, symbols, width, height);
-			ItemStack result = RecipeIo.parseOutput(GsonHelper.m_13930_(json, "result"));
-			boolean consuming = GsonHelper.m_13855_(json, "consuming", false);
-			boolean hidden = GsonHelper.m_13855_(json, "hidden", false);
+			ItemStack result = RecipeIo.parseOutput(GsonHelper.getAsJsonObject(json, "result"));
+			boolean consuming = GsonHelper.getAsBoolean(json, "consuming", false);
+			boolean hidden = GsonHelper.getAsBoolean(json, "hidden", false);
 			return AdvRecipe.create(id, width, height, ingredients, result, consuming, hidden);
 		}
 
-		public AdvRecipe read(ResourceLocation id, FriendlyByteBuf buf)
+		public AdvRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buf)
 		{
-			IRecipeInput[] ingredients = new IRecipeInput[buf.m_130242_()];
+			IRecipeInput[] ingredients = new IRecipeInput[buf.readVarInt()];
 
 			for (int i = 0; i < ingredients.length; i++)
 			{
@@ -353,24 +353,24 @@ public class AdvRecipe implements Ic2CraftingRecipe
 			}
 
 			return new AdvRecipe(
-				id, buf.m_130242_(), buf.m_130242_(), buf.readBoolean(), buf.readInt(), ingredients, buf.m_130267_(), buf.readBoolean(), buf.readBoolean()
+				id, buf.readVarInt(), buf.readVarInt(), buf.readBoolean(), buf.readInt(), ingredients, buf.readItem(), buf.readBoolean(), buf.readBoolean()
 			);
 		}
 
-		public void write(FriendlyByteBuf buf, AdvRecipe recipe)
+		public void toNetwork(FriendlyByteBuf buf, AdvRecipe recipe)
 		{
-			buf.m_130130_(recipe.input.length);
+			buf.writeVarInt(recipe.input.length);
 
 			for (IRecipeInput ing : recipe.input)
 			{
 				RecipeIo.writeInput(buf, ing);
 			}
 
-			buf.m_130130_(recipe.inputWidth);
-			buf.m_130130_(recipe.inputHeight);
+			buf.writeVarInt(recipe.inputWidth);
+			buf.writeVarInt(recipe.inputHeight);
 			buf.writeBoolean(recipe.inputMirrored != null);
 			buf.writeInt(recipe.masks[0]);
-			buf.m_130055_(recipe.output);
+			buf.writeItem(recipe.output);
 			buf.writeBoolean(recipe.consuming);
 			buf.writeBoolean(recipe.hidden);
 		}
@@ -412,7 +412,7 @@ public class AdvRecipe implements Ic2CraftingRecipe
 
 			for (int i = 0; i < strings.length; i++)
 			{
-				String string = GsonHelper.m_13805_(json.get(i), "pattern[" + i + "]");
+				String string = GsonHelper.convertToString(json.get(i), "pattern[" + i + "]");
 				if (string.length() > 3)
 				{
 					throw new JsonSyntaxException("Invalid pattern: too many columns, 3 is maximum");

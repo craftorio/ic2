@@ -26,6 +26,6 @@ public class MetalFormerCategory extends DynamicCategory
 	public void draw(IORecipeWrapper recipe, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY)
 	{
 		super.draw(recipe, recipeSlotsView, stack, mouseX, mouseY);
-		Minecraft.m_91087_().m_91291_().m_115123_(ICONS[this.mode], 70 + this.xOffset, 35 + this.yOffset);
+		Minecraft.getInstance().getItemRenderer().renderGuiItem(ICONS[this.mode], 70 + this.xOffset, 35 + this.yOffset);
 	}
 }

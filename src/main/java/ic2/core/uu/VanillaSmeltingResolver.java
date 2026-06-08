@@ -18,12 +18,12 @@ public class VanillaSmeltingResolver implements IRecipeResolver
 	{
 		List<RecipeTransformation> ret = new ArrayList<>();
 
-		for (SmeltingRecipe recipe : IC2.sideProxy.getRecipeManager().m_44013_(RecipeType.f_44108_))
+		for (SmeltingRecipe recipe : IC2.sideProxy.getRecipeManager().getAllRecipesFor(RecipeType.SMELTING))
 		{
 			try
 			{
-				List<List<LeanItemStack>> inputs = RecipeUtil.convertIngredients(recipe.m_7527_());
-				LeanItemStack output = new LeanItemStack(recipe.m_8043_());
+				List<List<LeanItemStack>> inputs = RecipeUtil.convertIngredients(recipe.getIngredients());
+				LeanItemStack output = new LeanItemStack(recipe.getResultItem());
 				ret.add(new RecipeTransformation(14.0, inputs, output));
 			} catch (IllegalArgumentException e)
 			{

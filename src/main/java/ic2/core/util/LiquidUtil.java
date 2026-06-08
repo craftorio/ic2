@@ -33,7 +33,7 @@ public class LiquidUtil
 	public static List<Fluid> getAllFluidsSorted()
 	{
 		List<Fluid> ret = new ArrayList<>(FluidHandler.getAllFluids());
-		ret.sort(Comparator.comparing(Registry.f_122822_::getKey));
+		ret.sort(Comparator.comparing(Registry.FLUID::getKey));
 		return ret;
 	}
 
@@ -47,14 +47,14 @@ public class LiquidUtil
 		{
 			Ic2FluidStack drained = FluidHandler.drainWorldFluid(state, world, pos, true);
 			isSource = drained != null && drained.getAmountMb() >= 1000;
-		} else if (block == Blocks.f_49990_)
+		} else if (block == Blocks.WATER)
 		{
-			liquid = Fluids.f_76193_;
-			isSource = (Integer) state.getValue(LiquidBlock.f_54688_) == 0;
-		} else if (block == Blocks.f_49991_)
+			liquid = Fluids.WATER;
+			isSource = (Integer) state.getValue(LiquidBlock.LEVEL) == 0;
+		} else if (block == Blocks.LAVA)
 		{
-			liquid = Fluids.f_76195_;
-			isSource = (Integer) state.getValue(LiquidBlock.f_54688_) == 0;
+			liquid = Fluids.LAVA;
+			isSource = (Integer) state.getValue(LiquidBlock.LEVEL) == 0;
 		}
 
 		return liquid != null ? new LiquidUtil.LiquidData(liquid, isSource) : null;
@@ -309,7 +309,7 @@ public class LiquidUtil
 		for (Direction dir : Util.ALL_DIRS)
 		{
 			BlockEntity te = source.getLevel().getBlockEntity(source.getBlockPos().relative(dir));
-			if (isFluidTile(te, dir.m_122424_()))
+			if (isFluidTile(te, dir.getOpposite()))
 			{
 				ret.add(new LiquidUtil.AdjacentFluidHandler(te, dir));
 			}
@@ -321,7 +321,7 @@ public class LiquidUtil
 	public static LiquidUtil.AdjacentFluidHandler getAdjacentHandler(BlockEntity source, Direction dir)
 	{
 		BlockEntity te = source.getLevel().getBlockEntity(source.getBlockPos().relative(dir));
-		return !isFluidTile(te, dir.m_122424_()) ? null : new LiquidUtil.AdjacentFluidHandler(te, dir);
+		return !isFluidTile(te, dir.getOpposite()) ? null : new LiquidUtil.AdjacentFluidHandler(te, dir);
 	}
 
 	public static int distribute(BlockEntity source, Ic2FluidStack stack, boolean simulate)
@@ -330,7 +330,7 @@ public class LiquidUtil
 
 		for (LiquidUtil.AdjacentFluidHandler handler : getAdjacentHandlers(source))
 		{
-			int amount = fillTile(handler.handler, handler.dir.m_122424_(), stack, simulate);
+			int amount = fillTile(handler.handler, handler.dir.getOpposite(), stack, simulate);
 			transferred += amount;
 			stack.setAmountMb(stack.getAmountMb() - amount);
 			if (stack.isEmpty())
@@ -417,7 +417,7 @@ public class LiquidUtil
 		for (Direction dir : Util.ALL_DIRS)
 		{
 			BlockEntity te = srcTe.getLevel().getBlockEntity(srcTe.getBlockPos().relative(dir));
-			if (isFluidTile(te, dir.m_122424_()))
+			if (isFluidTile(te, dir.getOpposite()))
 			{
 				Ic2FluidStack stack = transfer(source, dir, te, amount);
 				if (stack != null)
@@ -437,7 +437,7 @@ public class LiquidUtil
 
 	private static Direction getOppositeDir(Direction dir)
 	{
-		return dir == null ? null : dir.m_122424_();
+		return dir == null ? null : dir.getOpposite();
 	}
 
 	public static boolean check(Ic2FluidStack fs)
@@ -455,15 +455,15 @@ public class LiquidUtil
 			return drained;
 		}
 
-		if (block instanceof LiquidBlock && (Integer) state.getValue(LiquidBlock.f_54688_) == 0)
+		if (block instanceof LiquidBlock && (Integer) state.getValue(LiquidBlock.LEVEL) == 0)
 		{
 			Ic2FluidStack fluid = null;
-			if (block == Blocks.f_49990_)
+			if (block == Blocks.WATER)
 			{
-				fluid = Ic2FluidStack.create(Fluids.f_76193_, 1000);
-			} else if (block == Blocks.f_49991_)
+				fluid = Ic2FluidStack.create(Fluids.WATER, 1000);
+			} else if (block == Blocks.LAVA)
 			{
-				fluid = Ic2FluidStack.create(Fluids.f_76195_, 1000);
+				fluid = Ic2FluidStack.create(Fluids.LAVA, 1000);
 			}
 
 			if (fluid != null && !simulate)
@@ -508,7 +508,7 @@ public class LiquidUtil
 			{
 				BlockState state = world.getBlockState(pos);
 				Block block = state.getBlock();
-				if (!state.isAir() && state.getMaterial().m_76333_())
+				if (!state.isAir() && state.getMaterial().isSolid())
 				{
 					return false;
 				}
@@ -523,29 +523,29 @@ public class LiquidUtil
 					return true;
 				}
 
-				if (world.m_6042_().f_63857_() && fluidBlock.defaultBlockState().getMaterial() == Material.WATER)
+				if (world.dimensionType().ultraWarm() && fluidBlock.defaultBlockState().getMaterial() == Material.WATER)
 				{
-					world.playSound(null, pos, SoundEvents.f_11937_, SoundSource.BLOCKS, 0.5F, 2.6F + (world.random.nextFloat() - world.random.nextFloat()) * 0.8F);
+					world.playSound(null, pos, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 0.5F, 2.6F + (world.random.nextFloat() - world.random.nextFloat()) * 0.8F);
 
 					for (int i = 0; i < 8; i++)
 					{
 						world.addParticle(
-							ParticleTypes.f_123755_, pos.getX() + Math.random(), pos.getY() + Math.random(), pos.getZ() + Math.random(), 0.0, 0.0, 0.0
+							ParticleTypes.LARGE_SMOKE, pos.getX() + Math.random(), pos.getY() + Math.random(), pos.getZ() + Math.random(), 0.0, 0.0, 0.0
 						);
 					}
 				} else
 				{
-					if (!world.isClientSide && !state.getMaterial().m_76333_() && !state.getMaterial().m_76332_())
+					if (!world.isClientSide && !state.getMaterial().isSolid() && !state.getMaterial().isLiquid())
 					{
 						world.removeBlock(pos, true);
 					}
 
-					if (fluid == Fluids.f_76193_)
+					if (fluid == Fluids.WATER)
 					{
-						block = Blocks.f_49990_;
-					} else if (fluid == Fluids.f_76195_)
+						block = Blocks.WATER;
+					} else if (fluid == Fluids.LAVA)
 					{
-						block = Blocks.f_49991_;
+						block = Blocks.LAVA;
 					} else
 					{
 						block = fluid.defaultFluidState().createLegacyBlock().getBlock();
@@ -577,7 +577,7 @@ public class LiquidUtil
 			return drained.getAmountMb() >= 1000;
 		} else
 		{
-			return state.m_61148_().containsKey(LiquidBlock.f_54688_) ? (Integer) state.getValue(LiquidBlock.f_54688_) == 0 : false;
+			return state.getValues().containsKey(LiquidBlock.LEVEL) ? (Integer) state.getValue(LiquidBlock.LEVEL) == 0 : false;
 		}
 	}
 

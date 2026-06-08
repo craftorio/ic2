@@ -34,17 +34,17 @@ public class ContainerStandardMachine<T extends TileEntityStandardMachine<?, ?, 
 		super(type, syncId, playerInventory, base, height, dischargeX, dischargeY);
 		if (base.inputSlot != null)
 		{
-			this.m_38897_(new SlotInvSlot(base.inputSlot, 0, inputX, inputY));
+			this.addSlot(new SlotInvSlot(base.inputSlot, 0, inputX, inputY));
 		}
 
 		if (base.outputSlot != null)
 		{
-			this.m_38897_(new SlotInvSlot(base.outputSlot, 0, outputX, outputY));
+			this.addSlot(new SlotInvSlot(base.outputSlot, 0, outputX, outputY));
 		}
 
 		for (int i = 0; i < 4; i++)
 		{
-			this.m_38897_(new SlotInvSlot(base.upgradeSlot, i, upgradeX, upgradeY + i * 18));
+			this.addSlot(new SlotInvSlot(base.upgradeSlot, i, upgradeX, upgradeY + i * 18));
 		}
 	}
 

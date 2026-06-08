@@ -75,7 +75,7 @@ public class NetworkManager implements INetworkManager
 		{
 			SubPacketType.PlayerItemData.writeTo(buffer);
 			buffer.writeByte(slot);
-			DataEncoder.encode(buffer, ((ItemStack) player.getInventory().f_35974_.get(slot)).getItem(), false);
+			DataEncoder.encode(buffer, player.getInventory().items.get(slot).getItem(), false);
 			buffer.writeVarInt(data.length);
 
 			for (Object o : data)
@@ -197,7 +197,7 @@ public class NetworkManager implements INetworkManager
 	public final void initiateTileEntityEvent(BlockEntity te, int event, boolean limitRange)
 	{
 		assert !this.isClient();
-		if (!te.getLevel().m_6907_().isEmpty())
+		if (!te.getLevel().players().isEmpty())
 		{
 			GrowingBuffer buffer = new GrowingBuffer(32);
 
@@ -213,7 +213,7 @@ public class NetworkManager implements INetworkManager
 
 			buffer.flip();
 
-			for (ServerPlayer target : (ArrayList) getPlayersInRange(te.getLevel(), te.getBlockPos(), new ArrayList()))
+			for (ServerPlayer target : getPlayersInRange(te.getLevel(), te.getBlockPos(), new ArrayList<>()))
 			{
 				if (limitRange)
 				{
@@ -254,7 +254,7 @@ public class NetworkManager implements INetworkManager
 
 		buffer.flip();
 
-		for (ServerPlayer target : (ArrayList) getPlayersInRange(player.getCommandSenderWorld(), player.m_20183_(), new ArrayList()))
+		for (ServerPlayer target : getPlayersInRange(player.getCommandSenderWorld(), player.blockPosition(), new ArrayList<>()))
 		{
 			if (limitRange)
 			{
@@ -375,7 +375,7 @@ public class NetworkManager implements INetworkManager
 			try
 			{
 				SubPacketType.ContainerData.writeTo(buffer);
-				buffer.writeInt(container.f_38840_);
+				buffer.writeInt(container.containerId);
 				writeFieldData(container, fieldName, buffer);
 			} catch (IOException e)
 			{
@@ -400,7 +400,7 @@ public class NetworkManager implements INetworkManager
 	{
 		GrowingBuffer buffer = new GrowingBuffer(64);
 		SubPacketType.ContainerEvent.writeTo(buffer);
-		buffer.writeInt(container.f_38840_);
+		buffer.writeInt(container.containerId);
 		buffer.writeString(event);
 		buffer.flip();
 		if (!this.isClient())
@@ -433,7 +433,7 @@ public class NetworkManager implements INetworkManager
 			try
 			{
 				SubPacketType.HandHeldInvData.writeTo(buffer);
-				buffer.writeInt(container.f_38840_);
+				buffer.writeInt(container.containerId);
 				writeFieldData(container.base, fieldName, buffer);
 			} catch (IOException e)
 			{
@@ -514,14 +514,14 @@ public class NetworkManager implements INetworkManager
 
 	public void onPacket(ByteBuf packet, Player player)
 	{
-		assert !player.f_19853_.isClientSide;
+		assert !player.level.isClientSide;
 
 		try
 		{
 			this.onPacketData(GrowingBuffer.wrap(packet), player);
 		} catch (Throwable t)
 		{
-			IC2.log.warn(LogCategory.Network, t, "Network read failed");
+			IC2.log.warn(LogCategory.Network, t, "Network fromJson failed");
 			throw new RuntimeException(t);
 		}
 	}
@@ -572,7 +572,7 @@ public class NetworkManager implements INetworkManager
 							@Override
 							public void run()
 							{
-								BlockEntity te = DataEncoder.getValue(teDeferred, player.m_20194_());
+								BlockEntity te = DataEncoder.getValue(teDeferred, player.getServer());
 								if (te instanceof INetworkClientTileEntityEventListener)
 								{
 									((INetworkClientTileEntityEventListener) te).onNetworkEvent(player, event);
@@ -600,8 +600,8 @@ public class NetworkManager implements INetworkManager
 								{
 									for (InteractionHand hand : Util.HANDS)
 									{
-										ItemStack stack = player.m_21120_(hand);
-										if (stack != null && stack.getItem() instanceof IHandHeldInventory)
+										ItemStack stack = player.getItemInHand(hand);
+										if (stack.getItem() instanceof IHandHeldInventory)
 										{
 											IHasGui gui = ((IHandHeldInventory) stack.getItem()).getInventory(player, hand, stack);
 											gui.openManagedItem(player, hand, null);
@@ -639,21 +639,17 @@ public class NetworkManager implements INetworkManager
 
 				if (slot >= 0 && slot < 9)
 				{
-					IC2.sideProxy.requestTick(simulating, new Runnable()
+					IC2.sideProxy.requestTick(simulating, () ->
 					{
-						@Override
-						public void run()
+						for (int i = 0; i < subData.length; i++)
 						{
-							for (int i = 0; i < subData.length; i++)
-							{
-								subData[i] = DataEncoder.getValue(subData[i], player.m_20194_());
-							}
+							subData[i] = DataEncoder.getValue(subData[i], player.getServer());
+						}
 
-							ItemStack stack = (ItemStack) player.getInventory().f_35974_.get(slot);
-							if (!StackUtil.isEmpty(stack) && stack.getItem() == item && item instanceof IPlayerItemDataListener)
-							{
-								((IPlayerItemDataListener) item).onPlayerItemNetworkData(player, slot, subData);
-							}
+						ItemStack stack = player.getInventory().items.get(slot);
+						if (!StackUtil.isEmpty(stack) && stack.getItem() == item && item instanceof IPlayerItemDataListener)
+						{
+							((IPlayerItemDataListener) item).onPlayerItemNetworkData(player, slot, subData);
 						}
 					});
 				}
@@ -666,17 +662,13 @@ public class NetworkManager implements INetworkManager
 				IC2.sideProxy
 					.requestTick(
 						simulating,
-						new Runnable()
+						() ->
 						{
-							@Override
-							public void run()
+							if (player.containerMenu instanceof ContainerBase
+								&& player.containerMenu.containerId == windowId
+								&& (NetworkManager.this.isClient() || NetworkManager.this.getClientModifiableField(player.containerMenu.getClass(), fieldName) != null))
 							{
-								if (player.f_36096_ instanceof ContainerBase
-									&& player.f_36096_.f_38840_ == windowId
-									&& (NetworkManager.this.isClient() || NetworkManager.this.getClientModifiableField(player.f_36096_.getClass(), fieldName) != null))
-								{
-									ReflectionUtil.setValueRecursive(player.f_36096_, fieldName, DataEncoder.getValue(value, player.m_20194_()));
-								}
+								ReflectionUtil.setValueRecursive(player.containerMenu, fieldName, DataEncoder.getValue(value, player.getServer()));
 							}
 						}
 					);
@@ -686,15 +678,11 @@ public class NetworkManager implements INetworkManager
 			{
 				final int windowId = is.readInt();
 				final String event = is.readString();
-				IC2.sideProxy.requestTick(simulating, new Runnable()
+				IC2.sideProxy.requestTick(simulating, () ->
 				{
-					@Override
-					public void run()
+					if (player.containerMenu instanceof ContainerBase && player.containerMenu.containerId == windowId)
 					{
-						if (player.f_36096_ instanceof ContainerBase && player.f_36096_.f_38840_ == windowId)
-						{
-							((ContainerBase) player.f_36096_).onContainerEvent(event);
-						}
+						((ContainerBase<?>) player.containerMenu).onContainerEvent(event);
 					}
 				});
 				break;
@@ -707,20 +695,15 @@ public class NetworkManager implements INetworkManager
 				IC2.sideProxy
 					.requestTick(
 						simulating,
-						new Runnable()
+						() ->
 						{
-							@Override
-							public void run()
+							if (player.containerMenu instanceof ContainerBase<?> container && player.containerMenu.containerId == windowId)
 							{
-								if (player.f_36096_ instanceof ContainerBase && player.f_36096_.f_38840_ == windowId)
+								if (container.base instanceof HandHeldInventory
+									&& (NetworkManager.this.isClient() || NetworkManager.this.getClientModifiableField(container.base.getClass(), fieldName) != null)
+								)
 								{
-									ContainerBase<?> container = (ContainerBase<?>) player.f_36096_;
-									if (container.base instanceof HandHeldInventory
-										&& (NetworkManager.this.isClient() || NetworkManager.this.getClientModifiableField(container.base.getClass(), fieldName) != null)
-									)
-									{
-										ReflectionUtil.setValueRecursive(container.base, fieldName, DataEncoder.getValue(value, player.m_20194_()));
-									}
+									ReflectionUtil.setValueRecursive(container.base, fieldName, DataEncoder.getValue(value, player.getServer()));
 								}
 							}
 						}
@@ -732,16 +715,12 @@ public class NetworkManager implements INetworkManager
 				final Object teDeferred = DataEncoder.decodeDeferred(is, BlockEntity.class);
 				final String fieldName = is.readString();
 				final Object value = DataEncoder.decode(is);
-				IC2.sideProxy.requestTick(simulating, new Runnable()
+				IC2.sideProxy.requestTick(simulating, () ->
 				{
-					@Override
-					public void run()
+					BlockEntity te = DataEncoder.getValue(teDeferred, player.getServer());
+					if (te != null && (NetworkManager.this.isClient() || NetworkManager.this.getClientModifiableField(te.getClass(), fieldName) != null))
 					{
-						BlockEntity te = DataEncoder.getValue(teDeferred, player.m_20194_());
-						if (te != null && (NetworkManager.this.isClient() || NetworkManager.this.getClientModifiableField(te.getClass(), fieldName) != null))
-						{
-							ReflectionUtil.setValueRecursive(te, fieldName, DataEncoder.getValue(value, player.m_20194_()));
-						}
+						ReflectionUtil.setValueRecursive(te, fieldName, DataEncoder.getValue(value, player.getServer()));
 					}
 				});
 				break;
@@ -772,9 +751,9 @@ public class NetworkManager implements INetworkManager
 			DataEncoder.encode(buffer, type, false);
 			buffer.flip();
 
-			for (Player player : world.m_6907_())
+			for (Player player : world.players())
 			{
-				if (player instanceof ServerPlayer && player.m_20275_(pos.f_82479_, pos.f_82480_, pos.f_82481_) < 128.0)
+				if (player instanceof ServerPlayer && player.distanceToSqr(pos.x, pos.y, pos.z) < 128.0)
 				{
 					this.sendS2CPacket((ServerPlayer) player, buffer, false);
 				}
@@ -794,15 +773,12 @@ public class NetworkManager implements INetworkManager
 	{
 		assert !this.isClient();
 		ByteBuf data = makePacket(buffer, advancePos);
-		ServerGamePacketListenerImpl handler = player.f_8906_;
-		if (handler != null)
+		ServerGamePacketListenerImpl handler = player.connection;
+		Connection connection = handler.getConnection();
+		if (connection.isConnected())
 		{
-			Connection connection = handler.m_6198_();
-			if (connection != null && connection.m_129536_())
-			{
-				Packet<?> packet = new ClientboundCustomPayloadPacket(channelId, new FriendlyByteBuf(data));
-				connection.m_129512_(packet);
-			}
+			Packet<?> packet = new ClientboundCustomPayloadPacket(channelId, new FriendlyByteBuf(data));
+			connection.send(packet);
 		}
 	}
 
@@ -813,7 +789,7 @@ public class NetworkManager implements INetworkManager
 			return result;
 		}
 
-		((ServerLevel) world).m_7726_().f_8325_.m_183262_(new ChunkPos(pos), false).forEach(result::add);
+		((ServerLevel) world).getChunkSource().chunkMap.getPlayers(new ChunkPos(pos), false).forEach(result::add);
 		return result;
 	}
 

@@ -62,7 +62,7 @@ public class TileEntitySteamKineticGenerator extends TileEntityInventory impleme
 		this.fluids = this.addComponent(new Fluids(this));
 		this.steamTank = this.fluids.addTankInsert("steamTank", 21000, Fluids.fluidPredicate(Ic2Fluids.STEAM.still, Ic2Fluids.SUPERHEATED_STEAM.still));
 		this.distilledWaterTank = this.fluids
-			.addTank("distilledWaterTank", 1000, Fluids.fluidPredicate(Ic2Fluids.DISTILLED_WATER.still, net.minecraft.world.level.material.Fluids.f_76193_));
+			.addTank("distilledWaterTank", 1000, Fluids.fluidPredicate(Ic2Fluids.DISTILLED_WATER.still, net.minecraft.world.level.material.Fluids.WATER));
 	}
 
 	@Override
@@ -167,7 +167,7 @@ public class TileEntitySteamKineticGenerator extends TileEntityInventory impleme
 			BlockEntity te = world.getBlockEntity(this.worldPosition.relative(dir));
 			if (te instanceof TileEntityCondenser || hotSteam && te instanceof TileEntitySteamKineticGenerator)
 			{
-				int transAmount = LiquidUtil.fillTile(te, dir.m_122424_(), Ic2FluidStack.create(Ic2Fluids.STEAM.still, amount), false);
+				int transAmount = LiquidUtil.fillTile(te, dir.getOpposite(), Ic2FluidStack.create(Ic2Fluids.STEAM.still, amount), false);
 				if (transAmount > 0)
 				{
 					amount -= transAmount;

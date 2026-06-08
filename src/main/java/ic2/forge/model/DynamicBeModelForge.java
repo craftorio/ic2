@@ -51,7 +51,7 @@ final class DynamicBeModelForge extends DynamicBeModel<List<BakedQuad>[]> implem
 		ResourceLocation modelLocation
 	)
 	{
-		return this.m_7611_(bakery, spriteGetter, modelTransform, modelLocation);
+		return this.bake(bakery, spriteGetter, modelTransform, modelLocation);
 	}
 
 	@Override
@@ -59,7 +59,7 @@ final class DynamicBeModelForge extends DynamicBeModel<List<BakedQuad>[]> implem
 		IGeometryBakingContext owner, Function<ResourceLocation, UnbakedModel> modelGetter, Set<Pair<String, String>> missingTextureErrors
 	)
 	{
-		return this.m_5500_(modelGetter, missingTextureErrors);
+		return this.getMaterials(modelGetter, missingTextureErrors);
 	}
 
 	public ModelData getModelData(BlockAndTintGetter world, BlockPos pos, BlockState state, ModelData tileData)

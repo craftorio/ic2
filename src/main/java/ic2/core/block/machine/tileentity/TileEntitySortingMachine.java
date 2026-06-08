@@ -49,13 +49,13 @@ public class TileEntitySortingMachine extends TileEntityElectricMachine implemen
 	public void load(CompoundTag nbt)
 	{
 		super.load(nbt);
-		ListTag filtersTag = nbt.m_128437_("filters", 10);
+		ListTag filtersTag = nbt.getList("filters", 10);
 
 		for (int i = 0; i < filtersTag.size(); i++)
 		{
-			CompoundTag filterTag = filtersTag.m_128728_(i);
+			CompoundTag filterTag = filtersTag.getCompound(i);
 			int index = filterTag.getByte("index") & 255;
-			ItemStack stack = ItemStack.m_41712_(filterTag);
+			ItemStack stack = ItemStack.of(filterTag);
 			this.filters[index / 7][index % 7] = stack;
 		}
 
@@ -79,7 +79,7 @@ public class TileEntitySortingMachine extends TileEntityElectricMachine implemen
 			{
 				CompoundTag contentTag = new CompoundTag();
 				contentTag.putByte("index", (byte) i);
-				stack.m_41739_(contentTag);
+				stack.save(contentTag);
 				filtersTag.add(contentTag);
 			}
 		}

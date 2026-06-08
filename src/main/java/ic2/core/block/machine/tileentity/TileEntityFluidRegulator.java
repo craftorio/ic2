@@ -126,7 +126,7 @@ public class TileEntityFluidRegulator extends TileEntityElectricMachine implemen
 
 		Direction dir = this.getFacing();
 		BlockEntity te = this.getLevel().getBlockEntity(this.worldPosition.relative(dir));
-		Direction side = dir.m_122424_();
+		Direction side = dir.getOpposite();
 		if (LiquidUtil.isFluidTile(te, side))
 		{
 			int amount = LiquidUtil.fillTile(te, side, this.fluidTank.drainMbUnchecked(this.outputmb, true), false);

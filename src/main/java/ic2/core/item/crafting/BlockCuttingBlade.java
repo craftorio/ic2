@@ -34,20 +34,20 @@ public class BlockCuttingBlade extends Item implements IBlockCuttingBlade
 		};
 	}
 
-	public void m_7373_(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag advanced)
+	public void appendHoverText(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag advanced)
 	{
 		switch (this.type)
 		{
 			case iron:
-				tooltip.add(Component.m_237115_("ic2.IronBlockCuttingBlade.info"));
+				tooltip.add(Component.translatable("ic2.IronBlockCuttingBlade.info"));
 				break;
 			case steel:
-				tooltip.add(Component.m_237115_("ic2.AdvIronBlockCuttingBlade.info"));
+				tooltip.add(Component.translatable("ic2.AdvIronBlockCuttingBlade.info"));
 				break;
 			case diamond:
-				tooltip.add(Component.m_237115_("ic2.DiamondBlockCuttingBlade.info"));
+				tooltip.add(Component.translatable("ic2.DiamondBlockCuttingBlade.info"));
 		}
 
-		tooltip.add(Component.m_237110_("ic2.CuttingBlade.hardness", new Object[] { this.getHardness(stack) }));
+		tooltip.add(Component.translatable("ic2.CuttingBlade.hardness", new Object[] { this.getHardness(stack) }));
 	}
 }

@@ -13,6 +13,6 @@ public abstract class ContainerElectricMachine<T extends TileEntityElectricMachi
 	)
 	{
 		super(type, syncId, playerInventory, base, height);
-		this.m_38897_(new SlotInvSlot(base.dischargeSlot, 0, dischargeX, dischargeY));
+		this.addSlot(new SlotInvSlot(base.dischargeSlot, 0, dischargeX, dischargeY));
 	}
 }

@@ -43,33 +43,33 @@ public abstract class DynamicBeModel<T> implements UnbakedModel, BakedModel
 
 	protected DynamicBeModel(ResourceLocation id)
 	{
-		ResourceLocation blockId = ResourceLocation.fromNamespaceAndPath(id.m_135827_(), id.m_135815_().substring(id.m_135815_().lastIndexOf(47) + 1));
-		Block block = (Block) Registry.BLOCK.m_7745_(blockId);
+		ResourceLocation blockId = ResourceLocation.fromNamespaceAndPath(id.getNamespace(), id.getPath().substring(id.getPath().lastIndexOf(47) + 1));
+		Block block = (Block) Registry.BLOCK.get(blockId);
 		if (!(block instanceof Ic2TileEntityBlock))
 		{
 			throw new IllegalArgumentException("invalid id: " + id);
 		}
 
 		this.block = (Ic2TileEntityBlock) block;
-		this.backingModelId = ResourceLocation.fromNamespaceAndPath(id.m_135827_(), id.m_135815_().replace("block/be/", "block/"));
+		this.backingModelId = ResourceLocation.fromNamespaceAndPath(id.getNamespace(), id.getPath().replace("block/be/", "block/"));
 		this.cache = (T[]) (new Object[(this.block.facingProperty != null ? 6 : 1) * (this.block.canActive() ? 2 : 1)]);
 	}
 
-	public Collection<ResourceLocation> m_7970_()
+	public Collection<ResourceLocation> getDependencies()
 	{
 		return this.block.canActive() ? Arrays.asList(this.backingModelId, this.getActiveModelId()) : Collections.singletonList(this.backingModelId);
 	}
 
 	private ResourceLocation getActiveModelId()
 	{
-		return ResourceLocation.fromNamespaceAndPath(this.backingModelId.m_135827_(), this.backingModelId.m_135815_().concat("_active"));
+		return ResourceLocation.fromNamespaceAndPath(this.backingModelId.getNamespace(), this.backingModelId.getPath().concat("_active"));
 	}
 
-	public Collection<Material> m_5500_(Function<ResourceLocation, UnbakedModel> unbakedModelGetter, Set<Pair<String, String>> unresolvedTextureReferences)
+	public Collection<Material> getMaterials(Function<ResourceLocation, UnbakedModel> unbakedModelGetter, Set<Pair<String, String>> unresolvedTextureReferences)
 	{
 		Set<Material> ret = new HashSet<>();
 
-		for (ResourceLocation id : this.m_7970_())
+		for (ResourceLocation id : this.getDependencies())
 		{
 			UnbakedModel backingModel = unbakedModelGetter.apply(id);
 			if (backingModel == null)
@@ -77,16 +77,16 @@ public abstract class DynamicBeModel<T> implements UnbakedModel, BakedModel
 				IC2.log.warn(LogCategory.Resource, "Missing model %s", id);
 			} else
 			{
-				ret.addAll(backingModel.m_5500_(unbakedModelGetter, unresolvedTextureReferences));
+				ret.addAll(backingModel.getMaterials(unbakedModelGetter, unresolvedTextureReferences));
 			}
 		}
 
 		return ret;
 	}
 
-	public BakedModel m_7611_(ModelBakery loader, Function<Material, TextureAtlasSprite> textureGetter, ModelState rotationContainer, ResourceLocation modelId)
+	public BakedModel bake(ModelBakery loader, Function<Material, TextureAtlasSprite> textureGetter, ModelState rotationContainer, ResourceLocation modelId)
 	{
-		this.baseModel = loader.m_119349_(this.backingModelId, rotationContainer);
+		this.baseModel = loader.bake(this.backingModelId, rotationContainer);
 		if (this.baseModel == null)
 		{
 			throw new IllegalStateException("missing model " + this.backingModelId);
@@ -94,7 +94,7 @@ public abstract class DynamicBeModel<T> implements UnbakedModel, BakedModel
 
 		if (this.block.canActive())
 		{
-			this.activeBaseModel = loader.m_119349_(this.getActiveModelId(), rotationContainer);
+			this.activeBaseModel = loader.bake(this.getActiveModelId(), rotationContainer);
 			if (this.activeBaseModel == null)
 			{
 				throw new IllegalStateException("missing model " + this.getActiveModelId());
@@ -104,44 +104,44 @@ public abstract class DynamicBeModel<T> implements UnbakedModel, BakedModel
 		return this;
 	}
 
-	public List<BakedQuad> m_213637_(@Nullable BlockState state, @Nullable Direction side, RandomSource random)
+	public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, RandomSource random)
 	{
 		return Collections.emptyList();
 	}
 
-	public boolean m_7541_()
+	public boolean useAmbientOcclusion()
 	{
 		return true;
 	}
 
-	public boolean m_7539_()
+	public boolean isGui3d()
 	{
 		return true;
 	}
 
-	public boolean m_7547_()
+	public boolean usesBlockLight()
 	{
 		return true;
 	}
 
-	public boolean m_7521_()
+	public boolean isCustomRenderer()
 	{
 		return false;
 	}
 
-	public TextureAtlasSprite m_6160_()
+	public TextureAtlasSprite getParticleIcon()
 	{
-		return this.baseModel.m_6160_();
+		return this.baseModel.getParticleIcon();
 	}
 
-	public ItemTransforms m_7442_()
+	public ItemTransforms getTransforms()
 	{
-		return ItemTransforms.f_111786_;
+		return ItemTransforms.NO_TRANSFORMS;
 	}
 
-	public ItemOverrides m_7343_()
+	public ItemOverrides getOverrides()
 	{
-		return ItemOverrides.f_111734_;
+		return ItemOverrides.EMPTY;
 	}
 
 	protected T getMesh(BlockState state, boolean active)
@@ -185,7 +185,7 @@ public abstract class DynamicBeModel<T> implements UnbakedModel, BakedModel
 			case WEST -> 3;
 			case EAST -> 1;
 			default -> throw new IllegalStateException();
-		}, facing.m_122434_() == Axis.Y);
+		}, facing.getAxis() == Axis.Y);
 		stamp = this.cacheLock.readLock();
 
 		try
@@ -230,7 +230,7 @@ public abstract class DynamicBeModel<T> implements UnbakedModel, BakedModel
 			return quad;
 		}
 
-		int[] data = quad.m_111303_();
+		int[] data = quad.getVertices();
 		int[] newData = Arrays.copyOf(data, data.length);
 		int stride = data.length >>> 2;
 		int offsetA;
@@ -273,23 +273,23 @@ public abstract class DynamicBeModel<T> implements UnbakedModel, BakedModel
 			newData[offset + offsetB] = Float.floatToRawIntBits(b);
 		}
 
-		return new BakedQuad(newData, quad.m_111305_(), rotateFace(quad.m_111306_(), rot, rotX), quad.m_173410_(), quad.m_111307_());
+		return new BakedQuad(newData, quad.getTintIndex(), rotateFace(quad.getDirection(), rot, rotX), quad.getSprite(), quad.isShade());
 	}
 
 	protected static Direction rotateFace(Direction face, int count, boolean rotX)
 	{
 		count &= 3;
-		if (rotX && face.m_122434_() != Axis.X)
+		if (rotX && face.getAxis() != Axis.X)
 		{
 			for (int i = 0; i < count; i++)
 			{
-				face = face.m_175362_(Axis.X);
+				face = face.getClockWise(Axis.X);
 			}
-		} else if (!rotX && face.m_122434_() != Axis.Y)
+		} else if (!rotX && face.getAxis() != Axis.Y)
 		{
 			for (int i = 0; i < count; i++)
 			{
-				face = face.m_122427_();
+				face = face.getClockWise();
 			}
 		}
 

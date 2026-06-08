@@ -10,12 +10,14 @@ import java.util.Set;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class KeyboardClient extends Keyboard
 {
 	private static final String keyCategory = "IC2";
-	private final Minecraft mc = Minecraft.m_91087_();
+	private final Minecraft mc = Minecraft.getInstance();
 	private final KeyMapping altKey = new KeyMapping("ALT Key", 342, "IC2");
 	private final KeyMapping boostKey = new KeyMapping("Boost Key", 341, "IC2");
 	private final KeyMapping modeSwitchKey = new KeyMapping("Mode Switch Key", 77, "IC2");
@@ -41,40 +43,40 @@ public class KeyboardClient extends Keyboard
 	public void sendKeyUpdate()
 	{
 		Set<Keyboard.Key> keys = EnumSet.noneOf(Keyboard.Key.class);
-		Screen currentScreen = SideProxyClient.mc.f_91080_;
-		if (currentScreen == null || currentScreen.f_96546_)
+		Screen currentScreen = SideProxyClient.mc.screen;
+		if (currentScreen == null || currentScreen.passEvents)
 		{
-			if (this.altKey.m_90857_())
+			if (this.altKey.isDown())
 			{
 				keys.add(Keyboard.Key.alt);
 			}
 
-			if (this.boostKey.m_90857_())
+			if (this.boostKey.isDown())
 			{
 				keys.add(Keyboard.Key.boost);
 			}
 
-			if (this.mc.f_91066_.f_92085_.m_90857_())
+			if (this.mc.options.keyUp.isDown())
 			{
 				keys.add(Keyboard.Key.forward);
 			}
 
-			if (this.modeSwitchKey.m_90857_())
+			if (this.modeSwitchKey.isDown())
 			{
 				keys.add(Keyboard.Key.modeSwitch);
 			}
 
-			if (this.mc.f_91066_.f_92089_.m_90857_())
+			if (this.mc.options.keyJump.isDown())
 			{
 				keys.add(Keyboard.Key.jump);
 			}
 
-			if (this.sideinventoryKey.m_90857_())
+			if (this.sideinventoryKey.isDown())
 			{
 				keys.add(Keyboard.Key.sideInventory);
 			}
 
-			if (this.expandinfo.m_90857_())
+			if (this.expandinfo.isDown())
 			{
 				keys.add(Keyboard.Key.hubMode);
 			}

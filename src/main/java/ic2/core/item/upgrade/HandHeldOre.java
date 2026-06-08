@@ -18,6 +18,8 @@ import java.util.List;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class HandHeldOre extends HandHeldUpgradeOption
 {
@@ -49,7 +51,7 @@ public class HandHeldOre extends HandHeldUpgradeOption
 
 			for (byte slot = 0; slot < 9; slot++)
 			{
-				this.m_38897_(new SlotHologramSlot(HandHeldOre.this.inventory, slot, 8 + 18 * slot, 8, 1, HandHeldOre.this.makeSaveCallback()));
+				this.addSlot(new SlotHologramSlot(HandHeldOre.this.inventory, slot, 8 + 18 * slot, 8, 1, HandHeldOre.this.makeSaveCallback()));
 			}
 		}
 

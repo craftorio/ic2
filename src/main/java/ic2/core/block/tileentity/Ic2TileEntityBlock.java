@@ -55,10 +55,10 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 {
 	private static final BlockEntityTicker<Ic2TileEntity> TICKER = (world, pos, state, be) -> be.tick();
 	private static final String facingPropertyName = "facing";
-	public static final Property<Direction> anyFacingProperty = DirectionProperty.m_61543_("facing", Util.allFacings);
-	public static final Property<Direction> horizontalFacingProperty = DirectionProperty.m_61543_("facing", Util.horizontalFacings);
-	public static final Property<Direction> verticalFacingProperty = DirectionProperty.m_61543_("facing", Util.verticalFacings);
-	public static final BooleanProperty CROSSING_BASE = BooleanProperty.m_61465_("crossing_base");
+	public static final Property<Direction> anyFacingProperty = DirectionProperty.create("facing", Util.allFacings);
+	public static final Property<Direction> horizontalFacingProperty = DirectionProperty.create("facing", Util.horizontalFacings);
+	public static final Property<Direction> verticalFacingProperty = DirectionProperty.create("facing", Util.verticalFacings);
+	public static final BooleanProperty CROSSING_BASE = BooleanProperty.create("crossing_base");
 	private static final Map<Integer, IntegerProperty> ageProperties = new HashMap<>();
 	private int cropMaxAge = -1;
 	private Ic2CropType cropType;
@@ -71,7 +71,7 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 	private final Supplier<Ic2TileEntity> dummyTe;
 	public final Property<Direction> facingProperty;
 	private boolean enableWorldTick;
-	public static final BooleanProperty ACTIVE = BooleanProperty.m_61465_("active");
+	public static final BooleanProperty ACTIVE = BooleanProperty.create("active");
 
 	public static Ic2TileEntityBlock create(
 		Properties settings,
@@ -140,8 +140,8 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 		this.defaultDrop = defaultDrop;
 		this.allowWrenchRotating = allowWrenchRotating;
 		this.supportedFacings = data.supportedFacings;
-		this.facingProperty = this.supportedFacings.size() > 1 ? this.f_49792_.m_61081_("facing") : null;
-		this.dummyTe = Suppliers.memoize(() -> this.createBlockEntity(BlockPos.f_121853_, this.defaultBlockState()));
+		this.facingProperty = this.supportedFacings.size() > 1 ? (Property<Direction>) this.stateDefinition.getProperty("facing") : null;
+		this.dummyTe = Suppliers.memoize(() -> this.newBlockEntity(BlockPos.ZERO, this.defaultBlockState()));
 	}
 
 	private IntegerProperty getAgeProperty(int cropMaxAge)
@@ -151,7 +151,7 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 			return ageProperties.get(cropMaxAge);
 		}
 
-		IntegerProperty ret = IntegerProperty.m_61631_("age", 0, cropMaxAge);
+		IntegerProperty ret = IntegerProperty.create("age", 0, cropMaxAge);
 		ageProperties.put(cropMaxAge, ret);
 		return ret;
 	}
@@ -185,13 +185,13 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 	{
 		if (this.canActive())
 		{
-			if (state.m_60713_(this))
+			if (state.is(this))
 			{
 				Ic2TileEntity tileEntity = (Ic2TileEntity) world.getBlockEntity(pos);
 				if (tileEntity != null)
 				{
 					tileEntity.setActive(active);
-					world.setBlockAndUpdate(pos, (BlockState) state.setValue(ACTIVE, active));
+					world.setBlockAndUpdate(pos, state.setValue(ACTIVE, active));
 				}
 			}
 		}
@@ -212,7 +212,7 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 		return this.supportedFacings;
 	}
 
-	public Ic2TileEntity createBlockEntity(BlockPos pos, BlockState state)
+	public Ic2TileEntity newBlockEntity(BlockPos pos, BlockState state)
 	{
 		try
 		{
@@ -223,12 +223,12 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 		}
 	}
 
-	public <T extends BlockEntity> BlockEntityTicker<T> m_142354_(Level world, BlockState state, BlockEntityType<T> type)
+	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type)
 	{
 		return (BlockEntityTicker<T>) TICKER;
 	}
 
-	protected void m_7926_(Builder<Block, BlockState> builder)
+	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		Ic2TileEntityBlock.InitData data = pendingInitData.get();
 		Set<Direction> facings = data.supportedFacings;
@@ -236,39 +236,39 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 		{
 			if (facings.equals(Util.allFacings))
 			{
-				builder.m_61104_(new Property[] { anyFacingProperty });
+				builder.add(anyFacingProperty);
 			} else if (facings.equals(Util.horizontalFacings))
 			{
-				builder.m_61104_(new Property[] { horizontalFacingProperty });
+				builder.add(horizontalFacingProperty);
 			} else if (facings.equals(Util.verticalFacings))
 			{
-				builder.m_61104_(new Property[] { verticalFacingProperty });
+				builder.add(verticalFacingProperty);
 			} else
 			{
-				builder.m_61104_(new Property[] { DirectionProperty.m_61543_("facing", facings) });
+				builder.add(DirectionProperty.create("facing", facings));
 			}
 		}
 
 		if (data.canActive)
 		{
-			builder.m_61104_(new Property[] { ACTIVE });
+			builder.add(ACTIVE);
 		}
 
 		if (data.cropType != null)
 		{
 			if (data.cropType == Ic2CropType.none)
 			{
-				builder.m_61104_(new Property[] { CROSSING_BASE });
+				builder.add(CROSSING_BASE);
 			} else
 			{
-				builder.m_61104_(new Property[] { this.getAgeProperty(data.maxAge) });
+				builder.add(this.getAgeProperty(data.maxAge));
 			}
 		}
 	}
 
-	public BlockState m_5573_(BlockPlaceContext ctx)
+	public BlockState getStateForPlacement(BlockPlaceContext ctx)
 	{
-		BlockState ret = super.m_5573_(ctx);
+		BlockState ret = super.getStateForPlacement(ctx);
 		if (ret == null)
 		{
 			return null;
@@ -276,22 +276,22 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 
 		if (this.facingProperty != null)
 		{
-			ret = (BlockState) ret.setValue(this.facingProperty, this.getPlacementFacing(ctx.m_43723_(), ctx.m_7820_()));
+			ret = ret.setValue(this.facingProperty, this.getPlacementFacing(ctx.getPlayer(), ctx.getNearestLookingDirection()));
 		}
 
 		if (this.canActive)
 		{
-			ret = (BlockState) ret.setValue(ACTIVE, false);
+			ret = ret.setValue(ACTIVE, false);
 		}
 
 		if (this.cropType != null)
 		{
 			if (this.cropType == Ic2CropType.none)
 			{
-				ret = (BlockState) ret.setValue(CROSSING_BASE, false);
+				ret = ret.setValue(CROSSING_BASE, false);
 			} else
 			{
-				ret = (BlockState) ret.setValue(this.getAgeProperty(), 0);
+				ret = ret.setValue(this.getAgeProperty(), 0);
 			}
 		}
 
@@ -308,13 +308,13 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 
 		if (placer != null)
 		{
-			Vec3 dir = placer.m_20154_();
+			Vec3 dir = placer.getLookAngle();
 			Direction bestFacing = null;
 			double maxMatch = Double.NEGATIVE_INFINITY;
 
 			for (Direction cFacing : supportedFacings)
 			{
-				double match = dir.m_82526_(Vec3.m_82528_(cFacing.m_122424_().m_122436_()));
+				double match = dir.dot(Vec3.atLowerCornerOf(cFacing.getOpposite().getNormal()));
 				if (match > maxMatch)
 				{
 					maxMatch = match;
@@ -325,31 +325,31 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 			return bestFacing;
 		} else
 		{
-			return facing != null && supportedFacings.contains(facing.m_122424_()) ? facing.m_122424_() : this.getSupportedFacings().iterator().next();
+			return facing != null && supportedFacings.contains(facing.getOpposite()) ? facing.getOpposite() : this.getSupportedFacings().iterator().next();
 		}
 	}
 
-	public boolean m_7898_(BlockState state, LevelReader world, BlockPos pos)
+	public boolean canSurvive(BlockState state, LevelReader world, BlockPos pos)
 	{
 		return this.cropType == null
-			? super.m_7898_(state, world, pos)
-			: CropSoilType.contains(world.getBlockState(pos.m_7495_()).getBlock()) && super.m_7898_(state, world, pos);
+			? super.canSurvive(state, world, pos)
+			: CropSoilType.contains(world.getBlockState(pos.below()).getBlock()) && super.canSurvive(state, world, pos);
 	}
 
-	public BlockState m_7417_(BlockState state, Direction direction, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos)
+	public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos)
 	{
 		if (this.cropType == null)
 		{
-			return super.m_7417_(state, direction, neighborState, world, pos, neighborPos);
+			return super.updateShape(state, direction, neighborState, world, pos, neighborPos);
 		} else
 		{
-			return !state.m_60710_(world, pos) ? Blocks.f_50016_.defaultBlockState() : super.m_7417_(state, direction, neighborState, world, pos, neighborPos);
+			return !state.canSurvive(world, pos) ? Blocks.AIR.defaultBlockState() : super.updateShape(state, direction, neighborState, world, pos, neighborPos);
 		}
 	}
 
-	public void m_6861_(BlockState state, Level world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify)
+	public void neighborChanged(BlockState state, Level world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify)
 	{
-		super.m_6861_(state, world, pos, sourceBlock, sourcePos, notify);
+		super.neighborChanged(state, world, pos, sourceBlock, sourcePos, notify);
 		Ic2TileEntity tileEntity = getTe(world, pos);
 		if (tileEntity != null)
 		{
@@ -357,14 +357,14 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 		}
 	}
 
-	public void m_7892_(BlockState state, Level world, BlockPos pos, Entity entity)
+	public void entityInside(BlockState state, Level world, BlockPos pos, Entity entity)
 	{
-		if (this.cropType != null && entity instanceof Ravager && world.m_46469_().m_46207_(GameRules.f_46132_))
+		if (this.cropType != null && entity instanceof Ravager && world.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING))
 		{
-			world.m_46953_(pos, true, entity);
+			world.destroyBlock(pos, true, entity);
 		}
 
-		super.m_7892_(state, world, pos, entity);
+		super.entityInside(state, world, pos, entity);
 	}
 
 	private void updateStateForEnergyNet(Level world, BlockPos pos, BlockState state, LivingEntity placer)
@@ -373,68 +373,68 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 		{
 			Direction[] supportedFacingArr = new Direction[this.supportedFacings.size()];
 			supportedFacingArr = this.supportedFacings.toArray(supportedFacingArr);
-			Direction direction = (Direction) state.getValue(this.facingProperty);
+			Direction direction = state.getValue(this.facingProperty);
 			Direction iDirection = direction.equals(supportedFacingArr[0]) ? supportedFacingArr[1] : supportedFacingArr[0];
 			this.setFacing(world, pos, iDirection, (Player) placer);
 			this.setFacing(world, pos, direction, (Player) placer);
 		}
 	}
 
-	public void m_6402_(Level world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack)
+	public void setPlacedBy(Level world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack)
 	{
 		Ic2TileEntity te = getTe(world, pos);
 		if (te != null)
 		{
 			this.updateStateForEnergyNet(world, pos, state, placer);
-			te.onPlaced(stack, placer, this.facingProperty != null ? (Direction) state.getValue(this.facingProperty) : Direction.NORTH);
+			te.onPlaced(stack, placer, this.facingProperty != null ? state.getValue(this.facingProperty) : Direction.NORTH);
 		}
 	}
 
-	public VoxelShape m_5940_(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context)
+	public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context)
 	{
 		Ic2TileEntity be = getTe(world, pos);
 		if (be == null)
 		{
-			return !this.f_60443_ ? Shapes.m_83040_() : Shapes.block();
+			return !this.hasCollision ? Shapes.empty() : Shapes.block();
 		} else
 		{
 			return be.getOutlineShape(context);
 		}
 	}
 
-	public VoxelShape m_5939_(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context)
+	public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context)
 	{
 		Ic2TileEntity be = getTe(world, pos);
 		if (be == null)
 		{
-			return !this.f_60443_ ? Shapes.m_83040_() : Shapes.block();
+			return !this.hasCollision ? Shapes.empty() : Shapes.block();
 		} else
 		{
 			return be.getCollisionShape(context);
 		}
 	}
 
-	public VoxelShape m_7952_(BlockState state, BlockGetter world, BlockPos pos)
+	public VoxelShape getOcclusionShape(BlockState state, BlockGetter world, BlockPos pos)
 	{
 		Ic2TileEntity be = getTe(world, pos);
 		if (be == null)
 		{
-			return !this.f_60443_ ? Shapes.m_83040_() : Shapes.block();
+			return !this.hasCollision ? Shapes.empty() : Shapes.block();
 		} else
 		{
 			return be.getCullingShape();
 		}
 	}
 
-	public InteractionResult m_6227_(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit)
+	public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit)
 	{
-		if (player.m_6144_())
+		if (player.isShiftKeyDown())
 		{
 			return InteractionResult.PASS;
 		}
 
 		Ic2TileEntity te = getTe(world, pos);
-		return te == null ? InteractionResult.PASS : te.onActivated(player, hand, hit.m_82434_(), hit.m_82450_());
+		return te == null ? InteractionResult.PASS : te.onActivated(player, hand, hit.getDirection(), hit.getLocation());
 	}
 
 	@Override
@@ -443,22 +443,22 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 		return world.getBlockEntity(pos) instanceof Ic2TileEntity ic2TileEntity ? ic2TileEntity.onClicked(player) : InteractionResult.PASS;
 	}
 
-	public void m_6810_(BlockState state, Level world, BlockPos pos, BlockState newState, boolean moved)
+	public void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean moved)
 	{
-		if (!state.m_60713_(newState.getBlock()) && !moved)
+		if (!state.is(newState.getBlock()) && !moved)
 		{
 			if (world.getBlockEntity(pos) instanceof Ic2TileEntity tileEntity)
 			{
 				for (ItemStack stack : tileEntity.getAuxDrops(0))
 				{
-					Block.m_49840_(world, pos, stack);
+					Block.popResource(world, pos, stack);
 				}
 
-				super.m_6810_(state, world, pos, newState, moved);
+				super.onRemove(state, world, pos, newState, moved);
 			}
 		} else
 		{
-			super.m_6810_(state, world, pos, newState, moved);
+			super.onRemove(state, world, pos, newState, moved);
 		}
 	}
 
@@ -473,27 +473,27 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 	public boolean canSetFacing(Level world, BlockPos pos, Direction newDirection, Player player)
 	{
 		Ic2TileEntity te = getTe(world, pos);
-		return te == null ? false : te.canSetFacingWrench(newDirection, player);
+		return te != null && te.canSetFacingWrench(newDirection, player);
 	}
 
 	@Override
 	public boolean setFacing(Level world, BlockPos pos, Direction newDirection, Player player)
 	{
 		Ic2TileEntity te = getTe(world, pos);
-		return te == null ? false : te.setFacingWrench(world, newDirection, player);
+		return te != null && te.setFacingWrench(world, newDirection, player);
 	}
 
 	@Override
 	public boolean wrenchCanRemove(Level world, BlockPos pos, Player player)
 	{
 		Ic2TileEntity te = getTe(world, pos);
-		return te == null ? false : te.wrenchCanRemove(player);
+		return te != null && te.wrenchCanRemove(player);
 	}
 
 	@Override
 	public List<ItemStack> getWrenchDrops(Level world, BlockPos pos, BlockState state, BlockEntity te, Player player, int fortune)
 	{
-		ItemStack stack = state.getBlock().m_5456_().m_7968_();
+		ItemStack stack = state.getBlock().asItem().getDefaultInstance();
 		if (te instanceof Ic2TileEntity)
 		{
 			stack = ((Ic2TileEntity) te).adjustDrop(stack, true);
@@ -522,7 +522,7 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 		}
 
 		Obscuration component = te.getComponent(Obscuration.class);
-		return component == null ? false : component.applyObscuration(side, new Obscuration.ObscurationData(refState, refVariant, refSide, refColorMultipliers));
+		return component != null && component.applyObscuration(side, new Obscuration.ObscurationData(refState, refVariant, refSide, refColorMultipliers));
 	}
 
 	private static Ic2TileEntity getTe(BlockGetter world, BlockPos pos)
@@ -542,7 +542,7 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 		None,
 		Generator,
 		Machine,
-		AdvMachine;
+		AdvMachine
 	}
 
 	private record InitData(Set<Direction> supportedFacings, boolean canActive, Class<?> teClass, Ic2CropType cropType,

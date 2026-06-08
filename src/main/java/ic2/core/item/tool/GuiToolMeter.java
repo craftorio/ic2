@@ -39,17 +39,17 @@ public class GuiToolMeter extends Ic2Gui<ContainerMeter>
 	}
 
 	@Override
-	public void m_181908_()
+	public void containerTick()
 	{
-		super.m_181908_();
-		this.getContainer().m_38946_();
+		super.containerTick();
+		this.getContainer().broadcastChanges();
 	}
 
 	@Override
-	public boolean m_6375_(double mouseX, double mouseY, int mouseButton)
+	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
 	{
-		int xMin = (this.f_96543_ - this.imageWidth) / 2;
-		int yMin = (this.f_96544_ - this.imageHeight) / 2;
+		int xMin = (this.width - this.imageWidth) / 2;
+		int yMin = (this.height - this.imageHeight) / 2;
 		int x = (int) (mouseX - xMin);
 		int y = (int) (mouseY - yMin);
 		if (x >= 26 && y >= 111 && x <= 83 && y <= 123)
@@ -57,7 +57,7 @@ public class GuiToolMeter extends Ic2Gui<ContainerMeter>
 			this.getContainer().reset();
 		}
 
-		return super.m_6375_(mouseX, mouseY, mouseButton);
+		return super.mouseClicked(mouseX, mouseY, mouseButton);
 	}
 
 	@Override
@@ -92,9 +92,9 @@ public class GuiToolMeter extends Ic2Gui<ContainerMeter>
 	}
 
 	@Override
-	protected void m_7286_(PoseStack matrices, float delta, int mouseX, int mouseY)
+	protected void renderBg(PoseStack matrices, float delta, int mouseX, int mouseY)
 	{
-		super.m_7286_(matrices, delta, mouseX, mouseY);
+		super.renderBg(matrices, delta, mouseX, mouseY);
 		this.bindTexture();
 		ContainerMeter container = this.getContainer();
 		switch (container.getMode())
@@ -114,7 +114,7 @@ public class GuiToolMeter extends Ic2Gui<ContainerMeter>
 	}
 
 	@Override
-	protected ResourceLocation getTexture()
+	protected ResourceLocation getTextureLocation()
 	{
 		return ResourceLocation.fromNamespaceAndPath("ic2", "textures/gui/guitooleumeter.png");
 	}

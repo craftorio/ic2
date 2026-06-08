@@ -49,7 +49,7 @@ public class CropFlax extends Ic2CropCard
 	@Override
 	public ItemStack getGain(ICropTile crop)
 	{
-		return new ItemStack(Items.f_42401_);
+		return new ItemStack(Items.STRING);
 	}
 
 	@Override

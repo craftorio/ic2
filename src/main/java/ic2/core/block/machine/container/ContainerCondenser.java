@@ -13,14 +13,14 @@ public class ContainerCondenser extends ContainerElectricMachine<TileEntityConde
 	public ContainerCondenser(int syncId, Inventory playerInventory, TileEntityCondenser te)
 	{
 		super(Ic2ScreenHandlers.CONDENSER, syncId, playerInventory, te, 184, 8, 44);
-		this.m_38897_(new SlotInvSlot(te.waterInputSlot, 0, 26, 73));
-		this.m_38897_(new SlotInvSlot(te.waterOutputSlot, 0, 134, 73));
-		this.m_38897_(new SlotInvSlot(te.upgradeSlot, 0, 152, 73));
+		this.addSlot(new SlotInvSlot(te.waterInputSlot, 0, 26, 73));
+		this.addSlot(new SlotInvSlot(te.waterOutputSlot, 0, 134, 73));
+		this.addSlot(new SlotInvSlot(te.upgradeSlot, 0, 152, 73));
 
 		for (int i = 0; i < 2; i++)
 		{
-			this.m_38897_(new SlotInvSlot(te.ventSlots, i, 26 + i * 108, 26));
-			this.m_38897_(new SlotInvSlot(te.ventSlots, i + 2, 26 + i * 108, 44));
+			this.addSlot(new SlotInvSlot(te.ventSlots, i, 26 + i * 108, 26));
+			this.addSlot(new SlotInvSlot(te.ventSlots, i + 2, 26 + i * 108, 44));
 		}
 	}
 

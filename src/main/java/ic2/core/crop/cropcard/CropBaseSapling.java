@@ -67,15 +67,15 @@ public class CropBaseSapling extends CropBase
 	public ItemStack[] getGains(ICropTile crop)
 	{
 		List<ItemStack> drops = new ArrayList<>();
-		drops.add(this.cropDrop.m_41777_());
+		drops.add(this.cropDrop.copy());
 		if (IC2.random.nextInt(100) >= 75)
 		{
-			drops.add(this.cropSapling.m_41777_());
+			drops.add(this.cropSapling.copy());
 		}
 
 		if (this.getId().equalsIgnoreCase("oak_sapling") && IC2.random.nextInt(100) >= 75)
 		{
-			drops.add(new ItemStack(Items.f_42410_));
+			drops.add(new ItemStack(Items.APPLE));
 		}
 
 		return drops.toArray(new ItemStack[drops.size()]);

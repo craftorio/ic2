@@ -14,7 +14,7 @@ public class GuiItemBuffer extends Ic2Gui<ContainerItemBuffer>
 	}
 
 	@Override
-	public ResourceLocation getTexture()
+	public ResourceLocation getTextureLocation()
 	{
 		return ResourceLocation.fromNamespaceAndPath("ic2", "textures/gui/guiitembuffer.png");
 	}

@@ -56,7 +56,7 @@ public abstract class ItemArmorElectric extends ItemArmorIC2 implements IElectri
 
 	public static void damageArmor(Player entity, DamageSource source, float amount)
 	{
-		if (!(amount <= 0.0F) && !source.m_19379_())
+		if (!(amount <= 0.0F) && !source.isBypassMagic())
 		{
 			float damage = amount / 4.0F;
 			if (damage < 1.0F)
@@ -66,7 +66,7 @@ public abstract class ItemArmorElectric extends ItemArmorIC2 implements IElectri
 
 			for (EquipmentSlot slot : EquipmentSlot.values())
 			{
-				ItemStack stack = entity.m_6844_(slot);
+				ItemStack stack = entity.getItemBySlot(slot);
 				if (stack.getItem() instanceof ItemArmorElectric electricArmor)
 				{
 					electricArmor.damageArmor(entity, stack, source, damage, slot);
@@ -75,20 +75,20 @@ public abstract class ItemArmorElectric extends ItemArmorIC2 implements IElectri
 		}
 	}
 
-	public boolean m_8120_(ItemStack stack)
+	public boolean isEnchantable(ItemStack stack)
 	{
 		return false;
 	}
 
-	public void m_6787_(CreativeModeTab tab, NonNullList<ItemStack> subItems)
+	public void fillItemCategory(CreativeModeTab tab, NonNullList<ItemStack> subItems)
 	{
-		if (this.m_220152_(tab))
+		if (this.allowedIn(tab))
 		{
 			ElectricItemManager.addChargeVariants(this, subItems);
 		}
 	}
 
-	public void m_7373_(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag context)
+	public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag context)
 	{
 		ElectricItemTooltipHandler.addTooltip(stack, tooltip);
 	}
@@ -122,58 +122,58 @@ public abstract class ItemArmorElectric extends ItemArmorIC2 implements IElectri
 		return this.transferLimit;
 	}
 
-	public boolean m_142522_(ItemStack stack)
+	public boolean isBarVisible(ItemStack stack)
 	{
 		return ElectricItem.manager.getChargeLevel(stack) < 1.0;
 	}
 
-	public int m_142158_(ItemStack stack)
+	public int getBarWidth(ItemStack stack)
 	{
 		return (int) Math.round(ElectricItem.manager.getChargeLevel(stack) * 13.0);
 	}
 
-	public int m_142159_(ItemStack stack)
+	public int getBarColor(ItemStack stack)
 	{
-		return Mth.m_14169_((float) (ElectricItem.manager.getChargeLevel(stack) / 3.0), 1.0F, 1.0F);
+		return Mth.hsvToRgb((float) (ElectricItem.manager.getChargeLevel(stack) / 3.0), 1.0F, 1.0F);
 	}
 
 	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(ItemStack stack, EquipmentSlot slot)
 	{
-		if (slot != this.f_40377_)
+		if (slot != this.slot)
 		{
-			return this.m_7167_(slot);
+			return this.getDefaultAttributeModifiers(slot);
 		}
 
 		boolean hasCharge = ElectricItem.manager.getCharge(stack) >= ((ItemArmorElectric) stack.getItem()).getEnergyPerDamage();
 		if (!hasCharge)
 		{
-			return this.m_7167_(slot);
+			return this.getDefaultAttributeModifiers(slot);
 		}
 
 		Item armor = stack.getItem();
 		int protection;
 		if (armor instanceof ItemArmorNanoSuit)
 		{
-			protection = ItemArmorNanoSuit.CHARGED_PROTECTION[slot.m_20749_()];
+			protection = ItemArmorNanoSuit.CHARGED_PROTECTION[slot.getIndex()];
 		} else
 		{
 			if (!(armor instanceof ItemArmorQuantumSuit))
 			{
-				return this.m_7167_(slot);
+				return this.getDefaultAttributeModifiers(slot);
 			}
 
-			protection = ItemArmorQuantumSuit.CHARGED_PROTECTION[slot.m_20749_()];
+			protection = ItemArmorQuantumSuit.CHARGED_PROTECTION[slot.getIndex()];
 		}
 
 		Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
-		Attribute attr = Attributes.f_22284_;
-		UUID uuid = MODIFIERS[slot.m_20749_()];
-		Collection<AttributeModifier> plain = this.m_7167_(slot).get(attr);
+		Attribute attr = Attributes.ARMOR;
+		UUID uuid = MODIFIERS[slot.getIndex()];
+		Collection<AttributeModifier> plain = this.getDefaultAttributeModifiers(slot).get(attr);
 		if (plain != null)
 		{
 			for (AttributeModifier modifier : plain)
 			{
-				if (!modifier.m_22209_().equals(uuid))
+				if (!modifier.getId().equals(uuid))
 				{
 					builder.put(attr, modifier);
 				}

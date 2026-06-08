@@ -5,10 +5,10 @@ import net.minecraft.world.level.block.Blocks;
 
 public enum CropSoilType
 {
-	FARMLAND(Blocks.f_50093_),
-	MYCELIUM(Blocks.f_50195_),
-	SAND(Blocks.f_49992_),
-	SOULSAND(Blocks.f_50135_);
+	FARMLAND(Blocks.FARMLAND),
+	MYCELIUM(Blocks.MYCELIUM),
+	SAND(Blocks.SAND),
+	SOULSAND(Blocks.SOUL_SAND);
 
 	private final Block block;
 

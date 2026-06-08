@@ -45,7 +45,7 @@ public abstract class TileEntityExplosive extends TileEntityInventory implements
 	@Override
 	protected InteractionResult onActivated(Player player, InteractionHand hand, Direction side, Vec3 hit)
 	{
-		if (!StackUtil.consume(player, hand, StackUtil.sameItem(Items.f_42613_), 1) && !StackUtil.damage(player, hand, StackUtil.sameItem(Items.f_42409_), 1))
+		if (!StackUtil.consume(player, hand, StackUtil.sameItem(Items.FIRE_CHARGE), 1) && !StackUtil.damage(player, hand, StackUtil.sameItem(Items.FLINT_AND_STEEL), 1))
 		{
 			return super.onActivated(player, hand, side, hit);
 		}
@@ -58,7 +58,7 @@ public abstract class TileEntityExplosive extends TileEntityInventory implements
 	protected void onExploded(Explosion explosion)
 	{
 		super.onExploded(explosion);
-		this.explode(explosion.m_46079_(), true);
+		this.explode(explosion.getSourceMob(), true);
 	}
 
 	@Override
@@ -77,10 +77,10 @@ public abstract class TileEntityExplosive extends TileEntityInventory implements
 	@Override
 	protected void onEntityCollision(Entity entity)
 	{
-		if (!this.getLevel().isClientSide && entity instanceof Projectile && entity.m_6060_())
+		if (!this.getLevel().isClientSide && entity instanceof Projectile && entity.isOnFire())
 		{
 			Projectile arrow = (Projectile) entity;
-			Entity owner = arrow.m_37282_();
+			Entity owner = arrow.getOwner();
 			this.explode(owner instanceof LivingEntity ? (LivingEntity) owner : null, false);
 		}
 	}
@@ -114,7 +114,7 @@ public abstract class TileEntityExplosive extends TileEntityInventory implements
 		}
 
 		world.addFreshEntity(entity);
-		world.m_6263_((Player) null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.f_12512_, SoundSource.BLOCKS, 1.0F, 1.0F);
+		world.playSound((Player) null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.TNT_PRIMED, SoundSource.BLOCKS, 1.0F, 1.0F);
 		this.exploded = true;
 		return true;
 	}

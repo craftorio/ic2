@@ -34,6 +34,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public final class Util
 {
@@ -214,10 +215,7 @@ public final class Util
 
 		do
 		{
-			for (Class<?> i : c.getInterfaces())
-			{
-				interfaces.add(i);
-			}
+			Collections.addAll(interfaces, c.getInterfaces());
 
 			c = c.getSuperclass();
 		} while (c != null);
@@ -267,7 +265,7 @@ public final class Util
 
 	public static boolean hasAssertions()
 	{
-		boolean ret;
+		boolean ret = false;
 		assert ret = true;
 		return ret;
 	}
@@ -291,43 +289,44 @@ public final class Util
 			throw new NullPointerException("null name");
 		} else
 		{
-			return getBlock(ResourceLocation.fromNamespaceAndPath(name));
+			// TODO
+			return getBlock(ResourceLocation.withDefaultNamespace(name));
 		}
 	}
 
 	public static Block getBlock(ResourceLocation loc)
 	{
-		Block ret = (Block) Registry.BLOCK.m_7745_(loc);
-		if (ret != Blocks.f_50016_)
+		Block ret = Registry.BLOCK.get(loc);
+		if (ret != Blocks.AIR)
 		{
 			return ret;
 		} else
 		{
-			return loc.m_135827_().equals("minecraft") && loc.m_135815_().equals("air") ? ret : null;
+			return loc.getNamespace().equals("minecraft") && loc.getPath().equals("air") ? ret : null;
 		}
 	}
 
 	public static boolean canShear(BlockState state)
 	{
-		return state.m_204336_(BlockTags.f_13035_)
-			|| state.m_60713_(Blocks.f_50033_)
-			|| state.m_60713_(Blocks.f_50034_)
-			|| state.m_60713_(Blocks.f_50035_)
-			|| state.m_60713_(Blocks.f_50036_)
-			|| state.m_60713_(Blocks.f_152548_)
-			|| state.m_60713_(Blocks.f_50191_)
-			|| state.m_60713_(Blocks.f_50267_)
-			|| state.m_204336_(BlockTags.f_13089_);
+		return state.is(BlockTags.LEAVES)
+			|| state.is(Blocks.COBWEB)
+			|| state.is(Blocks.GRASS)
+			|| state.is(Blocks.FERN)
+			|| state.is(Blocks.DEAD_BUSH)
+			|| state.is(Blocks.HANGING_ROOTS)
+			|| state.is(Blocks.VINE)
+			|| state.is(Blocks.TRIPWIRE)
+			|| state.is(BlockTags.WOOL);
 	}
 
 	public static Vector3 getEyePosition(Entity entity)
 	{
-		return new Vector3(entity.getX(), entity.m_20188_(), entity.getZ());
+		return new Vector3(entity.getX(), entity.getEyeY(), entity.getZ());
 	}
 
 	public static ResourceLocation getName(Block block)
 	{
-		return Registry.BLOCK.getKey(block);
+		return ForgeRegistries.BLOCKS.getKey(block);
 	}
 
 	public static Item getItem(String name)
@@ -337,38 +336,38 @@ public final class Util
 			throw new NullPointerException("null name");
 		} else
 		{
-			return getItem(ResourceLocation.fromNamespaceAndPath(name));
+			return getItem(ResourceLocation.withDefaultNamespace(name));
 		}
 	}
 
 	public static Item getItem(ResourceLocation loc)
 	{
-		return (Item) Registry.f_122827_.m_7745_(loc);
+		return Registry.ITEM.get(loc);
 	}
 
 	public static Vector3 getLook(Entity entity)
 	{
-		return new Vector3(entity.m_20154_());
+		return new Vector3(entity.getLookAngle());
 	}
 
 	public static ResourceLocation getName(Item item)
 	{
-		return Registry.f_122827_.getKey(item);
+		return Registry.ITEM.getKey(item);
 	}
 
 	public static Fluid getFluid(ResourceLocation loc)
 	{
-		return (Fluid) Registry.f_122822_.m_7745_(loc);
+		return Registry.FLUID.get(loc);
 	}
 
 	public static ResourceLocation getName(Fluid fluid)
 	{
-		return Registry.f_122822_.getKey(fluid);
+		return Registry.FLUID.getKey(fluid);
 	}
 
 	public static ResourceLocation getDimId(Level world)
 	{
-		return world.m_46472_().m_135782_();
+		return world.dimension().location();
 	}
 
 	public static String toString(BlockEntity te)
@@ -581,7 +580,7 @@ public final class Util
 			}
 		}
 
-		ret = ret + Integer.toString(iVal);
+		ret = ret + iVal;
 		if (digits > iDigits && dVal != 0)
 		{
 			ret = ret + String.format(".%0" + (digits - iDigits) + "d", dVal);
@@ -640,7 +639,7 @@ public final class Util
 
 	public static boolean isAreaLoaded(LevelReader world, BlockPos center, int dist)
 	{
-		return world.m_151572_(center.getX() - dist, center.getZ() - dist, center.getX() + dist, center.getZ() + dist);
+		return world.hasChunksAt(center.getX() - dist, center.getZ() - dist, center.getX() + dist, center.getZ() + dist);
 	}
 
 	public static boolean harvestBlock(Level world, BlockPos pos)
@@ -654,14 +653,14 @@ public final class Util
 		Block block = state.getBlock();
 		BlockEntity be = world.getBlockEntity(pos);
 		Player player = Ic2Player.get(world);
-		block.m_5707_(world, pos, state, player);
+		block.playerWillDestroy(world, pos, state, player);
 		if (!world.removeBlock(pos, false))
 		{
 			return false;
 		}
 
-		block.m_6786_(world, pos, state);
-		block.m_6240_(world, player, pos, state, be, new ItemStack(Items.f_42390_));
+		block.destroy(world, pos, state);
+		block.playerDestroy(world, player, pos, state, be, new ItemStack(Items.DIAMOND_PICKAXE));
 		return true;
 	}
 
@@ -669,7 +668,7 @@ public final class Util
 	{
 		if (!(match instanceof ItemStack))
 		{
-			if (!(match instanceof TagKey<?> tagKey && tagKey.m_207645_(Registry.f_122827_.m_123023_())))
+			if (!(match instanceof TagKey<?> tagKey && tagKey.isFor(Registry.ITEM.key())))
 			{
 				return stack == match;
 			} else
@@ -679,18 +678,18 @@ public final class Util
 					return false;
 				}
 
-				Optional<TagKey<Item>> itemTagKeyOpt = tagKey.m_207647_(Registry.f_122827_.m_123023_());
+				Optional<TagKey<Item>> itemTagKeyOpt = tagKey.cast(Registry.ITEM.key());
 				if (itemTagKeyOpt.isEmpty())
 				{
 					return false;
 				}
 
 				TagKey<Item> itemTagKey = itemTagKeyOpt.get();
-				return stack.m_204117_(itemTagKey);
+				return stack.is(itemTagKey);
 			}
 		} else
 		{
-			return !StackUtil.isEmpty(stack) && stack.m_41656_((ItemStack) match);
+			return !StackUtil.isEmpty(stack) && stack.sameItem((ItemStack) match);
 		}
 	}
 }

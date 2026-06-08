@@ -16,14 +16,14 @@ public class ItemComparableItemStack
 		CompoundTag nbt = stack.getTag();
 		if (nbt != null)
 		{
-			if (nbt.m_128456_())
+			if (nbt.isEmpty())
 			{
 				nbt = null;
 			} else
 			{
 				if (copyNbt)
 				{
-					nbt = nbt.m_6426_();
+					nbt = nbt.copy();
 				}
 
 				boolean copied = copyNbt;
@@ -32,14 +32,14 @@ public class ItemComparableItemStack
 				{
 					if (!copied && nbt.contains(key))
 					{
-						nbt = nbt.m_6426_();
+						nbt = nbt.copy();
 						copied = true;
 					}
 
-					nbt.m_128473_(key);
+					nbt.remove(key);
 				}
 
-				if (nbt.m_128456_())
+				if (nbt.isEmpty())
 				{
 					nbt = null;
 				}
@@ -53,7 +53,7 @@ public class ItemComparableItemStack
 	private ItemComparableItemStack(ItemComparableItemStack src)
 	{
 		this.item = src.item;
-		this.nbt = src.nbt != null ? src.nbt.m_6426_() : null;
+		this.nbt = src.nbt != null ? src.nbt.copy() : null;
 		this.hashCode = src.hashCode;
 	}
 
@@ -114,7 +114,7 @@ public class ItemComparableItemStack
 		}
 
 		ItemStack ret = new ItemStack(this.item, size);
-		ret.m_41751_(this.nbt);
+		ret.setTag(this.nbt);
 		return ret;
 	}
 }

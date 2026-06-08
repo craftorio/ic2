@@ -18,13 +18,13 @@ public class ContainerCropHarvester extends ContainerElectricMachine<TileEntityC
 		{
 			for (int x = 0; x < 5; x++)
 			{
-				this.m_38897_(new SlotInvSlot(base.contentSlot, x + y * 5, 48 + x * 18, 17 + y * 18));
+				this.addSlot(new SlotInvSlot(base.contentSlot, x + y * 5, 48 + x * 18, 17 + y * 18));
 			}
 		}
 
 		for (int i = 0; i < 4; i++)
 		{
-			this.m_38897_(new SlotInvSlot(base.upgradeSlot, i, 152, 8 + i * 18));
+			this.addSlot(new SlotInvSlot(base.upgradeSlot, i, 152, 8 + i * 18));
 		}
 	}
 

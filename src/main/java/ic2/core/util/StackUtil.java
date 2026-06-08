@@ -60,14 +60,14 @@ public final class StackUtil
 {
 	private static final List<TagKey<Item>> oreTags = List.of(
 		Ic2ItemTags.ORES,
-		ItemTags.f_144316_,
-		ItemTags.f_144318_,
-		ItemTags.f_144313_,
-		ItemTags.f_13152_,
-		ItemTags.f_144312_,
-		ItemTags.f_144317_,
-		ItemTags.f_144315_,
-		ItemTags.f_144314_
+		ItemTags.COAL_ORES,
+		ItemTags.COPPER_ORES,
+		ItemTags.DIAMOND_ORES,
+		ItemTags.GOLD_ORES,
+		ItemTags.IRON_ORES,
+		ItemTags.EMERALD_ORES,
+		ItemTags.LAPIS_ORES,
+		ItemTags.REDSTONE_ORES
 	);
 	static final Set<String> ignoredNbtKeys = new HashSet<>(Arrays.asList("damage", "charge", "energy", "advDmg"));
 	public static final Predicate<ItemStack> anyStack = stack -> true;
@@ -77,24 +77,24 @@ public final class StackUtil
 
 	public static boolean isEmpty(ItemStack stack)
 	{
-		return stack == emptyStack || stack == null || stack.getItem() == null || stack.m_41613_() <= 0;
+		return stack == emptyStack || stack == null || stack.getItem() == null || stack.getCount() <= 0;
 	}
 
 	public static boolean isEmpty(Player player, InteractionHand hand)
 	{
-		return isEmpty(player.m_21120_(hand));
+		return isEmpty(player.getItemInHand(hand));
 	}
 
 	public static int getSize(ItemStack stack)
 	{
-		return isEmpty(stack) ? 0 : stack.m_41613_();
+		return isEmpty(stack) ? 0 : stack.getCount();
 	}
 
 	public static boolean isOreStack(ItemStack stack)
 	{
 		for (TagKey<Item> oreTag : oreTags)
 		{
-			if (stack.m_204117_(oreTag))
+			if (stack.is(oreTag))
 			{
 				return true;
 			}
@@ -105,7 +105,7 @@ public final class StackUtil
 
 	public static ItemStack setSize(ItemStack stack, int size)
 	{
-		stack.m_41764_(size);
+		stack.setCount(size);
 		return size <= 0 ? emptyStack : stack;
 	}
 
@@ -222,7 +222,7 @@ public final class StackUtil
 
 	public static ItemStack copy(ItemStack stack)
 	{
-		return stack.m_41777_();
+		return stack.copy();
 	}
 
 	public static ItemStack copyWithSize(ItemStack stack, int newSize)
@@ -265,7 +265,7 @@ public final class StackUtil
 		if (ret == null)
 		{
 			ret = new CompoundTag();
-			stack.m_41751_(ret);
+			stack.setTag(ret);
 		}
 
 		return ret;
@@ -283,7 +283,7 @@ public final class StackUtil
 
 	public static boolean checkItemEqualityStrict(ItemStack a, ItemStack b)
 	{
-		return isEmpty(a) && isEmpty(b) || !isEmpty(a) && !isEmpty(b) && a.m_41656_(b) && checkNbtEqualityStrict(a, b);
+		return isEmpty(a) && isEmpty(b) || !isEmpty(a) && !isEmpty(b) && a.sameItem(b) && checkNbtEqualityStrict(a, b);
 	}
 
 	private static boolean checkNbtEquality(ItemStack a, ItemStack b)
@@ -330,7 +330,7 @@ public final class StackUtil
 
 		for (String key : toCheck)
 		{
-			if (!a.m_128423_(key).equals(b.m_128423_(key)))
+			if (!a.get(key).equals(b.get(key)))
 			{
 				return false;
 			}
@@ -399,8 +399,8 @@ public final class StackUtil
 			throw new NullPointerException("null block");
 		} else
 		{
-			Item item = block.m_5456_();
-			if (item != null && (item != Items.f_41852_ || block == Blocks.f_50016_))
+			Item item = block.asItem();
+			if (item != null && (item != Items.AIR || block == Blocks.AIR))
 			{
 				return sameItem(item);
 			} else
@@ -473,7 +473,7 @@ public final class StackUtil
 			return emptyStack;
 		}
 
-		if (player.m_150110_().f_35937_)
+		if (player.getAbilities().instabuild)
 		{
 			return copyOutput ? copyWithSize(stack, amount) : stack;
 		}
@@ -505,7 +505,7 @@ public final class StackUtil
 	public static ItemStack consumeFromPlayerInventoryAndGet(Player player, Predicate<ItemStack> request, int amount, boolean excludeSelectedSlot)
 	{
 		Inventory inventory = player.getInventory();
-		NonNullList<ItemStack> contents = inventory.f_35974_;
+		NonNullList<ItemStack> contents = inventory.items;
 		int amountNeeded = amount;
 
 		for (int i = 0; i < contents.size(); i++)
@@ -513,12 +513,12 @@ public final class StackUtil
 			ItemStack stack = (ItemStack) contents.get(i);
 			if (request.test(stack))
 			{
-				if (player.m_150110_().f_35937_)
+				if (player.getAbilities().instabuild)
 				{
 					return copyWithSize(stack, amount);
 				}
 
-				if (!excludeSelectedSlot || i != inventory.f_35977_)
+				if (!excludeSelectedSlot || i != inventory.selected)
 				{
 					int cAmount = Math.min(getSize(stack), amountNeeded);
 					amountNeeded -= cAmount;
@@ -541,12 +541,12 @@ public final class StackUtil
 
 	public static boolean addToPlayerInventory(Player player, ItemStack stack)
 	{
-		return player.getInventory().m_36054_(stack);
+		return player.getInventory().add(stack);
 	}
 
 	public static boolean consumeFromPlayerInventory(Player player, Predicate<ItemStack> request, int amount, boolean simulate)
 	{
-		NonNullList<ItemStack> contents = player.getInventory().f_35974_;
+		NonNullList<ItemStack> contents = player.getInventory().items;
 		int pass = 0;
 
 		label47:
@@ -559,7 +559,7 @@ public final class StackUtil
 				ItemStack stack = (ItemStack) contents.get(i);
 				if (request.test(stack))
 				{
-					if (player.m_150110_().f_35937_)
+					if (player.getAbilities().instabuild)
 					{
 						return true;
 					}
@@ -632,7 +632,7 @@ public final class StackUtil
 			return emptyStack;
 		}
 
-		int maxDamage = stack.m_41776_();
+		int maxDamage = stack.getMaxDamage();
 		if (maxDamage <= 0)
 		{
 			return emptyStack;
@@ -643,9 +643,9 @@ public final class StackUtil
 			return emptyStack;
 		}
 
-		if (!player.m_150110_().f_35937_ && stack.m_41763_())
+		if (!player.getAbilities().instabuild && stack.isDamageableItem())
 		{
-			stack.m_41622_(amount, player, p -> p.m_21190_(hand));
+			stack.hurtAndBreak(amount, player, p -> p.broadcastBreakEvent(hand));
 			ItemStack ret;
 			if (isEmpty(stack))
 			{
@@ -666,7 +666,7 @@ public final class StackUtil
 
 	public static ItemStack get(Player player, InteractionHand hand)
 	{
-		return player.m_21120_(hand);
+		return player.getItemInHand(hand);
 	}
 
 	public static void set(Player player, InteractionHand hand, ItemStack stack)
@@ -679,7 +679,7 @@ public final class StackUtil
 		Inventory inv = player.getInventory();
 		if (hand == InteractionHand.MAIN_HAND)
 		{
-			inv.f_35974_.set(inv.f_35977_, stack);
+			inv.items.set(inv.selected, stack);
 		} else
 		{
 			if (hand != InteractionHand.OFF_HAND)
@@ -687,7 +687,7 @@ public final class StackUtil
 				throw new IllegalArgumentException("invalid hand: " + hand);
 			}
 
-			inv.f_35976_.set(0, stack);
+			inv.offhand.set(0, stack);
 		}
 	}
 
@@ -708,15 +708,15 @@ public final class StackUtil
 	{
 		if (!simulate)
 		{
-			return player.getInventory().m_36054_(stack);
+			return player.getInventory().add(stack);
 		}
 
 		int sizeLeft = getSize(stack);
 		int maxStackSize = Math.min(player.getInventory().getMaxStackSize(), stack.getMaxStackSize());
 
-		for (int i = 0; i < player.getInventory().f_35974_.size() && sizeLeft > 0; i++)
+		for (int i = 0; i < player.getInventory().items.size() && sizeLeft > 0; i++)
 		{
-			ItemStack invStack = (ItemStack) player.getInventory().f_35974_.get(i);
+			ItemStack invStack = (ItemStack) player.getInventory().items.get(i);
 			if (isEmpty(invStack))
 			{
 				sizeLeft -= maxStackSize;
@@ -737,8 +737,8 @@ public final class StackUtil
 			double dx = world.random.nextFloat() * f + (1.0 - f) * 0.5;
 			double dy = world.random.nextFloat() * f + (1.0 - f) * 0.5;
 			double dz = world.random.nextFloat() * f + (1.0 - f) * 0.5;
-			ItemEntity entityItem = new ItemEntity(world, pos.getX() + dx, pos.getY() + dy, pos.getZ() + dz, stack.m_41777_());
-			entityItem.m_32060_();
+			ItemEntity entityItem = new ItemEntity(world, pos.getX() + dx, pos.getY() + dy, pos.getZ() + dz, stack.copy());
+			entityItem.setDefaultPickUpDelay();
 			world.addFreshEntity(entityItem);
 		}
 	}
@@ -804,12 +804,12 @@ public final class StackUtil
 		int oldSize = getSize(stack);
 		Player player = Ic2Player.get(world);
 		InteractionHand hand = InteractionHand.MAIN_HAND;
-		ItemStack prev = player.m_21120_(hand);
-		player.m_21008_(hand, stack);
-		InteractionResult result = item.m_6225_(
-			new UseOnContext(player, hand, new BlockHitResult(Vec3.m_82528_(pos).m_82520_(0.5, 1.0, 0.5), Direction.DOWN, pos, false))
+		ItemStack prev = player.getItemInHand(hand);
+		player.setItemInHand(hand, stack);
+		InteractionResult result = item.useOn(
+			new UseOnContext(player, hand, new BlockHitResult(Vec3.atLowerCornerOf(pos).add(0.5, 1.0, 0.5), Direction.DOWN, pos, false))
 		);
-		player.m_21008_(hand, prev);
+		player.setItemInHand(hand, prev);
 		stack = setSize(stack, oldSize);
 		return result == InteractionResult.SUCCESS || result == InteractionResult.CONSUME;
 	}
@@ -826,7 +826,7 @@ public final class StackUtil
 
 	public static ItemStack getPickStack(Level world, BlockPos pos, BlockState state, Player player)
 	{
-		ItemStack ret = state.getBlock().m_7397_(world, pos, state);
+		ItemStack ret = state.getBlock().getCloneItemStack(world, pos, state);
 		return isEmpty(ret) ? emptyStack : ret;
 	}
 
@@ -847,16 +847,16 @@ public final class StackUtil
 			return Collections.emptyList();
 		}
 
-		ItemStack stack = new ItemStack(Items.f_42390_);
+		ItemStack stack = new ItemStack(Items.DIAMOND_PICKAXE);
 		if (silkTouch)
 		{
-			EnchantmentHelper.m_44865_(Collections.singletonMap(Enchantments.f_44985_, fortune), stack);
+			EnchantmentHelper.setEnchantments(Collections.singletonMap(Enchantments.SILK_TOUCH, fortune), stack);
 		} else if (fortune > 0)
 		{
-			EnchantmentHelper.m_44865_(Collections.singletonMap(Enchantments.f_44987_, fortune), stack);
+			EnchantmentHelper.setEnchantments(Collections.singletonMap(Enchantments.BLOCK_FORTUNE, fortune), stack);
 		}
 
-		return Block.m_49874_(state, (ServerLevel) world, pos, world.getBlockEntity(pos), player, stack);
+		return Block.getDrops(state, (ServerLevel) world, pos, world.getBlockEntity(pos), player, stack);
 	}
 
 	public static IntSet getSlotsFromInv(Container inv)

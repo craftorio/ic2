@@ -30,7 +30,7 @@ public class InvSlotConsumableClass extends InvSlotConsumable
 			return false;
 		} else
 		{
-			return stack.getItem() instanceof BlockItem ? this.clazz.isInstance(Block.m_49814_(stack.getItem())) : this.clazz.isInstance(stack.getItem());
+			return stack.getItem() instanceof BlockItem ? this.clazz.isInstance(Block.byItem(stack.getItem())) : this.clazz.isInstance(stack.getItem());
 		}
 	}
 }

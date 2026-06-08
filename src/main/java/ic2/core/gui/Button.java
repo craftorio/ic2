@@ -76,7 +76,7 @@ public abstract class Button<T extends Button<T>> extends GuiElement<T>
 	@Override
 	protected boolean onMouseClick(int mouseX, int mouseY, MouseButton button)
 	{
-		SideProxyClient.mc.m_91106_().m_120367_(SimpleSoundInstance.m_119752_(SoundEvents.f_12490_, 1.0F));
+		SideProxyClient.mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
 		this.handler.onClick(button);
 		return false;
 	}

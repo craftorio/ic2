@@ -39,11 +39,11 @@ public class UpgradesWidget extends GuiElement<UpgradesWidget>
 	protected List<Component> getToolTip()
 	{
 		List<Component> ret = super.getToolTip();
-		ret.add(Component.m_237115_("ic2.generic.text.upgrade"));
+		ret.add(Component.translatable("ic2.generic.text.upgrade"));
 
 		for (ItemStack itemstack : this.compatibleUpgrades)
 		{
-			ret.add(itemstack.m_41786_());
+			ret.add(itemstack.getHoverName());
 		}
 
 		return ret;

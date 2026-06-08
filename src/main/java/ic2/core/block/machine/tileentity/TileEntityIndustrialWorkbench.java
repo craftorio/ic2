@@ -56,7 +56,7 @@ public class TileEntityIndustrialWorkbench extends TileEntityInventory implement
 	public void onPlaced(ItemStack stack, LivingEntity placer, Direction facing)
 	{
 		super.onPlaced(stack, placer, facing);
-		if (!stack.m_41782_() || !stack.getTag().contains("PLACED"))
+		if (!stack.hasTag() || !stack.getTag().contains("PLACED"))
 		{
 			this.leftCrafting.tool.put(new ItemStack(Ic2Items.FORGE_HAMMER));
 			this.rightCrafting.tool.put(new ItemStack(Ic2Items.CUTTER));
@@ -102,7 +102,7 @@ public class TileEntityIndustrialWorkbench extends TileEntityInventory implement
 
 	private static int getPossible(int max, ItemStack existing, ItemStack in)
 	{
-		int amount = Math.min(max, in.m_41753_() ? in.getMaxStackSize() : 1);
+		int amount = Math.min(max, in.isStackable() ? in.getMaxStackSize() : 1);
 		if (!StackUtil.isEmpty(existing))
 		{
 			if (!StackUtil.checkItemEqualityStrict(existing, in))
@@ -291,12 +291,12 @@ public class TileEntityIndustrialWorkbench extends TileEntityInventory implement
 					return false;
 				}
 
-				if (this.recipe != null && this.recipe.m_5818_(this.crafting, world))
+				if (this.recipe != null && this.recipe.matches(this.crafting, world))
 				{
 					return true;
 				}
 
-				this.recipe = (CraftingRecipe) world.getServer().m_129894_().m_44015_(RecipeType.f_44107_, this.crafting, world).orElse(null);
+				this.recipe = (CraftingRecipe) world.getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, this.crafting, world).orElse(null);
 				return this.recipe != null;
 			} else
 			{
@@ -306,7 +306,7 @@ public class TileEntityIndustrialWorkbench extends TileEntityInventory implement
 
 		public ItemStack getOutputStack()
 		{
-			return !this.canProcess() ? StackUtil.emptyStack : this.recipe.m_5874_(this.crafting);
+			return !this.canProcess() ? StackUtil.emptyStack : this.recipe.assemble(this.crafting);
 		}
 	}
 }

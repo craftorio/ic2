@@ -41,19 +41,19 @@ public class CannerRecipeProvider extends Ic2RecipeProvider
 		gen.add(itemInput(Ic2Items.FUEL_ROD), itemInput(Ic2Items.URANIUM), new ItemStack(Ic2Items.URANIUM_FUEL_ROD), "uranium_fuel_rod");
 		gen.add(itemInput(Ic2Items.FUEL_ROD), itemInput(Ic2Items.MOX), new ItemStack(Ic2Items.MOX_FUEL_ROD), "mox_fuel_rod");
 
-		for (Item item : Registry.f_122827_)
+		for (Item item : Registry.ITEM)
 		{
-			FoodProperties comp = item.m_41473_();
+			FoodProperties comp = item.getFoodProperties();
 			if (comp != null)
 			{
-				int hunger = Math.min(64, comp.m_38744_());
+				int hunger = Math.min(64, comp.getNutrition());
 				if (hunger >= 1)
 				{
 					boolean harmful = false;
 
-					for (Pair<MobEffectInstance, Float> effectPair : comp.m_38749_())
+					for (Pair<MobEffectInstance, Float> effectPair : comp.getEffects())
 					{
-						if (((MobEffectInstance) effectPair.getFirst()).m_19544_().m_19483_() == MobEffectCategory.HARMFUL)
+						if (((MobEffectInstance) effectPair.getFirst()).getEffect().getCategory() == MobEffectCategory.HARMFUL)
 						{
 							harmful = true;
 							break;
@@ -69,12 +69,12 @@ public class CannerRecipeProvider extends Ic2RecipeProvider
 						}
 					}
 
-					int fillItemCount = item != Items.f_42675_ && item != Items.f_42583_ ? 1 : 2;
+					int fillItemCount = item != Items.POISONOUS_POTATO && item != Items.ROTTEN_FLESH ? 1 : 2;
 					gen.add(
 						itemInput(Ic2Items.TIN_CAN, hunger),
 						itemInput(item, fillItemCount),
 						new ItemStack(Ic2Items.FILLED_TIN_CAN, hunger),
-						Registry.f_122827_.getKey(item).m_135815_() + "_filled_tin_can"
+						Registry.ITEM.getKey(item).getPath() + "_filled_tin_can"
 					);
 				}
 			}
@@ -84,9 +84,9 @@ public class CannerRecipeProvider extends Ic2RecipeProvider
 	private static void generateEnrich(Consumer<FinishedRecipe> consumer)
 	{
 		CannerEnrichRecipeGenerator gen = new CannerEnrichRecipeGenerator(consumer);
-		gen.add(bucket(Fluids.f_76193_), itemInput(Ic2Items.CF_POWDER), bucket(Ic2Fluids.CONSTRUCTION_FOAM.still), "construction_foam");
-		gen.add(bucket(Fluids.f_76193_), tagInput(Ic2ItemTags.LAPIS_DUSTS, 8), bucket(Ic2Fluids.COOLANT.still), "coolant_from_water");
+		gen.add(bucket(Fluids.WATER), itemInput(Ic2Items.CF_POWDER), bucket(Ic2Fluids.CONSTRUCTION_FOAM.still), "construction_foam");
+		gen.add(bucket(Fluids.WATER), tagInput(Ic2ItemTags.LAPIS_DUSTS, 8), bucket(Ic2Fluids.COOLANT.still), "coolant_from_water");
 		gen.add(bucket(Ic2Fluids.DISTILLED_WATER.still), tagInput(Ic2ItemTags.LAPIS_DUSTS), bucket(Ic2Fluids.COOLANT.still), "coolant_from_distilled_water");
-		gen.add(bucket(Fluids.f_76193_), itemInput(Ic2Items.BIO_CHAFF), bucket(Ic2Fluids.BIOMASS.still), "biomass");
+		gen.add(bucket(Fluids.WATER), itemInput(Ic2Items.BIO_CHAFF), bucket(Ic2Fluids.BIOMASS.still), "biomass");
 	}
 }

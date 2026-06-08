@@ -45,10 +45,10 @@ public class AdvShapelessRecipe implements CraftingRecipe
 
 	public boolean matches(CraftingContainer inventorycrafting, Level world)
 	{
-		return this.craft(inventorycrafting) != StackUtil.emptyStack;
+		return this.assemble(inventorycrafting) != StackUtil.emptyStack;
 	}
 
-	public ItemStack craft(CraftingContainer inventorycrafting)
+	public ItemStack assemble(CraftingContainer inventorycrafting)
 	{
 		int offerSize = inventorycrafting.getContainerSize();
 		if (offerSize < this.input.length)
@@ -84,12 +84,12 @@ public class AdvShapelessRecipe implements CraftingRecipe
 			return StackUtil.emptyStack;
 		}
 
-		ItemStack ret = this.output.m_41777_();
+		ItemStack ret = this.output.copy();
 		ElectricItem.manager.charge(ret, outputCharge, Integer.MAX_VALUE, true, false);
 		return ret;
 	}
 
-	public ItemStack m_8043_()
+	public ItemStack getResultItem()
 	{
 		return this.output;
 	}
@@ -103,10 +103,10 @@ public class AdvShapelessRecipe implements CraftingRecipe
 	{
 		if (this.consuming)
 		{
-			return NonNullList.m_122780_(inv.getContainerSize(), StackUtil.emptyStack);
+			return NonNullList.withSize(inv.getContainerSize(), StackUtil.emptyStack);
 		}
 
-		NonNullList<ItemStack> defaultedList = NonNullList.m_122780_(inv.getContainerSize(), ItemStack.EMPTY);
+		NonNullList<ItemStack> defaultedList = NonNullList.withSize(inv.getContainerSize(), ItemStack.EMPTY);
 
 		for (int i = 0; i < defaultedList.size(); i++)
 		{
@@ -114,15 +114,15 @@ public class AdvShapelessRecipe implements CraftingRecipe
 			ItemStack remainder = IC2.envProxy.getRecipeRemainder(stack);
 			if (stack.getItem() instanceof ItemToolCrafting)
 			{
-				remainder = stack.m_41777_();
-				remainder.m_41721_(remainder.getDamageValue() + 1);
-				if (remainder.getDamageValue() == remainder.m_41776_())
+				remainder = stack.copy();
+				remainder.setDamageValue(remainder.getDamageValue() + 1);
+				if (remainder.getDamageValue() == remainder.getMaxDamage())
 				{
 					remainder = ItemStack.EMPTY;
 				}
 			}
 
-			if (!remainder.m_41619_())
+			if (!remainder.isEmpty())
 			{
 				defaultedList.set(i, remainder);
 			}
@@ -131,14 +131,14 @@ public class AdvShapelessRecipe implements CraftingRecipe
 		return defaultedList;
 	}
 
-	public boolean m_8004_(int x, int y)
+	public boolean canCraftInDimensions(int x, int y)
 	{
 		return x * y >= this.input.length;
 	}
 
-	public NonNullList<Ingredient> m_7527_()
+	public NonNullList<Ingredient> getIngredients()
 	{
-		NonNullList<Ingredient> list = NonNullList.m_122779_();
+		NonNullList<Ingredient> list = NonNullList.create();
 		if (!this.hidden)
 		{
 			for (IRecipeInput input : this.input)
@@ -150,26 +150,26 @@ public class AdvShapelessRecipe implements CraftingRecipe
 		return list;
 	}
 
-	public boolean m_5598_()
+	public boolean isSpecial()
 	{
 		return this.hidden;
 	}
 
-	public ResourceLocation m_6423_()
+	public ResourceLocation getId()
 	{
 		return this.id;
 	}
 
-	public RecipeSerializer<?> m_7707_()
+	public RecipeSerializer<?> getSerializer()
 	{
 		return Ic2RecipeSerializers.SHAPELESS;
 	}
 
 	public static class Serializer implements RecipeSerializer<AdvShapelessRecipe>
 	{
-		public AdvShapelessRecipe read(ResourceLocation id, JsonObject json)
+		public AdvShapelessRecipe fromJson(ResourceLocation id, JsonObject json)
 		{
-			IRecipeInput[] ingredients = getIngredients(GsonHelper.m_13933_(json, "ingredients"));
+			IRecipeInput[] ingredients = getIngredients(GsonHelper.getAsJsonArray(json, "ingredients"));
 			if (ingredients.length == 0)
 			{
 				throw new JsonParseException("No ingredients for IC2 shapeless recipe");
@@ -180,9 +180,9 @@ public class AdvShapelessRecipe implements CraftingRecipe
 				throw new JsonParseException("Too many ingredients for IC2 shapeless recipe");
 			}
 
-			ItemStack result = RecipeIo.parseOutput(GsonHelper.m_13930_(json, "result"));
-			boolean consuming = GsonHelper.m_13855_(json, "consuming", false);
-			boolean hidden = GsonHelper.m_13855_(json, "hidden", false);
+			ItemStack result = RecipeIo.parseOutput(GsonHelper.getAsJsonObject(json, "result"));
+			boolean consuming = GsonHelper.getAsBoolean(json, "consuming", false);
+			boolean hidden = GsonHelper.getAsBoolean(json, "hidden", false);
 			return new AdvShapelessRecipe(id, ingredients, result, hidden, consuming);
 		}
 
@@ -198,28 +198,28 @@ public class AdvShapelessRecipe implements CraftingRecipe
 			return inputs;
 		}
 
-		public AdvShapelessRecipe read(ResourceLocation id, FriendlyByteBuf buf)
+		public AdvShapelessRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buf)
 		{
-			IRecipeInput[] inputs = new IRecipeInput[buf.m_130242_()];
+			IRecipeInput[] inputs = new IRecipeInput[buf.readVarInt()];
 
 			for (int i = 0; i < inputs.length; i++)
 			{
 				inputs[i] = RecipeIo.readInput(buf);
 			}
 
-			return new AdvShapelessRecipe(id, inputs, buf.m_130267_(), buf.readBoolean(), buf.readBoolean());
+			return new AdvShapelessRecipe(id, inputs, buf.readItem(), buf.readBoolean(), buf.readBoolean());
 		}
 
-		public void write(FriendlyByteBuf buf, AdvShapelessRecipe recipe)
+		public void toNetwork(FriendlyByteBuf buf, AdvShapelessRecipe recipe)
 		{
-			buf.m_130130_(recipe.input.length);
+			buf.writeVarInt(recipe.input.length);
 
 			for (IRecipeInput input : recipe.input)
 			{
 				RecipeIo.writeInput(buf, input);
 			}
 
-			buf.m_130055_(recipe.output);
+			buf.writeItem(recipe.output);
 			buf.writeBoolean(recipe.hidden);
 			buf.writeBoolean(recipe.consuming);
 		}

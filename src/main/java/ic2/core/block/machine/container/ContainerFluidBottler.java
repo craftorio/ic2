@@ -13,8 +13,8 @@ public class ContainerFluidBottler extends ContainerStandardMachine<TileEntityFl
 	public ContainerFluidBottler(int syncId, Inventory playerInventory, TileEntityFluidBottler be)
 	{
 		super(Ic2ScreenHandlers.FLUID_BOTTLER, syncId, playerInventory, be, 184, 8, 53, 0, 0, 117, 53, 152, 26);
-		this.m_38897_(new SlotInvSlot(be.drainInputSlot, 0, 44, 35));
-		this.m_38897_(new SlotInvSlot(be.fillInputSlot, 0, 44, 72));
+		this.addSlot(new SlotInvSlot(be.drainInputSlot, 0, 44, 35));
+		this.addSlot(new SlotInvSlot(be.fillInputSlot, 0, 44, 72));
 	}
 
 	@Override

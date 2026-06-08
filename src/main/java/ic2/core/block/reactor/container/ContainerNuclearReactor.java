@@ -25,14 +25,14 @@ public class ContainerNuclearReactor extends ContainerBase<TileEntityNuclearReac
 		{
 			int x = i % this.size;
 			int y = i / this.size;
-			this.m_38897_(new SlotInvSlot(te.reactorSlot, i, startX + 18 * x, startY + 18 * y));
+			this.addSlot(new SlotInvSlot(te.reactorSlot, i, startX + 18 * x, startY + 18 * y));
 		}
 
 		this.addPlayerInventorySlots(playerInventory, 214, 243);
-		this.m_38897_(new SlotInvSlot(te.coolantinputSlot, 0, 8, 25));
-		this.m_38897_(new SlotInvSlot(te.hotcoolinputSlot, 0, 188, 25));
-		this.m_38897_(new SlotInvSlot(te.coolantoutputSlot, 0, 8, 115));
-		this.m_38897_(new SlotInvSlot(te.hotcoolantoutputSlot, 0, 188, 115));
+		this.addSlot(new SlotInvSlot(te.coolantinputSlot, 0, 8, 25));
+		this.addSlot(new SlotInvSlot(te.hotcoolinputSlot, 0, 188, 25));
+		this.addSlot(new SlotInvSlot(te.coolantoutputSlot, 0, 8, 115));
+		this.addSlot(new SlotInvSlot(te.hotcoolantoutputSlot, 0, 188, 115));
 	}
 
 	@Override

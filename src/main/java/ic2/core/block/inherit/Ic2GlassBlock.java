@@ -15,8 +15,8 @@ public class Ic2GlassBlock extends AbstractGlassBlock
 		super(settings);
 	}
 
-	public VoxelShape m_7947_(BlockState state, BlockGetter world, BlockPos pos)
+	public VoxelShape getBlockSupportShape(BlockState state, BlockGetter world, BlockPos pos)
 	{
-		return Shapes.m_83040_();
+		return Shapes.empty();
 	}
 }

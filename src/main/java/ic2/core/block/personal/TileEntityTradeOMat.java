@@ -404,7 +404,7 @@ public class TileEntityTradeOMat
 
 	private boolean canToggleInfinite(Player player)
 	{
-		MinecraftServer server = player.m_20194_();
+		MinecraftServer server = player.getServer();
 		return server != null && server.getPlayerList().isOp(player.getGameProfile());
 	}
 }

@@ -69,13 +69,13 @@ public class SlotGrid extends GuiElement<SlotGrid>
 	@Override
 	protected boolean suppressTooltip(int mouseX, int mouseY)
 	{
-		if (!StackUtil.isEmpty(this.gui.getContainer().m_142621_()))
+		if (!StackUtil.isEmpty(this.gui.getContainer().getCarried()))
 		{
 			return false;
 		}
 
 		Slot slot = this.gui.getFocusedSlot();
-		return slot != null && slot.m_6657_();
+		return slot != null && slot.hasItem();
 	}
 
 	public static final class SlotStyle

@@ -124,19 +124,19 @@ public class NewLangGenerator
 
 	private NewLangGenerator appendBlockText(Block block, String text)
 	{
-		String blockKey = Registry.BLOCK.getKey(block).m_214298_();
+		String blockKey = Registry.BLOCK.getKey(block).toLanguageKey();
 		return this.append("block." + blockKey, text);
 	}
 
 	private NewLangGenerator appendItemText(Item item, String text)
 	{
-		String itemKey = Registry.f_122827_.getKey(item).m_214298_();
+		String itemKey = Registry.ITEM.getKey(item).toLanguageKey();
 		return this.append("item." + itemKey, text);
 	}
 
 	private NewLangGenerator appendItemGroupText(CreativeModeTab group, String text)
 	{
-		String groupKey = group.m_40783_();
+		String groupKey = group.getRecipeFolderName();
 		return this.append("itemGroup." + groupKey, text);
 	}
 }

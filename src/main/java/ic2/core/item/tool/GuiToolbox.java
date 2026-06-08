@@ -15,18 +15,18 @@ public class GuiToolbox extends Ic2Gui<ContainerToolbox>
 	public GuiToolbox(ContainerToolbox container, Inventory playerInventory, Component title)
 	{
 		super(container, playerInventory, title);
-		this.addElement(TextLabel.create(this, 65, 11, Ic2Items.TOOL_BOX.m_41466_().getString(), 0, false));
+		this.addElement(TextLabel.create(this, 65, 11, Ic2Items.TOOL_BOX.getDescription().getString(), 0, false));
 	}
 
 	@Override
 	protected void drawBackgroundAndTitle(PoseStack matrices, float partialTicks, int mouseX, int mouseY)
 	{
 		this.bindTexture();
-		this.m_93228_(matrices, this.f_97735_, this.f_97736_, 0, 0, this.imageWidth, this.imageHeight);
+		this.blit(matrices, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
 	}
 
 	@Override
-	protected ResourceLocation getTexture()
+	protected ResourceLocation getTextureLocation()
 	{
 		return background;
 	}

@@ -31,13 +31,13 @@ public class WeightedMachineRecipeSerializer implements RecipeSerializer<RecipeH
 		this.metaProcessor = metaProcessor;
 	}
 
-	public RecipeHolder<IRecipeInput, Collection<ItemStack>> read(ResourceLocation id, JsonObject json)
+	public RecipeHolder<IRecipeInput, Collection<ItemStack>> fromJson(ResourceLocation id, JsonObject json)
 	{
 		IRecipeInput input = RecipeIo.parseInput(json.get("ingredient"));
 		RecipeOutputWeighted output = new RecipeOutputWeighted();
 		CompoundTag meta = this.metaProcessor != null ? this.metaProcessor.apply(json) : null;
 		JsonElement resultJsonObj = json.get("result");
-		boolean weighted = GsonHelper.m_13855_(json, "weighted", false);
+		boolean weighted = GsonHelper.getAsBoolean(json, "weighted", false);
 		MachineRecipe<IRecipeInput, Collection<ItemStack>> machineRecipe;
 		if (weighted)
 		{
@@ -51,22 +51,22 @@ public class WeightedMachineRecipeSerializer implements RecipeSerializer<RecipeH
 		return new RecipeHolder<>(machineRecipe, id, this, this.recipeType);
 	}
 
-	public RecipeHolder<IRecipeInput, Collection<ItemStack>> read(ResourceLocation id, FriendlyByteBuf buf)
+	public RecipeHolder<IRecipeInput, Collection<ItemStack>> fromNetwork(ResourceLocation id, FriendlyByteBuf buf)
 	{
 		byte type = buf.readByte();
 		MachineRecipe<IRecipeInput, Collection<ItemStack>> machineRecipe;
 		if (type == 1)
 		{
-			machineRecipe = new MachineRecipeWeighted<>(RecipeIo.readInput(buf), RecipeIo.readWeightedOutput(buf, new RecipeOutputWeighted()), buf.m_130260_());
+			machineRecipe = new MachineRecipeWeighted<>(RecipeIo.readInput(buf), RecipeIo.readWeightedOutput(buf, new RecipeOutputWeighted()), buf.readNbt());
 		} else
 		{
-			machineRecipe = new MachineRecipe<>(RecipeIo.readInput(buf), RecipeIo.readOutput(buf), buf.m_130260_());
+			machineRecipe = new MachineRecipe<>(RecipeIo.readInput(buf), RecipeIo.readOutput(buf), buf.readNbt());
 		}
 
 		return new RecipeHolder<>(machineRecipe, id, this, this.recipeType);
 	}
 
-	public void write(FriendlyByteBuf buf, RecipeHolder<IRecipeInput, Collection<ItemStack>> recipe)
+	public void toNetwork(FriendlyByteBuf buf, RecipeHolder<IRecipeInput, Collection<ItemStack>> recipe)
 	{
 		RecipeIo.writeInput(buf, recipe.recipe().getInput());
 		MachineRecipe<IRecipeInput, Collection<ItemStack>> machineRecipe = recipe.recipe();
@@ -78,6 +78,6 @@ public class WeightedMachineRecipeSerializer implements RecipeSerializer<RecipeH
 			RecipeIo.writeOutput(buf, machineRecipe.getOutput());
 		}
 
-		buf.m_130079_(machineRecipe.getMetaData());
+		buf.writeNbt(machineRecipe.getMetaData());
 	}
 }

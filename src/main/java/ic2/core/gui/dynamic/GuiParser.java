@@ -38,7 +38,7 @@ public class GuiParser
 {
 	public static GuiParser.GuiNode parse(ResourceLocation id, Class<?> baseClass)
 	{
-		String fileLoc = String.format("/assets/%s/guidef/%s.xml", id.m_135827_(), id.m_135815_());
+		String fileLoc = String.format("/assets/%s/guidef/%s.xml", id.getNamespace(), id.getPath());
 		InputStream is = null;
 
 		try
@@ -97,7 +97,7 @@ public class GuiParser
 		@Override
 		protected boolean isKeyDown()
 		{
-			return Screen.m_96639_();
+			return Screen.hasAltDown();
 		}
 	}
 
@@ -215,7 +215,7 @@ public class GuiParser
 		@Override
 		protected boolean isKeyDown()
 		{
-			return Screen.m_96637_();
+			return Screen.hasControlDown();
 		}
 	}
 
@@ -854,7 +854,7 @@ public class GuiParser
 		@Override
 		protected boolean isKeyDown()
 		{
-			return Screen.m_96638_();
+			return Screen.hasShiftDown();
 		}
 	}
 

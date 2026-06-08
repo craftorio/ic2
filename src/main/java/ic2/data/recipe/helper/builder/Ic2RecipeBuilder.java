@@ -25,7 +25,7 @@ public abstract class Ic2RecipeBuilder<T extends Ic2RecipeBuilder<T>>
 	{
 		this.result = result;
 		this.exporter = exporter;
-		this.advancementBuilder = Builder.m_138353_();
+		this.advancementBuilder = Builder.advancement();
 	}
 
 	public T group(String group)
@@ -36,7 +36,7 @@ public abstract class Ic2RecipeBuilder<T extends Ic2RecipeBuilder<T>>
 
 	public T criterion(String string, CriterionTriggerInstance arg)
 	{
-		this.advancementBuilder.m_138386_(string, arg);
+		this.advancementBuilder.addCriterion(string, arg);
 		return (T) this;
 	}
 
@@ -45,15 +45,15 @@ public abstract class Ic2RecipeBuilder<T extends Ic2RecipeBuilder<T>>
 	public void finish(String name)
 	{
 		Ic2RecipeJsonProvider builder = this.build(name);
-		if (!this.advancementBuilder.m_138405_().isEmpty())
+		if (!this.advancementBuilder.getCriteria().isEmpty())
 		{
-			ResourceLocation recipeId = builder.m_6445_();
+			ResourceLocation recipeId = builder.getId();
 			this.advancementBuilder
-				.m_138396_(RecipeBuilder.f_236353_)
-				.m_138386_("has_the_recipe", RecipeUnlockedTrigger.m_63728_(recipeId))
-				.m_138354_(net.minecraft.advancements.AdvancementRewards.Builder.m_10009_(recipeId))
-				.m_138360_(RequirementsStrategy.f_15979_);
-			builder.setAdvancementBuilder(this.advancementBuilder).setAdvancementId(IC2.getIdentifier("recipes/" + recipeId.m_135815_()));
+				.parent(RecipeBuilder.ROOT_RECIPE_ADVANCEMENT)
+				.addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(recipeId))
+				.rewards(net.minecraft.advancements.AdvancementRewards.Builder.recipe(recipeId))
+				.requirements(RequirementsStrategy.OR);
+			builder.setAdvancementBuilder(this.advancementBuilder).setAdvancementId(IC2.getIdentifier("recipes/" + recipeId.getPath()));
 		}
 
 		this.exporter.accept(builder);

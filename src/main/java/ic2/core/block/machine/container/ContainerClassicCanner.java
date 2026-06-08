@@ -13,9 +13,9 @@ public class ContainerClassicCanner extends ContainerElectricMachine<TileEntityC
 	public ContainerClassicCanner(int syncId, Inventory playerInventory, TileEntityClassicCanner base)
 	{
 		super(Ic2ScreenHandlers.CLASSIC_CANNER, syncId, playerInventory, base, 166, 30, 45);
-		this.m_38897_(new SlotInvSlot(base.resInputSlot, 0, 69, 17));
-		this.m_38897_(new SlotInvSlot(base.outputSlot, 0, 119, 35));
-		this.m_38897_(new SlotInvSlot(base.inputSlot, 0, 69, 53));
+		this.addSlot(new SlotInvSlot(base.resInputSlot, 0, 69, 17));
+		this.addSlot(new SlotInvSlot(base.outputSlot, 0, 119, 35));
+		this.addSlot(new SlotInvSlot(base.inputSlot, 0, 69, 53));
 	}
 
 	@Override

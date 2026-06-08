@@ -14,17 +14,17 @@ public class ContainerClassicCropmatron extends ContainerFullInv<TileEntityClass
 
 		for (int i = 0; i < base.fertilizerSlot.size(); i++)
 		{
-			this.m_38897_(new SlotInvSlot(base.fertilizerSlot, i, 62, 20 + i * 18));
+			this.addSlot(new SlotInvSlot(base.fertilizerSlot, i, 62, 20 + i * 18));
 		}
 
 		for (int i = 0; i < base.hydrationSlot.size(); i++)
 		{
-			this.m_38897_(new SlotInvSlot(base.hydrationSlot, i, 98, 20 + i * 18));
+			this.addSlot(new SlotInvSlot(base.hydrationSlot, i, 98, 20 + i * 18));
 		}
 
 		for (int i = 0; i < base.weedExSlot.size(); i++)
 		{
-			this.m_38897_(new SlotInvSlot(base.weedExSlot, i, 134, 20 + i * 18));
+			this.addSlot(new SlotInvSlot(base.weedExSlot, i, 134, 20 + i * 18));
 		}
 	}
 }

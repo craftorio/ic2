@@ -17,9 +17,9 @@ public class HandHeldMeter extends HandHeldInventory
 
 	void closeGUI()
 	{
-		if (!this.player.f_19853_.isClientSide)
+		if (!this.player.level.isClientSide)
 		{
-			((ServerPlayer) this.player).m_6915_();
+			((ServerPlayer) this.player).closeContainer();
 		}
 	}
 

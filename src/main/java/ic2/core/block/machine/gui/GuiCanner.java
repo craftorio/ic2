@@ -78,9 +78,9 @@ public class GuiCanner extends Ic2Gui<ContainerCanner>
 	}
 
 	@Override
-	protected void m_7286_(PoseStack matrices, float delta, int mouseX, int mouseY)
+	protected void renderBg(PoseStack matrices, float delta, int mouseX, int mouseY)
 	{
-		super.m_7286_(matrices, delta, mouseX, mouseY);
+		super.renderBg(matrices, delta, mouseX, mouseY);
 		this.bindTexture();
 		switch (((ContainerCanner) this.menu).base.getMode())
 		{
@@ -106,7 +106,7 @@ public class GuiCanner extends Ic2Gui<ContainerCanner>
 	}
 
 	@Override
-	protected ResourceLocation getTexture()
+	protected ResourceLocation getTextureLocation()
 	{
 		return texture;
 	}

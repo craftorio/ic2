@@ -153,30 +153,27 @@ public final class Ic2ScreenHandlers
 
 	public static <T extends AbstractContainerMenu> MenuType<T> registerManagedBe(String name)
 	{
-		return registerExtended(name, MANAGED_CLIENT_BE_HANDLER);
+		return (MenuType<T>) registerExtended(name, MANAGED_CLIENT_BE_HANDLER);
 	}
 
 	private static <T extends AbstractContainerMenu> MenuType<T> registerManagedItem(String name)
 	{
-		return registerExtended(name, MANAGED_CLIENT_ITEM_HANDLER);
+		return (MenuType<T>) registerExtended(name, MANAGED_CLIENT_ITEM_HANDLER);
 	}
 
 	private static EnvProxy.ExtendedClientScreenHandlerFactory<ContainerBase<?>> createManagedBeClientHandler()
 	{
-		return new EnvProxy.ExtendedClientScreenHandlerFactory<ContainerBase<?>>()
+		return (syncId, inventory, data) ->
 		{
-			public ContainerBase<?> create(int syncId, Inventory inventory, ByteBuf data)
-			{
-				GrowingBuffer buffer = GrowingBuffer.wrap(data);
+			GrowingBuffer buffer = GrowingBuffer.wrap(data);
 
-				try
-				{
-					BlockEntity be = DataEncoder.getValue(DataEncoder.decode(buffer, DataEncoder.EncodedType.TileEntity), null);
-					return !(be instanceof IHasGui provider) ? null : provider.createClientScreenHandler(syncId, inventory, buffer);
-				} catch (IOException e)
-				{
-					throw new RuntimeException(e);
-				}
+			try
+			{
+				BlockEntity be = DataEncoder.getValue(DataEncoder.decode(buffer, DataEncoder.EncodedType.TileEntity), null);
+				return !(be instanceof IHasGui provider) ? null : provider.createClientScreenHandler(syncId, inventory, buffer);
+			} catch (IOException e)
+			{
+				throw new RuntimeException(e);
 			}
 		};
 	}
@@ -188,69 +185,63 @@ public final class Ic2ScreenHandlers
 
 	private static EnvProxy.ExtendedClientScreenHandlerFactory<ContainerBase<?>> createManagedItemClientHandler()
 	{
-		return new EnvProxy.ExtendedClientScreenHandlerFactory<ContainerBase<?>>()
+		return (syncId, inventory, data) ->
 		{
-			public ContainerBase<?> create(int syncId, Inventory inventory, ByteBuf data)
+			GrowingBuffer buffer = GrowingBuffer.wrap(data);
+			int currentItemPosition = buffer.readInt();
+			boolean subGui = buffer.readBoolean();
+			int subGuiId = subGui ? buffer.readVarInt() : 0;
+			Player player = IC2.sideProxy.getPlayerInstance();
+			InteractionHand hand;
+			ItemStack currentItem;
+			if (currentItemPosition < 0)
 			{
-				GrowingBuffer buffer = GrowingBuffer.wrap(data);
-				int currentItemPosition = buffer.readInt();
-				boolean subGui = buffer.readBoolean();
-				int subGuiId = subGui ? buffer.readVarInt() : 0;
-				Player player = IC2.sideProxy.getPlayerInstance();
-				InteractionHand hand;
-				ItemStack currentItem;
-				if (currentItemPosition < 0)
-				{
-					int handOrdinal = -currentItemPosition;
-					if (handOrdinal >= Util.HANDS.length)
-					{
-						return null;
-					}
-
-					hand = Util.HANDS[handOrdinal];
-					currentItem = player.m_21120_(hand);
-				} else
-				{
-					if (currentItemPosition != player.getInventory().f_35977_)
-					{
-						return null;
-					}
-
-					hand = InteractionHand.MAIN_HAND;
-					currentItem = player.getInventory().m_36056_();
-				}
-
-				if (currentItem == null)
+				int handOrdinal = -currentItemPosition;
+				if (handOrdinal >= Util.HANDS.length)
 				{
 					return null;
-				} else if (!(currentItem.getItem() instanceof IHandHeldInventory item))
+				}
+
+				hand = Util.HANDS[handOrdinal];
+				currentItem = player.getItemInHand(hand);
+			} else
+			{
+				if (currentItemPosition != player.getInventory().selected)
 				{
 					return null;
+				}
+
+				hand = InteractionHand.MAIN_HAND;
+				currentItem = player.getInventory().getSelected();
+			}
+
+			if (!(currentItem.getItem() instanceof IHandHeldInventory item))
+			{
+				return null;
+			} else
+			{
+				IHasGui provider;
+				if (subGui && item instanceof IHandHeldSubInventory)
+				{
+					provider = ((IHandHeldSubInventory) item).getSubInventory(player, hand, currentItem, subGuiId);
 				} else
 				{
-					IHasGui provider;
-					if (subGui && item instanceof IHandHeldSubInventory)
-					{
-						provider = ((IHandHeldSubInventory) item).getSubInventory(player, hand, currentItem, subGuiId);
-					} else
-					{
-						provider = item.getInventory(player, hand, currentItem);
-					}
-
-					return provider.createClientScreenHandler(syncId, inventory, buffer);
+					provider = item.getInventory(player, hand, currentItem);
 				}
+
+				return provider.createClientScreenHandler(syncId, inventory, buffer);
 			}
 		};
 	}
 
 	public static void writeManagedItemData(Player player, InteractionHand hand, Integer subGuiId, GrowingBuffer buffer)
 	{
-		Item item = player.m_21120_(hand).getItem();
+		Item item = player.getItemInHand(hand).getItem();
 		assert item instanceof IHandHeldInventory;
 		int slot;
 		if (hand == InteractionHand.MAIN_HAND)
 		{
-			slot = player.getInventory().f_35977_;
+			slot = player.getInventory().selected;
 		} else
 		{
 			slot = -hand.ordinal();

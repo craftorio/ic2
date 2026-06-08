@@ -59,7 +59,7 @@ public class TileEntityStirlingKineticGenerator extends TileEntityInventory impl
 	public TileEntityStirlingKineticGenerator(BlockPos pos, BlockState state)
 	{
 		super(Ic2BlockEntities.STIRLING_KINETIC_GENERATOR, pos, state);
-		this.inputTank = this.fluids.addTankInsert("inputTank", 2000, Fluids.fluidPredicate(Recipes.liquidHeatupManager.getSingleDirectionLiquidManager()));
+		this.inputTank = this.fluids.addTankInsert("inputTank", 2000, Fluids.fluidPredicate(Recipes.liquidHeatUpManager.getSingleDirectionLiquidManager()));
 		this.outputTank = this.fluids.addTankExtract("outputTank", 2000);
 		this.hotoutputSlot = new InvSlotOutput(this, "hotOutputSlot", 1);
 		this.cooloutputSlot = new InvSlotOutput(this, "outputSlot", 1);
@@ -70,7 +70,7 @@ public class TileEntityStirlingKineticGenerator extends TileEntityInventory impl
 			1,
 			InvSlot.InvSide.TOP,
 			InvSlotConsumableLiquid.OpType.Drain,
-			Recipes.liquidHeatupManager.getSingleDirectionLiquidManager()
+			Recipes.liquidHeatUpManager.getSingleDirectionLiquidManager()
 		);
 		this.hotfluidinputSlot = new InvSlotConsumableLiquidByTank(
 			this, "hotfluidoutputSlot", InvSlot.Access.I, 1, InvSlot.InvSide.BOTTOM, InvSlotConsumableLiquid.OpType.Fill, this.outputTank
@@ -120,10 +120,10 @@ public class TileEntityStirlingKineticGenerator extends TileEntityInventory impl
 		this.newActive = false;
 		if (this.inputTank.getFluidAmount() > 0
 			&& this.outputTank.getFluidAmount() < this.outputTank.getCapacity()
-			&& Recipes.liquidHeatupManager.getSingleDirectionLiquidManager().acceptsFluid(this.inputTank.getFluidStack().getFluid())
+			&& Recipes.liquidHeatUpManager.getSingleDirectionLiquidManager().acceptsFluid(this.inputTank.getFluidStack().getFluid())
 			&& this.kUBuffer < this.maxkUBuffer)
 		{
-			ILiquidHeatExchangerManager.HeatExchangeProperty property = Recipes.liquidHeatupManager
+			ILiquidHeatExchangerManager.HeatExchangeProperty property = Recipes.liquidHeatUpManager
 				.getHeatExchangeProperty(this.inputTank.getFluidStack().getFluid());
 			if (this.outputTank.isEmpty() || this.outputTank.hasExactFluid(property.outputFluid))
 			{
@@ -179,10 +179,10 @@ public class TileEntityStirlingKineticGenerator extends TileEntityInventory impl
 		{
 			if (dir != this.getFacing() && world.getBlockEntity(this.worldPosition.relative(dir)) instanceof IHeatSource hs)
 			{
-				int request = hs.drawHeat(dir.m_122424_(), tmpAmount, true);
+				int request = hs.drawHeat(dir.getOpposite(), tmpAmount, true);
 				if (request > 0)
 				{
-					tmpAmount -= hs.drawHeat(dir.m_122424_(), request, false);
+					tmpAmount -= hs.drawHeat(dir.getOpposite(), request, false);
 					if (tmpAmount <= 0)
 					{
 						break;

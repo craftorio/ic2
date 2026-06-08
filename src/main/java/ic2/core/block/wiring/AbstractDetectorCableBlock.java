@@ -19,32 +19,32 @@ import net.minecraft.world.level.block.state.properties.Property;
 
 public abstract class AbstractDetectorCableBlock extends AbstractCableBlock
 {
-	public static final BooleanProperty active = BooleanProperty.m_61465_("active");
+	public static final BooleanProperty active = BooleanProperty.create("active");
 	private static final int tickRate = 32;
 
 	protected AbstractDetectorCableBlock(Properties settings)
 	{
 		super(settings, CableType.detector, 0);
-		this.m_49959_((BlockState) this.defaultBlockState().setValue(active, false));
+		this.registerDefaultState((BlockState) this.defaultBlockState().setValue(active, false));
 	}
 
 	@Override
-	protected void m_7926_(Builder<Block, BlockState> builder)
+	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
-		super.m_7926_(builder);
-		builder.m_61104_(new Property[] { active });
+		super.createBlockStateDefinition(builder);
+		builder.add(new Property[] { active });
 	}
 
 	@Override
-	public void m_6807_(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify)
+	public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify)
 	{
-		super.m_6807_(state, world, pos, oldState, notify);
-		world.m_186460_(pos, this, world.m_213780_().nextInt(32));
+		super.onPlace(state, world, pos, oldState, notify);
+		world.scheduleTick(pos, this, world.getRandom().nextInt(32));
 	}
 
-	public void m_213897_(BlockState state, ServerLevel world, BlockPos pos, RandomSource random)
+	public void tick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random)
 	{
-		world.m_186460_(pos, this, 32);
+		world.scheduleTick(pos, this, 32);
 		IEnergyTile tile = EnergyNet.instance.getTile(world, pos);
 		if (tile != null)
 		{
@@ -57,28 +57,28 @@ public abstract class AbstractDetectorCableBlock extends AbstractCableBlock
 					world.setBlockAndUpdate(pos, (BlockState) state.setValue(active, newActive));
 				} else if (newActive)
 				{
-					world.m_46717_(pos, this);
+					world.updateNeighbourForOutputSignal(pos, this);
 				}
 			}
 		}
 	}
 
-	public boolean m_7899_(BlockState state)
+	public boolean isSignalSource(BlockState state)
 	{
 		return true;
 	}
 
-	public int m_6378_(BlockState state, BlockGetter world, BlockPos pos, Direction direction)
+	public int getSignal(BlockState state, BlockGetter world, BlockPos pos, Direction direction)
 	{
 		return state.getValue(active) ? 15 : 0;
 	}
 
-	public boolean m_7278_(BlockState state)
+	public boolean hasAnalogOutputSignal(BlockState state)
 	{
 		return true;
 	}
 
-	public int m_6782_(BlockState state, Level world, BlockPos pos)
+	public int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos)
 	{
 		if (!(Boolean) state.getValue(active))
 		{

@@ -87,12 +87,12 @@ public class TileEntityPatternStorage extends TileEntityInventory implements IHa
 
 	public void readContents(CompoundTag nbt)
 	{
-		ListTag patternList = nbt.m_128437_("patterns", 10);
+		ListTag patternList = nbt.getList("patterns", 10);
 
 		for (int i = 0; i < patternList.size(); i++)
 		{
-			CompoundTag contentTag = patternList.m_128728_(i);
-			ItemStack Item = ItemStack.m_41712_(contentTag);
+			CompoundTag contentTag = patternList.getCompound(i);
+			ItemStack Item = ItemStack.of(contentTag);
 			this.addPattern(Item);
 		}
 
@@ -106,7 +106,7 @@ public class TileEntityPatternStorage extends TileEntityInventory implements IHa
 		for (ItemStack stack : this.patterns)
 		{
 			CompoundTag contentTag = new CompoundTag();
-			stack.m_41739_(contentTag);
+			stack.save(contentTag);
 			list.add(contentTag);
 		}
 

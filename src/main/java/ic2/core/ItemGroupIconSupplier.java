@@ -27,17 +27,17 @@ final class ItemGroupIconSupplier implements Supplier<ItemStack>
 		{
 			if (a == null)
 			{
-				a = new ItemStack(Items.f_42681_);
+				a = new ItemStack(Items.ZOMBIE_HEAD);
 			}
 
 			if (b == null)
 			{
-				b = new ItemStack(Items.f_42678_);
+				b = new ItemStack(Items.SKELETON_SKULL);
 			}
 
 			if (z == null)
 			{
-				z = Ic2Items.NANO_CHESTPLATE.m_7968_();
+				z = Ic2Items.NANO_CHESTPLATE.getDefaultInstance();
 			}
 
 			if (++this.ticker >= 5000)
@@ -57,7 +57,7 @@ final class ItemGroupIconSupplier implements Supplier<ItemStack>
 			case MACHINES -> new ItemStack(Ic2Items.MACERATOR);
 			case GENERATORS_AND_WIRING -> new ItemStack(Ic2Items.GENERATOR);
 			case TOOLS_AND_UTILITIES -> new ItemStack(Ic2Items.WRENCH);
-			case COMBAT -> new ItemStack(Ic2Items.NANO_SABER).m_41714_(Component.m_130674_("ic2:tab_icon"));
+			case COMBAT -> new ItemStack(Ic2Items.NANO_SABER).setHoverName(Component.nullToEmpty("ic2:tab_icon"));
 			case MATERIALS -> new ItemStack(Ic2Items.RUBBER);
 			case FARMING -> new ItemStack(Ic2Items.CROP_SEED_BACK);
 		};

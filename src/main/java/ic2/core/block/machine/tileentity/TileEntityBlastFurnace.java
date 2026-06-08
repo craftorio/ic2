@@ -9,7 +9,6 @@ import ic2.api.upgrade.UpgradableProperty;
 import ic2.core.ContainerBase;
 import ic2.core.IC2;
 import ic2.core.IHasGui;
-import ic2.core.block.IInventorySlotHolder;
 import ic2.core.block.comp.Fluids;
 import ic2.core.block.comp.Redstone;
 import ic2.core.block.invslot.InvSlotConsumableLiquidByList;
@@ -53,7 +52,7 @@ public class TileEntityBlastFurnace extends TileEntityInventory implements IUpgr
 	protected int progressNeeded = 300;
 	@GuiSynced
 	protected float guiProgress;
-	public final InvSlotProcessableGeneric inputSlot = new InvSlotProcessableGeneric(this, "input", 1, Recipes.blastfurnace);
+	public final InvSlotProcessableGeneric inputSlot = new InvSlotProcessableGeneric(this, "input", 1, Recipes.blast_furnace);
 	public final InvSlotOutput outputSlot = new InvSlotOutput(this, "output", 2)
 	{
 		@Override
@@ -190,7 +189,7 @@ public class TileEntityBlastFurnace extends TileEntityInventory implements IUpgr
 			BlockEntity te = this.getLevel().getBlockEntity(this.worldPosition.relative(dir));
 			if (te instanceof IHeatSource)
 			{
-				gainhU = ((IHeatSource) te).drawHeat(dir.m_122424_(), heatRequested, false);
+				gainhU = ((IHeatSource) te).drawHeat(dir.getOpposite(), heatRequested, false);
 				this.heat += gainhU;
 			}
 

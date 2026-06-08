@@ -17,6 +17,6 @@ public interface IRecipeInput
 
 	default Ingredient getIngredient()
 	{
-		return Ingredient.m_43921_(this.getInputs().stream());
+		return Ingredient.of(this.getInputs().stream());
 	}
 }

@@ -13,15 +13,15 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 
 public class CannerEnrichRecipeSerializer implements RecipeSerializer<RecipeHolder<ICannerEnrichRecipeManager.Input, Ic2FluidStack>>
 {
-	public RecipeHolder<ICannerEnrichRecipeManager.Input, Ic2FluidStack> read(ResourceLocation id, JsonObject json)
+	public RecipeHolder<ICannerEnrichRecipeManager.Input, Ic2FluidStack> fromJson(ResourceLocation id, JsonObject json)
 	{
-		Ic2FluidStack input = RecipeIo.parseFluidStack(GsonHelper.m_13930_(json, "input_ingredient"));
+		Ic2FluidStack input = RecipeIo.parseFluidStack(GsonHelper.getAsJsonObject(json, "input_ingredient"));
 		IRecipeInput additive = RecipeIo.parseInput(json.get("additive_ingredient"));
-		Ic2FluidStack result = RecipeIo.parseFluidStack(GsonHelper.m_13930_(json, "result"));
+		Ic2FluidStack result = RecipeIo.parseFluidStack(GsonHelper.getAsJsonObject(json, "result"));
 		return new RecipeHolder<>(new MachineRecipe<>(new ICannerEnrichRecipeManager.Input(input, additive), result), id, this, Ic2RecipeTypes.CANNER_ENRICH);
 	}
 
-	public RecipeHolder<ICannerEnrichRecipeManager.Input, Ic2FluidStack> read(ResourceLocation id, FriendlyByteBuf buf)
+	public RecipeHolder<ICannerEnrichRecipeManager.Input, Ic2FluidStack> fromNetwork(ResourceLocation id, FriendlyByteBuf buf)
 	{
 		Ic2FluidStack input = RecipeIo.readFluidStack(buf);
 		IRecipeInput additive = RecipeIo.readInput(buf);
@@ -29,7 +29,7 @@ public class CannerEnrichRecipeSerializer implements RecipeSerializer<RecipeHold
 		return new RecipeHolder<>(new MachineRecipe<>(new ICannerEnrichRecipeManager.Input(input, additive), result), id, this, Ic2RecipeTypes.CANNER_ENRICH);
 	}
 
-	public void write(FriendlyByteBuf buf, RecipeHolder<ICannerEnrichRecipeManager.Input, Ic2FluidStack> recipe)
+	public void toNetwork(FriendlyByteBuf buf, RecipeHolder<ICannerEnrichRecipeManager.Input, Ic2FluidStack> recipe)
 	{
 		RecipeIo.writeFluidStack(buf, recipe.recipe().getInput().fluid);
 		RecipeIo.writeInput(buf, recipe.recipe().getInput().additive);

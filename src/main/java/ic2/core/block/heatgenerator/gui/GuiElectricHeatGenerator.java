@@ -51,7 +51,7 @@ public class GuiElectricHeatGenerator extends Ic2Gui<ContainerElectricHeatGenera
 	}
 
 	@Override
-	protected ResourceLocation getTexture()
+	protected ResourceLocation getTextureLocation()
 	{
 		return background;
 	}

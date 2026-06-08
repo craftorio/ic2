@@ -29,7 +29,7 @@ public class ItemNuclearResource extends Item implements IBaseReactorComponent
 		return false;
 	}
 
-	public void m_6883_(ItemStack stack, Level world, Entity rawEntity, int slot, boolean selected)
+	public void inventoryTick(ItemStack stack, Level world, Entity rawEntity, int slot, boolean selected)
 	{
 		if (rawEntity instanceof LivingEntity entity)
 		{

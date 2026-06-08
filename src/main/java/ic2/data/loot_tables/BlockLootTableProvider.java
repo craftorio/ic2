@@ -34,6 +34,6 @@ public class BlockLootTableProvider extends Ic2LootTableProvider
 	@Override
 	protected LootContextParamSet getContextType()
 	{
-		return LootContextParamSets.f_81421_;
+		return LootContextParamSets.BLOCK;
 	}
 }

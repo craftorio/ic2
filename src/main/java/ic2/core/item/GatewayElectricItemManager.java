@@ -92,7 +92,7 @@ public class GatewayElectricItemManager implements IElectricItemManager
 			return false;
 		}
 
-		if (entity instanceof Player && ((Player) entity).m_150110_().f_35937_)
+		if (entity instanceof Player && ((Player) entity).getAbilities().instabuild)
 		{
 			return this.canUse(stack, amount);
 		}

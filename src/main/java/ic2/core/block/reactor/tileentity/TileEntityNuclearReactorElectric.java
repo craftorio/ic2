@@ -108,11 +108,11 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 		super(Ic2BlockEntities.NUCLEAR_REACTOR, pos, state);
 		this.updateTicker = IC2.random.nextInt(this.getTickRate());
 		this.fluids = this.addComponent(new Fluids(this));
-		this.inputTank = this.fluids.addTank("inputTank", 10000, InvSlot.Access.NONE, InvSlot.InvSide.ANY, Fluids.fluidPredicate(Recipes.liquidHeatupManager));
+		this.inputTank = this.fluids.addTank("inputTank", 10000, InvSlot.Access.NONE, InvSlot.InvSide.ANY, Fluids.fluidPredicate(Recipes.liquidHeatUpManager));
 		this.outputTank = this.fluids.addTank("outputTank", 10000, InvSlot.Access.NONE);
 		this.reactorSlot = new InvSlotReactor(this, "reactor", 54);
 		this.coolantinputSlot = new InvSlotConsumableLiquidByManager(
-			this, "coolantinputSlot", InvSlot.Access.I, 1, InvSlot.InvSide.ANY, InvSlotConsumableLiquid.OpType.Drain, Recipes.liquidHeatupManager
+			this, "coolantinputSlot", InvSlot.Access.I, 1, InvSlot.InvSide.ANY, InvSlotConsumableLiquid.OpType.Drain, Recipes.liquidHeatUpManager
 		);
 		this.hotcoolinputSlot = new InvSlotConsumableLiquidByTank(
 			this, "hotcoolinputSlot", InvSlot.Access.I, 1, InvSlot.InvSide.ANY, InvSlotConsumableLiquid.OpType.Fill, this.outputTank
@@ -297,13 +297,13 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 				{
 					this.processfluidsSlots();
 					Ic2FluidStack inputFluid = this.inputTank.getFluidStack();
-					assert inputFluid == null || Recipes.liquidHeatupManager.acceptsFluid(this.inputTank.getFluidStack().getFluid());
+					assert inputFluid == null || Recipes.liquidHeatUpManager.acceptsFluid(this.inputTank.getFluidStack().getFluid());
 					int huOtput = (int) (huOutputModifier * this.EmitHeatbuffer);
 					int outputroom = this.outputTank.getCapacity() - this.outputTank.getFluidAmount();
 					this.EmitHeatbuffer = 0;
 					if (outputroom > 0 && inputFluid != null)
 					{
-						ILiquidHeatExchangerManager.HeatExchangeProperty prop = Recipes.liquidHeatupManager.getHeatExchangeProperty(inputFluid.getFluid());
+						ILiquidHeatExchangerManager.HeatExchangeProperty prop = Recipes.liquidHeatUpManager.getHeatExchangeProperty(inputFluid.getFluid());
 						int fluidOutput = huOtput / prop.huPerMB;
 						Ic2FluidStack draincoolant;
 						if (fluidOutput < outputroom)

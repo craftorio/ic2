@@ -44,15 +44,15 @@ public final class ChunkLoadAwareBlockHandler
 
 	private static void processChunk(LevelChunk chunk, boolean isLoad)
 	{
-		for (LevelChunkSection section : chunk.m_7103_())
+		for (LevelChunkSection section : chunk.getSections())
 		{
-			if (!section.m_188008_())
+			if (!section.hasOnlyAir())
 			{
-				PalettedContainer<BlockState> container = section.m_63019_();
-				if (container.m_63109_(stateMap::containsKey))
+				PalettedContainer<BlockState> container = section.getStates();
+				if (container.maybeHas(stateMap::containsKey))
 				{
-					Level world = chunk.m_62953_();
-					MutableBlockPos pos = new MutableBlockPos(chunk.m_7697_().m_45604_(), section.m_63017_(), chunk.m_7697_().m_45605_());
+					Level world = chunk.getLevel();
+					MutableBlockPos pos = new MutableBlockPos(chunk.getPos().getMinBlockX(), section.bottomBlockY(), chunk.getPos().getMinBlockZ());
 					BlockState lastState = null;
 					ChunkLoadAwareBlock lastBlock = null;
 
@@ -62,7 +62,7 @@ public final class ChunkLoadAwareBlockHandler
 						{
 							for (int x = 0; x < 16; x++)
 							{
-								BlockState state = (BlockState) container.m_63087_(x, y, z);
+								BlockState state = (BlockState) container.get(x, y, z);
 								if (state != lastState)
 								{
 									lastState = state;

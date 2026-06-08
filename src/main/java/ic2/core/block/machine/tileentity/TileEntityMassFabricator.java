@@ -251,7 +251,7 @@ public class TileEntityMassFabricator extends TileEntityElectricMachine implemen
 	@Override
 	public void addInformation(ItemStack stack, List<String> tooltip, TooltipFlag advanced)
 	{
-		tooltip.add("You probably want the " + Localization.translate(Ic2Items.MATTER_GENERATOR.m_5524_()));
+		tooltip.add("You probably want the " + Localization.translate(Ic2Items.MATTER_GENERATOR.getDescriptionId()));
 	}
 
 	@Override

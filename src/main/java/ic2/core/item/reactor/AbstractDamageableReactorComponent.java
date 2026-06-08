@@ -69,12 +69,12 @@ public abstract class AbstractDamageableReactorComponent extends Item implements
 		return 0.0F;
 	}
 
-	public void m_7373_(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag advanced)
+	public void appendHoverText(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag advanced)
 	{
-		super.m_7373_(stack, world, tooltip, advanced);
+		super.appendHoverText(stack, world, tooltip, advanced);
 		tooltip.add(
-			Component.m_237113_(Localization.translate("ic2.reactoritem.durability") + " " + (this.getMaxUse() - this.getUse(stack)) + "/" + this.getMaxUse())
-				.m_130940_(ChatFormatting.GRAY)
+			Component.literal(Localization.translate("ic2.reactoritem.durability") + " " + (this.getMaxUse() - this.getUse(stack)) + "/" + this.getMaxUse())
+				.withStyle(ChatFormatting.GRAY)
 		);
 	}
 
@@ -92,12 +92,12 @@ public abstract class AbstractDamageableReactorComponent extends Item implements
 
 	public void setUse(ItemStack stack, int use)
 	{
-		stack.m_41784_().putInt("use", use);
+		stack.getOrCreateTag().putInt("use", use);
 	}
 
 	protected void incrementUse(ItemStack stack)
 	{
-		stack.m_41784_().putInt("use", Math.min(this.getUse(stack) + 1, this.maxUse));
+		stack.getOrCreateTag().putInt("use", Math.min(this.getUse(stack) + 1, this.maxUse));
 	}
 
 	protected int getMaxUse()
@@ -110,18 +110,18 @@ public abstract class AbstractDamageableReactorComponent extends Item implements
 		return Util.limit((double) this.getUse(stack) / this.maxUse, 0.0, 1.0);
 	}
 
-	public boolean m_142522_(ItemStack stack)
+	public boolean isBarVisible(ItemStack stack)
 	{
 		return true;
 	}
 
-	public int m_142158_(ItemStack stack)
+	public int getBarWidth(ItemStack stack)
 	{
 		return (int) Math.round((1.0 - this.getUseFraction(stack)) * 13.0);
 	}
 
-	public int m_142159_(ItemStack stack)
+	public int getBarColor(ItemStack stack)
 	{
-		return Mth.m_14169_((float) ((1.0 - this.getUseFraction(stack)) / 3.0), 1.0F, 1.0F);
+		return Mth.hsvToRgb((float) ((1.0 - this.getUseFraction(stack)) / 3.0), 1.0F, 1.0F);
 	}
 }

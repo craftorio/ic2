@@ -9,6 +9,6 @@ public class RepeatablePositionedSoundInstance extends PositionedSoundInstance
 	public RepeatablePositionedSoundInstance(SoundEvent sound, SoundSource category, float volume, float pitch, BlockPos pos)
 	{
 		super(sound, category, volume, pitch, pos);
-		this.f_119578_ = true;
+		this.looping = true;
 	}
 }

@@ -19,23 +19,23 @@ public class SlotInvSlot extends Slot
 		this.index = index;
 	}
 
-	public boolean m_5857_(ItemStack stack)
+	public boolean mayPlace(ItemStack stack)
 	{
 		return this.invSlot.accepts(stack);
 	}
 
-	public ItemStack m_7993_()
+	public ItemStack getItem()
 	{
 		return this.invSlot.get(this.index);
 	}
 
-	public void m_5852_(ItemStack stack)
+	public void set(ItemStack stack)
 	{
 		this.invSlot.put(this.index, stack);
-		this.m_6654_();
+		this.setChanged();
 	}
 
-	public ItemStack m_6201_(int amount)
+	public ItemStack remove(int amount)
 	{
 		if (amount <= 0)
 		{
@@ -60,18 +60,18 @@ public class SlotInvSlot extends Slot
 			this.invSlot.put(this.index, StackUtil.decSize(stack, amount));
 		}
 
-		this.m_6654_();
+		this.setChanged();
 		return ret;
 	}
 
-	public int m_6641_()
+	public int getMaxStackSize()
 	{
 		return this.invSlot.getStackSizeLimit();
 	}
 
-	public void m_142406_(Player player, ItemStack stack)
+	public void onTake(Player player, ItemStack stack)
 	{
-		super.m_142406_(player, stack);
+		super.onTake(player, stack);
 		this.invSlot.onPickupFromSlot(player, stack);
 	}
 }

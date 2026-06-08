@@ -150,7 +150,7 @@ public class ItemReactorUranium extends AbstractDamageableReactorComponent
 		return 2 * this.numberOfCells;
 	}
 
-	public void m_6883_(ItemStack stack, Level world, Entity entity, int slotIndex, boolean isCurrentItem)
+	public void inventoryTick(ItemStack stack, Level world, Entity entity, int slotIndex, boolean isCurrentItem)
 	{
 		if (entity instanceof LivingEntity entityLiving && !ItemArmorHazmat.hasCompleteHazmat(entityLiving))
 		{

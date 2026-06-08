@@ -71,7 +71,7 @@ public enum Ic2CropType implements StringRepresentable, ICropType
 		this.maxAge = maxAge;
 	}
 
-	public String m_7912_()
+	public String getSerializedName()
 	{
 		return this.name;
 	}

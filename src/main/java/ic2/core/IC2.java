@@ -47,17 +47,17 @@ public class IC2
 
 	public static int getSeaLevel(Level world)
 	{
-		return world.m_5736_();
+		return world.getSeaLevel();
 	}
 
 	public static int getWorldMaxHeight(Level world)
 	{
-		return world.m_141928_();
+		return world.getHeight();
 	}
 
 	public static int getWorldMinHeight(Level world)
 	{
-		return world.m_141937_();
+		return world.getMinBuildHeight();
 	}
 
 	public static ResourceLocation getIdentifier(String name)
@@ -133,7 +133,7 @@ public class IC2
 		tabIc2Farming = envProxy.createItemGroup(getIdentifier("farming"), new ItemGroupIconSupplier(Ic2ItemGroupType.FARMING));
 		tabIc2Materials = envProxy.createItemGroup(getIdentifier("materials"), new ItemGroupIconSupplier(Ic2ItemGroupType.MATERIALS));
 		threadPool = new PriorityExecutor(Math.max(Runtime.getRuntime().availableProcessors(), 2));
-		random = RandomSource.m_216327_();
+		random = RandomSource.create();
 		initialized = false;
 		suddenlyHoes = false;
 		seasonal = false;

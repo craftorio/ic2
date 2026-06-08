@@ -21,20 +21,20 @@ public class ContainerToolbox extends ContainerHandHeldInventory<HandHeldToolbox
 
 		for (int col = 0; col < 9; col++)
 		{
-			this.m_38897_(new SlotBoxable(inventory, col, 8 + col * 18, 41));
+			this.addSlot(new SlotBoxable(inventory, col, 8 + col * 18, 41));
 		}
 
 		for (int row = 0; row < 3; row++)
 		{
 			for (int col = 0; col < 9; col++)
 			{
-				this.m_38897_(new Slot(this.player.getInventory(), col + row * 9 + 9, 8 + col * 18, 84 + row * 18));
+				this.addSlot(new Slot(this.player.getInventory(), col + row * 9 + 9, 8 + col * 18, 84 + row * 18));
 			}
 		}
 
 		for (int col = 0; col < 9; col++)
 		{
-			this.m_38897_(new Slot(this.player.getInventory(), col, 8 + col * 18, 142));
+			this.addSlot(new Slot(this.player.getInventory(), col, 8 + col * 18, 142));
 		}
 	}
 }

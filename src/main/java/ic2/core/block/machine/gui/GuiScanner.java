@@ -102,20 +102,20 @@ public class GuiScanner extends Ic2Gui<ContainerScanner>
 	}
 
 	@Override
-	protected void m_7286_(PoseStack matrices, float delta, int mouseX, int mouseY)
+	protected void renderBg(PoseStack matrices, float delta, int mouseX, int mouseY)
 	{
-		super.m_7286_(matrices, delta, mouseX, mouseY);
+		super.renderBg(matrices, delta, mouseX, mouseY);
 		this.bindTexture();
 		TileEntityScanner te = ((ContainerScanner) this.menu).base;
 		int scanningloop = te.getSubPercentageDoneScaled(66);
 		if (scanningloop > 0)
 		{
-			this.drawTexturedRect(matrices, this.f_97735_ + 30, this.f_97736_ + 20, 176.0, 14.0, scanningloop, 43.0);
+			this.drawTexturedRect(matrices, this.leftPos + 30, this.topPos + 20, 176.0, 14.0, scanningloop, 43.0);
 		}
 	}
 
 	@Override
-	protected ResourceLocation getTexture()
+	protected ResourceLocation getTextureLocation()
 	{
 		return background;
 	}

@@ -13,13 +13,13 @@ public class ContainerReplicator extends ContainerElectricMachine<TileEntityRepl
 	public ContainerReplicator(int syncId, Inventory playerInventory, TileEntityReplicator be)
 	{
 		super(Ic2ScreenHandlers.REPLICATOR, syncId, playerInventory, be, 184, 152, 83);
-		this.m_38897_(new SlotInvSlot(be.outputSlot, 0, 90, 59));
-		this.m_38897_(new SlotInvSlot(be.fluidSlot, 0, 8, 27));
-		this.m_38897_(new SlotInvSlot(be.cellSlot, 0, 8, 72));
+		this.addSlot(new SlotInvSlot(be.outputSlot, 0, 90, 59));
+		this.addSlot(new SlotInvSlot(be.fluidSlot, 0, 8, 27));
+		this.addSlot(new SlotInvSlot(be.cellSlot, 0, 8, 72));
 
 		for (int i = 0; i < 4; i++)
 		{
-			this.m_38897_(new SlotInvSlot(be.upgradeSlot, i, 152, 8 + i * 18));
+			this.addSlot(new SlotInvSlot(be.upgradeSlot, i, 152, 8 + i * 18));
 		}
 	}
 

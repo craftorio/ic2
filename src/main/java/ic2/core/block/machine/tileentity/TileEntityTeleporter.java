@@ -96,7 +96,7 @@ public class TileEntityTeleporter extends TileEntityBase implements INetworkTile
 		}
 
 		Level world = this.getLevel();
-		if (world.m_46753_(this.worldPosition) && this.target != null)
+		if (world.hasNeighborSignal(this.worldPosition) && this.target != null)
 		{
 			this.activate(false);
 			List<Entity> entitiesNearby;
@@ -115,7 +115,7 @@ public class TileEntityTeleporter extends TileEntityBase implements INetworkTile
 						this.worldPosition.getY() + 3,
 						this.worldPosition.getZ() + 2
 					),
-					EntitySelector.f_20402_
+					EntitySelector.ENTITY_STILL_ALIVE
 				);
 			}
 
@@ -126,9 +126,9 @@ public class TileEntityTeleporter extends TileEntityBase implements INetworkTile
 
 				for (Entity entity : entitiesNearby)
 				{
-					if (entity.m_20202_() == null)
+					if (entity.getVehicle() == null)
 					{
-						double distSquared = this.worldPosition.m_203202_(entity.getX(), entity.getY(), entity.getZ());
+						double distSquared = this.worldPosition.distToLowCornerSqr(entity.getX(), entity.getY(), entity.getZ());
 						if (distSquared < minDistanceSquared)
 						{
 							minDistanceSquared = distSquared;
@@ -138,7 +138,7 @@ public class TileEntityTeleporter extends TileEntityBase implements INetworkTile
 				}
 
 				assert closestEntity != null;
-				this.teleport(closestEntity, Math.sqrt(this.worldPosition.m_123331_(this.target)));
+				this.teleport(closestEntity, Math.sqrt(this.worldPosition.distSqr(this.target)));
 			} else if (++this.targetCheckTicker % 1024 == 0)
 			{
 				this.verifyTarget();
@@ -195,15 +195,15 @@ public class TileEntityTeleporter extends TileEntityBase implements INetworkTile
 				this.consumeEnergy(energyCost);
 				if (user instanceof ServerPlayer)
 				{
-					user.m_6021_(this.target.getX() + 0.5, this.target.getY() + 1.5 + user.m_6049_(), this.target.getZ() + 0.5);
+					user.teleportTo(this.target.getX() + 0.5, this.target.getY() + 1.5 + user.getMyRidingOffset(), this.target.getZ() + 0.5);
 				} else
 				{
-					user.m_19890_(
+					user.absMoveTo(
 						this.target.getX() + 0.5,
-						this.target.getY() + 1.5 + user.m_6049_(),
+						this.target.getY() + 1.5 + user.getMyRidingOffset(),
 						this.target.getZ() + 0.5,
-						user.m_146908_(),
-						user.m_146909_()
+						user.getYRot(),
+						user.getXRot()
 					);
 				}
 
@@ -250,7 +250,7 @@ public class TileEntityTeleporter extends TileEntityBase implements INetworkTile
 		for (Direction dir : Util.ALL_DIRS)
 		{
 			if (world.getBlockEntity(this.worldPosition.relative(dir)) instanceof IEnergyStorage energySource
-				&& energySource.isTeleporterCompatible(dir.m_122424_())
+				&& energySource.isTeleporterCompatible(dir.getOpposite())
 				&& energySource.getStored() > 0)
 			{
 				energySources.add(energySource);
@@ -291,7 +291,7 @@ public class TileEntityTeleporter extends TileEntityBase implements INetworkTile
 
 		for (Direction dir : Util.ALL_DIRS)
 		{
-			if (world.getBlockEntity(this.worldPosition.relative(dir)) instanceof IEnergyStorage storage && storage.isTeleporterCompatible(dir.m_122424_()))
+			if (world.getBlockEntity(this.worldPosition.relative(dir)) instanceof IEnergyStorage storage && storage.isTeleporterCompatible(dir.getOpposite()))
 			{
 				energy += storage.getStored();
 			}
@@ -306,7 +306,7 @@ public class TileEntityTeleporter extends TileEntityBase implements INetworkTile
 		int weight = 0;
 		if (user instanceof ItemEntity)
 		{
-			ItemStack is = ((ItemEntity) user).m_32055_();
+			ItemStack is = ((ItemEntity) user).getItem();
 			weight += 100 * StackUtil.getSize(is) / is.getMaxStackSize();
 		} else if (user instanceof Animal || user instanceof AbstractMinecart || user instanceof Boat)
 		{
@@ -316,7 +316,7 @@ public class TileEntityTeleporter extends TileEntityBase implements INetworkTile
 			weight += 1000;
 			if (teleporterUseInventoryWeight)
 			{
-				for (ItemStack stack : ((Player) user).getInventory().f_35974_)
+				for (ItemStack stack : ((Player) user).getInventory().items)
 				{
 					weight += getStackCost(stack);
 				}
@@ -337,19 +337,19 @@ public class TileEntityTeleporter extends TileEntityBase implements INetworkTile
 
 		if (teleporterUseInventoryWeight && user instanceof LivingEntity living)
 		{
-			for (ItemStack stack : living.m_20158_())
+			for (ItemStack stack : living.getAllSlots())
 			{
 				weight += getStackCost(stack);
 			}
 
 			if (user instanceof Player)
 			{
-				ItemStack stack = living.m_21205_();
+				ItemStack stack = living.getMainHandItem();
 				weight -= getStackCost(stack);
 			}
 		}
 
-		for (Entity passenger : user.m_20197_())
+		for (Entity passenger : user.getPassengers())
 		{
 			weight += this.getWeightOf(passenger);
 		}

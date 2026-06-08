@@ -33,20 +33,20 @@ public class Ic2DataGenerators
 {
 	public static void setup(DataGenerator generator)
 	{
-		generator.m_236039_(true, new Ic2ItemTagProvider(generator));
-		generator.m_236039_(true, new Ic2BlockTagProvider(generator));
-		generator.m_236039_(true, new BlastFurnaceRecipeProvider(generator));
-		generator.m_236039_(true, new BlockCutterRecipeProvider(generator));
-		generator.m_236039_(true, new CannerRecipeProvider(generator));
-		generator.m_236039_(true, new CentrifugeRecipeProvider(generator));
-		generator.m_236039_(true, new CompressorRecipeProvider(generator));
-		generator.m_236039_(true, new ExtractorRecipeProvider(generator));
-		generator.m_236039_(true, new MaceratorRecipeProvider(generator));
-		generator.m_236039_(true, new MatterFabricatorRecipeProvider(generator));
-		generator.m_236039_(true, new MetalFormerRecipeProvider(generator));
-		generator.m_236039_(true, new OreWasherRecipeProvider(generator));
-		generator.m_236039_(true, new ShapedRecipeProvider(generator));
-		generator.m_236039_(true, new ShapelessRecipeProvider(generator));
+		generator.addProvider(true, new Ic2ItemTagProvider(generator));
+		generator.addProvider(true, new Ic2BlockTagProvider(generator));
+		generator.addProvider(true, new BlastFurnaceRecipeProvider(generator));
+		generator.addProvider(true, new BlockCutterRecipeProvider(generator));
+		generator.addProvider(true, new CannerRecipeProvider(generator));
+		generator.addProvider(true, new CentrifugeRecipeProvider(generator));
+		generator.addProvider(true, new CompressorRecipeProvider(generator));
+		generator.addProvider(true, new ExtractorRecipeProvider(generator));
+		generator.addProvider(true, new MaceratorRecipeProvider(generator));
+		generator.addProvider(true, new MatterFabricatorRecipeProvider(generator));
+		generator.addProvider(true, new MetalFormerRecipeProvider(generator));
+		generator.addProvider(true, new OreWasherRecipeProvider(generator));
+		generator.addProvider(true, new ShapedRecipeProvider(generator));
+		generator.addProvider(true, new ShapelessRecipeProvider(generator));
 	}
 
 	public static void saveJsonPreserveOrder(Gson gson, CachedOutput writer, JsonElement jsonElement, Path path) throws IOException
@@ -56,6 +56,6 @@ public class Ic2DataGenerators
 		Writer writer2 = new OutputStreamWriter(hashingOutputStream, StandardCharsets.UTF_8);
 		writer2.write(gson.toJson(jsonElement));
 		writer2.close();
-		writer.m_213871_(path, byteArrayOutputStream.toByteArray(), hashingOutputStream.hash());
+		writer.writeIfNeeded(path, byteArrayOutputStream.toByteArray(), hashingOutputStream.hash());
 	}
 }

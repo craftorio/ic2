@@ -30,14 +30,14 @@ public class ItemBatterySU extends Item implements IBoxable, IItemHudInfo
 		this.tier = tier;
 	}
 
-	public InteractionResultHolder<ItemStack> m_7203_(Level world, Player player, InteractionHand hand)
+	public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand)
 	{
 		ItemStack stack = StackUtil.get(player, hand);
 		double energy = this.capacity;
 
 		for (int i = 0; i < 9 && energy > 0.0; i++)
 		{
-			ItemStack target = (ItemStack) player.getInventory().f_35974_.get(i);
+			ItemStack target = (ItemStack) player.getInventory().items.get(i);
 			if (target != null && target != stack)
 			{
 				energy -= ElectricItem.manager.charge(target, energy, this.tier, true, false);

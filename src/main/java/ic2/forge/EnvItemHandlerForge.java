@@ -51,7 +51,7 @@ final class EnvItemHandlerForge implements EnvItemHandler
 	{
 		BlockEntity target = source.getLevel().getBlockEntity(source.getBlockPos().relative(dir));
 		GameProfile profile = source instanceof IPersonalBlock ? ((IPersonalBlock) source).getOwner() : null;
-		return EnvItemHandlerForge.HandlerForge.ofNullable(getStorage(target, dir.m_122424_(), profile, personalInventories), dir);
+		return EnvItemHandlerForge.HandlerForge.ofNullable(getStorage(target, dir.getOpposite(), profile, personalInventories), dir);
 	}
 
 	private ItemStack extractItemFrom(EnvItemHandlerForge.HandlerForge storage, int amount, boolean simulate)
@@ -59,7 +59,7 @@ final class EnvItemHandlerForge implements EnvItemHandler
 		for (int i = 0; i < storage.getSlots(); i++)
 		{
 			ItemStack itemStack = storage.getStackInSlot(i);
-			if (!itemStack.m_41619_() && storage.canExtractItem(i, itemStack))
+			if (!itemStack.isEmpty() && storage.canExtractItem(i, itemStack))
 			{
 				return storage.extractItem(i, amount, simulate);
 			}
@@ -73,7 +73,7 @@ final class EnvItemHandlerForge implements EnvItemHandler
 		for (int i = 0; i < storage.getSlots(); i++)
 		{
 			ItemStack itemStack = storage.getStackInSlot(i);
-			if (!itemStack.m_41619_() && storage.canExtractItem(i, itemStack) && filter.test(itemStack))
+			if (!itemStack.isEmpty() && storage.canExtractItem(i, itemStack) && filter.test(itemStack))
 			{
 				return storage.extractItem(i, amount, simulate);
 			}
@@ -87,10 +87,10 @@ final class EnvItemHandlerForge implements EnvItemHandler
 		for (int i = 0; i < storage.getSlots(); i++)
 		{
 			ItemStack itemStack = storage.getStackInSlot(i);
-			if (storage.canInsertItem(i, stack) && (itemStack.m_41619_() || itemStack.m_41726_(stack) && itemStack.m_41613_() < itemStack.getMaxStackSize()))
+			if (storage.canInsertItem(i, stack) && (itemStack.isEmpty() || itemStack.sameItemStackIgnoreDurability(stack) && itemStack.getCount() < itemStack.getMaxStackSize()))
 			{
 				ItemStack remainStack = storage.insertItem(i, stack, simulate);
-				return stack.m_41613_() - remainStack.m_41613_();
+				return stack.getCount() - remainStack.getCount();
 			}
 		}
 
@@ -172,11 +172,11 @@ final class EnvItemHandlerForge implements EnvItemHandler
 		EnvItemHandlerForge.HandlerForge fromStorage = (EnvItemHandlerForge.HandlerForge) from;
 		EnvItemHandlerForge.HandlerForge toStorage = (EnvItemHandlerForge.HandlerForge) to;
 		ItemStack extractedItemStack = this.extractItemFrom(fromStorage, maxAmount, true);
-		if (extractedItemStack.m_41613_() > 0 && this.insertItemTo(toStorage, extractedItemStack, true) > 0)
+		if (extractedItemStack.getCount() > 0 && this.insertItemTo(toStorage, extractedItemStack, true) > 0)
 		{
 			this.extractItemFrom(fromStorage, maxAmount, false);
 			this.insertItemTo(toStorage, extractedItemStack, false);
-			return extractedItemStack.m_41613_();
+			return extractedItemStack.getCount();
 		} else
 		{
 			return 0;
@@ -189,11 +189,11 @@ final class EnvItemHandlerForge implements EnvItemHandler
 		EnvItemHandlerForge.HandlerForge fromStorage = (EnvItemHandlerForge.HandlerForge) from;
 		EnvItemHandlerForge.HandlerForge toStorage = (EnvItemHandlerForge.HandlerForge) to;
 		ItemStack extractedItemStack = this.extractItemFrom(fromStorage, maxAmount, filter, true);
-		if (extractedItemStack.m_41613_() > 0 && this.insertItemTo(toStorage, extractedItemStack, true) > 0)
+		if (extractedItemStack.getCount() > 0 && this.insertItemTo(toStorage, extractedItemStack, true) > 0)
 		{
 			this.extractItemFrom(fromStorage, maxAmount, filter, false);
 			this.insertItemTo(toStorage, extractedItemStack, false);
-			return extractedItemStack.m_41613_();
+			return extractedItemStack.getCount();
 		} else
 		{
 			return 0;
@@ -263,12 +263,12 @@ final class EnvItemHandlerForge implements EnvItemHandler
 
 		public boolean canInsertItem(int slot, @NotNull ItemStack stack)
 		{
-			return !(this.inventory instanceof WorldlyContainer sidedInventory && !sidedInventory.m_7155_(slot, stack, this.getSide()));
+			return !(this.inventory instanceof WorldlyContainer sidedInventory && !sidedInventory.canPlaceItemThroughFace(slot, stack, this.getSide()));
 		}
 
 		public boolean canExtractItem(int slot, @NotNull ItemStack stack)
 		{
-			return !(this.inventory instanceof WorldlyContainer sidedInventory && !sidedInventory.m_7157_(slot, stack, this.getSide()));
+			return !(this.inventory instanceof WorldlyContainer sidedInventory && !sidedInventory.canTakeItemThroughFace(slot, stack, this.getSide()));
 		}
 
 		@Override

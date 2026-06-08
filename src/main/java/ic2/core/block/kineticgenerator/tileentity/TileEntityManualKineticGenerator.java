@@ -46,7 +46,7 @@ public class TileEntityManualKineticGenerator extends Ic2TileEntity implements I
 
 	private void playerClicked(Player player)
 	{
-		if (player.m_36324_().m_38702_() > 6)
+		if (player.getFoodData().getFoodLevel() > 6)
 		{
 			if (player instanceof ServerPlayer)
 			{
@@ -63,7 +63,7 @@ public class TileEntityManualKineticGenerator extends Ic2TileEntity implements I
 
 					ku = (int) (ku * outputModifier);
 					this.currentKU = Math.min(this.currentKU + ku, 1000);
-					player.m_36399_(0.25F);
+					player.causeFoodExhaustion(0.25F);
 					this.clicks++;
 				}
 			}

@@ -68,7 +68,7 @@ public class GuiAdvMiner extends Ic2Gui<ContainerAdvMiner>
 	}
 
 	@Override
-	public ResourceLocation getTexture()
+	public ResourceLocation getTextureLocation()
 	{
 		return ResourceLocation.fromNamespaceAndPath("ic2", "textures/gui/guiadvminer.png");
 	}

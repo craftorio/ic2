@@ -14,11 +14,11 @@ public class ContainerChunkLoader extends ContainerFullInv<TileEntityChunkloader
 	public ContainerChunkLoader(int syncId, Inventory playerInventory, TileEntityChunkloader be)
 	{
 		super(Ic2ScreenHandlers.CHUNK_LOADER, syncId, playerInventory, be, 250);
-		this.m_38897_(new SlotInvSlot(be.dischargeSlot, 0, 8, 143));
+		this.addSlot(new SlotInvSlot(be.dischargeSlot, 0, 8, 143));
 
 		for (int i = 0; i < be.upgradeSlot.size(); i++)
 		{
-			this.m_38897_(new SlotInvSlot(be.upgradeSlot, i, 8, 44 + 18 * i));
+			this.addSlot(new SlotInvSlot(be.upgradeSlot, i, 8, 44 + 18 * i));
 		}
 	}
 

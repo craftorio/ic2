@@ -11,10 +11,10 @@ public class RotationUtil
 {
 	public static Direction rotateByRay(BlockHitResult ray)
 	{
-		assert ray.m_6662_() == Type.BLOCK;
-		Vec3 hit = ray.m_82450_();
-		BlockPos pos = ray.m_82425_();
-		return rotateByHit(ray.m_82434_(), (float) hit.f_82479_ - pos.getX(), (float) hit.f_82480_ - pos.getY(), (float) hit.f_82481_ - pos.getZ());
+		assert ray.getType() == Type.BLOCK;
+		Vec3 hit = ray.getLocation();
+		BlockPos pos = ray.getBlockPos();
+		return rotateByHit(ray.getDirection(), (float) hit.x - pos.getX(), (float) hit.y - pos.getY(), (float) hit.z - pos.getZ());
 	}
 
 	public static Direction rotateByHit(Direction facingHit, float hitX, float hitY, float hitZ)

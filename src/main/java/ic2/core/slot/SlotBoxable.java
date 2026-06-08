@@ -12,7 +12,7 @@ public class SlotBoxable extends Slot
 		super(iinventory, i, j, k);
 	}
 
-	public boolean m_5857_(ItemStack itemstack)
+	public boolean mayPlace(ItemStack itemstack)
 	{
 		return itemstack == null ? false : ItemWrapper.canBeStoredInToolbox(itemstack);
 	}

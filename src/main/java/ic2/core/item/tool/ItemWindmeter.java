@@ -37,19 +37,19 @@ public class ItemWindMeter extends ItemElectricTool implements PriorityUsableIte
 	}
 
 	@Override
-	public void m_7373_(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag advanced)
+	public void appendHoverText(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag advanced)
 	{
-		tooltip.add(Component.m_237115_("ic2.wind_meter.tooltipA"));
-		tooltip.add(Component.m_237115_("ic2.wind_meter.tooltipB"));
+		tooltip.add(Component.translatable("ic2.wind_meter.tooltipA"));
+		tooltip.add(Component.translatable("ic2.wind_meter.tooltipB"));
 	}
 
 	@Override
 	public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context)
 	{
-		Player player = context.m_43723_();
-		Level world = context.m_43725_();
-		BlockPos pos = context.m_8083_();
-		if (world.isClientSide || player == null || player.m_6144_())
+		Player player = context.getPlayer();
+		Level world = context.getLevel();
+		BlockPos pos = context.getClickedPos();
+		if (world.isClientSide || player == null || player.isShiftKeyDown())
 		{
 			return InteractionResult.PASS;
 		}
@@ -116,7 +116,7 @@ public class ItemWindMeter extends ItemElectricTool implements PriorityUsableIte
 	}
 
 	@Override
-	public InteractionResultHolder<ItemStack> m_7203_(Level world, Player player, InteractionHand hand)
+	public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand)
 	{
 		ItemStack stack = StackUtil.get(player, hand);
 		if (!IC2.sideProxy.isSimulating())

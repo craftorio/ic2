@@ -38,7 +38,7 @@ public class GuiFluidRegulator extends Ic2Gui<ContainerFluidRegulator>
 	}
 
 	@Override
-	protected ResourceLocation getTexture()
+	protected ResourceLocation getTextureLocation()
 	{
 		return background;
 	}

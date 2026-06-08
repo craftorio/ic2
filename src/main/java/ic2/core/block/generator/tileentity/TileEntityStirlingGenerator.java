@@ -71,7 +71,7 @@ public class TileEntityStirlingGenerator extends TileEntityConversionGenerator
 		}
 
 		assert !((BlockEntity) this.source).isRemoved();
-		return this.source.drawHeat(this.getFacing().m_122424_(), this.source.getConnectionBandwidth(this.getFacing().m_122424_()), true);
+		return this.source.drawHeat(this.getFacing().getOpposite(), this.source.getConnectionBandwidth(this.getFacing().getOpposite()), true);
 	}
 
 	@Override
@@ -80,7 +80,7 @@ public class TileEntityStirlingGenerator extends TileEntityConversionGenerator
 		if (this.source != null)
 		{
 			assert !((BlockEntity) this.source).isRemoved();
-			this.source.drawHeat(this.getFacing().m_122424_(), amount, false);
+			this.source.drawHeat(this.getFacing().getOpposite(), amount, false);
 		} else
 		{
 			assert false;

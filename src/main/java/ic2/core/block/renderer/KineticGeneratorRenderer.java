@@ -28,7 +28,7 @@ public class KineticGeneratorRenderer<T extends BlockEntity & IRotorProvider> im
 	{
 	}
 
-	public void m_6922_(T windGen, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay)
+	public void render(T windGen, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay)
 	{
 		int diameter = windGen.getRotorDiameter();
 		if (diameter != 0)
@@ -39,54 +39,54 @@ public class KineticGeneratorRenderer<T extends BlockEntity & IRotorProvider> im
 			if (model == null)
 			{
 				MeshDefinition modelData = new MeshDefinition();
-				PartDefinition modelPartData = modelData.m_171576_();
-				modelPartData.m_171599_(
+				PartDefinition modelPartData = modelData.getRoot();
+				modelPartData.addOrReplaceChild(
 					"1",
-					CubeListBuilder.m_171558_().m_171514_(0, 0).m_171481_(0.0F, 0.0F, -4.0F, 1.0F, diameter * 8, 8.0F),
-					PartPose.m_171423_(-8.0F, 0.0F, 0.0F, 0.0F, -0.5F, 0.0F)
+					CubeListBuilder.create().texOffs(0, 0).addBox(0.0F, 0.0F, -4.0F, 1.0F, diameter * 8, 8.0F),
+					PartPose.offsetAndRotation(-8.0F, 0.0F, 0.0F, 0.0F, -0.5F, 0.0F)
 				);
-				modelPartData.m_171599_(
+				modelPartData.addOrReplaceChild(
 					"2",
-					CubeListBuilder.m_171558_().m_171514_(0, 0).m_171481_(0.0F, 0.0F, -4.0F, 1.0F, diameter * 8, 8.0F),
-					PartPose.m_171423_(-8.0F, 0.0F, 0.0F, 3.1F, 0.5F, 0.0F)
+					CubeListBuilder.create().texOffs(0, 0).addBox(0.0F, 0.0F, -4.0F, 1.0F, diameter * 8, 8.0F),
+					PartPose.offsetAndRotation(-8.0F, 0.0F, 0.0F, 3.1F, 0.5F, 0.0F)
 				);
-				modelPartData.m_171599_(
+				modelPartData.addOrReplaceChild(
 					"3",
-					CubeListBuilder.m_171558_().m_171514_(0, 0).m_171481_(0.0F, 0.0F, -4.0F, 1.0F, diameter * 8, 8.0F),
-					PartPose.m_171423_(-8.0F, 0.0F, 0.0F, 4.7F, 0.0F, 0.5F)
+					CubeListBuilder.create().texOffs(0, 0).addBox(0.0F, 0.0F, -4.0F, 1.0F, diameter * 8, 8.0F),
+					PartPose.offsetAndRotation(-8.0F, 0.0F, 0.0F, 4.7F, 0.0F, 0.5F)
 				);
-				modelPartData.m_171599_(
+				modelPartData.addOrReplaceChild(
 					"4",
-					CubeListBuilder.m_171558_().m_171514_(0, 0).m_171481_(0.0F, 0.0F, -4.0F, 1.0F, diameter * 8, 8.0F),
-					PartPose.m_171423_(-8.0F, 0.0F, 0.0F, 1.5F, 0.0F, -0.5F)
+					CubeListBuilder.create().texOffs(0, 0).addBox(0.0F, 0.0F, -4.0F, 1.0F, diameter * 8, 8.0F),
+					PartPose.offsetAndRotation(-8.0F, 0.0F, 0.0F, 1.5F, 0.0F, -0.5F)
 				);
-				model = LayerDefinition.m_171565_(modelData, 32, 256).m_171564_();
+				model = LayerDefinition.create(modelData, 32, 256).bakeRoot();
 				rotorModels.put(diameter, model);
 			}
 
 			Direction facing = windGen.getFacing();
-			matrices.m_85836_();
-			matrices.m_85837_(0.5, 0.5, 0.5);
+			matrices.pushPose();
+			matrices.translate(0.5, 0.5, 0.5);
 			switch (facing)
 			{
 				case NORTH:
-					matrices.m_85845_(Vector3f.f_122225_.m_122240_(-90.0F));
+					matrices.mulPose(Vector3f.YP.rotationDegrees(-90.0F));
 					break;
 				case EAST:
-					matrices.m_85845_(Vector3f.f_122225_.m_122240_(-180.0F));
+					matrices.mulPose(Vector3f.YP.rotationDegrees(-180.0F));
 					break;
 				case SOUTH:
-					matrices.m_85845_(Vector3f.f_122225_.m_122240_(-270.0F));
+					matrices.mulPose(Vector3f.YP.rotationDegrees(-270.0F));
 					break;
 				case UP:
-					matrices.m_85845_(Vector3f.f_122227_.m_122240_(-90.0F));
+					matrices.mulPose(Vector3f.ZP.rotationDegrees(-90.0F));
 			}
 
-			matrices.m_85845_(Vector3f.f_122223_.m_122240_(angle));
-			matrices.m_85837_(-0.2, 0.0, 0.0);
-			light = LevelRenderer.m_109541_(windGen.getLevel(), windGen.getBlockPos().relative(facing));
-			model.m_104301_(matrices, vertexConsumers.m_6299_(RenderType.m_110446_(rotorRL)), light, overlay);
-			matrices.m_85849_();
+			matrices.mulPose(Vector3f.XP.rotationDegrees(angle));
+			matrices.translate(-0.2, 0.0, 0.0);
+			light = LevelRenderer.getLightColor(windGen.getLevel(), windGen.getBlockPos().relative(facing));
+			model.render(matrices, vertexConsumers.getBuffer(RenderType.entitySolid(rotorRL)), light, overlay);
+			matrices.popPose();
 		}
 	}
 }

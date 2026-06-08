@@ -107,10 +107,10 @@ public class TileEntitySteamRepressurizer extends TileEntityInventory implements
 			{
 				if (world.getBlockEntity(this.worldPosition.relative(dir)) instanceof IHeatSource hs)
 				{
-					int request = hs.drawHeat(dir.m_122424_(), targetHeat, true);
+					int request = hs.drawHeat(dir.getOpposite(), targetHeat, true);
 					if (request > 0)
 					{
-						targetHeat -= hs.drawHeat(dir.m_122424_(), request, false);
+						targetHeat -= hs.drawHeat(dir.getOpposite(), request, false);
 						if (targetHeat <= 0)
 						{
 							break;
@@ -167,11 +167,11 @@ public class TileEntitySteamRepressurizer extends TileEntityInventory implements
 		Fluid ret = detectedSteamFluid;
 		if (ret == null)
 		{
-			Iterator var1 = Registry.f_122822_.m_206058_(Ic2FluidTags.STEAM).iterator();
+			Iterator var1 = Registry.FLUID.getTagOrEmpty(Ic2FluidTags.STEAM).iterator();
 			if (var1.hasNext())
 			{
 				Holder<Fluid> entry = (Holder<Fluid>) var1.next();
-				detectedSteamFluid = ret = (Fluid) entry.m_203334_();
+				detectedSteamFluid = ret = (Fluid) entry.value();
 			}
 		}
 

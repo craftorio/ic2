@@ -30,26 +30,26 @@ public class BoatEntityRenderer extends EntityRenderer<AbstractBoatEntity>
 	public BoatEntityRenderer(Context ctx, boolean chest, String modId)
 	{
 		super(ctx);
-		this.f_114477_ = 0.8F;
+		this.shadowRadius = 0.8F;
 		this.texturesAndModels = BoatType.stream()
 			.collect(
-				ImmutableMap.toImmutableMap(type -> type, type -> Pair.of(ResourceLocation.fromNamespaceAndPath(modId, this.getTexture(type, chest)), this.createModel(ctx, chest)))
+				ImmutableMap.toImmutableMap(type -> type, type -> Pair.of(ResourceLocation.fromNamespaceAndPath(modId, this.getTextureLocation(type, chest)), this.createModel(ctx, chest)))
 			);
 	}
 
 	private BoatModel createModel(Context ctx, boolean chest)
 	{
-		ModelLayerLocation entityModelLayer = chest ? ModelLayers.m_233550_(Type.OAK) : ModelLayers.m_171289_(Type.OAK);
-		return new BoatModel(ctx.m_174023_(entityModelLayer), chest);
+		ModelLayerLocation entityModelLayer = chest ? ModelLayers.createChestBoatModelName(Type.OAK) : ModelLayers.createBoatModelName(Type.OAK);
+		return new BoatModel(ctx.bakeLayer(entityModelLayer), chest);
 	}
 
 	public void render(AbstractBoatEntity boatEntity, float f, float g, PoseStack matrixStack, MultiBufferSource vertexConsumerProvider, int i)
 	{
-		matrixStack.m_85836_();
-		matrixStack.m_85837_(0.0, 0.375, 0.0);
-		matrixStack.m_85845_(Vector3f.f_122225_.m_122240_(180.0F - f));
-		float h = boatEntity.m_38385_() - g;
-		float j = boatEntity.m_38384_() - g;
+		matrixStack.pushPose();
+		matrixStack.translate(0.0, 0.375, 0.0);
+		matrixStack.mulPose(Vector3f.YP.rotationDegrees(180.0F - f));
+		float h = boatEntity.getHurtTime() - g;
+		float j = boatEntity.getDamage() - g;
 		if (j < 0.0F)
 		{
 			j = 0.0F;
@@ -57,38 +57,38 @@ public class BoatEntityRenderer extends EntityRenderer<AbstractBoatEntity>
 
 		if (h > 0.0F)
 		{
-			matrixStack.m_85845_(Vector3f.f_122223_.m_122240_(Mth.m_14031_(h) * h * j / 10.0F * boatEntity.m_38386_()));
+			matrixStack.mulPose(Vector3f.XP.rotationDegrees(Mth.sin(h) * h * j / 10.0F * boatEntity.getHurtDir()));
 		}
 
-		if (!Mth.m_14033_(boatEntity.m_38352_(g), 0.0F))
+		if (!Mth.equal(boatEntity.getBubbleAngle(g), 0.0F))
 		{
-			matrixStack.m_85845_(new Quaternion(new Vector3f(1.0F, 0.0F, 1.0F), boatEntity.m_38352_(g), true));
+			matrixStack.mulPose(new Quaternion(new Vector3f(1.0F, 0.0F, 1.0F), boatEntity.getBubbleAngle(g), true));
 		}
 
 		Pair<ResourceLocation, BoatModel> pair = this.texturesAndModels.get(boatEntity.getOverrideBoatType());
 		ResourceLocation identifier = (ResourceLocation) pair.getFirst();
 		BoatModel boatEntityModel = (BoatModel) pair.getSecond();
-		matrixStack.m_85841_(-1.0F, -1.0F, 1.0F);
-		matrixStack.m_85845_(Vector3f.f_122225_.m_122240_(90.0F));
-		boatEntityModel.m_6973_(boatEntity, g, 0.0F, -0.1F, 0.0F, 0.0F);
-		VertexConsumer vertexConsumer = vertexConsumerProvider.m_6299_(boatEntityModel.m_103119_(identifier));
-		boatEntityModel.m_7695_(matrixStack, vertexConsumer, i, OverlayTexture.f_118083_, 1.0F, 1.0F, 1.0F, 1.0F);
-		if (!boatEntity.m_5842_())
+		matrixStack.scale(-1.0F, -1.0F, 1.0F);
+		matrixStack.mulPose(Vector3f.YP.rotationDegrees(90.0F));
+		boatEntityModel.setupAnim(boatEntity, g, 0.0F, -0.1F, 0.0F, 0.0F);
+		VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(boatEntityModel.renderType(identifier));
+		boatEntityModel.renderToBuffer(matrixStack, vertexConsumer, i, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+		if (!boatEntity.isUnderWater())
 		{
-			VertexConsumer vertexConsumer2 = vertexConsumerProvider.m_6299_(RenderType.m_110478_());
-			boatEntityModel.m_102282_().m_104301_(matrixStack, vertexConsumer2, i, OverlayTexture.f_118083_);
+			VertexConsumer vertexConsumer2 = vertexConsumerProvider.getBuffer(RenderType.waterMask());
+			boatEntityModel.waterPatch().render(matrixStack, vertexConsumer2, i, OverlayTexture.NO_OVERLAY);
 		}
 
-		matrixStack.m_85849_();
-		super.m_7392_(boatEntity, f, g, matrixStack, vertexConsumerProvider, i);
+		matrixStack.popPose();
+		super.render(boatEntity, f, g, matrixStack, vertexConsumerProvider, i);
 	}
 
-	protected String getTexture(BoatType type, boolean chest)
+	protected String getTextureLocation(BoatType type, boolean chest)
 	{
 		return chest ? "textures/entity/chest_boat/" + type.getName() + ".png" : "textures/entity/boat/" + type.getName() + ".png";
 	}
 
-	public ResourceLocation getTexture(AbstractBoatEntity boatEntity)
+	public ResourceLocation getTextureLocation(AbstractBoatEntity boatEntity)
 	{
 		return (ResourceLocation) this.texturesAndModels.get(boatEntity.getOverrideBoatType()).getFirst();
 	}

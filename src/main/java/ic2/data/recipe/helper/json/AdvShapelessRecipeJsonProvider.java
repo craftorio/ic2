@@ -14,7 +14,7 @@ public class AdvShapelessRecipeJsonProvider extends ShapelessRecipeJsonProvider
 	}
 
 	@Override
-	public void m_7917_(JsonObject json)
+	public void serializeRecipeData(JsonObject json)
 	{
 		if (this.consuming)
 		{
@@ -26,7 +26,7 @@ public class AdvShapelessRecipeJsonProvider extends ShapelessRecipeJsonProvider
 			json.addProperty("hidden", true);
 		}
 
-		super.m_7917_(json);
+		super.serializeRecipeData(json);
 	}
 
 	public AdvShapelessRecipeJsonProvider setConsuming(boolean consuming)

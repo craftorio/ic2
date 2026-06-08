@@ -11,6 +11,8 @@ import java.util.WeakHashMap;
 
 
 import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class Keyboard implements IKeyboard
 {
@@ -62,7 +64,7 @@ public class Keyboard implements IKeyboard
 	@Override
 	public boolean isSneakKeyDown(Player player)
 	{
-		return player.m_6144_();
+		return player.isShiftKeyDown();
 	}
 
 	public void sendKeyUpdate()

@@ -21,7 +21,7 @@ public class ItemToolbox extends Item implements IHandHeldInventory
 		super(settings);
 	}
 
-	public InteractionResultHolder<ItemStack> m_7203_(Level world, Player player, InteractionHand hand)
+	public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand)
 	{
 		ItemStack stack = StackUtil.get(player, hand);
 		if (!world.isClientSide)
@@ -34,20 +34,20 @@ public class ItemToolbox extends Item implements IHandHeldInventory
 
 	public boolean onDroppedByPlayer(ItemStack stack, Player player)
 	{
-		if (!player.getCommandSenderWorld().isClientSide && !StackUtil.isEmpty(stack) && player.f_36096_ instanceof ContainerToolbox)
+		if (!player.getCommandSenderWorld().isClientSide && !StackUtil.isEmpty(stack) && player.containerMenu instanceof ContainerToolbox)
 		{
-			HandHeldToolbox toolbox = ((ContainerToolbox) player.f_36096_).base;
+			HandHeldToolbox toolbox = ((ContainerToolbox) player.containerMenu).base;
 			if (toolbox.isThisContainer(stack))
 			{
 				toolbox.saveAsThrown(stack);
-				((ServerPlayer) player).m_6915_();
+				((ServerPlayer) player).closeContainer();
 			}
 		}
 
 		return true;
 	}
 
-	public Rarity m_41460_(ItemStack stack)
+	public Rarity getRarity(ItemStack stack)
 	{
 		return Rarity.UNCOMMON;
 	}

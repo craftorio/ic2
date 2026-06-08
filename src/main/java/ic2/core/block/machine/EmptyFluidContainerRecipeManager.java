@@ -43,7 +43,7 @@ public class EmptyFluidContainerRecipeManager implements IEmptyFluidContainerRec
 		}
 
 		Collection<ItemStack> output = StackUtil.isEmpty(result.extraOutput) ? Collections.emptyList() : Collections.singletonList(result.extraOutput);
-		return new MachineRecipe<>(null, new IEmptyFluidContainerRecipeManager.Output(output, result.fluidChange)).getResult(result.inPlaceOutput);
+		return (MachineRecipeResult) new MachineRecipe<>(null, new IEmptyFluidContainerRecipeManager.Output(output, result.fluidChange)).getResult(result.inPlaceOutput);
 	}
 
 	@Override

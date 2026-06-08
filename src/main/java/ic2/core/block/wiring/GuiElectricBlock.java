@@ -49,7 +49,7 @@ public class GuiElectricBlock extends Ic2Gui<ContainerElectricBlock>
 	}
 
 	@Override
-	protected ResourceLocation getTexture()
+	protected ResourceLocation getTextureLocation()
 	{
 		return background;
 	}

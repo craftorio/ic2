@@ -30,7 +30,7 @@ import net.minecraft.world.phys.HitResult.Type;
 
 public class BoatItem extends Item
 {
-	private static final Predicate<Entity> RIDERS = EntitySelector.f_20408_.and(Entity::m_6087_);
+	private static final Predicate<Entity> RIDERS = EntitySelector.NO_SPECTATORS.and(Entity::isPickable);
 	private final Class<? extends Boat> boatEntityClass;
 	private final EntityType<? extends Boat> boatEntityType;
 
@@ -41,55 +41,55 @@ public class BoatItem extends Item
 		this.boatEntityType = boatEntityType;
 	}
 
-	public InteractionResultHolder<ItemStack> m_7203_(Level world, Player user, InteractionHand hand)
+	public InteractionResultHolder<ItemStack> use(Level world, Player user, InteractionHand hand)
 	{
-		ItemStack itemStack = user.m_21120_(hand);
-		BlockHitResult hitResult = m_41435_(world, user, Fluid.ANY);
-		if (hitResult.m_6662_() == Type.MISS)
+		ItemStack itemStack = user.getItemInHand(hand);
+		BlockHitResult hitResult = getPlayerPOVHitResult(world, user, Fluid.ANY);
+		if (hitResult.getType() == Type.MISS)
 		{
-			return InteractionResultHolder.m_19098_(itemStack);
+			return InteractionResultHolder.pass(itemStack);
 		}
 
-		Vec3 vec3d = user.m_20252_(1.0F);
-		List<Entity> list = world.m_6249_(user, user.m_20191_().m_82369_(vec3d.m_82490_(5.0)).m_82400_(1.0), RIDERS);
+		Vec3 vec3d = user.getViewVector(1.0F);
+		List<Entity> list = world.getEntities(user, user.getBoundingBox().expandTowards(vec3d.scale(5.0)).inflate(1.0), RIDERS);
 		if (!list.isEmpty())
 		{
-			Vec3 vec3d2 = user.m_146892_();
+			Vec3 vec3d2 = user.getEyePosition();
 
 			for (Entity entity : list)
 			{
-				AABB box = entity.m_20191_().m_82400_(entity.m_6143_());
-				if (box.m_82390_(vec3d2))
+				AABB box = entity.getBoundingBox().inflate(entity.getPickRadius());
+				if (box.contains(vec3d2))
 				{
-					return InteractionResultHolder.m_19098_(itemStack);
+					return InteractionResultHolder.pass(itemStack);
 				}
 			}
 		}
 
-		if (hitResult.m_6662_() == Type.BLOCK)
+		if (hitResult.getType() == Type.BLOCK)
 		{
 			Boat boatEntity = this.createEntity(world, hitResult);
-			boatEntity.m_146922_(user.m_146908_());
-			if (!world.m_45756_(boatEntity, boatEntity.m_20191_()))
+			boatEntity.setYRot(user.getYRot());
+			if (!world.noCollision(boatEntity, boatEntity.getBoundingBox()))
 			{
-				return InteractionResultHolder.m_19100_(itemStack);
+				return InteractionResultHolder.fail(itemStack);
 			}
 
 			if (!world.isClientSide)
 			{
 				world.addFreshEntity(boatEntity);
-				world.m_220400_(user, GameEvent.f_157810_, hitResult.m_82450_());
-				if (!user.m_150110_().f_35937_)
+				world.gameEvent(user, GameEvent.ENTITY_PLACE, hitResult.getLocation());
+				if (!user.getAbilities().instabuild)
 				{
-					itemStack.m_41774_(1);
+					itemStack.shrink(1);
 				}
 			}
 
-			user.m_36246_(Stats.f_12982_.m_12902_(this));
-			return InteractionResultHolder.m_19092_(itemStack, world.m_5776_());
+			user.awardStat(Stats.ITEM_USED.get(this));
+			return InteractionResultHolder.sidedSuccess(itemStack, world.isClientSide());
 		} else
 		{
-			return InteractionResultHolder.m_19098_(itemStack);
+			return InteractionResultHolder.pass(itemStack);
 		}
 	}
 
@@ -105,7 +105,7 @@ public class BoatItem extends Item
 		{
 			Constructor constructor = this.boatEntityClass.getConstructor(EntityType.class, Level.class, double.class, double.class, double.class);
 			return (Boat) constructor.newInstance(
-				this.boatEntityType, world, hitResult.m_82450_().f_82479_, hitResult.m_82450_().f_82480_, hitResult.m_82450_().f_82481_
+				this.boatEntityType, world, hitResult.getLocation().x, hitResult.getLocation().y, hitResult.getLocation().z
 			);
 		} catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e)
 		{

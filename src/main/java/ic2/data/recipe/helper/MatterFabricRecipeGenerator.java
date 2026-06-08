@@ -26,10 +26,10 @@ public class MatterFabricRecipeGenerator
 		this.exporter.accept(new Ic2RecipeJsonProvider(Ic2RecipeSerializers.MATTER_FABRICATOR, "%s_to_%s".formatted(IdentifierUtil.getPath(inputItem), output))
 		{
 			@Override
-			public void m_7917_(JsonObject json)
+			public void serializeRecipeData(JsonObject json)
 			{
 				JsonObject input = new JsonObject();
-				input.addProperty("item", Registry.f_122827_.getKey(inputItem.m_5456_()).toString());
+				input.addProperty("item", Registry.ITEM.getKey(inputItem.asItem()).toString());
 				if (inputCount != 1)
 				{
 					input.addProperty("count", inputCount);

@@ -14,24 +14,24 @@ public class ContainerLiquidHeatExchanger extends ContainerFullInv<TileEntityLiq
 	public ContainerLiquidHeatExchanger(int syncId, Inventory playerInventory, TileEntityLiquidHeatExchanger be)
 	{
 		super(Ic2ScreenHandlers.LIQUID_HEAT_EXCHANGER, syncId, playerInventory, be, 204);
-		this.m_38897_(new SlotInvSlot(be.hotfluidinputSlot, 0, 8, 103));
-		this.m_38897_(new SlotInvSlot(be.cooloutputSlot, 0, 152, 103));
-		this.m_38897_(new SlotInvSlot(be.coolfluidinputSlot, 0, 134, 103));
-		this.m_38897_(new SlotInvSlot(be.hotoutputSlot, 0, 26, 103));
+		this.addSlot(new SlotInvSlot(be.hotfluidinputSlot, 0, 8, 103));
+		this.addSlot(new SlotInvSlot(be.cooloutputSlot, 0, 152, 103));
+		this.addSlot(new SlotInvSlot(be.coolfluidinputSlot, 0, 134, 103));
+		this.addSlot(new SlotInvSlot(be.hotoutputSlot, 0, 26, 103));
 
 		for (int i = 0; i < 3; i++)
 		{
-			this.m_38897_(new SlotInvSlot(be.upgradeSlot, i, 62 + i * 18, 103));
+			this.addSlot(new SlotInvSlot(be.upgradeSlot, i, 62 + i * 18, 103));
 		}
 
 		for (int i = 0; i < 5; i++)
 		{
-			this.m_38897_(new SlotInvSlot(be.heatexchangerslots, i, 46 + i * 17, 50));
+			this.addSlot(new SlotInvSlot(be.heatexchangerslots, i, 46 + i * 17, 50));
 		}
 
 		for (int i = 5; i < 10; i++)
 		{
-			this.m_38897_(new SlotInvSlot(be.heatexchangerslots, i, 46 + (i - 5) * 17, 72));
+			this.addSlot(new SlotInvSlot(be.heatexchangerslots, i, 46 + (i - 5) * 17, 72));
 		}
 	}
 

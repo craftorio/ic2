@@ -18,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -44,7 +45,7 @@ public class OldToNewLangConverter implements DataProvider
 		this.generator = generator;
 	}
 
-	public String m_6055_()
+	public String getName()
 	{
 		return "IC2 Localization";
 	}
@@ -63,9 +64,9 @@ public class OldToNewLangConverter implements DataProvider
 		return "item.ic2." + color + "_painter";
 	}
 
-	public void m_213708_(CachedOutput cache) throws IOException
+	public void run(CachedOutput cache) throws IOException
 	{
-		Path outputPath = this.generator.m_123916_();
+		Path outputPath = this.generator.getOutputFolder();
 		Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 		Path oldLangPath = outputPath.getParent().resolve("resources").resolve("assets/ic2/lang_ic2");
 		Files.walk(oldLangPath, 1)
@@ -145,22 +146,22 @@ public class OldToNewLangConverter implements DataProvider
 								}
 							);
 							newLangGenerator.generate();
-							list.removeIf(pairx -> ((String) pairx.left()).startsWith("item.") && !Registry.f_122827_.m_7804_(extractIdentifier((String) pairx.left())));
-							list.removeIf(pairx -> ((String) pairx.left()).startsWith("block.") && !Registry.BLOCK.m_7804_(extractIdentifier((String) pairx.left())));
+							list.removeIf(pairx -> pairx.left().startsWith("item.") && !Registry.ITEM.containsKey(extractIdentifier(pairx.left())));
+							list.removeIf(pairx -> pairx.left().startsWith("block.") && !Registry.BLOCK.containsKey(extractIdentifier(pairx.left())));
 							list.addAll(
 								list.stream()
-									.filter(pairx -> ((String) pairx.left()).startsWith("block.") && ((String) pairx.left()).split("[.]").length == 3)
+									.filter(pairx -> pairx.left().startsWith("block.") && pairx.left().split("[.]").length == 3)
 									.filter(pairx ->
 									{
-										ResourceLocation id = extractIdentifier((String) pairx.left());
-										boolean hasContainer = this.mapping.containsKey("container.ic2." + id.m_135815_());
+										ResourceLocation id = extractIdentifier(pairx.left());
+										boolean hasContainer = this.mapping.containsKey("container.ic2." + id.getPath());
 										return !hasContainer;
 									})
-									.map(pairx -> Pair.of("container.ic2." + extractIdentifier((String) pairx.left()).m_135815_(), (String) pairx.right()))
+									.map(pairx -> Pair.of("container.ic2." + extractIdentifier(pairx.left()).getPath(), pairx.right()))
 									.filter(
 										pairx ->
 										{
-											if (Registry.f_122863_.m_7804_(extractIdentifier((String) pairx.left())))
+											if (Registry.MENU.containsKey(extractIdentifier(pairx.left())))
 											{
 												return true;
 											}
@@ -182,7 +183,7 @@ public class OldToNewLangConverter implements DataProvider
 
 											for (String container : extraContainers)
 											{
-												if (((String) pairx.left()).contains(container))
+												if (pairx.left().contains(container))
 												{
 													return true;
 												}
@@ -194,16 +195,16 @@ public class OldToNewLangConverter implements DataProvider
 									.toList()
 							);
 							list.sort(
-								((o1, o2) -> tryCompareByRawId((Pair<String, String>) o1, (Pair<String, String>) o2, "block", Registry.BLOCK))
-									.thenComparing((o1, o2) -> tryCompareByRawId((Pair<String, String>) o1, (Pair<String, String>) o2, "item", Registry.f_122827_))
-									.thenComparing((o1, o2) -> tryCompareByRawId((Pair<String, String>) o1, (Pair<String, String>) o2, "container", Registry.BLOCK))
-									.thenComparing(pairx -> (String) pairx.left())
+								((Comparator<Pair<String, String>>) (o1, o2) -> tryCompareByRawId(o1, o2, "block", Registry.BLOCK))
+									.thenComparing((o1, o2) -> tryCompareByRawId(o1, o2, "item", Registry.ITEM))
+									.thenComparing((o1, o2) -> tryCompareByRawId(o1, o2, "container", Registry.BLOCK))
+									.thenComparing(pairx -> pairx.left())
 							);
 							JsonObject newLang = new JsonObject();
 
 							for (Pair<String, String> pair : list)
 							{
-								newLang.addProperty((String) pair.left(), (String) pair.right());
+								newLang.addProperty(pair.left(), pair.right());
 							}
 
 							writeToPath(cache, newLang, newFile);
@@ -224,9 +225,9 @@ public class OldToNewLangConverter implements DataProvider
 		JsonWriter jsonWriter = new JsonWriter(writer2);
 		jsonWriter.setSerializeNulls(false);
 		jsonWriter.setIndent("  ");
-		GsonHelper.m_216207_(jsonWriter, json, null);
+		GsonHelper.writeValue(jsonWriter, json, null);
 		jsonWriter.close();
-		writer.m_213871_(path, byteStream.toByteArray(), hashingStream.hash());
+		writer.writeIfNeeded(path, byteStream.toByteArray(), hashingStream.hash());
 	}
 
 	private static Map<String, String> createMappings()
@@ -632,7 +633,7 @@ public class OldToNewLangConverter implements DataProvider
 
 		for (DyeColor color : DyeColor.values())
 		{
-			map.put("wall." + color.m_41065_(), "block.ic2." + color.m_41065_() + "_wall");
+			map.put("wall." + color.getName(), "block.ic2." + color.getName() + "_wall");
 		}
 
 		map.put("reinforced_door", "block.ic2.reinforced_door");
@@ -657,9 +658,9 @@ public class OldToNewLangConverter implements DataProvider
 		for (Block block : Registry.BLOCK)
 		{
 			ResourceLocation id = Registry.BLOCK.getKey(block);
-			if (id.m_135827_().equals("ic2"))
+			if (id.getNamespace().equals("ic2"))
 			{
-				String name = id.m_135815_();
+				String name = id.getPath();
 
 				String oldName = switch (name)
 				{
@@ -734,19 +735,19 @@ public class OldToNewLangConverter implements DataProvider
 
 	private static String toCamelCase(String string)
 	{
-		return (String) CaseFormat.LOWER_UNDERSCORE.converterTo(CaseFormat.UPPER_CAMEL).convert(string);
+		return CaseFormat.LOWER_UNDERSCORE.converterTo(CaseFormat.UPPER_CAMEL).convert(string);
 	}
 
 	private static <T> int tryCompareByRawId(Pair<String, String> o1, Pair<String, String> o2, String entryType, Registry<T> registry)
 	{
-		if (((String) o1.left()).startsWith(entryType + ".ic2"))
+		if (o1.left().startsWith(entryType + ".ic2"))
 		{
-			if (((String) o2.left()).startsWith(entryType + ".ic2"))
+			if (o2.left().startsWith(entryType + ".ic2"))
 			{
-				ResourceLocation id1 = extractIdentifier((String) o1.left());
-				ResourceLocation id2 = extractIdentifier((String) o2.left());
-				int item1 = registry.m_6612_(id1).<Integer>map(registry::m_7447_).orElse(Integer.MAX_VALUE);
-				int item2 = registry.m_6612_(id2).<Integer>map(registry::m_7447_).orElse(Integer.MAX_VALUE);
+				ResourceLocation id1 = extractIdentifier(o1.left());
+				ResourceLocation id2 = extractIdentifier(o2.left());
+				int item1 = registry.getOptional(id1).map(registry::getId).orElse(Integer.MAX_VALUE);
+				int item2 = registry.getOptional(id2).map(registry::getId).orElse(Integer.MAX_VALUE);
 				return Integer.compare(item1, item2);
 			} else
 			{
@@ -754,7 +755,7 @@ public class OldToNewLangConverter implements DataProvider
 			}
 		} else
 		{
-			return ((String) o2.left()).startsWith(entryType + ".ic2") ? 1 : 0;
+			return o2.left().startsWith(entryType + ".ic2") ? 1 : 0;
 		}
 	}
 

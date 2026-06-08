@@ -13,37 +13,37 @@ public record RecipeHolder<I, O>(MachineRecipe<I, O> recipe, ResourceLocation id
                                  RecipeType<?> type)
 	implements Recipe<Container>
 {
-	public boolean m_5818_(Container inventory, Level world)
+	public boolean matches(Container inventory, Level world)
 	{
 		throw new UnsupportedOperationException("Not supported for IC2 machine recipes.");
 	}
 
-	public ItemStack m_5874_(Container inventory)
+	public ItemStack assemble(Container inventory)
 	{
 		throw new UnsupportedOperationException("Not supported for IC2 machine recipes.");
 	}
 
-	public boolean m_8004_(int width, int height)
+	public boolean canCraftInDimensions(int width, int height)
 	{
 		throw new UnsupportedOperationException("Not supported for IC2 machine recipes.");
 	}
 
-	public ItemStack m_8043_()
+	public ItemStack getResultItem()
 	{
 		return ItemStack.EMPTY;
 	}
 
-	public ResourceLocation m_6423_()
+	public ResourceLocation getId()
 	{
 		return this.id;
 	}
 
-	public RecipeSerializer<?> m_7707_()
+	public RecipeSerializer<?> getSerializer()
 	{
 		return this.serializer;
 	}
 
-	public RecipeType<?> m_6671_()
+	public RecipeType<?> getType()
 	{
 		return this.type;
 	}

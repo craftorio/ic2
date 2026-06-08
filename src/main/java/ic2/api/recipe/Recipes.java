@@ -11,8 +11,8 @@ public class Recipes
 	public static Recipes.IGetter<IBasicMachineRecipeManager> extractor;
 	public static Recipes.IGetter<IBasicMachineRecipeManager> compressor;
 	public static Recipes.IGetter<IBasicMachineRecipeManager> centrifuge;
-	public static Recipes.IGetter<IBasicMachineRecipeManager> blockcutter;
-	public static Recipes.IGetter<IBasicMachineRecipeManager> blastfurnace;
+	public static Recipes.IGetter<IBasicMachineRecipeManager> block_cutter;
+	public static Recipes.IGetter<IBasicMachineRecipeManager> blast_furnace;
 	public static IBasicMachineRecipeManager recycler;
 	public static Recipes.IGetter<IBasicMachineRecipeManager> metalformerExtruding;
 	public static Recipes.IGetter<IBasicMachineRecipeManager> metalformerCutting;
@@ -30,7 +30,7 @@ public class Recipes
 	public static ISemiFluidFuelManager semiFluidGenerator;
 	public static IFluidHeatManager fluidHeatGenerator;
 	public static ILiquidHeatExchangerManager liquidCooldownManager;
-	public static ILiquidHeatExchangerManager liquidHeatupManager;
+	public static ILiquidHeatExchangerManager liquidHeatUpManager;
 	public static IEmptyFluidContainerRecipeManager emptyFluidContainer;
 	public static IFillFluidContainerRecipeManager fillFluidContainer;
 

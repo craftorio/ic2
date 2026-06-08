@@ -14,8 +14,8 @@ public class ContainerSteamKineticGenerator extends ContainerFullInv<TileEntityS
 	public ContainerSteamKineticGenerator(int syncId, Inventory playerInventory, TileEntitySteamKineticGenerator te)
 	{
 		super(Ic2ScreenHandlers.STEAM_KINETIC_GENERATOR, syncId, playerInventory, te, 166);
-		this.m_38897_(new SlotInvSlot(te.upgradeSlot, 0, 152, 26));
-		this.m_38897_(new SlotInvSlot(te.turbineSlot, 0, 80, 26));
+		this.addSlot(new SlotInvSlot(te.upgradeSlot, 0, 152, 26));
+		this.addSlot(new SlotInvSlot(te.turbineSlot, 0, 80, 26));
 	}
 
 	@Override

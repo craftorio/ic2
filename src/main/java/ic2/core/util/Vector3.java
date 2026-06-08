@@ -27,7 +27,7 @@ public final class Vector3
 
 	public Vector3(Vec3 v)
 	{
-		this(v.f_82479_, v.f_82480_, v.f_82481_);
+		this(v.x, v.y, v.z);
 	}
 
 	public Vector3 copy()
@@ -55,7 +55,7 @@ public final class Vector3
 
 	public Vector3 set(Vec3 v)
 	{
-		return this.set(v.f_82479_, v.f_82480_, v.f_82481_);
+		return this.set(v.x, v.y, v.z);
 	}
 
 	public Vector3 add(double vx, double vy, double vz)
@@ -151,7 +151,7 @@ public final class Vector3
 
 	public double distanceSquared(Vec3 v)
 	{
-		return this.distanceSquared(v.f_82479_, v.f_82480_, v.f_82481_);
+		return this.distanceSquared(v.x, v.y, v.z);
 	}
 
 	public double distance(double vx, double vy, double vz)
@@ -166,7 +166,7 @@ public final class Vector3
 
 	public double distance(Vec3 v)
 	{
-		return this.distance(v.f_82479_, v.f_82480_, v.f_82481_);
+		return this.distance(v.x, v.y, v.z);
 	}
 
 	public Vector3 scale(double factor)

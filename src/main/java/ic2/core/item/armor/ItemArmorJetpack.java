@@ -16,9 +16,9 @@ public class ItemArmorJetpack extends ItemArmorFluidTank implements IJetpack
 		super(Ic2ArmorMaterials.JET_PACK, settings, Ic2Fluids.BIOGAS.still, 30000);
 	}
 
-	public void m_6787_(CreativeModeTab group, NonNullList<ItemStack> stacks)
+	public void fillItemCategory(CreativeModeTab group, NonNullList<ItemStack> stacks)
 	{
-		if (this.m_220152_(group))
+		if (this.allowedIn(group))
 		{
 			ItemStack stack = new ItemStack(this);
 			this.filltank(stack);

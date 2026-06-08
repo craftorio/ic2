@@ -29,6 +29,6 @@ public class GuiFullInv<T extends ContainerBase<? extends Container>> extends Gu
 	protected void drawBackgroundAndTitle(PoseStack matrices, float partialTicks, int mouseX, int mouseY)
 	{
 		super.drawBackgroundAndTitle(matrices, partialTicks, mouseX, mouseY);
-		this.drawXCenteredString(matrices, this.imageWidth / 2, 6, this.f_96539_, 4210752, false);
+		this.drawXCenteredString(matrices, this.imageWidth / 2, 6, this.title, 4210752, false);
 	}
 }

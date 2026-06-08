@@ -227,7 +227,7 @@ public class EnergyNetGlobal implements IEnergyNet
 			throw new IllegalStateException("not applicable clientside");
 		}
 
-		assert world.getServer().m_18695_();
+		assert world.getServer().isSameThread();
 		return WorldData.get(world).energyNet;
 	}
 }

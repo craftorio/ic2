@@ -15,10 +15,10 @@ public class EnergyBlockLootTableGenerator extends Ic2BlockLootTableGenerator
 			if (block instanceof Ic2TileEntityBlock tileEntityBlock)
 			{
 				Ic2TileEntity tileEntity = tileEntityBlock.getDummyTe();
-				ItemStack stack = tileEntity.adjustDrop(block.m_5456_().m_7968_(), false);
+				ItemStack stack = tileEntity.adjustDrop(block.asItem().getDefaultInstance(), false);
 				if (stack != null)
 				{
-					if (stack.m_41782_())
+					if (stack.hasTag())
 					{
 						this.addDropWithNbt(block);
 					} else

@@ -35,14 +35,14 @@ public class ContainerIndustrialWorkbench extends ContainerFullInv<TileEntityInd
 		protected void set(int index, ItemStack stack)
 		{
 			super.set(index, stack);
-			ContainerIndustrialWorkbench.this.m_6199_(this);
+			ContainerIndustrialWorkbench.this.slotsChanged(this);
 		}
 
 		@Override
 		public ItemStack removeItem(int index, int amount)
 		{
 			ItemStack stack = super.removeItem(index, amount);
-			ContainerIndustrialWorkbench.this.m_6199_(this);
+			ContainerIndustrialWorkbench.this.slotsChanged(this);
 			return stack;
 		}
 	};
@@ -62,11 +62,11 @@ public class ContainerIndustrialWorkbench extends ContainerFullInv<TileEntityInd
 	public ContainerIndustrialWorkbench(int syncId, Inventory playerInventory, TileEntityIndustrialWorkbench tileEntity)
 	{
 		super(Ic2ScreenHandlers.INDUSTRIAL_WORKBENCH, syncId, playerInventory, tileEntity, 228);
-		this.player = playerInventory.f_35978_;
-		this.indexOutput = this.f_38839_.size();
-		this.outputs[0] = this.m_38897_(new Ic2CraftingResultSlot(this.player, this.craftMatrix, this.craftResult, 0, 124, 61)
+		this.player = playerInventory.player;
+		this.indexOutput = this.slots.size();
+		this.outputs[0] = this.addSlot(new Ic2CraftingResultSlot(this.player, this.craftMatrix, this.craftResult, 0, 124, 61)
 		{
-			protected void m_5845_(ItemStack stack)
+			protected void checkTakeAchievements(ItemStack stack)
 			{
 				if (IC2.sideProxy.isRendering())
 				{
@@ -76,47 +76,47 @@ public class ContainerIndustrialWorkbench extends ContainerFullInv<TileEntityInd
 					ContainerIndustrialWorkbench.this.onContainerEvent("craft");
 				}
 
-				super.m_5845_(stack);
+				super.checkTakeAchievements(stack);
 			}
 		});
-		this.indexGridStart = this.f_38839_.size();
+		this.indexGridStart = this.slots.size();
 
 		for (int y = 0; y < 3; y++)
 		{
 			for (int x = 0; x < 3; x++)
 			{
-				this.m_38897_(new SlotInvSlot(tileEntity.craftingGrid, x + y * 3, 30 + x * 18, 43 + y * 18)
+				this.addSlot(new SlotInvSlot(tileEntity.craftingGrid, x + y * 3, 30 + x * 18, 43 + y * 18)
 				{
-					public void m_6654_()
+					public void setChanged()
 					{
-						super.m_6654_();
-						ContainerIndustrialWorkbench.this.m_6199_(ContainerIndustrialWorkbench.this.craftMatrix);
+						super.setChanged();
+						ContainerIndustrialWorkbench.this.slotsChanged(ContainerIndustrialWorkbench.this.craftMatrix);
 					}
 				});
 			}
 		}
 
-		this.indexGridEnd = this.f_38839_.size();
-		this.indexBufferStart = this.f_38839_.size();
+		this.indexGridEnd = this.slots.size();
+		this.indexBufferStart = this.slots.size();
 
 		for (int y = 0; y < 2; y++)
 		{
 			for (int x = 0; x < 9; x++)
 			{
-				this.m_38897_(new SlotInvSlot(tileEntity.craftingStorage, x + y * 9, 8 + x * 18, 106 + y * 18));
+				this.addSlot(new SlotInvSlot(tileEntity.craftingStorage, x + y * 9, 8 + x * 18, 106 + y * 18));
 			}
 		}
 
-		this.indexBufferEnd = this.f_38839_.size();
-		this.m_38897_(new SlotInvSlot(tileEntity.leftCrafting.tool, 0, 7, 17));
-		this.m_38897_(new SlotInvSlot(tileEntity.leftCrafting.input, 0, 25, 17));
-		this.indexOutputHammer = this.f_38839_.size();
-		this.outputs[1] = this.m_38897_(new Ic2CraftingResultSlot(this.player, tileEntity.leftCrafting.crafting, tileEntity.leftCrafting.resultInv, 0, 69, 17));
-		this.m_38897_(new SlotInvSlot(tileEntity.rightCrafting.tool, 0, 91, 17));
-		this.m_38897_(new SlotInvSlot(tileEntity.rightCrafting.input, 0, 109, 17));
-		this.indexOutputCutter = this.f_38839_.size();
-		this.outputs[2] = this.m_38897_(new Ic2CraftingResultSlot(this.player, tileEntity.rightCrafting.crafting, tileEntity.rightCrafting.resultInv, 0, 153, 17));
-		this.m_6199_(this.craftMatrix);
+		this.indexBufferEnd = this.slots.size();
+		this.addSlot(new SlotInvSlot(tileEntity.leftCrafting.tool, 0, 7, 17));
+		this.addSlot(new SlotInvSlot(tileEntity.leftCrafting.input, 0, 25, 17));
+		this.indexOutputHammer = this.slots.size();
+		this.outputs[1] = this.addSlot(new Ic2CraftingResultSlot(this.player, tileEntity.leftCrafting.crafting, tileEntity.leftCrafting.resultInv, 0, 69, 17));
+		this.addSlot(new SlotInvSlot(tileEntity.rightCrafting.tool, 0, 91, 17));
+		this.addSlot(new SlotInvSlot(tileEntity.rightCrafting.input, 0, 109, 17));
+		this.indexOutputCutter = this.slots.size();
+		this.outputs[2] = this.addSlot(new Ic2CraftingResultSlot(this.player, tileEntity.rightCrafting.crafting, tileEntity.rightCrafting.resultInv, 0, 153, 17));
+		this.slotsChanged(this.craftMatrix);
 	}
 
 	private CraftingRecipe getRecipe(CraftingContainer inventory)
@@ -128,7 +128,7 @@ public class ContainerIndustrialWorkbench extends ContainerFullInv<TileEntityInd
 		}
 
 		MinecraftServer server = world.getServer();
-		return server == null ? null : (CraftingRecipe) server.m_129894_().m_44015_(RecipeType.f_44107_, inventory, world).orElse(null);
+		return server == null ? null : (CraftingRecipe) server.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, inventory, world).orElse(null);
 	}
 
 	@Override
@@ -136,21 +136,21 @@ public class ContainerIndustrialWorkbench extends ContainerFullInv<TileEntityInd
 	{
 		if ("craft".equals(event))
 		{
-			this.m_38946_();
+			this.broadcastChanges();
 			this.base.rebalance();
-			this.m_38946_();
+			this.broadcastChanges();
 		} else if ("clear".equals(event))
 		{
-			this.m_38946_();
+			this.broadcastChanges();
 			this.craftResult.clearContent();
 			this.base.clear(this.player);
-			this.m_38946_();
+			this.broadcastChanges();
 		}
 
 		super.onContainerEvent(event);
 	}
 
-	public void m_6199_(Container inventory)
+	public void slotsChanged(Container inventory)
 	{
 		Level world = this.base.getLevel();
 		if (world != null)
@@ -158,23 +158,23 @@ public class ContainerIndustrialWorkbench extends ContainerFullInv<TileEntityInd
 			if (world.getServer() != null)
 			{
 				CraftingRecipe recipe = this.getRecipe(this.craftMatrix);
-				ItemStack output = recipe == null ? ItemStack.EMPTY : recipe.m_5874_(this.craftMatrix);
+				ItemStack output = recipe == null ? ItemStack.EMPTY : recipe.assemble(this.craftMatrix);
 				this.craftResult.setItem(0, output);
 			}
 		}
 	}
 
-	public boolean m_5882_(ItemStack stack, Slot slot)
+	public boolean canTakeItemForPickAll(ItemStack stack, Slot slot)
 	{
 		for (Slot output : this.outputs)
 		{
-			if (slot.f_40218_ == output.f_40218_)
+			if (slot.container == output.container)
 			{
 				return false;
 			}
 		}
 
-		return super.m_5882_(stack, slot);
+		return super.canTakeItemForPickAll(stack, slot);
 	}
 
 	@Override
@@ -186,7 +186,7 @@ public class ContainerIndustrialWorkbench extends ContainerFullInv<TileEntityInd
 		while (iter.hasNext())
 		{
 			int currentSlot = iter.nextInt();
-			((Slot) this.f_38839_.get(currentSlot + 37)).m_6654_();
+			((Slot) this.slots.get(currentSlot + 37)).setChanged();
 		}
 
 		return !changes.a.isEmpty() ? super.handlePlayerSlotShiftClick(player, changes.a.get(0)) : StackUtil.emptyStack;
@@ -195,12 +195,12 @@ public class ContainerIndustrialWorkbench extends ContainerFullInv<TileEntityInd
 	@Override
 	protected ItemStack handleGUISlotShiftClick(Player player, ItemStack sourceItemStack)
 	{
-		ItemStack start = sourceItemStack.m_41777_();
+		ItemStack start = sourceItemStack.copy();
 		Slot craftingSlot = null;
 
 		for (Slot slot : this.outputs)
 		{
-			if (slot.m_7993_() == sourceItemStack)
+			if (slot.getItem() == sourceItemStack)
 			{
 				craftingSlot = slot;
 				break;
@@ -212,8 +212,8 @@ public class ContainerIndustrialWorkbench extends ContainerFullInv<TileEntityInd
 
 		for (int i = this.indexBufferStart; i < this.indexBufferEnd; i++)
 		{
-			Slot slot = (Slot) this.f_38839_.get(i);
-			if (slot.m_7993_() == sourceItemStack)
+			Slot slot = (Slot) this.slots.get(i);
+			if (slot.getItem() == sourceItemStack)
 			{
 				isBuffer = true;
 				break;
@@ -222,15 +222,15 @@ public class ContainerIndustrialWorkbench extends ContainerFullInv<TileEntityInd
 
 		for (int run = 0; run < 2 && !StackUtil.isEmpty(sourceItemStack); run++)
 		{
-			ListIterator<Slot> it = this.f_38839_.listIterator(this.f_38839_.size());
+			ListIterator<Slot> it = this.slots.listIterator(this.slots.size());
 
 			while (it.hasPrevious())
 			{
 				Slot targetSlot = it.previous();
-				if (targetSlot.f_40218_ == player.getInventory()
+				if (targetSlot.container == player.getInventory()
 					|| !isBuffer
-					&& targetSlot.f_40219_ >= this.indexBufferStart
-					&& targetSlot.f_40219_ < this.indexBufferEnd
+					&& targetSlot.index >= this.indexBufferStart
+					&& targetSlot.index < this.indexBufferEnd
 					&& isValidTargetSlot(targetSlot, sourceItemStack, run == 1, false))
 				{
 					sourceItemStack = this.transfer(sourceItemStack, targetSlot);
@@ -238,15 +238,15 @@ public class ContainerIndustrialWorkbench extends ContainerFullInv<TileEntityInd
 					{
 						if (isOutput)
 						{
-							craftingSlot.m_40234_(sourceItemStack, start);
-							craftingSlot.m_142406_(player, start);
+							craftingSlot.onQuickCraft(sourceItemStack, start);
+							craftingSlot.onTake(player, start);
 							Ic2CraftingResultSlot outputSlot = (Ic2CraftingResultSlot) craftingSlot;
 							CraftingContainer inputInv = outputSlot.getInput();
 							CraftingRecipe recipe = this.getRecipe(inputInv);
-							if (recipe != null && StackUtil.checkItemEquality(recipe.m_5874_(inputInv), start))
+							if (recipe != null && StackUtil.checkItemEquality(recipe.assemble(inputInv), start))
 							{
-								sourceItemStack = craftingSlot.m_7993_();
-								start = sourceItemStack.m_41777_();
+								sourceItemStack = craftingSlot.getItem();
+								start = sourceItemStack.copy();
 								assert it.hasNext();
 								it.next();
 								continue;

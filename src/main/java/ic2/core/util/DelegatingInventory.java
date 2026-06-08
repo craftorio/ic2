@@ -81,13 +81,13 @@ public class DelegatingInventory implements Container
 		return this.parent.canPlaceItem(slot, stack);
 	}
 
-	public int m_18947_(Item item)
+	public int countItem(Item item)
 	{
-		return this.parent.m_18947_(item);
+		return this.parent.countItem(item);
 	}
 
-	public boolean m_18949_(Set<Item> items)
+	public boolean hasAnyOf(Set<Item> items)
 	{
-		return this.parent.m_18949_(items);
+		return this.parent.hasAnyOf(items);
 	}
 }

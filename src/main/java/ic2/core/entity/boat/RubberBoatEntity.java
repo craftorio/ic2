@@ -21,7 +21,7 @@ public class RubberBoatEntity extends AbstractBoatEntity
 		super(entityType, world, x, y, z);
 	}
 
-	public Item m_38369_()
+	public Item getDropItem()
 	{
 		return Ic2Items.RUBBER_BOAT;
 	}

@@ -18,10 +18,10 @@ public class ElectricItemTooltipHandler
 			String tooltip = ElectricItem.manager.getToolTip(stack);
 			if (tooltip != null && !tooltip.trim().isEmpty())
 			{
-				out.add(Component.m_237113_(tooltip));
-				if (Screen.m_96638_())
+				out.add(Component.literal(tooltip));
+				if (Screen.hasShiftDown())
 				{
-					out.add(Component.m_237110_("ic2.item.tooltip.PowerTier", new Object[] { ElectricItem.manager.getTier(stack) }).m_130940_(ChatFormatting.GRAY));
+					out.add(Component.translatable("ic2.item.tooltip.PowerTier", new Object[] { ElectricItem.manager.getTier(stack) }).withStyle(ChatFormatting.GRAY));
 				}
 			}
 		}

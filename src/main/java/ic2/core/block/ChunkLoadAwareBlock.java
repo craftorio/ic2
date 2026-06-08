@@ -11,7 +11,7 @@ public interface ChunkLoadAwareBlock
 {
 	default Collection<BlockState> getLoadAwareState(Block block)
 	{
-		return block.m_49965_().m_61056_();
+		return block.getStateDefinition().getPossibleStates();
 	}
 
 	void onLoad(BlockState var1, Level var2, BlockPos var3);

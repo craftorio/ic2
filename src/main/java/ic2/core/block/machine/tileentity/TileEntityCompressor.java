@@ -78,20 +78,20 @@ public class TileEntityCompressor extends TileEntityStandardMachine<IRecipeInput
 			return output;
 		}
 
-		if (!this.pumps.isEmpty() && this.inputSlot.isEmpty() && this.outputSlot.canAdd(new ItemStack(Items.f_42452_)))
+		if (!this.pumps.isEmpty() && this.inputSlot.isEmpty() && this.outputSlot.canAdd(new ItemStack(Items.SNOWBALL)))
 		{
 			int reqAmount = 1000;
 
 			for (TileEntityPump pump : this.pumps)
 			{
-				int amount = LiquidUtil.drainTile(pump, Direction.UP, Fluids.f_76193_, reqAmount, true);
+				int amount = LiquidUtil.drainTile(pump, Direction.UP, Fluids.WATER, reqAmount, true);
 				if (amount > 0)
 				{
 					reqAmount -= amount;
 					if (reqAmount <= 0)
 					{
 						this.usingPumpRecipe = true;
-						output = new MachineRecipe<>(null, Collections.singletonList(new ItemStack(Items.f_42452_))).getResult(null);
+						output = (MachineRecipeResult) new MachineRecipe<>(null, Collections.singletonList(new ItemStack(Items.SNOWBALL))).getResult(null);
 						break;
 					}
 				}
@@ -110,7 +110,7 @@ public class TileEntityCompressor extends TileEntityStandardMachine<IRecipeInput
 
 			for (TileEntityPump pump : this.pumps)
 			{
-				int amount = LiquidUtil.drainTile(pump, Direction.UP, Fluids.f_76193_, reqAmount, false);
+				int amount = LiquidUtil.drainTile(pump, Direction.UP, Fluids.WATER, reqAmount, false);
 				if (amount > 0)
 				{
 					reqAmount -= amount;

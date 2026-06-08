@@ -51,7 +51,7 @@ public class GuiPatternStorage extends Ic2Gui<ContainerPatternStorage>
 			public String get()
 			{
 				ItemStack pattern = container.base.pattern;
-				return pattern != null ? pattern.m_41786_().getString() : null;
+				return pattern != null ? pattern.getHoverName().getString() : null;
 			}
 		}), 16777215, false).withEnableHandler(patternInfoEnabler));
 		this.addElement(TextLabel.create(this, 80, 59, TextProvider.of(new Supplier<String>()
@@ -78,7 +78,7 @@ public class GuiPatternStorage extends Ic2Gui<ContainerPatternStorage>
 	}
 
 	@Override
-	protected ResourceLocation getTexture()
+	protected ResourceLocation getTextureLocation()
 	{
 		return background;
 	}

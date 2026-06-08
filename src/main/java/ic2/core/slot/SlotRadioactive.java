@@ -11,8 +11,8 @@ public class SlotRadioactive extends Slot
 		super(inventory, index, x, y);
 	}
 
-	public boolean m_5857_(ItemStack stack)
+	public boolean mayPlace(ItemStack stack)
 	{
-		return this.f_40218_.canPlaceItem(this.m_150661_(), stack);
+		return this.container.canPlaceItem(this.getContainerSlot(), stack);
 	}
 }

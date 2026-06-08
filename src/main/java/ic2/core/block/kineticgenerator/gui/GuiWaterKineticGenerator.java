@@ -55,7 +55,7 @@ public class GuiWaterKineticGenerator extends Ic2Gui<ContainerWaterKineticGenera
 	}
 
 	@Override
-	protected ResourceLocation getTexture()
+	protected ResourceLocation getTextureLocation()
 	{
 		return background;
 	}

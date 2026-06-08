@@ -25,6 +25,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import org.apache.commons.lang3.mutable.Mutable;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class ItemClassicCell extends Ic2BucketItem implements Ic2FluidItem
 {
@@ -53,18 +55,18 @@ public class ItemClassicCell extends Ic2BucketItem implements Ic2FluidItem
 	@Override
 	public List<Fluid> getDrainableFluidList()
 	{
-		return List.of(Fluids.f_76195_, Fluids.f_76193_);
+		return List.of(Fluids.LAVA, Fluids.WATER);
 	}
 
 	@Override
 	public Item getBucketItem(Fluid fluid)
 	{
-		if (fluid == Fluids.f_76193_)
+		if (fluid == Fluids.WATER)
 		{
 			return Ic2Items.WATER_CELL;
 		} else
 		{
-			return fluid == Fluids.f_76195_ ? Ic2Items.LAVA_CELL : Ic2Items.EMPTY_CELL;
+			return fluid == Fluids.LAVA ? Ic2Items.LAVA_CELL : Ic2Items.EMPTY_CELL;
 		}
 	}
 
@@ -73,8 +75,8 @@ public class ItemClassicCell extends Ic2BucketItem implements Ic2FluidItem
 	{
 		BlockEntity be;
 		return (this == Ic2Items.WATER_CELL || this == Ic2Items.WEED_EX_CELL || this == Ic2Items.HYDRATION_CELL)
-			&& (be = context.m_43725_().getBlockEntity(context.m_8083_())) instanceof TileEntityCrop
-			&& this.useOnCrop(context.m_43722_(), (TileEntityCrop) be, true);
+			&& (be = context.getLevel().getBlockEntity(context.getClickedPos())) instanceof TileEntityCrop
+			&& this.useOnCrop(context.getItemInHand(), (TileEntityCrop) be, true);
 	}
 
 	public boolean useOnCrop(ItemStack stack, TileEntityCrop crop, boolean manual)
@@ -144,10 +146,10 @@ public class ItemClassicCell extends Ic2BucketItem implements Ic2FluidItem
 	{
 		if (uses <= 0)
 		{
-			stack.m_41751_(null);
+			stack.setTag(null);
 		} else
 		{
-			stack.m_41784_().putInt("uses", uses);
+			stack.getOrCreateTag().putInt("uses", uses);
 		}
 	}
 
@@ -156,34 +158,34 @@ public class ItemClassicCell extends Ic2BucketItem implements Ic2FluidItem
 		return (double) (this.charges - this.getUsage(stack)) / this.charges;
 	}
 
-	public boolean m_142522_(ItemStack stack)
+	public boolean isBarVisible(ItemStack stack)
 	{
 		return this.getUsage(stack) > 0;
 	}
 
-	public int m_142158_(ItemStack stack)
+	public int getBarWidth(ItemStack stack)
 	{
 		return (int) Math.round(this.getChargeLevel(stack) * 13.0);
 	}
 
-	public int m_142159_(ItemStack stack)
+	public int getBarColor(ItemStack stack)
 	{
-		return Mth.m_14169_((float) (this.getChargeLevel(stack) / 3.0), 1.0F, 1.0F);
+		return Mth.hsvToRgb((float) (this.getChargeLevel(stack) / 3.0), 1.0F, 1.0F);
 	}
 
 	@OnlyIn(Dist.CLIENT)
-	public void m_7373_(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag advanced)
+	public void appendHoverText(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag advanced)
 	{
-		if (this.charges > 1 && stack.m_41613_() == 1 && advanced.m_7050_())
+		if (this.charges > 1 && stack.getCount() == 1 && advanced.isAdvanced())
 		{
-			tooltip.add(Component.m_237110_("item.durability", new Object[] { this.charges - this.getUsage(stack), this.charges }).m_130940_(ChatFormatting.GRAY));
+			tooltip.add(Component.translatable("item.durability", new Object[] { this.charges - this.getUsage(stack), this.charges }).withStyle(ChatFormatting.GRAY));
 		}
 	}
 
 	@Override
 	public Ic2FluidStack getFluidStack(ItemStack stack)
 	{
-		if (this.fluid == Fluids.f_76191_)
+		if (this.fluid == Fluids.EMPTY)
 		{
 			return Ic2FluidStack.EMPTY;
 		} else
@@ -206,12 +208,12 @@ public class ItemClassicCell extends Ic2BucketItem implements Ic2FluidItem
 			newStack.setValue(stack);
 		}
 
-		if (stack.m_41613_() != 1)
+		if (stack.getCount() != 1)
 		{
 			throw new IllegalArgumentException("invalid stack size");
 		}
 
-		if (this.fluid == Fluids.f_76191_)
+		if (this.fluid == Fluids.EMPTY)
 		{
 			return Ic2FluidStack.EMPTY;
 		}
@@ -228,7 +230,7 @@ public class ItemClassicCell extends Ic2BucketItem implements Ic2FluidItem
 
 		if (!simulate)
 		{
-			stack.m_41774_(1);
+			stack.shrink(1);
 		}
 
 		if (newStack != null)
@@ -247,7 +249,7 @@ public class ItemClassicCell extends Ic2BucketItem implements Ic2FluidItem
 			newStack.setValue(stack);
 		}
 
-		if (stack.m_41613_() != 1)
+		if (stack.getCount() != 1)
 		{
 			throw new IllegalArgumentException("invalid stack size");
 		}
@@ -257,11 +259,11 @@ public class ItemClassicCell extends Ic2BucketItem implements Ic2FluidItem
 			return 0;
 		}
 
-		if (this.fluid != null && this.fluid != Fluids.f_76191_ && drainFs.hasExactFluid(this.fluid))
+		if (this.fluid != null && this.fluid != Fluids.EMPTY && drainFs.hasExactFluid(this.fluid))
 		{
 			if (!simulate)
 			{
-				stack.m_41774_(1);
+				stack.shrink(1);
 			}
 
 			if (newStack != null)
@@ -284,7 +286,7 @@ public class ItemClassicCell extends Ic2BucketItem implements Ic2FluidItem
 			newStack.setValue(stack);
 		}
 
-		if (stack.m_41613_() != 1)
+		if (stack.getCount() != 1)
 		{
 			throw new IllegalArgumentException("invalid stack size");
 		}
@@ -294,7 +296,7 @@ public class ItemClassicCell extends Ic2BucketItem implements Ic2FluidItem
 			return 0;
 		}
 
-		if (this.fluid != Fluids.f_76191_)
+		if (this.fluid != Fluids.EMPTY)
 		{
 			return 0;
 		}
@@ -304,7 +306,7 @@ public class ItemClassicCell extends Ic2BucketItem implements Ic2FluidItem
 		{
 			if (!simulate)
 			{
-				stack.m_41774_(1);
+				stack.shrink(1);
 			}
 
 			if (newStack != null)

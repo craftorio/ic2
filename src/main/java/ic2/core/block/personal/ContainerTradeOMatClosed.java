@@ -14,10 +14,10 @@ public class ContainerTradeOMatClosed extends ContainerFullInv<TileEntityTradeOM
 	public ContainerTradeOMatClosed(int syncId, Inventory playerInventory, TileEntityTradeOMat be)
 	{
 		super(Ic2ScreenHandlers.TRADE_O_MAT_CLOSED, syncId, playerInventory, be, 166);
-		this.m_38897_(new SlotInvSlotReadOnly(be.demandSlot, 0, 50, 19));
-		this.m_38897_(new SlotInvSlotReadOnly(be.offerSlot, 0, 50, 38));
-		this.m_38897_(new SlotInvSlot(be.inputSlot, 0, 143, 17));
-		this.m_38897_(new SlotInvSlot(be.outputSlot, 0, 143, 53));
+		this.addSlot(new SlotInvSlotReadOnly(be.demandSlot, 0, 50, 19));
+		this.addSlot(new SlotInvSlotReadOnly(be.offerSlot, 0, 50, 38));
+		this.addSlot(new SlotInvSlot(be.inputSlot, 0, 143, 17));
+		this.addSlot(new SlotInvSlot(be.outputSlot, 0, 143, 53));
 	}
 
 	@Override

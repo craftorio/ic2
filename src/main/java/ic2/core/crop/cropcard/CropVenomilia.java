@@ -73,7 +73,7 @@ public class CropVenomilia extends Ic2CropCard
 			return new ItemStack(Ic2Items.GRIN_POWDER);
 		} else
 		{
-			return crop.getCurrentAge() >= 3 ? new ItemStack(Items.f_42493_) : null;
+			return crop.getCurrentAge() >= 3 ? new ItemStack(Items.PURPLE_DYE) : null;
 		}
 	}
 
@@ -92,7 +92,7 @@ public class CropVenomilia extends Ic2CropCard
 	@Override
 	public boolean onRightClick(ICropTile crop, Player player)
 	{
-		if (!player.m_6144_())
+		if (!player.isShiftKeyDown())
 		{
 			this.onEntityCollision(crop, player);
 		}
@@ -103,7 +103,7 @@ public class CropVenomilia extends Ic2CropCard
 	@Override
 	public boolean onLeftClick(ICropTile crop, Player player)
 	{
-		if (!player.m_6144_())
+		if (!player.isShiftKeyDown())
 		{
 			this.onEntityCollision(crop, player);
 		}
@@ -116,12 +116,12 @@ public class CropVenomilia extends Ic2CropCard
 	{
 		if (crop.getCurrentAge() == 4 && entity instanceof LivingEntity)
 		{
-			if (entity instanceof Player && entity.m_6144_() && IC2.random.nextInt(50) != 0)
+			if (entity instanceof Player && entity.isShiftKeyDown() && IC2.random.nextInt(50) != 0)
 			{
 				return super.onEntityCollision(crop, entity);
 			}
 
-			((LivingEntity) entity).m_7292_(new MobEffectInstance(MobEffects.f_19614_, (IC2.random.nextInt(10) + 5) * 20, 0));
+			((LivingEntity) entity).addEffect(new MobEffectInstance(MobEffects.POISON, (IC2.random.nextInt(10) + 5) * 20, 0));
 			crop.setCurrentAge(3);
 			crop.updateState();
 		}

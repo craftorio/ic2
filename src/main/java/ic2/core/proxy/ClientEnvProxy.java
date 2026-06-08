@@ -61,9 +61,9 @@ public interface ClientEnvProxy
 
 	default ClientEnvProxy.QuadData getQuadData(BakedQuad quad)
 	{
-		VertexFormat format = DefaultVertexFormat.f_85811_;
-		int[] data = quad.m_111303_();
-		int stride = format.m_86017_();
+		VertexFormat format = DefaultVertexFormat.BLOCK;
+		int[] data = quad.getVertices();
+		int stride = format.getIntegerSize();
 		int posOffset = 0;
 		int uvOffset = 4;
 		final float[] positions = new float[12];
@@ -101,13 +101,13 @@ public interface ClientEnvProxy
 			@Override
 			public int tint()
 			{
-				return quad.m_111305_();
+				return quad.getTintIndex();
 			}
 
 			@Override
 			public TextureAtlasSprite sprite()
 			{
-				return quad.m_173410_();
+				return quad.getSprite();
 			}
 		};
 	}

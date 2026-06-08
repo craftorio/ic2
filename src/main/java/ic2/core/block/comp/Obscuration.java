@@ -26,17 +26,17 @@ public class Obscuration extends TileEntityComponent
 	@Override
 	public void readFromNbt(CompoundTag nbt)
 	{
-		if (!nbt.m_128456_())
+		if (!nbt.isEmpty())
 		{
 			for (Direction facing : Util.ALL_DIRS)
 			{
-				if (nbt.contains(facing.m_7912_(), 10))
+				if (nbt.contains(facing.getSerializedName(), 10))
 				{
-					CompoundTag cNbt = nbt.getCompound(facing.m_7912_());
-					Block block = Util.getBlock(cNbt.m_128461_("block"));
+					CompoundTag cNbt = nbt.getCompound(facing.getSerializedName());
+					Block block = Util.getBlock(cNbt.getString("block"));
 					if (block != null)
 					{
-						String variant = cNbt.m_128461_("variant");
+						String variant = cNbt.getString("variant");
 						BlockState state = BlockStateUtil.getState(block, variant);
 						if (state != null)
 						{
@@ -44,7 +44,7 @@ public class Obscuration extends TileEntityComponent
 							if (rawSide >= 0 && rawSide < Util.ALL_DIRS.length)
 							{
 								Direction side = Util.ALL_DIRS[rawSide];
-								int[] colorMultipliers = ItemObscurator.internColorMultipliers(cNbt.m_128465_("colorMuls"));
+								int[] colorMultipliers = ItemObscurator.internColorMultipliers(cNbt.getIntArray("colorMuls"));
 								Obscuration.ObscurationData data = new Obscuration.ObscurationData(state, variant, side, colorMultipliers);
 								if (this.dataMap == null)
 								{
@@ -76,11 +76,11 @@ public class Obscuration extends TileEntityComponent
 			if (data != null)
 			{
 				CompoundTag nbt = new CompoundTag();
-				nbt.m_128359_("block", Util.getName(data.state.getBlock()).toString());
-				nbt.m_128359_("variant", data.variant);
+				nbt.putString("block", Util.getName(data.state.getBlock()).toString());
+				nbt.putString("variant", data.variant);
 				nbt.putByte("side", (byte) data.side.ordinal());
-				nbt.m_128385_("colorMuls", data.colorMultipliers);
-				ret.put(facing.m_7912_(), nbt);
+				nbt.putIntArray("colorMuls", data.colorMultipliers);
+				ret.put(facing.getSerializedName(), nbt);
 			}
 		}
 

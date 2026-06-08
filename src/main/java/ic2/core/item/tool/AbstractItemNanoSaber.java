@@ -61,21 +61,21 @@ public abstract class AbstractItemNanoSaber extends ItemElectricTool implements 
 	}
 
 	@Override
-	public float m_8102_(ItemStack stack, BlockState state)
+	public float getDestroySpeed(ItemStack stack, BlockState state)
 	{
 		if (isActive(stack))
 		{
 			this.soundTicker++;
 			if (IC2.sideProxy.isRendering() && this.soundTicker % 4 == 0)
 			{
-				Entity entity = stack.m_41609_();
+				Entity entity = stack.getEntityRepresentation();
 				if (entity != null)
 				{
-					entity.m_5496_(this.getRandomSwingSound(), 1.0F, 1.0F);
+					entity.playSound(this.getRandomSwingSound(), 1.0F, 1.0F);
 				}
 			}
 
-			return state.getBlock() == Blocks.f_50033_ ? 50.0F : 4.0F;
+			return state.getBlock() == Blocks.COBWEB ? 50.0F : 4.0F;
 		} else
 		{
 			return 1.0F;
@@ -83,7 +83,7 @@ public abstract class AbstractItemNanoSaber extends ItemElectricTool implements 
 	}
 
 	@Override
-	public boolean m_7579_(ItemStack stack, LivingEntity target, LivingEntity source)
+	public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity source)
 	{
 		if (!isActive(stack))
 		{
@@ -93,7 +93,7 @@ public abstract class AbstractItemNanoSaber extends ItemElectricTool implements 
 		if (IC2.sideProxy.isSimulating())
 		{
 			this.consumeEnergy(stack, 400.0, source);
-			if (!(source instanceof ServerPlayer) || !(target instanceof Player) || ((ServerPlayer) source).m_7099_((Player) target))
+			if (!(source instanceof ServerPlayer) || !(target instanceof Player) || ((ServerPlayer) source).canHarmPlayer((Player) target))
 			{
 				for (EquipmentSlot slot : ArmorSlot.getAll())
 				{
@@ -102,7 +102,7 @@ public abstract class AbstractItemNanoSaber extends ItemElectricTool implements 
 						break;
 					}
 
-					ItemStack armor = target.m_6844_(slot);
+					ItemStack armor = target.getItemBySlot(slot);
 					if (armor != null)
 					{
 						double amount = 0.0;
@@ -119,7 +119,7 @@ public abstract class AbstractItemNanoSaber extends ItemElectricTool implements 
 							this.consumeEnergy(armor, amount, null);
 							if (!ElectricItem.manager.canUse(armor, 1.0))
 							{
-								target.m_8061_(slot, null);
+								target.setItemSlot(slot, null);
 							}
 
 							this.consumeEnergy(stack, 2000.0, source);
@@ -142,19 +142,19 @@ public abstract class AbstractItemNanoSaber extends ItemElectricTool implements 
 		};
 	}
 
-	public boolean m_6777_(BlockState state, Level world, BlockPos pos, Player miner)
+	public boolean canAttackBlock(BlockState state, Level world, BlockPos pos, Player miner)
 	{
-		return miner.m_7500_() ? false : super.m_6777_(state, world, pos, miner);
+		return miner.isCreative() ? false : super.canAttackBlock(state, world, pos, miner);
 	}
 
 	@Override
-	public InteractionResult m_6225_(UseOnContext context)
+	public InteractionResult useOn(UseOnContext context)
 	{
-		return super.m_6225_(context);
+		return super.useOn(context);
 	}
 
 	@Override
-	public InteractionResultHolder<ItemStack> m_7203_(@NotNull Level world, Player player, InteractionHand hand)
+	public InteractionResultHolder<ItemStack> use(@NotNull Level world, Player player, InteractionHand hand)
 	{
 		ItemStack stack = StackUtil.get(player, hand);
 		if (world.isClientSide)
@@ -173,15 +173,15 @@ public abstract class AbstractItemNanoSaber extends ItemElectricTool implements 
 				return new InteractionResultHolder(InteractionResult.SUCCESS, stack);
 			} else
 			{
-				return super.m_7203_(world, player, hand);
+				return super.use(world, player, hand);
 			}
 		}
 	}
 
 	@Override
-	public void m_6883_(ItemStack stack, Level world, Entity entity, int slot, boolean par5)
+	public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean par5)
 	{
-		super.m_6883_(stack, world, entity, slot, par5 && isActive(stack));
+		super.inventoryTick(stack, world, entity, slot, par5 && isActive(stack));
 		CompoundTag nbt = StackUtil.getOrCreateNbtData(stack);
 		if (!isActive(nbt))
 		{
@@ -207,7 +207,7 @@ public abstract class AbstractItemNanoSaber extends ItemElectricTool implements 
 		return ticker > 0 ? (float) (Math.floor(ticker / 20.0 * 4.0) % 10.0 + 1.0) / 10.0F : 0.0F;
 	}
 
-	public Rarity m_41460_(ItemStack stack)
+	public Rarity getRarity(ItemStack stack)
 	{
 		return Rarity.UNCOMMON;
 	}

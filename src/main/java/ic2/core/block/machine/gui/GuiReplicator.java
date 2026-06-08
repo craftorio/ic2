@@ -42,7 +42,7 @@ public class GuiReplicator extends Ic2Gui<ContainerReplicator>
 
 				String uuReq = Util.toSiString(te.patternUu, 4) + Localization.translate("ic2.generic.text.bucketUnit");
 				String euReq = Util.toSiString(te.patternEu, 4) + Localization.translate("ic2.generic.text.EU");
-				return te.pattern.m_41786_() + " UU: " + uuReq + " EU: " + euReq;
+				return te.pattern.getHoverName() + " UU: " + uuReq + " EU: " + euReq;
 			}
 		}));
 		this.addElement(new CustomButton(this, 80, 16, 9, 18, this.createEventSender(0)).withTooltip("ic2.Replicator.gui.info.last"));
@@ -73,7 +73,7 @@ public class GuiReplicator extends Ic2Gui<ContainerReplicator>
 	}
 
 	@Override
-	public ResourceLocation getTexture()
+	public ResourceLocation getTextureLocation()
 	{
 		return ResourceLocation.fromNamespaceAndPath("ic2", "textures/gui/guireplicator.png");
 	}

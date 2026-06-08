@@ -47,12 +47,12 @@ public interface IHasGui extends Container
 		buffer.flip();
 		return IC2.envProxy.openHandledScreen(player, new MenuProvider()
 		{
-			public AbstractContainerMenu m_7208_(int syncId, Inventory playerInventory, Player playerx)
+			public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player playerx)
 			{
 				return IHasGui.this.createServerScreenHandler(syncId, playerx);
 			}
 
-			public Component m_5446_()
+			public Component getDisplayName()
 			{
 				return IHasGui.getBeName((BlockEntity) IHasGui.this);
 			}
@@ -62,7 +62,7 @@ public interface IHasGui extends Container
 	static Component getBeName(BlockEntity be)
 	{
 		ResourceLocation id = Util.getName(be.getBlockState().getBlock());
-		return Component.m_237115_(String.format("container.%s.%s", id.m_135827_(), id.m_135815_().replace('/', '.')));
+		return Component.translatable(String.format("container.%s.%s", id.getNamespace(), id.getPath().replace('/', '.')));
 	}
 
 	default boolean openManagedItem(Player player, InteractionHand hand, Integer subGuiId)
@@ -79,15 +79,15 @@ public interface IHasGui extends Container
 		}
 
 		buffer.flip();
-		final Item item = player.m_21120_(hand).getItem();
+		final Item item = player.getItemInHand(hand).getItem();
 		return IC2.envProxy.openHandledScreen(player, new MenuProvider()
 		{
-			public AbstractContainerMenu m_7208_(int syncId, Inventory playerInventory, Player playerx)
+			public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player playerx)
 			{
 				return IHasGui.this.createServerScreenHandler(syncId, playerx);
 			}
 
-			public Component m_5446_()
+			public Component getDisplayName()
 			{
 				return IHasGui.getItemName(item, subGuiId);
 			}
@@ -97,8 +97,8 @@ public interface IHasGui extends Container
 	static Component getItemName(Item item, Integer subGuiId)
 	{
 		ResourceLocation id = Util.getName(item);
-		return Component.m_237115_(
-			String.format("container.%s.%s%s", id.m_135827_(), id.m_135815_().replace('/', '.'), subGuiId != null ? String.format(".%d", subGuiId) : "")
+		return Component.translatable(
+			String.format("container.%s.%s%s", id.getNamespace(), id.getPath().replace('/', '.'), subGuiId != null ? String.format(".%d", subGuiId) : "")
 		);
 	}
 }

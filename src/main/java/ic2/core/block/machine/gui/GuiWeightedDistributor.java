@@ -31,7 +31,7 @@ public abstract class GuiWeightedDistributor<T extends ContainerBase<? extends I
 
 			for (int col = 0; col < 6; col++)
 			{
-				final Direction facing = Direction.m_122376_(facingOffset(col));
+				final Direction facing = Direction.from3DDataValue(facingOffset(col));
 				this.addElement(this.buttons[y][col] = new StickyVanillaButton(this, 63 + col * 18, 17 + y * 18, 16, 16, new IClickHandler()
 				{
 					private void rebalance(int change)
@@ -72,7 +72,7 @@ public abstract class GuiWeightedDistributor<T extends ContainerBase<? extends I
 					{
 						boolean switchingOff = false;
 						int i = 0;
-						int aim = GuiWeightedDistributor.buttonOffset(facing.m_122411_());
+						int aim = GuiWeightedDistributor.buttonOffset(facing.get3DDataValue());
 
 						while (i < GuiWeightedDistributor.this.buttons.length)
 						{
@@ -91,7 +91,7 @@ public abstract class GuiWeightedDistributor<T extends ContainerBase<? extends I
 						{
 							StickyVanillaButton[] switches = GuiWeightedDistributor.this.buttons[this.findNextEmptyRow(row)];
 							aim = 0;
-							int aimx = GuiWeightedDistributor.buttonOffset(facing.m_122411_());
+							int aimx = GuiWeightedDistributor.buttonOffset(facing.get3DDataValue());
 
 							while (aim < switches.length)
 							{
@@ -109,7 +109,7 @@ public abstract class GuiWeightedDistributor<T extends ContainerBase<? extends I
 							{
 								if (switches[ix].isOn())
 								{
-									priorities.add(Direction.m_122376_(GuiWeightedDistributor.facingOffset(ix)));
+									priorities.add(Direction.from3DDataValue(GuiWeightedDistributor.facingOffset(ix)));
 									break;
 								}
 							}
@@ -124,7 +124,7 @@ public abstract class GuiWeightedDistributor<T extends ContainerBase<? extends I
 					{
 						return ((IWeightedDistributor) GuiWeightedDistributor.this.getContainer().base).getFacing() != facing;
 					}
-				}).withText(facing.m_7912_().substring(0, 1).toUpperCase(Locale.ENGLISH)).withTooltip(getNameForFacing(facing)));
+				}).withText(facing.getSerializedName().substring(0, 1).toUpperCase(Locale.ENGLISH)).withTooltip(getNameForFacing(facing)));
 			}
 			this.addElement(TextLabel.create(this, 8, 21 + y * 18, switch (y)
 			{
@@ -141,7 +141,7 @@ public abstract class GuiWeightedDistributor<T extends ContainerBase<? extends I
 
 		for (Direction side : ((IWeightedDistributor) container.base).getPriority())
 		{
-			this.buttons[end++][buttonOffset(side.m_122411_())].setOn(true);
+			this.buttons[end++][buttonOffset(side.get3DDataValue())].setOn(true);
 		}
 	}
 

@@ -270,7 +270,7 @@ public final class EventHandlerForge
 	@SubscribeEvent
 	public void onEnergyTileLoad(EnergyTileLoadEvent event)
 	{
-		if (event.getLevel().m_5776_())
+		if (event.getLevel().isClientSide())
 		{
 			IC2.log
 				.warn(
@@ -287,7 +287,7 @@ public final class EventHandlerForge
 	@SubscribeEvent
 	public void onEnergyTileUnload(EnergyTileUnloadEvent event)
 	{
-		if (event.getLevel().m_5776_())
+		if (event.getLevel().isClientSide())
 		{
 			IC2.log
 				.warn(

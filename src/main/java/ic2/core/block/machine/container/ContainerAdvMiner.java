@@ -13,18 +13,18 @@ public class ContainerAdvMiner extends ContainerElectricMachine<TileEntityAdvMin
 	public ContainerAdvMiner(int syncId, Inventory playerInventory, TileEntityAdvMiner be)
 	{
 		super(Ic2ScreenHandlers.ADVANCED_MINER, syncId, playerInventory, be, 203, 8, 80);
-		this.m_38897_(new SlotInvSlot(be.scannerSlot, 0, 8, 26));
+		this.addSlot(new SlotInvSlot(be.scannerSlot, 0, 8, 26));
 
 		for (int i = 0; i < 4; i++)
 		{
-			this.m_38897_(new SlotInvSlot(be.upgradeSlot, i, 152, 26 + i * 18));
+			this.addSlot(new SlotInvSlot(be.upgradeSlot, i, 152, 26 + i * 18));
 		}
 
 		for (int row = 0; row < 3; row++)
 		{
 			for (int col = 0; col < 5; col++)
 			{
-				this.m_38897_(new SlotInvSlot(be.filterSlot, col + row * 5, 36 + col * 18, 44 + row * 18));
+				this.addSlot(new SlotInvSlot(be.filterSlot, col + row * 5, 36 + col * 18, 44 + row * 18));
 			}
 		}
 	}

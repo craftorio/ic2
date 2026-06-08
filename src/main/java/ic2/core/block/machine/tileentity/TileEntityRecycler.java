@@ -128,7 +128,7 @@ public class TileEntityRecycler extends TileEntityStandardMachine<IRecipeInput, 
 			RecipeOutput ret = new RecipeOutput(null, new ArrayList<>(getOutput(input)));
 			if (adjustInput)
 			{
-				input.m_41774_(1);
+				input.shrink(1);
 			}
 
 			return ret;

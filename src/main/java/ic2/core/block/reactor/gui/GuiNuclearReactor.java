@@ -96,9 +96,9 @@ public class GuiNuclearReactor extends Ic2Gui<ContainerNuclearReactor>
 	}
 
 	@Override
-	protected void m_7286_(PoseStack matrices, float delta, int mouseX, int mouseY)
+	protected void renderBg(PoseStack matrices, float delta, int mouseX, int mouseY)
 	{
-		super.m_7286_(matrices, delta, mouseX, mouseY);
+		super.renderBg(matrices, delta, mouseX, mouseY);
 		int size = ((ContainerNuclearReactor) this.menu).base.getReactorSize();
 		int startX = 26;
 		int startY = 25;
@@ -126,7 +126,7 @@ public class GuiNuclearReactor extends Ic2Gui<ContainerNuclearReactor>
 	}
 
 	@Override
-	protected ResourceLocation getTexture()
+	protected ResourceLocation getTextureLocation()
 	{
 		return ((ContainerNuclearReactor) this.menu).base.isFluidCooled() ? backgroundFluid : background;
 	}

@@ -197,6 +197,6 @@ public final class FluidHandler
 
 	public static Collection<Fluid> getAllFluids()
 	{
-		return Registry.f_122822_.m_123024_().filter(fluid -> fluid.m_7444_(fluid.defaultFluidState()) && fluid != Fluids.f_76191_).toList();
+		return Registry.FLUID.stream().filter(fluid -> fluid.isSource(fluid.defaultFluidState()) && fluid != Fluids.EMPTY).toList();
 	}
 }

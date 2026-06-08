@@ -60,21 +60,21 @@ public class SoundManagerClient extends SoundManager
 	public void pauseAll()
 	{
 		super.pauseAll();
-		SideProxyClient.mc.m_91106_().m_120391_();
+		SideProxyClient.mc.getSoundManager().pause();
 	}
 
 	@Override
 	public void resumeAll()
 	{
 		super.resumeAll();
-		SideProxyClient.mc.m_91106_().m_120407_();
+		SideProxyClient.mc.getSoundManager().resume();
 	}
 
 	@Override
 	public void stopAll()
 	{
 		super.stopAll();
-		SideProxyClient.mc.m_91106_().m_120405_();
+		SideProxyClient.mc.getSoundManager().stop();
 	}
 
 	@Override
@@ -123,23 +123,23 @@ public class SoundManagerClient extends SoundManager
 
 	public static SoundInstance onSoundPlayed(SoundInstance sound)
 	{
-		SoundSource category = sound.m_8070_();
-		String name = sound.m_7904_().m_135815_();
+		SoundSource category = sound.getSource();
+		String name = sound.getLocation().getPath();
 		if (category == SoundSource.BLOCKS && name.endsWith(".hit") || category == SoundSource.BLOCKS && name.endsWith(".break"))
 		{
-			LocalPlayer player = Minecraft.m_91087_().f_91074_;
+			LocalPlayer player = Minecraft.getInstance().player;
 			ItemStack stack = null;
 			if (player != null)
 			{
-				stack = player.getInventory().m_36056_();
+				stack = player.getInventory().getSelected();
 			}
 
 			if (stack != null && stack.getItem() instanceof IHitSoundOverride hitSoundOverride)
 			{
 				Level world = player.getCommandSenderWorld();
 				BlockHitResult mop = getMovingObjectPositionFromPlayer(world, player, false);
-				BlockPos pos = new BlockPos(sound.m_7772_(), sound.m_7780_(), sound.m_7778_());
-				if (mop != null && mop.m_6662_() == Type.BLOCK && pos.equals(mop.m_82425_()))
+				BlockPos pos = new BlockPos(sound.getX(), sound.getY(), sound.getZ());
+				if (mop != null && mop.getType() == Type.BLOCK && pos.equals(mop.getBlockPos()))
 				{
 					SoundEvent replaceSound;
 					if (name.endsWith(".hit"))
@@ -164,21 +164,21 @@ public class SoundManagerClient extends SoundManager
 
 	private static BlockHitResult getMovingObjectPositionFromPlayer(Level worldIn, Player playerIn, boolean useLiquids)
 	{
-		float f = playerIn.m_146909_();
-		float f1 = playerIn.m_146908_();
+		float f = playerIn.getXRot();
+		float f1 = playerIn.getYRot();
 		double d0 = playerIn.getX();
-		double d1 = playerIn.getY() + playerIn.m_20236_(playerIn.m_20089_());
+		double d1 = playerIn.getY() + playerIn.getEyeHeight(playerIn.getPose());
 		double d2 = playerIn.getZ();
 		Vec3 vec3 = new Vec3(d0, d1, d2);
-		float f2 = Mth.m_14089_(-f1 * (float) (Math.PI / 180.0) - (float) Math.PI);
-		float f3 = Mth.m_14031_(-f1 * (float) (Math.PI / 180.0) - (float) Math.PI);
-		float f4 = -Mth.m_14089_(-f * (float) (Math.PI / 180.0));
-		float f5 = Mth.m_14031_(-f * (float) (Math.PI / 180.0));
+		float f2 = Mth.cos(-f1 * (float) (Math.PI / 180.0) - (float) Math.PI);
+		float f3 = Mth.sin(-f1 * (float) (Math.PI / 180.0) - (float) Math.PI);
+		float f4 = -Mth.cos(-f * (float) (Math.PI / 180.0));
+		float f5 = Mth.sin(-f * (float) (Math.PI / 180.0));
 		float f6 = f3 * f4;
 		float f7 = f2 * f4;
 		double d3 = 5.0;
-		Vec3 vec31 = vec3.m_82520_(f6 * d3, f5 * d3, f7 * d3);
-		return worldIn.m_45547_(new ClipContext(vec3, vec31, Block.OUTLINE, useLiquids ? Fluid.ANY : Fluid.NONE, playerIn));
+		Vec3 vec31 = vec3.add(f6 * d3, f5 * d3, f7 * d3);
+		return worldIn.clip(new ClipContext(vec3, vec31, Block.OUTLINE, useLiquids ? Fluid.ANY : Fluid.NONE, playerIn));
 	}
 
 	public static class WeakObject extends WeakReference<Object>

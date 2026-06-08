@@ -276,7 +276,7 @@ public class TileEntityReplicator extends TileEntityElectricMachine implements I
 		int modeIdx = nbt.getInt("mode");
 		this.mode = modeIdx < TileEntityReplicator.Mode.values().length ? TileEntityReplicator.Mode.values()[modeIdx] : TileEntityReplicator.Mode.STOPPED;
 		CompoundTag contentTag = nbt.getCompound("pattern");
-		this.pattern = ItemStack.m_41712_(contentTag);
+		this.pattern = ItemStack.of(contentTag);
 	}
 
 	@Override
@@ -290,7 +290,7 @@ public class TileEntityReplicator extends TileEntityElectricMachine implements I
 		if (this.pattern != null)
 		{
 			CompoundTag contentTag = new CompoundTag();
-			this.pattern.m_41739_(contentTag);
+			this.pattern.save(contentTag);
 			nbt.put("pattern", contentTag);
 		}
 	}

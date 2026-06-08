@@ -25,21 +25,21 @@ import net.minecraft.world.level.chunk.PalettedContainer;
 
 public final class BiomeUtil
 {
-	private static final Field field_ChunkSection_biomeContainer = ReflectionUtil.getField(LevelChunkSection.class, "biomeContainer", "field_34556", "f_187995_");
+	private static final Field field_ChunkSection_biomeContainer = ReflectionUtil.getField(LevelChunkSection.class, "biomeContainer", "field_34556", "biomes");
 
 	public static Biome getBiome(Level world, ResourceKey<Biome> key)
 	{
-		return (Biome) world.m_5962_().m_175515_(Registry.f_122885_).m_6246_(key);
+		return (Biome) world.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY).get(key);
 	}
 
 	public static Holder<Biome> getOriginalBiome(LevelReader world, BlockPos pos)
 	{
-		return world.m_203675_(pos.getX(), pos.getY(), pos.getZ());
+		return world.getUncachedNoiseBiome(pos.getX(), pos.getY(), pos.getZ());
 	}
 
 	public static Holder<Biome> getBiome(LevelReader world, BlockPos pos)
 	{
-		return world.m_204166_(pos);
+		return world.getBiome(pos);
 	}
 
 	public static void setBiome(LevelReader world, BlockPos pos, Biome biome)
@@ -47,15 +47,15 @@ public final class BiomeUtil
 		Objects.requireNonNull(biome, "null biome");
 		int x = pos.getX() >> 4;
 		int z = pos.getZ() >> 4;
-		ChunkAccess chunk = world.m_46819_(x, z, ChunkStatus.f_62317_);
+		ChunkAccess chunk = world.getChunk(x, z, ChunkStatus.BIOMES);
 
-		for (LevelChunkSection section : chunk.m_7103_())
+		for (LevelChunkSection section : chunk.getSections())
 		{
 			PalettedContainer<Biome> biomeContainer = ReflectionUtil.getFieldValue(field_ChunkSection_biomeContainer, section);
 
 			for (int y = 0; y < 3; y++)
 			{
-				biomeContainer.m_156470_(x >> 2, y, z >> 2, biome);
+				biomeContainer.set(x >> 2, y, z >> 2, biome);
 			}
 		}
 	}
@@ -63,19 +63,19 @@ public final class BiomeUtil
 	public static void setBiomeAndNotify(Level world, BlockPos pos, Biome biome)
 	{
 		setBiome(world, pos, biome);
-		ChunkSource chunkManager = world.m_7726_();
+		ChunkSource chunkManager = world.getChunkSource();
 		if (chunkManager instanceof ServerChunkCache)
 		{
-			LevelChunk chunk = world.m_46745_(pos);
+			LevelChunk chunk = world.getChunkAt(pos);
 			ClientboundLevelChunkWithLightPacket packet = new ClientboundLevelChunkWithLightPacket(
-				chunk, ((ServerLevel) world).m_7726_().m_7827_(), null, null, true
+				chunk, ((ServerLevel) world).getChunkSource().getLightEngine(), null, null, true
 			);
-			((ServerChunkCache) chunkManager).f_8325_.m_183262_(chunk.m_7697_(), false).forEach(player -> player.f_8906_.m_9829_(packet));
-			chunk.m_8092_(true);
+			((ServerChunkCache) chunkManager).chunkMap.getPlayers(chunk.getPos(), false).forEach(player -> player.connection.send(packet));
+			chunk.setUnsaved(true);
 		} else
 		{
 			assert !world.isClientSide : "Can't notify a server of a client side biome change";
-			world.m_46745_(pos).m_8092_(true);
+			world.getChunkAt(pos).setUnsaved(true);
 		}
 	}
 

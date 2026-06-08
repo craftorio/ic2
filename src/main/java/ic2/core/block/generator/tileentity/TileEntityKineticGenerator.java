@@ -68,7 +68,7 @@ public class TileEntityKineticGenerator extends TileEntityConversionGenerator
 		if (this.source != null)
 		{
 			assert !((BlockEntity) this.source).isRemoved();
-			return this.source.drawKineticEnergy(this.getFacing().m_122424_(), this.source.getConnectionBandwidth(this.getFacing().m_122424_()), true);
+			return this.source.drawKineticEnergy(this.getFacing().getOpposite(), this.source.getConnectionBandwidth(this.getFacing().getOpposite()), true);
 		} else
 		{
 			return 0;
@@ -81,7 +81,7 @@ public class TileEntityKineticGenerator extends TileEntityConversionGenerator
 		if (this.source != null)
 		{
 			assert !((BlockEntity) this.source).isRemoved();
-			this.source.drawKineticEnergy(this.getFacing().m_122424_(), amount, false);
+			this.source.drawKineticEnergy(this.getFacing().getOpposite(), amount, false);
 		} else
 		{
 			assert false;

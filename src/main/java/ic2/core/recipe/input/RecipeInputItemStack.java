@@ -22,7 +22,7 @@ public class RecipeInputItemStack extends RecipeInputBase
 			throw new IllegalArgumentException("invalid input stack");
 		}
 
-		this.input = input.m_41777_();
+		this.input = input.copy();
 	}
 
 	@Override
@@ -34,7 +34,7 @@ public class RecipeInputItemStack extends RecipeInputBase
 	@Override
 	public int getAmount()
 	{
-		return this.input.m_41613_();
+		return this.input.getCount();
 	}
 
 	@Override
@@ -63,11 +63,11 @@ public class RecipeInputItemStack extends RecipeInputBase
 	public JsonElement toJson()
 	{
 		JsonObject obj = new JsonObject();
-		obj.addProperty("item", Registry.f_122827_.getKey(this.input.getItem()).toString());
-		obj.add("data", (JsonElement) NbtOps.f_128958_.convertTo(JsonOps.INSTANCE, this.input.getTag()));
-		if (this.input.m_41613_() != 1)
+		obj.addProperty("item", Registry.ITEM.getKey(this.input.getItem()).toString());
+		obj.add("data", (JsonElement) NbtOps.INSTANCE.convertTo(JsonOps.INSTANCE, this.input.getTag()));
+		if (this.input.getCount() != 1)
 		{
-			obj.addProperty("count", this.input.m_41613_());
+			obj.addProperty("count", this.input.getCount());
 		}
 
 		return obj;

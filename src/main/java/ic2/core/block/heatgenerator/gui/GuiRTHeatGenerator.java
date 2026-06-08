@@ -26,7 +26,7 @@ public class GuiRTHeatGenerator extends Ic2Gui<ContainerRTHeatGenerator>
 	}
 
 	@Override
-	protected ResourceLocation getTexture()
+	protected ResourceLocation getTextureLocation()
 	{
 		return background;
 	}

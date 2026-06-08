@@ -157,7 +157,7 @@ public class GuiSteamGenerator extends Ic2Gui<ContainerSteamGenerator>
 	}
 
 	@Override
-	public ResourceLocation getTexture()
+	public ResourceLocation getTextureLocation()
 	{
 		return BACKGROUND;
 	}

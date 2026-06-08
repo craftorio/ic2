@@ -14,7 +14,7 @@ public class ContainerWaterKineticGenerator extends ContainerFullInv<TileEntityW
 	public ContainerWaterKineticGenerator(int syncId, Inventory playerInventory, TileEntityWaterKineticGenerator be)
 	{
 		super(Ic2ScreenHandlers.WATER_KINETIC_GENERATOR, syncId, playerInventory, be, 166);
-		this.m_38897_(new SlotInvSlot(be.rotorSlot, 0, 80, 26));
+		this.addSlot(new SlotInvSlot(be.rotorSlot, 0, 80, 26));
 	}
 
 	@Override

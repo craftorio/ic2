@@ -106,7 +106,7 @@ public class Image extends GuiElement<Image>
 				vE = vS + this.height;
 			}
 
-			RenderSystem.m_157456_(0, this.texture);
+			RenderSystem.setShaderTexture(0, this.texture);
 			this.gui
 				.drawTexturedRect(matrices, this.x, this.y, this.width, this.height, uS * widthScale, vS * heightScale, uE * widthScale, vE * heightScale, false);
 		} else

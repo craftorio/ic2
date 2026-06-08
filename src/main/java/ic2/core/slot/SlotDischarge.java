@@ -21,7 +21,7 @@ public class SlotDischarge extends Slot
 		super(par1iInventory, par2, par3, par4);
 	}
 
-	public boolean m_5857_(ItemStack stack)
+	public boolean mayPlace(ItemStack stack)
 	{
 		if (stack == null)
 		{

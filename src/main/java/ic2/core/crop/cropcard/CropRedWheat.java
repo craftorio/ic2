@@ -57,8 +57,8 @@ public class CropRedWheat extends Ic2CropCard
 	public ItemStack getGain(ICropTile crop)
 	{
 		BlockPos coords = crop.getPosition();
-		return crop.getWorldObj().m_46755_(coords) <= 0 && !crop.getWorldObj().random.m_188499_()
-			? new ItemStack(Items.f_42405_, 1)
+		return crop.getWorldObj().getBestNeighborSignal(coords) <= 0 && !crop.getWorldObj().random.nextBoolean()
+			? new ItemStack(Items.WHEAT, 1)
 			: new ItemStack(Items.REDSTONE, 1);
 	}
 

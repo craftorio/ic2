@@ -107,7 +107,7 @@ public class TileEntityFluidDistributor extends TileEntityInventory implements I
 		if (this.getActive())
 		{
 			BlockEntity target = world.getBlockEntity(this.worldPosition.relative(this.getFacing()));
-			Direction side = this.getFacing().m_122424_();
+			Direction side = this.getFacing().getOpposite();
 			if (LiquidUtil.isFluidTile(target, side))
 			{
 				int amount = LiquidUtil.fillTile(target, side, this.fluidTank.getFluidStack(), false);
@@ -126,7 +126,7 @@ public class TileEntityFluidDistributor extends TileEntityInventory implements I
 				if (dir != this.getFacing())
 				{
 					BlockEntity target = world.getBlockEntity(this.worldPosition.relative(dir));
-					Direction side = dir.m_122424_();
+					Direction side = dir.getOpposite();
 					if (LiquidUtil.isFluidTile(target, side))
 					{
 						int amount = LiquidUtil.fillTile(target, side, this.fluidTank.getFluidStack(), true);
@@ -153,7 +153,7 @@ public class TileEntityFluidDistributor extends TileEntityInventory implements I
 					for (Entry<Direction, BlockEntity> entry : acceptingNeighbors.entrySet())
 					{
 						BlockEntity target = entry.getValue();
-						Direction side = entry.getKey().m_122424_();
+						Direction side = entry.getKey().getOpposite();
 						Ic2FluidStack fs = this.fluidTank.getFluidStack();
 						if (fs == null)
 						{
@@ -180,7 +180,7 @@ public class TileEntityFluidDistributor extends TileEntityInventory implements I
 				{
 					Entry<Direction, BlockEntity> entry = it.next();
 					BlockEntity target = entry.getValue();
-					Direction side = entry.getKey().m_122424_();
+					Direction side = entry.getKey().getOpposite();
 					Ic2FluidStack fs = this.fluidTank.getFluidStack();
 					if (fs == null)
 					{

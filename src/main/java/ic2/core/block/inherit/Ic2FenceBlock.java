@@ -44,17 +44,17 @@ public class Ic2FenceBlock extends FenceBlock
 		this.canBoost = canBoost;
 	}
 
-	public BlockState m_5573_(BlockPlaceContext ctx)
+	public BlockState getStateForPlacement(BlockPlaceContext ctx)
 	{
-		FluidState fluidState = ctx.m_43725_().m_6425_(ctx.m_8083_());
-		return this.getActualState((BlockState) this.defaultBlockState().setValue(f_52313_, fluidState.m_192917_(Fluids.f_76193_)), ctx.m_43725_(), ctx.m_8083_());
+		FluidState fluidState = ctx.getLevel().getFluidState(ctx.getClickedPos());
+		return this.getActualState((BlockState) this.defaultBlockState().setValue(WATERLOGGED, fluidState.is(Fluids.WATER)), ctx.getLevel(), ctx.getClickedPos());
 	}
 
-	public BlockState m_7417_(BlockState state, Direction direction, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos)
+	public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos)
 	{
-		if ((Boolean) state.getValue(f_52313_))
+		if ((Boolean) state.getValue(WATERLOGGED))
 		{
-			world.m_186469_(pos, Fluids.f_76193_, Fluids.f_76193_.m_6718_(world));
+			world.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
 		}
 
 		return this.getActualState(state, world, pos);
@@ -110,47 +110,47 @@ public class Ic2FenceBlock extends FenceBlock
 
 	private boolean isFence(BlockState state)
 	{
-		return state.m_204336_(BlockTags.f_13039_) && !state.m_204336_(BlockTags.f_13098_);
+		return state.is(BlockTags.FENCES) && !state.is(BlockTags.WOODEN_FENCES);
 	}
 
-	public void m_7892_(BlockState state, Level world, BlockPos pos, Entity rawEntity)
+	public void entityInside(BlockState state, Level world, BlockPos pos, Entity rawEntity)
 	{
 		if (rawEntity instanceof Player player)
 		{
 			boolean powered = this.isPowered(world, pos);
 			boolean metalShoes = hasMetalShoes(player);
-			boolean descending = player.m_6144_();
-			Vec3 velocity = player.m_20184_();
-			boolean slow = velocity.f_82480_ >= -0.25 || velocity.f_82480_ < 1.6;
+			boolean descending = player.isShiftKeyDown();
+			Vec3 velocity = player.getDeltaMovement();
+			boolean slow = velocity.y >= -0.25 || velocity.y < 1.6;
 			if (slow)
 			{
-				player.f_19789_ = 0.0F;
+				player.fallDistance = 0.0F;
 			}
 
 			if (!powered)
 			{
 				if (descending && !slow && metalShoes)
 				{
-					player.m_20256_(velocity.m_82542_(1.0, 0.9, 1.0));
+					player.setDeltaMovement(velocity.multiply(1.0, 0.9, 1.0));
 				}
 			} else if (descending)
 			{
 				if (!slow)
 				{
-					player.m_20256_(velocity.m_82542_(1.0, 0.8, 1.0));
+					player.setDeltaMovement(velocity.multiply(1.0, 0.8, 1.0));
 				}
 			} else
 			{
-				player.m_20256_(velocity.m_82520_(0.0, 0.075, 0.0));
-				velocity = player.m_20184_();
-				if (velocity.m_7098_() > 0.0)
+				player.setDeltaMovement(velocity.add(0.0, 0.075, 0.0));
+				velocity = player.getDeltaMovement();
+				if (velocity.y() > 0.0)
 				{
-					player.m_20256_(velocity.m_82542_(1.0, 1.03, 1.0));
+					player.setDeltaMovement(velocity.multiply(1.0, 1.03, 1.0));
 				}
 
 				double maxSpeed = IC2.keyboard.isAltKeyDown(player) ? 0.1 : (metalShoes ? 1.5 : 0.5);
-				velocity = player.m_20184_();
-				player.m_20334_(velocity.f_82479_, Math.min(velocity.m_7098_(), maxSpeed), velocity.f_82481_);
+				velocity = player.getDeltaMovement();
+				player.setDeltaMovement(velocity.x, Math.min(velocity.y(), maxSpeed), velocity.z);
 			}
 
 			if (!world.isClientSide)
@@ -172,7 +172,7 @@ public class Ic2FenceBlock extends FenceBlock
 
 		if (world.getBlockEntity(pos) instanceof TileEntityMagnetizer ret)
 		{
-			if (side != null && !side.m_122424_().equals(ret.getFacing()))
+			if (side != null && !side.getOpposite().equals(ret.getFacing()))
 			{
 				return null;
 			}
@@ -188,9 +188,9 @@ public class Ic2FenceBlock extends FenceBlock
 
 	public static boolean hasMetalShoes(Player player)
 	{
-		ItemStack shoes = (ItemStack) player.getInventory().f_35975_.get(0);
+		ItemStack shoes = (ItemStack) player.getInventory().armor.get(0);
 		Item item = shoes.getItem();
-		return item == Items.f_42471_ || item == Items.f_42479_ || item == Items.f_42467_ || ItemWrapper.isMetalArmor(shoes, player);
+		return item == Items.IRON_BOOTS || item == Items.GOLDEN_BOOTS || item == Items.CHAINMAIL_BOOTS || ItemWrapper.isMetalArmor(shoes, player);
 	}
 
 	private boolean isPowered(Level world, BlockPos start)
@@ -256,7 +256,7 @@ public class Ic2FenceBlock extends FenceBlock
 			while (dir < maxDir)
 			{
 				int offset = dir * 2 - 1;
-				center = center.m_175288_(start.getY() + offset * dy);
+				center = center.atY(start.getY() + offset * dy);
 				BlockState centerState = world.getBlockState(center);
 				if (centerState.getBlock() instanceof Ic2FenceBlock && ((Ic2FenceBlock) centerState.getBlock()).canBoost)
 				{
@@ -335,6 +335,6 @@ public class Ic2FenceBlock extends FenceBlock
 
 	private static Map<Direction, BooleanProperty> getConnectProperties()
 	{
-		return CrossCollisionBlock.f_52314_;
+		return CrossCollisionBlock.PROPERTY_BY_DIRECTION;
 	}
 }

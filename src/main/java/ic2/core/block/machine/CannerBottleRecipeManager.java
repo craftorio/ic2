@@ -128,10 +128,10 @@ public class CannerBottleRecipeManager implements ICannerBottleRecipeManager
 				{
 					if (!StackUtil.isEmpty(container))
 					{
-						container.m_41774_(recipeInput.container.getAmount());
+						container.shrink(recipeInput.container.getAmount());
 					}
 
-					fill.m_41774_(recipeInput.fill.getAmount());
+					fill.shrink(recipeInput.fill.getAmount());
 				}
 
 				new RecipeOutput(null, recipe.getOutput());

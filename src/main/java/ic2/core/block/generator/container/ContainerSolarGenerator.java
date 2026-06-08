@@ -14,7 +14,7 @@ public class ContainerSolarGenerator extends ContainerFullInv<TileEntitySolarGen
 	public ContainerSolarGenerator(int syncId, Inventory playerInventory, TileEntitySolarGenerator base)
 	{
 		super(Ic2ScreenHandlers.SOLAR_GENERATOR, syncId, playerInventory, base, 166);
-		this.m_38897_(new SlotInvSlot(base.chargeSlot, 0, 80, 26));
+		this.addSlot(new SlotInvSlot(base.chargeSlot, 0, 80, 26));
 	}
 
 	@Override

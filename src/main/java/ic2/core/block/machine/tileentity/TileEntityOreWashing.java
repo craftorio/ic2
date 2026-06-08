@@ -40,10 +40,10 @@ public class TileEntityOreWashing extends TileEntityStandardMachine<IRecipeInput
 	{
 		super(Ic2BlockEntities.ORE_WASHING_PLANT, pos, state, 16, 500, 3);
 		this.inputSlot = new InvSlotProcessableGeneric(this, "input", 1, Recipes.oreWashing);
-		this.fluidSlot = new InvSlotConsumableLiquidByList(this, "fluid", 1, net.minecraft.world.level.material.Fluids.f_76193_);
+		this.fluidSlot = new InvSlotConsumableLiquidByList(this, "fluid", 1, net.minecraft.world.level.material.Fluids.WATER);
 		this.cellSlot = new InvSlotOutput(this, "cell", 1);
 		this.fluids = this.addComponent(new Fluids(this));
-		this.fluidTank = this.fluids.addTankInsert("fluid", 8000, Fluids.fluidPredicate(net.minecraft.world.level.material.Fluids.f_76193_));
+		this.fluidTank = this.fluids.addTankInsert("fluid", 8000, Fluids.fluidPredicate(net.minecraft.world.level.material.Fluids.WATER));
 	}
 
 	@Override

@@ -60,26 +60,26 @@ public abstract class BaseElectricItem extends Item implements IElectricItem, II
 		return info;
 	}
 
-	public void m_6787_(CreativeModeTab tab, NonNullList<ItemStack> subItems)
+	public void fillItemCategory(CreativeModeTab tab, NonNullList<ItemStack> subItems)
 	{
-		if (this.m_220152_(tab))
+		if (this.allowedIn(tab))
 		{
 			ElectricItemManager.addChargeVariants(this, subItems);
 		}
 	}
 
-	public boolean m_142522_(ItemStack stack)
+	public boolean isBarVisible(ItemStack stack)
 	{
 		return ElectricItem.manager.getCharge(stack) <= ElectricItem.manager.getMaxCharge(stack);
 	}
 
-	public int m_142158_(ItemStack stack)
+	public int getBarWidth(ItemStack stack)
 	{
 		return (int) Math.round(ElectricItem.manager.getStackChargeLevel(stack) * 13.0);
 	}
 
-	public int m_142159_(ItemStack stack)
+	public int getBarColor(ItemStack stack)
 	{
-		return Mth.m_14169_((float) (ElectricItem.manager.getStackChargeLevel(stack) / 3.0), 1.0F, 1.0F);
+		return Mth.hsvToRgb((float) (ElectricItem.manager.getStackChargeLevel(stack) / 3.0), 1.0F, 1.0F);
 	}
 }

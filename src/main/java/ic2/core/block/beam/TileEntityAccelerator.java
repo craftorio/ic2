@@ -25,7 +25,7 @@ public class TileEntityAccelerator extends TileEntityElectricMachine
 	@Override
 	protected List<AABB> getAabbs(boolean forCollision)
 	{
-		return FACING_AABBs.get(this.getFacing().m_122434_());
+		return FACING_AABBs.get(this.getFacing().getAxis());
 	}
 
 	@Override

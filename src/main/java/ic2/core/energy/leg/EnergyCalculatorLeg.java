@@ -681,7 +681,7 @@ public class EnergyCalculatorLeg implements IEnergyCalculator
 					List<LivingEntity> nearbyEntities = world.getEntitiesOfClass(
 						LivingEntity.class,
 						new AABB(path.minX - 1, path.minY - 1, path.minZ - 1, path.maxX + 2, path.maxY + 2, path.maxZ + 2),
-						EntitySelector.f_20403_
+						EntitySelector.LIVING_ENTITY_STILL_ALIVE
 					);
 					if (!nearbyEntities.isEmpty())
 					{
@@ -703,8 +703,8 @@ public class EnergyCalculatorLeg implements IEnergyCalculator
 									{
 										MutableDouble prev = localShockEnergyMap.get(entity);
 										if ((prev == null || !(prev.doubleValue() >= shockEnergy))
-											&& entity.m_20191_()
-											.m_82381_(
+											&& entity.getBoundingBox()
+											.intersects(
 												new AABB(
 													pos.getX() - 1,
 													pos.getY() - 1,
@@ -778,7 +778,7 @@ public class EnergyCalculatorLeg implements IEnergyCalculator
 			{
 				LivingEntity target = entry.getKey();
 				int damage = (int) Math.ceil(entry.getValue().doubleValue() / 64.0);
-				if (target.m_6084_() && damage > 0)
+				if (target.isAlive() && damage > 0)
 				{
 					target.hurt(Ic2DamageSource.electricity, damage);
 				}
@@ -831,7 +831,7 @@ public class EnergyCalculatorLeg implements IEnergyCalculator
 						power = override.getExplosionPower(tier, power);
 					}
 
-					Player closestPlayer = world.m_45924_(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 20.0, false);
+					Player closestPlayer = world.getNearestPlayer(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 20.0, false);
 					world.removeBlock(pos, false);
 					Ic2Explosion explosion = new Ic2Explosion(
 						world, null, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, power, 0.75F, Ic2Explosion.Type.Electrical

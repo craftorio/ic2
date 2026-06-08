@@ -35,7 +35,7 @@ public class InvSlotConsumableKineticRotor extends InvSlotConsumableClass
 	@Override
 	public void onChanged()
 	{
-		if (this.updateName != null && this.base.getParent().m_58898_() && !this.base.getParent().getLevel().isClientSide)
+		if (this.updateName != null && this.base.getParent().hasLevel() && !this.base.getParent().getLevel().isClientSide)
 		{
 			IC2.network.get(true).updateTileEntityField(this.base.getParent(), this.updateName);
 		}

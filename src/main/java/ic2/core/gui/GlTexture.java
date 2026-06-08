@@ -39,14 +39,14 @@ public class GlTexture implements Closeable
 
 	public static void init()
 	{
-		ResourceManager manager = Minecraft.m_91087_().m_91098_();
+		ResourceManager manager = Minecraft.getInstance().getResourceManager();
 		if (manager instanceof ReloadableResourceManager)
 		{
 			((ReloadableResourceManager) manager)
-				.m_7217_(
+				.registerReloadListener(
 					new PreparableReloadListener()
 					{
-						public CompletableFuture<Void> m_5540_(
+						public CompletableFuture<Void> reload(
 							PreparationBarrier synchronizer,
 							ResourceManager managerx,
 							ProfilerFiller prepareProfiler,
@@ -84,7 +84,7 @@ public class GlTexture implements Closeable
 	{
 		try
 		{
-			texture.load(Minecraft.m_91087_().m_91098_());
+			texture.load(Minecraft.getInstance().getResourceManager());
 		} catch (IOException e)
 		{
 			IC2.log.warn(LogCategory.General, "Can't load texture %s", identifier);
@@ -103,9 +103,9 @@ public class GlTexture implements Closeable
 
 	protected void load(ResourceManager manager) throws IOException
 	{
-		Resource resource = manager.m_215593_(this.loc);
+		Resource resource = manager.getResourceOrThrow(this.loc);
 
-		try (InputStream is = resource.m_215507_())
+		try (InputStream is = resource.open())
 		{
 			this.load(ImageIO.read(is));
 		}
@@ -117,7 +117,7 @@ public class GlTexture implements Closeable
 		this.height = img.getHeight();
 		this.canvasWidth = Integer.highestOneBit((this.width - 1) * 2);
 		this.canvasHeight = Integer.highestOneBit((this.height - 1) * 2);
-		this.textureId = TextureUtil.m_85280_();
+		this.textureId = TextureUtil.generateTextureId();
 		IntBuffer buffer = ByteBuffer.allocateDirect(this.canvasWidth * this.canvasHeight * 4).asIntBuffer();
 		int[] tmp = new int[this.canvasWidth * this.canvasHeight];
 		img.getRGB(0, 0, this.width, this.height, tmp, 0, this.canvasWidth);
@@ -139,7 +139,7 @@ public class GlTexture implements Closeable
 	{
 		if (this.textureId != 0)
 		{
-			TextureUtil.m_85281_(this.textureId);
+			TextureUtil.releaseTextureId(this.textureId);
 			this.textureId = 0;
 		}
 	}
@@ -151,7 +151,7 @@ public class GlTexture implements Closeable
 			throw new IllegalStateException("uninitialized texture");
 		}
 
-		RenderSystem.m_69396_(this.textureId);
+		RenderSystem.bindTexture(this.textureId);
 	}
 
 	public int getWidth()

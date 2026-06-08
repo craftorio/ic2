@@ -40,7 +40,7 @@ public class GuiFluidHeatGenerator extends Ic2Gui<ContainerFluidHeatGenerator>
 	}
 
 	@Override
-	protected ResourceLocation getTexture()
+	protected ResourceLocation getTextureLocation()
 	{
 		return background;
 	}

@@ -56,7 +56,7 @@ public class CropReed extends Ic2CropCard
 	@Override
 	public ItemStack getGain(ICropTile crop)
 	{
-		return new ItemStack(Items.f_41909_, crop.getCurrentAge());
+		return new ItemStack(Items.SUGAR_CANE, crop.getCurrentAge());
 	}
 
 	@Override

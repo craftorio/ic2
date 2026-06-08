@@ -14,9 +14,9 @@ public class ItemArmorCFPack extends ItemArmorFluidTank
 		super(Ic2ArmorMaterials.CF_PACK, settings, Ic2Fluids.CONSTRUCTION_FOAM.still, 80000);
 	}
 
-	public void m_6787_(CreativeModeTab tab, NonNullList<ItemStack> subItems)
+	public void fillItemCategory(CreativeModeTab tab, NonNullList<ItemStack> subItems)
 	{
-		if (this.m_220152_(tab))
+		if (this.allowedIn(tab))
 		{
 			ItemStack stack = new ItemStack(this);
 			this.filltank(stack);

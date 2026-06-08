@@ -32,17 +32,17 @@ public class ItemDrill extends ItemElectricTool implements IMiningDrill, IHitSou
 
 	public ItemDrill(Properties settings, int operationEnergyCost, Tier material, int maxCharge, int transferLimit, int tier, float miningSpeed)
 	{
-		super(settings, operationEnergyCost, material, Arrays.asList(BlockTags.f_144282_, BlockTags.f_144283_));
+		super(settings, operationEnergyCost, material, Arrays.asList(BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.MINEABLE_WITH_SHOVEL));
 		this.maxCharge = maxCharge;
 		this.transferLimit = transferLimit;
 		this.tier = tier;
-		this.extraSpeedMultiplier = miningSpeed / material.m_6624_();
+		this.extraSpeedMultiplier = miningSpeed / material.getSpeed();
 	}
 
 	@Override
-	public float m_8102_(ItemStack stack, BlockState state)
+	public float getDestroySpeed(ItemStack stack, BlockState state)
 	{
-		float speed = super.m_8102_(stack, state);
+		float speed = super.getDestroySpeed(stack, state);
 		if (speed == 1.0F)
 		{
 			return speed;
@@ -51,12 +51,12 @@ public class ItemDrill extends ItemElectricTool implements IMiningDrill, IHitSou
 		Player player = getPlayerHoldingItem(stack);
 		if (player != null)
 		{
-			if (player.m_204029_(FluidTags.f_13131_) && !EnchantmentHelper.m_44934_(player))
+			if (player.isEyeInFluid(FluidTags.WATER) && !EnchantmentHelper.hasAquaAffinity(player))
 			{
 				speed *= 3.0F;
 			}
 
-			if (!player.m_20096_())
+			if (!player.isOnGround())
 			{
 				speed *= 3.0F;
 			}
@@ -70,7 +70,7 @@ public class ItemDrill extends ItemElectricTool implements IMiningDrill, IHitSou
 		if (IC2.sideProxy.isRendering())
 		{
 			Player player = IC2.sideProxy.getPlayerInstance();
-			if (player != null && player.getInventory().m_36056_() == stack)
+			if (player != null && player.getInventory().getSelected() == stack)
 			{
 				return player;
 			}
@@ -82,9 +82,9 @@ public class ItemDrill extends ItemElectricTool implements IMiningDrill, IHitSou
 				return null;
 			}
 
-			for (Player player : server.getPlayerList().m_11314_())
+			for (Player player : server.getPlayerList().getPlayers())
 			{
-				if (player.getInventory().m_36056_() == stack)
+				if (player.getInventory().getSelected() == stack)
 				{
 					return player;
 				}
@@ -167,6 +167,6 @@ public class ItemDrill extends ItemElectricTool implements IMiningDrill, IHitSou
 	public SoundEvent getBreakSoundForBlock(LocalPlayer player, Level world, BlockPos pos, ItemStack stack)
 	{
 		Block block = world.getBlockState(pos).getBlock();
-		return block.m_155943_() >= 3.0F ? Ic2SoundEvents.ITEM_DRILL_HARD : Ic2SoundEvents.ITEM_DRILL_SOFT;
+		return block.defaultDestroyTime() >= 3.0F ? Ic2SoundEvents.ITEM_DRILL_HARD : Ic2SoundEvents.ITEM_DRILL_SOFT;
 	}
 }

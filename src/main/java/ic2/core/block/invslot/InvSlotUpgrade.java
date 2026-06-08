@@ -10,6 +10,7 @@ import ic2.api.upgrade.ITransformerUpgrade;
 import ic2.api.upgrade.IUpgradableBlock;
 import ic2.api.upgrade.IUpgradeItem;
 import ic2.core.block.IInventorySlotHolder;
+import ic2.core.block.comp.Process;
 import ic2.core.block.comp.Redstone;
 import ic2.core.block.comp.TileEntityComponent;
 import ic2.core.util.StackUtil;
@@ -35,7 +36,7 @@ public class InvSlotUpgrade extends InvSlot
 
 	public static InvSlotUpgrade createUnchecked(IInventorySlotHolder<?> base, String name, int count)
 	{
-		return new InvSlotUpgrade(base, name, count);
+		return new InvSlotUpgrade((IInventorySlotHolder<?> & IUpgradableBlock) base, name, count);
 	}
 
 	public <T extends IInventorySlotHolder<?> & IUpgradableBlock> InvSlotUpgrade(T base, String name, int count)
@@ -47,7 +48,7 @@ public class InvSlotUpgrade extends InvSlot
 	@Override
 	public boolean accepts(ItemStack stack)
 	{
-		return !(stack.getItem() instanceof IUpgradeItem item) ? false : item.isSuitableFor(stack, ((IUpgradableBlock) this.base).getUpgradableProperties());
+		return stack.getItem() instanceof IUpgradeItem item && item.isSuitableFor(stack, ((IUpgradableBlock) this.base).getUpgradableProperties());
 	}
 
 	@Override
@@ -156,19 +157,19 @@ public class InvSlotUpgrade extends InvSlot
 
 	public int getEnergyDemand(int defaultEnergyDemand)
 	{
-		return applyModifier(defaultEnergyDemand, this.extraEnergyDemand, this.energyDemandMultiplier);
+		return Process.applyModifier(defaultEnergyDemand, this.extraEnergyDemand, this.energyDemandMultiplier);
 	}
 
 	public int getEnergyStorage(int defaultEnergyStorage, int defaultOperationLength, int defaultEnergyDemand)
 	{
 		int opLen = this.getOperationLength(defaultOperationLength);
 		int energyDemand = this.getEnergyDemand(defaultEnergyDemand);
-		return applyModifier(defaultEnergyStorage, this.extraEnergyStorage + opLen * energyDemand, this.energyStorageMultiplier);
+		return Process.applyModifier(defaultEnergyStorage, this.extraEnergyStorage + opLen * energyDemand, this.energyStorageMultiplier);
 	}
 
 	public int getTier(int defaultTier)
 	{
-		return applyModifier(defaultTier, this.extraTier, 1.0);
+		return Process.applyModifier(defaultTier, this.extraTier, 1.0);
 	}
 
 	public int getRemoteRange(int existingRange)
@@ -187,12 +188,7 @@ public class InvSlotUpgrade extends InvSlot
 
 		return existingRange;
 	}
-
-	private static int applyModifier(int base, int extra, double multiplier)
-	{
-		double ret = Math.round(((double) base + extra) * multiplier);
-		return ret > 2.147483647E9 ? Integer.MAX_VALUE : (int) ret;
-	}
+	
 
 	public boolean tickNoMark()
 	{
@@ -219,23 +215,22 @@ public class InvSlotUpgrade extends InvSlot
 		}
 	}
 
-	private static class UpgradeRedstoneModifier implements Redstone.IRedstoneModifier
-	{
-		private final IRedstoneSensitiveUpgrade upgrade;
-		private final ItemStack stack;
-		private final IUpgradableBlock block;
-
-		UpgradeRedstoneModifier(IRedstoneSensitiveUpgrade upgrade, ItemStack stack, IUpgradableBlock block)
+	private record UpgradeRedstoneModifier(
+		IRedstoneSensitiveUpgrade upgrade,
+		ItemStack stack,
+		IUpgradableBlock block) implements Redstone.IRedstoneModifier
 		{
-			this.upgrade = upgrade;
-			this.stack = stack.m_41777_();
-			this.block = block;
+			private UpgradeRedstoneModifier(IRedstoneSensitiveUpgrade upgrade, ItemStack stack, IUpgradableBlock block)
+			{
+				this.upgrade = upgrade;
+				this.stack = stack.copy();
+				this.block = block;
+			}
+	
+			@Override
+			public int getRedstoneInput(int redstoneInput)
+			{
+				return this.upgrade.getRedstoneInput(this.stack, this.block, redstoneInput);
+			}
 		}
-
-		@Override
-		public int getRedstoneInput(int redstoneInput)
-		{
-			return this.upgrade.getRedstoneInput(this.stack, this.block, redstoneInput);
-		}
-	}
 }

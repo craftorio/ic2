@@ -64,13 +64,13 @@ public class ItemReactorHeatStorage extends AbstractDamageableReactorComponent
 	}
 
 	@Override
-	public void m_7373_(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag advanced)
+	public void appendHoverText(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag advanced)
 	{
-		super.m_7373_(stack, world, tooltip, advanced);
+		super.appendHoverText(stack, world, tooltip, advanced);
 		if (this.getUse(stack) > 0)
 		{
-			tooltip.add(Component.m_237113_("ic2.reactoritem.heatwarning.line1").m_130940_(ChatFormatting.GRAY));
-			tooltip.add(Component.m_237113_("ic2.reactoritem.heatwarning.line2").m_130940_(ChatFormatting.GRAY));
+			tooltip.add(Component.literal("ic2.reactoritem.heatwarning.line1").withStyle(ChatFormatting.GRAY));
+			tooltip.add(Component.literal("ic2.reactoritem.heatwarning.line2").withStyle(ChatFormatting.GRAY));
 		}
 	}
 }

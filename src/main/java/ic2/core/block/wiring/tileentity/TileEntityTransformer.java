@@ -107,7 +107,7 @@ public abstract class TileEntityTransformer extends TileEntityInventory implemen
 		TileEntityTransformer.Mode newMode = switch (this.configuredMode)
 		{
 			case redstone ->
-				this.getLevel().m_46753_(this.worldPosition) ? TileEntityTransformer.Mode.stepup : TileEntityTransformer.Mode.stepdown;
+				this.getLevel().hasNeighborSignal(this.worldPosition) ? TileEntityTransformer.Mode.stepup : TileEntityTransformer.Mode.stepdown;
 			case stepdown, stepup -> this.configuredMode;
 			default -> throw new RuntimeException("invalid mode: " + this.configuredMode);
 		};

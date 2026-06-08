@@ -23,13 +23,13 @@ public class RecipeInputIngredient extends RecipeInputBase
 	@Override
 	public boolean matches(ItemStack subject)
 	{
-		return !subject.m_41619_() && this.ingredient.test(subject);
+		return !subject.isEmpty() && this.ingredient.test(subject);
 	}
 
 	@Override
 	protected List<ItemStack> listStacks()
 	{
-		return Arrays.asList(this.ingredient.m_43908_());
+		return Arrays.asList(this.ingredient.getItems());
 	}
 
 	@Override
@@ -47,7 +47,7 @@ public class RecipeInputIngredient extends RecipeInputBase
 	@Override
 	public JsonElement toJson()
 	{
-		JsonElement element = this.ingredient.m_43942_();
+		JsonElement element = this.ingredient.toJson();
 		if (this.amount == 1)
 		{
 			return element;

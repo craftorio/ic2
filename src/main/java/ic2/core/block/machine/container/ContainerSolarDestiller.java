@@ -14,14 +14,14 @@ public class ContainerSolarDestiller extends ContainerFullInv<TileEntitySolarDes
 	public ContainerSolarDestiller(int syncId, Inventory playerInventory, TileEntitySolarDestiller be)
 	{
 		super(Ic2ScreenHandlers.SOLAR_DISTILLER, syncId, playerInventory, be, 184);
-		this.m_38897_(new SlotInvSlot(be.waterinputSlot, 0, 17, 27));
-		this.m_38897_(new SlotInvSlot(be.destiwaterinputSlot, 0, 136, 64));
-		this.m_38897_(new SlotInvSlot(be.wateroutputSlot, 0, 17, 45));
-		this.m_38897_(new SlotInvSlot(be.destiwateroutputSlott, 0, 136, 82));
+		this.addSlot(new SlotInvSlot(be.waterinputSlot, 0, 17, 27));
+		this.addSlot(new SlotInvSlot(be.destiwaterinputSlot, 0, 136, 64));
+		this.addSlot(new SlotInvSlot(be.wateroutputSlot, 0, 17, 45));
+		this.addSlot(new SlotInvSlot(be.destiwateroutputSlott, 0, 136, 82));
 
 		for (int i = 0; i < 2; i++)
 		{
-			this.m_38897_(new SlotInvSlot(be.upgradeSlot, i, 152, 8 + i * 18));
+			this.addSlot(new SlotInvSlot(be.upgradeSlot, i, 152, 8 + i * 18));
 		}
 	}
 

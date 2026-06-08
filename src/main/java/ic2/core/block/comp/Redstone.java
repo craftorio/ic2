@@ -52,7 +52,7 @@ public class Redstone extends TileEntityComponent
 		Level world = this.parent.getLevel();
 		if (world != null)
 		{
-			int input = world.m_46755_(this.parent.getBlockPos());
+			int input = world.getBestNeighborSignal(this.parent.getBlockPos());
 			if (this.modifiers != null)
 			{
 				for (Redstone.IRedstoneModifier modifier : this.modifiers)

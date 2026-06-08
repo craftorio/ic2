@@ -14,7 +14,7 @@ public class ContainerWindKineticGenerator extends ContainerFullInv<TileEntityWi
 	public ContainerWindKineticGenerator(int syncId, Inventory playerInventory, TileEntityWindKineticGenerator be)
 	{
 		super(Ic2ScreenHandlers.WIND_KINETIC_GENERATOR, syncId, playerInventory, be, 166);
-		this.m_38897_(new SlotInvSlot(be.rotorSlot, 0, 80, 26));
+		this.addSlot(new SlotInvSlot(be.rotorSlot, 0, 80, 26));
 	}
 
 	@Override

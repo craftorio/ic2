@@ -55,7 +55,7 @@ public abstract class InvSlotConsumable extends InvSlot
 						if (!consumeContainers && IC2.envProxy.hasRecipeRemainder(stack))
 						{
 							ItemStack container = IC2.envProxy.getRecipeRemainder(stack);
-							if (container != null && container.m_41763_() && DamageHandler.getDamage(container) > DamageHandler.getMaxDamage(container))
+							if (container != null && container.isDamageableItem() && DamageHandler.getDamage(container) > DamageHandler.getMaxDamage(container))
 							{
 								container = null;
 							}
@@ -105,16 +105,16 @@ public abstract class InvSlotConsumable extends InvSlot
 			if (!StackUtil.isEmpty(stack))
 			{
 				Item item = stack.getItem();
-				if (this.accepts(stack) && item.m_41465_() && (target == null || item == target.getItem() && ItemStack.m_41658_(stack, target)))
+				if (this.accepts(stack) && item.canBeDepleted() && (target == null || item == target.getItem() && ItemStack.tagMatches(stack, target)))
 				{
 					if (target == null)
 					{
-						target = stack.m_41777_();
+						target = stack.copy();
 					}
 
 					if (simulate)
 					{
-						stack = stack.m_41777_();
+						stack = stack.copy();
 					}
 
 					int maxDamage = DamageHandler.getMaxDamage(stack);

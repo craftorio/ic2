@@ -18,18 +18,18 @@ public class GuiSolarDestiller extends Ic2Gui<ContainerSolarDestiller>
 	}
 
 	@Override
-	protected void m_7286_(PoseStack matrices, float delta, int mouseX, int mouseY)
+	protected void renderBg(PoseStack matrices, float delta, int mouseX, int mouseY)
 	{
-		super.m_7286_(matrices, delta, mouseX, mouseY);
+		super.renderBg(matrices, delta, mouseX, mouseY);
 		this.bindTexture();
 		if (((ContainerSolarDestiller) this.menu).base.canWork())
 		{
-			this.drawTexturedRect(matrices, this.f_97735_ + 36, this.f_97736_ + 26, 0.0, 184.0, 97.0, 29.0);
+			this.drawTexturedRect(matrices, this.leftPos + 36, this.topPos + 26, 0.0, 184.0, 97.0, 29.0);
 		}
 	}
 
 	@Override
-	protected ResourceLocation getTexture()
+	protected ResourceLocation getTextureLocation()
 	{
 		return ResourceLocation.fromNamespaceAndPath("ic2", "textures/gui/guisolardestiller.png");
 	}

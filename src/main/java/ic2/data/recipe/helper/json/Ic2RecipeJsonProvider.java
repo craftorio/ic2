@@ -26,29 +26,29 @@ public abstract class Ic2RecipeJsonProvider implements FinishedRecipe
 		this.fileName = fileName;
 	}
 
-	public void m_7917_(JsonObject json)
+	public void serializeRecipeData(JsonObject json)
 	{
 		json.add("result", RecipeIo.resultToJson(this.result));
 	}
 
-	public final ResourceLocation m_6445_()
+	public final ResourceLocation getId()
 	{
-		return IC2.getIdentifier(Registry.f_122865_.getKey(this.serializer).m_135815_() + "/" + this.fileName);
+		return IC2.getIdentifier(Registry.RECIPE_SERIALIZER.getKey(this.serializer).getPath() + "/" + this.fileName);
 	}
 
-	public final RecipeSerializer<?> m_6637_()
+	public final RecipeSerializer<?> getType()
 	{
 		return this.serializer;
 	}
 
 	@Nullable
-	public final JsonObject m_5860_()
+	public final JsonObject serializeAdvancement()
 	{
-		return this.advancementBuilder != null ? this.advancementBuilder.m_138400_() : null;
+		return this.advancementBuilder != null ? this.advancementBuilder.serializeToJson() : null;
 	}
 
 	@Nullable
-	public final ResourceLocation m_6448_()
+	public final ResourceLocation getAdvancementId()
 	{
 		return this.advancementId != null ? this.advancementId : null;
 	}

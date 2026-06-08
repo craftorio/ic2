@@ -26,22 +26,22 @@ public class BlockCutterRecipeProvider extends Ic2RecipeProvider
 		BasicMachineRecipeGenerator<? extends BasicMachineRecipeGenerator<?>> gen = (BasicMachineRecipeGenerator<? extends BasicMachineRecipeGenerator<?>>) (new BasicMachineRecipeGenerator<>(
 			consumer, Ic2RecipeSerializers.BLOCK_CUTTER, true
 		));
-		gen.cutterLevel(2).add(ItemTags.f_13184_, 1, Items.f_42647_, 6);
-		gen.cutterLevel(2).add(ItemTags.f_13185_, 1, Items.f_42753_, 6);
-		gen.cutterLevel(2).add(ItemTags.f_13188_, 1, Items.f_42700_, 6);
-		gen.cutterLevel(2).add(ItemTags.f_13186_, 1, Items.f_42795_, 6);
-		gen.cutterLevel(2).add(ItemTags.f_13187_, 1, Items.f_42794_, 6);
-		gen.cutterLevel(2).add(ItemTags.f_13183_, 1, Items.f_42796_, 6);
-		gen.cutterLevel(2).add(ItemTags.f_215869_, 1, Items.f_220174_, 6);
-		gen.cutterLevel(2).add(ItemTags.f_13168_, 1, Items.f_42398_, 3);
+		gen.cutterLevel(2).add(ItemTags.OAK_LOGS, 1, Items.OAK_PLANKS, 6);
+		gen.cutterLevel(2).add(ItemTags.BIRCH_LOGS, 1, Items.BIRCH_PLANKS, 6);
+		gen.cutterLevel(2).add(ItemTags.SPRUCE_LOGS, 1, Items.SPRUCE_PLANKS, 6);
+		gen.cutterLevel(2).add(ItemTags.ACACIA_LOGS, 1, Items.ACACIA_PLANKS, 6);
+		gen.cutterLevel(2).add(ItemTags.JUNGLE_LOGS, 1, Items.JUNGLE_PLANKS, 6);
+		gen.cutterLevel(2).add(ItemTags.DARK_OAK_LOGS, 1, Items.DARK_OAK_PLANKS, 6);
+		gen.cutterLevel(2).add(ItemTags.MANGROVE_LOGS, 1, Items.MANGROVE_PLANKS, 6);
+		gen.cutterLevel(2).add(ItemTags.PLANKS, 1, Items.STICK, 3);
 		gen.cutterLevel(2).add(Ic2ItemTags.LEAD_BLOCKS, 1, Ic2Items.LEAD_PLATE, 9);
 		gen.cutterLevel(2).add(Ic2ItemTags.TIN_BLOCKS, 1, Ic2Items.TIN_PLATE, 9);
 		gen.cutterLevel(2).add(Ic2ItemTags.BRONZE_BLOCKS, 1, Ic2Items.BRONZE_PLATE, 9);
-		gen.cutterLevel(2).add(Items.f_151000_, 1, Ic2Items.COPPER_PLATE, 9);
-		gen.cutterLevel(2).add(Items.f_41912_, 1, Ic2Items.GOLD_PLATE, 9);
-		gen.cutterLevel(5).add(Items.f_41854_, 1, Ic2Items.LAPIS_PLATE, 9);
-		gen.cutterLevel(5).add(Items.f_41913_, 1, Ic2Items.IRON_PLATE, 9);
-		gen.cutterLevel(8).add(Items.f_41999_, 1, Ic2Items.OBSIDIAN_PLATE, 9);
+		gen.cutterLevel(2).add(Items.COPPER_BLOCK, 1, Ic2Items.COPPER_PLATE, 9);
+		gen.cutterLevel(2).add(Items.GOLD_BLOCK, 1, Ic2Items.GOLD_PLATE, 9);
+		gen.cutterLevel(5).add(Items.LAPIS_BLOCK, 1, Ic2Items.LAPIS_PLATE, 9);
+		gen.cutterLevel(5).add(Items.IRON_BLOCK, 1, Ic2Items.IRON_PLATE, 9);
+		gen.cutterLevel(8).add(Items.OBSIDIAN, 1, Ic2Items.OBSIDIAN_PLATE, 9);
 		gen.cutterLevel(8).add(Ic2ItemTags.STEEL_BLOCKS, 1, Ic2Items.STEEL_PLATE, 9);
 	}
 }

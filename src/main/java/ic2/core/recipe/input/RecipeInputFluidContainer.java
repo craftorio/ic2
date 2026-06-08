@@ -69,7 +69,7 @@ public class RecipeInputFluidContainer extends RecipeInputBase
 	public JsonElement toJson()
 	{
 		JsonObject obj = new JsonObject();
-		obj.addProperty("fluid", Registry.f_122822_.getKey(this.fluid).toString());
+		obj.addProperty("fluid", Registry.FLUID.getKey(this.fluid).toString());
 		obj.addProperty("amount", this.amount);
 		return obj;
 	}
@@ -88,7 +88,7 @@ public class RecipeInputFluidContainer extends RecipeInputBase
 
 		for (ItemStack stack : containerItems)
 		{
-			int amount = FluidHandler.fillMb(stack.m_41777_(), fillFs, false, container);
+			int amount = FluidHandler.fillMb(stack.copy(), fillFs, false, container);
 			if (amount > 0 && container.getValue() != null)
 			{
 				Ic2FluidStack fs = FluidHandler.drainMb((ItemStack) container.getValue(), Integer.MAX_VALUE, true, null);
@@ -113,17 +113,17 @@ public class RecipeInputFluidContainer extends RecipeInputBase
 		ret = new ArrayList<>();
 		MutableObject<ItemStack> container = new MutableObject();
 
-		for (Item item : Registry.f_122827_)
+		for (Item item : Registry.ITEM)
 		{
-			if (item != Items.f_41852_)
+			if (item != Items.AIR)
 			{
 				ItemStack stack = new ItemStack(item);
-				assert !stack.m_41619_();
+				assert !stack.isEmpty();
 				Ic2FluidStack fs = FluidHandler.drainMb(stack, Integer.MAX_VALUE, false, container);
 				if (fs != null)
 				{
 					stack = (ItemStack) container.getValue();
-					if (!stack.m_41619_())
+					if (!stack.isEmpty())
 					{
 						fs = FluidHandler.drainMb(stack, Integer.MAX_VALUE, true, null);
 						if (fs != null && fs.isEmpty())

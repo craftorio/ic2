@@ -115,7 +115,7 @@ public class Ic2Explosion extends Explosion
 			this.damageSource = Ic2DamageSource.getNukeSource(igniter);
 		} else
 		{
-			this.damageSource = DamageSource.m_19373_(igniter);
+			this.damageSource = DamageSource.explosion(igniter);
 		}
 
 		this.destroyedBlockPositions = new long[this.worldMaxHeight - this.worldMinHeight][];
@@ -139,7 +139,7 @@ public class Ic2Explosion extends Explosion
 				BlockPos end = pos.offset(range, range, range);
 				this.chunkCache = new PathNavigationRegion(this.worldObj, start, end);
 
-				for (Entity entity : this.worldObj.m_45933_(this.exploder, new AABB(start, end)))
+				for (Entity entity : this.worldObj.getEntities(this.exploder, new AABB(start, end)))
 				{
 					if (entity instanceof LivingEntity || entity instanceof ItemEntity)
 					{
@@ -185,14 +185,14 @@ public class Ic2Explosion extends Explosion
 				{
 					Entity entity = entry.entity;
 					entity.hurt(this.damageSource, (float) entry.damage);
-					if (entity instanceof Player player && this.isNuclear() && this.igniter != null && player == this.igniter && player.m_21223_() <= 0.0F)
+					if (entity instanceof Player player && this.isNuclear() && this.igniter != null && player == this.igniter && player.getHealth() <= 0.0F)
 					{
 						IC2.achievements.issueAchievement(player, "dieFromOwnNuke");
 					}
 
 					double motionSq = Util.square(entry.motionX) + Util.square(entry.motionY) + Util.square(entry.motionZ);
 					double reduction = motionSq > 3600.0 ? Math.sqrt(3600.0 / motionSq) : 1.0;
-					entity.m_20256_(entity.m_20184_().m_82520_(entry.motionX * reduction, entry.motionY * reduction, entry.motionZ * reduction));
+					entity.setDeltaMovement(entity.getDeltaMovement().add(entry.motionX * reduction, entry.motionY * reduction, entry.motionZ * reduction));
 				}
 
 				if (this.isNuclear() && this.radiationRange >= 1)
@@ -213,12 +213,12 @@ public class Ic2Explosion extends Explosion
 					{
 						if (!ItemArmorHazmat.hasCompleteHazmat(entity))
 						{
-							double distance = entity.m_20182_().m_82554_(position);
+							double distance = entity.position().distanceTo(position);
 							int hungerLength = (int) (120.0 * (this.radiationRange - distance));
 							int poisonLength = (int) (80.0 * (this.radiationRange / 3 - distance));
 							if (hungerLength >= 0)
 							{
-								entity.m_7292_(new MobEffectInstance(MobEffects.f_19612_, hungerLength, 0));
+								entity.addEffect(new MobEffectInstance(MobEffects.HUNGER, hungerLength, 0));
 							}
 
 							if (poisonLength >= 0)
@@ -231,14 +231,14 @@ public class Ic2Explosion extends Explosion
 
 				IC2.network.get(true).initiateExplosionEffect(this.worldObj, position, this.type);
 				RandomSource rng = this.worldObj.random;
-				boolean doDrops = this.worldObj.m_46469_().m_46207_(GameRules.f_46136_);
+				boolean doDrops = this.worldObj.getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS);
 				Map<Ic2Explosion.XZPosition, Map<ItemComparableItemStack, Ic2Explosion.DropData>> blocksToDrop = new HashMap<>();
 				Builder builder = new Builder((ServerLevel) this.worldObj)
-					.m_230911_(this.worldObj.random)
-					.m_78972_(LootContextParams.f_81460_, new Vec3(this.explosionX, this.explosionY, this.explosionZ))
-					.m_78972_(LootContextParams.f_81463_, ItemStack.EMPTY)
-					.m_78984_(LootContextParams.f_81455_, this.exploder)
-					.m_78972_(LootContextParams.f_81464_, this.power);
+					.withRandom(this.worldObj.random)
+					.withParameter(LootContextParams.ORIGIN, new Vec3(this.explosionX, this.explosionY, this.explosionZ))
+					.withParameter(LootContextParams.TOOL, ItemStack.EMPTY)
+					.withOptionalParameter(LootContextParams.THIS_ENTITY, this.exploder)
+					.withParameter(LootContextParams.EXPLOSION_RADIUS, this.power);
 
 				for (int destroyedBlockPosIndex = 0; destroyedBlockPosIndex < this.destroyedBlockPositions.length; destroyedBlockPosIndex++)
 				{
@@ -262,12 +262,12 @@ public class Ic2Explosion extends Explosion
 							{
 							}
 
-							if (doDrops && block.m_6903_(this) && getAtIndex(index, bitSet, 2) == 1)
+							if (doDrops && block.dropFromExplosion(this) && getAtIndex(index, bitSet, 2) == 1)
 							{
-								BlockEntity be = state.m_155947_() ? this.worldObj.getBlockEntity(tmpPos) : null;
-								builder.m_78984_(LootContextParams.f_81462_, be);
+								BlockEntity be = state.hasBlockEntity() ? this.worldObj.getBlockEntity(tmpPos) : null;
+								builder.withOptionalParameter(LootContextParams.BLOCK_ENTITY, be);
 
-								for (ItemStack stack : state.m_60724_(builder))
+								for (ItemStack stack : state.getDrops(builder))
 								{
 									if (!(rng.nextFloat() > this.explosionDropRate))
 									{
@@ -293,8 +293,8 @@ public class Ic2Explosion extends Explosion
 								}
 							}
 
-							this.worldObj.m_7731_(tmpPos, Blocks.f_50016_.defaultBlockState(), 3);
-							block.m_7592_(this.worldObj, tmpPos, this);
+							this.worldObj.setBlock(tmpPos, Blocks.AIR.defaultBlockState(), 3);
+							block.wasExploded(this.worldObj, tmpPos, this);
 						}
 					}
 				}
@@ -318,7 +318,7 @@ public class Ic2Explosion extends Explosion
 								(xZposition.z + this.worldObj.random.nextFloat()) * 2.0F,
 								isw.toStack(stackSize)
 							);
-							entityitem.m_32060_();
+							entityitem.setDefaultPickUpDelay();
 							this.worldObj.addFreshEntity(entityitem);
 							count -= stackSize;
 						}
@@ -389,7 +389,7 @@ public class Ic2Explosion extends Explosion
 					break;
 				}
 
-				if (block == Blocks.f_50069_ || block != Blocks.f_50016_ && !state.isAir())
+				if (block == Blocks.STONE || block != Blocks.AIR && !state.isAir())
 				{
 					this.destroyUnchecked(blockX, blockY, blockZ, power1 > 8.0);
 				}
@@ -420,9 +420,9 @@ public class Ic2Explosion extends Explosion
 	{
 		double ret = 0.5;
 		Block block = state.getBlock();
-		if (block != Blocks.f_50016_ && !state.isAir())
+		if (block != Blocks.AIR && !state.isAir())
 		{
-			if (block == Blocks.f_49990_ && this.type != Ic2Explosion.Type.Normal)
+			if (block == Blocks.WATER && this.type != Ic2Explosion.Type.Normal)
 			{
 				ret++;
 			} else
@@ -505,7 +505,7 @@ public class Ic2Explosion extends Explosion
 				if (entry.health <= 0.0)
 				{
 					entity.hurt(this.damageSource, (float) entry.damage);
-					if (!entity.m_6084_())
+					if (!entity.isAlive())
 					{
 						this.entitiesInRange.remove(i);
 						i--;
@@ -515,7 +515,7 @@ public class Ic2Explosion extends Explosion
 		}
 	}
 
-	public LivingEntity m_46079_()
+	public LivingEntity getSourceMob()
 	{
 		return this.igniter;
 	}

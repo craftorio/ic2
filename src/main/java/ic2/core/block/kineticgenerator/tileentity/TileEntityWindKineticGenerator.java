@@ -146,7 +146,7 @@ public class TileEntityWindKineticGenerator extends TileEntityInventory implemen
 	{
 		return !this.rotorSlot.isEmpty()
 			? Localization.translate(
-			"ic2.WindKineticGenerator.gui.rotorhealth", (int) (100.0F - (float) this.rotorSlot.get().getDamageValue() / this.rotorSlot.get().m_41776_() * 100.0F)
+			"ic2.WindKineticGenerator.gui.rotorhealth", (int) (100.0F - (float) this.rotorSlot.get().getDamageValue() / this.rotorSlot.get().getMaxDamage() * 100.0F)
 		)
 			: "";
 	}
@@ -160,7 +160,7 @@ public class TileEntityWindKineticGenerator extends TileEntityInventory implemen
 	@Override
 	public int getConnectionBandwidth(Direction side)
 	{
-		return this.facingMatchesDirection(side.m_122424_()) ? this.getKuOutput() : 0;
+		return this.facingMatchesDirection(side.getOpposite()) ? this.getKuOutput() : 0;
 	}
 
 	@Override
@@ -172,7 +172,7 @@ public class TileEntityWindKineticGenerator extends TileEntityInventory implemen
 	@Override
 	public int drawKineticEnergy(Direction side, int request, boolean simulate)
 	{
-		return this.facingMatchesDirection(side.m_122424_()) ? Math.min(request, this.getKuOutput()) : 0;
+		return this.facingMatchesDirection(side.getOpposite()) ? Math.min(request, this.getKuOutput()) : 0;
 	}
 
 	public int checkSpace(int length, boolean onlyrotor)
@@ -191,9 +191,9 @@ public class TileEntityWindKineticGenerator extends TileEntityInventory implemen
 		}
 
 		Direction fwdDir = this.getFacing();
-		Direction rightDir = fwdDir.m_175362_(Axis.Y);
-		int xMaxDist = Math.abs(length * fwdDir.m_122429_() + box * rightDir.m_122429_());
-		int zMaxDist = Math.abs(length * fwdDir.m_122431_() + box * rightDir.m_122431_());
+		Direction rightDir = fwdDir.getClockWise(Axis.Y);
+		int xMaxDist = Math.abs(length * fwdDir.getStepX() + box * rightDir.getStepX());
+		int zMaxDist = Math.abs(length * fwdDir.getStepZ() + box * rightDir.getStepZ());
 		PathNavigationRegion chunkCache = new PathNavigationRegion(
 			this.getLevel(), this.worldPosition.offset(-xMaxDist, -box, -zMaxDist), this.worldPosition.offset(xMaxDist, box, zMaxDist)
 		);
@@ -213,8 +213,8 @@ public class TileEntityWindKineticGenerator extends TileEntityInventory implemen
 
 				for (int fwd = lentemp - length; fwd <= length; fwd++)
 				{
-					int x = xCoord + fwd * fwdDir.m_122429_() + right * rightDir.m_122429_();
-					int z = zCoord + fwd * fwdDir.m_122431_() + right * rightDir.m_122431_();
+					int x = xCoord + fwd * fwdDir.getStepX() + right * rightDir.getStepX();
+					int z = zCoord + fwd * fwdDir.getStepZ() + right * rightDir.getStepZ();
 					pos.set(x, y, z);
 					assert Math.abs(x - xCoord) <= xMaxDist;
 					assert Math.abs(z - zCoord) <= zMaxDist;

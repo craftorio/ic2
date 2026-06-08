@@ -33,11 +33,13 @@ public final class FmlMod
 	public static FmlMod instance;
 	public static ExistingFileHelper existingFileHelper;
 	private static final AtomicInteger loadState = new AtomicInteger();
+	private final FMLJavaModLoadingContext ctx;
 
-	public FmlMod()
+	public FmlMod(FMLJavaModLoadingContext ctx)
 	{
 		instance = this;
-		IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+		this.ctx = ctx;
+		IEventBus modEventBus = this.ctx.getModEventBus();
 		modEventBus.register(this);
 		EnvProxyForge.blockEntityRegistry.register(modEventBus);
 		EnvProxyForge.entityRegistry.register(modEventBus);
@@ -64,7 +66,7 @@ public final class FmlMod
 		}
 
 		NetworkRegistry.newEventChannel(NetworkManager.channelId, () -> "0", v -> true, v -> true).registerObject(new ForgeNetworkHandler());
-		ModLoadingContext.get()
+		this.ctx
 			.registerExtensionPoint(
 				DisplayTest.class,
 				() -> new DisplayTest(
@@ -101,7 +103,7 @@ public final class FmlMod
 	@SubscribeEvent
 	public void registerBlocks(RegisterEvent event)
 	{
-		if (event.getRegistryKey() == Registry.f_122901_)
+		if (event.getRegistryKey() == Registry.BLOCK_REGISTRY)
 		{
 			if (!loadState.compareAndSet(0, 1))
 			{
@@ -115,7 +117,7 @@ public final class FmlMod
 	@SubscribeEvent
 	public void registerGameEvents(RegisterEvent event)
 	{
-		if (event.getRegistryKey() == Registry.f_122898_)
+		if (event.getRegistryKey() == Registry.SOUND_EVENT_REGISTRY)
 		{
 			EventHandler.onInitGameEvents();
 		}
@@ -149,7 +151,7 @@ public final class FmlMod
 	@SubscribeEvent
 	public void registerFeatures(RegisterEvent event)
 	{
-		if (event.getRegistryKey() == Registry.f_122838_)
+		if (event.getRegistryKey() == Registry.FEATURE_REGISTRY)
 		{
 			for (Runnable reg : EnvProxyForge.configuredFeatureRegistrations)
 			{
@@ -158,12 +160,12 @@ public final class FmlMod
 
 			for (EnvProxyForge.PlacedFeatureRegistration<?> reg : EnvProxyForge.placedFeatureRegistrations)
 			{
-				reg.placedFeature().complete(PlacementUtils.m_206509_(reg.id().toString(), reg.feature().join(), reg.modifiers()));
+				reg.placedFeature().complete(PlacementUtils.register(reg.id().toString(), reg.feature().join(), reg.modifiers()));
 			}
 
 			for (EnvProxyForge.PlacementModifierTypeRegistration reg : EnvProxyForge.placementModifierTypeRegistrations)
 			{
-				Registry.m_122965_(Registry.f_194570_, reg.id(), reg.type());
+				Registry.register(Registry.PLACEMENT_MODIFIERS, reg.id(), reg.type());
 			}
 		}
 	}

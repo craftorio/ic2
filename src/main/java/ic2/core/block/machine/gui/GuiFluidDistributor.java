@@ -33,24 +33,24 @@ public class GuiFluidDistributor extends Ic2Gui<ContainerFluidDistributor>
 	}
 
 	@Override
-	public boolean m_6375_(double mouseX, double mouseY, int mouseButton)
+	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
 	{
-		mouseX -= this.f_97735_;
-		mouseY -= this.f_97736_;
+		mouseX -= this.leftPos;
+		mouseY -= this.topPos;
 		if (mouseX >= 117.0 && mouseY >= 58.0 && mouseX <= 135.0 && mouseY <= 66.0)
 		{
 			IC2.network.get(false).initiateClientTileEntityEvent(((ContainerFluidDistributor) this.menu).base, 1);
 			return true;
 		} else
 		{
-			mouseX += this.f_97735_;
-			mouseY += this.f_97736_;
-			return super.m_6375_(mouseX, mouseY, mouseButton);
+			mouseX += this.leftPos;
+			mouseY += this.topPos;
+			return super.mouseClicked(mouseX, mouseY, mouseButton);
 		}
 	}
 
 	@Override
-	protected ResourceLocation getTexture()
+	protected ResourceLocation getTextureLocation()
 	{
 		return ResourceLocation.fromNamespaceAndPath("ic2", "textures/gui/guifluiddistributor.png");
 	}

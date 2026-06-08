@@ -44,7 +44,7 @@ public class GuiTradeOMatOpen extends Ic2Gui<ContainerTradeOMatOpen>
 	}
 
 	@Override
-	protected ResourceLocation getTexture()
+	protected ResourceLocation getTextureLocation()
 	{
 		return background;
 	}

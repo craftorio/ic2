@@ -165,7 +165,7 @@ public abstract class TileEntityAbstractRCI extends TileEntityElectricMachine im
 			this.reactor = null;
 		} else
 		{
-			BlockEntity tileEntity = world.getBlockEntity(this.worldPosition.relative(this.getFacing().m_122424_()));
+			BlockEntity tileEntity = world.getBlockEntity(this.worldPosition.relative(this.getFacing().getOpposite()));
 			if (tileEntity instanceof TileEntityNuclearReactorElectric)
 			{
 				this.reactor = (TileEntityNuclearReactorElectric) tileEntity;

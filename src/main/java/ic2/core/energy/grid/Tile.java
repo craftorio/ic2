@@ -142,7 +142,7 @@ public final class Tile
 		String ret = getTeClassName(this.mainTile);
 		Level world = EnergyNet.instance.getWorld(this.mainTile);
 		MinecraftServer server = world.getServer();
-		if (server != null && server.m_18695_())
+		if (server != null && server.isSameThread())
 		{
 			BlockPos pos = EnergyNet.instance.getPos(this.mainTile);
 			if (world.isLoaded(pos))

@@ -14,7 +14,7 @@ public class ContainerPatternStorage extends ContainerFullInv<TileEntityPatternS
 	public ContainerPatternStorage(int syncId, Inventory playerInventory, TileEntityPatternStorage be)
 	{
 		super(Ic2ScreenHandlers.PATTERN_STORAGE, syncId, playerInventory, be, 166);
-		this.m_38897_(new SlotInvSlot(be.diskSlot, 0, 18, 20));
+		this.addSlot(new SlotInvSlot(be.diskSlot, 0, 18, 20));
 	}
 
 	@Override

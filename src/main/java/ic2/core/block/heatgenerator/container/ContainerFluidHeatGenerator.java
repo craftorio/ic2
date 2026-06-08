@@ -14,8 +14,8 @@ public class ContainerFluidHeatGenerator extends ContainerFullInv<TileEntityFlui
 	public ContainerFluidHeatGenerator(int syncId, Inventory playerInventory, TileEntityFluidHeatGenerator be)
 	{
 		super(Ic2ScreenHandlers.FLUID_HEAT_GENERATOR, syncId, playerInventory, be, 166);
-		this.m_38897_(new SlotInvSlot(be.fluidSlot, 0, 27, 21));
-		this.m_38897_(new SlotInvSlot(be.outputSlot, 0, 27, 54));
+		this.addSlot(new SlotInvSlot(be.fluidSlot, 0, 27, 21));
+		this.addSlot(new SlotInvSlot(be.outputSlot, 0, 27, 54));
 	}
 
 	@Override

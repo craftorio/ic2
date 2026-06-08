@@ -31,9 +31,9 @@ public class WorldUtil
 		{
 			for (int z = zS; z <= zE; z++)
 			{
-				LevelChunk chunk = world.m_6325_(x, z);
+				LevelChunk chunk = world.getChunk(x, z);
 
-				for (BlockEntity te : chunk.m_62954_().values())
+				for (BlockEntity te : chunk.getBlockEntities().values())
 				{
 					BlockPos pos = te.getBlockPos();
 					if (pos.getY() >= minY
@@ -53,14 +53,14 @@ public class WorldUtil
 
 	public static void strip(BlockState state, Level world, BlockPos pos, Player player, ItemStack mainHandItem, BlockState strippedBlockState)
 	{
-		world.playSound(player, pos, SoundEvents.f_11688_, SoundSource.BLOCKS, 1.0F, 1.0F);
+		world.playSound(player, pos, SoundEvents.AXE_STRIP, SoundSource.BLOCKS, 1.0F, 1.0F);
 		if (player instanceof ServerPlayer)
 		{
-			CriteriaTriggers.f_10562_.m_220040_((ServerPlayer) player, pos, mainHandItem);
+			CriteriaTriggers.ITEM_USED_ON_BLOCK.trigger((ServerPlayer) player, pos, mainHandItem);
 		}
 
-		world.m_7731_(pos, strippedBlockState, 11);
-		mainHandItem.m_41622_(1, player, p -> p.m_21190_(player.m_7655_()));
+		world.setBlock(pos, strippedBlockState, 11);
+		mainHandItem.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(player.getUsedItemHand()));
 	}
 
 	public interface ITileEntityResultHandler

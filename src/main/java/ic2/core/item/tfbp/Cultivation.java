@@ -28,29 +28,29 @@ public class Cultivation extends TerraformerBase
 	@Override
 	void init()
 	{
-		plants.add(Blocks.f_50359_.defaultBlockState());
-		plants.add(Blocks.f_50359_.defaultBlockState());
-		plants.add(Blocks.f_50035_.defaultBlockState());
-		plants.add(Blocks.f_50112_.defaultBlockState());
-		plants.add(Blocks.f_50111_.defaultBlockState());
-		plants.add(Blocks.f_50359_.defaultBlockState());
-		plants.add(Blocks.f_50357_.defaultBlockState());
-		plants.add(Blocks.f_50355_.defaultBlockState());
+		plants.add(Blocks.TALL_GRASS.defaultBlockState());
+		plants.add(Blocks.TALL_GRASS.defaultBlockState());
+		plants.add(Blocks.FERN.defaultBlockState());
+		plants.add(Blocks.POPPY.defaultBlockState());
+		plants.add(Blocks.DANDELION.defaultBlockState());
+		plants.add(Blocks.TALL_GRASS.defaultBlockState());
+		plants.add(Blocks.ROSE_BUSH.defaultBlockState());
+		plants.add(Blocks.SUNFLOWER.defaultBlockState());
 
-		for (Holder<Block> entry : Registry.BLOCK.m_206058_(BlockTags.f_13104_))
+		for (Holder<Block> entry : Registry.BLOCK.getTagOrEmpty(BlockTags.SAPLINGS))
 		{
-			Block block = (Block) entry.m_203334_();
+			Block block = (Block) entry.value();
 			if (isVanilla(block))
 			{
 				plants.add(block.defaultBlockState());
 			}
 		}
 
-		plants.add(Blocks.f_50092_.defaultBlockState());
-		plants.add(Blocks.f_50073_.defaultBlockState());
-		plants.add(Blocks.f_50072_.defaultBlockState());
-		plants.add(Blocks.f_50133_.defaultBlockState());
-		plants.add(Blocks.f_50186_.defaultBlockState());
+		plants.add(Blocks.WHEAT.defaultBlockState());
+		plants.add(Blocks.RED_MUSHROOM.defaultBlockState());
+		plants.add(Blocks.BROWN_MUSHROOM.defaultBlockState());
+		plants.add(Blocks.PUMPKIN.defaultBlockState());
+		plants.add(Blocks.MELON.defaultBlockState());
 		plants.add(Ic2Blocks.RUBBER_SAPLING.defaultBlockState());
 	}
 
@@ -63,51 +63,51 @@ public class Cultivation extends TerraformerBase
 			return false;
 		}
 
-		if (TileEntityTerra.switchGround(world, pos, Blocks.f_49992_, Blocks.f_50493_.defaultBlockState(), true))
+		if (TileEntityTerra.switchGround(world, pos, Blocks.SAND, Blocks.DIRT.defaultBlockState(), true))
 		{
 			return true;
 		}
 
-		if (TileEntityTerra.switchGround(world, pos, Blocks.f_50259_, Blocks.f_50493_.defaultBlockState(), true))
+		if (TileEntityTerra.switchGround(world, pos, Blocks.END_STONE, Blocks.DIRT.defaultBlockState(), true))
 		{
 			int i = 4;
 
-			while (--i > 0 && TileEntityTerra.switchGround(world, pos, Blocks.f_50259_, Blocks.f_50493_.defaultBlockState(), true))
+			while (--i > 0 && TileEntityTerra.switchGround(world, pos, Blocks.END_STONE, Blocks.DIRT.defaultBlockState(), true))
 			{
 			}
 		}
 
 		Block block = world.getBlockState(pos).getBlock();
-		if (block == Blocks.f_50493_)
+		if (block == Blocks.DIRT)
 		{
-			world.setBlockAndUpdate(pos, Blocks.f_50034_.defaultBlockState());
+			world.setBlockAndUpdate(pos, Blocks.GRASS.defaultBlockState());
 			return true;
 		} else
 		{
-			return block == Blocks.f_50034_ ? growPlantsOn(world, pos) : false;
+			return block == Blocks.GRASS ? growPlantsOn(world, pos) : false;
 		}
 	}
 
 	private static boolean growPlantsOn(Level world, BlockPos pos)
 	{
-		BlockPos above = pos.m_7494_();
+		BlockPos above = pos.above();
 		BlockState state = world.getBlockState(above);
 		Block block = state.getBlock();
-		if (state.isAir() || block == Blocks.f_50359_ && world.random.nextInt(4) == 0)
+		if (state.isAir() || block == Blocks.TALL_GRASS && world.random.nextInt(4) == 0)
 		{
 			BlockState plant = pickRandomPlant(world.random);
-			if (plant.m_61148_().containsKey(DirectionalBlock.f_52588_))
+			if (plant.getValues().containsKey(DirectionalBlock.FACING))
 			{
-				plant = (BlockState) plant.setValue(DirectionalBlock.f_52588_, Util.HORIZONTAL_DIRS[world.random.nextInt(Util.HORIZONTAL_DIRS.length)]);
+				plant = (BlockState) plant.setValue(DirectionalBlock.FACING, Util.HORIZONTAL_DIRS[world.random.nextInt(Util.HORIZONTAL_DIRS.length)]);
 			}
 
 			if (plant.getBlock() instanceof CropBlock)
 			{
-				world.setBlockAndUpdate(pos, Blocks.f_50093_.defaultBlockState());
+				world.setBlockAndUpdate(pos, Blocks.FARMLAND.defaultBlockState());
 			} else if (plant.getBlock() instanceof DoublePlantBlock)
 			{
-				world.setBlockAndUpdate(above, (BlockState) plant.setValue(DoublePlantBlock.f_52858_, DoubleBlockHalf.LOWER));
-				world.setBlockAndUpdate(above.m_7494_(), (BlockState) plant.setValue(DoublePlantBlock.f_52858_, DoubleBlockHalf.UPPER));
+				world.setBlockAndUpdate(above, (BlockState) plant.setValue(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER));
+				world.setBlockAndUpdate(above.above(), (BlockState) plant.setValue(DoublePlantBlock.HALF, DoubleBlockHalf.UPPER));
 				return true;
 			}
 

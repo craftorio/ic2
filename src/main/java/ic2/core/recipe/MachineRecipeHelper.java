@@ -66,7 +66,7 @@ public abstract class MachineRecipeHelper<RI, RO> implements IMachineRecipeManag
 			&& !acceptTest
 			&& !this.consumeContainer(input, adjustedInput, recipe))
 		{
-			if (!acceptTest && StackUtil.getSize(input) != recipeInput.getAmount())
+			if (StackUtil.getSize(input) != recipeInput.getAmount())
 			{
 				return null;
 			}
@@ -83,12 +83,12 @@ public abstract class MachineRecipeHelper<RI, RO> implements IMachineRecipeManag
 	@Override
 	public Iterable<? extends MachineRecipe<RI, RO>> getRecipes()
 	{
-		return new Iterable<MachineRecipe<RI, RO>>()
+		return new Iterable<>()
 		{
 			@Override
 			public Iterator<MachineRecipe<RI, RO>> iterator()
 			{
-				return new Iterator<MachineRecipe<RI, RO>>()
+				return new Iterator<>()
 				{
 					private final Iterator<MachineRecipe<RI, RO>> recipeIt = MachineRecipeHelper.this.recipes.values().iterator();
 					private Object lastInput;
@@ -110,7 +110,7 @@ public abstract class MachineRecipeHelper<RI, RO> implements IMachineRecipeManag
 					public void remove()
 					{
 						this.recipeIt.remove();
-						MachineRecipeHelper.this.removeCachedRecipes(this.lastInput);
+						MachineRecipeHelper.this.removeCachedRecipes((RI) this.lastInput);
 					}
 				};
 			}
@@ -170,12 +170,7 @@ public abstract class MachineRecipeHelper<RI, RO> implements IMachineRecipeManag
 
 	private void addToCache(Item item, MachineRecipe<RI, RO> recipe)
 	{
-		List<MachineRecipe<RI, RO>> recipes = this.recipeCache.get(item);
-		if (recipes == null)
-		{
-			recipes = new ArrayList<>();
-			this.recipeCache.put(item, recipes);
-		}
+		List<MachineRecipe<RI, RO>> recipes = this.recipeCache.computeIfAbsent(item, k -> new ArrayList<>());
 
 		if (!recipes.contains(recipe))
 		{

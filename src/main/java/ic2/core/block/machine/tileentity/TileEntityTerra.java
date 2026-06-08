@@ -102,7 +102,7 @@ public class TileEntityTerra extends TileEntityElectricMachine
 	protected InteractionResult onActivated(Player player, InteractionHand hand, Direction side, Vec3 hit)
 	{
 		final Level world = this.getLevel();
-		if (!player.m_6144_() && !world.isClientSide)
+		if (!player.isShiftKeyDown() && !world.isClientSide)
 		{
 			if (this.ejectBlueprint())
 			{
@@ -157,12 +157,12 @@ public class TileEntityTerra extends TileEntityElectricMachine
 		while (ret.getY() >= 0)
 		{
 			BlockState state = world.getBlockState(ret);
-			if (state.m_60804_(world, pos))
+			if (state.isSolidRender(world, pos))
 			{
-				return ret.m_7949_();
+				return ret.immutable();
 			}
 
-			ret.m_122173_(Direction.DOWN);
+			ret.move(Direction.DOWN);
 		}
 
 		return null;
@@ -174,12 +174,12 @@ public class TileEntityTerra extends TileEntityElectricMachine
 
 		while (ret.getY() >= 0)
 		{
-			if (!world.m_46859_(ret))
+			if (!world.isEmptyBlock(ret))
 			{
 				return new BlockPos(ret);
 			}
 
-			ret.m_122173_(Direction.DOWN);
+			ret.move(Direction.DOWN);
 		}
 
 		return null;
@@ -197,12 +197,12 @@ public class TileEntityTerra extends TileEntityElectricMachine
 				break;
 			}
 
-			cPos.m_122173_(Direction.DOWN);
+			cPos.move(Direction.DOWN);
 		}
 
 		if ((!upwards || cPos.getY() != pos.getY()) && (upwards || cPos.getY() >= 0))
 		{
-			world.setBlockAndUpdate(upwards ? cPos.m_7494_() : new BlockPos(cPos), to);
+			world.setBlockAndUpdate(upwards ? cPos.above() : new BlockPos(cPos), to);
 			return true;
 		} else
 		{

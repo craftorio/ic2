@@ -7,11 +7,11 @@ public class IdentifierUtil
 {
 	public static String getPath(ItemLike item)
 	{
-		return Registry.f_122827_.getKey(item.m_5456_()).m_135815_();
+		return Registry.ITEM.getKey(item.asItem()).getPath();
 	}
 
 	public static String getNamespace(ItemLike item)
 	{
-		return Registry.f_122827_.getKey(item.m_5456_()).m_135827_();
+		return Registry.ITEM.getKey(item.asItem()).getNamespace();
 	}
 }

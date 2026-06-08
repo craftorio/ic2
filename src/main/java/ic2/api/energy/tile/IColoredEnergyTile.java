@@ -15,7 +15,7 @@ public interface IColoredEnergyTile extends IEnergyTile
 		} else
 		{
 			DyeColor thisColor = this.getColor(side);
-			DyeColor otherColor = other.getColor(side.m_122424_());
+			DyeColor otherColor = other.getColor(side.getOpposite());
 			return thisColor == null || otherColor == null || thisColor == otherColor;
 		}
 	}

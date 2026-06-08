@@ -18,44 +18,44 @@ public class ParticleEntity extends Entity
 	public ParticleEntity(EntityType<?> type, Level world)
 	{
 		super(type, world);
-		this.f_19794_ = true;
+		this.noPhysics = true;
 	}
 
 	public ParticleEntity(TileEntityEmitter emitter)
 	{
 		this(null, emitter.getLevel());
 		Direction dir = emitter.getFacing();
-		double x = emitter.getBlockPos().getX() + 0.5 + dir.m_122429_() * 0.5;
-		double y = emitter.getBlockPos().getY() + 0.5 + dir.m_122430_() * 0.5;
-		double z = emitter.getBlockPos().getZ() + 0.5 + dir.m_122431_() * 0.5;
-		this.m_20248_(x, y, z);
-		this.m_20334_(dir.m_122429_() * 0.5, dir.m_122430_() * 0.5, dir.m_122431_() * 0.5);
+		double x = emitter.getBlockPos().getX() + 0.5 + dir.getStepX() * 0.5;
+		double y = emitter.getBlockPos().getY() + 0.5 + dir.getStepY() * 0.5;
+		double z = emitter.getBlockPos().getZ() + 0.5 + dir.getStepZ() * 0.5;
+		this.absMoveTo(x, y, z);
+		this.setDeltaMovement(dir.getStepX() * 0.5, dir.getStepY() * 0.5, dir.getStepZ() * 0.5);
 	}
 
-	protected void m_8097_()
+	protected void defineSynchedData()
 	{
 	}
 
-	protected void m_7378_(CompoundTag nbttagcompound)
+	protected void readAdditionalSaveData(CompoundTag nbttagcompound)
 	{
 	}
 
-	protected void m_7380_(CompoundTag nbttagcompound)
+	protected void addAdditionalSaveData(CompoundTag nbttagcompound)
 	{
 	}
 
-	public Packet<?> m_5654_()
+	public Packet<?> getAddEntityPacket()
 	{
 		return new ClientboundAddEntityPacket(this);
 	}
 
-	public void m_8119_()
+	public void tick()
 	{
-		this.m_6478_(MoverType.SELF, this.m_20184_());
-		this.m_20256_(this.m_20184_().m_82490_(0.99));
-		if (this.m_20184_().m_82556_() < 1.0E-4)
+		this.move(MoverType.SELF, this.getDeltaMovement());
+		this.setDeltaMovement(this.getDeltaMovement().scale(0.99));
+		if (this.getDeltaMovement().lengthSqr() < 1.0E-4)
 		{
-			this.m_142687_(RemovalReason.DISCARDED);
+			this.remove(RemovalReason.DISCARDED);
 		}
 	}
 }

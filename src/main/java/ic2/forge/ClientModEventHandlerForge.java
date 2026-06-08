@@ -21,7 +21,7 @@ public final class ClientModEventHandlerForge
 	{
 		for (ClientEnvProxyForge.BlockColorProviderRegistration reg : ClientEnvProxyForge.blockColorProviderRegistrations)
 		{
-			event.getBlockColors().m_92589_(reg.provider(), reg.blocks());
+			event.getBlockColors().register(reg.provider(), reg.blocks());
 		}
 	}
 
@@ -30,7 +30,7 @@ public final class ClientModEventHandlerForge
 	{
 		for (ClientEnvProxyForge.ItemColorProviderRegistration reg : ClientEnvProxyForge.itemColorProviderRegistrations)
 		{
-			event.getItemColors().m_92689_(reg.provider(), reg.items());
+			event.getItemColors().register(reg.provider(), reg.items());
 		}
 	}
 

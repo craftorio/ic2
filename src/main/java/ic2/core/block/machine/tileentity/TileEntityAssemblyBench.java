@@ -34,7 +34,7 @@ public class TileEntityAssemblyBench extends TileEntityBatchCrafter implements I
 	{
 		for (CraftingRecipe recipe : RECIPES)
 		{
-			if (recipe.m_5818_(this.crafting, this.getLevel()))
+			if (recipe.matches(this.crafting, this.getLevel()))
 			{
 				return recipe;
 			}
@@ -46,7 +46,7 @@ public class TileEntityAssemblyBench extends TileEntityBatchCrafter implements I
 	@Override
 	public void addInformation(ItemStack stack, List<String> tooltip, TooltipFlag advanced)
 	{
-		tooltip.add("You probably want the " + Localization.translate(Ic2Items.REPLICATOR.m_5524_()));
+		tooltip.add("You probably want the " + Localization.translate(Ic2Items.REPLICATOR.getDescriptionId()));
 	}
 
 	@Override

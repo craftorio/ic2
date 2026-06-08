@@ -26,14 +26,14 @@ public class ItemToolCutter extends ItemToolCrafting implements IEnhancedOverlay
 		super(settings);
 	}
 
-	public InteractionResult m_6225_(UseOnContext context)
+	public InteractionResult useOn(UseOnContext context)
 	{
-		Level world = context.m_43725_();
-		BlockPos pos = context.m_8083_();
+		Level world = context.getLevel();
+		BlockPos pos = context.getClickedPos();
 		BlockState state = world.getBlockState(pos);
 		if (state.getBlock() instanceof CableBlock cable)
 		{
-			Player player = context.m_43723_();
+			Player player = context.getPlayer();
 			Predicate<ItemStack> request = StackUtil.sameItem(Ic2Items.RUBBER);
 			if (player == null)
 			{
@@ -43,7 +43,7 @@ public class ItemToolCutter extends ItemToolCrafting implements IEnhancedOverlay
 			if (StackUtil.consumeFromPlayerInventory(player, request, 1, true) && cable.tryAddInsulation(state, world, pos))
 			{
 				StackUtil.consumeFromPlayerInventory(player, request, 1, false);
-				StackUtil.damageOrError(player, context.m_43724_(), 1);
+				StackUtil.damageOrError(player, context.getHand(), 1);
 				return InteractionResult.SUCCESS;
 			}
 		}
@@ -59,7 +59,7 @@ public class ItemToolCutter extends ItemToolCrafting implements IEnhancedOverlay
 			cable.tryRemoveInsulation(state, world, pos, false);
 			if (world.isClientSide)
 			{
-				player.m_5496_(Ic2SoundEvents.ITEM_CUTTER_USE, 1.0F, 1.0F);
+				player.playSound(Ic2SoundEvents.ITEM_CUTTER_USE, 1.0F, 1.0F);
 			} else
 			{
 				StackUtil.dropAsEntity(world, pos, new ItemStack(Ic2Items.RUBBER));

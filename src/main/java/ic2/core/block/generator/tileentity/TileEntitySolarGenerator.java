@@ -65,26 +65,26 @@ public class TileEntitySolarGenerator extends TileEntityBaseGenerator
 
 	public void updateSunVisibility()
 	{
-		this.skyLight = getSkyLight(this.getLevel(), this.worldPosition.m_7494_());
+		this.skyLight = getSkyLight(this.getLevel(), this.worldPosition.above());
 		this.sunlight = this.skyLight > 0.0F;
 	}
 
 	public static float getSkyLight(Level world, BlockPos pos)
 	{
-		if (!world.m_6042_().f_223549_())
+		if (!world.dimensionType().hasSkyLight())
 		{
 			return 0.0F;
 		}
 
-		float sunBrightness = Util.limit((float) Math.cos(world.m_46490_(1.0F)) * 2.0F + 0.2F, 0.0F, 1.0F);
+		float sunBrightness = Util.limit((float) Math.cos(world.getSunAngle(1.0F)) * 2.0F + 0.2F, 0.0F, 1.0F);
 		if (!IC2.envProxy.biomeHasType(BiomeUtil.getBiome(world, pos), EnvProxy.BiomeType.SANDY))
 		{
-			sunBrightness *= 1.0F - world.m_46722_(1.0F) * 5.0F / 16.0F;
-			sunBrightness *= 1.0F - world.m_46661_(1.0F) * 5.0F / 16.0F;
+			sunBrightness *= 1.0F - world.getRainLevel(1.0F) * 5.0F / 16.0F;
+			sunBrightness *= 1.0F - world.getThunderLevel(1.0F) * 5.0F / 16.0F;
 			sunBrightness = Util.limit(sunBrightness, 0.0F, 1.0F);
 		}
 
-		return world.m_45517_(LightLayer.SKY, pos) / 15.0F * sunBrightness;
+		return world.getBrightness(LightLayer.SKY, pos) / 15.0F * sunBrightness;
 	}
 
 	@Override

@@ -16,7 +16,7 @@ public final class Ic2FluidTags
 
 	private static TagKey<Fluid> create(String fabricName, String forgeName)
 	{
-		ResourceLocation id = ResourceLocation.fromNamespaceAndPath(IC2.envProxy.isFabricEnv() ? fabricName : forgeName);
-		return TagKey.m_203882_(Registry.f_122899_, id);
+		ResourceLocation id = ResourceLocation.parse(IC2.envProxy.isFabricEnv() ? fabricName : forgeName);
+		return TagKey.create(Registry.FLUID_REGISTRY, id);
 	}
 }

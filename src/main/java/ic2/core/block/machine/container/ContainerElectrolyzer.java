@@ -16,7 +16,7 @@ public class ContainerElectrolyzer extends ContainerElectricMachine<TileEntityEl
 
 		for (int i = 0; i < 4; i++)
 		{
-			this.m_38897_(new SlotInvSlot(tileEntity.upgradeSlot, i, 152, 8 + i * 18));
+			this.addSlot(new SlotInvSlot(tileEntity.upgradeSlot, i, 152, 8 + i * 18));
 		}
 	}
 

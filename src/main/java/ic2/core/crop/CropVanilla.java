@@ -28,7 +28,7 @@ public abstract class CropVanilla extends Ic2CropCard
 
 		for (int size = 1; size <= this.getMaxAge(); size++)
 		{
-			ret.add(ResourceLocation.fromNamespaceAndPath("blocks/" + this.getId() + "_stage_" + size));
+			ret.add(ResourceLocation.withDefaultNamespace("blocks/" + this.getId() + "_stage_" + size));
 		}
 
 		return ret;

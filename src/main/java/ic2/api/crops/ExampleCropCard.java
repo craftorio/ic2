@@ -48,7 +48,7 @@ public class ExampleCropCard extends CropCard
 	@Override
 	public ItemStack getGain(ICropTile crop)
 	{
-		return new ItemStack(Items.f_42415_, 1);
+		return new ItemStack(Items.DIAMOND, 1);
 	}
 
 	@Override

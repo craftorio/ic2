@@ -65,7 +65,7 @@ public class GuiIndustrialWorkbench extends Ic2Gui<ContainerIndustrialWorkbench>
 				new CustomButton(
 					this,
 					173,
-					3 + (side.m_122411_() + 5) % 6 * 18,
+					3 + (side.get3DDataValue() + 5) % 6 * 18,
 					18,
 					18,
 					new IClickHandler()
@@ -77,7 +77,7 @@ public class GuiIndustrialWorkbench extends Ic2Gui<ContainerIndustrialWorkbench>
 						public void onClick(MouseButton button)
 						{
 							TileEntityIndustrialWorkbench base = ((ContainerIndustrialWorkbench) GuiIndustrialWorkbench.this.menu).base;
-							assert base.m_58898_();
+							assert base.hasLevel();
 							BlockEntity neighbour = base.getLevel().getBlockEntity(base.getBlockPos().relative(side));
 							assert neighbour instanceof IHasGui;
 							if (neighbour instanceof IPersonalBlock
@@ -98,7 +98,7 @@ public class GuiIndustrialWorkbench extends Ic2Gui<ContainerIndustrialWorkbench>
 
 						private void onScreenClose()
 						{
-							if (!this.keepOpen(SideProxyClient.mc.f_91080_))
+							if (!this.keepOpen(SideProxyClient.mc.screen))
 							{
 								if (!this.firstOpen)
 								{
@@ -137,7 +137,7 @@ public class GuiIndustrialWorkbench extends Ic2Gui<ContainerIndustrialWorkbench>
 						public boolean isEnabled()
 						{
 							TileEntityIndustrialWorkbench base = ((ContainerIndustrialWorkbench) GuiIndustrialWorkbench.this.menu).base;
-							return base.m_58898_() && base.getLevel().getBlockEntity(base.getBlockPos().relative(side)) instanceof IHasGui;
+							return base.hasLevel() && base.getLevel().getBlockEntity(base.getBlockPos().relative(side)) instanceof IHasGui;
 						}
 					})
 					.withIcon(new Supplier<ItemStack>()
@@ -145,7 +145,7 @@ public class GuiIndustrialWorkbench extends Ic2Gui<ContainerIndustrialWorkbench>
 						public ItemStack get()
 						{
 							TileEntityIndustrialWorkbench base = ((ContainerIndustrialWorkbench) GuiIndustrialWorkbench.this.menu).base;
-							assert base.m_58898_();
+							assert base.hasLevel();
 							BlockPos pos = base.getBlockPos().relative(side);
 							BlockState state = base.getLevel().getBlockState(pos);
 							return StackUtil.getPickStack(base.getLevel(), pos, state, ((ContainerIndustrialWorkbench) GuiIndustrialWorkbench.this.menu).player);
@@ -177,7 +177,7 @@ public class GuiIndustrialWorkbench extends Ic2Gui<ContainerIndustrialWorkbench>
 						public String get()
 						{
 							TileEntityIndustrialWorkbench base = ((ContainerIndustrialWorkbench) GuiIndustrialWorkbench.this.menu).base;
-							assert base.m_58898_();
+							assert base.hasLevel();
 							BlockEntity neighbour = base.getLevel().getBlockEntity(base.getBlockPos().relative(side));
 							assert neighbour instanceof IHasGui;
 							return IHasGui.getBeName(neighbour).getString() + "\n" + ChatFormatting.DARK_GRAY + Localization.translate(this.getSideName());
@@ -200,7 +200,7 @@ public class GuiIndustrialWorkbench extends Ic2Gui<ContainerIndustrialWorkbench>
 	}
 
 	@Override
-	protected ResourceLocation getTexture()
+	protected ResourceLocation getTextureLocation()
 	{
 		return TEXTURE;
 	}

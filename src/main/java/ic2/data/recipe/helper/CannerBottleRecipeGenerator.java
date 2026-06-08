@@ -26,7 +26,7 @@ public class CannerBottleRecipeGenerator
 		this.exporter.accept(new Ic2RecipeJsonProvider(Ic2RecipeSerializers.CANNER_BOTTLE, name)
 		{
 			@Override
-			public void m_7917_(JsonObject json)
+			public void serializeRecipeData(JsonObject json)
 			{
 				json.add("container_ingredient", container.toJson());
 				json.add("fill_ingredient", fill.toJson());

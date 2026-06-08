@@ -34,7 +34,7 @@ public class ItemFrequencyTransmitter extends Item
 		super(settings);
 	}
 
-	public InteractionResultHolder<ItemStack> m_7203_(Level world, Player player, InteractionHand hand)
+	public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand)
 	{
 		ItemStack stack = StackUtil.get(player, hand);
 		if (IC2.sideProxy.isSimulating())
@@ -56,12 +56,12 @@ public class ItemFrequencyTransmitter extends Item
 		return new InteractionResultHolder(InteractionResult.SUCCESS, stack);
 	}
 
-	public InteractionResult m_6225_(UseOnContext context)
+	public InteractionResult useOn(UseOnContext context)
 	{
-		Level world = context.m_43725_();
-		Player player = context.m_43723_();
-		BlockPos pos = context.m_8083_();
-		InteractionHand hand = context.m_43724_();
+		Level world = context.getLevel();
+		Player player = context.getPlayer();
+		BlockPos pos = context.getClickedPos();
+		InteractionHand hand = context.getHand();
 		if (player == null)
 		{
 			return InteractionResult.PASS;
@@ -112,20 +112,20 @@ public class ItemFrequencyTransmitter extends Item
 		}
 	}
 
-	public void m_7373_(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag advanced)
+	public void appendHoverText(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag advanced)
 	{
 		CompoundTag nbtData = StackUtil.getOrCreateNbtData(stack);
 		if (nbtData.getBoolean("targetSet"))
 		{
 			tooltip.add(
-				Component.m_237110_(
+				Component.translatable(
 					"ic2.frequency_transmitter.tooltip.target",
 					new Object[] { nbtData.getInt("targetX"), nbtData.getInt("targetY"), nbtData.getInt("targetZ") }
 				)
 			);
 		} else
 		{
-			tooltip.add(Component.m_237115_("ic2.frequency_transmitter.tooltip.blank"));
+			tooltip.add(Component.translatable("ic2.frequency_transmitter.tooltip.blank"));
 		}
 	}
 }

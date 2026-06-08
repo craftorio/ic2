@@ -17,7 +17,7 @@ public class SoundClient extends Sound
 	private EntityTrackingSoundInstance entityTrackingInstance = null;
 	private final List<SoundInstance> startedSoundList = new ArrayList<>();
 	private boolean isStarted = false;
-	public net.minecraft.client.sounds.SoundManager vanillaManager = Minecraft.m_91087_().m_91106_();
+	public net.minecraft.client.sounds.SoundManager vanillaManager = Minecraft.getInstance().getSoundManager();
 
 	protected SoundClient()
 	{
@@ -40,20 +40,20 @@ public class SoundClient extends Sound
 	public void play()
 	{
 		super.play();
-		if (this.repeatInstance != null && !this.vanillaManager.m_120403_(this.repeatInstance))
+		if (this.repeatInstance != null && !this.vanillaManager.isActive(this.repeatInstance))
 		{
-			if (this.vanillaManager.m_120403_(this.onceInstance))
+			if (this.vanillaManager.isActive(this.onceInstance))
 			{
-				this.vanillaManager.m_120399_(this.onceInstance);
+				this.vanillaManager.stop(this.onceInstance);
 			}
 
-			this.vanillaManager.m_120367_(this.repeatInstance);
+			this.vanillaManager.play(this.repeatInstance);
 			this.startedSoundList.add(this.repeatInstance);
 		}
 
-		if (this.entityTrackingInstance != null && !this.vanillaManager.m_120403_(this.entityTrackingInstance))
+		if (this.entityTrackingInstance != null && !this.vanillaManager.isActive(this.entityTrackingInstance))
 		{
-			this.vanillaManager.m_120367_(this.entityTrackingInstance);
+			this.vanillaManager.play(this.entityTrackingInstance);
 			this.startedSoundList.add(this.entityTrackingInstance);
 		}
 
@@ -66,7 +66,7 @@ public class SoundClient extends Sound
 		super.playOnce();
 		if (this.onceInstance != null)
 		{
-			this.vanillaManager.m_120367_(this.onceInstance);
+			this.vanillaManager.play(this.onceInstance);
 			this.startedSoundList.add(this.onceInstance);
 		}
 
@@ -84,14 +84,14 @@ public class SoundClient extends Sound
 	{
 		super.stop();
 		this.isStarted = false;
-		this.vanillaManager.m_120399_(this.repeatInstance);
-		this.vanillaManager.m_120399_(this.onceInstance);
-		this.vanillaManager.m_120399_(this.entityTrackingInstance);
+		this.vanillaManager.stop(this.repeatInstance);
+		this.vanillaManager.stop(this.onceInstance);
+		this.vanillaManager.stop(this.entityTrackingInstance);
 	}
 
 	private boolean isPlayingSound(SoundInstance instance)
 	{
-		return instance != null && this.vanillaManager.m_120403_(instance);
+		return instance != null && this.vanillaManager.isActive(instance);
 	}
 
 	@Override
@@ -120,7 +120,7 @@ public class SoundClient extends Sound
 	{
 		if (instance instanceof ListenableSoundInstance listenableSoundInstance)
 		{
-			if (!this.vanillaManager.m_120403_(instance) && this.startedSoundList.contains(instance))
+			if (!this.vanillaManager.isActive(instance) && this.startedSoundList.contains(instance))
 			{
 				listenableSoundInstance.finish();
 				this.startedSoundList.remove(instance);

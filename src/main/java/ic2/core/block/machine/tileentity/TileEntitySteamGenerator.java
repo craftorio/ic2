@@ -53,7 +53,7 @@ public class TileEntitySteamGenerator extends TileEntityInventory implements IHa
 	{
 		super(Ic2BlockEntities.STEAM_GENERATOR, pos, state);
 		this.waterTank = this.fluids
-			.addTankInsert("waterTank", 10000, Fluids.fluidPredicate(net.minecraft.world.level.material.Fluids.f_76193_, Ic2Fluids.DISTILLED_WATER.still));
+			.addTankInsert("waterTank", 10000, Fluids.fluidPredicate(net.minecraft.world.level.material.Fluids.WATER, Ic2Fluids.DISTILLED_WATER.still));
 	}
 
 	@Override
@@ -72,7 +72,7 @@ public class TileEntitySteamGenerator extends TileEntityInventory implements IHa
 		super.saveAdditional(nbt);
 		nbt.putInt("inputmb", this.inputMB);
 		nbt.putInt("pressurevalve", this.pressure);
-		nbt.m_128350_("systemheat", this.systemHeat);
+		nbt.putFloat("systemheat", this.systemHeat);
 		nbt.putInt("calcification", this.calcification);
 	}
 
@@ -250,10 +250,10 @@ public class TileEntitySteamGenerator extends TileEntityInventory implements IHa
 		{
 			if (world.getBlockEntity(this.worldPosition.relative(dir)) instanceof IHeatSource hs)
 			{
-				int request = hs.drawHeat(dir.m_122424_(), targetHeat, true);
+				int request = hs.drawHeat(dir.getOpposite(), targetHeat, true);
 				if (request > 0)
 				{
-					targetHeat -= hs.drawHeat(dir.m_122424_(), request, false);
+					targetHeat -= hs.drawHeat(dir.getOpposite(), request, false);
 					if (targetHeat == 0)
 					{
 						return requestHeat;

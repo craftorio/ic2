@@ -14,8 +14,8 @@ public class ContainerFluidDistributor extends ContainerFullInv<TileEntityFluidD
 	public ContainerFluidDistributor(int syncId, Inventory playerInventory, TileEntityFluidDistributor be)
 	{
 		super(Ic2ScreenHandlers.FLUID_DISTRIBUTOR, syncId, playerInventory, be, 184);
-		this.m_38897_(new SlotInvSlot(be.inputSlot, 0, 9, 54));
-		this.m_38897_(new SlotInvSlot(be.OutputSlot, 0, 9, 72));
+		this.addSlot(new SlotInvSlot(be.inputSlot, 0, 9, 54));
+		this.addSlot(new SlotInvSlot(be.OutputSlot, 0, 9, 72));
 	}
 
 	@Override

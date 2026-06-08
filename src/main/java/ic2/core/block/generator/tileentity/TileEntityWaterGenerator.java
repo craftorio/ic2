@@ -35,7 +35,7 @@ public class TileEntityWaterGenerator extends TileEntityBaseRotorGenerator imple
 		super(Ic2BlockEntities.WATER_GENERATOR, pos, state, 2.0, 1, 4, 2);
 		this.production = 2.0;
 		this.fuelSlot = new InvSlotConsumableLiquidByList(
-			this, "fuel", allowAutomation ? InvSlot.Access.IO : InvSlot.Access.NONE, 1, InvSlot.InvSide.TOP, InvSlotConsumableLiquid.OpType.Drain, Fluids.f_76193_
+			this, "fuel", allowAutomation ? InvSlot.Access.IO : InvSlot.Access.NONE, 1, InvSlot.InvSide.TOP, InvSlotConsumableLiquid.OpType.Drain, Fluids.WATER
 		);
 	}
 

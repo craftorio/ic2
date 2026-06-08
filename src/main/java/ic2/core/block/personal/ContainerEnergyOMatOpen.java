@@ -14,18 +14,18 @@ public class ContainerEnergyOMatOpen extends ContainerFullInv<TileEntityEnergyOM
 	public ContainerEnergyOMatOpen(int syncId, Inventory playerInventory, TileEntityEnergyOMat be)
 	{
 		super(Ic2ScreenHandlers.ENERGY_O_MAT_OPEN, syncId, playerInventory, be, 166);
-		this.m_38897_(new SlotInvSlot(be.demandSlot, 0, 24, 17));
-		this.m_38897_(new SlotInvSlot(be.upgradeSlot, 0, 24, 53));
-		this.m_38897_(new SlotInvSlot(be.inputSlot, 0, 60, 17));
-		this.m_38897_(new SlotInvSlot(be.chargeSlot, 0, 60, 53));
-		this.m_38895_(new DataSlot()
+		this.addSlot(new SlotInvSlot(be.demandSlot, 0, 24, 17));
+		this.addSlot(new SlotInvSlot(be.upgradeSlot, 0, 24, 53));
+		this.addSlot(new SlotInvSlot(be.inputSlot, 0, 60, 17));
+		this.addSlot(new SlotInvSlot(be.chargeSlot, 0, 60, 53));
+		this.addDataSlot(new DataSlot()
 		{
-			public int m_6501_()
+			public int get()
 			{
 				return ContainerEnergyOMatOpen.this.base.chargeSlot.tier;
 			}
 
-			public void m_6422_(int value)
+			public void set(int value)
 			{
 				ContainerEnergyOMatOpen.this.base.chargeSlot.tier = value;
 			}

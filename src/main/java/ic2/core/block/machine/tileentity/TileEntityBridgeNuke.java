@@ -62,7 +62,7 @@ public abstract class TileEntityBridgeNuke extends TileEntityExplosive
 	@Override
 	protected void onIgnite(LivingEntity igniter)
 	{
-		String cause = igniter == null ? "indirectly" : "by " + igniter.getClass().getSimpleName() + " " + igniter.m_7755_();
+		String cause = igniter == null ? "indirectly" : "by " + igniter.getClass().getSimpleName() + " " + igniter.getName();
 		IC2.log.log(LogCategory.PlayerActivity, Level.INFO, "Nuke at %s was ignited %s.", Util.formatPosition(this), cause);
 	}
 

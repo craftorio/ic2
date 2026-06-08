@@ -31,7 +31,7 @@ public class GuiChunkLoader extends Ic2Gui<ContainerChunkLoader>
 	}
 
 	@Override
-	protected ResourceLocation getTexture()
+	protected ResourceLocation getTextureLocation()
 	{
 		return background;
 	}
@@ -47,11 +47,11 @@ public class GuiChunkLoader extends Ic2Gui<ContainerChunkLoader>
 		{
 			for (int j = -4; j <= 4; j++)
 			{
-				ChunkPos currentChunk = new ChunkPos(mainChunk.f_45578_ + i, mainChunk.f_45579_ + j);
-				int xpos = -this.f_97735_ + 89 + 16 * i;
-				int ypos = -this.f_97736_ + 80 + 16 * j;
+				ChunkPos currentChunk = new ChunkPos(mainChunk.x + i, mainChunk.z + j);
+				int xpos = -this.leftPos + 89 + 16 * i;
+				int ypos = -this.topPos + 80 + 16 * j;
 				this.drawChunkAt(matrices, xpos, ypos, currentChunk);
-				if (loadedChunks.contains(currentChunk.m_45588_()))
+				if (loadedChunks.contains(currentChunk.toLong()))
 				{
 					this.drawColoredRect(matrices, xpos, ypos, 16, 16, 805371648);
 					amountLoadedChunks++;
@@ -69,18 +69,18 @@ public class GuiChunkLoader extends Ic2Gui<ContainerChunkLoader>
 	private void drawChunkAt(PoseStack matrices, int x, int y, ChunkPos chunkPos)
 	{
 		Level world = ((ContainerChunkLoader) this.menu).base.getLevel();
-		LevelChunk chunk = world.m_6325_(chunkPos.f_45578_, chunkPos.f_45579_);
+		LevelChunk chunk = world.getChunk(chunkPos.x, chunkPos.z);
 		MutableBlockPos worldPos = new MutableBlockPos();
 
 		for (int cx = 0; cx < 16; cx++)
 		{
 			for (int cz = 0; cz < 16; cz++)
 			{
-				worldPos.set(chunkPos.f_45578_ << 4 | cx, chunk.m_5885_(Types.WORLD_SURFACE, cx, cz), chunkPos.f_45579_ << 4 | cz);
+				worldPos.set(chunkPos.x << 4 | cx, chunk.getHeight(Types.WORLD_SURFACE, cx, cz), chunkPos.z << 4 | cz);
 				BlockState state = chunk.getBlockState(worldPos);
 				if (state.isAir())
 				{
-					worldPos.m_122173_(Direction.DOWN);
+					worldPos.move(Direction.DOWN);
 					state = chunk.getBlockState(worldPos);
 				}
 
@@ -91,19 +91,19 @@ public class GuiChunkLoader extends Ic2Gui<ContainerChunkLoader>
 
 	private int getColor(BlockState state, Level world, BlockPos pos)
 	{
-		MaterialColor color = state.m_60780_(world, pos);
+		MaterialColor color = state.getMapColor(world, pos);
 		if (color == null)
 		{
 			IC2.log.error(LogCategory.General, "BlockState " + state + " does not have a MapColor set. Please report to the mod author of that mod.");
 			return 0;
 		} else
 		{
-			return color.f_76396_ | 0xFF000000;
+			return color.col | 0xFF000000;
 		}
 	}
 
 	@Override
-	public boolean m_6375_(double mouseX, double mouseY, int mouseButton)
+	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
 	{
 		if (mouseButton == 0)
 		{
@@ -113,19 +113,19 @@ public class GuiChunkLoader extends Ic2Gui<ContainerChunkLoader>
 			{
 				for (int dy = -4; dy <= 4; dy++)
 				{
-					if (mouseX - this.f_97735_ > 89 + 16 * dx
-						&& mouseX - this.f_97735_ <= 89 + 16 * dx + 16
-						&& mouseY - this.f_97736_ > 80 + 16 * dy
-						&& mouseY - this.f_97736_ <= 80 + 16 * dy + 16)
+					if (mouseX - this.leftPos > 89 + 16 * dx
+						&& mouseX - this.leftPos <= 89 + 16 * dx + 16
+						&& mouseY - this.topPos > 80 + 16 * dy
+						&& mouseY - this.topPos <= 80 + 16 * dy + 16)
 					{
-						this.changeChunk(new ChunkPos(mainChunk.f_45578_ + dx, mainChunk.f_45579_ + dy));
+						this.changeChunk(new ChunkPos(mainChunk.x + dx, mainChunk.z + dy));
 						return true;
 					}
 				}
 			}
 		}
 
-		return super.m_6375_(mouseX, mouseY, mouseButton);
+		return super.mouseClicked(mouseX, mouseY, mouseButton);
 	}
 
 	private void changeChunk(ChunkPos chunk)
@@ -134,7 +134,7 @@ public class GuiChunkLoader extends Ic2Gui<ContainerChunkLoader>
 		IC2.network
 			.get(false)
 			.initiateClientTileEntityEvent(
-				((ContainerChunkLoader) this.menu).base, chunk.f_45578_ - mainChunk.f_45578_ + 8 & 15 | (chunk.f_45579_ - mainChunk.f_45579_ + 8 & 15) << 4
+				((ContainerChunkLoader) this.menu).base, chunk.x - mainChunk.x + 8 & 15 | (chunk.z - mainChunk.z + 8 & 15) << 4
 			);
 	}
 }

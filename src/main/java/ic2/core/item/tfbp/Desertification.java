@@ -19,25 +19,25 @@ public class Desertification extends TerraformerBase
 			return false;
 		}
 
-		BlockState sand = Blocks.f_49992_.defaultBlockState();
-		if (!TileEntityTerra.switchGround(world, pos, Blocks.f_50493_, sand, false)
-			&& !TileEntityTerra.switchGround(world, pos, Blocks.f_50034_, sand, false)
-			&& !TileEntityTerra.switchGround(world, pos, Blocks.f_50093_, sand, false))
+		BlockState sand = Blocks.SAND.defaultBlockState();
+		if (!TileEntityTerra.switchGround(world, pos, Blocks.DIRT, sand, false)
+			&& !TileEntityTerra.switchGround(world, pos, Blocks.GRASS, sand, false)
+			&& !TileEntityTerra.switchGround(world, pos, Blocks.FARMLAND, sand, false))
 		{
 			BlockState state = world.getBlockState(pos);
 			Block block = state.getBlock();
-			if (block == Blocks.f_49990_ || block == Blocks.f_50125_ || state.m_204336_(BlockTags.f_13035_) || isPlant(block))
+			if (block == Blocks.WATER || block == Blocks.SNOW || state.is(BlockTags.LEAVES) || isPlant(block))
 			{
 				world.removeBlock(pos, false);
-				if (isPlant(world.getBlockState(pos.m_7494_()).getBlock()))
+				if (isPlant(world.getBlockState(pos.above()).getBlock()))
 				{
-					world.removeBlock(pos.m_7494_(), false);
+					world.removeBlock(pos.above(), false);
 				}
 
 				return true;
-			} else if (block != Blocks.f_50126_ && block != Blocks.f_50125_)
+			} else if (block != Blocks.ICE && block != Blocks.SNOW)
 			{
-				if ((state.m_204336_(BlockTags.f_13090_) || state.m_204336_(BlockTags.f_13105_)) && world.random.nextInt(15) == 0)
+				if ((state.is(BlockTags.PLANKS) || state.is(BlockTags.LOGS_THAT_BURN)) && world.random.nextInt(15) == 0)
 				{
 					world.setBlockAndUpdate(pos, Blocks.FIRE.defaultBlockState());
 					return true;
@@ -47,12 +47,12 @@ public class Desertification extends TerraformerBase
 				}
 			} else
 			{
-				world.setBlockAndUpdate(pos, Blocks.f_49990_.defaultBlockState());
+				world.setBlockAndUpdate(pos, Blocks.WATER.defaultBlockState());
 				return true;
 			}
 		} else
 		{
-			TileEntityTerra.switchGround(world, pos, Blocks.f_50493_, sand, false);
+			TileEntityTerra.switchGround(world, pos, Blocks.DIRT, sand, false);
 			return true;
 		}
 	}
@@ -67,8 +67,8 @@ public class Desertification extends TerraformerBase
 			}
 		}
 
-		return block.m_204297_().m_203656_(BlockTags.f_13104_)
-			|| block.m_204297_().m_203656_(BlockTags.f_13073_)
-			|| block.m_204297_().m_203656_(BlockTags.f_13041_);
+		return block.builtInRegistryHolder().is(BlockTags.SAPLINGS)
+			|| block.builtInRegistryHolder().is(BlockTags.CROPS)
+			|| block.builtInRegistryHolder().is(BlockTags.FLOWERS);
 	}
 }

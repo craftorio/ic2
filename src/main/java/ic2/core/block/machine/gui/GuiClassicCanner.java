@@ -21,7 +21,7 @@ public class GuiClassicCanner extends Ic2Gui<ContainerClassicCanner>
 	}
 
 	@Override
-	protected ResourceLocation getTexture()
+	protected ResourceLocation getTextureLocation()
 	{
 		return background;
 	}

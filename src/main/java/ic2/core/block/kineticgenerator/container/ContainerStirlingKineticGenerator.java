@@ -14,14 +14,14 @@ public class ContainerStirlingKineticGenerator extends ContainerFullInv<TileEnti
 	public ContainerStirlingKineticGenerator(int syncId, Inventory playerInventory, TileEntityStirlingKineticGenerator te)
 	{
 		super(Ic2ScreenHandlers.STIRLING_KINETIC_GENERATOR, syncId, playerInventory, te, 204);
-		this.m_38897_(new SlotInvSlot(te.coolfluidinputSlot, 0, 8, 103));
-		this.m_38897_(new SlotInvSlot(te.cooloutputSlot, 0, 26, 103));
-		this.m_38897_(new SlotInvSlot(te.hotfluidinputSlot, 0, 134, 103));
-		this.m_38897_(new SlotInvSlot(te.hotoutputSlot, 0, 152, 103));
+		this.addSlot(new SlotInvSlot(te.coolfluidinputSlot, 0, 8, 103));
+		this.addSlot(new SlotInvSlot(te.cooloutputSlot, 0, 26, 103));
+		this.addSlot(new SlotInvSlot(te.hotfluidinputSlot, 0, 134, 103));
+		this.addSlot(new SlotInvSlot(te.hotoutputSlot, 0, 152, 103));
 
 		for (int i = 0; i < 3; i++)
 		{
-			this.m_38897_(new SlotInvSlot(te.upgradeSlot, i, 62 + i * 18, 103));
+			this.addSlot(new SlotInvSlot(te.upgradeSlot, i, 62 + i * 18, 103));
 		}
 	}
 

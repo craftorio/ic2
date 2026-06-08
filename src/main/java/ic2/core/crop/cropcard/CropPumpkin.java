@@ -39,13 +39,13 @@ public class CropPumpkin extends CropVanillaStem
 	@Override
 	protected ItemStack getProduct()
 	{
-		return new ItemStack(Blocks.f_50133_);
+		return new ItemStack(Blocks.PUMPKIN);
 	}
 
 	@Override
 	protected ItemStack getSeeds()
 	{
-		return new ItemStack(Items.f_42577_, IC2.random.nextInt(3) + 1);
+		return new ItemStack(Items.PUMPKIN_SEEDS, IC2.random.nextInt(3) + 1);
 	}
 
 	@Override

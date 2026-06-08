@@ -31,7 +31,7 @@ public class GuiFermenter extends Ic2Gui<ContainerFermenter>
 	}
 
 	@Override
-	protected ResourceLocation getTexture()
+	protected ResourceLocation getTextureLocation()
 	{
 		return TEXTURE;
 	}

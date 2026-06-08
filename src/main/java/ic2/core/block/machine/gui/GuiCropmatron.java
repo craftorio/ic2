@@ -19,7 +19,7 @@ public class GuiCropmatron extends Ic2Gui<ContainerCropmatron>
 	}
 
 	@Override
-	public ResourceLocation getTexture()
+	public ResourceLocation getTextureLocation()
 	{
 		return ResourceLocation.fromNamespaceAndPath("ic2", "textures/gui/guicropmatron.png");
 	}

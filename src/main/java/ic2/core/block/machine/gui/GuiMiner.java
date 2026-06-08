@@ -16,7 +16,7 @@ public class GuiMiner extends Ic2Gui<ContainerMiner>
 	}
 
 	@Override
-	protected ResourceLocation getTexture()
+	protected ResourceLocation getTextureLocation()
 	{
 		return ResourceLocation.fromNamespaceAndPath("ic2", "textures/gui/guiminer.png");
 	}

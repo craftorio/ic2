@@ -63,12 +63,12 @@ public class ItemArmorNightVisionGoggles extends ItemArmorUtility implements IEl
 		return info;
 	}
 
-	public void m_6883_(ItemStack stack, Level world, Entity entity, int slot, boolean selected)
+	public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected)
 	{
-		super.m_6883_(stack, world, entity, slot, selected);
+		super.inventoryTick(stack, world, entity, slot, selected);
 		if (entity instanceof Player player)
 		{
-			if (slot == this.f_40377_.m_20749_())
+			if (slot == this.slot.getIndex())
 			{
 				CompoundTag nbtData = StackUtil.getOrCreateNbtData(stack);
 				boolean active = nbtData.getBoolean("active");
@@ -97,31 +97,31 @@ public class ItemArmorNightVisionGoggles extends ItemArmorUtility implements IEl
 
 				if (active && IC2.sideProxy.isSimulating())
 				{
-					int skylight = player.getCommandSenderWorld().m_46803_(new BlockPos(player.m_20182_()));
+					int skylight = player.getCommandSenderWorld().getMaxLocalRawBrightness(new BlockPos(player.position()));
 					if (skylight <= 8 && ElectricItem.manager.use(stack, 1.0, player))
 					{
-						player.m_7292_(new MobEffectInstance(MobEffects.f_19611_, 300, 0, true, true));
+						player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 300, 0, true, true));
 						return;
 					}
 				}
 
 				if (IC2.sideProxy.isSimulating())
 				{
-					player.m_21195_(MobEffects.f_19611_);
+					player.removeEffect(MobEffects.NIGHT_VISION);
 				}
 			}
 		}
 	}
 
-	public void m_6787_(CreativeModeTab tab, NonNullList<ItemStack> subItems)
+	public void fillItemCategory(CreativeModeTab tab, NonNullList<ItemStack> subItems)
 	{
-		if (this.m_220152_(tab))
+		if (this.allowedIn(tab))
 		{
 			ElectricItemManager.addChargeVariants(this, subItems);
 		}
 	}
 
-	public boolean m_6832_(ItemStack par1ItemStack, ItemStack par2ItemStack)
+	public boolean isValidRepairItem(ItemStack par1ItemStack, ItemStack par2ItemStack)
 	{
 		return false;
 	}

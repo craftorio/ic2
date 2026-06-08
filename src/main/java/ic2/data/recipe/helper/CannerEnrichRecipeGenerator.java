@@ -26,7 +26,7 @@ public class CannerEnrichRecipeGenerator
 		this.exporter.accept(new Ic2RecipeJsonProvider(Ic2RecipeSerializers.CANNER_ENRICH, name)
 		{
 			@Override
-			public void m_7917_(JsonObject json)
+			public void serializeRecipeData(JsonObject json)
 			{
 				json.add("input_ingredient", RecipeIo.fluidStackToJson(input));
 				json.add("additive_ingredient", additive.toJson());

@@ -34,7 +34,8 @@ public class RecipeInputFactory implements IRecipeInputFactory
 	@Override
 	public IRecipeInput forTag(String name, int amount)
 	{
-		return this.forIngredient(Ingredient.m_204132_(TagKey.m_203882_(Registry.f_122904_, ResourceLocation.fromNamespaceAndPath(name))), amount);
+		// TODO
+		return this.forIngredient(Ingredient.of(TagKey.create(Registry.ITEM_REGISTRY, ResourceLocation.parse(name))), amount);
 	}
 
 	@Override

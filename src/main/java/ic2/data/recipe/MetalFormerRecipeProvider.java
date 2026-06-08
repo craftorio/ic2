@@ -46,11 +46,11 @@ public class MetalFormerRecipeProvider extends Ic2RecipeProvider
 		gen.add(Ic2ItemTags.IRON_PLATES, 1, Ic2Items.FUEL_ROD);
 		gen.add(Ic2Items.TIN_CASING, 1, Ic2Items.TIN_CAN);
 		gen.add(Ic2ItemTags.BRONZE_BLOCKS, 1, Ic2Items.BRONZE_SHAFT);
-		gen.add(Items.f_41913_, 1, Ic2Items.IRON_SHAFT);
+		gen.add(Items.IRON_BLOCK, 1, Ic2Items.IRON_SHAFT);
 		gen.add(Ic2ItemTags.STEEL_BLOCKS, 1, Ic2Items.STEEL_SHAFT);
-		gen.add(Items.f_151052_, 1, Ic2Items.COPPER_CABLE, 3);
-		gen.add(Items.f_42417_, 1, Ic2Items.GOLD_CABLE, 4);
-		gen.add(Items.f_42416_, 1, Ic2Items.IRON_CABLE, 4);
+		gen.add(Items.COPPER_INGOT, 1, Ic2Items.COPPER_CABLE, 3);
+		gen.add(Items.GOLD_INGOT, 1, Ic2Items.GOLD_CABLE, 4);
+		gen.add(Items.IRON_INGOT, 1, Ic2Items.IRON_CABLE, 4);
 		gen.add(Ic2ItemTags.TIN_INGOTS, 1, Ic2Items.TIN_CABLE, 3);
 	}
 
@@ -58,9 +58,9 @@ public class MetalFormerRecipeProvider extends Ic2RecipeProvider
 	{
 		BasicMachineRecipeGenerator gen = new BasicMachineRecipeGenerator(consumer, Ic2RecipeSerializers.METAL_FORMER_ROLLING);
 		gen.add(Ic2ItemTags.BRONZE_INGOTS, 1, Ic2Items.BRONZE_PLATE);
-		gen.add(Items.f_151052_, 1, Ic2Items.COPPER_PLATE);
-		gen.add(Items.f_42417_, 1, Ic2Items.GOLD_PLATE);
-		gen.add(Items.f_42416_, 1, Ic2Items.IRON_PLATE);
+		gen.add(Items.COPPER_INGOT, 1, Ic2Items.COPPER_PLATE);
+		gen.add(Items.GOLD_INGOT, 1, Ic2Items.GOLD_PLATE);
+		gen.add(Items.IRON_INGOT, 1, Ic2Items.IRON_PLATE);
 		gen.add(Ic2ItemTags.LEAD_INGOTS, 1, Ic2Items.LEAD_PLATE);
 		gen.add(Ic2ItemTags.STEEL_INGOTS, 1, Ic2Items.STEEL_PLATE);
 		gen.add(Ic2ItemTags.TIN_INGOTS, 1, Ic2Items.TIN_PLATE);

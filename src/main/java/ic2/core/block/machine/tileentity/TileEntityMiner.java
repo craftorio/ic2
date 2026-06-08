@@ -164,19 +164,19 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
 			return this.withDrawPipe(operatingPos);
 		}
 
-		if (operatingPos.getY() >= this.level.m_141937_())
+		if (operatingPos.getY() >= this.level.getMinBuildHeight())
 		{
 			Level world = this.getLevel();
 			BlockState state = world.getBlockState(operatingPos);
 			if (state.getBlock() != Ic2Blocks.MINING_PIPE_TIP)
 			{
-				return operatingPos.getY() > world.m_141937_() ? this.digDown(operatingPos, state, false) : false;
+				return operatingPos.getY() > world.getMinBuildHeight() ? this.digDown(operatingPos, state, false) : false;
 			} else
 			{
 				TileEntityMiner.MineResult result = this.mineLevel(operatingPos.getY());
 				if (result == TileEntityMiner.MineResult.Done)
 				{
-					operatingPos.m_122173_(Direction.DOWN);
+					operatingPos.move(Direction.DOWN);
 					state = world.getBlockState(operatingPos);
 					return this.digDown(operatingPos, state, true);
 				} else
@@ -192,9 +192,9 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
 
 	private MutableBlockPos getOperationPos()
 	{
-		MutableBlockPos ret = this.worldPosition.m_122032_().m_122173_(Direction.DOWN);
+		MutableBlockPos ret = this.worldPosition.mutable().move(Direction.DOWN);
 		Level world = this.getLevel();
-		int bottom = world.m_141937_();
+		int bottom = world.getMinBuildHeight();
 		BlockState pipeState = Ic2Blocks.MINING_PIPE.defaultBlockState();
 
 		while (ret.getY() >= bottom)
@@ -205,7 +205,7 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
 				return ret;
 			}
 
-			ret.m_122173_(Direction.DOWN);
+			ret.move(Direction.DOWN);
 		}
 
 		return ret;
@@ -219,9 +219,9 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
 			this.progress = 0;
 		}
 
-		if (operatingPos.getY() < this.level.m_141937_() || this.level.getBlockState(operatingPos).getBlock() != Ic2Blocks.MINING_PIPE_TIP)
+		if (operatingPos.getY() < this.level.getMinBuildHeight() || this.level.getBlockState(operatingPos).getBlock() != Ic2Blocks.MINING_PIPE_TIP)
 		{
-			operatingPos.m_122173_(Direction.UP);
+			operatingPos.move(Direction.UP);
 		}
 
 		if (operatingPos.getY() != this.worldPosition.getY() && this.energy.getEnergy() >= 3.0)
@@ -255,7 +255,7 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
 			Item fillerItem = filler.getItem();
 			if (fillerItem instanceof BlockItem)
 			{
-				((BlockItem) fillerItem).m_40576_(new DirectionalPlaceContext(world, operatingPos.m_7494_(), Direction.DOWN, filler, Direction.UP));
+				((BlockItem) fillerItem).place(new DirectionalPlaceContext(world, operatingPos.above(), Direction.DOWN, filler, Direction.UP));
 			}
 		}
 	}
@@ -268,11 +268,11 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
 			return false;
 		}
 
-		if (operatingPos.getY() < this.level.m_141937_())
+		if (operatingPos.getY() < this.level.getMinBuildHeight())
 		{
 			if (removeTipAbove)
 			{
-				this.getLevel().setBlockAndUpdate(operatingPos.m_142448_(this.level.m_141937_()), Ic2Blocks.MINING_PIPE.defaultBlockState());
+				this.getLevel().setBlockAndUpdate(operatingPos.setY(this.level.getMinBuildHeight()), Ic2Blocks.MINING_PIPE.defaultBlockState());
 			}
 
 			return false;
@@ -285,7 +285,7 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
 				{
 					if (removeTipAbove)
 					{
-						this.getLevel().setBlockAndUpdate(operatingPos.m_7494_(), Ic2Blocks.MINING_PIPE.defaultBlockState());
+						this.getLevel().setBlockAndUpdate(operatingPos.above(), Ic2Blocks.MINING_PIPE.defaultBlockState());
 					}
 
 					this.pipeSlot.consume(1);
@@ -297,7 +297,7 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
 			{
 				if (removeTipAbove)
 				{
-					this.getLevel().setBlockAndUpdate(operatingPos.m_122173_(Direction.UP), Ic2Blocks.MINING_PIPE.defaultBlockState());
+					this.getLevel().setBlockAndUpdate(operatingPos.move(Direction.UP), Ic2Blocks.MINING_PIPE.defaultBlockState());
 				}
 
 				return false;
@@ -335,7 +335,7 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
 				BlockState state = world.getBlockState(target);
 				boolean isValidTarget = false;
 				if ((
-					state.m_204336_(Ic2BlockTags.ORES)
+					state.is(Ic2BlockTags.ORES)
 						|| OreValues.get(StackUtil.getDrops(world, target, state, 0)) > 0
 						|| OreValues.get(StackUtil.getPickStack(world, target, state, player)) > 0
 				)
@@ -586,9 +586,9 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
 			return true;
 		}
 
-		if (block != Ic2Blocks.MINING_PIPE && block != Ic2Blocks.MINING_PIPE_TIP && block != Blocks.f_50087_)
+		if (block != Ic2Blocks.MINING_PIPE && block != Ic2Blocks.MINING_PIPE_TIP && block != Blocks.CHEST)
 		{
-			if ((block == Blocks.f_49990_ || block == Blocks.f_49991_ || FluidHandler.getWorldFluid(state) != null) && this.isPumpConnected(target))
+			if ((block == Blocks.WATER || block == Blocks.LAVA || FluidHandler.getWorldFluid(state) != null) && this.isPumpConnected(target))
 			{
 				return true;
 			} else
@@ -597,15 +597,15 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
 				if (state.getDestroySpeed(world, target) < 0.0F)
 				{
 					return false;
-				} else if (!state.m_60834_())
+				} else if (!state.requiresCorrectToolForDrops())
 				{
 					return true;
-				} else if (block == Blocks.f_50033_)
+				} else if (block == Blocks.COBWEB)
 				{
 					return true;
 				} else
 				{
-					return !this.drillSlot.isEmpty() ? this.drillSlot.get().m_41735_(state) : false;
+					return !this.drillSlot.isEmpty() ? this.drillSlot.get().isCorrectToolForDrops(state) : false;
 				}
 			}
 		} else

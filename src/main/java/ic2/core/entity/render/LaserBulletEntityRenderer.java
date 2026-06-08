@@ -27,17 +27,17 @@ public class LaserBulletEntityRenderer extends EntityRenderer<LaserBulletEntity>
 
 	public void render(LaserBulletEntity entity, float f, float g, PoseStack matrixStack, MultiBufferSource vertexConsumerProvider, int i)
 	{
-		matrixStack.m_85836_();
-		matrixStack.m_85845_(Vector3f.f_122225_.m_122240_(Mth.m_14179_(g, entity.f_19859_, entity.m_146908_()) - 90.0F));
-		matrixStack.m_85845_(Vector3f.f_122227_.m_122240_(Mth.m_14179_(g, entity.f_19860_, entity.m_146909_())));
-		matrixStack.m_85845_(Vector3f.f_122227_.m_122240_(0.0F));
-		matrixStack.m_85845_(Vector3f.f_122223_.m_122240_(45.0F));
-		matrixStack.m_85841_(0.05625F, 0.05625F, 0.05625F);
-		matrixStack.m_85837_(-4.0, 0.0, 0.0);
-		VertexConsumer vertexConsumer = vertexConsumerProvider.m_6299_(RenderType.m_110452_(this.getTexture(entity)));
-		Pose entry = matrixStack.m_85850_();
-		Matrix4f matrix4f = entry.m_85861_();
-		Matrix3f matrix3f = entry.m_85864_();
+		matrixStack.pushPose();
+		matrixStack.mulPose(Vector3f.YP.rotationDegrees(Mth.lerp(g, entity.yRotO, entity.getYRot()) - 90.0F));
+		matrixStack.mulPose(Vector3f.ZP.rotationDegrees(Mth.lerp(g, entity.xRotO, entity.getXRot())));
+		matrixStack.mulPose(Vector3f.ZP.rotationDegrees(0.0F));
+		matrixStack.mulPose(Vector3f.XP.rotationDegrees(45.0F));
+		matrixStack.scale(0.05625F, 0.05625F, 0.05625F);
+		matrixStack.translate(-4.0, 0.0, 0.0);
+		VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(RenderType.entityCutout(this.getTextureLocation(entity)));
+		Pose entry = matrixStack.last();
+		Matrix4f matrix4f = entry.pose();
+		Matrix3f matrix3f = entry.normal();
 		this.vertex(matrix4f, matrix3f, vertexConsumer, -7, -2, -2, 0.0F, 0.15625F, -1, 0, 0, i);
 		this.vertex(matrix4f, matrix3f, vertexConsumer, -7, -2, 2, 0.15625F, 0.15625F, -1, 0, 0, i);
 		this.vertex(matrix4f, matrix3f, vertexConsumer, -7, 2, 2, 0.15625F, 0.3125F, -1, 0, 0, i);
@@ -49,15 +49,15 @@ public class LaserBulletEntityRenderer extends EntityRenderer<LaserBulletEntity>
 
 		for (int u = 0; u < 4; u++)
 		{
-			matrixStack.m_85845_(Vector3f.f_122223_.m_122240_(90.0F));
+			matrixStack.mulPose(Vector3f.XP.rotationDegrees(90.0F));
 			this.vertex(matrix4f, matrix3f, vertexConsumer, -8, -2, 0, 0.0F, 0.0F, 0, 1, 0, i);
 			this.vertex(matrix4f, matrix3f, vertexConsumer, 8, -2, 0, 0.5F, 0.0F, 0, 1, 0, i);
 			this.vertex(matrix4f, matrix3f, vertexConsumer, 8, 2, 0, 0.5F, 0.15625F, 0, 1, 0, i);
 			this.vertex(matrix4f, matrix3f, vertexConsumer, -8, 2, 0, 0.0F, 0.15625F, 0, 1, 0, i);
 		}
 
-		matrixStack.m_85849_();
-		super.m_7392_(entity, f, g, matrixStack, vertexConsumerProvider, i);
+		matrixStack.popPose();
+		super.render(entity, f, g, matrixStack, vertexConsumerProvider, i);
 	}
 
 	public void vertex(
@@ -75,16 +75,16 @@ public class LaserBulletEntityRenderer extends EntityRenderer<LaserBulletEntity>
 		int light
 	)
 	{
-		vertexConsumer.m_85982_(positionMatrix, x, y, z)
-			.m_6122_(255, 255, 255, 255)
-			.m_7421_(u, v)
-			.m_86008_(OverlayTexture.f_118083_)
-			.m_85969_(light)
-			.m_85977_(normalMatrix, normalX, normalY, normalZ)
-			.m_5752_();
+		vertexConsumer.vertex(positionMatrix, x, y, z)
+			.color(255, 255, 255, 255)
+			.uv(u, v)
+			.overlayCoords(OverlayTexture.NO_OVERLAY)
+			.uv2(light)
+			.normal(normalMatrix, normalX, normalY, normalZ)
+			.endVertex();
 	}
 
-	public ResourceLocation getTexture(LaserBulletEntity entity)
+	public ResourceLocation getTextureLocation(LaserBulletEntity entity)
 	{
 		return TEXTURE;
 	}

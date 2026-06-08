@@ -112,10 +112,10 @@ public class WindSim
 			+ this.windHeightCoefficients[2] * height * height * height;
 		heightMultiplier = Math.max(0.0, heightMultiplier);
 		ret *= heightMultiplier;
-		if (this.world.m_46470_())
+		if (this.world.isThundering())
 		{
 			ret *= 1.5;
-		} else if (this.world.m_46471_())
+		} else if (this.world.isRaining())
 		{
 			ret *= 1.25;
 		}

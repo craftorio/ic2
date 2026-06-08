@@ -48,15 +48,15 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadAwareBlock, SimpleWaterloggedBlock
 {
 	public static final DyeColor DEFAULT_COLOR = DyeColor.BLACK;
-	public static final EnumProperty<DyeColor> colorProperty = EnumProperty.m_61587_("color", DyeColor.class);
-	public static final EnumProperty<CableFoam> foamProperty = EnumProperty.m_61587_("foam", CableFoam.class);
-	public static final BooleanProperty WATERLOGGED = BlockStateProperties.f_61362_;
-	public static final BooleanProperty UP = BlockStateProperties.f_61366_;
-	public static final BooleanProperty DOWN = BlockStateProperties.f_61367_;
-	public static final BooleanProperty NORTH = BlockStateProperties.f_61368_;
-	public static final BooleanProperty EAST = BlockStateProperties.f_61369_;
-	public static final BooleanProperty SOUTH = BlockStateProperties.f_61370_;
-	public static final BooleanProperty WEST = BlockStateProperties.f_61371_;
+	public static final EnumProperty<DyeColor> colorProperty = EnumProperty.create("color", DyeColor.class);
+	public static final EnumProperty<CableFoam> foamProperty = EnumProperty.create("foam", CableFoam.class);
+	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
+	public static final BooleanProperty UP = BlockStateProperties.UP;
+	public static final BooleanProperty DOWN = BlockStateProperties.DOWN;
+	public static final BooleanProperty NORTH = BlockStateProperties.NORTH;
+	public static final BooleanProperty EAST = BlockStateProperties.EAST;
+	public static final BooleanProperty SOUTH = BlockStateProperties.SOUTH;
+	public static final BooleanProperty WEST = BlockStateProperties.WEST;
 	private static final Map<CableType, Int2ReferenceMap<AbstractCableBlock>> types = new EnumMap<>(CableType.class);
 	private static boolean pendingHasColor;
 	private boolean hasColor;
@@ -85,7 +85,7 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 			}
 		}
 
-		this.m_49959_(defaultState);
+		this.registerDefaultState(defaultState);
 	}
 
 	protected BlockState copyState(BlockState from, AbstractCableBlock to)
@@ -128,7 +128,7 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 		this.type = type;
 		this.insulation = insulation;
 		this.hasColor = insulation >= type.minColoredInsulation;
-		BlockState defaultState = (BlockState) this.f_49792_.m_61090_();
+		BlockState defaultState = (BlockState) this.stateDefinition.any();
 		if (!this.isFoam())
 		{
 			defaultState = (BlockState) defaultState.setValue(WATERLOGGED, false);
@@ -141,35 +141,35 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 		}
 	}
 
-	protected void m_7926_(Builder<Block, BlockState> builder)
+	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
 		if (this.isFoam())
 		{
-			builder.m_61104_(new Property[] { foamProperty });
+			builder.add(new Property[] { foamProperty });
 		} else
 		{
-			builder.m_61104_(new Property[] { WATERLOGGED, UP, DOWN, NORTH, EAST, SOUTH, WEST });
+			builder.add(new Property[] { WATERLOGGED, UP, DOWN, NORTH, EAST, SOUTH, WEST });
 		}
 
 		if (pendingHasColor)
 		{
-			builder.m_61104_(new Property[] { colorProperty });
+			builder.add(new Property[] { colorProperty });
 		}
 	}
 
-	public FluidState m_5888_(BlockState state)
+	public FluidState getFluidState(BlockState state)
 	{
-		return !this.isFoam() && state.getValue(WATERLOGGED) ? Fluids.f_76193_.m_76068_(false) : Fluids.f_76191_.defaultFluidState();
+		return !this.isFoam() && state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : Fluids.EMPTY.defaultFluidState();
 	}
 
 	public BlockState withConnectionStates(BlockState state, Level world, BlockPos pos)
 	{
-		boolean isConnectedDown = this.isConnectedWith(state, null, world, pos.m_7495_());
-		boolean isConnectedUp = this.isConnectedWith(state, null, world, pos.m_7494_());
-		boolean isConnectedNorth = this.isConnectedWith(state, null, world, pos.m_122012_());
-		boolean isConnectedEast = this.isConnectedWith(state, null, world, pos.m_122029_());
-		boolean isConnectedSouth = this.isConnectedWith(state, null, world, pos.m_122019_());
-		boolean isConnectedWest = this.isConnectedWith(state, null, world, pos.m_122024_());
+		boolean isConnectedDown = this.isConnectedWith(state, null, world, pos.below());
+		boolean isConnectedUp = this.isConnectedWith(state, null, world, pos.above());
+		boolean isConnectedNorth = this.isConnectedWith(state, null, world, pos.north());
+		boolean isConnectedEast = this.isConnectedWith(state, null, world, pos.east());
+		boolean isConnectedSouth = this.isConnectedWith(state, null, world, pos.south());
+		boolean isConnectedWest = this.isConnectedWith(state, null, world, pos.west());
 		return (BlockState) ((BlockState) ((BlockState) ((BlockState) ((BlockState) ((BlockState) state.setValue(DOWN, isConnectedDown)).setValue(UP, isConnectedUp))
 			.setValue(NORTH, isConnectedNorth))
 			.setValue(EAST, isConnectedEast))
@@ -186,7 +186,7 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 
 		if (!(neighborState.getBlock() instanceof AbstractCableBlock neighborBlock))
 		{
-			return neighborState.m_204336_(Ic2BlockTags.CABLE_CONNECTABLE);
+			return neighborState.is(Ic2BlockTags.CABLE_CONNECTABLE);
 		} else if (neighborBlock.hasColor() && this.hasColor())
 		{
 			DyeColor color = this.getColor(state);
@@ -198,18 +198,18 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 		}
 	}
 
-	public BlockState m_5573_(BlockPlaceContext ctx)
+	public BlockState getStateForPlacement(BlockPlaceContext ctx)
 	{
 		BlockState ret = this.defaultBlockState();
-		Fluid fluid = ctx.m_43725_().m_6425_(ctx.m_8083_()).m_76152_();
-		if (fluid == Fluids.f_76193_)
+		Fluid fluid = ctx.getLevel().getFluidState(ctx.getClickedPos()).getType();
+		if (fluid == Fluids.WATER)
 		{
 			ret = (BlockState) ret.setValue(WATERLOGGED, true);
 		}
 
 		if (!this.isFoam())
 		{
-			ret = this.withConnectionStates(ret, ctx.m_43725_(), ctx.m_8083_());
+			ret = this.withConnectionStates(ret, ctx.getLevel(), ctx.getClickedPos());
 		} else if (fluid == Ic2Fluids.CONSTRUCTION_FOAM.still)
 		{
 			ret = (BlockState) ret.setValue(foamProperty, CableFoam.SOFT);
@@ -218,87 +218,87 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 		return ret;
 	}
 
-	public VoxelShape m_7952_(BlockState state, BlockGetter world, BlockPos pos)
+	public VoxelShape getOcclusionShape(BlockState state, BlockGetter world, BlockPos pos)
 	{
 		if (!this.isFoam())
 		{
-			return super.m_7952_(state, world, pos);
+			return super.getOcclusionShape(state, world, pos);
 		} else
 		{
-			return ((CableFoam) state.getValue(foamProperty)).isSoft() ? Shapes.m_83040_() : super.m_7952_(state, world, pos);
+			return ((CableFoam) state.getValue(foamProperty)).isSoft() ? Shapes.empty() : super.getOcclusionShape(state, world, pos);
 		}
 	}
 
-	public VoxelShape m_5940_(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context)
+	public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context)
 	{
 		if (!this.isFoam())
 		{
-			return super.m_5940_(state, world, pos, context);
+			return super.getShape(state, world, pos, context);
 		} else
 		{
-			return ((CableFoam) state.getValue(foamProperty)).isPresent() ? Shapes.block() : Shapes.m_83040_();
+			return ((CableFoam) state.getValue(foamProperty)).isPresent() ? Shapes.block() : Shapes.empty();
 		}
 	}
 
-	public BlockState m_7417_(BlockState state, Direction direction, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos)
+	public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos)
 	{
 		if (!this.isFoam() && (Boolean) state.getValue(WATERLOGGED))
 		{
-			world.m_186469_(pos, Fluids.f_76193_, Fluids.f_76193_.m_6718_(world));
+			world.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
 		}
 
 		if (!this.isFoam())
 		{
 			boolean isConnected = this.isConnectedWith(state, neighborState, (Level) world, neighborPos);
-			return (BlockState) state.setValue((Property) PipeBlock.f_55154_.get(direction), isConnected);
+			return (BlockState) state.setValue((Property) PipeBlock.PROPERTY_BY_DIRECTION.get(direction), isConnected);
 		} else
 		{
-			return super.m_7417_(state, direction, neighborState, world, pos, neighborPos);
+			return super.updateShape(state, direction, neighborState, world, pos, neighborPos);
 		}
 	}
 
-	public boolean m_6044_(BlockGetter world, BlockPos pos, BlockState state, Fluid fluid)
+	public boolean canPlaceLiquid(BlockGetter world, BlockPos pos, BlockState state, Fluid fluid)
 	{
-		return !this.isFoam() && !(Boolean) state.getValue(WATERLOGGED) && fluid == Fluids.f_76193_;
+		return !this.isFoam() && !(Boolean) state.getValue(WATERLOGGED) && fluid == Fluids.WATER;
 	}
 
-	public boolean m_7361_(LevelAccessor world, BlockPos pos, BlockState state, FluidState fluidState)
+	public boolean placeLiquid(LevelAccessor world, BlockPos pos, BlockState state, FluidState fluidState)
 	{
-		if (!this.m_6044_(world, pos, state, fluidState.m_76152_()))
+		if (!this.canPlaceLiquid(world, pos, state, fluidState.getType()))
 		{
 			return false;
 		}
 
-		if (!world.m_5776_())
+		if (!world.isClientSide())
 		{
-			world.m_7731_(pos, (BlockState) state.setValue(WATERLOGGED, true), 3);
-			world.m_186469_(pos, fluidState.m_76152_(), fluidState.m_76152_().m_6718_(world));
+			world.setBlock(pos, (BlockState) state.setValue(WATERLOGGED, true), 3);
+			world.scheduleTick(pos, fluidState.getType(), fluidState.getType().getTickDelay(world));
 		}
 
 		return true;
 	}
 
-	public ItemStack m_142598_(LevelAccessor world, BlockPos pos, BlockState state)
+	public ItemStack pickupBlock(LevelAccessor world, BlockPos pos, BlockState state)
 	{
 		if (!this.isFoam() && (Boolean) state.getValue(WATERLOGGED))
 		{
-			world.m_7731_(pos, (BlockState) state.setValue(WATERLOGGED, false), 3);
-			return new ItemStack(Items.f_42447_);
+			world.setBlock(pos, (BlockState) state.setValue(WATERLOGGED, false), 3);
+			return new ItemStack(Items.WATER_BUCKET);
 		} else
 		{
 			return ItemStack.EMPTY;
 		}
 	}
 
-	public void m_6256_(BlockState state, Level world, BlockPos pos, Player player)
+	public void attack(BlockState state, Level world, BlockPos pos, Player player)
 	{
 		if (!this.isHardFoam(state))
 		{
-			ItemStack stack = player.m_21205_();
+			ItemStack stack = player.getMainHandItem();
 			Item item = stack.getItem();
 			if (item instanceof ItemToolCutter)
 			{
-				((ItemToolCutter) item).removeInsulation(player, player.m_7655_(), state, world, pos);
+				((ItemToolCutter) item).removeInsulation(player, player.getUsedItemHand(), state, world, pos);
 			}
 		}
 	}
@@ -387,15 +387,15 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 		return true;
 	}
 
-	public void m_6810_(BlockState state, Level world, BlockPos pos, BlockState newState, boolean moved)
+	public void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean moved)
 	{
-		if (!newState.m_60713_(this) || this.getColor(newState) != this.getColor(state))
+		if (!newState.is(this) || this.getColor(newState) != this.getColor(state))
 		{
 			this.removeFromEnet(state, world, pos);
 		}
 	}
 
-	public void m_6807_(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify)
+	public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify)
 	{
 		this.addToEnet(state, world, pos, true);
 	}
@@ -439,7 +439,7 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 		{
 			this.state = state;
 			this.world = world;
-			this.pos = pos.m_7949_();
+			this.pos = pos.immutable();
 		}
 
 		@Override

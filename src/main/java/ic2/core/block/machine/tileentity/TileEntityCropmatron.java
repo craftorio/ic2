@@ -50,7 +50,7 @@ public class TileEntityCropmatron extends TileEntityElectricMachine implements I
 	public TileEntityCropmatron(BlockPos pos, BlockState state)
 	{
 		super(Ic2BlockEntities.CROPMATRON, pos, state, 10000, 1);
-		this.waterTank = this.fluids.addTankInsert("waterTank", 2000, Fluids.fluidPredicate(net.minecraft.world.level.material.Fluids.f_76193_));
+		this.waterTank = this.fluids.addTankInsert("waterTank", 2000, Fluids.fluidPredicate(net.minecraft.world.level.material.Fluids.WATER));
 		this.exTank = this.fluids.addTankInsert("exTank", 2000, Fluids.fluidPredicate(Ic2Fluids.WEED_EX.still));
 		this.fertilizerSlot = new InvSlotConsumableItemStack(this, "fertilizer", 7, new ItemStack(Ic2Items.FERTILIZER));
 		this.wasserinputSlot = new InvSlotConsumableLiquidByTank(
@@ -129,13 +129,13 @@ public class TileEntityCropmatron extends TileEntityElectricMachine implements I
 		Level world = this.getLevel();
 		BlockState state = world.getBlockState(pos);
 		int hydration;
-		if (state.getBlock() == Blocks.f_50093_ && (hydration = (Integer) state.getValue(FarmBlock.f_53243_)) < 7)
+		if (state.getBlock() == Blocks.FARMLAND && (hydration = (Integer) state.getValue(FarmBlock.MOISTURE)) < 7)
 		{
 			int drainAmount = Math.min(this.waterTank.getFluidAmount(), 7 - hydration);
 			assert drainAmount > 0;
 			assert drainAmount <= 7;
 			this.waterTank.drainMbUnchecked(drainAmount, false);
-			world.m_7731_(pos, (BlockState) state.setValue(FarmBlock.f_53243_, hydration + drainAmount), 2);
+			world.setBlock(pos, (BlockState) state.setValue(FarmBlock.MOISTURE, hydration + drainAmount), 2);
 			return true;
 		} else
 		{

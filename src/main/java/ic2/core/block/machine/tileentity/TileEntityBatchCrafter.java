@@ -117,13 +117,13 @@ public class TileEntityBatchCrafter
 						return false;
 					}
 
-					assert recipe.m_5818_(TileEntityBatchCrafter.this.crafting, TileEntityBatchCrafter.this.level);
+					assert recipe.matches(TileEntityBatchCrafter.this.crafting, TileEntityBatchCrafter.this.level);
 					ItemStack recipeStack = TileEntityBatchCrafter.this.craftingGrid[slot];
 
 					try
 					{
 						TileEntityBatchCrafter.this.craftingGrid[slot] = ingredient;
-						return recipe.m_5818_(TileEntityBatchCrafter.this.crafting, TileEntityBatchCrafter.this.level);
+						return recipe.matches(TileEntityBatchCrafter.this.crafting, TileEntityBatchCrafter.this.level);
 					} finally
 					{
 						TileEntityBatchCrafter.this.craftingGrid[slot] = recipeStack;
@@ -150,12 +150,12 @@ public class TileEntityBatchCrafter
 	{
 		super.load(nbt);
 		this.progress = nbt.getShort("progress");
-		ListTag grid = nbt.m_128437_("grid", 10);
+		ListTag grid = nbt.getList("grid", 10);
 
 		for (int i = 0; i < grid.size(); i++)
 		{
-			CompoundTag contentTag = grid.m_128728_(i);
-			this.craftingGrid[contentTag.getByte("index")] = ItemStack.m_41712_(contentTag);
+			CompoundTag contentTag = grid.getCompound(i);
+			this.craftingGrid[contentTag.getByte("index")] = ItemStack.of(contentTag);
 		}
 	}
 
@@ -173,7 +173,7 @@ public class TileEntityBatchCrafter
 			{
 				CompoundTag contentTag = new CompoundTag();
 				contentTag.putByte("index", i);
-				content.m_41739_(contentTag);
+				content.save(contentTag);
 				grid.add(contentTag);
 			}
 		}
@@ -185,30 +185,30 @@ public class TileEntityBatchCrafter
 	{
 		Level world = this.getLevel();
 		MinecraftServer server = world.getServer();
-		return server == null ? null : (CraftingRecipe) server.m_129894_().m_44015_(RecipeType.f_44107_, this.crafting, world).orElse(null);
+		return server == null ? null : (CraftingRecipe) server.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, this.crafting, world).orElse(null);
 	}
 
 	protected CraftingRecipe findCraftingRecipe()
 	{
 		Level world = this.getLevel();
 		MinecraftServer server = world.getServer();
-		return server == null ? null : (CraftingRecipe) server.m_129894_().m_44015_(RecipeType.f_44107_, this.ingredients, world).orElse(null);
+		return server == null ? null : (CraftingRecipe) server.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, this.ingredients, world).orElse(null);
 	}
 
 	public ItemStack getCraftingRecipeOutput()
 	{
 		CraftingRecipe craftingRecipe = this.findCraftingRecipe();
-		return craftingRecipe != null ? craftingRecipe.m_5874_(this.ingredients) : StackUtil.emptyStack;
+		return craftingRecipe != null ? craftingRecipe.assemble(this.ingredients) : StackUtil.emptyStack;
 	}
 
 	public void matrixChange(int slot)
 	{
-		if (this.recipe == null || !this.recipe.m_5818_(this.crafting, this.getLevel()))
+		if (this.recipe == null || !this.recipe.matches(this.crafting, this.getLevel()))
 		{
 			this.recipe = this.findRecipe();
 		}
 
-		this.recipeOutput = this.recipe != null ? this.recipe.m_5874_(this.crafting) : StackUtil.emptyStack;
+		this.recipeOutput = this.recipe != null ? this.recipe.assemble(this.crafting) : StackUtil.emptyStack;
 		this.newChange = true;
 	}
 
@@ -349,7 +349,7 @@ public class TileEntityBatchCrafter
 		assert this.hasRecipe();
 		assert this.craftingOutput.canAdd(recipeOutput);
 		this.craftingOutput.add(recipeOutput);
-		List<ItemStack> stacks = this.findCraftingRecipe().m_7457_(this.ingredients);
+		List<ItemStack> stacks = this.findCraftingRecipe().getRemainingItems(this.ingredients);
 		Level world = this.getLevel();
 
 		for (int slot = 0; slot < this.ingredientsRow.length; slot++)

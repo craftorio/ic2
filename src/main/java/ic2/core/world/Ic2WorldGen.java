@@ -24,25 +24,25 @@ import net.minecraft.world.level.levelgen.feature.trunkplacers.StraightTrunkPlac
 public class Ic2WorldGen
 {
 	private static final WeightedStateProvider RUBBER_LOG_PROVIDER = new WeightedStateProvider(
-		SimpleWeightedRandomList.m_146263_()
-			.m_146271_(Ic2Blocks.RUBBER_LOG.defaultBlockState(), 16)
-			.m_146271_((BlockState) Ic2Blocks.RUBBER_LOG.defaultBlockState().setValue(RubberLogBlock.stateProperty, RubberLogBlock.RubberWoodState.wet_north), 1)
-			.m_146271_((BlockState) Ic2Blocks.RUBBER_LOG.defaultBlockState().setValue(RubberLogBlock.stateProperty, RubberLogBlock.RubberWoodState.wet_east), 1)
-			.m_146271_((BlockState) Ic2Blocks.RUBBER_LOG.defaultBlockState().setValue(RubberLogBlock.stateProperty, RubberLogBlock.RubberWoodState.wet_south), 1)
-			.m_146271_((BlockState) Ic2Blocks.RUBBER_LOG.defaultBlockState().setValue(RubberLogBlock.stateProperty, RubberLogBlock.RubberWoodState.wet_west), 1)
+		(SimpleWeightedRandomList.Builder) SimpleWeightedRandomList.builder()
+			.add(Ic2Blocks.RUBBER_LOG.defaultBlockState(), 16)
+			.add(Ic2Blocks.RUBBER_LOG.defaultBlockState().setValue(RubberLogBlock.stateProperty, RubberLogBlock.RubberWoodState.wet_north), 1)
+			.add(Ic2Blocks.RUBBER_LOG.defaultBlockState().setValue(RubberLogBlock.stateProperty, RubberLogBlock.RubberWoodState.wet_east), 1)
+			.add(Ic2Blocks.RUBBER_LOG.defaultBlockState().setValue(RubberLogBlock.stateProperty, RubberLogBlock.RubberWoodState.wet_south), 1)
+			.add(Ic2Blocks.RUBBER_LOG.defaultBlockState().setValue(RubberLogBlock.stateProperty, RubberLogBlock.RubberWoodState.wet_west), 1)
 	);
 	public static final CompletableFuture<Holder<ConfiguredFeature<TreeConfiguration, ?>>> RUBBER_TREE = register(
 		"rubber_tree",
-		Feature.f_65760_,
+		Feature.TREE,
 		new TreeConfigurationBuilder(
 			RUBBER_LOG_PROVIDER,
 			new StraightTrunkPlacer(4, 4, 0),
-			BlockStateProvider.m_191382_(Ic2Blocks.RUBBER_LEAVES),
+			BlockStateProvider.simple(Ic2Blocks.RUBBER_LEAVES),
 			RubberTreeFoliagePlacer.INSTANCE,
 			new TwoLayersFeatureSize(1, 0, 1)
 		)
-			.m_68244_()
-			.m_68251_()
+			.ignoreVines()
+			.build()
 	);
 
 	public static void init()

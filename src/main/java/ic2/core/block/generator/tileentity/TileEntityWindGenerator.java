@@ -77,7 +77,7 @@ public class TileEntityWindGenerator extends TileEntityBaseRotorGenerator implem
 				{
 					for (int i = world.random.nextInt(5); i > 0; i--)
 					{
-						StackUtil.dropAsEntity(world, this.worldPosition, new ItemStack(Items.f_42416_));
+						StackUtil.dropAsEntity(world, this.worldPosition, new ItemStack(Items.IRON_INGOT));
 					}
 				}
 
@@ -107,7 +107,7 @@ public class TileEntityWindGenerator extends TileEntityBaseRotorGenerator implem
 			{
 				for (int z = -4; z < 5; z++)
 				{
-					if (!world.m_46859_(this.worldPosition.offset(x, y, z)))
+					if (!world.isEmptyBlock(this.worldPosition.offset(x, y, z)))
 					{
 						count++;
 					}

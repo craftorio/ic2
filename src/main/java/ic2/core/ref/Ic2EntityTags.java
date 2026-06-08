@@ -16,12 +16,12 @@ public class Ic2EntityTags
 
 	private static TagKey<EntityType<?>> create(String name)
 	{
-		return TagKey.m_203882_(Registry.f_122903_, IC2.getIdentifier(name));
+		return TagKey.create(Registry.ENTITY_TYPE_REGISTRY, IC2.getIdentifier(name));
 	}
 
 	private static TagKey<EntityType<?>> create(String fabricName, String forgeName)
 	{
-		ResourceLocation id = ResourceLocation.fromNamespaceAndPath(IC2.envProxy.isFabricEnv() ? fabricName : forgeName);
-		return TagKey.m_203882_(Registry.f_122903_, id);
+		ResourceLocation id = ResourceLocation.parse(IC2.envProxy.isFabricEnv() ? fabricName : forgeName);
+		return TagKey.create(Registry.ENTITY_TYPE_REGISTRY, id);
 	}
 }

@@ -28,7 +28,7 @@ public class TileEntityGeoGenerator extends TileEntityBaseGenerator
 	public TileEntityGeoGenerator(BlockPos pos, BlockState state)
 	{
 		super(Ic2BlockEntities.GEO_GENERATOR, pos, state, 20.0, 1, 2400);
-		this.fluidTank = this.fluids.addTankInsert("fluid", 8000, Fluids.fluidPredicate(net.minecraft.world.level.material.Fluids.f_76195_));
+		this.fluidTank = this.fluids.addTankInsert("fluid", 8000, Fluids.fluidPredicate(net.minecraft.world.level.material.Fluids.LAVA));
 		this.production = Math.round(20.0F * ConfigUtil.getFloat(MainConfig.get(), "balance/energy/generator/geothermal"));
 		this.fluidSlot = new InvSlotConsumableLiquidByTank(
 			this, "fluidSlot", InvSlot.Access.I, 1, InvSlot.InvSide.ANY, InvSlotConsumableLiquid.OpType.Drain, this.fluidTank

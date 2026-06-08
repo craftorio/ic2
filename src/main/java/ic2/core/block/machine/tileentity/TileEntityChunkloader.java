@@ -77,12 +77,12 @@ public class TileEntityChunkloader extends TileEntityInventory implements INetwo
 	public void load(CompoundTag nbt)
 	{
 		super.load(nbt);
-		ListTag list = nbt.m_128437_("loadedChunks", 4);
+		ListTag list = nbt.getList("loadedChunks", 4);
 		this.loadedChunks.clear();
 
 		for (int i = 0; i < list.size(); i++)
 		{
-			this.loadedChunks.add(((LongTag) list.get(i)).m_7046_());
+			this.loadedChunks.add(((LongTag) list.get(i)).getAsLong());
 		}
 	}
 
@@ -97,7 +97,7 @@ public class TileEntityChunkloader extends TileEntityInventory implements INetwo
 		while (var3.hasNext())
 		{
 			long pos = (Long) var3.next();
-			list.add(LongTag.m_128882_(pos));
+			list.add(LongTag.valueOf(pos));
 		}
 	}
 
@@ -138,7 +138,7 @@ public class TileEntityChunkloader extends TileEntityInventory implements INetwo
 	public void onPlaced(ItemStack stack, LivingEntity placer, Direction facing)
 	{
 		super.onPlaced(stack, placer, facing);
-		this.loadedChunks.add(ChunkPos.m_151388_(this.worldPosition));
+		this.loadedChunks.add(ChunkPos.asLong(this.worldPosition));
 	}
 
 	@Override
@@ -163,7 +163,7 @@ public class TileEntityChunkloader extends TileEntityInventory implements INetwo
 			IC2.log.warn(LogCategory.Block, "Trying to add a Chunk to loaded, however the chunk is too far away. Aborting.");
 		} else
 		{
-			if (this.loadedChunks.add(chunk.m_45588_()))
+			if (this.loadedChunks.add(chunk.toLong()))
 			{
 				ChunkLoaderLogic.updateChunkLoader((ServerLevel) this.level, this.worldPosition, this.loadedChunks);
 				this.setChanged();
@@ -176,9 +176,9 @@ public class TileEntityChunkloader extends TileEntityInventory implements INetwo
 		if (this.level.isClientSide)
 		{
 			new RuntimeException("Something tried to change the ChunkLoaderState on the client.").printStackTrace();
-		} else if (ChunkPos.m_151388_(this.worldPosition) != chunk.m_45588_())
+		} else if (ChunkPos.asLong(this.worldPosition) != chunk.toLong())
 		{
-			if (this.loadedChunks.remove(chunk.m_45588_()))
+			if (this.loadedChunks.remove(chunk.toLong()))
 			{
 				ChunkLoaderLogic.updateChunkLoader((ServerLevel) this.level, this.worldPosition, this.loadedChunks);
 				this.setChanged();
@@ -194,7 +194,7 @@ public class TileEntityChunkloader extends TileEntityInventory implements INetwo
 	public boolean isChunkInRange(ChunkPos chunk)
 	{
 		ChunkPos mainChunk = new ChunkPos(this.worldPosition);
-		return Math.abs(chunk.f_45578_ - mainChunk.f_45578_) <= 4 && Math.abs(chunk.f_45579_ - mainChunk.f_45579_) <= 4;
+		return Math.abs(chunk.x - mainChunk.x) <= 4 && Math.abs(chunk.z - mainChunk.z) <= 4;
 	}
 
 	public int getMaxChunks()
@@ -208,10 +208,10 @@ public class TileEntityChunkloader extends TileEntityInventory implements INetwo
 		int x = (event & 15) - 8;
 		int z = (event >> 4 & 15) - 8;
 		ChunkPos mainChunk = new ChunkPos(this.worldPosition);
-		ChunkPos chunk = new ChunkPos(mainChunk.f_45578_ + x, mainChunk.f_45579_ + z);
+		ChunkPos chunk = new ChunkPos(mainChunk.x + x, mainChunk.z + z);
 		if (this.isChunkInRange(chunk))
 		{
-			if (this.getLoadedChunks().contains(chunk.m_45588_()))
+			if (this.getLoadedChunks().contains(chunk.toLong()))
 			{
 				this.removeChunkFromLoaded(chunk);
 			} else

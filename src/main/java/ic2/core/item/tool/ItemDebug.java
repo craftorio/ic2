@@ -49,7 +49,6 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Item.Properties;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -73,9 +72,9 @@ public class ItemDebug extends Item implements PriorityUsableItem, ISpecialElect
 	@Override
 	public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context)
 	{
-		Level world = context.m_43725_();
-		BlockPos pos = context.m_8083_();
-		Player player = context.m_43723_();
+		Level world = context.getLevel();
+		BlockPos pos = context.getClickedPos();
+		Player player = context.getPlayer();
 		ItemDebug.Mode mode = getMode(stack);
 		if (IC2.keyboard.isModeSwitchKeyDown(player))
 		{
@@ -91,21 +90,19 @@ public class ItemDebug extends Item implements PriorityUsableItem, ISpecialElect
 			}
 		} else
 		{
-			BlockEntity tileentity = world.getBlockEntity(pos);
-			if (tileentity instanceof IDebuggable)
+			BlockEntity blockEntity = world.getBlockEntity(pos);
+			if (blockEntity instanceof IDebuggable dbg)
 			{
 				if (world.isClientSide)
 				{
 					return InteractionResult.PASS;
 				}
 
-				IDebuggable dbg = (IDebuggable) tileentity;
-				if (dbg.isDebuggable() && !world.isClientSide)
+				if (dbg.isDebuggable())
 				{
 					IC2.sideProxy.messagePlayer(player, dbg.getDebugText());
 				}
 
-				return world.isClientSide ? InteractionResult.PASS : InteractionResult.SUCCESS;
 			} else
 			{
 				ItemDebug.Output output = new ItemDebug.Output();
@@ -113,11 +110,12 @@ public class ItemDebug extends Item implements PriorityUsableItem, ISpecialElect
 				{
 					case InterfacesFields:
 					case InterfacesFieldsRetrace:
+					{
 						String plat = getPlatform(world);
 						BlockState state = world.getBlockState(pos);
 						Block block = state.getBlock();
 						BlockEntity te = world.getBlockEntity(pos);
-						output.both("[%s] block state: %s%nname: %s%ncls: %s%nbe: %s", plat, state, block.m_7705_(), block.getClass().getName(), te);
+						output.both("[%s] block state: %s%nname: %s%ncls: %s%nbe: %s", plat, state, block.getDescriptionId(), block.getClass().getName(), te);
 						if (te != null)
 						{
 							output.part("[%s] interfaces:", plat);
@@ -145,7 +143,9 @@ public class ItemDebug extends Item implements PriorityUsableItem, ISpecialElect
 							dumpObjectFields(te, output);
 						}
 						break;
+					}
 					case TileData:
+					{
 						if (world.isClientSide)
 						{
 							return InteractionResult.PASS;
@@ -208,7 +208,9 @@ public class ItemDebug extends Item implements PriorityUsableItem, ISpecialElect
 							);
 						}
 						break;
+					}
 					case EnergyNet:
+					{
 						if (world.isClientSide)
 						{
 							return InteractionResult.PASS;
@@ -235,6 +237,7 @@ public class ItemDebug extends Item implements PriorityUsableItem, ISpecialElect
 							output.chat(chatBuffer.toString(StandardCharsets.UTF_8).stripTrailing());
 						}
 						break;
+					}
 					case Accelerate:
 					case AccelerateX100:
 						if (world.isClientSide)
@@ -246,8 +249,8 @@ public class ItemDebug extends Item implements PriorityUsableItem, ISpecialElect
 				}
 
 				output.flush(player);
-				return world.isClientSide ? InteractionResult.PASS : InteractionResult.SUCCESS;
 			}
+			return world.isClientSide ? InteractionResult.PASS : InteractionResult.SUCCESS;
 		}
 	}
 
@@ -255,9 +258,9 @@ public class ItemDebug extends Item implements PriorityUsableItem, ISpecialElect
 	{
 		BlockState state = world.getBlockState(pos);
 		BlockEntity be;
-		if (state.m_155947_() && (be = world.getBlockEntity(pos)) != null)
+		if (state.hasBlockEntity() && (be = world.getBlockEntity(pos)) != null)
 		{
-			BlockEntityTicker ticker = state.m_155944_(world, be.m_58903_());
+			BlockEntityTicker ticker = state.getTicker(world, be.getType());
 			if (ticker == null)
 			{
 				return false;
@@ -273,14 +276,14 @@ public class ItemDebug extends Item implements PriorityUsableItem, ISpecialElect
 				{
 					changes++;
 					state = world.getBlockState(pos);
-					if (!state.m_155947_() || (be = world.getBlockEntity(pos)) == null || be.isRemoved() || (ticker = state.m_155944_(world, be.m_58903_())) == null)
+					if (!state.hasBlockEntity() || (be = world.getBlockEntity(pos)) == null || be.isRemoved() || (ticker = state.getTicker(world, be.getType())) == null)
 					{
 						interruptCount = i;
 						break;
 					}
 				}
 
-				ticker.m_155252_(world, pos, state, be);
+				ticker.tick(world, pos, state, be);
 			}
 
 			if (changes > 0)
@@ -294,10 +297,9 @@ public class ItemDebug extends Item implements PriorityUsableItem, ISpecialElect
 				}
 			}
 
-			return true;
 		} else
 		{
-			if (!state.m_60823_())
+			if (!state.isRandomlyTicking())
 			{
 				return false;
 			}
@@ -306,7 +308,7 @@ public class ItemDebug extends Item implements PriorityUsableItem, ISpecialElect
 
 			for (int i = 0; i < count && world.getBlockState(pos) == state; i++)
 			{
-				state.m_222972_((ServerLevel) world, pos, IC2.random);
+				state.randomTick((ServerLevel) world, pos, IC2.random);
 				if (world.getBlockState(pos) != state)
 				{
 					output.chat("Ran %d ticks before a state change.", i);
@@ -314,11 +316,11 @@ public class ItemDebug extends Item implements PriorityUsableItem, ISpecialElect
 				}
 			}
 
-			return true;
 		}
+		return true;
 	}
 
-	public InteractionResult m_6880_(ItemStack stack, Player user, LivingEntity entity, InteractionHand hand)
+	public InteractionResult interactLivingEntity(ItemStack stack, Player user, LivingEntity entity, InteractionHand hand)
 	{
 		return handleEntity(stack, user, entity);
 	}
@@ -331,15 +333,15 @@ public class ItemDebug extends Item implements PriorityUsableItem, ISpecialElect
 			return InteractionResult.PASS;
 		}
 
-		Level world = player.m_9236_();
+		Level world = player.getLevel();
 		ItemDebug.Output output = new ItemDebug.Output();
 		String plat = getPlatform(world);
 		output.both("[%s] entity: %s", output, entity);
 		if (entity instanceof ItemEntity)
 		{
-			ItemStack entStack = ((ItemEntity) entity).m_32055_();
+			ItemStack entStack = ((ItemEntity) entity).getItem();
 			String name = Util.getName(entStack.getItem()).toString();
-			output.both("[%s] item id: %s size: %s name: %s", plat, name, StackUtil.getSize(entStack), entStack.m_41778_());
+			output.both("[%s] item id: %s size: %s name: %s", plat, name, StackUtil.getSize(entStack), entStack.getDescriptionId());
 			output.console("NBT: %s", entStack.getTag());
 		}
 
@@ -361,7 +363,7 @@ public class ItemDebug extends Item implements PriorityUsableItem, ISpecialElect
 
 	private static void setMode(ItemStack stack, ItemDebug.Mode mode)
 	{
-		stack.m_41784_().putInt("mode", mode.ordinal());
+		stack.getOrCreateTag().putInt("mode", mode.ordinal());
 	}
 
 	private static String getPlatform(Level world)
@@ -451,19 +453,19 @@ public class ItemDebug extends Item implements PriorityUsableItem, ISpecialElect
 
 					if (value instanceof Iterable)
 					{
-						output.part("    values (%s):", value instanceof Collection ? ((Collection) value).size() : "?");
+						output.part("    values (%s):", value instanceof Collection ? ((Collection<?>) value).size() : "?");
 						int i = 0;
 
-						for (Object o2 : (Iterable) value)
+						for (Object o2 : (Iterable<?>) value)
 						{
 							output.part("      [%d] ", i++);
 							dumpValueString(o2, field, "        ", output);
 						}
 					} else if (value instanceof Map)
 					{
-						output.console("    values (%s):", ((Map) value).size());
+						output.console("    values (%s):", ((Map<?, ?>) value).size());
 
-						for (Entry<?, ?> entry : ((Map) value).entrySet())
+						for (Entry<?, ?> entry : ((Map<?, ?>) value).entrySet())
 						{
 							output.part("      %s: ", entry.getKey());
 							dumpValueString(entry.getValue(), field, "        ", output);
@@ -486,10 +488,10 @@ public class ItemDebug extends Item implements PriorityUsableItem, ISpecialElect
 			output.partToConsole();
 		} else
 		{
-			String ret;
+			StringBuilder ret;
 			if (o.getClass().isArray())
 			{
-				ret = "";
+				ret = new StringBuilder();
 
 				for (int i = 0; i < Array.getLength(o); i++)
 				{
@@ -507,19 +509,19 @@ public class ItemDebug extends Item implements PriorityUsableItem, ISpecialElect
 						}
 					}
 
-					ret = ret + " [" + i + "] " + valStr;
+					ret.append(" [").append(i).append("] ").append(valStr);
 				}
 			} else
 			{
-				ret = o.toString();
+				ret = new StringBuilder(o.toString());
 			}
 
 			if (ret.length() > 100)
 			{
-				ret = ret.substring(0, 90) + "... (" + (ret.length() - 90) + " more)";
+				ret = new StringBuilder(ret.substring(0, 90) + "... (" + (ret.length() - 90) + " more)");
 			}
 
-			output.part(ret);
+			output.part(ret.toString());
 			output.partToConsole();
 			if (!Modifier.isStatic(parentField.getModifiers())
 				&& !parentField.isSynthetic()
@@ -733,7 +735,7 @@ public class ItemDebug extends Item implements PriorityUsableItem, ISpecialElect
 
 		void flush(Player player)
 		{
-			if (player.m_9236_().isClientSide)
+			if (player.getLevel().isClientSide)
 			{
 				System.out.println(this.consoleSb);
 

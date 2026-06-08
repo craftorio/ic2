@@ -30,7 +30,7 @@ public class ShapelessRecipeBuilder<T extends ShapelessRecipeBuilder<T>> extends
 
 	public T add(ItemLike item)
 	{
-		this.ingredient.add(new RecipeInputIngredient(Ingredient.m_43929_(new ItemLike[] { item }), 1));
+		this.ingredient.add(new RecipeInputIngredient(Ingredient.of(new ItemLike[] { item }), 1));
 		return (T) this;
 	}
 
@@ -42,7 +42,7 @@ public class ShapelessRecipeBuilder<T extends ShapelessRecipeBuilder<T>> extends
 
 	public T add(TagKey<Item> tag)
 	{
-		this.ingredient.add(new RecipeInputIngredient(Ingredient.m_204132_(tag), 1));
+		this.ingredient.add(new RecipeInputIngredient(Ingredient.of(tag), 1));
 		return (T) this;
 	}
 

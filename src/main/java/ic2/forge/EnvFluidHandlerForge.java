@@ -95,17 +95,17 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 			.bucket(() -> res.get().bucket);
 		Fluid still = new ForgeFlowingFluid.Source(properties);
 		Fluid flowing = flowingSpriteId != null ? new ForgeFlowingFluid.Flowing(properties) : null;
-		BucketItem bucket = new BucketItem(() -> still, new Properties().m_41495_(Items.f_42446_).m_41487_(1).m_41491_(IC2.tabIc2ToolsAndUtilities));
+		BucketItem bucket = new BucketItem(() -> still, new Properties().craftRemainder(Items.BUCKET).stacksTo(1).tab(IC2.tabIc2ToolsAndUtilities));
 		EnvFluidHandler.FluidRefs ret = new EnvFluidHandler.FluidRefs(null, still, flowing, bucket);
 		res.set(ret);
 		ForgeRegistries.FLUID_TYPES.get().register(id, fluidType);
 		ForgeRegistries.FLUIDS.register(id, still);
 		if (ret.flowing != null)
 		{
-			ForgeRegistries.FLUIDS.register(ResourceLocation.fromNamespaceAndPath(id.m_135827_(), "flowing_" + id.m_135815_()), flowing);
+			ForgeRegistries.FLUIDS.register(ResourceLocation.fromNamespaceAndPath(id.getNamespace(), "flowing_" + id.getPath()), flowing);
 		}
 
-		IC2.envProxy.registerItem(ResourceLocation.fromNamespaceAndPath(id.m_135827_(), id.m_135815_() + "_bucket"), bucket);
+		IC2.envProxy.registerItem(ResourceLocation.fromNamespaceAndPath(id.getNamespace(), id.getPath() + "_bucket"), bucket);
 		return ret;
 	}
 
@@ -165,7 +165,7 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 			return null;
 		}
 
-		if (stack.m_41613_() != 1)
+		if (stack.getCount() != 1)
 		{
 			stack = StackUtil.copyWithSize(stack, 1);
 		}
@@ -193,7 +193,7 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 			return null;
 		}
 
-		if (stack.m_41613_() != 1)
+		if (stack.getCount() != 1)
 		{
 			stack = StackUtil.copyWithSize(stack, 1);
 		}
@@ -255,10 +255,10 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 			return new Ic2FluidStackImpl(FluidStack.loadFluidStackFromNBT(nbt));
 		}
 
-		String id = nbt.m_128461_("FluidName");
+		String id = nbt.getString("FluidName");
 		int amount = nbt.getInt("Amount");
 		Fluid fluid;
-		return id != null && (fluid = ForgeRegistries.FLUIDS.getValue(ResourceLocation.fromNamespaceAndPath(id))) != null && amount >= 0
+		return id != null && (fluid = ForgeRegistries.FLUIDS.getValue(ResourceLocation.parse(id))) != null && amount >= 0
 			? Ic2FluidStack.create(fluid, amount)
 			: null;
 	}
@@ -283,9 +283,9 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 		} else if (amount == 0)
 		{
 			return Ic2FluidStack.EMPTY;
-		} else if (stack.m_41613_() != 1)
+		} else if (stack.getCount() != 1)
 		{
-			throw new IllegalArgumentException("invalid stack size: " + stack.m_41613_());
+			throw new IllegalArgumentException("invalid stack size: " + stack.getCount());
 		} else
 		{
 			IFluidHandlerItem handler = getFluidHandler(stack);
@@ -321,9 +321,9 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 		} else if (drainFs.isEmpty())
 		{
 			return 0;
-		} else if (stack.m_41613_() != 1)
+		} else if (stack.getCount() != 1)
 		{
-			throw new IllegalArgumentException("invalid stack size: " + stack.m_41613_());
+			throw new IllegalArgumentException("invalid stack size: " + stack.getCount());
 		} else
 		{
 			IFluidHandlerItem handler = getFluidHandler(stack);
@@ -363,9 +363,9 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 			return 0;
 		}
 
-		if (stack.m_41613_() != 1)
+		if (stack.getCount() != 1)
 		{
-			throw new IllegalArgumentException("invalid stack size: " + stack.m_41613_());
+			throw new IllegalArgumentException("invalid stack size: " + stack.getCount());
 		}
 
 		IFluidHandlerItem handler = getFluidHandler(stack);
@@ -404,7 +404,7 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 						LogCategory.Item,
 						"Fluid handler %s for item %s yielded null container",
 						handler.getClass().getName(),
-						Registry.f_122827_.getKey(((ItemStack) out.getValue()).getItem())
+						Registry.ITEM.getKey(((ItemStack) out.getValue()).getItem())
 					);
 			} else
 			{
@@ -455,7 +455,7 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 			return 0;
 		}
 
-		if (!state.m_155947_())
+		if (!state.hasBlockEntity())
 		{
 			return 0;
 		}
@@ -483,7 +483,7 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 			return 0;
 		}
 
-		if (!state.m_155947_())
+		if (!state.hasBlockEntity())
 		{
 			return 0;
 		}
@@ -503,7 +503,7 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 	{
 		if (be == null)
 		{
-			if (state.m_155947_())
+			if (state.hasBlockEntity())
 			{
 				be = world.getBlockEntity(pos);
 			}

@@ -14,14 +14,14 @@ public class ContainerElectricKineticGenerator extends ContainerFullInv<TileEnti
 
 		for (int i = 0; i < 5; i++)
 		{
-			this.m_38897_(new SlotInvSlot(be.slotMotor, i, 44 + i * 18, 27));
+			this.addSlot(new SlotInvSlot(be.slotMotor, i, 44 + i * 18, 27));
 		}
 
 		for (int i = 5; i < 10; i++)
 		{
-			this.m_38897_(new SlotInvSlot(be.slotMotor, i, 44 + (i - 5) * 18, 45));
+			this.addSlot(new SlotInvSlot(be.slotMotor, i, 44 + (i - 5) * 18, 45));
 		}
 
-		this.m_38897_(new SlotInvSlot(be.dischargeSlot, 0, 8, 62));
+		this.addSlot(new SlotInvSlot(be.dischargeSlot, 0, 8, 62));
 	}
 }

@@ -144,7 +144,7 @@ public class BasicMachineRecipeManager extends MachineRecipeHelper<IRecipeInput,
 				return false;
 			}
 
-			items.add(stack.m_41777_());
+			items.add(stack.copy());
 		}
 
 		for (ItemStack is : input.getInputs())
@@ -205,7 +205,7 @@ public class BasicMachineRecipeManager extends MachineRecipeHelper<IRecipeInput,
 					throw new UnsupportedOperationException("can't adjust input item, use apply() instead");
 				}
 
-				input.m_41774_(recipe.getInput().getAmount());
+				input.shrink(recipe.getInput().getAmount());
 			}
 
 			return new RecipeOutput(recipe.getMetaData(), new ArrayList<>(recipe.getOutput()));

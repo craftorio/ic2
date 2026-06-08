@@ -22,35 +22,35 @@ import org.jetbrains.annotations.Nullable;
 
 public class CropStickBlock extends Block
 {
-	public static final BooleanProperty CROSSING_BASE = BooleanProperty.m_61465_("crossing_base");
+	public static final BooleanProperty CROSSING_BASE = BooleanProperty.create("crossing_base");
 
 	public CropStickBlock(Properties settings)
 	{
 		super(settings);
 	}
 
-	protected void m_7926_(Builder<Block, BlockState> builder)
+	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
 	{
-		super.m_7926_(builder);
-		builder.m_61104_(new Property[] { CROSSING_BASE });
+		super.createBlockStateDefinition(builder);
+		builder.add(new Property[] { CROSSING_BASE });
 	}
 
 	@Nullable
-	public BlockState m_5573_(BlockPlaceContext ctx)
+	public BlockState getStateForPlacement(BlockPlaceContext ctx)
 	{
-		return (BlockState) Objects.requireNonNull(super.m_5573_(ctx)).setValue(CROSSING_BASE, false);
+		return (BlockState) Objects.requireNonNull(super.getStateForPlacement(ctx)).setValue(CROSSING_BASE, false);
 	}
 
-	public InteractionResult m_6227_(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit)
+	public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit)
 	{
-		ItemStack heldStack = player.m_21120_(hand);
-		if (heldStack.m_150930_(Ic2Items.CROP_STICK))
+		ItemStack heldStack = player.getItemInHand(hand);
+		if (heldStack.is(Ic2Items.CROP_STICK))
 		{
 			world.setBlockAndUpdate(pos, (BlockState) state.setValue(CROSSING_BASE, true));
 			return InteractionResult.SUCCESS;
 		} else
 		{
-			return super.m_6227_(state, world, pos, player, hand, hit);
+			return super.use(state, world, pos, player, hand, hit);
 		}
 	}
 }

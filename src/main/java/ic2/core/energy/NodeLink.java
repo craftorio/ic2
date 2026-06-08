@@ -99,14 +99,14 @@ class NodeLink
 		{
 			for (IEnergyTile posB : this.nodeB.tile.subTiles)
 			{
-				BlockPos delta = EnergyNet.instance.getPos(posA).m_121996_(EnergyNet.instance.getPos(posB));
+				BlockPos delta = EnergyNet.instance.getPos(posA).subtract(EnergyNet.instance.getPos(posB));
 
 				for (Direction dir : Util.ALL_DIRS)
 				{
-					if (dir.m_122429_() == delta.getX() && dir.m_122430_() == delta.getY() && dir.m_122431_() == delta.getZ())
+					if (dir.getStepX() == delta.getX() && dir.getStepY() == delta.getY() && dir.getStepZ() == delta.getZ())
 					{
 						this.dirFromA = dir;
-						this.dirFromB = dir.m_122424_();
+						this.dirFromB = dir.getOpposite();
 						return;
 					}
 				}

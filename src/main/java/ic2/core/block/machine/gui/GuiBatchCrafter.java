@@ -32,7 +32,7 @@ public class GuiBatchCrafter extends Ic2Gui<ContainerBatchCrafter>
 	}
 
 	@Override
-	protected ResourceLocation getTexture()
+	protected ResourceLocation getTextureLocation()
 	{
 		return TEXTURE;
 	}

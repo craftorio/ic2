@@ -13,14 +13,14 @@ import net.minecraft.world.level.ItemLike;
 
 public enum Ic2ArmorMaterials implements ArmorMaterial
 {
-	BRONZE("ic2_bronze", 15, new int[] { 2, 5, 6, 2 }, 9, SoundEvents.f_11677_, 0.0F, 0.0F, () -> Ingredient.m_43929_(new ItemLike[] { Ic2Items.BRONZE_INGOT })),
-	ALLOY("ic2_alloy", 50, new int[] { 4, 7, 9, 4 }, 12, SoundEvents.f_11677_, 2.0F, 0.0F, () -> Ingredient.m_43929_(new ItemLike[] { Ic2Items.ALLOY })),
-	NANO_SUIT("ic2_nano", 0, new int[] { 0, 0, 0, 0 }, 0, SoundEvents.f_11677_, 2.0F, 0.0F, Ingredient::m_151265_),
-	QUANTUM_SUIT("ic2_quantum", 0, new int[] { 0, 0, 0, 0 }, 0, SoundEvents.f_11677_, 2.0F, 0.0F, Ingredient::m_151265_),
-	NIGHT_VISION_GOGGLES("ic2_night_vision", 0, new int[] { 3, 0, 0, 0 }, 0, SoundEvents.f_11677_, 2.0F, 0.0F, Ingredient::m_151265_),
-	HAZMAT("ic2_hazmat", SoundEvents.f_11678_),
-	CF_PACK("ic2_cf_pack", SoundEvents.f_11677_),
-	JET_PACK("ic2_jet_pack", SoundEvents.f_11677_);
+	BRONZE("ic2_bronze", 15, new int[] { 2, 5, 6, 2 }, 9, SoundEvents.ARMOR_EQUIP_IRON, 0.0F, 0.0F, () -> Ingredient.of(new ItemLike[] { Ic2Items.BRONZE_INGOT })),
+	ALLOY("ic2_alloy", 50, new int[] { 4, 7, 9, 4 }, 12, SoundEvents.ARMOR_EQUIP_IRON, 2.0F, 0.0F, () -> Ingredient.of(new ItemLike[] { Ic2Items.ALLOY })),
+	NANO_SUIT("ic2_nano", 0, new int[] { 0, 0, 0, 0 }, 0, SoundEvents.ARMOR_EQUIP_IRON, 2.0F, 0.0F, Ingredient::of),
+	QUANTUM_SUIT("ic2_quantum", 0, new int[] { 0, 0, 0, 0 }, 0, SoundEvents.ARMOR_EQUIP_IRON, 2.0F, 0.0F, Ingredient::of),
+	NIGHT_VISION_GOGGLES("ic2_night_vision", 0, new int[] { 3, 0, 0, 0 }, 0, SoundEvents.ARMOR_EQUIP_IRON, 2.0F, 0.0F, Ingredient::of),
+	HAZMAT("ic2_hazmat", SoundEvents.ARMOR_EQUIP_LEATHER),
+	CF_PACK("ic2_cf_pack", SoundEvents.ARMOR_EQUIP_IRON),
+	JET_PACK("ic2_jet_pack", SoundEvents.ARMOR_EQUIP_IRON);
 
 	private static final int[] BASE_DURABILITY = new int[] { 13, 15, 16, 11 };
 	private final String name;
@@ -62,45 +62,45 @@ public enum Ic2ArmorMaterials implements ArmorMaterial
 		this.knockbackResistance = 0.0F;
 		this.protectionAmounts = new int[] { 0, 0, 0, 0 };
 		this.toughness = 0.0F;
-		this.repairIngredientSupplier = Suppliers.memoize(Ingredient::m_151265_);
+		this.repairIngredientSupplier = Suppliers.memoize(Ingredient::of);
 	}
 
-	public int m_7366_(EquipmentSlot slot)
+	public int getDurabilityForSlot(EquipmentSlot slot)
 	{
-		return BASE_DURABILITY[slot.m_20749_()] * this.durabilityMultiplier;
+		return BASE_DURABILITY[slot.getIndex()] * this.durabilityMultiplier;
 	}
 
-	public int m_7365_(EquipmentSlot slot)
+	public int getDefenseForSlot(EquipmentSlot slot)
 	{
-		return this.protectionAmounts[slot.m_20749_()];
+		return this.protectionAmounts[slot.getIndex()];
 	}
 
-	public int m_6646_()
+	public int getEnchantmentValue()
 	{
 		return this.enchantability;
 	}
 
-	public SoundEvent m_7344_()
+	public SoundEvent getEquipSound()
 	{
 		return this.equipSound;
 	}
 
-	public Ingredient m_6230_()
+	public Ingredient getRepairIngredient()
 	{
 		return this.repairIngredientSupplier.get();
 	}
 
-	public String m_6082_()
+	public String getName()
 	{
 		return this.name;
 	}
 
-	public float m_6651_()
+	public float getToughness()
 	{
 		return this.toughness;
 	}
 
-	public float m_6649_()
+	public float getKnockbackResistance()
 	{
 		return this.knockbackResistance;
 	}

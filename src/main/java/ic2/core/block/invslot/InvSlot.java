@@ -63,11 +63,11 @@ public class InvSlot implements Iterable<ItemStack>
 	public void readFromNbt(CompoundTag nbt)
 	{
 		this.clear();
-		ListTag contentsTag = nbt.m_128437_("Contents", 10);
+		ListTag contentsTag = nbt.getList("Contents", 10);
 
 		for (int i = 0; i < contentsTag.size(); i++)
 		{
-			CompoundTag contentTag = contentsTag.m_128728_(i);
+			CompoundTag contentTag = contentsTag.getCompound(i);
 			int index = contentTag.getByte("Index") & 255;
 			if (index >= this.size())
 			{
@@ -81,7 +81,7 @@ public class InvSlot implements Iterable<ItemStack>
 					);
 			} else
 			{
-				ItemStack stack = ItemStack.m_41712_(contentTag);
+				ItemStack stack = ItemStack.of(contentTag);
 				if (StackUtil.isEmpty(stack))
 				{
 					IC2.log
@@ -130,7 +130,7 @@ public class InvSlot implements Iterable<ItemStack>
 			{
 				CompoundTag contentTag = new CompoundTag();
 				contentTag.putByte("Index", (byte) i);
-				content.m_41739_(contentTag);
+				content.save(contentTag);
 				contentsTag.add(contentTag);
 			}
 		}
@@ -328,7 +328,7 @@ public class InvSlot implements Iterable<ItemStack>
 		for (int i = 0; i < this.contents.length; i++)
 		{
 			ItemStack content = this.contents[i];
-			ret[i] = StackUtil.isEmpty(content) ? StackUtil.emptyStack : content.m_41777_();
+			ret[i] = StackUtil.isEmpty(content) ? StackUtil.emptyStack : content.copy();
 		}
 
 		return ret;

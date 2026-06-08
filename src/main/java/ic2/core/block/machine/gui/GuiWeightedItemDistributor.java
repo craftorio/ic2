@@ -15,7 +15,7 @@ public class GuiWeightedItemDistributor extends GuiWeightedDistributor<Container
 	}
 
 	@Override
-	protected ResourceLocation getTexture()
+	protected ResourceLocation getTextureLocation()
 	{
 		return TEXTURE;
 	}

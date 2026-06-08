@@ -17,7 +17,7 @@ public class GuiWeightedFluidDistributor extends GuiWeightedDistributor<Containe
 	}
 
 	@Override
-	protected ResourceLocation getTexture()
+	protected ResourceLocation getTextureLocation()
 	{
 		return TEXTURE;
 	}

@@ -76,10 +76,10 @@ public class Ic2JeiPlugin implements IModPlugin
 
 	public void registerRecipes(IRecipeRegistration registration)
 	{
-		RecipeManager recipeManager = Minecraft.m_91087_().f_91073_.m_7465_();
+		RecipeManager recipeManager = Minecraft.getInstance().level.getRecipeManager();
 		BiConsumer<RecipeType<IORecipeWrapper>, net.minecraft.world.item.crafting.RecipeType<RecipeHolder<IRecipeInput, Collection<ItemStack>>>> registerBasic = (id, type) ->
 		{
-			List<IORecipeWrapper> recipeList = recipeManager.m_44013_(type).stream().map(r -> new IORecipeWrapper(r.recipe())).toList();
+			List<IORecipeWrapper> recipeList = recipeManager.getAllRecipesFor(type).stream().map(r -> new IORecipeWrapper(r.recipe())).toList();
 			registration.addRecipes(id, recipeList);
 		};
 		registerBasic.accept(this.BLAST_FURNACE, Ic2RecipeTypes.BLAST_FURNACE);

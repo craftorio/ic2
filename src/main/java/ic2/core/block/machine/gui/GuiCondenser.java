@@ -36,7 +36,7 @@ public class GuiCondenser extends Ic2Gui<ContainerCondenser>
 	}
 
 	@Override
-	protected ResourceLocation getTexture()
+	protected ResourceLocation getTextureLocation()
 	{
 		return BACKGROUND;
 	}

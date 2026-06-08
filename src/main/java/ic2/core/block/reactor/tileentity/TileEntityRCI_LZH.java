@@ -13,6 +13,6 @@ public class TileEntityRCI_LZH extends TileEntityAbstractRCI
 {
 	public TileEntityRCI_LZH(BlockPos pos, BlockState state)
 	{
-		super(Ic2BlockEntities.RCI_LZH, pos, state, new ItemStack(Ic2Items.LZH_CONDENSATOR), new ItemStack(Blocks.f_50060_));
+		super(Ic2BlockEntities.RCI_LZH, pos, state, new ItemStack(Ic2Items.LZH_CONDENSATOR), new ItemStack(Blocks.LAPIS_BLOCK));
 	}
 }

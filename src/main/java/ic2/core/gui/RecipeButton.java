@@ -31,7 +31,7 @@ public class RecipeButton extends Button<RecipeButton>
 	protected List<Component> getToolTip()
 	{
 		List<Component> ret = super.getToolTip();
-		ret.add(Component.m_237115_("ic2.jei.recipes"));
+		ret.add(Component.translatable("ic2.jei.recipes"));
 		return ret;
 	}
 

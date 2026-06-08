@@ -53,7 +53,7 @@ final class DynamicCableModelForge extends DynamicCableModel<List<BakedQuad>[], 
 		ResourceLocation modelLocation
 	)
 	{
-		return this.m_7611_(bakery, spriteGetter, modelTransform, modelLocation);
+		return this.bake(bakery, spriteGetter, modelTransform, modelLocation);
 	}
 
 	@Override
@@ -61,7 +61,7 @@ final class DynamicCableModelForge extends DynamicCableModel<List<BakedQuad>[], 
 		IGeometryBakingContext owner, Function<ResourceLocation, UnbakedModel> modelGetter, Set<Pair<String, String>> missingTextureErrors
 	)
 	{
-		return this.m_5500_(modelGetter, missingTextureErrors);
+		return this.getMaterials(modelGetter, missingTextureErrors);
 	}
 
 	public ModelData getModelData(BlockAndTintGetter world, BlockPos pos, BlockState state, ModelData tileData)
@@ -165,11 +165,11 @@ final class DynamicCableModelForge extends DynamicCableModel<List<BakedQuad>[], 
 	protected void emitQuad(List<BakedQuad>[] emitter, Direction face, float xs, float ys, float zs, float xe, float ye, float ze, TextureAtlasSprite texture)
 	{
 		int[] data = new int[32];
-		float us = texture.m_118409_();
-		float vs = texture.m_118411_();
-		float ue = texture.m_118410_();
-		float ve = texture.m_118412_();
-		int normals = packNormals(face.m_122429_(), face.m_122430_(), face.m_122431_());
+		float us = texture.getU0();
+		float vs = texture.getV0();
+		float ue = texture.getU1();
+		float ve = texture.getV1();
+		int normals = packNormals(face.getStepX(), face.getStepY(), face.getStepZ());
 		float depth;
 		switch (face)
 		{

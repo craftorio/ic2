@@ -55,7 +55,7 @@ public class CropCocoa extends Ic2CropCard
 	@Override
 	public ItemStack getGain(ICropTile crop)
 	{
-		return new ItemStack(Items.f_42533_);
+		return new ItemStack(Items.COCOA_BEANS);
 	}
 
 	@Override

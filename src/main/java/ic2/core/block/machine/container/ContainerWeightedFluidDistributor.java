@@ -16,8 +16,8 @@ public class ContainerWeightedFluidDistributor extends ContainerFullInv<TileEnti
 	public ContainerWeightedFluidDistributor(int syncId, Inventory playerInventory, TileEntityWeightedFluidDistributor te)
 	{
 		super(Ic2ScreenHandlers.WEIGHTED_FLUID_DISTRIBUTOR, syncId, playerInventory, te, 211);
-		this.m_38897_(new SlotInvSlot(te.inputSlot, 0, 8, 108));
-		this.m_38897_(new SlotInvSlot(te.OutputSlot, 0, 152, 108));
+		this.addSlot(new SlotInvSlot(te.inputSlot, 0, 8, 108));
+		this.addSlot(new SlotInvSlot(te.OutputSlot, 0, 152, 108));
 	}
 
 	@Override

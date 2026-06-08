@@ -46,7 +46,7 @@ public final class ClientEnvProxyForge implements ClientEnvProxy
 	@Override
 	public <H extends AbstractContainerMenu> void registerScreen(MenuType<H> type, ClientEnvProxy.ScreenFactory<H> factory)
 	{
-		MenuScreens.m_96206_(type, factory::create);
+		MenuScreens.register(type, factory::create);
 	}
 
 	@Override
@@ -118,7 +118,7 @@ public final class ClientEnvProxyForge implements ClientEnvProxy
 	public TextureAtlasSprite getFluidStillSprite(Ic2FluidStack stack)
 	{
 		ResourceLocation id = this.getAttributes(stack).getStillTexture(EnvFluidHandlerForge.getForgeFs(stack));
-		return (TextureAtlasSprite) SideProxyClient.mc.m_91258_(TextureAtlas.f_118259_).apply(id);
+		return (TextureAtlasSprite) SideProxyClient.mc.getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(id);
 	}
 
 	@Override

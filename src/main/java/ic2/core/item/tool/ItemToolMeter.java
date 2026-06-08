@@ -32,10 +32,10 @@ public class ItemToolMeter extends Item implements IBoxable, IHandHeldInventory,
 	@Override
 	public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context)
 	{
-		Level world = context.m_43725_();
-		BlockPos pos = context.m_8083_();
-		Player player = context.m_43723_();
-		InteractionHand hand = context.m_43724_();
+		Level world = context.getLevel();
+		BlockPos pos = context.getClickedPos();
+		Player player = context.getPlayer();
+		InteractionHand hand = context.getHand();
 		if (world == null)
 		{
 			return InteractionResult.PASS;
@@ -57,7 +57,7 @@ public class ItemToolMeter extends Item implements IBoxable, IHandHeldInventory,
 			IC2.sideProxy.messagePlayer(player, "Not an energy net tile");
 		} else if (this.getInventory(player, hand, StackUtil.get(player, hand)).openManagedItem(player, hand, null))
 		{
-			ContainerMeter container = (ContainerMeter) player.f_36096_;
+			ContainerMeter container = (ContainerMeter) player.containerMenu;
 			container.setUut(tile);
 			return InteractionResult.SUCCESS;
 		}
@@ -67,13 +67,13 @@ public class ItemToolMeter extends Item implements IBoxable, IHandHeldInventory,
 
 	public boolean onDroppedByPlayer(ItemStack stack, Player player)
 	{
-		if (!player.getCommandSenderWorld().isClientSide && !StackUtil.isEmpty(stack) && player.f_36096_ instanceof ContainerMeter)
+		if (!player.getCommandSenderWorld().isClientSide && !StackUtil.isEmpty(stack) && player.containerMenu instanceof ContainerMeter)
 		{
-			HandHeldMeter euReader = ((ContainerMeter) player.f_36096_).base;
+			HandHeldMeter euReader = ((ContainerMeter) player.containerMenu).base;
 			if (euReader.isThisContainer(stack))
 			{
 				euReader.saveAsThrown(stack);
-				((ServerPlayer) player).m_6915_();
+				((ServerPlayer) player).closeContainer();
 			}
 		}
 

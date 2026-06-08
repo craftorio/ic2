@@ -13,7 +13,7 @@ public class BlockStateUtil
 {
 	public static String getVariantString(BlockState state)
 	{
-		ImmutableMap<Property<?>, Comparable<?>> properties = state.m_61148_();
+		ImmutableMap<Property<?>, Comparable<?>> properties = state.getValues();
 		if (properties.isEmpty())
 		{
 			return "normal";
@@ -31,9 +31,9 @@ public class BlockStateUtil
 				ret.append(',');
 			}
 
-			ret.append(property.m_61708_());
+			ret.append(property.getName());
 			ret.append('=');
-			ret.append(property.m_6940_(entry.getValue()));
+			ret.append(property.getName(entry.getValue()));
 		}
 
 		return ret.toString();
@@ -77,9 +77,9 @@ public class BlockStateUtil
 	{
 		Property<T> property = null;
 
-		for (Property<?> cProperty : state.m_61147_())
+		for (Property<?> cProperty : state.getProperties())
 		{
-			if (cProperty.m_61708_().equals(name))
+			if (cProperty.getName().equals(name))
 			{
 				property = (Property<T>) cProperty;
 				break;
@@ -91,9 +91,9 @@ public class BlockStateUtil
 			return state;
 		}
 
-		for (T cValue : property.m_6908_())
+		for (T cValue : property.getPossibleValues())
 		{
-			if (value.equals(property.m_6940_(cValue)))
+			if (value.equals(property.getName(cValue)))
 			{
 				return (BlockState) state.setValue(property, cValue);
 			}

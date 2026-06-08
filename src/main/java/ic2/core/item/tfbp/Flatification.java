@@ -20,27 +20,27 @@ public class Flatification extends TerraformerBase
 	@Override
 	void init()
 	{
-		removable.add(Blocks.f_50125_);
-		removable.add(Blocks.f_50126_);
-		removable.add(Blocks.f_50034_);
-		removable.add(Blocks.f_50069_);
-		removable.add(Blocks.f_49994_);
-		removable.add(Blocks.f_49992_);
-		removable.add(Blocks.f_50493_);
-		removable.add(Blocks.f_50050_);
-		removable.add(Blocks.f_50051_);
-		removable.add(Blocks.f_50052_);
-		removable.add(Blocks.f_50053_);
-		removable.add(Blocks.f_50054_);
-		removable.add(Blocks.f_50055_);
-		removable.add(Blocks.f_50359_);
-		removable.add(Blocks.f_50112_);
-		removable.add(Blocks.f_50111_);
-		removable.add(Blocks.f_50092_);
-		removable.add(Blocks.f_50073_);
-		removable.add(Blocks.f_50072_);
-		removable.add(Blocks.f_50133_);
-		removable.add(Blocks.f_50186_);
+		removable.add(Blocks.SNOW);
+		removable.add(Blocks.ICE);
+		removable.add(Blocks.GRASS);
+		removable.add(Blocks.STONE);
+		removable.add(Blocks.GRAVEL);
+		removable.add(Blocks.SAND);
+		removable.add(Blocks.DIRT);
+		removable.add(Blocks.OAK_LEAVES);
+		removable.add(Blocks.SPRUCE_LEAVES);
+		removable.add(Blocks.BIRCH_LEAVES);
+		removable.add(Blocks.JUNGLE_LEAVES);
+		removable.add(Blocks.ACACIA_LEAVES);
+		removable.add(Blocks.DARK_OAK_LEAVES);
+		removable.add(Blocks.TALL_GRASS);
+		removable.add(Blocks.POPPY);
+		removable.add(Blocks.DANDELION);
+		removable.add(Blocks.WHEAT);
+		removable.add(Blocks.RED_MUSHROOM);
+		removable.add(Blocks.BROWN_MUSHROOM);
+		removable.add(Blocks.PUMPKIN);
+		removable.add(Blocks.MELON);
 		removable.add(Ic2Blocks.RUBBER_LEAVES);
 		removable.add(Ic2Blocks.RUBBER_SAPLING);
 		removable.add(Ic2Blocks.RUBBER_LOG);
@@ -55,9 +55,9 @@ public class Flatification extends TerraformerBase
 			return false;
 		}
 
-		if (world.getBlockState(workPos).getBlock() == Blocks.f_50125_)
+		if (world.getBlockState(workPos).getBlock() == Blocks.SNOW)
 		{
-			workPos = workPos.m_7495_();
+			workPos = workPos.below();
 		}
 
 		if (pos.getY() == workPos.getY())
@@ -65,7 +65,7 @@ public class Flatification extends TerraformerBase
 			return false;
 		} else if (workPos.getY() < pos.getY())
 		{
-			world.setBlockAndUpdate(workPos.m_7494_(), Blocks.f_50493_.defaultBlockState());
+			world.setBlockAndUpdate(workPos.above(), Blocks.DIRT.defaultBlockState());
 			return true;
 		} else if (canRemove(world.getBlockState(workPos).getBlock()))
 		{
@@ -79,6 +79,6 @@ public class Flatification extends TerraformerBase
 
 	private static boolean canRemove(Block block)
 	{
-		return removable.contains(block) || block.m_204297_().m_203656_(BlockTags.f_13104_) || block.m_204297_().m_203656_(BlockTags.f_13106_);
+		return removable.contains(block) || block.builtInRegistryHolder().is(BlockTags.SAPLINGS) || block.builtInRegistryHolder().is(BlockTags.LOGS);
 	}
 }

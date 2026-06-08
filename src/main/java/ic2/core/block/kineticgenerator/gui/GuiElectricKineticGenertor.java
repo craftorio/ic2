@@ -51,7 +51,7 @@ public class GuiElectricKineticGenertor extends Ic2Gui<ContainerElectricKineticG
 	}
 
 	@Override
-	protected ResourceLocation getTexture()
+	protected ResourceLocation getTextureLocation()
 	{
 		return background;
 	}

@@ -25,7 +25,7 @@ public class OreWasherRecipeProvider extends Ic2RecipeProvider
 		BasicMachineRecipeGenerator<? extends BasicMachineRecipeGenerator<?>> gen = (BasicMachineRecipeGenerator<? extends BasicMachineRecipeGenerator<?>>) (new BasicMachineRecipeGenerator<>(
 			consumer, Ic2RecipeSerializers.ORE_WASHER, true
 		));
-		gen.amount(1000).add(Items.f_41832_, 1, Ic2Items.STONE_DUST);
+		gen.amount(1000).add(Items.GRAVEL, 1, Ic2Items.STONE_DUST);
 		gen.amount(1000)
 			.add(
 				Ic2Items.CRUSHED_COPPER,

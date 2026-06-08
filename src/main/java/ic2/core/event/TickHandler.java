@@ -20,13 +20,13 @@ public class TickHandler
 			WorldData worldData = WorldData.get(world, false);
 			if (worldData != null)
 			{
-				world.m_46473_().m_6180_("updates");
+				world.getProfiler().push("updates");
 				processUpdates(world, worldData);
-				world.m_46473_().m_6182_("Wind");
+				world.getProfiler().popPush("Wind");
 				worldData.windSim.updateWind();
-				world.m_46473_().m_6182_("energynet");
+				world.getProfiler().popPush("energynet");
 				worldData.energyNet.onTickStart();
-				world.m_46473_().m_7238_();
+				world.getProfiler().pop();
 			}
 		}
 	}
@@ -38,11 +38,11 @@ public class TickHandler
 			WorldData worldData = WorldData.get(world, false);
 			if (worldData != null)
 			{
-				world.m_46473_().m_6180_("energynet");
+				world.getProfiler().push("energynet");
 				worldData.energyNet.onTickEnd();
-				world.m_46473_().m_6182_("Networking");
+				world.getProfiler().popPush("Networking");
 				IC2.network.get(true).onTickEnd(worldData);
-				world.m_46473_().m_7238_();
+				world.getProfiler().pop();
 			}
 		}
 	}
@@ -109,7 +109,7 @@ public class TickHandler
 
 	private static void processUpdates(Level world, WorldData worldData)
 	{
-		world.m_46473_().m_6180_("single-update");
+		world.getProfiler().push("single-update");
 
 		IWorldTickCallback callback;
 		while ((callback = worldData.singleUpdates.poll()) != null)
@@ -122,7 +122,7 @@ public class TickHandler
 			callback.onTick(world);
 		}
 
-		world.m_46473_().m_6182_("cont-update");
+		world.getProfiler().popPush("cont-update");
 		worldData.continuousUpdatesInUse = true;
 
 		for (IWorldTickCallback update : worldData.continuousUpdates)
@@ -145,6 +145,6 @@ public class TickHandler
 		worldData.continuousUpdatesToAdd.clear();
 		worldData.continuousUpdates.removeAll(worldData.continuousUpdatesToRemove);
 		worldData.continuousUpdatesToRemove.clear();
-		world.m_46473_().m_7238_();
+		world.getProfiler().pop();
 	}
 }

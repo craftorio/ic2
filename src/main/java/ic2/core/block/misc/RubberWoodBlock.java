@@ -21,16 +21,16 @@ public class RubberWoodBlock extends Block
 		super(settings);
 	}
 
-	public InteractionResult m_6227_(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit)
+	public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit)
 	{
-		ItemStack mainHandItem = player.m_21205_();
+		ItemStack mainHandItem = player.getMainHandItem();
 		if (mainHandItem.getItem() instanceof AxeItem)
 		{
 			WorldUtil.strip(state, world, pos, player, mainHandItem, Ic2Blocks.STRIPPED_RUBBER_WOOD.defaultBlockState());
-			return InteractionResult.m_19078_(world.isClientSide);
+			return InteractionResult.sidedSuccess(world.isClientSide);
 		} else
 		{
-			return super.m_6227_(state, world, pos, player, hand, hit);
+			return super.use(state, world, pos, player, hand, hit);
 		}
 	}
 }

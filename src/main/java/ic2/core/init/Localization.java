@@ -9,11 +9,11 @@ public class Localization
 
 	public static String translate(String key)
 	{
-		return I18n.m_118938_(key, new Object[0]);
+		return I18n.get(key, new Object[0]);
 	}
 
 	public static String translate(String key, Object... args)
 	{
-		return I18n.m_118938_(key, args);
+		return I18n.get(key, args);
 	}
 }

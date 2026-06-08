@@ -27,6 +27,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Direction;
@@ -41,10 +43,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.Item.Properties;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.Nullable;
 
 public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSubInventory, IItemHudInfo
@@ -70,37 +73,37 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 	}
 
 	@OnlyIn(Dist.CLIENT)
-	public void m_7373_(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag advanced)
+	public void appendHoverText(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag advanced)
 	{
-		super.m_7373_(stack, world, tooltip, advanced);
+		super.appendHoverText(stack, world, tooltip, advanced);
 		switch (this.type)
 		{
 			case overclocker:
 				tooltip.add(
-					Component.m_237110_(
+					Component.translatable(
 							"ic2.tooltip.upgrade.overclocker.time",
 							new Object[] { decimalformat.format(100.0 * Math.pow(this.getProcessTimeMultiplier(stack, null), StackUtil.getSize(stack))) }
 						)
-						.m_130940_(ChatFormatting.GRAY)
+						.withStyle(ChatFormatting.GRAY)
 				);
 				tooltip.add(
-					Component.m_237110_(
+					Component.translatable(
 							"ic2.tooltip.upgrade.overclocker.power",
 							new Object[] { decimalformat.format(100.0 * Math.pow(this.getEnergyDemandMultiplier(stack, null), StackUtil.getSize(stack))) }
 						)
-						.m_130940_(ChatFormatting.GRAY)
+						.withStyle(ChatFormatting.GRAY)
 				);
 				break;
 			case transformer:
 				tooltip.add(
-					Component.m_237110_("ic2.tooltip.upgrade.transformer", new Object[] { this.getExtraTier(stack, null) * StackUtil.getSize(stack) })
-						.m_130940_(ChatFormatting.GRAY)
+					Component.translatable("ic2.tooltip.upgrade.transformer", new Object[] { this.getExtraTier(stack, null) * StackUtil.getSize(stack) })
+						.withStyle(ChatFormatting.GRAY)
 				);
 				break;
 			case energy_storage:
 				tooltip.add(
-					Component.m_237110_("ic2.tooltip.upgrade.storage", new Object[] { this.getExtraEnergyStorage(stack, null) * StackUtil.getSize(stack) })
-						.m_130940_(ChatFormatting.GRAY)
+					Component.translatable("ic2.tooltip.upgrade.storage", new Object[] { this.getExtraEnergyStorage(stack, null) * StackUtil.getSize(stack) })
+						.withStyle(ChatFormatting.GRAY)
 				);
 				break;
 			case ejector:
@@ -108,7 +111,7 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 			case fluid_ejector:
 			{
 				String side = getSideName(stack);
-				tooltip.add(Component.m_237110_("ic2.tooltip.upgrade.ejector", new Object[] { Localization.translate(side) }).m_130940_(ChatFormatting.GRAY));
+				tooltip.add(Component.translatable("ic2.tooltip.upgrade.ejector", new Object[] { Localization.translate(side) }).withStyle(ChatFormatting.GRAY));
 				break;
 			}
 			case pulling:
@@ -116,14 +119,14 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 			case fluid_pulling:
 			{
 				String side = getSideName(stack);
-				tooltip.add(Component.m_237110_("ic2.tooltip.upgrade.pulling", new Object[] { Localization.translate(side) }).m_130940_(ChatFormatting.GRAY));
+				tooltip.add(Component.translatable("ic2.tooltip.upgrade.pulling", new Object[] { Localization.translate(side) }).withStyle(ChatFormatting.GRAY));
 				break;
 			}
 			case redstone_inverter:
-				tooltip.add(Component.m_237115_("ic2.tooltip.upgrade.redstone").m_130940_(ChatFormatting.GRAY));
+				tooltip.add(Component.translatable("ic2.tooltip.upgrade.redstone").withStyle(ChatFormatting.GRAY));
 				break;
 			case remote_interface:
-				tooltip.add(Component.m_237110_("ic2.tooltip.upgrade.remote_interface", new Object[] { StackUtil.getSize(stack) }).m_130940_(ChatFormatting.GRAY));
+				tooltip.add(Component.translatable("ic2.tooltip.upgrade.remote_interface", new Object[] { StackUtil.getSize(stack) }).withStyle(ChatFormatting.GRAY));
 		}
 	}
 
@@ -154,12 +157,12 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 		}
 	}
 
-	public InteractionResult m_6225_(UseOnContext context)
+	public InteractionResult useOn(UseOnContext context)
 	{
-		ItemStack stack = context.m_43722_();
+		ItemStack stack = context.getItemInHand();
 		if (this.type.directional)
 		{
-			int dir = 1 + context.m_43719_().ordinal();
+			int dir = 1 + context.getClickedFace().ordinal();
 			CompoundTag nbtData = StackUtil.getOrCreateNbtData(stack);
 			if (nbtData.getByte("dir") == dir)
 			{
@@ -169,27 +172,27 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 				nbtData.putByte("dir", (byte) dir);
 			}
 
-			if (context.m_43725_().m_5776_())
+			if (context.getLevel().isClientSide())
 			{
 				switch (this.type)
 				{
 					case ejector:
 					case advanced_ejector:
 						IC2.sideProxy
-							.messagePlayer(context.m_43723_(), Localization.translate("ic2.tooltip.upgrade.ejector", Localization.translate(getSideName(stack))));
+							.messagePlayer(context.getPlayer(), Localization.translate("ic2.tooltip.upgrade.ejector", Localization.translate(getSideName(stack))));
 						break;
 					case fluid_ejector:
 						IC2.sideProxy
-							.messagePlayer(context.m_43723_(), Localization.translate("ic2.tooltip.upgrade.ejector", Localization.translate(getSideName(stack))));
+							.messagePlayer(context.getPlayer(), Localization.translate("ic2.tooltip.upgrade.ejector", Localization.translate(getSideName(stack))));
 						break;
 					case pulling:
 					case advanced_pulling:
 						IC2.sideProxy
-							.messagePlayer(context.m_43723_(), Localization.translate("ic2.tooltip.upgrade.pulling", Localization.translate(getSideName(stack))));
+							.messagePlayer(context.getPlayer(), Localization.translate("ic2.tooltip.upgrade.pulling", Localization.translate(getSideName(stack))));
 						break;
 					case fluid_pulling:
 						IC2.sideProxy
-							.messagePlayer(context.m_43723_(), Localization.translate("ic2.tooltip.upgrade.pulling", Localization.translate(getSideName(stack))));
+							.messagePlayer(context.getPlayer(), Localization.translate("ic2.tooltip.upgrade.pulling", Localization.translate(getSideName(stack))));
 				}
 			}
 
@@ -200,9 +203,9 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 		}
 	}
 
-	public InteractionResultHolder<ItemStack> m_7203_(Level world, Player player, InteractionHand hand)
+	public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand)
 	{
-		ItemStack stack = player.m_21120_(hand);
+		ItemStack stack = player.getItemInHand(hand);
 		switch (this.type)
 		{
 			case advanced_ejector:
@@ -224,13 +227,13 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 		{
 			case advanced_ejector:
 			case advanced_pulling:
-				if (!player.getCommandSenderWorld().isClientSide && !StackUtil.isEmpty(stack) && player.f_36096_ instanceof DynamicHandHeldContainer)
+				if (!player.getCommandSenderWorld().isClientSide && !StackUtil.isEmpty(stack) && player.containerMenu instanceof DynamicHandHeldContainer)
 				{
-					HandHeldInventory base = (HandHeldInventory) ((DynamicHandHeldContainer) player.f_36096_).base;
+					HandHeldInventory base = (HandHeldInventory) ((DynamicHandHeldContainer) player.containerMenu).base;
 					if (base instanceof HandHeldAdvancedUpgrade && base.isThisContainer(stack))
 					{
 						base.saveAsThrown(stack);
-						((ServerPlayer) player).m_6915_();
+						((ServerPlayer) player).closeContainer();
 					}
 				}
 			default:
@@ -391,6 +394,7 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 		switch (this.type)
 		{
 			case ejector:
+			{
 				int amount = (int) Math.pow(4.0, Math.min(4, size - 1));
 
 				for (EnvItemHandler.AdjacentInventory inv : getTargetInventories(stack, te))
@@ -398,7 +402,9 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 					StackUtil.ENV.transfer(StackUtil.ENV.wrapInventory(te, inv.getSide()), inv, amount);
 				}
 				break;
+			}
 			case advanced_ejector:
+			{
 				int amount = (int) Math.pow(4.0, Math.min(4, size - 1));
 
 				for (EnvItemHandler.AdjacentInventory inv : getTargetInventories(stack, te))
@@ -406,7 +412,9 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 					StackUtil.ENV.transfer(StackUtil.ENV.wrapInventory(te, inv.getSide()), inv, amount, stackChecker(stack));
 				}
 				break;
+			}
 			case fluid_ejector:
+			{
 				if (!LiquidUtil.isFluidTile(te, null))
 				{
 					return false;
@@ -419,7 +427,9 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 					LiquidUtil.transfer(te, fh.dir, fh.handler, amount);
 				}
 				break;
+			}
 			case pulling:
+			{
 				int amount = (int) Math.pow(4.0, Math.min(4, size - 1));
 
 				for (EnvItemHandler.AdjacentInventory inv : getTargetInventories(stack, te))
@@ -427,7 +437,9 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 					StackUtil.ENV.transfer(inv, StackUtil.ENV.wrapInventory(te, inv.getSide()), amount);
 				}
 				break;
+			}
 			case advanced_pulling:
+			{
 				int amount = (int) Math.pow(4.0, Math.min(4, size - 1));
 
 				for (EnvItemHandler.AdjacentInventory inv : getTargetInventories(stack, te))
@@ -435,7 +447,9 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 					StackUtil.ENV.transfer(inv, StackUtil.ENV.wrapInventory(te, inv.getSide()), amount, stackChecker(stack));
 				}
 				break;
+			}
 			case fluid_pulling:
+			{
 				if (!LiquidUtil.isFluidTile(te, null))
 				{
 					return false;
@@ -445,9 +459,10 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 
 				for (LiquidUtil.AdjacentFluidHandler fh : getTargetFluidHandlers(stack, te))
 				{
-					LiquidUtil.transfer(fh.handler, fh.dir.m_122424_(), te, amount);
+					LiquidUtil.transfer(fh.handler, fh.dir.getOpposite(), te, amount);
 				}
 				break;
+			}
 			default:
 				return false;
 		}
@@ -479,15 +494,15 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 			private Set<ItemStack> getFilterStacks(CompoundTag nbt)
 			{
 				Set<ItemStack> ret = new HashSet<>();
-				ListTag contentList = nbt.m_128437_("Items", 10);
+				ListTag contentList = nbt.getList("Items", 10);
 
 				for (int tag = 0; tag < contentList.size(); tag++)
 				{
-					CompoundTag slotNbt = contentList.m_128728_(tag);
+					CompoundTag slotNbt = contentList.getCompound(tag);
 					int slot = slotNbt.getByte("Slot");
 					if (slot >= 0 && slot < 9)
 					{
-						ItemStack filter = ItemStack.m_41712_(slotNbt);
+						ItemStack filter = ItemStack.of(slotNbt);
 						if (!StackUtil.isEmpty(filter))
 						{
 							ret.add(filter);

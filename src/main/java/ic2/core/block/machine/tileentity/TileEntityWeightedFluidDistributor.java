@@ -36,12 +36,12 @@ public class TileEntityWeightedFluidDistributor extends TileEntityFluidDistribut
 	public void load(CompoundTag nbt)
 	{
 		super.load(nbt);
-		int[] indexes = nbt.m_128465_("priority");
+		int[] indexes = nbt.getIntArray("priority");
 		if (indexes.length > 0)
 		{
 			for (int index : indexes)
 			{
-				this.priority.add(Direction.m_122376_(index));
+				this.priority.add(Direction.from3DDataValue(index));
 			}
 		}
 	}
@@ -56,10 +56,10 @@ public class TileEntityWeightedFluidDistributor extends TileEntityFluidDistribut
 
 			for (int i = 0; i < indexes.length; i++)
 			{
-				indexes[i] = this.priority.get(i).m_122411_();
+				indexes[i] = this.priority.get(i).get3DDataValue();
 			}
 
-			nbt.m_128385_("priority", indexes);
+			nbt.putIntArray("priority", indexes);
 		}
 	}
 
@@ -93,7 +93,7 @@ public class TileEntityWeightedFluidDistributor extends TileEntityFluidDistribut
 			{
 				assert dir != this.getFacing();
 				BlockEntity target = this.level.getBlockEntity(this.worldPosition.relative(dir));
-				Direction side = dir.m_122424_();
+				Direction side = dir.getOpposite();
 				if (LiquidUtil.isFluidTile(target, side))
 				{
 					int amount = LiquidUtil.fillTile(target, side, this.fluidTank.getFluidStack(), false);
@@ -139,7 +139,7 @@ public class TileEntityWeightedFluidDistributor extends TileEntityFluidDistribut
 	public void onNetworkEvent(Player player, int event)
 	{
 		int position = event / 10;
-		Direction facing = Direction.m_122376_(event % 10 & 6);
+		Direction facing = Direction.from3DDataValue(event % 10 & 6);
 		assert position >= 0 && position <= this.priority.size() : "Position was " + position;
 		assert facing != this.getFacing();
 		if (position == this.priority.size())

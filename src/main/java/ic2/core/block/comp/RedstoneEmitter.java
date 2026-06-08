@@ -12,6 +12,6 @@ public class RedstoneEmitter extends BasicRedstoneComponent
 	@Override
 	public void onChange()
 	{
-		this.parent.getLevel().m_46672_(this.parent.getBlockPos(), this.parent.getBlockState().getBlock());
+		this.parent.getLevel().updateNeighborsAt(this.parent.getBlockPos(), this.parent.getBlockState().getBlock());
 	}
 }

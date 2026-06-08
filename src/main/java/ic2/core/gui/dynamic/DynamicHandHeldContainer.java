@@ -44,23 +44,23 @@ public class DynamicHandHeldContainer<T extends HandHeldInventory> extends Dynam
 	}
 
 	@Override
-	public void m_150399_(int slot, int button, ClickType type, Player player)
+	public void clicked(int slot, int button, ClickType type, Player player)
 	{
 		ItemStack stack = null;
 		boolean thrown = false;
 		Slot realSlot = null;
-		if (!player.getCommandSenderWorld().isClientSide && slot >= 0 && slot < this.f_38839_.size())
+		if (!player.getCommandSenderWorld().isClientSide && slot >= 0 && slot < this.slots.size())
 		{
-			realSlot = (Slot) this.f_38839_.get(slot);
-			stack = realSlot.m_7993_();
+			realSlot = (Slot) this.slots.get(slot);
+			stack = realSlot.getItem();
 			thrown = this.base.isThisContainer(stack);
 		}
 
-		super.m_150399_(slot, button, type, player);
-		if (thrown && !realSlot.m_6657_())
+		super.clicked(slot, button, type, player);
+		if (thrown && !realSlot.hasItem())
 		{
 			this.base.saveAsThrown(stack);
-			((ServerPlayer) player).m_6915_();
+			((ServerPlayer) player).closeContainer();
 		}
 	}
 

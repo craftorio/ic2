@@ -312,8 +312,8 @@ public class ConfigUtil
 			{
 				amount = 1000;
 			}
-
-			ResourceLocation id = ResourceLocation.fromNamespaceAndPath(itemName.substring("Fluid:".length()));
+			// TODO
+			ResourceLocation id = ResourceLocation.withDefaultNamespace(itemName.substring("Fluid:".length()));
 			Fluid fluid = Util.getFluid(id);
 			return fluid == null ? null : Recipes.inputFactory.forFluidContainer(fluid, amount);
 		} else

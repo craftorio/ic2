@@ -66,7 +66,7 @@ public class Ic2FluidTank
 			this.fluidStack.toNbt(nbt);
 		} else
 		{
-			nbt.m_128359_("Empty", "");
+			nbt.putString("Empty", "");
 		}
 
 		return nbt;

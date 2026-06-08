@@ -13,7 +13,7 @@ public class ContainerCanner extends ContainerStandardMachine<TileEntityCanner>
 	public ContainerCanner(int syncId, Inventory playerInventory, TileEntityCanner canner)
 	{
 		super(Ic2ScreenHandlers.CANNER, syncId, playerInventory, canner, 184, 8, 80, 80, 44, 119, 17, 152, 26);
-		this.m_38897_(new SlotInvSlot(canner.canInputSlot, 0, 41, 17));
+		this.addSlot(new SlotInvSlot(canner.canInputSlot, 0, 41, 17));
 	}
 
 	@Override

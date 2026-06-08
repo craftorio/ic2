@@ -129,8 +129,8 @@ public final class EnvProxyForge implements EnvProxy
 	@Override
 	public <T extends BlockEntity> BlockEntityType<T> registerBlockEntity(ResourceLocation id, BiFunction<BlockPos, BlockState, T> factory, Block... blocks)
 	{
-		BlockEntityType<T> type = Builder.m_155273_(factory::apply, blocks).m_58966_(null);
-		blockEntityRegistry.register(id.m_135815_(), () -> type);
+		BlockEntityType<T> type = Builder.of(factory::apply, blocks).build(null);
+		blockEntityRegistry.register(id.getPath(), () -> type);
 		return type;
 	}
 
@@ -138,7 +138,7 @@ public final class EnvProxyForge implements EnvProxy
 	public <T extends AbstractContainerMenu> MenuType<T> registerScreenHandler(ResourceLocation id, BiFunction<Integer, Inventory, T> factory)
 	{
 		MenuType<T> type = new MenuType(factory::apply);
-		screenHandlerRegistry.register(id.m_135815_(), () -> type);
+		screenHandlerRegistry.register(id.getPath(), () -> type);
 		return type;
 	}
 
@@ -148,7 +148,7 @@ public final class EnvProxyForge implements EnvProxy
 	)
 	{
 		MenuType<T> type = IForgeMenuType.create(factory::create);
-		screenHandlerRegistry.register(id.m_135815_(), () -> type);
+		screenHandlerRegistry.register(id.getPath(), () -> type);
 		return type;
 	}
 
@@ -161,19 +161,19 @@ public final class EnvProxyForge implements EnvProxy
 	@Override
 	public void registerEntity(ResourceLocation id, EntityType<?> type)
 	{
-		entityRegistry.register(id.m_135815_(), () -> type);
+		entityRegistry.register(id.getPath(), () -> type);
 	}
 
 	@Override
 	public WoodType registerSignType(String name)
 	{
-		return WoodType.m_61844_(WoodType.create(name));
+		return WoodType.register(WoodType.create(name));
 	}
 
 	@Override
 	public void registerStatusEffect(ResourceLocation id, MobEffect effect)
 	{
-		statusEffectRegistry.register(id.m_135815_(), () -> effect);
+		statusEffectRegistry.register(id.getPath(), () -> effect);
 	}
 
 	@Override
@@ -194,7 +194,7 @@ public final class EnvProxyForge implements EnvProxy
 	public GameEvent registerGameEvent(String id, int range)
 	{
 		ResourceLocation identifier = IC2.getIdentifier(id);
-		return (GameEvent) Registry.m_122965_(Registry.f_175412_, identifier, new GameEvent(identifier.toString(), range));
+		return (GameEvent) Registry.register(Registry.GAME_EVENT, identifier, new GameEvent(identifier.toString(), range));
 	}
 
 	@Override
@@ -203,7 +203,7 @@ public final class EnvProxyForge implements EnvProxy
 	)
 	{
 		CompletableFuture<Holder<ConfiguredFeature<FC, ?>>> ret = new CompletableFuture<>();
-		configuredFeatureRegistrations.add(() -> ret.complete(FeatureUtils.m_206488_(id.toString(), feature, config)));
+		configuredFeatureRegistrations.add(() -> ret.complete(FeatureUtils.register(id.toString(), feature, config)));
 		return ret;
 	}
 
@@ -230,7 +230,7 @@ public final class EnvProxyForge implements EnvProxy
 	public <T extends FoliagePlacer> FoliagePlacerType<T> registerFoliagePlacer(ResourceLocation id, Codec<T> codec)
 	{
 		FoliagePlacerType<T> type = new FoliagePlacerType(codec);
-		foliagePlacerRegistry.register(id.m_135815_(), () -> type);
+		foliagePlacerRegistry.register(id.getPath(), () -> type);
 		return type;
 	}
 
@@ -238,14 +238,14 @@ public final class EnvProxyForge implements EnvProxy
 	public <T extends Recipe<?>> RecipeType<T> registerRecipeType(ResourceLocation id)
 	{
 		RecipeType<T> type = RecipeType.simple(id);
-		recipeTypeRegistry.register(id.m_135815_(), () -> type);
+		recipeTypeRegistry.register(id.getPath(), () -> type);
 		return type;
 	}
 
 	@Override
 	public void registerRecipeSerializer(ResourceLocation id, RecipeSerializer<?> serializer)
 	{
-		recipeSerializerRegistry.register(id.m_135815_(), () -> serializer);
+		recipeSerializerRegistry.register(id.getPath(), () -> serializer);
 	}
 
 	@Override
@@ -257,14 +257,14 @@ public final class EnvProxyForge implements EnvProxy
 	@Override
 	public CreativeModeTab createItemGroup(ResourceLocation id, Supplier<ItemStack> iconSupplier)
 	{
-		return new CreativeModeTab(String.format("%s.%s", id.m_135827_(), id.m_135815_()))
+		return new CreativeModeTab(String.format("%s.%s", id.getNamespace(), id.getPath()))
 		{
-			public ItemStack m_40787_()
+			public ItemStack getIconItem()
 			{
 				return iconSupplier.get();
 			}
 
-			public ItemStack m_6976_()
+			public ItemStack makeIcon()
 			{
 				return null;
 			}
@@ -322,7 +322,7 @@ public final class EnvProxyForge implements EnvProxy
 	@Override
 	public void registerBurnTime(ItemLike stack, int value)
 	{
-		burnTimeRecord.put(stack.m_5456_(), value);
+		burnTimeRecord.put(stack.asItem(), value);
 	}
 
 	@Override

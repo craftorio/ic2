@@ -64,7 +64,7 @@ public final class Ic2RecipeSerializers
 	{
 		return json ->
 		{
-			int metaValue = GsonHelper.m_13927_(json, name);
+			int metaValue = GsonHelper.getAsInt(json, name);
 			CompoundTag nbt = new CompoundTag();
 			nbt.putInt(name, metaValue);
 			return nbt;
@@ -75,8 +75,8 @@ public final class Ic2RecipeSerializers
 	{
 		return json ->
 		{
-			int metaValue1 = GsonHelper.m_13927_(json, name1);
-			int metaValue2 = GsonHelper.m_13927_(json, name2);
+			int metaValue1 = GsonHelper.getAsInt(json, name1);
+			int metaValue2 = GsonHelper.getAsInt(json, name2);
 			CompoundTag nbt = new CompoundTag();
 			nbt.putInt(name1, metaValue1);
 			nbt.putInt(name2, metaValue2);

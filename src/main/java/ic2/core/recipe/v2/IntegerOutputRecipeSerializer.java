@@ -25,7 +25,7 @@ public class IntegerOutputRecipeSerializer implements RecipeSerializer<RecipeHol
 		this.metaProcessor = metaProcessor;
 	}
 
-	public RecipeHolder<IRecipeInput, Integer> read(ResourceLocation id, JsonObject json)
+	public RecipeHolder<IRecipeInput, Integer> fromJson(ResourceLocation id, JsonObject json)
 	{
 		IRecipeInput input = RecipeIo.parseInput(json.get("ingredient"));
 		int output = json.get("result").getAsInt();
@@ -33,22 +33,22 @@ public class IntegerOutputRecipeSerializer implements RecipeSerializer<RecipeHol
 		return new RecipeHolder<>(new MachineRecipe<>(input, output, meta), id, this, this.recipeType);
 	}
 
-	public RecipeHolder<IRecipeInput, Integer> read(ResourceLocation id, FriendlyByteBuf buf)
+	public RecipeHolder<IRecipeInput, Integer> fromNetwork(ResourceLocation id, FriendlyByteBuf buf)
 	{
 		byte type = buf.readByte();
 		if (type != 0)
 		{
-			throw new Error("Reading recipe error! The type of recipe: \"" + id.m_135815_() + "\" is wrong!");
+			throw new Error("Reading recipe error! The type of recipe: \"" + id.getPath() + "\" is wrong!");
 		} else
 		{
-			return new RecipeHolder<>(new MachineRecipe<>(RecipeIo.readInput(buf), RecipeIo.readIntegerOutput(buf), buf.m_130260_()), id, this, this.recipeType);
+			return new RecipeHolder<>(new MachineRecipe<>(RecipeIo.readInput(buf), RecipeIo.readIntegerOutput(buf), buf.readNbt()), id, this, this.recipeType);
 		}
 	}
 
-	public void write(FriendlyByteBuf buf, RecipeHolder<IRecipeInput, Integer> recipe)
+	public void toNetwork(FriendlyByteBuf buf, RecipeHolder<IRecipeInput, Integer> recipe)
 	{
 		RecipeIo.writeInput(buf, recipe.recipe().getInput());
 		RecipeIo.writeIntegerOutput(buf, recipe.recipe().getOutput());
-		buf.m_130079_(recipe.recipe().getMetaData());
+		buf.writeNbt(recipe.recipe().getMetaData());
 	}
 }

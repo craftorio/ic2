@@ -40,7 +40,7 @@ public class CropBaseMushroom extends CropBase
 	@Override
 	public ItemStack getGain(ICropTile crop)
 	{
-		return this.cropDrop.m_41777_();
+		return this.cropDrop.copy();
 	}
 
 	@Override

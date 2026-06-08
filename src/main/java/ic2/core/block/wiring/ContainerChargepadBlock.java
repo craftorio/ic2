@@ -14,8 +14,8 @@ public class ContainerChargepadBlock extends ContainerFullInv<TileEntityChargepa
 	public ContainerChargepadBlock(int syncId, Inventory playerInventory, TileEntityChargepadBlock be)
 	{
 		super(Ic2ScreenHandlers.CHARGEPAD, syncId, playerInventory, be, 161);
-		this.m_38897_(new SlotInvSlot(be.chargeSlot, 0, 56, 17));
-		this.m_38897_(new SlotInvSlot(be.dischargeSlot, 0, 56, 53));
+		this.addSlot(new SlotInvSlot(be.chargeSlot, 0, 56, 17));
+		this.addSlot(new SlotInvSlot(be.dischargeSlot, 0, 56, 53));
 	}
 
 	@Override

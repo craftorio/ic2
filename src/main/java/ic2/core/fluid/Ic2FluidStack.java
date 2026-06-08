@@ -8,7 +8,7 @@ import net.minecraft.world.level.material.Fluids;
 
 public interface Ic2FluidStack
 {
-	Ic2FluidStack EMPTY = create(Fluids.f_76191_, 0);
+	Ic2FluidStack EMPTY = create(Fluids.EMPTY, 0);
 	int BUCKET_MB = 1000;
 
 	static Ic2FluidStack create(Fluid fluid, int amount)

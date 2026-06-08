@@ -110,7 +110,7 @@ public class Process extends TileEntityComponent
 
 	public static Process asBlockCutter(TileEntityInventory parent, int operationCost, int operationDuration, int outputSlots, int upgradeSlots)
 	{
-		return new Process(parent, Recipes.blockcutter, operationCost, operationDuration, outputSlots, upgradeSlots);
+		return new Process(parent, Recipes.block_cutter, operationCost, operationDuration, outputSlots, upgradeSlots);
 	}
 
 	public static Process asBlastFurnace(TileEntityInventory parent)
@@ -120,7 +120,7 @@ public class Process extends TileEntityComponent
 
 	public static Process asBlastFurnace(TileEntityInventory parent, int operationCost, int operationDuration, int outputSlots, int upgradeSlots)
 	{
-		return new Process(parent, Recipes.blastfurnace, operationCost, operationDuration, outputSlots, upgradeSlots);
+		return new Process(parent, Recipes.blast_furnace, operationCost, operationDuration, outputSlots, upgradeSlots);
 	}
 
 	public static Process asExtruder(TileEntityInventory parent)

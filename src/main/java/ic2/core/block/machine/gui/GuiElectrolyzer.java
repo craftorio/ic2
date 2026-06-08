@@ -50,7 +50,7 @@ public class GuiElectrolyzer extends Ic2Gui<ContainerElectrolyzer>
 	}
 
 	@Override
-	protected ResourceLocation getTexture()
+	protected ResourceLocation getTextureLocation()
 	{
 		return background;
 	}

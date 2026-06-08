@@ -34,7 +34,7 @@ public class GuiEnergyOMatClosed extends Ic2Gui<ContainerEnergyOMatClosed>
 	}
 
 	@Override
-	protected ResourceLocation getTexture()
+	protected ResourceLocation getTextureLocation()
 	{
 		return background;
 	}

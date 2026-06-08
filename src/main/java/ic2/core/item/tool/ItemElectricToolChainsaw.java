@@ -41,7 +41,7 @@ public class ItemElectricToolChainsaw extends ItemElectricTool implements IHitSo
 {
 	public ItemElectricToolChainsaw(Properties settings)
 	{
-		super(settings, 100, Ic2ToolMaterials.CHAINSAW, Collections.singletonList(BlockTags.f_144280_));
+		super(settings, 100, Ic2ToolMaterials.CHAINSAW, Collections.singletonList(BlockTags.MINEABLE_WITH_AXE));
 		this.maxCharge = 30000;
 		this.transferLimit = 100;
 		this.tier = 1;
@@ -53,11 +53,11 @@ public class ItemElectricToolChainsaw extends ItemElectricTool implements IHitSo
 	}
 
 	@Override
-	public InteractionResultHolder<ItemStack> m_7203_(Level world, Player player, InteractionHand hand)
+	public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand)
 	{
 		if (world.isClientSide)
 		{
-			return super.m_7203_(world, player, hand);
+			return super.use(world, player, hand);
 		}
 
 		if (IC2.keyboard.isModeSwitchKeyDown(player))
@@ -74,25 +74,25 @@ public class ItemElectricToolChainsaw extends ItemElectricTool implements IHitSo
 			}
 		}
 
-		return super.m_7203_(world, player, hand);
+		return super.use(world, player, hand);
 	}
 
 	@Override
-	public boolean m_8096_(BlockState state)
+	public boolean isCorrectToolForDrops(BlockState state)
 	{
-		return super.m_8096_(state) || state.m_60713_(Blocks.f_50033_) || Util.canShear(state);
+		return super.isCorrectToolForDrops(state) || state.is(Blocks.COBWEB) || Util.canShear(state);
 	}
 
 	@Override
-	public float m_8102_(ItemStack stack, BlockState state)
+	public float getDestroySpeed(ItemStack stack, BlockState state)
 	{
-		return !this.canUse(stack) || !state.m_204336_(BlockTags.f_144280_) && !state.m_60713_(Blocks.f_50033_) && !Util.canShear(state) ? 1.0F : this.f_40980_;
+		return !this.canUse(stack) || !state.is(BlockTags.MINEABLE_WITH_AXE) && !state.is(Blocks.COBWEB) && !Util.canShear(state) ? 1.0F : this.speed;
 	}
 
 	@Override
 	public boolean onAttackEntity(Player player, Entity target)
 	{
-		ItemStack itemstack = player.m_21205_();
+		ItemStack itemstack = player.getMainHandItem();
 		if (this.consumeEnergy(itemstack, this.operationEnergyCost, player))
 		{
 			this.playUsingSound(player);
@@ -103,28 +103,28 @@ public class ItemElectricToolChainsaw extends ItemElectricTool implements IHitSo
 
 	private void handleVanillaBlockBreakLogic(Player player, Level world, BlockPos pos, BlockState state)
 	{
-		world.m_5898_(player, 2001, pos, Block.m_49956_(state));
-		if (state.m_204336_(BlockTags.f_13088_))
+		world.levelEvent(player, 2001, pos, Block.getId(state));
+		if (state.is(BlockTags.GUARDED_BY_PIGLINS))
 		{
-			PiglinAi.m_34873_(player, false);
+			PiglinAi.angerNearbyPiglins(player, false);
 		}
 
-		world.m_220407_(GameEvent.f_157794_, pos, Context.m_223719_(player, state));
+		world.gameEvent(GameEvent.BLOCK_DESTROY, pos, Context.of(player, state));
 	}
 
 	@Override
 	public InteractionResult onBlockStartBreak(Player player, Level world, InteractionHand hand, BlockPos pos, Direction direction)
 	{
 		BlockState state = world.getBlockState(pos);
-		ItemStack stack = player.m_21120_(hand);
+		ItemStack stack = player.getItemInHand(hand);
 		if (!this.isShearMode(stack) || !Util.canShear(state))
 		{
 			return InteractionResult.PASS;
 		} else if (this.consumeEnergy(stack, this.operationEnergyCost, player))
 		{
 			this.handleVanillaBlockBreakLogic(player, world, pos, state);
-			StackUtil.dropAsEntity(world, pos, new ItemStack(state.getBlock().m_5456_()));
-			world.m_7731_(pos, Blocks.f_50016_.defaultBlockState(), 11);
+			StackUtil.dropAsEntity(world, pos, new ItemStack(state.getBlock().asItem()));
+			world.setBlock(pos, Blocks.AIR.defaultBlockState(), 11);
 			this.playUsingSound(player);
 			return InteractionResult.SUCCESS;
 		} else
@@ -133,14 +133,14 @@ public class ItemElectricToolChainsaw extends ItemElectricTool implements IHitSo
 		}
 	}
 
-	public InteractionResult m_6880_(ItemStack stack, Player user, LivingEntity entity, InteractionHand hand)
+	public InteractionResult interactLivingEntity(ItemStack stack, Player user, LivingEntity entity, InteractionHand hand)
 	{
 		if (entity instanceof Shearable shearable
 			&& !StackUtil.getOrCreateNbtData(stack).getBoolean("disableShear")
 			&& this.consumeEnergy(stack, this.operationEnergyCost, user)
-			&& shearable.m_6220_())
+			&& shearable.readyForShearing())
 		{
-			shearable.m_5851_(SoundSource.PLAYERS);
+			shearable.shear(SoundSource.PLAYERS);
 			this.playUsingSound(user);
 			return InteractionResult.SUCCESS;
 		} else
@@ -151,15 +151,15 @@ public class ItemElectricToolChainsaw extends ItemElectricTool implements IHitSo
 
 	public void playUsingSound(LivingEntity user)
 	{
-		if (user.m_9236_().isClientSide)
+		if (user.getLevel().isClientSide)
 		{
-			user.m_5496_(this.getToolUsingSound(), 1.0F, 1.0F);
+			user.playSound(this.getToolUsingSound(), 1.0F, 1.0F);
 		}
 	}
 
 	public SoundEvent getToolUsingSound()
 	{
-		return IC2.random.m_188499_() ? Ic2SoundEvents.ITEM_CHAINSAW_USE1 : Ic2SoundEvents.ITEM_CHAINSAW_USE2;
+		return IC2.random.nextBoolean() ? Ic2SoundEvents.ITEM_CHAINSAW_USE1 : Ic2SoundEvents.ITEM_CHAINSAW_USE2;
 	}
 
 	@Override

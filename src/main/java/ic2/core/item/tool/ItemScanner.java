@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -40,27 +42,27 @@ public class ItemScanner extends BaseElectricItem implements IBoxable, IHandHeld
 	}
 
 	@OnlyIn(Dist.CLIENT)
-	public void m_7373_(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag advanced)
+	public void appendHoverText(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag advanced)
 	{
-		super.m_7373_(stack, world, tooltip, advanced);
-		tooltip.add(Component.m_237110_("ic2.scanner.range", new Object[] { this.getScanRange() + "" }).m_130940_(ChatFormatting.GRAY));
+		super.appendHoverText(stack, world, tooltip, advanced);
+		tooltip.add(Component.translatable("ic2.scanner.range", new Object[] { this.getScanRange() + "" }).withStyle(ChatFormatting.GRAY));
 	}
 
-	public InteractionResultHolder<ItemStack> m_7203_(Level world, Player player, InteractionHand hand)
+	public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand)
 	{
 		ItemStack stack = StackUtil.get(player, hand);
 		if ((this.tier != 1 || ElectricItem.manager.use(stack, 50.0, player)) && (this.tier != 2 || ElectricItem.manager.use(stack, 250.0, player)))
 		{
 			if (!world.isClientSide)
 			{
-				if (this.getInventory(player, hand, stack).openManagedItem(player, hand, null) && player.f_36096_ instanceof ContainerToolScanner container)
+				if (this.getInventory(player, hand, stack).openManagedItem(player, hand, null) && player.containerMenu instanceof ContainerToolScanner container)
 				{
-					Map<ItemComparableItemStack, Integer> scanResult = this.scan(player.getCommandSenderWorld(), player.m_20183_(), this.getScanRange());
+					Map<ItemComparableItemStack, Integer> scanResult = this.scan(player.getCommandSenderWorld(), player.blockPosition(), this.getScanRange());
 					container.setResults(this.scanMapToSortedList(scanResult));
 				}
 			} else
 			{
-				player.m_5496_(Ic2SoundEvents.ITEM_SCANNER_USE, 1.0F, 1.0F);
+				player.playSound(Ic2SoundEvents.ITEM_SCANNER_USE, 1.0F, 1.0F);
 			}
 
 			return new InteractionResultHolder(InteractionResult.SUCCESS, stack);
@@ -72,13 +74,13 @@ public class ItemScanner extends BaseElectricItem implements IBoxable, IHandHeld
 
 	public boolean onDroppedByPlayer(ItemStack stack, Player player)
 	{
-		if (!player.getCommandSenderWorld().isClientSide && !StackUtil.isEmpty(stack) && player.f_36096_ instanceof ContainerToolScanner)
+		if (!player.getCommandSenderWorld().isClientSide && !StackUtil.isEmpty(stack) && player.containerMenu instanceof ContainerToolScanner)
 		{
-			HandHeldScanner scanner = ((ContainerToolScanner) player.f_36096_).base;
+			HandHeldScanner scanner = ((ContainerToolScanner) player.containerMenu).base;
 			if (scanner.isThisContainer(stack))
 			{
 				scanner.saveAsThrown(stack);
-				((ServerPlayer) player).m_6915_();
+				((ServerPlayer) player).closeContainer();
 			}
 		}
 
@@ -122,10 +124,10 @@ public class ItemScanner extends BaseElectricItem implements IBoxable, IHandHeld
 					BlockState state = world.getBlockState(tmpPos);
 					if (!state.isAir())
 					{
-						ItemStack blockItemStack = new ItemStack(state.getBlock().m_5456_(), 1);
+						ItemStack blockItemStack = new ItemStack(state.getBlock().asItem(), 1);
 						if (StackUtil.isOreStack(blockItemStack))
 						{
-							ItemStack pickStack = state.getBlock().m_7397_(world, center, state);
+							ItemStack pickStack = state.getBlock().getCloneItemStack(world, center, state);
 							ItemComparableItemStack key = new ItemComparableItemStack(pickStack, true);
 							Integer count = ret.get(key);
 							if (count == null)

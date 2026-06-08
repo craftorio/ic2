@@ -23,18 +23,11 @@ public class InvSlotProcessableCanner extends InvSlotProcessable<Object, Object,
 	@Override
 	public boolean accepts(ItemStack stack)
 	{
-		switch (((TileEntityCanner) this.base).getMode())
+		return switch (((TileEntityCanner) this.base).getMode())
 		{
-			case BottleSolid:
-			case EnrichLiquid:
-				return super.accepts(stack);
-			case BottleLiquid:
-			case EmptyLiquid:
-				return false;
-			default:
-				assert false;
-				return false;
-		}
+			case BottleSolid, EnrichLiquid -> super.accepts(stack);
+			case BottleLiquid, EmptyLiquid -> false;
+		};
 	}
 
 	@Override
@@ -58,20 +51,13 @@ public class InvSlotProcessableCanner extends InvSlotProcessable<Object, Object,
 	protected Object getInput(ItemStack fill)
 	{
 		ItemStack container = ((TileEntityCanner) this.base).canInputSlot.get();
-		switch (((TileEntityCanner) this.base).getMode())
+		return switch (((TileEntityCanner) this.base).getMode())
 		{
-			case BottleSolid:
-				return new ICannerBottleRecipeManager.RawInput(container, fill);
-			case EnrichLiquid:
-				return new ICannerEnrichRecipeManager.RawInput(this.getTankFluid(), fill);
-			case BottleLiquid:
-				return new IFillFluidContainerRecipeManager.Input(container, this.getTankFluid());
-			case EmptyLiquid:
-				return container;
-			default:
-				assert false;
-				return null;
-		}
+			case BottleSolid -> new ICannerBottleRecipeManager.RawInput(container, fill);
+			case EnrichLiquid -> new ICannerEnrichRecipeManager.RawInput(this.getTankFluid(), fill);
+			case BottleLiquid -> new IFillFluidContainerRecipeManager.Input(container, this.getTankFluid());
+			case EmptyLiquid -> container;
+		};
 	}
 
 	@Override
@@ -125,23 +111,17 @@ public class InvSlotProcessableCanner extends InvSlotProcessable<Object, Object,
 	protected MachineRecipeResult<Object, Object, Object> getOutput(Object input, boolean forAccept)
 	{
 		Level world = this.base.getParent().getLevel();
-		switch (((TileEntityCanner) this.base).getMode())
+		return switch (((TileEntityCanner) this.base).getMode())
 		{
-			case BottleSolid:
-				return Recipes.cannerBottle.get(world).apply((ICannerBottleRecipeManager.RawInput) input, forAccept);
-			case EnrichLiquid:
-				return Recipes.cannerEnrich.get(world).apply((ICannerEnrichRecipeManager.RawInput) input, forAccept);
-			case BottleLiquid:
-				return Recipes.fillFluidContainer.apply((IFillFluidContainerRecipeManager.Input) input, FluidContainerOutputMode.EmptyFullToOutput, forAccept);
-			case EmptyLiquid:
-				return Recipes.emptyFluidContainer
-					.apply(
-						(ItemStack) input, this.getTankFluid() == null ? null : this.getTankFluid().getFluid(), FluidContainerOutputMode.EmptyFullToOutput, forAccept
-					);
-			default:
-				assert false;
-				return null;
-		}
+			case BottleSolid ->
+				(MachineRecipeResult) Recipes.cannerBottle.get(world).apply((ICannerBottleRecipeManager.RawInput) input, forAccept);
+			case EnrichLiquid ->
+				(MachineRecipeResult) Recipes.cannerEnrich.get(world).apply((ICannerEnrichRecipeManager.RawInput) input, forAccept);
+			case BottleLiquid ->
+				(MachineRecipeResult) Recipes.fillFluidContainer.apply((IFillFluidContainerRecipeManager.Input) input, FluidContainerOutputMode.EmptyFullToOutput, forAccept);
+			case EmptyLiquid ->
+				(MachineRecipeResult) Recipes.emptyFluidContainer.apply((ItemStack) input, this.getTankFluid() == null ? null : this.getTankFluid().getFluid(), FluidContainerOutputMode.EmptyFullToOutput, forAccept);
+		};
 	}
 
 	private Ic2FluidStack getTankFluid()

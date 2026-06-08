@@ -8,8 +8,8 @@ import net.minecraft.world.level.ItemLike;
 
 public enum Ic2ToolMaterials implements Tier
 {
-	BRONZE(2, 350, 6.0F, 2.0F, 14, () -> Ingredient.m_43929_(new ItemLike[] { Ic2Items.BRONZE_INGOT })),
-	CHAINSAW(3, 250, 12.0F, 9.0F, 14, Ingredient::m_151265_);
+	BRONZE(2, 350, 6.0F, 2.0F, 14, () -> Ingredient.of(new ItemLike[] { Ic2Items.BRONZE_INGOT })),
+	CHAINSAW(3, 250, 12.0F, 9.0F, 14, Ingredient::of);
 
 	private final int miningLevel;
 	private final int itemDurability;
@@ -28,32 +28,32 @@ public enum Ic2ToolMaterials implements Tier
 		this.repairIngredient = repairIngredient;
 	}
 
-	public int m_6609_()
+	public int getUses()
 	{
 		return this.itemDurability;
 	}
 
-	public float m_6624_()
+	public float getSpeed()
 	{
 		return this.miningSpeed;
 	}
 
-	public float m_6631_()
+	public float getAttackDamageBonus()
 	{
 		return this.attackDamage;
 	}
 
-	public int m_6604_()
+	public int getLevel()
 	{
 		return this.miningLevel;
 	}
 
-	public int m_6601_()
+	public int getEnchantmentValue()
 	{
 		return this.enchantability;
 	}
 
-	public Ingredient m_6282_()
+	public Ingredient getRepairIngredient()
 	{
 		return this.repairIngredient.get();
 	}

@@ -68,25 +68,25 @@ public class LaserBulletEntity extends ThrowableProjectile
 	{
 		this(world, owner);
 		this.owner = owner;
-		this.m_20248_(start.x, start.y, start.z);
+		this.absMoveTo(start.x, start.y, start.z);
 		this.range = range;
 		this.power = power;
 		this.blockBreaks = blockBreaks;
 		this.isExplosiveMode = isExplosiveMode;
 	}
 
-	protected float m_7139_()
+	protected float getGravity()
 	{
 		return 0.0F;
 	}
 
-	protected void m_8097_()
+	protected void defineSynchedData()
 	{
 	}
 
-	public void m_8119_()
+	public void tick()
 	{
-		super.m_8119_();
+		super.tick();
 		if (IC2.sideProxy.isSimulating() && (this.range < 1.0F || this.power <= 0.0F || this.blockBreaks <= 0))
 		{
 			if (this.isExplosiveMode)
@@ -94,22 +94,22 @@ public class LaserBulletEntity extends ThrowableProjectile
 				this.explode();
 			}
 
-			this.m_142687_(RemovalReason.DISCARDED);
+			this.remove(RemovalReason.DISCARDED);
 		} else
 		{
 			this.power -= 0.5F;
 		}
 	}
 
-	protected void m_8060_(BlockHitResult blockHitResult)
+	protected void onHitBlock(BlockHitResult blockHitResult)
 	{
-		super.m_8060_(blockHitResult);
+		super.onHitBlock(blockHitResult);
 		this.handleHit(blockHitResult);
 	}
 
-	protected void m_5790_(EntityHitResult entityHitResult)
+	protected void onHitEntity(EntityHitResult entityHitResult)
 	{
-		super.m_5790_(entityHitResult);
+		super.onHitEntity(entityHitResult);
 		this.handleHit(entityHitResult);
 	}
 
@@ -118,33 +118,33 @@ public class LaserBulletEntity extends ThrowableProjectile
 		if (this.isExplosiveMode)
 		{
 			this.explode();
-			this.m_142687_(RemovalReason.DISCARDED);
+			this.remove(RemovalReason.DISCARDED);
 		} else
 		{
-			switch (hitResult.m_6662_())
+			switch (hitResult.getType())
 			{
 				case ENTITY:
-					if (this.hitEntity(((EntityHitResult) hitResult).m_82443_()))
+					if (this.hitEntity(((EntityHitResult) hitResult).getEntity()))
 					{
 						this.power -= 0.5F;
 					} else
 					{
-						this.m_142687_(RemovalReason.DISCARDED);
+						this.remove(RemovalReason.DISCARDED);
 					}
 					break;
 				case BLOCK:
 					assert hitResult instanceof BlockHitResult;
 					BlockHitResult blockHitResult = (BlockHitResult) hitResult;
-					if (!this.hitBlock(blockHitResult.m_82425_(), blockHitResult.m_82434_()))
+					if (!this.hitBlock(blockHitResult.getBlockPos(), blockHitResult.getDirection()))
 					{
 						this.power -= 0.5F;
 					} else
 					{
-						this.m_142687_(RemovalReason.DISCARDED);
+						this.remove(RemovalReason.DISCARDED);
 					}
 					break;
 				default:
-					throw new RuntimeException("invalid hit type: " + hitResult.m_6662_());
+					throw new RuntimeException("invalid hit type: " + hitResult.getType());
 			}
 		}
 	}
@@ -161,8 +161,8 @@ public class LaserBulletEntity extends ThrowableProjectile
 		int damage = (int) this.power;
 		if (damage > 0)
 		{
-			entity.m_20254_(damage * (this.isSmeltMode ? 2 : 1));
-			return entity.hurt(new IndirectEntityDamageSource("laser", this, this.owner).m_19366_(), damage);
+			entity.setSecondsOnFire(damage * (this.isSmeltMode ? 2 : 1));
+			return entity.hurt(new IndirectEntityDamageSource("laser", this, this.owner).setProjectile(), damage);
 		} else
 		{
 			return true;
@@ -178,7 +178,7 @@ public class LaserBulletEntity extends ThrowableProjectile
 			return false;
 		}
 
-		if (playerOwner.m_36187_(world, pos, Objects.requireNonNull(playerOwner.m_20194_()).m_130008_()))
+		if (playerOwner.blockActionRestricted(world, pos, Objects.requireNonNull(playerOwner.getServer()).getDefaultGameType()))
 		{
 			return false;
 		}
@@ -187,8 +187,8 @@ public class LaserBulletEntity extends ThrowableProjectile
 		Block block = state.getBlock();
 		boolean dropBlock = true;
 		if (world.getBlockState(pos).isAir()
-			|| block == Blocks.f_50058_
-			|| block == Blocks.f_50185_
+			|| block == Blocks.GLASS
+			|| block == Blocks.GLASS_PANE
 			|| block instanceof StainedGlassPaneBlock
 			|| block instanceof StainedGlassBlock)
 		{
@@ -203,7 +203,7 @@ public class LaserBulletEntity extends ThrowableProjectile
 		float hardness = state.getDestroySpeed(world, pos);
 		if (hardness < 0.0F)
 		{
-			this.m_142687_(RemovalReason.DISCARDED);
+			this.remove(RemovalReason.DISCARDED);
 			return true;
 		}
 
@@ -214,9 +214,9 @@ public class LaserBulletEntity extends ThrowableProjectile
 		}
 
 		List<ItemStack> replacements = new ArrayList<>();
-		if (state.getMaterial() == Material.f_76273_)
+		if (state.getMaterial() == Material.EXPLOSIVE)
 		{
-			block.m_7592_(
+			block.wasExploded(
 				world, pos, new Explosion(world, this, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 1.0F, false, BlockInteraction.BREAK)
 			);
 		} else if (this.isSmeltMode)
@@ -239,7 +239,7 @@ public class LaserBulletEntity extends ThrowableProjectile
 		{
 			if (dropBlock)
 			{
-				Block.m_49950_(state, world, pos);
+				Block.dropResources(state, world, pos);
 			}
 
 			world.removeBlock(pos, false);
@@ -254,7 +254,7 @@ public class LaserBulletEntity extends ThrowableProjectile
 				this.power = 0.0F;
 			}
 
-			if (world.random.nextInt(10) == 0 && state.getMaterial().m_76335_())
+			if (world.random.nextInt(10) == 0 && state.getMaterial().isFlammable())
 			{
 				world.setBlockAndUpdate(pos, Blocks.FIRE.defaultBlockState());
 			}
@@ -266,18 +266,18 @@ public class LaserBulletEntity extends ThrowableProjectile
 
 	private void appendSmeltItemStack(Block targetBlock, ItemStack inputItemStack, List<ItemStack> replacementList)
 	{
-		if (inputItemStack.getItem() instanceof BlockItem && ((BlockItem) inputItemStack.getItem()).m_40614_() != targetBlock)
+		if (inputItemStack.getItem() instanceof BlockItem && ((BlockItem) inputItemStack.getItem()).getBlock() != targetBlock)
 		{
-			inputItemStack = new ItemStack(targetBlock.m_5456_());
+			inputItemStack = new ItemStack(targetBlock.asItem());
 		}
 
 		SmeltingRecipe recipe = (SmeltingRecipe) IC2.sideProxy
 			.getRecipeManager()
-			.m_44015_(RecipeType.f_44108_, new SimpleContainer(new ItemStack[] { inputItemStack }), null)
+			.getRecipeFor(RecipeType.SMELTING, new SimpleContainer(new ItemStack[] { inputItemStack }), null)
 			.orElse(null);
 		if (recipe != null)
 		{
-			ItemStack replacementStack = recipe.m_8043_();
+			ItemStack replacementStack = recipe.getResultItem();
 			if (!StackUtil.isEmpty(replacementStack))
 			{
 				replacementList.add(replacementStack);

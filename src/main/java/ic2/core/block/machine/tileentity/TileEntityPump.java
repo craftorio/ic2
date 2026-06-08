@@ -207,7 +207,7 @@ public class TileEntityPump extends TileEntityElectricMachine implements IHasGui
 		{
 			BlockEntity te = world.getBlockEntity(startPos);
 			BlockState state = world.getBlockState(startPos);
-			Direction side = this.getFacing().m_122424_();
+			Direction side = this.getFacing().getOpposite();
 			if (LiquidUtil.isFluidTile(state, te, side))
 			{
 				if (freeSpace > 1000)

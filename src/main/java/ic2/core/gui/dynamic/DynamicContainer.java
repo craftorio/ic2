@@ -25,16 +25,16 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class DynamicContainer<T extends Container> extends ContainerBase<T>
 {
-	private static Map<Class<?>, List<String>> networkedFieldCache = new IdentityHashMap<>();
+	private static final Map<Class<?>, List<String>> networkedFieldCache = new IdentityHashMap<>();
 	final GuiParser.GuiNode guiNode;
 
 	public static DynamicContainer<TileEntityInventory> create(int syncId, Inventory playerInventory, TileEntityInventory base)
 	{
 		return new DynamicContainer(
-			(MenuType<DynamicContainer<T>>) Ic2ScreenHandlers.DYNAMIC_BE,
+			Ic2ScreenHandlers.DYNAMIC_BE,
 			syncId,
 			playerInventory,
-			(T) base,
+			base,
 			GuiParser.parse(Util.getName(base.getBlockType()), base.getClass())
 		);
 	}
@@ -66,6 +66,7 @@ public class DynamicContainer<T extends Container> extends ContainerBase<T>
 					}
 					break;
 				case playerinventory:
+				{
 					GuiParser.PlayerInventoryNode node = (GuiParser.PlayerInventoryNode) rawNode;
 					int xOffset = (node.style.width - 16) / 2;
 					int yOffset = (node.style.height - 16) / 2;
@@ -76,23 +77,25 @@ public class DynamicContainer<T extends Container> extends ContainerBase<T>
 					{
 						for (int col = 0; col < 9; col++)
 						{
-							this.m_38897_(new Slot(playerInventory, col + row * 9 + 9, node.x + col * width + xOffset, node.y + row * height + yOffset));
+							this.addSlot(new Slot(playerInventory, col + row * 9 + 9, node.x + col * width + xOffset, node.y + row * height + yOffset));
 						}
 					}
 
 					for (int col = 0; col < 9; col++)
 					{
-						this.m_38897_(new Slot(playerInventory, col, node.x + col * width + xOffset, node.y + node.hotbarOffset + yOffset));
+						this.addSlot(new Slot(playerInventory, col, node.x + col * width + xOffset, node.y + node.hotbarOffset + yOffset));
 					}
 					break;
+				}
 				case slot:
+				{
 					if (!(this.base instanceof IInventorySlotHolder))
 					{
 						throw new RuntimeException("Invalid base " + this.base + " for slot elements");
 					}
 
 					GuiParser.SlotNode node = (GuiParser.SlotNode) rawNode;
-					InvSlot slot = ((IInventorySlotHolder) this.base).getInventorySlot(node.name);
+					InvSlot slot = ((IInventorySlotHolder<?>) this.base).getInventorySlot(node.name);
 					if (slot == null)
 					{
 						throw new RuntimeException("Invalid InvSlot name " + node.name + " for base " + this.base);
@@ -100,9 +103,11 @@ public class DynamicContainer<T extends Container> extends ContainerBase<T>
 
 					int x = node.x + (node.style.width - 16) / 2;
 					int y = node.y + (node.style.height - 16) / 2;
-					this.m_38897_(new SlotInvSlot(slot, node.index, x, y));
+					this.addSlot(new SlotInvSlot(slot, node.index, x, y));
 					break;
+				}
 				case slotgrid:
+				{
 					if (!(this.base instanceof IInventorySlotHolder))
 					{
 						throw new RuntimeException("Invalid base " + this.base + " for slot elements");
@@ -136,7 +141,7 @@ public class DynamicContainer<T extends Container> extends ContainerBase<T>
 
 								for (int col = 0; col < cols && idx < size; col++)
 								{
-									this.m_38897_(new SlotInvSlot(slot, idx, x, y));
+									this.addSlot(new SlotInvSlot(slot, idx, x, y));
 									idx++;
 									x += width;
 								}
@@ -153,7 +158,7 @@ public class DynamicContainer<T extends Container> extends ContainerBase<T>
 
 								for (int row = 0; row < rows && idx < size; row++)
 								{
-									this.m_38897_(new SlotInvSlot(slot, idx, x, y));
+									this.addSlot(new SlotInvSlot(slot, idx, x, y));
 									idx++;
 									y += height;
 								}
@@ -163,7 +168,9 @@ public class DynamicContainer<T extends Container> extends ContainerBase<T>
 						}
 					}
 					break;
+				}
 				case slothologram:
+				{
 					if (!(this.base instanceof IHolographicSlotProvider))
 					{
 						throw new RuntimeException("Invalid base " + this.base + " for holographic slot elements");
@@ -172,11 +179,12 @@ public class DynamicContainer<T extends Container> extends ContainerBase<T>
 					GuiParser.SlotHologramNode node = (GuiParser.SlotHologramNode) rawNode;
 					int x = node.x + (node.style.width - 16) / 2;
 					int y = node.y + (node.style.height - 16) / 2;
-					this.m_38897_(
+					this.addSlot(
 						new SlotHologramSlot(
 							((IHolographicSlotProvider) this.base).getStacksForName(node.name), node.index, x, y, node.stackSizeLimit, this.getCallback()
 						)
 					);
+				}
 				case gui:
 				case key:
 				case only:
@@ -188,6 +196,7 @@ public class DynamicContainer<T extends Container> extends ContainerBase<T>
 				case fluidtank:
 				case fluidslot:
 				case image:
+					break;
 			}
 
 			if (rawNode instanceof GuiParser.ParentNode)

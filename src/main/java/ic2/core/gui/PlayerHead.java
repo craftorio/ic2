@@ -37,7 +37,7 @@ public class PlayerHead extends ItemImage
 		List<Component> tooltip = super.getToolTip();
 		if (StringUtils.isNotBlank(this.player.getName()))
 		{
-			tooltip.add(Component.m_237113_(this.player.getName()));
+			tooltip.add(Component.literal(this.player.getName()));
 		}
 
 		return tooltip;
@@ -55,13 +55,13 @@ public class PlayerHead extends ItemImage
 		public ItemStack get()
 		{
 			CompletableFuture<GameProfile> future = new CompletableFuture<>();
-			SkullBlockEntity.m_155738_(this.profile, future::complete);
+			SkullBlockEntity.updateGameprofile(this.profile, future::complete);
 
 			try
 			{
 				return PlayerHead.IMAGE_MAKER.computeIfAbsent(future.get(), resolvedProfile ->
 				{
-					ItemStack skull = new ItemStack(Items.f_42680_);
+					ItemStack skull = new ItemStack(Items.PLAYER_HEAD);
 					StackUtil.getOrCreateNbtData(skull).put("SkullOwner", NbtUtils.writeGameProfile(new CompoundTag(), resolvedProfile));
 					return skull;
 				});

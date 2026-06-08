@@ -31,32 +31,32 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 		return 20000;
 	}
 
-	public boolean m_41113_(ItemStack stack)
+	public boolean hasCustomColor(ItemStack stack)
 	{
-		return this.m_41121_(stack) != -1;
+		return this.getColor(stack) != -1;
 	}
 
-	public void m_41123_(ItemStack stack)
+	public void clearColor(ItemStack stack)
 	{
 		CompoundTag nbt = this.getDisplayNbt(stack, false);
 		if (nbt != null && nbt.contains("color", 3))
 		{
-			nbt.m_128473_("color");
-			if (nbt.m_128456_())
+			nbt.remove("color");
+			if (nbt.isEmpty())
 			{
 				assert stack.getTag() != null;
-				stack.getTag().m_128473_("display");
+				stack.getTag().remove("display");
 			}
 		}
 	}
 
-	public int m_41121_(ItemStack stack)
+	public int getColor(ItemStack stack)
 	{
 		CompoundTag nbt = this.getDisplayNbt(stack, false);
 		return nbt != null && nbt.contains("color", 3) ? nbt.getInt("color") : -1;
 	}
 
-	public void m_41115_(ItemStack stack, int color)
+	public void setColor(ItemStack stack, int color)
 	{
 		CompoundTag nbt = this.getDisplayNbt(stack, true);
 		assert nbt != null;
@@ -74,7 +74,7 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 			}
 
 			nbt = new CompoundTag();
-			stack.m_41751_(nbt);
+			stack.setTag(nbt);
 		}
 
 		CompoundTag ret;
@@ -114,12 +114,12 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 		return true;
 	}
 
-	public Rarity m_41460_(ItemStack stack)
+	public Rarity getRarity(ItemStack stack)
 	{
 		return Rarity.RARE;
 	}
 
-	public int m_6473_()
+	public int getEnchantmentValue()
 	{
 		return 0;
 	}
@@ -169,7 +169,7 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 	@Override
 	public boolean doesProvideHUD(ItemStack stack)
 	{
-		return this.f_40377_ == EquipmentSlot.HEAD && ElectricItem.manager.getCharge(stack) > 0.0;
+		return this.slot == EquipmentSlot.HEAD && ElectricItem.manager.getCharge(stack) > 0.0;
 	}
 
 	@Override

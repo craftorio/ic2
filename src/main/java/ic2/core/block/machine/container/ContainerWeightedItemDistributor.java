@@ -16,7 +16,7 @@ public class ContainerWeightedItemDistributor extends ContainerFullInv<TileEntit
 
 		for (int i = 0; i < te.buffer.size(); i++)
 		{
-			this.m_38897_(new SlotInvSlot(te.buffer, i, 8 + i * 18, 108));
+			this.addSlot(new SlotInvSlot(te.buffer, i, 8 + i * 18, 108));
 		}
 	}
 }

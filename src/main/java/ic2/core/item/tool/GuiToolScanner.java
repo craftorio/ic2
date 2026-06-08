@@ -27,7 +27,7 @@ public class GuiToolScanner extends Ic2Gui<ContainerToolScanner>
 
 			for (Tuple.T2<ItemStack, Integer> result : ((ContainerToolScanner) this.menu).scanResults)
 			{
-				String name = result.a.getItem().m_7626_(result.a).getString();
+				String name = result.a.getItem().getName(result.a).getString();
 				this.drawString(matrices, 10, 34 + count * 11, result.b + "x " + name, 5752026);
 				if (++count == 10)
 				{
@@ -38,9 +38,9 @@ public class GuiToolScanner extends Ic2Gui<ContainerToolScanner>
 	}
 
 	@Override
-	protected void m_7286_(PoseStack matrices, float delta, int mouseX, int mouseY)
+	protected void renderBg(PoseStack matrices, float delta, int mouseX, int mouseY)
 	{
-		super.m_7286_(matrices, delta, mouseX, mouseY);
+		super.renderBg(matrices, delta, mouseX, mouseY);
 		if (((ContainerToolScanner) this.menu).scanResults != null)
 		{
 			int count = 0;
@@ -58,7 +58,7 @@ public class GuiToolScanner extends Ic2Gui<ContainerToolScanner>
 	}
 
 	@Override
-	public ResourceLocation getTexture()
+	public ResourceLocation getTextureLocation()
 	{
 		return ResourceLocation.fromNamespaceAndPath("ic2", "textures/gui/guitoolscanner.png");
 	}

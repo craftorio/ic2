@@ -24,7 +24,7 @@ public class NukeEntity extends ExplosiveEntity
 		this(world, 0.0, 0.0, 0.0, 1.0F, 1);
 	}
 
-	public InteractionResult m_6096_(Player player, InteractionHand hand)
+	public InteractionResult interact(Player player, InteractionHand hand)
 	{
 		ItemStack stack = StackUtil.get(player, hand);
 		if (!StackUtil.isEmpty(stack) && stack.getItem() instanceof ItemToolWrench)
@@ -32,13 +32,13 @@ public class NukeEntity extends ExplosiveEntity
 			ItemToolWrench wrench = (ItemToolWrench) stack.getItem();
 			if (wrench.canTakeDamage(stack, 1))
 			{
-				if (this.f_19853_.isClientSide)
+				if (this.level.isClientSide)
 				{
 					return InteractionResult.PASS;
 				}
 
 				wrench.damage(stack, 1, player, hand);
-				this.m_146870_();
+				this.discard();
 				return InteractionResult.CONSUME;
 			}
 		}

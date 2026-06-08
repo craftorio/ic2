@@ -24,7 +24,7 @@ public class Covers extends TileEntityComponent
 	{
 		if (StackUtil.isEmpty(this.covers[side.ordinal()]))
 		{
-			ItemStack ret = cover.m_41777_();
+			ItemStack ret = cover.copy();
 			CompoundTag nbtTagCompound = StackUtil.getOrCreateNbtData(ret);
 			nbtTagCompound.putByte("side", (byte) side.ordinal());
 			this.covers[side.ordinal()] = ret;
@@ -34,7 +34,7 @@ public class Covers extends TileEntityComponent
 	public ItemStack removeCover(Direction side)
 	{
 		ItemStack ret = this.covers[side.ordinal()];
-		ret.m_41751_(null);
+		ret.setTag(null);
 		this.covers[side.ordinal()] = null;
 		return ret;
 	}
@@ -53,18 +53,18 @@ public class Covers extends TileEntityComponent
 	@Override
 	public void readFromNbt(CompoundTag nbt)
 	{
-		ListTag coversTag = nbt.m_128437_("covers", 10);
+		ListTag coversTag = nbt.getList("covers", 10);
 
 		for (int i = 0; i < coversTag.size(); i++)
 		{
-			CompoundTag coverTag = coversTag.m_128728_(i);
+			CompoundTag coverTag = coversTag.getCompound(i);
 			int index = coverTag.getByte("facing") & 255;
 			if (index >= this.covers.length)
 			{
 				IC2.log.error(LogCategory.Block, "Can't load cover for %s, index %d is out of bounds.", Util.toString(this.parent), index);
 			} else
 			{
-				ItemStack cover = ItemStack.m_41712_(coverTag);
+				ItemStack cover = ItemStack.of(coverTag);
 				if (StackUtil.isEmpty(cover))
 				{
 					IC2.log
@@ -111,7 +111,7 @@ public class Covers extends TileEntityComponent
 			{
 				CompoundTag coverTag = new CompoundTag();
 				coverTag.putByte("facing", (byte) facing.ordinal());
-				cover.m_41739_(coverTag);
+				cover.save(coverTag);
 				coversTag.add(coverTag);
 			}
 		}

@@ -97,7 +97,7 @@ public class LiquidHeatExchangerManager implements ILiquidHeatExchangerManager
 
 	public ILiquidHeatExchangerManager getOpposite()
 	{
-		return this.heatup ? Recipes.liquidCooldownManager : Recipes.liquidHeatupManager;
+		return this.heatup ? Recipes.liquidCooldownManager : Recipes.liquidHeatUpManager;
 	}
 
 	public class SingleDirectionManager implements ILiquidAcceptManager

@@ -14,7 +14,7 @@ public class Ic2Potion extends MobEffect
 		super(type, liquidColor);
 	}
 
-	public void m_6742_(LivingEntity entity, int amplifier)
+	public void applyEffectTick(LivingEntity entity, int amplifier)
 	{
 		if (this == radiation)
 		{
@@ -22,7 +22,7 @@ public class Ic2Potion extends MobEffect
 		}
 	}
 
-	public boolean m_6584_(int duration, int amplifier)
+	public boolean isDurationEffectTick(int duration, int amplifier)
 	{
 		if (this == radiation)
 		{
@@ -37,6 +37,6 @@ public class Ic2Potion extends MobEffect
 	public void applyTo(LivingEntity entity, int duration, int amplifier)
 	{
 		MobEffectInstance effect = new MobEffectInstance(radiation, duration, amplifier);
-		entity.m_7292_(effect);
+		entity.addEffect(effect);
 	}
 }

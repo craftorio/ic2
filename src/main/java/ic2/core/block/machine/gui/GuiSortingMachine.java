@@ -64,7 +64,7 @@ public class GuiSortingMachine extends Ic2Gui<ContainerSortingMachine>
 	}
 
 	@Override
-	protected ResourceLocation getTexture()
+	protected ResourceLocation getTextureLocation()
 	{
 		return texture;
 	}

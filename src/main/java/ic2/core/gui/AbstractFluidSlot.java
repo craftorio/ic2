@@ -42,7 +42,7 @@ public abstract class AbstractFluidSlot extends GuiElement<TankFluidSlot>
 			int fluidWidth = 16;
 			int fluidHeight = 16;
 			Fluid fluid = fs.getFluid();
-			TextureAtlasSprite sprite = fluid != null ? getBlockTextureMap().m_118316_(FluidHandler.getStillSpriteId(fluid)) : null;
+			TextureAtlasSprite sprite = fluid != null ? getBlockTextureMap().getSprite(FluidHandler.getStillSpriteId(fluid)) : null;
 			int color = fluid != null ? FluidHandler.getColor(fluid) : -1;
 			bindBlockTexture();
 			this.gui.drawSprite(matrices, fluidX, fluidY, fluidWidth, fluidHeight, sprite, color, 1.0, false, false);
@@ -59,19 +59,19 @@ public abstract class AbstractFluidSlot extends GuiElement<TankFluidSlot>
 			Fluid fluid = fs.getFluid();
 			if (fluid != null)
 			{
-				ret.add(Component.m_237113_(Util.getName(fs.getFluid()).toString()));
-				ret.add(Component.m_237113_("Amount: " + fs.getAmountMb() + " " + Localization.translate("ic2.generic.text.mb")));
+				ret.add(Component.literal(Util.getName(fs.getFluid()).toString()));
+				ret.add(Component.literal("Amount: " + fs.getAmountMb() + " " + Localization.translate("ic2.generic.text.mb")));
 				String state = FluidHandler.isGaseous(fluid) ? "Gas" : "Liquid";
-				ret.add(Component.m_237113_("Type: " + state));
+				ret.add(Component.literal("Type: " + state));
 			} else
 			{
-				ret.add(Component.m_237113_("Invalid FluidStack instance."));
+				ret.add(Component.literal("Invalid FluidStack instance."));
 			}
 		} else
 		{
-			ret.add(Component.m_237113_("No Fluid"));
-			ret.add(Component.m_237113_("Amount: 0 " + Localization.translate("ic2.generic.text.mb")));
-			ret.add(Component.m_237113_("Type: Not Available"));
+			ret.add(Component.literal("No Fluid"));
+			ret.add(Component.literal("Amount: 0 " + Localization.translate("ic2.generic.text.mb")));
+			ret.add(Component.literal("Type: Not Available"));
 		}
 
 		return ret;

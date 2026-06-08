@@ -55,15 +55,15 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
 	}
 
 	@Override
-	public boolean m_142522_(ItemStack stack)
+	public boolean isBarVisible(ItemStack stack)
 	{
-		return !stack.m_41786_().getString().equals("ic2:tab_icon");
+		return !stack.getHoverName().getString().equals("ic2:tab_icon");
 	}
 
 	@Override
-	public void m_7373_(ItemStack stack, Level world, List<Component> list, TooltipFlag par4)
+	public void appendHoverText(ItemStack stack, Level world, List<Component> list, TooltipFlag par4)
 	{
-		super.m_7373_(stack, world, list, par4);
+		super.appendHoverText(stack, world, list, par4);
 		CompoundTag nbtData = StackUtil.getOrCreateNbtData(stack);
 		String mode;
 		switch (nbtData.getInt("laserSetting"))
@@ -96,7 +96,7 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
 				return;
 		}
 
-		list.add(Component.m_237110_("ic2.tooltip.mode", new Object[] { mode }));
+		list.add(Component.translatable("ic2.tooltip.mode", new Object[] { mode }));
 	}
 
 	@Override
@@ -110,7 +110,7 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
 	}
 
 	@Override
-	public InteractionResultHolder<ItemStack> m_7203_(Level world, Player player, InteractionHand hand)
+	public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand)
 	{
 		ItemStack stack = StackUtil.get(player, hand);
 		if (!IC2.sideProxy.isSimulating())
@@ -167,7 +167,7 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
 					Vector3 right = look.copy().cross(Vector3.UP);
 					if (right.lengthSquared() < 1.0E-4)
 					{
-						double angle = Math.toRadians(player.m_146908_()) - (Math.PI / 2);
+						double angle = Math.toRadians(player.getYRot()) - (Math.PI / 2);
 						right.set(Math.sin(angle), 0.0, -Math.cos(angle));
 					} else
 					{
@@ -198,15 +198,15 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
 			}
 		}
 
-		return super.m_7203_(world, player, hand);
+		return super.use(world, player, hand);
 	}
 
 	@Override
 	public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context)
 	{
-		Level world = context.m_43725_();
-		Player player = context.m_43723_();
-		BlockPos pos = context.m_8083_();
+		Level world = context.getLevel();
+		Player player = context.getPlayer();
+		BlockPos pos = context.getClickedPos();
 		if (world.isClientSide)
 		{
 			return InteractionResult.PASS;
@@ -246,7 +246,7 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
 						this.shootLaser(
 							stack, world, new Vector3(start.x, start.y + 1.0, start.z), dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false
 						);
-						if (player.m_6350_().equals(Direction.SOUTH) || player.m_6350_().equals(Direction.NORTH))
+						if (player.getDirection().equals(Direction.SOUTH) || player.getDirection().equals(Direction.NORTH))
 						{
 							this.shootLaser(
 								stack, world, new Vector3(start.x - 1.0, start.y, start.z), dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false
@@ -304,7 +304,7 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
 							);
 						}
 
-						if (player.m_6350_().equals(Direction.EAST) || player.m_6350_().equals(Direction.WEST))
+						if (player.getDirection().equals(Direction.EAST) || player.getDirection().equals(Direction.WEST))
 						{
 							this.shootLaser(
 								stack, world, new Vector3(start.x, start.y, start.z - 1.0), dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false
@@ -457,9 +457,9 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
 
 	private void setLaserVelocity(Projectile laser, Entity shooter, Vector3 direction, float speed, float divergence)
 	{
-		laser.m_6686_(direction.x, direction.y, direction.z, speed, divergence);
-		Vec3 vec3d = shooter.m_20184_();
-		laser.m_20256_(laser.m_20184_().m_82520_(vec3d.f_82479_, shooter.m_20096_() ? 0.0 : vec3d.f_82480_, vec3d.f_82481_));
+		laser.shoot(direction.x, direction.y, direction.z, speed, divergence);
+		Vec3 vec3d = shooter.getDeltaMovement();
+		laser.setDeltaMovement(laser.getDeltaMovement().add(vec3d.x, shooter.isOnGround() ? 0.0 : vec3d.y, vec3d.z));
 	}
 
 	public boolean shootLaser(ItemStack stack, Level world, LivingEntity owner, float range, float power, int blockBreaks, boolean explosive, boolean smelt)
@@ -487,14 +487,14 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
 		return true;
 	}
 
-	public Rarity m_41460_(ItemStack stack)
+	public Rarity getRarity(ItemStack stack)
 	{
 		return Rarity.UNCOMMON;
 	}
 
 	private void playShotSound(Player player, SoundEvent soundEvent)
 	{
-		player.m_6330_(soundEvent, SoundSource.PLAYERS, 1.0F, 1.0F);
+		player.playNotifySound(soundEvent, SoundSource.PLAYERS, 1.0F, 1.0F);
 	}
 
 	@Override

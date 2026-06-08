@@ -57,7 +57,7 @@ public class BasicMachineRecipeGenerator<T extends BasicMachineRecipeGenerator<T
 		this.add("%s_to_%s".formatted(path(inputItem), path(stacks[0].getItem())), json ->
 		{
 			JsonObject input = new JsonObject();
-			input.addProperty("item", Registry.f_122827_.getKey(inputItem.m_5456_()).toString());
+			input.addProperty("item", Registry.ITEM.getKey(inputItem.asItem()).toString());
 			if (inputCount != 1)
 			{
 				input.addProperty("count", inputCount);
@@ -83,7 +83,7 @@ public class BasicMachineRecipeGenerator<T extends BasicMachineRecipeGenerator<T
 		this.add("%s_to_%s".formatted(path(inputTag), path(stacks[0].getItem())), json ->
 		{
 			JsonObject input = new JsonObject();
-			input.addProperty("tag", inputTag.f_203868_().toString());
+			input.addProperty("tag", inputTag.location().toString());
 			if (inputCount != 1)
 			{
 				input.addProperty("count", inputCount);
@@ -99,7 +99,7 @@ public class BasicMachineRecipeGenerator<T extends BasicMachineRecipeGenerator<T
 		this.add("%s_to_%s".formatted(path(fluid), path(outputItem)), json ->
 		{
 			JsonObject input = new JsonObject();
-			input.addProperty("fluid", Registry.f_122822_.getKey(fluid).toString());
+			input.addProperty("fluid", Registry.FLUID.getKey(fluid).toString());
 			input.addProperty("amount", fluidAmount);
 			json.add("ingredient", input);
 			writeOutput(json, new ItemStack(outputItem, 1));
@@ -108,17 +108,17 @@ public class BasicMachineRecipeGenerator<T extends BasicMachineRecipeGenerator<T
 
 	protected static String path(ItemLike item)
 	{
-		return Registry.f_122827_.getKey(item.m_5456_()).m_135815_();
+		return Registry.ITEM.getKey(item.asItem()).getPath();
 	}
 
 	protected static String path(TagKey<Item> tag)
 	{
-		return tag.f_203868_().m_135815_().replace('/', '_');
+		return tag.location().getPath().replace('/', '_');
 	}
 
 	protected static String path(Fluid fluid)
 	{
-		return Registry.f_122822_.getKey(fluid).m_135815_();
+		return Registry.FLUID.getKey(fluid).getPath();
 	}
 
 	protected static void writeOutput(JsonObject json, ItemStack... stacks)
@@ -149,7 +149,7 @@ public class BasicMachineRecipeGenerator<T extends BasicMachineRecipeGenerator<T
 		this.exporter.accept((new Ic2RecipeJsonProvider(this.recipeSerializer, id)
 		{
 			@Override
-			public void m_7917_(JsonObject json)
+			public void serializeRecipeData(JsonObject json)
 			{
 				serializer.accept(json);
 				if (BasicMachineRecipeGenerator.this.requiresMeta == (BasicMachineRecipeGenerator.this.currentMeta == null))

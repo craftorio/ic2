@@ -18,7 +18,7 @@ public class ShapelessRecipeJsonProvider extends Ic2RecipeJsonProvider
 	}
 
 	@Override
-	public void m_7917_(JsonObject json)
+	public void serializeRecipeData(JsonObject json)
 	{
 		JsonArray ingredients = new JsonArray();
 
@@ -33,7 +33,7 @@ public class ShapelessRecipeJsonProvider extends Ic2RecipeJsonProvider
 			json.addProperty("group", this.group);
 		}
 
-		super.m_7917_(json);
+		super.serializeRecipeData(json);
 	}
 
 	public ShapelessRecipeJsonProvider setIngredient(List<RecipeInputBase> ingredient)

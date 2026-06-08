@@ -181,7 +181,7 @@ public final class EventHandler
 	public static void onChunkUnload(LevelChunk chunk)
 	{
 		ChunkLoadAwareBlockHandler.onChunkUnload(chunk);
-		if (!chunk.m_62953_().isClientSide)
+		if (!chunk.getLevel().isClientSide)
 		{
 			ChunkLoaderLogic.onChunkUnload(chunk);
 		}
@@ -189,7 +189,7 @@ public final class EventHandler
 
 	public static InteractionResult onBlockStartBreak(Player player, Level world, InteractionHand hand, BlockPos pos, Direction direction)
 	{
-		if (player.m_21120_(hand).getItem() instanceof BlockBreakableItem blockBreakableItem)
+		if (player.getItemInHand(hand).getItem() instanceof BlockBreakableItem blockBreakableItem)
 		{
 			InteractionResult actionResult = blockBreakableItem.onBlockStartBreak(player, world, hand, pos, direction);
 			if (actionResult != InteractionResult.PASS)
@@ -206,13 +206,13 @@ public final class EventHandler
 
 	public static boolean beforeBlockBreak(Level world, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity)
 	{
-		Item item = player.m_21205_().getItem();
+		Item item = player.getMainHandItem().getItem();
 		return item instanceof BlockBreakableItem ? ((BlockBreakableItem) item).beforeBlockBreak(world, player, pos, state, blockEntity) : true;
 	}
 
 	public static void afterBlockBreak(Level world, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity)
 	{
-		Item item = player.m_21205_().getItem();
+		Item item = player.getMainHandItem().getItem();
 		if (item instanceof BlockBreakableItem)
 		{
 			((BlockBreakableItem) item).afterBlockBreak(world, player, pos, state, blockEntity);
@@ -231,7 +231,7 @@ public final class EventHandler
 
 			for (EquipmentSlot slot : EquipmentSlot.values())
 			{
-				entity.m_21409_(slot, Float.NEGATIVE_INFINITY);
+				entity.setDropChance(slot, Float.NEGATIVE_INFINITY);
 			}
 		}
 	}
@@ -243,7 +243,7 @@ public final class EventHandler
 			return false;
 		} else
 		{
-			ItemStack armor = entity.m_6844_(EquipmentSlot.FEET);
+			ItemStack armor = entity.getItemBySlot(EquipmentSlot.FEET);
 			if (StackUtil.isEmpty(armor))
 			{
 				return false;
@@ -266,13 +266,13 @@ public final class EventHandler
 
 	public static boolean onEntitySwingHand(LivingEntity entity, InteractionHand hand)
 	{
-		ItemStack stack = entity.m_21120_(hand);
+		ItemStack stack = entity.getItemInHand(hand);
 		if (stack.getItem() instanceof ISwingSoundItem swingSoundItem)
 		{
 			SoundEvent swingSound = swingSoundItem.getSwingSound(entity, hand);
 			if (swingSound != null)
 			{
-				entity.m_5496_(swingSound, 1.0F, 1.0F);
+				entity.playSound(swingSound, 1.0F, 1.0F);
 			}
 
 			return false;
@@ -301,7 +301,7 @@ public final class EventHandler
 
 	public static boolean onAttackEntity(Player player, Entity target)
 	{
-		Item item = player.m_21205_().getItem();
+		Item item = player.getMainHandItem().getItem();
 		return item instanceof IEntityAttackableItem ? ((IEntityAttackableItem) item).onAttackEntity(player, target) : true;
 	}
 

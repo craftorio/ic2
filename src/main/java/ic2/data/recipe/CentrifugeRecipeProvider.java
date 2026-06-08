@@ -24,8 +24,8 @@ public class CentrifugeRecipeProvider extends Ic2RecipeProvider
 	{
 		BasicMachineRecipeGenerator gen = new BasicMachineRecipeGenerator(consumer, Ic2RecipeSerializers.CENTRIFUGE, true);
 		gen.minHeat(250).add(Ic2Items.CLAY_DUST, 4, Ic2Items.SILICON_DIOXIDE_DUST);
-		gen.minHeat(100).add(Items.f_42594_, 1, Ic2Items.STONE_DUST);
-		gen.minHeat(500).add(Items.f_42692_, 2, Ic2Items.SMALL_LITHIUM_DUST);
+		gen.minHeat(100).add(Items.COBBLESTONE, 1, Ic2Items.STONE_DUST);
+		gen.minHeat(500).add(Items.QUARTZ, 2, Ic2Items.SMALL_LITHIUM_DUST);
 		gen.minHeat(1500).add(Ic2Items.SLAG, 1, new ItemStack(Ic2Items.SMALL_GOLD_DUST), new ItemStack(Ic2Items.COAL_DUST, 5));
 		gen.minHeat(5000).add(Ic2Items.RTG_PELLET, 1, new ItemStack(Ic2Items.PLUTONIUM, 3), new ItemStack(Ic2Items.IRON_DUST, 54));
 		gen.minHeat(4000).add(Ic2Items.URANIUM, 20, new ItemStack(Ic2Items.URANIUM_238, 112), new ItemStack(Ic2Items.URANIUM_235, 7));

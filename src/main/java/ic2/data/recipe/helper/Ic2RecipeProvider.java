@@ -45,8 +45,8 @@ public abstract class Ic2RecipeProvider implements DataProvider
 	public Ic2RecipeProvider(DataGenerator root)
 	{
 		this.generator = root;
-		this.recipesPathResolver = root.m_236036_(Target.DATA_PACK, "recipes");
-		this.advancementsPathResolver = root.m_236036_(Target.DATA_PACK, "advancements");
+		this.recipesPathResolver = root.createPathProvider(Target.DATA_PACK, "recipes");
+		this.advancementsPathResolver = root.createPathProvider(Target.DATA_PACK, "advancements");
 	}
 
 	protected abstract void generate(Consumer<FinishedRecipe> var1);
@@ -58,17 +58,17 @@ public abstract class Ic2RecipeProvider implements DataProvider
 
 	protected static RecipeInputIngredient tagInput(TagKey<Item> tag, int amount)
 	{
-		return new RecipeInputIngredient(Ingredient.m_204132_(tag), amount);
+		return new RecipeInputIngredient(Ingredient.of(tag), amount);
 	}
 
 	protected static RecipeInputIngredient itemInput(ItemLike... item)
 	{
-		return new RecipeInputIngredient(Ingredient.m_43929_(item), 1);
+		return new RecipeInputIngredient(Ingredient.of(item), 1);
 	}
 
 	protected static RecipeInputIngredient itemInput(ItemLike item, int amount)
 	{
-		return new RecipeInputIngredient(Ingredient.m_43929_(new ItemLike[] { item }), amount);
+		return new RecipeInputIngredient(Ingredient.of(new ItemLike[] { item }), amount);
 	}
 
 	protected static Ic2FluidStack bucket(Fluid fluid)
@@ -76,26 +76,26 @@ public abstract class Ic2RecipeProvider implements DataProvider
 		return FluidHandler.createFluidStackMb(fluid, 1000, null);
 	}
 
-	public String m_6055_()
+	public String getName()
 	{
 		return this.getClass().getSimpleName();
 	}
 
-	public void m_213708_(CachedOutput writer)
+	public void run(CachedOutput writer)
 	{
 		Set<ResourceLocation> set = Sets.newHashSet();
 		this.generate(provider ->
 		{
-			if (!set.add(provider.m_6445_()))
+			if (!set.add(provider.getId()))
 			{
-				throw new IllegalStateException("Duplicate recipe " + provider.m_6445_());
+				throw new IllegalStateException("Duplicate recipe " + provider.getId());
 			}
 
-			saveRecipe(writer, provider.m_125966_(), this.recipesPathResolver.m_236048_(provider.m_6445_()));
-			JsonObject jsonObject = provider.m_5860_();
+			saveRecipe(writer, provider.serializeRecipe(), this.recipesPathResolver.json(provider.getId()));
+			JsonObject jsonObject = provider.serializeAdvancement();
 			if (jsonObject != null)
 			{
-				saveRecipeAdvancement(writer, jsonObject, this.advancementsPathResolver.m_236048_(provider.m_6448_()));
+				saveRecipeAdvancement(writer, jsonObject, this.advancementsPathResolver.json(provider.getAdvancementId()));
 			}
 		});
 	}
@@ -115,7 +115,7 @@ public abstract class Ic2RecipeProvider implements DataProvider
 	{
 		try
 		{
-			DataProvider.m_236072_(cache, json, path);
+			DataProvider.saveStable(cache, json, path);
 		} catch (IOException var4)
 		{
 			LOGGER.error("Couldn't save recipe advancement {}", path, var4);
@@ -124,21 +124,21 @@ public abstract class Ic2RecipeProvider implements DataProvider
 
 	public static TriggerInstance conditionsFromItem(Ints count, ItemLike item)
 	{
-		return conditionsFromItemPredicates(Builder.m_45068_().m_151445_(new ItemLike[] { item }).m_151443_(count).m_45077_());
+		return conditionsFromItemPredicates(Builder.item().of(new ItemLike[] { item }).withCount(count).build());
 	}
 
 	public static TriggerInstance conditionsFromItem(ItemLike item)
 	{
-		return conditionsFromItemPredicates(Builder.m_45068_().m_151445_(new ItemLike[] { item }).m_45077_());
+		return conditionsFromItemPredicates(Builder.item().of(new ItemLike[] { item }).build());
 	}
 
 	public static TriggerInstance conditionsFromTag(TagKey<Item> tag)
 	{
-		return conditionsFromItemPredicates(Builder.m_45068_().m_204145_(tag).m_45077_());
+		return conditionsFromItemPredicates(Builder.item().of(tag).build());
 	}
 
 	public static TriggerInstance conditionsFromItemPredicates(ItemPredicate... predicates)
 	{
-		return new TriggerInstance(Composite.f_36667_, Ints.f_55364_, Ints.f_55364_, Ints.f_55364_, predicates);
+		return new TriggerInstance(Composite.ANY, Ints.ANY, Ints.ANY, Ints.ANY, predicates);
 	}
 }

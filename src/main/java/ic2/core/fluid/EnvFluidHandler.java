@@ -66,7 +66,28 @@ public interface EnvFluidHandler
 
 	Ic2FluidStack drainWorldFluid(BlockState var1, Level var2, BlockPos var3, boolean var4);
 
-	record FluidRefs(Block block, Fluid still, Fluid flowing, BucketItem bucket)
+	final class FluidRefs
+	{
+		private final Block block;
+		private final java.util.concurrent.atomic.AtomicReference<Fluid> stillRef;
+		private final java.util.concurrent.atomic.AtomicReference<Fluid> flowingRef;
+		private final java.util.concurrent.atomic.AtomicReference<BucketItem> bucketRef;
+
+		public FluidRefs(Block block, Fluid still, Fluid flowing, BucketItem bucket)
 		{
+			this.block = block;
+			this.stillRef = new java.util.concurrent.atomic.AtomicReference<>(still);
+			this.flowingRef = new java.util.concurrent.atomic.AtomicReference<>(flowing);
+			this.bucketRef = new java.util.concurrent.atomic.AtomicReference<>(bucket);
 		}
+
+		public Block block() { return this.block; }
+		public Fluid still() { return this.stillRef.get(); }
+		public Fluid flowing() { return this.flowingRef.get(); }
+		public BucketItem bucket() { return this.bucketRef.get(); }
+
+		public void still(Fluid still) { this.stillRef.set(still); }
+		public void flowing(Fluid flowing) { this.flowingRef.set(flowing); }
+		public void bucket(BucketItem bucket) { this.bucketRef.set(bucket); }
+	}
 }

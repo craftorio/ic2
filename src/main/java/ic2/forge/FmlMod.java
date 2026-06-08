@@ -2,6 +2,7 @@ package ic2.forge;
 
 import ic2.core.event.EventHandler;
 import ic2.core.network.NetworkManager;
+import ic2.core.ref.Ic2Fluids;
 import ic2.data.Ic2DataGenerators;
 
 import java.util.ArrayList;
@@ -59,6 +60,8 @@ public final class FmlMod
 		{
 			modEventBus.register(new ClientModEventHandlerForge());
 		}
+
+		Ic2Fluids.init();
 	}
 
 	@SubscribeEvent
@@ -103,6 +106,33 @@ public final class FmlMod
 	{
 		existingFileHelper = event.getExistingFileHelper();
 		Ic2DataGenerators.setup(event.getGenerator(), event.getLookupProvider(), event.getExistingFileHelper());
+	}
+
+	@SubscribeEvent
+	public void registerFluidTypes(RegisterEvent event)
+	{
+		if (event.getRegistryKey() == ForgeRegistries.Keys.FLUID_TYPES)
+		{
+			EnvFluidHandlerForge.registerPendingFluidTypes();
+		}
+	}
+
+	@SubscribeEvent
+	public void registerFluids(RegisterEvent event)
+	{
+		if (event.getRegistryKey() == Registries.FLUID)
+		{
+			EnvFluidHandlerForge.registerPendingFluids();
+		}
+	}
+
+	@SubscribeEvent
+	public void registerItems(RegisterEvent event)
+	{
+		if (event.getRegistryKey() == Registries.ITEM)
+		{
+			EnvProxyForge.registerPendingItems();
+		}
 	}
 
 	@SubscribeEvent

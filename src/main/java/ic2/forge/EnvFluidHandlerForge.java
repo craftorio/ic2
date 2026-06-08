@@ -44,6 +44,8 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 {
 	static final DeferredRegister<Fluid> fluidRegistry = DeferredRegister.create(ForgeRegistries.FLUIDS, "ic2");
 	static final DeferredRegister<FluidType> fluidTypeRegistry = DeferredRegister.create(ForgeRegistries.Keys.FLUID_TYPES, "ic2");
+	private static final java.util.List<Runnable> pendingFluidTypeRegistrations = new java.util.ArrayList<>();
+	private static final java.util.List<Runnable> pendingFluidRegistrations = new java.util.ArrayList<>();
 
 	@Override
 	public EnvFluidHandler.FluidRefs createFluid(
@@ -57,54 +59,71 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 		int color
 	)
 	{
-		AtomicReference<EnvFluidHandler.FluidRefs> res = new AtomicReference<>();
-		FluidType.Properties attributesBuilder = FluidType.Properties.create()
-			.density(density)
-			.viscosity(viscosity)
-			.lightLevel(luminosity)
-			.temperature(temperature);
-		FluidType fluidType = new FluidType(attributesBuilder)
+		EnvFluidHandler.FluidRefs ret = new EnvFluidHandler.FluidRefs(null, null, null, null);
+		java.util.concurrent.atomic.AtomicReference<FluidType> fluidTypeRef = new java.util.concurrent.atomic.AtomicReference<>();
+
+		pendingFluidTypeRegistrations.add(() ->
 		{
-			@Override
-			public void initializeClient(Consumer<IClientFluidTypeExtensions> consumer)
+			FluidType.Properties attributesBuilder = FluidType.Properties.create()
+				.density(density)
+				.viscosity(viscosity)
+				.lightLevel(luminosity)
+				.temperature(temperature);
+			FluidType fluidType = new FluidType(attributesBuilder)
 			{
-				consumer.accept(new IClientFluidTypeExtensions()
+				@Override
+				public void initializeClient(Consumer<IClientFluidTypeExtensions> consumer)
 				{
-					@Override
-					public int getTintColor()
+					consumer.accept(new IClientFluidTypeExtensions()
 					{
-						return color;
-					}
+						@Override
+						public int getTintColor()
+						{
+							return color;
+						}
 
-					@Override
-					public ResourceLocation getStillTexture()
-					{
-						return stillSpriteId;
-					}
+						@Override
+						public ResourceLocation getStillTexture()
+						{
+							return stillSpriteId;
+						}
 
-					@Override
-					public ResourceLocation getFlowingTexture()
-					{
-						return flowingSpriteId;
-					}
-				});
-			}
-		};
-		ForgeFlowingFluid.Properties properties = new ForgeFlowingFluid.Properties(() -> fluidType, () -> res.get().still(), () -> res.get().flowing())
-			.bucket(() -> res.get().bucket());
-		Fluid still = new ForgeFlowingFluid.Source(properties);
-		Fluid flowing = flowingSpriteId != null ? new ForgeFlowingFluid.Flowing(properties) : null;
-		BucketItem bucket = new BucketItem(() -> still, new Properties().craftRemainder(Items.BUCKET).stacksTo(1));
-		EnvFluidHandler.FluidRefs ret = new EnvFluidHandler.FluidRefs(null, still, flowing, bucket);
-		res.set(ret);
-		ForgeRegistries.FLUID_TYPES.get().register(id, fluidType);
-		ForgeRegistries.FLUIDS.register(id, still);
-		if (ret.flowing() != null)
+						@Override
+						public ResourceLocation getFlowingTexture()
+						{
+							return flowingSpriteId;
+						}
+					});
+				}
+			};
+			ForgeRegistries.FLUID_TYPES.get().register(id, fluidType);
+			fluidTypeRef.set(fluidType);
+		});
+
+		pendingFluidRegistrations.add(() ->
 		{
-			ForgeRegistries.FLUIDS.register(ResourceLocation.fromNamespaceAndPath(id.getNamespace(), "flowing_" + id.getPath()), flowing);
-		}
+			ForgeFlowingFluid.Properties properties = new ForgeFlowingFluid.Properties(
+				() -> fluidTypeRef.get(), () -> ret.still(), () -> ret.flowing()
+			).bucket(() -> ret.bucket());
+			Fluid still = new ForgeFlowingFluid.Source(properties);
+			Fluid flowing = flowingSpriteId != null ? new ForgeFlowingFluid.Flowing(properties) : null;
+			ForgeRegistries.FLUIDS.register(id, still);
+			ret.still(still);
+			ret.flowing(flowing);
+			if (flowing != null)
+			{
+				ForgeRegistries.FLUIDS.register(ResourceLocation.fromNamespaceAndPath(id.getNamespace(), "flowing_" + id.getPath()), flowing);
+			}
+		});
 
-		IC2.envProxy.registerItem(ResourceLocation.fromNamespaceAndPath(id.getNamespace(), id.getPath() + "_bucket"), bucket);
+		ResourceLocation bucketId = ResourceLocation.fromNamespaceAndPath(id.getNamespace(), id.getPath() + "_bucket");
+		EnvProxyForge.pendingItemRegistrations.add(() ->
+		{
+			BucketItem bucket = new BucketItem(() -> ret.still(), new Properties().craftRemainder(Items.BUCKET).stacksTo(1));
+			ForgeRegistries.ITEMS.register(bucketId, bucket);
+			ret.bucket(bucket);
+		});
+
 		return ret;
 	}
 
@@ -569,4 +588,25 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 			return fs instanceof Ic2FluidStackImpl ? ((Ic2FluidStackImpl) fs).parent : new FluidStack(fs.getFluid(), fs.getAmountMb());
 		}
 	}
+
+	static void registerPendingFluidTypes()
+	{
+		for (Runnable r : pendingFluidTypeRegistrations)
+		{
+			r.run();
+		}
+
+		pendingFluidTypeRegistrations.clear();
+	}
+
+	static void registerPendingFluids()
+	{
+		for (Runnable r : pendingFluidRegistrations)
+		{
+			r.run();
+		}
+
+		pendingFluidRegistrations.clear();
+	}
+
 }

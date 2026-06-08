@@ -91,6 +91,7 @@ public final class EnvProxyForge implements EnvProxy
 	static final DeferredRegister<MenuType<?>> screenHandlerRegistry = DeferredRegister.create(ForgeRegistries.MENU_TYPES, "ic2");
 	static final DeferredRegister<EntityType<?>> entityRegistry = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, "ic2");
 	static final DeferredRegister<MobEffect> statusEffectRegistry = DeferredRegister.create(ForgeRegistries.MOB_EFFECTS, "ic2");
+	static List<Runnable> pendingItemRegistrations = new ArrayList<>();
 	static List<Runnable> configuredFeatureRegistrations = new ArrayList<>();
 	static List<EnvProxyForge.PlacedFeatureRegistration<?>> placedFeatureRegistrations = new ArrayList<>();
 	static List<EnvProxyForge.PlacementModifierTypeRegistration> placementModifierTypeRegistrations = new ArrayList<>();
@@ -393,6 +394,16 @@ public final class EnvProxyForge implements EnvProxy
 	{
 		ExplosionEvent event = new ExplosionEvent(world, entity, pos, power, igniter, radiationRange, rangeLimit);
 		return !MinecraftForge.EVENT_BUS.post(event);
+	}
+
+	static void registerPendingItems()
+	{
+		for (Runnable r : pendingItemRegistrations)
+		{
+			r.run();
+		}
+
+		pendingItemRegistrations.clear();
 	}
 
 	record PlacedFeatureRegistration<FC extends FeatureConfiguration>(

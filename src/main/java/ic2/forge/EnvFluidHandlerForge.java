@@ -119,7 +119,7 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 		ResourceLocation bucketId = ResourceLocation.fromNamespaceAndPath(id.getNamespace(), id.getPath() + "_bucket");
 		EnvProxyForge.pendingItemRegistrations.add(() ->
 		{
-			BucketItem bucket = new BucketItem(() -> ret.still(), new Properties().craftRemainder(Items.BUCKET).stacksTo(1));
+			BucketItem bucket = new BucketItem(ret::still, new Properties().craftRemainder(Items.BUCKET).stacksTo(1));
 			ForgeRegistries.ITEMS.register(bucketId, bucket);
 			ret.bucket(bucket);
 		});

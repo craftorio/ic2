@@ -32,7 +32,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.PipeBlock;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
@@ -210,7 +209,7 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 		if (!this.isFoam())
 		{
 			ret = this.withConnectionStates(ret, ctx.getLevel(), ctx.getClickedPos());
-		} else if (fluid == Ic2Fluids.CONSTRUCTION_FOAM.still)
+		} else if (fluid == Ic2Fluids.CONSTRUCTION_FOAM.still())
 		{
 			ret = (BlockState) ret.setValue(foamProperty, CableFoam.SOFT);
 		}

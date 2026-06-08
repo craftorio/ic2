@@ -8,7 +8,7 @@
 
 ## 快速开始
 
-请使用 Java 8 构建和编译本分支。
+请使用 Java 17 构建和编译本分支。
 
 ```shell
 gradlew build

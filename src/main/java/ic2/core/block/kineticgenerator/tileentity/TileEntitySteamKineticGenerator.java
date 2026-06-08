@@ -60,9 +60,9 @@ public class TileEntitySteamKineticGenerator extends TileEntityInventory impleme
 		super(Ic2BlockEntities.STEAM_KINETIC_GENERATOR, pos, state);
 		this.turbineSlot.setStackSizeLimit(1);
 		this.fluids = this.addComponent(new Fluids(this));
-		this.steamTank = this.fluids.addTankInsert("steamTank", 21000, Fluids.fluidPredicate(Ic2Fluids.STEAM.still, Ic2Fluids.SUPERHEATED_STEAM.still));
+		this.steamTank = this.fluids.addTankInsert("steamTank", 21000, Fluids.fluidPredicate(Ic2Fluids.STEAM.still(), Ic2Fluids.SUPERHEATED_STEAM.still()));
 		this.distilledWaterTank = this.fluids
-			.addTank("distilledWaterTank", 1000, Fluids.fluidPredicate(Ic2Fluids.DISTILLED_WATER.still, net.minecraft.world.level.material.Fluids.WATER));
+			.addTank("distilledWaterTank", 1000, Fluids.fluidPredicate(Ic2Fluids.DISTILLED_WATER.still(), net.minecraft.world.level.material.Fluids.WATER));
 	}
 
 	@Override
@@ -83,7 +83,7 @@ public class TileEntitySteamKineticGenerator extends TileEntityInventory impleme
 				needsInvUpdate = true;
 			}
 
-			boolean hotSteam = this.steamTank.hasExactFluid(Ic2Fluids.SUPERHEATED_STEAM.still);
+			boolean hotSteam = this.steamTank.hasExactFluid(Ic2Fluids.SUPERHEATED_STEAM.still());
 			boolean turbineDoneWork = this.turbineDoWork(hotSteam);
 			if (this.updateTicker++ >= this.getTickRate())
 			{
@@ -145,10 +145,10 @@ public class TileEntitySteamKineticGenerator extends TileEntityInventory impleme
 		this.kUoutput = (int) (rawOutput * throttle * outputModifier);
 		if (this.condensationProgress >= 100)
 		{
-			if (this.distilledWaterTank.fillMbUnchecked(Ic2FluidStack.create(Ic2Fluids.DISTILLED_WATER.still, 1), true) == 1)
+			if (this.distilledWaterTank.fillMbUnchecked(Ic2FluidStack.create(Ic2Fluids.DISTILLED_WATER.still(), 1), true) == 1)
 			{
 				this.condensationProgress -= 100;
-				this.distilledWaterTank.fillMbUnchecked(Ic2FluidStack.create(Ic2Fluids.DISTILLED_WATER.still, 1), false);
+				this.distilledWaterTank.fillMbUnchecked(Ic2FluidStack.create(Ic2Fluids.DISTILLED_WATER.still(), 1), false);
 			} else
 			{
 				this.isTurbineFilledWithWater = true;
@@ -167,7 +167,7 @@ public class TileEntitySteamKineticGenerator extends TileEntityInventory impleme
 			BlockEntity te = world.getBlockEntity(this.worldPosition.relative(dir));
 			if (te instanceof TileEntityCondenser || hotSteam && te instanceof TileEntitySteamKineticGenerator)
 			{
-				int transAmount = LiquidUtil.fillTile(te, dir.getOpposite(), Ic2FluidStack.create(Ic2Fluids.STEAM.still, amount), false);
+				int transAmount = LiquidUtil.fillTile(te, dir.getOpposite(), Ic2FluidStack.create(Ic2Fluids.STEAM.still(), amount), false);
 				if (transAmount > 0)
 				{
 					amount -= transAmount;

@@ -7,13 +7,12 @@ import ic2.core.ref.Ic2Fluids;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Item.Properties;
 
 public class ItemArmorJetpack extends ItemArmorFluidTank implements IJetpack
 {
 	public ItemArmorJetpack(Properties settings)
 	{
-		super(Ic2ArmorMaterials.JET_PACK, settings, Ic2Fluids.BIOGAS.still, 30000);
+		super(Ic2ArmorMaterials.JET_PACK, settings, Ic2Fluids.BIOGAS.still(), 30000);
 	}
 
 	public void fillItemCategory(CreativeModeTab group, NonNullList<ItemStack> stacks)

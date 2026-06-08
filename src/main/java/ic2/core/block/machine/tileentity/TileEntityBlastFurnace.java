@@ -64,7 +64,7 @@ public class TileEntityBlastFurnace extends TileEntityInventory implements IUpgr
 			}
 		}
 	};
-	public final InvSlotConsumableLiquidByList tankInputSlot = new InvSlotConsumableLiquidByList(this, "cellInput", 1, Ic2Fluids.AIR.still);
+	public final InvSlotConsumableLiquidByList tankInputSlot = new InvSlotConsumableLiquidByList(this, "cellInput", 1, Ic2Fluids.AIR.still());
 	public final InvSlotOutput tankOutputSlot = new InvSlotOutput(this, "cellOutput", 1);
 	public final InvSlotUpgrade upgradeSlot = new InvSlotUpgrade(this, "upgrade", 2);
 	@GuiSynced
@@ -75,7 +75,7 @@ public class TileEntityBlastFurnace extends TileEntityInventory implements IUpgr
 		super(Ic2BlockEntities.BLAST_FURNACE, pos, state);
 		this.redstone = this.addComponent(new Redstone(this));
 		this.fluids = this.addComponent(new Fluids(this));
-		this.fluidTank = this.fluids.addTankInsert("fluid", 8000, Fluids.fluidPredicate(Ic2Fluids.AIR.still));
+		this.fluidTank = this.fluids.addTankInsert("fluid", 8000, Fluids.fluidPredicate(Ic2Fluids.AIR.still()));
 	}
 
 	@Override

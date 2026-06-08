@@ -1,7 +1,6 @@
 package ic2.core.block.machine.tileentity;
 
 import ic2.api.energy.tile.IExplosionPowerOverride;
-import ic2.api.recipe.IMachineRecipeManager;
 import ic2.api.recipe.IRecipeInput;
 import ic2.api.recipe.MachineRecipeResult;
 import ic2.api.recipe.Recipes;
@@ -10,7 +9,6 @@ import ic2.api.upgrade.UpgradableProperty;
 import ic2.core.ContainerBase;
 import ic2.core.IC2;
 import ic2.core.IHasGui;
-import ic2.core.block.IInventorySlotHolder;
 import ic2.core.block.comp.Fluids;
 import ic2.core.block.comp.Redstone;
 import ic2.core.block.invslot.InvSlot;
@@ -73,7 +71,7 @@ public class TileEntityMatter extends TileEntityElectricMachine implements IHasG
 	};
 	public final InvSlotOutput outputSlot = new InvSlotOutput(this, "output", 1);
 	public final InvSlotConsumableLiquid containerslot = new InvSlotConsumableLiquidByList(
-		this, "container", InvSlot.Access.I, 1, InvSlot.InvSide.TOP, InvSlotConsumableLiquid.OpType.Fill, Ic2Fluids.UU_MATTER.still
+		this, "container", InvSlot.Access.I, 1, InvSlot.InvSide.TOP, InvSlotConsumableLiquid.OpType.Fill, Ic2Fluids.UU_MATTER.still()
 	);
 	@GuiSynced
 	public final Ic2FluidTank fluidTank;
@@ -89,7 +87,7 @@ public class TileEntityMatter extends TileEntityElectricMachine implements IHasG
 		this.redstone = this.addComponent(new Redstone(this));
 		this.redstone.subscribe(newLevel -> this.energy.setEnabled(newLevel == 0));
 		this.fluids = this.addComponent(new Fluids(this));
-		this.fluidTank = this.fluids.addTank("fluidTank", 8000, Fluids.fluidPredicate(Ic2Fluids.UU_MATTER.still));
+		this.fluidTank = this.fluids.addTank("fluidTank", 8000, Fluids.fluidPredicate(Ic2Fluids.UU_MATTER.still()));
 		this.comparator.setUpdate(() ->
 		{
 			int count = calcRedstoneFromInvSlots(this.amplifierSlot);
@@ -214,7 +212,7 @@ public class TileEntityMatter extends TileEntityElectricMachine implements IHasG
 			return false;
 		}
 
-		this.fluidTank.fillMbUnchecked(Ic2FluidStack.create(Ic2Fluids.UU_MATTER.still, 1), false);
+		this.fluidTank.fillMbUnchecked(Ic2FluidStack.create(Ic2Fluids.UU_MATTER.still(), 1), false);
 		this.energy.useEnergy(this.energy.getCapacity());
 		return true;
 	}

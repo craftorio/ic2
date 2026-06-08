@@ -798,7 +798,7 @@ public class ShapedRecipeProvider extends Ic2RecipeProvider
 			.key('L', Items.LAPIS_BLOCK)
 			.finish("lzh_condensator");
 		gen.start(Ic2Items.REACTOR_COOLANT_CELL, " T ", "TWT", " T ")
-			.key('W', Ic2Fluids.COOLANT.still, 1000)
+			.key('W', Ic2Fluids.COOLANT.still(), 1000)
 			.key('T', Ic2ItemTags.TIN_PLATES)
 			.finish("reactor_coolant_cell");
 		gen.start(Ic2Items.TRIPLE_REACTOR_COOLANT_CELL, "TTT", "CCC", "TTT")

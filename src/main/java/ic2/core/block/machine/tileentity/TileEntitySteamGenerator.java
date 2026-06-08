@@ -53,7 +53,7 @@ public class TileEntitySteamGenerator extends TileEntityInventory implements IHa
 	{
 		super(Ic2BlockEntities.STEAM_GENERATOR, pos, state);
 		this.waterTank = this.fluids
-			.addTankInsert("waterTank", 10000, Fluids.fluidPredicate(net.minecraft.world.level.material.Fluids.WATER, Ic2Fluids.DISTILLED_WATER.still));
+			.addTankInsert("waterTank", 10000, Fluids.fluidPredicate(net.minecraft.world.level.material.Fluids.WATER, Ic2Fluids.DISTILLED_WATER.still()));
 	}
 
 	@Override
@@ -116,7 +116,7 @@ public class TileEntitySteamGenerator extends TileEntityInventory implements IHa
 		if (!this.waterTank.isEmpty() && this.inputMB > 0)
 		{
 			Fluid inputFluid = this.waterTank.getFluidStack().getFluid();
-			boolean hasDistilledWater = inputFluid == Ic2Fluids.DISTILLED_WATER.still;
+			boolean hasDistilledWater = inputFluid == Ic2Fluids.DISTILLED_WATER.still();
 			int maxAmount = Math.min(this.inputMB, this.waterTank.getFluidAmount());
 			float hUneeded = 100.0F + this.pressure / 220.0F * 100.0F;
 			float targetTemp = 100.0F + this.pressure / 220.0F * 100.0F * 2.74F;
@@ -193,11 +193,11 @@ public class TileEntitySteamGenerator extends TileEntityInventory implements IHa
 			Fluid output;
 			if (this.systemHeat >= 373.9999F)
 			{
-				output = Ic2Fluids.SUPERHEATED_STEAM.still;
+				output = Ic2Fluids.SUPERHEATED_STEAM.still();
 				this.outputFluid = TileEntitySteamGenerator.outputType.SUPERHEATEDSTEAM;
 			} else
 			{
-				output = Ic2Fluids.STEAM.still;
+				output = Ic2Fluids.STEAM.still();
 				this.outputFluid = TileEntitySteamGenerator.outputType.STEAM;
 			}
 

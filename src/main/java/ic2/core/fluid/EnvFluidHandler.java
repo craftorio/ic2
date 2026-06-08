@@ -67,19 +67,7 @@ public interface EnvFluidHandler
 
 	Ic2FluidStack drainWorldFluid(BlockState var1, Level var2, BlockPos var3, boolean var4);
 
-	final class FluidRefs
-	{
-		public final Block block;
-		public final Fluid still;
-		public final Fluid flowing;
-		public final BucketItem bucket;
-
-		public FluidRefs(Block block, Fluid still, Fluid flowing, BucketItem bucket)
+	record FluidRefs(Block block, Fluid still, Fluid flowing, BucketItem bucket)
 		{
-			this.block = block;
-			this.still = still;
-			this.flowing = flowing;
-			this.bucket = bucket;
 		}
-	}
 }

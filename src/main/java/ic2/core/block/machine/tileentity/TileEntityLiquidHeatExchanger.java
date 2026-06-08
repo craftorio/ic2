@@ -80,16 +80,16 @@ public class TileEntityLiquidHeatExchanger extends TileEntityHeatSourceInventory
 				{
 					addCooldownRecipe(
 						net.minecraft.world.level.material.Fluids.LAVA,
-						Ic2Fluids.PAHOEHOE_LAVA.still,
+						Ic2Fluids.PAHOEHOE_LAVA.still(),
 						Math.round(20.0F * ConfigUtil.getFloat(MainConfig.get(), "balance/energy/fluidconversion/heatExchangerLava"))
 					);
 					addBiDiRecipe(
-						Ic2Fluids.HOT_COOLANT.still,
-						Ic2Fluids.COOLANT.still,
+						Ic2Fluids.HOT_COOLANT.still(),
+						Ic2Fluids.COOLANT.still(),
 						Math.round(20.0F * ConfigUtil.getFloat(MainConfig.get(), "balance/energy/fluidconversion/heatExchangerHotCoolant"))
 					);
 					addHeatupRecipe(
-						Ic2Fluids.HOT_WATER.still,
+						Ic2Fluids.HOT_WATER.still(),
 						net.minecraft.world.level.material.Fluids.WATER,
 						Math.round(1.0F * ConfigUtil.getFloat(MainConfig.get(), "balance/energy/fluidconversion/heatExchangerWater"))
 					);

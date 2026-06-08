@@ -79,10 +79,10 @@ public class TileEntityFermenter extends TileEntityInventory implements IHasGui,
 		Recipes.fermenter = new FermenterRecipeManager();
 		Recipes.fermenter
 			.addRecipe(
-				Ic2Fluids.BIOMASS.still,
+				Ic2Fluids.BIOMASS.still(),
 				ConfigUtil.getInt(MainConfig.get(), "balance/fermenter/need_amount_biomass_per_run"),
 				ConfigUtil.getInt(MainConfig.get(), "balance/fermenter/hU_per_run"),
-				Ic2Fluids.BIOGAS.still,
+				Ic2Fluids.BIOGAS.still(),
 				ConfigUtil.getInt(MainConfig.get(), "balance/fermenter/output_amount_biogas_per_run")
 			);
 	}

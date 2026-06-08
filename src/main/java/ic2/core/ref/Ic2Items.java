@@ -915,7 +915,7 @@ public final class Ic2Items
 	public static final Item EMPTY_CELL = register("empty_cell", new ItemClassicCell(new Properties().tab(IC2.tabIc2ToolsAndUtilities), Fluids.EMPTY, 0));
 	public static final Item WATER_CELL = register("water_cell", new ItemClassicCell(new Properties().tab(IC2.tabIc2ToolsAndUtilities), Fluids.WATER, 1));
 	public static final Item LAVA_CELL = register("lava_cell", new ItemClassicCell(new Properties().tab(IC2.tabIc2ToolsAndUtilities), Fluids.LAVA, 1));
-	public static final Item AIR_CELL = register("air_cell", new ItemClassicCell(new Properties().tab(IC2.tabIc2ToolsAndUtilities), Ic2Fluids.AIR.still, 1));
+	public static final Item AIR_CELL = register("air_cell", new ItemClassicCell(new Properties().tab(IC2.tabIc2ToolsAndUtilities), Ic2Fluids.AIR.still(), 1));
 	public static final Item ELECTROLYZED_WATER_CELL = register(
 		"electrolyzed_water_cell", new ItemClassicCell(new Properties().tab(IC2.tabIc2ToolsAndUtilities), null, 1)
 	);

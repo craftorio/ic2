@@ -5,7 +5,6 @@ import ic2.api.recipe.MachineRecipeResult;
 import ic2.api.recipe.Recipes;
 import ic2.core.ContainerBase;
 import ic2.core.IHasGui;
-import ic2.core.block.IInventorySlotHolder;
 import ic2.core.block.invslot.InvSlot;
 import ic2.core.block.invslot.InvSlotConsumable;
 import ic2.core.block.invslot.InvSlotConsumableItemStack;
@@ -187,7 +186,7 @@ public class TileEntityClassicCanner extends TileEntityElectricMachine implement
 					} else
 					{
 						ItemStack stack = this.inputSlot.get();
-						((ItemArmorFluidTank) stack.getItem()).fillMb(stack, Ic2FluidStack.create(Ic2Fluids.BIOGAS.still, this.fuelQuality), false, null);
+						((ItemArmorFluidTank) stack.getItem()).fillMb(stack, Ic2FluidStack.create(Ic2Fluids.BIOGAS.still(), this.fuelQuality), false, null);
 						this.inputSlot.clear();
 						this.outputSlot.add(stack);
 					}

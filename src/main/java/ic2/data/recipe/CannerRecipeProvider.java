@@ -84,9 +84,9 @@ public class CannerRecipeProvider extends Ic2RecipeProvider
 	private static void generateEnrich(Consumer<FinishedRecipe> consumer)
 	{
 		CannerEnrichRecipeGenerator gen = new CannerEnrichRecipeGenerator(consumer);
-		gen.add(bucket(Fluids.WATER), itemInput(Ic2Items.CF_POWDER), bucket(Ic2Fluids.CONSTRUCTION_FOAM.still), "construction_foam");
-		gen.add(bucket(Fluids.WATER), tagInput(Ic2ItemTags.LAPIS_DUSTS, 8), bucket(Ic2Fluids.COOLANT.still), "coolant_from_water");
-		gen.add(bucket(Ic2Fluids.DISTILLED_WATER.still), tagInput(Ic2ItemTags.LAPIS_DUSTS), bucket(Ic2Fluids.COOLANT.still), "coolant_from_distilled_water");
-		gen.add(bucket(Fluids.WATER), itemInput(Ic2Items.BIO_CHAFF), bucket(Ic2Fluids.BIOMASS.still), "biomass");
+		gen.add(bucket(Fluids.WATER), itemInput(Ic2Items.CF_POWDER), bucket(Ic2Fluids.CONSTRUCTION_FOAM.still()), "construction_foam");
+		gen.add(bucket(Fluids.WATER), tagInput(Ic2ItemTags.LAPIS_DUSTS, 8), bucket(Ic2Fluids.COOLANT.still()), "coolant_from_water");
+		gen.add(bucket(Ic2Fluids.DISTILLED_WATER.still()), tagInput(Ic2ItemTags.LAPIS_DUSTS), bucket(Ic2Fluids.COOLANT.still()), "coolant_from_distilled_water");
+		gen.add(bucket(Fluids.WATER), itemInput(Ic2Items.BIO_CHAFF), bucket(Ic2Fluids.BIOMASS.still()), "biomass");
 	}
 }

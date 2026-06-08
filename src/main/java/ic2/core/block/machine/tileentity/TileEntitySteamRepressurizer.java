@@ -46,7 +46,7 @@ public class TileEntitySteamRepressurizer extends TileEntityInventory implements
 	public TileEntitySteamRepressurizer(BlockPos pos, BlockState state)
 	{
 		super(Ic2BlockEntities.STEAM_REPRESSURIZER, pos, state);
-		this.input = this.fluids.addTankInsert("input", 10000, Fluids.fluidPredicate(Ic2Fluids.STEAM.still, Ic2Fluids.SUPERHEATED_STEAM.still));
+		this.input = this.fluids.addTankInsert("input", 10000, Fluids.fluidPredicate(Ic2Fluids.STEAM.still(), Ic2Fluids.SUPERHEATED_STEAM.still()));
 		this.output = this.fluids.addTankExtract("output", 10000);
 	}
 
@@ -127,10 +127,10 @@ public class TileEntitySteamRepressurizer extends TileEntityInventory implements
 	{
 		assert !this.input.isEmpty();
 		Fluid fluid = this.input.getFluidStack().getFluid();
-		if (fluid == Ic2Fluids.STEAM.still)
+		if (fluid == Ic2Fluids.STEAM.still())
 		{
 			return ConfigUtil.getInt(MainConfig.get(), "balance/steamRepressurizer/steamPerSteam");
-		} else if (fluid == Ic2Fluids.SUPERHEATED_STEAM.still)
+		} else if (fluid == Ic2Fluids.SUPERHEATED_STEAM.still())
 		{
 			return ConfigUtil.getInt(MainConfig.get(), "balance/steamRepressurizer/steamPerSuperSteam");
 		} else

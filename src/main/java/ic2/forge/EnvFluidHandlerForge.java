@@ -91,8 +91,8 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 				});
 			}
 		};
-		ForgeFlowingFluid.Properties properties = new ForgeFlowingFluid.Properties(() -> fluidType, () -> res.get().still, () -> res.get().flowing)
-			.bucket(() -> res.get().bucket);
+		ForgeFlowingFluid.Properties properties = new ForgeFlowingFluid.Properties(() -> fluidType, () -> res.get().still(), () -> res.get().flowing())
+			.bucket(() -> res.get().bucket());
 		Fluid still = new ForgeFlowingFluid.Source(properties);
 		Fluid flowing = flowingSpriteId != null ? new ForgeFlowingFluid.Flowing(properties) : null;
 		BucketItem bucket = new BucketItem(() -> still, new Properties().craftRemainder(Items.BUCKET).stacksTo(1).tab(IC2.tabIc2ToolsAndUtilities));
@@ -100,7 +100,7 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 		res.set(ret);
 		ForgeRegistries.FLUID_TYPES.get().register(id, fluidType);
 		ForgeRegistries.FLUIDS.register(id, still);
-		if (ret.flowing != null)
+		if (ret.flowing() != null)
 		{
 			ForgeRegistries.FLUIDS.register(ResourceLocation.fromNamespaceAndPath(id.getNamespace(), "flowing_" + id.getPath()), flowing);
 		}

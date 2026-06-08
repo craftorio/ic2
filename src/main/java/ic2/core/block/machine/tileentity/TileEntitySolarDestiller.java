@@ -84,7 +84,7 @@ public class TileEntitySolarDestiller extends TileEntityInventory implements IHa
 			if (this.canWork())
 			{
 				this.inputTank.drainMbUnchecked(1, false);
-				this.outputTank.fillMbUnchecked(Ic2FluidStack.create(Ic2Fluids.DISTILLED_WATER.still, 1), false);
+				this.outputTank.fillMbUnchecked(Ic2FluidStack.create(Ic2Fluids.DISTILLED_WATER.still(), 1), false);
 			}
 
 			this.updateTicker = 0;

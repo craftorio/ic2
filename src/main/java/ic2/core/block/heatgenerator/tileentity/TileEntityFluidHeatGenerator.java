@@ -80,7 +80,7 @@ public class TileEntityFluidHeatGenerator extends TileEntityHeatSourceInventory 
 		Recipes.fluidHeatGenerator = new FluidHeatManager();
 		if (ConfigUtil.getFloat(MainConfig.get(), "balance/energy/generator/semiFluidBiogas") > 0.0F)
 		{
-			addFuel(Ic2Fluids.BIOGAS.still, 10, Math.round(32.0F * ConfigUtil.getFloat(MainConfig.get(), "balance/energy/heatgenerator/semiFluidBiogas")));
+			addFuel(Ic2Fluids.BIOGAS.still(), 10, Math.round(32.0F * ConfigUtil.getFloat(MainConfig.get(), "balance/energy/heatgenerator/semiFluidBiogas")));
 		}
 	}
 

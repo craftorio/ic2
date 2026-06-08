@@ -55,7 +55,7 @@ public class TileEntityReplicator extends TileEntityElectricMachine implements I
 	public int maxIndex;
 	public double patternUu;
 	public double patternEu;
-	public final InvSlotConsumableLiquid fluidSlot = new InvSlotConsumableLiquidByList(this, "fluid", 1, Ic2Fluids.UU_MATTER.still);
+	public final InvSlotConsumableLiquid fluidSlot = new InvSlotConsumableLiquidByList(this, "fluid", 1, Ic2Fluids.UU_MATTER.still());
 	public final InvSlotOutput cellSlot = new InvSlotOutput(this, "cell", 1);
 	public final InvSlotOutput outputSlot = new InvSlotOutput(this, "output", 1);
 	public final InvSlotUpgrade upgradeSlot = new InvSlotUpgrade(this, "upgrade", 4);
@@ -66,7 +66,7 @@ public class TileEntityReplicator extends TileEntityElectricMachine implements I
 	public TileEntityReplicator(BlockPos pos, BlockState state)
 	{
 		super(Ic2BlockEntities.REPLICATOR, pos, state, 2000000, 4);
-		this.fluidTank = this.fluids.addTank("fluidTank", 16000, Fluids.fluidPredicate(Ic2Fluids.UU_MATTER.still));
+		this.fluidTank = this.fluids.addTank("fluidTank", 16000, Fluids.fluidPredicate(Ic2Fluids.UU_MATTER.still()));
 	}
 
 	@Override
@@ -140,7 +140,7 @@ public class TileEntityReplicator extends TileEntityElectricMachine implements I
 		amount -= this.extraUuStored;
 		int toDrain = (int) Math.ceil(amount * 1000.0);
 		Ic2FluidStack drained = this.fluidTank.drainMbUnchecked(toDrain, true);
-		if (drained != null && drained.getFluid() == Ic2Fluids.UU_MATTER.still && drained.getAmountMb() == toDrain)
+		if (drained != null && drained.getFluid() == Ic2Fluids.UU_MATTER.still() && drained.getAmountMb() == toDrain)
 		{
 			this.fluidTank.drainMbUnchecked(toDrain, false);
 			amount -= drained.getAmountMb() / 1000.0;

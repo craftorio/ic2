@@ -490,7 +490,7 @@ public class TileEntityCrop extends Ic2TileEntity implements ICropTile
 				return true;
 			}
 
-			fs = Ic2FluidStack.create(Ic2Fluids.WEED_EX.still, Integer.MAX_VALUE);
+			fs = Ic2FluidStack.create(Ic2Fluids.WEED_EX.still(), Integer.MAX_VALUE);
 			amount = FluidHandler.drainMb(heldItem, fs, true, null);
 			if (amount > 0)
 			{

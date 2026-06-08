@@ -52,8 +52,8 @@ public class TileEntityElectrolyzer extends TileEntityElectricMachine implements
 				net.minecraft.world.level.material.Fluids.WATER,
 				40,
 				32,
-				new IElectrolyzerRecipeManager.ElectrolyzerOutput(Ic2Fluids.HYDROGEN.still, 26, Direction.DOWN),
-				new IElectrolyzerRecipeManager.ElectrolyzerOutput(Ic2Fluids.OXYGEN.still, 13, Direction.UP)
+				new IElectrolyzerRecipeManager.ElectrolyzerOutput(Ic2Fluids.HYDROGEN.still(), 26, Direction.DOWN),
+				new IElectrolyzerRecipeManager.ElectrolyzerOutput(Ic2Fluids.OXYGEN.still(), 13, Direction.UP)
 			);
 	}
 

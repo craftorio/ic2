@@ -49,7 +49,7 @@ public class TileEntityCondenser extends TileEntityElectricMachine implements IH
 	public TileEntityCondenser(BlockPos pos, BlockState state)
 	{
 		super(Ic2BlockEntities.CONDENSER, pos, state, 100000, 3);
-		this.inputTank = this.fluids.addTankInsert("inputTank", 100000, Fluids.fluidPredicate(Ic2Fluids.STEAM.still, Ic2Fluids.SUPERHEATED_STEAM.still));
+		this.inputTank = this.fluids.addTankInsert("inputTank", 100000, Fluids.fluidPredicate(Ic2Fluids.STEAM.still(), Ic2Fluids.SUPERHEATED_STEAM.still()));
 		this.outputTank = this.fluids.addTankExtract("outputTank", 1000);
 		this.waterInputSlot = new InvSlotConsumableLiquidByTank(
 			this, "waterInputSlot", InvSlot.Access.I, 1, InvSlot.InvSide.BOTTOM, InvSlotConsumableLiquid.OpType.Fill, this.outputTank
@@ -128,7 +128,7 @@ public class TileEntityCondenser extends TileEntityElectricMachine implements IH
 		{
 			if (this.progress >= 10000)
 			{
-				this.outputTank.fillMbUnchecked(Ic2FluidStack.create(Ic2Fluids.DISTILLED_WATER.still, 100), false);
+				this.outputTank.fillMbUnchecked(Ic2FluidStack.create(Ic2Fluids.DISTILLED_WATER.still(), 100), false);
 				this.progress -= 10000;
 			}
 

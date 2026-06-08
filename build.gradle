@@ -21,7 +21,6 @@ java {
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 minecraft {
     mappings channel: mapping_channel, version: mapping_version
-
     copyIdeResources = true
 
     runs {
@@ -30,7 +29,6 @@ minecraft {
 
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
-            property 'forge.enabledGameTestNamespaces', mod_id
 
             mods {
                 "${mod_id}" {
@@ -47,7 +45,6 @@ minecraft {
             property 'forge.enabledGameTestNamespaces', mod_id
             args '--nogui'
         }
-
         gameTestServer {
             property 'forge.enabledGameTestNamespaces', mod_id
         }
@@ -72,8 +69,7 @@ repositories {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-    compileOnly "mezz.jei:jei-1.19.2-forge-api:11.8.1.1034"
-    
+    compileOnly 'mezz.jei:jei-1.20.1-forge-api:15.20.0.130'
     implementation 'org.ejml:ejml-all:0.45.1'
 }
 
@@ -104,7 +100,6 @@ tasks.named('jar', Jar).configure {
                 'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }
-    
     finalizedBy 'reobfJar'
 }
 

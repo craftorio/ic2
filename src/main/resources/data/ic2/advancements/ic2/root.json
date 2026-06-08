@@ -10,7 +10,7 @@
       "translate": "advancements.ic2.root.desc"
     },
     "frame": "task",
-    "background": "ic2:textures/blocks/machine/chunk_loader_bottom.png",
+    "background": "ic2:textures/block/resource/advanced_machine.png",
     "show_toast": false,
     "announce_to_chat": false,
     "hidden": false

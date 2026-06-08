@@ -119,3 +119,85 @@ publishing {
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
+
+tasks.register('syncVersion') {
+    description = '同步 mod_version 到 release.md 和 README.md，并校验版本号递增'
+    group = 'versioning'
+
+    doLast {
+        def versionPattern = /^2\.10\.(\d+)-ex120$/
+
+        // 1. 读取 gradle.properties 中的 mod_version
+        def propsFile = file('gradle.properties')
+        def props = new Properties()
+        propsFile.withInputStream { props.load(it) }
+        def currentVersion = props['mod_version']
+
+        def matcher = currentVersion =~ versionPattern
+        if (!matcher) {
+            throw new GradleException("版本格式不正确: $currentVersion，期望格式: 2.10.xxx-ex120")
+        }
+        def currentXxx = matcher[0][1] as int
+
+        // 2. 读取上一次同步时存储的版本
+        def versionFile = file('build/syncVersion/lastVersion.txt')
+        def lastXxx = -1
+        def lastVersion = '无'
+        if (versionFile.exists()) {
+            lastVersion = versionFile.text.trim()
+            def lastMatcher = lastVersion =~ versionPattern
+            if (lastMatcher) {
+                lastXxx = lastMatcher[0][1] as int
+            }
+        }
+
+        // 3. 比较版本号：xxx 必须大于上一次
+        if (currentXxx <= lastXxx) {
+            def lineNum = 1
+            propsFile.eachLine { line ->
+                if (line.startsWith('mod_version=')) {
+                    throw new GradleException("gradle.properties:${lineNum}: 目前版本是${currentVersion}，但上一次同步时版本是${lastVersion}")
+                }
+                lineNum++
+            }
+            return
+        }
+
+        // 4. 写入当前版本到自动生成的文件
+        versionFile.parentFile.mkdirs()
+        versionFile.text = currentVersion
+        println "syncVersion: 版本已记录为 $currentVersion"
+
+        // 5. 更新 release.md 第一行标题
+        def releaseFile = file('release.md')
+        if (releaseFile.exists()) {
+            def releaseLines = releaseFile.readLines()
+            releaseLines[0] = "# $currentVersion"
+            releaseFile.text = releaseLines.join('\n') + '\n'
+            println "syncVersion: release.md 标题已更新为 # $currentVersion"
+        } else {
+            println "syncVersion: 未找到 release.md，跳过"
+        }
+
+        // 6. 更新 README.md 中的 Version badge
+        def readmeFile = file('README.md')
+        if (readmeFile.exists()) {
+            def readmeText = readmeFile.text
+            // shields.io 中 '-' 需要转义为 '--'
+            def shieldsVersion = currentVersion.replace('-', '--')
+            def badgePattern = ~/<img src="https:\/\/img\.shields\.io\/badge\/Version-[^"]+" alt="Version [^"]*">/
+            def newBadge = "<img src=\"https://img.shields.io/badge/Version-${shieldsVersion}-blue\" alt=\"Version ${currentVersion}\">"
+            if (readmeText.find(badgePattern)) {
+                readmeText = readmeText.replaceAll(badgePattern, newBadge)
+                readmeFile.text = readmeText
+                println "syncVersion: README.md Version badge 已更新"
+            } else {
+                println "syncVersion: 未在 README.md 中找到 Version badge，跳过"
+            }
+        } else {
+            println "syncVersion: 未找到 README.md，跳过"
+        }
+
+        println "syncVersion: 同步完成 ($currentVersion)"
+    }
+}

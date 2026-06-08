@@ -48,6 +48,7 @@ public final class FmlMod
 		IEventBus modEventBus = this.ctx.getModEventBus();
 		modEventBus.register(this);
 		EnvProxyForge.blockEntityRegistry.register(modEventBus);
+		EnvProxyForge.creativeTabRegistry.register(modEventBus);
 		EnvProxyForge.entityRegistry.register(modEventBus);
 		EnvProxyForge.screenHandlerRegistry.register(modEventBus);
 		EnvProxyForge.statusEffectRegistry.register(modEventBus);
@@ -63,6 +64,7 @@ public final class FmlMod
 
 		Ic2Fluids.init();
 	}
+
 
 	@SubscribeEvent
 	public void load(FMLCommonSetupEvent event)

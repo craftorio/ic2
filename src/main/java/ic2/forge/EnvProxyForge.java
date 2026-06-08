@@ -27,6 +27,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.worldgen.features.FeatureUtils;
 import net.minecraft.network.chat.Component;
@@ -97,6 +98,11 @@ public final class EnvProxyForge implements EnvProxy
 	static List<Runnable> configuredFeatureRegistrations = new ArrayList<>();
 	static List<EnvProxyForge.PlacedFeatureRegistration<?>> placedFeatureRegistrations = new ArrayList<>();
 	static List<EnvProxyForge.PlacementModifierTypeRegistration> placementModifierTypeRegistrations = new ArrayList<>();
+
+	static final DeferredRegister<CreativeModeTab> creativeTabRegistry = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, "ic2");
+	static final List<TabRegistration> pendingTabRegistrations = new ArrayList<>();
+
+	record TabRegistration(ResourceLocation id, Supplier<ItemStack> icon, Ic2ItemGroupType groupType) {}
 	static final DeferredRegister<FoliagePlacerType<?>> foliagePlacerRegistry = DeferredRegister.create(ForgeRegistries.FOLIAGE_PLACER_TYPES, "ic2");
 	static final DeferredRegister<RecipeType<?>> recipeTypeRegistry = DeferredRegister.create(ForgeRegistries.RECIPE_TYPES, "ic2");
 	static final DeferredRegister<RecipeSerializer<?>> recipeSerializerRegistry = DeferredRegister.create(ForgeRegistries.RECIPE_SERIALIZERS, "ic2");
@@ -262,22 +268,31 @@ public final class EnvProxyForge implements EnvProxy
 	}
 
 	@Override
-	public CreativeModeTab createItemGroup(ResourceLocation id, Supplier<ItemStack> iconSupplier, Ic2ItemGroupType groupType)
-	{
-		return CreativeModeTab.builder()
-			.title(Component.translatable("itemGroup." + id.getNamespace() + "." + id.getPath()))
-			.icon(iconSupplier)
-			.displayItems((params, output) ->
-			{
-				for (Supplier<Item> itemSupplier : Ic2Items.CREATIVE_TAB_ITEMS.get(groupType))
+		public CreativeModeTab createItemGroup(ResourceLocation id, Supplier<ItemStack> iconSupplier, Ic2ItemGroupType groupType)
+		{
+			pendingTabRegistrations.add(new TabRegistration(id, iconSupplier, groupType));
+			CreativeModeTab tab = CreativeModeTab.builder()
+				.title(Component.translatable("itemGroup." + id.getNamespace() + "." + id.getPath()))
+				.icon(iconSupplier)
+				.displayItems((params, output) ->
 				{
-					output.accept(new ItemStack(itemSupplier.get()));
-				}
-			})
-			.build();
-	}
+					List<Supplier<Item>> items = Ic2Items.CREATIVE_TAB_ITEMS.get(groupType);
+					if (items != null)
+					{
+						for (Supplier<Item> itemSupplier : items)
+						{
+							output.accept(new ItemStack(itemSupplier.get()));
+						}
+					}
+				})
+				.build();
+			creativeTabRegistry.register(id.getPath(), () -> tab);
+			return tab;
+		}
 
 	@Override
+
+
 	public EnvFluidHandler createFluidStackHandler()
 	{
 		if (this.isClientEnv())

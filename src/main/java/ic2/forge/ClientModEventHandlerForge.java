@@ -92,6 +92,7 @@ public final class ClientModEventHandlerForge
 	public void onClientSetup(FMLClientSetupEvent event)
 	{
 		// Render layers are now defined through blockstate JSON models in 1.20.1
+		// Set your render type in your block model's JSON (eg. "render_type": "cutout") or override net.minecraft.client.resources.model.BakedModel.getRenderTypes(BlockState, net.minecraft.util.RandomSource, net.minecraftforge.client.model.data.ModelData)
 		for (ClientEnvProxyForge.BlockLayerRegistration registration : ClientEnvProxyForge.blockLayerRegistrations)
 		{
 			for (Block block : registration.blocks())

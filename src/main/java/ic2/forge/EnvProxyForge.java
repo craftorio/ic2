@@ -6,8 +6,10 @@ import ic2.api.energy.ProfileEvent;
 import ic2.api.event.ExplosionEvent;
 import ic2.api.event.RetextureEvent;
 import ic2.core.IC2;
+import ic2.core.Ic2ItemGroupType;
 import ic2.core.fluid.EnvFluidHandler;
 import ic2.core.item.EnvItemHandler;
+import ic2.core.ref.Ic2Items;
 import ic2.core.network.GrowingBuffer;
 import ic2.core.proxy.EnvProxy;
 
@@ -260,11 +262,18 @@ public final class EnvProxyForge implements EnvProxy
 	}
 
 	@Override
-	public CreativeModeTab createItemGroup(ResourceLocation id, Supplier<ItemStack> iconSupplier)
+	public CreativeModeTab createItemGroup(ResourceLocation id, Supplier<ItemStack> iconSupplier, Ic2ItemGroupType groupType)
 	{
 		return CreativeModeTab.builder()
 			.title(Component.translatable("itemGroup." + id.getNamespace() + "." + id.getPath()))
 			.icon(iconSupplier)
+			.displayItems((params, output) ->
+			{
+				for (Supplier<Item> itemSupplier : Ic2Items.CREATIVE_TAB_ITEMS.get(groupType))
+				{
+					output.accept(new ItemStack(itemSupplier.get()));
+				}
+			})
 			.build();
 	}
 

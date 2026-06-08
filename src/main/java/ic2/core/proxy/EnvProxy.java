@@ -2,6 +2,7 @@ package ic2.core.proxy;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.serialization.Codec;
+import ic2.core.Ic2ItemGroupType;
 import ic2.core.fluid.EnvFluidHandler;
 import ic2.core.item.EnvItemHandler;
 import ic2.core.network.GrowingBuffer;
@@ -111,7 +112,7 @@ public interface EnvProxy
 
 	void runAfterRegistryInit(Runnable var1);
 
-	CreativeModeTab createItemGroup(ResourceLocation var1, Supplier<ItemStack> var2);
+	CreativeModeTab createItemGroup(ResourceLocation var1, Supplier<ItemStack> var2, Ic2ItemGroupType var3);
 
 	EnvFluidHandler createFluidStackHandler();
 

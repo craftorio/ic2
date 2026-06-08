@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -101,7 +102,7 @@ public abstract class ItemArmorFluidTank extends ItemArmorUtility implements Sta
 	{
 		Ic2FluidStack fs = Ic2FluidStack.get(stack);
 		return !fs.isEmpty()
-			? String.format("< %s, %d mB >", Registry.FLUID.getKey(fs.getFluid()), fs.getAmountMb())
+			? String.format("< %s, %d mB >", BuiltInRegistries.FLUID.getKey(fs.getFluid()), fs.getAmountMb())
 			: Localization.translate("ic2.item.FluidContainer.Empty");
 	}
 

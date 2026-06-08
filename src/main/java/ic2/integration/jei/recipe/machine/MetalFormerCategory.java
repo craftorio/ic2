@@ -1,6 +1,6 @@
 package ic2.integration.jei.recipe.machine;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.ref.Ic2Blocks;
 import ic2.core.ref.Ic2Items;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
@@ -23,9 +23,9 @@ public class MetalFormerCategory extends DynamicCategory
 	}
 
 	@Override
-	public void draw(IORecipeWrapper recipe, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY)
+	public void draw(IORecipeWrapper recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY)
 	{
-		super.draw(recipe, recipeSlotsView, stack, mouseX, mouseY);
-		Minecraft.getInstance().getItemRenderer().renderGuiItem(ICONS[this.mode], 70 + this.xOffset, 35 + this.yOffset);
+		super.draw(recipe, recipeSlotsView, guiGraphics, mouseX, mouseY);
+		guiGraphics.renderItem(ICONS[this.mode], 70 + this.xOffset, 35 + this.yOffset);
 	}
 }

@@ -1,7 +1,9 @@
 package ic2.core.event;
 
+import net.minecraft.client.gui.GuiGraphics;
 import com.mojang.blaze3d.vertex.PoseStack;
 import ic2.api.item.ElectricItem;
+import net.minecraft.core.registries.BuiltInRegistries;
 import ic2.api.item.IEnhancedOverlayProvider;
 import ic2.core.IC2;
 import ic2.core.fluid.FluidHandler;
@@ -100,7 +102,7 @@ public class EventHandlerClient
 	public static float onSetupFogDensity(BlockState state)
 	{
 		Fluid fluid = FluidHandler.getWorldFluid(state);
-		if (fluid != null && "ic2".equals(Registry.FLUID.getKey(fluid).getNamespace()))
+		if (fluid != null && "ic2".equals(BuiltInRegistries.FLUID.getKey(fluid).getNamespace()))
 		{
 			int density = FluidHandler.getDensity(fluid);
 			return (float) Util.map(Math.abs(density), 20000.0, 2.0);
@@ -113,7 +115,7 @@ public class EventHandlerClient
 	public static int onRenderFogColor(BlockState state)
 	{
 		Fluid fluid = FluidHandler.getWorldFluid(state);
-		return fluid != null && "ic2".equals(Registry.FLUID.getKey(fluid).getNamespace()) ? FluidHandler.getColor(fluid) : -1;
+		return fluid != null && "ic2".equals(BuiltInRegistries.FLUID.getKey(fluid).getNamespace()) ? FluidHandler.getColor(fluid) : -1;
 	}
 
 	public static void onDrawBlockHighlight(Player player, BlockHitResult target, float partialTicks, PoseStack matrix, MultiBufferSource buffers)

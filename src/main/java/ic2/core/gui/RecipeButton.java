@@ -1,7 +1,7 @@
 package ic2.core.gui;
 
 import com.google.common.base.Function;
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.Ic2Gui;
 
 import java.util.List;
@@ -37,7 +37,7 @@ public class RecipeButton extends Button<RecipeButton>
 
 	@GuiElement.SkippedMethod
 	@Override
-	public void drawBackground(PoseStack matrices, int mouseX, int mouseY)
+	public void drawBackground(GuiGraphics guiGraphics, int mouseX, int mouseY)
 	{
 	}
 }

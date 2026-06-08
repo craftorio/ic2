@@ -17,7 +17,7 @@ import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
-import net.minecraft.client.resources.model.ModelBakery;
+import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.core.BlockPos;
@@ -44,23 +44,16 @@ final class DynamicBeModelForge extends DynamicBeModel<List<BakedQuad>[]> implem
 	@Override
 	public BakedModel bake(
 		IGeometryBakingContext owner,
-		ModelBakery bakery,
+		ModelBaker bakery,
 		Function<Material, TextureAtlasSprite> spriteGetter,
 		ModelState modelTransform,
 		ItemOverrides overrides,
 		ResourceLocation modelLocation
 	)
 	{
-		return this.bake(bakery, spriteGetter, modelTransform, modelLocation);
+		return super.bake(bakery, spriteGetter, modelTransform, modelLocation);
 	}
 
-	@Override
-	public Collection<Material> getMaterials(
-		IGeometryBakingContext owner, Function<ResourceLocation, UnbakedModel> modelGetter, Set<Pair<String, String>> missingTextureErrors
-	)
-	{
-		return this.getMaterials(modelGetter, missingTextureErrors);
-	}
 
 	public ModelData getModelData(BlockAndTintGetter world, BlockPos pos, BlockState state, ModelData tileData)
 	{

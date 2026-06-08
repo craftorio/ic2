@@ -1,6 +1,6 @@
 package ic2.core.gui;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.Ic2Gui;
 import ic2.core.fluid.FluidHandler;
 import ic2.core.fluid.Ic2FluidStack;
@@ -30,11 +30,11 @@ public abstract class AbstractFluidSlot extends GuiElement<TankFluidSlot>
 	}
 
 	@Override
-	public void drawBackground(PoseStack matrices, int mouseX, int mouseY)
+	public void drawBackground(GuiGraphics guiGraphics, int mouseX, int mouseY)
 	{
 		bindCommonTexture();
 		Ic2FluidStack fs = this.getFluidStack();
-		this.gui.drawTexturedRect(matrices, this.x, this.y, this.width, this.height, 8.0, 160.0);
+		this.gui.drawTexturedRect(guiGraphics.pose(), this.x, this.y, this.width, this.height, 8.0, 160.0);
 		if (fs != null && !fs.isEmpty())
 		{
 			int fluidX = this.x + 1;
@@ -45,7 +45,7 @@ public abstract class AbstractFluidSlot extends GuiElement<TankFluidSlot>
 			TextureAtlasSprite sprite = fluid != null ? getBlockTextureMap().getSprite(FluidHandler.getStillSpriteId(fluid)) : null;
 			int color = fluid != null ? FluidHandler.getColor(fluid) : -1;
 			bindBlockTexture();
-			this.gui.drawSprite(matrices, fluidX, fluidY, fluidWidth, fluidHeight, sprite, color, 1.0, false, false);
+			this.gui.drawSprite(guiGraphics.pose(), fluidX, fluidY, fluidWidth, fluidHeight, sprite, color, 1.0, false, false);
 		}
 	}
 

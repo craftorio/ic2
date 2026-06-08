@@ -1,7 +1,8 @@
 package ic2.core.entity.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Vector3f;
+import org.joml.Vector3f;
+import com.mojang.math.Axis;
 import ic2.api.entity.block.ExplosiveEntity;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
@@ -38,9 +39,9 @@ public class ExplosiveBlockRenderer extends EntityRenderer<ExplosiveEntity>
 			matrixStack.scale(k, k, k);
 		}
 
-		matrixStack.mulPose(Vector3f.YP.rotationDegrees(-90.0F));
+		matrixStack.mulPose(Axis.YP.rotationDegrees(-90.0F));
 		matrixStack.translate(-0.5, -0.5, 0.5);
-		matrixStack.mulPose(Vector3f.YP.rotationDegrees(90.0F));
+		matrixStack.mulPose(Axis.YP.rotationDegrees(90.0F));
 		TntMinecartRenderer.renderWhiteSolidBlock(this.blockRenderManager, tntEntity.renderBlockState, matrixStack, vertexConsumerProvider, i, j / 5 % 2 == 0);
 		matrixStack.popPose();
 		super.render(tntEntity, f, g, matrixStack, vertexConsumerProvider, i);

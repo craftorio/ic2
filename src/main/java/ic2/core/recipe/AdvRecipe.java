@@ -217,6 +217,11 @@ public class AdvRecipe implements Ic2CraftingRecipe
 		return this.output;
 	}
 
+	public ItemStack getResultItem(net.minecraft.core.RegistryAccess registryAccess)
+	{
+		return this.output;
+	}
+
 	public static boolean canShow(Object[] input, ItemStack output, boolean hidden)
 	{
 		return !hidden || !ConfigUtil.getBool(MainConfig.get(), "misc/hideSecretRecipes");
@@ -321,6 +326,17 @@ public class AdvRecipe implements Ic2CraftingRecipe
 	public ResourceLocation getId()
 	{
 		return this.id;
+	}
+
+	@Override
+	public ItemStack assemble(net.minecraft.world.inventory.CraftingContainer inventory, net.minecraft.core.RegistryAccess registryAccess)
+	{
+		return this.assemble(inventory);
+	}
+
+	public net.minecraft.world.item.crafting.CraftingBookCategory category()
+	{
+		return net.minecraft.world.item.crafting.CraftingBookCategory.MISC;
 	}
 
 	public RecipeSerializer<?> getSerializer()

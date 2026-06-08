@@ -8,7 +8,7 @@ import java.util.Objects;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerChunkCache;
@@ -29,7 +29,7 @@ public final class BiomeUtil
 
 	public static Biome getBiome(Level world, ResourceKey<Biome> key)
 	{
-		return (Biome) world.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY).get(key);
+		return (Biome) world.registryAccess().registryOrThrow(Registries.BIOME).get(key);
 	}
 
 	public static Holder<Biome> getOriginalBiome(LevelReader world, BlockPos pos)
@@ -68,7 +68,7 @@ public final class BiomeUtil
 		{
 			LevelChunk chunk = world.getChunkAt(pos);
 			ClientboundLevelChunkWithLightPacket packet = new ClientboundLevelChunkWithLightPacket(
-				chunk, ((ServerLevel) world).getChunkSource().getLightEngine(), null, null, true
+				chunk, ((ServerLevel) world).getChunkSource().getLightEngine(), null, null
 			);
 			((ServerChunkCache) chunkManager).chunkMap.getPlayers(chunk.getPos(), false).forEach(player -> player.connection.send(packet));
 			chunk.setUnsaved(true);

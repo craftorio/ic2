@@ -107,7 +107,7 @@ public class ItemArmorNanoSuit extends ItemArmorElectric implements IItemHudProv
 
 				if (isNightVisionEnabled && IC2.sideProxy.isSimulating())
 				{
-					int skylight = player.getCommandSenderWorld().getMaxLocalRawBrightness(new BlockPos(player.position()));
+					int skylight = player.getCommandSenderWorld().getMaxLocalRawBrightness(BlockPos.containing(player.position()));
 					if (skylight <= 8 && ElectricItem.manager.use(stack, 1.0, player))
 					{
 						player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 300, 0, true, true));
@@ -131,7 +131,7 @@ public class ItemArmorNanoSuit extends ItemArmorElectric implements IItemHudProv
 	@Override
 	public boolean doesProvideHUD(ItemStack stack)
 	{
-		return this.slot == EquipmentSlot.HEAD && ElectricItem.manager.getCharge(stack) > 0.0;
+		return this.getEquipmentSlot() == EquipmentSlot.HEAD && ElectricItem.manager.getCharge(stack) > 0.0;
 	}
 
 	@Override

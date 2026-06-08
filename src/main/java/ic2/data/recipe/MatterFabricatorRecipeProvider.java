@@ -6,14 +6,14 @@ import ic2.data.recipe.helper.MatterFabricRecipeGenerator;
 
 import java.util.function.Consumer;
 
-import net.minecraft.data.DataGenerator;
+import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.FinishedRecipe;
 
 public class MatterFabricatorRecipeProvider extends Ic2RecipeProvider
 {
-	public MatterFabricatorRecipeProvider(DataGenerator generator)
+	public MatterFabricatorRecipeProvider(PackOutput packOutput)
 	{
-		super(generator);
+		super(packOutput);
 	}
 
 	@Override

@@ -29,6 +29,7 @@ import ic2.core.crop.cropcard.CropWeed;
 import ic2.core.crop.cropcard.CropWheat;
 import ic2.core.proxy.EnvProxy;
 import ic2.core.ref.Ic2BlockTags;
+import net.minecraft.core.registries.BuiltInRegistries;
 import ic2.core.ref.Ic2Blocks;
 import ic2.core.ref.Ic2Items;
 
@@ -306,7 +307,7 @@ public class Ic2Crops extends Crops
 	@Override
 	public CropCard getCropCard(ItemStack stack)
 	{
-		ResourceLocation identifier = Registry.ITEM.getKey(stack.getItem());
+		ResourceLocation identifier = BuiltInRegistries.ITEM.getKey(stack.getItem());
 		if (stack.is(ItemTags.SAPLINGS) && identifier.getNamespace().equals("minecraft"))
 		{
 			return this.getCropCard("ic2", identifier.getPath());
@@ -326,7 +327,7 @@ public class Ic2Crops extends Crops
 	@Override
 	public CropCard getCropCard(Block cropBlock)
 	{
-		ResourceLocation cropIdentifier = Registry.BLOCK.getKey(cropBlock);
+		ResourceLocation cropIdentifier = BuiltInRegistries.BLOCK.getKey(cropBlock);
 		String cropOwner = cropIdentifier.getNamespace();
 		String cropName = cropIdentifier.getPath().replace("_crop", "");
 		return this.getCropCard(cropOwner, cropName);

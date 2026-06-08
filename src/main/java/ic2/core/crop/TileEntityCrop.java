@@ -8,6 +8,7 @@ import ic2.api.crops.ICropTile;
 import ic2.api.network.NetworkHelper;
 import ic2.core.IC2;
 import ic2.core.block.tileentity.Ic2TileEntity;
+import net.minecraft.core.registries.BuiltInRegistries;
 import ic2.core.block.tileentity.Ic2TileEntityBlock;
 import ic2.core.fluid.FluidHandler;
 import ic2.core.fluid.Ic2FluidStack;
@@ -77,7 +78,7 @@ public class TileEntityCrop extends Ic2TileEntity implements ICropTile
 
 	public TileEntityCrop(BlockPos pos, BlockState state)
 	{
-		super(Ic2BlockEntities.get(Registry.BLOCK.getKey(state.getBlock())), pos, state);
+		super(Ic2BlockEntities.get(BuiltInRegistries.BLOCK.getKey(state.getBlock())), pos, state);
 		this.crop = Crops.instance.getCropCard(this.getBlockType());
 		if (debug)
 		{

@@ -4,7 +4,7 @@ import com.google.gson.JsonObject;
 import ic2.core.IC2;
 import ic2.core.recipe.v2.RecipeIo;
 import net.minecraft.advancements.Advancement.Builder;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -33,7 +33,7 @@ public abstract class Ic2RecipeJsonProvider implements FinishedRecipe
 
 	public final ResourceLocation getId()
 	{
-		return IC2.getIdentifier(Registry.RECIPE_SERIALIZER.getKey(this.serializer).getPath() + "/" + this.fileName);
+		return IC2.getIdentifier(BuiltInRegistries.RECIPE_SERIALIZER.getKey(this.serializer).getPath() + "/" + this.fileName);
 	}
 
 	public final RecipeSerializer<?> getType()

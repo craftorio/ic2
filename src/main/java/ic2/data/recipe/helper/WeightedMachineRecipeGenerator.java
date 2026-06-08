@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.function.Consumer;
 
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -32,7 +33,7 @@ public class WeightedMachineRecipeGenerator extends BasicMachineRecipeGenerator<
 		this.add("%s_to_%s".formatted(path(inputItem), path(weightedItemStacks[0].itemStack.getItem())), json ->
 		{
 			JsonObject input = new JsonObject();
-			input.addProperty("item", Registry.ITEM.getKey(inputItem.asItem()).toString());
+			input.addProperty("item", BuiltInRegistries.ITEM.getKey(inputItem.asItem()).toString());
 			if (inputCount != 1)
 			{
 				input.addProperty("count", inputCount);

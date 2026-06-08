@@ -1,6 +1,6 @@
 package ic2.core.gui;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.Ic2Gui;
 import net.minecraft.resources.ResourceLocation;
 
@@ -27,7 +27,7 @@ public class CustomButton extends Button<CustomButton>
 	}
 
 	@Override
-	public void drawBackground(PoseStack matrices, int mouseX, int mouseY)
+	public void drawBackground(GuiGraphics guiGraphics, int mouseX, int mouseY)
 	{
 		if (this.texture != null)
 		{
@@ -35,7 +35,7 @@ public class CustomButton extends Button<CustomButton>
 			double scale = 0.00390625;
 			this.gui
 				.drawTexturedRect(
-					matrices,
+					guiGraphics.pose(),
 					this.x,
 					this.y,
 					this.width,
@@ -50,9 +50,9 @@ public class CustomButton extends Button<CustomButton>
 
 		if (this.contains(mouseX, mouseY))
 		{
-			this.gui.drawColoredRect(matrices, this.x, this.y, this.width, this.height, -2130706433);
+			this.gui.drawColoredRect(guiGraphics.pose(), this.x, this.y, this.width, this.height, -2130706433);
 		}
 
-		super.drawBackground(matrices, mouseX, mouseY);
+		super.drawBackground(guiGraphics, mouseX, mouseY);
 	}
 }

@@ -94,6 +94,11 @@ public class AdvShapelessRecipe implements CraftingRecipe
 		return this.output;
 	}
 
+	public ItemStack getResultItem(net.minecraft.core.RegistryAccess registryAccess)
+	{
+		return this.output;
+	}
+
 	public boolean canShow()
 	{
 		return AdvRecipe.canShow(this.input, this.output, this.hidden);
@@ -158,6 +163,17 @@ public class AdvShapelessRecipe implements CraftingRecipe
 	public ResourceLocation getId()
 	{
 		return this.id;
+	}
+
+	@Override
+	public ItemStack assemble(net.minecraft.world.inventory.CraftingContainer inventory, net.minecraft.core.RegistryAccess registryAccess)
+	{
+		return this.assemble(inventory);
+	}
+
+	public net.minecraft.world.item.crafting.CraftingBookCategory category()
+	{
+		return net.minecraft.world.item.crafting.CraftingBookCategory.MISC;
 	}
 
 	public RecipeSerializer<?> getSerializer()

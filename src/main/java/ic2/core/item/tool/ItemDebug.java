@@ -333,7 +333,7 @@ public class ItemDebug extends Item implements PriorityUsableItem, ISpecialElect
 			return InteractionResult.PASS;
 		}
 
-		Level world = player.getLevel();
+		Level world = player.level();
 		ItemDebug.Output output = new ItemDebug.Output();
 		String plat = getPlatform(world);
 		output.both("[%s] entity: %s", output, entity);
@@ -735,7 +735,7 @@ public class ItemDebug extends Item implements PriorityUsableItem, ISpecialElect
 
 		void flush(Player player)
 		{
-			if (player.getLevel().isClientSide)
+			if (player.level().isClientSide)
 			{
 				System.out.println(this.consoleSb);
 

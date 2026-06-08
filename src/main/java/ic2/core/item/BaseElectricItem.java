@@ -62,7 +62,7 @@ public abstract class BaseElectricItem extends Item implements IElectricItem, II
 
 	public void fillItemCategory(CreativeModeTab tab, NonNullList<ItemStack> subItems)
 	{
-		if (this.allowedIn(tab))
+		if (true)
 		{
 			ElectricItemManager.addChargeVariants(this, subItems);
 		}

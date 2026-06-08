@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 
 import net.minecraft.advancements.Advancement.Builder;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -57,7 +58,7 @@ public class BasicMachineRecipeGenerator<T extends BasicMachineRecipeGenerator<T
 		this.add("%s_to_%s".formatted(path(inputItem), path(stacks[0].getItem())), json ->
 		{
 			JsonObject input = new JsonObject();
-			input.addProperty("item", Registry.ITEM.getKey(inputItem.asItem()).toString());
+			input.addProperty("item", BuiltInRegistries.ITEM.getKey(inputItem.asItem()).toString());
 			if (inputCount != 1)
 			{
 				input.addProperty("count", inputCount);
@@ -99,7 +100,7 @@ public class BasicMachineRecipeGenerator<T extends BasicMachineRecipeGenerator<T
 		this.add("%s_to_%s".formatted(path(fluid), path(outputItem)), json ->
 		{
 			JsonObject input = new JsonObject();
-			input.addProperty("fluid", Registry.FLUID.getKey(fluid).toString());
+			input.addProperty("fluid", BuiltInRegistries.FLUID.getKey(fluid).toString());
 			input.addProperty("amount", fluidAmount);
 			json.add("ingredient", input);
 			writeOutput(json, new ItemStack(outputItem, 1));
@@ -108,7 +109,7 @@ public class BasicMachineRecipeGenerator<T extends BasicMachineRecipeGenerator<T
 
 	protected static String path(ItemLike item)
 	{
-		return Registry.ITEM.getKey(item.asItem()).getPath();
+		return BuiltInRegistries.ITEM.getKey(item.asItem()).getPath();
 	}
 
 	protected static String path(TagKey<Item> tag)
@@ -118,7 +119,7 @@ public class BasicMachineRecipeGenerator<T extends BasicMachineRecipeGenerator<T
 
 	protected static String path(Fluid fluid)
 	{
-		return Registry.FLUID.getKey(fluid).getPath();
+		return BuiltInRegistries.FLUID.getKey(fluid).getPath();
 	}
 
 	protected static void writeOutput(JsonObject json, ItemStack... stacks)

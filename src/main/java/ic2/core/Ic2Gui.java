@@ -5,9 +5,9 @@ import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.BufferUploader;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat.Mode;
-import com.mojang.math.Matrix4f;
 import ic2.api.upgrade.IUpgradableBlock;
 import ic2.api.upgrade.IUpgradeItem;
 import ic2.api.upgrade.UpgradableProperty;
@@ -28,6 +28,7 @@ import java.util.Queue;
 import java.util.Set;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
@@ -42,12 +43,14 @@ import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.joml.Matrix4f;
 
 public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> extends AbstractContainerScreen<T>
 {
 	public static final int textHeight = 8;
 	protected static Runnable closeHandler;
 	private boolean fixKeyEvents = false;
+	private GuiGraphics guiGraphics;
 	private final Set<GuiElement.ImplementedMethod> elementMethods = EnumSet.noneOf(GuiElement.ImplementedMethod.class);
 	private final Queue<Ic2Gui.Tooltip> queuedTooltips = new ArrayDeque<>();
 	protected final List<GuiElement<?>> elements = new ArrayList<>();
@@ -97,18 +100,20 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 		{
 			if (element instanceof IKeyboardDependent)
 			{
-				this.minecraft.keyboardHandler.setSendRepeatsToGui(true);
+				// TODO: In 1.20.1, keyboardHandler.setSendRepeatsToGui was removed.
+				// this.minecraft.keyboardHandler.setSendRepeatsToGui(true);
 				this.fixKeyEvents = true;
 				break;
 			}
 		}
 	}
 
-	public void render(PoseStack matrices, int mouseX, int mouseY, float partialTicks)
+	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks)
 	{
-		this.renderBackground(matrices);
-		super.render(matrices, mouseX, mouseY, partialTicks);
-		this.renderTooltip(matrices, mouseX, mouseY);
+		this.guiGraphics = guiGraphics;
+		this.renderBackground(guiGraphics);
+		super.render(guiGraphics, mouseX, mouseY, partialTicks);
+		this.renderTooltip(guiGraphics, mouseX, mouseY);
 	}
 
 	public void containerTick()
@@ -126,15 +131,15 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 		}
 	}
 
-	protected void renderBg(PoseStack matrices, float delta, int mouseX, int mouseY)
+	protected void renderBg(GuiGraphics guiGraphics, float delta, int mouseX, int mouseY)
 	{
 		mouseX -= this.leftPos;
 		mouseY -= this.topPos;
-		this.drawBackgroundAndTitle(matrices, delta, mouseX, mouseY);
+		this.drawBackgroundAndTitle(guiGraphics, delta, mouseX, mouseY);
 		if (this.menu.base instanceof IUpgradableBlock)
 		{
 			bindTexture(ResourceLocation.fromNamespaceAndPath("ic2", "textures/gui/infobutton.png"));
-			this.drawTexturedRect(matrices, 3.0, 3.0, 10.0, 10.0, 0.0, 0.0);
+			this.drawTexturedRect(guiGraphics.pose(), 3.0, 3.0, 10.0, 10.0, 0.0, 0.0);
 		}
 
 		if (this.elementMethods.contains(GuiElement.ImplementedMethod.drawBackground))
@@ -143,26 +148,26 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 			{
 				if (element.isEnabled())
 				{
-					element.drawBackground(matrices, mouseX, mouseY);
+					element.drawBackground(guiGraphics, mouseX, mouseY);
 				}
 			}
 		}
 	}
 
-	protected void drawBackgroundAndTitle(PoseStack matrices, float partialTicks, int mouseX, int mouseY)
+	protected void drawBackgroundAndTitle(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY)
 	{
 		this.bindTexture();
-		this.blit(matrices, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
-		this.drawXCenteredString(matrices, this.imageWidth / 2, 6, this.title, 4210752, false);
+		guiGraphics.blit(this.getTextureLocation(), this.leftPos, this.topPos, 0.0F, 0.0F, this.imageWidth, this.imageHeight, 256, 256);
+		this.drawXCenteredString(guiGraphics, this.imageWidth / 2, 6, this.title, 4210752, false);
 	}
 
-	protected final void renderLabels(PoseStack matrices, int mouseX, int mouseY)
+	protected final void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY)
 	{
-		this.drawForegroundLayer(matrices, mouseX - this.leftPos, mouseY - this.topPos);
-		this.flushTooltips(matrices);
+		this.drawForegroundLayer(guiGraphics, mouseX - this.leftPos, mouseY - this.topPos);
+		this.flushTooltips(guiGraphics);
 	}
 
-	protected void drawForegroundLayer(PoseStack matrices, int mouseX, int mouseY)
+	protected void drawForegroundLayer(GuiGraphics guiGraphics, int mouseX, int mouseY)
 	{
 		if (this.menu.base instanceof IUpgradableBlock)
 		{
@@ -173,7 +178,7 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 		{
 			if (element.isEnabled())
 			{
-				element.drawForeground(matrices, mouseX, mouseY);
+				element.drawForeground(guiGraphics, mouseX, mouseY);
 			}
 		}
 	}
@@ -361,7 +366,8 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 		super.removed();
 		if (this.fixKeyEvents)
 		{
-			this.minecraft.keyboardHandler.setSendRepeatsToGui(false);
+			// TODO: In 1.20.1, keyboardHandler.setSendRepeatsToGui was removed.
+			// this.minecraft.keyboardHandler.setSendRepeatsToGui(false);
 		}
 
 		if (closeHandler != null)
@@ -396,7 +402,7 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 		}
 
 		Matrix4f matrix = matrices.last().pose();
-		int z = this.getBlitOffset();
+		int z = 0;
 		RenderSystem.setShader(GameRenderer::getPositionTexShader);
 		BufferBuilder buffer = Tesselator.getInstance().getBuilder();
 		buffer.begin(Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
@@ -437,7 +443,7 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 		int g = color >>> 8 & 0xFF;
 		int b = color & 0xFF;
 		Matrix4f matrix = matrices.last().pose();
-		int z = this.getBlitOffset();
+		int z = 0;
 		RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
 		BufferBuilder buffer = Tesselator.getInstance().getBuilder();
 		buffer.begin(Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
@@ -490,13 +496,19 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 
 	public void drawItem(int x, int y, ItemStack stack)
 	{
-		this.itemRenderer.renderGuiItem(stack, this.leftPos + x, this.topPos + y);
+		if (this.guiGraphics != null)
+		{
+			this.guiGraphics.renderItem(stack, this.leftPos + x, this.topPos + y);
+		}
 	}
 
 	public void drawItemStack(int x, int y, ItemStack stack)
 	{
 		this.drawItem(x, y, stack);
-		this.itemRenderer.renderGuiItemDecorations(this.font, stack, this.leftPos + x, this.topPos + y, null);
+		if (this.guiGraphics != null)
+		{
+			this.guiGraphics.renderItemDecorations(this.font, stack, this.leftPos + x, this.topPos + y, null);
+		}
 	}
 
 	public void drawColoredRect(PoseStack matrices, int x, int y, int width, int height, int color)
@@ -508,7 +520,7 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 		Matrix4f matrix = matrices.last().pose();
 		int xE = x + width;
 		int yE = y + height;
-		int z = this.getBlitOffset();
+		int z = 0;
 		if (blend)
 		{
 			RenderSystem.enableBlend();
@@ -528,44 +540,42 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 		}
 	}
 
-	public int drawString(PoseStack matrices, int x, int y, String text, int color)
+	public int drawString(GuiGraphics guiGraphics, int x, int y, String text, int color)
 	{
-		return this.font.draw(matrices, text, x, y, color);
+		return guiGraphics.drawString(this.font, text, x, y, color);
 	}
 
-	public int drawString(PoseStack matrices, int x, int y, String text, int color, boolean shadow)
+	public int drawString(GuiGraphics guiGraphics, int x, int y, String text, int color, boolean shadow)
 	{
-		return !shadow
-			? this.font.draw(matrices, text, this.leftPos + x, this.topPos + y, color) - this.leftPos
-			: this.font.drawShadow(matrices, text, this.leftPos + x, this.topPos + y, color) - this.leftPos;
+		return guiGraphics.drawString(this.font, text, this.leftPos + x, this.topPos + y, color, shadow) - this.leftPos;
 	}
 
-	public void drawTrimmedString(PoseStack matrices, int x, int y, String text, int maxWidth, int color)
+	public void drawTrimmedString(GuiGraphics guiGraphics, int x, int y, String text, int maxWidth, int color)
 	{
-		MultiLineLabel.create(this.font, Component.literal(text), maxWidth).renderLeftAlignedNoShadow(matrices, x, y, 10, color);
+		MultiLineLabel.create(this.font, Component.literal(text), maxWidth).renderLeftAlignedNoShadow(guiGraphics, x, y, 10, color);
 	}
 
-	public void drawXCenteredString(PoseStack matrices, int x, int y, String text, int color, boolean shadow)
+	public void drawXCenteredString(GuiGraphics guiGraphics, int x, int y, String text, int color, boolean shadow)
 	{
-		this.drawCenteredString(matrices, x, y, text, color, shadow, true, false);
+		this.drawCenteredString(guiGraphics, x, y, text, color, shadow, true, false);
 	}
 
-	public void drawXCenteredString(PoseStack matrices, int x, int y, Component text, int color, boolean shadow)
+	public void drawXCenteredString(GuiGraphics guiGraphics, int x, int y, Component text, int color, boolean shadow)
 	{
-		this.drawCenteredString(matrices, x, y, text, color, shadow, true, false);
+		this.drawCenteredString(guiGraphics, x, y, text, color, shadow, true, false);
 	}
 
-	public void drawXYCenteredString(PoseStack matrices, int x, int y, String text, int color, boolean shadow)
+	public void drawXYCenteredString(GuiGraphics guiGraphics, int x, int y, String text, int color, boolean shadow)
 	{
-		this.drawCenteredString(matrices, x, y, text, color, shadow, true, true);
+		this.drawCenteredString(guiGraphics, x, y, text, color, shadow, true, true);
 	}
 
-	public void drawXYCenteredString(PoseStack matrices, int x, int y, Component text, int color, boolean shadow)
+	public void drawXYCenteredString(GuiGraphics guiGraphics, int x, int y, Component text, int color, boolean shadow)
 	{
-		this.drawCenteredString(matrices, x, y, text, color, shadow, true, true);
+		this.drawCenteredString(guiGraphics, x, y, text, color, shadow, true, true);
 	}
 
-	public void drawCenteredString(PoseStack matrices, int x, int y, String text, int color, boolean shadow, boolean centerX, boolean centerY)
+	public void drawCenteredString(GuiGraphics guiGraphics, int x, int y, String text, int color, boolean shadow, boolean centerX, boolean centerY)
 	{
 		if (centerX)
 		{
@@ -577,10 +587,10 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 			y -= 4;
 		}
 
-		this.font.draw(matrices, text, this.leftPos + x, this.topPos + y, color);
+		guiGraphics.drawString(this.font, text, this.leftPos + x, this.topPos + y, color, shadow);
 	}
 
-	public void drawCenteredString(PoseStack matrices, int x, int y, Component text, int color, boolean shadow, boolean centerX, boolean centerY)
+	public void drawCenteredString(GuiGraphics guiGraphics, int x, int y, Component text, int color, boolean shadow, boolean centerX, boolean centerY)
 	{
 		if (centerX)
 		{
@@ -592,7 +602,7 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 			y -= 4;
 		}
 
-		this.font.draw(matrices, text, this.leftPos + x, this.topPos + y, color);
+		guiGraphics.drawString(this.font, text, this.leftPos + x, this.topPos + y, color, shadow);
 	}
 
 	public int getStringWidth(String text)
@@ -620,17 +630,17 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 		this.queuedTooltips.add(new Ic2Gui.Tooltip(text, x, y));
 	}
 
-	public void drawTooltip(PoseStack matrices, int x, int y, ItemStack stack)
+	public void drawTooltip(GuiGraphics guiGraphics, int x, int y, ItemStack stack)
 	{
 		assert !StackUtil.isEmpty(stack);
-		this.renderTooltip(matrices, stack, x, y);
+		guiGraphics.renderTooltip(this.font, stack, x, y);
 	}
 
-	protected void flushTooltips(PoseStack matrices)
+	protected void flushTooltips(GuiGraphics guiGraphics)
 	{
 		for (Ic2Gui.Tooltip tooltip : this.queuedTooltips)
 		{
-			this.renderTooltip(matrices, tooltip.text, Optional.empty(), tooltip.x, tooltip.y);
+			guiGraphics.renderTooltip(this.font, tooltip.text, java.util.Optional.empty(), tooltip.x, tooltip.y);
 		}
 
 		this.queuedTooltips.clear();

@@ -15,7 +15,8 @@ import java.util.Set;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BlockTags;
@@ -296,7 +297,7 @@ public final class Util
 
 	public static Block getBlock(ResourceLocation loc)
 	{
-		Block ret = Registry.BLOCK.get(loc);
+		Block ret = BuiltInRegistries.BLOCK.get(loc);
 		if (ret != Blocks.AIR)
 		{
 			return ret;
@@ -342,7 +343,7 @@ public final class Util
 
 	public static Item getItem(ResourceLocation loc)
 	{
-		return Registry.ITEM.get(loc);
+		return BuiltInRegistries.ITEM.get(loc);
 	}
 
 	public static Vector3 getLook(Entity entity)
@@ -352,17 +353,17 @@ public final class Util
 
 	public static ResourceLocation getName(Item item)
 	{
-		return Registry.ITEM.getKey(item);
+		return BuiltInRegistries.ITEM.getKey(item);
 	}
 
 	public static Fluid getFluid(ResourceLocation loc)
 	{
-		return Registry.FLUID.get(loc);
+		return BuiltInRegistries.FLUID.get(loc);
 	}
 
 	public static ResourceLocation getName(Fluid fluid)
 	{
-		return Registry.FLUID.getKey(fluid);
+		return BuiltInRegistries.FLUID.getKey(fluid);
 	}
 
 	public static ResourceLocation getDimId(Level world)
@@ -668,7 +669,7 @@ public final class Util
 	{
 		if (!(match instanceof ItemStack))
 		{
-			if (!(match instanceof TagKey<?> tagKey && tagKey.isFor(Registry.ITEM.key())))
+			if (!(match instanceof TagKey<?> tagKey && tagKey.isFor(BuiltInRegistries.ITEM.key())))
 			{
 				return stack == match;
 			} else
@@ -678,7 +679,7 @@ public final class Util
 					return false;
 				}
 
-				Optional<TagKey<Item>> itemTagKeyOpt = tagKey.cast(Registry.ITEM.key());
+				Optional<TagKey<Item>> itemTagKeyOpt = tagKey.cast(BuiltInRegistries.ITEM.key());
 				if (itemTagKeyOpt.isEmpty())
 				{
 					return false;
@@ -689,7 +690,7 @@ public final class Util
 			}
 		} else
 		{
-			return !StackUtil.isEmpty(stack) && stack.sameItem((ItemStack) match);
+			return !StackUtil.isEmpty(stack) && ItemStack.isSameItem(stack, (ItemStack) match);
 		}
 	}
 }

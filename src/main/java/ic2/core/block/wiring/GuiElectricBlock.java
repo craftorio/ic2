@@ -1,7 +1,7 @@
 package ic2.core.block.wiring;
 
 import com.google.common.base.Supplier;
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.Ic2Gui;
 import ic2.core.gui.EnergyGauge;
 import ic2.core.gui.VanillaButton;
@@ -36,16 +36,16 @@ public class GuiElectricBlock extends Ic2Gui<ContainerElectricBlock>
 	}
 
 	@Override
-	protected void drawForegroundLayer(PoseStack matrices, int mouseX, int mouseY)
+	protected void drawForegroundLayer(GuiGraphics guiGraphics, int mouseX, int mouseY)
 	{
-		super.drawForegroundLayer(matrices, mouseX, mouseY);
-		this.drawString(matrices, 8, 74, Localization.translate("ic2.EUStorage.gui.info.armor"), 4210752);
-		this.drawString(matrices, 79, 40, Localization.translate("ic2.EUStorage.gui.info.level"), 4210752);
+		super.drawForegroundLayer(guiGraphics, mouseX, mouseY);
+		this.drawString(guiGraphics, 8, 74, Localization.translate("ic2.EUStorage.gui.info.armor"), 4210752);
+		this.drawString(guiGraphics, 79, 40, Localization.translate("ic2.EUStorage.gui.info.level"), 4210752);
 		int e = (int) Math.min(((ContainerElectricBlock) this.menu).base.energy.getEnergy(), ((ContainerElectricBlock) this.menu).base.energy.getCapacity());
-		this.drawString(matrices, 110, 50, " " + e, 4210752);
-		this.drawString(matrices, 110, 60, "/" + (int) ((ContainerElectricBlock) this.menu).base.energy.getCapacity(), 4210752);
+		this.drawString(guiGraphics, 110, 50, " " + e, 4210752);
+		this.drawString(guiGraphics, 110, 60, "/" + (int) ((ContainerElectricBlock) this.menu).base.energy.getCapacity(), 4210752);
 		String output = Localization.translate("ic2.EUStorage.gui.info.output", ((ContainerElectricBlock) this.menu).base.getOutput());
-		this.drawString(matrices, 85, 75, output, 4210752);
+		this.drawString(guiGraphics, 85, 75, output, 4210752);
 	}
 
 	@Override

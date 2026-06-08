@@ -1,7 +1,7 @@
 package ic2.core.gui;
 
 import com.google.common.base.Suppliers;
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.Ic2Gui;
 import ic2.core.gui.dynamic.TextProvider;
 
@@ -89,11 +89,11 @@ public abstract class GuiElement<T extends GuiElement<T>>
 	{
 	}
 
-	public void drawBackground(PoseStack matrices, int mouseX, int mouseY)
+	public void drawBackground(GuiGraphics guiGraphics, int mouseX, int mouseY)
 	{
 	}
 
-	public void drawForeground(PoseStack matrices, int mouseX, int mouseY)
+	public void drawForeground(GuiGraphics guiGraphics, int mouseX, int mouseY)
 	{
 		if (this.contains(mouseX, mouseY) && !this.suppressTooltip(mouseX, mouseY))
 		{

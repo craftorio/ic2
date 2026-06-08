@@ -169,7 +169,7 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 	@Override
 	public boolean doesProvideHUD(ItemStack stack)
 	{
-		return this.slot == EquipmentSlot.HEAD && ElectricItem.manager.getCharge(stack) > 0.0;
+		return this.getEquipmentSlot() == EquipmentSlot.HEAD && ElectricItem.manager.getCharge(stack) > 0.0;
 	}
 
 	@Override

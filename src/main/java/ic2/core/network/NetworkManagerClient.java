@@ -156,7 +156,7 @@ public class NetworkManagerClient extends NetworkManager
 	@Override
 	public void onPacket(ByteBuf packet, Player player)
 	{
-		assert player == null || player.level.isClientSide;
+		assert player == null || player.level().isClientSide;
 
 		try
 		{

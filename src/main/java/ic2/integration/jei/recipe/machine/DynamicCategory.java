@@ -1,6 +1,6 @@
 package ic2.integration.jei.recipe.machine;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.block.invslot.InvSlot;
 import ic2.core.block.machine.tileentity.TileEntityStandardMachine;
 import ic2.core.block.tileentity.Ic2TileEntity;
@@ -27,6 +27,7 @@ import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 
 public class DynamicCategory extends IORecipeCategory
 {
@@ -42,7 +43,7 @@ public class DynamicCategory extends IORecipeCategory
 	{
 		super(teBlock);
 		this.recipeType = recipeType;
-		this.initializeWidgets(guiHelper, GuiParser.parse(Registry.BLOCK.getKey(teBlock), teBlock.getDummyTe().getClass()));
+		this.initializeWidgets(guiHelper, GuiParser.parse(BuiltInRegistries.BLOCK.getKey(teBlock), teBlock.getDummyTe().getClass()));
 		int minX = 1000;
 		int minY = 1000;
 		int maxX = -1000;
@@ -229,11 +230,11 @@ public class DynamicCategory extends IORecipeCategory
 		this.addRecipeSlots(builder, recipe, focuses, this.xOffset, this.yOffset);
 	}
 
-	public void draw(IORecipeWrapper recipe, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY)
+	public void draw(IORecipeWrapper recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY)
 	{
 		for (Tuple.T2<IDrawable, SlotPosition> element : this.elements)
 		{
-			element.a.draw(stack, element.b.x() + this.xOffset, element.b.y() + this.yOffset);
+			element.a.draw(guiGraphics, element.b.x() + this.xOffset, element.b.y() + this.yOffset);
 		}
 	}
 
@@ -242,6 +243,7 @@ public class DynamicCategory extends IORecipeCategory
 		return this.recipeType;
 	}
 
+	@SuppressWarnings("removal")
 	public IDrawable getBackground()
 	{
 		return this.background;

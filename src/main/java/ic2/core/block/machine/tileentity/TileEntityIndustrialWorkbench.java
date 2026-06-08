@@ -22,6 +22,7 @@ import java.util.List;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
@@ -306,7 +307,12 @@ public class TileEntityIndustrialWorkbench extends TileEntityInventory implement
 
 		public ItemStack getOutputStack()
 		{
-			return !this.canProcess() ? StackUtil.emptyStack : this.recipe.assemble(this.crafting);
+			if (!this.canProcess())
+			{
+				return StackUtil.emptyStack;
+			}
+			Level world = this.tool.base.getParent().getLevel();
+			return this.recipe.assemble(this.crafting, world.registryAccess());
 		}
 	}
 }

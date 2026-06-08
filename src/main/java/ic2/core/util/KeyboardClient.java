@@ -44,7 +44,7 @@ public class KeyboardClient extends Keyboard
 	{
 		Set<Keyboard.Key> keys = EnumSet.noneOf(Keyboard.Key.class);
 		Screen currentScreen = SideProxyClient.mc.screen;
-		if (currentScreen == null || currentScreen.passEvents)
+		if (currentScreen == null)
 		{
 			if (this.altKey.isDown())
 			{

@@ -1,6 +1,6 @@
 package ic2.core.gui;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.Ic2Gui;
 import ic2.core.block.comp.Process;
 import ic2.core.block.tileentity.Ic2TileEntity;
@@ -19,14 +19,14 @@ public class ProgressGauge extends GuiElement<ProgressGauge>
 	}
 
 	@Override
-	public void drawBackground(PoseStack matrices, int mouseX, int mouseY)
+	public void drawBackground(GuiGraphics guiGraphics, int mouseX, int mouseY)
 	{
 		bindCommonTexture();
-		this.gui.drawTexturedRect(matrices, this.x, this.y, this.type.w, this.type.h, this.type.emptyX, this.type.emptyY);
+		this.gui.drawTexturedRect(guiGraphics.pose(), this.x, this.y, this.type.w, this.type.h, this.type.emptyX, this.type.emptyY);
 		int renderWidth = Util.limit((int) Math.round(this.getProgressRatio() * this.type.w), 0, this.type.w);
 		if (renderWidth > 0)
 		{
-			this.gui.drawTexturedRect(matrices, this.x, this.y, renderWidth, this.type.h, this.type.fullX, this.type.fullY);
+			this.gui.drawTexturedRect(guiGraphics.pose(), this.x, this.y, renderWidth, this.type.h, this.type.fullX, this.type.fullY);
 		}
 	}
 

@@ -105,7 +105,7 @@ public abstract class InvSlotConsumable extends InvSlot
 			if (!StackUtil.isEmpty(stack))
 			{
 				Item item = stack.getItem();
-				if (this.accepts(stack) && item.canBeDepleted() && (target == null || item == target.getItem() && ItemStack.tagMatches(stack, target)))
+				if (this.accepts(stack) && stack.isDamageableItem() && (target == null || item == target.getItem() && ItemStack.isSameItemSameTags(stack, target)))
 				{
 					if (target == null)
 					{

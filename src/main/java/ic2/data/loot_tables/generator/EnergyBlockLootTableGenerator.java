@@ -3,6 +3,7 @@ package ic2.data.loot_tables.generator;
 import ic2.core.block.tileentity.Ic2TileEntity;
 import ic2.core.block.tileentity.Ic2TileEntityBlock;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.ItemStack;
 
 public class EnergyBlockLootTableGenerator extends Ic2BlockLootTableGenerator
@@ -10,7 +11,7 @@ public class EnergyBlockLootTableGenerator extends Ic2BlockLootTableGenerator
 	@Override
 	public Ic2BlockLootTableGenerator build()
 	{
-		Registry.BLOCK.forEach(block ->
+		BuiltInRegistries.BLOCK.forEach(block ->
 		{
 			if (block instanceof Ic2TileEntityBlock tileEntityBlock)
 			{

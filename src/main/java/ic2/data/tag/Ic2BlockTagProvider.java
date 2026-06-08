@@ -8,13 +8,17 @@ import ic2.core.ref.Ic2BlockTags;
 import ic2.core.ref.Ic2Blocks;
 
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
-import net.minecraft.core.Registry;
-import net.minecraft.data.DataGenerator;
-import net.minecraft.data.tags.TagsProvider.TagAppender;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.data.PackOutput;
+import net.minecraft.data.tags.IntrinsicHolderTagsProvider.IntrinsicTagAppender;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
+import net.minecraftforge.common.data.ExistingFileHelper;
+import org.jetbrains.annotations.Nullable;
 
 public class Ic2BlockTagProvider extends AbstractBlockTagProvider
 {
@@ -22,19 +26,19 @@ public class Ic2BlockTagProvider extends AbstractBlockTagProvider
 		Ic2Blocks.CLASSIC_NUKE, Ic2Blocks.NUKE, Ic2Blocks.ITNT, Ic2Blocks.ITEM_BUFFER, Ic2Blocks.OBSCURED_WALL, Ic2Blocks.IRON_FURNACE
 	);
 
-	public Ic2BlockTagProvider(DataGenerator root)
+	public Ic2BlockTagProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, @Nullable ExistingFileHelper existingFileHelper)
 	{
-		super(root);
+		super(output, lookupProvider, existingFileHelper);
 	}
 
-	protected TagAppender<Block> tag(TagKey<Block> tag)
+	protected IntrinsicTagAppender<Block> tag(TagKey<Block> tag)
 	{
-		return this.tag(tag);
+		return super.tag(tag);
 	}
 
-	protected void addTags()
+	protected void addTags(HolderLookup.Provider lookupProvider)
 	{
-		Registry.BLOCK.forEach(block ->
+		BuiltInRegistries.BLOCK.forEach(block ->
 		{
 			if (block instanceof AbstractCableBlock)
 			{
@@ -62,7 +66,7 @@ public class Ic2BlockTagProvider extends AbstractBlockTagProvider
 
 	public boolean canCableConnect(Block block)
 	{
-		String identifierPath = Registry.BLOCK.getKey(block).getPath();
+		String identifierPath = BuiltInRegistries.BLOCK.getKey(block).getPath();
 		return !unconnectableBlockList.contains(block) && !identifierPath.contains("storage_box") && !identifierPath.contains("tank");
 	}
 }

@@ -1,13 +1,11 @@
 package ic2.core.ref;
 
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.level.material.MaterialColor;
-import net.minecraft.world.level.material.Material.Builder;
+import net.minecraft.world.level.material.MapColor;
 
 public class IC2Material
 {
-	public static final Material MACHINE = new Builder(MaterialColor.COLOR_LIGHT_GRAY).build();
-	public static final Material PIPE = new Builder(MaterialColor.COLOR_LIGHT_GRAY).build();
-	public static final Material CABLE = new Builder(MaterialColor.COLOR_BLACK).build();
-	public static final Material STEAM = new Builder(MaterialColor.COLOR_LIGHT_GRAY).noCollider().nonSolid().replaceable().liquid().build();
+	public static final MapColor MACHINE = MapColor.COLOR_LIGHT_GRAY;
+	public static final MapColor PIPE = MapColor.COLOR_LIGHT_GRAY;
+	public static final MapColor CABLE = MapColor.COLOR_BLACK;
+	public static final MapColor STEAM = MapColor.COLOR_LIGHT_GRAY;
 }

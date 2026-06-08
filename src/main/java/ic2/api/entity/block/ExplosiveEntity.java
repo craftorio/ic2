@@ -4,6 +4,7 @@ import ic2.core.Ic2Explosion;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -84,7 +85,7 @@ public abstract class ExplosiveEntity extends Entity
 
 		this.move(MoverType.SELF, this.getDeltaMovement());
 		this.setDeltaMovement(this.getDeltaMovement().scale(0.98));
-		if (this.onGround)
+		if (this.onGround())
 		{
 			this.setDeltaMovement(this.getDeltaMovement().multiply(0.7, -0.5, 0.7));
 		}
@@ -94,16 +95,16 @@ public abstract class ExplosiveEntity extends Entity
 		if (i <= 0)
 		{
 			this.discard();
-			if (!this.level.isClientSide)
+			if (!this.level().isClientSide)
 			{
 				this.explode();
 			}
 		} else
 		{
 			this.updateInWaterStateAndDoFluidPushing();
-			if (this.level.isClientSide)
+			if (this.level().isClientSide)
 			{
-				this.level.addParticle(ParticleTypes.SMOKE, this.getX(), this.getY() + 0.5, this.getZ(), 0.0, 0.0, 0.0);
+				this.level().addParticle(ParticleTypes.SMOKE, this.getX(), this.getY() + 0.5, this.getZ(), 0.0, 0.0, 0.0);
 			}
 		}
 	}
@@ -166,7 +167,7 @@ public abstract class ExplosiveEntity extends Entity
 		return (Integer) this.entityData.get(FUSE);
 	}
 
-	public Packet<?> getAddEntityPacket()
+	public Packet<ClientGamePacketListener> getAddEntityPacket()
 	{
 		return new ClientboundAddEntityPacket(this);
 	}

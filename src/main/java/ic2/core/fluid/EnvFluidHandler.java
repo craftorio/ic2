@@ -13,14 +13,13 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.material.Material;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.jetbrains.annotations.Nullable;
 
 public interface EnvFluidHandler
 {
 	EnvFluidHandler.FluidRefs createFluid(
-		ResourceLocation var1, Material var2, int var3, int var4, int var5, int var6, ResourceLocation var7, ResourceLocation var8, int var9
+		ResourceLocation var1, int var3, int var4, int var5, int var6, ResourceLocation var7, ResourceLocation var8, int var9
 	);
 
 	Collection<Fluid> getAllFluids();

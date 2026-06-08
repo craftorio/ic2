@@ -8,6 +8,7 @@ import ic2.data.recipe.helper.json.Ic2RecipeJsonProvider;
 import java.util.function.Consumer;
 
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.ItemLike;
@@ -29,7 +30,7 @@ public class MatterFabricRecipeGenerator
 			public void serializeRecipeData(JsonObject json)
 			{
 				JsonObject input = new JsonObject();
-				input.addProperty("item", Registry.ITEM.getKey(inputItem.asItem()).toString());
+				input.addProperty("item", BuiltInRegistries.ITEM.getKey(inputItem.asItem()).toString());
 				if (inputCount != 1)
 				{
 					input.addProperty("count", inputCount);

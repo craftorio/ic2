@@ -23,7 +23,7 @@ public class RecipeResolver implements IRecipeResolver
 		for (Recipe<?> irecipe : IC2.sideProxy.getRecipeManager().getRecipes())
 		{
 			NonNullList<Ingredient> inputs = irecipe.getIngredients();
-			ItemStack output = irecipe.getResultItem();
+			ItemStack output = irecipe.getResultItem((net.minecraft.core.RegistryAccess) null);
 			if (!StackUtil.isEmpty(output) && !inputs.isEmpty())
 			{
 				ret.add(new RecipeTransformation(1.0, toDoubleStackList(inputs), new LeanItemStack(output)));

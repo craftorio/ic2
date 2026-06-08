@@ -1,6 +1,6 @@
 package ic2.core.gui;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.Ic2Gui;
 import ic2.core.init.Localization;
 import ic2.core.proxy.SideProxyClient;
@@ -53,7 +53,7 @@ public abstract class Button<T extends Button<T>> extends GuiElement<T>
 	}
 
 	@Override
-	public void drawBackground(PoseStack matrices, int mouseX, int mouseY)
+	public void drawBackground(GuiGraphics guiGraphics, int mouseX, int mouseY)
 	{
 		if (this.textProvider != null)
 		{
@@ -61,7 +61,7 @@ public abstract class Button<T extends Button<T>> extends GuiElement<T>
 			if (text != null && !text.isEmpty())
 			{
 				text = Localization.translate(text);
-				this.gui.drawXYCenteredString(matrices, this.x + this.width / 2, this.y + this.height / 2, text, this.getTextColor(mouseX, mouseY), true);
+				this.gui.drawXYCenteredString(guiGraphics, this.x + this.width / 2, this.y + this.height / 2, text, this.getTextColor(mouseX, mouseY), true);
 			}
 		} else if (this.iconProvider != null)
 		{

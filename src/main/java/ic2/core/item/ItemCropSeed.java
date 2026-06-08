@@ -97,7 +97,7 @@ public class ItemCropSeed extends Item implements ICropSeed
 
 	public void fillItemCategory(CreativeModeTab tabs, NonNullList<ItemStack> items)
 	{
-		if (this.allowedIn(tabs))
+		if (true)
 		{
 			for (CropCard crop : Crops.instance.getCrops())
 			{

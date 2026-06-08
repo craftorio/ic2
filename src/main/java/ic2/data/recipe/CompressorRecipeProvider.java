@@ -8,7 +8,7 @@ import ic2.data.recipe.helper.Ic2RecipeProvider;
 
 import java.util.function.Consumer;
 
-import net.minecraft.data.DataGenerator;
+import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
@@ -16,9 +16,9 @@ import net.minecraft.world.level.material.Fluids;
 
 public class CompressorRecipeProvider extends Ic2RecipeProvider
 {
-	public CompressorRecipeProvider(DataGenerator generator)
+	public CompressorRecipeProvider(PackOutput packOutput)
 	{
-		super(generator);
+		super(packOutput);
 	}
 
 	@Override

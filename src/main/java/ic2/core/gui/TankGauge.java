@@ -1,6 +1,6 @@
 package ic2.core.gui;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.Ic2Gui;
 import ic2.core.fluid.Ic2FluidStack;
 import ic2.core.fluid.Ic2FluidTank;
@@ -57,7 +57,7 @@ public class TankGauge extends GuiElement<TankGauge>
 	}
 
 	@Override
-	public void drawBackground(PoseStack matrices, int mouseX, int mouseY)
+	public void drawBackground(GuiGraphics guiGraphics, int mouseX, int mouseY)
 	{
 		bindCommonTexture();
 		Ic2FluidStack fs = this.tank.getFluidStack();
@@ -65,7 +65,7 @@ public class TankGauge extends GuiElement<TankGauge>
 		{
 			if (this.style.withBorder)
 			{
-				this.gui.drawTexturedRect(matrices, this.x, this.y, this.width, this.height, 6.0, 100.0);
+				this.gui.drawTexturedRect(guiGraphics.pose(), this.x, this.y, this.width, this.height, 6.0, 100.0);
 			}
 
 			int fluidX = this.x;
@@ -84,7 +84,7 @@ public class TankGauge extends GuiElement<TankGauge>
 			int color = SideProxyClient.envProxy.getFluidColor(fs);
 			double renderHeight = fluidHeight * Util.limit((double) fs.getAmountMb() / this.tank.getCapacity(), 0.0, 1.0);
 			bindBlockTexture();
-			this.gui.drawSprite(matrices, fluidX, fluidY + fluidHeight - renderHeight, fluidWidth, renderHeight, sprite, color, 1.0, false, true);
+			this.gui.drawSprite(guiGraphics.pose(), fluidX, fluidY + fluidHeight - renderHeight, fluidWidth, renderHeight, sprite, color, 1.0, false, true);
 			if (this.style.withGauge)
 			{
 				bindCommonTexture();
@@ -96,14 +96,14 @@ public class TankGauge extends GuiElement<TankGauge>
 					gaugeY -= 4;
 				}
 
-				this.gui.drawTexturedRect(matrices, gaugeX, gaugeY, 20.0, 55.0, 38.0, 100.0, this.style.mirrorGauge);
+				this.gui.drawTexturedRect(guiGraphics.pose(), gaugeX, gaugeY, 20.0, 55.0, 38.0, 100.0, this.style.mirrorGauge);
 			}
 		} else if (this.style.withBorder)
 		{
-			this.gui.drawTexturedRect(matrices, this.x, this.y, this.width, this.height, 70.0, 100.0, this.style.mirrorGauge);
+			this.gui.drawTexturedRect(guiGraphics.pose(), this.x, this.y, this.width, this.height, 70.0, 100.0, this.style.mirrorGauge);
 		} else if (this.style.withGauge)
 		{
-			this.gui.drawTexturedRect(matrices, this.x, this.y, this.width, this.height, 74.0, 104.0, this.style.mirrorGauge);
+			this.gui.drawTexturedRect(guiGraphics.pose(), this.x, this.y, this.width, this.height, 74.0, 104.0, this.style.mirrorGauge);
 		}
 	}
 

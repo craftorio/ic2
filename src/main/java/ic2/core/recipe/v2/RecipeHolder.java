@@ -1,6 +1,7 @@
 package ic2.core.recipe.v2;
 
 import ic2.api.recipe.MachineRecipe;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
@@ -23,12 +24,22 @@ public record RecipeHolder<I, O>(MachineRecipe<I, O> recipe, ResourceLocation id
 		throw new UnsupportedOperationException("Not supported for IC2 machine recipes.");
 	}
 
+	public ItemStack assemble(Container inventory, RegistryAccess registryAccess)
+	{
+		throw new UnsupportedOperationException("Not supported for IC2 machine recipes.");
+	}
+
 	public boolean canCraftInDimensions(int width, int height)
 	{
 		throw new UnsupportedOperationException("Not supported for IC2 machine recipes.");
 	}
 
 	public ItemStack getResultItem()
+	{
+		return ItemStack.EMPTY;
+	}
+
+	public ItemStack getResultItem(RegistryAccess registryAccess)
 	{
 		return ItemStack.EMPTY;
 	}

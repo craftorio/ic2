@@ -9,7 +9,12 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.placement.PlacementUtils;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.data.event.GatherDataEvent;
@@ -97,13 +102,13 @@ public final class FmlMod
 	public void initData(GatherDataEvent event)
 	{
 		existingFileHelper = event.getExistingFileHelper();
-		Ic2DataGenerators.setup(event.getGenerator());
+		Ic2DataGenerators.setup(event.getGenerator(), event.getLookupProvider(), event.getExistingFileHelper());
 	}
 
 	@SubscribeEvent
 	public void registerBlocks(RegisterEvent event)
 	{
-		if (event.getRegistryKey() == Registry.BLOCK_REGISTRY)
+		if (event.getRegistryKey() == Registries.BLOCK)
 		{
 			if (!loadState.compareAndSet(0, 1))
 			{
@@ -117,7 +122,7 @@ public final class FmlMod
 	@SubscribeEvent
 	public void registerGameEvents(RegisterEvent event)
 	{
-		if (event.getRegistryKey() == Registry.SOUND_EVENT_REGISTRY)
+		if (event.getRegistryKey() == Registries.SOUND_EVENT)
 		{
 			EventHandler.onInitGameEvents();
 		}
@@ -151,7 +156,7 @@ public final class FmlMod
 	@SubscribeEvent
 	public void registerFeatures(RegisterEvent event)
 	{
-		if (event.getRegistryKey() == Registry.FEATURE_REGISTRY)
+		if (event.getRegistryKey() == Registries.FEATURE)
 		{
 			for (Runnable reg : EnvProxyForge.configuredFeatureRegistrations)
 			{
@@ -160,12 +165,13 @@ public final class FmlMod
 
 			for (EnvProxyForge.PlacedFeatureRegistration<?> reg : EnvProxyForge.placedFeatureRegistrations)
 			{
-				reg.placedFeature().complete(PlacementUtils.register(reg.id().toString(), reg.feature().join(), reg.modifiers()));
+									ResourceKey<PlacedFeature> placedKey = ResourceKey.create(Registries.PLACED_FEATURE, ResourceLocation.parse(reg.id().toString()));
+				// TODO: Fix for 1.20.1 - reg.placedFeature().complete(Registry.registerForHolder(ForgeRegistries.PLACED_FEATURES, placedKey, new PlacedFeature(reg.feature().join().value(), reg.modifiers())));
 			}
 
 			for (EnvProxyForge.PlacementModifierTypeRegistration reg : EnvProxyForge.placementModifierTypeRegistrations)
 			{
-				Registry.register(Registry.PLACEMENT_MODIFIERS, reg.id(), reg.type());
+				// TODO: Fix for 1.20.1 - Registry.register(ForgeRegistries.PLACEMENT_MODIFIER_TYPES, reg.id(), reg.type());
 			}
 		}
 	}

@@ -1,0 +1,509 @@
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by net.rubygrapefruit.platform.internal.NativeLibraryLoader in an unnamed module (file:/C:/Users/qq183/.gradle/wrapper/dists/gradle-8.8-bin/dl7vupf4psengwqhwktix4v1/gradle-8.8/lib/native-platform-0.22-milestone-26.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.8/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+
+> Configure project :
+Java: 25.0.1, JVM: 25.0.1+8-LTS (Microsoft), Arch: amd64
+
+> Task :compileJava
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\network\NetworkManager.java:777: 错误: 找不到符号
+		Connection connection = handler.getConnection();
+		                               ^
+  符号:   方法 getConnection()
+  位置: 类型为ServerGamePacketListenerImpl的变量 handler
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\sound\SoundManagerClient.java:141: 错误: 不兼容的类型: 从double转换到int可能会有损失
+				BlockPos pos = new BlockPos(sound.getX(), sound.getY(), sound.getZ());
+				                                      ^
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\Ic2Explosion.java:137: 错误: 不兼容的类型: 从double转换到int可能会有损失
+				BlockPos pos = new BlockPos(this.explosionX, this.explosionY, this.explosionZ);
+				                                ^
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\Ic2Explosion.java:236: 错误: 对于Builder(ServerLevel), 找不到合适的构造器
+				Builder builder = new Builder((ServerLevel) this.worldObj)
+				                  ^
+    构造器 Builder.Builder(LootParams)不适用
+      (参数不匹配; ServerLevel无法转换为LootParams)
+    构造器 Builder.Builder(LootContext)不适用
+      (参数不匹配; ServerLevel无法转换为LootContext)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\Ic2Explosion.java:268: 错误: 找不到符号
+								builder.withOptionalParameter(LootContextParams.BLOCK_ENTITY, be);
+								       ^
+  符号:   方法 withOptionalParameter(LootContextParam<BlockEntity>,BlockEntity)
+  位置: 类型为Builder的变量 builder
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\Ic2Explosion.java:270: 错误: 不兼容的类型: net.minecraft.world.level.storage.loot.LootContext.Builder无法转换为net.minecraft.world.level.storage.loot.LootParams.Builder
+								for (ItemStack stack : state.getDrops(builder))
+								                                      ^
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\recipe\v2\RecipeHolder.java:12: 错误: RecipeHolder不是抽象的, 并且未覆盖Recipe中的抽象方法getResultItem(RegistryAccess)
+public record RecipeHolder<I, O>(MachineRecipe<I, O> recipe, ResourceLocation id, RecipeSerializer<?> serializer,
+       ^
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\item\armor\ItemArmorUtility.java:12: 错误: 不兼容的类型: EquipmentSlot无法转换为Type
+		super(material, type, settings);
+		                ^
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\item\armor\ItemArmorCFPack.java:18: 错误: 找不到符号
+		if (this.allowedIn(tab))
+		        ^
+  符号: 方法 allowedIn(CreativeModeTab)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\item\armor\ItemArmorIC2.java:15: 错误: 不兼容的类型: EquipmentSlot无法转换为Type
+		super(material, slot, settings);
+		                ^
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\item\armor\ItemArmorElectric.java:59: 错误: 找不到符号
+		if (!(amount <= 0.0F) && !source.isBypassMagic())
+		                                ^
+  符号:   方法 isBypassMagic()
+  位置: 类型为DamageSource的变量 source
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\item\armor\ItemArmorElectric.java:85: 错误: 找不到符号
+		if (this.allowedIn(tab))
+		        ^
+  符号: 方法 allowedIn(CreativeModeTab)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\item\armor\ItemArmorElectric.java:142: 错误: 找不到符号
+		if (slot != this.slot)
+		                ^
+  符号: 变量 slot
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\item\armor\ItemArmorHazmat.java:30: 错误: 找不到符号
+			if (slot.getType() == Type.ARMOR)
+			                          ^
+  符号:   变量 ARMOR
+  位置: 类 Type
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\item\armor\ItemArmorHazmat.java:56: 错误: 找不到符号
+		return source == DamageSource.IN_FIRE
+		                             ^
+  符号:   变量 IN_FIRE
+  位置: 类 DamageSource
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\item\armor\ItemArmorHazmat.java:57: 错误: 找不到符号
+			|| source == DamageSource.IN_WALL
+			                         ^
+  符号:   变量 IN_WALL
+  位置: 类 DamageSource
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\item\armor\ItemArmorHazmat.java:58: 错误: 找不到符号
+			|| source == DamageSource.LAVA
+			                         ^
+  符号:   变量 LAVA
+  位置: 类 DamageSource
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\item\armor\ItemArmorHazmat.java:59: 错误: 找不到符号
+			|| source == DamageSource.HOT_FLOOR
+			                         ^
+  符号:   变量 HOT_FLOOR
+  位置: 类 DamageSource
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\item\armor\ItemArmorHazmat.java:60: 错误: 找不到符号
+			|| source == DamageSource.ON_FIRE
+			                         ^
+  符号:   变量 ON_FIRE
+  位置: 类 DamageSource
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\item\armor\ItemArmorHazmat.java:76: 错误: 找不到符号
+				stack.hurtAndBreak(armorDamage, entity, player -> player.broadcastBreakEvent(this.slot));
+				                                                                                 ^
+  符号: 变量 slot
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\item\armor\ItemArmorJetpack.java:20: 错误: 找不到符号
+		if (this.allowedIn(group))
+		        ^
+  符号: 方法 allowedIn(CreativeModeTab)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\item\armor\ItemArmorNanoSuit.java:110: 错误: 不兼容的类型: Vec3无法转换为Vec3i
+					int skylight = player.getCommandSenderWorld().getMaxLocalRawBrightness(new BlockPos(player.position()));
+					                                                                                                   ^
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\item\armor\ItemArmorNanoSuit.java:134: 错误: 找不到符号
+		return this.slot == EquipmentSlot.HEAD && ElectricItem.manager.getCharge(stack) > 0.0;
+		           ^
+  符号: 变量 slot
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\item\armor\ItemArmorNightVisionGoggles.java:71: 错误: 找不到符号
+			if (slot == this.slot.getIndex())
+			                ^
+  符号: 变量 slot
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\item\armor\ItemArmorNightVisionGoggles.java:100: 错误: 不兼容的类型: Vec3无法转换为Vec3i
+					int skylight = player.getCommandSenderWorld().getMaxLocalRawBrightness(new BlockPos(player.position()));
+					                                                                                                   ^
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\item\armor\ItemArmorNightVisionGoggles.java:118: 错误: 找不到符号
+		if (this.allowedIn(tab))
+		        ^
+  符号: 方法 allowedIn(CreativeModeTab)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\item\armor\ItemArmorQuantumSuit.java:172: 错误: 找不到符号
+		return this.slot == EquipmentSlot.HEAD && ElectricItem.manager.getCharge(stack) > 0.0;
+		           ^
+  符号: 变量 slot
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\item\BaseElectricItem.java:65: 错误: 找不到符号
+		if (this.allowedIn(tab))
+		        ^
+  符号: 方法 allowedIn(CreativeModeTab)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\item\ItemCropSeed.java:100: 错误: 找不到符号
+		if (this.allowedIn(tabs))
+		        ^
+  符号: 方法 allowedIn(CreativeModeTab)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\item\tool\ItemElectricTool.java:221: 错误: 找不到符号
+		if (this.allowedIn(tab))
+		        ^
+  符号: 方法 allowedIn(CreativeModeTab)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\item\tool\HandHeldMeter.java:20: 错误: level 在 Entity 中是 private 访问控制
+		if (!this.player.level.isClientSide)
+		                ^
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\item\tool\ItemDebug.java:336: 错误: 找不到符号
+		Level world = player.getLevel();
+		                    ^
+  符号:   方法 getLevel()
+  位置: 类型为Player的变量 player
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\item\tool\ItemDebug.java:738: 错误: 找不到符号
+			if (player.getLevel().isClientSide)
+			          ^
+  符号:   方法 getLevel()
+  位置: 类型为Player的变量 player
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\item\tool\ItemDrill.java:59: 错误: 找不到符号
+			if (!player.isOnGround())
+			           ^
+  符号:   方法 isOnGround()
+  位置: 类型为Player的变量 player
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\item\tool\ItemElectricToolChainsaw.java:154: 错误: 找不到符号
+		if (user.getLevel().isClientSide)
+		        ^
+  符号:   方法 getLevel()
+  位置: 类型为LivingEntity的变量 user
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\item\tool\ItemToolMiningLaser.java:462: 错误: 找不到符号
+		laser.setDeltaMovement(laser.getDeltaMovement().add(vec3d.x, shooter.isOnGround() ? 0.0 : vec3d.y, vec3d.z));
+		                                                                    ^
+  符号:   方法 isOnGround()
+  位置: 类型为Entity的变量 shooter
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\loot\Ic2LootNbtProviderTypes.java:15: 错误: 找不到符号
+		return (LootNbtProviderType) Registry.register(Registry.LOOT_NBT_PROVIDER_TYPE, IC2.getIdentifier(id), new LootNbtProviderType(jsonSerializer));
+		                                                       ^
+  符号:   变量 LOOT_NBT_PROVIDER_TYPE
+  位置: 接口 Registry
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\network\NetworkManagerClient.java:159: 错误: level 在 Entity 中是 private 访问控制
+		assert player == null || player.level.isClientSide;
+		                               ^
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\recipe\AdvRecipe.java:36: 错误: AdvRecipe不是抽象的, 并且未覆盖CraftingRecipe中的抽象方法category()
+public class AdvRecipe implements Ic2CraftingRecipe
+       ^
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\recipe\AdvShapelessRecipe.java:29: 错误: AdvShapelessRecipe不是抽象的, 并且未覆盖CraftingRecipe中的抽象方法category()
+public class AdvShapelessRecipe implements CraftingRecipe
+       ^
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\recipe\input\RecipeInputFactory.java:39: 错误: 找不到符号
+		return this.forIngredient(Ingredient.of(TagKey.create(BuiltInRegistries.ITEM_REGISTRY, ResourceLocation.parse(name))), amount);
+		                                                                       ^
+  符号:   变量 ITEM_REGISTRY
+  位置: 类 BuiltInRegistries
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\recipe\SmeltingRecipeManager.java:33: 错误: 无法将类 AbstractCookingRecipe中的方法 getResultItem应用到给定类型;
+		ItemStack output = recipe.getResultItem();
+		                         ^
+  需要: RegistryAccess
+  找到:    没有参数
+  原因: 实际参数列表和形式参数列表长度不同
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\recipe\helper\json\Ic2RecipeJsonProvider.java:36: 错误: 找不到符号
+		return IC2.getIdentifier(Registry.RECIPE_SERIALIZER.getKey(this.serializer).getPath() + "/" + this.fileName);
+		                                 ^
+  符号:   变量 RECIPE_SERIALIZER
+  位置: 接口 Registry
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2ArmorMaterials.java:14: 错误: Ic2ArmorMaterials不是抽象的, 并且未覆盖ArmorMaterial中的抽象方法getDefenseForType(Type)
+public enum Ic2ArmorMaterials implements ArmorMaterial
+       ^
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Blocks.java:258: 错误: <匿名ic2.core.ref.Ic2Blocks$1>不是抽象的, 并且未覆盖AbstractTreeGrower中的抽象方法getConfiguredFeature(RandomSource,boolean)
+	{
+	^
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Blocks.java:259: 错误: <匿名ic2.core.ref.Ic2Blocks$1>中的getConfiguredFeature(RandomSource,boolean)无法覆盖AbstractTreeGrower中的getConfiguredFeature(RandomSource,boolean)
+		protected Holder<ConfiguredFeature<TreeConfiguration, ?>> getConfiguredFeature(RandomSource random, boolean bees)
+		                                                          ^
+  返回类型Holder<ConfiguredFeature<TreeConfiguration,?>>与ResourceKey<ConfiguredFeature<?,?>>不兼容
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Blocks.java:270: 错误: 无法将类 ButtonBlock中的构造器 ButtonBlock应用到给定类型;
+		"rubber_button", new ButtonBlock(Properties.of().noCollission().strength(0.5F).sound(SoundType.WOOD))
+		                 ^
+  需要: Properties,BlockSetType,int,boolean
+  找到:    Properties
+  原因: 实际参数列表和形式参数列表长度不同
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Blocks.java:275: 错误: 无法将类 Properties中的方法 of应用到给定类型;
+		"rubber_door", new DoorBlock(Properties.of(RUBBER_PLANKS.defaultMapColor()).strength(3.0F).sound(SoundType.WOOD).noOcclusion())
+		                                       ^
+  需要: 没有参数
+  找到:    MapColor
+  原因: 实际参数列表和形式参数列表长度不同
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Blocks.java:280: 错误: 无法将类 Properties中的方法 of应用到给定类型;
+		"rubber_fence", new FenceBlock(Properties.of(RUBBER_PLANKS.defaultMapColor()).strength(2.0F, 3.0F).sound(SoundType.WOOD))
+		                                         ^
+  需要: 没有参数
+  找到:    MapColor
+  原因: 实际参数列表和形式参数列表长度不同
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Blocks.java:284: 错误: 无法将类 Properties中的方法 of应用到给定类型;
+		new FenceGateBlock(Properties.of(RUBBER_PLANKS.defaultMapColor()).strength(2.0F, 3.0F).sound(SoundType.WOOD))
+		                             ^
+  需要: 没有参数
+  找到:    MapColor
+  原因: 实际参数列表和形式参数列表长度不同
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Blocks.java:289: 错误: 无法将类 Properties中的方法 of应用到给定类型;
+			Sensitivity.EVERYTHING, Properties.of(RUBBER_PLANKS.defaultMapColor()).noCollission().strength(0.5F).sound(SoundType.WOOD)
+			                                  ^
+  需要: 没有参数
+  找到:    MapColor
+  原因: 实际参数列表和形式参数列表长度不同
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Blocks.java:296: 错误: 无法将类 Properties中的方法 of应用到给定类型;
+		new Ic2SignBlock(Properties.of(RUBBER_LOG.defaultMapColor()).noCollission().strength(1.0F).sound(SoundType.WOOD), Ic2SignType.RUBBER)
+		                           ^
+  需要: 没有参数
+  找到:    MapColor
+  原因: 实际参数列表和形式参数列表长度不同
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Blocks.java:309: 错误: 无法将类 TrapDoorBlock中的构造器 TrapDoorBlock应用到给定类型;
+		new TrapDoorBlock(
+		^
+  需要: Properties,BlockSetType
+  找到:    Properties
+  原因: 实际参数列表和形式参数列表长度不同
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Blocks.java:318: 错误: 无法将类 Properties中的方法 of应用到给定类型;
+			Properties.of(RUBBER_LOG.defaultMapColor()).noCollission().strength(1.0F).sound(SoundType.WOOD).dropsLike(RUBBER_SIGN),
+			          ^
+  需要: 没有参数
+  找到:    MapColor
+  原因: 实际参数列表和形式参数列表长度不同
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Blocks.java:376: 错误: 无法将类 DoorBlock中的构造器 DoorBlock应用到给定类型;
+		"reinforced_door", new DoorBlock(Properties.of().strength(50.0F, 150.0F).sound(SoundType.METAL))
+		                   ^
+  需要: Properties,BlockSetType
+  找到:    Properties
+  原因: 实际参数列表和形式参数列表长度不同
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2BlockTags.java:33: 错误: 找不到符号
+		return TagKey.create(BuiltInRegistries.BLOCK_REGISTRY, id);
+		                                      ^
+  符号:   变量 BLOCK_REGISTRY
+  位置: 类 BuiltInRegistries
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2EntityTags.java:19: 错误: 找不到符号
+		return TagKey.create(Registry.ENTITY_TYPE_REGISTRY, IC2.getIdentifier(name));
+		                             ^
+  符号:   变量 ENTITY_TYPE_REGISTRY
+  位置: 接口 Registry
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2EntityTags.java:25: 错误: 找不到符号
+		return TagKey.create(Registry.ENTITY_TYPE_REGISTRY, id);
+		                             ^
+  符号:   变量 ENTITY_TYPE_REGISTRY
+  位置: 接口 Registry
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2FluidTags.java:21: 错误: 找不到符号
+		return TagKey.create(BuiltInRegistries.FLUID_REGISTRY, id);
+		                                      ^
+  符号:   变量 FLUID_REGISTRY
+  位置: 类 BuiltInRegistries
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Items.java:92: 错误: 找不到符号
+	public static final Item BASALT = register("basalt", new BlockItem(Ic2Blocks.BASALT, new Properties().tab(IC2.tabIc2General)));
+	                                                                                                     ^
+  符号:   方法 tab(CreativeModeTab)
+  位置: 类 Properties
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Items.java:93: 错误: 找不到符号
+	public static final Item LEAD_ORE = register("lead_ore", new BlockItem(Ic2Blocks.LEAD_ORE, new Properties().tab(IC2.tabIc2General)));
+	                                                                                                           ^
+  符号:   方法 tab(CreativeModeTab)
+  位置: 类 Properties
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Items.java:94: 错误: 找不到符号
+	public static final Item TIN_ORE = register("tin_ore", new BlockItem(Ic2Blocks.TIN_ORE, new Properties().tab(IC2.tabIc2General)));
+	                                                                                                        ^
+  符号:   方法 tab(CreativeModeTab)
+  位置: 类 Properties
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Items.java:95: 错误: 找不到符号
+	public static final Item URANIUM_ORE = register("uranium_ore", new BlockItem(Ic2Blocks.URANIUM_ORE, new Properties().tab(IC2.tabIc2General)));
+	                                                                                                                    ^
+  符号:   方法 tab(CreativeModeTab)
+  位置: 类 Properties
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Items.java:97: 错误: 找不到符号
+		"deepslate_uranium_ore", new BlockItem(Ic2Blocks.DEEPSLATE_URANIUM_ORE, new Properties().tab(IC2.tabIc2General))
+		                                                                                        ^
+  符号:   方法 tab(CreativeModeTab)
+  位置: 类 Properties
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Items.java:100: 错误: 找不到符号
+		"deepslate_tin_ore", new BlockItem(Ic2Blocks.DEEPSLATE_TIN_ORE, new Properties().tab(IC2.tabIc2General))
+		                                                                                ^
+  符号:   方法 tab(CreativeModeTab)
+  位置: 类 Properties
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Items.java:103: 错误: 找不到符号
+		"deepslate_lead_ore", new BlockItem(Ic2Blocks.DEEPSLATE_LEAD_ORE, new Properties().tab(IC2.tabIc2General))
+		                                                                                  ^
+  符号:   方法 tab(CreativeModeTab)
+  位置: 类 Properties
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Items.java:105: 错误: 找不到符号
+	public static final Item RAW_LEAD_BLOCK = register("raw_lead_block", new BlockItem(Ic2Blocks.RAW_LEAD_BLOCK, new Properties().tab(IC2.tabIc2General)));
+	                                                                                                                             ^
+  符号:   方法 tab(CreativeModeTab)
+  位置: 类 Properties
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Items.java:106: 错误: 找不到符号
+	public static final Item RAW_TIN_BLOCK = register("raw_tin_block", new BlockItem(Ic2Blocks.RAW_TIN_BLOCK, new Properties().tab(IC2.tabIc2General)));
+	                                                                                                                          ^
+  符号:   方法 tab(CreativeModeTab)
+  位置: 类 Properties
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Items.java:108: 错误: 找不到符号
+		"raw_uranium_block", new BlockItem(Ic2Blocks.RAW_URANIUM_BLOCK, new Properties().tab(IC2.tabIc2General))
+		                                                                                ^
+  符号:   方法 tab(CreativeModeTab)
+  位置: 类 Properties
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Items.java:110: 错误: 找不到符号
+	public static final Item BRONZE_BLOCK = register("bronze_block", new BlockItem(Ic2Blocks.BRONZE_BLOCK, new Properties().tab(IC2.tabIc2General)));
+	                                                                                                                       ^
+  符号:   方法 tab(CreativeModeTab)
+  位置: 类 Properties
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Items.java:111: 错误: 找不到符号
+	public static final Item LEAD_BLOCK = register("lead_block", new BlockItem(Ic2Blocks.LEAD_BLOCK, new Properties().tab(IC2.tabIc2General)));
+	                                                                                                                 ^
+  符号:   方法 tab(CreativeModeTab)
+  位置: 类 Properties
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Items.java:112: 错误: 找不到符号
+	public static final Item STEEL_BLOCK = register("steel_block", new BlockItem(Ic2Blocks.STEEL_BLOCK, new Properties().tab(IC2.tabIc2General)));
+	                                                                                                                    ^
+  符号:   方法 tab(CreativeModeTab)
+  位置: 类 Properties
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Items.java:113: 错误: 找不到符号
+	public static final Item TIN_BLOCK = register("tin_block", new BlockItem(Ic2Blocks.TIN_BLOCK, new Properties().tab(IC2.tabIc2General)));
+	                                                                                                              ^
+  符号:   方法 tab(CreativeModeTab)
+  位置: 类 Properties
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Items.java:114: 错误: 找不到符号
+	public static final Item URANIUM_BLOCK = register("uranium_block", new BlockItem(Ic2Blocks.URANIUM_BLOCK, new Properties().tab(IC2.tabIc2General)));
+	                                                                                                                          ^
+  符号:   方法 tab(CreativeModeTab)
+  位置: 类 Properties
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Items.java:116: 错误: 找不到符号
+		"reinforced_stone", new BlockItem(Ic2Blocks.REINFORCED_STONE, new Properties().tab(IC2.tabIc2General))
+		                                                                              ^
+  符号:   方法 tab(CreativeModeTab)
+  位置: 类 Properties
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Items.java:118: 错误: 找不到符号
+	public static final Item MACHINE = register("machine", new BlockItem(Ic2Blocks.MACHINE, new Properties().tab(IC2.tabIc2General)));
+	                                                                                                        ^
+  符号:   方法 tab(CreativeModeTab)
+  位置: 类 Properties
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Items.java:120: 错误: 找不到符号
+		"advanced_machine", new BlockItem(Ic2Blocks.ADVANCED_MACHINE, new Properties().tab(IC2.tabIc2General))
+		                                                                              ^
+  符号:   方法 tab(CreativeModeTab)
+  位置: 类 Properties
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Items.java:122: 错误: 找不到符号
+	public static final Item SILVER_BLOCK = register("silver_block", new BlockItem(Ic2Blocks.SILVER_BLOCK, new Properties().tab(IC2.tabIc2General)));
+	                                                                                                                       ^
+  符号:   方法 tab(CreativeModeTab)
+  位置: 类 Properties
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Items.java:123: 错误: 找不到符号
+	public static final Item RUBBER_LEAVES = register("rubber_leaves", new BlockItem(Ic2Blocks.RUBBER_LEAVES, new Properties().tab(IC2.tabIc2General)));
+	                                                                                                                          ^
+  符号:   方法 tab(CreativeModeTab)
+  位置: 类 Properties
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Items.java:124: 错误: 找不到符号
+	public static final Item RUBBER_LOG = register("rubber_log", new BlockItem(Ic2Blocks.RUBBER_LOG, new Properties().tab(IC2.tabIc2General)));
+	                                                                                                                 ^
+  符号:   方法 tab(CreativeModeTab)
+  位置: 类 Properties
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Items.java:126: 错误: 找不到符号
+		"stripped_rubber_log", new BlockItem(Ic2Blocks.STRIPPED_RUBBER_LOG, new Properties().tab(IC2.tabIc2General))
+		                                                                                    ^
+  符号:   方法 tab(CreativeModeTab)
+  位置: 类 Properties
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Items.java:128: 错误: 找不到符号
+	public static final Item RUBBER_WOOD = register("rubber_wood", new BlockItem(Ic2Blocks.RUBBER_WOOD, new Properties().tab(IC2.tabIc2General)));
+	                                                                                                                    ^
+  符号:   方法 tab(CreativeModeTab)
+  位置: 类 Properties
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Items.java:130: 错误: 找不到符号
+		"stripped_rubber_wood", new BlockItem(Ic2Blocks.STRIPPED_RUBBER_WOOD, new Properties().tab(IC2.tabIc2General))
+		                                                                                      ^
+  符号:   方法 tab(CreativeModeTab)
+  位置: 类 Properties
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Items.java:132: 错误: 找不到符号
+	public static final Item RUBBER_PLANKS = register("rubber_planks", new BlockItem(Ic2Blocks.RUBBER_PLANKS, new Properties().tab(IC2.tabIc2General)));
+	                                                                                                                          ^
+  符号:   方法 tab(CreativeModeTab)
+  位置: 类 Properties
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Items.java:133: 错误: 找不到符号
+	public static final Item RUBBER_SAPLING = register("rubber_sapling", new BlockItem(Ic2Blocks.RUBBER_SAPLING, new Properties().tab(IC2.tabIc2Farming)));
+	                                                                                                                             ^
+  符号:   方法 tab(CreativeModeTab)
+  位置: 类 Properties
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Items.java:134: 错误: 找不到符号
+	public static final Item RUBBER_BUTTON = register("rubber_button", new BlockItem(Ic2Blocks.RUBBER_BUTTON, new Properties().tab(IC2.tabIc2General)));
+	                                                                                                                          ^
+  符号:   方法 tab(CreativeModeTab)
+  位置: 类 Properties
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Items.java:135: 错误: 找不到符号
+	public static final Item RUBBER_DOOR = register("rubber_door", new BlockItem(Ic2Blocks.RUBBER_DOOR, new Properties().tab(IC2.tabIc2General)));
+	                                                                                                                    ^
+  符号:   方法 tab(CreativeModeTab)
+  位置: 类 Properties
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Items.java:136: 错误: 找不到符号
+	public static final Item RUBBER_FENCE = register("rubber_fence", new BlockItem(Ic2Blocks.RUBBER_FENCE, new Properties().tab(IC2.tabIc2General)));
+	                                                                                                                       ^
+  符号:   方法 tab(CreativeModeTab)
+  位置: 类 Properties
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Items.java:138: 错误: 找不到符号
+		"rubber_fence_gate", new BlockItem(Ic2Blocks.RUBBER_FENCE_GATE, new Properties().tab(IC2.tabIc2General))
+		                                                                                ^
+  符号:   方法 tab(CreativeModeTab)
+  位置: 类 Properties
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Items.java:141: 错误: 找不到符号
+		"rubber_pressure_plate", new BlockItem(Ic2Blocks.RUBBER_PRESSURE_PLATE, new Properties().tab(IC2.tabIc2General))
+		                                                                                        ^
+  符号:   方法 tab(CreativeModeTab)
+  位置: 类 Properties
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Items.java:144: 错误: 找不到符号
+		"rubber_sign", new SignItem(new Properties().tab(IC2.tabIc2General), Ic2Blocks.RUBBER_SIGN, Ic2Blocks.RUBBER_WALL_SIGN)
+		                                            ^
+  符号:   方法 tab(CreativeModeTab)
+  位置: 类 Properties
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Items.java:146: 错误: 找不到符号
+	public static final Item RUBBER_SLAB = register("rubber_slab", new BlockItem(Ic2Blocks.RUBBER_SLAB, new Properties().tab(IC2.tabIc2General)));
+	                                                                                                                    ^
+  符号:   方法 tab(CreativeModeTab)
+  位置: 类 Properties
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Items.java:147: 错误: 找不到符号
+	public static final Item RUBBER_STAIRS = register("rubber_stairs", new BlockItem(Ic2Blocks.RUBBER_STAIRS, new Properties().tab(IC2.tabIc2General)));
+	                                                                                                                          ^
+  符号:   方法 tab(CreativeModeTab)
+  位置: 类 Properties
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Items.java:149: 错误: 找不到符号
+		"rubber_trapdoor", new BlockItem(Ic2Blocks.RUBBER_TRAPDOOR, new Properties().tab(IC2.tabIc2General))
+		                                                                            ^
+  符号:   方法 tab(CreativeModeTab)
+  位置: 类 Properties
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Items.java:151: 错误: 找不到符号
+	public static final Item MINING_PIPE = register("mining_pipe", new BlockItem(Ic2Blocks.MINING_PIPE, new Properties().tab(IC2.tabIc2ToolsAndUtilities)));
+	                                                                                                                    ^
+  符号:   方法 tab(CreativeModeTab)
+  位置: 类 Properties
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Items.java:153: 错误: 找不到符号
+		"wooden_scaffold", new BlockItem(Ic2Blocks.WOODEN_SCAFFOLD, new Properties().tab(IC2.tabIc2General))
+		                                                                            ^
+  符号:   方法 tab(CreativeModeTab)
+  位置: 类 Properties
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Items.java:156: 错误: 找不到符号
+		"reinforced_wooden_scaffold", new BlockItem(Ic2Blocks.REINFORCED_WOODEN_SCAFFOLD, new Properties().tab(IC2.tabIc2General))
+		                                                                                                  ^
+  符号:   方法 tab(CreativeModeTab)
+  位置: 类 Properties
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Items.java:158: 错误: 找不到符号
+	public static final Item IRON_SCAFFOLD = register("iron_scaffold", new BlockItem(Ic2Blocks.IRON_SCAFFOLD, new Properties().tab(IC2.tabIc2General)));
+	                                                                                                                          ^
+  符号:   方法 tab(CreativeModeTab)
+  位置: 类 Properties
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Items.java:160: 错误: 找不到符号
+		"reinforced_iron_scaffold", new BlockItem(Ic2Blocks.REINFORCED_IRON_SCAFFOLD, new Properties().tab(IC2.tabIc2General))
+		                                                                                              ^
+  符号:   方法 tab(CreativeModeTab)
+  位置: 类 Properties
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\ref\Ic2Items.java:162: 错误: 找不到符号
+	public static final Item IRON_FENCE = register("iron_fence", new BlockItem(Ic2Blocks.IRON_FENCE, new Properties().tab(IC2.tabIc2General)));
+	                                                                                                                 ^
+  符号:   方法 tab(CreativeModeTab)
+  位置: 类 Properties
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\forge\ClientModEventHandlerForge.java:99: 警告: [removal] ItemBlockRenderTypes 中的 setRenderLayer(Block,RenderType) 已过时, 且标记为待删除
+				ItemBlockRenderTypes.setRenderLayer(block, registration.layer());
+				                    ^
+注: 某些输入文件使用或覆盖了已过时的 API。
+注: 有关详细信息, 请使用 -Xlint:deprecation 重新编译。
+注: 某些输入文件使用了未经检查或不安全的操作。
+注: 有关详细信息, 请使用 -Xlint:unchecked 重新编译。
+注: 某些消息已经过简化; 请使用 -Xdiags:verbose 重新编译以获得完整输出
+100 个错误
+1 个警告
+仅显示前 100 个错误（共 730 个）；若要查看更多错误，请使用 -Xmaxerrs
+
+> Task :compileJava FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':compileJava'.
+> Compilation failed; see the compiler error output for details.
+
+* Try:
+> Run with --info option to get more log output.
+> Run with --scan to get full insights.
+
+BUILD FAILED in 15s
+1 actionable task: 1 executed

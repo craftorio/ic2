@@ -25,8 +25,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.CompletableFuture;
 
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
@@ -64,9 +67,11 @@ public class OldToNewLangConverter implements DataProvider
 		return "item.ic2." + color + "_painter";
 	}
 
-	public void run(CachedOutput cache) throws IOException
+	public CompletableFuture<?> run(CachedOutput cache)
 	{
-		Path outputPath = this.generator.getOutputFolder();
+		try
+		{
+		Path outputPath = this.generator.getPackOutput().getOutputFolder();
 		Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 		Path oldLangPath = outputPath.getParent().resolve("resources").resolve("assets/ic2/lang_ic2");
 		Files.walk(oldLangPath, 1)
@@ -146,8 +151,8 @@ public class OldToNewLangConverter implements DataProvider
 								}
 							);
 							newLangGenerator.generate();
-							list.removeIf(pairx -> pairx.left().startsWith("item.") && !Registry.ITEM.containsKey(extractIdentifier(pairx.left())));
-							list.removeIf(pairx -> pairx.left().startsWith("block.") && !Registry.BLOCK.containsKey(extractIdentifier(pairx.left())));
+							list.removeIf(pairx -> pairx.left().startsWith("item.") && !BuiltInRegistries.ITEM.containsKey(extractIdentifier(pairx.left())));
+							list.removeIf(pairx -> pairx.left().startsWith("block.") && !BuiltInRegistries.BLOCK.containsKey(extractIdentifier(pairx.left())));
 							list.addAll(
 								list.stream()
 									.filter(pairx -> pairx.left().startsWith("block.") && pairx.left().split("[.]").length == 3)
@@ -161,7 +166,7 @@ public class OldToNewLangConverter implements DataProvider
 									.filter(
 										pairx ->
 										{
-											if (Registry.MENU.containsKey(extractIdentifier(pairx.left())))
+											if (BuiltInRegistries.MENU.containsKey(extractIdentifier(pairx.left())))
 											{
 												return true;
 											}
@@ -195,9 +200,9 @@ public class OldToNewLangConverter implements DataProvider
 									.toList()
 							);
 							list.sort(
-								((Comparator<Pair<String, String>>) (o1, o2) -> tryCompareByRawId(o1, o2, "block", Registry.BLOCK))
-									.thenComparing((o1, o2) -> tryCompareByRawId(o1, o2, "item", Registry.ITEM))
-									.thenComparing((o1, o2) -> tryCompareByRawId(o1, o2, "container", Registry.BLOCK))
+								((Comparator<Pair<String, String>>) (o1, o2) -> tryCompareByRawId(o1, o2, "block", BuiltInRegistries.BLOCK))
+									.thenComparing((o1, o2) -> tryCompareByRawId(o1, o2, "item", BuiltInRegistries.ITEM))
+									.thenComparing((o1, o2) -> tryCompareByRawId(o1, o2, "container", BuiltInRegistries.BLOCK))
 									.thenComparing(pairx -> pairx.left())
 							);
 							JsonObject newLang = new JsonObject();
@@ -215,6 +220,12 @@ public class OldToNewLangConverter implements DataProvider
 					}
 				}
 			);
+		return CompletableFuture.allOf();
+		}
+		catch (IOException e)
+		{
+			throw new RuntimeException(e);
+		}
 	}
 
 	private static void writeToPath(CachedOutput writer, JsonElement json, Path path) throws IOException
@@ -655,9 +666,9 @@ public class OldToNewLangConverter implements DataProvider
 		map.put("cable.glass_cable", "block.ic2.glass_fibre_cable");
 		map.put("cable.tooltip.loss ", "ic2.cable.tooltip.loss");
 
-		for (Block block : Registry.BLOCK)
+		for (Block block : BuiltInRegistries.BLOCK)
 		{
-			ResourceLocation id = Registry.BLOCK.getKey(block);
+			ResourceLocation id = BuiltInRegistries.BLOCK.getKey(block);
 			if (id.getNamespace().equals("ic2"))
 			{
 				String name = id.getPath();

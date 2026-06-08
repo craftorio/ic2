@@ -283,7 +283,7 @@ public final class StackUtil
 
 	public static boolean checkItemEqualityStrict(ItemStack a, ItemStack b)
 	{
-		return isEmpty(a) && isEmpty(b) || !isEmpty(a) && !isEmpty(b) && a.sameItem(b) && checkNbtEqualityStrict(a, b);
+		return isEmpty(a) && isEmpty(b) || !isEmpty(a) && !isEmpty(b) && ItemStack.isSameItem(a, b) && checkNbtEqualityStrict(a, b);
 	}
 
 	private static boolean checkNbtEquality(ItemStack a, ItemStack b)

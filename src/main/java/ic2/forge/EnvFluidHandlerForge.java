@@ -15,6 +15,7 @@ import java.util.function.Consumer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BucketItem;
@@ -26,7 +27,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.material.Material;
 import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fluids.FluidStack;
@@ -48,7 +48,6 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 	@Override
 	public EnvFluidHandler.FluidRefs createFluid(
 		ResourceLocation id,
-		Material material,
 		int density,
 		int viscosity,
 		int luminosity,
@@ -95,7 +94,7 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 			.bucket(() -> res.get().bucket());
 		Fluid still = new ForgeFlowingFluid.Source(properties);
 		Fluid flowing = flowingSpriteId != null ? new ForgeFlowingFluid.Flowing(properties) : null;
-		BucketItem bucket = new BucketItem(() -> still, new Properties().craftRemainder(Items.BUCKET).stacksTo(1).tab(IC2.tabIc2ToolsAndUtilities));
+		BucketItem bucket = new BucketItem(() -> still, new Properties().craftRemainder(Items.BUCKET).stacksTo(1));
 		EnvFluidHandler.FluidRefs ret = new EnvFluidHandler.FluidRefs(null, still, flowing, bucket);
 		res.set(ret);
 		ForgeRegistries.FLUID_TYPES.get().register(id, fluidType);
@@ -404,7 +403,7 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 						LogCategory.Item,
 						"Fluid handler %s for item %s yielded null container",
 						handler.getClass().getName(),
-						Registry.ITEM.getKey(((ItemStack) out.getValue()).getItem())
+						BuiltInRegistries.ITEM.getKey(((ItemStack) out.getValue()).getItem())
 					);
 			} else
 			{

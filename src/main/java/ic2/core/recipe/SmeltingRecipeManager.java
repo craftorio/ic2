@@ -11,6 +11,7 @@ import ic2.core.util.StackUtil;
 import java.util.Collection;
 import java.util.Collections;
 
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
@@ -30,7 +31,7 @@ public class SmeltingRecipeManager implements IMachineRecipeManager<ItemStack, I
 			return null;
 		}
 
-		ItemStack output = recipe.getResultItem();
+		ItemStack output = recipe.getResultItem((RegistryAccess) null);
 		if (StackUtil.isEmpty(output))
 		{
 			return null;

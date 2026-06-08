@@ -1,7 +1,7 @@
 package ic2.core.block.machine.gui;
 
 import com.google.common.base.Supplier;
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.IC2;
 import ic2.core.Ic2Gui;
 import ic2.core.block.machine.container.ContainerCanner;
@@ -78,30 +78,30 @@ public class GuiCanner extends Ic2Gui<ContainerCanner>
 	}
 
 	@Override
-	protected void renderBg(PoseStack matrices, float delta, int mouseX, int mouseY)
+	protected void renderBg(GuiGraphics guiGraphics, float delta, int mouseX, int mouseY)
 	{
-		super.renderBg(matrices, delta, mouseX, mouseY);
+		super.renderBg(guiGraphics, delta, mouseX, mouseY);
 		this.bindTexture();
 		switch (((ContainerCanner) this.menu).base.getMode())
 		{
 			case BottleSolid:
-				this.drawTexturedRect(matrices, 59.0, 53.0, 9.0, 18.0, 3.0, 4.0);
-				this.drawTexturedRect(matrices, 99.0, 53.0, 18.0, 23.0, 3.0, 4.0);
+				this.drawTexturedRect(guiGraphics.pose(), 59.0, 53.0, 9.0, 18.0, 3.0, 4.0);
+				this.drawTexturedRect(guiGraphics.pose(), 99.0, 53.0, 18.0, 23.0, 3.0, 4.0);
 				break;
 			case EmptyLiquid:
-				this.drawTexturedRect(matrices, 71.0, 43.0, 26.0, 18.0, 196.0, 0.0);
-				this.drawTexturedRect(matrices, 59.0, 53.0, 9.0, 18.0, 3.0, 4.0);
+				this.drawTexturedRect(guiGraphics.pose(), 71.0, 43.0, 26.0, 18.0, 196.0, 0.0);
+				this.drawTexturedRect(guiGraphics.pose(), 59.0, 53.0, 9.0, 18.0, 3.0, 4.0);
 				break;
 			case BottleLiquid:
-				this.drawTexturedRect(matrices, 99.0, 53.0, 18.0, 23.0, 3.0, 4.0);
-				this.drawTexturedRect(matrices, 71.0, 43.0, 26.0, 18.0, 196.0, 0.0);
+				this.drawTexturedRect(guiGraphics.pose(), 99.0, 53.0, 18.0, 23.0, 3.0, 4.0);
+				this.drawTexturedRect(guiGraphics.pose(), 71.0, 43.0, 26.0, 18.0, 196.0, 0.0);
 			case EnrichLiquid:
 		}
 
 		int progressSize = Math.round(((ContainerCanner) this.menu).base.getProgress() * 23.0F);
 		if (progressSize > 0)
 		{
-			this.drawTexturedRect(matrices, 74.0, 22.0, progressSize, 14.0, 233.0, 0.0);
+			this.drawTexturedRect(guiGraphics.pose(), 74.0, 22.0, progressSize, 14.0, 233.0, 0.0);
 		}
 	}
 

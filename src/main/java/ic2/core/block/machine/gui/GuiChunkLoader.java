@@ -1,6 +1,6 @@
 package ic2.core.block.machine.gui;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.IC2;
 import ic2.core.Ic2Gui;
 import ic2.core.block.machine.container.ContainerChunkLoader;
@@ -18,7 +18,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.levelgen.Heightmap.Types;
-import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.level.material.MapColor;
 
 public class GuiChunkLoader extends Ic2Gui<ContainerChunkLoader>
 {
@@ -37,7 +37,7 @@ public class GuiChunkLoader extends Ic2Gui<ContainerChunkLoader>
 	}
 
 	@Override
-	protected void drawForegroundLayer(PoseStack matrices, int mouseX, int mouseY)
+	protected void drawForegroundLayer(GuiGraphics guiGraphics, int mouseX, int mouseY)
 	{
 		ChunkPos mainChunk = new ChunkPos(((ContainerChunkLoader) this.menu).base.getBlockPos());
 		LongSet loadedChunks = ((ContainerChunkLoader) this.menu).base.getLoadedChunks();
@@ -50,23 +50,23 @@ public class GuiChunkLoader extends Ic2Gui<ContainerChunkLoader>
 				ChunkPos currentChunk = new ChunkPos(mainChunk.x + i, mainChunk.z + j);
 				int xpos = -this.leftPos + 89 + 16 * i;
 				int ypos = -this.topPos + 80 + 16 * j;
-				this.drawChunkAt(matrices, xpos, ypos, currentChunk);
+				this.drawChunkAt(guiGraphics, xpos, ypos, currentChunk);
 				if (loadedChunks.contains(currentChunk.toLong()))
 				{
-					this.drawColoredRect(matrices, xpos, ypos, 16, 16, 805371648);
+					this.drawColoredRect(guiGraphics.pose(), xpos, ypos, 16, 16, 805371648);
 					amountLoadedChunks++;
 				} else
 				{
-					this.drawColoredRect(matrices, xpos, ypos, 16, 16, 822018048);
+					this.drawColoredRect(guiGraphics.pose(), xpos, ypos, 16, 16, 822018048);
 				}
 			}
 		}
 
-		this.drawTrimmedString(matrices, 8, 58, amountLoadedChunks + " / " + ((ContainerChunkLoader) this.menu).base.getMaxChunks(), 15, 4210752);
-		super.drawForegroundLayer(matrices, mouseX, mouseY);
+		this.drawTrimmedString(guiGraphics, 8, 58, amountLoadedChunks + " / " + ((ContainerChunkLoader) this.menu).base.getMaxChunks(), 15, 4210752);
+		super.drawForegroundLayer(guiGraphics, mouseX, mouseY);
 	}
 
-	private void drawChunkAt(PoseStack matrices, int x, int y, ChunkPos chunkPos)
+	private void drawChunkAt(GuiGraphics guiGraphics, int x, int y, ChunkPos chunkPos)
 	{
 		Level world = ((ContainerChunkLoader) this.menu).base.getLevel();
 		LevelChunk chunk = world.getChunk(chunkPos.x, chunkPos.z);
@@ -84,14 +84,14 @@ public class GuiChunkLoader extends Ic2Gui<ContainerChunkLoader>
 					state = chunk.getBlockState(worldPos);
 				}
 
-				this.drawColoredRect(matrices, x + cx, y + cz, 1, 1, this.getColor(state, world, worldPos));
+				this.drawColoredRect(guiGraphics.pose(), x + cx, y + cz, 1, 1, this.getColor(state, world, worldPos));
 			}
 		}
 	}
 
 	private int getColor(BlockState state, Level world, BlockPos pos)
 	{
-		MaterialColor color = state.getMapColor(world, pos);
+		MapColor color = state.getMapColor(world, pos);
 		if (color == null)
 		{
 			IC2.log.error(LogCategory.General, "BlockState " + state + " does not have a MapColor set. Please report to the mod author of that mod.");

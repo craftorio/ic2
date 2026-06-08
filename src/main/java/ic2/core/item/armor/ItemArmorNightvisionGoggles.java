@@ -68,7 +68,7 @@ public class ItemArmorNightVisionGoggles extends ItemArmorUtility implements IEl
 		super.inventoryTick(stack, world, entity, slot, selected);
 		if (entity instanceof Player player)
 		{
-			if (slot == this.slot.getIndex())
+			if (slot == this.getEquipmentSlot().getIndex())
 			{
 				CompoundTag nbtData = StackUtil.getOrCreateNbtData(stack);
 				boolean active = nbtData.getBoolean("active");
@@ -97,7 +97,7 @@ public class ItemArmorNightVisionGoggles extends ItemArmorUtility implements IEl
 
 				if (active && IC2.sideProxy.isSimulating())
 				{
-					int skylight = player.getCommandSenderWorld().getMaxLocalRawBrightness(new BlockPos(player.position()));
+					int skylight = player.getCommandSenderWorld().getMaxLocalRawBrightness(BlockPos.containing(player.position()));
 					if (skylight <= 8 && ElectricItem.manager.use(stack, 1.0, player))
 					{
 						player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 300, 0, true, true));
@@ -115,7 +115,7 @@ public class ItemArmorNightVisionGoggles extends ItemArmorUtility implements IEl
 
 	public void fillItemCategory(CreativeModeTab tab, NonNullList<ItemStack> subItems)
 	{
-		if (this.allowedIn(tab))
+		if (true)
 		{
 			ElectricItemManager.addChargeVariants(this, subItems);
 		}

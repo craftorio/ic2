@@ -167,11 +167,14 @@ public class TileEntitySteamRepressurizer extends TileEntityInventory implements
 		Fluid ret = detectedSteamFluid;
 		if (ret == null)
 		{
-			Iterator var1 = Registry.FLUID.getTagOrEmpty(Ic2FluidTags.STEAM).iterator();
-			if (var1.hasNext())
+			var tag = net.minecraft.core.registries.BuiltInRegistries.FLUID.getTag(Ic2FluidTags.STEAM);
+			if (tag.isPresent())
 			{
-				Holder<Fluid> entry = (Holder<Fluid>) var1.next();
-				detectedSteamFluid = ret = (Fluid) entry.value();
+				for (Holder<Fluid> entry : tag.get())
+				{
+					detectedSteamFluid = ret = entry.value();
+					break;
+				}
 			}
 		}
 

@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.List;
 
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
@@ -168,7 +169,7 @@ public class RecipeIo
 	public static JsonObject resultToJson(ItemStack stack)
 	{
 		JsonObject json = new JsonObject();
-		json.addProperty("item", Registry.ITEM.getKey(stack.getItem()).toString());
+		json.addProperty("item", BuiltInRegistries.ITEM.getKey(stack.getItem()).toString());
 		if (stack.getCount() != 1)
 		{
 			json.addProperty("count", stack.getCount());
@@ -180,7 +181,7 @@ public class RecipeIo
 	public static JsonObject resultToJson(WeightedMachineRecipeGenerator.WeightedItemStack stack)
 	{
 		JsonObject json = new JsonObject();
-		json.addProperty("item", Registry.ITEM.getKey(stack.itemStack.getItem()).toString());
+		json.addProperty("item", BuiltInRegistries.ITEM.getKey(stack.itemStack.getItem()).toString());
 		if (stack.itemStack.getCount() != 1)
 		{
 			json.addProperty("count", stack.itemStack.getCount());
@@ -193,7 +194,7 @@ public class RecipeIo
 	public static JsonObject fluidStackToJson(Ic2FluidStack stack)
 	{
 		JsonObject json = new JsonObject();
-		json.addProperty("fluid", Registry.FLUID.getKey(stack.getFluid()).toString());
+		json.addProperty("fluid", BuiltInRegistries.FLUID.getKey(stack.getFluid()).toString());
 		json.addProperty("amount", stack.getAmountMb());
 		return json;
 	}
@@ -203,7 +204,7 @@ public class RecipeIo
 		if (input instanceof RecipeInputFluidContainer fluidContainer)
 		{
 			buf.writeByte(0);
-			buf.writeVarInt(Registry.FLUID.getId(fluidContainer.fluid));
+			buf.writeVarInt(BuiltInRegistries.FLUID.getId(fluidContainer.fluid));
 			buf.writeVarInt(fluidContainer.amount);
 		} else if (input instanceof RecipeInputIngredient ingredient)
 		{
@@ -237,7 +238,7 @@ public class RecipeIo
 	{
 		return switch (buf.readByte())
 		{
-			case 0 -> new RecipeInputFluidContainer(Registry.FLUID.byId(buf.readVarInt()), buf.readVarInt());
+			case 0 -> new RecipeInputFluidContainer(BuiltInRegistries.FLUID.byId(buf.readVarInt()), buf.readVarInt());
 			case 1 -> new RecipeInputIngredient(Ingredient.fromNetwork(buf), buf.readVarInt());
 			case 2 -> new RecipeInputItemStack(buf.readItem());
 			case 3 ->
@@ -315,13 +316,13 @@ public class RecipeIo
 
 	public static void writeFluidStack(FriendlyByteBuf buf, Ic2FluidStack stack)
 	{
-		buf.writeVarInt(Registry.FLUID.getId(stack.getFluid()));
+		buf.writeVarInt(BuiltInRegistries.FLUID.getId(stack.getFluid()));
 		buf.writeVarInt(stack.getAmountMb());
 	}
 
 	public static Ic2FluidStack readFluidStack(FriendlyByteBuf buf)
 	{
-		return FluidHandler.createFluidStackMb(Registry.FLUID.byId(buf.readVarInt()), buf.readVarInt(), null);
+		return FluidHandler.createFluidStackMb(BuiltInRegistries.FLUID.byId(buf.readVarInt()), buf.readVarInt(), null);
 	}
 
 	private static Fluid asFluid(JsonElement element, String name)
@@ -329,7 +330,7 @@ public class RecipeIo
 		if (element.isJsonPrimitive())
 		{
 			String string = element.getAsString();
-			return Registry.FLUID
+			return BuiltInRegistries.FLUID
 				// TODO
 				.getOptional(ResourceLocation.parse(string))
 				.orElseThrow(() -> new JsonSyntaxException("Expected " + name + " to be an fluid, was unknown string '" + string + "'"));

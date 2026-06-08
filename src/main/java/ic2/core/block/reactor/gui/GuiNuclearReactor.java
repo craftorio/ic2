@@ -1,7 +1,7 @@
 package ic2.core.block.reactor.gui;
 
 import com.google.common.base.Supplier;
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.Ic2Gui;
 import ic2.core.block.reactor.container.ContainerNuclearReactor;
 import ic2.core.gui.Area;
@@ -96,9 +96,9 @@ public class GuiNuclearReactor extends Ic2Gui<ContainerNuclearReactor>
 	}
 
 	@Override
-	protected void renderBg(PoseStack matrices, float delta, int mouseX, int mouseY)
+	protected void renderBg(GuiGraphics guiGraphics, float delta, int mouseX, int mouseY)
 	{
-		super.renderBg(matrices, delta, mouseX, mouseY);
+		super.renderBg(guiGraphics, delta, mouseX, mouseY);
 		int size = ((ContainerNuclearReactor) this.menu).base.getReactorSize();
 		int startX = 26;
 		int startY = 25;
@@ -108,20 +108,20 @@ public class GuiNuclearReactor extends Ic2Gui<ContainerNuclearReactor>
 		{
 			for (int x = size; x < 9; x++)
 			{
-				this.drawTexturedRect(matrices, 26 + x * 18, 25 + y * 18, 16.0, 16.0, 213.0, 1.0);
+				this.drawTexturedRect(guiGraphics.pose(), 26 + x * 18, 25 + y * 18, 16.0, 16.0, 213.0, 1.0);
 			}
 		}
 
 		if (((ContainerNuclearReactor) this.menu).base.isFluidCooled())
 		{
 			int heat = ((ContainerNuclearReactor) this.menu).base.gaugeHeatScaled(160);
-			this.drawTexturedRect(matrices, 186 - heat, 23.0, 0.0, 243.0, heat, 2.0);
-			this.drawTexturedRect(matrices, 186 - heat, 41.0, 0.0, 243.0, heat, 2.0);
-			this.drawTexturedRect(matrices, 186 - heat, 59.0, 0.0, 243.0, heat, 2.0);
-			this.drawTexturedRect(matrices, 186 - heat, 77.0, 0.0, 243.0, heat, 2.0);
-			this.drawTexturedRect(matrices, 186 - heat, 95.0, 0.0, 243.0, heat, 2.0);
-			this.drawTexturedRect(matrices, 186 - heat, 113.0, 0.0, 243.0, heat, 2.0);
-			this.drawTexturedRect(matrices, 186 - heat, 131.0, 0.0, 243.0, heat, 2.0);
+			this.drawTexturedRect(guiGraphics.pose(), 186 - heat, 23.0, 0.0, 243.0, heat, 2.0);
+			this.drawTexturedRect(guiGraphics.pose(), 186 - heat, 41.0, 0.0, 243.0, heat, 2.0);
+			this.drawTexturedRect(guiGraphics.pose(), 186 - heat, 59.0, 0.0, 243.0, heat, 2.0);
+			this.drawTexturedRect(guiGraphics.pose(), 186 - heat, 77.0, 0.0, 243.0, heat, 2.0);
+			this.drawTexturedRect(guiGraphics.pose(), 186 - heat, 95.0, 0.0, 243.0, heat, 2.0);
+			this.drawTexturedRect(guiGraphics.pose(), 186 - heat, 113.0, 0.0, 243.0, heat, 2.0);
+			this.drawTexturedRect(guiGraphics.pose(), 186 - heat, 131.0, 0.0, 243.0, heat, 2.0);
 		}
 	}
 

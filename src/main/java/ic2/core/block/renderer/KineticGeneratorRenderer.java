@@ -1,7 +1,8 @@
 package ic2.core.block.renderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Vector3f;
+import org.joml.Vector3f;
+import com.mojang.math.Axis;
 import ic2.api.tile.IRotorProvider;
 import it.unimi.dsi.fastutil.ints.Int2ReferenceMap;
 import it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap;
@@ -70,19 +71,19 @@ public class KineticGeneratorRenderer<T extends BlockEntity & IRotorProvider> im
 			switch (facing)
 			{
 				case NORTH:
-					matrices.mulPose(Vector3f.YP.rotationDegrees(-90.0F));
+					matrices.mulPose(Axis.YP.rotationDegrees(-90.0F));
 					break;
 				case EAST:
-					matrices.mulPose(Vector3f.YP.rotationDegrees(-180.0F));
+					matrices.mulPose(Axis.YP.rotationDegrees(-180.0F));
 					break;
 				case SOUTH:
-					matrices.mulPose(Vector3f.YP.rotationDegrees(-270.0F));
+					matrices.mulPose(Axis.YP.rotationDegrees(-270.0F));
 					break;
 				case UP:
-					matrices.mulPose(Vector3f.ZP.rotationDegrees(-90.0F));
+					matrices.mulPose(Axis.ZP.rotationDegrees(-90.0F));
 			}
 
-			matrices.mulPose(Vector3f.XP.rotationDegrees(angle));
+			matrices.mulPose(Axis.XP.rotationDegrees(angle));
 			matrices.translate(-0.2, 0.0, 0.0);
 			light = LevelRenderer.getLightColor(windGen.getLevel(), windGen.getBlockPos().relative(facing));
 			model.render(matrices, vertexConsumers.getBuffer(RenderType.entitySolid(rotorRL)), light, overlay);

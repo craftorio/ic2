@@ -1,7 +1,7 @@
 package ic2.core.ref;
 
 import ic2.core.IC2;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
@@ -16,12 +16,12 @@ public class Ic2EntityTags
 
 	private static TagKey<EntityType<?>> create(String name)
 	{
-		return TagKey.create(Registry.ENTITY_TYPE_REGISTRY, IC2.getIdentifier(name));
+		return TagKey.create(Registries.ENTITY_TYPE, IC2.getIdentifier(name));
 	}
 
 	private static TagKey<EntityType<?>> create(String fabricName, String forgeName)
 	{
 		ResourceLocation id = ResourceLocation.parse(IC2.envProxy.isFabricEnv() ? fabricName : forgeName);
-		return TagKey.create(Registry.ENTITY_TYPE_REGISTRY, id);
+		return TagKey.create(Registries.ENTITY_TYPE, id);
 	}
 }

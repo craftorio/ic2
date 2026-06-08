@@ -39,9 +39,8 @@ public abstract class AbstractBoatEntity extends Boat
 		this.zo = z;
 	}
 
-	public void setType(Type type)
+	public void setBoatType(Type type)
 	{
-		super.setType(Type.OAK);
 	}
 
 	public ItemStack getExtraDropItemStack()
@@ -63,17 +62,12 @@ public abstract class AbstractBoatEntity extends Boat
 
 	protected SoundEvent getPaddleSound()
 	{
-		switch (this.checkLocation())
+		return switch (this.checkLocation())
 		{
-			case IN_WATER:
-			case UNDER_WATER:
-			case UNDER_FLOWING_WATER:
-				return SoundEvents.BOAT_PADDLE_WATER;
-			case ON_LAND:
-				return SoundEvents.BOAT_PADDLE_LAND;
-			default:
-				return null;
-		}
+			case IN_WATER, UNDER_WATER, UNDER_FLOWING_WATER -> SoundEvents.BOAT_PADDLE_WATER;
+			case ON_LAND -> SoundEvents.BOAT_PADDLE_LAND;
+			default -> null;
+		};
 	}
 
 	private Status checkLocation()
@@ -138,10 +132,10 @@ public abstract class AbstractBoatEntity extends Boat
 					for (int q = m; q < n; q++)
 					{
 						mutable.set(o, p, q);
-						FluidState fluidState = this.level.getFluidState(mutable);
+						FluidState fluidState = this.level().getFluidState(mutable);
 						if (this.canFloatOn(fluidState))
 						{
-							float f = p + fluidState.getHeight(this.level, mutable);
+							float f = p + fluidState.getHeight(this.level(), mutable);
 							waterLevelField.set(this, Math.max(f, (Double) waterLevelField.get(this)));
 							bl |= box.minY < f;
 						}
@@ -176,8 +170,8 @@ public abstract class AbstractBoatEntity extends Boat
 				for (int q = m; q < n; q++)
 				{
 					mutable.set(o, p, q);
-					FluidState fluidState = this.level.getFluidState(mutable);
-					if (this.canFloatOn(fluidState) && d < mutable.getY() + fluidState.getHeight(this.level, mutable))
+					FluidState fluidState = this.level().getFluidState(mutable);
+					if (this.canFloatOn(fluidState) && d < mutable.getY() + fluidState.getHeight(this.level(), mutable))
 					{
 						if (!fluidState.isSource())
 						{
@@ -220,10 +214,10 @@ public abstract class AbstractBoatEntity extends Boat
 					for (int q = m; q < n; q++)
 					{
 						mutable.set(p, o, q);
-						FluidState fluidState = this.level.getFluidState(mutable);
+						FluidState fluidState = this.level().getFluidState(mutable);
 						if (this.canFloatOn(fluidState))
 						{
-							f = Math.max(f, fluidState.getHeight(this.level, mutable));
+							f = Math.max(f, fluidState.getHeight(this.level(), mutable));
 						}
 
 						if (f >= 1.0F)
@@ -267,7 +261,7 @@ public abstract class AbstractBoatEntity extends Boat
 
 	public ItemEntity spawnAtLocation(ItemLike item)
 	{
-		if (item == this.getBoatType().getPlanks())
+		if (item == this.getOverrideBoatType().getBaseItem())
 		{
 			return this.spawnAtLocation(new ItemStack(this.getOverrideBoatType().getBaseItem()));
 		} else if (item == Items.STICK && !this.isExtraItemDropped)

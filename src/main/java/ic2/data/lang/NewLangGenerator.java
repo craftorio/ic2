@@ -1,14 +1,12 @@
 package ic2.data.lang;
 
-import ic2.core.IC2;
 import ic2.core.ref.Ic2Blocks;
 import ic2.core.ref.Ic2Items;
 import it.unimi.dsi.fastutil.Pair;
 
 import java.util.List;
 
-import net.minecraft.core.Registry;
-import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 
@@ -50,14 +48,14 @@ public class NewLangGenerator
 					.appendItemText(Ic2Items.RAW_LEAD, "粗铅")
 					.appendItemText(Ic2Items.RAW_TIN, "粗锡")
 					.appendItemText(Ic2Items.RAW_URANIUM, "粗铀")
-					.appendItemGroupText(IC2.tabIc2General, "工业2常规")
-					.appendItemGroupText(IC2.tabIc2GeneratorsAndWiring, "工业2发电机与线路")
-					.appendItemGroupText(IC2.tabIc2Machines, "工业2机器")
-					.appendItemGroupText(IC2.tabIc2Farming, "工业2农业")
-					.appendItemGroupText(IC2.tabIc2ToolsAndUtilities, "工业2工具与实用物品")
-					.appendItemGroupText(IC2.tabIc2Combat, "工业2战斗用品")
-					.appendItemGroupText(IC2.tabIc2Materials, "工业2原材料")
-					.appendItemGroupText(IC2.tabIc2Reactor, "工业2反应堆");
+					.appendItemGroupText("ic2.general", "工业2常规")
+					.appendItemGroupText("ic2.generators_and_wiring", "工业2发电机与线路")
+					.appendItemGroupText("ic2.machines", "工业2机器")
+					.appendItemGroupText("ic2.farming", "工业2农业")
+					.appendItemGroupText("ic2.tools_and_utilities", "工业2工具与实用物品")
+					.appendItemGroupText("ic2.combat", "工业2战斗用品")
+					.appendItemGroupText("ic2.materials", "工业2原材料")
+					.appendItemGroupText("ic2.reactor", "工业2反应堆");
 				break;
 			case "en_us":
 				this.appendBlockText(Ic2Blocks.STRIPPED_RUBBER_WOOD, "Stripped Rubber Wood")
@@ -82,14 +80,14 @@ public class NewLangGenerator
 					.appendItemText(Ic2Items.RAW_LEAD, "Raw Lead")
 					.appendItemText(Ic2Items.RAW_TIN, "Raw Tin")
 					.appendItemText(Ic2Items.RAW_URANIUM, "Raw Uranium")
-					.appendItemGroupText(IC2.tabIc2General, "IC2 General")
-					.appendItemGroupText(IC2.tabIc2GeneratorsAndWiring, "IC2 Generators And Wiring")
-					.appendItemGroupText(IC2.tabIc2Machines, "IC2 Machines")
-					.appendItemGroupText(IC2.tabIc2Farming, "IC2 Farming")
-					.appendItemGroupText(IC2.tabIc2ToolsAndUtilities, "IC2 Tools And Utilities")
-					.appendItemGroupText(IC2.tabIc2Combat, "IC2 Combat")
-					.appendItemGroupText(IC2.tabIc2Materials, "IC2 Materials")
-					.appendItemGroupText(IC2.tabIc2Reactor, "IC2 Reactor");
+					.appendItemGroupText("ic2.general", "IC2 General")
+					.appendItemGroupText("ic2.generators_and_wiring", "IC2 Generators And Wiring")
+					.appendItemGroupText("ic2.machines", "IC2 Machines")
+					.appendItemGroupText("ic2.farming", "IC2 Farming")
+					.appendItemGroupText("ic2.tools_and_utilities", "IC2 Tools And Utilities")
+					.appendItemGroupText("ic2.combat", "IC2 Combat")
+					.appendItemGroupText("ic2.materials", "IC2 Materials")
+					.appendItemGroupText("ic2.reactor", "IC2 Reactor");
 		}
 	}
 
@@ -124,19 +122,18 @@ public class NewLangGenerator
 
 	private NewLangGenerator appendBlockText(Block block, String text)
 	{
-		String blockKey = Registry.BLOCK.getKey(block).toLanguageKey();
+		String blockKey = BuiltInRegistries.BLOCK.getKey(block).toLanguageKey();
 		return this.append("block." + blockKey, text);
 	}
 
 	private NewLangGenerator appendItemText(Item item, String text)
 	{
-		String itemKey = Registry.ITEM.getKey(item).toLanguageKey();
+		String itemKey = BuiltInRegistries.ITEM.getKey(item).toLanguageKey();
 		return this.append("item." + itemKey, text);
 	}
 
-	private NewLangGenerator appendItemGroupText(CreativeModeTab group, String text)
+	private NewLangGenerator appendItemGroupText(String groupKey, String text)
 	{
-		String groupKey = group.getRecipeFolderName();
 		return this.append("itemGroup." + groupKey, text);
 	}
 }

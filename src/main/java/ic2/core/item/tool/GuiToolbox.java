@@ -1,6 +1,6 @@
 package ic2.core.item.tool;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.Ic2Gui;
 import ic2.core.gui.TextLabel;
 import ic2.core.ref.Ic2Items;
@@ -19,10 +19,10 @@ public class GuiToolbox extends Ic2Gui<ContainerToolbox>
 	}
 
 	@Override
-	protected void drawBackgroundAndTitle(PoseStack matrices, float partialTicks, int mouseX, int mouseY)
+	protected void drawBackgroundAndTitle(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY)
 	{
 		this.bindTexture();
-		this.blit(matrices, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
+		guiGraphics.blit(this.getTextureLocation(), this.leftPos, this.topPos, 0.0F, 0.0F, this.imageWidth, this.imageHeight, 256, 256);
 	}
 
 	@Override

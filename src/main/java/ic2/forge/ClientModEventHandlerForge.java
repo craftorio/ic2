@@ -91,11 +91,11 @@ public final class ClientModEventHandlerForge
 	@SubscribeEvent
 	public void onClientSetup(FMLClientSetupEvent event)
 	{
+		// Render layers are now defined through blockstate JSON models in 1.20.1
 		for (ClientEnvProxyForge.BlockLayerRegistration registration : ClientEnvProxyForge.blockLayerRegistrations)
 		{
 			for (Block block : registration.blocks())
 			{
-				ItemBlockRenderTypes.setRenderLayer(block, registration.layer());
 			}
 		}
 	}

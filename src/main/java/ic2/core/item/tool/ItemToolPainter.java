@@ -13,6 +13,7 @@ import java.util.List;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -208,7 +209,7 @@ public class ItemToolPainter extends ItemToolCrafting implements IBoxable
 				return true;
 			} else
 			{
-				ResourceLocation identifier = Registry.BLOCK.getKey(block);
+				ResourceLocation identifier = BuiltInRegistries.BLOCK.getKey(block);
 				if (identifier.getNamespace().equals("minecraft") && identifier.getPath().contains("concrete"))
 				{
 					world.setBlockAndUpdate(pos, getColorBlockState(color.dyeColor, VanillaColorBlockId.CONCRETE));
@@ -223,20 +224,20 @@ public class ItemToolPainter extends ItemToolCrafting implements IBoxable
 
 	public static boolean canColor(Block block, DyeColor color)
 	{
-		ResourceLocation identifier = Registry.BLOCK.getKey(block);
+		ResourceLocation identifier = BuiltInRegistries.BLOCK.getKey(block);
 		return !identifier.getPath().contains(color.getName());
 	}
 
 	public static BlockState getColorBlockState(DyeColor color, VanillaColorBlockId vanillaColorBlock)
 	{
 		ResourceLocation identifier = ResourceLocation.fromNamespaceAndPath("minecraft", color.getName() + "_" + vanillaColorBlock.id);
-		return ((Block) Registry.BLOCK.get(identifier)).defaultBlockState();
+		return ((Block) BuiltInRegistries.BLOCK.get(identifier)).defaultBlockState();
 	}
 
 	public static BlockState getBlockStateWithProperties(DyeColor color, VanillaColorBlockId vanillaColorBlock, BlockState state)
 	{
 		ResourceLocation identifier = ResourceLocation.fromNamespaceAndPath("minecraft", color.getName() + "_" + vanillaColorBlock.id);
-		return ((Block) Registry.BLOCK.get(identifier)).withPropertiesOf(state);
+		return ((Block) BuiltInRegistries.BLOCK.get(identifier)).withPropertiesOf(state);
 	}
 
 	public InteractionResult interactLivingEntity(ItemStack stack, Player user, LivingEntity entity, InteractionHand hand)

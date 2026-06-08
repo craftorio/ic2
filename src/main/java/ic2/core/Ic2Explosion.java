@@ -38,7 +38,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.loot.LootContext.Builder;
+import net.minecraft.world.level.storage.loot.LootParams.Builder;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -112,10 +112,10 @@ public class Ic2Explosion extends Explosion
 		this.areaZ = Util.roundToNegInf(z) - maxDistanceInt;
 		if (this.isNuclear())
 		{
-			this.damageSource = Ic2DamageSource.getNukeSource(igniter);
+			this.damageSource = Ic2DamageSource.getNukeSource(igniter, this.worldObj);
 		} else
 		{
-			this.damageSource = DamageSource.explosion(igniter);
+			this.damageSource = this.worldObj.damageSources().explosion(this);
 		}
 
 		this.destroyedBlockPositions = new long[this.worldMaxHeight - this.worldMinHeight][];
@@ -134,7 +134,7 @@ public class Ic2Explosion extends Explosion
 			if (IC2.envProxy.announceExplosion(this.worldObj, this.exploder, position, this.power, this.igniter, this.radiationRange, this.maxDistance))
 			{
 				int range = this.areaSize / 2;
-				BlockPos pos = new BlockPos(this.explosionX, this.explosionY, this.explosionZ);
+				BlockPos pos = new BlockPos((int) this.explosionX, (int) this.explosionY, (int) this.explosionZ);
 				BlockPos start = pos.offset(-range, -range, -range);
 				BlockPos end = pos.offset(range, range, range);
 				this.chunkCache = new PathNavigationRegion(this.worldObj, start, end);
@@ -234,11 +234,10 @@ public class Ic2Explosion extends Explosion
 				boolean doDrops = this.worldObj.getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS);
 				Map<Ic2Explosion.XZPosition, Map<ItemComparableItemStack, Ic2Explosion.DropData>> blocksToDrop = new HashMap<>();
 				Builder builder = new Builder((ServerLevel) this.worldObj)
-					.withRandom(this.worldObj.random)
 					.withParameter(LootContextParams.ORIGIN, new Vec3(this.explosionX, this.explosionY, this.explosionZ))
 					.withParameter(LootContextParams.TOOL, ItemStack.EMPTY)
-					.withOptionalParameter(LootContextParams.THIS_ENTITY, this.exploder)
-					.withParameter(LootContextParams.EXPLOSION_RADIUS, this.power);
+					.withOptionalParameter(LootContextParams.THIS_ENTITY, this.exploder);
+
 
 				for (int destroyedBlockPosIndex = 0; destroyedBlockPosIndex < this.destroyedBlockPositions.length; destroyedBlockPosIndex++)
 				{

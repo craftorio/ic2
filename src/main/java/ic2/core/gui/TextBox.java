@@ -6,7 +6,7 @@ import com.mojang.blaze3d.platform.GlStateManager.LogicOp;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat.Mode;
 import ic2.core.Ic2Gui;
@@ -146,20 +146,20 @@ public class TextBox extends GuiElement<TextBox>
 	}
 
 	@Override
-	public void drawBackground(PoseStack matrices, int mouseX, int mouseY)
+	public void drawBackground(GuiGraphics guiGraphics, int mouseX, int mouseY)
 	{
-		super.drawBackground(matrices, mouseX, mouseY);
+		super.drawBackground(guiGraphics, mouseX, mouseY);
 		if (this.drawBackground)
 		{
-			this.gui.drawColoredRect(matrices, this.x - 1, this.y - 1, this.width + 2, this.height + 2, -6250336);
-			this.gui.drawColoredRect(matrices, this.x, this.y, this.width, this.height, -16777216);
+			this.gui.drawColoredRect(guiGraphics.pose(), this.x - 1, this.y - 1, this.width + 2, this.height + 2, -6250336);
+			this.gui.drawColoredRect(guiGraphics.pose(), this.x, this.y, this.width, this.height, -16777216);
 		}
 	}
 
 	@Override
-	public void drawForeground(PoseStack matrices, int mouseX, int mouseY)
+	public void drawForeground(GuiGraphics guiGraphics, int mouseX, int mouseY)
 	{
-		super.drawForeground(matrices, mouseX, mouseY);
+		super.drawForeground(guiGraphics, mouseX, mouseY);
 		int colour = this.willDraw() ? 14737632 : 7368816;
 		int textOffset = this.cursor - this.scrollOffset;
 		int selectionOffset = this.selectionEnd - this.scrollOffset;
@@ -175,7 +175,7 @@ public class TextBox extends GuiElement<TextBox>
 
 		if (!text.isEmpty())
 		{
-			xPos = this.gui.drawString(matrices, xStartPos, yPos, validOffset ? text.substring(0, textOffset) : text, colour, true);
+			xPos = this.gui.drawString(guiGraphics, xStartPos, yPos, validOffset ? text.substring(0, textOffset) : text, colour, true);
 		}
 
 		boolean inStringOrFull = this.cursor < this.text.length() || this.text.length() >= this.maxTextLength;
@@ -191,17 +191,17 @@ public class TextBox extends GuiElement<TextBox>
 
 		if (!text.isEmpty() && validOffset && textOffset < text.length())
 		{
-			xPos = this.gui.drawString(matrices, xPos, yPos, text.substring(textOffset), colour, true);
+			xPos = this.gui.drawString(guiGraphics, xPos, yPos, text.substring(textOffset), colour, true);
 		}
 
 		if (this.focused && this.cursorTick / 6 % 2 == 0 && validOffset)
 		{
 			if (inStringOrFull)
 			{
-				this.gui.drawColoredRect(matrices, xCursorPos, yPos - 1, 1, 10, -3092272);
+				this.gui.drawColoredRect(guiGraphics.pose(), xCursorPos, yPos - 1, 1, 10, -3092272);
 			} else
 			{
-				this.gui.drawString(matrices, xCursorPos, yPos, "_", colour, true);
+				this.gui.drawString(guiGraphics, xCursorPos, yPos, "_", colour, true);
 			}
 		}
 
@@ -246,7 +246,6 @@ public class TextBox extends GuiElement<TextBox>
 		BufferBuilder buffer = tessellator.getBuilder();
 		RenderSystem.setShader(GameRenderer::getPositionShader);
 		RenderSystem.setShaderColor(0.0F, 0.0F, 1.0F, 1.0F);
-		RenderSystem.disableTexture();
 		RenderSystem.enableColorLogicOp();
 		RenderSystem.logicOp(LogicOp.OR_REVERSE);
 		buffer.begin(Mode.QUADS, DefaultVertexFormat.POSITION);
@@ -257,7 +256,6 @@ public class TextBox extends GuiElement<TextBox>
 		tessellator.end();
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.disableColorLogicOp();
-		RenderSystem.enableTexture();
 	}
 
 	@Override

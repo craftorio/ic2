@@ -32,7 +32,7 @@ public class NukeEntity extends ExplosiveEntity
 			ItemToolWrench wrench = (ItemToolWrench) stack.getItem();
 			if (wrench.canTakeDamage(stack, 1))
 			{
-				if (this.level.isClientSide)
+				if (this.level().isClientSide)
 				{
 					return InteractionResult.PASS;
 				}

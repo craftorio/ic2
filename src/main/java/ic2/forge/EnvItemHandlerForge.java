@@ -87,7 +87,7 @@ final class EnvItemHandlerForge implements EnvItemHandler
 		for (int i = 0; i < storage.getSlots(); i++)
 		{
 			ItemStack itemStack = storage.getStackInSlot(i);
-			if (storage.canInsertItem(i, stack) && (itemStack.isEmpty() || itemStack.sameItemStackIgnoreDurability(stack) && itemStack.getCount() < itemStack.getMaxStackSize()))
+			if (storage.canInsertItem(i, stack) && (itemStack.isEmpty() || ItemStack.isSameItemSameTags(itemStack, stack) && itemStack.getCount() < itemStack.getMaxStackSize()))
 			{
 				ItemStack remainStack = storage.insertItem(i, stack, simulate);
 				return stack.getCount() - remainStack.getCount();

@@ -8,6 +8,7 @@ import ic2.core.util.StackUtil;
 import java.util.List;
 
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.world.item.ItemStack;
 
@@ -63,7 +64,7 @@ public class RecipeInputItemStack extends RecipeInputBase
 	public JsonElement toJson()
 	{
 		JsonObject obj = new JsonObject();
-		obj.addProperty("item", Registry.ITEM.getKey(this.input.getItem()).toString());
+		obj.addProperty("item", BuiltInRegistries.ITEM.getKey(this.input.getItem()).toString());
 		obj.add("data", (JsonElement) NbtOps.INSTANCE.convertTo(JsonOps.INSTANCE, this.input.getTag()));
 		if (this.input.getCount() != 1)
 		{

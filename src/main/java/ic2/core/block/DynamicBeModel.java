@@ -8,7 +8,6 @@ import ic2.core.util.LogCategory;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.locks.StampedLock;
@@ -20,11 +19,11 @@ import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
-import net.minecraft.client.resources.model.ModelBakery;
+import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
@@ -43,8 +42,8 @@ public abstract class DynamicBeModel<T> implements UnbakedModel, BakedModel
 
 	protected DynamicBeModel(ResourceLocation id)
 	{
-		ResourceLocation blockId = ResourceLocation.fromNamespaceAndPath(id.getNamespace(), id.getPath().substring(id.getPath().lastIndexOf(47) + 1));
-		Block block = (Block) Registry.BLOCK.get(blockId);
+		ResourceLocation blockId = ResourceLocation.fromNamespaceAndPath(id.getNamespace(), id.getPath().substring(id.getPath().lastIndexOf('/') + 1));
+		Block block = (Block) BuiltInRegistries.BLOCK.get(blockId);
 		if (!(block instanceof Ic2TileEntityBlock))
 		{
 			throw new IllegalArgumentException("invalid id: " + id);
@@ -65,26 +64,18 @@ public abstract class DynamicBeModel<T> implements UnbakedModel, BakedModel
 		return ResourceLocation.fromNamespaceAndPath(this.backingModelId.getNamespace(), this.backingModelId.getPath().concat("_active"));
 	}
 
-	public Collection<Material> getMaterials(Function<ResourceLocation, UnbakedModel> unbakedModelGetter, Set<Pair<String, String>> unresolvedTextureReferences)
+	public void resolveParents(Function<ResourceLocation, UnbakedModel> resolver)
 	{
-		Set<Material> ret = new HashSet<>();
-
 		for (ResourceLocation id : this.getDependencies())
 		{
-			UnbakedModel backingModel = unbakedModelGetter.apply(id);
-			if (backingModel == null)
+			if (resolver.apply(id) == null)
 			{
 				IC2.log.warn(LogCategory.Resource, "Missing model %s", id);
-			} else
-			{
-				ret.addAll(backingModel.getMaterials(unbakedModelGetter, unresolvedTextureReferences));
 			}
 		}
-
-		return ret;
 	}
 
-	public BakedModel bake(ModelBakery loader, Function<Material, TextureAtlasSprite> textureGetter, ModelState rotationContainer, ResourceLocation modelId)
+	public BakedModel bake(ModelBaker loader, Function<Material, TextureAtlasSprite> textureGetter, ModelState rotationContainer, ResourceLocation modelId)
 	{
 		this.baseModel = loader.bake(this.backingModelId, rotationContainer);
 		if (this.baseModel == null)

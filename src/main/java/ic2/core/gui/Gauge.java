@@ -1,6 +1,6 @@
 package ic2.core.gui;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.IC2;
 import ic2.core.Ic2Gui;
 
@@ -28,7 +28,7 @@ public abstract class Gauge<T extends Gauge<T>> extends GuiElement<T>
 	}
 
 	@Override
-	public void drawBackground(PoseStack matrices, int mouseX, int mouseY)
+	public void drawBackground(GuiGraphics guiGraphics, int mouseX, int mouseY)
 	{
 		double ratio = this.getRatio();
 		if (!(ratio <= 0.0) || this.properties.bgWidth > 0)
@@ -41,7 +41,7 @@ public abstract class Gauge<T extends Gauge<T>> extends GuiElement<T>
 				boolean active = this.isActive(ratio);
 				this.gui
 					.drawTexturedRect(
-						matrices,
+						guiGraphics.pose(),
 						x + this.properties.bgXOffset,
 						y + this.properties.bgYOffset,
 						this.properties.bgWidth,
@@ -89,7 +89,7 @@ public abstract class Gauge<T extends Gauge<T>> extends GuiElement<T>
 					width = renderSize;
 				}
 
-				this.gui.drawTexturedRect(matrices, x, y, width, height, u, v);
+				this.gui.drawTexturedRect(guiGraphics.pose(), x, y, width, height, u, v);
 			}
 		}
 	}

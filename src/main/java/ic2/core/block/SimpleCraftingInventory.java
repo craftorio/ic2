@@ -2,18 +2,36 @@ package ic2.core.block;
 
 import ic2.core.block.invslot.InvSlot;
 import ic2.core.util.StackUtil;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.StackedContents;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 
-public abstract class SimpleCraftingInventory extends CraftingContainer
+public abstract class SimpleCraftingInventory implements CraftingContainer
 {
+	private final int width;
+	private final int height;
 	private final int size;
 
 	public SimpleCraftingInventory(int width, int height)
 	{
-		super(null, width, height);
+		super();
+		this.width = width;
+		this.height = height;
 		this.size = width * height;
+	}
+
+	@Override
+	public int getWidth()
+	{
+		return this.width;
+	}
+
+	@Override
+	public int getHeight()
+	{
+		return this.height;
 	}
 
 	public ItemStack getItem(int index)
@@ -76,6 +94,34 @@ public abstract class SimpleCraftingInventory extends CraftingContainer
 				finder.accountSimpleStack(stack);
 			}
 		}
+	}
+
+	@Override
+	public NonNullList<ItemStack> getItems()
+	{
+		NonNullList<ItemStack> list = NonNullList.withSize(this.size, ItemStack.EMPTY);
+		for (int i = 0; i < this.size; i++)
+		{
+			list.set(i, this.getItem(i));
+		}
+		return list;
+	}
+
+	@Override
+	public int getContainerSize()
+	{
+		return this.size;
+	}
+
+	@Override
+	public boolean stillValid(Player player)
+	{
+		return true;
+	}
+
+	@Override
+	public void setChanged()
+	{
 	}
 
 	protected abstract ItemStack get(int var1);

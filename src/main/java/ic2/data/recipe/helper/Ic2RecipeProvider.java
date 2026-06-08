@@ -12,19 +12,19 @@ import ic2.data.Ic2DataGenerators;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
+import net.minecraft.advancements.critereon.ContextAwarePredicate;
 import net.minecraft.advancements.critereon.ItemPredicate;
-import net.minecraft.advancements.critereon.EntityPredicate.Composite;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger.TriggerInstance;
 import net.minecraft.advancements.critereon.ItemPredicate.Builder;
 import net.minecraft.advancements.critereon.MinMaxBounds.Ints;
 import net.minecraft.data.CachedOutput;
-import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
-import net.minecraft.data.DataGenerator.PathProvider;
-import net.minecraft.data.DataGenerator.Target;
+import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -38,15 +38,11 @@ public abstract class Ic2RecipeProvider implements DataProvider
 {
 	private static final Logger LOGGER = LogUtils.getLogger();
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-	private final DataGenerator generator;
-	private final PathProvider recipesPathResolver;
-	private final PathProvider advancementsPathResolver;
+	private final PackOutput packOutput;
 
-	public Ic2RecipeProvider(DataGenerator root)
+	public Ic2RecipeProvider(PackOutput packOutput)
 	{
-		this.generator = root;
-		this.recipesPathResolver = root.createPathProvider(Target.DATA_PACK, "recipes");
-		this.advancementsPathResolver = root.createPathProvider(Target.DATA_PACK, "advancements");
+		this.packOutput = packOutput;
 	}
 
 	protected abstract void generate(Consumer<FinishedRecipe> var1);
@@ -81,7 +77,7 @@ public abstract class Ic2RecipeProvider implements DataProvider
 		return this.getClass().getSimpleName();
 	}
 
-	public void run(CachedOutput writer)
+	public CompletableFuture<?> run(CachedOutput writer)
 	{
 		Set<ResourceLocation> set = Sets.newHashSet();
 		this.generate(provider ->
@@ -91,13 +87,18 @@ public abstract class Ic2RecipeProvider implements DataProvider
 				throw new IllegalStateException("Duplicate recipe " + provider.getId());
 			}
 
-			saveRecipe(writer, provider.serializeRecipe(), this.recipesPathResolver.json(provider.getId()));
+			Path recipePath = this.packOutput.getOutputFolder()
+				.resolve("data/" + provider.getId().getNamespace() + "/recipes/" + provider.getId().getPath() + ".json");
+			saveRecipe(writer, provider.serializeRecipe(), recipePath);
 			JsonObject jsonObject = provider.serializeAdvancement();
 			if (jsonObject != null)
 			{
-				saveRecipeAdvancement(writer, jsonObject, this.advancementsPathResolver.json(provider.getAdvancementId()));
+				Path advancementPath = this.packOutput.getOutputFolder()
+					.resolve("data/" + provider.getAdvancementId().getNamespace() + "/advancements/" + provider.getAdvancementId().getPath() + ".json");
+				saveRecipeAdvancement(writer, jsonObject, advancementPath);
 			}
 		});
+		return CompletableFuture.allOf();
 	}
 
 	private static void saveRecipe(CachedOutput cache, JsonObject json, Path path)
@@ -105,7 +106,7 @@ public abstract class Ic2RecipeProvider implements DataProvider
 		try
 		{
 			Ic2DataGenerators.saveJsonPreserveOrder(GSON, cache, json, path);
-		} catch (IOException var4)
+		} catch (Exception var4)
 		{
 			LOGGER.error("Couldn't save recipe {}", path, var4);
 		}
@@ -116,7 +117,7 @@ public abstract class Ic2RecipeProvider implements DataProvider
 		try
 		{
 			DataProvider.saveStable(cache, json, path);
-		} catch (IOException var4)
+		} catch (Exception var4)
 		{
 			LOGGER.error("Couldn't save recipe advancement {}", path, var4);
 		}
@@ -139,6 +140,6 @@ public abstract class Ic2RecipeProvider implements DataProvider
 
 	public static TriggerInstance conditionsFromItemPredicates(ItemPredicate... predicates)
 	{
-		return new TriggerInstance(Composite.ANY, Ints.ANY, Ints.ANY, Ints.ANY, predicates);
+		return new TriggerInstance(ContextAwarePredicate.ANY, Ints.ANY, Ints.ANY, Ints.ANY, predicates);
 	}
 }

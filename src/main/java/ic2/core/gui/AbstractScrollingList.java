@@ -1,7 +1,7 @@
 package ic2.core.gui;
 
 import com.mojang.blaze3d.platform.Window;
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.Ic2Gui;
 import ic2.core.proxy.SideProxyClient;
 import ic2.core.util.Util;
@@ -68,12 +68,12 @@ public abstract class AbstractScrollingList<T extends AbstractScrollingList<T, I
 	}
 
 	@Override
-	public void drawBackground(PoseStack matrices, int mouseX, int mouseY)
+	public void drawBackground(GuiGraphics guiGraphics, int mouseX, int mouseY)
 	{
 		bindCommonTexture();
-		this.gui.drawColoredRect(matrices, this.x, this.y, this.width, this.height, -16777216);
-		this.gui.drawColoredRect(matrices, this.x + 1, this.y + 1, this.width - 7 - 1, this.height - 2, -6250336);
-		this.gui.drawColoredRect(matrices, this.x + this.width - 7 + 1, this.y + 1, 5, this.height - 2, -6250241);
+		this.gui.drawColoredRect(guiGraphics.pose(), this.x, this.y, this.width, this.height, -16777216);
+		this.gui.drawColoredRect(guiGraphics.pose(), this.x + 1, this.y + 1, this.width - 7 - 1, this.height - 2, -6250336);
+		this.gui.drawColoredRect(guiGraphics.pose(), this.x + this.width - 7 + 1, this.y + 1, 5, this.height - 2, -6250241);
 		int scrollStart;
 		int scrollHeight;
 		if (this.items.size() * 11 - 1 <= this.height - 2)
@@ -86,13 +86,13 @@ public abstract class AbstractScrollingList<T extends AbstractScrollingList<T, I
 			scrollStart = (int) Util.lerp(this.y + 1, this.y + this.height - 1 - scrollHeight, this.scroll / this.getMaxScroll());
 		}
 
-		this.gui.drawColoredRect(matrices, this.x + this.width - 7 + 1, scrollStart, 5, scrollHeight, -16777216);
+		this.gui.drawColoredRect(guiGraphics.pose(), this.x + this.width - 7 + 1, scrollStart, 5, scrollHeight, -16777216);
 	}
 
 	@Override
-	public void drawForeground(PoseStack matrices, int mouseX, int mouseY)
+	public void drawForeground(GuiGraphics guiGraphics, int mouseX, int mouseY)
 	{
-		super.drawForeground(matrices, mouseX, mouseY);
+		super.drawForeground(guiGraphics, mouseX, mouseY);
 		int left = this.gui.getX();
 		int top = this.gui.getY();
 		this.doScissor(left, top);
@@ -105,7 +105,7 @@ public abstract class AbstractScrollingList<T extends AbstractScrollingList<T, I
 		{
 			if (currentY > -10)
 			{
-				item.draw(matrices, xOffset, this.y - top + currentY, this.width - 7 - 1, 10, mouseX, mouseY - currentY);
+				item.draw(guiGraphics, xOffset, this.y - top + currentY, this.width - 7 - 1, 10, mouseX, mouseY - currentY);
 			}
 
 			currentY += 11;
@@ -117,7 +117,7 @@ public abstract class AbstractScrollingList<T extends AbstractScrollingList<T, I
 					break;
 				}
 
-				this.gui.drawColoredRect(matrices, xOffset, this.y - top + currentY - 1, this.width - 7, 1, -16777216);
+				this.gui.drawColoredRect(guiGraphics.pose(), xOffset, this.y - top + currentY - 1, this.width - 7, 1, -16777216);
 				if (bottomGap == -1)
 				{
 					break;
@@ -255,6 +255,6 @@ public abstract class AbstractScrollingList<T extends AbstractScrollingList<T, I
 
 	public interface IListItem
 	{
-		void draw(PoseStack var1, int var2, int var3, int var4, int var5, int var6, int var7);
+		void draw(GuiGraphics var1, int var2, int var3, int var4, int var5, int var6, int var7);
 	}
 }

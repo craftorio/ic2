@@ -8,16 +8,16 @@ import ic2.data.recipe.helper.WeightedMachineRecipeGenerator;
 
 import java.util.function.Consumer;
 
-import net.minecraft.data.DataGenerator;
+import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Items;
 
 public class MaceratorRecipeProvider extends Ic2RecipeProvider
 {
-	public MaceratorRecipeProvider(DataGenerator generator)
+	public MaceratorRecipeProvider(PackOutput packOutput)
 	{
-		super(generator);
+		super(packOutput);
 	}
 
 	@Override

@@ -1,7 +1,7 @@
 package ic2.core.gui;
 
 import com.google.common.base.Supplier;
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.Ic2Gui;
 import ic2.core.util.StackUtil;
 import net.minecraft.world.item.ItemStack;
@@ -17,9 +17,9 @@ public class ItemStackImage extends GuiElement<ItemStackImage>
 	}
 
 	@Override
-	public void drawBackground(PoseStack matrices, int mouseX, int mouseY)
+	public void drawBackground(GuiGraphics guiGraphics, int mouseX, int mouseY)
 	{
-		super.drawBackground(matrices, mouseX, mouseY);
+		super.drawBackground(guiGraphics, mouseX, mouseY);
 		ItemStack stack = (ItemStack) this.itemSupplier.get();
 		if (!StackUtil.isEmpty(stack))
 		{
@@ -28,14 +28,14 @@ public class ItemStackImage extends GuiElement<ItemStackImage>
 	}
 
 	@Override
-	public void drawForeground(PoseStack matrices, int mouseX, int mouseY)
+	public void drawForeground(GuiGraphics guiGraphics, int mouseX, int mouseY)
 	{
 		if (this.contains(mouseX, mouseY))
 		{
 			ItemStack stack = (ItemStack) this.itemSupplier.get();
 			if (!StackUtil.isEmpty(stack))
 			{
-				this.gui.drawTooltip(matrices, mouseX, mouseY, stack);
+				this.gui.drawTooltip(guiGraphics, mouseX, mouseY, stack);
 			}
 		}
 	}

@@ -23,7 +23,7 @@ public class VanillaSmeltingResolver implements IRecipeResolver
 			try
 			{
 				List<List<LeanItemStack>> inputs = RecipeUtil.convertIngredients(recipe.getIngredients());
-				LeanItemStack output = new LeanItemStack(recipe.getResultItem());
+				LeanItemStack output = new LeanItemStack(recipe.getResultItem((net.minecraft.core.RegistryAccess) null));
 				ret.add(new RecipeTransformation(14.0, inputs, output));
 			} catch (IllegalArgumentException e)
 			{

@@ -1,6 +1,6 @@
 package ic2.core.block.personal;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.IC2;
 import ic2.core.Ic2Gui;
 import ic2.core.gui.VanillaButton;
@@ -23,17 +23,17 @@ public class GuiTradeOMatOpen extends Ic2Gui<ContainerTradeOMatOpen>
 	}
 
 	@Override
-	protected void drawForegroundLayer(PoseStack matrices, int mouseX, int mouseY)
+	protected void drawForegroundLayer(GuiGraphics guiGraphics, int mouseX, int mouseY)
 	{
-		super.drawForegroundLayer(matrices, mouseX, mouseY);
-		this.drawString(matrices, 8, this.imageHeight - 96 + 2, Localization.translate("container.inventory"), 4210752);
-		this.drawString(matrices, 12, 23, Localization.translate("ic2.container.personalTrader.want"), 4210752);
-		this.drawString(matrices, 12, 57, Localization.translate("ic2.container.personalTrader.offer"), 4210752);
-		this.drawString(matrices, 108, 28, Localization.translate("ic2.container.personalTrader.totalTrades0"), 4210752);
-		this.drawString(matrices, 108, 36, Localization.translate("ic2.container.personalTrader.totalTrades1"), 4210752);
-		this.drawString(matrices, 112, 44, ((ContainerTradeOMatOpen) this.menu).base.totalTradeCount + "", 4210752);
+		super.drawForegroundLayer(guiGraphics, mouseX, mouseY);
+		this.drawString(guiGraphics, 8, this.imageHeight - 96 + 2, Localization.translate("container.inventory"), 4210752);
+		this.drawString(guiGraphics, 12, 23, Localization.translate("ic2.container.personalTrader.want"), 4210752);
+		this.drawString(guiGraphics, 12, 57, Localization.translate("ic2.container.personalTrader.offer"), 4210752);
+		this.drawString(guiGraphics, 108, 28, Localization.translate("ic2.container.personalTrader.totalTrades0"), 4210752);
+		this.drawString(guiGraphics, 108, 36, Localization.translate("ic2.container.personalTrader.totalTrades1"), 4210752);
+		this.drawString(guiGraphics, 112, 44, ((ContainerTradeOMatOpen) this.menu).base.totalTradeCount + "", 4210752);
 		this.drawString(
-			matrices,
+			guiGraphics,
 			108,
 			60,
 			Localization.translate("ic2.container.personalTrader.stock")

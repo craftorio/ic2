@@ -1,6 +1,6 @@
 package ic2.core.block.machine.gui;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.IC2;
 import ic2.core.Ic2Gui;
 import ic2.core.block.machine.container.ContainerFluidDistributor;
@@ -19,16 +19,16 @@ public class GuiFluidDistributor extends Ic2Gui<ContainerFluidDistributor>
 	}
 
 	@Override
-	protected void drawForegroundLayer(PoseStack matrices, int mouseX, int mouseY)
+	protected void drawForegroundLayer(GuiGraphics guiGraphics, int mouseX, int mouseY)
 	{
-		super.drawForegroundLayer(matrices, mouseX, mouseY);
-		this.drawString(matrices, 112, 56, Localization.translate("ic2.FluidDistributor.gui.mode.info"), 5752026);
+		super.drawForegroundLayer(guiGraphics, mouseX, mouseY);
+		this.drawString(guiGraphics, 112, 56, Localization.translate("ic2.FluidDistributor.gui.mode.info"), 5752026);
 		if (((ContainerFluidDistributor) this.menu).base.getActive())
 		{
-			this.drawString(matrices, 95, 80, Localization.translate("ic2.FluidDistributor.gui.mode.concentrate"), 5752026);
+			this.drawString(guiGraphics, 95, 80, Localization.translate("ic2.FluidDistributor.gui.mode.concentrate"), 5752026);
 		} else
 		{
-			this.drawString(matrices, 95, 80, Localization.translate("ic2.FluidDistributor.gui.mode.distribute"), 5752026);
+			this.drawString(guiGraphics, 95, 80, Localization.translate("ic2.FluidDistributor.gui.mode.distribute"), 5752026);
 		}
 	}
 

@@ -1,6 +1,6 @@
 package ic2.core.block.machine.tileentity;
 
-import com.mojang.math.Vector3f;
+import org.joml.Vector3f;
 import ic2.api.network.INetworkTileEntityEventListener;
 import ic2.api.tile.IEnergyStorage;
 import ic2.core.IC2;

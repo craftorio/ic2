@@ -27,6 +27,8 @@ import java.util.Set;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -50,6 +52,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public abstract class Ic2TileEntity extends BlockEntity implements INetworkDataProvider, INetworkUpdateListener, IGuiConditionProvider
 {
@@ -109,7 +112,7 @@ public abstract class Ic2TileEntity extends BlockEntity implements INetworkDataP
 	{
 		super.clearRemoved();
 		Level world = this.getLevel();
-		if (world == null || this.worldPosition == null)
+		if (world == null)
 		{
 			throw new IllegalStateException("no world/pos");
 		}
@@ -122,29 +125,19 @@ public abstract class Ic2TileEntity extends BlockEntity implements INetworkDataP
 		this.loadState = 1;
 		TickHandler.requestSingleWorldTick(
 			world,
-			new IWorldTickCallback()
+			world1 ->
 			{
-				@Override
-				public void onTick(Level world)
+				if (world1 == Ic2TileEntity.this.getLevel() && !Ic2TileEntity.this.isRemoved() && Ic2TileEntity.this.loadState == 1 && world1.isLoaded(Ic2TileEntity.this.worldPosition) && world1.getBlockState(Ic2TileEntity.this.worldPosition).getBlock() == Ic2TileEntity.this.teBlock && world1.getBlockEntity(Ic2TileEntity.this.worldPosition) == Ic2TileEntity.this)
 				{
-					if (world == Ic2TileEntity.this.getLevel()
-						&& Ic2TileEntity.this.worldPosition != null
-						&& !Ic2TileEntity.this.isRemoved()
-						&& Ic2TileEntity.this.loadState == 1
-						&& world.isLoaded(Ic2TileEntity.this.worldPosition)
-						&& world.getBlockState(Ic2TileEntity.this.worldPosition).getBlock() == Ic2TileEntity.this.teBlock
-						&& world.getBlockEntity(Ic2TileEntity.this.worldPosition) == Ic2TileEntity.this)
+					if (Ic2TileEntity.debugLoad)
 					{
-						if (Ic2TileEntity.debugLoad)
-						{
-							IC2.log.debug(LogCategory.Block, "TE onLoaded for %s at %s.", Ic2TileEntity.this, Util.formatPosition(Ic2TileEntity.this));
-						}
-
-						Ic2TileEntity.this.onLoaded();
-					} else if (Ic2TileEntity.debugLoad)
-					{
-						IC2.log.debug(LogCategory.Block, "Skipping TE init for %s at %s.", Ic2TileEntity.this, Util.formatPosition(Ic2TileEntity.this));
+						IC2.log.debug(LogCategory.Block, "TE onLoaded for %s at %s.", Ic2TileEntity.this, Util.formatPosition(Ic2TileEntity.this));
 					}
+
+					Ic2TileEntity.this.onLoaded();
+				} else if (Ic2TileEntity.debugLoad)
+				{
+					IC2.log.debug(LogCategory.Block, "Skipping TE init for %s at %s.", Ic2TileEntity.this, Util.formatPosition(Ic2TileEntity.this));
 				}
 			}
 		);
@@ -235,7 +228,7 @@ public abstract class Ic2TileEntity extends BlockEntity implements INetworkDataP
 						nbt.put("components", componentsNbt);
 					}
 
-					String id = Components.getId((Class<? extends TileEntityComponent>) component.getClass());
+					String id = Components.getId(component.getClass());
 					if (id == null)
 					{
 						throw new RuntimeException("no component id for " + component.getClass().getName());
@@ -290,7 +283,7 @@ public abstract class Ic2TileEntity extends BlockEntity implements INetworkDataP
 	public List<String> getNetworkedFields()
 	{
 		List<String> ret = new ArrayList<>(3);
-		ret.add("teBlk=" + Registry.BLOCK.getKey(this.teBlock));
+		ret.add("teBlk=" + ForgeRegistries.BLOCKS.getKey(this.teBlock));
 		ret.add("active");
 		return ret;
 	}
@@ -467,7 +460,7 @@ public abstract class Ic2TileEntity extends BlockEntity implements INetworkDataP
 
 	public Direction getFacing()
 	{
-		return this.teBlock.facingProperty == null ? Direction.NORTH : (Direction) this.getBlockState().getValue(this.teBlock.facingProperty);
+		return this.teBlock.facingProperty == null ? Direction.NORTH : this.getBlockState().getValue(this.teBlock.facingProperty);
 	}
 
 	protected boolean canSetFacingWrench(Direction facing, Player player)
@@ -477,7 +470,7 @@ public abstract class Ic2TileEntity extends BlockEntity implements INetworkDataP
 			return false;
 		} else
 		{
-			return facing == this.getFacing() ? false : this.getSupportedFacings().contains(facing);
+			return facing != this.getFacing() && this.getSupportedFacings().contains(facing);
 		}
 	}
 
@@ -546,7 +539,7 @@ public abstract class Ic2TileEntity extends BlockEntity implements INetworkDataP
 			throw new IllegalArgumentException("invalid facing: " + facing + ", supported: " + this.getSupportedFacings());
 		}
 
-		BlockState newState = (BlockState) world.getBlockState(this.worldPosition).setValue(this.teBlock.facingProperty, facing);
+		BlockState newState = world.getBlockState(this.worldPosition).setValue(this.teBlock.facingProperty, facing);
 		world.setBlockAndUpdate(this.worldPosition, newState);
 	}
 
@@ -606,7 +599,7 @@ public abstract class Ic2TileEntity extends BlockEntity implements INetworkDataP
 			this.components = new IdentityHashMap<>(4);
 		}
 
-		TileEntityComponent prev = this.components.put((Class<? extends TileEntityComponent>) component.getClass(), component);
+		TileEntityComponent prev = this.components.put(component.getClass(), component);
 		if (prev != null)
 		{
 			throw new RuntimeException("conflicting component while adding " + component + ", already used by " + prev + ".");
@@ -618,7 +611,7 @@ public abstract class Ic2TileEntity extends BlockEntity implements INetworkDataP
 
 	public boolean hasComponent(Class<? extends TileEntityComponent> cls)
 	{
-		return this.components == null ? false : this.components.containsKey(cls);
+		return this.components != null && this.components.containsKey(cls);
 	}
 
 	public <T extends TileEntityComponent> T getComponent(Class<T> cls)
@@ -637,7 +630,7 @@ public abstract class Ic2TileEntity extends BlockEntity implements INetworkDataP
 		Objects.requireNonNull(this.getLevel()).sendBlockUpdated(this.worldPosition, state, state, 2);
 		if (this.teBlock.canActive() && this.level != null)
 		{
-			this.level.setBlockAndUpdate(this.worldPosition, (BlockState) state.setValue(Ic2TileEntityBlock.ACTIVE, this.active));
+			this.level.setBlockAndUpdate(this.worldPosition, state.setValue(Ic2TileEntityBlock.ACTIVE, this.active));
 		}
 	}
 

@@ -3,9 +3,10 @@ package ic2.core.entity.render;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.PoseStack.Pose;
-import com.mojang.math.Matrix3f;
-import com.mojang.math.Matrix4f;
-import com.mojang.math.Vector3f;
+import org.joml.Matrix3f;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
+import com.mojang.math.Axis;
 import ic2.core.IC2;
 import ic2.core.entity.LaserBulletEntity;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -28,10 +29,10 @@ public class LaserBulletEntityRenderer extends EntityRenderer<LaserBulletEntity>
 	public void render(LaserBulletEntity entity, float f, float g, PoseStack matrixStack, MultiBufferSource vertexConsumerProvider, int i)
 	{
 		matrixStack.pushPose();
-		matrixStack.mulPose(Vector3f.YP.rotationDegrees(Mth.lerp(g, entity.yRotO, entity.getYRot()) - 90.0F));
-		matrixStack.mulPose(Vector3f.ZP.rotationDegrees(Mth.lerp(g, entity.xRotO, entity.getXRot())));
-		matrixStack.mulPose(Vector3f.ZP.rotationDegrees(0.0F));
-		matrixStack.mulPose(Vector3f.XP.rotationDegrees(45.0F));
+		matrixStack.mulPose(Axis.YP.rotationDegrees(Mth.lerp(g, entity.yRotO, entity.getYRot()) - 90.0F));
+		matrixStack.mulPose(Axis.ZP.rotationDegrees(Mth.lerp(g, entity.xRotO, entity.getXRot())));
+		matrixStack.mulPose(Axis.ZP.rotationDegrees(0.0F));
+		matrixStack.mulPose(Axis.XP.rotationDegrees(45.0F));
 		matrixStack.scale(0.05625F, 0.05625F, 0.05625F);
 		matrixStack.translate(-4.0, 0.0, 0.0);
 		VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(RenderType.entityCutout(this.getTextureLocation(entity)));
@@ -49,7 +50,7 @@ public class LaserBulletEntityRenderer extends EntityRenderer<LaserBulletEntity>
 
 		for (int u = 0; u < 4; u++)
 		{
-			matrixStack.mulPose(Vector3f.XP.rotationDegrees(90.0F));
+			matrixStack.mulPose(Axis.XP.rotationDegrees(90.0F));
 			this.vertex(matrix4f, matrix3f, vertexConsumer, -8, -2, 0, 0.0F, 0.0F, 0, 1, 0, i);
 			this.vertex(matrix4f, matrix3f, vertexConsumer, 8, -2, 0, 0.5F, 0.0F, 0, 1, 0, i);
 			this.vertex(matrix4f, matrix3f, vertexConsumer, 8, 2, 0, 0.5F, 0.15625F, 0, 1, 0, i);

@@ -1,6 +1,7 @@
 package ic2.core.util;
 
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.Block;
 
 public enum VanillaColorBlockId
@@ -28,6 +29,6 @@ public enum VanillaColorBlockId
 
 	public boolean test(Block block)
 	{
-		return Registry.BLOCK.getKey(block).getPath().contains(this.id);
+		return BuiltInRegistries.BLOCK.getKey(block).getPath().contains(this.id);
 	}
 }

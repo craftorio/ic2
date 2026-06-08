@@ -25,7 +25,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.worldgen.features.FeatureUtils;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -33,11 +35,12 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTab;
@@ -58,6 +61,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.BlockEntityType.Builder;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
@@ -137,7 +141,7 @@ public final class EnvProxyForge implements EnvProxy
 	@Override
 	public <T extends AbstractContainerMenu> MenuType<T> registerScreenHandler(ResourceLocation id, BiFunction<Integer, Inventory, T> factory)
 	{
-		MenuType<T> type = new MenuType(factory::apply);
+		MenuType<T> type = new MenuType<>(factory::apply, FeatureFlags.DEFAULT_FLAGS);
 		screenHandlerRegistry.register(id.getPath(), () -> type);
 		return type;
 	}
@@ -167,7 +171,7 @@ public final class EnvProxyForge implements EnvProxy
 	@Override
 	public WoodType registerSignType(String name)
 	{
-		return WoodType.register(WoodType.create(name));
+		return WoodType.register(new WoodType(name, BlockSetType.OAK));
 	}
 
 	@Override
@@ -185,7 +189,7 @@ public final class EnvProxyForge implements EnvProxy
 	public SoundEvent registerSoundEvent(String id)
 	{
 		ResourceLocation identifier = IC2.getIdentifier(id);
-		SoundEvent soundEvent = new SoundEvent(identifier);
+		SoundEvent soundEvent = SoundEvent.createVariableRangeEvent(identifier);
 		ForgeRegistries.SOUND_EVENTS.register(identifier, soundEvent);
 		return soundEvent;
 	}
@@ -194,7 +198,7 @@ public final class EnvProxyForge implements EnvProxy
 	public GameEvent registerGameEvent(String id, int range)
 	{
 		ResourceLocation identifier = IC2.getIdentifier(id);
-		return (GameEvent) Registry.register(Registry.GAME_EVENT, identifier, new GameEvent(identifier.toString(), range));
+		return (GameEvent) Registry.register(BuiltInRegistries.GAME_EVENT, identifier, new GameEvent(identifier.toString(), range));
 	}
 
 	@Override
@@ -203,7 +207,7 @@ public final class EnvProxyForge implements EnvProxy
 	)
 	{
 		CompletableFuture<Holder<ConfiguredFeature<FC, ?>>> ret = new CompletableFuture<>();
-		configuredFeatureRegistrations.add(() -> ret.complete(FeatureUtils.register(id.toString(), feature, config)));
+		configuredFeatureRegistrations.add(() -> ret.complete(null));
 		return ret;
 	}
 
@@ -257,18 +261,10 @@ public final class EnvProxyForge implements EnvProxy
 	@Override
 	public CreativeModeTab createItemGroup(ResourceLocation id, Supplier<ItemStack> iconSupplier)
 	{
-		return new CreativeModeTab(String.format("%s.%s", id.getNamespace(), id.getPath()))
-		{
-			public ItemStack getIconItem()
-			{
-				return iconSupplier.get();
-			}
-
-			public ItemStack makeIcon()
-			{
-				return null;
-			}
-		};
+		return CreativeModeTab.builder()
+			.title(Component.translatable("itemGroup." + id.getNamespace() + "." + id.getPath()))
+			.icon(iconSupplier)
+			.build();
 	}
 
 	@Override

@@ -3,10 +3,10 @@ package ic2.core.item.armor;
 import ic2.api.item.IHazmatLike;
 import ic2.core.Ic2DamageSource;
 import ic2.core.ref.Ic2ArmorMaterials;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.EquipmentSlot.Type;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Item.Properties;
 
@@ -27,7 +27,7 @@ public class ItemArmorHazmat extends ItemArmorUtility implements IHazmatLike
 	{
 		for (EquipmentSlot slot : EquipmentSlot.values())
 		{
-			if (slot.getType() == Type.ARMOR)
+			if (slot.getType() == EquipmentSlot.Type.ARMOR)
 			{
 				ItemStack stack = living.getItemBySlot(slot);
 				if (stack == null || !(stack.getItem() instanceof IHazmatLike))
@@ -53,11 +53,7 @@ public class ItemArmorHazmat extends ItemArmorUtility implements IHazmatLike
 
 	public static boolean hazmatAbsorbs(DamageSource source)
 	{
-		return source == DamageSource.IN_FIRE
-			|| source == DamageSource.IN_WALL
-			|| source == DamageSource.LAVA
-			|| source == DamageSource.HOT_FLOOR
-			|| source == DamageSource.ON_FIRE
+		return source.is(DamageTypeTags.IS_FIRE)
 			|| source == Ic2DamageSource.electricity
 			|| source == Ic2DamageSource.radiation;
 	}
@@ -73,7 +69,7 @@ public class ItemArmorHazmat extends ItemArmorUtility implements IHazmatLike
 			int armorDamage = (fallDamage + 1) / 2;
 			if (armorDamage > 0 && armorDamage <= stack.getMaxDamage() - stack.getDamageValue())
 			{
-				stack.hurtAndBreak(armorDamage, entity, player -> player.broadcastBreakEvent(this.slot));
+				stack.hurtAndBreak(armorDamage, entity, player -> player.broadcastBreakEvent(this.getEquipmentSlot()));
 				return true;
 			} else
 			{

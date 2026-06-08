@@ -1,6 +1,6 @@
 package ic2.core.item.upgrade;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.ContainerBase;
 import ic2.core.gui.GuiDefaultBackground;
 import ic2.core.gui.MouseButton;
@@ -92,9 +92,9 @@ public class HandHeldOre extends HandHeldUpgradeOption
 			}
 
 			@Override
-			public void draw(PoseStack matrices, int xOffset, int yOffset, int width, int height, int mouseX, int mouseY)
+			public void draw(GuiGraphics guiGraphics, int xOffset, int yOffset, int width, int height, int mouseX, int mouseY)
 			{
-				GuiEditOre.this.drawString(matrices, xOffset + 2, yOffset + 1, "Thing " + this.number, 16777215, false);
+				GuiEditOre.this.drawString(guiGraphics, xOffset + 2, yOffset + 1, "Thing " + this.number, 16777215, false);
 			}
 
 			@Override

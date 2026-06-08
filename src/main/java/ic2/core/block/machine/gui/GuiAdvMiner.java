@@ -1,7 +1,7 @@
 package ic2.core.block.machine.gui;
 
 import com.google.common.base.Supplier;
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.Ic2Gui;
 import ic2.core.block.machine.container.ContainerAdvMiner;
 import ic2.core.gui.BasicButton;
@@ -36,14 +36,14 @@ public class GuiAdvMiner extends Ic2Gui<ContainerAdvMiner>
 	}
 
 	@Override
-	protected void drawForegroundLayer(PoseStack matrices, int mouseX, int mouseY)
+	protected void drawForegroundLayer(GuiGraphics guiGraphics, int mouseX, int mouseY)
 	{
 		BlockPos target = ((ContainerAdvMiner) this.menu).base.getMineTarget();
 		if (target != null)
 		{
 			BlockPos pos = ((ContainerAdvMiner) this.menu).base.getBlockPos();
 			this.drawString(
-				matrices,
+				guiGraphics,
 				28,
 				104,
 				Localization.translate(
@@ -58,13 +58,13 @@ public class GuiAdvMiner extends Ic2Gui<ContainerAdvMiner>
 
 		if (((ContainerAdvMiner) this.menu).base.blacklist)
 		{
-			this.drawString(matrices, 40, 30, Localization.translate("ic2.AdvMiner.gui.mode.blacklist"), 2157374);
+			this.drawString(guiGraphics, 40, 30, Localization.translate("ic2.AdvMiner.gui.mode.blacklist"), 2157374);
 		} else
 		{
-			this.drawString(matrices, 40, 30, Localization.translate("ic2.AdvMiner.gui.mode.whitelist"), 2157374);
+			this.drawString(guiGraphics, 40, 30, Localization.translate("ic2.AdvMiner.gui.mode.whitelist"), 2157374);
 		}
 
-		super.drawForegroundLayer(matrices, mouseX, mouseY);
+		super.drawForegroundLayer(guiGraphics, mouseX, mouseY);
 	}
 
 	@Override

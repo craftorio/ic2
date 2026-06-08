@@ -11,7 +11,8 @@ import ic2.data.recipe.helper.Ic2RecipeProvider;
 import java.util.function.Consumer;
 
 import net.minecraft.core.Registry;
-import net.minecraft.data.DataGenerator;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -23,9 +24,9 @@ import net.minecraft.world.level.material.Fluids;
 
 public class CannerRecipeProvider extends Ic2RecipeProvider
 {
-	public CannerRecipeProvider(DataGenerator root)
+	public CannerRecipeProvider(PackOutput packOutput)
 	{
-		super(root);
+		super(packOutput);
 	}
 
 	@Override
@@ -41,7 +42,7 @@ public class CannerRecipeProvider extends Ic2RecipeProvider
 		gen.add(itemInput(Ic2Items.FUEL_ROD), itemInput(Ic2Items.URANIUM), new ItemStack(Ic2Items.URANIUM_FUEL_ROD), "uranium_fuel_rod");
 		gen.add(itemInput(Ic2Items.FUEL_ROD), itemInput(Ic2Items.MOX), new ItemStack(Ic2Items.MOX_FUEL_ROD), "mox_fuel_rod");
 
-		for (Item item : Registry.ITEM)
+		for (Item item : BuiltInRegistries.ITEM)
 		{
 			FoodProperties comp = item.getFoodProperties();
 			if (comp != null)
@@ -74,7 +75,7 @@ public class CannerRecipeProvider extends Ic2RecipeProvider
 						itemInput(Ic2Items.TIN_CAN, hunger),
 						itemInput(item, fillItemCount),
 						new ItemStack(Ic2Items.FILLED_TIN_CAN, hunger),
-						Registry.ITEM.getKey(item).getPath() + "_filled_tin_can"
+						BuiltInRegistries.ITEM.getKey(item).getPath() + "_filled_tin_can"
 					);
 				}
 			}

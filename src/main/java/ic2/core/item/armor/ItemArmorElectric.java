@@ -14,6 +14,7 @@ import java.util.UUID;
 
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -56,7 +57,7 @@ public abstract class ItemArmorElectric extends ItemArmorIC2 implements IElectri
 
 	public static void damageArmor(Player entity, DamageSource source, float amount)
 	{
-		if (!(amount <= 0.0F) && !source.isBypassMagic())
+		if (!(amount <= 0.0F) && !source.is(DamageTypeTags.BYPASSES_ENCHANTMENTS))
 		{
 			float damage = amount / 4.0F;
 			if (damage < 1.0F)
@@ -82,7 +83,7 @@ public abstract class ItemArmorElectric extends ItemArmorIC2 implements IElectri
 
 	public void fillItemCategory(CreativeModeTab tab, NonNullList<ItemStack> subItems)
 	{
-		if (this.allowedIn(tab))
+		if (true)
 		{
 			ElectricItemManager.addChargeVariants(this, subItems);
 		}
@@ -139,7 +140,7 @@ public abstract class ItemArmorElectric extends ItemArmorIC2 implements IElectri
 
 	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(ItemStack stack, EquipmentSlot slot)
 	{
-		if (slot != this.slot)
+		if (slot != this.getEquipmentSlot())
 		{
 			return this.getDefaultAttributeModifiers(slot);
 		}

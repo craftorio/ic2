@@ -1,13 +1,19 @@
 package ic2.compat;
 
-import ic2.forge.FmlMod;
-import net.minecraft.data.DataGenerator;
-import net.minecraft.data.tags.BlockTagsProvider;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.data.PackOutput;
+import net.minecraft.data.tags.IntrinsicHolderTagsProvider;
+import net.minecraft.world.level.block.Block;
+import net.minecraftforge.common.data.ExistingFileHelper;
+import org.jetbrains.annotations.Nullable;
 
-public abstract class AbstractBlockTagProvider extends BlockTagsProvider
+import java.util.concurrent.CompletableFuture;
+
+public abstract class AbstractBlockTagProvider extends IntrinsicHolderTagsProvider<Block>
 {
-	public AbstractBlockTagProvider(DataGenerator arg)
+	public AbstractBlockTagProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, @Nullable ExistingFileHelper existingFileHelper)
 	{
-		super(arg, "ic2", FmlMod.existingFileHelper);
+		super(output, Registries.BLOCK, lookupProvider, block -> block.builtInRegistryHolder().key(), "ic2", existingFileHelper);
 	}
 }

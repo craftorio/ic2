@@ -459,7 +459,7 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
 	{
 		laser.shoot(direction.x, direction.y, direction.z, speed, divergence);
 		Vec3 vec3d = shooter.getDeltaMovement();
-		laser.setDeltaMovement(laser.getDeltaMovement().add(vec3d.x, shooter.isOnGround() ? 0.0 : vec3d.y, vec3d.z));
+		laser.setDeltaMovement(laser.getDeltaMovement().add(vec3d.x, shooter.onGround() ? 0.0 : vec3d.y, vec3d.z));
 	}
 
 	public boolean shootLaser(ItemStack stack, Level world, LivingEntity owner, float range, float power, int blockBreaks, boolean explosive, boolean smelt)

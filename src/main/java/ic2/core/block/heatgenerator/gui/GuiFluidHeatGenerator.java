@@ -1,6 +1,6 @@
 package ic2.core.block.heatgenerator.gui;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.Ic2Gui;
 import ic2.core.block.heatgenerator.container.ContainerFluidHeatGenerator;
 import ic2.core.gui.TankGauge;
@@ -20,18 +20,18 @@ public class GuiFluidHeatGenerator extends Ic2Gui<ContainerFluidHeatGenerator>
 	}
 
 	@Override
-	protected void drawForegroundLayer(PoseStack matrices, int mouseX, int mouseY)
+	protected void drawForegroundLayer(GuiGraphics guiGraphics, int mouseX, int mouseY)
 	{
-		super.drawForegroundLayer(matrices, mouseX, mouseY);
+		super.drawForegroundLayer(guiGraphics, mouseX, mouseY);
 		this.drawString(
-			matrices,
+			guiGraphics,
 			96,
 			33,
 			Localization.translate("ic2.FluidHeatGenerator.gui.info.Emit") + ((ContainerFluidHeatGenerator) this.menu).base.gettransmitHeat(),
 			5752026
 		);
 		this.drawString(
-			matrices,
+			guiGraphics,
 			96,
 			52,
 			Localization.translate("ic2.FluidHeatGenerator.gui.info.MaxEmit") + ((ContainerFluidHeatGenerator) this.menu).base.getMaxHeatEmittedPerTick(),

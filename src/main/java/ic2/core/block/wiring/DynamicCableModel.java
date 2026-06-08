@@ -23,7 +23,7 @@ import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
-import net.minecraft.client.resources.model.ModelBakery;
+import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.core.Direction;
@@ -56,6 +56,10 @@ public abstract class DynamicCableModel<T, E> implements UnbakedModel, BakedMode
 	public Collection<ResourceLocation> getDependencies()
 	{
 		return Collections.emptyList();
+	}
+
+	public void resolveParents(Function<ResourceLocation, UnbakedModel> resolver)
+	{
 	}
 
 	public Collection<Material> getMaterials(Function<ResourceLocation, UnbakedModel> unbakedModelGetter, Set<Pair<String, String>> unresolvedTextureReferences)
@@ -102,7 +106,7 @@ public abstract class DynamicCableModel<T, E> implements UnbakedModel, BakedMode
 		return new Material(atlas, IC2.getIdentifier(path));
 	}
 
-	public BakedModel bake(ModelBakery loader, Function<Material, TextureAtlasSprite> textureGetter, ModelState rotationContainer, ResourceLocation modelId)
+	public BakedModel bake(ModelBaker loader, Function<Material, TextureAtlasSprite> textureGetter, ModelState rotationContainer, ResourceLocation modelId)
 	{
 		this.blackSprite = textureGetter.apply(getTextureId(this.type, this.insulation, DyeColor.BLACK, this.active));
 		if (!this.foam.isPresent())

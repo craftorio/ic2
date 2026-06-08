@@ -9,16 +9,16 @@ import ic2.data.recipe.helper.ShapelessRecipeGenerator;
 
 import java.util.function.Consumer;
 
-import net.minecraft.data.DataGenerator;
+import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.material.Fluids;
 
 public class ShapelessRecipeProvider extends Ic2RecipeProvider
 {
-	public ShapelessRecipeProvider(DataGenerator generator)
+	public ShapelessRecipeProvider(PackOutput packOutput)
 	{
-		super(generator);
+		super(packOutput);
 	}
 
 	@Override

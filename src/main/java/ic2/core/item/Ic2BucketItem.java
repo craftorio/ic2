@@ -35,7 +35,6 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult.Type;
 import net.minecraftforge.event.ForgeEventFactory;
@@ -191,7 +190,6 @@ public abstract class Ic2BucketItem extends BucketItem
 
 		BlockState blockState = world.getBlockState(pos);
 		Block block = blockState.getBlock();
-		Material material = blockState.getMaterial();
 		boolean bl = blockState.canBeReplaced(this.fluid);
 		boolean bl2 = blockState.isAir()
 			|| bl
@@ -223,7 +221,7 @@ public abstract class Ic2BucketItem extends BucketItem
 				return true;
 			}
 
-			if (!world.isClientSide && bl && !material.isLiquid())
+			if (!world.isClientSide && bl && blockState.getFluidState().isEmpty())
 			{
 				world.destroyBlock(pos, true);
 			}

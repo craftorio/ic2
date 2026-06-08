@@ -7,16 +7,16 @@ import ic2.data.recipe.helper.Ic2RecipeProvider;
 
 import java.util.function.Consumer;
 
-import net.minecraft.data.DataGenerator;
+import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
 public class CentrifugeRecipeProvider extends Ic2RecipeProvider
 {
-	public CentrifugeRecipeProvider(DataGenerator generator)
+	public CentrifugeRecipeProvider(PackOutput packOutput)
 	{
-		super(generator);
+		super(packOutput);
 	}
 
 	@Override

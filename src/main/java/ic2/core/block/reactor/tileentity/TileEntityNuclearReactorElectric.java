@@ -70,7 +70,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
+
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
@@ -446,13 +446,12 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 					world.setBlockAndUpdate(coord, Blocks.FIRE.defaultBlockState());
 				} else if (state.getDestroySpeed(world, coord) >= 0.0F && world.getBlockEntity(coord) == null)
 				{
-					Material mat = state.getMaterial();
-					if (mat != Material.STONE && mat != Material.METAL && mat != Material.LAVA && mat != Material.DIRT && mat != Material.CLAY)
+					if (state.canOcclude() || state.getFluidState().is(net.minecraft.world.level.material.Fluids.LAVA))
 					{
-						world.setBlockAndUpdate(coord, Blocks.FIRE.defaultBlockState());
+						world.setBlockAndUpdate(coord, net.minecraft.world.level.material.Fluids.LAVA.defaultFluidState().createLegacyBlock());
 					} else
 					{
-						world.setBlockAndUpdate(coord, net.minecraft.world.level.material.Fluids.FLOWING_LAVA.defaultFluidState().createLegacyBlock());
+						world.setBlockAndUpdate(coord, Blocks.FIRE.defaultBlockState());
 					}
 				}
 			}
@@ -480,7 +479,7 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 			{
 				BlockPos coord = this.getRandCoord(2);
 				BlockState state = world.getBlockState(coord);
-				if (state.getMaterial() == Material.WATER)
+				if (state.getFluidState().is(net.minecraft.world.level.material.Fluids.WATER))
 				{
 					world.removeBlock(coord, false);
 				}
@@ -492,8 +491,7 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 				if (world.getBlockEntity(coord) == null)
 				{
 					BlockState state = world.getBlockState(coord);
-					Material mat = state.getMaterial();
-					if (mat == Material.WOOD || mat == Material.LEAVES || mat == Material.WOOL)
+					if (state.isFlammable(world, coord, Direction.UP))
 					{
 						world.setBlockAndUpdate(coord, Blocks.FIRE.defaultBlockState());
 					}

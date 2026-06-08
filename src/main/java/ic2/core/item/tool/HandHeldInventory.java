@@ -259,7 +259,7 @@ public abstract class HandHeldInventory implements IHasGui
 					category = crash.addCategory("Container info");
 					category.setDetail("Type", this.getClass().getName());
 					category.setDetail("Container", this.player.containerMenu == null ? null : this.player.containerMenu.getClass().getName());
-					if (this.player.level.isClientSide)
+					if (this.player.level().isClientSide)
 					{
 						category.setDetail("GUI", new CrashReportDetail<String>()
 						{

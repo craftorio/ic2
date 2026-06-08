@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Set;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.server.MinecraftServer;
@@ -198,7 +199,8 @@ public class TileEntityBatchCrafter
 	public ItemStack getCraftingRecipeOutput()
 	{
 		CraftingRecipe craftingRecipe = this.findCraftingRecipe();
-		return craftingRecipe != null ? craftingRecipe.assemble(this.ingredients) : StackUtil.emptyStack;
+		Level world = this.getLevel();
+		return craftingRecipe != null ? craftingRecipe.assemble(this.ingredients, world.registryAccess()) : StackUtil.emptyStack;
 	}
 
 	public void matrixChange(int slot)
@@ -208,7 +210,7 @@ public class TileEntityBatchCrafter
 			this.recipe = this.findRecipe();
 		}
 
-		this.recipeOutput = this.recipe != null ? this.recipe.assemble(this.crafting) : StackUtil.emptyStack;
+		this.recipeOutput = this.recipe != null ? this.recipe.assemble(this.crafting, this.getLevel().registryAccess()) : StackUtil.emptyStack;
 		this.newChange = true;
 	}
 

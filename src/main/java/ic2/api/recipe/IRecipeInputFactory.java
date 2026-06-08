@@ -5,7 +5,6 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.material.Fluid;
 
-@Deprecated(forRemoval = true)
 public interface IRecipeInputFactory
 {
 	IRecipeInput forItem(ItemLike var1);

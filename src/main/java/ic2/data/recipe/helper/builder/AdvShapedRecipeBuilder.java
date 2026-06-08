@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -37,7 +38,7 @@ public class AdvShapedRecipeBuilder extends Ic2RecipeBuilder<AdvShapedRecipeBuil
 	public AdvShapedRecipeBuilder key(char key, ItemLike item)
 	{
 		this.key.put(key, new RecipeInputIngredient(Ingredient.of(new ItemLike[] { item }), 1));
-		this.criterion("has_" + Registry.ITEM.getKey(item.asItem()).getPath(), Ic2RecipeProvider.conditionsFromItem(item));
+		this.criterion("has_" + BuiltInRegistries.ITEM.getKey(item.asItem()).getPath(), Ic2RecipeProvider.conditionsFromItem(item));
 		return this;
 	}
 
@@ -60,7 +61,7 @@ public class AdvShapedRecipeBuilder extends Ic2RecipeBuilder<AdvShapedRecipeBuil
 		input.getInputs().forEach(itemStack ->
 		{
 			Item item = itemStack.getItem();
-			this.criterion("has_" + Registry.ITEM.getKey(item).getPath(), Ic2RecipeProvider.conditionsFromItem(item));
+			this.criterion("has_" + BuiltInRegistries.ITEM.getKey(item).getPath(), Ic2RecipeProvider.conditionsFromItem(item));
 		});
 		return this;
 	}

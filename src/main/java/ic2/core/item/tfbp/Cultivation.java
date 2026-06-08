@@ -10,6 +10,7 @@ import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
@@ -37,7 +38,7 @@ public class Cultivation extends TerraformerBase
 		plants.add(Blocks.ROSE_BUSH.defaultBlockState());
 		plants.add(Blocks.SUNFLOWER.defaultBlockState());
 
-		for (Holder<Block> entry : Registry.BLOCK.getTagOrEmpty(BlockTags.SAPLINGS))
+		for (Holder<Block> entry : BuiltInRegistries.BLOCK.getTagOrEmpty(BlockTags.SAPLINGS))
 		{
 			Block block = (Block) entry.value();
 			if (isVanilla(block))

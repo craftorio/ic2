@@ -1,6 +1,6 @@
 package ic2.core.block.machine.gui;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.Ic2Gui;
 import ic2.core.block.machine.container.ContainerScanner;
 import ic2.core.block.machine.tileentity.TileEntityScanner;
@@ -57,60 +57,60 @@ public class GuiScanner extends Ic2Gui<ContainerScanner>
 	}
 
 	@Override
-	protected void drawForegroundLayer(PoseStack matrices, int mouseX, int mouseY)
+	protected void drawForegroundLayer(GuiGraphics guiGraphics, int mouseX, int mouseY)
 	{
-		super.drawForegroundLayer(matrices, mouseX, mouseY);
-		this.drawString(matrices, 105, 6, this.info[5] + ":", 4210752);
+		super.drawForegroundLayer(guiGraphics, mouseX, mouseY);
+		this.drawString(guiGraphics, 105, 6, this.info[5] + ":", 4210752);
 		TileEntityScanner te = ((ContainerScanner) this.menu).base;
 		switch (te.getState())
 		{
 			case IDLE:
-				this.drawString(matrices, 10, 69, Localization.translate("ic2.Scanner.gui.idle"), 15461152);
+				this.drawString(guiGraphics, 10, 69, Localization.translate("ic2.Scanner.gui.idle"), 15461152);
 				break;
 			case NO_STORAGE:
-				this.drawString(matrices, 10, 69, this.info[2], 15461152);
+				this.drawString(guiGraphics, 10, 69, this.info[2], 15461152);
 				break;
 			case SCANNING:
-				this.drawString(matrices, 10, 69, this.info[1], 2157374);
-				this.drawString(matrices, 125, 69, te.getPercentageDone() + "%", 2157374);
+				this.drawString(guiGraphics, 10, 69, this.info[1], 2157374);
+				this.drawString(guiGraphics, 125, 69, te.getPercentageDone() + "%", 2157374);
 				break;
 			case NO_ENERGY:
-				this.drawString(matrices, 10, 69, this.info[3], 14094352);
+				this.drawString(guiGraphics, 10, 69, this.info[3], 14094352);
 				break;
 			case ALREADY_RECORDED:
-				this.drawString(matrices, 10, 69, this.info[8], 14094352);
+				this.drawString(guiGraphics, 10, 69, this.info[8], 14094352);
 				break;
 			case FAILED:
-				this.drawString(matrices, 10, 69, this.info[4], 2157374);
-				this.drawString(matrices, 110, 30, this.info[6], 14094352);
+				this.drawString(guiGraphics, 10, 69, this.info[4], 2157374);
+				this.drawString(guiGraphics, 110, 30, this.info[6], 14094352);
 				break;
 			case COMPLETED:
 			case TRANSFER_ERROR:
 				if (te.getState() == TileEntityScanner.State.COMPLETED)
 				{
-					this.drawString(matrices, 10, 69, this.info[4], 2157374);
+					this.drawString(guiGraphics, 10, 69, this.info[4], 2157374);
 				}
 
 				if (te.getState() == TileEntityScanner.State.TRANSFER_ERROR)
 				{
-					this.drawString(matrices, 10, 69, this.info[7], 14094352);
+					this.drawString(guiGraphics, 10, 69, this.info[7], 14094352);
 				}
 
-				this.drawString(matrices, 105, 25, Util.toSiString(te.patternUu, 4) + "B UUM", 16777215);
-				this.drawString(matrices, 105, 36, Util.toSiString(te.patternEu, 4) + "EU", 16777215);
+				this.drawString(guiGraphics, 105, 25, Util.toSiString(te.patternUu, 4) + "B UUM", 16777215);
+				this.drawString(guiGraphics, 105, 36, Util.toSiString(te.patternEu, 4) + "EU", 16777215);
 		}
 	}
 
 	@Override
-	protected void renderBg(PoseStack matrices, float delta, int mouseX, int mouseY)
+	protected void renderBg(GuiGraphics guiGraphics, float delta, int mouseX, int mouseY)
 	{
-		super.renderBg(matrices, delta, mouseX, mouseY);
+		super.renderBg(guiGraphics, delta, mouseX, mouseY);
 		this.bindTexture();
 		TileEntityScanner te = ((ContainerScanner) this.menu).base;
 		int scanningloop = te.getSubPercentageDoneScaled(66);
 		if (scanningloop > 0)
 		{
-			this.drawTexturedRect(matrices, this.leftPos + 30, this.topPos + 20, 176.0, 14.0, scanningloop, 43.0);
+			this.drawTexturedRect(guiGraphics.pose(), this.leftPos + 30, this.topPos + 20, 176.0, 14.0, scanningloop, 43.0);
 		}
 	}
 

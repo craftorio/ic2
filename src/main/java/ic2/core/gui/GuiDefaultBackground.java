@@ -1,7 +1,7 @@
 package ic2.core.gui;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import ic2.core.ContainerBase;
+import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.Ic2Gui;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -26,15 +26,15 @@ public abstract class GuiDefaultBackground<T extends ContainerBase<? extends Con
 	}
 
 	@Override
-	protected void drawBackgroundAndTitle(PoseStack matrices, float partialTicks, int mouseX, int mouseY)
+	protected void drawBackgroundAndTitle(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY)
 	{
 		GuiElement.bindCommonTexture();
 		int width = this.imageWidth;
 		int height = this.imageHeight;
-		this.drawTexturedRect(matrices, -16.0, -16.0, 32.0, 32.0, 0.0, 0.0);
-		this.drawTexturedRect(matrices, width - 16, -16.0, 32.0, 32.0, 64.0, 0.0);
-		this.drawTexturedRect(matrices, -16.0, height - 16, 32.0, 32.0, 0.0, 64.0);
-		this.drawTexturedRect(matrices, width - 16, height - 16, 32.0, 32.0, 64.0, 64.0);
+		this.drawTexturedRect(guiGraphics.pose(), -16.0, -16.0, 32.0, 32.0, 0.0, 0.0);
+		this.drawTexturedRect(guiGraphics.pose(), width - 16, -16.0, 32.0, 32.0, 64.0, 0.0);
+		this.drawTexturedRect(guiGraphics.pose(), -16.0, height - 16, 32.0, 32.0, 0.0, 64.0);
+		this.drawTexturedRect(guiGraphics.pose(), width - 16, height - 16, 32.0, 32.0, 64.0, 64.0);
 
 		for (int side = 0; side < 2; side++)
 		{
@@ -44,7 +44,7 @@ public abstract class GuiDefaultBackground<T extends ContainerBase<? extends Con
 			for (int x = 16; x < width - 16; x += 32)
 			{
 				int cwidth = Math.min(32, width - 16 - x);
-				this.drawTexturedRect(matrices, x, y, cwidth, 32.0, 32.0, v);
+				this.drawTexturedRect(guiGraphics.pose(), x, y, cwidth, 32.0, 32.0, v);
 			}
 		}
 
@@ -56,7 +56,7 @@ public abstract class GuiDefaultBackground<T extends ContainerBase<? extends Con
 			for (int y = 16; y < height - 16; y += 32)
 			{
 				int cheight = Math.min(32, height - 16 - y);
-				this.drawTexturedRect(matrices, x, y, 32.0, cheight, u, 32.0);
+				this.drawTexturedRect(guiGraphics.pose(), x, y, 32.0, cheight, u, 32.0);
 			}
 		}
 
@@ -67,7 +67,7 @@ public abstract class GuiDefaultBackground<T extends ContainerBase<? extends Con
 			for (int x = 16; x < width - 16; x += 32)
 			{
 				int cwidth = Math.min(32, width - 16 - x);
-				this.drawTexturedRect(matrices, x, y, cwidth, cheight, 32.0, 32.0);
+				this.drawTexturedRect(guiGraphics.pose(), x, y, cwidth, cheight, 32.0, 32.0);
 			}
 		}
 	}

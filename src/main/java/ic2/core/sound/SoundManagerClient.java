@@ -138,7 +138,7 @@ public class SoundManagerClient extends SoundManager
 			{
 				Level world = player.getCommandSenderWorld();
 				BlockHitResult mop = getMovingObjectPositionFromPlayer(world, player, false);
-				BlockPos pos = new BlockPos(sound.getX(), sound.getY(), sound.getZ());
+				BlockPos pos = new BlockPos((int) sound.getX(), (int) sound.getY(), (int) sound.getZ());
 				if (mop != null && mop.getType() == Type.BLOCK && pos.equals(mop.getBlockPos()))
 				{
 					SoundEvent replaceSound;

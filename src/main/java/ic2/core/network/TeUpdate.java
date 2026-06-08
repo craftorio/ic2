@@ -20,6 +20,7 @@ import java.util.Map.Entry;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
@@ -124,7 +125,7 @@ class TeUpdate
 				{
 					String id = ((String) Objects.requireNonNull(value)).split(":")[1];
 					ResourceLocation identifier = IC2.getIdentifier(id);
-					teData.teType = (Ic2TileEntityBlock) Registry.BLOCK.get(identifier);
+					teData.teType = (Ic2TileEntityBlock) BuiltInRegistries.BLOCK.get(identifier);
 				} else
 				{
 					teData.addField(fieldName, value);

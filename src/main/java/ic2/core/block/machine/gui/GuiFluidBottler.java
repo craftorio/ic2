@@ -1,6 +1,6 @@
 package ic2.core.block.machine.gui;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.Ic2Gui;
 import ic2.core.block.machine.container.ContainerFluidBottler;
 import ic2.core.gui.EnergyGauge;
@@ -19,16 +19,16 @@ public class GuiFluidBottler extends Ic2Gui<ContainerFluidBottler>
 	}
 
 	@Override
-	protected void renderBg(PoseStack matrices, float delta, int mouseX, int mouseY)
+	protected void renderBg(GuiGraphics guiGraphics, float delta, int mouseX, int mouseY)
 	{
-		super.renderBg(matrices, delta, mouseX, mouseY);
+		super.renderBg(guiGraphics, delta, mouseX, mouseY);
 		this.bindTexture();
 		int progressSize = Math.round(((ContainerFluidBottler) this.menu).base.getProgress() * 16.0F);
 		if (progressSize > 0)
 		{
-			this.drawTexturedRect(matrices, this.leftPos + 61, this.topPos + 36, 198.0, 0.0, progressSize, 13.0);
-			this.drawTexturedRect(matrices, this.leftPos + 61, this.topPos + 73, 198.0, 0.0, progressSize, 13.0);
-			this.drawTexturedRect(matrices, this.leftPos + 99, this.topPos + 55, 198.0, 0.0, progressSize, 13.0);
+			this.drawTexturedRect(guiGraphics.pose(), this.leftPos + 61, this.topPos + 36, 198.0, 0.0, progressSize, 13.0);
+			this.drawTexturedRect(guiGraphics.pose(), this.leftPos + 61, this.topPos + 73, 198.0, 0.0, progressSize, 13.0);
+			this.drawTexturedRect(guiGraphics.pose(), this.leftPos + 99, this.topPos + 55, 198.0, 0.0, progressSize, 13.0);
 		}
 	}
 

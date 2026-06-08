@@ -3,8 +3,8 @@ package ic2.core.block;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
-import net.minecraft.core.Registry;
 import net.minecraft.core.BlockPos.MutableBlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -20,7 +20,7 @@ public final class ChunkLoadAwareBlockHandler
 
 	public static void init()
 	{
-		for (Block rawBlock : Registry.BLOCK)
+		for (Block rawBlock : BuiltInRegistries.BLOCK)
 		{
 			if (rawBlock instanceof ChunkLoadAwareBlock block)
 			{
@@ -44,15 +44,19 @@ public final class ChunkLoadAwareBlockHandler
 
 	private static void processChunk(LevelChunk chunk, boolean isLoad)
 	{
-		for (LevelChunkSection section : chunk.getSections())
+		LevelChunkSection[] sections = chunk.getSections();
+
+		for (int sectionIdx = 0; sectionIdx < sections.length; sectionIdx++)
 		{
+			LevelChunkSection section = sections[sectionIdx];
 			if (!section.hasOnlyAir())
 			{
 				PalettedContainer<BlockState> container = section.getStates();
 				if (container.maybeHas(stateMap::containsKey))
 				{
 					Level world = chunk.getLevel();
-					MutableBlockPos pos = new MutableBlockPos(chunk.getPos().getMinBlockX(), section.bottomBlockY(), chunk.getPos().getMinBlockZ());
+					MutableBlockPos pos = new MutableBlockPos();
+					pos.set(chunk.getPos().getMinBlockX(), chunk.getMinBuildHeight() + sectionIdx * 16, chunk.getPos().getMinBlockZ());
 					BlockState lastState = null;
 					ChunkLoadAwareBlock lastBlock = null;
 

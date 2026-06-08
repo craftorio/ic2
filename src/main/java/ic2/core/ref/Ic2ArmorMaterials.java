@@ -7,6 +7,7 @@ import java.util.function.Supplier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
@@ -65,14 +66,14 @@ public enum Ic2ArmorMaterials implements ArmorMaterial
 		this.repairIngredientSupplier = Suppliers.memoize(Ingredient::of);
 	}
 
-	public int getDurabilityForSlot(EquipmentSlot slot)
+	public int getDurabilityForType(ArmorItem.Type type)
 	{
-		return BASE_DURABILITY[slot.getIndex()] * this.durabilityMultiplier;
+		return BASE_DURABILITY[type.getSlot().getIndex()] * this.durabilityMultiplier;
 	}
 
-	public int getDefenseForSlot(EquipmentSlot slot)
+	public int getDefenseForType(ArmorItem.Type type)
 	{
-		return this.protectionAmounts[slot.getIndex()];
+		return this.protectionAmounts[type.getSlot().getIndex()];
 	}
 
 	public int getEnchantmentValue()

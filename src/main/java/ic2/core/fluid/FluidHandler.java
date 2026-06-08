@@ -7,6 +7,7 @@ import java.util.Collection;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -16,7 +17,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.level.material.Material;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,7 +26,6 @@ public final class FluidHandler
 
 	public static EnvFluidHandler.FluidRefs createFluid(
 		ResourceLocation id,
-		Material material,
 		int density,
 		int viscosity,
 		int luminosity,
@@ -37,7 +36,7 @@ public final class FluidHandler
 		int color
 	)
 	{
-		return ENV_HANDLER.createFluid(id, material, density, viscosity, luminosity, temperature, stillSpriteId, flowingSpriteId, color);
+		return ENV_HANDLER.createFluid(id, density, viscosity, luminosity, temperature, stillSpriteId, flowingSpriteId, color);
 	}
 
 	public static int getDensity(Fluid fluid)
@@ -197,6 +196,6 @@ public final class FluidHandler
 
 	public static Collection<Fluid> getAllFluids()
 	{
-		return Registry.FLUID.stream().filter(fluid -> fluid.isSource(fluid.defaultFluidState()) && fluid != Fluids.EMPTY).toList();
+		return BuiltInRegistries.FLUID.stream().filter(fluid -> fluid.isSource(fluid.defaultFluidState()) && fluid != Fluids.EMPTY).toList();
 	}
 }

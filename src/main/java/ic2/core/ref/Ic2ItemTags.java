@@ -1,7 +1,8 @@
 package ic2.core.ref;
 
 import ic2.core.IC2;
-import net.minecraft.core.Registry;
+
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -62,13 +63,13 @@ public final class Ic2ItemTags
 
 	private static TagKey<Item> create(String name)
 	{
-		return TagKey.create(Registry.ITEM_REGISTRY, IC2.getIdentifier(name));
+		return TagKey.create(Registries.ITEM, IC2.getIdentifier(name));
 	}
 
 	private static TagKey<Item> create(String fabricName, String forgeName)
 	{
 		ResourceLocation id = ResourceLocation.parse(IC2.envProxy.isFabricEnv() ? fabricName : forgeName);
-		return TagKey.create(Registry.ITEM_REGISTRY, id);
+		return TagKey.create(Registries.ITEM, id);
 	}
 
 	private static TagKey<Item> createResource(String material, String form)

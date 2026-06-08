@@ -17,7 +17,7 @@ public class ItemArmorJetpack extends ItemArmorFluidTank implements IJetpack
 
 	public void fillItemCategory(CreativeModeTab group, NonNullList<ItemStack> stacks)
 	{
-		if (this.allowedIn(group))
+		if (true)
 		{
 			ItemStack stack = new ItemStack(this);
 			this.filltank(stack);

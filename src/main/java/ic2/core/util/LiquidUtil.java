@@ -11,6 +11,7 @@ import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -25,7 +26,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.level.material.Material;
 import org.apache.commons.lang3.mutable.MutableObject;
 
 public class LiquidUtil
@@ -33,7 +33,7 @@ public class LiquidUtil
 	public static List<Fluid> getAllFluidsSorted()
 	{
 		List<Fluid> ret = new ArrayList<>(FluidHandler.getAllFluids());
-		ret.sort(Comparator.comparing(Registry.FLUID::getKey));
+		ret.sort(Comparator.comparing(BuiltInRegistries.FLUID::getKey));
 		return ret;
 	}
 
@@ -508,7 +508,7 @@ public class LiquidUtil
 			{
 				BlockState state = world.getBlockState(pos);
 				Block block = state.getBlock();
-				if (!state.isAir() && state.getMaterial().isSolid())
+				if (!state.isAir() && state.canOcclude())
 				{
 					return false;
 				}
@@ -523,7 +523,7 @@ public class LiquidUtil
 					return true;
 				}
 
-				if (world.dimensionType().ultraWarm() && fluidBlock.defaultBlockState().getMaterial() == Material.WATER)
+				if (world.dimensionType().ultraWarm() && fluidBlock == Blocks.WATER)
 				{
 					world.playSound(null, pos, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 0.5F, 2.6F + (world.random.nextFloat() - world.random.nextFloat()) * 0.8F);
 
@@ -535,7 +535,7 @@ public class LiquidUtil
 					}
 				} else
 				{
-					if (!world.isClientSide && !state.getMaterial().isSolid() && !state.getMaterial().isLiquid())
+					if (!world.isClientSide && !state.canOcclude() && state.getFluidState().isEmpty())
 					{
 						world.removeBlock(pos, true);
 					}

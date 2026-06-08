@@ -1,6 +1,7 @@
 package ic2.core.gui;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.Ic2Gui;
 import net.minecraft.resources.ResourceLocation;
 
@@ -41,7 +42,7 @@ public class VanillaButton extends Button<VanillaButton>
 	}
 
 	@Override
-	public void drawBackground(PoseStack matrices, int mouseX, int mouseY)
+	public void drawBackground(GuiGraphics guiGraphics, int mouseX, int mouseY)
 	{
 		bindTexture(texture);
 		int u;
@@ -77,20 +78,20 @@ public class VanillaButton extends Button<VanillaButton>
 		int cx = this.x;
 		int remainingWidth = this.width;
 		int cWidth = Math.min(remainingWidth, 200) - minRight;
-		drawVerticalPiece(this.gui, matrices, cx, this.y, cWidth, this.height, u, v);
+		drawVerticalPiece(this.gui, guiGraphics.pose(), cx, this.y, cWidth, this.height, u, v);
 		cx += cWidth;
 		remainingWidth -= cWidth;
 
 		while (remainingWidth > 200 - minLeft)
 		{
 			cWidth = Math.min(remainingWidth, 200 - minLeft) - minRight;
-			drawVerticalPiece(this.gui, matrices, cx, this.y, cWidth, this.height, u + minLeft, v);
+			drawVerticalPiece(this.gui, guiGraphics.pose(), cx, this.y, cWidth, this.height, u + minLeft, v);
 			cx += cWidth;
 			remainingWidth -= cWidth;
 		}
 
-		drawVerticalPiece(this.gui, matrices, cx, this.y, remainingWidth, this.height, u + 200 - remainingWidth, v);
-		super.drawBackground(matrices, mouseX, mouseY);
+		drawVerticalPiece(this.gui, guiGraphics.pose(), cx, this.y, remainingWidth, this.height, u + 200 - remainingWidth, v);
+		super.drawBackground(guiGraphics, mouseX, mouseY);
 	}
 
 	private static void drawVerticalPiece(Ic2Gui<?> gui, PoseStack matrices, int x, int y, int width, int height, int u, int v)

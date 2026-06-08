@@ -1,6 +1,6 @@
 package ic2.core.gui;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.Ic2Gui;
 import ic2.core.util.StackUtil;
 
@@ -43,9 +43,9 @@ public class SlotGrid extends GuiElement<SlotGrid>
 	}
 
 	@Override
-	public void drawBackground(PoseStack matrices, int mouseX, int mouseY)
+	public void drawBackground(GuiGraphics guiGraphics, int mouseX, int mouseY)
 	{
-		super.drawBackground(matrices, mouseX, mouseY);
+		super.drawBackground(guiGraphics, mouseX, mouseY);
 		if (this.style.background != null)
 		{
 			bindTexture(this.style.background);
@@ -60,7 +60,7 @@ public class SlotGrid extends GuiElement<SlotGrid>
 			{
 				for (int cx = startX; cx < maxX; cx += xStep)
 				{
-					this.gui.drawTexturedRect(matrices, cx, cy, this.style.width, this.style.height, this.style.u, this.style.v);
+					this.gui.drawTexturedRect(guiGraphics.pose(), cx, cy, this.style.width, this.style.height, this.style.u, this.style.v);
 				}
 			}
 		}

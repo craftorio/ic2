@@ -4,27 +4,33 @@ import ic2.compat.AbstractItemTagProvider;
 import ic2.core.IC2;
 import ic2.core.ref.Ic2ItemTags;
 import ic2.core.ref.Ic2Items;
-import net.minecraft.data.DataGenerator;
-import net.minecraft.data.tags.BlockTagsProvider;
-import net.minecraft.data.tags.TagsProvider.TagAppender;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.data.PackOutput;
+import net.minecraft.data.tags.IntrinsicHolderTagsProvider.IntrinsicTagAppender;
+import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
+import net.minecraftforge.common.data.ExistingFileHelper;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.concurrent.CompletableFuture;
 
 public class Ic2ItemTagProvider extends AbstractItemTagProvider
 {
-	public Ic2ItemTagProvider(DataGenerator root)
+	public Ic2ItemTagProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, CompletableFuture<TagsProvider.TagLookup<Block>> blockTags, @Nullable ExistingFileHelper existingFileHelper)
 	{
-		super(root, new BlockTagsProvider(root));
+		super(output, lookupProvider, blockTags, existingFileHelper);
 	}
 
-	protected TagAppender<Item> tag(TagKey<Item> tag)
+	protected IntrinsicTagAppender<Item> tag(TagKey<Item> tag)
 	{
-		return this.tag(tag);
+		return super.tag(tag);
 	}
 
-	protected void addTags()
+	protected void addTags(HolderLookup.Provider lookupProvider)
 	{
 		this.tag(Ic2ItemTags.COAL_DUSTS).add(Ic2Items.COAL_DUST);
 		this.tag(Ic2ItemTags.COPPER_DUSTS).add(Ic2Items.COPPER_DUST);

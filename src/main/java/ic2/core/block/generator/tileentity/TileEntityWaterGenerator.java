@@ -16,7 +16,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.level.material.Material;
 
 public class TileEntityWaterGenerator extends TileEntityBaseRotorGenerator implements IGuiValueProvider
 {
@@ -128,7 +127,7 @@ public class TileEntityWaterGenerator extends TileEntityBaseRotorGenerator imple
 			{
 				for (int z = -1; z < 2; z++)
 				{
-					if (world.getBlockState(this.worldPosition.offset(x, y, z)).getMaterial() == Material.WATER)
+					if (world.getBlockState(this.worldPosition.offset(x, y, z)).getFluidState().is(Fluids.WATER))
 					{
 						count++;
 					}

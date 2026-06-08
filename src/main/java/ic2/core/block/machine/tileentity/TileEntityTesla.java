@@ -1,6 +1,6 @@
 package ic2.core.block.machine.tileentity;
 
-import com.mojang.math.Vector3f;
+import org.joml.Vector3f;
 import ic2.core.IC2;
 import ic2.core.Ic2DamageSource;
 import ic2.core.block.comp.Energy;

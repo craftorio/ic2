@@ -56,7 +56,7 @@ public class ItemDrill extends ItemElectricTool implements IMiningDrill, IHitSou
 				speed *= 3.0F;
 			}
 
-			if (!player.isOnGround())
+			if (!player.onGround())
 			{
 				speed *= 3.0F;
 			}

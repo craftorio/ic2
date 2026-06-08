@@ -1,0 +1,649 @@
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by net.rubygrapefruit.platform.internal.NativeLibraryLoader in an unnamed module (file:/C:/Users/qq183/.gradle/wrapper/dists/gradle-8.8-bin/dl7vupf4psengwqhwktix4v1/gradle-8.8/lib/native-platform-0.22-milestone-26.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\util\StackUtil.java:286: 错误: 对于is(ItemStack), 找不到合适的方法
+		return isEmpty(a) && isEmpty(b) || !isEmpty(a) && !isEmpty(b) && a.is(b) && checkNbtEqualityStrict(a, b);
+		                                                                  ^
+    方法 ItemStack.is(TagKey<Item>)不适用
+      (参数不匹配; ItemStack无法转换为TagKey<Item>)
+    方法 ItemStack.is(Item)不适用
+      (参数不匹配; ItemStack无法转换为Item)
+    方法 ItemStack.is(Predicate<Holder<Item>>)不适用
+      (参数不匹配; ItemStack无法转换为Predicate<Holder<Item>>)
+    方法 ItemStack.is(Holder<Item>)不适用
+      (参数不匹配; ItemStack无法转换为Holder<Item>)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\core\util\Util.java:693: 错误: 对于is(ItemStack), 找不到合适的方法
+			return !StackUtil.isEmpty(stack) && stack.is((ItemStack) match);
+			                                         ^
+    方法 ItemStack.is(TagKey<Item>)不适用
+      (参数不匹配; ItemStack无法转换为TagKey<Item>)
+    方法 ItemStack.is(Item)不适用
+      (参数不匹配; ItemStack无法转换为Item)
+    方法 ItemStack.is(Predicate<Holder<Item>>)不适用
+      (参数不匹配; ItemStack无法转换为Predicate<Holder<Item>>)
+    方法 ItemStack.is(Holder<Item>)不适用
+      (参数不匹配; ItemStack无法转换为Holder<Item>)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\Ic2DataGenerators.java:43: 错误: 找不到符号
+		generator.addProvider(true, new Ic2ItemTagProvider(output, lookupProvider, blockTags.getTagLookup(), existingFileHelper));
+		                                                                                    ^
+  符号:   方法 getTagLookup()
+  位置: 类型为Ic2BlockTagProvider的变量 blockTags
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\lang\OldToNewLangConverter.java:70: 错误: OldToNewLangConverter中的run(CachedOutput)无法实现DataProvider中的run(CachedOutput)
+	public CompletableFuture<?> run(CachedOutput cache) throws IOException
+	                            ^
+  被覆盖的方法未抛出IOException
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\loot_tables\Ic2LootTableProvider.java:43: 错误: 不兼容的类型: lambda 表达式的函数描述符无效
+			LootDataResolver resolver = identifier -> null;
+			                            ^
+    接口 LootDataResolver 中的方法 <T>(LootDataId<T>)T 为泛型方法
+  其中, T是类型变量:
+    T扩展已在方法 <T>getElement(LootDataId<T>)中声明的Object
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\loot_tables\Ic2LootTableProvider.java:58: 错误: 找不到符号
+				DataProvider.saveStable(writer, LootTable.CODEC, table, path);
+				                                         ^
+  符号:   变量 CODEC
+  位置: 类 LootTable
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\recipe\helper\Ic2RecipeProvider.java:142: 错误: 不兼容的类型: 不存在类型变量T的实例, 以使Optional<T>与ContextAwarePredicate一致
+		return new TriggerInstance(Optional.empty(), Ints.ANY, Ints.ANY, Ints.ANY, predicates);
+		       ^
+  其中, T是类型变量:
+    T扩展已在方法 <T>empty()中声明的Object
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2BlockTagProvider.java:46: 错误: 对于add(Block), 找不到合适的方法
+				this.tag(Ic2BlockTags.CABLE_CONNECTABLE).add(block);
+				                                        ^
+    方法 TagAppender.add(ResourceKey<Block>)不适用
+      (参数不匹配; Block无法转换为ResourceKey<Block>)
+    方法 TagAppender.add(ResourceKey<Block>...)不适用
+      (varargs 不匹配; Block无法转换为ResourceKey<Block>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Block无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2BlockTagProvider.java:53: 错误: 对于add(Block), 找不到合适的方法
+						this.tag(Ic2BlockTags.CABLE_CONNECTABLE).add(block);
+						                                        ^
+    方法 TagAppender.add(ResourceKey<Block>)不适用
+      (参数不匹配; Block无法转换为ResourceKey<Block>)
+    方法 TagAppender.add(ResourceKey<Block>...)不适用
+      (varargs 不匹配; Block无法转换为ResourceKey<Block>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Block无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2BlockTagProvider.java:59: 错误: 对于add(RubberLogBlock), 找不到合适的方法
+			.add(Ic2Blocks.RUBBER_LOG)
+			^
+    方法 TagAppender.add(ResourceKey<Block>)不适用
+      (参数不匹配; RubberLogBlock无法转换为ResourceKey<Block>)
+    方法 TagAppender.add(ResourceKey<Block>...)不适用
+      (varargs 不匹配; RubberLogBlock无法转换为ResourceKey<Block>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; RubberLogBlock无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2BlockTagProvider.java:64: 错误: 对于add(Block), 找不到合适的方法
+		this.tag(BlockTags.PLANKS).add(Ic2Blocks.RUBBER_PLANKS);
+		                          ^
+    方法 TagAppender.add(ResourceKey<Block>)不适用
+      (参数不匹配; Block无法转换为ResourceKey<Block>)
+    方法 TagAppender.add(ResourceKey<Block>...)不适用
+      (varargs 不匹配; Block无法转换为ResourceKey<Block>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Block无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:28: 错误: Ic2ItemTagProvider中的tag(TagKey<Item>)无法覆盖IntrinsicHolderTagsProvider中的tag(TagKey<T>)
+	protected TagAppender<Item> tag(TagKey<Item> tag)
+	                            ^
+  返回类型TagAppender<Item>与IntrinsicTagAppender<Item>不兼容
+  其中, T是类型变量:
+    T扩展已在类 IntrinsicHolderTagsProvider中声明的Object
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:35: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.COAL_DUSTS).add(Ic2Items.COAL_DUST);
+		                                ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:36: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.COPPER_DUSTS).add(Ic2Items.COPPER_DUST);
+		                                  ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:37: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.DIAMOND_DUSTS).add(Ic2Items.DIAMOND_DUST);
+		                                   ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:38: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.GOLD_DUSTS).add(Ic2Items.GOLD_DUST);
+		                                ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:39: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.IRON_DUSTS).add(Ic2Items.IRON_DUST);
+		                                ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:40: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.LAPIS_DUSTS).add(Ic2Items.LAPIS_DUST);
+		                                 ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:41: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.LEAD_DUSTS).add(Ic2Items.LEAD_DUST);
+		                                ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:42: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.OBSIDIAN_DUSTS).add(Ic2Items.OBSIDIAN_DUST);
+		                                    ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:43: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.SILVER_DUSTS).add(Ic2Items.SILVER_DUST);
+		                                  ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:44: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.STONE_DUSTS).add(Ic2Items.STONE_DUST);
+		                                 ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:45: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.SULFUR_DUSTS).add(Ic2Items.SULFUR_DUST);
+		                                  ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:46: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.TIN_DUSTS).add(Ic2Items.TIN_DUST);
+		                               ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:47: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.IRIDIUM_NUGGETS).add(Ic2Items.IRIDIUM_SHARD);
+		                                     ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:48: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.IRON_PLATES).add(Ic2Items.IRON_PLATE);
+		                                 ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:49: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.GOLD_PLATES).add(Ic2Items.GOLD_PLATE);
+		                                 ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:50: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.LEAD_PLATES).add(Ic2Items.LEAD_PLATE);
+		                                 ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:51: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.BRONZE_PLATES).add(Ic2Items.BRONZE_PLATE);
+		                                   ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:52: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.TIN_PLATES).add(Ic2Items.TIN_PLATE);
+		                                ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:53: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.COPPER_PLATES).add(Ic2Items.COPPER_PLATE);
+		                                   ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:54: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.LAPIS_PLATES).add(Ic2Items.LAPIS_PLATE);
+		                                  ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:55: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.OBSIDIAN_PLATES).add(Ic2Items.OBSIDIAN_PLATE);
+		                                     ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:56: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.STEEL_PLATES).add(Ic2Items.STEEL_PLATE);
+		                                  ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:57: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.BRONZE_INGOTS).add(Ic2Items.BRONZE_INGOT);
+		                                   ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:58: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.LEAD_INGOTS).add(Ic2Items.LEAD_INGOT);
+		                                 ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:60: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.SILVER_INGOTS).add(Ic2Items.SILVER_INGOT);
+		                                   ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:61: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.STEEL_INGOTS).add(Ic2Items.STEEL_INGOT);
+		                                  ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:62: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.TIN_INGOTS).add(Ic2Items.TIN_INGOT);
+		                                ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:63: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.URANIUM_INGOTS).add(Ic2Items.URANIUM_INGOT);
+		                                    ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:64: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.LEAD_ORES).add(Ic2Items.LEAD_ORE);
+		                               ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:65: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.LEAD_ORES).add(Ic2Items.DEEPSLATE_LEAD_ORE);
+		                               ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:66: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.LEAD_RAW_ORES).add(Ic2Items.RAW_LEAD);
+		                                   ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:68: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.TIN_ORES).add(Ic2Items.TIN_ORE);
+		                              ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:69: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.TIN_ORES).add(Ic2Items.DEEPSLATE_TIN_ORE);
+		                              ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:70: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.TIN_RAW_ORES).add(Ic2Items.RAW_TIN);
+		                                  ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:71: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.URANIUM_ORES).add(Ic2Items.URANIUM_ORE);
+		                                  ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:72: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.URANIUM_ORES).add(Ic2Items.DEEPSLATE_URANIUM_ORE);
+		                                  ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:73: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.URANIUM_RAW_ORES).add(Ic2Items.RAW_URANIUM);
+		                                      ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:79: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.LEAD_BLOCKS).add(Ic2Items.LEAD_BLOCK);
+		                                 ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:80: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.URANIUM_BLOCKS).add(Ic2Items.URANIUM_BLOCK);
+		                                    ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:81: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.TIN_BLOCKS).add(Ic2Items.TIN_BLOCK);
+		                                ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:82: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.BRONZE_BLOCKS).add(Ic2Items.BRONZE_BLOCK);
+		                                   ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:83: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.STEEL_BLOCKS).add(Ic2Items.STEEL_BLOCK);
+		                                  ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:84: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(Ic2ItemTags.DIAMONDS).add(Ic2Items.INDUTRIAL_DIAMOND);
+		                              ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:86: 错误: 对于add(Item), 找不到合适的方法
+			.add(Ic2Items.RUBBER_LOG)
+			^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:91: 错误: 对于add(Item), 找不到合适的方法
+		this.tag(ItemTags.PLANKS).add(Ic2Items.RUBBER_PLANKS);
+		                         ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\data\tag\Ic2ItemTagProvider.java:95: 错误: 对于add(Item), 找不到合适的方法
+			this.tag(Ic2ItemTags.WOODEN_CHESTS).add(Items.CHEST);
+			                                   ^
+    方法 TagAppender.add(ResourceKey<Item>)不适用
+      (参数不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(ResourceKey<Item>...)不适用
+      (varargs 不匹配; Item无法转换为ResourceKey<Item>)
+    方法 TagAppender.add(TagEntry)不适用
+      (参数不匹配; Item无法转换为TagEntry)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\forge\EnvFluidHandlerForge.java:97: 错误: 找不到符号
+		BucketItem bucket = new BucketItem(() -> still, new Properties().craftRemainder(Items.BUCKET).stacksTo(1).tab(IC2.tabIc2ToolsAndUtilities));
+		                                                                                                         ^
+  符号:   方法 tab(CreativeModeTab)
+  位置: 类 Properties
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\forge\ClientModEventHandlerForge.java:99: 警告: [removal] ItemBlockRenderTypes 中的 setRenderLayer(Block,RenderType) 已过时, 且标记为待删除
+				ItemBlockRenderTypes.setRenderLayer(block, registration.layer());
+				                    ^
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\forge\EnvItemHandlerForge.java:90: 错误: 找不到符号
+			if (storage.canInsertItem(i, stack) && (itemStack.isEmpty() || itemStack.sameItemStackIgnoreDurability(stack) && itemStack.getCount() < itemStack.getMaxStackSize()))
+			                                                                        ^
+  符号:   方法 sameItemStackIgnoreDurability(ItemStack)
+  位置: 类型为ItemStack的变量 itemStack
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\forge\EnvProxyForge.java:140: 错误: 无法将类 MenuType<T>中的构造器 MenuType应用到给定类型;
+		MenuType<T> type = new MenuType(factory::apply);
+		                   ^
+  需要: MenuSupplier,FeatureFlagSet
+  找到:    factory::apply
+  原因: 实际参数列表和形式参数列表长度不同
+  其中, T是类型变量:
+    T扩展已在类 MenuType中声明的AbstractContainerMenu
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\forge\EnvProxyForge.java:170: 错误: 找不到符号
+		return WoodType.register(WoodType.create(name));
+		                                 ^
+  符号:   方法 create(String)
+  位置: 类 WoodType
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\forge\EnvProxyForge.java:188: 错误: 无法将类 SoundEvent中的构造器 SoundEvent应用到给定类型;
+		SoundEvent soundEvent = new SoundEvent(identifier);
+		                        ^
+  需要: ResourceLocation,float,boolean
+  找到:    ResourceLocation
+  原因: 实际参数列表和形式参数列表长度不同
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\forge\EnvProxyForge.java:197: 错误: 找不到符号
+		return (GameEvent) Registry.register(Registry.GAME_EVENT, identifier, new GameEvent(identifier.toString(), range));
+		                                             ^
+  符号:   变量 GAME_EVENT
+  位置: 接口 Registry
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\forge\EnvProxyForge.java:206: 错误: 对于register(String,F#1,FC#1), 找不到合适的方法
+		configuredFeatureRegistrations.add(() -> ret.complete(FeatureUtils.register(id.toString(), feature, config)));
+		                                                                  ^
+    方法 FeatureUtils.register(BootstapContext<ConfiguredFeature<?,?>>,ResourceKey<ConfiguredFeature<?,?>>,Feature<NoneFeatureConfiguration>)不适用
+      (参数不匹配; String无法转换为BootstapContext<ConfiguredFeature<?,?>>)
+    方法 FeatureUtils.<FC#2,F#2>register(BootstapContext<ConfiguredFeature<?,?>>,ResourceKey<ConfiguredFeature<?,?>>,F#2,FC#2)不适用
+      (无法推断类型变量 FC#2,F#2
+        (实际参数列表和形式参数列表长度不同))
+  其中, F#1,FC#1,FC#2,F#2是类型变量:
+    F#1扩展已在方法 <FC#1,F#1>registerConfiguredFeature(ResourceLocation,F#1,FC#1)中声明的Feature<FC#1>
+    FC#1扩展已在方法 <FC#1,F#1>registerConfiguredFeature(ResourceLocation,F#1,FC#1)中声明的FeatureConfiguration
+    FC#2扩展已在方法 <FC#2,F#2>register(BootstapContext<ConfiguredFeature<?,?>>,ResourceKey<ConfiguredFeature<?,?>>,F#2,FC#2)中声明的FeatureConfiguration
+    F#2扩展已在方法 <FC#2,F#2>register(BootstapContext<ConfiguredFeature<?,?>>,ResourceKey<ConfiguredFeature<?,?>>,F#2,FC#2)中声明的Feature<FC#2>
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\forge\EnvProxyForge.java:260: 错误: 不兼容的类型: String无法转换为Builder
+		return new CreativeModeTab(String.format("%s.%s", id.getNamespace(), id.getPath()))
+		                                        ^
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\forge\EnvProxyForge.java:260: 错误: 找不到符号
+		return new CreativeModeTab(String.format("%s.%s", id.getNamespace(), id.getPath()))
+		       ^
+  符号: 构造器 (String)
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\forge\FmlMod.java:107: 错误: 找不到符号
+		if (event.getRegistryKey() == BuiltInRegistries.BLOCK_REGISTRY)
+		                                               ^
+  符号:   变量 BLOCK_REGISTRY
+  位置: 类 BuiltInRegistries
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\forge\FmlMod.java:121: 错误: 找不到符号
+		if (event.getRegistryKey() == Registry.SOUND_EVENT_REGISTRY)
+		                                      ^
+  符号:   变量 SOUND_EVENT_REGISTRY
+  位置: 接口 Registry
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\forge\FmlMod.java:155: 错误: 找不到符号
+		if (event.getRegistryKey() == Registry.FEATURE_REGISTRY)
+		                                      ^
+  符号:   变量 FEATURE_REGISTRY
+  位置: 接口 Registry
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\forge\FmlMod.java:164: 错误: 不兼容的类型: String无法转换为BootstapContext<PlacedFeature>
+				reg.placedFeature().complete(PlacementUtils.register(reg.id().toString(), reg.feature().join(), reg.modifiers()));
+				                                                                      ^
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\forge\FmlMod.java:169: 错误: 找不到符号
+				Registry.register(Registry.PLACEMENT_MODIFIERS, reg.id(), reg.type());
+				                          ^
+  符号:   变量 PLACEMENT_MODIFIERS
+  位置: 接口 Registry
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\forge\model\DynamicBeModelForge.java:35: 错误: DynamicBeModelForge不是抽象的, 并且未覆盖IUnbakedGeometry中的抽象方法bake(IGeometryBakingContext,ModelBaker,Function<Material,TextureAtlasSprite>,ModelState,ItemOverrides,ResourceLocation)
+final class DynamicBeModelForge extends DynamicBeModel<List<BakedQuad>[]> implements Ic2Model
+      ^
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\forge\model\DynamicBeModelForge.java:44: 错误: 方法不会覆盖或实现超类型的方法
+	@Override
+	^
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\forge\model\DynamicBeModelForge.java:54: 错误: 不兼容的类型: ModelBakery无法转换为ModelBaker
+		return this.bake(bakery, spriteGetter, modelTransform, modelLocation);
+		                 ^
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\forge\model\DynamicBeModelForge.java:57: 错误: 方法不会覆盖或实现超类型的方法
+	@Override
+	^
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\forge\model\DynamicBeModelForge.java:62: 错误: 无法将类 DynamicBeModelForge中的方法 getMaterials应用到给定类型;
+		return this.getMaterials(modelGetter, missingTextureErrors);
+		           ^
+  需要: IGeometryBakingContext,Function<ResourceLocation,UnbakedModel>,Set<Pair<String,String>>
+  找到:    Function<ResourceLocation,UnbakedModel>,Set<Pair<String,String>>
+  原因: 实际参数列表和形式参数列表长度不同
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\forge\model\DynamicCableModelForge.java:36: 错误: DynamicCableModelForge不是抽象的, 并且未覆盖UnbakedModel中的抽象方法bake(ModelBaker,Function<Material,TextureAtlasSprite>,ModelState,ResourceLocation)
+final class DynamicCableModelForge extends DynamicCableModel<List<BakedQuad>[], List<BakedQuad>[]> implements Ic2Model
+      ^
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\forge\model\DynamicCableModelForge.java:46: 错误: 方法不会覆盖或实现超类型的方法
+	@Override
+	^
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\forge\model\DynamicCableModelForge.java:59: 错误: 方法不会覆盖或实现超类型的方法
+	@Override
+	^
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\integration\jei\recipe\machine\DynamicCategory.java:237: 错误: 找不到符号
+			element.a.draw(stack, element.b.x() + this.xOffset, element.b.y() + this.yOffset);
+			               ^
+  符号:   变量 stack
+  位置: 类 DynamicCategory
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\integration\jei\recipe\machine\MetalFormerCategory.java:28: 错误: 找不到符号
+		super.draw(recipe, recipeSlotsView, stack, mouseX, mouseY);
+		                                    ^
+  符号:   变量 stack
+  位置: 类 MetalFormerCategory
+D:\Files\Codes\JavaSources\ic2\src\main\java\ic2\integration\jei\recipe\machine\MetalFormerCategory.java:29: 错误: 找不到符号
+		Minecraft.getInstance().getItemRenderer().renderGuiItem(ICONS[this.mode], 70 + this.xOffset, 35 + this.yOffset);
+		                                         ^
+  符号:   方法 renderGuiItem(ItemStack,int,int)
+  位置: 类 ItemRenderer
+注: 某些输入文件使用或覆盖了已过时的 API。
+注: 有关详细信息, 请使用 -Xlint:deprecation 重新编译。
+注: 某些输入文件使用了未经检查或不安全的操作。
+注: 有关详细信息, 请使用 -Xlint:unchecked 重新编译。
+注: 某些消息已经过简化; 请使用 -Xdiags:verbose 重新编译以获得完整输出
+83 个错误
+1 个警告
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':compileJava'.
+> Compilation failed; see the compiler error output for details.
+
+* Try:
+> Run with --info option to get more log output.
+> Run with --scan to get full insights.
+
+BUILD FAILED in 15s

@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -69,7 +70,7 @@ public class RecipeInputFluidContainer extends RecipeInputBase
 	public JsonElement toJson()
 	{
 		JsonObject obj = new JsonObject();
-		obj.addProperty("fluid", Registry.FLUID.getKey(this.fluid).toString());
+		obj.addProperty("fluid", BuiltInRegistries.FLUID.getKey(this.fluid).toString());
 		obj.addProperty("amount", this.amount);
 		return obj;
 	}
@@ -113,7 +114,7 @@ public class RecipeInputFluidContainer extends RecipeInputBase
 		ret = new ArrayList<>();
 		MutableObject<ItemStack> container = new MutableObject();
 
-		for (Item item : Registry.ITEM)
+		for (Item item : BuiltInRegistries.ITEM)
 		{
 			if (item != Items.AIR)
 			{

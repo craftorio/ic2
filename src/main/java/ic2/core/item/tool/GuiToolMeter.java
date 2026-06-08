@@ -1,6 +1,6 @@
 package ic2.core.item.tool;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.Ic2Gui;
 import ic2.core.gui.CustomButton;
 import ic2.core.gui.IClickHandler;
@@ -61,55 +61,55 @@ public class GuiToolMeter extends Ic2Gui<ContainerMeter>
 	}
 
 	@Override
-	protected void drawForegroundLayer(PoseStack matrices, int mouseX, int mouseY)
+	protected void drawForegroundLayer(GuiGraphics guiGraphics, int mouseX, int mouseY)
 	{
-		super.drawForegroundLayer(matrices, mouseX, mouseY);
+		super.drawForegroundLayer(guiGraphics, mouseX, mouseY);
 		ContainerMeter container = this.getContainer();
 		String unit = container.getMode() == ContainerMeter.Mode.Voltage ? "ic2.generic.text.v" : "ic2.generic.text.EUt";
 		unit = Localization.translate(unit);
-		this.drawString(matrices, 115, 43, Localization.translate("ic2.meter.mode"), 2157374);
-		this.drawString(matrices, 15, 42, Localization.translate("ic2.meter.avg"), 2157374);
-		this.drawString(matrices, 15, 52, Util.toSiString(container.getResultAvg(), 6) + unit, 2157374);
-		this.drawString(matrices, 15, 66, Localization.translate("ic2.meter.max/min"), 2157374);
-		this.drawString(matrices, 15, 76, Util.toSiString(container.getResultMax(), 6) + unit, 2157374);
-		this.drawString(matrices, 15, 86, Util.toSiString(container.getResultMin(), 6) + unit, 2157374);
-		this.drawString(matrices, 15, 100, Localization.translate("ic2.meter.cycle", container.getResultCount() / 20), 2157374);
-		this.drawString(matrices, 39, 114, Localization.translate("ic2.meter.mode.reset"), 2157374);
+		this.drawString(guiGraphics, 115, 43, Localization.translate("ic2.meter.mode"), 2157374);
+		this.drawString(guiGraphics, 15, 42, Localization.translate("ic2.meter.avg"), 2157374);
+		this.drawString(guiGraphics, 15, 52, Util.toSiString(container.getResultAvg(), 6) + unit, 2157374);
+		this.drawString(guiGraphics, 15, 66, Localization.translate("ic2.meter.max/min"), 2157374);
+		this.drawString(guiGraphics, 15, 76, Util.toSiString(container.getResultMax(), 6) + unit, 2157374);
+		this.drawString(guiGraphics, 15, 86, Util.toSiString(container.getResultMin(), 6) + unit, 2157374);
+		this.drawString(guiGraphics, 15, 100, Localization.translate("ic2.meter.cycle", container.getResultCount() / 20), 2157374);
+		this.drawString(guiGraphics, 39, 114, Localization.translate("ic2.meter.mode.reset"), 2157374);
 		switch (container.getMode())
 		{
 			case EnergyIn:
-				this.drawString(matrices, 105, 1236, Localization.translate("ic2.meter.mode.EnergyIn"), 2157374);
+				this.drawString(guiGraphics, 105, 1236, Localization.translate("ic2.meter.mode.EnergyIn"), 2157374);
 				break;
 			case EnergyOut:
-				this.drawString(matrices, 105, 1236, Localization.translate("ic2.meter.mode.EnergyOut"), 2157374);
+				this.drawString(guiGraphics, 105, 1236, Localization.translate("ic2.meter.mode.EnergyOut"), 2157374);
 				break;
 			case EnergyGain:
-				this.drawString(matrices, 105, 1236, Localization.translate("ic2.meter.mode.EnergyGain"), 2157374);
+				this.drawString(guiGraphics, 105, 1236, Localization.translate("ic2.meter.mode.EnergyGain"), 2157374);
 				break;
 			case Voltage:
-				this.drawString(matrices, 105, 1236, Localization.translate("ic2.meter.mode.Voltage"), 2157374);
+				this.drawString(guiGraphics, 105, 1236, Localization.translate("ic2.meter.mode.Voltage"), 2157374);
 		}
 	}
 
 	@Override
-	protected void renderBg(PoseStack matrices, float delta, int mouseX, int mouseY)
+	protected void renderBg(GuiGraphics guiGraphics, float delta, int mouseX, int mouseY)
 	{
-		super.renderBg(matrices, delta, mouseX, mouseY);
+		super.renderBg(guiGraphics, delta, mouseX, mouseY);
 		this.bindTexture();
 		ContainerMeter container = this.getContainer();
 		switch (container.getMode())
 		{
 			case EnergyIn:
-				this.drawTexturedRect(matrices, 112.0, 55.0, 40.0, 40.0, 176.0, 0.0);
+				this.drawTexturedRect(guiGraphics.pose(), 112.0, 55.0, 40.0, 40.0, 176.0, 0.0);
 				break;
 			case EnergyOut:
-				this.drawTexturedRect(matrices, 112.0, 55.0, 40.0, 40.0, 176.0, 40.0);
+				this.drawTexturedRect(guiGraphics.pose(), 112.0, 55.0, 40.0, 40.0, 176.0, 40.0);
 				break;
 			case EnergyGain:
-				this.drawTexturedRect(matrices, 112.0, 55.0, 40.0, 40.0, 176.0, 120.0);
+				this.drawTexturedRect(guiGraphics.pose(), 112.0, 55.0, 40.0, 40.0, 176.0, 120.0);
 				break;
 			case Voltage:
-				this.drawTexturedRect(matrices, 112.0, 55.0, 40.0, 40.0, 176.0, 80.0);
+				this.drawTexturedRect(guiGraphics.pose(), 112.0, 55.0, 40.0, 40.0, 176.0, 80.0);
 		}
 	}
 

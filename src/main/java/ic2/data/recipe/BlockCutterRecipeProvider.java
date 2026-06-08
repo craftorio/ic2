@@ -8,16 +8,16 @@ import ic2.data.recipe.helper.Ic2RecipeProvider;
 
 import java.util.function.Consumer;
 
-import net.minecraft.data.DataGenerator;
+import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Items;
 
 public class BlockCutterRecipeProvider extends Ic2RecipeProvider
 {
-	public BlockCutterRecipeProvider(DataGenerator root)
+	public BlockCutterRecipeProvider(PackOutput packOutput)
 	{
-		super(root);
+		super(packOutput);
 	}
 
 	@Override

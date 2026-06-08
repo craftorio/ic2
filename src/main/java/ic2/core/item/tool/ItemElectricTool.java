@@ -218,7 +218,7 @@ public abstract class ItemElectricTool extends DiggerItem implements IElectricIt
 
 	public void fillItemCategory(CreativeModeTab tab, NonNullList<ItemStack> subItems)
 	{
-		if (this.allowedIn(tab))
+		if (true)
 		{
 			ElectricItemManager.addChargeVariants(this, subItems);
 		}

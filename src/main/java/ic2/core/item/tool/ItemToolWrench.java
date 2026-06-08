@@ -17,6 +17,7 @@ import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Direction.AxisDirection;
 import net.minecraft.server.level.ServerLevel;
@@ -242,7 +243,7 @@ public class ItemToolWrench extends Item implements PriorityUsableItem, IBoxable
 
 	private static String getTeName(BlockEntity te)
 	{
-		return te != null ? Registry.BLOCK_ENTITY_TYPE.getKey(te.getType()).toString() : "none";
+		return te != null ? BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(te.getType()).toString() : "none";
 	}
 
 	public void damage(ItemStack is, int damage, Player player, InteractionHand hand)

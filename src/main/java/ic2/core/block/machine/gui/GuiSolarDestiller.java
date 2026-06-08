@@ -1,6 +1,6 @@
 package ic2.core.block.machine.gui;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.Ic2Gui;
 import ic2.core.block.machine.container.ContainerSolarDestiller;
 import ic2.core.gui.TankGauge;
@@ -18,13 +18,13 @@ public class GuiSolarDestiller extends Ic2Gui<ContainerSolarDestiller>
 	}
 
 	@Override
-	protected void renderBg(PoseStack matrices, float delta, int mouseX, int mouseY)
+	protected void renderBg(GuiGraphics guiGraphics, float delta, int mouseX, int mouseY)
 	{
-		super.renderBg(matrices, delta, mouseX, mouseY);
+		super.renderBg(guiGraphics, delta, mouseX, mouseY);
 		this.bindTexture();
 		if (((ContainerSolarDestiller) this.menu).base.canWork())
 		{
-			this.drawTexturedRect(matrices, this.leftPos + 36, this.topPos + 26, 0.0, 184.0, 97.0, 29.0);
+			this.drawTexturedRect(guiGraphics.pose(), this.leftPos + 36, this.topPos + 26, 0.0, 184.0, 97.0, 29.0);
 		}
 	}
 

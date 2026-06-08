@@ -1,7 +1,7 @@
 package ic2.core.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.Ic2Gui;
 import net.minecraft.resources.ResourceLocation;
 
@@ -74,9 +74,9 @@ public class Image extends GuiElement<Image>
 	}
 
 	@Override
-	public void drawBackground(PoseStack matrices, int mouseX, int mouseY)
+	public void drawBackground(GuiGraphics guiGraphics, int mouseX, int mouseY)
 	{
-		super.drawBackground(matrices, mouseX, mouseY);
+		super.drawBackground(guiGraphics, mouseX, mouseY);
 		GlTexture texture = GlTexture.get(this.texture);
 		if (texture != null)
 		{
@@ -108,7 +108,7 @@ public class Image extends GuiElement<Image>
 
 			RenderSystem.setShaderTexture(0, this.texture);
 			this.gui
-				.drawTexturedRect(matrices, this.x, this.y, this.width, this.height, uS * widthScale, vS * heightScale, uE * widthScale, vE * heightScale, false);
+				.drawTexturedRect(guiGraphics.pose(), this.x, this.y, this.width, this.height, uS * widthScale, vS * heightScale, uE * widthScale, vE * heightScale, false);
 		} else
 		{
 			if (this.autoWidth)

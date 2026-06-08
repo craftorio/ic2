@@ -1,6 +1,6 @@
 package ic2.core.block.personal;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.Ic2Gui;
 import ic2.core.gui.VanillaButton;
 import ic2.core.init.Localization;
@@ -26,12 +26,12 @@ public class GuiEnergyOMatOpen extends Ic2Gui<ContainerEnergyOMatOpen>
 	}
 
 	@Override
-	protected void drawForegroundLayer(PoseStack matrices, int mouseX, int mouseY)
+	protected void drawForegroundLayer(GuiGraphics guiGraphics, int mouseX, int mouseY)
 	{
-		super.drawForegroundLayer(matrices, mouseX, mouseY);
-		this.drawString(matrices, 8, this.imageHeight - 96 + 2, Localization.translate("container.inventory"), 4210752);
-		this.drawString(matrices, 100, 60, Localization.translate("ic2.container.personalTrader.offer"), 4210752);
-		this.drawString(matrices, 100, 68, ((ContainerEnergyOMatOpen) this.menu).base.euOffer + " EU", 4210752);
+		super.drawForegroundLayer(guiGraphics, mouseX, mouseY);
+		this.drawString(guiGraphics, 8, this.imageHeight - 96 + 2, Localization.translate("container.inventory"), 4210752);
+		this.drawString(guiGraphics, 100, 60, Localization.translate("ic2.container.personalTrader.offer"), 4210752);
+		this.drawString(guiGraphics, 100, 68, ((ContainerEnergyOMatOpen) this.menu).base.euOffer + " EU", 4210752);
 	}
 
 	@Override

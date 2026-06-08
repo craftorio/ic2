@@ -60,7 +60,7 @@ public class Ic2SheetBlock extends Block
 			return !(state.getBlock() == Ic2Blocks.WOOL_SHEET && context instanceof EntityCollisionContext entityContext)
 				|| !(entityContext.getEntity() instanceof Player)
 				|| !entityContext.getEntity().isShiftKeyDown()
-				&& !(entityContext.getEntity().getY() < pos.getY() + 0.125 - entityContext.getEntity().maxUpStep)
+				&& !(entityContext.getEntity().getY() < pos.getY() + 0.125 - entityContext.getEntity().maxUpStep())
 				? aabb
 				: Shapes.empty();
 		}

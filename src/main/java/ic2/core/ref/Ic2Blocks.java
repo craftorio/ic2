@@ -131,7 +131,7 @@ import ic2.core.crop.TileEntityCrop;
 import ic2.core.util.Util;
 import ic2.core.world.Ic2WorldGen;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
+
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
@@ -149,75 +149,78 @@ import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.TrapDoorBlock;
-import net.minecraft.world.level.block.WoodButtonBlock;
+import net.minecraft.world.level.block.ButtonBlock;
 import net.minecraft.world.level.block.PressurePlateBlock.Sensitivity;
 import net.minecraft.world.level.block.grower.AbstractTreeGrower;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
-import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.level.material.MaterialColor;
+
+
+import net.minecraft.world.level.material.MapColor;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.block.state.properties.BlockSetType;
+import net.minecraft.world.level.block.state.properties.WoodType;
 
 public final class Ic2Blocks
 {
-	public static final Block BASALT = register("basalt", new Block(Properties.of(Material.STONE).strength(20.0F, 45.0F).requiresCorrectToolForDrops()));
-	public static final Block LEAD_ORE = register("lead_ore", new Block(Properties.of(Material.STONE).strength(2.0F, 4.0F).requiresCorrectToolForDrops()));
-	public static final Block TIN_ORE = register("tin_ore", new Block(Properties.of(Material.STONE).strength(3.0F, 5.0F).requiresCorrectToolForDrops()));
-	public static final Block URANIUM_ORE = register("uranium_ore", new Block(Properties.of(Material.STONE).strength(4.0F, 6.0F).requiresCorrectToolForDrops()));
+	public static final Block BASALT = register("basalt", new Block(Properties.of().strength(20.0F, 45.0F).requiresCorrectToolForDrops()));
+	public static final Block LEAD_ORE = register("lead_ore", new Block(Properties.of().strength(2.0F, 4.0F).requiresCorrectToolForDrops()));
+	public static final Block TIN_ORE = register("tin_ore", new Block(Properties.of().strength(3.0F, 5.0F).requiresCorrectToolForDrops()));
+	public static final Block URANIUM_ORE = register("uranium_ore", new Block(Properties.of().strength(4.0F, 6.0F).requiresCorrectToolForDrops()));
 	public static final Block DEEPSLATE_LEAD_ORE = register(
 		"deepslate_lead_ore",
-		new Block(Properties.of(Material.STONE, MaterialColor.DEEPSLATE).strength(3.0F, 6.0F).requiresCorrectToolForDrops().sound(SoundType.DEEPSLATE))
+		new Block(Properties.of().mapColor(MapColor.DEEPSLATE).strength(3.0F, 6.0F).requiresCorrectToolForDrops().sound(SoundType.DEEPSLATE))
 	);
 	public static final Block DEEPSLATE_TIN_ORE = register(
 		"deepslate_tin_ore",
-		new Block(Properties.of(Material.STONE, MaterialColor.DEEPSLATE).strength(4.0F, 7.0F).requiresCorrectToolForDrops().sound(SoundType.DEEPSLATE))
+		new Block(Properties.of().mapColor(MapColor.DEEPSLATE).strength(4.0F, 7.0F).requiresCorrectToolForDrops().sound(SoundType.DEEPSLATE))
 	);
 	public static final Block DEEPSLATE_URANIUM_ORE = register(
 		"deepslate_uranium_ore",
-		new Block(Properties.of(Material.STONE, MaterialColor.DEEPSLATE).strength(5.0F, 8.0F).requiresCorrectToolForDrops().sound(SoundType.DEEPSLATE))
+		new Block(Properties.of().mapColor(MapColor.DEEPSLATE).strength(5.0F, 8.0F).requiresCorrectToolForDrops().sound(SoundType.DEEPSLATE))
 	);
 	public static final Block RAW_LEAD_BLOCK = register(
-		"raw_lead_block", new Block(Properties.of(Material.STONE, MaterialColor.COLOR_LIGHT_GRAY).strength(3.0F, 11.0F).requiresCorrectToolForDrops())
+		"raw_lead_block", new Block(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(3.0F, 11.0F).requiresCorrectToolForDrops())
 	);
 	public static final Block RAW_TIN_BLOCK = register(
-		"raw_tin_block", new Block(Properties.of(Material.STONE, MaterialColor.SNOW).strength(4.0F, 12.0F).requiresCorrectToolForDrops())
+		"raw_tin_block", new Block(Properties.of().mapColor(MapColor.SNOW).strength(4.0F, 12.0F).requiresCorrectToolForDrops())
 	);
 	public static final Block RAW_URANIUM_BLOCK = register(
-		"raw_uranium_block", new Block(Properties.of(Material.STONE, MaterialColor.COLOR_GREEN).strength(5.0F, 13.0F).requiresCorrectToolForDrops())
+		"raw_uranium_block", new Block(Properties.of().mapColor(MapColor.COLOR_GREEN).strength(5.0F, 13.0F).requiresCorrectToolForDrops())
 	);
 	public static final Block BRONZE_BLOCK = register(
-		"bronze_block", new Block(Properties.of(Material.STONE).strength(5.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL))
+		"bronze_block", new Block(Properties.of().strength(5.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL))
 	);
 	public static final Block LEAD_BLOCK = register(
-		"lead_block", new Block(Properties.of(Material.STONE).strength(4.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL))
+		"lead_block", new Block(Properties.of().strength(4.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL))
 	);
 	public static final Block STEEL_BLOCK = register(
-		"steel_block", new Block(Properties.of(Material.STONE).strength(8.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL))
+		"steel_block", new Block(Properties.of().strength(8.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL))
 	);
 	public static final Block TIN_BLOCK = register(
-		"tin_block", new Block(Properties.of(Material.STONE).strength(4.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL))
+		"tin_block", new Block(Properties.of().strength(4.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL))
 	);
 	public static final Block URANIUM_BLOCK = register(
-		"uranium_block", new Block(Properties.of(Material.STONE).strength(6.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL))
+		"uranium_block", new Block(Properties.of().strength(6.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL))
 	);
 	public static final Block REINFORCED_STONE = register(
-		"reinforced_stone", new Block(Properties.of(Material.STONE).strength(80.0F, 180.0F).requiresCorrectToolForDrops())
+		"reinforced_stone", new Block(Properties.of().strength(80.0F, 180.0F).requiresCorrectToolForDrops())
 	);
 	public static final Block MACHINE = register(
-		"machine", new Block(Properties.of(Material.STONE).strength(5.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL))
+		"machine", new Block(Properties.of().strength(5.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL))
 	);
 	public static final Block ADVANCED_MACHINE = register(
-		"advanced_machine", new Block(Properties.of(Material.STONE).strength(8.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL))
+		"advanced_machine", new Block(Properties.of().strength(8.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL))
 	);
-	public static final Block REACTOR_VESSEL = register("reactor_vessel", new Block(Properties.of(Material.STONE).strength(40.0F, 90.0F).requiresCorrectToolForDrops()));
+	public static final Block REACTOR_VESSEL = register("reactor_vessel", new Block(Properties.of().strength(40.0F, 90.0F).requiresCorrectToolForDrops()));
 	public static final Block SILVER_BLOCK = register(
-		"silver_block", new Block(Properties.of(Material.STONE).strength(4.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL))
+		"silver_block", new Block(Properties.of().strength(4.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL))
 	);
 	public static final LeavesBlock RUBBER_LEAVES = register(
 		"rubber_leaves",
 		new LeavesBlock(
-			Properties.of(Material.LEAVES)
+			Properties.of()
 				.strength(0.2F)
 				.randomTicks()
 				.sound(SoundType.GRASS)
@@ -230,8 +233,8 @@ public final class Ic2Blocks
 	public static final RubberLogBlock RUBBER_LOG = register(
 		"rubber_log",
 		new RubberLogBlock(
-			Properties.of(
-					Material.WOOD, state -> state.getValue(RotatedPillarBlock.AXIS) == Axis.Y ? MaterialColor.PODZOL : MaterialColor.COLOR_BROWN
+			Properties.of().mapColor(
+					state -> state.getValue(RotatedPillarBlock.AXIS) == Axis.Y ? MapColor.PODZOL : MapColor.COLOR_BROWN
 				)
 				.randomTicks()
 				.strength(1.0F)
@@ -241,73 +244,73 @@ public final class Ic2Blocks
 	public static final RotatedPillarBlock STRIPPED_RUBBER_LOG = register(
 		"stripped_rubber_log",
 		new RotatedPillarBlock(
-			Properties.of(
-					Material.WOOD, state -> state.getValue(RotatedPillarBlock.AXIS) == Axis.Y ? MaterialColor.PODZOL : MaterialColor.COLOR_BROWN
+			Properties.of().mapColor(
+					state -> state.getValue(RotatedPillarBlock.AXIS) == Axis.Y ? MapColor.PODZOL : MapColor.COLOR_BROWN
 				)
 				.strength(1.0F)
 				.sound(SoundType.WOOD)
 		)
 	);
 	public static final RubberWoodBlock RUBBER_WOOD = register(
-		"rubber_wood", new RubberWoodBlock(Properties.of(Material.WOOD, MaterialColor.COLOR_BROWN).strength(1.0F).sound(SoundType.WOOD))
+		"rubber_wood", new RubberWoodBlock(Properties.of().mapColor(MapColor.COLOR_BROWN).strength(1.0F).sound(SoundType.WOOD))
 	);
 	public static final Block STRIPPED_RUBBER_WOOD = register(
-		"stripped_rubber_wood", new Block(Properties.of(Material.WOOD, MaterialColor.PODZOL).strength(1.0F).sound(SoundType.WOOD))
+		"stripped_rubber_wood", new Block(Properties.of().mapColor(MapColor.PODZOL).strength(1.0F).sound(SoundType.WOOD))
 	);
 	public static final Block RUBBER_SAPLING = register("rubber_sapling", new SaplingBlock(new AbstractTreeGrower()
 	{
-		protected Holder<ConfiguredFeature<TreeConfiguration, ?>> getConfiguredFeature(RandomSource random, boolean bees)
+		protected ResourceKey<ConfiguredFeature<?, ?>> getConfiguredFeature(RandomSource random, boolean bees)
 		{
-			return Ic2WorldGen.RUBBER_TREE.join();
+			return (ResourceKey<ConfiguredFeature<?, ?>>) (ResourceKey<?>) Ic2WorldGen.RUBBER_TREE.join().unwrapKey().orElseThrow();
 		}
-	}, Properties.of(Material.PLANT).noCollission().randomTicks().instabreak().sound(SoundType.GRASS))
+	}, Properties.of().noCollission().randomTicks().instabreak().sound(SoundType.GRASS))
 	{
 	});
 	public static final Block RUBBER_PLANKS = register(
-		"rubber_planks", new Block(Properties.of(Material.WOOD, MaterialColor.PODZOL).strength(2.0F, 3.0F).sound(SoundType.WOOD))
+		"rubber_planks", new Block(Properties.of().mapColor(MapColor.PODZOL).strength(2.0F, 3.0F).sound(SoundType.WOOD))
 	);
 	public static final Block RUBBER_BUTTON = register(
-		"rubber_button", new WoodButtonBlock(Properties.of(Material.DECORATION).noCollission().strength(0.5F).sound(SoundType.WOOD))
+		"rubber_button", new ButtonBlock(Properties.of().noCollission().strength(0.5F).sound(SoundType.WOOD), BlockSetType.OAK, 30, false)
 		{
 		}
 	);
 	public static final Block RUBBER_DOOR = register(
-		"rubber_door", new DoorBlock(Properties.of(Material.WOOD, RUBBER_PLANKS.defaultMaterialColor()).strength(3.0F).sound(SoundType.WOOD).noOcclusion())
+		"rubber_door", new DoorBlock(Properties.of().mapColor(RUBBER_PLANKS.defaultMapColor()).strength(3.0F).sound(SoundType.WOOD).noOcclusion(), BlockSetType.OAK)
 		{
 		}
 	);
 	public static final Block RUBBER_FENCE = register(
-		"rubber_fence", new FenceBlock(Properties.of(Material.WOOD, RUBBER_PLANKS.defaultMaterialColor()).strength(2.0F, 3.0F).sound(SoundType.WOOD))
+		"rubber_fence", new FenceBlock(Properties.of().mapColor(RUBBER_PLANKS.defaultMapColor()).strength(2.0F, 3.0F).sound(SoundType.WOOD))
 	);
 	public static final Block RUBBER_FENCE_GATE = register(
 		"rubber_fence_gate",
-		new FenceGateBlock(Properties.of(Material.WOOD, RUBBER_PLANKS.defaultMaterialColor()).strength(2.0F, 3.0F).sound(SoundType.WOOD))
+		new FenceGateBlock(Properties.of().mapColor(RUBBER_PLANKS.defaultMapColor()).strength(2.0F, 3.0F).sound(SoundType.WOOD), WoodType.OAK)
 	);
 	public static final Block RUBBER_PRESSURE_PLATE = register(
 		"rubber_pressure_plate",
 		new PressurePlateBlock(
-			Sensitivity.EVERYTHING, Properties.of(Material.WOOD, RUBBER_PLANKS.defaultMaterialColor()).noCollission().strength(0.5F).sound(SoundType.WOOD)
+			Sensitivity.EVERYTHING, Properties.of().mapColor(RUBBER_PLANKS.defaultMapColor()).noCollission().strength(0.5F).sound(SoundType.WOOD), BlockSetType.OAK
 		)
 		{
 		}
 	);
 	public static final Block RUBBER_SIGN = register(
 		"rubber_sign",
-		new Ic2SignBlock(Properties.of(Material.WOOD, RUBBER_LOG.defaultMaterialColor()).noCollission().strength(1.0F).sound(SoundType.WOOD), Ic2SignType.RUBBER)
+		new Ic2SignBlock(Properties.of().mapColor(RUBBER_LOG.defaultMapColor()).noCollission().strength(1.0F).sound(SoundType.WOOD), Ic2SignType.RUBBER)
 	);
 	public static final Block RUBBER_SLAB = register(
-		"rubber_slab", new SlabBlock(Properties.of(Material.WOOD, MaterialColor.WOOD).strength(2.0F, 3.0F).sound(SoundType.WOOD))
+		"rubber_slab", new SlabBlock(Properties.of().mapColor(MapColor.WOOD).strength(2.0F, 3.0F).sound(SoundType.WOOD))
 	);
 	public static final Block RUBBER_STAIRS = register(
 		"rubber_stairs",
-		new StairBlock(RUBBER_PLANKS.defaultBlockState(), Properties.of(Material.WOOD, MaterialColor.PODZOL).strength(2.0F, 3.0F).sound(SoundType.WOOD))
+		new StairBlock(RUBBER_PLANKS.defaultBlockState(), Properties.of().mapColor(MapColor.PODZOL).strength(2.0F, 3.0F).sound(SoundType.WOOD))
 		{
 		}
 	);
 	public static final Block RUBBER_TRAPDOOR = register(
 		"rubber_trapdoor",
 		new TrapDoorBlock(
-			Properties.of(Material.WOOD, MaterialColor.PODZOL).strength(3.0F).sound(SoundType.WOOD).noOcclusion().isValidSpawn(Ic2Blocks::never)
+			Properties.of().mapColor(MapColor.PODZOL).strength(3.0F).sound(SoundType.WOOD).noOcclusion().isValidSpawn(Ic2Blocks::never), BlockSetType.OAK
 		)
 		{
 		}
@@ -315,38 +318,38 @@ public final class Ic2Blocks
 	public static final Block RUBBER_WALL_SIGN = register(
 		"rubber_wall_sign",
 		new Ic2WallSignBlock(
-			Properties.of(Material.WOOD, RUBBER_LOG.defaultMaterialColor()).noCollission().strength(1.0F).sound(SoundType.WOOD).dropsLike(RUBBER_SIGN),
+			Properties.of().mapColor(RUBBER_LOG.defaultMapColor()).noCollission().strength(1.0F).sound(SoundType.WOOD).dropsLike(RUBBER_SIGN),
 			Ic2SignType.RUBBER
 		)
 	);
 	public static final Block WOODEN_SCAFFOLD = register(
-		"wooden_scaffold", new ScaffoldBlock(Properties.of(Material.WOOD).noOcclusion().strength(0.5F, 0.12F).randomTicks().sound(SoundType.WOOD), 2)
+		"wooden_scaffold", new ScaffoldBlock(Properties.of().noOcclusion().strength(0.5F, 0.12F).randomTicks().sound(SoundType.WOOD), 2)
 	);
 	public static final Block REINFORCED_WOODEN_SCAFFOLD = register(
 		"reinforced_wooden_scaffold",
-		new ScaffoldBlock(Properties.of(Material.WOOD).noOcclusion().strength(0.6F, 0.24F).randomTicks().sound(SoundType.WOOD), 5)
+		new ScaffoldBlock(Properties.of().noOcclusion().strength(0.6F, 0.24F).randomTicks().sound(SoundType.WOOD), 5)
 	);
 	public static final Block IRON_SCAFFOLD = register(
-		"iron_scaffold", new ScaffoldBlock(Properties.of(Material.METAL).noOcclusion().strength(0.8F, 6.0F).randomTicks().sound(SoundType.METAL), 5)
+		"iron_scaffold", new ScaffoldBlock(Properties.of().noOcclusion().strength(0.8F, 6.0F).randomTicks().sound(SoundType.METAL), 5)
 	);
 	public static final Block REINFORCED_IRON_SCAFFOLD = register(
 		"reinforced_iron_scaffold",
-		new ScaffoldBlock(Properties.of(Material.METAL).noOcclusion().strength(1.0F, 8.0F).randomTicks().sound(SoundType.METAL), 12)
+		new ScaffoldBlock(Properties.of().noOcclusion().strength(1.0F, 8.0F).randomTicks().sound(SoundType.METAL), 12)
 	);
-	public static final Block IRON_FENCE = register("iron_fence", new Ic2FenceBlock(Properties.of(Material.METAL).strength(5.0F, 10.0F), true));
-	public static final Block RESIN_SHEET = register("resin_sheet", new Ic2SheetBlock(Properties.of(Material.DECORATION).strength(1.6F, 0.5F)));
-	public static final Block RUBBER_SHEET = register("rubber_sheet", new Ic2SheetBlock(Properties.of(Material.DECORATION).strength(0.8F, 2.0F)));
-	public static final Block WOOL_SHEET = register("wool_sheet", new Ic2SheetBlock(Properties.of(Material.DECORATION).strength(0.8F, 0.8F)));
+	public static final Block IRON_FENCE = register("iron_fence", new Ic2FenceBlock(Properties.of().strength(5.0F, 10.0F), true));
+	public static final Block RESIN_SHEET = register("resin_sheet", new Ic2SheetBlock(Properties.of().strength(1.6F, 0.5F)));
+	public static final Block RUBBER_SHEET = register("rubber_sheet", new Ic2SheetBlock(Properties.of().strength(0.8F, 2.0F)));
+	public static final Block WOOL_SHEET = register("wool_sheet", new Ic2SheetBlock(Properties.of().strength(0.8F, 0.8F)));
 	public static final Block REINFORCED_GLASS = register(
 		"reinforced_glass",
 		new Ic2GlassBlock(
-			Properties.of(Material.GLASS).noOcclusion().strength(5.0F, 180.0F).sound(SoundType.GLASS).isValidSpawn((state, world, pos, type) -> false)
+			Properties.of().noOcclusion().strength(5.0F, 180.0F).sound(SoundType.GLASS).isValidSpawn((state, world, pos, type) -> false)
 		)
 	);
 	public static final Block FOAM = register(
-		"foam", new FoamBlock(Properties.of(Material.WOOL).noOcclusion().strength(0.01F, 10.0F).randomTicks().sound(SoundType.WOOL))
+		"foam", new FoamBlock(Properties.of().noOcclusion().strength(0.01F, 10.0F).randomTicks().sound(SoundType.WOOL))
 	);
-	private static final Properties wallSettings = Properties.of(Material.STONE).strength(3.0F, 30.0F).requiresCorrectToolForDrops().sound(SoundType.STONE);
+	private static final Properties wallSettings = Properties.of().strength(3.0F, 30.0F).requiresCorrectToolForDrops().sound(SoundType.STONE);
 	public static final Block WHITE_WALL = register("white_wall", new WallBlock(wallSettings, DyeColor.WHITE));
 	public static final Block ORANGE_WALL = register("orange_wall", new WallBlock(wallSettings, DyeColor.ORANGE));
 	public static final Block MAGENTA_WALL = register("magenta_wall", new WallBlock(wallSettings, DyeColor.MAGENTA));
@@ -367,20 +370,20 @@ public final class Ic2Blocks
 		"obscured_wall", Ic2TileEntityBlock.create(wallSettings, TileEntityWall.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.noFacings, false)
 	);
 	public static final Block MINING_PIPE = register(
-		"mining_pipe", new MiningPipeBlock(Properties.of(Material.METAL).strength(6.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL))
+		"mining_pipe", new MiningPipeBlock(Properties.of().strength(6.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL))
 	);
 	public static final Block MINING_PIPE_TIP = register(
-		"mining_pipe_tip", new Block(Properties.of(Material.METAL).strength(6.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL))
+		"mining_pipe_tip", new Block(Properties.of().strength(6.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL))
 	);
 	public static final Block REINFORCED_DOOR = register(
-		"reinforced_door", new DoorBlock(Properties.of(Material.METAL).strength(50.0F, 150.0F).sound(SoundType.METAL))
+		"reinforced_door", new DoorBlock(Properties.of().strength(50.0F, 150.0F).sound(SoundType.METAL), BlockSetType.IRON)
 		{
 		}
 	);
 	public static final Block ITNT = register(
 		"itnt",
 		Ic2TileEntityBlock.create(
-			Properties.of(Material.EXPLOSIVE).strength(0.0F, 0.0F).sound(SoundType.GRASS),
+			Properties.of().strength(0.0F, 0.0F).sound(SoundType.GRASS),
 			TileEntityITnt.class,
 			false,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -391,7 +394,7 @@ public final class Ic2Blocks
 	public static final Block NUKE = register(
 		"nuke",
 		Ic2TileEntityBlock.create(
-			Properties.of(Material.EXPLOSIVE).strength(0.0F, 0.0F).sound(SoundType.GRASS),
+			Properties.of().strength(0.0F, 0.0F).sound(SoundType.GRASS),
 			TileEntityNuke.class,
 			false,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -402,7 +405,7 @@ public final class Ic2Blocks
 	public static final Block CLASSIC_NUKE = register(
 		"classic_nuke",
 		Ic2TileEntityBlock.create(
-			Properties.of(Material.EXPLOSIVE).strength(0.0F, 0.0F).sound(SoundType.GRASS),
+			Properties.of().strength(0.0F, 0.0F).sound(SoundType.GRASS),
 			TileEntityBridgeNuke.TileEntityClassicNuke.class,
 			false,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -413,7 +416,7 @@ public final class Ic2Blocks
 	public static final Block GENERATOR = register(
 		"generator",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityGenerator.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -424,7 +427,7 @@ public final class Ic2Blocks
 	public static final Block GEO_GENERATOR = register(
 		"geo_generator",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityGeoGenerator.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Generator,
@@ -435,7 +438,7 @@ public final class Ic2Blocks
 	public static final Block KINETIC_GENERATOR = register(
 		"kinetic_generator",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityKineticGenerator.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Generator,
@@ -446,7 +449,7 @@ public final class Ic2Blocks
 	public static final Block RT_GENERATOR = register(
 		"rt_generator",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityRTGenerator.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Generator,
@@ -457,7 +460,7 @@ public final class Ic2Blocks
 	public static final Block SEMIFLUID_GENERATOR = register(
 		"semifluid_generator",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntitySemifluidGenerator.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Generator,
@@ -468,7 +471,7 @@ public final class Ic2Blocks
 	public static final Block SOLAR_GENERATOR = register(
 		"solar_generator",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntitySolarGenerator.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Generator,
@@ -479,7 +482,7 @@ public final class Ic2Blocks
 	public static final Block STIRLING_GENERATOR = register(
 		"stirling_generator",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityStirlingGenerator.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Generator,
@@ -490,7 +493,7 @@ public final class Ic2Blocks
 	public static final Block WATER_GENERATOR = register(
 		"water_generator",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityWaterGenerator.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Generator,
@@ -501,7 +504,7 @@ public final class Ic2Blocks
 	public static final Block WIND_GENERATOR = register(
 		"wind_generator",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityWindGenerator.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Generator,
@@ -512,7 +515,7 @@ public final class Ic2Blocks
 	public static final Block ELECTRIC_HEAT_GENERATOR = register(
 		"electric_heat_generator",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityElectricHeatGenerator.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -523,7 +526,7 @@ public final class Ic2Blocks
 	public static final Block FLUID_HEAT_GENERATOR = register(
 		"fluid_heat_generator",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityFluidHeatGenerator.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -534,7 +537,7 @@ public final class Ic2Blocks
 	public static final Block RT_HEAT_GENERATOR = register(
 		"rt_heat_generator",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityRTHeatGenerator.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -545,7 +548,7 @@ public final class Ic2Blocks
 	public static final Block SOLID_HEAT_GENERATOR = register(
 		"solid_heat_generator",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntitySolidHeatGenerator.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -556,7 +559,7 @@ public final class Ic2Blocks
 	public static final Block ELECTRIC_KINETIC_GENERATOR = register(
 		"electric_kinetic_generator",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityElectricKineticGenerator.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -567,7 +570,7 @@ public final class Ic2Blocks
 	public static final Block MANUAL_KINETIC_GENERATOR = register(
 		"manual_kinetic_generator",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityManualKineticGenerator.class,
 			false,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -578,7 +581,7 @@ public final class Ic2Blocks
 	public static final Block STEAM_KINETIC_GENERATOR = register(
 		"steam_kinetic_generator",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntitySteamKineticGenerator.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -589,7 +592,7 @@ public final class Ic2Blocks
 	public static final Block STIRLING_KINETIC_GENERATOR = register(
 		"stirling_kinetic_generator",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityStirlingKineticGenerator.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -600,7 +603,7 @@ public final class Ic2Blocks
 	public static final Block WATER_KINETIC_GENERATOR = register(
 		"water_kinetic_generator",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityWaterKineticGenerator.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -611,7 +614,7 @@ public final class Ic2Blocks
 	public static final Block WIND_KINETIC_GENERATOR = register(
 		"wind_kinetic_generator",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityWindKineticGenerator.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -622,7 +625,7 @@ public final class Ic2Blocks
 	public static final Block NUCLEAR_REACTOR = register(
 		"nuclear_reactor",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityNuclearReactorElectric.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Generator,
@@ -633,7 +636,7 @@ public final class Ic2Blocks
 	public static final Block REACTOR_ACCESS_HATCH = register(
 		"reactor_access_hatch",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(40.0F, 90.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(40.0F, 90.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityReactorAccessHatch.class,
 			false,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -644,7 +647,7 @@ public final class Ic2Blocks
 	public static final Block REACTOR_CHAMBER = register(
 		"reactor_chamber",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityReactorChamberElectric.class,
 			false,
 			Ic2TileEntityBlock.DefaultDrop.Machine,
@@ -655,7 +658,7 @@ public final class Ic2Blocks
 	public static final Block REACTOR_FLUID_PORT = register(
 		"reactor_fluid_port",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(40.0F, 90.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(40.0F, 90.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityReactorFluidPort.class,
 			false,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -666,7 +669,7 @@ public final class Ic2Blocks
 	public static final Block REACTOR_REDSTONE_PORT = register(
 		"reactor_redstone_port",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(40.0F, 90.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(40.0F, 90.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityReactorRedstonePort.class,
 			false,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -677,7 +680,7 @@ public final class Ic2Blocks
 	public static final Block CONDENSER = register(
 		"condenser",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityCondenser.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Machine,
@@ -688,7 +691,7 @@ public final class Ic2Blocks
 	public static final Block FLUID_BOTTLER = register(
 		"fluid_bottler",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityFluidBottler.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Machine,
@@ -699,7 +702,7 @@ public final class Ic2Blocks
 	public static final Block FLUID_DISTRIBUTOR = register(
 		"fluid_distributor",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityFluidDistributor.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Machine,
@@ -710,7 +713,7 @@ public final class Ic2Blocks
 	public static final Block FLUID_REGULATOR = register(
 		"fluid_regulator",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityFluidRegulator.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Machine,
@@ -721,7 +724,7 @@ public final class Ic2Blocks
 	public static final Block LIQUID_HEAT_EXCHANGER = register(
 		"liquid_heat_exchanger",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityLiquidHeatExchanger.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Machine,
@@ -732,7 +735,7 @@ public final class Ic2Blocks
 	public static final Block PUMP = register(
 		"pump",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityPump.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Machine,
@@ -743,7 +746,7 @@ public final class Ic2Blocks
 	public static final Block SOLAR_DISTILLER = register(
 		"solar_distiller",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntitySolarDestiller.class,
 			false,
 			Ic2TileEntityBlock.DefaultDrop.Machine,
@@ -754,7 +757,7 @@ public final class Ic2Blocks
 	public static final Block STEAM_GENERATOR = register(
 		"steam_generator",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntitySteamGenerator.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -765,7 +768,7 @@ public final class Ic2Blocks
 	public static final Block ITEM_BUFFER = register(
 		"item_buffer",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityItemBuffer.class,
 			false,
 			Ic2TileEntityBlock.DefaultDrop.Machine,
@@ -776,7 +779,7 @@ public final class Ic2Blocks
 	public static final Block MAGNETIZER = register(
 		"magnetizer",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityMagnetizer.class,
 			false,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -787,7 +790,7 @@ public final class Ic2Blocks
 	public static final Block SORTING_MACHINE = register(
 		"sorting_machine",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntitySortingMachine.class,
 			false,
 			Ic2TileEntityBlock.DefaultDrop.Machine,
@@ -798,7 +801,7 @@ public final class Ic2Blocks
 	public static final Block TELEPORTER = register(
 		"teleporter",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityTeleporter.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.AdvMachine,
@@ -809,7 +812,7 @@ public final class Ic2Blocks
 	public static final Block TERRAFORMER = register(
 		"terraformer",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityTerra.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.AdvMachine,
@@ -820,7 +823,7 @@ public final class Ic2Blocks
 	public static final Block TESLA_COIL = register(
 		"tesla_coil",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityTesla.class,
 			false,
 			Ic2TileEntityBlock.DefaultDrop.Machine,
@@ -831,7 +834,7 @@ public final class Ic2Blocks
 	public static final Block CANNER = register(
 		"canner",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityCanner.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Machine,
@@ -842,7 +845,7 @@ public final class Ic2Blocks
 	public static final Block CLASSIC_CANNER = register(
 		"classic_canner",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityClassicCanner.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Machine,
@@ -853,7 +856,7 @@ public final class Ic2Blocks
 	public static final Ic2TileEntityBlock COMPRESSOR = register(
 		"compressor",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityCompressor.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Machine,
@@ -864,7 +867,7 @@ public final class Ic2Blocks
 	public static final Block ELECTRIC_FURNACE = register(
 		"electric_furnace",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityElectricFurnace.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -875,7 +878,7 @@ public final class Ic2Blocks
 	public static final Ic2TileEntityBlock EXTRACTOR = register(
 		"extractor",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityExtractor.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Machine,
@@ -886,7 +889,7 @@ public final class Ic2Blocks
 	public static final Block IRON_FURNACE = register(
 		"iron_furnace",
 		Ic2TileEntityBlock.create(
-			Properties.of(Material.METAL).strength(5.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().strength(5.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityIronFurnace.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -897,7 +900,7 @@ public final class Ic2Blocks
 	public static final Ic2TileEntityBlock MACERATOR = register(
 		"macerator",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityMacerator.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Machine,
@@ -908,7 +911,7 @@ public final class Ic2Blocks
 	public static final Block RECYCLER = register(
 		"recycler",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityRecycler.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Machine,
@@ -919,7 +922,7 @@ public final class Ic2Blocks
 	public static final Block SOLID_CANNER = register(
 		"solid_canner",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntitySolidCanner.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Machine,
@@ -930,7 +933,7 @@ public final class Ic2Blocks
 	public static final Ic2TileEntityBlock BLAST_FURNACE = register(
 		"blast_furnace",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityBlastFurnace.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Machine,
@@ -941,7 +944,7 @@ public final class Ic2Blocks
 	public static final Ic2TileEntityBlock BLOCK_CUTTER = register(
 		"block_cutter",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityBlockCutter.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.AdvMachine,
@@ -952,7 +955,7 @@ public final class Ic2Blocks
 	public static final Ic2TileEntityBlock CENTRIFUGE = register(
 		"centrifuge",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityCentrifuge.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Machine,
@@ -963,7 +966,7 @@ public final class Ic2Blocks
 	public static final Block FERMENTER = register(
 		"fermenter",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityFermenter.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Machine,
@@ -974,7 +977,7 @@ public final class Ic2Blocks
 	public static final Block INDUCTION_FURNACE = register(
 		"induction_furnace",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityInduction.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.AdvMachine,
@@ -985,7 +988,7 @@ public final class Ic2Blocks
 	public static final Ic2TileEntityBlock METAL_FORMER = register(
 		"metal_former",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityMetalFormer.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Machine,
@@ -996,7 +999,7 @@ public final class Ic2Blocks
 	public static final Ic2TileEntityBlock ORE_WASHING_PLANT = register(
 		"ore_washing_plant",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityOreWashing.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Machine,
@@ -1007,7 +1010,7 @@ public final class Ic2Blocks
 	public static final Block ADVANCED_MINER = register(
 		"advanced_miner",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityAdvMiner.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -1018,7 +1021,7 @@ public final class Ic2Blocks
 	public static final Block CROP_HARVESTER = register(
 		"crop_harvester",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityCropHarvester.class,
 			false,
 			Ic2TileEntityBlock.DefaultDrop.Machine,
@@ -1029,7 +1032,7 @@ public final class Ic2Blocks
 	public static final Block CROPMATRON = register(
 		"cropmatron",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityCropmatron.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Machine,
@@ -1040,7 +1043,7 @@ public final class Ic2Blocks
 	public static final Block CLASSIC_CROPMATRON = register(
 		"classic_cropmatron",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityClassicCropmatron.class,
 			false,
 			Ic2TileEntityBlock.DefaultDrop.Machine,
@@ -1051,7 +1054,7 @@ public final class Ic2Blocks
 	public static final Block MINER = register(
 		"miner",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityMiner.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -1062,7 +1065,7 @@ public final class Ic2Blocks
 	public static final Block MASS_FABRICATOR = register(
 		"mass_fabricator",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityMassFabricator.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.AdvMachine,
@@ -1073,7 +1076,7 @@ public final class Ic2Blocks
 	public static final Block CLASSIC_MASS_FABRICATOR = register(
 		"classic_mass_fabricator",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityClassicMassFabricator.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.AdvMachine,
@@ -1084,7 +1087,7 @@ public final class Ic2Blocks
 	public static final Block UU_ASSEMBLY_BENCH = register(
 		"uu_assembly_bench",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityAssemblyBench.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.AdvMachine,
@@ -1095,7 +1098,7 @@ public final class Ic2Blocks
 	public static final Block MATTER_GENERATOR = register(
 		"matter_generator",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityMatter.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.AdvMachine,
@@ -1106,7 +1109,7 @@ public final class Ic2Blocks
 	public static final Block PATTERN_STORAGE = register(
 		"pattern_storage",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityPatternStorage.class,
 			false,
 			Ic2TileEntityBlock.DefaultDrop.AdvMachine,
@@ -1117,7 +1120,7 @@ public final class Ic2Blocks
 	public static final Block REPLICATOR = register(
 		"replicator",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityReplicator.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.AdvMachine,
@@ -1128,7 +1131,7 @@ public final class Ic2Blocks
 	public static final Block UU_SCANNER = register(
 		"uu_scanner",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityScanner.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.AdvMachine,
@@ -1139,7 +1142,7 @@ public final class Ic2Blocks
 	public static final Block ENERGY_O_MAT = register(
 		"energy_o_mat",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(-1.0F, 3600000.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(-1.0F, 3600000.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityEnergyOMat.class,
 			false,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -1150,7 +1153,7 @@ public final class Ic2Blocks
 	public static final Block PERSONAL_CHEST = register(
 		"personal_chest",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(-1.0F, 3600000.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(-1.0F, 3600000.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityPersonalChest.class,
 			false,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -1161,7 +1164,7 @@ public final class Ic2Blocks
 	public static final Block TRADE_O_MAT = register(
 		"trade_o_mat",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(-1.0F, 3600000.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(-1.0F, 3600000.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityTradeOMat.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -1169,8 +1172,8 @@ public final class Ic2Blocks
 			false
 		)
 	);
-	private static final Properties cableSettings = Properties.of(Material.METAL).strength(0.5F, 5.0F).sound(SoundType.METAL);
-	private static final Properties insulatedCableSettings = Properties.of(Material.WOOL).strength(0.5F, 5.0F).sound(SoundType.WOOL);
+	private static final Properties cableSettings = Properties.of().strength(0.5F, 5.0F).sound(SoundType.METAL);
+	private static final Properties insulatedCableSettings = Properties.of().strength(0.5F, 5.0F).sound(SoundType.WOOL);
 	public static final FoamCableBlock COPPER_FOAM_CABLE = register("copper_foam_cable", FoamCableBlock.create(cableSettings, CableType.copper, 0));
 	public static final Block COPPER_CABLE = register("copper_cable", CableBlock.create(cableSettings, CableType.copper, 0, COPPER_FOAM_CABLE));
 	public static final FoamCableBlock INSULATED_COPPER_FOAM_CABLE = register(
@@ -1181,11 +1184,11 @@ public final class Ic2Blocks
 	);
 	public static final FoamCableBlock GLASS_FIBRE_FOAM_CABLE = register(
 		"glass_fibre_foam_cable",
-		FoamCableBlock.create(Properties.of(Material.GLASS).strength(0.5F, 5.0F).sound(SoundType.GLASS), CableType.glass, 0)
+		FoamCableBlock.create(Properties.of().strength(0.5F, 5.0F).sound(SoundType.GLASS), CableType.glass, 0)
 	);
 	public static final Block GLASS_FIBRE_CABLE = register(
 		"glass_fibre_cable",
-		CableBlock.create(Properties.of(Material.GLASS).strength(0.5F, 5.0F).sound(SoundType.GLASS), CableType.glass, 0, GLASS_FIBRE_FOAM_CABLE)
+		CableBlock.create(Properties.of().strength(0.5F, 5.0F).sound(SoundType.GLASS), CableType.glass, 0, GLASS_FIBRE_FOAM_CABLE)
 	);
 	public static final FoamCableBlock GOLD_FOAM_CABLE = register("gold_foam_cable", FoamCableBlock.create(cableSettings, CableType.gold, 0));
 	public static final Block GOLD_CABLE = register("gold_cable", CableBlock.create(cableSettings, CableType.gold, 0, GOLD_FOAM_CABLE));
@@ -1236,7 +1239,7 @@ public final class Ic2Blocks
 	public static final Block BATBOX_CHARGEPAD = register(
 		"batbox_chargepad",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL).noOcclusion(),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL).noOcclusion(),
 			TileEntityChargepadBatBox.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -1247,7 +1250,7 @@ public final class Ic2Blocks
 	public static final Block CESU_CHARGEPAD = register(
 		"cesu_chargepad",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL).noOcclusion(),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL).noOcclusion(),
 			TileEntityChargepadCESU.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -1258,7 +1261,7 @@ public final class Ic2Blocks
 	public static final Block MFE_CHARGEPAD = register(
 		"mfe_chargepad",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL).noOcclusion(),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL).noOcclusion(),
 			TileEntityChargepadMFE.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -1269,7 +1272,7 @@ public final class Ic2Blocks
 	public static final Block MFSU_CHARGEPAD = register(
 		"mfsu_chargepad",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL).noOcclusion(),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL).noOcclusion(),
 			TileEntityChargepadMFSU.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -1280,7 +1283,7 @@ public final class Ic2Blocks
 	public static final Block BATBOX = register(
 		"batbox",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityElectricBatBox.class,
 			false,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -1291,7 +1294,7 @@ public final class Ic2Blocks
 	public static final Block CESU = register(
 		"cesu",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityElectricCESU.class,
 			false,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -1302,7 +1305,7 @@ public final class Ic2Blocks
 	public static final Block MFE = register(
 		"mfe",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityElectricMFE.class,
 			false,
 			Ic2TileEntityBlock.DefaultDrop.Machine,
@@ -1313,7 +1316,7 @@ public final class Ic2Blocks
 	public static final Block CLASSIC_MFE = register(
 		"classic_mfe",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityElectricMFE.TileEntityElectricClassicMFE.class,
 			false,
 			Ic2TileEntityBlock.DefaultDrop.Machine,
@@ -1324,7 +1327,7 @@ public final class Ic2Blocks
 	public static final Block MFSU = register(
 		"mfsu",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityElectricMFSU.class,
 			false,
 			Ic2TileEntityBlock.DefaultDrop.AdvMachine,
@@ -1335,7 +1338,7 @@ public final class Ic2Blocks
 	public static final Block CLASSIC_MFSU = register(
 		"classic_mfsu",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityElectricMFSU.TileEntityElectricClassicMFSU.class,
 			false,
 			Ic2TileEntityBlock.DefaultDrop.AdvMachine,
@@ -1346,7 +1349,7 @@ public final class Ic2Blocks
 	public static final Block ELECTROLYZER = register(
 		"electrolyzer",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityElectrolyzer.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Machine,
@@ -1357,7 +1360,7 @@ public final class Ic2Blocks
 	public static final Block CLASSIC_ELECTROLYZER = register(
 		"classic_electrolyzer",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityClassicElectrolyzer.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Machine,
@@ -1368,7 +1371,7 @@ public final class Ic2Blocks
 	public static final Block LV_TRANSFORMER = register(
 		"lv_transformer",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityTransformerLV.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -1379,7 +1382,7 @@ public final class Ic2Blocks
 	public static final Block MV_TRANSFORMER = register(
 		"mv_transformer",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityTransformerMV.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Machine,
@@ -1390,7 +1393,7 @@ public final class Ic2Blocks
 	public static final Block HV_TRANSFORMER = register(
 		"hv_transformer",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityTransformerHV.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Machine,
@@ -1401,7 +1404,7 @@ public final class Ic2Blocks
 	public static final Block EV_TRANSFORMER = register(
 		"ev_transformer",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityTransformerEV.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Machine,
@@ -1412,7 +1415,7 @@ public final class Ic2Blocks
 	public static final Block TANK = register(
 		"tank",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityTank.class,
 			false,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -1423,7 +1426,7 @@ public final class Ic2Blocks
 	public static final Block CHUNK_LOADER = register(
 		"chunk_loader",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityChunkloader.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -1434,7 +1437,7 @@ public final class Ic2Blocks
 	public static final Block CREATIVE_GENERATOR = register(
 		"creative_generator",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(-1.0F, Float.POSITIVE_INFINITY).sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(-1.0F, Float.POSITIVE_INFINITY).sound(SoundType.METAL),
 			TileEntityCreativeGenerator.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.None,
@@ -1445,7 +1448,7 @@ public final class Ic2Blocks
 	public static final Block STEAM_REPRESSURIZER = register(
 		"steam_repressurizer",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntitySteamRepressurizer.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.Machine,
@@ -1456,7 +1459,7 @@ public final class Ic2Blocks
 	public static final Block WEIGHTED_FLUID_DISTRIBUTOR = register(
 		"weighted_fluid_distributor",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityWeightedFluidDistributor.class,
 			false,
 			Ic2TileEntityBlock.DefaultDrop.Machine,
@@ -1467,7 +1470,7 @@ public final class Ic2Blocks
 	public static final Block WEIGHTED_ITEM_DISTRIBUTOR = register(
 		"weighted_item_distributor",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityWeightedItemDistributor.class,
 			false,
 			Ic2TileEntityBlock.DefaultDrop.Machine,
@@ -1478,7 +1481,7 @@ public final class Ic2Blocks
 	public static final Block RCI_RSH = register(
 		"rci_rsh",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityRCI_RSH.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.AdvMachine,
@@ -1489,7 +1492,7 @@ public final class Ic2Blocks
 	public static final Block RCI_LZH = register(
 		"rci_lzh",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityRCI_LZH.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.AdvMachine,
@@ -1497,7 +1500,7 @@ public final class Ic2Blocks
 			true
 		)
 	);
-	private static final Properties cropSettings = Properties.of(Material.PLANT).strength(0.8F, 0.2F).sound(SoundType.CROP).noCollission();
+	private static final Properties cropSettings = Properties.of().strength(0.8F, 0.2F).sound(SoundType.CROP).noCollission();
 	public static final Block CROP_STICK = register(
 		"crop_stick",
 		Ic2TileEntityBlock.create(cropSettings, TileEntityCrop.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.noFacings, false, Ic2CropType.none)
@@ -1663,7 +1666,7 @@ public final class Ic2Blocks
 	public static final Block INDUSTRIAL_WORKBENCH = register(
 		"industrial_workbench",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityIndustrialWorkbench.class,
 			false,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -1674,7 +1677,7 @@ public final class Ic2Blocks
 	public static final Block BATCH_CRAFTER = register(
 		"batch_crafter",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityBatchCrafter.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.AdvMachine,
@@ -1685,7 +1688,7 @@ public final class Ic2Blocks
 	public static final Block WOODEN_STORAGE_BOX = register(
 		"wooden_storage_box",
 		Ic2TileEntityBlock.create(
-			Properties.of(Material.WOOD).strength(1.0F, 10.0F).sound(SoundType.WOOD),
+			Properties.of().strength(1.0F, 10.0F).sound(SoundType.WOOD),
 			TileEntityWoodenStorageBox.class,
 			false,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -1696,7 +1699,7 @@ public final class Ic2Blocks
 	public static final Block IRON_STORAGE_BOX = register(
 		"iron_storage_box",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(1.0F, 15.0F).sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(1.0F, 15.0F).sound(SoundType.METAL),
 			TileEntityIronStorageBox.class,
 			false,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -1707,7 +1710,7 @@ public final class Ic2Blocks
 	public static final Block BRONZE_STORAGE_BOX = register(
 		"bronze_storage_box",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(1.0F, 15.0F).sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(1.0F, 15.0F).sound(SoundType.METAL),
 			TileEntityBronzeStorageBox.class,
 			false,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -1718,7 +1721,7 @@ public final class Ic2Blocks
 	public static final Block STEEL_STORAGE_BOX = register(
 		"steel_storage_box",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(2.0F, 20.0F).sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 20.0F).sound(SoundType.METAL),
 			TileEntitySteelStorageBox.class,
 			false,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -1729,7 +1732,7 @@ public final class Ic2Blocks
 	public static final Block IRIDIUM_STORAGE_BOX = register(
 		"iridium_storage_box",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(3.0F, 100.0F).sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(3.0F, 100.0F).sound(SoundType.METAL),
 			TileEntityIridiumStorageBox.class,
 			false,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -1740,7 +1743,7 @@ public final class Ic2Blocks
 	public static final Block BRONZE_TANK = register(
 		"bronze_tank",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(3.0F, 15.0F).sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(3.0F, 15.0F).sound(SoundType.METAL),
 			TileEntityBronzeTank.class,
 			false,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -1751,7 +1754,7 @@ public final class Ic2Blocks
 	public static final Block IRON_TANK = register(
 		"iron_tank",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(3.0F, 15.0F).sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(3.0F, 15.0F).sound(SoundType.METAL),
 			TileEntityIronTank.class,
 			false,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -1762,7 +1765,7 @@ public final class Ic2Blocks
 	public static final Block STEEL_TANK = register(
 		"steel_tank",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(4.0F, 20.0F).sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(4.0F, 20.0F).sound(SoundType.METAL),
 			TileEntitySteelTank.class,
 			false,
 			Ic2TileEntityBlock.DefaultDrop.Self,
@@ -1773,7 +1776,7 @@ public final class Ic2Blocks
 	public static final Block IRIDIUM_TANK = register(
 		"iridium_tank",
 		Ic2TileEntityBlock.create(
-			Properties.of(IC2Material.MACHINE).strength(5.0F, 100.0F).sound(SoundType.METAL),
+			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(5.0F, 100.0F).sound(SoundType.METAL),
 			TileEntityIridiumTank.class,
 			false,
 			Ic2TileEntityBlock.DefaultDrop.Self,

@@ -4,8 +4,9 @@ import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.datafixers.util.Pair;
-import com.mojang.math.Quaternion;
-import com.mojang.math.Vector3f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
+import com.mojang.math.Axis;
 import ic2.api.entity.boat.AbstractBoatEntity;
 import ic2.api.entity.boat.BoatType;
 
@@ -40,14 +41,14 @@ public class BoatEntityRenderer extends EntityRenderer<AbstractBoatEntity>
 	private BoatModel createModel(Context ctx, boolean chest)
 	{
 		ModelLayerLocation entityModelLayer = chest ? ModelLayers.createChestBoatModelName(Type.OAK) : ModelLayers.createBoatModelName(Type.OAK);
-		return new BoatModel(ctx.bakeLayer(entityModelLayer), chest);
+		return new BoatModel(ctx.bakeLayer(entityModelLayer));
 	}
 
 	public void render(AbstractBoatEntity boatEntity, float f, float g, PoseStack matrixStack, MultiBufferSource vertexConsumerProvider, int i)
 	{
 		matrixStack.pushPose();
 		matrixStack.translate(0.0, 0.375, 0.0);
-		matrixStack.mulPose(Vector3f.YP.rotationDegrees(180.0F - f));
+		matrixStack.mulPose(Axis.YP.rotationDegrees(180.0F - f));
 		float h = boatEntity.getHurtTime() - g;
 		float j = boatEntity.getDamage() - g;
 		if (j < 0.0F)
@@ -57,19 +58,19 @@ public class BoatEntityRenderer extends EntityRenderer<AbstractBoatEntity>
 
 		if (h > 0.0F)
 		{
-			matrixStack.mulPose(Vector3f.XP.rotationDegrees(Mth.sin(h) * h * j / 10.0F * boatEntity.getHurtDir()));
+			matrixStack.mulPose(Axis.XP.rotationDegrees(Mth.sin(h) * h * j / 10.0F * boatEntity.getHurtDir()));
 		}
 
 		if (!Mth.equal(boatEntity.getBubbleAngle(g), 0.0F))
 		{
-			matrixStack.mulPose(new Quaternion(new Vector3f(1.0F, 0.0F, 1.0F), boatEntity.getBubbleAngle(g), true));
+			matrixStack.mulPose(new Quaternionf().rotateAxis(boatEntity.getBubbleAngle(g) * ((float)Math.PI / 180F), 1.0F, 0.0F, 1.0F));
 		}
 
 		Pair<ResourceLocation, BoatModel> pair = this.texturesAndModels.get(boatEntity.getOverrideBoatType());
 		ResourceLocation identifier = (ResourceLocation) pair.getFirst();
 		BoatModel boatEntityModel = (BoatModel) pair.getSecond();
 		matrixStack.scale(-1.0F, -1.0F, 1.0F);
-		matrixStack.mulPose(Vector3f.YP.rotationDegrees(90.0F));
+		matrixStack.mulPose(Axis.YP.rotationDegrees(90.0F));
 		boatEntityModel.setupAnim(boatEntity, g, 0.0F, -0.1F, 0.0F, 0.0F);
 		VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(boatEntityModel.renderType(identifier));
 		boatEntityModel.renderToBuffer(matrixStack, vertexConsumer, i, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);

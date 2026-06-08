@@ -514,7 +514,7 @@ public class NetworkManager implements INetworkManager
 
 	public void onPacket(ByteBuf packet, Player player)
 	{
-		assert !player.level.isClientSide;
+		assert !player.level().isClientSide;
 
 		try
 		{
@@ -774,12 +774,8 @@ public class NetworkManager implements INetworkManager
 		assert !this.isClient();
 		ByteBuf data = makePacket(buffer, advancePos);
 		ServerGamePacketListenerImpl handler = player.connection;
-		Connection connection = handler.getConnection();
-		if (connection.isConnected())
-		{
-			Packet<?> packet = new ClientboundCustomPayloadPacket(channelId, new FriendlyByteBuf(data));
-			connection.send(packet);
-		}
+		Packet<?> packet = new ClientboundCustomPayloadPacket(channelId, new FriendlyByteBuf(data));
+		handler.send(packet);
 	}
 
 	static <T extends Collection<ServerPlayer>> T getPlayersInRange(Level world, BlockPos pos, T result)

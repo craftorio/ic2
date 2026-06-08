@@ -14,7 +14,7 @@ import java.util.Objects;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.SimpleContainer;
-import net.minecraft.world.damagesource.IndirectEntityDamageSource;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -33,7 +33,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.StainedGlassBlock;
 import net.minecraft.world.level.block.StainedGlassPaneBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -162,7 +161,7 @@ public class LaserBulletEntity extends ThrowableProjectile
 		if (damage > 0)
 		{
 			entity.setSecondsOnFire(damage * (this.isSmeltMode ? 2 : 1));
-			return entity.hurt(new IndirectEntityDamageSource("laser", this, this.owner).setProjectile(), damage);
+			return entity.hurt(this.level().damageSources().mobProjectile(this, this.owner), damage);
 		} else
 		{
 			return true;
@@ -214,14 +213,14 @@ public class LaserBulletEntity extends ThrowableProjectile
 		}
 
 		List<ItemStack> replacements = new ArrayList<>();
-		if (state.getMaterial() == Material.EXPLOSIVE)
+		if (block == Blocks.TNT )
 		{
 			block.wasExploded(
-				world, pos, new Explosion(world, this, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 1.0F, false, BlockInteraction.BREAK)
+				world, pos, new Explosion(world, this, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 1.0F, false, BlockInteraction.DESTROY)
 			);
 		} else if (this.isSmeltMode)
 		{
-			if (state.getMaterial() == Material.WOOD)
+			if (state.isFlammable(world, pos, side))
 			{
 				dropBlock = false;
 			} else
@@ -254,7 +253,7 @@ public class LaserBulletEntity extends ThrowableProjectile
 				this.power = 0.0F;
 			}
 
-			if (world.random.nextInt(10) == 0 && state.getMaterial().isFlammable())
+			if (world.random.nextInt(10) == 0 && state.isFlammable(world, pos, Direction.UP))
 			{
 				world.setBlockAndUpdate(pos, Blocks.FIRE.defaultBlockState());
 			}
@@ -273,11 +272,11 @@ public class LaserBulletEntity extends ThrowableProjectile
 
 		SmeltingRecipe recipe = (SmeltingRecipe) IC2.sideProxy
 			.getRecipeManager()
-			.getRecipeFor(RecipeType.SMELTING, new SimpleContainer(new ItemStack[] { inputItemStack }), null)
+			.getRecipeFor(RecipeType.SMELTING, new SimpleContainer(new ItemStack[] { inputItemStack }), this.getCommandSenderWorld())
 			.orElse(null);
 		if (recipe != null)
 		{
-			ItemStack replacementStack = recipe.getResultItem();
+			ItemStack replacementStack = recipe.getResultItem(this.getCommandSenderWorld().registryAccess());
 			if (!StackUtil.isEmpty(replacementStack))
 			{
 				replacementList.add(replacementStack);

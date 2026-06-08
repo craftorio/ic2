@@ -35,8 +35,6 @@ public class CropEating extends Ic2CropCard
 {
 	private final double movementMultiplier = 0.5;
 	private final double length = 1.0;
-	private static final Ic2DamageSource damage = new Ic2DamageSource("cropEating");
-
 	public CropEating(ICropType cropType)
 	{
 		super(cropType);
@@ -122,7 +120,7 @@ public class CropEating extends Ic2CropCard
 					if (!(entity instanceof Player) || !((Player) entity).getAbilities().instabuild)
 					{
 						entity.setDeltaMovement((xcentered - entity.getX()) * 0.5, Math.min(entity.getDeltaMovement().y(), -0.05), (zcentered - entity.getZ()) * 0.5);
-						entity.hurt(damage, (crop.getCurrentAge() + 1) * 2.0F);
+						entity.hurt(Ic2DamageSource.create(crop.getWorldObj(), "cropEating"), (crop.getCurrentAge() + 1) * 2.0F);
 						if (!hasMetalAromor(entity))
 						{
 							entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 64, 50));

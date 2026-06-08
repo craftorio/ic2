@@ -3,7 +3,7 @@ package ic2.core.recipe.input;
 import ic2.api.recipe.IRecipeInput;
 import ic2.api.recipe.IRecipeInputFactory;
 import ic2.core.util.StackUtil;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.ItemStack;
@@ -35,7 +35,7 @@ public class RecipeInputFactory implements IRecipeInputFactory
 	public IRecipeInput forTag(String name, int amount)
 	{
 		// TODO
-		return this.forIngredient(Ingredient.of(TagKey.create(Registry.ITEM_REGISTRY, ResourceLocation.parse(name))), amount);
+		return this.forIngredient(Ingredient.of(TagKey.create(Registries.ITEM, ResourceLocation.parse(name))), amount);
 	}
 
 	@Override

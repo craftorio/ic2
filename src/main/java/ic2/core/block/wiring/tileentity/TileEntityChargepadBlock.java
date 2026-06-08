@@ -1,6 +1,6 @@
 package ic2.core.block.wiring.tileentity;
 
-import com.mojang.math.Vector3f;
+import org.joml.Vector3f;
 import ic2.api.item.ElectricItem;
 import ic2.core.ContainerBase;
 import ic2.core.IC2;

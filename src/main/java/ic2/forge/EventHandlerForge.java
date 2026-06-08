@@ -36,7 +36,7 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
-import net.minecraftforge.event.entity.living.LivingSpawnEvent;
+import net.minecraftforge.event.entity.living.MobSpawnEvent;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -153,7 +153,7 @@ public final class EventHandlerForge
 	}
 
 	@SubscribeEvent
-	public void onLivingSpecialSpawn(LivingSpawnEvent.SpecialSpawn event)
+	public void onLivingSpecialSpawn(MobSpawnEvent.FinalizeSpawn event)
 	{
 		EventHandler.onLivingSpecialSpawn(event.getEntity());
 	}

@@ -3,7 +3,7 @@ package ic2.core.world;
 import com.mojang.serialization.Codec;
 import ic2.core.IC2;
 
-import java.util.function.BiConsumer;
+import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacer.FoliageSetter;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
@@ -38,7 +38,7 @@ public final class RubberTreeFoliagePlacer extends FoliagePlacer
 
 	protected void createFoliage(
 		LevelSimulatedReader world,
-		BiConsumer<BlockPos, BlockState> replacer,
+		FoliageSetter replacer,
 		RandomSource random,
 		TreeConfiguration config,
 		int trunkHeight,

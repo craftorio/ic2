@@ -1,6 +1,6 @@
 package ic2.core.gui;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.Ic2Gui;
 import ic2.core.gui.dynamic.TextProvider;
 
@@ -186,7 +186,7 @@ public class TextLabel extends GuiElement<TextLabel>
 	}
 
 	@Override
-	public void drawBackground(PoseStack matrices, int mouseX, int mouseY)
+	public void drawBackground(GuiGraphics guiGraphics, int mouseX, int mouseY)
 	{
 		String text = this.textProvider.get(this.getBase(), this.getTokens());
 		int textWidth;
@@ -225,10 +225,10 @@ public class TextLabel extends GuiElement<TextLabel>
 			this.height = textHeight;
 		}
 
-		super.drawBackground(matrices, mouseX, mouseY);
+		super.drawBackground(guiGraphics, mouseX, mouseY);
 		if (!text.isEmpty())
 		{
-			this.gui.drawString(matrices, textX, textY, text, this.color.getAsInt(), this.shadow);
+			this.gui.drawString(guiGraphics, textX, textY, text, this.color.getAsInt(), this.shadow);
 		}
 	}
 

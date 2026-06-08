@@ -1,6 +1,6 @@
 package ic2.core.item.tool;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.Ic2Gui;
 import ic2.core.init.Localization;
 import ic2.core.util.Tuple;
@@ -17,10 +17,10 @@ public class GuiToolScanner extends Ic2Gui<ContainerToolScanner>
 	}
 
 	@Override
-	protected void drawForegroundLayer(PoseStack matrices, int mouseX, int mouseY)
+	protected void drawForegroundLayer(GuiGraphics guiGraphics, int mouseX, int mouseY)
 	{
-		super.drawForegroundLayer(matrices, mouseX, mouseY);
-		this.drawString(matrices, 10, 20, Localization.translate("ic2.itemScanner.found"), 2157374);
+		super.drawForegroundLayer(guiGraphics, mouseX, mouseY);
+		this.drawString(guiGraphics, 10, 20, Localization.translate("ic2.itemScanner.found"), 2157374);
 		if (((ContainerToolScanner) this.menu).scanResults != null)
 		{
 			int count = 0;
@@ -28,7 +28,7 @@ public class GuiToolScanner extends Ic2Gui<ContainerToolScanner>
 			for (Tuple.T2<ItemStack, Integer> result : ((ContainerToolScanner) this.menu).scanResults)
 			{
 				String name = result.a.getItem().getName(result.a).getString();
-				this.drawString(matrices, 10, 34 + count * 11, result.b + "x " + name, 5752026);
+				this.drawString(guiGraphics, 10, 34 + count * 11, result.b + "x " + name, 5752026);
 				if (++count == 10)
 				{
 					break;
@@ -38,9 +38,9 @@ public class GuiToolScanner extends Ic2Gui<ContainerToolScanner>
 	}
 
 	@Override
-	protected void renderBg(PoseStack matrices, float delta, int mouseX, int mouseY)
+	protected void renderBg(GuiGraphics guiGraphics, float delta, int mouseX, int mouseY)
 	{
-		super.renderBg(matrices, delta, mouseX, mouseY);
+		super.renderBg(guiGraphics, delta, mouseX, mouseY);
 		if (((ContainerToolScanner) this.menu).scanResults != null)
 		{
 			int count = 0;

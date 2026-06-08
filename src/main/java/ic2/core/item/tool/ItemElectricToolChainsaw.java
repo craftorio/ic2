@@ -151,7 +151,7 @@ public class ItemElectricToolChainsaw extends ItemElectricTool implements IHitSo
 
 	public void playUsingSound(LivingEntity user)
 	{
-		if (user.getLevel().isClientSide)
+		if (user.level().isClientSide)
 		{
 			user.playSound(this.getToolUsingSound(), 1.0F, 1.0F);
 		}

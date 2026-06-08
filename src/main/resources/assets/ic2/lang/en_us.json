@@ -861,5 +861,11 @@
   "itemGroup.ic2.machines": "IC2 Machines",
   "itemGroup.ic2.materials": "IC2 Materials",
   "itemGroup.ic2.reactor": "IC2 Reactor",
-  "itemGroup.ic2.tools_and_utilities": "IC2 Tools And Utilities"
+  "itemGroup.ic2.tools_and_utilities": "IC2 Tools And Utilities",
+  "death.attack.ic2.electricity": "%1$s was electrocuted",
+  "death.attack.ic2.electricity.player": "%1$s was electrocuted whilst trying to escape %2$s",
+  "death.attack.ic2.nuke": "%1$s was nuked",
+  "death.attack.ic2.nuke.player": "%1$s was nuked by %2$s",
+  "death.attack.ic2.radiation": "%1$s died of radiation poisoning",
+  "death.attack.ic2.radiation.player": "%1$s died of radiation poisoning whilst trying to escape %2$s"
 }

@@ -849,5 +849,11 @@
   "itemGroup.ic2.machines": "工业2机器",
   "itemGroup.ic2.materials": "工业2原材料",
   "itemGroup.ic2.reactor": "工业2反应堆",
-  "itemGroup.ic2.tools_and_utilities": "工业2工具与实用物品"
+  "itemGroup.ic2.tools_and_utilities": "工业2工具与实用物品",
+  "death.attack.ic2.electricity": "%1$s触电身亡",
+  "death.attack.ic2.electricity.player": "%1$s在试图逃离%2$s时触电身亡",
+  "death.attack.ic2.nuke": "%1$s被核弹炸飞了",
+  "death.attack.ic2.nuke.player": "%1$s被%2$s用核弹炸飞了",
+  "death.attack.ic2.radiation": "%1$s死于辐射",
+  "death.attack.ic2.radiation.player": "%1$s在试图逃离%2$s时死于辐射"
 }

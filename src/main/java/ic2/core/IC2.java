@@ -18,7 +18,7 @@ import org.apache.logging.log4j.LogManager;
 public class IC2
 {
 	public static final String VERSION = "2.9.%build%%suffix%";
-	public static final String MODID = "ic2";
+	public static final String MOD_ID = "ic2";
 	public static final String RESOURCE_DOMAIN = "ic2";
 	public static final String ICON_STACK_NAME = "ic2:tab_icon";
 	public static final EnvProxy envProxy;
@@ -133,7 +133,7 @@ public class IC2
 		tabIc2Farming = envProxy.createItemGroup(getIdentifier("farming"), new ItemGroupIconSupplier(Ic2ItemGroupType.FARMING), Ic2ItemGroupType.FARMING);
 		tabIc2Materials = envProxy.createItemGroup(getIdentifier("materials"), new ItemGroupIconSupplier(Ic2ItemGroupType.MATERIALS), Ic2ItemGroupType.MATERIALS);
 		threadPool = new PriorityExecutor(Math.max(Runtime.getRuntime().availableProcessors(), 2));
-		random = RandomSource.create();
+		random = RandomSource.createNewThreadLocalInstance();
 		initialized = false;
 		suddenlyHoes = false;
 		seasonal = false;

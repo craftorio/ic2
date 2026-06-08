@@ -102,27 +102,24 @@ public abstract class AbstractItemNanoSaber extends ItemElectricTool implements 
 					}
 
 					ItemStack armor = target.getItemBySlot(slot);
-					if (armor != null)
+					double amount = 0.0;
+					if (armor.getItem() instanceof ItemArmorNanoSuit)
 					{
-						double amount = 0.0;
-						if (armor.getItem() instanceof ItemArmorNanoSuit)
+						amount = 48000.0;
+					} else if (armor.getItem() instanceof ItemArmorQuantumSuit)
+					{
+						amount = 300000.0;
+					}
+
+					if (amount > 0.0)
+					{
+						this.consumeEnergy(armor, amount, null);
+						if (!ElectricItem.manager.canUse(armor, 1.0))
 						{
-							amount = 48000.0;
-						} else if (armor.getItem() instanceof ItemArmorQuantumSuit)
-						{
-							amount = 300000.0;
+							target.setItemSlot(slot, null);
 						}
 
-						if (amount > 0.0)
-						{
-							this.consumeEnergy(armor, amount, null);
-							if (!ElectricItem.manager.canUse(armor, 1.0))
-							{
-								target.setItemSlot(slot, null);
-							}
-
-							this.consumeEnergy(stack, 2000.0, source);
-						}
+						this.consumeEnergy(stack, 2000.0, source);
 					}
 				}
 			}
@@ -143,7 +140,7 @@ public abstract class AbstractItemNanoSaber extends ItemElectricTool implements 
 
 	public boolean canAttackBlock(BlockState state, Level world, BlockPos pos, Player miner)
 	{
-		return miner.isCreative() ? false : super.canAttackBlock(state, world, pos, miner);
+		return !miner.isCreative() && super.canAttackBlock(state, world, pos, miner);
 	}
 
 	@Override

@@ -15,8 +15,6 @@ import java.util.Set;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BlockTags;
@@ -92,7 +90,7 @@ public final class Util
 			return min;
 		} else
 		{
-			return value >= max ? max : value;
+			return Math.min(value, max);
 		}
 	}
 
@@ -103,7 +101,7 @@ public final class Util
 			return min;
 		} else
 		{
-			return value >= max ? max : value;
+			return Math.min(value, max);
 		}
 	}
 
@@ -114,7 +112,7 @@ public final class Util
 			return min;
 		} else
 		{
-			return value >= max ? max : value;
+			return Math.min(value, max);
 		}
 	}
 
@@ -297,7 +295,7 @@ public final class Util
 
 	public static Block getBlock(ResourceLocation loc)
 	{
-		Block ret = BuiltInRegistries.BLOCK.get(loc);
+		Block ret = ForgeRegistries.BLOCKS.getValue(loc);
 		if (ret != Blocks.AIR)
 		{
 			return ret;
@@ -337,13 +335,14 @@ public final class Util
 			throw new NullPointerException("null name");
 		} else
 		{
-			return getItem(ResourceLocation.withDefaultNamespace(name));
+			// Error occurred once, name has a namespace.
+			return getItem(ResourceLocation.parse(name));
 		}
 	}
 
 	public static Item getItem(ResourceLocation loc)
 	{
-		return BuiltInRegistries.ITEM.get(loc);
+		return ForgeRegistries.ITEMS.getValue(loc);
 	}
 
 	public static Vector3 getLook(Entity entity)
@@ -353,17 +352,17 @@ public final class Util
 
 	public static ResourceLocation getName(Item item)
 	{
-		return BuiltInRegistries.ITEM.getKey(item);
+		return ForgeRegistries.ITEMS.getKey(item);
 	}
 
 	public static Fluid getFluid(ResourceLocation loc)
 	{
-		return BuiltInRegistries.FLUID.get(loc);
+		return ForgeRegistries.FLUIDS.getValue(loc);
 	}
 
 	public static ResourceLocation getName(Fluid fluid)
 	{
-		return BuiltInRegistries.FLUID.getKey(fluid);
+		return ForgeRegistries.FLUIDS.getKey(fluid);
 	}
 
 	public static ResourceLocation getDimId(Level world)
@@ -489,74 +488,36 @@ public final class Util
 		{
 			int reduce = (int) Math.floor(log / 3.0);
 			mul = 1.0 / Math.pow(10.0, reduce * 3);
-			switch (reduce)
+			si = switch (reduce)
 			{
-				case 0:
-					si = "";
-					break;
-				case 1:
-					si = "k";
-					break;
-				case 2:
-					si = "M";
-					break;
-				case 3:
-					si = "G";
-					break;
-				case 4:
-					si = "T";
-					break;
-				case 5:
-					si = "P";
-					break;
-				case 6:
-					si = "E";
-					break;
-				case 7:
-					si = "Z";
-					break;
-				case 8:
-					si = "Y";
-					break;
-				default:
-					si = "E" + reduce * 3;
-			}
+				case 0 -> "";
+				case 1 -> "k";
+				case 2 -> "M";
+				case 3 -> "G";
+				case 4 -> "T";
+				case 5 -> "P";
+				case 6 -> "E";
+				case 7 -> "Z";
+				case 8 -> "Y";
+				default -> "E" + reduce * 3;
+			};
 		} else
 		{
 			int expand = (int) Math.ceil(-log / 3.0);
 			mul = Math.pow(10.0, expand * 3);
-			switch (expand)
+			si = switch (expand)
 			{
-				case 0:
-					si = "";
-					break;
-				case 1:
-					si = "m";
-					break;
-				case 2:
-					si = "µ";
-					break;
-				case 3:
-					si = "n";
-					break;
-				case 4:
-					si = "p";
-					break;
-				case 5:
-					si = "f";
-					break;
-				case 6:
-					si = "a";
-					break;
-				case 7:
-					si = "z";
-					break;
-				case 8:
-					si = "y";
-					break;
-				default:
-					si = "E-" + expand * 3;
-			}
+				case 0 -> "";
+				case 1 -> "m";
+				case 2 -> "µ";
+				case 3 -> "n";
+				case 4 -> "p";
+				case 5 -> "f";
+				case 6 -> "a";
+				case 7 -> "z";
+				case 8 -> "y";
+				default -> "E-" + expand * 3;
+			};
 		}
 
 		value *= mul;
@@ -593,7 +554,7 @@ public final class Util
 
 	public static void exit(int status)
 	{
-		Method exit = null;
+		Method exit;
 
 		try
 		{
@@ -669,7 +630,7 @@ public final class Util
 	{
 		if (!(match instanceof ItemStack))
 		{
-			if (!(match instanceof TagKey<?> tagKey && tagKey.isFor(BuiltInRegistries.ITEM.key())))
+			if (!(match instanceof TagKey<?> tagKey && tagKey.isFor(ForgeRegistries.ITEMS.getRegistryKey())))
 			{
 				return stack == match;
 			} else
@@ -679,7 +640,7 @@ public final class Util
 					return false;
 				}
 
-				Optional<TagKey<Item>> itemTagKeyOpt = tagKey.cast(BuiltInRegistries.ITEM.key());
+				Optional<TagKey<Item>> itemTagKeyOpt = tagKey.cast(ForgeRegistries.ITEMS.getRegistryKey());
 				if (itemTagKeyOpt.isEmpty())
 				{
 					return false;

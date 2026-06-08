@@ -96,7 +96,7 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
 				return;
 		}
 
-		list.add(Component.translatable("ic2.tooltip.mode", new Object[] { mode }));
+		list.add(Component.translatable("ic2.tooltip.mode", mode));
 	}
 
 	@Override
@@ -115,7 +115,7 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
 		ItemStack stack = StackUtil.get(player, hand);
 		if (!IC2.sideProxy.isSimulating())
 		{
-			return new InteractionResultHolder(InteractionResult.PASS, stack);
+			return new InteractionResultHolder<>(InteractionResult.PASS, stack);
 		}
 
 		CompoundTag nbtData = StackUtil.getOrCreateNbtData(stack);
@@ -130,7 +130,7 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
 			int consume = new int[] { 1250, 100, 5000, 0, 2500, 10000, 5000, 7500 }[laserSetting];
 			if (!this.consumeEnergy(stack, consume, player))
 			{
-				return new InteractionResultHolder(InteractionResult.FAIL, stack);
+				return new InteractionResultHolder<>(InteractionResult.FAIL, stack);
 			}
 
 			switch (laserSetting)
@@ -154,8 +154,6 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
 					}
 				case 3:
 				case 7:
-				default:
-					break;
 				case 4:
 					if (this.shootLaser(stack, world, player, Float.POSITIVE_INFINITY, 8.0F, Integer.MAX_VALUE, false, true))
 					{
@@ -194,7 +192,9 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
 					if (this.shootLaser(stack, world, player, Float.POSITIVE_INFINITY, 12.0F, Integer.MAX_VALUE, true, false))
 					{
 						IC2.network.get(true).initiateItemEvent(player, stack, 6, true);
-					}
+					} 
+				default:
+					break;
 			}
 		}
 

@@ -64,7 +64,7 @@ import ic2.core.block.machine.tileentity.TileEntityPump;
 import ic2.core.block.machine.tileentity.TileEntityRecycler;
 import ic2.core.block.machine.tileentity.TileEntityReplicator;
 import ic2.core.block.machine.tileentity.TileEntityScanner;
-import ic2.core.block.machine.tileentity.TileEntitySolarDestiller;
+import ic2.core.block.machine.tileentity.TileEntitySolarDistiller;
 import ic2.core.block.machine.tileentity.TileEntitySolidCanner;
 import ic2.core.block.machine.tileentity.TileEntitySortingMachine;
 import ic2.core.block.machine.tileentity.TileEntitySteamGenerator;
@@ -208,8 +208,8 @@ public final class Ic2BlockEntities
 		"liquid_heat_exchanger", TileEntityLiquidHeatExchanger::new, Ic2Blocks.LIQUID_HEAT_EXCHANGER
 	);
 	public static final BlockEntityType<TileEntityPump> PUMP = register("pump", TileEntityPump::new, Ic2Blocks.PUMP);
-	public static final BlockEntityType<TileEntitySolarDestiller> SOLAR_DISTILLER = register(
-		"solar_distiller", TileEntitySolarDestiller::new, Ic2Blocks.SOLAR_DISTILLER
+	public static final BlockEntityType<TileEntitySolarDistiller> SOLAR_DISTILLER = register(
+		"solar_distiller", TileEntitySolarDistiller::new, Ic2Blocks.SOLAR_DISTILLER
 	);
 	public static final BlockEntityType<TileEntitySteamGenerator> STEAM_GENERATOR = register(
 		"steam_generator", TileEntitySteamGenerator::new, Ic2Blocks.STEAM_GENERATOR

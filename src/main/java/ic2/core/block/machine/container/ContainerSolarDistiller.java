@@ -1,7 +1,7 @@
 package ic2.core.block.machine.container;
 
 import ic2.core.ContainerFullInv;
-import ic2.core.block.machine.tileentity.TileEntitySolarDestiller;
+import ic2.core.block.machine.tileentity.TileEntitySolarDistiller;
 import ic2.core.ref.Ic2ScreenHandlers;
 import ic2.core.slot.SlotInvSlot;
 
@@ -9,14 +9,14 @@ import java.util.List;
 
 import net.minecraft.world.entity.player.Inventory;
 
-public class ContainerSolarDestiller extends ContainerFullInv<TileEntitySolarDestiller>
+public class ContainerSolarDistiller extends ContainerFullInv<TileEntitySolarDistiller>
 {
-	public ContainerSolarDestiller(int syncId, Inventory playerInventory, TileEntitySolarDestiller be)
+	public ContainerSolarDistiller(int syncId, Inventory playerInventory, TileEntitySolarDistiller be)
 	{
 		super(Ic2ScreenHandlers.SOLAR_DISTILLER, syncId, playerInventory, be, 184);
 		this.addSlot(new SlotInvSlot(be.waterinputSlot, 0, 17, 27));
 		this.addSlot(new SlotInvSlot(be.destiwaterinputSlot, 0, 136, 64));
-		this.addSlot(new SlotInvSlot(be.wateroutputSlot, 0, 17, 45));
+		this.addSlot(new SlotInvSlot(be.waterOutputSlot, 0, 17, 45));
 		this.addSlot(new SlotInvSlot(be.destiwateroutputSlott, 0, 136, 82));
 
 		for (int i = 0; i < 2; i++)

@@ -13,7 +13,7 @@ import ic2.core.block.invslot.InvSlotConsumableLiquidByList;
 import ic2.core.block.invslot.InvSlotConsumableLiquidByTank;
 import ic2.core.block.invslot.InvSlotOutput;
 import ic2.core.block.invslot.InvSlotUpgrade;
-import ic2.core.block.machine.container.ContainerSolarDestiller;
+import ic2.core.block.machine.container.ContainerSolarDistiller;
 import ic2.core.block.tileentity.TileEntityInventory;
 import ic2.core.fluid.Ic2FluidStack;
 import ic2.core.fluid.Ic2FluidTank;
@@ -35,21 +35,21 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
 
 @NotClassic
-public class TileEntitySolarDestiller extends TileEntityInventory implements IHasGui, IUpgradableBlock
+public class TileEntitySolarDistiller extends TileEntityInventory implements IHasGui, IUpgradableBlock
 {
 	public final Ic2FluidTank inputTank;
 	public final Ic2FluidTank outputTank;
-	private int tickrate;
+	private int tickRate;
 	private int updateTicker;
 	private float skyLight;
-	public final InvSlotOutput wateroutputSlot;
+	public final InvSlotOutput waterOutputSlot;
 	public final InvSlotOutput destiwateroutputSlott;
 	public final InvSlotConsumableLiquidByList waterinputSlot;
 	public final InvSlotConsumableLiquidByTank destiwaterinputSlot;
 	public final InvSlotUpgrade upgradeSlot;
 	protected final Fluids fluids = this.addComponent(new Fluids(this));
 
-	public TileEntitySolarDestiller(BlockPos pos, BlockState state)
+	public TileEntitySolarDistiller(BlockPos pos, BlockState state)
 	{
 		super(Ic2BlockEntities.SOLAR_DISTILLER, pos, state);
 		this.inputTank = this.fluids.addTankInsert("inputTank", 10000, Fluids.fluidPredicate(net.minecraft.world.level.material.Fluids.WATER));
@@ -58,10 +58,10 @@ public class TileEntitySolarDestiller extends TileEntityInventory implements IHa
 			this, "waterInput", InvSlot.Access.I, 1, InvSlot.InvSide.TOP, InvSlotConsumableLiquid.OpType.Drain, net.minecraft.world.level.material.Fluids.WATER
 		);
 		this.destiwaterinputSlot = new InvSlotConsumableLiquidByTank(
-			this, "destilledWaterInput", InvSlot.Access.I, 1, InvSlot.InvSide.BOTTOM, InvSlotConsumableLiquid.OpType.Fill, this.outputTank
+			this, "distilledWaterInput", InvSlot.Access.I, 1, InvSlot.InvSide.BOTTOM, InvSlotConsumableLiquid.OpType.Fill, this.outputTank
 		);
-		this.wateroutputSlot = new InvSlotOutput(this, "waterOutput", 1);
-		this.destiwateroutputSlott = new InvSlotOutput(this, "destilledWaterOutput", 1);
+		this.waterOutputSlot = new InvSlotOutput(this, "waterOutput", 1);
+		this.destiwateroutputSlott = new InvSlotOutput(this, "distilledWaterOutput", 1);
 		this.upgradeSlot = new InvSlotUpgrade(this, "upgrade", 3);
 	}
 
@@ -69,16 +69,16 @@ public class TileEntitySolarDestiller extends TileEntityInventory implements IHa
 	protected void onLoaded()
 	{
 		super.onLoaded();
-		this.tickrate = this.getTickRate();
-		this.updateTicker = IC2.random.nextInt(this.tickrate);
+		this.tickRate = this.getTickRate();
+		this.updateTicker = this.getLevel().random.nextInt(this.tickRate);
 	}
 
 	@Override
 	protected void updateEntityServer()
 	{
 		super.updateEntityServer();
-		this.waterinputSlot.processIntoTank(this.inputTank, this.wateroutputSlot);
-		if (++this.updateTicker >= this.tickrate)
+		this.waterinputSlot.processIntoTank(this.inputTank, this.waterOutputSlot);
+		if (++this.updateTicker >= this.tickRate)
 		{
 			this.updateSunVisibility();
 			if (this.canWork())
@@ -102,13 +102,13 @@ public class TileEntitySolarDestiller extends TileEntityInventory implements IHa
 	@Override
 	public ContainerBase<?> createServerScreenHandler(int syncId, Player player)
 	{
-		return new ContainerSolarDestiller(syncId, player.getInventory(), this);
+		return new ContainerSolarDistiller(syncId, player.getInventory(), this);
 	}
 
 	@Override
 	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
-		return new ContainerSolarDestiller(syncId, inventory, this);
+		return new ContainerSolarDistiller(syncId, inventory, this);
 	}
 
 	public int getTickRate()

@@ -149,9 +149,7 @@ public abstract class ItemElectricTool extends DiggerItem implements IElectricIt
 		int level = this.getTier().getLevel();
 		return (level >= 3 || !state.is(BlockTags.NEEDS_DIAMOND_TOOL))
 			&& (level >= 2 || !state.is(BlockTags.NEEDS_IRON_TOOL))
-			&& (level >= 1 || !state.is(BlockTags.NEEDS_STONE_TOOL))
-			? this.isEffective(state)
-			: false;
+			&& (level >= 1 || !state.is(BlockTags.NEEDS_STONE_TOOL)) && this.isEffective(state);
 	}
 
 	private boolean isEffective(BlockState state)
@@ -218,10 +216,7 @@ public abstract class ItemElectricTool extends DiggerItem implements IElectricIt
 
 	public void fillItemCategory(CreativeModeTab tab, NonNullList<ItemStack> subItems)
 	{
-		if (true)
-		{
-			ElectricItemManager.addChargeVariants(this, subItems);
-		}
+		ElectricItemManager.addChargeVariants(this, subItems);
 	}
 
 	public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag context)
@@ -256,7 +251,7 @@ public abstract class ItemElectricTool extends DiggerItem implements IElectricIt
 			} else if (!isEquipped && this.idleSound != null && entity instanceof LivingEntity theEntity)
 			{
 				ItemStack stack = theEntity.getItemBySlot(EquipmentSlot.MAINHAND);
-				if (stack == null || stack.getItem() != this || stack == itemstack)
+				if (stack.getItem() != this || stack == itemstack)
 				{
 					if (this.stopSound != null)
 					{

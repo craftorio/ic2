@@ -5,10 +5,13 @@ import com.mojang.serialization.Codec;
 import ic2.api.energy.ProfileEvent;
 import ic2.api.event.ExplosionEvent;
 import ic2.api.event.RetextureEvent;
+import ic2.api.item.IElectricItem;
 import ic2.core.IC2;
 import ic2.core.Ic2ItemGroupType;
 import ic2.core.fluid.EnvFluidHandler;
+import ic2.core.item.ElectricItemManager;
 import ic2.core.item.EnvItemHandler;
+import ic2.core.item.armor.ItemArmorFluidTank;
 import ic2.core.ref.Ic2Items;
 import ic2.core.network.GrowingBuffer;
 import ic2.core.proxy.EnvProxy;
@@ -281,7 +284,18 @@ public final class EnvProxyForge implements EnvProxy
 					{
 						for (Supplier<Item> itemSupplier : items)
 						{
-							output.accept(new ItemStack(itemSupplier.get()));
+							Item item = itemSupplier.get();
+							output.accept(new ItemStack(item));
+							if (item instanceof IElectricItem)
+							{
+								output.accept(ElectricItemManager.getCharged(item, Double.POSITIVE_INFINITY));
+							}
+							if (item instanceof ItemArmorFluidTank tankItem)
+							{
+								ItemStack filledStack = new ItemStack(item);
+								tankItem.filltank(filledStack);
+								output.accept(filledStack);
+							}
 						}
 					}
 				})

@@ -36,7 +36,7 @@ import ic2.core.block.machine.container.ContainerMiner;
 import ic2.core.block.machine.container.ContainerPatternStorage;
 import ic2.core.block.machine.container.ContainerReplicator;
 import ic2.core.block.machine.container.ContainerScanner;
-import ic2.core.block.machine.container.ContainerSolarDestiller;
+import ic2.core.block.machine.container.ContainerSolarDistiller;
 import ic2.core.block.machine.container.ContainerSortingMachine;
 import ic2.core.block.machine.container.ContainerSteamGenerator;
 import ic2.core.block.machine.container.ContainerWeightedFluidDistributor;
@@ -99,7 +99,7 @@ public final class Ic2ScreenHandlers
 	public static final MenuType<ContainerFluidDistributor> FLUID_DISTRIBUTOR = registerManagedBe("fluid_distributor");
 	public static final MenuType<ContainerFluidRegulator> FLUID_REGULATOR = registerManagedBe("fluid_regulator");
 	public static final MenuType<ContainerLiquidHeatExchanger> LIQUID_HEAT_EXCHANGER = registerManagedBe("liquid_heat_exchanger");
-	public static final MenuType<ContainerSolarDestiller> SOLAR_DISTILLER = registerManagedBe("solar_distiller");
+	public static final MenuType<ContainerSolarDistiller> SOLAR_DISTILLER = registerManagedBe("solar_distiller");
 	public static final MenuType<ContainerSteamGenerator> STEAM_GENERATOR = registerManagedBe("steam_generator");
 	public static final MenuType<ContainerItemBuffer> ITEM_BUFFER = registerManagedBe("item_buffer");
 	public static final MenuType<ContainerMagnetizer> MAGNETIZER = registerManagedBe("magnetizer");

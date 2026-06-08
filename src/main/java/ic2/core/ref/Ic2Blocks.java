@@ -70,7 +70,7 @@ import ic2.core.block.machine.tileentity.TileEntityPump;
 import ic2.core.block.machine.tileentity.TileEntityRecycler;
 import ic2.core.block.machine.tileentity.TileEntityReplicator;
 import ic2.core.block.machine.tileentity.TileEntityScanner;
-import ic2.core.block.machine.tileentity.TileEntitySolarDestiller;
+import ic2.core.block.machine.tileentity.TileEntitySolarDistiller;
 import ic2.core.block.machine.tileentity.TileEntitySolidCanner;
 import ic2.core.block.machine.tileentity.TileEntitySortingMachine;
 import ic2.core.block.machine.tileentity.TileEntitySteamGenerator;
@@ -747,7 +747,7 @@ public final class Ic2Blocks
 		"solar_distiller",
 		Ic2TileEntityBlock.create(
 			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
-			TileEntitySolarDestiller.class,
+			TileEntitySolarDistiller.class,
 			false,
 			Ic2TileEntityBlock.DefaultDrop.Machine,
 			Util.noFacings,

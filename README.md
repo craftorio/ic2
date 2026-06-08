@@ -10,6 +10,8 @@
 
 请使用 Java 17 构建和编译本分支。
 
+其他信息请查看 [Release](./release.md)。
+
 ```shell
 gradlew build
 gradlew runClient

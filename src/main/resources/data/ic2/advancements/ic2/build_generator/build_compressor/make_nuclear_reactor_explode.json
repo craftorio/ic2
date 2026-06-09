@@ -23,7 +23,7 @@
           "type": {
             "tags": [
               {
-                "id": "ic2:nuke",
+                "id": "ic2:reactor_explosion",
                 "expected": true
               }
             ]

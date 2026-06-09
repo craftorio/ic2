@@ -791,7 +791,7 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 		}
 
 		world.removeBlock(this.worldPosition, false);
-		Ic2Explosion explosion = new Ic2Explosion(world, null, this.worldPosition, boomPower, 0.01F, Ic2Explosion.Type.Nuclear);
+		Ic2Explosion explosion = new Ic2Explosion(world, null, this.worldPosition, boomPower, 0.01F, Ic2Explosion.Type.ReactorMeltdown);
 		explosion.doExplosion();
 	}
 

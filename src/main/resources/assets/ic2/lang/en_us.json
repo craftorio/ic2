@@ -871,6 +871,8 @@
   "death.attack.ic2.electricity.player": "%1$s was electrocuted whilst trying to escape %2$s",
   "death.attack.ic2.nuke": "%1$s was nuked",
   "death.attack.ic2.nuke.player": "%1$s was nuked by %2$s",
+  "death.attack.ic2.reactorExplosion": "%1$s was killed by a nuclear reactor meltdown",
+  "death.attack.ic2.reactorExplosion.player": "%1$s was killed by a nuclear reactor meltdown whilst trying to escape %2$s",
   "death.attack.ic2.radiation": "%1$s died of radiation poisoning",
   "death.attack.ic2.radiation.player": "%1$s died of radiation poisoning whilst trying to escape %2$s"
 }

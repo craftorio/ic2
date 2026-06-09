@@ -110,7 +110,14 @@ public class Ic2Explosion extends Explosion
 		this.areaSize = maxDistanceInt * 2;
 		this.areaX = Util.roundToNegInf(x) - maxDistanceInt;
 		this.areaZ = Util.roundToNegInf(z) - maxDistanceInt;
-		if (this.isNuclear())
+		if (this.type == Ic2Explosion.Type.ReactorMeltdown)
+		{
+			if (Ic2DamageSource.reactorExplosion == null)
+			{
+				Ic2DamageSource.init(this.worldObj.registryAccess());
+			}
+			this.damageSource = Ic2DamageSource.reactorExplosion;
+		} else if (this.isNuclear())
 		{
 			this.damageSource = Ic2DamageSource.getNukeSource(igniter, this.worldObj);
 		} else
@@ -521,7 +528,7 @@ public class Ic2Explosion extends Explosion
 
 	private boolean isNuclear()
 	{
-		return this.type == Ic2Explosion.Type.Nuclear;
+		return this.type == Ic2Explosion.Type.Nuclear || this.type == Ic2Explosion.Type.ReactorMeltdown;
 	}
 
 	private static double getEntityHealth(Entity entity)
@@ -616,7 +623,8 @@ public class Ic2Explosion extends Explosion
 		Normal,
 		Heat,
 		Electrical,
-		Nuclear;
+		Nuclear,
+		ReactorMeltdown;
 	}
 
 	private static class XZPosition

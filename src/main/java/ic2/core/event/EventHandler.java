@@ -28,6 +28,7 @@ import ic2.core.item.ElectricItemManager;
 import ic2.core.item.GatewayElectricItemManager;
 import ic2.core.item.armor.ItemArmorElectric;
 import ic2.core.item.armor.ItemArmorHazmat;
+import ic2.core.item.armor.jetpack.JetpackHandler;
 import ic2.core.item.armor.ItemArmorNanoSuit;
 import ic2.core.item.armor.ItemArmorQuantumSuit;
 import ic2.core.recipe.input.RecipeInputFactory;
@@ -221,6 +222,7 @@ public final class EventHandler
 
 	public static void onPlayerTick(Player player)
 	{
+		JetpackHandler.onPlayerTick(player);
 	}
 
 	public static void onLivingSpecialSpawn(LivingEntity rawEntity)

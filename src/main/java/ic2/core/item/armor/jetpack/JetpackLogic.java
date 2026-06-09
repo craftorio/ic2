@@ -1,0 +1,168 @@
+package ic2.core.item.armor.jetpack;
+
+import ic2.core.IC2;
+import ic2.core.util.StackUtil;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
+
+public class JetpackLogic
+{
+	public static boolean useJetpack(Player player, boolean hoverMode, IJetpack jetpack, ItemStack stack)
+	{
+		if (jetpack.getChargeLevel(stack) <= 0.0)
+		{
+			return false;
+		}
+
+		IBoostingJetpack bjetpack = jetpack instanceof IBoostingJetpack ? (IBoostingJetpack) jetpack : null;
+		float power = jetpack.getPower(stack);
+		float dropPercentage = jetpack.getDropPercentage(stack);
+		if (jetpack.getChargeLevel(stack) <= dropPercentage)
+		{
+			power = (float) (power * (jetpack.getChargeLevel(stack) / dropPercentage));
+		}
+
+		Level world = player.level();
+		Vec3 motion = player.getDeltaMovement();
+		double motionX = motion.x;
+		double motionY = motion.y;
+		double motionZ = motion.z;
+
+		if (IC2.keyboard.isForwardKeyDown(player))
+		{
+			float retruster, boost;
+			if (bjetpack != null)
+			{
+				retruster = bjetpack.getBaseThrust(stack, hoverMode);
+				boost = bjetpack.getBoostThrust(player, stack, hoverMode);
+			} else
+			{
+				retruster = hoverMode ? 1.0F : 0.15F;
+				boost = 0.0F;
+			}
+
+			float forwarder = power * retruster * 2.0F;
+			if (forwarder > 0.0F)
+			{
+				float yaw = player.getYRot() * (float) Math.PI / 180.0F;
+				motionX += -Math.sin(yaw) * 0.4F * forwarder;
+				motionZ += Math.cos(yaw) * 0.4F * forwarder;
+				if (boost != 0.0F && !player.onGround())
+				{
+					motionX += -Math.sin(yaw) * boost;
+					motionZ += Math.cos(yaw) * boost;
+					bjetpack.useBoostPower(stack, boost);
+				}
+			}
+		}
+
+		int worldHeight = world.getMaxBuildHeight();
+		int maxFlightHeight = (int) (worldHeight / jetpack.getWorldHeightDivisor(stack));
+		double y = player.getY();
+		if (y > maxFlightHeight - 25)
+		{
+			if (y > maxFlightHeight)
+			{
+				y = maxFlightHeight;
+			}
+
+			power = (float) (power * ((maxFlightHeight - y) / 25.0));
+		}
+
+		double prevMotionY = motionY;
+		motionY = Math.min(motionY + power * 0.2F, 0.6F);
+		if (hoverMode)
+		{
+			float maxHoverY = 0.0F;
+			if (IC2.keyboard.isJumpKeyDown(player))
+			{
+				maxHoverY += jetpack.getHoverMultiplier(stack, true);
+				if (bjetpack != null)
+				{
+					maxHoverY *= bjetpack.getHoverBoost(player, stack, true);
+				}
+			}
+
+			if (IC2.keyboard.isSneakKeyDown(player))
+			{
+				maxHoverY += -jetpack.getHoverMultiplier(stack, false);
+				if (bjetpack != null)
+				{
+					maxHoverY *= bjetpack.getHoverBoost(player, stack, false);
+				}
+			}
+
+			if (motionY > maxHoverY)
+			{
+				motionY = maxHoverY;
+				if (prevMotionY > motionY)
+				{
+					motionY = prevMotionY;
+				}
+			}
+		}
+
+		player.setDeltaMovement(motionX, motionY, motionZ);
+
+		int consume = hoverMode ? 1 : 2;
+		if (!player.onGround())
+		{
+			jetpack.drainEnergy(stack, consume);
+		}
+
+		player.fallDistance = 0.0F;
+		player.resetFallDistance();
+		return true;
+	}
+
+	public static void onArmorTick(Level world, Player player, ItemStack stack, IJetpack jetpack)
+	{
+		if (stack != null && jetpack.isJetpackActive(stack))
+		{
+			CompoundTag nbtData = StackUtil.getOrCreateNbtData(stack);
+			boolean hoverMode = nbtData.getBoolean("hoverMode");
+			byte toggleTimer = nbtData.getByte("toggleTimer");
+			boolean jetpackUsed = false;
+
+			if (IC2.keyboard.isJumpKeyDown(player) && IC2.keyboard.isModeSwitchKeyDown(player) && toggleTimer == 0)
+			{
+				toggleTimer = 10;
+				hoverMode = !hoverMode;
+				if (!world.isClientSide())
+				{
+					nbtData.putBoolean("hoverMode", hoverMode);
+					if (hoverMode)
+					{
+						IC2.sideProxy.messagePlayer(player, "Hover Mode enabled.");
+					} else
+					{
+						IC2.sideProxy.messagePlayer(player, "Hover Mode disabled.");
+					}
+				}
+			}
+
+			if (IC2.keyboard.isJumpKeyDown(player) || hoverMode)
+			{
+				jetpackUsed = useJetpack(player, hoverMode, jetpack, stack);
+				if (player.onGround() && hoverMode && !world.isClientSide())
+				{
+					nbtData.putBoolean("hoverMode", false);
+					IC2.sideProxy.messagePlayer(player, "Hover Mode disabled.");
+				}
+			}
+
+			if (!world.isClientSide() && toggleTimer > 0)
+			{
+				nbtData.putByte("toggleTimer", --toggleTimer);
+			}
+
+			if (jetpackUsed)
+			{
+				player.inventoryMenu.broadcastChanges();
+			}
+		}
+	}
+}

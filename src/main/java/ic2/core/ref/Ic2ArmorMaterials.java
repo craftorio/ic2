@@ -21,7 +21,11 @@ public enum Ic2ArmorMaterials implements ArmorMaterial
 	NIGHT_VISION_GOGGLES("ic2:ic2_night_vision", 0, new int[] { 3, 0, 0, 0 }, 0, SoundEvents.ARMOR_EQUIP_IRON, 2.0F, 0.0F, Ingredient::of),
 	HAZMAT("ic2:ic2_hazmat", SoundEvents.ARMOR_EQUIP_LEATHER),
 	CF_PACK("ic2:ic2_cf_pack", SoundEvents.ARMOR_EQUIP_IRON),
-	JET_PACK("ic2:ic2_jet_pack", SoundEvents.ARMOR_EQUIP_IRON);
+	JET_PACK("ic2:ic2_jet_pack", SoundEvents.ARMOR_EQUIP_IRON),
+	BAT_PACK("ic2:ic2_bat_pack", SoundEvents.ARMOR_EQUIP_IRON),
+	ADVANCED_BAT_PACK("ic2:ic2_advanced_bat_pack", SoundEvents.ARMOR_EQUIP_IRON),
+	ENERGY_PACK("ic2:ic2_energy_pack", SoundEvents.ARMOR_EQUIP_IRON),
+	LAP_PACK("ic2:ic2_lap_pack", SoundEvents.ARMOR_EQUIP_IRON);
 
 	private static final int[] BASE_DURABILITY = new int[] { 13, 15, 16, 11 };
 	private final String name;

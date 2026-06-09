@@ -16,9 +16,14 @@ import ic2.core.item.ItemNuclearResource;
 import ic2.core.item.ItemTerraWart;
 import ic2.core.item.ItemTinCan;
 import ic2.core.item.armor.ItemArmorCFPack;
+import ic2.core.item.armor.ItemArmorAdvBatpack;
+import ic2.core.item.armor.ItemArmorBatpack;
+import ic2.core.item.armor.ItemArmorEnergypack;
 import ic2.core.item.armor.ItemArmorHazmat;
 import ic2.core.item.armor.ItemArmorIC2;
 import ic2.core.item.armor.ItemArmorJetpack;
+import ic2.core.item.armor.ItemArmorJetpackElectric;
+import ic2.core.item.armor.ItemArmorLappack;
 import ic2.core.item.armor.ItemArmorNanoSuit;
 import ic2.core.item.armor.ItemArmorNightVisionGoggles;
 import ic2.core.item.armor.ItemArmorQuantumSuit;
@@ -1016,6 +1021,11 @@ public final class Ic2Items
 	public static final Item HAZMAT_HELMET = register("hazmat_helmet", new ItemArmorHazmat(EquipmentSlot.HEAD, new Properties()));
 	public static final Item HAZMAT_LEGGINGS = register("hazmat_leggings", new ItemArmorHazmat(EquipmentSlot.LEGS, new Properties()));
 	public static final Item JETPACK = register("jetpack", new ItemArmorJetpack(new Properties()));
+	public static final Item JETPACK_ELECTRIC = register("jetpack_electric", new ItemArmorJetpackElectric());
+	public static final Item BATPACK = register("batpack", new ItemArmorBatpack());
+	public static final Item ADVANCED_BATPACK = register("advanced_batpack", new ItemArmorAdvBatpack());
+	public static final Item ENERGY_PACK = register("energy_pack", new ItemArmorEnergypack());
+	public static final Item LAPPACK = register("lappack", new ItemArmorLappack());
 	public static final Item NANO_BOOTS = register(
 		"nano_boots",
 		new ItemArmorNanoSuit(Ic2ArmorMaterials.NANO_SUIT, EquipmentSlot.FEET, new Properties().rarity(Rarity.UNCOMMON))
@@ -1075,6 +1085,11 @@ public final class Ic2Items
 		addToCreativeTab(Ic2ItemGroupType.COMBAT, () -> HAZMAT_LEGGINGS);
 		addToCreativeTab(Ic2ItemGroupType.COMBAT, () -> ITNT);
 		addToCreativeTab(Ic2ItemGroupType.COMBAT, () -> JETPACK);
+		addToCreativeTab(Ic2ItemGroupType.COMBAT, () -> JETPACK_ELECTRIC);
+		addToCreativeTab(Ic2ItemGroupType.COMBAT, () -> BATPACK);
+		addToCreativeTab(Ic2ItemGroupType.COMBAT, () -> ADVANCED_BATPACK);
+		addToCreativeTab(Ic2ItemGroupType.COMBAT, () -> ENERGY_PACK);
+		addToCreativeTab(Ic2ItemGroupType.COMBAT, () -> LAPPACK);
 		addToCreativeTab(Ic2ItemGroupType.COMBAT, () -> NANO_BOOTS);
 		addToCreativeTab(Ic2ItemGroupType.COMBAT, () -> NANO_CHESTPLATE);
 		addToCreativeTab(Ic2ItemGroupType.COMBAT, () -> NANO_HELMET);

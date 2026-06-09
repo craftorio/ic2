@@ -1,9 +1,7 @@
 package ic2.forge;
 
-import ic2.core.IC2;
 import ic2.core.fluid.EnvFluidHandler;
 import ic2.core.fluid.Ic2FluidStack;
-import ic2.core.util.LogCategory;
 import ic2.core.util.StackUtil;
 import ic2.core.util.Util;
 
@@ -14,8 +12,6 @@ import java.util.function.Consumer;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BucketItem;
@@ -24,9 +20,13 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Item.Properties;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fluids.FluidStack;
@@ -38,7 +38,6 @@ import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.mutable.Mutable;
-import org.jetbrains.annotations.Nullable;
 
 class EnvFluidHandlerForge implements EnvFluidHandler
 {
@@ -61,7 +60,7 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 	{
 		EnvFluidHandler.FluidRefs ret = new EnvFluidHandler.FluidRefs(null, null, null, null);
 		java.util.concurrent.atomic.AtomicReference<FluidType> fluidTypeRef = new java.util.concurrent.atomic.AtomicReference<>();
-
+		
 		pendingFluidTypeRegistrations.add(() ->
 		{
 			FluidType.Properties attributesBuilder = FluidType.Properties.create()
@@ -100,11 +99,14 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 			fluidTypeRef.set(fluidType);
 		});
 
+		AtomicReference<LiquidBlock> fluidBlockRef = new java.util.concurrent.atomic.AtomicReference<>();
 		pendingFluidRegistrations.add(() ->
 		{
-			ForgeFlowingFluid.Properties properties = new ForgeFlowingFluid.Properties(
-				() -> fluidTypeRef.get(), () -> ret.still(), () -> ret.flowing()
-			).bucket(() -> ret.bucket());
+			ForgeFlowingFluid.Properties properties = new ForgeFlowingFluid.Properties(fluidTypeRef::get, ret::still, ret::flowing).bucket(ret::bucket);
+			if (flowingSpriteId != null)
+			{
+				properties.block(fluidBlockRef::get);
+			}
 			Fluid still = new ForgeFlowingFluid.Source(properties);
 			Fluid flowing = flowingSpriteId != null ? new ForgeFlowingFluid.Flowing(properties) : null;
 			ForgeRegistries.FLUIDS.register(id, still);
@@ -113,6 +115,12 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 			if (flowing != null)
 			{
 				ForgeRegistries.FLUIDS.register(ResourceLocation.fromNamespaceAndPath(id.getNamespace(), "flowing_" + id.getPath()), flowing);
+				LiquidBlock fluidBlock = new LiquidBlock(
+					(FlowingFluid) ret.still(),
+					Block.Properties.copy(Blocks.WATER).noLootTable().noCollission().randomTicks().pushReaction(net.minecraft.world.level.material.PushReaction.DESTROY)
+				);
+				ForgeRegistries.BLOCKS.register(ResourceLocation.fromNamespaceAndPath(id.getNamespace(), "fluid_block_" + id.getPath()), fluidBlock);
+				fluidBlockRef.set(fluidBlock);
 			}
 		});
 
@@ -200,7 +208,7 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 			fs = handler.drain(Integer.MAX_VALUE, getAction(true));
 		}
 
-		return fs != null && !fs.isEmpty() ? new Ic2FluidStackImpl(fs) : Ic2FluidStack.EMPTY;
+		return !fs.isEmpty() ? new Ic2FluidStackImpl(fs) : Ic2FluidStack.EMPTY;
 	}
 
 	@Override
@@ -223,44 +231,30 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 		}
 
 		int tanks = handler.getTanks();
-		Ic2FluidStack[] ret = null;
+		Ic2FluidStack[] ret;
 		if (tanks > 0)
 		{
 			ret = new Ic2FluidStack[tanks];
 			int writeIdx = 0;
-			boolean foundAny = false;
 
 			for (int i = 0; i < tanks; i++)
 			{
 				FluidStack fs = handler.getFluidInTank(i);
-				if (fs != null)
-				{
-					foundAny = true;
-					ret[writeIdx++] = !fs.isEmpty() ? new Ic2FluidStackImpl(fs) : Ic2FluidStack.EMPTY;
-				}
+				ret[writeIdx++] = !fs.isEmpty() ? new Ic2FluidStackImpl(fs) : Ic2FluidStack.EMPTY;
 			}
 
-			if (foundAny)
+			if (writeIdx < ret.length)
 			{
-				if (writeIdx < ret.length)
-				{
-					ret = Arrays.copyOf(ret, writeIdx);
-				}
-
-				return ret;
+				ret = Arrays.copyOf(ret, writeIdx);
 			}
+
+			return ret;
 		}
 
 		FluidStack fs = handler.drain(Integer.MAX_VALUE, getAction(true));
-		if (fs != null || ret == null)
-		{
-			if (ret == null || ret.length != 1)
-			{
-				ret = new Ic2FluidStack[1];
-			}
+		ret = new Ic2FluidStack[1];
 
-			ret[0] = fs != null && !fs.isEmpty() ? new Ic2FluidStackImpl(fs) : Ic2FluidStack.EMPTY;
-		}
+		ret[0] = !fs.isEmpty() ? new Ic2FluidStackImpl(fs) : Ic2FluidStack.EMPTY;
 
 		return ret;
 	}
@@ -276,7 +270,7 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 		String id = nbt.getString("FluidName");
 		int amount = nbt.getInt("Amount");
 		Fluid fluid;
-		return id != null && (fluid = ForgeRegistries.FLUIDS.getValue(ResourceLocation.parse(id))) != null && amount >= 0
+		return (fluid = ForgeRegistries.FLUIDS.getValue(ResourceLocation.parse(id))) != null && amount >= 0
 			? Ic2FluidStack.create(fluid, amount)
 			: null;
 	}
@@ -309,18 +303,16 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 			IFluidHandlerItem handler = getFluidHandler(stack);
 			if (handler == null)
 			{
-				return null;
+				return Ic2FluidStack.EMPTY;
+			}
+			FluidStack drained = handler.drain(amount, getAction(simulate));
+			if (!drained.isEmpty())
+			{
+				updateResultStack(newStack, handler);
+				return new Ic2FluidStackImpl(drained);
 			} else
 			{
-				FluidStack drained = handler.drain(amount, getAction(simulate));
-				if (drained != null && !drained.isEmpty())
-				{
-					updateResultStack(newStack, handler);
-					return new Ic2FluidStackImpl(drained);
-				} else
-				{
-					return Ic2FluidStack.EMPTY;
-				}
+				return Ic2FluidStack.EMPTY;
 			}
 		}
 	}
@@ -348,17 +340,15 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 			if (handler == null)
 			{
 				return 0;
+			}
+			FluidStack drained = handler.drain(getForgeFs(drainFs), getAction(simulate));
+			if (!drained.isEmpty())
+			{
+				updateResultStack(newStack, handler);
+				return drained.getAmount();
 			} else
 			{
-				FluidStack drained = handler.drain(getForgeFs(drainFs), getAction(simulate));
-				if (drained != null && !drained.isEmpty())
-				{
-					updateResultStack(newStack, handler);
-					return drained.getAmount();
-				} else
-				{
-					return 0;
-				}
+				return 0;
 			}
 		}
 	}
@@ -402,11 +392,10 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 		updateResultStack(newStack, handler);
 		return ret;
 	}
-
-	@Nullable
+	
 	private static IFluidHandlerItem getFluidHandler(ItemStack stack)
 	{
-		return (IFluidHandlerItem) stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM, null).orElse(null);
+		return stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM, null).orElse(null);
 	}
 
 	private static void updateResultStack(Mutable<ItemStack> out, IFluidHandlerItem handler)
@@ -415,19 +404,7 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 		{
 			assert out.getValue() != null;
 			ItemStack container = handler.getContainer();
-			if (container == null)
-			{
-				IC2.log
-					.warn(
-						LogCategory.Item,
-						"Fluid handler %s for item %s yielded null container",
-						handler.getClass().getName(),
-						BuiltInRegistries.ITEM.getKey(((ItemStack) out.getValue()).getItem())
-					);
-			} else
-			{
-				out.setValue(container);
-			}
+			out.setValue(container);
 		}
 	}
 
@@ -457,7 +434,7 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 		}
 
 		FluidStack drained = handler.drain(amount, getAction(simulate));
-		return drained != null && !drained.isEmpty() ? new Ic2FluidStackImpl(drained) : Ic2FluidStack.EMPTY;
+		return !drained.isEmpty() ? new Ic2FluidStackImpl(drained) : Ic2FluidStack.EMPTY;
 	}
 
 	@Override
@@ -485,7 +462,7 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 		}
 
 		FluidStack drained = handler.drain(getForgeFs(drainFs), getAction(simulate));
-		return drained != null && !drained.isEmpty() ? drained.getAmount() : 0;
+		return !drained.isEmpty() ? drained.getAmount() : 0;
 	}
 
 	@Override
@@ -514,7 +491,7 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 
 		FluidStack fillMedium = getForgeFs(fillFs);
 		int ret = handler.fill(fillMedium, getAction(simulate));
-		return ret <= 0 ? 0 : ret;
+		return Math.max(ret, 0);
 	}
 
 	private static IFluidHandler getFluidHandler(BlockState state, Level world, BlockPos pos, BlockEntity be, Direction side)
@@ -532,7 +509,7 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 			}
 		}
 
-		return (IFluidHandler) be.getCapability(ForgeCapabilities.FLUID_HANDLER, null).orElse(null);
+		return be.getCapability(ForgeCapabilities.FLUID_HANDLER, null).orElse(null);
 	}
 
 	private static IFluidHandler.FluidAction getAction(boolean simulate)
@@ -544,29 +521,45 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 	public Fluid getWorldFluid(BlockState state, Level world, BlockPos pos)
 	{
 		Block block = state.getBlock();
-		return !(block instanceof IFluidBlock) ? null : ((IFluidBlock) block).getFluid();
+		if (block instanceof IFluidBlock)
+		{
+			return ((IFluidBlock) block).getFluid();
+		}
+		if (block instanceof LiquidBlock)
+		{
+			return state.getFluidState().getType();
+		}
+		return null;
 	}
 
 	@Override
 	public int getWorldFluidLevel(BlockState state, Level world, BlockPos pos)
 	{
 		Block block = state.getBlock();
-		if (!(block instanceof IFluidBlock))
+		if (block instanceof IFluidBlock)
 		{
-			return -1;
+			float fillPct = Math.abs(((IFluidBlock) block).getFilledPercentage(world, pos));
+			return 7 - Util.limit(Math.round(6.0F * fillPct), 0, 6);
 		}
-
-		float fillPct = Math.abs(((IFluidBlock) block).getFilledPercentage(world, pos));
-		return 7 - Util.limit(Math.round(6.0F * fillPct), 0, 6);
+		if (block instanceof LiquidBlock)
+		{
+			FluidState fluidState = state.getFluidState();
+			if (fluidState.isSource())
+			{
+				return 0;
+			}
+			Integer level = fluidState.getValue(FlowingFluid.LEVEL);
+			float fillPct = level / 8.0F;
+			return 7 - Util.limit(Math.round(6.0F * fillPct), 0, 6);
+		}
+		return -1;
 	}
 
 	@Override
 	public Ic2FluidStack drainWorldFluid(BlockState state, Level world, BlockPos pos, boolean simulate)
 	{
-		if (!(state.getBlock() instanceof IFluidBlock fluidBlock))
-		{
-			return null;
-		} else
+		Block block = state.getBlock();
+		if (block instanceof IFluidBlock fluidBlock)
 		{
 			if (!fluidBlock.canDrain(world, pos))
 			{
@@ -574,8 +567,23 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 			}
 
 			FluidStack drained = fluidBlock.drain(world, pos, getAction(simulate));
-			return drained != null && !drained.isEmpty() ? new Ic2FluidStackImpl(drained) : Ic2FluidStack.EMPTY;
+			return !drained.isEmpty() ? new Ic2FluidStackImpl(drained) : Ic2FluidStack.EMPTY;
 		}
+		if (block instanceof LiquidBlock)
+		{
+			FluidState fluidState = state.getFluidState();
+			if (!fluidState.isSource())
+			{
+				return null;
+			}
+			Fluid fluid = fluidState.getType();
+			if (!simulate)
+			{
+				world.setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
+			}
+			return Ic2FluidStack.create(fluid, 1000);
+		}
+		return null;
 	}
 
 	static FluidStack getForgeFs(Ic2FluidStack fs)

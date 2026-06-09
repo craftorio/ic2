@@ -220,6 +220,7 @@
 	"block.ic2.bronze_storage_box": "青铜储物箱",
 	"block.ic2.steel_storage_box": "钢制储物箱",
 	"block.ic2.iridium_storage_box": "铱储物箱",
+	"item.ic2.empty_cell": "空单元",
 	"item.ic2.crowbar": "撬棍",
 	"item.ic2.night_vision_goggles": "夜视镜",
 	"item.ic2.broken_rubber_boat": "损坏的橡胶船",

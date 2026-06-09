@@ -143,7 +143,7 @@ public abstract class Ic2BucketItem extends BucketItem
 		if (state.getBlock() instanceof LiquidBlock)
 		{
 			Fluid fluid = state.getFluidState().getType();
-			if (this.drainableFluidList.contains(fluid))
+			if (this.getDrainableFluidList().contains(fluid))
 			{
 				world.setBlock(pos, Blocks.AIR.defaultBlockState(), 11);
 				return new ItemStack(this.getBucketItem(fluid));

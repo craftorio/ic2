@@ -19,12 +19,16 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.Item.Properties;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.BlockHitResult;
 import org.apache.commons.lang3.mutable.Mutable;
+import org.jetbrains.annotations.Nullable;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -40,7 +44,7 @@ public class ItemClassicCell extends Ic2BucketItem implements Ic2FluidItem
 		super(fluid, settings);
 		this.fluid = fluid;
 		this.charges = charges;
-		if (fluid != null)
+		if (fluid != null && fluid != Fluids.EMPTY)
 		{
 			instances.put(fluid, this);
 		}
@@ -55,19 +59,18 @@ public class ItemClassicCell extends Ic2BucketItem implements Ic2FluidItem
 	@Override
 	public List<Fluid> getDrainableFluidList()
 	{
-		return List.of(Fluids.LAVA, Fluids.WATER);
+		return List.copyOf(instances.keySet());
 	}
 
 	@Override
 	public Item getBucketItem(Fluid fluid)
 	{
-		if (fluid == Fluids.WATER)
+		ItemClassicCell cell = instances.get(fluid);
+		if (cell != null)
 		{
-			return Ic2Items.WATER_CELL;
-		} else
-		{
-			return fluid == Fluids.LAVA ? Ic2Items.LAVA_CELL : Ic2Items.EMPTY_CELL;
+			return cell;
 		}
+		return Ic2Items.EMPTY_CELL;
 	}
 
 	@Override
@@ -77,6 +80,24 @@ public class ItemClassicCell extends Ic2BucketItem implements Ic2FluidItem
 		return (this == Ic2Items.WATER_CELL || this == Ic2Items.WEED_EX_CELL || this == Ic2Items.HYDRATION_CELL)
 			&& (be = context.getLevel().getBlockEntity(context.getClickedPos())) instanceof TileEntityCrop
 			&& this.useOnCrop(context.getItemInHand(), (TileEntityCrop) be, true);
+	}
+
+	@Nullable
+	@Override
+	public boolean emptyContents(@Nullable Player player, Level world, BlockPos pos, @Nullable BlockHitResult hitResult)
+	{
+		if (!(this.fluid instanceof net.minecraft.world.level.material.FlowingFluid))
+		{
+			return false;
+		}
+
+		net.minecraft.world.level.block.state.BlockState legacyBlock = this.fluid.defaultFluidState().createLegacyBlock();
+		if (legacyBlock.isAir())
+		{
+			return false;
+		}
+
+		return super.emptyContents(player, world, pos, hitResult);
 	}
 
 	public boolean useOnCrop(ItemStack stack, TileEntityCrop crop, boolean manual)

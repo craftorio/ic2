@@ -260,7 +260,7 @@ public final class EventHandler
 					return ((ItemArmorNanoSuit) armorItem).absorbFall(armor, entity, distance);
 				} else
 				{
-					return armorItem == Ic2Items.QUANTUM_BOOTS ? ((ItemArmorQuantumSuit) armorItem).absorbFall(armor, entity, distance) : false;
+					return armorItem == Ic2Items.QUANTUM_BOOTS && ((ItemArmorQuantumSuit) armorItem).absorbFall(armor, entity, distance);
 				}
 			}
 		}
@@ -277,11 +277,8 @@ public final class EventHandler
 				entity.playSound(swingSound, 1.0F, 1.0F);
 			}
 
-			return false;
-		} else
-		{
-			return false;
 		}
+		return false;
 	}
 
 	public static boolean onEntityInteract(Player player, InteractionHand hand, Entity target)
@@ -304,7 +301,7 @@ public final class EventHandler
 	public static boolean onAttackEntity(Player player, Entity target)
 	{
 		Item item = player.getMainHandItem().getItem();
-		return item instanceof IEntityAttackableItem ? ((IEntityAttackableItem) item).onAttackEntity(player, target) : true;
+		return !(item instanceof IEntityAttackableItem) || ((IEntityAttackableItem) item).onAttackEntity(player, target);
 	}
 
 	public static boolean onEntityAttacked(LivingEntity victim, DamageSource source, float amount)

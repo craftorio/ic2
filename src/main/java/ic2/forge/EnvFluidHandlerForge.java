@@ -509,7 +509,7 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 			}
 		}
 
-		return be.getCapability(ForgeCapabilities.FLUID_HANDLER, null).orElse(null);
+		return be.getCapability(ForgeCapabilities.FLUID_HANDLER, side).orElse(null);
 	}
 
 	private static IFluidHandler.FluidAction getAction(boolean simulate)

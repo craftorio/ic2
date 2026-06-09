@@ -34,7 +34,17 @@ final class BlockFluidCapImpl implements ICapabilityProvider
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> capability, Direction facing)
 	{
-		return (LazyOptional<T>) (facing != null && capability == ForgeCapabilities.FLUID_HANDLER ? this.sides[facing.ordinal()] : LazyOptional.empty());
+		if (capability != ForgeCapabilities.FLUID_HANDLER)
+		{
+			return LazyOptional.empty();
+		}
+
+		if (facing == null)
+		{
+			return (LazyOptional<T>) this.sides[0];
+		}
+
+		return (LazyOptional<T>) this.sides[facing.ordinal()];
 	}
 
 	private class SideHandler implements IFluidHandler, NonNullSupplier<IFluidHandler>

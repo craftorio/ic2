@@ -7,6 +7,7 @@ import ic2.api.recipe.ILiquidAcceptManager;
 import ic2.core.block.invslot.InvSlot;
 import ic2.core.block.tileentity.Ic2TileEntity;
 import ic2.core.fluid.FluidTankInfo;
+import ic2.core.fluid.Ic2FluidBlock;
 import ic2.core.fluid.Ic2FluidStack;
 import ic2.core.fluid.Ic2FluidTank;
 import ic2.core.util.Util;
@@ -19,12 +20,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.function.Predicate;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 
-public class Fluids extends TileEntityComponent
+public class Fluids extends TileEntityComponent implements Ic2FluidBlock
 {
 	protected final List<Fluids.InternalFluidTank> managedTanks = new ArrayList<>();
 	protected final List<Supplier<? extends Collection<Fluids.InternalFluidTank>>> unmanagedTanks = new ArrayList<>();
@@ -353,6 +358,38 @@ public class Fluids extends TileEntityComponent
 		}
 
 		return tanks;
+	}
+
+	// ---- Ic2FluidBlock ----
+
+	@Override
+	public boolean isFluidBlock(BlockState state, Level world, BlockPos pos, BlockEntity be)
+	{
+		return true;
+	}
+
+	@Override
+	public FluidTankInfo[] getTankInfos(BlockState state, Level world, BlockPos pos, BlockEntity be)
+	{
+		return this.getTankInfos();
+	}
+
+	@Override
+	public Ic2FluidStack drainMb(BlockState state, Level world, BlockPos pos, BlockEntity be, Direction side, int amount, boolean simulate)
+	{
+		return this.drainMb(side, amount, simulate);
+	}
+
+	@Override
+	public int drainMb(BlockState state, Level world, BlockPos pos, BlockEntity be, Direction side, Ic2FluidStack drainFs, boolean simulate)
+	{
+		return this.drainMb(side, drainFs, simulate);
+	}
+
+	@Override
+	public int fillMb(BlockState state, Level world, BlockPos pos, BlockEntity be, Direction side, Ic2FluidStack fillFs, boolean simulate)
+	{
+		return this.fillMb(side, fillFs, simulate);
 	}
 
 	public static class InternalFluidTank extends Ic2FluidTank

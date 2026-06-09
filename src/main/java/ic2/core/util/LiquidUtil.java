@@ -243,8 +243,8 @@ public class LiquidUtil
 			fsChange.setAmountMb(amount);
 			Ic2FluidStack fillTestFs = fsIn.copy();
 			fillTestFs.setAmountMb(Integer.MAX_VALUE);
-			boolean isFull = FluidHandler.fillMb(singleStack, fillTestFs, true, null) <= 0;
 			singleStack = (ItemStack) newStack.getValue();
+			boolean isFull = FluidHandler.fillMb(singleStack, fillTestFs, true, null) <= 0;
 			assert fsChange.getFluid() == fsIn.getFluid();
 			assert !fsChange.isEmpty();
 			assert StackUtil.getSize(singleStack) == 1;

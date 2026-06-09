@@ -56,8 +56,8 @@ public final class Ic2Fluids
 	)
 	{
 		assert color >>> 24 >= 8;
-		ResourceLocation stillSpriteId = IC2.getIdentifier("blocks/fluid/" + stillSprite + "_still");
-		ResourceLocation flowingSpriteId = flowingSprite != null ? IC2.getIdentifier("blocks/fluid/" + flowingSprite + "_flow") : null;
+		ResourceLocation stillSpriteId = IC2.getIdentifier("block/fluid/" + stillSprite + "_still");
+		ResourceLocation flowingSpriteId = flowingSprite != null ? IC2.getIdentifier("block/fluid/" + flowingSprite + "_flow") : null;
 		return FluidHandler.createFluid(
 			IC2.getIdentifier(name), density, viscosity, luminosity, temperature, isGaseous, stillSpriteId, flowingSpriteId, color
 		);

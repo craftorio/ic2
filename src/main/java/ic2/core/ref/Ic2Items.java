@@ -938,6 +938,51 @@ public final class Ic2Items
 	public static final ItemClassicCell HYDRATION_CELL = register(
 		"hydration_cell", new ItemClassicCell(new Properties().stacksTo(1), null, 10000)
 	);
+	public static final Item UU_MATTER_CELL = register(
+		"uu_matter_cell", new ItemClassicCell(new Properties(), Ic2Fluids.UU_MATTER.still(), 1)
+	);
+	public static final Item CONSTRUCTION_FOAM_CELL = register(
+		"construction_foam_cell", new ItemClassicCell(new Properties(), Ic2Fluids.CONSTRUCTION_FOAM.still(), 1)
+	);
+	public static final Item COOLANT_CELL = register(
+		"coolant_cell", new ItemClassicCell(new Properties(), Ic2Fluids.COOLANT.still(), 1)
+	);
+	public static final Item CREOSOTE_CELL = register(
+		"creosote_cell", new ItemClassicCell(new Properties(), Ic2Fluids.CREOSOTE.still(), 1)
+	);
+	public static final Item HOT_COOLANT_CELL = register(
+		"hot_coolant_cell", new ItemClassicCell(new Properties(), Ic2Fluids.HOT_COOLANT.still(), 1)
+	);
+	public static final Item PAHOEHOE_LAVA_CELL = register(
+		"pahoehoe_lava_cell", new ItemClassicCell(new Properties(), Ic2Fluids.PAHOEHOE_LAVA.still(), 1)
+	);
+	public static final Item BIOMASS_CELL = register(
+		"biomass_cell", new ItemClassicCell(new Properties(), Ic2Fluids.BIOMASS.still(), 1)
+	);
+	public static final Item BIOGAS_CELL = register(
+		"biogas_cell", new ItemClassicCell(new Properties(), Ic2Fluids.BIOGAS.still(), 1)
+	);
+	public static final Item DISTILLED_WATER_CELL = register(
+		"distilled_water_cell", new ItemClassicCell(new Properties(), Ic2Fluids.DISTILLED_WATER.still(), 1)
+	);
+	public static final Item SUPERHEATED_STEAM_CELL = register(
+		"superheated_steam_cell", new ItemClassicCell(new Properties(), Ic2Fluids.SUPERHEATED_STEAM.still(), 1)
+	);
+	public static final Item STEAM_CELL = register(
+		"steam_cell", new ItemClassicCell(new Properties(), Ic2Fluids.STEAM.still(), 1)
+	);
+	public static final Item HOT_WATER_CELL = register(
+		"hot_water_cell", new ItemClassicCell(new Properties(), Ic2Fluids.HOT_WATER.still(), 1)
+	);
+	public static final Item HYDROGEN_CELL = register(
+		"hydrogen_cell", new ItemClassicCell(new Properties(), Ic2Fluids.HYDROGEN.still(), 1)
+	);
+	public static final Item OXYGEN_CELL = register(
+		"oxygen_cell", new ItemClassicCell(new Properties(), Ic2Fluids.OXYGEN.still(), 1)
+	);
+	public static final Item HEAVY_WATER_CELL = register(
+		"heavy_water_cell", new ItemClassicCell(new Properties(), Ic2Fluids.HEAVY_WATER.still(), 1)
+	);
 	public static final Item OVERCLOCKER_UPGRADE = register(
 		"overclocker_upgrade", new ItemUpgradeModule(new Properties(), ItemUpgradeModule.UpgradeType.overclocker)
 	);
@@ -1557,6 +1602,21 @@ public final class Ic2Items
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> TRANSFORMER_UPGRADE);
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> TREETAP);
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> WATER_CELL);
+		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> BIOMASS_CELL);
+		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> BIOGAS_CELL);
+		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> CONSTRUCTION_FOAM_CELL);
+		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> COOLANT_CELL);
+		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> CREOSOTE_CELL);
+		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> DISTILLED_WATER_CELL);
+		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> HEAVY_WATER_CELL);
+		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> HOT_COOLANT_CELL);
+		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> HOT_WATER_CELL);
+		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> HYDROGEN_CELL);
+		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> OXYGEN_CELL);
+		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> PAHOEHOE_LAVA_CELL);
+		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> STEAM_CELL);
+		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> SUPERHEATED_STEAM_CELL);
+		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> UU_MATTER_CELL);
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> WHITE_PAINTER);
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> WIND_METER);
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> WOODEN_ROTOR);

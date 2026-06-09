@@ -345,12 +345,11 @@ public class Fluids extends TileEntityComponent
 			return this.managedTanks;
 		}
 
-		List<Fluids.InternalFluidTank> tanks = new ArrayList<>();
-		tanks.addAll(this.managedTanks);
+		List<InternalFluidTank> tanks = new ArrayList<>(this.managedTanks);
 
 		for (Supplier<? extends Collection<Fluids.InternalFluidTank>> suppl : this.unmanagedTanks)
 		{
-			tanks.addAll((Collection<? extends Fluids.InternalFluidTank>) suppl.get());
+			tanks.addAll(suppl.get());
 		}
 
 		return tanks;

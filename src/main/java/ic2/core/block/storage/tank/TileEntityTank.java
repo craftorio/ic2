@@ -90,7 +90,7 @@ public abstract class TileEntityTank extends TileEntityInventory implements IHas
 		}
 
 		Ic2FluidStack fs = this.contents.getFluidStack();
-		int amount = 0;
+		int amount;
 		if (fs != null && !fs.isEmpty())
 		{
 			amount = LiquidUtil.fillContainer(player, hand, fs, FluidContainerOutputMode.InPlacePreferred, false);

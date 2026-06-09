@@ -23,12 +23,10 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
@@ -542,12 +540,12 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 
 	public int drawString(GuiGraphics guiGraphics, int x, int y, String text, int color)
 	{
-		return guiGraphics.drawString(this.font, text, x, y, color);
+		return guiGraphics.drawString(this.font, text, x, y, color, false);
 	}
 
-	public int drawString(GuiGraphics guiGraphics, int x, int y, String text, int color, boolean shadow)
+	public int drawString(GuiGraphics guiGraphics, int x, int y, String text, int color, boolean ignored)
 	{
-		return guiGraphics.drawString(this.font, text, this.leftPos + x, this.topPos + y, color, shadow) - this.leftPos;
+		return guiGraphics.drawString(this.font, text, this.leftPos + x, this.topPos + y, color, false) - this.leftPos;
 	}
 
 	public void drawTrimmedString(GuiGraphics guiGraphics, int x, int y, String text, int maxWidth, int color)

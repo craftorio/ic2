@@ -1,0 +1,61 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_empty_cell": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:empty_cell"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_geo_generator": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:geo_generator"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_iron_casing": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:iron_casing"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "ic2:shaped/semifluid_generator"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_geo_generator",
+      "has_empty_cell",
+      "has_iron_casing",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "ic2:shaped/semifluid_generator"
+    ]
+  },
+  "sends_telemetry_event": true
+}

@@ -1,0 +1,61 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_generator": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:generator"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_iron_casing": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:iron_casing"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_reactor_chamber": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:reactor_chamber"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "ic2:shaped/rt_generator"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_iron_casing",
+      "has_reactor_chamber",
+      "has_generator",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "ic2:shaped/rt_generator"
+    ]
+  },
+  "sends_telemetry_event": true
+}

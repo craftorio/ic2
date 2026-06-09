@@ -1,0 +1,61 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_copper_boiler": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:copper_boiler"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_heat_conductor": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:heat_conductor"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_iron_casing": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:iron_casing"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "ic2:shaped/steam_generator"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_heat_conductor",
+      "has_copper_boiler",
+      "has_iron_casing",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "ic2:shaped/steam_generator"
+    ]
+  },
+  "sends_telemetry_event": true
+}

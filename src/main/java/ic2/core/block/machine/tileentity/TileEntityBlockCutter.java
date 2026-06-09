@@ -30,7 +30,7 @@ public class TileEntityBlockCutter extends TileEntityStandardMachine<IRecipeInpu
 	{
 		super(Ic2BlockEntities.BLOCK_CUTTER, pos, state, 4, 450, 1);
 		this.inputSlot = new InvSlotProcessableGeneric(this, "input", 1, Recipes.block_cutter);
-		this.cutterSlot = new InvSlotConsumableClass(this, "cutterInputSlot", 1, IBlockCuttingBlade.class);
+		this.cutterSlot = new InvSlotConsumableClass(this, "cutter_input_slot", 1, IBlockCuttingBlade.class);
 	}
 
 	@Override

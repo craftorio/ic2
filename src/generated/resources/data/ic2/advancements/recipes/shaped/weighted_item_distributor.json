@@ -1,0 +1,74 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_chest": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:chest"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_ejector_upgrade": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:ejector_upgrade"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_machine": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:machine"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_pulling_upgrade": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:pulling_upgrade"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "ic2:shaped/weighted_item_distributor"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_machine",
+      "has_chest",
+      "has_ejector_upgrade",
+      "has_pulling_upgrade",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "ic2:shaped/weighted_item_distributor"
+    ]
+  },
+  "sends_telemetry_event": true
+}

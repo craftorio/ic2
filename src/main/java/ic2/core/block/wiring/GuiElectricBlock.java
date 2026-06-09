@@ -20,32 +20,22 @@ public class GuiElectricBlock extends Ic2Gui<ContainerElectricBlock>
 	{
 		super(container, playerInventory, title, 196);
 		this.addElement(EnergyGauge.asBar(this, 79, 38, container.base));
-		this.addElement(new VanillaButton(this, 152, 4, 20, 20, this.createEventSender(0)).withIcon(new Supplier<ItemStack>()
-		{
-			public ItemStack get()
-			{
-				return new ItemStack(Items.REDSTONE);
-			}
-		}).withTooltip(new Supplier<String>()
-		{
-			public String get()
-			{
-				return container.base.getRedstoneMode();
-			}
-		}));
+		this.addElement(new VanillaButton(this, 152, 4, 20, 20, this.createEventSender(0)).withIcon((Supplier<ItemStack>) () -> new ItemStack(Items.REDSTONE)).withTooltip((Supplier<String>) container.base::getRedstoneMode));
 	}
 
 	@Override
 	protected void drawForegroundLayer(GuiGraphics guiGraphics, int mouseX, int mouseY)
 	{
+		int rightTextHeight = 24;
+		int color = 4207152;
 		super.drawForegroundLayer(guiGraphics, mouseX, mouseY);
-		this.drawString(guiGraphics, 8, 74, Localization.translate("ic2.EUStorage.gui.info.armor"), 4210752);
-		this.drawString(guiGraphics, 79, 40, Localization.translate("ic2.EUStorage.gui.info.level"), 4210752);
-		int e = (int) Math.min(((ContainerElectricBlock) this.menu).base.energy.getEnergy(), ((ContainerElectricBlock) this.menu).base.energy.getCapacity());
-		this.drawString(guiGraphics, 110, 50, " " + e, 4210752);
-		this.drawString(guiGraphics, 110, 60, "/" + (int) ((ContainerElectricBlock) this.menu).base.energy.getCapacity(), 4210752);
-		String output = Localization.translate("ic2.EUStorage.gui.info.output", ((ContainerElectricBlock) this.menu).base.getOutput());
-		this.drawString(guiGraphics, 85, 75, output, 4210752);
+		this.drawString(guiGraphics, 8, 74, Localization.translate("ic2.EUStorage.gui.info.armor"), color);
+		this.drawString(guiGraphics, 79, rightTextHeight, Localization.translate("ic2.EUStorage.gui.info.level", this.menu.base.energy.getSourceTier()), color);
+		int e = (int) Math.min(this.menu.base.energy.getEnergy(), this.menu.base.energy.getCapacity());
+		this.drawString(guiGraphics, 110, rightTextHeight + 10, " " + e, color);
+		this.drawString(guiGraphics, 110, rightTextHeight + 20, "/" + (int) this.menu.base.energy.getCapacity(), color);
+		String output = Localization.translate("ic2.EUStorage.gui.info.output", this.menu.base.getOutput());
+		this.drawString(guiGraphics, 85, rightTextHeight + 35, output, color);
 	}
 
 	@Override

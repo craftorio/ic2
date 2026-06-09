@@ -1,0 +1,74 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_electric_motor": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:electric_motor"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_iron_casing": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:iron_casing"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_iron_shaft": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:iron_shaft"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_re_battery": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:re_battery"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "ic2:shaped/electric_kinetic_generator"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_iron_casing",
+      "has_re_battery",
+      "has_electric_motor",
+      "has_iron_shaft",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "ic2:shaped/electric_kinetic_generator"
+    ]
+  },
+  "sends_telemetry_event": true
+}

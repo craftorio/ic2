@@ -1,6 +1,21 @@
 {
   "ic2.frequency_transmitter.tooltip.blank": "<空>",
   "ic2.item.tooltip.PowerTier": "电压等级: %s",
+  "ic2.item.FluidContainer.Empty": "<空>",
+  "ic2.construction_foam": "建筑泡沫",
+  "ic2.biogas": "沼气",
+  "container.ic2.bronze_storage_box": "青铜储物箱",
+  "container.ic2.iron_storage_box": "铁质储物箱",
+  "container.ic2.steel_storage_box": "钢制储物箱",
+  "container.ic2.iridium_storage_box": "铱储物箱",
+  "container.ic2.wooden_storage_box": "木质储物箱",
+  "container.ic2.bronze_tank": "青铜流体储存器",
+  "container.ic2.iron_tank": "铁质流体储存器",
+  "container.ic2.steel_tank": "钢制流体储存器",
+  "container.ic2.iridium_tank": "铱流体储存器",
+  "container.ic2.batbox": "储电箱",
+  "container.ic2.cesu": "CESU储电箱",
+  "container.ic2.personal_chest": "保险箱",
   "block.ic2.basalt": "玄武岩",
   "block.ic2.lead_ore": "铅矿石",
   "block.ic2.tin_ore": "锡矿石",
@@ -874,6 +889,7 @@
   "death.attack.ic2.electricity.player": "%1$s在试图逃离%2$s时触电身亡",
   "death.attack.ic2.nuke": "%1$s死于核弹",
   "death.attack.ic2.nuke.player": "%1$s被%2$s用核弹炸飞了",
-  "death.attack.ic2.radiation": "%1$s死于辐射",
+  "death.attack.ic2.radiation": "%1$s沐浴在辐射中但没能成为哥斯拉",
   "death.attack.ic2.radiation.player": "%1$s在试图逃离%2$s时死于辐射"
+
 }

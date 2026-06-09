@@ -26,8 +26,8 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeType;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.NotNull;
 
 public class DynamicCategory extends IORecipeCategory
 {
@@ -43,7 +43,7 @@ public class DynamicCategory extends IORecipeCategory
 	{
 		super(teBlock);
 		this.recipeType = recipeType;
-		this.initializeWidgets(guiHelper, GuiParser.parse(BuiltInRegistries.BLOCK.getKey(teBlock), teBlock.getDummyTe().getClass()));
+		this.initializeWidgets(guiHelper, GuiParser.parse(ForgeRegistries.BLOCKS.getKey(teBlock), teBlock.getDummyTe().getClass()));
 		int minX = 1000;
 		int minY = 1000;
 		int maxX = -1000;
@@ -153,7 +153,7 @@ public class DynamicCategory extends IORecipeCategory
 					int extraX = (node.style.width - 16) / 2;
 					int extraY = (node.style.height - 16) / 2;
 					String slotName = node.name.toLowerCase(Locale.ENGLISH);
-					if (!slotName.contains("input") && !slotName.equals("cutterInputSlot"))
+					if (!slotName.contains("input") && !slotName.equals("cutter_input_slot"))
 					{
 						if (slotName.contains("output"))
 						{
@@ -225,7 +225,7 @@ public class DynamicCategory extends IORecipeCategory
 		}
 	}
 
-	public void setRecipe(IRecipeLayoutBuilder builder, IORecipeWrapper recipe, IFocusGroup focuses)
+	public void setRecipe(@NotNull IRecipeLayoutBuilder builder, @NotNull IORecipeWrapper recipe, @NotNull IFocusGroup focuses)
 	{
 		this.addRecipeSlots(builder, recipe, focuses, this.xOffset, this.yOffset);
 	}
@@ -238,15 +238,9 @@ public class DynamicCategory extends IORecipeCategory
 		}
 	}
 
-	public RecipeType<IORecipeWrapper> getRecipeType()
+	public @NotNull RecipeType<IORecipeWrapper> getRecipeType()
 	{
 		return this.recipeType;
-	}
-
-	@SuppressWarnings("removal")
-	public IDrawable getBackground()
-	{
-		return this.background;
 	}
 
 	@Override
@@ -266,9 +260,9 @@ public class DynamicCategory extends IORecipeCategory
 		if ("progress".equals(name))
 		{
 			Ic2TileEntity te = this.block.getDummyTe();
-			if (te != null && te instanceof TileEntityStandardMachine)
+			if (te instanceof TileEntityStandardMachine)
 			{
-				return ((TileEntityStandardMachine) te).defaultOperationLength / 3;
+				return ((TileEntityStandardMachine<?, ?, ?>) te).defaultOperationLength / 3;
 			}
 		}
 

@@ -8,3 +8,6 @@ run/
 out/
 
 gradle-wrapper.jar
+
+.cache/
+run-data/

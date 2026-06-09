@@ -1,0 +1,61 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_alloy": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:alloy"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_iron_chestplate": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:iron_chestplate"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_leather_chestplate": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:leather_chestplate"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "ic2:shaped/alloy_chestplate_2"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_leather_chestplate",
+      "has_iron_chestplate",
+      "has_alloy",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "ic2:shaped/alloy_chestplate_2"
+    ]
+  },
+  "sends_telemetry_event": true
+}

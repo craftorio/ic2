@@ -70,6 +70,7 @@ repositories {
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     compileOnly 'mezz.jei:jei-1.20.1-forge-api:15.20.0.130'
+    runtimeOnly fg.deobf('mezz.jei:jei-1.20.1-forge:15.20.0.130')
     implementation 'org.ejml:ejml-all:0.45.1'
 }
 

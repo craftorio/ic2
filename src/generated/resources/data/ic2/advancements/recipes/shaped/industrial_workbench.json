@@ -1,0 +1,74 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_crafting_table": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:crafting_table"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_cutter": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:cutter"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_forge_hammer": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:forge_hammer"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_machine": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:machine"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "ic2:shaped/industrial_workbench"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_forge_hammer",
+      "has_machine",
+      "has_cutter",
+      "has_crafting_table",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "ic2:shaped/industrial_workbench"
+    ]
+  },
+  "sends_telemetry_event": true
+}

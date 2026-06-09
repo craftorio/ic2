@@ -88,8 +88,6 @@ public abstract class TileEntityTransformer extends TileEntityInventory implemen
 		{
 			this.configuredMode = TileEntityTransformer.Mode.VALUES[event];
 			this.updateRedstone(false);
-		} else if (event == 3)
-		{
 		}
 	}
 
@@ -109,12 +107,7 @@ public abstract class TileEntityTransformer extends TileEntityInventory implemen
 			case redstone ->
 				this.getLevel().hasNeighborSignal(this.worldPosition) ? TileEntityTransformer.Mode.stepup : TileEntityTransformer.Mode.stepdown;
 			case stepdown, stepup -> this.configuredMode;
-			default -> throw new RuntimeException("invalid mode: " + this.configuredMode);
 		};
-		if (newMode != TileEntityTransformer.Mode.stepup && newMode != TileEntityTransformer.Mode.stepdown)
-		{
-			throw new RuntimeException("invalid mode: " + newMode);
-		}
 
 		this.energy.setEnabled(true);
 		if (force || this.transformMode != newMode)

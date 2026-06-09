@@ -1,0 +1,61 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_circuit": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:circuit"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_insulated_copper_cable": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:insulated_copper_cable"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_sextuple_reactor_coolant_cell": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:sextuple_reactor_coolant_cell"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "ic2:shaped/overclocker_upgrade_12"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_sextuple_reactor_coolant_cell",
+      "has_insulated_copper_cable",
+      "has_circuit",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "ic2:shaped/overclocker_upgrade_12"
+    ]
+  },
+  "sends_telemetry_event": true
+}

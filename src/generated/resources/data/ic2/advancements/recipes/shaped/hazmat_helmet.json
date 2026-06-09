@@ -1,0 +1,74 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_glass": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:glass"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_iron_bars": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:iron_bars"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_orange_dye": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:orange_dye"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_rubber": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:rubber"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "ic2:shaped/hazmat_helmet"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_rubber",
+      "has_glass",
+      "has_iron_bars",
+      "has_orange_dye",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "ic2:shaped/hazmat_helmet"
+    ]
+  },
+  "sends_telemetry_event": true
+}

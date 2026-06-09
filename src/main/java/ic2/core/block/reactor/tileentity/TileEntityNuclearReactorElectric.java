@@ -854,7 +854,7 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 			{
 				if (chamber.redstone.isLinked() && chamber.redstone.getLinkReceiver() != this.redstone)
 				{
-					chamber.destoryChamber(true);
+					chamber.destroyChamber(true);
 				} else
 				{
 					chamber.redstone.linkTo(this.redstone);

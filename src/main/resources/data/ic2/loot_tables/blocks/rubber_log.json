@@ -30,7 +30,7 @@
         {
           "condition": "minecraft:inverted",
           "term": {
-            "condition": "minecraft:alternative",
+            "condition": "minecraft:alternatives",
             "terms": [
               {
                 "condition": "minecraft:block_state_property",

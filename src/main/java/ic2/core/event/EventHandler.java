@@ -305,20 +305,14 @@ public final class EventHandler
 		return !(item instanceof IEntityAttackableItem) || ((IEntityAttackableItem) item).onAttackEntity(player, target);
 	}
 
+	// True means cancelling this damage event
 	public static boolean onEntityAttacked(LivingEntity victim, DamageSource source, float amount)
 	{
-		if (!(victim instanceof Player player))
+		if (victim instanceof Player player)
 		{
-			return true;
+			// TODO: Varies by damage sources, or entity types.
+			return ItemArmorElectric.damageArmor(player, source, amount);
 		}
-
-		ItemArmorElectric.damageArmor(player, source, amount);
-
-		if (source.is(DamageTypeTags.BYPASSES_ENCHANTMENTS) && ItemArmorQuantumSuit.isWearingFullSet(player))
-		{
-			return !ItemArmorQuantumSuit.absorbMagicDamage(player, source, amount);
-		}
-
-		return true;
+		return false;
 	}
 }

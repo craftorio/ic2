@@ -1,5 +1,3 @@
 {
-  "parent": "minecraft:item/handheld",
-  "display": {
-  }
+  "parent": "minecraft:item/handheld"
 }

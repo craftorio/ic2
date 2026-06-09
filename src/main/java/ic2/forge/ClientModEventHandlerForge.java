@@ -1,11 +1,10 @@
 package ic2.forge;
 
+import ic2.core.event.EventHandlerClient;
 import ic2.forge.model.BeModelLoader;
 import ic2.forge.model.CableModelLoader;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.ModelEvent;
@@ -91,13 +90,6 @@ public final class ClientModEventHandlerForge
 	@SubscribeEvent
 	public void onClientSetup(FMLClientSetupEvent event)
 	{
-		// Render layers are now defined through blockstate JSON models in 1.20.1
-		// Set your render type in your block model's JSON (eg. "render_type": "cutout") or override net.minecraft.client.resources.model.BakedModel.getRenderTypes(BlockState, net.minecraft.util.RandomSource, net.minecraftforge.client.model.data.ModelData)
-		for (ClientEnvProxyForge.BlockLayerRegistration registration : ClientEnvProxyForge.blockLayerRegistrations)
-		{
-			for (Block block : registration.blocks())
-			{
-			}
-		}
+		EventHandlerClient.onClientSetup();
 	}
 }

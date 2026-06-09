@@ -1,6 +1,5 @@
 package ic2.core.block.reactor.tileentity;
 
-import com.google.common.base.Supplier;
 import ic2.api.energy.tile.IEnergyAcceptor;
 import ic2.api.energy.tile.IEnergyEmitter;
 import ic2.api.reactor.IReactorChamber;
@@ -12,7 +11,6 @@ import ic2.core.util.StackUtil;
 import ic2.core.util.Util;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 
 
@@ -42,13 +40,10 @@ public class TileEntityReactorChamberElectric extends Ic2TileEntity implements C
 	public TileEntityReactorChamberElectric(BlockPos pos, BlockState state)
 	{
 		super(Ic2BlockEntities.REACTOR_CHAMBER, pos, state);
-		this.fluids.addUnmanagedTankHook(new Supplier<Collection<Fluids.InternalFluidTank>>()
+		this.fluids.addUnmanagedTankHook(() ->
 		{
-			public Collection<Fluids.InternalFluidTank> get()
-			{
-				TileEntityNuclearReactorElectric reactor = TileEntityReactorChamberElectric.this.getReactor();
-				return reactor == null ? Collections.emptySet() : Arrays.asList(reactor.inputTank, reactor.outputTank);
-			}
+			TileEntityNuclearReactorElectric reactor = TileEntityReactorChamberElectric.this.getReactor();
+			return reactor == null ? Collections.emptySet() : Arrays.asList(reactor.inputTank, reactor.outputTank);
 		});
 	}
 
@@ -90,8 +85,7 @@ public class TileEntityReactorChamberElectric extends Ic2TileEntity implements C
 		if (reactor != null)
 		{
 			Level world = this.getLevel();
-			return reactor.getBlockType()
-				.use(reactor.getBlockState(), world, reactor.getBlockPos(), player, hand, new BlockHitResult(hit, side, reactor.getBlockPos(), false));
+			return reactor.getBlockType().use(reactor.getBlockState(), world, reactor.getBlockPos(), player, hand, new BlockHitResult(hit, side, reactor.getBlockPos(), false));
 		} else
 		{
 			return InteractionResult.PASS;
@@ -105,11 +99,11 @@ public class TileEntityReactorChamberElectric extends Ic2TileEntity implements C
 		this.lastReactorUpdate = 0L;
 		if (this.getReactor() == null)
 		{
-			this.destoryChamber(true);
+			this.destroyChamber(true);
 		}
 	}
 
-	public void destoryChamber(boolean wrench)
+	public void destroyChamber(boolean wrench)
 	{
 		Level world = this.getLevel();
 		world.removeBlock(this.worldPosition, false);
@@ -168,7 +162,7 @@ public class TileEntityReactorChamberElectric extends Ic2TileEntity implements C
 	public boolean stillValid(Player player)
 	{
 		TileEntityNuclearReactorElectric reactor = this.getReactor();
-		return reactor != null ? reactor.stillValid(player) : false;
+		return reactor != null && reactor.stillValid(player);
 	}
 
 	public void startOpen(Player player)
@@ -192,7 +186,7 @@ public class TileEntityReactorChamberElectric extends Ic2TileEntity implements C
 	public boolean canPlaceItem(int index, ItemStack stack)
 	{
 		TileEntityNuclearReactorElectric reactor = this.getReactor();
-		return reactor != null ? reactor.canPlaceItem(index, stack) : false;
+		return reactor != null && reactor.canPlaceItem(index, stack);
 	}
 
 	public void clearContent()

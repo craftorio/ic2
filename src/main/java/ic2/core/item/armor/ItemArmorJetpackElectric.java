@@ -60,4 +60,10 @@ public class ItemArmorJetpackElectric extends ItemArmorElectric implements IJetp
 	{
 		return 0;
 	}
+
+	@Override
+	public double getDamageAbsorptionRatio()
+	{
+		return 0.0;
+	}
 }

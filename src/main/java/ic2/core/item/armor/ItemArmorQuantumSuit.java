@@ -22,7 +22,6 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorMaterial;
@@ -58,6 +57,19 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 	public int getEnergyPerDamage()
 	{
 		return 20000;
+	}
+
+	@Override
+	public double getDamageAbsorptionRatio()
+	{
+		return switch (this.getEquipmentSlot())
+		{
+			case HEAD -> 0.15;
+			case CHEST -> 0.48;
+			case LEGS -> 0.3;
+			case FEET -> 0.15;
+			default -> 0.0;
+		};
 	}
 
 	public boolean hasCustomColor(ItemStack stack)
@@ -465,48 +477,4 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 		return true;
 	}
 
-	public static boolean absorbMagicDamage(Player player, DamageSource source, float amount)
-	{
-		if (amount <= 0.0F)
-		{
-			return false;
-		}
-
-		float damage = amount / 4.0F;
-		if (damage < 1.0F)
-		{
-			damage = 1.0F;
-		}
-
-		for (EquipmentSlot slot : EquipmentSlot.values())
-		{
-			if (slot.getType() == EquipmentSlot.Type.ARMOR)
-			{
-				ItemStack armor = player.getItemBySlot(slot);
-				if (armor.getItem() instanceof ItemArmorQuantumSuit qs)
-				{
-					double needed = damage * qs.getEnergyPerDamage() * 2.0;
-					if (!ElectricItem.manager.canUse(armor, needed))
-					{
-						return false;
-					}
-				}
-			}
-		}
-
-		for (EquipmentSlot slot : EquipmentSlot.values())
-		{
-			if (slot.getType() == EquipmentSlot.Type.ARMOR)
-			{
-				ItemStack armor = player.getItemBySlot(slot);
-				if (armor.getItem() instanceof ItemArmorQuantumSuit qs)
-				{
-					double needed = damage * qs.getEnergyPerDamage() * 2.0;
-					ElectricItem.manager.discharge(armor, needed, Integer.MAX_VALUE, true, false, false);
-				}
-			}
-		}
-
-		return true;
-	}
 }

@@ -197,9 +197,10 @@ public final class EventHandlerForge
 	@SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
 	public void onEntityAttacked(LivingAttackEvent event)
 	{
-		LivingEntity entity = event.getEntity();
-		boolean setCanceled = EventHandler.onEntityAttacked(entity, event.getSource(), event.getAmount());
-		if (setCanceled) event.setCanceled(true);
+		if (EventHandler.onEntityAttacked(event.getEntity(), event.getSource(), event.getAmount()))
+		{
+			event.setCanceled(true);
+		}
 	}
 
 	@SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)

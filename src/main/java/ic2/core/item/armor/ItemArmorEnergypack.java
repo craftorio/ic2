@@ -22,4 +22,10 @@ public class ItemArmorEnergypack extends ItemArmorElectric
 	{
 		return 0;
 	}
+
+	@Override
+	public double getDamageAbsorptionRatio()
+	{
+		return 0.0;
+	}
 }

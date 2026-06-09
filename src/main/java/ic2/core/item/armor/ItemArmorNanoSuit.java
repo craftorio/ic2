@@ -35,6 +35,19 @@ public class ItemArmorNanoSuit extends ItemArmorElectric implements IItemHudProv
 		return 5000;
 	}
 
+	@Override
+	public double getDamageAbsorptionRatio()
+	{
+		return switch (this.getEquipmentSlot())
+		{
+			case HEAD -> 0.15;
+			case CHEST -> 0.4;
+			case LEGS -> 0.3;
+			case FEET -> 0.15;
+			default -> 0.0;
+		};
+	}
+
 	public boolean absorbFall(ItemStack stack, LivingEntity entity, float distance)
 	{
 		int fallDamage = Math.max((int) distance - 3, 0);

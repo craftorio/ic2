@@ -310,7 +310,6 @@ public final class EventHandler
 	{
 		if (victim instanceof Player player)
 		{
-			// TODO: Varies by damage sources, or entity types.
 			return ItemArmorElectric.damageArmor(player, source, amount);
 		}
 		return false;

@@ -55,6 +55,8 @@ public abstract class ItemArmorElectric extends ItemArmorIC2 implements IElectri
 
 	public abstract int getEnergyPerDamage();
 
+	public abstract double getDamageAbsorptionRatio();
+
 	public static boolean damageArmor(Player entity, DamageSource source, float amount)
 	{
 		if (source == null || amount <= 0.0F || source.is(DamageTypeTags.BYPASSES_ENCHANTMENTS))
@@ -62,12 +64,7 @@ public abstract class ItemArmorElectric extends ItemArmorIC2 implements IElectri
 			return false;
 		}
 
-		float damage = amount / 4.0F;
-		if (damage < 1.0F)
-		{
-			damage = 1.0F;
-		}
-
+		boolean hasArmor = false;
 		boolean fullAbsorb = true;
 
 		for (EquipmentSlot slot : EquipmentSlot.values())
@@ -75,7 +72,9 @@ public abstract class ItemArmorElectric extends ItemArmorIC2 implements IElectri
 			ItemStack stack = entity.getItemBySlot(slot);
 			if (stack.getItem() instanceof ItemArmorElectric electricArmor)
 			{
-				double needed = damage * electricArmor.getEnergyPerDamage();
+				hasArmor = true;
+				double absorbedDamage = amount * electricArmor.getDamageAbsorptionRatio();
+				double needed = absorbedDamage * electricArmor.getEnergyPerDamage();
 				if (!ElectricItem.manager.canUse(stack, needed))
 				{
 					fullAbsorb = false;
@@ -83,16 +82,20 @@ public abstract class ItemArmorElectric extends ItemArmorIC2 implements IElectri
 			}
 		}
 
-		for (EquipmentSlot slot : EquipmentSlot.values())
+		if (hasArmor && fullAbsorb)
 		{
-			ItemStack stack = entity.getItemBySlot(slot);
-			if (stack.getItem() instanceof ItemArmorElectric electricArmor)
+			for (EquipmentSlot slot : EquipmentSlot.values())
 			{
-				electricArmor.damageArmor(entity, stack, source, damage, slot);
+				ItemStack stack = entity.getItemBySlot(slot);
+				if (stack.getItem() instanceof ItemArmorElectric electricArmor)
+				{
+					double absorbedDamage = amount * electricArmor.getDamageAbsorptionRatio();
+					electricArmor.damageArmor(entity, stack, source, absorbedDamage, slot);
+				}
 			}
 		}
 
-		return fullAbsorb;
+		return hasArmor && fullAbsorb;
 	}
 
 	public boolean isEnchantable(ItemStack stack)

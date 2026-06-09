@@ -39,7 +39,6 @@ import ic2.core.block.machine.tileentity.TileEntityChunkloader;
 import ic2.core.block.machine.tileentity.TileEntityClassicCanner;
 import ic2.core.block.machine.tileentity.TileEntityClassicCropmatron;
 import ic2.core.block.machine.tileentity.TileEntityClassicElectrolyzer;
-import ic2.core.block.machine.tileentity.TileEntityClassicMassFabricator;
 import ic2.core.block.machine.tileentity.TileEntityCompressor;
 import ic2.core.block.machine.tileentity.TileEntityCondenser;
 import ic2.core.block.machine.tileentity.TileEntityCropHarvester;
@@ -1067,17 +1066,6 @@ public final class Ic2Blocks
 		Ic2TileEntityBlock.create(
 			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
 			TileEntityMassFabricator.class,
-			true,
-			Ic2TileEntityBlock.DefaultDrop.AdvMachine,
-			Util.horizontalFacings,
-			true
-		)
-	);
-	public static final Block CLASSIC_MASS_FABRICATOR = register(
-		"classic_mass_fabricator",
-		Ic2TileEntityBlock.create(
-			Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL),
-			TileEntityClassicMassFabricator.class,
 			true,
 			Ic2TileEntityBlock.DefaultDrop.AdvMachine,
 			Util.horizontalFacings,

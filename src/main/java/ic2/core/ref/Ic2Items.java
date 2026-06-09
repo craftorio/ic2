@@ -461,9 +461,6 @@ public final class Ic2Items
 	public static final Item MASS_FABRICATOR = register(
 		"mass_fabricator", new BlockItem(Ic2Blocks.MASS_FABRICATOR, new Properties().rarity(Rarity.RARE))
 	);
-	public static final Item CLASSIC_MASS_FABRICATOR = register(
-		"classic_mass_fabricator", new BlockItem(Ic2Blocks.CLASSIC_MASS_FABRICATOR, new Properties().rarity(Rarity.RARE))
-	);
 	public static final Item UU_ASSEMBLY_BENCH = register(
 		"uu_assembly_bench", new BlockItem(Ic2Blocks.UU_ASSEMBLY_BENCH, new Properties().rarity(Rarity.UNCOMMON))
 	);
@@ -1245,7 +1242,6 @@ public final class Ic2Items
 		addToCreativeTab(Ic2ItemGroupType.MACHINES, () -> CLASSIC_CANNER);
 		addToCreativeTab(Ic2ItemGroupType.MACHINES, () -> CLASSIC_CROPMATRON);
 		addToCreativeTab(Ic2ItemGroupType.MACHINES, () -> CLASSIC_ELECTROLYZER);
-		addToCreativeTab(Ic2ItemGroupType.MACHINES, () -> CLASSIC_MASS_FABRICATOR);
 		addToCreativeTab(Ic2ItemGroupType.MACHINES, () -> COMPRESSOR);
 		addToCreativeTab(Ic2ItemGroupType.MACHINES, () -> CONDENSER);
 		addToCreativeTab(Ic2ItemGroupType.MACHINES, () -> CROPMATRON);

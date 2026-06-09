@@ -22,14 +22,10 @@ public class GuiFluidDistributor extends Ic2Gui<ContainerFluidDistributor>
 	protected void drawForegroundLayer(GuiGraphics guiGraphics, int mouseX, int mouseY)
 	{
 		super.drawForegroundLayer(guiGraphics, mouseX, mouseY);
-		this.drawString(guiGraphics, 112, 56, Localization.translate("ic2.FluidDistributor.gui.mode.info"), 5752026);
-		if (((ContainerFluidDistributor) this.menu).base.getActive())
-		{
-			this.drawString(guiGraphics, 95, 80, Localization.translate("ic2.FluidDistributor.gui.mode.concentrate"), 5752026);
-		} else
-		{
-			this.drawString(guiGraphics, 95, 80, Localization.translate("ic2.FluidDistributor.gui.mode.distribute"), 5752026);
-		}
+		this.drawString(guiGraphics, 116, 47, Localization.translate("ic2.FluidDistributor.gui.mode.info"), 5752026);
+		
+		String drawnString = this.menu.base.getActive() ? Localization.translate("ic2.FluidDistributor.gui.mode.concentrate") : Localization.translate("ic2.FluidDistributor.gui.mode.distribute");
+		this.drawString(guiGraphics, 99, 71, drawnString, 5752026);
 	}
 
 	@Override
@@ -39,7 +35,7 @@ public class GuiFluidDistributor extends Ic2Gui<ContainerFluidDistributor>
 		mouseY -= this.topPos;
 		if (mouseX >= 117.0 && mouseY >= 58.0 && mouseX <= 135.0 && mouseY <= 66.0)
 		{
-			IC2.network.get(false).initiateClientTileEntityEvent(((ContainerFluidDistributor) this.menu).base, 1);
+			IC2.network.get(false).initiateClientTileEntityEvent(this.menu.base, 1);
 			return true;
 		} else
 		{

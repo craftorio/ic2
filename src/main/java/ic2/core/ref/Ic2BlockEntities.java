@@ -33,7 +33,6 @@ import ic2.core.block.machine.tileentity.TileEntityChunkloader;
 import ic2.core.block.machine.tileentity.TileEntityClassicCanner;
 import ic2.core.block.machine.tileentity.TileEntityClassicCropmatron;
 import ic2.core.block.machine.tileentity.TileEntityClassicElectrolyzer;
-import ic2.core.block.machine.tileentity.TileEntityClassicMassFabricator;
 import ic2.core.block.machine.tileentity.TileEntityCompressor;
 import ic2.core.block.machine.tileentity.TileEntityCondenser;
 import ic2.core.block.machine.tileentity.TileEntityCropHarvester;
@@ -257,9 +256,6 @@ public final class Ic2BlockEntities
 	public static final BlockEntityType<TileEntityMiner> MINER = register("miner", TileEntityMiner::new, Ic2Blocks.MINER);
 	public static final BlockEntityType<TileEntityMassFabricator> MASS_FABRICATOR = register(
 		"mass_fabricator", TileEntityMassFabricator::new, Ic2Blocks.MASS_FABRICATOR
-	);
-	public static final BlockEntityType<TileEntityClassicMassFabricator> CLASSIC_MASS_FABRICATOR = register(
-		"classic_mass_fabricator", TileEntityClassicMassFabricator::new, Ic2Blocks.CLASSIC_MASS_FABRICATOR
 	);
 	public static final BlockEntityType<TileEntityAssemblyBench> UU_ASSEMBLY_BENCH = register(
 		"uu_assembly_bench", TileEntityAssemblyBench::new, Ic2Blocks.UU_ASSEMBLY_BENCH

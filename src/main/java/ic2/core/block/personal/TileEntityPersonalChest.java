@@ -48,7 +48,7 @@ public class TileEntityPersonalChest extends TileEntityInventory implements IPer
 {
 	private GameProfile owner = null;
 	private static final int openingSteps = 10;
-	private static final List<AABB> aabbs = Arrays.asList(new AABB(0.0625, 0.0, 0.0625, 0.9375, 1.0, 0.9375));
+	private static final List<AABB> aabbs = Arrays.asList(new AABB(0.0, 0.0, 0.0, 1.0, 1.0, 1.0));
 	public final InvSlot contentSlot;
 	private final Set<Player> usingPlayers = Collections.newSetFromMap(new WeakHashMap<>());
 	private int usingPlayerCount;

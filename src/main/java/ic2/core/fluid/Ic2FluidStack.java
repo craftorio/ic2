@@ -43,6 +43,11 @@ public interface Ic2FluidStack
 
 	default Ic2FluidStack copyWithAmountMb(int amountMb)
 	{
+		if (this.isEmpty())
+		{
+			return EMPTY;
+		}
+
 		Ic2FluidStack ret = this.copy();
 		ret.setAmountMb(amountMb);
 		return ret;

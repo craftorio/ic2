@@ -5,7 +5,10 @@ import ic2.core.ContainerBase;
 import ic2.core.IHasGui;
 import ic2.core.block.comp.Fluids;
 import ic2.core.block.tileentity.TileEntityInventory;
+import ic2.core.fluid.FluidBeBridge;
 import ic2.core.fluid.FluidHandler;
+import ic2.core.fluid.FluidTankInfo;
+import ic2.core.fluid.Ic2FluidBlock;
 import ic2.core.fluid.Ic2FluidStack;
 import ic2.core.gui.dynamic.DynamicContainer;
 import ic2.core.network.GrowingBuffer;
@@ -28,13 +31,15 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public abstract class TileEntityTank extends TileEntityInventory implements IHasGui
+public abstract class TileEntityTank extends TileEntityInventory implements IHasGui, Ic2FluidBlock, FluidBeBridge
 {
 	protected final Fluids fluidsComponent = this.addComponent(new Fluids(this));
 	@GuiSynced
@@ -149,5 +154,43 @@ public abstract class TileEntityTank extends TileEntityInventory implements IHas
 	public ContainerBase<?> createClientScreenHandler(int syncId, Inventory inventory, GrowingBuffer data)
 	{
 		return DynamicContainer.create(syncId, inventory, this);
+	}
+
+	// ---- Ic2FluidBlock + FluidBeBridge ----
+
+	@Override
+	public Ic2FluidBlock getFluidBlock()
+	{
+		return this;
+	}
+
+	@Override
+	public boolean isFluidBlock(BlockState state, Level world, BlockPos pos, BlockEntity be)
+	{
+		return true;
+	}
+
+	@Override
+	public FluidTankInfo[] getTankInfos(BlockState state, Level world, BlockPos pos, BlockEntity be)
+	{
+		return this.fluidsComponent.getTankInfos();
+	}
+
+	@Override
+	public Ic2FluidStack drainMb(BlockState state, Level world, BlockPos pos, BlockEntity be, Direction side, int amount, boolean simulate)
+	{
+		return this.fluidsComponent.drainMb(side, amount, simulate);
+	}
+
+	@Override
+	public int drainMb(BlockState state, Level world, BlockPos pos, BlockEntity be, Direction side, Ic2FluidStack drainFs, boolean simulate)
+	{
+		return this.fluidsComponent.drainMb(side, drainFs, simulate);
+	}
+
+	@Override
+	public int fillMb(BlockState state, Level world, BlockPos pos, BlockEntity be, Direction side, Ic2FluidStack fillFs, boolean simulate)
+	{
+		return this.fluidsComponent.fillMb(side, fillFs, simulate);
 	}
 }

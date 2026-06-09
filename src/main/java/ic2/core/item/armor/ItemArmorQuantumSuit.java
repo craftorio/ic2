@@ -4,20 +4,50 @@ import ic2.api.item.ElectricItem;
 import ic2.api.item.HudMode;
 import ic2.api.item.IHazmatLike;
 import ic2.api.item.IItemHudProvider;
+import ic2.core.IC2;
+import ic2.core.Ic2Potion;
+import ic2.core.init.Localization;
+import ic2.core.init.MainConfig;
+import ic2.core.item.ItemTinCan;
 import ic2.core.item.armor.jetpack.IJetpack;
+import ic2.core.ref.Ic2Items;
+import ic2.core.util.ConfigUtil;
 import ic2.core.util.StackUtil;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.DyeableLeatherItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
+
+import java.util.IdentityHashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
 public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack, IHazmatLike, IItemHudProvider, DyeableLeatherItem
 {
 	public static final int[] CHARGED_PROTECTION = new int[] { 3, 6, 8, 3 };
-	private static final int defaultColor = -1;
+	protected static final Map<MobEffect, Integer> potionRemovalCost = new IdentityHashMap<>();
+	private float jumpCharge;
+
+	static
+	{
+		potionRemovalCost.put(MobEffects.POISON, 10000);
+		potionRemovalCost.put(Ic2Potion.radiation, 10000);
+		potionRemovalCost.put(MobEffects.WITHER, 25000);
+	}
 
 	public ItemArmorQuantumSuit(ArmorMaterial material, EquipmentSlot armorType, Properties settings)
 	{
@@ -113,14 +143,255 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 		return true;
 	}
 
+	@Override
 	public Rarity getRarity(ItemStack stack)
 	{
 		return Rarity.RARE;
 	}
 
+	@Override
 	public int getEnchantmentValue()
 	{
 		return 0;
+	}
+
+	@Override
+	public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected)
+	{
+		super.inventoryTick(stack, world, entity, slot, selected);
+		if (!(entity instanceof Player player))
+		{
+			return;
+		}
+
+		if (player.getItemBySlot(this.getEquipmentSlot()) != stack)
+		{
+			return;
+		}
+
+		CompoundTag nbtData = StackUtil.getOrCreateNbtData(stack);
+		byte toggleTimer = nbtData.getByte("toggleTimer");
+		boolean ret = false;
+		EquipmentSlot equipSlot = this.getEquipmentSlot();
+
+		if (equipSlot == EquipmentSlot.HEAD)
+		{
+			int air = player.getAirSupply();
+			if (ElectricItem.manager.canUse(stack, 1000.0) && air < player.getMaxAirSupply())
+			{
+				player.setAirSupply(air + 200);
+				ElectricItem.manager.use(stack, 1000.0, player);
+				ret = true;
+			} else if (air <= 0)
+			{
+				IC2.achievements.issueAchievement(player, "starveWithQHelmet");
+			}
+
+			if (ElectricItem.manager.canUse(stack, 1000.0) && player.getFoodData().needsFood())
+			{
+				int foodSlot = -1;
+
+				for (int i = 0; i < player.getInventory().items.size(); i++)
+				{
+					ItemStack invStack = player.getInventory().items.get(i);
+					if (!StackUtil.isEmpty(invStack) && invStack.getItem() == Ic2Items.FILLED_TIN_CAN)
+					{
+						foodSlot = i;
+						break;
+					}
+				}
+
+				if (foodSlot > -1)
+				{
+					ItemStack foodStack = player.getInventory().items.get(foodSlot);
+					ItemTinCan can = (ItemTinCan) foodStack.getItem();
+					InteractionResultHolder<ItemStack> result = can.onEaten(player, foodStack);
+					player.getInventory().items.set(foodSlot, result.getObject());
+
+					if (result.getResult() == InteractionResult.SUCCESS)
+					{
+						ElectricItem.manager.use(stack, 1000.0, player);
+					}
+
+					ret = true;
+				}
+			} else if (player.getFoodData().getFoodLevel() <= 0)
+			{
+				IC2.achievements.issueAchievement(player, "starveWithQHelmet");
+			}
+
+			for (MobEffectInstance effect : new LinkedList<>(player.getActiveEffects()))
+			{
+				MobEffect potion = effect.getEffect();
+				Integer cost = potionRemovalCost.get(potion);
+				if (cost != null)
+				{
+					cost = cost * (effect.getAmplifier() + 1);
+					if (ElectricItem.manager.canUse(stack, cost.intValue()))
+					{
+						ElectricItem.manager.use(stack, cost.intValue(), player);
+						player.removeEffect(potion);
+					}
+				}
+			}
+
+			boolean Nightvision = nbtData.getBoolean("Nightvision");
+			short hudmode = nbtData.getShort("HudMode");
+			if (IC2.keyboard.isAltKeyDown(player) && IC2.keyboard.isModeSwitchKeyDown(player) && toggleTimer == 0)
+			{
+				toggleTimer = 10;
+				Nightvision = !Nightvision;
+				if (IC2.sideProxy.isSimulating())
+				{
+					nbtData.putBoolean("Nightvision", Nightvision);
+					if (Nightvision)
+					{
+						IC2.sideProxy.messagePlayer(player, "Nightvision enabled.");
+					} else
+					{
+						IC2.sideProxy.messagePlayer(player, "Nightvision disabled.");
+					}
+				}
+			}
+
+			if (IC2.keyboard.isAltKeyDown(player) && IC2.keyboard.isHudModeKeyDown(player) && toggleTimer == 0)
+			{
+				toggleTimer = 10;
+				if (hudmode == HudMode.getMaxMode())
+				{
+					hudmode = 0;
+				} else
+				{
+					hudmode++;
+				}
+
+				if (IC2.sideProxy.isSimulating())
+				{
+					nbtData.putShort("HudMode", hudmode);
+					IC2.sideProxy.messagePlayer(player, Localization.translate(HudMode.getFromID(hudmode).getTranslationKey()));
+				}
+			}
+
+			if (IC2.sideProxy.isSimulating() && toggleTimer > 0)
+			{
+				nbtData.putByte("toggleTimer", --toggleTimer);
+			}
+
+			if (Nightvision && IC2.sideProxy.isSimulating() && ElectricItem.manager.use(stack, 1.0, player))
+			{
+				BlockPos pos = BlockPos.containing(player.position());
+				int skylight = player.getCommandSenderWorld().getMaxLocalRawBrightness(pos);
+				if (skylight > 8)
+				{
+					player.removeEffect(MobEffects.NIGHT_VISION);
+					player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 100, 0, true, true));
+				} else
+				{
+					player.removeEffect(MobEffects.BLINDNESS);
+					player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 300, 0, true, true));
+				}
+
+				ret = true;
+			}
+
+		}
+		else if (equipSlot == EquipmentSlot.CHEST)
+		{
+			player.clearFire();
+		}
+		else if (equipSlot == EquipmentSlot.LEGS)
+		{
+			boolean enableQuantumSpeedOnSprint;
+			if (IC2.sideProxy.isRendering())
+			{
+				enableQuantumSpeedOnSprint = ConfigUtil.getBool(MainConfig.get(), "misc/quantumSpeedOnSprint");
+			} else
+			{
+				enableQuantumSpeedOnSprint = true;
+			}
+
+			if (ElectricItem.manager.canUse(stack, 1000.0)
+				&& (player.onGround() || player.isInWater())
+				&& IC2.keyboard.isForwardKeyDown(player)
+				&& (enableQuantumSpeedOnSprint && player.isSprinting() || !enableQuantumSpeedOnSprint && IC2.keyboard.isBoostKeyDown(player)))
+			{
+				byte speedTicker = nbtData.getByte("speedTicker");
+				if (++speedTicker >= 10)
+				{
+					speedTicker = 0;
+					ElectricItem.manager.use(stack, 1000.0, player);
+					ret = true;
+				}
+
+				nbtData.putByte("speedTicker", speedTicker);
+				float speed = 0.22F;
+				if (player.isInWater())
+				{
+					speed = 0.1F;
+					if (IC2.keyboard.isJumpKeyDown(player))
+					{
+						Vec3 motion = player.getDeltaMovement();
+						player.setDeltaMovement(motion.x, motion.y + 0.1F, motion.z);
+					}
+				}
+
+				if (speed > 0.0F)
+				{
+					float yawRad = player.getYRot() * (float) Math.PI / 180.0F;
+					Vec3 motion = player.getDeltaMovement();
+					player.setDeltaMovement(motion.x + (-Math.sin(yawRad) * speed), motion.y, motion.z + (Math.cos(yawRad) * speed));
+				}
+			}
+
+		}
+		else if (equipSlot == EquipmentSlot.FEET)
+		{
+			if (IC2.sideProxy.isSimulating())
+			{
+				boolean wasOnGround = nbtData.contains("wasOnGround") ? nbtData.getBoolean("wasOnGround") : true;
+				if (wasOnGround && !player.onGround() && IC2.keyboard.isJumpKeyDown(player) && IC2.keyboard.isBoostKeyDown(player))
+				{
+					ElectricItem.manager.use(stack, 4000.0, player);
+					ret = true;
+				}
+
+				if (player.onGround() != wasOnGround)
+				{
+					nbtData.putBoolean("wasOnGround", player.onGround());
+				}
+			} else
+			{
+				if (ElectricItem.manager.canUse(stack, 4000.0) && player.onGround())
+				{
+					this.jumpCharge = 1.0F;
+				}
+
+				if (player.getDeltaMovement().y >= 0.0 && this.jumpCharge > 0.0F && !player.isInWater())
+				{
+					if (IC2.keyboard.isJumpKeyDown(player) && IC2.keyboard.isBoostKeyDown(player))
+					{
+						if (this.jumpCharge == 1.0F)
+						{
+							Vec3 motion = player.getDeltaMovement();
+							player.setDeltaMovement(motion.x * 3.5, motion.y, motion.z * 3.5);
+						}
+
+						Vec3 motion = player.getDeltaMovement();
+						player.setDeltaMovement(motion.x, motion.y + this.jumpCharge * 0.3F, motion.z);
+						this.jumpCharge = (float) (this.jumpCharge * 0.75);
+					} else if (this.jumpCharge < 1.0F)
+					{
+						this.jumpCharge = 0.0F;
+					}
+				}
+			}
+
+		}
+
+		if (ret)
+		{
+			player.inventoryMenu.broadcastChanges();
+		}
 	}
 
 	@Override
@@ -175,5 +446,67 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 	public HudMode getHudMode(ItemStack stack)
 	{
 		return HudMode.getFromID(StackUtil.getOrCreateNbtData(stack).getShort("HudMode"));
+	}
+
+	public static boolean isWearingFullSet(Player player)
+	{
+		for (EquipmentSlot slot : EquipmentSlot.values())
+		{
+			if (slot.getType() == EquipmentSlot.Type.ARMOR)
+			{
+				ItemStack armor = player.getItemBySlot(slot);
+				if (!(armor.getItem() instanceof ItemArmorQuantumSuit))
+				{
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
+	public static boolean absorbMagicDamage(Player player, DamageSource source, float amount)
+	{
+		if (amount <= 0.0F)
+		{
+			return false;
+		}
+
+		float damage = amount / 4.0F;
+		if (damage < 1.0F)
+		{
+			damage = 1.0F;
+		}
+
+		for (EquipmentSlot slot : EquipmentSlot.values())
+		{
+			if (slot.getType() == EquipmentSlot.Type.ARMOR)
+			{
+				ItemStack armor = player.getItemBySlot(slot);
+				if (armor.getItem() instanceof ItemArmorQuantumSuit qs)
+				{
+					double needed = damage * qs.getEnergyPerDamage() * 2.0;
+					if (!ElectricItem.manager.canUse(armor, needed))
+					{
+						return false;
+					}
+				}
+			}
+		}
+
+		for (EquipmentSlot slot : EquipmentSlot.values())
+		{
+			if (slot.getType() == EquipmentSlot.Type.ARMOR)
+			{
+				ItemStack armor = player.getItemBySlot(slot);
+				if (armor.getItem() instanceof ItemArmorQuantumSuit qs)
+				{
+					double needed = damage * qs.getEnergyPerDamage() * 2.0;
+					ElectricItem.manager.discharge(armor, needed, Integer.MAX_VALUE, true, false, false);
+				}
+			}
+		}
+
+		return true;
 	}
 }

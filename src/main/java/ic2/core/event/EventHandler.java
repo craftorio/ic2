@@ -53,6 +53,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -306,12 +307,18 @@ public final class EventHandler
 
 	public static boolean onEntityAttacked(LivingEntity victim, DamageSource source, float amount)
 	{
-		if (!(victim instanceof Player))
+		if (!(victim instanceof Player player))
 		{
 			return true;
 		}
 
-		ItemArmorElectric.damageArmor((Player) victim, source, amount);
+		ItemArmorElectric.damageArmor(player, source, amount);
+
+		if (source.is(DamageTypeTags.BYPASSES_ENCHANTMENTS) && ItemArmorQuantumSuit.isWearingFullSet(player))
+		{
+			return !ItemArmorQuantumSuit.absorbMagicDamage(player, source, amount);
+		}
+
 		return true;
 	}
 }

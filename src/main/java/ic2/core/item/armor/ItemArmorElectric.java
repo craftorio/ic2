@@ -55,25 +55,44 @@ public abstract class ItemArmorElectric extends ItemArmorIC2 implements IElectri
 
 	public abstract int getEnergyPerDamage();
 
-	public static void damageArmor(Player entity, DamageSource source, float amount)
+	public static boolean damageArmor(Player entity, DamageSource source, float amount)
 	{
-		if (source != null && !(amount <= 0.0F) && !source.is(DamageTypeTags.BYPASSES_ENCHANTMENTS))
+		if (source == null || amount <= 0.0F || source.is(DamageTypeTags.BYPASSES_ENCHANTMENTS))
 		{
-			float damage = amount / 4.0F;
-			if (damage < 1.0F)
-			{
-				damage = 1.0F;
-			}
+			return false;
+		}
 
-			for (EquipmentSlot slot : EquipmentSlot.values())
+		float damage = amount / 4.0F;
+		if (damage < 1.0F)
+		{
+			damage = 1.0F;
+		}
+
+		boolean fullAbsorb = true;
+
+		for (EquipmentSlot slot : EquipmentSlot.values())
+		{
+			ItemStack stack = entity.getItemBySlot(slot);
+			if (stack.getItem() instanceof ItemArmorElectric electricArmor)
 			{
-				ItemStack stack = entity.getItemBySlot(slot);
-				if (stack.getItem() instanceof ItemArmorElectric electricArmor)
+				double needed = damage * electricArmor.getEnergyPerDamage();
+				if (!ElectricItem.manager.canUse(stack, needed))
 				{
-					electricArmor.damageArmor(entity, stack, source, damage, slot);
+					fullAbsorb = false;
 				}
 			}
 		}
+
+		for (EquipmentSlot slot : EquipmentSlot.values())
+		{
+			ItemStack stack = entity.getItemBySlot(slot);
+			if (stack.getItem() instanceof ItemArmorElectric electricArmor)
+			{
+				electricArmor.damageArmor(entity, stack, source, damage, slot);
+			}
+		}
+
+		return fullAbsorb;
 	}
 
 	public boolean isEnchantable(ItemStack stack)

@@ -362,7 +362,10 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 
 				for (LiquidUtil.AdjacentFluidHandler fh : getTargetFluidHandlers(stack, te))
 				{
-					LiquidUtil.transfer(te, fh.dir, fh.handler, (int) (50.0 * pow));
+					if (LiquidUtil.transfer(te, fh.dir, fh.handler, (int) (50.0 * pow)) != null)
+					{
+						ret = true;
+					}
 				}
 				break;
 			}
@@ -390,7 +393,10 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 				}
 				for (LiquidUtil.AdjacentFluidHandler fh : getTargetFluidHandlers(stack, te))
 				{
-					LiquidUtil.transfer(fh.handler, fh.dir.getOpposite(), te, (int) (50.0 * pow));
+					if (LiquidUtil.transfer(fh.handler, fh.dir.getOpposite(), te, (int) (50.0 * pow)) != null)
+					{
+						ret = true;
+					}
 				}
 				break;
 			}

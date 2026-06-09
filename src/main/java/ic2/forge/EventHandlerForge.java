@@ -304,7 +304,7 @@ public final class EventHandlerForge
 	public void onAttachBlockEntityCapabilities(AttachCapabilitiesEvent<BlockEntity> event)
 	{
 		final BlockEntity be = event.getObject();
-		if (be instanceof Ic2TileEntity ic2te)
+		if (be instanceof Ic2TileEntity)
 		{
 			if (be instanceof FluidBeBridge bridge)
 			{
@@ -313,10 +313,9 @@ public final class EventHandlerForge
 				{
 					event.addCapability(fluidCapId, new BlockFluidCapImpl(fb, be));
 				}
-			} else if (ic2te.hasComponent(ic2.core.block.comp.Fluids.class))
+			} else
 			{
-				ic2.core.block.comp.Fluids fluids = ic2te.getComponent(ic2.core.block.comp.Fluids.class);
-				event.addCapability(fluidCapId, new BlockFluidCapImpl(fluids, be));
+				event.addCapability(fluidCapId, new LazyBlockFluidCapImpl(be));
 			}
 
 			if (be instanceof WorldlyContainer)

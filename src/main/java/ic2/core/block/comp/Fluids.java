@@ -280,6 +280,10 @@ public class Fluids extends TileEntityComponent implements Ic2FluidBlock
 
 			int ret = initialAmount - drainFs.getAmountMb();
 			drainFs.setAmountMb(initialAmount);
+			if (ret > 0 && !simulate)
+			{
+				this.parent.setChanged();
+			}
 			return ret;
 		} else
 		{
@@ -312,6 +316,10 @@ public class Fluids extends TileEntityComponent implements Ic2FluidBlock
 
 			int ret = initialAmount - fillFs.getAmountMb();
 			fillFs.setAmountMb(initialAmount);
+			if (ret > 0 && !simulate)
+			{
+				this.parent.setChanged();
+			}
 			return ret;
 		} else
 		{

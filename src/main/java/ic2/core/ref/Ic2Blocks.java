@@ -157,6 +157,7 @@ import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 
 
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.block.state.properties.WoodType;
@@ -260,7 +261,7 @@ public final class Ic2Blocks
 	{
 		protected ResourceKey<ConfiguredFeature<?, ?>> getConfiguredFeature(RandomSource random, boolean bees)
 		{
-			return (ResourceKey<ConfiguredFeature<?, ?>>) (ResourceKey<?>) Ic2WorldGen.RUBBER_TREE.join().unwrapKey().orElseThrow();
+			return ResourceKey.create(Registries.CONFIGURED_FEATURE, IC2.getIdentifier("rubber_tree"));
 		}
 	}, Properties.of().noCollission().randomTicks().instabreak().sound(SoundType.GRASS))
 	{

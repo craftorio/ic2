@@ -35,12 +35,12 @@ public class UuIndex
 
 	public void add(ItemStack stack, double value)
 	{
-		if (stack != null && stack.getItem() != null)
+		if (stack != null)
 		{
 			UuGraph.set(stack, value);
 		} else
 		{
-			throw new NullPointerException("invalid itemstack to add");
+			throw new NullPointerException("invalid item stack to add");
 		}
 	}
 

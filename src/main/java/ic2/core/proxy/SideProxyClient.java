@@ -154,6 +154,8 @@ public final class SideProxyClient implements SideProxy
 		envProxy.registerScreen(Ic2ScreenHandlers.SOLAR_GENERATOR, GuiSolarGenerator::new);
 		envProxy.registerColorProvider((state, world, post, tintIndex) -> 6723908, Ic2Blocks.RUBBER_LEAVES);
 		envProxy.registerColorProvider((var1, var2) -> 6723908, Ic2Items.RUBBER_LEAVES);
+
+		// TODO: Check if useful or not
 		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.RUBBER_SAPLING);
 		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.WOODEN_SCAFFOLD, Ic2Blocks.IRON_SCAFFOLD);
 		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.FOAM);

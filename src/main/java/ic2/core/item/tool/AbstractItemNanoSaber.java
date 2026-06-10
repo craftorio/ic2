@@ -161,12 +161,10 @@ public abstract class AbstractItemNanoSaber extends ItemElectricTool implements 
 			if (isActive(nbt))
 			{
 				setActive(nbt, false);
-				nbt.putLong("activationTick", 0);
 				return InteractionResultHolder.consume(stack);
 			} else if (ElectricItem.manager.canUse(stack, 16.0))
 			{
 				setActive(nbt, true);
-				nbt.putLong("activationTick", world.getGameTime());
 				nbt.putInt("energyTick", 0);
 				return InteractionResultHolder.consume(stack);
 			} else
@@ -209,22 +207,7 @@ public abstract class AbstractItemNanoSaber extends ItemElectricTool implements 
 
 	public float getActiveData(ItemStack stack, Level world)
 	{
-		if (world == null || !isActive(stack))
-		{
-			return 0.0F;
-		}
-		CompoundTag nbt = StackUtil.getOrCreateNbtData(stack);
-		long activationTick = nbt.getLong("activationTick");
-		if (activationTick == 0)
-		{
-			return 0.0F;
-		}
-		long elapsed = world.getGameTime() - activationTick;
-		if (elapsed < 0)
-		{
-			return 0.0F;
-		}
-		return (float) (Math.floor(elapsed / 5.0) % 10.0 + 1.0) / 10.0F;
+		return isActive(stack) ? 1.0F : 0.0F;
 	}
 
 	public Rarity getRarity(ItemStack stack)
@@ -240,12 +223,12 @@ public abstract class AbstractItemNanoSaber extends ItemElectricTool implements 
 
 	public static boolean isActive(CompoundTag nbt)
 	{
-		return nbt.getBoolean("active");
+		return nbt.getBoolean("is_activated");
 	}
 
 	private static void setActive(CompoundTag nbt, boolean active)
 	{
-		nbt.putBoolean("active", active);
+		nbt.putBoolean("is_activated", active);
 	}
 
 	@Override

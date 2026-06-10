@@ -3,14 +3,10 @@ package ic2.core.block.invslot;
 import ic2.core.IC2;
 import ic2.core.block.IInventorySlotHolder;
 import ic2.core.network.IRpcProvider;
-import ic2.core.network.Rpc;
 import ic2.core.network.RpcHandler;
-import ic2.core.util.LogCategory;
 import ic2.core.util.StackUtil;
 import ic2.core.uu.UuGraph;
 import ic2.core.uu.UuIndex;
-
-import java.util.concurrent.TimeUnit;
 
 import net.minecraft.world.item.ItemStack;
 
@@ -30,16 +26,8 @@ public class InvSlotScannable extends InvSlotConsumable
 			return isValidStack(stack);
 		}
 
-		Rpc<Boolean> rpc = RpcHandler.run(InvSlotScannable.ServerScannableCheck.class, stack);
-
-		try
-		{
-			return rpc.get(1L, TimeUnit.SECONDS);
-		} catch (Exception e)
-		{
-			IC2.log.debug(LogCategory.Block, e, "Scannability check failed.");
-			return false;
-		}
+		// Client side: accept everything, server will validate via isValidStack
+		return true;
 	}
 
 	private static boolean isValidStack(ItemStack stack)

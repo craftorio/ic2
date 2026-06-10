@@ -2,10 +2,10 @@ package ic2.core.slot;
 
 import ic2.core.block.invslot.InvSlot;
 import ic2.core.util.StackUtil;
-import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 public class SlotInvSlot extends Slot
 {
@@ -14,7 +14,7 @@ public class SlotInvSlot extends Slot
 
 	public SlotInvSlot(InvSlot invSlot, int index, int x, int y)
 	{
-		super((Container) invSlot.base.getParent(), invSlot.base.getBaseIndex(invSlot) + index, x, y);
+		super(invSlot.base.getParent(), invSlot.base.getBaseIndex(invSlot) + index, x, y);
 		this.invSlot = invSlot;
 		this.index = index;
 	}
@@ -24,12 +24,12 @@ public class SlotInvSlot extends Slot
 		return this.invSlot.accepts(stack);
 	}
 
-	public ItemStack getItem()
+	public @NotNull ItemStack getItem()
 	{
 		return this.invSlot.get(this.index);
 	}
 
-	public void set(ItemStack stack)
+	public void set(@NotNull ItemStack stack)
 	{
 		this.invSlot.put(this.index, stack);
 		this.setChanged();

@@ -15,6 +15,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.placement.PlacementUtils;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.data.ExistingFileHelper;
@@ -188,13 +189,17 @@ public final class FmlMod
 	@SubscribeEvent
 	public void registerFeatures(RegisterEvent event)
 	{
-		if (event.getRegistryKey() == Registries.FEATURE)
+		if (event.getRegistryKey() == Registries.CONFIGURED_FEATURE)
 		{
-			for (Runnable reg : EnvProxyForge.configuredFeatureRegistrations)
+			for (EnvProxyForge.ConfiguredFeatureRegistration<?, ?> reg : EnvProxyForge.configuredFeatureRegistrations)
 			{
-				reg.run();
+				@SuppressWarnings({ "unchecked", "rawtypes" })
+				ConfiguredFeature<?, ?> cf = new ConfiguredFeature(reg.feature(), reg.config());
+				event.register(Registries.CONFIGURED_FEATURE, reg.id(), () -> cf);
 			}
-
+		}
+		else if (event.getRegistryKey() == Registries.FEATURE)
+		{
 			for (EnvProxyForge.PlacedFeatureRegistration<?> reg : EnvProxyForge.placedFeatureRegistrations)
 			{
 									ResourceKey<PlacedFeature> placedKey = ResourceKey.create(Registries.PLACED_FEATURE, ResourceLocation.parse(reg.id().toString()));

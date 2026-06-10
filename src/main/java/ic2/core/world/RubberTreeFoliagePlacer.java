@@ -4,27 +4,27 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import ic2.core.IC2;
 
-import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacer.FoliageSetter;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.valueproviders.ConstantInt;
 import net.minecraft.util.valueproviders.IntProvider;
 import net.minecraft.world.level.LevelSimulatedReader;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
 import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacer;
 import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacerType;
-import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacer.FoliageAttachment;
+import org.jetbrains.annotations.NotNull;
 
 public final class RubberTreeFoliagePlacer extends FoliagePlacer
 {
 	public static final RubberTreeFoliagePlacer INSTANCE = new RubberTreeFoliagePlacer(ConstantInt.of(2), ConstantInt.of(0));
 	public static final Codec<RubberTreeFoliagePlacer> CODEC = RecordCodecBuilder.create(instance ->
-		foliagePlacerFields(instance).apply(instance, RubberTreeFoliagePlacer::new)
+		instance.group(
+			IntProvider.CODEC.fieldOf("radius").forGetter(placer -> placer.radius),
+			IntProvider.CODEC.fieldOf("offset").forGetter(placer -> placer.offset)
+		).apply(instance, RubberTreeFoliagePlacer::new)
 	);
-	public static final FoliagePlacerType<?> TYPE = registerFoliagePlacer("rubber_tree", CODEC);
+	public static final FoliagePlacerType<?> TYPE = registerFoliagePlacer();
 
 	public static void init()
 	{
@@ -35,18 +35,18 @@ public final class RubberTreeFoliagePlacer extends FoliagePlacer
 		super(radius, offset);
 	}
 
-	protected FoliagePlacerType<?> type()
+	protected @NotNull FoliagePlacerType<?> type()
 	{
 		return TYPE;
 	}
 
 	protected void createFoliage(
-		LevelSimulatedReader world,
-		FoliageSetter replacer,
-		RandomSource random,
-		TreeConfiguration config,
+		@NotNull LevelSimulatedReader world,
+		@NotNull FoliageSetter replacer,
+		@NotNull RandomSource random,
+		@NotNull TreeConfiguration config,
 		int trunkHeight,
-		FoliageAttachment treeNode,
+		@NotNull FoliageAttachment treeNode,
 		int foliageHeight,
 		int radius,
 		int offset
@@ -105,18 +105,18 @@ public final class RubberTreeFoliagePlacer extends FoliagePlacer
 		}
 	}
 
-	public int foliageHeight(RandomSource random, int trunkHeight, TreeConfiguration config)
+	public int foliageHeight(RandomSource random, int trunkHeight, @NotNull TreeConfiguration config)
 	{
 		return 1 + trunkHeight / 4 + random.nextInt(2);
 	}
 
-	protected boolean shouldSkipLocation(RandomSource random, int dx, int y, int dz, int radius, boolean giantTrunk)
+	protected boolean shouldSkipLocation(@NotNull RandomSource random, int dx, int y, int dz, int radius, boolean giantTrunk)
 	{
 		return false;
 	}
 
-	private static <T extends FoliagePlacer> FoliagePlacerType<T> registerFoliagePlacer(String name, Codec<T> codec)
+	private static <T extends FoliagePlacer> FoliagePlacerType<T> registerFoliagePlacer()
 	{
-		return IC2.envProxy.registerFoliagePlacer(IC2.getIdentifier(name), codec);
+		return IC2.envProxy.registerFoliagePlacer(IC2.getIdentifier("rubber_tree"), (Codec<T>) RubberTreeFoliagePlacer.CODEC);
 	}
 }

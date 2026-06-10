@@ -21,7 +21,7 @@ public class ElectricItemTooltipHandler
 				out.add(Component.literal(tooltip));
 				if (Screen.hasShiftDown())
 				{
-					out.add(Component.translatable("ic2.item.tooltip.PowerTier", new Object[] { ElectricItem.manager.getTier(stack) }).withStyle(ChatFormatting.GRAY));
+					out.add(Component.translatable("ic2.item.tooltip.power_tier", new Object[] { ElectricItem.manager.getTier(stack) }).withStyle(ChatFormatting.GRAY));
 				}
 			}
 		}

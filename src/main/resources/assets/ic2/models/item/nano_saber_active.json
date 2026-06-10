@@ -1,5 +1,5 @@
 {
-  "parent": "ic2:item/tool/default",
+  "parent": "minecraft:item/handheld",
   "textures": {
     "layer0": "ic2:item/tool/electric/nano_saber_active"
   }

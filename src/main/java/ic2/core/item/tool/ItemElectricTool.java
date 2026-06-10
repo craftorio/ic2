@@ -123,7 +123,7 @@ public abstract class ItemElectricTool extends DiggerItem implements IElectricIt
 	{
 		List<String> info = new LinkedList<>();
 		info.add(ElectricItem.manager.getToolTip(stack));
-		info.add(Localization.translate("ic2.item.tooltip.PowerTier", this.tier));
+		info.add(Localization.translate("ic2.item.tooltip.power_tier", this.tier));
 		return info;
 	}
 

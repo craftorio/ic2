@@ -2,7 +2,6 @@ package ic2.core.event;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import ic2.api.item.ElectricItem;
-import net.minecraft.core.registries.BuiltInRegistries;
 import ic2.api.item.IEnhancedOverlayProvider;
 import ic2.core.IC2;
 import ic2.core.fluid.FluidHandler;
@@ -20,6 +19,7 @@ import ic2.core.util.StackUtil;
 import ic2.core.util.Util;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 import net.minecraft.ChatFormatting;
@@ -49,39 +49,29 @@ public class EventHandlerClient
 {
 	public static void onClientSetup()
 	{
-		SideProxyClient.envProxy
-			.registerModelPredicateProvider(IC2.getIdentifier("charge"), (stack, world, entity, seed) -> (float) ElectricItem.manager.getChargeLevel(stack));
+		SideProxyClient.envProxy.registerModelPredicateProvider(IC2.getIdentifier("charge"), (stack, world, entity, seed) -> (float) ElectricItem.manager.getChargeLevel(stack));
 
 		for (Direction direction : Util.ALL_DIRS)
 		{
-			SideProxyClient.envProxy
-				.registerModelPredicateProvider(
-					IC2.getIdentifier(direction.getName()),
-					(stack, world, entity, seed) -> stack.getItem() instanceof ItemUpgradeModule && ItemUpgradeModule.getDirection(stack) == direction
-						? 1.0F
-						: 0.0F
-				);
+			SideProxyClient.envProxy.registerModelPredicateProvider(IC2.getIdentifier(direction.getName()), (stack, world, entity, seed) -> stack.getItem() instanceof ItemUpgradeModule && ItemUpgradeModule.getDirection(stack) == direction ? 1.0F : 0.0F);
 		}
 
-		SideProxyClient.envProxy.registerModelPredicateProvider(IC2.getIdentifier("is_activated"), (stack, world, entity, seed) -> stack.getItem() instanceof AbstractItemNanoSaber nanoSaber && nanoSaber.getActiveData(stack, world));
-		SideProxyClient.envProxy
-			.registerModelPredicateProvider(
-				IC2.getIdentifier("tool_box_open"),
-				(stack, world, entity, seed) ->
+		SideProxyClient.envProxy.registerModelPredicateProvider(IC2.getIdentifier("is_activated"), (stack, world, entity, seed) -> stack.getItem() instanceof AbstractItemNanoSaber nanoSaber ? nanoSaber.getActiveData(stack, world) : 0f);
+		SideProxyClient.envProxy.registerModelPredicateProvider(IC2.getIdentifier("tool_box_open"), (stack, world, entity, seed) ->
+			{
+				if (!(entity instanceof Player player))
 				{
-					if (!(entity instanceof Player player))
-					{
-						return 0.0F;
-					} else
-					{
-						ItemStack mainHandItem;
-						boolean open = player.containerMenu instanceof ContainerToolbox && (
-							StackUtil.checkItemEquality(mainHandItem = player.getMainHandItem(), stack) || StackUtil.checkItemEquality(player.getOffhandItem(), stack) && !(mainHandItem.getItem() instanceof IHandHeldInventory)
-						);
-						return open ? 1.0F : 0.0F;
-					}
+					return 0.0F;
+				} else
+				{
+					ItemStack mainHandItem;
+					boolean open = player.containerMenu instanceof ContainerToolbox && (
+						StackUtil.checkItemEquality(mainHandItem = player.getMainHandItem(), stack) || StackUtil.checkItemEquality(player.getOffhandItem(), stack) && !(mainHandItem.getItem() instanceof IHandHeldInventory)
+					);
+					return open ? 1.0F : 0.0F;
 				}
-			);
+			}
+		);
 	}
 
 	public static void onSoundSetup()
@@ -99,7 +89,7 @@ public class EventHandlerClient
 	public static float onSetupFogDensity(BlockState state)
 	{
 		Fluid fluid = FluidHandler.getWorldFluid(state);
-		if (fluid != null && "ic2".equals(ForgeRegistries.FLUIDS.getKey(fluid).getNamespace()))
+		if (fluid != null && "ic2".equals(Objects.requireNonNull(ForgeRegistries.FLUIDS.getKey(fluid)).getNamespace()))
 		{
 			int density = FluidHandler.getDensity(fluid);
 			return (float) Util.map(Math.abs(density), 20000.0, 2.0);
@@ -108,6 +98,7 @@ public class EventHandlerClient
 			return -1.0F;
 		}
 	}
+
 	public static int onRenderFogColor(BlockState state)
 	{
 		Fluid fluid = FluidHandler.getWorldFluid(state);
@@ -167,11 +158,10 @@ public class EventHandlerClient
 				Energy energy = dummyTe.getComponent(Energy.class);
 				if (!energy.getSourceDirs().isEmpty())
 				{
-					out.add(Component.translatable("ic2.item.tooltip.PowerTier", energy.getSourceTier()).withStyle(ChatFormatting.GRAY));
-				}
-				else if (!energy.getSinkDirs().isEmpty())
+					out.add(Component.translatable("ic2.item.tooltip.power_tier", energy.getSourceTier()).withStyle(ChatFormatting.GRAY));
+				} else if (!energy.getSinkDirs().isEmpty())
 				{
-					out.add(Component.translatable("ic2.item.tooltip.PowerTier", energy.getSinkTier()).withStyle(ChatFormatting.GRAY));
+					out.add(Component.translatable("ic2.item.tooltip.power_tier", energy.getSinkTier()).withStyle(ChatFormatting.GRAY));
 				}
 			}
 		}

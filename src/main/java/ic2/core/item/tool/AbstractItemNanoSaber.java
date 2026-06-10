@@ -205,12 +205,12 @@ public abstract class AbstractItemNanoSaber extends ItemElectricTool implements 
 		}
 	}
 
-	public boolean getActiveData(ItemStack stack, Level world)
+	public float getActiveData(ItemStack stack, Level world)
 	{
-		return isActive(stack);
+		return isActive(stack) ? 1f : 0f;
 	}
 
-	public Rarity getRarity(ItemStack stack)
+	public Rarity getRarity(@NotNull ItemStack stack)
 	{
 		return Rarity.UNCOMMON;
 	}

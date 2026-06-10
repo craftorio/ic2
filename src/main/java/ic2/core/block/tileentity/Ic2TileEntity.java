@@ -579,10 +579,10 @@ public abstract class Ic2TileEntity extends BlockEntity implements INetworkDataP
 			Energy energy = this.getComponent(Energy.class);
 			if (!energy.getSourceDirs().isEmpty())
 			{
-				tooltip.add(Localization.translate("ic2.item.tooltip.PowerTier", energy.getSourceTier()));
+				tooltip.add(Localization.translate("ic2.item.tooltip.power_tier", energy.getSourceTier()));
 			} else if (!energy.getSinkDirs().isEmpty())
 			{
-				tooltip.add(Localization.translate("ic2.item.tooltip.PowerTier", energy.getSinkTier()));
+				tooltip.add(Localization.translate("ic2.item.tooltip.power_tier", energy.getSinkTier()));
 			}
 		}
 	}

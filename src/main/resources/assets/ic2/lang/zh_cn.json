@@ -17,7 +17,7 @@
 	"fluid_type.ic2.oxygen": "氧气",
 	"fluid_type.ic2.heavy_water": "重水",
 	"ic2.frequency_transmitter.tooltip.blank": "<空>",
-	"ic2.item.tooltip.PowerTier": "电压等级: %s",
+	"ic2.item.tooltip.power_tier": "电压等级: %s",
 	"ic2.item.FluidContainer.Empty": "<空>",
 	"ic2.construction_foam": "建筑泡沫",
 	"ic2.biogas": "沼气",

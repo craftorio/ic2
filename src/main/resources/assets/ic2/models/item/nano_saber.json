@@ -1,14 +1,14 @@
 {
-  "parent": "ic2:item/tool/default",
+  "parent": "minecraft:item/handheld",
   "textures": {
     "layer0": "ic2:item/tool/electric/nano_saber_inactive"
   },
   "overrides": [
     {
       "predicate": {
-        "ic2:is_activated": true
+        "ic2:is_activated": 1
       },
-      "model": "ic2:item/tool/nano_saber_active"
+      "model": "ic2:item/nano_saber_active"
     }
   ]
 }

@@ -44,6 +44,7 @@ import ic2.core.ref.Ic2RecipeTypes;
 import ic2.core.ref.Ic2SoundEvents;
 import ic2.core.util.LogCategory;
 import ic2.core.util.StackUtil;
+import ic2.core.uu.UuIndex;
 import ic2.core.world.Ic2WorldGen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -119,6 +120,8 @@ public final class EventHandler
 	public static void onInitLate()
 	{
 		long startTime = System.nanoTime();
+		UuIndex.instance.init();
+		UuIndex.instance.refresh(true);
 		IC2.sideProxy.onPostInit();
 		IC2.sideProxy.requestTick(!IC2.envProxy.isClientEnv(), ChunkLoadAwareBlockHandler::init);
 		IC2.log.debug(LogCategory.General, "Finished post-init after %d ms.", (System.nanoTime() - startTime) / 1000000L);
@@ -209,7 +212,7 @@ public final class EventHandler
 	public static boolean beforeBlockBreak(Level world, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity)
 	{
 		Item item = player.getMainHandItem().getItem();
-		return item instanceof BlockBreakableItem ? ((BlockBreakableItem) item).beforeBlockBreak(world, player, pos, state, blockEntity) : true;
+		return !(item instanceof BlockBreakableItem) || ((BlockBreakableItem) item).beforeBlockBreak(world, player, pos, state, blockEntity);
 	}
 
 	public static void afterBlockBreak(Level world, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity)
@@ -290,12 +293,7 @@ public final class EventHandler
 		}
 
 		ItemStack stack = StackUtil.get(player, hand);
-		if (StackUtil.isEmpty(stack))
-		{
-			return false;
-		}
-
-		Item item = stack.getItem();
+		StackUtil.isEmpty(stack);
 		return false;
 	}
 

@@ -33,7 +33,6 @@ public class ItemNanoSaber extends AbstractItemNanoSaber
 			dmg = 20;
 		}
 
-		Multimap<String, AttributeModifier> ret = HashMultimap.create();
 		Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
 		builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Tool modifier", dmg, Operation.ADDITION));
 		builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Tool modifier", -3.0, Operation.ADDITION));

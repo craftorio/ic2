@@ -25,7 +25,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.Tiers;
-import net.minecraft.world.item.Item.Properties;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -138,7 +137,7 @@ public abstract class AbstractItemNanoSaber extends ItemElectricTool implements 
 		};
 	}
 
-	public boolean canAttackBlock(BlockState state, Level world, BlockPos pos, Player miner)
+	public boolean canAttackBlock(@NotNull BlockState state, @NotNull Level world, @NotNull BlockPos pos, Player miner)
 	{
 		return !miner.isCreative() && super.canAttackBlock(state, world, pos, miner);
 	}

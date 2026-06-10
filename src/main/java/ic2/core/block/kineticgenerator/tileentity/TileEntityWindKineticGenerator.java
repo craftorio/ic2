@@ -48,7 +48,7 @@ public class TileEntityWindKineticGenerator extends TileEntityInventory implemen
 	private long lastcheck;
 	private static final double efficiencyRollOffExponent = 2.0;
 	public static final float outputModifier = 10.0F * ConfigUtil.getFloat(MainConfig.get(), "balance/energy/kineticgenerator/wind");
-	private static final ResourceLocation woodenRotorTexture = ResourceLocation.fromNamespaceAndPath("ic2", "textures/items/rotor/wood_rotor_model.png");
+	private static final ResourceLocation woodenRotorTexture = ResourceLocation.fromNamespaceAndPath("ic2", "textures/item/rotor/wood_rotor_model.png");
 
 	public TileEntityWindKineticGenerator(BlockPos pos, BlockState state)
 	{

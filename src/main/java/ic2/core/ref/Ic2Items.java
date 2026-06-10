@@ -868,7 +868,7 @@ public final class Ic2Items
 			0.25F,
 			10,
 			60,
-			IC2.getIdentifier("textures/items/rotor/wood_rotor_model.png")
+			IC2.getIdentifier("textures/item/rotor/wood_rotor_model.png")
 		)
 	);
 	public static final Item BRONZE_ROTOR = register(
@@ -880,7 +880,7 @@ public final class Ic2Items
 			0.5F,
 			14,
 			75,
-			ResourceLocation.fromNamespaceAndPath("ic2", "textures/items/rotor/bronze_rotor_model.png")
+			ResourceLocation.fromNamespaceAndPath("ic2", "textures/item/rotor/bronze_rotor_model.png")
 		)
 	);
 	public static final Item IRON_ROTOR = register(
@@ -892,7 +892,7 @@ public final class Ic2Items
 			0.5F,
 			14,
 			75,
-			ResourceLocation.fromNamespaceAndPath("ic2", "textures/items/rotor/iron_rotor_model.png")
+			ResourceLocation.fromNamespaceAndPath("ic2", "textures/item/rotor/iron_rotor_model.png")
 		)
 	);
 	public static final Item STEEL_ROTOR = register(
@@ -904,7 +904,7 @@ public final class Ic2Items
 			0.75F,
 			17,
 			90,
-			ResourceLocation.fromNamespaceAndPath("ic2", "textures/items/rotor/steel_rotor_model.png")
+			ResourceLocation.fromNamespaceAndPath("ic2", "textures/item/rotor/steel_rotor_model.png")
 		)
 	);
 	public static final Item CARBON_ROTOR = register(
@@ -916,7 +916,7 @@ public final class Ic2Items
 			1.0F,
 			20,
 			110,
-			ResourceLocation.fromNamespaceAndPath("ic2", "textures/items/rotor/carbon_rotor_model.png")
+			ResourceLocation.fromNamespaceAndPath("ic2", "textures/item/rotor/carbon_rotor_model.png")
 		)
 	);
 	public static final Item EMPTY_CELL = register("empty_cell", new ItemClassicCell(new Properties(), Fluids.EMPTY, 0));

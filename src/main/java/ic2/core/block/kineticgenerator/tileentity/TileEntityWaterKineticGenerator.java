@@ -55,7 +55,7 @@ public class TileEntityWaterKineticGenerator extends TileEntityInventory impleme
 	private static final float rotationModifier = 0.1F;
 	private static final double efficiencyRollOffExponent = 2.0;
 	private static final float outputModifier = 0.2F * ConfigUtil.getFloat(MainConfig.get(), "balance/energy/kineticgenerator/water");
-	private static final ResourceLocation woodenRotorTexture = ResourceLocation.fromNamespaceAndPath("ic2", "textures/items/rotor/wood_rotor_model.png");
+	private static final ResourceLocation woodenRotorTexture = ResourceLocation.fromNamespaceAndPath("ic2", "textures/item/rotor/wood_rotor_model.png");
 
 	public TileEntityWaterKineticGenerator(BlockPos pos, BlockState state)
 	{

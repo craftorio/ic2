@@ -9,7 +9,7 @@ import net.minecraft.world.level.block.state.BlockState;
 public abstract class TileEntityBaseRotorGenerator extends TileEntityBaseGenerator implements IRotorProvider
 {
 	private static final float rotationSpeed = 0.4F;
-	private static final ResourceLocation rotorTexture = ResourceLocation.fromNamespaceAndPath("ic2", "textures/items/rotor/iron_rotor_model.png");
+	private static final ResourceLocation rotorTexture = ResourceLocation.fromNamespaceAndPath("ic2", "textures/item/rotor/iron_rotor_model.png");
 	private final int rotorDiameter;
 	private float angle = 0.0F;
 	private long lastcheck;

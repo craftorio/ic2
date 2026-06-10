@@ -98,9 +98,9 @@ public class MainConfig
 		}
 
 		List<String> blacklist = ConfigUtil.asList(ConfigUtil.getString(config, "balance/recyclerBlacklist"));
-		if (blacklist.contains("IC2:blockScaffold"))
+		if (blacklist.contains("ic2:blockScaffold"))
 		{
-			blacklist.set(blacklist.indexOf("IC2:blockScaffold"), "IC2:scaffold");
+			blacklist.set(blacklist.indexOf("ic2:blockScaffold"), "ic2:scaffold");
 			config.set("balance/recyclerBlacklist", Joiner.on(", ").join(blacklist));
 		}
 

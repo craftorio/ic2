@@ -8,7 +8,7 @@
       "predicate": {
         "ic2:is_activated": true
       },
-      "model": "ic2:item/tool/nano_saber/active"
+      "model": "ic2:item/tool/nano_saber_active"
     }
   ]
 }

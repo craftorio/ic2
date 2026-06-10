@@ -98,7 +98,7 @@ public final class EnvProxyForge implements EnvProxy
 	static final DeferredRegister<EntityType<?>> entityRegistry = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, "ic2");
 	static final DeferredRegister<MobEffect> statusEffectRegistry = DeferredRegister.create(ForgeRegistries.MOB_EFFECTS, "ic2");
 	static List<Runnable> pendingItemRegistrations = new ArrayList<>();
-	static List<Runnable> configuredFeatureRegistrations = new ArrayList<>();
+	static List<ConfiguredFeatureRegistration<?, ?>> configuredFeatureRegistrations = new ArrayList<>();
 	static List<EnvProxyForge.PlacedFeatureRegistration<?>> placedFeatureRegistrations = new ArrayList<>();
 	static List<EnvProxyForge.PlacementModifierTypeRegistration> placementModifierTypeRegistrations = new ArrayList<>();
 
@@ -219,7 +219,7 @@ public final class EnvProxyForge implements EnvProxy
 	)
 	{
 		CompletableFuture<Holder<ConfiguredFeature<FC, ?>>> ret = new CompletableFuture<>();
-		configuredFeatureRegistrations.add(() -> ret.complete(null));
+		configuredFeatureRegistrations.add(new ConfiguredFeatureRegistration<>(id, feature, config, ret));
 		return ret;
 	}
 
@@ -444,7 +444,16 @@ public final class EnvProxyForge implements EnvProxy
 		pendingItemRegistrations.clear();
 	}
 
-	record PlacedFeatureRegistration<FC extends FeatureConfiguration>(
+	record ConfiguredFeatureRegistration<FC extends FeatureConfiguration, F extends Feature<FC>>(
+			ResourceLocation id,
+			F feature,
+			FC config,
+			CompletableFuture<Holder<ConfiguredFeature<FC, ?>>> future
+		)
+		{
+		}
+
+		record PlacedFeatureRegistration<FC extends FeatureConfiguration>(
 		ResourceLocation id,
 		CompletableFuture<Holder<ConfiguredFeature<FC, ?>>> feature,
 		List<PlacementModifier> modifiers,

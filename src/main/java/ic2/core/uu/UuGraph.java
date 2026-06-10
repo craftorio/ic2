@@ -5,7 +5,6 @@ import ic2.core.util.LogCategory;
 import ic2.core.util.StackUtil;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,7 +22,7 @@ import net.minecraft.world.item.ItemStack;
 
 public class UuGraph
 {
-	private static final List<UuGraph.Node> emptyList = Arrays.asList();
+	private static final List<UuGraph.Node> emptyList = List.of();
 	private static final double epsilon = 1.0E-9;
 	private static final Map<LeanItemStack, UuGraph.Node> nodes = new HashMap<>();
 	private static final Map<Item, Set<UuGraph.Node>> itemNodes = new IdentityHashMap<>();
@@ -70,14 +69,7 @@ public class UuGraph
 		}
 
 		IC2.log.debug(LogCategory.Uu, "%d UU recipe transformations fetched after %d ms.", transformations.size(), (System.nanoTime() - startTime) / 1000000L);
-		calculation = IC2.threadPool.submit(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				UuGraph.processRecipes(transformations);
-			}
-		});
+		calculation = IC2.threadPool.submit(() -> UuGraph.processRecipes(transformations));
 	}
 
 	public static void set(ItemStack stack, double value)
@@ -115,7 +107,7 @@ public class UuGraph
 				return StackUtil.emptyStack;
 			} else
 			{
-				return nodes.size() == 1 ? nodes.iterator().next().stack.toMcStack() : nodes.iterator().next().stack.toMcStack();
+				return nodes.iterator().next().stack.toMcStack();
 			}
 		}
 	}
@@ -160,12 +152,7 @@ public class UuGraph
 			ret = new UuGraph.Node(stack);
 			nodes.put(stack, ret);
 			Item item = stack.getItem();
-			Set<UuGraph.Node> itemNodeSet = itemNodes.get(item);
-			if (itemNodeSet == null)
-			{
-				itemNodeSet = new HashSet<>(1);
-				itemNodes.put(item, itemNodeSet);
-			}
+			Set<UuGraph.Node> itemNodeSet = itemNodes.computeIfAbsent(item, k -> new HashSet<>(1));
 
 			itemNodeSet.add(ret);
 		}
@@ -175,7 +162,7 @@ public class UuGraph
 
 	private static Collection<UuGraph.Node> getAll(LeanItemStack stack)
 	{
-		return new ArrayList<>(Arrays.asList(getInternal(stack)));
+		return new ArrayList<>(List.of(getInternal(stack)));
 	}
 
 	private static void registerTransform(RecipeTransformation transform)
@@ -255,7 +242,7 @@ public class UuGraph
 						if (outputSize <= 0)
 						{
 							IC2.log
-								.warn(LogCategory.Uu, "UU update: Invalid output size %d in recipetransform %s, expected %s.", outputSize, nt.transform, node.stack);
+								.warn(LogCategory.Uu, "UU update: Invalid output size %d in recipe transform %s, expected %s.", outputSize, nt.transform, node.stack);
 							assert false;
 						} else if (node.value > value / outputSize)
 						{

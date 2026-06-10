@@ -33,7 +33,6 @@ public class TileEntityScanner extends TileEntityElectricMachine implements IHas
 {
 	private ItemStack currentStack = StackUtil.emptyStack;
 	private ItemStack pattern = StackUtil.emptyStack;
-	private final int energyUsePerCycle = 256;
 	public int progress = 0;
 	public final int duration = 3300;
 	public final InvSlotConsumable inputSlot;
@@ -58,6 +57,7 @@ public class TileEntityScanner extends TileEntityElectricMachine implements IHas
 		{
 			if (!this.inputSlot.isEmpty() && (StackUtil.isEmpty(this.currentStack) || StackUtil.checkItemEquality(this.currentStack, this.inputSlot.get())))
 			{
+				int energyUsePerCycle = 256;
 				if (this.getPatternStorage() == null && this.diskSlot.isEmpty())
 				{
 					this.state = TileEntityScanner.State.NO_STORAGE;

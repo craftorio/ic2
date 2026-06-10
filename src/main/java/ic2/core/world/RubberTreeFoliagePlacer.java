@@ -1,6 +1,7 @@
 package ic2.core.world;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import ic2.core.IC2;
 
 import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacer.FoliageSetter;
@@ -9,6 +10,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.valueproviders.ConstantInt;
+import net.minecraft.util.valueproviders.IntProvider;
 import net.minecraft.world.level.LevelSimulatedReader;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
@@ -18,17 +20,19 @@ import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacer.F
 
 public final class RubberTreeFoliagePlacer extends FoliagePlacer
 {
-	public static final RubberTreeFoliagePlacer INSTANCE = new RubberTreeFoliagePlacer();
-	public static final Codec<RubberTreeFoliagePlacer> CODEC = Codec.unit(INSTANCE);
+	public static final RubberTreeFoliagePlacer INSTANCE = new RubberTreeFoliagePlacer(ConstantInt.of(2), ConstantInt.of(0));
+	public static final Codec<RubberTreeFoliagePlacer> CODEC = RecordCodecBuilder.create(instance ->
+		foliagePlacerFields(instance).apply(instance, RubberTreeFoliagePlacer::new)
+	);
 	public static final FoliagePlacerType<?> TYPE = registerFoliagePlacer("rubber_tree", CODEC);
 
 	public static void init()
 	{
 	}
 
-	RubberTreeFoliagePlacer()
+	RubberTreeFoliagePlacer(IntProvider radius, IntProvider offset)
 	{
-		super(ConstantInt.of(2), ConstantInt.of(0));
+		super(radius, offset);
 	}
 
 	protected FoliagePlacerType<?> type()

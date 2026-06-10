@@ -246,6 +246,6 @@ public abstract class AbstractItemNanoSaber extends ItemElectricTool implements 
 	@Override
 	public SoundEvent getSwingSound(LivingEntity entity, InteractionHand hand)
 	{
-		return this.getRandomSwingSound();
+		return isActive(entity.getItemInHand(hand)) ? this.getRandomSwingSound() : null;
 	}
 }

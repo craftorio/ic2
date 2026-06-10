@@ -277,7 +277,7 @@ public abstract class ItemElectricTool extends DiggerItem implements IElectricIt
 		SoundEvent startEvent;
 		if (this.startSound == null && (startEvent = this.getStartSound(entity, stack)) != null)
 		{
-			this.stopSound = IC2.soundManager.createSound(entity, startEvent, SoundSource.PLAYERS, entity, 1.0F, 1.0F);
+			this.startSound = IC2.soundManager.createSound(entity, startEvent, SoundSource.PLAYERS, entity, 1.0F, 1.0F);
 		}
 
 		SoundEvent stopEvent;

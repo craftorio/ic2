@@ -1,4 +1,7 @@
 {
+	"ic2.itemrotor.wind.info": "最小风力：%s MCW；最大风力：%s MCW",
+	"ic2.itemrotor.fitsin.true": "转子与这个动能发生机兼容",
+	"ic2.itemrotor.fitsin.false": "转子与这个动能发生机不兼容",
 	"fluid_type.ic2.uu_matter": "UU物质",
 	"fluid_type.ic2.construction_foam": "建筑泡沫",
 	"fluid_type.ic2.coolant": "冷却液",

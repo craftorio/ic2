@@ -46,7 +46,7 @@ public class ItemWindRotor extends Item implements IKineticRotor
 	@OnlyIn(Dist.CLIENT)
 	public void appendHoverText(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag advanced)
 	{
-		tooltip.add(Component.translatable("ic2.itemrotor.wind.info", new Object[] { this.minWindStrength, this.maxWindStrength }).withStyle(ChatFormatting.GRAY));
+		tooltip.add(Component.translatable("ic2.itemrotor.wind.info", this.minWindStrength, this.maxWindStrength).withStyle(ChatFormatting.GRAY));
 		IKineticRotor.GearboxType type = null;
 		if (Minecraft.getInstance().screen instanceof GuiWaterKineticGenerator)
 		{

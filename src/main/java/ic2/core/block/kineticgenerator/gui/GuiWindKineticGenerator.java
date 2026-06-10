@@ -27,22 +27,19 @@ public class GuiWindKineticGenerator extends Ic2Gui<ContainerWindKineticGenerato
 				143,
 				13,
 				TextProvider.of(
-					new Supplier<String>()
+					() ->
 					{
-						public String get()
+						if (!container.base.hasRotor())
 						{
-							if (!container.base.hasRotor())
-							{
-								return Localization.translate("ic2.WindKineticGenerator.gui.rotormiss");
-							} else if (!container.base.rotorHasSpace())
-							{
-								return Localization.translate("ic2.WindKineticGenerator.gui.rotorspace");
-							} else
-							{
-								return !container.base.isWindStrongEnough()
-									? Localization.translate("ic2.WindKineticGenerator.gui.windweak1")
-									: Localization.translate("ic2.WindKineticGenerator.gui.output", container.base.getKuOutput());
-							}
+							return Localization.translate("ic2.WindKineticGenerator.gui.rotormiss");
+						} else if (!container.base.rotorHasSpace())
+						{
+							return Localization.translate("ic2.WindKineticGenerator.gui.rotorspace");
+						} else
+						{
+							return !container.base.isWindStrongEnough()
+								? Localization.translate("ic2.WindKineticGenerator.gui.windweak1")
+								: Localization.translate("ic2.WindKineticGenerator.gui.output", container.base.getKuOutput());
 						}
 					}
 				),

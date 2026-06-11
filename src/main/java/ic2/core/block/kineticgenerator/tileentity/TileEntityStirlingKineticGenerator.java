@@ -1,7 +1,6 @@
 package ic2.core.block.kineticgenerator.tileentity;
 
 import ic2.api.energy.tile.IHeatSource;
-import ic2.api.energy.tile.IKineticSource;
 import ic2.api.recipe.ILiquidHeatExchangerManager;
 import ic2.api.recipe.Recipes;
 import ic2.api.upgrade.IUpgradableBlock;
@@ -16,7 +15,6 @@ import ic2.core.block.invslot.InvSlotConsumableLiquidByTank;
 import ic2.core.block.invslot.InvSlotOutput;
 import ic2.core.block.invslot.InvSlotUpgrade;
 import ic2.core.block.kineticgenerator.container.ContainerStirlingKineticGenerator;
-import ic2.core.block.tileentity.TileEntityInventory;
 import ic2.core.fluid.Ic2FluidStack;
 import ic2.core.fluid.Ic2FluidTank;
 import ic2.core.network.GrowingBuffer;
@@ -36,7 +34,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 @NotClassic
-public class TileEntityStirlingKineticGenerator extends TileEntityInventory implements IKineticSource, IUpgradableBlock, IHasGui
+public class TileEntityStirlingKineticGenerator extends TileEntityAbstractKineticGenerator implements IUpgradableBlock, IHasGui
 {
 	public Ic2FluidTank inputTank;
 	public Ic2FluidTank outputTank;
@@ -47,8 +45,6 @@ public class TileEntityStirlingKineticGenerator extends TileEntityInventory impl
 	public InvSlotUpgrade upgradeSlot;
 	private int heatbuffer = 0;
 	private final int maxHeatbuffer;
-	private int kUBuffer;
-	private final int maxkUBuffer;
 	private boolean newActive;
 	private int liquidHeatStored;
 	protected final Fluids fluids = this.addComponent(new Fluids(this));
@@ -77,7 +73,7 @@ public class TileEntityStirlingKineticGenerator extends TileEntityInventory impl
 		);
 		this.upgradeSlot = new InvSlotUpgrade(this, "upgrade", 3);
 		this.maxHeatbuffer = 1000;
-		this.maxkUBuffer = 2000;
+		this.maxKuBuffer = 2000;
 	}
 
 	@Override
@@ -87,7 +83,7 @@ public class TileEntityStirlingKineticGenerator extends TileEntityInventory impl
 		this.inputTank.fromNbt(nbt.getCompound("inputTank"));
 		this.outputTank.fromNbt(nbt.getCompound("outputTank"));
 		this.heatbuffer = nbt.getInt("heatbuffer");
-		this.kUBuffer = nbt.getInt("kubuffer");
+		this.kuBuffer = nbt.getInt("kubuffer");
 		this.liquidHeatStored = nbt.getInt("liquidHeatStored");
 	}
 
@@ -102,7 +98,7 @@ public class TileEntityStirlingKineticGenerator extends TileEntityInventory impl
 		this.outputTank.toNbt(outputTankTag);
 		nbt.put("outputTank", outputTankTag);
 		nbt.putInt("heatbuffer", this.heatbuffer);
-		nbt.putInt("kUBuffer", this.kUBuffer);
+		nbt.putInt("kUBuffer", this.kuBuffer);
 		nbt.putInt("liquidHeatStored", this.liquidHeatStored);
 	}
 
@@ -121,7 +117,7 @@ public class TileEntityStirlingKineticGenerator extends TileEntityInventory impl
 		if (this.inputTank.getFluidAmount() > 0
 			&& this.outputTank.getFluidAmount() < this.outputTank.getCapacity()
 			&& Recipes.liquidHeatUpManager.getSingleDirectionLiquidManager().acceptsFluid(this.inputTank.getFluidStack().getFluid())
-			&& this.kUBuffer < this.maxkUBuffer)
+			&& this.kuBuffer < this.maxKuBuffer)
 		{
 			ILiquidHeatExchangerManager.HeatExchangeProperty property = Recipes.liquidHeatUpManager
 				.getHeatExchangeProperty(this.inputTank.getFluidStack().getFluid());
@@ -136,10 +132,10 @@ public class TileEntityStirlingKineticGenerator extends TileEntityInventory impl
 					)
 						/ 1
 				);
-				heatbufferToUse = Math.min(heatbufferToUse, (this.maxkUBuffer - this.kUBuffer) / 3);
+				heatbufferToUse = Math.min(heatbufferToUse, (this.maxKuBuffer - this.kuBuffer) / 3);
 				if (heatbufferToUse > 0)
 				{
-					this.kUBuffer += heatbufferToUse * 3 * 4;
+					this.kuBuffer += heatbufferToUse * 3 * 4;
 					this.liquidHeatStored += heatbufferToUse * 1;
 					this.heatbuffer -= heatbufferToUse * 4;
 					this.newActive = true;
@@ -197,19 +193,13 @@ public class TileEntityStirlingKineticGenerator extends TileEntityInventory impl
 	@Override
 	public int maxrequestkineticenergyTick(Direction directionFrom)
 	{
-		return Math.min(this.kUBuffer, this.getConnectionBandwidth(directionFrom));
+		return Math.min(this.kuBuffer, this.getConnectionBandwidth(directionFrom));
 	}
 
 	@Override
 	public int getConnectionBandwidth(Direction side)
 	{
-		return side != this.getFacing() ? 0 : this.maxkUBuffer;
-	}
-
-	@Override
-	public int requestkineticenergy(Direction directionFrom, int requestkineticenergy)
-	{
-		return this.drawKineticEnergy(directionFrom, requestkineticenergy, false);
+		return side != this.getFacing() ? 0 : this.maxKuBuffer;
 	}
 
 	@Override
@@ -220,14 +210,14 @@ public class TileEntityStirlingKineticGenerator extends TileEntityInventory impl
 			return 0;
 		}
 
-		if (request > this.kUBuffer)
+		if (request > this.kuBuffer)
 		{
-			request = this.kUBuffer;
+			request = this.kuBuffer;
 		}
 
 		if (!simulate)
 		{
-			this.kUBuffer -= request;
+			this.kuBuffer -= request;
 		}
 
 		return request;

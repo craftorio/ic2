@@ -1,6 +1,5 @@
 package ic2.core.block.kineticgenerator.tileentity;
 
-import ic2.api.energy.tile.IKineticSource;
 import ic2.core.ContainerBase;
 import ic2.core.IHasGui;
 import ic2.core.block.comp.Energy;
@@ -8,7 +7,6 @@ import ic2.core.block.invslot.InvSlot;
 import ic2.core.block.invslot.InvSlotConsumableItemStack;
 import ic2.core.block.invslot.InvSlotDischarge;
 import ic2.core.block.kineticgenerator.container.ContainerElectricKineticGenerator;
-import ic2.core.block.tileentity.TileEntityInventory;
 import ic2.core.init.MainConfig;
 import ic2.core.network.GrowingBuffer;
 import ic2.core.profile.NotClassic;
@@ -29,7 +27,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 @NotClassic
-public class TileEntityElectricKineticGenerator extends TileEntityInventory implements IKineticSource, IHasGui
+public class TileEntityElectricKineticGenerator extends TileEntityAbstractKineticGenerator implements IHasGui
 {
 	public InvSlotConsumableItemStack slotMotor;
 	public InvSlotDischarge dischargeSlot;
@@ -98,12 +96,6 @@ public class TileEntityElectricKineticGenerator extends TileEntityInventory impl
 	public int getMaxKUForGUI()
 	{
 		return 1000;
-	}
-
-	@Override
-	public int requestkineticenergy(Direction directionFrom, int requestkineticenergy)
-	{
-		return this.drawKineticEnergy(directionFrom, requestkineticenergy, false);
 	}
 
 	@Override

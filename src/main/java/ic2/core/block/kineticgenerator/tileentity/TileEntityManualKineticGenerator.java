@@ -1,7 +1,5 @@
 package ic2.core.block.kineticgenerator.tileentity;
 
-import ic2.api.energy.tile.IKineticSource;
-import ic2.core.block.tileentity.Ic2TileEntity;
 import ic2.core.init.MainConfig;
 import ic2.core.profile.NotClassic;
 import ic2.core.ref.Ic2BlockEntities;
@@ -17,17 +15,16 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
 @NotClassic
-public class TileEntityManualKineticGenerator extends Ic2TileEntity implements IKineticSource
+public class TileEntityManualKineticGenerator extends TileEntityAbstractKineticGenerator
 {
 	public int clicks;
 	public static final int maxClicksPerTick = 10;
-	public final int maxKU = 1000;
-	public int currentKU;
 	private static final float outputModifier = Math.round(ConfigUtil.getFloat(MainConfig.get(), "balance/energy/kineticgenerator/manual"));
 
 	public TileEntityManualKineticGenerator(BlockPos pos, BlockState state)
 	{
 		super(Ic2BlockEntities.MANUAL_KINETIC_GENERATOR, pos, state);
+		this.maxKuBuffer = 1000;
 	}
 
 	@Override
@@ -62,7 +59,7 @@ public class TileEntityManualKineticGenerator extends Ic2TileEntity implements I
 					}
 
 					ku = (int) (ku * outputModifier);
-					this.currentKU = Math.min(this.currentKU + ku, 1000);
+					this.kuBuffer = Math.min(this.kuBuffer + ku, this.maxKuBuffer);
 					player.causeFoodExhaustion(0.25F);
 					this.clicks++;
 				}
@@ -79,22 +76,16 @@ public class TileEntityManualKineticGenerator extends Ic2TileEntity implements I
 	@Override
 	public int getConnectionBandwidth(Direction side)
 	{
-		return 1000;
-	}
-
-	@Override
-	public int requestkineticenergy(Direction directionFrom, int requestkineticenergy)
-	{
-		return this.drawKineticEnergy(directionFrom, requestkineticenergy, false);
+		return this.maxKuBuffer;
 	}
 
 	@Override
 	public int drawKineticEnergy(Direction side, int request, boolean simulate)
 	{
-		int max = Math.min(this.currentKU, request);
+		int max = Math.min(this.kuBuffer, request);
 		if (!simulate)
 		{
-			this.currentKU -= max;
+			this.kuBuffer -= max;
 		}
 
 		return max;

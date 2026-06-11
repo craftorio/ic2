@@ -50,12 +50,12 @@ public class TileEntitySteamKineticGenerator extends TileEntityAbstractKineticGe
 	private boolean throttled;
 	private boolean isTurbineFilledWithWater = false;
 	private int condensationProgress = 0;
-	private int updateTicker = IC2.random.nextInt(this.getTickRate());
 	protected final Fluids fluids;
 
 	public TileEntitySteamKineticGenerator(BlockPos pos, BlockState state)
 	{
 		super(Ic2BlockEntities.STEAM_KINETIC_GENERATOR, pos, state);
+		this.updateTicker = IC2.random.nextInt(this.getTickRate());
 		this.turbineSlot.setStackSizeLimit(1);
 		this.fluids = this.addComponent(new Fluids(this));
 		this.steamTank = this.fluids.addTankInsert("steamTank", 21000, Fluids.fluidPredicate(Ic2Fluids.STEAM.still(), Ic2Fluids.SUPERHEATED_STEAM.still()));
@@ -222,21 +222,9 @@ public class TileEntitySteamKineticGenerator extends TileEntityAbstractKineticGe
 	}
 
 	@Override
-	public int maxrequestkineticenergyTick(Direction directionFrom)
-	{
-		return this.getConnectionBandwidth(directionFrom);
-	}
-
-	@Override
 	public int getConnectionBandwidth(Direction side)
 	{
 		return side == this.getFacing() ? this.kuOutput : 0;
-	}
-
-	@Override
-	public int requestkineticenergy(Direction directionFrom, int requestKineticEnergy)
-	{
-		return this.drawKineticEnergy(directionFrom, requestKineticEnergy, false);
 	}
 
 	@Override

@@ -41,7 +41,6 @@ public class TileEntityWindKineticGenerator extends TileEntityAbstractKineticGen
 	private double windStrength;
 	private int obstructedCrossSection;
 	private int crossSection;
-	private int updateTicker;
 	private float rotationSpeed;
 	private float angle = 0.0F;
 	private long lastCheck;
@@ -154,21 +153,9 @@ public class TileEntityWindKineticGenerator extends TileEntityAbstractKineticGen
 	}
 
 	@Override
-	public int maxrequestkineticenergyTick(Direction directionFrom)
-	{
-		return this.getConnectionBandwidth(directionFrom);
-	}
-
-	@Override
 	public int getConnectionBandwidth(Direction side)
 	{
 		return this.facingMatchesDirection(side.getOpposite()) ? this.getKuOutput() : 0;
-	}
-
-	@Override
-	public int requestkineticenergy(Direction directionFrom, int requestkineticenergy)
-	{
-		return this.drawKineticEnergy(directionFrom, requestkineticenergy, false);
 	}
 
 	@Override
@@ -177,17 +164,17 @@ public class TileEntityWindKineticGenerator extends TileEntityAbstractKineticGen
 		return this.facingMatchesDirection(side.getOpposite()) ? Math.min(request, this.getKuOutput()) : 0;
 	}
 
-	public int checkSpace(int length, boolean onlyrotor)
+	public int checkSpace(int length, boolean onlyRotor)
 	{
 		int box = this.getRotorDiameter() / 2;
 		int lentemp = 0;
-		if (onlyrotor)
+		if (onlyRotor)
 		{
 			length = 1;
 			lentemp = length + 1;
 		}
 
-		if (!onlyrotor)
+		if (!onlyRotor)
 		{
 			box *= 2;
 		}
@@ -225,7 +212,7 @@ public class TileEntityWindKineticGenerator extends TileEntityAbstractKineticGen
 					if (!state.isAir())
 					{
 						occupied = true;
-						if ((up != 0 || right != 0 || fwd != 0) && chunkCache.getBlockEntity(pos) instanceof TileEntityWindKineticGenerator && !onlyrotor)
+						if ((up != 0 || right != 0 || fwd != 0) && chunkCache.getBlockEntity(pos) instanceof TileEntityWindKineticGenerator && !onlyRotor)
 						{
 							return -1;
 						}
@@ -332,7 +319,6 @@ public class TileEntityWindKineticGenerator extends TileEntityAbstractKineticGen
 
 	public int getKuOutput()
 	{
-		IC2.log.debug(LogCategory.General, "Wind strength: %s, Min wind: %s, efficiency: %s, active: %s", this.windStrength, this.getMinWindStrength(), this.getEfficiency(), this.getActive());
 		return this.windStrength >= this.getMinWindStrength() && this.getActive() ? (int) (this.windStrength * outputModifier * this.getEfficiency()) : 0;
 	}
 

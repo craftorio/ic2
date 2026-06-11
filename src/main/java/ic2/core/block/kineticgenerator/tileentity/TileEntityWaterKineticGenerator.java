@@ -41,7 +41,6 @@ public class TileEntityWaterKineticGenerator extends TileEntityAbstractKineticGe
 {
 	public InvSlotConsumableClass rotorSlot;
 	public TileEntityWaterKineticGenerator.BiomeState type = TileEntityWaterKineticGenerator.BiomeState.UNKNOWN;
-	protected int updateTicker;
 	private boolean rightFacing;
 	private int distanceToNormalBiome;
 	private int waterFlow;
@@ -324,21 +323,9 @@ public class TileEntityWaterKineticGenerator extends TileEntityAbstractKineticGe
 	}
 
 	@Override
-	public int maxrequestkineticenergyTick(Direction directionFrom)
-	{
-		return this.getConnectionBandwidth(directionFrom);
-	}
-
-	@Override
 	public int getConnectionBandwidth(Direction side)
 	{
 		return side.getOpposite() == this.getFacing() ? this.getKuOutput() : 0;
-	}
-
-	@Override
-	public int requestkineticenergy(Direction directionFrom, int requestkineticenergy)
-	{
-		return this.drawKineticEnergy(directionFrom, requestkineticenergy, false);
 	}
 
 	@Override

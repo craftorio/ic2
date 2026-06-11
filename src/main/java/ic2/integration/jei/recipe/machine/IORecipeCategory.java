@@ -51,16 +51,14 @@ public abstract class IORecipeCategory implements IRecipeCategory<IORecipeWrappe
 		List<SlotPosition> outputSlots = this.getOutputSlotPos();
 		List<List<ItemStack>> outputStacks = List.of(recipe.getOutputs());
 
-		for (int i = 0; i < outputSlots.size(); idx++)
+		for (idx = 0; idx < outputSlots.size(); idx++)
 		{
-			SlotPosition pos = outputSlots.get(i);
+			SlotPosition pos = outputSlots.get(idx);
 			IRecipeSlotBuilder slot = builder.addSlot(RecipeIngredientRole.OUTPUT, pos.x() + xOffset, pos.y() + yOffset);
-			if (i < outputStacks.size())
+			if (idx < outputStacks.size())
 			{
-				slot.addItemStacks(outputStacks.get(i));
+				slot.addItemStacks(outputStacks.get(idx));
 			}
-
-			i++;
 		}
 	}
 

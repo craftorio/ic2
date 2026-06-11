@@ -17,7 +17,6 @@ import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.RecipeType;
-import mezz.jei.api.recipe.category.IRecipeCategory;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
@@ -25,6 +24,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeManager;
+import org.jetbrains.annotations.NotNull;
 
 @JeiPlugin
 public class Ic2JeiPlugin implements IModPlugin
@@ -48,33 +48,33 @@ public class Ic2JeiPlugin implements IModPlugin
 	public void registerCategories(IRecipeCategoryRegistration registration)
 	{
 		IGuiHelper guiHelper = registration.getJeiHelpers().getGuiHelper();
-		registration.addRecipeCategories(new IRecipeCategory[] { new DynamicCategory(Ic2Blocks.BLAST_FURNACE, this.BLAST_FURNACE, guiHelper) });
-		registration.addRecipeCategories(new IRecipeCategory[] { new DynamicCategory(Ic2Blocks.BLOCK_CUTTER, this.BLOCK_CUTTER, guiHelper) });
-		registration.addRecipeCategories(new IRecipeCategory[] { new DynamicCategory(Ic2Blocks.CENTRIFUGE, this.CENTRIFUGE, guiHelper) });
-		registration.addRecipeCategories(new IRecipeCategory[] { new DynamicCategory(Ic2Blocks.COMPRESSOR, this.COMPRESSOR, guiHelper) });
-		registration.addRecipeCategories(new IRecipeCategory[] { new DynamicCategory(Ic2Blocks.EXTRACTOR, this.EXTRACTOR, guiHelper) });
-		registration.addRecipeCategories(new IRecipeCategory[] { new DynamicCategory(Ic2Blocks.MACERATOR, this.MACERATOR, guiHelper) });
-		registration.addRecipeCategories(new IRecipeCategory[] { new MetalFormerCategory(this.METAL_FORMER_EXTRUDING, 0, guiHelper) });
-		registration.addRecipeCategories(new IRecipeCategory[] { new MetalFormerCategory(this.METAL_FORMER_ROLLING, 1, guiHelper) });
-		registration.addRecipeCategories(new IRecipeCategory[] { new MetalFormerCategory(this.METAL_FORMER_CUTTING, 2, guiHelper) });
-		registration.addRecipeCategories(new IRecipeCategory[] { new DynamicCategory(Ic2Blocks.ORE_WASHING_PLANT, this.ORE_WASHER, guiHelper) });
+		registration.addRecipeCategories(new DynamicCategory(Ic2Blocks.BLAST_FURNACE, this.BLAST_FURNACE, guiHelper));
+		registration.addRecipeCategories(new DynamicCategory(Ic2Blocks.BLOCK_CUTTER, this.BLOCK_CUTTER, guiHelper));
+		registration.addRecipeCategories(new DynamicCategory(Ic2Blocks.CENTRIFUGE, this.CENTRIFUGE, guiHelper));
+		registration.addRecipeCategories(new DynamicCategory(Ic2Blocks.COMPRESSOR, this.COMPRESSOR, guiHelper));
+		registration.addRecipeCategories(new DynamicCategory(Ic2Blocks.EXTRACTOR, this.EXTRACTOR, guiHelper));
+		registration.addRecipeCategories(new DynamicCategory(Ic2Blocks.MACERATOR, this.MACERATOR, guiHelper));
+		registration.addRecipeCategories(new MetalFormerCategory(this.METAL_FORMER_EXTRUDING, 0, guiHelper));
+		registration.addRecipeCategories(new MetalFormerCategory(this.METAL_FORMER_ROLLING, 1, guiHelper));
+		registration.addRecipeCategories(new MetalFormerCategory(this.METAL_FORMER_CUTTING, 2, guiHelper));
+		registration.addRecipeCategories(new DynamicCategory(Ic2Blocks.ORE_WASHING_PLANT, this.ORE_WASHER, guiHelper));
 	}
 
 	public void registerRecipeCatalysts(IRecipeCatalystRegistration registration)
 	{
-		registration.addRecipeCatalyst(new ItemStack(Ic2Blocks.BLAST_FURNACE), new RecipeType[] { this.BLAST_FURNACE });
-		registration.addRecipeCatalyst(new ItemStack(Ic2Blocks.BLOCK_CUTTER), new RecipeType[] { this.BLOCK_CUTTER });
-		registration.addRecipeCatalyst(new ItemStack(Ic2Blocks.CENTRIFUGE), new RecipeType[] { this.CENTRIFUGE });
-		registration.addRecipeCatalyst(new ItemStack(Ic2Blocks.COMPRESSOR), new RecipeType[] { this.COMPRESSOR });
-		registration.addRecipeCatalyst(new ItemStack(Ic2Blocks.EXTRACTOR), new RecipeType[] { this.EXTRACTOR });
-		registration.addRecipeCatalyst(new ItemStack(Ic2Blocks.MACERATOR), new RecipeType[] { this.MACERATOR });
+		registration.addRecipeCatalyst(new ItemStack(Ic2Blocks.BLAST_FURNACE), this.BLAST_FURNACE);
+		registration.addRecipeCatalyst(new ItemStack(Ic2Blocks.BLOCK_CUTTER), this.BLOCK_CUTTER);
+		registration.addRecipeCatalyst(new ItemStack(Ic2Blocks.CENTRIFUGE), this.CENTRIFUGE);
+		registration.addRecipeCatalyst(new ItemStack(Ic2Blocks.COMPRESSOR), this.COMPRESSOR);
+		registration.addRecipeCatalyst(new ItemStack(Ic2Blocks.EXTRACTOR), this.EXTRACTOR);
+		registration.addRecipeCatalyst(new ItemStack(Ic2Blocks.MACERATOR), this.MACERATOR);
 		registration.addRecipeCatalyst(
-			new ItemStack(Ic2Blocks.METAL_FORMER), new RecipeType[] { this.METAL_FORMER_CUTTING, this.METAL_FORMER_EXTRUDING, this.METAL_FORMER_ROLLING }
-		);
-		registration.addRecipeCatalyst(new ItemStack(Ic2Blocks.ORE_WASHING_PLANT), new RecipeType[] { this.ORE_WASHER });
+			new ItemStack(Ic2Blocks.METAL_FORMER),
+			this.METAL_FORMER_CUTTING, this.METAL_FORMER_EXTRUDING, this.METAL_FORMER_ROLLING);
+		registration.addRecipeCatalyst(new ItemStack(Ic2Blocks.ORE_WASHING_PLANT), this.ORE_WASHER);
 	}
 
-	public void registerRecipes(IRecipeRegistration registration)
+	public void registerRecipes(@NotNull IRecipeRegistration registration)
 	{
 		RecipeManager recipeManager = Minecraft.getInstance().level.getRecipeManager();
 		BiConsumer<RecipeType<IORecipeWrapper>, net.minecraft.world.item.crafting.RecipeType<RecipeHolder<IRecipeInput, Collection<ItemStack>>>> registerBasic = (id, type) ->

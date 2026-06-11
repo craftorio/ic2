@@ -23,15 +23,18 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.Container;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 
 public class AdvRecipe implements Ic2CraftingRecipe
 {
@@ -47,9 +50,7 @@ public class AdvRecipe implements Ic2CraftingRecipe
 	public final boolean consuming;
 	private final ResourceLocation id;
 
-	private static AdvRecipe create(
-		ResourceLocation id, int width, int height, IRecipeInput[] ingredients, ItemStack result, boolean isConsuming, boolean isHidden
-	)
+	private static AdvRecipe create(ResourceLocation id, int width, int height, IRecipeInput[] ingredients, ItemStack result, boolean isConsuming, boolean isHidden)
 	{
 		int mask = 0;
 		List<IRecipeInput> inputs = new ArrayList<>();
@@ -84,9 +85,7 @@ public class AdvRecipe implements Ic2CraftingRecipe
 		return new AdvRecipe(id, width, height, mirror, mask, input, result, isConsuming, isHidden);
 	}
 
-	private AdvRecipe(
-		ResourceLocation id, int width, int height, boolean mirror, int mask, IRecipeInput[] input, ItemStack result, boolean isConsuming, boolean isHidden
-	)
+	private AdvRecipe(ResourceLocation id, int width, int height, boolean mirror, int mask, IRecipeInput[] input, ItemStack result, boolean isConsuming, boolean isHidden)
 	{
 		this.id = id;
 		this.inputWidth = width;
@@ -167,9 +166,9 @@ public class AdvRecipe implements Ic2CraftingRecipe
 		}
 	}
 
-	public boolean matches(CraftingContainer inventorycrafting, Level world)
+	public boolean matches(@NotNull CraftingContainer inventoryCrafting, @NotNull Level world)
 	{
-		return this.assemble(inventorycrafting) != StackUtil.emptyStack;
+		return this.assemble(inventoryCrafting) != StackUtil.emptyStack;
 	}
 
 	public ItemStack assemble(CraftingContainer inventoryCrafting)
@@ -217,7 +216,7 @@ public class AdvRecipe implements Ic2CraftingRecipe
 		return this.output;
 	}
 
-	public ItemStack getResultItem(net.minecraft.core.RegistryAccess registryAccess)
+	public @NotNull ItemStack getResultItem(@NotNull RegistryAccess registryAccess)
 	{
 		return this.output;
 	}
@@ -295,7 +294,7 @@ public class AdvRecipe implements Ic2CraftingRecipe
 		return this.inputHeight;
 	}
 
-	public NonNullList<Ingredient> getIngredients()
+	public @NotNull NonNullList<Ingredient> getIngredients()
 	{
 		NonNullList<Ingredient> list = NonNullList.create();
 		if (!this.hidden)
@@ -303,14 +302,17 @@ public class AdvRecipe implements Ic2CraftingRecipe
 			int mask = this.masks[0];
 			int actualIngredient = 0;
 
-			for (int x = 0; x < 9; x++)
+			for (int y = 0; y < this.inputHeight; y++)
 			{
-				if ((mask >>> 8 - x & 1) != 0)
+				for (int x = 0; x < this.inputWidth; x++)
 				{
-					list.add(this.input[actualIngredient++].getIngredient());
-				} else
-				{
-					list.add(Ingredient.EMPTY);
+					if ((mask >>> 8 - (x + y * 3) & 1) != 0)
+					{
+						list.add(this.input[actualIngredient++].getIngredient());
+					} else
+					{
+						list.add(Ingredient.EMPTY);
+					}
 				}
 			}
 		}
@@ -323,30 +325,30 @@ public class AdvRecipe implements Ic2CraftingRecipe
 		return this.hidden;
 	}
 
-	public ResourceLocation getId()
+	public @NotNull ResourceLocation getId()
 	{
 		return this.id;
 	}
 
 	@Override
-	public ItemStack assemble(net.minecraft.world.inventory.CraftingContainer inventory, net.minecraft.core.RegistryAccess registryAccess)
+	public @NotNull ItemStack assemble(@NotNull CraftingContainer inventory, @NotNull RegistryAccess registryAccess)
 	{
 		return this.assemble(inventory);
 	}
 
-	public net.minecraft.world.item.crafting.CraftingBookCategory category()
+	public @NotNull CraftingBookCategory category()
 	{
-		return net.minecraft.world.item.crafting.CraftingBookCategory.MISC;
+		return CraftingBookCategory.MISC;
 	}
 
-	public RecipeSerializer<?> getSerializer()
+	public @NotNull RecipeSerializer<?> getSerializer()
 	{
 		return Ic2RecipeSerializers.SHAPED;
 	}
 
 	public static final class Serializer implements RecipeSerializer<AdvRecipe>
 	{
-		public AdvRecipe fromJson(ResourceLocation id, JsonObject json)
+		public @NotNull AdvRecipe fromJson(@NotNull ResourceLocation id, @NotNull JsonObject json)
 		{
 			Map<String, IRecipeInput> symbols = readSymbols(GsonHelper.getAsJsonObject(json, "key"));
 			String[] pattern = getPattern(GsonHelper.getAsJsonArray(json, "pattern"));
@@ -359,7 +361,7 @@ public class AdvRecipe implements Ic2CraftingRecipe
 			return AdvRecipe.create(id, width, height, ingredients, result, consuming, hidden);
 		}
 
-		public AdvRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buf)
+		public AdvRecipe fromNetwork(@NotNull ResourceLocation id, FriendlyByteBuf buf)
 		{
 			IRecipeInput[] ingredients = new IRecipeInput[buf.readVarInt()];
 
@@ -368,9 +370,7 @@ public class AdvRecipe implements Ic2CraftingRecipe
 				ingredients[i] = RecipeIo.readInput(buf);
 			}
 
-			return new AdvRecipe(
-				id, buf.readVarInt(), buf.readVarInt(), buf.readBoolean(), buf.readInt(), ingredients, buf.readItem(), buf.readBoolean(), buf.readBoolean()
-			);
+			return new AdvRecipe(id, buf.readVarInt(), buf.readVarInt(), buf.readBoolean(), buf.readInt(), ingredients, buf.readItem(), buf.readBoolean(), buf.readBoolean());
 		}
 
 		public void toNetwork(FriendlyByteBuf buf, AdvRecipe recipe)

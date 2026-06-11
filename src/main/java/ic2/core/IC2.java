@@ -20,7 +20,7 @@ import org.apache.logging.log4j.LogManager;
 
 public class IC2
 {
-	public static final String VERSION = "2.10.8-ex120";
+	public static final String VERSION = "2.10.9-ex120";
 	public static final String MOD_ID = "ic2";
 	public static final String RESOURCE_DOMAIN = "ic2";
 	public static final String ICON_STACK_NAME = "ic2:tab_icon";

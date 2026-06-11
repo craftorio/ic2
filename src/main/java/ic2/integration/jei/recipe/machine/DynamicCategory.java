@@ -244,6 +244,24 @@ public class DynamicCategory extends IORecipeCategory
 	}
 
 	@Override
+	public IDrawable getBackground()
+	{
+		return this.background;
+	}
+
+	@Override
+	public int getWidth()
+	{
+		return this.background.getWidth();
+	}
+
+	@Override
+	public int getHeight()
+	{
+		return this.background.getHeight();
+	}
+
+	@Override
 	protected List<SlotPosition> getInputSlotPos()
 	{
 		return this.inputSlots;

@@ -8,7 +8,7 @@ import net.minecraft.world.level.ItemLike;
 
 public enum Ic2ToolMaterials implements Tier
 {
-	BRONZE(2, 350, 6.0F, 2.0F, 14, () -> Ingredient.of(new ItemLike[] { Ic2Items.BRONZE_INGOT })),
+	BRONZE(2, 350, 6.0F, 2.0F, 14, () -> Ingredient.of(Ic2Items.BRONZE_INGOT)),
 	CHAINSAW(3, 250, 12.0F, 9.0F, 14, Ingredient::of);
 
 	private final int miningLevel;

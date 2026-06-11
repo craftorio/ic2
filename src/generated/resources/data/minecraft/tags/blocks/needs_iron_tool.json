@@ -2,8 +2,6 @@
   "replace": false,
   "values": [
     "ic2:uranium_ore",
-    "ic2:deepslate_lead_ore",
-    "ic2:deepslate_tin_ore",
     "ic2:deepslate_uranium_ore",
     "ic2:steel_block",
     "ic2:uranium_block",

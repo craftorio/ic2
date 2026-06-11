@@ -1,6 +1,5 @@
 package ic2.core;
 
-import ic2.api.network.INetworkManager;
 import ic2.core.network.NetworkManager;
 import ic2.core.network.NetworkManagerClient;
 import ic2.core.proxy.EnvProxy;
@@ -13,7 +12,6 @@ import ic2.core.util.Log;
 import ic2.core.util.PriorityExecutor;
 import ic2.core.util.SideGateway;
 import ic2.forge.EnvProxyForge;
-import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.CreativeModeTab;
@@ -82,14 +80,6 @@ public class IC2
 
 	static
 	{
-		try
-		{
-			new BlockPos(1, 2, 3).offset(2, 3, 4);
-		} catch (Throwable t)
-		{
-			throw new Error("IC2 is incompatible with this environment, use the normal IC2 version, not the dev one.", t);
-		}
-
 		envProxy = createEnvProxy();
 		sideProxy = createSideProxy();
 		log = new Log(LogManager.getLogger("ic2"));
@@ -97,9 +87,7 @@ public class IC2
 		keyboard = sideProxy.getKeyboard();
 		soundManager = sideProxy.getSoundManager();
 		tabIc2General = envProxy.createItemGroup(getIdentifier("general"), new ItemGroupIconSupplier(Ic2ItemGroupType.GENERAL), Ic2ItemGroupType.GENERAL);
-		tabIc2GeneratorsAndWiring = envProxy.createItemGroup(
-			getIdentifier("generators_and_wiring"), new ItemGroupIconSupplier(Ic2ItemGroupType.GENERATORS_AND_WIRING), Ic2ItemGroupType.GENERATORS_AND_WIRING
-		);
+		tabIc2GeneratorsAndWiring = envProxy.createItemGroup(getIdentifier("generators_and_wiring"), new ItemGroupIconSupplier(Ic2ItemGroupType.GENERATORS_AND_WIRING), Ic2ItemGroupType.GENERATORS_AND_WIRING);
 		tabIc2Reactor = envProxy.createItemGroup(getIdentifier("reactor"), new ItemGroupIconSupplier(Ic2ItemGroupType.REACTOR), Ic2ItemGroupType.REACTOR);
 		tabIc2Machines = envProxy.createItemGroup(getIdentifier("machines"), new ItemGroupIconSupplier(Ic2ItemGroupType.MACHINES), Ic2ItemGroupType.MACHINES);
 		tabIc2ToolsAndUtilities = envProxy.createItemGroup(getIdentifier("tools_and_utilities"), new ItemGroupIconSupplier(Ic2ItemGroupType.TOOLS_AND_UTILITIES), Ic2ItemGroupType.TOOLS_AND_UTILITIES);

@@ -58,7 +58,7 @@ public class Ic2DataGenerators
 	public static void saveJsonPreserveOrder(Gson gson, CachedOutput writer, JsonElement jsonElement, Path path) throws IOException
 	{
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-		HashingOutputStream hashingOutputStream = new HashingOutputStream(Hashing.sha1(), byteArrayOutputStream);
+		HashingOutputStream hashingOutputStream = new HashingOutputStream(Hashing.sha256(), byteArrayOutputStream);
 		Writer writer2 = new OutputStreamWriter(hashingOutputStream, StandardCharsets.UTF_8);
 		writer2.write(gson.toJson(jsonElement));
 		writer2.close();

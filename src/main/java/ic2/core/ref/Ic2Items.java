@@ -77,7 +77,6 @@ import ic2.core.item.tool.ItemWindMeter;
 import ic2.core.item.type.BlockCuttingBladeType;
 import ic2.core.item.upgrade.ItemUpgradeModule;
 import ic2.core.util.Ic2Color;
-import ic2.core.util.Util;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -101,7 +100,6 @@ import net.minecraft.world.level.material.Fluids;
 
 public final class Ic2Items
 {
-	public static final Item BASALT = register("basalt", new BlockItem(Ic2Blocks.BASALT, new Properties()));
 	public static final Item LEAD_ORE = register("lead_ore", new BlockItem(Ic2Blocks.LEAD_ORE, new Properties()));
 	public static final Item TIN_ORE = register("tin_ore", new BlockItem(Ic2Blocks.TIN_ORE, new Properties()));
 	public static final Item URANIUM_ORE = register("uranium_ore", new BlockItem(Ic2Blocks.URANIUM_ORE, new Properties()));
@@ -1160,7 +1158,6 @@ public final class Ic2Items
 		addToCreativeTab(Ic2ItemGroupType.FARMING, () -> TERRA_WART);
 		addToCreativeTab(Ic2ItemGroupType.FARMING, () -> WEED);
 		addToCreativeTab(Ic2ItemGroupType.GENERAL, () -> ADVANCED_MACHINE);
-		addToCreativeTab(Ic2ItemGroupType.GENERAL, () -> BASALT);
 		addToCreativeTab(Ic2ItemGroupType.GENERAL, () -> BLACK_WALL);
 		addToCreativeTab(Ic2ItemGroupType.GENERAL, () -> BLUE_WALL);
 		addToCreativeTab(Ic2ItemGroupType.GENERAL, () -> BRONZE_BLOCK);

@@ -12,8 +12,6 @@
 
 ## 准备删除
 
-- 玄武岩 basalt
-
 ## 已知问题
 
 - 纳米剑 `nano_saber`: 右键激活不显示
@@ -23,6 +21,7 @@
 - `[MAJOR]` JEI 配方修复，连带着配方错误导致服务端报错：联机也直接进不去
 - 修正进度系统，位于 `IC2.achievements` 原本是成就
 - 国际化混乱应用，有 `Localization.translate -> String` 和 `Component.translatable -> Component`
+- 创造模式物品栏乱序（目前是按照注册顺序的，后续会调整为分类顺序）
 
 ## 翻译
 

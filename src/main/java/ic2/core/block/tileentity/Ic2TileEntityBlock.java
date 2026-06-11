@@ -364,6 +364,12 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 			world.destroyBlock(pos, true, entity);
 		}
 
+		Ic2TileEntity te = getTe(world, pos);
+		if (te != null)
+		{
+			te.onEntityCollision(entity);
+		}
+
 		super.entityInside(state, world, pos, entity);
 	}
 

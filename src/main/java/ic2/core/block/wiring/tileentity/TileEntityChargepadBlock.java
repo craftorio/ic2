@@ -10,7 +10,6 @@ import ic2.core.network.GrowingBuffer;
 import ic2.core.ref.Ic2Items;
 import ic2.core.util.Util;
 
-import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -33,15 +32,13 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 public abstract class TileEntityChargepadBlock extends TileEntityElectricBlock
 {
-	private static final List<AABB> aabbs = Arrays.asList(new AABB(0.0, 0.0, 0.0, 1.0, 0.9375, 1.0));
+	private static final List<AABB> aabbs = List.of(new AABB(0.0, 0.0, 0.0, 1.0, 0.9375, 1.0));
 	private static final DustParticleOptions effect = new DustParticleOptions(new Vector3f(0.2F, 0.2F, 1.0F), 1.0F);
 	private int updateTicker;
 	private Player player = null;
 	public static byte redstoneModes = 2;
 
-	public TileEntityChargepadBlock(
-		BlockEntityType<? extends TileEntityChargepadBlock> type, BlockPos pos, BlockState state, int tier, int output, int maxStorage
-	)
+	public TileEntityChargepadBlock(BlockEntityType<? extends TileEntityChargepadBlock> type, BlockPos pos, BlockState state, int tier, int output, int maxStorage)
 	{
 		super(type, pos, state, tier, output, maxStorage);
 		this.energy.setDirections(EnumSet.complementOf(EnumSet.copyOf(Util.verticalFacings)), EnumSet.of(Direction.DOWN));
@@ -133,7 +130,50 @@ public abstract class TileEntityChargepadBlock extends TileEntityElectricBlock
 		}
 	}
 
-	protected abstract void getItems(Player var1);
+	// Logic: Main hand, Offhand, Armor, Stack, Inventory
+	protected void getItems(Player player)
+	{
+		int chargeFactor = (int) this.output;
+
+		ItemStack stack = player.getMainHandItem();
+		if (!stack.isEmpty())
+		{
+			if (this.chargeItem(stack, chargeFactor)) return;
+		}
+
+		stack = player.getOffhandItem();
+		if (!stack.isEmpty())
+		{
+			if (this.chargeItem(stack, chargeFactor)) return;
+		}
+
+		for (int i = player.getInventory().armor.size() - 1; i >= 0; i--)
+		{
+			stack = player.getInventory().armor.get(i);
+			if (!stack.isEmpty())
+			{
+				if (this.chargeItem(stack, chargeFactor)) return;
+			}
+		}
+		
+		for (int i = 0; i < 9; i++)
+		{
+			stack = player.getInventory().items.get(i);
+			if (!stack.isEmpty())
+			{
+				if (this.chargeItem(stack, chargeFactor)) return;
+			}
+		}
+
+		for (int i = 9; i < 36; i++)
+		{
+			stack = player.getInventory().items.get(i);
+			if (!stack.isEmpty())
+			{
+				if (this.chargeItem(stack, chargeFactor)) return;
+			}
+		}
+	}
 
 	@Override
 	protected boolean shouldEmitRedstone()
@@ -178,13 +218,13 @@ public abstract class TileEntityChargepadBlock extends TileEntityElectricBlock
 		return this.redstoneMode <= 1 && this.redstoneMode >= 0 ? Localization.translate("ic2.blockChargepad.gui.mod.redstone" + this.redstoneMode) : "";
 	}
 
-	protected void chargeItem(ItemStack stack, int chargeFactor)
+	protected boolean chargeItem(ItemStack stack, int chargeFactor)
 	{
 		if (stack.getItem() != Ic2Items.DEBUG_ITEM)
 		{
-			double freeAmount = ElectricItem.manager.charge(stack, Double.POSITIVE_INFINITY, this.energy.getSourceTier(), true, true);
-			double charge = 0.0;
-			if (freeAmount >= 0.0)
+			double freeAmount = ElectricItem.manager.charge(stack, Double.POSITIVE_INFINITY, Integer.MAX_VALUE, true, true);
+			double charge;
+			if (freeAmount > 0.0)
 			{
 				if (freeAmount >= chargeFactor * this.getTickRate())
 				{
@@ -199,8 +239,10 @@ public abstract class TileEntityChargepadBlock extends TileEntityElectricBlock
 					charge = this.energy.getEnergy();
 				}
 
-				this.energy.useEnergy(ElectricItem.manager.charge(stack, charge, this.energy.getSourceTier(), true, false));
+				this.energy.useEnergy(ElectricItem.manager.charge(stack, charge, Integer.MAX_VALUE, true, false));
+				return true;
 			}
 		}
+		return false;
 	}
 }

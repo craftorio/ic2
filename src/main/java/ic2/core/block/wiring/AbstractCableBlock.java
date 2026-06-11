@@ -16,9 +16,13 @@ import it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap;
 
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.Random;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
@@ -36,13 +40,13 @@ import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
-import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadAwareBlock, SimpleWaterloggedBlock
 {
@@ -58,7 +62,7 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 	public static final BooleanProperty WEST = BlockStateProperties.WEST;
 	private static final Map<CableType, Int2ReferenceMap<AbstractCableBlock>> types = new EnumMap<>(CableType.class);
 	private static boolean pendingHasColor;
-	private boolean hasColor;
+	private final boolean hasColor;
 	final CableType type;
 	final int insulation;
 
@@ -70,17 +74,13 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 	{
 		if (this.isFoam())
 		{
-			defaultState = (BlockState) defaultState.setValue(foamProperty, FoamCableBlock.DEFAULT_FOAM);
+			defaultState = defaultState.setValue(foamProperty, FoamCableBlock.DEFAULT_FOAM);
 		} else
 		{
-			defaultState = (BlockState) ((BlockState) ((BlockState) ((BlockState) ((BlockState) ((BlockState) defaultState.setValue(UP, false)).setValue(DOWN, false))
-				.setValue(NORTH, false))
-				.setValue(EAST, false))
-				.setValue(SOUTH, false))
-				.setValue(WEST, false);
+			defaultState = defaultState.setValue(UP, false).setValue(DOWN, false).setValue(NORTH, false).setValue(EAST, false).setValue(SOUTH, false).setValue(WEST, false);
 			if (this.hasColor())
 			{
-				defaultState = (BlockState) defaultState.setValue(colorProperty, DEFAULT_COLOR);
+				defaultState = defaultState.setValue(colorProperty, DEFAULT_COLOR);
 			}
 		}
 
@@ -92,20 +92,20 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 		BlockState ret = to.defaultBlockState();
 		if (to.insulation >= to.type.minColoredInsulation)
 		{
-			ret = (BlockState) ret.setValue(colorProperty, ((AbstractCableBlock) from.getBlock()).getColor(from));
+			ret = ret.setValue(colorProperty, ((AbstractCableBlock) from.getBlock()).getColor(from));
 		}
 
 		if (this.isFoam())
 		{
-			ret = (BlockState) ret.setValue(foamProperty, (CableFoam) from.getValue(foamProperty));
+			ret = ret.setValue(foamProperty, from.getValue(foamProperty));
 		} else
 		{
-			ret = (BlockState) ((BlockState) ((BlockState) ((BlockState) ((BlockState) ((BlockState) ret.setValue(UP, (Boolean) from.getValue(UP)))
-				.setValue(DOWN, (Boolean) from.getValue(DOWN)))
-				.setValue(NORTH, (Boolean) from.getValue(NORTH)))
-				.setValue(EAST, (Boolean) from.getValue(EAST)))
-				.setValue(SOUTH, (Boolean) from.getValue(SOUTH)))
-				.setValue(WEST, (Boolean) from.getValue(WEST));
+			ret = ret.setValue(UP, from.getValue(UP))
+				.setValue(DOWN, from.getValue(DOWN))
+				.setValue(NORTH, from.getValue(NORTH))
+				.setValue(EAST, from.getValue(EAST))
+				.setValue(SOUTH, from.getValue(SOUTH))
+				.setValue(WEST, from.getValue(WEST));
 		}
 
 		return ret;
@@ -127,16 +127,16 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 		this.type = type;
 		this.insulation = insulation;
 		this.hasColor = insulation >= type.minColoredInsulation;
-		BlockState defaultState = (BlockState) this.stateDefinition.any();
+		BlockState defaultState = this.stateDefinition.any();
 		if (!this.isFoam())
 		{
-			defaultState = (BlockState) defaultState.setValue(WATERLOGGED, false);
+			defaultState = defaultState.setValue(WATERLOGGED, false);
 		}
 
 		this.initializeState(defaultState);
 		if (type.maxInsulation > 0)
 		{
-			types.computeIfAbsent(type, t -> new Int2ReferenceOpenHashMap(t.maxInsulation + 1)).put(insulation, this);
+			types.computeIfAbsent(type, t -> new Int2ReferenceOpenHashMap<>(t.maxInsulation + 1)).put(insulation, this);
 		}
 	}
 
@@ -144,19 +144,19 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 	{
 		if (this.isFoam())
 		{
-			builder.add(new Property[] { foamProperty });
+			builder.add(foamProperty);
 		} else
 		{
-			builder.add(new Property[] { WATERLOGGED, UP, DOWN, NORTH, EAST, SOUTH, WEST });
+			builder.add(WATERLOGGED, UP, DOWN, NORTH, EAST, SOUTH, WEST);
 		}
 
 		if (pendingHasColor)
 		{
-			builder.add(new Property[] { colorProperty });
+			builder.add(colorProperty);
 		}
 	}
 
-	public FluidState getFluidState(BlockState state)
+	public @NotNull FluidState getFluidState(@NotNull BlockState state)
 	{
 		return !this.isFoam() && state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : Fluids.EMPTY.defaultFluidState();
 	}
@@ -169,10 +169,10 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 		boolean isConnectedEast = this.isConnectedWith(state, null, world, pos.east());
 		boolean isConnectedSouth = this.isConnectedWith(state, null, world, pos.south());
 		boolean isConnectedWest = this.isConnectedWith(state, null, world, pos.west());
-		return (BlockState) ((BlockState) ((BlockState) ((BlockState) ((BlockState) ((BlockState) state.setValue(DOWN, isConnectedDown)).setValue(UP, isConnectedUp))
-			.setValue(NORTH, isConnectedNorth))
-			.setValue(EAST, isConnectedEast))
-			.setValue(SOUTH, isConnectedSouth))
+		return state.setValue(DOWN, isConnectedDown).setValue(UP, isConnectedUp)
+			.setValue(NORTH, isConnectedNorth)
+			.setValue(EAST, isConnectedEast)
+			.setValue(SOUTH, isConnectedSouth)
 			.setValue(WEST, isConnectedWest);
 	}
 
@@ -203,7 +203,7 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 		Fluid fluid = ctx.getLevel().getFluidState(ctx.getClickedPos()).getType();
 		if (fluid == Fluids.WATER)
 		{
-			ret = (BlockState) ret.setValue(WATERLOGGED, true);
+			ret = ret.setValue(WATERLOGGED, true);
 		}
 
 		if (!this.isFoam())
@@ -211,37 +211,37 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 			ret = this.withConnectionStates(ret, ctx.getLevel(), ctx.getClickedPos());
 		} else if (fluid == Ic2Fluids.CONSTRUCTION_FOAM.still())
 		{
-			ret = (BlockState) ret.setValue(foamProperty, CableFoam.SOFT);
+			ret = ret.setValue(foamProperty, CableFoam.SOFT);
 		}
 
 		return ret;
 	}
 
-	public VoxelShape getOcclusionShape(BlockState state, BlockGetter world, BlockPos pos)
+	public @NotNull VoxelShape getOcclusionShape(@NotNull BlockState state, @NotNull BlockGetter world, @NotNull BlockPos pos)
 	{
 		if (!this.isFoam())
 		{
 			return super.getOcclusionShape(state, world, pos);
 		} else
 		{
-			return ((CableFoam) state.getValue(foamProperty)).isSoft() ? Shapes.empty() : super.getOcclusionShape(state, world, pos);
+			return state.getValue(foamProperty).isSoft() ? Shapes.empty() : super.getOcclusionShape(state, world, pos);
 		}
 	}
 
-	public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context)
+	public @NotNull VoxelShape getShape(@NotNull BlockState state, @NotNull BlockGetter world, @NotNull BlockPos pos, @NotNull CollisionContext context)
 	{
 		if (!this.isFoam())
 		{
 			return super.getShape(state, world, pos, context);
 		} else
 		{
-			return ((CableFoam) state.getValue(foamProperty)).isPresent() ? Shapes.block() : Shapes.empty();
+			return state.getValue(foamProperty).isPresent() ? Shapes.block() : Shapes.empty();
 		}
 	}
 
-	public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos)
+	public @NotNull BlockState updateShape(@NotNull BlockState state, @NotNull Direction direction, @NotNull BlockState neighborState, @NotNull LevelAccessor world, @NotNull BlockPos pos, @NotNull BlockPos neighborPos)
 	{
-		if (!this.isFoam() && (Boolean) state.getValue(WATERLOGGED))
+		if (!this.isFoam() && state.getValue(WATERLOGGED))
 		{
 			world.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
 		}
@@ -249,19 +249,19 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 		if (!this.isFoam())
 		{
 			boolean isConnected = this.isConnectedWith(state, neighborState, (Level) world, neighborPos);
-			return (BlockState) state.setValue((Property) PipeBlock.PROPERTY_BY_DIRECTION.get(direction), isConnected);
+			return state.setValue(PipeBlock.PROPERTY_BY_DIRECTION.get(direction), isConnected);
 		} else
 		{
 			return super.updateShape(state, direction, neighborState, world, pos, neighborPos);
 		}
 	}
 
-	public boolean canPlaceLiquid(BlockGetter world, BlockPos pos, BlockState state, Fluid fluid)
+	public boolean canPlaceLiquid(@NotNull BlockGetter world, @NotNull BlockPos pos, @NotNull BlockState state, @NotNull Fluid fluid)
 	{
 		return !this.isFoam() && !(Boolean) state.getValue(WATERLOGGED) && fluid == Fluids.WATER;
 	}
 
-	public boolean placeLiquid(LevelAccessor world, BlockPos pos, BlockState state, FluidState fluidState)
+	public boolean placeLiquid(@NotNull LevelAccessor world, @NotNull BlockPos pos, @NotNull BlockState state, FluidState fluidState)
 	{
 		if (!this.canPlaceLiquid(world, pos, state, fluidState.getType()))
 		{
@@ -270,18 +270,18 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 
 		if (!world.isClientSide())
 		{
-			world.setBlock(pos, (BlockState) state.setValue(WATERLOGGED, true), 3);
+			world.setBlock(pos, state.setValue(WATERLOGGED, true), 3);
 			world.scheduleTick(pos, fluidState.getType(), fluidState.getType().getTickDelay(world));
 		}
 
 		return true;
 	}
 
-	public ItemStack pickupBlock(LevelAccessor world, BlockPos pos, BlockState state)
+	public @NotNull ItemStack pickupBlock(@NotNull LevelAccessor world, @NotNull BlockPos pos, @NotNull BlockState state)
 	{
-		if (!this.isFoam() && (Boolean) state.getValue(WATERLOGGED))
+		if (!this.isFoam() && state.getValue(WATERLOGGED))
 		{
-			world.setBlock(pos, (BlockState) state.setValue(WATERLOGGED, false), 3);
+			world.setBlock(pos, state.setValue(WATERLOGGED, false), 3);
 			return new ItemStack(Items.WATER_BUCKET);
 		} else
 		{
@@ -289,7 +289,7 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 		}
 	}
 
-	public void attack(BlockState state, Level world, BlockPos pos, Player player)
+	public void attack(@NotNull BlockState state, @NotNull Level world, @NotNull BlockPos pos, @NotNull Player player)
 	{
 		if (!this.isHardFoam(state))
 		{
@@ -314,7 +314,7 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 
 	public static DyeColor getColor(BlockState state, CableType type, int insulation)
 	{
-		return insulation >= type.minColoredInsulation ? (DyeColor) state.getValue(colorProperty) : DEFAULT_COLOR;
+		return insulation >= type.minColoredInsulation ? state.getValue(colorProperty) : DEFAULT_COLOR;
 	}
 
 	public boolean tryAddInsulation(BlockState state, Level world, BlockPos pos)
@@ -329,7 +329,7 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 			return false;
 		}
 
-		AbstractCableBlock newBlock = (AbstractCableBlock) types.get(this.type).get(this.insulation + 1);
+		AbstractCableBlock newBlock = types.get(this.type).get(this.insulation + 1);
 		if (newBlock == null)
 		{
 			return false;
@@ -351,7 +351,7 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 			return false;
 		}
 
-		AbstractCableBlock newBlock = (AbstractCableBlock) types.get(this.type).get(this.insulation - 1);
+		AbstractCableBlock newBlock = types.get(this.type).get(this.insulation - 1);
 		if (newBlock == null)
 		{
 			return false;
@@ -386,7 +386,7 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 		return true;
 	}
 
-	public void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean moved)
+	public void onRemove(@NotNull BlockState state, @NotNull Level world, @NotNull BlockPos pos, BlockState newState, boolean moved)
 	{
 		if (!newState.is(this) || this.getColor(newState) != this.getColor(state))
 		{
@@ -508,18 +508,13 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 		{
 			AbstractCableBlock.this.tryRemoveInsulation(this.state, this.world, this.pos, false);
 		}
-
 		@Override
 		public void removeConductor()
 		{
-			this.world.removeBlock(this.pos, false);
+			world.playLocalSound(this.pos, SoundEvents.GENERIC_EXTINGUISH_FIRE, SoundSource.BLOCKS, 10, 1, false);
+			world.addParticle(ParticleTypes.SMOKE, pos.getX() + new Random().nextFloat(), pos.getY() + 0.95F, pos.getZ() + new Random().nextFloat(), 0.0, 0.0, 0.0);
+			world.removeBlock(this.pos, false);
 		}
-
-		@Override
-		public void onConnectionChange()
-		{
-		}
-
 		private void setState(BlockState state)
 		{
 			assert state != this.state;

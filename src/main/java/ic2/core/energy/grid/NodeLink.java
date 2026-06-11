@@ -95,7 +95,7 @@ public class NodeLink
 		{
 			for (IEnergyTile posB : this.nodeB.tile.subTiles)
 			{
-				BlockPos delta = EnergyNet.instance.getPos(posA).subtract(EnergyNet.instance.getPos(posB));
+				BlockPos delta = EnergyNet.instance.getPos(posB).subtract(EnergyNet.instance.getPos(posA));
 
 				for (Direction dir : Util.ALL_DIRS)
 				{

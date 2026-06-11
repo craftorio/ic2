@@ -26,9 +26,7 @@ public abstract class TileEntityBaseGenerator extends TileEntityBase implements 
 	private int ticksSinceLastActiveUpdate;
 	private int activityMeter = 0;
 
-	public TileEntityBaseGenerator(
-		BlockEntityType<? extends TileEntityBaseGenerator> type, BlockPos pos, BlockState state, double production, int tier, int maxStorage
-	)
+	public TileEntityBaseGenerator(BlockEntityType<? extends TileEntityBaseGenerator> type, BlockPos pos, BlockState state, double production, int tier, int maxStorage)
 	{
 		super(type, pos, state);
 		this.production = production;

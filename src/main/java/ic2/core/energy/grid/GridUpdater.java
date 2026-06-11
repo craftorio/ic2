@@ -2,6 +2,7 @@ package ic2.core.energy.grid;
 
 import ic2.api.energy.tile.IEnergyTile;
 import ic2.core.IC2;
+import ic2.core.util.LogCategory;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -124,7 +125,14 @@ class GridUpdater implements Runnable
 	@Override
 	public void run()
 	{
-		this.updateGrid();
+		try
+		{
+			this.updateGrid();
+		} catch (Exception e)
+		{
+			IC2.log.error(LogCategory.EnergyNet, e, "Unhandled exception in GridUpdater.run(), clearing busy flag.");
+			this.clearBusy();
+		}
 	}
 
 	private void prepareUpdate()
@@ -146,20 +154,27 @@ class GridUpdater implements Runnable
 		long startTime = 0L;
 		int totalChanges = this.changes.size();
 
-		GridChange change;
-		while ((change = this.changes.poll()) != null)
+		try
 		{
-			switch (change.type)
+			GridChange change;
+			while ((change = this.changes.poll()) != null)
 			{
-				case ADDITION:
-					ChangeHandler.applyAddition(this.enet, change.ioTile, change.pos, change.subTiles, this.changes);
-					break;
-				case REMOVAL:
-					ChangeHandler.applyRemoval(this.enet, change.ioTile, change.pos);
+				switch (change.type)
+				{
+					case ADDITION:
+						ChangeHandler.applyAddition(this.enet, change.ioTile, change.pos, change.subTiles, this.changes);
+						break;
+					case REMOVAL:
+						ChangeHandler.applyRemoval(this.enet, change.ioTile, change.pos);
+				}
 			}
-		}
 
-		this.notifyCalculator();
+			this.notifyCalculator();
+		} catch (Exception e)
+		{
+			IC2.log.error(LogCategory.EnergyNet, e, "Unhandled exception in GridUpdater.updateGrid(), clearing busy flag.");
+			this.clearBusy();
+		}
 	}
 
 	private void notifyCalculator()

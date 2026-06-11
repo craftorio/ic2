@@ -33,7 +33,6 @@ import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.PathNavigationRegion;
-import net.minecraft.world.level.Explosion.BlockInteraction;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -222,7 +221,7 @@ public class Ic2Explosion extends Explosion
 						{
 							double distance = entity.position().distanceTo(position);
 							int hungerLength = (int) (120.0 * (this.radiationRange - distance));
-							int poisonLength = (int) (80.0 * (this.radiationRange / 3 - distance));
+							int poisonLength = (int) (80.0 * ((double) this.radiationRange / 3 - distance));
 							if (hungerLength >= 0)
 							{
 								entity.addEffect(new MobEffectInstance(MobEffects.HUNGER, hungerLength, 0));
@@ -244,8 +243,7 @@ public class Ic2Explosion extends Explosion
 					.withParameter(LootContextParams.ORIGIN, new Vec3(this.explosionX, this.explosionY, this.explosionZ))
 					.withParameter(LootContextParams.TOOL, ItemStack.EMPTY)
 					.withOptionalParameter(LootContextParams.THIS_ENTITY, this.exploder);
-
-
+				
 				for (int destroyedBlockPosIndex = 0; destroyedBlockPosIndex < this.destroyedBlockPositions.length; destroyedBlockPosIndex++)
 				{
 					int y = destroyedBlockPosIndex + this.worldMinHeight;
@@ -254,7 +252,7 @@ public class Ic2Explosion extends Explosion
 					{
 						int index = -2;
 
-						while ((index = nextSetIndex(index + 2, bitSet, 2)) != -1)
+						while ((index = nextSetIndex(index + 2, bitSet)) != -1)
 						{
 							int realIndex = index / 2;
 							int z = realIndex / this.areaSize;
@@ -268,7 +266,7 @@ public class Ic2Explosion extends Explosion
 							{
 							}
 
-							if (doDrops && block.dropFromExplosion(this) && getAtIndex(index, bitSet, 2) == 1)
+							if (doDrops && block.dropFromExplosion(this) && getAtIndex(index, bitSet) == 1)
 							{
 								BlockEntity be = state.hasBlockEntity() ? this.worldObj.getBlockEntity(tmpPos) : null;
 								builder.withOptionalParameter(LootContextParams.BLOCK_ENTITY, be);
@@ -278,12 +276,7 @@ public class Ic2Explosion extends Explosion
 									if (!(rng.nextFloat() > this.explosionDropRate))
 									{
 										Ic2Explosion.XZPosition xZposition = new Ic2Explosion.XZPosition(x / 2, z / 2);
-										Map<ItemComparableItemStack, Ic2Explosion.DropData> map = blocksToDrop.get(xZposition);
-										if (map == null)
-										{
-											map = new HashMap<>();
-											blocksToDrop.put(xZposition, map);
-										}
+										Map<ItemComparableItemStack, Ic2Explosion.DropData> map = blocksToDrop.computeIfAbsent(xZposition, k -> new HashMap<>());
 
 										ItemComparableItemStack isw = new ItemComparableItemStack(stack, false);
 										Ic2Explosion.DropData data = map.get(isw);
@@ -317,15 +310,15 @@ public class Ic2Explosion extends Explosion
 						while (count > 0)
 						{
 							int stackSize = Math.min(count, 64);
-							ItemEntity entityitem = new ItemEntity(
+							ItemEntity entityItem = new ItemEntity(
 								this.worldObj,
 								(xZposition.x + this.worldObj.random.nextFloat()) * 2.0F,
 								entry2.getValue().maxY + 0.5,
 								(xZposition.z + this.worldObj.random.nextFloat()) * 2.0F,
 								isw.toStack(stackSize)
 							);
-							entityitem.setDefaultPickUpDelay();
-							this.worldObj.addFreshEntity(entityitem);
+							entityItem.setDefaultPickUpDelay();
+							this.worldObj.addFreshEntity(entityItem);
 							count -= stackSize;
 						}
 					}
@@ -346,7 +339,7 @@ public class Ic2Explosion extends Explosion
 		long[] array = this.destroyedBlockPositions[y - this.worldMinHeight];
 		if (array == null)
 		{
-			array = makeArray(Util.square(this.areaSize), 2);
+			array = makeArray(Util.square(this.areaSize));
 			this.destroyedBlockPositions[y - this.worldMinHeight] = array;
 		}
 
@@ -449,41 +442,13 @@ public class Ic2Explosion extends Explosion
 				}
 			}
 
-			return ret;
-		} else
-		{
-			return ret;
 		}
+		return ret;
 	}
 
 	private void damageEntities(double x, double y, double z, int step, double power)
 	{
-		int index;
-		if (step != 4)
-		{
-			int distanceMin = Util.square(step - 5);
-			int indexStart = 0;
-			int indexEnd = this.entitiesInRange.size() - 1;
-
-			do
-			{
-				index = (indexStart + indexEnd) / 2;
-				int distance = this.entitiesInRange.get(index).distance;
-				if (distance < distanceMin)
-				{
-					indexStart = index + 1;
-				} else if (distance > distanceMin)
-				{
-					indexEnd = index - 1;
-				} else
-				{
-					indexEnd = index;
-				}
-			} while (indexStart < indexEnd);
-		} else
-		{
-			index = 0;
-		}
+		int index = getIndex(step);
 
 		int distanceMax = Util.square(step + 5);
 
@@ -521,6 +486,37 @@ public class Ic2Explosion extends Explosion
 		}
 	}
 
+	private int getIndex(int step)
+	{
+		int index;
+		if (step != 4)
+		{
+			int distanceMin = Util.square(step - 5);
+			int indexStart = 0;
+			int indexEnd = this.entitiesInRange.size() - 1;
+
+			do
+			{
+				index = (indexStart + indexEnd) / 2;
+				int distance = this.entitiesInRange.get(index).distance;
+				if (distance < distanceMin)
+				{
+					indexStart = index + 1;
+				} else if (distance > distanceMin)
+				{
+					indexEnd = index - 1;
+				} else
+				{
+					indexEnd = index;
+				}
+			} while (indexStart < indexEnd);
+		} else
+		{
+			index = 0;
+		}
+		return index;
+	}
+
 	public LivingEntity getSourceMob()
 	{
 		return this.igniter;
@@ -536,12 +532,12 @@ public class Ic2Explosion extends Explosion
 		return entity instanceof ItemEntity ? 5.0 : Double.POSITIVE_INFINITY;
 	}
 
-	private static long[] makeArray(int size, int step)
+	private static long[] makeArray(int size)
 	{
-		return new long[(size * step + 8 - step) / 8];
+		return new long[(size * 2 + 8 - 2) / 8];
 	}
 
-	private static int nextSetIndex(int start, long[] array, int step)
+	private static int nextSetIndex(int start, long[] array)
 	{
 		int offset = start % 8;
 
@@ -552,13 +548,13 @@ public class Ic2Explosion extends Explosion
 
 			while (j < 8)
 			{
-				int val = (int) (aval >> j & (1 << step) - 1);
+				int val = (int) (aval >> j & (1 << 2) - 1);
 				if (val != 0)
 				{
 					return i * 8 + j;
 				}
 
-				j += step;
+				j += 2;
 			}
 
 			offset = 0;
@@ -567,14 +563,14 @@ public class Ic2Explosion extends Explosion
 		return -1;
 	}
 
-	private static int getAtIndex(int index, long[] array, int step)
+	private static int getAtIndex(int index, long[] array)
 	{
-		return (int) (array[index / 8] >>> index % 8 & (1 << step) - 1);
+		return (int) (array[index / 8] >>> index % 8 & (1 << 2) - 1);
 	}
 
 	private static void setAtIndex(int index, long[] array, int value)
 	{
-		array[index / 8] = array[index / 8] | value << index % 8;
+		array[index / 8] = array[index / 8] | (long) value << index % 8;
 	}
 
 	private static class DropData
@@ -588,7 +584,7 @@ public class Ic2Explosion extends Explosion
 			this.maxY = y;
 		}
 
-		public Ic2Explosion.DropData add(int n1, int y)
+		public void add(int n1, int y)
 		{
 			this.n += n1;
 			if (y > this.maxY)
@@ -596,7 +592,6 @@ public class Ic2Explosion extends Explosion
 				this.maxY = y;
 			}
 
-			return this;
 		}
 	}
 
@@ -624,7 +619,7 @@ public class Ic2Explosion extends Explosion
 		Heat,
 		Electrical,
 		Nuclear,
-		ReactorMeltdown;
+		ReactorMeltdown
 	}
 
 	private static class XZPosition
@@ -641,7 +636,7 @@ public class Ic2Explosion extends Explosion
 		@Override
 		public boolean equals(Object obj)
 		{
-			return !(obj instanceof Ic2Explosion.XZPosition xzPosition) ? false : xzPosition.x == this.x && xzPosition.z == this.z;
+			return obj instanceof XZPosition xzPosition && xzPosition.x == this.x && xzPosition.z == this.z;
 		}
 
 		@Override

@@ -202,9 +202,6 @@ public final class Ic2Items
 	public static final Item BLACK_WALL = register("black_wall", new BlockItem(Ic2Blocks.BLACK_WALL, new Properties()));
 	public static final Item ITNT = register("itnt", new BlockItem(Ic2Blocks.ITNT, new Properties()));
 	public static final Item NUKE = register("nuke", new BlockItem(Ic2Blocks.NUKE, new Properties().rarity(Rarity.UNCOMMON)));
-	public static final Item CLASSIC_NUKE = register(
-		"classic_nuke", new BlockItem(Ic2Blocks.CLASSIC_NUKE, new Properties().rarity(Rarity.UNCOMMON))
-	);
 	public static final Item COPPER_CABLE = register(
 		"copper_cable", new BlockItem(Ic2Blocks.COPPER_CABLE, new Properties())
 	);
@@ -256,14 +253,8 @@ public final class Ic2Items
 	public static final Item BATBOX = register("batbox", new BlockItem(Ic2Blocks.BATBOX, new Properties()));
 	public static final Item CESU = register("cesu", new BlockItem(Ic2Blocks.CESU, new Properties()));
 	public static final Item MFE = register("mfe", new BlockItem(Ic2Blocks.MFE, new Properties()));
-	public static final Item CLASSIC_MFE = register(
-		"classic_mfe", new BlockItem(Ic2Blocks.CLASSIC_MFE, new Properties())
-	);
 	public static final Item MFSU = register(
 		"mfsu", new BlockItem(Ic2Blocks.MFSU, new Properties().rarity(Rarity.UNCOMMON))
-	);
-	public static final Item CLASSIC_MFSU = register(
-		"classic_mfsu", new BlockItem(Ic2Blocks.CLASSIC_MFSU, new Properties().rarity(Rarity.UNCOMMON))
 	);
 	public static final Item LV_TRANSFORMER = register(
 		"lv_transformer", new BlockItem(Ic2Blocks.LV_TRANSFORMER, new Properties())
@@ -422,14 +413,10 @@ public final class Ic2Items
 	);
 	public static final Item TESLA_COIL = register("tesla_coil", new BlockItem(Ic2Blocks.TESLA_COIL, new Properties()));
 	public static final Item ELECTROLYZER = register("electrolyzer", new BlockItem(Ic2Blocks.ELECTROLYZER, new Properties()));
-	public static final Item CLASSIC_ELECTROLYZER = register(
-		"classic_electrolyzer", new BlockItem(Ic2Blocks.CLASSIC_ELECTROLYZER, new Properties())
-	);
 	public static final Item CHUNK_LOADER = register(
 		"chunk_loader", new BlockItem(Ic2Blocks.CHUNK_LOADER, new Properties().rarity(Rarity.UNCOMMON))
 	);
 	public static final Item CANNER = register("canner", new BlockItem(Ic2Blocks.CANNER, new Properties()));
-	public static final Item CLASSIC_CANNER = register("classic_canner", new BlockItem(Ic2Blocks.CLASSIC_CANNER, new Properties()));
 	public static final Item COMPRESSOR = register("compressor", new BlockItem(Ic2Blocks.COMPRESSOR, new Properties()));
 	public static final Item ELECTRIC_FURNACE = register(
 		"electric_furnace", new BlockItem(Ic2Blocks.ELECTRIC_FURNACE, new Properties())
@@ -453,9 +440,6 @@ public final class Ic2Items
 	public static final Item ADVANCED_MINER = register("advanced_miner", new BlockItem(Ic2Blocks.ADVANCED_MINER, new Properties()));
 	public static final Item CROP_HARVESTER = register("crop_harvester", new BlockItem(Ic2Blocks.CROP_HARVESTER, new Properties()));
 	public static final Item CROPMATRON = register("cropmatron", new BlockItem(Ic2Blocks.CROPMATRON, new Properties()));
-	public static final Item CLASSIC_CROPMATRON = register(
-		"classic_cropmatron", new BlockItem(Ic2Blocks.CLASSIC_CROPMATRON, new Properties())
-	);
 	public static final Item MINER = register("miner", new BlockItem(Ic2Blocks.MINER, new Properties()));
 	public static final Item MASS_FABRICATOR = register(
 		"mass_fabricator", new BlockItem(Ic2Blocks.MASS_FABRICATOR, new Properties().rarity(Rarity.RARE))
@@ -1120,7 +1104,6 @@ public final class Ic2Items
 		addToCreativeTab(Ic2ItemGroupType.COMBAT, () -> BRONZE_HELMET);
 		addToCreativeTab(Ic2ItemGroupType.COMBAT, () -> BRONZE_LEGGINGS);
 		addToCreativeTab(Ic2ItemGroupType.COMBAT, () -> CF_PACK);
-		addToCreativeTab(Ic2ItemGroupType.COMBAT, () -> CLASSIC_NUKE);
 		addToCreativeTab(Ic2ItemGroupType.COMBAT, () -> HAZMAT_CHESTPLATE);
 		addToCreativeTab(Ic2ItemGroupType.COMBAT, () -> HAZMAT_HELMET);
 		addToCreativeTab(Ic2ItemGroupType.COMBAT, () -> HAZMAT_LEGGINGS);
@@ -1231,8 +1214,6 @@ public final class Ic2Items
 		addToCreativeTab(Ic2ItemGroupType.GENERATORS_AND_WIRING, () -> BATBOX_CHARGEPAD);
 		addToCreativeTab(Ic2ItemGroupType.GENERATORS_AND_WIRING, () -> CESU);
 		addToCreativeTab(Ic2ItemGroupType.GENERATORS_AND_WIRING, () -> CESU_CHARGEPAD);
-		addToCreativeTab(Ic2ItemGroupType.GENERATORS_AND_WIRING, () -> CLASSIC_MFE);
-		addToCreativeTab(Ic2ItemGroupType.GENERATORS_AND_WIRING, () -> CLASSIC_MFSU);
 		addToCreativeTab(Ic2ItemGroupType.GENERATORS_AND_WIRING, () -> COPPER_CABLE);
 		addToCreativeTab(Ic2ItemGroupType.GENERATORS_AND_WIRING, () -> CREATIVE_GENERATOR);
 		addToCreativeTab(Ic2ItemGroupType.GENERATORS_AND_WIRING, () -> DETECTOR_CABLE);
@@ -1282,9 +1263,6 @@ public final class Ic2Items
 		addToCreativeTab(Ic2ItemGroupType.MACHINES, () -> CANNER);
 		addToCreativeTab(Ic2ItemGroupType.MACHINES, () -> CENTRIFUGE);
 		addToCreativeTab(Ic2ItemGroupType.MACHINES, () -> CHUNK_LOADER);
-		addToCreativeTab(Ic2ItemGroupType.MACHINES, () -> CLASSIC_CANNER);
-		addToCreativeTab(Ic2ItemGroupType.MACHINES, () -> CLASSIC_CROPMATRON);
-		addToCreativeTab(Ic2ItemGroupType.MACHINES, () -> CLASSIC_ELECTROLYZER);
 		addToCreativeTab(Ic2ItemGroupType.MACHINES, () -> COMPRESSOR);
 		addToCreativeTab(Ic2ItemGroupType.MACHINES, () -> CONDENSER);
 		addToCreativeTab(Ic2ItemGroupType.MACHINES, () -> CROPMATRON);

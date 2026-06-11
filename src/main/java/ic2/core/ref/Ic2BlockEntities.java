@@ -26,13 +26,9 @@ import ic2.core.block.machine.tileentity.TileEntityAssemblyBench;
 import ic2.core.block.machine.tileentity.TileEntityBatchCrafter;
 import ic2.core.block.machine.tileentity.TileEntityBlastFurnace;
 import ic2.core.block.machine.tileentity.TileEntityBlockCutter;
-import ic2.core.block.machine.tileentity.TileEntityBridgeNuke;
 import ic2.core.block.machine.tileentity.TileEntityCanner;
 import ic2.core.block.machine.tileentity.TileEntityCentrifuge;
 import ic2.core.block.machine.tileentity.TileEntityChunkloader;
-import ic2.core.block.machine.tileentity.TileEntityClassicCanner;
-import ic2.core.block.machine.tileentity.TileEntityClassicCropmatron;
-import ic2.core.block.machine.tileentity.TileEntityClassicElectrolyzer;
 import ic2.core.block.machine.tileentity.TileEntityCompressor;
 import ic2.core.block.machine.tileentity.TileEntityCondenser;
 import ic2.core.block.machine.tileentity.TileEntityCropHarvester;
@@ -126,109 +122,47 @@ public final class Ic2BlockEntities
 	public static final BlockEntityType<TileEntityWall> WALL = register("wall", TileEntityWall::new, Ic2Blocks.OBSCURED_WALL);
 	public static final BlockEntityType<TileEntityITnt> ITNT = register("itnt", TileEntityITnt::new, Ic2Blocks.ITNT);
 	public static final BlockEntityType<TileEntityNuke> NUKE = register("nuke", TileEntityNuke::new, Ic2Blocks.NUKE);
-	public static final BlockEntityType<TileEntityBridgeNuke.TileEntityClassicNuke> CLASSIC_NUKE = register(
-		"classic_nuke", TileEntityBridgeNuke.TileEntityClassicNuke::new, Ic2Blocks.CLASSIC_NUKE
-	);
 	public static final BlockEntityType<TileEntityGenerator> GENERATOR = register("generator", TileEntityGenerator::new, Ic2Blocks.GENERATOR);
 	public static final BlockEntityType<TileEntityGeoGenerator> GEO_GENERATOR = register("geo_generator", TileEntityGeoGenerator::new, Ic2Blocks.GEO_GENERATOR);
-	public static final BlockEntityType<TileEntityKineticGenerator> KINETIC_GENERATOR = register(
-		"kinetic_generator", TileEntityKineticGenerator::new, Ic2Blocks.KINETIC_GENERATOR
-	);
+	public static final BlockEntityType<TileEntityKineticGenerator> KINETIC_GENERATOR = register("kinetic_generator", TileEntityKineticGenerator::new, Ic2Blocks.KINETIC_GENERATOR);
 	public static final BlockEntityType<TileEntityRTGenerator> RT_GENERATOR = register("rt_generator", TileEntityRTGenerator::new, Ic2Blocks.RT_GENERATOR);
-	public static final BlockEntityType<TileEntitySemifluidGenerator> SEMIFLUID_GENERATOR = register(
-		"semifluid_generator", TileEntitySemifluidGenerator::new, Ic2Blocks.SEMIFLUID_GENERATOR
-	);
-	public static final BlockEntityType<TileEntitySolarGenerator> SOLAR_GENERATOR = register(
-		"solar_generator", TileEntitySolarGenerator::new, Ic2Blocks.SOLAR_GENERATOR
-	);
-	public static final BlockEntityType<TileEntityStirlingGenerator> STIRLING_GENERATOR = register(
-		"stirling_generator", TileEntityStirlingGenerator::new, Ic2Blocks.STIRLING_GENERATOR
-	);
-	public static final BlockEntityType<TileEntityWaterGenerator> WATER_GENERATOR = register(
-		"water_generator", TileEntityWaterGenerator::new, Ic2Blocks.WATER_GENERATOR
-	);
-	public static final BlockEntityType<TileEntityWindGenerator> WIND_GENERATOR = register(
-		"wind_generator", TileEntityWindGenerator::new, Ic2Blocks.WIND_GENERATOR
-	);
-	public static final BlockEntityType<TileEntityElectricHeatGenerator> ELECTRIC_HEAT_GENERATOR = register(
-		"electric_heat_generator", TileEntityElectricHeatGenerator::new, Ic2Blocks.ELECTRIC_HEAT_GENERATOR
-	);
-	public static final BlockEntityType<TileEntityFluidHeatGenerator> FLUID_HEAT_GENERATOR = register(
-		"fluid_heat_generator", TileEntityFluidHeatGenerator::new, Ic2Blocks.FLUID_HEAT_GENERATOR
-	);
-	public static final BlockEntityType<TileEntityRTHeatGenerator> RT_HEAT_GENERATOR = register(
-		"rt_heat_generator", TileEntityRTHeatGenerator::new, Ic2Blocks.RT_HEAT_GENERATOR
-	);
-	public static final BlockEntityType<TileEntitySolidHeatGenerator> SOLID_HEAT_GENERATOR = register(
-		"solid_heat_generator", TileEntitySolidHeatGenerator::new, Ic2Blocks.SOLID_HEAT_GENERATOR
-	);
-	public static final BlockEntityType<TileEntityElectricKineticGenerator> ELECTRIC_KINETIC_GENERATOR = register(
-		"electric_kinetic_generator", TileEntityElectricKineticGenerator::new, Ic2Blocks.ELECTRIC_KINETIC_GENERATOR
-	);
-	public static final BlockEntityType<TileEntityManualKineticGenerator> MANUAL_KINETIC_GENERATOR = register(
-		"manual_kinetic_generator", TileEntityManualKineticGenerator::new, Ic2Blocks.MANUAL_KINETIC_GENERATOR
-	);
-	public static final BlockEntityType<TileEntitySteamKineticGenerator> STEAM_KINETIC_GENERATOR = register(
-		"steam_kinetic_generator", TileEntitySteamKineticGenerator::new, Ic2Blocks.STEAM_KINETIC_GENERATOR
-	);
-	public static final BlockEntityType<TileEntityStirlingKineticGenerator> STIRLING_KINETIC_GENERATOR = register(
-		"stirling_kinetic_generator", TileEntityStirlingKineticGenerator::new, Ic2Blocks.STIRLING_KINETIC_GENERATOR
-	);
-	public static final BlockEntityType<TileEntityWaterKineticGenerator> WATER_KINETIC_GENERATOR = register(
-		"water_kinetic_generator", TileEntityWaterKineticGenerator::new, Ic2Blocks.WATER_KINETIC_GENERATOR
-	);
-	public static final BlockEntityType<TileEntityWindKineticGenerator> WIND_KINETIC_GENERATOR = register(
-		"wind_kinetic_generator", TileEntityWindKineticGenerator::new, Ic2Blocks.WIND_KINETIC_GENERATOR
-	);
-	public static final BlockEntityType<TileEntityNuclearReactorElectric> NUCLEAR_REACTOR = register(
-		"nuclear_reactor", TileEntityNuclearReactorElectric::new, Ic2Blocks.NUCLEAR_REACTOR
-	);
-	public static final BlockEntityType<TileEntityReactorAccessHatch> REACTOR_ACCESS_HATCH = register(
-		"reactor_access_hatch", TileEntityReactorAccessHatch::new, Ic2Blocks.REACTOR_ACCESS_HATCH
-	);
-	public static final BlockEntityType<TileEntityReactorChamberElectric> REACTOR_CHAMBER = register(
-		"reactor_chamber", TileEntityReactorChamberElectric::new, Ic2Blocks.REACTOR_CHAMBER
-	);
-	public static final BlockEntityType<TileEntityReactorFluidPort> REACTOR_FLUID_PORT = register(
-		"reactor_fluid_port", TileEntityReactorFluidPort::new, Ic2Blocks.REACTOR_FLUID_PORT
-	);
-	public static final BlockEntityType<TileEntityReactorRedstonePort> REACTOR_REDSTONE_PORT = register(
-		"reactor_redstone_port", TileEntityReactorRedstonePort::new, Ic2Blocks.REACTOR_REDSTONE_PORT
-	);
+	public static final BlockEntityType<TileEntitySemifluidGenerator> SEMIFLUID_GENERATOR = register("semifluid_generator", TileEntitySemifluidGenerator::new, Ic2Blocks.SEMIFLUID_GENERATOR);
+	public static final BlockEntityType<TileEntitySolarGenerator> SOLAR_GENERATOR = register("solar_generator", TileEntitySolarGenerator::new, Ic2Blocks.SOLAR_GENERATOR);
+	public static final BlockEntityType<TileEntityStirlingGenerator> STIRLING_GENERATOR = register("stirling_generator", TileEntityStirlingGenerator::new, Ic2Blocks.STIRLING_GENERATOR);
+	public static final BlockEntityType<TileEntityWaterGenerator> WATER_GENERATOR = register("water_generator", TileEntityWaterGenerator::new, Ic2Blocks.WATER_GENERATOR);
+	public static final BlockEntityType<TileEntityWindGenerator> WIND_GENERATOR = register("wind_generator", TileEntityWindGenerator::new, Ic2Blocks.WIND_GENERATOR);
+	public static final BlockEntityType<TileEntityElectricHeatGenerator> ELECTRIC_HEAT_GENERATOR = register("electric_heat_generator", TileEntityElectricHeatGenerator::new, Ic2Blocks.ELECTRIC_HEAT_GENERATOR);
+	public static final BlockEntityType<TileEntityFluidHeatGenerator> FLUID_HEAT_GENERATOR = register("fluid_heat_generator", TileEntityFluidHeatGenerator::new, Ic2Blocks.FLUID_HEAT_GENERATOR);
+	public static final BlockEntityType<TileEntityRTHeatGenerator> RT_HEAT_GENERATOR = register("rt_heat_generator", TileEntityRTHeatGenerator::new, Ic2Blocks.RT_HEAT_GENERATOR);
+	public static final BlockEntityType<TileEntitySolidHeatGenerator> SOLID_HEAT_GENERATOR = register("solid_heat_generator", TileEntitySolidHeatGenerator::new, Ic2Blocks.SOLID_HEAT_GENERATOR);
+	public static final BlockEntityType<TileEntityElectricKineticGenerator> ELECTRIC_KINETIC_GENERATOR = register("electric_kinetic_generator", TileEntityElectricKineticGenerator::new, Ic2Blocks.ELECTRIC_KINETIC_GENERATOR);
+	public static final BlockEntityType<TileEntityManualKineticGenerator> MANUAL_KINETIC_GENERATOR = register("manual_kinetic_generator", TileEntityManualKineticGenerator::new, Ic2Blocks.MANUAL_KINETIC_GENERATOR);
+	public static final BlockEntityType<TileEntitySteamKineticGenerator> STEAM_KINETIC_GENERATOR = register("steam_kinetic_generator", TileEntitySteamKineticGenerator::new, Ic2Blocks.STEAM_KINETIC_GENERATOR);
+	public static final BlockEntityType<TileEntityStirlingKineticGenerator> STIRLING_KINETIC_GENERATOR = register("stirling_kinetic_generator", TileEntityStirlingKineticGenerator::new, Ic2Blocks.STIRLING_KINETIC_GENERATOR);
+	public static final BlockEntityType<TileEntityWaterKineticGenerator> WATER_KINETIC_GENERATOR = register("water_kinetic_generator", TileEntityWaterKineticGenerator::new, Ic2Blocks.WATER_KINETIC_GENERATOR);
+	public static final BlockEntityType<TileEntityWindKineticGenerator> WIND_KINETIC_GENERATOR = register("wind_kinetic_generator", TileEntityWindKineticGenerator::new, Ic2Blocks.WIND_KINETIC_GENERATOR);
+	public static final BlockEntityType<TileEntityNuclearReactorElectric> NUCLEAR_REACTOR = register("nuclear_reactor", TileEntityNuclearReactorElectric::new, Ic2Blocks.NUCLEAR_REACTOR);
+	public static final BlockEntityType<TileEntityReactorAccessHatch> REACTOR_ACCESS_HATCH = register("reactor_access_hatch", TileEntityReactorAccessHatch::new, Ic2Blocks.REACTOR_ACCESS_HATCH);
+	public static final BlockEntityType<TileEntityReactorChamberElectric> REACTOR_CHAMBER = register("reactor_chamber", TileEntityReactorChamberElectric::new, Ic2Blocks.REACTOR_CHAMBER);
+	public static final BlockEntityType<TileEntityReactorFluidPort> REACTOR_FLUID_PORT = register("reactor_fluid_port", TileEntityReactorFluidPort::new, Ic2Blocks.REACTOR_FLUID_PORT);
+	public static final BlockEntityType<TileEntityReactorRedstonePort> REACTOR_REDSTONE_PORT = register("reactor_redstone_port", TileEntityReactorRedstonePort::new, Ic2Blocks.REACTOR_REDSTONE_PORT);
 	public static final BlockEntityType<TileEntityCondenser> CONDENSER = register("condenser", TileEntityCondenser::new, Ic2Blocks.CONDENSER);
 	public static final BlockEntityType<TileEntityFluidBottler> FLUID_BOTTLER = register("fluid_bottler", TileEntityFluidBottler::new, Ic2Blocks.FLUID_BOTTLER);
-	public static final BlockEntityType<TileEntityFluidDistributor> FLUID_DISTRIBUTOR = register(
-		"fluid_distributor", TileEntityFluidDistributor::new, Ic2Blocks.FLUID_DISTRIBUTOR
-	);
-	public static final BlockEntityType<TileEntityFluidRegulator> FLUID_REGULATOR = register(
-		"fluid_regulator", TileEntityFluidRegulator::new, Ic2Blocks.FLUID_REGULATOR
-	);
-	public static final BlockEntityType<TileEntityLiquidHeatExchanger> LIQUID_HEAT_EXCHANGER = register(
-		"liquid_heat_exchanger", TileEntityLiquidHeatExchanger::new, Ic2Blocks.LIQUID_HEAT_EXCHANGER
-	);
+	public static final BlockEntityType<TileEntityFluidDistributor> FLUID_DISTRIBUTOR = register("fluid_distributor", TileEntityFluidDistributor::new, Ic2Blocks.FLUID_DISTRIBUTOR);
+	public static final BlockEntityType<TileEntityFluidRegulator> FLUID_REGULATOR = register("fluid_regulator", TileEntityFluidRegulator::new, Ic2Blocks.FLUID_REGULATOR);
+	public static final BlockEntityType<TileEntityLiquidHeatExchanger> LIQUID_HEAT_EXCHANGER = register("liquid_heat_exchanger", TileEntityLiquidHeatExchanger::new, Ic2Blocks.LIQUID_HEAT_EXCHANGER);
 	public static final BlockEntityType<TileEntityPump> PUMP = register("pump", TileEntityPump::new, Ic2Blocks.PUMP);
-	public static final BlockEntityType<TileEntitySolarDistiller> SOLAR_DISTILLER = register(
-		"solar_distiller", TileEntitySolarDistiller::new, Ic2Blocks.SOLAR_DISTILLER
-	);
-	public static final BlockEntityType<TileEntitySteamGenerator> STEAM_GENERATOR = register(
-		"steam_generator", TileEntitySteamGenerator::new, Ic2Blocks.STEAM_GENERATOR
-	);
+	public static final BlockEntityType<TileEntitySolarDistiller> SOLAR_DISTILLER = register("solar_distiller", TileEntitySolarDistiller::new, Ic2Blocks.SOLAR_DISTILLER);
+	public static final BlockEntityType<TileEntitySteamGenerator> STEAM_GENERATOR = register("steam_generator", TileEntitySteamGenerator::new, Ic2Blocks.STEAM_GENERATOR);
 	public static final BlockEntityType<TileEntityItemBuffer> ITEM_BUFFER = register("item_buffer", TileEntityItemBuffer::new, Ic2Blocks.ITEM_BUFFER);
 	public static final BlockEntityType<TileEntityMagnetizer> MAGNETIZER = register("magnetizer", TileEntityMagnetizer::new, Ic2Blocks.MAGNETIZER);
-	public static final BlockEntityType<TileEntitySortingMachine> SORTING_MACHINE = register(
-		"sorting_machine", TileEntitySortingMachine::new, Ic2Blocks.SORTING_MACHINE
-	);
+	public static final BlockEntityType<TileEntitySortingMachine> SORTING_MACHINE = register("sorting_machine", TileEntitySortingMachine::new, Ic2Blocks.SORTING_MACHINE);
 	public static final BlockEntityType<TileEntityTeleporter> TELEPORTER = register("teleporter", TileEntityTeleporter::new, Ic2Blocks.TELEPORTER);
 	public static final BlockEntityType<TileEntityTerra> TERRAFORMER = register("terraformer", TileEntityTerra::new, Ic2Blocks.TERRAFORMER);
 	public static final BlockEntityType<TileEntityTesla> TESLA_COIL = register("tesla_coil", TileEntityTesla::new, Ic2Blocks.TESLA_COIL);
 	public static final BlockEntityType<TileEntityCanner> CANNER = register("canner", TileEntityCanner::new, Ic2Blocks.CANNER);
-	public static final BlockEntityType<TileEntityClassicCanner> CLASSIC_CANNER = register(
-		"classic_canner", TileEntityClassicCanner::new, Ic2Blocks.CLASSIC_CANNER
-	);
 	public static final BlockEntityType<TileEntityCompressor> COMPRESSOR = register("compressor", TileEntityCompressor::new, Ic2Blocks.COMPRESSOR);
-	public static final BlockEntityType<TileEntityElectricFurnace> ELECTRIC_FURNACE = register(
-		"electric_furnace", TileEntityElectricFurnace::new, Ic2Blocks.ELECTRIC_FURNACE
-	);
+	public static final BlockEntityType<TileEntityElectricFurnace> ELECTRIC_FURNACE = register("electric_furnace", TileEntityElectricFurnace::new, Ic2Blocks.ELECTRIC_FURNACE);
 	public static final BlockEntityType<TileEntityExtractor> EXTRACTOR = register("extractor", TileEntityExtractor::new, Ic2Blocks.EXTRACTOR);
 	public static final BlockEntityType<TileEntityIronFurnace> IRON_FURNACE = register("iron_furnace", TileEntityIronFurnace::new, Ic2Blocks.IRON_FURNACE);
 	public static final BlockEntityType<TileEntityMacerator> MACERATOR = register("macerator", TileEntityMacerator::new, Ic2Blocks.MACERATOR);
@@ -238,89 +172,41 @@ public final class Ic2BlockEntities
 	public static final BlockEntityType<TileEntityBlockCutter> BLOCK_CUTTER = register("block_cutter", TileEntityBlockCutter::new, Ic2Blocks.BLOCK_CUTTER);
 	public static final BlockEntityType<TileEntityCentrifuge> CENTRIFUGE = register("centrifuge", TileEntityCentrifuge::new, Ic2Blocks.CENTRIFUGE);
 	public static final BlockEntityType<TileEntityFermenter> FERMENTER = register("fermenter", TileEntityFermenter::new, Ic2Blocks.FERMENTER);
-	public static final BlockEntityType<TileEntityInduction> INDUCTION_FURNACE = register(
-		"induction_furnace", TileEntityInduction::new, Ic2Blocks.INDUCTION_FURNACE
-	);
+	public static final BlockEntityType<TileEntityInduction> INDUCTION_FURNACE = register("induction_furnace", TileEntityInduction::new, Ic2Blocks.INDUCTION_FURNACE);
 	public static final BlockEntityType<TileEntityMetalFormer> METAL_FORMER = register("metal_former", TileEntityMetalFormer::new, Ic2Blocks.METAL_FORMER);
-	public static final BlockEntityType<TileEntityOreWashing> ORE_WASHING_PLANT = register(
-		"ore_washing_plant", TileEntityOreWashing::new, Ic2Blocks.ORE_WASHING_PLANT
-	);
+	public static final BlockEntityType<TileEntityOreWashing> ORE_WASHING_PLANT = register("ore_washing_plant", TileEntityOreWashing::new, Ic2Blocks.ORE_WASHING_PLANT);
 	public static final BlockEntityType<TileEntityAdvMiner> ADVANCED_MINER = register("advanced_miner", TileEntityAdvMiner::new, Ic2Blocks.ADVANCED_MINER);
-	public static final BlockEntityType<TileEntityCropHarvester> CROP_HARVESTER = register(
-		"crop_harvester", TileEntityCropHarvester::new, Ic2Blocks.CROP_HARVESTER
-	);
+	public static final BlockEntityType<TileEntityCropHarvester> CROP_HARVESTER = register("crop_harvester", TileEntityCropHarvester::new, Ic2Blocks.CROP_HARVESTER);
 	public static final BlockEntityType<TileEntityCropmatron> CROPMATRON = register("cropmatron", TileEntityCropmatron::new, Ic2Blocks.CROPMATRON);
-	public static final BlockEntityType<TileEntityClassicCropmatron> CLASSIC_CROPMATRON = register(
-		"classic_cropmatron", TileEntityClassicCropmatron::new, Ic2Blocks.CLASSIC_CROPMATRON
-	);
 	public static final BlockEntityType<TileEntityMiner> MINER = register("miner", TileEntityMiner::new, Ic2Blocks.MINER);
-	public static final BlockEntityType<TileEntityMassFabricator> MASS_FABRICATOR = register(
-		"mass_fabricator", TileEntityMassFabricator::new, Ic2Blocks.MASS_FABRICATOR
-	);
-	public static final BlockEntityType<TileEntityAssemblyBench> UU_ASSEMBLY_BENCH = register(
-		"uu_assembly_bench", TileEntityAssemblyBench::new, Ic2Blocks.UU_ASSEMBLY_BENCH
-	);
+	public static final BlockEntityType<TileEntityMassFabricator> MASS_FABRICATOR = register("mass_fabricator", TileEntityMassFabricator::new, Ic2Blocks.MASS_FABRICATOR);
+	public static final BlockEntityType<TileEntityAssemblyBench> UU_ASSEMBLY_BENCH = register("uu_assembly_bench", TileEntityAssemblyBench::new, Ic2Blocks.UU_ASSEMBLY_BENCH);
 	public static final BlockEntityType<TileEntityMatter> MATTER_GENERATOR = register("matter_generator", TileEntityMatter::new, Ic2Blocks.MATTER_GENERATOR);
-	public static final BlockEntityType<TileEntityPatternStorage> PATTERN_STORAGE = register(
-		"pattern_storage", TileEntityPatternStorage::new, Ic2Blocks.PATTERN_STORAGE
-	);
+	public static final BlockEntityType<TileEntityPatternStorage> PATTERN_STORAGE = register("pattern_storage", TileEntityPatternStorage::new, Ic2Blocks.PATTERN_STORAGE);
 	public static final BlockEntityType<TileEntityReplicator> REPLICATOR = register("replicator", TileEntityReplicator::new, Ic2Blocks.REPLICATOR);
 	public static final BlockEntityType<TileEntityScanner> UU_SCANNER = register("uu_scanner", TileEntityScanner::new, Ic2Blocks.UU_SCANNER);
 	public static final BlockEntityType<TileEntityEnergyOMat> ENERGY_O_MAT = register("energy_o_mat", TileEntityEnergyOMat::new, Ic2Blocks.ENERGY_O_MAT);
-	public static final BlockEntityType<TileEntityPersonalChest> PERSONAL_CHEST = register(
-		"personal_chest", TileEntityPersonalChest::new, Ic2Blocks.PERSONAL_CHEST
-	);
+	public static final BlockEntityType<TileEntityPersonalChest> PERSONAL_CHEST = register("personal_chest", TileEntityPersonalChest::new, Ic2Blocks.PERSONAL_CHEST);
 	public static final BlockEntityType<TileEntityTradeOMat> TRADE_O_MAT = register("trade_o_mat", TileEntityTradeOMat::new, Ic2Blocks.TRADE_O_MAT);
-	public static final BlockEntityType<TileEntityChargepadBatBox> BATBOX_CHARGEPAD = register(
-		"batbox_chargepad", TileEntityChargepadBatBox::new, Ic2Blocks.BATBOX_CHARGEPAD
-	);
-	public static final BlockEntityType<TileEntityChargepadCESU> CESU_CHARGEPAD = register(
-		"cesu_chargepad", TileEntityChargepadCESU::new, Ic2Blocks.CESU_CHARGEPAD
-	);
+	public static final BlockEntityType<TileEntityChargepadBatBox> BATBOX_CHARGEPAD = register("batbox_chargepad", TileEntityChargepadBatBox::new, Ic2Blocks.BATBOX_CHARGEPAD);
+	public static final BlockEntityType<TileEntityChargepadCESU> CESU_CHARGEPAD = register("cesu_chargepad", TileEntityChargepadCESU::new, Ic2Blocks.CESU_CHARGEPAD);
 	public static final BlockEntityType<TileEntityChargepadMFE> MFE_CHARGEPAD = register("mfe_chargepad", TileEntityChargepadMFE::new, Ic2Blocks.MFE_CHARGEPAD);
-	public static final BlockEntityType<TileEntityChargepadMFSU> MFSU_CHARGEPAD = register(
-		"mfsu_chargepad", TileEntityChargepadMFSU::new, Ic2Blocks.MFSU_CHARGEPAD
-	);
+	public static final BlockEntityType<TileEntityChargepadMFSU> MFSU_CHARGEPAD = register("mfsu_chargepad", TileEntityChargepadMFSU::new, Ic2Blocks.MFSU_CHARGEPAD);
 	public static final BlockEntityType<TileEntityElectricBatBox> BATBOX = register("batbox", TileEntityElectricBatBox::new, Ic2Blocks.BATBOX);
 	public static final BlockEntityType<TileEntityElectricCESU> CESU = register("cesu", TileEntityElectricCESU::new, Ic2Blocks.CESU);
 	public static final BlockEntityType<TileEntityElectricMFE> MFE = register("mfe", TileEntityElectricMFE::new, Ic2Blocks.MFE);
-	public static final BlockEntityType<TileEntityElectricMFE.TileEntityElectricClassicMFE> CLASSIC_MFE = register(
-		"classic_mfe", TileEntityElectricMFE.TileEntityElectricClassicMFE::new, Ic2Blocks.CLASSIC_MFE
-	);
 	public static final BlockEntityType<TileEntityElectricMFSU> MFSU = register("mfsu", TileEntityElectricMFSU::new, Ic2Blocks.MFSU);
-	public static final BlockEntityType<TileEntityElectricMFSU.TileEntityElectricClassicMFSU> CLASSIC_MFSU = register(
-		"classic_mfsu", TileEntityElectricMFSU.TileEntityElectricClassicMFSU::new, Ic2Blocks.CLASSIC_MFSU
-	);
 	public static final BlockEntityType<TileEntityElectrolyzer> ELECTROLYZER = register("electrolyzer", TileEntityElectrolyzer::new, Ic2Blocks.ELECTROLYZER);
-	public static final BlockEntityType<TileEntityClassicElectrolyzer> CLASSIC_ELECTROLYZER = register(
-		"classic_electrolyzer", TileEntityClassicElectrolyzer::new, Ic2Blocks.CLASSIC_ELECTROLYZER
-	);
-	public static final BlockEntityType<TileEntityTransformerLV> LV_TRANSFORMER = register(
-		"lv_transformer", TileEntityTransformerLV::new, Ic2Blocks.LV_TRANSFORMER
-	);
-	public static final BlockEntityType<TileEntityTransformerMV> MV_TRANSFORMER = register(
-		"mv_transformer", TileEntityTransformerMV::new, Ic2Blocks.MV_TRANSFORMER
-	);
-	public static final BlockEntityType<TileEntityTransformerHV> HV_TRANSFORMER = register(
-		"hv_transformer", TileEntityTransformerHV::new, Ic2Blocks.HV_TRANSFORMER
-	);
-	public static final BlockEntityType<TileEntityTransformerEV> EV_TRANSFORMER = register(
-		"ev_transformer", TileEntityTransformerEV::new, Ic2Blocks.EV_TRANSFORMER
-	);
+	public static final BlockEntityType<TileEntityTransformerLV> LV_TRANSFORMER = register("lv_transformer", TileEntityTransformerLV::new, Ic2Blocks.LV_TRANSFORMER);
+	public static final BlockEntityType<TileEntityTransformerMV> MV_TRANSFORMER = register("mv_transformer", TileEntityTransformerMV::new, Ic2Blocks.MV_TRANSFORMER);
+	public static final BlockEntityType<TileEntityTransformerHV> HV_TRANSFORMER = register("hv_transformer", TileEntityTransformerHV::new, Ic2Blocks.HV_TRANSFORMER);
+	public static final BlockEntityType<TileEntityTransformerEV> EV_TRANSFORMER = register("ev_transformer", TileEntityTransformerEV::new, Ic2Blocks.EV_TRANSFORMER);
 	public static final BlockEntityType<TileEntityTank> TANK = register("tank", TileEntityTank::new, Ic2Blocks.TANK);
 	public static final BlockEntityType<TileEntityChunkloader> CHUNK_LOADER = register("chunk_loader", TileEntityChunkloader::new, Ic2Blocks.CHUNK_LOADER);
-	public static final BlockEntityType<TileEntityCreativeGenerator> CREATIVE_GENERATOR = register(
-		"creative_generator", TileEntityCreativeGenerator::new, Ic2Blocks.CREATIVE_GENERATOR
-	);
-	public static final BlockEntityType<TileEntitySteamRepressurizer> STEAM_REPRESSURIZER = register(
-		"steam_repressurizer", TileEntitySteamRepressurizer::new, Ic2Blocks.STEAM_REPRESSURIZER
-	);
-	public static final BlockEntityType<TileEntityWeightedFluidDistributor> WEIGHTED_FLUID_DISTRIBUTOR = register(
-		"weighted_fluid_distributor", TileEntityWeightedFluidDistributor::new, Ic2Blocks.WEIGHTED_FLUID_DISTRIBUTOR
-	);
-	public static final BlockEntityType<TileEntityWeightedItemDistributor> WEIGHTED_ITEM_DISTRIBUTOR = register(
-		"weighted_item_distributor", TileEntityWeightedItemDistributor::new, Ic2Blocks.WEIGHTED_ITEM_DISTRIBUTOR
-	);
+	public static final BlockEntityType<TileEntityCreativeGenerator> CREATIVE_GENERATOR = register("creative_generator", TileEntityCreativeGenerator::new, Ic2Blocks.CREATIVE_GENERATOR);
+	public static final BlockEntityType<TileEntitySteamRepressurizer> STEAM_REPRESSURIZER = register("steam_repressurizer", TileEntitySteamRepressurizer::new, Ic2Blocks.STEAM_REPRESSURIZER);
+	public static final BlockEntityType<TileEntityWeightedFluidDistributor> WEIGHTED_FLUID_DISTRIBUTOR = register("weighted_fluid_distributor", TileEntityWeightedFluidDistributor::new, Ic2Blocks.WEIGHTED_FLUID_DISTRIBUTOR);
+	public static final BlockEntityType<TileEntityWeightedItemDistributor> WEIGHTED_ITEM_DISTRIBUTOR = register("weighted_item_distributor", TileEntityWeightedItemDistributor::new, Ic2Blocks.WEIGHTED_ITEM_DISTRIBUTOR);
 	public static final BlockEntityType<TileEntityRCI_RSH> RCI_RSH = register("rci_rsh", TileEntityRCI_RSH::new, Ic2Blocks.RCI_RSH);
 	public static final BlockEntityType<TileEntityRCI_LZH> RCI_LZH = register("rci_lzh", TileEntityRCI_LZH::new, Ic2Blocks.RCI_LZH);
 	public static final BlockEntityType<TileEntityCrop> CROP_STICK = register("crop_stick", TileEntityCrop::new, Ic2Blocks.CROP_STICK);
@@ -350,9 +236,7 @@ public final class Ic2BlockEntities
 	public static final BlockEntityType<TileEntityCrop> BIRCH_SAPLING_CROP = register("birch_sapling_crop", TileEntityCrop::new, Ic2Blocks.BIRCH_SAPLING_CROP);
 	public static final BlockEntityType<TileEntityCrop> JUNGLE_SAPLING_CROP = register("jungle_sapling_crop", TileEntityCrop::new, Ic2Blocks.JUNGLE_SAPLING_CROP);
 	public static final BlockEntityType<TileEntityCrop> ACACIA_SAPLING_CROP = register("acacia_sapling_crop", TileEntityCrop::new, Ic2Blocks.ACACIA_SAPLING_CROP);
-	public static final BlockEntityType<TileEntityCrop> DARK_OAK_SAPLING_CROP = register(
-		"dark_oak_sapling_crop", TileEntityCrop::new, Ic2Blocks.DARK_OAK_SAPLING_CROP
-	);
+	public static final BlockEntityType<TileEntityCrop> DARK_OAK_SAPLING_CROP = register("dark_oak_sapling_crop", TileEntityCrop::new, Ic2Blocks.DARK_OAK_SAPLING_CROP);
 	public static final BlockEntityType<TileEntityCrop> FERRU_CROP = register("ferru_crop", TileEntityCrop::new, Ic2Blocks.FERRU_CROP);
 	public static final BlockEntityType<TileEntityCrop> CYPRIUM_CROP = register("cyprium_crop", TileEntityCrop::new, Ic2Blocks.CYPRIUM_CROP);
 	public static final BlockEntityType<TileEntityCrop> STAGNIUM_CROP = register("stagnium_crop", TileEntityCrop::new, Ic2Blocks.STAGNIUM_CROP);
@@ -363,25 +247,13 @@ public final class Ic2BlockEntities
 	public static final BlockEntityType<TileEntityCrop> COFFEE_CROP = register("coffee_crop", TileEntityCrop::new, Ic2Blocks.COFFEE_CROP);
 	public static final BlockEntityType<TileEntityCrop> HOPS_CROP = register("hops_crop", TileEntityCrop::new, Ic2Blocks.HOPS_CROP);
 	public static final BlockEntityType<TileEntityCrop> EATING_PLANT_CROP = register("eating_plant_crop", TileEntityCrop::new, Ic2Blocks.EATING_PLANT_CROP);
-	public static final BlockEntityType<TileEntityIndustrialWorkbench> INDUSTRIAL_WORKBENCH = register(
-		"industrial_workbench", TileEntityIndustrialWorkbench::new, Ic2Blocks.INDUSTRIAL_WORKBENCH
-	);
+	public static final BlockEntityType<TileEntityIndustrialWorkbench> INDUSTRIAL_WORKBENCH = register("industrial_workbench", TileEntityIndustrialWorkbench::new, Ic2Blocks.INDUSTRIAL_WORKBENCH);
 	public static final BlockEntityType<TileEntityBatchCrafter> BATCH_CRAFTER = register("batch_crafter", TileEntityBatchCrafter::new, Ic2Blocks.BATCH_CRAFTER);
-	public static final BlockEntityType<TileEntityWoodenStorageBox> WOODEN_STORAGE_BOX = register(
-		"wooden_storage_box", TileEntityWoodenStorageBox::new, Ic2Blocks.WOODEN_STORAGE_BOX
-	);
-	public static final BlockEntityType<TileEntityIronStorageBox> IRON_STORAGE_BOX = register(
-		"iron_storage_box", TileEntityIronStorageBox::new, Ic2Blocks.IRON_STORAGE_BOX
-	);
-	public static final BlockEntityType<TileEntityBronzeStorageBox> BRONZE_STORAGE_BOX = register(
-		"bronze_storage_box", TileEntityBronzeStorageBox::new, Ic2Blocks.BRONZE_STORAGE_BOX
-	);
-	public static final BlockEntityType<TileEntitySteelStorageBox> STEEL_STORAGE_BOX = register(
-		"steel_storage_box", TileEntitySteelStorageBox::new, Ic2Blocks.STEEL_STORAGE_BOX
-	);
-	public static final BlockEntityType<TileEntityIridiumStorageBox> IRIDIUM_STORAGE_BOX = register(
-		"iridium_storage_box", TileEntityIridiumStorageBox::new, Ic2Blocks.IRIDIUM_STORAGE_BOX
-	);
+	public static final BlockEntityType<TileEntityWoodenStorageBox> WOODEN_STORAGE_BOX = register("wooden_storage_box", TileEntityWoodenStorageBox::new, Ic2Blocks.WOODEN_STORAGE_BOX);
+	public static final BlockEntityType<TileEntityIronStorageBox> IRON_STORAGE_BOX = register("iron_storage_box", TileEntityIronStorageBox::new, Ic2Blocks.IRON_STORAGE_BOX);
+	public static final BlockEntityType<TileEntityBronzeStorageBox> BRONZE_STORAGE_BOX = register("bronze_storage_box", TileEntityBronzeStorageBox::new, Ic2Blocks.BRONZE_STORAGE_BOX);
+	public static final BlockEntityType<TileEntitySteelStorageBox> STEEL_STORAGE_BOX = register("steel_storage_box", TileEntitySteelStorageBox::new, Ic2Blocks.STEEL_STORAGE_BOX);
+	public static final BlockEntityType<TileEntityIridiumStorageBox> IRIDIUM_STORAGE_BOX = register("iridium_storage_box", TileEntityIridiumStorageBox::new, Ic2Blocks.IRIDIUM_STORAGE_BOX);
 	public static final BlockEntityType<TileEntityBronzeTank> BRONZE_TANK = register("bronze_tank", TileEntityBronzeTank::new, Ic2Blocks.BRONZE_TANK);
 	public static final BlockEntityType<TileEntityIronTank> IRON_TANK = register("iron_tank", TileEntityIronTank::new, Ic2Blocks.IRON_TANK);
 	public static final BlockEntityType<TileEntitySteelTank> STEEL_TANK = register("steel_tank", TileEntitySteelTank::new, Ic2Blocks.STEEL_TANK);

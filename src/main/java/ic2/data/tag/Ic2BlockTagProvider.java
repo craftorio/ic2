@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 public class Ic2BlockTagProvider extends AbstractBlockTagProvider
 {
 	private static final Set<Block> unconnectableBlockList = Set.of(
-		Ic2Blocks.CLASSIC_NUKE, Ic2Blocks.NUKE, Ic2Blocks.ITNT, Ic2Blocks.ITEM_BUFFER, Ic2Blocks.OBSCURED_WALL, Ic2Blocks.IRON_FURNACE
+		Ic2Blocks.NUKE, Ic2Blocks.ITNT, Ic2Blocks.ITEM_BUFFER, Ic2Blocks.OBSCURED_WALL, Ic2Blocks.IRON_FURNACE
 	);
 
 	public Ic2BlockTagProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, @Nullable ExistingFileHelper existingFileHelper)

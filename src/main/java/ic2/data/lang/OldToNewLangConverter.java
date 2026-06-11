@@ -100,17 +100,6 @@ public class OldToNewLangConverter implements DataProvider
 											list.add(Pair.of("container.ic2." + oldKey.replace("te.", ""), translation));
 										}
 
-										if (oldKey.equals("te.mfsu") || oldKey.equals("te.mfe") || oldKey.equals("te.electrolyzer"))
-										{
-											list.add(Pair.of("block.ic2.classic_" + oldKey.replace("te.", ""), translation));
-											list.add(Pair.of("container.ic2.classic_" + oldKey.replace("te.", ""), translation));
-										}
-
-										if (oldKey.contains("te.nuke"))
-										{
-											list.add(Pair.of("block.ic2.classic_" + oldKey.replace("te.", ""), translation));
-										}
-
 										if (oldKey.startsWith("itemToolMEter."))
 										{
 											list.add(Pair.of("ic2.meter." + oldKey.replace("itemToolMEter.", ""), translation));
@@ -675,7 +664,6 @@ public class OldToNewLangConverter implements DataProvider
 				String oldName = switch (name)
 				{
 					case "uu_scanner" -> "scanner";
-					case "classic_cropmatron" -> "cropmatron";
 					default -> name;
 				};
 				map.put("te." + oldName, "block.ic2." + name);

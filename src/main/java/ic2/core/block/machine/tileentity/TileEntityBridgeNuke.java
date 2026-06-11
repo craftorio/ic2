@@ -4,7 +4,6 @@ import ic2.api.entity.block.ExplosiveEntity;
 import ic2.core.IC2;
 import ic2.core.entity.block.NukeEntity;
 import ic2.core.init.MainConfig;
-import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.util.ConfigUtil;
 import ic2.core.util.LogCategory;
 import ic2.core.util.Util;
@@ -66,25 +65,4 @@ public abstract class TileEntityBridgeNuke extends TileEntityExplosive
 		IC2.log.log(LogCategory.PlayerActivity, Level.INFO, "Nuke at %s was ignited %s.", Util.formatPosition(this), cause);
 	}
 
-	public static class TileEntityClassicNuke extends TileEntityBridgeNuke
-	{
-		private static final float POWER = 35.0F;
-
-		public TileEntityClassicNuke(BlockPos pos, BlockState state)
-		{
-			super(Ic2BlockEntities.CLASSIC_NUKE, pos, state);
-		}
-
-		@Override
-		public float getNukeExplosivePower()
-		{
-			return Math.min(35.0F, ConfigUtil.getFloat(MainConfig.get(), "protection/nukeExplosionPowerLimit"));
-		}
-
-		@Override
-		public int getRadiationRange()
-		{
-			return 1;
-		}
-	}
 }

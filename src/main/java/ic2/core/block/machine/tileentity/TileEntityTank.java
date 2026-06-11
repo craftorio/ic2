@@ -35,10 +35,7 @@ public class TileEntityTank extends TileEntityInventory implements IUpgradableBl
 	{
 		super(Ic2BlockEntities.TANK, pos, state);
 		this.fluidTank = this.fluids.addTank("fluid", 24000);
-		this.comparator
-			.setUpdate(
-				() -> this.fluidTank.getFluidAmount() == 0 ? 0 : (int) Util.lerp(1.0F, 15.0F, (float) this.fluidTank.getFluidAmount() / this.fluidTank.getCapacity())
-			);
+		this.comparator.setUpdate(() -> this.fluidTank.getFluidAmount() == 0 ? 0 : (int) Util.lerp(1.0F, 15.0F, (float) this.fluidTank.getFluidAmount() / this.fluidTank.getCapacity()));
 	}
 
 	@Override

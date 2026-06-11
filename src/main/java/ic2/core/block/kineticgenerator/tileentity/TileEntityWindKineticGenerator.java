@@ -16,6 +16,7 @@ import ic2.core.network.GrowingBuffer;
 import ic2.core.profile.NotClassic;
 import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.util.ConfigUtil;
+import ic2.core.util.LogCategory;
 import ic2.core.util.StackUtil;
 import ic2.core.util.Util;
 
@@ -64,14 +65,14 @@ public class TileEntityWindKineticGenerator extends TileEntityAbstractKineticGen
 		if (this.updateTicker++ % this.getTickRate() == 0)
 		{
 			boolean needsInvUpdate = false;
-			boolean isActive = this.getActive();
-			if ((this.hasRotor() && this.rotorHasSpace()) != isActive)
+			boolean nextActive = this.hasRotor() && this.rotorHasSpace();
+
+			if (nextActive != this.getActive())
 			{
-				this.setActive(isActive = !isActive);
 				needsInvUpdate = true;
 			}
 
-			if (isActive)
+			if (nextActive)
 			{
 				this.crossSection = Util.square(this.getRotorDiameter() / 2 * 2 * 2 + 1);
 				this.obstructedCrossSection = this.checkSpace(this.getRotorDiameter() * 3, false);
@@ -104,8 +105,11 @@ public class TileEntityWindKineticGenerator extends TileEntityAbstractKineticGen
 				}
 			} else
 			{
+				this.windStrength = 0.0;
 				this.setRotationSpeed(0.0F);
 			}
+
+			this.setActive(nextActive);
 
 			if (needsInvUpdate)
 			{
@@ -328,6 +332,7 @@ public class TileEntityWindKineticGenerator extends TileEntityAbstractKineticGen
 
 	public int getKuOutput()
 	{
+		IC2.log.debug(LogCategory.General, "Wind strength: %s, Min wind: %s, efficiency: %s, active: %s", this.windStrength, this.getMinWindStrength(), this.getEfficiency(), this.getActive());
 		return this.windStrength >= this.getMinWindStrength() && this.getActive() ? (int) (this.windStrength * outputModifier * this.getEfficiency()) : 0;
 	}
 

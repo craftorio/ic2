@@ -9,7 +9,7 @@ public class Localization
 
 	public static String translate(String key)
 	{
-		return I18n.get(key, new Object[0]);
+		return I18n.get(key);
 	}
 
 	public static String translate(String key, Object... args)

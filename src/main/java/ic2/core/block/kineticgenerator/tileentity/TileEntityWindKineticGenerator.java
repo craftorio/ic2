@@ -16,7 +16,6 @@ import ic2.core.network.GrowingBuffer;
 import ic2.core.profile.NotClassic;
 import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.util.ConfigUtil;
-import ic2.core.util.LogCategory;
 import ic2.core.util.StackUtil;
 import ic2.core.util.Util;
 
@@ -147,7 +146,7 @@ public class TileEntityWindKineticGenerator extends TileEntityAbstractKineticGen
 	{
 		return !this.rotorSlot.isEmpty()
 			? Localization.translate(
-			"ic2.WindKineticGenerator.gui.rotorhealth", (int) (100.0F - (float) this.rotorSlot.get().getDamageValue() / this.rotorSlot.get().getMaxDamage() * 100.0F)
+			"ic2.WindKineticGenerator.gui.rotorhealth", (int) (100.0F - (float) this.rotorSlot.get().getDamageValue() / this.rotorSlot.get().getMaxDamage() * 100.0F), "%"
 		)
 			: "";
 	}
@@ -319,14 +318,8 @@ public class TileEntityWindKineticGenerator extends TileEntityAbstractKineticGen
 
 	public int getKuOutput()
 	{
-		return this.windStrength >= this.getMinWindStrength() && this.getActive() ? (int) (this.windStrength * outputModifier * this.getEfficiency()) : 0;
+		return this.windStrength >= this.getMinWindStrength() ? (int) (this.windStrength * outputModifier * this.getEfficiency()) : 0;
 	}
-
-	public int getWindStrength()
-	{
-		return (int) this.windStrength;
-	}
-
 	public int getObstructions()
 	{
 		return this.obstructedCrossSection;

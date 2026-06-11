@@ -359,11 +359,7 @@ public class TileEntityWaterKineticGenerator extends TileEntityAbstractKineticGe
 
 	public String getRotorHealth()
 	{
-		return !this.rotorSlot.isEmpty()
-			? Localization.translate(
-			"ic2.WaterKineticGenerator.gui.rotorhealth", (int) (100.0F - (float) this.rotorSlot.get().getDamageValue() / this.rotorSlot.get().getMaxDamage() * 100.0F)
-		)
-			: "";
+		return !this.rotorSlot.isEmpty() ? Localization.translate("ic2.WaterKineticGenerator.gui.rotorhealth", (int) (100.0F - (float) this.rotorSlot.get().getDamageValue() / this.rotorSlot.get().getMaxDamage() * 100.0F), "%") : "";
 	}
 
 	@Override

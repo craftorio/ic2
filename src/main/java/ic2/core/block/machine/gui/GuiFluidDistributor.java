@@ -23,7 +23,7 @@ public class GuiFluidDistributor extends Ic2Gui<ContainerFluidDistributor>
 	{
 		super.drawForegroundLayer(guiGraphics, mouseX, mouseY);
 		this.drawString(guiGraphics, 116, 47, Localization.translate("ic2.FluidDistributor.gui.mode.info"), 5752026);
-		
+
 		String drawnString = this.menu.base.getActive() ? Localization.translate("ic2.FluidDistributor.gui.mode.concentrate") : Localization.translate("ic2.FluidDistributor.gui.mode.distribute");
 		this.drawString(guiGraphics, 99, 71, drawnString, 5752026);
 	}

@@ -42,10 +42,12 @@ public abstract class Ic2LootTableProvider extends LootTableProvider
 		this.generate((id, builder) ->
 		{
 			LootTable table = builder.setParamSet(this.getContextType()).build();
-			LootDataResolver resolver = new LootDataResolver() {
+			LootDataResolver resolver = new LootDataResolver()
+			{
 				@Override
 				@javax.annotation.Nullable
-				public <T> T getElement(LootDataId<T> id) {
+				public <T> T getElement(LootDataId<T> id)
+				{
 					return null;
 				}
 			};

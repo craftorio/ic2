@@ -105,7 +105,10 @@ public final class EnvProxyForge implements EnvProxy
 	static final DeferredRegister<CreativeModeTab> creativeTabRegistry = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, "ic2");
 	static final List<TabRegistration> pendingTabRegistrations = new ArrayList<>();
 
-	record TabRegistration(ResourceLocation id, Supplier<ItemStack> icon, Ic2ItemGroupType groupType) {}
+	record TabRegistration(ResourceLocation id, Supplier<ItemStack> icon, Ic2ItemGroupType groupType)
+	{
+	}
+
 	static final DeferredRegister<FoliagePlacerType<?>> foliagePlacerRegistry = DeferredRegister.create(ForgeRegistries.FOLIAGE_PLACER_TYPES, "ic2");
 	static final DeferredRegister<RecipeType<?>> recipeTypeRegistry = DeferredRegister.create(ForgeRegistries.RECIPE_TYPES, "ic2");
 	static final DeferredRegister<RecipeSerializer<?>> recipeSerializerRegistry = DeferredRegister.create(ForgeRegistries.RECIPE_SERIALIZERS, "ic2");
@@ -271,38 +274,38 @@ public final class EnvProxyForge implements EnvProxy
 	}
 
 	@Override
-		public CreativeModeTab createItemGroup(ResourceLocation id, Supplier<ItemStack> iconSupplier, Ic2ItemGroupType groupType)
-		{
-			pendingTabRegistrations.add(new TabRegistration(id, iconSupplier, groupType));
-			CreativeModeTab tab = CreativeModeTab.builder()
-				.title(Component.translatable("itemGroup." + id.getNamespace() + "." + id.getPath()))
-				.icon(iconSupplier)
-				.displayItems((params, output) ->
+	public CreativeModeTab createItemGroup(ResourceLocation id, Supplier<ItemStack> iconSupplier, Ic2ItemGroupType groupType)
+	{
+		pendingTabRegistrations.add(new TabRegistration(id, iconSupplier, groupType));
+		CreativeModeTab tab = CreativeModeTab.builder()
+			.title(Component.translatable("itemGroup." + id.getNamespace() + "." + id.getPath()))
+			.icon(iconSupplier)
+			.displayItems((params, output) ->
+			{
+				List<Supplier<Item>> items = Ic2Items.CREATIVE_TAB_ITEMS.get(groupType);
+				if (items != null)
 				{
-					List<Supplier<Item>> items = Ic2Items.CREATIVE_TAB_ITEMS.get(groupType);
-					if (items != null)
+					for (Supplier<Item> itemSupplier : items)
 					{
-						for (Supplier<Item> itemSupplier : items)
+						Item item = itemSupplier.get();
+						output.accept(new ItemStack(item));
+						if (item instanceof IElectricItem)
 						{
-							Item item = itemSupplier.get();
-							output.accept(new ItemStack(item));
-							if (item instanceof IElectricItem)
-							{
-								output.accept(ElectricItemManager.getCharged(item, Double.POSITIVE_INFINITY));
-							}
-							if (item instanceof ItemArmorFluidTank tankItem)
-							{
-								ItemStack filledStack = new ItemStack(item);
-								tankItem.filltank(filledStack);
-								output.accept(filledStack);
-							}
+							output.accept(ElectricItemManager.getCharged(item, Double.POSITIVE_INFINITY));
+						}
+						if (item instanceof ItemArmorFluidTank tankItem)
+						{
+							ItemStack filledStack = new ItemStack(item);
+							tankItem.filltank(filledStack);
+							output.accept(filledStack);
 						}
 					}
-				})
-				.build();
-			creativeTabRegistry.register(id.getPath(), () -> tab);
-			return tab;
-		}
+				}
+			})
+			.build();
+		creativeTabRegistry.register(id.getPath(), () -> tab);
+		return tab;
+	}
 
 	@Override
 
@@ -445,15 +448,15 @@ public final class EnvProxyForge implements EnvProxy
 	}
 
 	record ConfiguredFeatureRegistration<FC extends FeatureConfiguration, F extends Feature<FC>>(
-			ResourceLocation id,
-			F feature,
-			FC config,
-			CompletableFuture<Holder<ConfiguredFeature<FC, ?>>> future
-		)
-		{
-		}
+		ResourceLocation id,
+		F feature,
+		FC config,
+		CompletableFuture<Holder<ConfiguredFeature<FC, ?>>> future
+	)
+	{
+	}
 
-		record PlacedFeatureRegistration<FC extends FeatureConfiguration>(
+	record PlacedFeatureRegistration<FC extends FeatureConfiguration>(
 		ResourceLocation id,
 		CompletableFuture<Holder<ConfiguredFeature<FC, ?>>> feature,
 		List<PlacementModifier> modifiers,

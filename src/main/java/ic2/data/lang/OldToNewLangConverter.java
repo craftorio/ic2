@@ -71,158 +71,157 @@ public class OldToNewLangConverter implements DataProvider
 	{
 		try
 		{
-		Path outputPath = this.generator.getPackOutput().getOutputFolder();
-		Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-		Path oldLangPath = outputPath.getParent().resolve("resources").resolve("assets/ic2/lang_ic2");
-		Files.walk(oldLangPath, 1)
-			.forEach(
-				path ->
-				{
-					if (!Files.isDirectory(path))
+			Path outputPath = this.generator.getPackOutput().getOutputFolder();
+			Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+			Path oldLangPath = outputPath.getParent().resolve("resources").resolve("assets/ic2/lang_ic2");
+			Files.walk(oldLangPath, 1)
+				.forEach(
+					path ->
 					{
-						try
+						if (!Files.isDirectory(path))
 						{
-							String language = path.getFileName().toString().replace(".properties", "");
-							Path oldFile = oldLangPath.resolve(language + ".properties");
-							Path newFile = outputPath.resolve("assets/ic2/lang/" + language.toLowerCase(Locale.ROOT) + ".json");
-							Properties oldLang = new Properties();
-							oldLang.load(Files.newBufferedReader(oldFile));
-							List<Pair<String, String>> list = new ArrayList<>();
-							NewLangGenerator newLangGenerator = new NewLangGenerator(language, list);
-							String[] guiTools = new String[] { "meter", "tool_box", "advanced_scanner", "scanner" };
-							oldLang.forEach(
-								(o1, o2) ->
-								{
-									String oldKey = (String) o1;
-									String translation = (String) o2;
-									if (oldKey.contains("energy_o_mat") || oldKey.contains("uu_assembly_bench"))
+							try
+							{
+								String language = path.getFileName().toString().replace(".properties", "");
+								Path oldFile = oldLangPath.resolve(language + ".properties");
+								Path newFile = outputPath.resolve("assets/ic2/lang/" + language.toLowerCase(Locale.ROOT) + ".json");
+								Properties oldLang = new Properties();
+								oldLang.load(Files.newBufferedReader(oldFile));
+								List<Pair<String, String>> list = new ArrayList<>();
+								NewLangGenerator newLangGenerator = new NewLangGenerator(language, list);
+								String[] guiTools = new String[] { "meter", "tool_box", "advanced_scanner", "scanner" };
+								oldLang.forEach(
+									(o1, o2) ->
 									{
-										list.add(Pair.of("container.ic2." + oldKey.replace("te.", ""), translation));
-									}
-
-									if (oldKey.equals("te.mfsu") || oldKey.equals("te.mfe") || oldKey.equals("te.electrolyzer"))
-									{
-										list.add(Pair.of("block.ic2.classic_" + oldKey.replace("te.", ""), translation));
-										list.add(Pair.of("container.ic2.classic_" + oldKey.replace("te.", ""), translation));
-									}
-
-									if (oldKey.contains("te.nuke"))
-									{
-										list.add(Pair.of("block.ic2.classic_" + oldKey.replace("te.", ""), translation));
-									}
-
-									if (oldKey.startsWith("itemToolMEter."))
-									{
-										list.add(Pair.of("ic2.meter." + oldKey.replace("itemToolMEter.", ""), translation));
-									}
-
-									if (Arrays.asList(guiTools).contains(oldKey))
-									{
-										String newKey = "container.ic2." + oldKey;
-										list.add(Pair.of(newKey, translation));
-									}
-
-									if (this.mapping.containsKey(oldKey))
-									{
-										String newKey = this.mapping.get(oldKey);
-										if (!newLangGenerator.overrideOldTranslation(oldKey, newKey, translation))
+										String oldKey = (String) o1;
+										String translation = (String) o2;
+										if (oldKey.contains("energy_o_mat") || oldKey.contains("uu_assembly_bench"))
 										{
+											list.add(Pair.of("container.ic2." + oldKey.replace("te.", ""), translation));
+										}
+
+										if (oldKey.equals("te.mfsu") || oldKey.equals("te.mfe") || oldKey.equals("te.electrolyzer"))
+										{
+											list.add(Pair.of("block.ic2.classic_" + oldKey.replace("te.", ""), translation));
+											list.add(Pair.of("container.ic2.classic_" + oldKey.replace("te.", ""), translation));
+										}
+
+										if (oldKey.contains("te.nuke"))
+										{
+											list.add(Pair.of("block.ic2.classic_" + oldKey.replace("te.", ""), translation));
+										}
+
+										if (oldKey.startsWith("itemToolMEter."))
+										{
+											list.add(Pair.of("ic2.meter." + oldKey.replace("itemToolMEter.", ""), translation));
+										}
+
+										if (Arrays.asList(guiTools).contains(oldKey))
+										{
+											String newKey = "container.ic2." + oldKey;
 											list.add(Pair.of(newKey, translation));
 										}
-									} else if (oldKey.startsWith("tooltip.")
-										|| oldKey.startsWith("generic.")
-										|| oldKey.startsWith("wind_meter.")
-										|| this.isValidGuiLang(oldKey))
-									{
-										list.add(Pair.of("ic2." + oldKey, translation));
-									} else if (oldKey.startsWith("achievement."))
-									{
-										try
+
+										if (this.mapping.containsKey(oldKey))
 										{
-											String name = oldKey.split("[.]", 2)[1];
-											list.add(Pair.of("advancements.ic2." + name, translation));
-										} catch (ArrayIndexOutOfBoundsException var9x)
-										{
-										}
-									} else if (oldKey.startsWith("painter."))
-									{
-										list.add(Pair.of(this.convertPainterKey(oldKey), translation));
-									}
-								}
-							);
-							newLangGenerator.generate();
-							list.removeIf(pairx -> pairx.left().startsWith("item.") && !BuiltInRegistries.ITEM.containsKey(extractIdentifier(pairx.left())));
-							list.removeIf(pairx -> pairx.left().startsWith("block.") && !BuiltInRegistries.BLOCK.containsKey(extractIdentifier(pairx.left())));
-							list.addAll(
-								list.stream()
-									.filter(pairx -> pairx.left().startsWith("block.") && pairx.left().split("[.]").length == 3)
-									.filter(pairx ->
-									{
-										ResourceLocation id = extractIdentifier(pairx.left());
-										boolean hasContainer = this.mapping.containsKey("container.ic2." + id.getPath());
-										return !hasContainer;
-									})
-									.map(pairx -> Pair.of("container.ic2." + extractIdentifier(pairx.left()).getPath(), pairx.right()))
-									.filter(
-										pairx ->
-										{
-											if (BuiltInRegistries.MENU.containsKey(extractIdentifier(pairx.left())))
+											String newKey = this.mapping.get(oldKey);
+											if (!newLangGenerator.overrideOldTranslation(oldKey, newKey, translation))
 											{
-												return true;
+												list.add(Pair.of(newKey, translation));
 											}
-
-											String[] extraContainers = new String[] {
-												"mfe",
-												"mfsu",
-												"rt_generator",
-												"lv_transformer",
-												"mv_transformer",
-												"hv_transformer",
-												"ev_transformer",
-												"tank",
-												"batbox_chargepad",
-												"cesu_chargepad",
-												"mfe_chargepad",
-												"mfsu_chargepad"
-											};
-
-											for (String container : extraContainers)
+										} else if (oldKey.startsWith("tooltip.")
+											|| oldKey.startsWith("generic.")
+											|| oldKey.startsWith("wind_meter.")
+											|| this.isValidGuiLang(oldKey))
+										{
+											list.add(Pair.of("ic2." + oldKey, translation));
+										} else if (oldKey.startsWith("achievement."))
+										{
+											try
 											{
-												if (pairx.left().contains(container))
+												String name = oldKey.split("[.]", 2)[1];
+												list.add(Pair.of("advancements.ic2." + name, translation));
+											} catch (ArrayIndexOutOfBoundsException var9x)
+											{
+											}
+										} else if (oldKey.startsWith("painter."))
+										{
+											list.add(Pair.of(this.convertPainterKey(oldKey), translation));
+										}
+									}
+								);
+								newLangGenerator.generate();
+								list.removeIf(pairx -> pairx.left().startsWith("item.") && !BuiltInRegistries.ITEM.containsKey(extractIdentifier(pairx.left())));
+								list.removeIf(pairx -> pairx.left().startsWith("block.") && !BuiltInRegistries.BLOCK.containsKey(extractIdentifier(pairx.left())));
+								list.addAll(
+									list.stream()
+										.filter(pairx -> pairx.left().startsWith("block.") && pairx.left().split("[.]").length == 3)
+										.filter(pairx ->
+										{
+											ResourceLocation id = extractIdentifier(pairx.left());
+											boolean hasContainer = this.mapping.containsKey("container.ic2." + id.getPath());
+											return !hasContainer;
+										})
+										.map(pairx -> Pair.of("container.ic2." + extractIdentifier(pairx.left()).getPath(), pairx.right()))
+										.filter(
+											pairx ->
+											{
+												if (BuiltInRegistries.MENU.containsKey(extractIdentifier(pairx.left())))
 												{
 													return true;
 												}
+
+												String[] extraContainers = new String[] {
+													"mfe",
+													"mfsu",
+													"rt_generator",
+													"lv_transformer",
+													"mv_transformer",
+													"hv_transformer",
+													"ev_transformer",
+													"tank",
+													"batbox_chargepad",
+													"cesu_chargepad",
+													"mfe_chargepad",
+													"mfsu_chargepad"
+												};
+
+												for (String container : extraContainers)
+												{
+													if (pairx.left().contains(container))
+													{
+														return true;
+													}
+												}
+
+												return false;
 											}
+										)
+										.toList()
+								);
+								list.sort(
+									((Comparator<Pair<String, String>>) (o1, o2) -> tryCompareByRawId(o1, o2, "block", BuiltInRegistries.BLOCK))
+										.thenComparing((o1, o2) -> tryCompareByRawId(o1, o2, "item", BuiltInRegistries.ITEM))
+										.thenComparing((o1, o2) -> tryCompareByRawId(o1, o2, "container", BuiltInRegistries.BLOCK))
+										.thenComparing(pairx -> pairx.left())
+								);
+								JsonObject newLang = new JsonObject();
 
-											return false;
-										}
-									)
-									.toList()
-							);
-							list.sort(
-								((Comparator<Pair<String, String>>) (o1, o2) -> tryCompareByRawId(o1, o2, "block", BuiltInRegistries.BLOCK))
-									.thenComparing((o1, o2) -> tryCompareByRawId(o1, o2, "item", BuiltInRegistries.ITEM))
-									.thenComparing((o1, o2) -> tryCompareByRawId(o1, o2, "container", BuiltInRegistries.BLOCK))
-									.thenComparing(pairx -> pairx.left())
-							);
-							JsonObject newLang = new JsonObject();
+								for (Pair<String, String> pair : list)
+								{
+									newLang.addProperty(pair.left(), pair.right());
+								}
 
-							for (Pair<String, String> pair : list)
+								writeToPath(cache, newLang, newFile);
+							} catch (IOException e)
 							{
-								newLang.addProperty(pair.left(), pair.right());
+								throw new RuntimeException(e);
 							}
-
-							writeToPath(cache, newLang, newFile);
-						} catch (IOException e)
-						{
-							throw new RuntimeException(e);
 						}
 					}
-				}
-			);
-		return CompletableFuture.allOf();
-		}
-		catch (IOException e)
+				);
+			return CompletableFuture.allOf();
+		} catch (IOException e)
 		{
 			throw new RuntimeException(e);
 		}

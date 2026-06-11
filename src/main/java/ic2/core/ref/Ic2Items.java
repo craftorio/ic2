@@ -78,6 +78,7 @@ import ic2.core.item.type.BlockCuttingBladeType;
 import ic2.core.item.upgrade.ItemUpgradeModule;
 import ic2.core.util.Ic2Color;
 import ic2.core.util.Util;
+
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -732,7 +733,7 @@ public final class Ic2Items
 	public static final Item TERRA_WART = register(
 		"terra_wart",
 		new ItemTerraWart(
-			new Properties().food(new Builder().nutrition(0).saturationMod(1.0F).alwaysEat().build()).rarity(Rarity.RARE)		)
+			new Properties().food(new Builder().nutrition(0).saturationMod(1.0F).alwaysEat().build()).rarity(Rarity.RARE))
 	);
 	public static final Item CUTTER = register("cutter", new ItemToolCutter(new Properties().durability(60)));
 	public static final Item DEBUG_ITEM = register(

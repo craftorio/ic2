@@ -681,6 +681,6 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 	protected abstract ResourceLocation getTextureLocation();
 
 	private record Tooltip(List<Component> text, int x, int y)
-		{
-		}
+	{
+	}
 }

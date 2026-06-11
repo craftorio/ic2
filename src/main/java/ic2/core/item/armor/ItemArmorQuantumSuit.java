@@ -306,12 +306,10 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 				ret = true;
 			}
 
-		}
-		else if (equipSlot == EquipmentSlot.CHEST)
+		} else if (equipSlot == EquipmentSlot.CHEST)
 		{
 			player.clearFire();
-		}
-		else if (equipSlot == EquipmentSlot.LEGS)
+		} else if (equipSlot == EquipmentSlot.LEGS)
 		{
 			boolean enableQuantumSpeedOnSprint;
 			if (IC2.sideProxy.isRendering())
@@ -355,8 +353,7 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 				}
 			}
 
-		}
-		else if (equipSlot == EquipmentSlot.FEET)
+		} else if (equipSlot == EquipmentSlot.FEET)
 		{
 			if (IC2.sideProxy.isSimulating())
 			{

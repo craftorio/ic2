@@ -63,7 +63,7 @@ public class BoatEntityRenderer extends EntityRenderer<AbstractBoatEntity>
 
 		if (!Mth.equal(boatEntity.getBubbleAngle(g), 0.0F))
 		{
-			matrixStack.mulPose(new Quaternionf().rotateAxis(boatEntity.getBubbleAngle(g) * ((float)Math.PI / 180F), 1.0F, 0.0F, 1.0F));
+			matrixStack.mulPose(new Quaternionf().rotateAxis(boatEntity.getBubbleAngle(g) * ((float) Math.PI / 180F), 1.0F, 0.0F, 1.0F));
 		}
 
 		Pair<ResourceLocation, BoatModel> pair = this.texturesAndModels.get(boatEntity.getOverrideBoatType());

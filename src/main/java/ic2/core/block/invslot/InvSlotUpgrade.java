@@ -188,7 +188,7 @@ public class InvSlotUpgrade extends InvSlot
 
 		return existingRange;
 	}
-	
+
 
 	public boolean tickNoMark()
 	{
@@ -219,18 +219,18 @@ public class InvSlotUpgrade extends InvSlot
 		IRedstoneSensitiveUpgrade upgrade,
 		ItemStack stack,
 		IUpgradableBlock block) implements Redstone.IRedstoneModifier
+	{
+		private UpgradeRedstoneModifier(IRedstoneSensitiveUpgrade upgrade, ItemStack stack, IUpgradableBlock block)
 		{
-			private UpgradeRedstoneModifier(IRedstoneSensitiveUpgrade upgrade, ItemStack stack, IUpgradableBlock block)
-			{
-				this.upgrade = upgrade;
-				this.stack = stack.copy();
-				this.block = block;
-			}
-	
-			@Override
-			public int getRedstoneInput(int redstoneInput)
-			{
-				return this.upgrade.getRedstoneInput(this.stack, this.block, redstoneInput);
-			}
+			this.upgrade = upgrade;
+			this.stack = stack.copy();
+			this.block = block;
 		}
+
+		@Override
+		public int getRedstoneInput(int redstoneInput)
+		{
+			return this.upgrade.getRedstoneInput(this.stack, this.block, redstoneInput);
+		}
+	}
 }

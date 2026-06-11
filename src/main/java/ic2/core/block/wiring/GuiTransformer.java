@@ -31,9 +31,9 @@ public class GuiTransformer extends Ic2Gui<ContainerTransformer>
 		this.addElement(new ItemImage(this, 152, 67, () -> new ItemStack(Ic2Items.WRENCH)).withEnableHandler(() -> this.menu.base.getMode() == TileEntityTransformer.Mode.redstone));
 		this.addElement(new ItemImage(this, 152, 87, () -> new ItemStack(Ic2Items.WRENCH)).withEnableHandler(() -> this.menu.base.getMode() == TileEntityTransformer.Mode.stepdown));
 		this.addElement(new ItemImage(this, 152, 107, () -> new ItemStack(Ic2Items.WRENCH)).withEnableHandler(() -> this.menu.base.getMode() == TileEntityTransformer.Mode.stepup));
-}
+	}
 
-@Override
+	@Override
 	protected ResourceLocation getTextureLocation()
 	{
 		return background;

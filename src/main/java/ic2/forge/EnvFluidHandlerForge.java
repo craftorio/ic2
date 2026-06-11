@@ -60,7 +60,7 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 	{
 		EnvFluidHandler.FluidRefs ret = new EnvFluidHandler.FluidRefs(null, null, null, null);
 		java.util.concurrent.atomic.AtomicReference<FluidType> fluidTypeRef = new java.util.concurrent.atomic.AtomicReference<>();
-		
+
 		pendingFluidTypeRegistrations.add(() ->
 		{
 			FluidType.Properties attributesBuilder = FluidType.Properties.create()
@@ -392,7 +392,7 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 		updateResultStack(newStack, handler);
 		return ret;
 	}
-	
+
 	private static IFluidHandlerItem getFluidHandler(ItemStack stack)
 	{
 		return stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM, null).orElse(null);

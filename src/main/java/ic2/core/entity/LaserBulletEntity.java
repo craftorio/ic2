@@ -213,7 +213,7 @@ public class LaserBulletEntity extends ThrowableProjectile
 		}
 
 		List<ItemStack> replacements = new ArrayList<>();
-		if (block == Blocks.TNT )
+		if (block == Blocks.TNT)
 		{
 			block.wasExploded(
 				world, pos, new Explosion(world, this, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 1.0F, false, BlockInteraction.DESTROY)

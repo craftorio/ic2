@@ -35,6 +35,7 @@ public class CropEating extends Ic2CropCard
 {
 	private final double movementMultiplier = 0.5;
 	private final double length = 1.0;
+
 	public CropEating(ICropType cropType)
 	{
 		super(cropType);

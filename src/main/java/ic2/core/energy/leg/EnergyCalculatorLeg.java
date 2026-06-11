@@ -779,7 +779,7 @@ public class EnergyCalculatorLeg implements IEnergyCalculator
 				LivingEntity target = entry.getKey();
 				int damage = (int) Math.ceil(entry.getValue().doubleValue() / 64.0);
 				if (target.isAlive() && damage > 0)
-				{	
+				{
 					if (Ic2DamageSource.electricity == null)
 					{
 						Ic2DamageSource.init(target.level().registryAccess());

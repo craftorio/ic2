@@ -20,7 +20,7 @@ import org.apache.logging.log4j.LogManager;
 
 public class IC2
 {
-	public static final String VERSION = "2.10.7-ex120";
+	public static final String VERSION = "2.10.8-ex120";
 	public static final String MOD_ID = "ic2";
 	public static final String RESOURCE_DOMAIN = "ic2";
 	public static final String ICON_STACK_NAME = "ic2:tab_icon";
@@ -75,7 +75,7 @@ public class IC2
 
 	private static SideProxy createSideProxy()
 	{
-		return envProxy.isClientEnv() ? new SideProxyClient() :  new SideProxyServer();
+		return envProxy.isClientEnv() ? new SideProxyClient() : new SideProxyServer();
 	}
 
 	static

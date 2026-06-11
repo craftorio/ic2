@@ -197,12 +197,11 @@ public final class FmlMod
 				ConfiguredFeature<?, ?> cf = new ConfiguredFeature(reg.feature(), reg.config());
 				event.register(Registries.CONFIGURED_FEATURE, reg.id(), () -> cf);
 			}
-		}
-		else if (event.getRegistryKey() == Registries.FEATURE)
+		} else if (event.getRegistryKey() == Registries.FEATURE)
 		{
 			for (EnvProxyForge.PlacedFeatureRegistration<?> reg : EnvProxyForge.placedFeatureRegistrations)
 			{
-									ResourceKey<PlacedFeature> placedKey = ResourceKey.create(Registries.PLACED_FEATURE, ResourceLocation.parse(reg.id().toString()));
+				ResourceKey<PlacedFeature> placedKey = ResourceKey.create(Registries.PLACED_FEATURE, ResourceLocation.parse(reg.id().toString()));
 				// TODO: Fix for 1.20.1 - reg.placedFeature().complete(Registry.registerForHolder(ForgeRegistries.PLACED_FEATURES, placedKey, new PlacedFeature(reg.feature().join().value(), reg.modifiers())));
 			}
 

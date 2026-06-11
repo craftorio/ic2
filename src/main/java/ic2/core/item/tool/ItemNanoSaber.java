@@ -27,7 +27,7 @@ public class ItemNanoSaber extends AbstractItemNanoSaber
 
 		int dmg = 4;
 		float speed = -3.0f;
-		
+
 		if (ElectricItem.manager.canUse(stack, 400.0) && isActive(stack))
 		{
 			dmg = 20;

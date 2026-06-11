@@ -192,7 +192,7 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
 					if (this.shootLaser(stack, world, player, Float.POSITIVE_INFINITY, 12.0F, Integer.MAX_VALUE, true, false))
 					{
 						IC2.network.get(true).initiateItemEvent(player, stack, 6, true);
-					} 
+					}
 				default:
 					break;
 			}

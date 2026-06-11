@@ -320,6 +320,7 @@ public class TileEntityWindKineticGenerator extends TileEntityAbstractKineticGen
 	{
 		return this.windStrength >= this.getMinWindStrength() ? (int) (this.windStrength * outputModifier * this.getEfficiency()) : 0;
 	}
+
 	public int getObstructions()
 	{
 		return this.obstructedCrossSection;

@@ -844,9 +844,12 @@ public class TileEntityCrop extends Ic2TileEntity implements ICropTile
 	{
 		return this.getLevel();
 	}
-	
+
 	@Override
-	public Level getWorld() { return this.getLevel(); }
+	public Level getWorld()
+	{
+		return this.getLevel();
+	}
 
 	@Deprecated
 	@Override

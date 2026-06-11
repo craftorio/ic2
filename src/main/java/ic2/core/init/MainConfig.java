@@ -7,19 +7,17 @@ import ic2.core.util.ConfigUtil;
 
 import java.io.File;
 import java.nio.file.Files;
-import java.util.Iterator;
 import java.util.List;
 
 public class MainConfig
 {
 	public static boolean ignoreInvalidRecipes = false;
 	private static Config config;
-	private static Config defaultConfig;
 
 	public static void load()
 	{
 		config = new Config("ic2 general config");
-		defaultConfig = new Config("ic2 default config");
+		Config defaultConfig = new Config("ic2 default config");
 
 		try
 		{
@@ -32,18 +30,16 @@ public class MainConfig
 
 		File configFile = getFile();
 
-		if (configFile.exists())
+		if (configFile != null && configFile.exists())
 		{
 			try
 			{
 				String content = new String(Files.readAllBytes(configFile.toPath()));
 				if (!content.contains("#"))
 				{
-					// New version ic2.ini, no migration needed
 					return;
 				}
-				// Old version, delete and reconstruct from general.ini
-				configFile.delete();
+				boolean ignored = configFile.delete();
 			} catch (Exception e)
 			{
 				// Cannot read file, proceed with normal loading
@@ -82,20 +78,10 @@ public class MainConfig
 		return config;
 	}
 
-	public static Config.Value getDefault(String config)
-	{
-		return defaultConfig.get(config);
-	}
-
-	public static Iterator<Config.Value> getDefaults(String sub)
-	{
-		return defaultConfig.getSub(sub).valueIterator();
-	}
-
 	private static File getFile()
 	{
 		File folder = new File(IC2.sideProxy.getMinecraftDir(), "config");
-		folder.mkdirs();
+		boolean ignored = folder.mkdirs();
 		return new File(folder, "ic2.ini");
 	}
 

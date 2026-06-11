@@ -202,6 +202,23 @@ tasks.register('syncVersion') {
         } else {
             println "syncVersion: 未找到 README.md，跳过"
         }
+        
+        // 7. 更新 ic2.core.IC2 中的 VERSION 字段
+        def ic2File = file('src/main/java/ic2/core/IC2.java')
+        if (ic2File.exists()) {
+            def ic2Text = ic2File.text
+            def versionFieldPattern = /public static final String VERSION = "[^"]*";/
+            def newVersionField = "public static final String VERSION = \"${currentVersion}\";"
+            if (ic2Text.find(versionFieldPattern)) {
+                ic2Text = ic2Text.replaceAll(versionFieldPattern, newVersionField)
+                ic2File.text = ic2Text
+                println "syncVersion: ic2.core.IC2.VERSION 已更新为 ${currentVersion}"
+            } else {
+                println "syncVersion: 未在 ic2.core.IC2 中找到 VERSION 字段，跳过"
+            }
+        } else {
+            println "syncVersion: 未找到 src/main/java/ic2/core/IC2.java，跳过"
+        }
 
         println "syncVersion: 同步完成 ($currentVersion)"
     }

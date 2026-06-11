@@ -81,13 +81,39 @@ public interface EnvFluidHandler
 			this.bucketRef = new java.util.concurrent.atomic.AtomicReference<>(bucket);
 		}
 
-		public Block block() { return this.block; }
-		public Fluid still() { return this.stillRef.get(); }
-		public Fluid flowing() { return this.flowingRef.get(); }
-		public BucketItem bucket() { return this.bucketRef.get(); }
+		public Block block()
+		{
+			return this.block;
+		}
 
-		public void still(Fluid still) { this.stillRef.set(still); }
-		public void flowing(Fluid flowing) { this.flowingRef.set(flowing); }
-		public void bucket(BucketItem bucket) { this.bucketRef.set(bucket); }
+		public Fluid still()
+		{
+			return this.stillRef.get();
+		}
+
+		public Fluid flowing()
+		{
+			return this.flowingRef.get();
+		}
+
+		public BucketItem bucket()
+		{
+			return this.bucketRef.get();
+		}
+
+		public void still(Fluid still)
+		{
+			this.stillRef.set(still);
+		}
+
+		public void flowing(Fluid flowing)
+		{
+			this.flowingRef.set(flowing);
+		}
+
+		public void bucket(BucketItem bucket)
+		{
+			this.bucketRef.set(bucket);
+		}
 	}
 }

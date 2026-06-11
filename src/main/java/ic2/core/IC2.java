@@ -1,13 +1,18 @@
 package ic2.core;
 
+import ic2.api.network.INetworkManager;
 import ic2.core.network.NetworkManager;
+import ic2.core.network.NetworkManagerClient;
 import ic2.core.proxy.EnvProxy;
 import ic2.core.proxy.SideProxy;
+import ic2.core.proxy.SideProxyClient;
+import ic2.core.proxy.SideProxyServer;
 import ic2.core.sound.SoundManager;
 import ic2.core.util.Keyboard;
 import ic2.core.util.Log;
 import ic2.core.util.PriorityExecutor;
 import ic2.core.util.SideGateway;
+import ic2.forge.EnvProxyForge;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
@@ -17,14 +22,14 @@ import org.apache.logging.log4j.LogManager;
 
 public class IC2
 {
-	public static final String VERSION = "2.9.%build%%suffix%";
+	public static final String VERSION = "2.10.7-ex120";
 	public static final String MOD_ID = "ic2";
 	public static final String RESOURCE_DOMAIN = "ic2";
 	public static final String ICON_STACK_NAME = "ic2:tab_icon";
 	public static final EnvProxy envProxy;
 	public static final SideProxy sideProxy;
 	public static final Log log;
-	public static final SideGateway<NetworkManager> network;
+	public static final SideGateway network;
 	public static final Keyboard keyboard;
 	public static final SoundManager soundManager;
 	public static Ic2Achievements achievements;
@@ -67,43 +72,12 @@ public class IC2
 
 	private static EnvProxy createEnvProxy()
 	{
-		String name;
-		try
-		{
-			Class.forName("net.fabricmc.api.ModInitializer");
-			name = "ic2.fabric.EnvProxyFabric";
-		} catch (ClassNotFoundException e)
-		{
-			try
-			{
-				Class.forName("net.minecraftforge.common.MinecraftForge");
-				name = "ic2.forge.EnvProxyForge";
-			} catch (ClassNotFoundException e2)
-			{
-				throw new RuntimeException("unknown environment");
-			}
-		}
-
-		try
-		{
-			return (EnvProxy) Class.forName(name).getConstructor().newInstance();
-		} catch (ReflectiveOperationException e)
-		{
-			throw new RuntimeException(e);
-		}
+		return new EnvProxyForge();
 	}
 
 	private static SideProxy createSideProxy()
 	{
-		String name = envProxy.isClientEnv() ? "ic2.core.proxy.SideProxyClient" : "ic2.core.proxy.SideProxyServer";
-
-		try
-		{
-			return (SideProxy) Class.forName(name).getConstructor().newInstance();
-		} catch (ReflectiveOperationException e)
-		{
-			throw new RuntimeException(e);
-		}
+		return envProxy.isClientEnv() ? new SideProxyClient() :  new SideProxyServer();
 	}
 
 	static
@@ -119,7 +93,7 @@ public class IC2
 		envProxy = createEnvProxy();
 		sideProxy = createSideProxy();
 		log = new Log(LogManager.getLogger("ic2"));
-		network = new SideGateway<>("ic2.core.network.NetworkManager", "ic2.core.network.NetworkManagerClient");
+		network = new SideGateway(NetworkManager.class, NetworkManagerClient.class);
 		keyboard = sideProxy.getKeyboard();
 		soundManager = sideProxy.getSoundManager();
 		tabIc2General = envProxy.createItemGroup(getIdentifier("general"), new ItemGroupIconSupplier(Ic2ItemGroupType.GENERAL), Ic2ItemGroupType.GENERAL);

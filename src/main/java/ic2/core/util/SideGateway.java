@@ -1,32 +1,33 @@
 package ic2.core.util;
 
 import ic2.core.IC2;
+import ic2.core.network.NetworkManager;
 
-public final class SideGateway<T>
+public final class SideGateway
 {
-	private final T clientInstance;
-	private final T serverInstance;
+	private final NetworkManager clientInstance;
+	private final NetworkManager serverInstance;
 
-	public SideGateway(String serverClass, String clientClass)
+	public SideGateway(Class<? extends NetworkManager> serverClass, Class<? extends NetworkManager> clientClass)
 	{
 		try
 		{
 			if (IC2.envProxy.isClientEnv())
 			{
-				this.clientInstance = (T) Class.forName(clientClass).newInstance();
+				this.clientInstance = clientClass.getDeclaredConstructor().newInstance();
 			} else
 			{
 				this.clientInstance = null;
 			}
 
-			this.serverInstance = (T) Class.forName(serverClass).newInstance();
+			this.serverInstance = serverClass.getDeclaredConstructor().newInstance();
 		} catch (Exception e)
 		{
 			throw new RuntimeException(e);
 		}
 	}
 
-	public T get(boolean simulating)
+	public NetworkManager get(boolean simulating)
 	{
 		return simulating ? this.serverInstance : this.clientInstance;
 	}

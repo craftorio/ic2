@@ -6,6 +6,7 @@ import ic2.core.util.Config;
 import ic2.core.util.ConfigUtil;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.util.Iterator;
 import java.util.List;
 
@@ -30,6 +31,24 @@ public class MainConfig
 		}
 
 		File configFile = getFile();
+
+		if (configFile.exists())
+		{
+			try
+			{
+				String content = new String(Files.readAllBytes(configFile.toPath()));
+				if (!content.contains("#"))
+				{
+					// New version ic2.ini, no migration needed
+					return;
+				}
+				// Old version, delete and reconstruct from general.ini
+				configFile.delete();
+			} catch (Exception e)
+			{
+				// Cannot read file, proceed with normal loading
+			}
+		}
 
 		try
 		{
@@ -77,7 +96,7 @@ public class MainConfig
 	{
 		File folder = new File(IC2.sideProxy.getMinecraftDir(), "config");
 		folder.mkdirs();
-		return new File(folder, "IC2.ini");
+		return new File(folder, "ic2.ini");
 	}
 
 	private static void upgradeContents()

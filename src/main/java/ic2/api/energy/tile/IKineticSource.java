@@ -19,4 +19,5 @@ public interface IKineticSource
 	{
 		return !simulate ? this.requestkineticenergy(side, request) : this.maxrequestkineticenergyTick(side);
 	}
+	
 }

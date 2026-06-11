@@ -1,6 +1,5 @@
 package ic2.core.block.kineticgenerator.tileentity;
 
-import ic2.api.energy.tile.IKineticSource;
 import ic2.api.upgrade.IUpgradableBlock;
 import ic2.api.upgrade.UpgradableProperty;
 import ic2.core.ContainerBase;
@@ -13,7 +12,6 @@ import ic2.core.block.invslot.InvSlotConsumableItemStack;
 import ic2.core.block.invslot.InvSlotUpgrade;
 import ic2.core.block.kineticgenerator.container.ContainerSteamKineticGenerator;
 import ic2.core.block.machine.tileentity.TileEntityCondenser;
-import ic2.core.block.tileentity.TileEntityInventory;
 import ic2.core.fluid.Ic2FluidStack;
 import ic2.core.fluid.Ic2FluidTank;
 import ic2.core.init.MainConfig;
@@ -40,14 +38,14 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 @NotClassic
-public class TileEntitySteamKineticGenerator extends TileEntityInventory implements IKineticSource, IHasGui, IUpgradableBlock
+public class TileEntitySteamKineticGenerator extends TileEntityAbstractKineticGenerator implements IHasGui, IUpgradableBlock
 {
 	protected final Ic2FluidTank steamTank;
 	protected final Ic2FluidTank distilledWaterTank;
 	public final InvSlotUpgrade upgradeSlot = new InvSlotUpgrade(this, "upgrade", 1);
 	public final InvSlotConsumable turbineSlot = new InvSlotConsumableItemStack(this, "Turbineslot", 1, new ItemStack(Ic2Items.STEAM_TURBINE));
 	private static final float outputModifier = ConfigUtil.getFloat(MainConfig.get(), "balance/energy/kineticgenerator/steam");
-	private int kUoutput;
+	private int kuOutput;
 	private boolean ventingSteam;
 	private boolean throttled;
 	private boolean isTurbineFilledWithWater = false;
@@ -98,7 +96,7 @@ public class TileEntitySteamKineticGenerator extends TileEntityInventory impleme
 		{
 			this.setActive(false);
 			needsInvUpdate = true;
-			this.kUoutput = 0;
+			this.kuOutput = 0;
 		}
 
 		needsInvUpdate |= this.upgradeSlot.tickNoMark();
@@ -142,7 +140,7 @@ public class TileEntitySteamKineticGenerator extends TileEntityInventory impleme
 			throttle = 1.0F - (float) waterAmount / this.distilledWaterTank.getCapacity();
 		}
 
-		this.kUoutput = (int) (rawOutput * throttle * outputModifier);
+		this.kuOutput = (int) (rawOutput * throttle * outputModifier);
 		if (this.condensationProgress >= 100)
 		{
 			if (this.distilledWaterTank.fillMbUnchecked(Ic2FluidStack.create(Ic2Fluids.DISTILLED_WATER.still(), 1), true) == 1)
@@ -155,7 +153,7 @@ public class TileEntitySteamKineticGenerator extends TileEntityInventory impleme
 			}
 		}
 
-		return this.kUoutput > 0;
+		return this.kuOutput > 0;
 	}
 
 	private void outputSteam(int amount, boolean hotSteam)
@@ -194,7 +192,7 @@ public class TileEntitySteamKineticGenerator extends TileEntityInventory impleme
 
 	public int getKUoutput()
 	{
-		return this.kUoutput;
+		return this.kuOutput;
 	}
 
 	@Override
@@ -232,19 +230,19 @@ public class TileEntitySteamKineticGenerator extends TileEntityInventory impleme
 	@Override
 	public int getConnectionBandwidth(Direction side)
 	{
-		return side == this.getFacing() ? this.kUoutput : 0;
+		return side == this.getFacing() ? this.kuOutput : 0;
 	}
 
 	@Override
-	public int requestkineticenergy(Direction directionFrom, int requestkineticenergy)
+	public int requestkineticenergy(Direction directionFrom, int requestKineticEnergy)
 	{
-		return this.drawKineticEnergy(directionFrom, requestkineticenergy, false);
+		return this.drawKineticEnergy(directionFrom, requestKineticEnergy, false);
 	}
 
 	@Override
 	public int drawKineticEnergy(Direction side, int request, boolean simulate)
 	{
-		return side == this.getFacing() ? this.kUoutput : 0;
+		return side == this.getFacing() ? this.kuOutput : 0;
 	}
 
 	public int gaugeLiquidScaled(int i, int tank)

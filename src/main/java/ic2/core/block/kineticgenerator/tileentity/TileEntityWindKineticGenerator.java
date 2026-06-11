@@ -1,6 +1,5 @@
 package ic2.core.block.kineticgenerator.tileentity;
 
-import ic2.api.energy.tile.IKineticSource;
 import ic2.api.item.IKineticRotor;
 import ic2.api.tile.IRotorProvider;
 import ic2.core.ContainerBase;
@@ -10,7 +9,6 @@ import ic2.core.block.invslot.InvSlot;
 import ic2.core.block.invslot.InvSlotConsumableClass;
 import ic2.core.block.invslot.InvSlotConsumableKineticRotor;
 import ic2.core.block.kineticgenerator.container.ContainerWindKineticGenerator;
-import ic2.core.block.tileentity.TileEntityInventory;
 import ic2.core.event.WorldData;
 import ic2.core.init.Localization;
 import ic2.core.init.MainConfig;
@@ -36,7 +34,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
 @NotClassic
-public class TileEntityWindKineticGenerator extends TileEntityInventory implements IKineticSource, IRotorProvider, IHasGui
+public class TileEntityWindKineticGenerator extends TileEntityAbstractKineticGenerator implements IRotorProvider, IHasGui
 {
 	public final InvSlotConsumableClass rotorSlot;
 	private double windStrength;
@@ -45,7 +43,7 @@ public class TileEntityWindKineticGenerator extends TileEntityInventory implemen
 	private int updateTicker;
 	private float rotationSpeed;
 	private float angle = 0.0F;
-	private long lastcheck;
+	private long lastCheck;
 	private static final double efficiencyRollOffExponent = 2.0;
 	public static final float outputModifier = 10.0F * ConfigUtil.getFloat(MainConfig.get(), "balance/energy/kineticgenerator/wind");
 	private static final ResourceLocation woodenRotorTexture = ResourceLocation.fromNamespaceAndPath("ic2", "textures/item/rotor/wood_rotor_model.png");
@@ -198,14 +196,14 @@ public class TileEntityWindKineticGenerator extends TileEntityInventory implemen
 			this.getLevel(), this.worldPosition.offset(-xMaxDist, -box, -zMaxDist), this.worldPosition.offset(xMaxDist, box, zMaxDist)
 		);
 		int ret = 0;
-		int xCoord = this.worldPosition.getX();
-		int yCoord = this.worldPosition.getY();
-		int zCoord = this.worldPosition.getZ();
+		int xCord = this.worldPosition.getX();
+		int yCord = this.worldPosition.getY();
+		int zCord = this.worldPosition.getZ();
 		MutableBlockPos pos = new MutableBlockPos();
 
 		for (int up = -box; up <= box; up++)
 		{
-			int y = yCoord + up;
+			int y = yCord + up;
 
 			for (int right = -box; right <= box; right++)
 			{
@@ -213,11 +211,11 @@ public class TileEntityWindKineticGenerator extends TileEntityInventory implemen
 
 				for (int fwd = lentemp - length; fwd <= length; fwd++)
 				{
-					int x = xCoord + fwd * fwdDir.getStepX() + right * rightDir.getStepX();
-					int z = zCoord + fwd * fwdDir.getStepZ() + right * rightDir.getStepZ();
+					int x = xCord + fwd * fwdDir.getStepX() + right * rightDir.getStepX();
+					int z = zCord + fwd * fwdDir.getStepZ() + right * rightDir.getStepZ();
 					pos.set(x, y, z);
-					assert Math.abs(x - xCoord) <= xMaxDist;
-					assert Math.abs(z - zCoord) <= zMaxDist;
+					assert Math.abs(x - xCord) <= xMaxDist;
+					assert Math.abs(z - zCord) <= zMaxDist;
 					BlockState state = chunkCache.getBlockState(pos);
 					Block block = state.getBlock();
 					if (!state.isAir())
@@ -276,11 +274,11 @@ public class TileEntityWindKineticGenerator extends TileEntityInventory implemen
 	{
 		if (this.rotationSpeed != 0.0F)
 		{
-			this.angle = this.angle + (float) (System.currentTimeMillis() - this.lastcheck) * this.rotationSpeed;
+			this.angle = this.angle + (float) (System.currentTimeMillis() - this.lastCheck) * this.rotationSpeed;
 			this.angle %= 360.0F;
 		}
 
-		this.lastcheck = System.currentTimeMillis();
+		this.lastCheck = System.currentTimeMillis();
 		return this.angle;
 	}
 

@@ -235,6 +235,7 @@ public class TileEntityCrop extends Ic2TileEntity implements ICropTile
 			}
 
 			this.transformCropBlock(Ic2Crops.weed, 0);
+			return;
 		}
 
 		if (this.crop != null)
@@ -998,6 +999,8 @@ public class TileEntityCrop extends Ic2TileEntity implements ICropTile
 	@Override
 	public void reset()
 	{
+		this.crop = null;
+		this.resetData();
 		if (this.level != null)
 		{
 			this.level.setBlockAndUpdate(this.worldPosition, Ic2Blocks.CROP_STICK.defaultBlockState().setValue(Ic2TileEntityBlock.CROSSING_BASE, false));

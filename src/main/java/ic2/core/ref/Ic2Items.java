@@ -62,6 +62,7 @@ import ic2.core.item.tool.ItemNanoSaber;
 import ic2.core.item.tool.ItemObscurator;
 import ic2.core.item.tool.ItemScanner;
 import ic2.core.item.tool.ItemScannerAdv;
+import ic2.core.item.tool.ItemCropnalyzer;
 import ic2.core.item.tool.ItemToolCrafting;
 import ic2.core.item.tool.ItemToolCrowbar;
 import ic2.core.item.tool.ItemToolCutter;
@@ -70,6 +71,7 @@ import ic2.core.item.tool.ItemToolMiningLaser;
 import ic2.core.item.tool.ItemToolPainter;
 import ic2.core.item.tool.ItemToolWrench;
 import ic2.core.item.tool.ItemToolWrenchElectric;
+import ic2.core.item.tool.ItemWeedingTrowel;
 import ic2.core.item.tool.ItemToolbox;
 import ic2.core.item.tool.ItemTreetap;
 import ic2.core.item.tool.ItemTreetapElectric;
@@ -706,12 +708,23 @@ public final class Ic2Items
 	);
 	public static final Item CROP_STICK = register("crop_stick", new ItemCrop(new Properties()));
 	public static final Item CROP_SEED_BACK = register("crop_seed_bag", new ItemCropSeed(new Properties().stacksTo(1)));
+	public static final Item CROPNALYZER = register(
+		"cropnalyzer", new ItemCropnalyzer(new Properties().stacksTo(1).rarity(Rarity.UNCOMMON))
+	);
+	public static final Item WEEDING_TROWEL = register(
+		"weeding_trowel", new ItemWeedingTrowel(new Properties().stacksTo(1))
+	);
 	public static final Item COFFEE_BEANS = register("coffee_beans", new Item(new Properties()));
 	public static final Item COFFEE_POWDER = register("coffee_powder", new Item(new Properties()));
 	public static final Item FERTILIZER = register("fertilizer", new Item(new Properties()));
 	public static final Item GRIN_POWDER = register("grin_powder", new Item(new Properties()));
 	public static final Item HOPS = register("hops", new Item(new Properties()));
 	public static final Item WEED = register("weed", new Item(new Properties()));
+	public static final Item BOBS_YER_UNCLE_RANKS_BERRY = register("bobs_yer_uncle_ranks_berry", new Item(new Properties()));
+	public static final Item OIL_BERRY = register("oil_berry", new Item(new Properties()));
+	public static final Item MILK_WART = register("milk_wart", new Item(new Properties()));
+	public static final Item SMALL_DIAMOND_DUST = register("small_diamond_dust", new Item(new Properties()));
+	public static final Item ENDER_PEARL_DUST = register("ender_pearl_dust", new Item(new Properties()));
 	public static final Item TERRA_WART = register(
 		"terra_wart",
 		new ItemTerraWart(
@@ -1140,6 +1153,10 @@ public final class Ic2Items
 		addToCreativeTab(Ic2ItemGroupType.FARMING, () -> RUBBER_SAPLING);
 		addToCreativeTab(Ic2ItemGroupType.FARMING, () -> TERRA_WART);
 		addToCreativeTab(Ic2ItemGroupType.FARMING, () -> WEED);
+		addToCreativeTab(Ic2ItemGroupType.FARMING, () -> WEEDING_TROWEL);
+		addToCreativeTab(Ic2ItemGroupType.FARMING, () -> BOBS_YER_UNCLE_RANKS_BERRY);
+		addToCreativeTab(Ic2ItemGroupType.FARMING, () -> OIL_BERRY);
+		addToCreativeTab(Ic2ItemGroupType.FARMING, () -> MILK_WART);
 		addToCreativeTab(Ic2ItemGroupType.GENERAL, () -> ADVANCED_MACHINE);
 		addToCreativeTab(Ic2ItemGroupType.GENERAL, () -> BLACK_WALL);
 		addToCreativeTab(Ic2ItemGroupType.GENERAL, () -> BLUE_WALL);
@@ -1434,6 +1451,8 @@ public final class Ic2Items
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> SMALL_PLUTONIUM);
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> SMALL_POWER_UNIT);
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> SMALL_SILVER_DUST);
+		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> SMALL_DIAMOND_DUST);
+		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> ENDER_PEARL_DUST);
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> SMALL_SULFUR_DUST);
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> SMALL_TIN_DUST);
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> SMALL_URANIUM_235);
@@ -1572,6 +1591,7 @@ public final class Ic2Items
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> RE_BATTERY);
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> RUBBER_BOAT);
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> SCANNER);
+		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> CROPNALYZER);
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> SINGLE_USE_BATTERY);
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> STEEL_ROTOR);
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> TOOL_BOX);

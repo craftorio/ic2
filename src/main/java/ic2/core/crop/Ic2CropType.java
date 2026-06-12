@@ -47,7 +47,22 @@ public enum Ic2CropType implements StringRepresentable, ICropType
 	redWheat("red_wheat", Ic2Blocks.RED_WHEAT_CROP, 6),
 	coffee("coffee", Ic2Blocks.COFFEE_CROP, 4),
 	hops("hops", Ic2Blocks.HOPS_CROP, 6),
-	eatingPlant("eating_plant", Ic2Blocks.EATING_PLANT_CROP, 5);
+	eatingPlant("eating_plant", Ic2Blocks.EATING_PLANT_CROP, 5),
+	blazereed("blazereed", Ic2Blocks.BLAZEREED_CROP, 3),
+	bobsYerUncleRanksBerries("bobs_yer_uncle_ranks_berries", Ic2Blocks.BOBS_YER_UNCLE_RANKS_BERRIES_CROP, 3),
+	corium("corium", Ic2Blocks.CORIUM_CROP, 3),
+	corpse_plant("corpse_plant", Ic2Blocks.CORPSE_PLANT_CROP, 3),
+	creeper_weed("creeper_weed", Ic2Blocks.CREEPER_WEED_CROP, 3),
+	diareed("diareed", Ic2Blocks.DIAREED_CROP, 3),
+	egg_plant("egg_plant", Ic2Blocks.EGG_PLANT_CROP, 2),
+	ender_blossom("ender_blossom", Ic2Blocks.ENDER_BLOSSOM_CROP, 3),
+	meat_rose("meat_rose", Ic2Blocks.MEAT_ROSE_CROP, 3),
+	milk_wart("milk_wart", Ic2Blocks.MILK_WART_CROP, 2),
+	oil_berries("oil_berries", Ic2Blocks.OIL_BERRIES_CROP, 2),
+	slime_plant("slime_plant", Ic2Blocks.SLIME_PLANT_CROP, 3),
+	spidernip("spidernip", Ic2Blocks.SPIDERNIP_CROP, 3),
+	tearstalks("tearstalks", Ic2Blocks.TEARSTALKS_CROP, 3),
+	withereed("withereed", Ic2Blocks.WITHEREED_CROP, 3);
 
 	private final String owner;
 	private final String name;

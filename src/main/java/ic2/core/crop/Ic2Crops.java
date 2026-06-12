@@ -2,6 +2,7 @@ package ic2.core.crop;
 
 import ic2.api.crops.BaseSeed;
 import ic2.api.crops.CropCard;
+import ic2.api.crops.CropProperties;
 import ic2.api.crops.Crops;
 import ic2.core.IC2;
 import ic2.core.crop.cropcard.CropBaseMetalCommon;
@@ -27,6 +28,7 @@ import ic2.core.crop.cropcard.CropTerraWart;
 import ic2.core.crop.cropcard.CropVenomilia;
 import ic2.core.crop.cropcard.CropWeed;
 import ic2.core.crop.cropcard.CropWheat;
+import ic2.core.crop.cropcard.GenericCropCard;
 import ic2.core.proxy.EnvProxy;
 import ic2.core.ref.Ic2BlockTags;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -156,6 +158,125 @@ public class Ic2Crops extends Crops
 	public static CropCard cropPotato = new CropPotato(Ic2CropType.potato);
 	public static CropCard cropEatingPlant = new CropEating(Ic2CropType.eatingPlant);
 	public static CropCard cropBeetroots = new CropBeetroots(Ic2CropType.beetroots);
+	public static CropCard cropBlazereed = GenericCropCard.create(Ic2CropType.blazereed, Ic2Blocks.BLAZEREED_CROP)
+		.setDiscoveredBy("Mr. Brain")
+		.setProperties(new CropProperties(6, 0, 4, 1, 0, 0))
+		.setAttributes(new String[] { "Fire", "Blaze", "Reed", "Sulfur" })
+		.setMaxSize(4)
+		.setDrops(new ItemStack(Items.BLAZE_POWDER))
+		.setSpecialDrops(new ItemStack[] { new ItemStack(Items.BLAZE_ROD), new ItemStack(Ic2Items.SULFUR_DUST) })
+		.setAfterHarvestSize(1);
+	public static CropCard cropBobsYerUncleRanksBerries = GenericCropCard.create(Ic2CropType.bobsYerUncleRanksBerries, Ic2Blocks.BOBS_YER_UNCLE_RANKS_BERRIES_CROP)
+		.setDiscoveredBy("GenerikB")
+		.setProperties(new CropProperties(11, 4, 0, 8, 2, 9))
+		.setAttributes(new String[] { "Shiny", "Vine", "Emerald", "Berylium", "Crystal" })
+		.setMaxSize(4)
+		.setDrops(new ItemStack(Ic2Items.BOBS_YER_UNCLE_RANKS_BERRY))
+		.setSpecialDrops(new ItemStack[] { new ItemStack(Items.EMERALD) })
+		.setAfterHarvestSize(1);
+	public static CropCard cropCorium = GenericCropCard.create(Ic2CropType.corium, Ic2Blocks.CORIUM_CROP)
+		.setDiscoveredBy("Gregorius Techneticies")
+		.setProperties(new CropProperties(6, 0, 2, 3, 1, 0))
+		.setAttributes(new String[] { "Cow", "Silk", "Vine" })
+		.setMaxSize(4)
+		.setDrops(new ItemStack(Items.LEATHER))
+		.setAfterHarvestSize(1);
+	public static CropCard cropCorpsePlant = GenericCropCard.create(Ic2CropType.corpse_plant, Ic2Blocks.CORPSE_PLANT_CROP)
+		.setDiscoveredBy("Mr. Kenny")
+		.setProperties(new CropProperties(5, 0, 2, 1, 0, 3))
+		.setAttributes(new String[] { "Toxic", "Undead", "Vine", "Edible", "Rotten" })
+		.setMaxSize(4)
+		.setDrops(new ItemStack(Items.ROTTEN_FLESH))
+		.setSpecialDrops(new ItemStack[] { new ItemStack(Items.BONE), new ItemStack(Items.BONE_MEAL), new ItemStack(Items.BONE_MEAL) })
+		.setAfterHarvestSize(1);
+	public static CropCard cropCreeperWeed = GenericCropCard.create(Ic2CropType.creeper_weed, Ic2Blocks.CREEPER_WEED_CROP)
+		.setDiscoveredBy("General Spaz")
+		.setProperties(new CropProperties(7, 3, 0, 5, 1, 3))
+		.setAttributes(new String[] { "Creeper", "Vine", "Explosive", "Fire", "Sulfur", "Saltpeter", "Coal" })
+		.setMaxSize(4)
+		.setDrops(new ItemStack(Items.GUNPOWDER))
+		.setAfterHarvestSize(1);
+	public static CropCard cropDiareed = GenericCropCard.create(Ic2CropType.diareed, Ic2Blocks.DIAREED_CROP)
+		.setDiscoveredBy("Diareed")
+		.setProperties(new CropProperties(12, 5, 0, 10, 2, 10))
+		.setAttributes(new String[] { "Fire", "Shiny", "Reed", "Coal", "Diamond", "Crystal" })
+		.setMaxSize(4)
+		.setDrops(new ItemStack(Ic2Items.SMALL_DIAMOND_DUST))
+		.setSpecialDrops(new ItemStack[] { new ItemStack(Items.DIAMOND) })
+		.setAfterHarvestSize(1);
+	public static CropCard cropEggPlant = GenericCropCard.create(Ic2CropType.egg_plant, Ic2Blocks.EGG_PLANT_CROP)
+		.setDiscoveredBy("Link")
+		.setProperties(new CropProperties(6, 0, 4, 1, 0, 0))
+		.setAttributes(new String[] { "Chicken", "Egg", "Edible", "Feather", "Flower", "Addictive" })
+		.setMaxSize(3)
+		.setDrops(new ItemStack(Items.EGG))
+		.setSpecialDrops(new ItemStack[] { new ItemStack(Items.CHICKEN), new ItemStack(Items.FEATHER), new ItemStack(Items.FEATHER), new ItemStack(Items.FEATHER) })
+		.setGrowthSpeed(900)
+		.setAfterHarvestSize(2);
+	public static CropCard cropEnderBlossom = GenericCropCard.create(Ic2CropType.ender_blossom, Ic2Blocks.ENDER_BLOSSOM_CROP)
+		.setDiscoveredBy("RichardG")
+		.setProperties(new CropProperties(10, 5, 0, 2, 1, 6))
+		.setAttributes(new String[] { "Ender", "Flower", "Shiny" })
+		.setMaxSize(4)
+		.setDrops(new ItemStack(Ic2Items.ENDER_PEARL_DUST))
+		.setSpecialDrops(new ItemStack[] { new ItemStack(Items.ENDER_PEARL), new ItemStack(Items.ENDER_PEARL), new ItemStack(Items.ENDER_EYE) })
+		.setAfterHarvestSize(1);
+	public static CropCard cropMeatRose = GenericCropCard.create(Ic2CropType.meat_rose, Ic2Blocks.MEAT_ROSE_CROP)
+		.setDiscoveredBy("VintageBeef")
+		.setProperties(new CropProperties(7, 0, 4, 1, 3, 0))
+		.setAttributes(new String[] { "Edible", "Flower", "Cow", "Chicken", "Pig", "Sheep" })
+		.setMaxSize(4)
+		.setDrops(new ItemStack(Items.PINK_DYE))
+		.setSpecialDrops(new ItemStack[] { new ItemStack(Items.BEEF), new ItemStack(Items.PORKCHOP), new ItemStack(Items.CHICKEN), new ItemStack(Items.MUTTON) })
+		.setGrowthSpeed(1500)
+		.setAfterHarvestSize(1);
+	public static CropCard cropMilkWart = GenericCropCard.create(Ic2CropType.milk_wart, Ic2Blocks.MILK_WART_CROP)
+		.setDiscoveredBy("Mr. Brain")
+		.setProperties(new CropProperties(6, 0, 3, 0, 1, 0))
+		.setAttributes(new String[] { "Edible", "Milk", "Cow" })
+		.setMaxSize(3)
+		.setDrops(new ItemStack(Ic2Items.MILK_WART))
+		.setGrowthSpeed(900)
+		.setAfterHarvestSize(1)
+		.addBaseSeed(new ItemStack(Ic2Items.MILK_WART));
+	public static CropCard cropOilBerries = GenericCropCard.create(Ic2CropType.oil_berries, Ic2Blocks.OIL_BERRIES_CROP)
+		.setDiscoveredBy("Spacetoad")
+		.setProperties(new CropProperties(9, 6, 1, 2, 1, 12))
+		.setAttributes(new String[] { "Fire", "Dark", "Reed", "Rotten", "Coal", "Oil" })
+		.setMaxSize(3)
+		.setDrops(new ItemStack(Ic2Items.OIL_BERRY))
+		.setAfterHarvestSize(1);
+	public static CropCard cropSlimePlant = GenericCropCard.create(Ic2CropType.slime_plant, Ic2Blocks.SLIME_PLANT_CROP)
+		.setDiscoveredBy("Neowulf")
+		.setProperties(new CropProperties(6, 3, 0, 0, 0, 2))
+		.setAttributes(new String[] { "Slime", "Bouncy", "Sticky", "Bush" })
+		.setMaxSize(4)
+		.setDrops(new ItemStack(Items.SLIME_BALL))
+		.setAfterHarvestSize(3);
+	public static CropCard cropSpidernip = GenericCropCard.create(Ic2CropType.spidernip, Ic2Blocks.SPIDERNIP_CROP)
+		.setDiscoveredBy("Mr. Kenny")
+		.setProperties(new CropProperties(4, 2, 1, 4, 1, 3))
+		.setAttributes(new String[] { "Toxic", "Silk", "Spider", "Flower", "Ingredient", "Addictive" })
+		.setMaxSize(4)
+		.setDrops(new ItemStack(Items.STRING))
+		.setSpecialDrops(new ItemStack[] { new ItemStack(Items.SPIDER_EYE), new ItemStack(Blocks.COBWEB) })
+		.setGrowthSpeed(600)
+		.setAfterHarvestSize(1);
+	public static CropCard cropTearstalks = GenericCropCard.create(Ic2CropType.tearstalks, Ic2Blocks.TEARSTALKS_CROP)
+		.setDiscoveredBy("Neowulf")
+		.setProperties(new CropProperties(8, 1, 2, 0, 0, 0))
+		.setAttributes(new String[] { "Healing", "Nether", "Ingredient", "Reed", "Ghast" })
+		.setMaxSize(4)
+		.setDrops(new ItemStack(Items.GHAST_TEAR))
+		.setAfterHarvestSize(1);
+	public static CropCard cropWithereed = GenericCropCard.create(Ic2CropType.withereed, Ic2Blocks.WITHEREED_CROP)
+		.setDiscoveredBy("CovertJaguar")
+		.setProperties(new CropProperties(8, 2, 0, 4, 1, 3))
+		.setAttributes(new String[] { "Fire", "Undead", "Reed", "Coal", "Rotten", "Wither" })
+		.setMaxSize(4)
+		.setDrops(new ItemStack(Ic2Items.COAL_DUST))
+		.setSpecialDrops(new ItemStack[] { new ItemStack(Items.COAL), new ItemStack(Items.COAL) })
+		.setAfterHarvestSize(1);
 	static boolean needsToPost = true;
 	private final Map<String, Map<String, CropCard>> cropMap = new HashMap<>();
 
@@ -219,6 +340,21 @@ public class Ic2Crops extends Crops
 		Crops.instance.registerCrop(cropJungleSapling);
 		Crops.instance.registerCrop(cropAcaciaSapling);
 		Crops.instance.registerCrop(cropDarkOakSapling);
+		Crops.instance.registerCrop(cropBlazereed);
+		Crops.instance.registerCrop(cropBobsYerUncleRanksBerries);
+		Crops.instance.registerCrop(cropCorium);
+		Crops.instance.registerCrop(cropCorpsePlant);
+		Crops.instance.registerCrop(cropCreeperWeed);
+		Crops.instance.registerCrop(cropDiareed);
+		Crops.instance.registerCrop(cropEggPlant);
+		Crops.instance.registerCrop(cropEnderBlossom);
+		Crops.instance.registerCrop(cropMeatRose);
+		Crops.instance.registerCrop(cropMilkWart);
+		Crops.instance.registerCrop(cropOilBerries);
+		Crops.instance.registerCrop(cropSlimePlant);
+		Crops.instance.registerCrop(cropSpidernip);
+		Crops.instance.registerCrop(cropTearstalks);
+		Crops.instance.registerCrop(cropWithereed);
 	}
 
 	public static void registerBaseSeeds()
@@ -245,6 +381,7 @@ public class Ic2Crops extends Crops
 		Crops.instance.registerBaseSeed(new ItemStack(Blocks.JUNGLE_SAPLING), cropJungleSapling, 0, 1, 1, 1);
 		Crops.instance.registerBaseSeed(new ItemStack(Blocks.ACACIA_SAPLING), cropAcaciaSapling, 0, 1, 1, 1);
 		Crops.instance.registerBaseSeed(new ItemStack(Blocks.DARK_OAK_SAPLING), cropDarkOakSapling, 0, 1, 1, 1);
+		Crops.instance.registerBaseSeed(new ItemStack(Ic2Items.MILK_WART), cropMilkWart, 0, 1, 1, 1);
 	}
 
 	public static void ensureInit()

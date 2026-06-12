@@ -54,6 +54,7 @@ import ic2.core.item.IHandHeldSubInventory;
 import ic2.core.item.tool.ContainerMeter;
 import ic2.core.item.tool.ContainerToolScanner;
 import ic2.core.item.tool.ContainerToolbox;
+import ic2.core.item.tool.ContainerCropnalyzer;
 import ic2.core.item.tool.HandHeldInventory;
 import ic2.core.item.upgrade.HandHeldAdvancedUpgrade;
 import ic2.core.item.upgrade.HandHeldOre;
@@ -132,6 +133,7 @@ public final class Ic2ScreenHandlers
 	public static final MenuType<ContainerToolScanner> SCANNER = registerManagedItem("scanner");
 	public static final MenuType<ContainerMeter> METER = registerManagedItem("meter");
 	public static final MenuType<ContainerToolbox> TOOL_BOX = registerManagedItem("tool_box");
+	public static final MenuType<ContainerCropnalyzer> CROPNALYZER = registerManagedItem("cropnalyzer");
 
 	public static void init()
 	{

@@ -72,7 +72,7 @@ public class WeightedMachineRecipeSerializer implements RecipeSerializer<RecipeH
 		if (machineRecipe instanceof MachineRecipeWeighted<?> machineRecipeWeighted)
 		{
 			buf.writeByte(1);
-			RecipeIo.writeInput(buf, machineRecipeWeighted.getInput());
+			RecipeIo.writeInput(buf, (IRecipeInput) machineRecipeWeighted.getInput());
 			RecipeIo.writeWeightedOutput(buf, machineRecipeWeighted.getOutputWeighted());
 		} else
 		{

@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "age=0": {
+      "model": "ic2:block/crop/bobs_yer_uncle_ranks_berries_0"
+    },
+    "age=1": {
+      "model": "ic2:block/crop/bobs_yer_uncle_ranks_berries_1"
+    },
+    "age=2": {
+      "model": "ic2:block/crop/bobs_yer_uncle_ranks_berries_2"
+    },
+    "age=3": {
+      "model": "ic2:block/crop/bobs_yer_uncle_ranks_berries_3"
+    }
+  }
+}

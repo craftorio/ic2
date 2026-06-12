@@ -47,6 +47,7 @@ public class IntegerOutputRecipeSerializer implements RecipeSerializer<RecipeHol
 
 	public void toNetwork(FriendlyByteBuf buf, RecipeHolder<IRecipeInput, Integer> recipe)
 	{
+		buf.writeByte(0);
 		RecipeIo.writeInput(buf, recipe.recipe().getInput());
 		RecipeIo.writeIntegerOutput(buf, recipe.recipe().getOutput());
 		buf.writeNbt(recipe.recipe().getMetaData());

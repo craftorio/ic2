@@ -258,7 +258,6 @@ public class RecipeIo
 
 	public static void writeOutput(FriendlyByteBuf buf, Collection<ItemStack> output)
 	{
-		buf.writeByte(0);
 		buf.writeVarInt(output.size());
 
 		for (ItemStack stack : output)
@@ -269,13 +268,11 @@ public class RecipeIo
 
 	public static void writeIntegerOutput(FriendlyByteBuf buf, int output)
 	{
-		buf.writeByte(0);
 		buf.writeInt(output);
 	}
 
 	public static void writeWeightedOutput(FriendlyByteBuf buf, RecipeOutputWeighted outputs)
 	{
-		buf.writeByte(1);
 		buf.writeVarInt(outputs.getOutputs().size());
 		outputs.forEach((stack, weight) ->
 		{

@@ -68,13 +68,16 @@ public class WeightedMachineRecipeSerializer implements RecipeSerializer<RecipeH
 
 	public void toNetwork(FriendlyByteBuf buf, RecipeHolder<IRecipeInput, Collection<ItemStack>> recipe)
 	{
-		RecipeIo.writeInput(buf, recipe.recipe().getInput());
 		MachineRecipe<IRecipeInput, Collection<ItemStack>> machineRecipe = recipe.recipe();
 		if (machineRecipe instanceof MachineRecipeWeighted<?> machineRecipeWeighted)
 		{
+			buf.writeByte(1);
+			RecipeIo.writeInput(buf, machineRecipeWeighted.getInput());
 			RecipeIo.writeWeightedOutput(buf, machineRecipeWeighted.getOutputWeighted());
 		} else
 		{
+			buf.writeByte(0);
+			RecipeIo.writeInput(buf, machineRecipe.getInput());
 			RecipeIo.writeOutput(buf, machineRecipe.getOutput());
 		}
 

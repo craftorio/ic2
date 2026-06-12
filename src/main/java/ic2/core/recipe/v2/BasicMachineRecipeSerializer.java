@@ -49,6 +49,7 @@ public class BasicMachineRecipeSerializer implements RecipeSerializer<RecipeHold
 
 	public void toNetwork(FriendlyByteBuf buf, RecipeHolder<IRecipeInput, Collection<ItemStack>> recipe)
 	{
+		buf.writeByte(0);
 		RecipeIo.writeInput(buf, recipe.recipe().getInput());
 		RecipeIo.writeOutput(buf, recipe.recipe().getOutput());
 		buf.writeNbt(recipe.recipe().getMetaData());

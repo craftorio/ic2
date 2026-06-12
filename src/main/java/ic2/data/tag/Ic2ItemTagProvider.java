@@ -6,7 +6,6 @@ import ic2.core.ref.Ic2ItemTags;
 import ic2.core.ref.Ic2Items;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
-import net.minecraft.data.tags.IntrinsicHolderTagsProvider.IntrinsicTagAppender;
 import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
@@ -14,6 +13,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.data.ExistingFileHelper;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
@@ -25,12 +25,12 @@ public class Ic2ItemTagProvider extends AbstractItemTagProvider
 		super(output, lookupProvider, blockTags, existingFileHelper);
 	}
 
-	protected IntrinsicTagAppender<Item> tag(TagKey<Item> tag)
+	protected @NotNull IntrinsicTagAppender<Item> tag(@NotNull TagKey<Item> tag)
 	{
 		return super.tag(tag);
 	}
 
-	protected void addTags(HolderLookup.Provider lookupProvider)
+	protected void addTags(HolderLookup.@NotNull Provider lookupProvider)
 	{
 		this.tag(Ic2ItemTags.COAL_DUSTS).add(Ic2Items.COAL_DUST);
 		this.tag(Ic2ItemTags.COPPER_DUSTS).add(Ic2Items.COPPER_DUST);
@@ -71,22 +71,14 @@ public class Ic2ItemTagProvider extends AbstractItemTagProvider
 		this.tag(Ic2ItemTags.URANIUM_ORES).add(Ic2Items.URANIUM_ORE);
 		this.tag(Ic2ItemTags.URANIUM_ORES).add(Ic2Items.DEEPSLATE_URANIUM_ORE);
 		this.tag(Ic2ItemTags.URANIUM_RAW_ORES).add(Ic2Items.RAW_URANIUM);
-		this.tag(Ic2ItemTags.ORES)
-			.addTag(Ic2ItemTags.LEAD_ORES)
-			.addTag(Ic2ItemTags.SILVER_ORES)
-			.addTag(Ic2ItemTags.TIN_ORES)
-			.addTag(Ic2ItemTags.URANIUM_ORES);
+		this.tag(Ic2ItemTags.ORES).addTag(Ic2ItemTags.LEAD_ORES).addTag(Ic2ItemTags.SILVER_ORES).addTag(Ic2ItemTags.TIN_ORES).addTag(Ic2ItemTags.URANIUM_ORES);
 		this.tag(Ic2ItemTags.LEAD_BLOCKS).add(Ic2Items.LEAD_BLOCK);
 		this.tag(Ic2ItemTags.URANIUM_BLOCKS).add(Ic2Items.URANIUM_BLOCK);
 		this.tag(Ic2ItemTags.TIN_BLOCKS).add(Ic2Items.TIN_BLOCK);
 		this.tag(Ic2ItemTags.BRONZE_BLOCKS).add(Ic2Items.BRONZE_BLOCK);
 		this.tag(Ic2ItemTags.STEEL_BLOCKS).add(Ic2Items.STEEL_BLOCK);
 		this.tag(Ic2ItemTags.DIAMONDS).add(Ic2Items.INDUTRIAL_DIAMOND);
-		this.tag(Ic2ItemTags.RUBBER_LOGS)
-			.add(Ic2Items.RUBBER_LOG)
-			.add(Ic2Items.RUBBER_WOOD)
-			.add(Ic2Items.STRIPPED_RUBBER_LOG)
-			.add(Ic2Items.STRIPPED_RUBBER_WOOD);
+		this.tag(Ic2ItemTags.RUBBER_LOGS).add(Ic2Items.RUBBER_LOG).add(Ic2Items.RUBBER_WOOD).add(Ic2Items.STRIPPED_RUBBER_LOG).add(Ic2Items.STRIPPED_RUBBER_WOOD);
 		this.tag(ItemTags.LOGS).addTag(Ic2ItemTags.RUBBER_LOGS);
 		this.tag(ItemTags.PLANKS).add(Ic2Items.RUBBER_PLANKS);
 		this.tag(ItemTags.LOGS_THAT_BURN).addTag(Ic2ItemTags.RUBBER_LOGS);

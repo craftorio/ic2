@@ -62,7 +62,7 @@ import ic2.core.item.tool.ItemNanoSaber;
 import ic2.core.item.tool.ItemObscurator;
 import ic2.core.item.tool.ItemScanner;
 import ic2.core.item.tool.ItemScannerAdv;
-import ic2.core.item.tool.ItemCropnalyzer;
+import ic2.core.item.tool.ItemCropAnalyzer;
 import ic2.core.item.tool.ItemToolCrafting;
 import ic2.core.item.tool.ItemToolCrowbar;
 import ic2.core.item.tool.ItemToolCutter;
@@ -709,7 +709,7 @@ public final class Ic2Items
 	public static final Item CROP_STICK = register("crop_stick", new ItemCrop(new Properties()));
 	public static final Item CROP_SEED_BACK = register("crop_seed_bag", new ItemCropSeed(new Properties().stacksTo(1)));
 	public static final Item CROPNALYZER = register(
-		"cropnalyzer", new ItemCropnalyzer(new Properties().stacksTo(1).rarity(Rarity.UNCOMMON))
+		"crop_analyzer", new ItemCropAnalyzer(new Properties().stacksTo(1).rarity(Rarity.UNCOMMON))
 	);
 	public static final Item WEEDING_TROWEL = register(
 		"weeding_trowel", new ItemWeedingTrowel(new Properties().stacksTo(1))

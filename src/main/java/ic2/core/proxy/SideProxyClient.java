@@ -53,6 +53,7 @@ import ic2.core.entity.render.LaserBulletEntityRenderer;
 import ic2.core.gui.dynamic.DynamicGui;
 import ic2.core.item.tool.GuiToolMeter;
 import ic2.core.item.tool.GuiToolScanner;
+import ic2.core.item.tool.GuiCropAnalyzer;
 import ic2.core.item.tool.GuiToolbox;
 import ic2.core.item.upgrade.AdvancedUpgradeScreenFactory;
 import ic2.core.item.upgrade.HandHeldOre;
@@ -147,6 +148,7 @@ public final class SideProxyClient implements SideProxy
 		envProxy.registerScreen(Ic2ScreenHandlers.SCANNER, GuiToolScanner::new);
 		envProxy.registerScreen(Ic2ScreenHandlers.TOOL_BOX, GuiToolbox::new);
 		envProxy.registerScreen(Ic2ScreenHandlers.METER, GuiToolMeter::new);
+		envProxy.registerScreen(Ic2ScreenHandlers.CROP_ANALYZER, GuiCropAnalyzer::new);
 		envProxy.registerScreen(Ic2ScreenHandlers.SOLAR_GENERATOR, GuiSolarGenerator::new);
 		envProxy.registerColorProvider((state, world, post, tintIndex) -> 6723908, Ic2Blocks.RUBBER_LEAVES);
 		envProxy.registerColorProvider((var1, var2) -> 6723908, Ic2Items.RUBBER_LEAVES);

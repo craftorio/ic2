@@ -467,7 +467,7 @@ public class OldToNewLangConverter implements DataProvider
 			"frequency_transmitter",
 			"debug_item",
 			"obscurator",
-			"cropnalyzer",
+			"crop_analyzer",
 			"wind_meter",
 			"lathing_tool",
 			"weeding_trowel",

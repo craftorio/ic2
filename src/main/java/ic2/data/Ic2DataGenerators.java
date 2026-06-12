@@ -4,18 +4,8 @@ import com.google.common.hash.Hashing;
 import com.google.common.hash.HashingOutputStream;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import ic2.data.recipe.BlastFurnaceRecipeProvider;
-import ic2.data.recipe.BlockCutterRecipeProvider;
-import ic2.data.recipe.CannerRecipeProvider;
-import ic2.data.recipe.CentrifugeRecipeProvider;
-import ic2.data.recipe.CompressorRecipeProvider;
-import ic2.data.recipe.ExtractorRecipeProvider;
-import ic2.data.recipe.MaceratorRecipeProvider;
-import ic2.data.recipe.MatterFabricatorRecipeProvider;
-import ic2.data.recipe.MetalFormerRecipeProvider;
-import ic2.data.recipe.OreWasherRecipeProvider;
-import ic2.data.recipe.ShapedRecipeProvider;
-import ic2.data.recipe.ShapelessRecipeProvider;
+import ic2.data.loot_tables.BlockLootTableProvider;
+import ic2.data.recipe.*;
 import ic2.data.tag.Ic2BlockTagProvider;
 import ic2.data.tag.Ic2ItemTagProvider;
 
@@ -53,6 +43,8 @@ public class Ic2DataGenerators
 		generator.addProvider(true, new OreWasherRecipeProvider(output));
 		generator.addProvider(true, new ShapedRecipeProvider(output));
 		generator.addProvider(true, new ShapelessRecipeProvider(output));
+		generator.addProvider(true, new BlockLootTableProvider(output, lookupProvider));
+		generator.addProvider(true, new SmeltingProvider(output));
 	}
 
 	public static void saveJsonPreserveOrder(Gson gson, CachedOutput writer, JsonElement jsonElement, Path path) throws IOException

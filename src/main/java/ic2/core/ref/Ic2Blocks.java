@@ -157,6 +157,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.block.state.properties.WoodType;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
 public final class Ic2Blocks
@@ -208,13 +209,13 @@ public final class Ic2Blocks
 	});
 	public static final Block RUBBER_SIGN = register("rubber_sign", new Ic2SignBlock(Properties.of().mapColor(RUBBER_LOG.defaultMapColor()).noCollission().strength(1.0F).sound(SoundType.WOOD), Ic2SignType.RUBBER));
 	public static final Block RUBBER_SLAB = register("rubber_slab", new SlabBlock(Properties.of().mapColor(MapColor.WOOD).strength(2.0F, 3.0F).sound(SoundType.WOOD)));
-	public static final Block RUBBER_STAIRS = register("rubber_stairs", new StairBlock(RUBBER_PLANKS.defaultBlockState(), Properties.of().mapColor(MapColor.PODZOL).strength(2.0F, 3.0F).sound(SoundType.WOOD))
+	public static final Block RUBBER_STAIRS = register("rubber_stairs", new StairBlock(RUBBER_PLANKS::defaultBlockState, Properties.of().mapColor(MapColor.PODZOL).strength(2.0F, 3.0F).sound(SoundType.WOOD))
 	{
 	});
 	public static final Block RUBBER_TRAPDOOR = register("rubber_trapdoor", new TrapDoorBlock(Properties.of().mapColor(MapColor.PODZOL).strength(3.0F).sound(SoundType.WOOD).noOcclusion().isValidSpawn(Ic2Blocks::never), BlockSetType.OAK)
 	{
 	});
-	public static final Block RUBBER_WALL_SIGN = register("rubber_wall_sign", new Ic2WallSignBlock(Properties.of().mapColor(RUBBER_LOG.defaultMapColor()).noCollission().strength(1.0F).sound(SoundType.WOOD).dropsLike(RUBBER_SIGN), Ic2SignType.RUBBER));
+	public static final Block RUBBER_WALL_SIGN = register("rubber_wall_sign", new Ic2WallSignBlock(Properties.of().mapColor(RUBBER_LOG.defaultMapColor()).noCollission().strength(1.0F).sound(SoundType.WOOD).lootFrom(ForgeRegistries.BLOCKS.getDelegateOrThrow(RUBBER_SIGN)), Ic2SignType.RUBBER));
 	public static final Block WOODEN_SCAFFOLD = register("wooden_scaffold", new ScaffoldBlock(Properties.of().noOcclusion().strength(0.5F, 0.12F).randomTicks().sound(SoundType.WOOD), 2));
 	public static final Block REINFORCED_WOODEN_SCAFFOLD = register("reinforced_wooden_scaffold", new ScaffoldBlock(Properties.of().noOcclusion().strength(0.6F, 0.24F).randomTicks().sound(SoundType.WOOD), 5));
 	public static final Block IRON_SCAFFOLD = register("iron_scaffold", new ScaffoldBlock(Properties.of().noOcclusion().strength(0.8F, 6.0F).randomTicks().sound(SoundType.METAL), 5));

@@ -8,7 +8,6 @@ import ic2.api.crops.ICropTile;
 import ic2.api.network.NetworkHelper;
 import ic2.core.IC2;
 import ic2.core.block.tileentity.Ic2TileEntity;
-import net.minecraft.core.registries.BuiltInRegistries;
 import ic2.core.block.tileentity.Ic2TileEntityBlock;
 import ic2.core.fluid.FluidHandler;
 import ic2.core.fluid.Ic2FluidStack;
@@ -32,7 +31,6 @@ import java.util.stream.IntStream;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
@@ -49,13 +47,14 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.mutable.MutableObject;
 
 public class TileEntityCrop extends Ic2TileEntity implements ICropTile
 {
 	public boolean dirty = true;
 	public static int tickRate = 256;
-	private CropCard crop = null;
+	private CropCard crop;
 	private byte statGrowth;
 	private byte statGain;
 	private byte statResistance;
@@ -78,7 +77,7 @@ public class TileEntityCrop extends Ic2TileEntity implements ICropTile
 
 	public TileEntityCrop(BlockPos pos, BlockState state)
 	{
-		super(Ic2BlockEntities.get(BuiltInRegistries.BLOCK.getKey(state.getBlock())), pos, state);
+		super(Ic2BlockEntities.get(ForgeRegistries.BLOCKS.getKey(state.getBlock())), pos, state);
 		this.crop = Crops.instance.getCropCard(this.getBlockType());
 		if (debug)
 		{
@@ -302,7 +301,6 @@ public class TileEntityCrop extends Ic2TileEntity implements ICropTile
 				if (aux > 100 && IC2.random.nextInt(32) > this.statResistance)
 				{
 					this.reset();
-					totalGrowth = 0;
 				} else
 				{
 					totalGrowth = baseGrowth * (100 - aux) / 100;
@@ -336,8 +334,7 @@ public class TileEntityCrop extends Ic2TileEntity implements ICropTile
 				}
 
 				CropCard neighborCrop = tileEntityCrop.getCrop();
-				if (neighborCrop == null
-					|| !neighborCrop.isWeed(tileEntityCrop) && IC2.random.nextInt(32) >= tileEntityCrop.getStatResistance() && !tileEntityCrop.hasWeedEX())
+				if (neighborCrop == null || !neighborCrop.isWeed(tileEntityCrop) && IC2.random.nextInt(32) >= tileEntityCrop.getStatResistance() && !tileEntityCrop.hasWeedEX())
 				{
 					if (debugWeedWork)
 					{
@@ -482,7 +479,7 @@ public class TileEntityCrop extends Ic2TileEntity implements ICropTile
 				if (amount > 0)
 				{
 					fs.setAmountMb(amount);
-					MutableObject<ItemStack> newStack = new MutableObject();
+					MutableObject<ItemStack> newStack = new MutableObject<>();
 					amount = FluidHandler.drainMb(heldItem, fs, false, newStack);
 					this.applyHydration(amount, false);
 					StackUtil.set(player, hand, newStack.getValue());
@@ -500,7 +497,7 @@ public class TileEntityCrop extends Ic2TileEntity implements ICropTile
 				if (amount > 0)
 				{
 					fs.setAmountMb(amount);
-					MutableObject<ItemStack> newStack = new MutableObject();
+					MutableObject<ItemStack> newStack = new MutableObject<>();
 					amount = FluidHandler.drainMb(heldItem, fs, false, newStack);
 					this.applyWeedEx(amount, false, true, false);
 					StackUtil.set(player, hand, newStack.getValue());
@@ -976,17 +973,11 @@ public class TileEntityCrop extends Ic2TileEntity implements ICropTile
 			}
 
 			int dropCount = (int) Math.max(0L, Math.round(IC2.random.nextGaussian() * chance * 0.6827 + chance));
-			List<ItemStack> ret = IntStream.range(0, dropCount)
-				.mapToObj(
-					ix ->
-					{
-						ItemStack[] drops = this.crop.getGains(this);
-						return Arrays.stream(drops)
-							.map(drop -> !StackUtil.isEmpty(drop) && IC2.random.nextInt(100) <= this.getStatGain() ? StackUtil.incSize(drop) : drop);
-					}
-				)
-				.flatMap(Function.identity())
-				.collect(Collectors.toList());
+			List<ItemStack> ret = IntStream.range(0, dropCount).mapToObj(ix ->
+			{
+				ItemStack[] drops = this.crop.getGains(this);
+				return Arrays.stream(drops).map(drop -> !StackUtil.isEmpty(drop) && IC2.random.nextInt(100) <= this.getStatGain() ? StackUtil.incSize(drop) : drop);
+			}).flatMap(Function.identity()).collect(Collectors.toList());
 			this.setCurrentAge(this.crop.getAgeAfterHarvest(this));
 			this.dirty = true;
 			return ret;
@@ -1155,15 +1146,14 @@ public class TileEntityCrop extends Ic2TileEntity implements ICropTile
 		return true;
 	}
 
-	public boolean withCropAge(Integer age)
+	public void withCropAge(Integer age)
 	{
 		if (this.level == null)
 		{
-			return false;
+			return;
 		}
 
 		this.level.setBlockAndUpdate(this.worldPosition, this.getBlockState().setValue(this.getBlockType().getAgeProperty(), age));
-		return true;
 	}
 
 	@Override
@@ -1175,9 +1165,7 @@ public class TileEntityCrop extends Ic2TileEntity implements ICropTile
 	@Override
 	protected ItemStack getPickBlock(Player player, BlockHitResult target)
 	{
-		return this.crop == null
-			? new ItemStack(Ic2Items.CROP_STICK)
-			: this.generateSeeds(this.crop, this.statGrowth, this.statGain, this.statResistance, this.scanLevel);
+		return this.crop == null ? new ItemStack(Ic2Items.CROP_STICK) : this.generateSeeds(this.crop, this.statGrowth, this.statGain, this.statResistance, this.scanLevel);
 	}
 
 	// $VF: Could not resugar all assert statements!

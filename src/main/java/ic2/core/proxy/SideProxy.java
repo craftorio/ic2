@@ -5,9 +5,13 @@ import ic2.core.sound.SoundManager;
 import ic2.core.util.Keyboard;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
@@ -53,7 +57,7 @@ public interface SideProxy
 
 	File getMinecraftDir();
 
-	void messagePlayer(Player var1, String var2, Object... var3);
+	void messagePlayer(Player player, String translatable, Object... args);
 
 	<T extends BlockEntity & IRotorProvider> void registerRotorProvider(BlockEntityType<T> var1);
 }

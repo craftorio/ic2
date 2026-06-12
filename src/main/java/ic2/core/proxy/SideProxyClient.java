@@ -349,7 +349,7 @@ public final class SideProxyClient implements SideProxy
 	}
 
 	@Override
-	public void messagePlayer(Player player, String message, Object... args)
+	public void messagePlayer(Player player, String translatable, Object... args)
 	{
 		if (player == null)
 		{
@@ -358,10 +358,10 @@ public final class SideProxyClient implements SideProxy
 
 		if (args.length > 0)
 		{
-			player.displayClientMessage(Component.translatable(message, (Object) SideProxyServer.getMessageComponents(args)), false);
+			player.displayClientMessage(Component.translatable(translatable, (Object[]) SideProxyServer.getMessageComponents(args)), false);
 		} else
 		{
-			player.displayClientMessage(Component.translatable(message), false);
+			player.displayClientMessage(Component.translatable(translatable), false);
 		}
 	}
 

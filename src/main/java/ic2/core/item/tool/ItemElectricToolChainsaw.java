@@ -66,11 +66,11 @@ public class ItemElectricToolChainsaw extends ItemElectricTool implements IHitSo
 			if (compoundTag.getBoolean("disableShear"))
 			{
 				compoundTag.putBoolean("disableShear", false);
-				IC2.sideProxy.messagePlayer(player, "ic2.tooltip.mode", "ic2.tooltip.mode.normal");
+				IC2.sideProxy.messagePlayer(player, "item.ic2.mining_laser.tooltip.mode", "item.ic2.mining_laser.tooltip.mode.normal");
 			} else
 			{
 				compoundTag.putBoolean("disableShear", true);
-				IC2.sideProxy.messagePlayer(player, "ic2.tooltip.mode", "ic2.tooltip.mode.noShear");
+				IC2.sideProxy.messagePlayer(player, "item.ic2.mining_laser.tooltip.mode", "item.ic2.mining_laser.tooltip.mode.noShear");
 			}
 		}
 

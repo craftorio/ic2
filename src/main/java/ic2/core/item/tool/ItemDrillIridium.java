@@ -85,10 +85,10 @@ public class ItemDrillIridium extends ItemDrill
 			if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, stack) == 0)
 			{
 				enchantmentMap.put(Enchantments.SILK_TOUCH, 1);
-				IC2.sideProxy.messagePlayer(player, "ic2.tooltip.mode", "ic2.tooltip.mode.silkTouch");
+				IC2.sideProxy.messagePlayer(player, "item.ic2.mining_laser.tooltip.mode", "item.ic2.mining_laser.tooltip.mode.silkTouch");
 			} else
 			{
-				IC2.sideProxy.messagePlayer(player, "ic2.tooltip.mode", "ic2.tooltip.mode.normal");
+				IC2.sideProxy.messagePlayer(player, "item.ic2.mining_laser.tooltip.mode", "item.ic2.mining_laser.tooltip.mode.normal");
 			}
 
 			EnchantmentHelper.setEnchantments(enchantmentMap, stack);

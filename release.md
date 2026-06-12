@@ -31,6 +31,7 @@
 ### 已经在修了
 
 - 纳米剑 `nano_saber`: 右键激活不显示
+- 采矿镭射枪的功能应该不对
 - 监守者声波伤害抵消（目前应该是抵消了一部分，待验证）
 - IC2 杂交系统: 目前为报错状态（哈哈），优先级低
 - 国际化混乱应用，有 `Localization.translate -> String` 和 `Component.translatable -> Component`

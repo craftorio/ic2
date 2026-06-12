@@ -18,12 +18,12 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
 import net.minecraft.client.renderer.item.ItemProperties;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
@@ -76,7 +76,7 @@ public final class ClientEnvProxyForge implements ClientEnvProxy
 	@Override
 	public <E extends BlockEntity> void registerBer(BlockEntityType<E> type, BlockEntityRendererProvider<? super E> rendererFactory)
 	{
-		berRegistrations.add(new ClientEnvProxyForge.BerRegistration(type, rendererFactory));
+		berRegistrations.add(new ClientEnvProxyForge.BerRegistration<>(type, rendererFactory));
 	}
 
 	@Override
@@ -100,13 +100,13 @@ public final class ClientEnvProxyForge implements ClientEnvProxy
 	@Override
 	public <E extends Entity> void registerEntityRenderer(EntityType<? extends E> type, EntityRendererProvider<E> factory)
 	{
-		entityRendererRegistrations.add(new ClientEnvProxyForge.EntityRendererRegistration(type, factory));
+		entityRendererRegistrations.add(new ClientEnvProxyForge.EntityRendererRegistration<>(type, factory));
 	}
 
 	@Override
 	public <E extends BlockEntity> void registerBlockEntityRenderer(BlockEntityType<? extends E> type, BlockEntityRendererProvider<E> factory)
 	{
-		blockEntityRendererRegistrations.add(new ClientEnvProxyForge.BlockEntityRendererRegistration(type, factory));
+		blockEntityRendererRegistrations.add(new ClientEnvProxyForge.BlockEntityRendererRegistration<>(type, factory));
 	}
 
 	IClientFluidTypeExtensions getAttributes(Ic2FluidStack stack)
@@ -118,7 +118,7 @@ public final class ClientEnvProxyForge implements ClientEnvProxy
 	public TextureAtlasSprite getFluidStillSprite(Ic2FluidStack stack)
 	{
 		ResourceLocation id = this.getAttributes(stack).getStillTexture(EnvFluidHandlerForge.getForgeFs(stack));
-		return (TextureAtlasSprite) SideProxyClient.mc.getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(id);
+		return SideProxyClient.mc.getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(id);
 	}
 
 	@Override
@@ -133,8 +133,7 @@ public final class ClientEnvProxyForge implements ClientEnvProxy
 		return Localization.translate(stack.getFluid().getFluidType().getDescriptionId(EnvFluidHandlerForge.getForgeFs(stack)));
 	}
 
-	record BerRegistration<T extends BlockEntity>(BlockEntityType<? extends T> blockEntityType,
-	                                              BlockEntityRendererProvider<T> blockEntityRendererProvider)
+	record BerRegistration<T extends BlockEntity>(BlockEntityType<? extends T> blockEntityType, BlockEntityRendererProvider<T> blockEntityRendererProvider)
 	{
 	}
 
@@ -142,8 +141,7 @@ public final class ClientEnvProxyForge implements ClientEnvProxy
 	{
 	}
 
-	record BlockEntityRendererRegistration<B extends BlockEntity>(BlockEntityType<? extends B> type,
-	                                                              BlockEntityRendererProvider<B> factory)
+	record BlockEntityRendererRegistration<B extends BlockEntity>(BlockEntityType<? extends B> type, BlockEntityRendererProvider<B> factory)
 	{
 	}
 

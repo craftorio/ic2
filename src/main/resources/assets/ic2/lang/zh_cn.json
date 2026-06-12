@@ -796,6 +796,7 @@
 	"ic2.meter.mode.switch": "转换为:",
 	"ic2.reactoritem.durability": "耐久:",
 	"item.ic2.mining_laser.tooltip.mode": "模式：%s",
+	"item.ic2.mining_laser.tooltip.mode.switch": "使用%s+%s切换模式",
 	"item.ic2.mining_laser.tooltip.mode.3x3": "3x3",
 	"item.ic2.mining_laser.tooltip.mode.boxable": "只有箱子处于禁用状态",
 	"item.ic2.mining_laser.tooltip.mode.disabled": "禁用",

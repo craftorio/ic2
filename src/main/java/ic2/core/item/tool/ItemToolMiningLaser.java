@@ -6,6 +6,7 @@ import ic2.core.entity.LaserBulletEntity;
 import ic2.core.init.Localization;
 import ic2.core.item.PriorityUsableItem;
 import ic2.core.ref.Ic2SoundEvents;
+import ic2.core.util.KeyboardClient;
 import ic2.core.util.StackUtil;
 import ic2.core.util.Util;
 import ic2.core.util.Vector3;
@@ -14,6 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -88,6 +90,7 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
 		}
 
 		list.add(Component.translatable("item.ic2.mining_laser.tooltip.mode", mode));
+		list.add(Component.translatable("item.ic2.mining_laser.tooltip.mode.switch", KeyboardClient.modeSwitchKey.getKey().getDisplayName(), Minecraft.getInstance().options.keyUse.getKey().getDisplayName()));
 	}
 
 	@Override
@@ -127,26 +130,26 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
 			switch (laserSetting)
 			{
 				case 0:
-					if (this.shootLaser(stack, world, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false))
+					if (this.shootLaser(world, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false))
 					{
 						IC2.network.get(true).initiateItemEvent(player, stack, 0, true);
 					}
 					break;
 				case 1:
-					if (this.shootLaser(stack, world, player, 4.0F, 5.0F, 1, false, false))
+					if (this.shootLaser(world, player, 4.0F, 5.0F, 1, false, false))
 					{
 						IC2.network.get(true).initiateItemEvent(player, stack, 1, true);
 					}
 					break;
 				case 2:
-					if (this.shootLaser(stack, world, player, Float.POSITIVE_INFINITY, 20.0F, Integer.MAX_VALUE, false, false))
+					if (this.shootLaser(world, player, Float.POSITIVE_INFINITY, 20.0F, Integer.MAX_VALUE, false, false))
 					{
 						IC2.network.get(true).initiateItemEvent(player, stack, 2, true);
 					}
 				case 3:
 				case 7:
 				case 4:
-					if (this.shootLaser(stack, world, player, Float.POSITIVE_INFINITY, 8.0F, Integer.MAX_VALUE, false, true))
+					if (this.shootLaser(world, player, Float.POSITIVE_INFINITY, 8.0F, Integer.MAX_VALUE, false, true))
 					{
 						IC2.network.get(true).initiateItemEvent(player, stack, 4, true);
 					}
@@ -171,14 +174,14 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
 						for (int u = -2; u <= 2; u++)
 						{
 							Vector3 dir = look.copy().addScaled(right, r).addScaled(up, u).normalize();
-							this.shootLaser(stack, world, dir, player, Float.POSITIVE_INFINITY, 12.0F, Integer.MAX_VALUE, false, false);
+							this.shootLaser(world, dir, player, Float.POSITIVE_INFINITY, 12.0F, Integer.MAX_VALUE, false, false);
 						}
 					}
 
 					IC2.network.get(true).initiateItemEvent(player, stack, 5, true);
 					break;
 				case 6:
-					if (this.shootLaser(stack, world, player, Float.POSITIVE_INFINITY, 12.0F, Integer.MAX_VALUE, true, false))
+					if (this.shootLaser(world, player, Float.POSITIVE_INFINITY, 12.0F, Integer.MAX_VALUE, true, false))
 					{
 						IC2.network.get(true).initiateItemEvent(player, stack, 6, true);
 					}
@@ -219,136 +222,35 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
 					dir.normalize();
 					Vector3 start = Util.getEyePosition(player);
 					start.y = pos.getY() + 0.5;
-					start = adjustStartPos(start, dir);
+					adjustStartPos(start, dir);
 					if (nbtData.getInt("laser_setting") == 3)
 					{
-						if (this.shootLaser(stack, world, start, dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false))
+						if (this.shootLaser(world, start, dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false))
 						{
 							IC2.network.get(true).initiateItemEvent(player, stack, 3, true);
 						}
-					} else if (nbtData.getInt("laser_setting") == 7
-						&& this.shootLaser(stack, world, start, dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false))
+					} else if (nbtData.getInt("laser_setting") == 7 && this.shootLaser(world, start, dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false))
 					{
-						this.shootLaser(
-							stack, world, new Vector3(start.x, start.y - 1.0, start.z), dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false
-						);
-						this.shootLaser(
-							stack, world, new Vector3(start.x, start.y + 1.0, start.z), dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false
-						);
+						this.shootLaser(world, new Vector3(start.x, start.y - 1.0, start.z), dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false);
+						this.shootLaser(world, new Vector3(start.x, start.y + 1.0, start.z), dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false);
 						if (player.getDirection().equals(Direction.SOUTH) || player.getDirection().equals(Direction.NORTH))
 						{
-							this.shootLaser(
-								stack, world, new Vector3(start.x - 1.0, start.y, start.z), dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false
-							);
-							this.shootLaser(
-								stack, world, new Vector3(start.x + 1.0, start.y, start.z), dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false
-							);
-							this.shootLaser(
-								stack,
-								world,
-								new Vector3(start.x - 1.0, start.y - 1.0, start.z),
-								dir,
-								player,
-								Float.POSITIVE_INFINITY,
-								5.0F,
-								Integer.MAX_VALUE,
-								false,
-								false
-							);
-							this.shootLaser(
-								stack,
-								world,
-								new Vector3(start.x + 1.0, start.y - 1.0, start.z),
-								dir,
-								player,
-								Float.POSITIVE_INFINITY,
-								5.0F,
-								Integer.MAX_VALUE,
-								false,
-								false
-							);
-							this.shootLaser(
-								stack,
-								world,
-								new Vector3(start.x - 1.0, start.y + 1.0, start.z),
-								dir,
-								player,
-								Float.POSITIVE_INFINITY,
-								5.0F,
-								Integer.MAX_VALUE,
-								false,
-								false
-							);
-							this.shootLaser(
-								stack,
-								world,
-								new Vector3(start.x + 1.0, start.y + 1.0, start.z),
-								dir,
-								player,
-								Float.POSITIVE_INFINITY,
-								5.0F,
-								Integer.MAX_VALUE,
-								false,
-								false
-							);
+							this.shootLaser(world, new Vector3(start.x - 1.0, start.y, start.z), dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false);
+							this.shootLaser(world, new Vector3(start.x + 1.0, start.y, start.z), dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false);
+							this.shootLaser(world, new Vector3(start.x - 1.0, start.y - 1.0, start.z), dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false);
+							this.shootLaser(world, new Vector3(start.x + 1.0, start.y - 1.0, start.z), dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false);
+							this.shootLaser(world, new Vector3(start.x - 1.0, start.y + 1.0, start.z), dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false);
+							this.shootLaser(world, new Vector3(start.x + 1.0, start.y + 1.0, start.z), dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false);
 						}
 
 						if (player.getDirection().equals(Direction.EAST) || player.getDirection().equals(Direction.WEST))
 						{
-							this.shootLaser(
-								stack, world, new Vector3(start.x, start.y, start.z - 1.0), dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false
-							);
-							this.shootLaser(
-								stack, world, new Vector3(start.x, start.y, start.z + 1.0), dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false
-							);
-							this.shootLaser(
-								stack,
-								world,
-								new Vector3(start.x, start.y - 1.0, start.z - 1.0),
-								dir,
-								player,
-								Float.POSITIVE_INFINITY,
-								5.0F,
-								Integer.MAX_VALUE,
-								false,
-								false
-							);
-							this.shootLaser(
-								stack,
-								world,
-								new Vector3(start.x, start.y - 1.0, start.z + 1.0),
-								dir,
-								player,
-								Float.POSITIVE_INFINITY,
-								5.0F,
-								Integer.MAX_VALUE,
-								false,
-								false
-							);
-							this.shootLaser(
-								stack,
-								world,
-								new Vector3(start.x, start.y + 1.0, start.z - 1.0),
-								dir,
-								player,
-								Float.POSITIVE_INFINITY,
-								5.0F,
-								Integer.MAX_VALUE,
-								false,
-								false
-							);
-							this.shootLaser(
-								stack,
-								world,
-								new Vector3(start.x, start.y + 1.0, start.z + 1.0),
-								dir,
-								player,
-								Float.POSITIVE_INFINITY,
-								5.0F,
-								Integer.MAX_VALUE,
-								false,
-								false
-							);
+							this.shootLaser(world, new Vector3(start.x, start.y, start.z - 1.0), dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false);
+							this.shootLaser(world, new Vector3(start.x, start.y, start.z + 1.0), dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false);
+							this.shootLaser(world, new Vector3(start.x, start.y - 1.0, start.z - 1.0), dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false);
+							this.shootLaser(world, new Vector3(start.x, start.y - 1.0, start.z + 1.0), dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false);
+							this.shootLaser(world, new Vector3(start.x, start.y + 1.0, start.z - 1.0), dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false);
+							this.shootLaser(world, new Vector3(start.x, start.y + 1.0, start.z + 1.0), dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false);
 						}
 
 						IC2.network.get(true).initiateItemEvent(player, stack, 7, true);
@@ -364,69 +266,17 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
 					Vector3 start = Util.getEyePosition(player);
 					start.x = pos.getX() + 0.5;
 					start.z = pos.getZ() + 0.5;
-					start = adjustStartPos(start, dir);
-					if (this.shootLaser(stack, world, start, dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false))
+					adjustStartPos(start, dir);
+					if (this.shootLaser(world, start, dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false))
 					{
-						this.shootLaser(
-							stack, world, new Vector3(start.x + 1.0, start.y, start.z), dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false
-						);
-						this.shootLaser(
-							stack, world, new Vector3(start.x - 1.0, start.y, start.z), dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false
-						);
-						this.shootLaser(
-							stack,
-							world,
-							new Vector3(start.x + 1.0, start.y, start.z + 1.0),
-							dir,
-							player,
-							Float.POSITIVE_INFINITY,
-							5.0F,
-							Integer.MAX_VALUE,
-							false,
-							false
-						);
-						this.shootLaser(
-							stack,
-							world,
-							new Vector3(start.x - 1.0, start.y, start.z - 1.0),
-							dir,
-							player,
-							Float.POSITIVE_INFINITY,
-							5.0F,
-							Integer.MAX_VALUE,
-							false,
-							false
-						);
-						this.shootLaser(
-							stack,
-							world,
-							new Vector3(start.x + 1.0, start.y, start.z - 1.0),
-							dir,
-							player,
-							Float.POSITIVE_INFINITY,
-							5.0F,
-							Integer.MAX_VALUE,
-							false,
-							false
-						);
-						this.shootLaser(
-							stack,
-							world,
-							new Vector3(start.x - 1.0, start.y, start.z + 1.0),
-							dir,
-							player,
-							Float.POSITIVE_INFINITY,
-							5.0F,
-							Integer.MAX_VALUE,
-							false,
-							false
-						);
-						this.shootLaser(
-							stack, world, new Vector3(start.x, start.y, start.z + 1.0), dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false
-						);
-						this.shootLaser(
-							stack, world, new Vector3(start.x, start.y, start.z - 1.0), dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false
-						);
+						this.shootLaser(world, new Vector3(start.x + 1.0, start.y, start.z), dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false);
+						this.shootLaser(world, new Vector3(start.x - 1.0, start.y, start.z), dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false);
+						this.shootLaser(world, new Vector3(start.x + 1.0, start.y, start.z + 1.0), dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false);
+						this.shootLaser(world, new Vector3(start.x - 1.0, start.y, start.z - 1.0), dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false);
+						this.shootLaser(world, new Vector3(start.x + 1.0, start.y, start.z - 1.0), dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false);
+						this.shootLaser(world, new Vector3(start.x - 1.0, start.y, start.z + 1.0), dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false);
+						this.shootLaser(world, new Vector3(start.x, start.y, start.z + 1.0), dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false);
+						this.shootLaser(world, new Vector3(start.x, start.y, start.z - 1.0), dir, player, Float.POSITIVE_INFINITY, 5.0F, Integer.MAX_VALUE, false, false);
 						IC2.network.get(true).initiateItemEvent(player, stack, 7, true);
 					}
 				}
@@ -444,39 +294,35 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
 		return pos.addScaled(dir, 0.2);
 	}
 
-	private void setLaserVelocity(Projectile laser, Entity shooter, Vector3 direction, float speed, float divergence)
+	private void setLaserVelocity(Projectile laser, Entity shooter, Vector3 direction)
 	{
-		laser.shoot(direction.x, direction.y, direction.z, speed, divergence);
+		laser.shoot(direction.x, direction.y, direction.z, (float) 3.0, (float) 1.0);
 		Vec3 vec3d = shooter.getDeltaMovement();
 		laser.setDeltaMovement(laser.getDeltaMovement().add(vec3d.x, shooter.onGround() ? 0.0 : vec3d.y, vec3d.z));
 	}
 
-	public boolean shootLaser(ItemStack stack, Level world, LivingEntity owner, float range, float power, int blockBreaks, boolean explosive, boolean smelt)
+	public boolean shootLaser(Level world, LivingEntity owner, float range, float power, int blockBreaks, boolean explosive, boolean smelt)
 	{
 		Vector3 dir = Util.getLook(owner);
-		return this.shootLaser(stack, world, dir, owner, range, power, blockBreaks, explosive, smelt);
+		return this.shootLaser(world, dir, owner, range, power, blockBreaks, explosive, smelt);
 	}
 
-	public boolean shootLaser(
-		ItemStack stack, Level world, Vector3 dir, LivingEntity owner, float range, float power, int blockBreaks, boolean explosive, boolean smelt
-	)
+	public boolean shootLaser(Level world, Vector3 dir, LivingEntity owner, float range, float power, int blockBreaks, boolean explosive, boolean smelt)
 	{
 		Vector3 start = adjustStartPos(Util.getEyePosition(owner), dir);
-		return this.shootLaser(stack, world, start, dir, owner, range, power, blockBreaks, explosive, smelt);
+		return this.shootLaser(world, start, dir, owner, range, power, blockBreaks, explosive, smelt);
 	}
 
-	public boolean shootLaser(
-		ItemStack stack, Level world, Vector3 start, Vector3 dir, LivingEntity owner, float range, float power, int blockBreaks, boolean explosive, boolean smelt
-	)
+	public boolean shootLaser(Level world, Vector3 start, Vector3 dir, LivingEntity owner, float range, float power, int blockBreaks, boolean explosive, boolean smelt)
 	{
 		LaserBulletEntity entity = new LaserBulletEntity(world, start, dir, owner, range, power, blockBreaks, explosive);
 		entity.init(owner, range, power, blockBreaks, explosive, smelt, true);
-		this.setLaserVelocity(entity, owner, dir, 3.0F, 1.0F);
+		this.setLaserVelocity(entity, owner, dir);
 		world.addFreshEntity(entity);
 		return true;
 	}
 
-	public Rarity getRarity(ItemStack stack)
+	public @NotNull Rarity getRarity(@NotNull ItemStack stack)
 	{
 		return Rarity.UNCOMMON;
 	}

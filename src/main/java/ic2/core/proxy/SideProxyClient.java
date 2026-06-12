@@ -71,6 +71,7 @@ import ic2.core.util.Util;
 import java.io.File;
 import java.util.Objects;
 
+import ic2.forge.ClientEnvProxyForge;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.SignRenderer;
@@ -90,9 +91,8 @@ public final class SideProxyClient implements SideProxy
 {
 	public static final ClientEnvProxy envProxy = getEnvProxy();
 	public static final Minecraft mc = Minecraft.getInstance();
+	public static final Keyboard keyboard = new KeyboardClient();
 	private static final SoundManager soundManager = new SoundManagerClient();
-	private static final Keyboard keyboard = new KeyboardClient();
-
 	@Override
 	public void preInit()
 	{
@@ -150,9 +150,6 @@ public final class SideProxyClient implements SideProxy
 		envProxy.registerScreen(Ic2ScreenHandlers.SOLAR_GENERATOR, GuiSolarGenerator::new);
 		envProxy.registerColorProvider((state, world, post, tintIndex) -> 6723908, Ic2Blocks.RUBBER_LEAVES);
 		envProxy.registerColorProvider((var1, var2) -> 6723908, Ic2Items.RUBBER_LEAVES);
-
-		// TODO: Check if useful or not
-		// envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.RUBBER_SAPLING);
 		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.WOODEN_SCAFFOLD, Ic2Blocks.IRON_SCAFFOLD);
 		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.FOAM);
 		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.REINFORCED_GLASS);
@@ -363,6 +360,7 @@ public final class SideProxyClient implements SideProxy
 
 	private static ClientEnvProxy getEnvProxy()
 	{
+		return new ClientEnvProxyForge();
 		try
 		{
 			if (IC2.envProxy.isFabricEnv())

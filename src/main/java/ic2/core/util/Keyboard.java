@@ -84,7 +84,7 @@ public class Keyboard implements IKeyboard
 	private boolean get(Player player, Keyboard.Key key)
 	{
 		Set<Keyboard.Key> keys = this.playerKeys.get(player);
-		return keys == null ? false : keys.contains(key);
+		return keys != null && keys.contains(key);
 	}
 
 	public void addKeyWatcher(Keyboard.IKeyWatcher watcher)
@@ -105,7 +105,7 @@ public class Keyboard implements IKeyboard
 		Keyboard.Key getRepresentation();
 	}
 
-	protected enum Key
+	public enum Key
 	{
 		alt,
 		boost,

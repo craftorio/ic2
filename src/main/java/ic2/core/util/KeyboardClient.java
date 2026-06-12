@@ -17,11 +17,11 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class KeyboardClient extends Keyboard
 {
 	private final Minecraft mc = Minecraft.getInstance();
-	public final KeyMapping altKey = new KeyMapping("ic2.keyboard.alt_key", 342, "ic2.name");
-	public final KeyMapping boostKey = new KeyMapping("ic2.keyboard.boost_key", 341, "ic2.name");
-	public final KeyMapping modeSwitchKey = new KeyMapping("ic2.keyboard.mode_switch_key", 77, "ic2.name");
-	public final KeyMapping sideInventoryKey = new KeyMapping("ic2.keyboard.side_inventory_key", 67, "ic2.name");
-	public final KeyMapping expandInfo = new KeyMapping("ic2.keyboard.hub_expand_key", 88, "ic2.name");
+	public static final KeyMapping altKey = new KeyMapping("ic2.keyboard.alt_key", 342, "ic2.name");
+	public static final KeyMapping boostKey = new KeyMapping("ic2.keyboard.boost_key", 341, "ic2.name");
+	public static final KeyMapping modeSwitchKey = new KeyMapping("ic2.keyboard.mode_switch_key", 77, "ic2.name");
+	public static final KeyMapping sideInventoryKey = new KeyMapping("ic2.keyboard.side_inventory_key", 67, "ic2.name");
+	public static final KeyMapping expandInfo = new KeyMapping("ic2.keyboard.hub_expand_key", 88, "ic2.name");
 	private static boolean registeredKeys = false;
 	private int lastKeyState = 0;
 

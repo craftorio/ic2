@@ -90,7 +90,7 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
 		}
 
 		list.add(Component.translatable("item.ic2.mining_laser.tooltip.mode", mode));
-		list.add(Component.translatable("item.ic2.mining_laser.tooltip.mode.switch", KeyboardClient.modeSwitchKey.getKey().getDisplayName(), Minecraft.getInstance().options.keyUse.getKey().getDisplayName()));
+		list.add(Component.translatable("item.ic2.tooltip.mode.switch", KeyboardClient.modeSwitchKey.getKey().getDisplayName(), Minecraft.getInstance().options.keyUse.getKey().getDisplayName()));
 	}
 
 	@Override

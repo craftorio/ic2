@@ -79,7 +79,7 @@ public class IC2
 		envProxy = createEnvProxy();
 		sideProxy = createSideProxy();
 		log = new Log(LogManager.getLogger("ic2"));
-		network = new SideGateway(NetworkManager.class, NetworkManagerClient.class);
+		network = new SideGateway();
 		keyboard = sideProxy.getKeyboard();
 		soundManager = sideProxy.getSoundManager();
 		tabIc2General = envProxy.createItemGroup(getIdentifier("general"), new ItemGroupIconSupplier(Ic2ItemGroupType.GENERAL), Ic2ItemGroupType.GENERAL);

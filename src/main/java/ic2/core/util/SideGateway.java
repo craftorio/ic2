@@ -8,19 +8,20 @@ public final class SideGateway
 	private final NetworkManager clientInstance;
 	private final NetworkManager serverInstance;
 
-	public SideGateway(Class<? extends NetworkManager> serverClass, Class<? extends NetworkManager> clientClass)
+	public SideGateway()
 	{
 		try
 		{
 			if (IC2.envProxy.isClientEnv())
 			{
-				this.clientInstance = clientClass.getDeclaredConstructor().newInstance();
-			} else
+				this.clientInstance = (NetworkManager) Class.forName("ic2.core.network.NetworkManagerClient").getConstructor().newInstance();
+			}
+			else
 			{
 				this.clientInstance = null;
 			}
 
-			this.serverInstance = serverClass.getDeclaredConstructor().newInstance();
+			this.serverInstance = new NetworkManager();
 		} catch (Exception e)
 		{
 			throw new RuntimeException(e);

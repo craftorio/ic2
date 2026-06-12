@@ -89,7 +89,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 
 public final class SideProxyClient implements SideProxy
 {
-	public static final ClientEnvProxy envProxy = getEnvProxy();
+	public static final ClientEnvProxy envProxy = new ClientEnvProxyForge();
 	public static final Minecraft mc = Minecraft.getInstance();
 	public static final Keyboard keyboard = new KeyboardClient();
 	private static final SoundManager soundManager = new SoundManagerClient();
@@ -357,25 +357,5 @@ public final class SideProxyClient implements SideProxy
 	{
 		envProxy.registerBer(type, KineticGeneratorRenderer::new);
 	}
-
-	private static ClientEnvProxy getEnvProxy()
-	{
-		return new ClientEnvProxyForge();
-		try
-		{
-			if (IC2.envProxy.isFabricEnv())
-			{
-				return (ClientEnvProxy) Class.forName("ic2.fabric.ClientEnvProxyFabric").getConstructors()[0].newInstance();
-			} else if (IC2.envProxy.isForgeEnv())
-			{
-				return (ClientEnvProxy) Class.forName("ic2.forge.ClientEnvProxyForge").getConstructors()[0].newInstance();
-			} else
-			{
-				throw new IllegalStateException("unknown env");
-			}
-		} catch (ReflectiveOperationException e)
-		{
-			throw new RuntimeException(e);
-		}
-	}
+	
 }

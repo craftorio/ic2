@@ -152,7 +152,7 @@ public final class SideProxyClient implements SideProxy
 		envProxy.registerColorProvider((var1, var2) -> 6723908, Ic2Items.RUBBER_LEAVES);
 
 		// TODO: Check if useful or not
-		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.RUBBER_SAPLING);
+		// envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.RUBBER_SAPLING);
 		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.WOODEN_SCAFFOLD, Ic2Blocks.IRON_SCAFFOLD);
 		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.FOAM);
 		envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.REINFORCED_GLASS);
@@ -351,18 +351,8 @@ public final class SideProxyClient implements SideProxy
 	@Override
 	public void messagePlayer(Player player, String translatable, Object... args)
 	{
-		if (player == null)
-		{
-			player = mc.player;
-		}
-
-		if (args.length > 0)
-		{
-			player.displayClientMessage(Component.translatable(translatable, (Object[]) SideProxyServer.getMessageComponents(args)), false);
-		} else
-		{
-			player.displayClientMessage(Component.translatable(translatable), false);
-		}
+		if (player == null) player = mc.player;
+		if (player != null) player.displayClientMessage(Component.translatable(translatable, args.length > 0 ? SideProxyServer.getMessageComponents(args) : new Object[0]), false);
 	}
 
 	@Override

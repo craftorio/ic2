@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:smelting",
+  "category": "misc",
+  "ingredient": {
+    "item": "ic2:raw_crystal_memory"
+  },
+  "result": "ic2:crystal_memory",
+  "experience": 0.1,
+  "cookingtime": 200
+}

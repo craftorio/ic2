@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:smelting",
+  "category": "misc",
+  "ingredient": {
+    "item": "ic2:coal_fuel_dust"
+  },
+  "result": "ic2:coal_dust",
+  "experience": 0.0,
+  "cookingtime": 200
+}

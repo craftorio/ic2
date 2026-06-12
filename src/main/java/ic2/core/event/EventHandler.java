@@ -125,7 +125,6 @@ public final class EventHandler
 		IC2.sideProxy.onPostInit();
 		IC2.sideProxy.requestTick(!IC2.envProxy.isClientEnv(), ChunkLoadAwareBlockHandler::init);
 		IC2.log.debug(LogCategory.General, "Finished post-init after %d ms.", (System.nanoTime() - startTime) / 1000000L);
-		IC2.log.info(LogCategory.General, "%s version %s loaded.", "ic2", "2.9.%build%%suffix%");
 	}
 
 	private static boolean loadSubModule(String name)

@@ -30,6 +30,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.IdentityHashMap;
 import java.util.LinkedList;
@@ -64,20 +65,19 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 	{
 		return switch (this.getEquipmentSlot())
 		{
-			case HEAD -> 0.15;
+			case HEAD, FEET -> 0.15;
 			case CHEST -> 0.48;
 			case LEGS -> 0.3;
-			case FEET -> 0.15;
 			default -> 0.0;
 		};
 	}
 
-	public boolean hasCustomColor(ItemStack stack)
+	public boolean hasCustomColor(@NotNull ItemStack stack)
 	{
 		return this.getColor(stack) != -1;
 	}
 
-	public void clearColor(ItemStack stack)
+	public void clearColor(@NotNull ItemStack stack)
 	{
 		CompoundTag nbt = this.getDisplayNbt(stack, false);
 		if (nbt != null && nbt.contains("color", 3))
@@ -91,13 +91,13 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 		}
 	}
 
-	public int getColor(ItemStack stack)
+	public int getColor(@NotNull ItemStack stack)
 	{
 		CompoundTag nbt = this.getDisplayNbt(stack, false);
 		return nbt != null && nbt.contains("color", 3) ? nbt.getInt("color") : -1;
 	}
 
-	public void setColor(ItemStack stack, int color)
+	public void setColor(@NotNull ItemStack stack, int color)
 	{
 		CompoundTag nbt = this.getDisplayNbt(stack, true);
 		assert nbt != null;
@@ -156,7 +156,7 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 	}
 
 	@Override
-	public Rarity getRarity(ItemStack stack)
+	public @NotNull Rarity getRarity(@NotNull ItemStack stack)
 	{
 		return Rarity.RARE;
 	}
@@ -168,7 +168,7 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 	}
 
 	@Override
-	public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected)
+	public void inventoryTick(@NotNull ItemStack stack, @NotNull Level world, @NotNull Entity entity, int slot, boolean selected)
 	{
 		super.inventoryTick(stack, world, entity, slot, selected);
 		if (!(entity instanceof Player player))
@@ -182,7 +182,7 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 		}
 
 		CompoundTag nbtData = StackUtil.getOrCreateNbtData(stack);
-		byte toggleTimer = nbtData.getByte("toggleTimer");
+		byte toggleTimer = nbtData.getByte("toggle_timer");
 		boolean ret = false;
 		EquipmentSlot equipSlot = this.getEquipmentSlot();
 
@@ -239,29 +239,29 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 				if (cost != null)
 				{
 					cost = cost * (effect.getAmplifier() + 1);
-					if (ElectricItem.manager.canUse(stack, cost.intValue()))
+					if (ElectricItem.manager.canUse(stack, cost))
 					{
-						ElectricItem.manager.use(stack, cost.intValue(), player);
+						ElectricItem.manager.use(stack, cost, player);
 						player.removeEffect(potion);
 					}
 				}
 			}
 
-			boolean Nightvision = nbtData.getBoolean("Nightvision");
-			short hudmode = nbtData.getShort("HudMode");
+			boolean Nightvision = nbtData.getBoolean("night_vision");
+			short hudmode = nbtData.getShort("hud_mode");
 			if (IC2.keyboard.isAltKeyDown(player) && IC2.keyboard.isModeSwitchKeyDown(player) && toggleTimer == 0)
 			{
 				toggleTimer = 10;
 				Nightvision = !Nightvision;
 				if (IC2.sideProxy.isSimulating())
 				{
-					nbtData.putBoolean("Nightvision", Nightvision);
+					nbtData.putBoolean("night_vision", Nightvision);
 					if (Nightvision)
 					{
-						IC2.sideProxy.messagePlayer(player, "Nightvision enabled.");
+						IC2.sideProxy.messagePlayer(player, "ic2.night_vision.mode.enabled");
 					} else
 					{
-						IC2.sideProxy.messagePlayer(player, "Nightvision disabled.");
+						IC2.sideProxy.messagePlayer(player, "ic2.night_vision.mode.disabled");
 					}
 				}
 			}
@@ -279,14 +279,14 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 
 				if (IC2.sideProxy.isSimulating())
 				{
-					nbtData.putShort("HudMode", hudmode);
+					nbtData.putShort("hud_mode", hudmode);
 					IC2.sideProxy.messagePlayer(player, Localization.translate(HudMode.getFromID(hudmode).getTranslationKey()));
 				}
 			}
 
 			if (IC2.sideProxy.isSimulating() && toggleTimer > 0)
 			{
-				nbtData.putByte("toggleTimer", --toggleTimer);
+				nbtData.putByte("toggle_timer", --toggleTimer);
 			}
 
 			if (Nightvision && IC2.sideProxy.isSimulating() && ElectricItem.manager.use(stack, 1.0, player))
@@ -325,7 +325,7 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 				&& IC2.keyboard.isForwardKeyDown(player)
 				&& (enableQuantumSpeedOnSprint && player.isSprinting() || !enableQuantumSpeedOnSprint && IC2.keyboard.isBoostKeyDown(player)))
 			{
-				byte speedTicker = nbtData.getByte("speedTicker");
+				byte speedTicker = nbtData.getByte("speed_ticker");
 				if (++speedTicker >= 10)
 				{
 					speedTicker = 0;
@@ -333,7 +333,7 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 					ret = true;
 				}
 
-				nbtData.putByte("speedTicker", speedTicker);
+				nbtData.putByte("speed_ticker", speedTicker);
 				float speed = 0.22F;
 				if (player.isInWater())
 				{
@@ -345,19 +345,16 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 					}
 				}
 
-				if (speed > 0.0F)
-				{
-					float yawRad = player.getYRot() * (float) Math.PI / 180.0F;
-					Vec3 motion = player.getDeltaMovement();
-					player.setDeltaMovement(motion.x + (-Math.sin(yawRad) * speed), motion.y, motion.z + (Math.cos(yawRad) * speed));
-				}
+				float yawRad = player.getYRot() * (float) Math.PI / 180.0F;
+				Vec3 motion = player.getDeltaMovement();
+				player.setDeltaMovement(motion.x + (-Math.sin(yawRad) * speed), motion.y, motion.z + (Math.cos(yawRad) * speed));
 			}
 
 		} else if (equipSlot == EquipmentSlot.FEET)
 		{
 			if (IC2.sideProxy.isSimulating())
 			{
-				boolean wasOnGround = nbtData.contains("wasOnGround") ? nbtData.getBoolean("wasOnGround") : true;
+				boolean wasOnGround = !nbtData.contains("on_ground") || nbtData.getBoolean("on_ground");
 				if (wasOnGround && !player.onGround() && IC2.keyboard.isJumpKeyDown(player) && IC2.keyboard.isBoostKeyDown(player))
 				{
 					ElectricItem.manager.use(stack, 4000.0, player);
@@ -366,7 +363,7 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 
 				if (player.onGround() != wasOnGround)
 				{
-					nbtData.putBoolean("wasOnGround", player.onGround());
+					nbtData.putBoolean("on_ground", player.onGround());
 				}
 			} else
 			{
@@ -404,9 +401,9 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 	}
 
 	@Override
-	public boolean drainEnergy(ItemStack pack, int amount)
+	public void drainEnergy(ItemStack pack, int amount)
 	{
-		return ElectricItem.manager.discharge(pack, amount + 6, Integer.MAX_VALUE, true, false, false) > 0.0;
+		ElectricItem.manager.discharge(pack, amount + 6, Integer.MAX_VALUE, true, false, false);
 	}
 
 	@Override
@@ -454,7 +451,7 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 	@Override
 	public HudMode getHudMode(ItemStack stack)
 	{
-		return HudMode.getFromID(StackUtil.getOrCreateNbtData(stack).getShort("HudMode"));
+		return HudMode.getFromID(StackUtil.getOrCreateNbtData(stack).getShort("hud_mode"));
 	}
 
 	public static boolean isWearingFullSet(Player player)

@@ -14,9 +14,9 @@ public class ItemArmorJetpackElectric extends ItemArmorElectric implements IJetp
 	}
 
 	@Override
-	public boolean drainEnergy(ItemStack pack, int amount)
+	public void drainEnergy(ItemStack pack, int amount)
 	{
-		return ElectricItem.manager.discharge(pack, amount + 6, Integer.MAX_VALUE, true, false, false) > 0.0;
+		ElectricItem.manager.discharge(pack, amount + 6, Integer.MAX_VALUE, true, false, false);
 	}
 
 	@Override

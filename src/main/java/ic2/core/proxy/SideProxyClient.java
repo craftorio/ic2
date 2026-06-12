@@ -361,7 +361,7 @@ public final class SideProxyClient implements SideProxy
 			player.displayClientMessage(Component.translatable(message, (Object) SideProxyServer.getMessageComponents(args)), false);
 		} else
 		{
-			player.displayClientMessage(Component.literal(message), false);
+			player.displayClientMessage(Component.translatable(message), false);
 		}
 	}
 

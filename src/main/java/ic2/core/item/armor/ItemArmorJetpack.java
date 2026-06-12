@@ -27,21 +27,20 @@ public class ItemArmorJetpack extends ItemArmorFluidTank implements IJetpack
 	}
 
 	@Override
-	public boolean drainEnergy(ItemStack pack, int amount)
+	public void drainEnergy(ItemStack pack, int amount)
 	{
 		if (this.isEmpty(pack))
 		{
-			return false;
+			return;
 		}
 
 		Ic2FluidStack fs = this.drainMb(pack, amount, true, null);
 		if (fs.getAmountMb() < amount)
 		{
-			return false;
+			return;
 		}
 
 		this.drainMb(pack, amount, false, null);
-		return true;
 	}
 
 	@Override

@@ -4,9 +4,7 @@ import net.minecraft.world.item.ItemStack;
 
 public interface IJetpack
 {
-	int EU_ENERGY_INCREASE = 6;
-
-	boolean drainEnergy(ItemStack var1, int var2);
+	void drainEnergy(ItemStack var1, int var2);
 
 	float getPower(ItemStack var1);
 

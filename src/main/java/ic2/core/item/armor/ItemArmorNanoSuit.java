@@ -17,8 +17,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
-import net.minecraft.world.item.Item.Properties;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 
 public class ItemArmorNanoSuit extends ItemArmorElectric implements IItemHudProvider
 {
@@ -40,10 +40,9 @@ public class ItemArmorNanoSuit extends ItemArmorElectric implements IItemHudProv
 	{
 		return switch (this.getEquipmentSlot())
 		{
-			case HEAD -> 0.15;
+			case HEAD, FEET -> 0.15;
 			case CHEST -> 0.4;
 			case LEGS -> 0.3;
-			case FEET -> 0.15;
 			default -> 0.0;
 		};
 	}
@@ -66,31 +65,31 @@ public class ItemArmorNanoSuit extends ItemArmorElectric implements IItemHudProv
 		return true;
 	}
 
-	public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected)
+	public void inventoryTick(@NotNull ItemStack stack, @NotNull Level world, @NotNull Entity entity, int slot, boolean selected)
 	{
 		super.inventoryTick(stack, world, entity, slot, selected);
 		if (entity instanceof Player player)
 		{
 			CompoundTag nbtData = StackUtil.getOrCreateNbtData(stack);
-			byte toggleTimer = nbtData.getByte("toggleTimer");
+			byte toggleTimer = nbtData.getByte("toggle_timer");
 			boolean ret = false;
 			if (slot == EquipmentSlot.HEAD.getIndex())
 			{
-				boolean isNightVisionEnabled = nbtData.getBoolean("Nightvision");
-				short hubmode = nbtData.getShort("HudMode");
+				boolean isNightVisionEnabled = nbtData.getBoolean("night_vision");
+				short hubmode = nbtData.getShort("hud_mode");
 				if (IC2.keyboard.isAltKeyDown(player) && IC2.keyboard.isModeSwitchKeyDown(player) && toggleTimer == 0)
 				{
 					toggleTimer = 10;
 					isNightVisionEnabled = !isNightVisionEnabled;
 					if (IC2.sideProxy.isSimulating())
 					{
-						nbtData.putBoolean("Nightvision", isNightVisionEnabled);
+						nbtData.putBoolean("night_vision", isNightVisionEnabled);
 						if (isNightVisionEnabled)
 						{
-							IC2.sideProxy.messagePlayer(player, "Nightvision enabled.");
+							IC2.sideProxy.messagePlayer(player, "ic2.night_vision.mode.enabled");
 						} else
 						{
-							IC2.sideProxy.messagePlayer(player, "Nightvision disabled.");
+							IC2.sideProxy.messagePlayer(player, "ic2.night_vision.mode.disabled");
 						}
 					}
 				}
@@ -108,14 +107,14 @@ public class ItemArmorNanoSuit extends ItemArmorElectric implements IItemHudProv
 
 					if (IC2.sideProxy.isSimulating())
 					{
-						nbtData.putShort("HudMode", hubmode);
+						nbtData.putShort("hud_mode", hubmode);
 						IC2.sideProxy.messagePlayer(player, Localization.translate(HudMode.getFromID(hubmode).getTranslationKey()));
 					}
 				}
 
 				if (IC2.sideProxy.isSimulating() && toggleTimer > 0)
 				{
-					nbtData.putByte("toggleTimer", --toggleTimer);
+					nbtData.putByte("toggle_timer", --toggleTimer);
 				}
 
 				if (isNightVisionEnabled && IC2.sideProxy.isSimulating())
@@ -136,7 +135,7 @@ public class ItemArmorNanoSuit extends ItemArmorElectric implements IItemHudProv
 		}
 	}
 
-	public Rarity getRarity(ItemStack stack)
+	public @NotNull Rarity getRarity(@NotNull ItemStack stack)
 	{
 		return Rarity.UNCOMMON;
 	}
@@ -150,6 +149,6 @@ public class ItemArmorNanoSuit extends ItemArmorElectric implements IItemHudProv
 	@Override
 	public HudMode getHudMode(ItemStack stack)
 	{
-		return HudMode.getFromID(StackUtil.getOrCreateNbtData(stack).getShort("HudMode"));
+		return HudMode.getFromID(StackUtil.getOrCreateNbtData(stack).getShort("hud_mode"));
 	}
 }

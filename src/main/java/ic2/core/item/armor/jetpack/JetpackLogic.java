@@ -17,7 +17,7 @@ public class JetpackLogic
 			return false;
 		}
 
-		IBoostingJetpack bjetpack = jetpack instanceof IBoostingJetpack ? (IBoostingJetpack) jetpack : null;
+		IBoostingJetpack iBoostingJetpack = jetpack instanceof IBoostingJetpack ? (IBoostingJetpack) jetpack : null;
 		float power = jetpack.getPower(stack);
 		float dropPercentage = jetpack.getDropPercentage(stack);
 		if (jetpack.getChargeLevel(stack) <= dropPercentage)
@@ -33,18 +33,18 @@ public class JetpackLogic
 
 		if (IC2.keyboard.isForwardKeyDown(player))
 		{
-			float retruster, boost;
-			if (bjetpack != null)
+			float thruster, boost;
+			if (iBoostingJetpack != null)
 			{
-				retruster = bjetpack.getBaseThrust(stack, hoverMode);
-				boost = bjetpack.getBoostThrust(player, stack, hoverMode);
+				thruster = iBoostingJetpack.getBaseThrust(stack, hoverMode);
+				boost = iBoostingJetpack.getBoostThrust(player, stack, hoverMode);
 			} else
 			{
-				retruster = hoverMode ? 1.0F : 0.15F;
+				thruster = hoverMode ? 1.0F : 0.15F;
 				boost = 0.0F;
 			}
 
-			float forwarder = power * retruster * 2.0F;
+			float forwarder = power * thruster * 2.0F;
 			if (forwarder > 0.0F)
 			{
 				float yaw = player.getYRot() * (float) Math.PI / 180.0F;
@@ -54,7 +54,7 @@ public class JetpackLogic
 				{
 					motionX += -Math.sin(yaw) * boost;
 					motionZ += Math.cos(yaw) * boost;
-					bjetpack.useBoostPower(stack, boost);
+					iBoostingJetpack.useBoostPower(stack, boost);
 				}
 			}
 		}
@@ -80,18 +80,18 @@ public class JetpackLogic
 			if (IC2.keyboard.isJumpKeyDown(player))
 			{
 				maxHoverY += jetpack.getHoverMultiplier(stack, true);
-				if (bjetpack != null)
+				if (iBoostingJetpack != null)
 				{
-					maxHoverY *= bjetpack.getHoverBoost(player, stack, true);
+					maxHoverY *= iBoostingJetpack.getHoverBoost(player, stack, true);
 				}
 			}
 
 			if (IC2.keyboard.isSneakKeyDown(player))
 			{
 				maxHoverY += -jetpack.getHoverMultiplier(stack, false);
-				if (bjetpack != null)
+				if (iBoostingJetpack != null)
 				{
-					maxHoverY *= bjetpack.getHoverBoost(player, stack, false);
+					maxHoverY *= iBoostingJetpack.getHoverBoost(player, stack, false);
 				}
 			}
 
@@ -123,8 +123,8 @@ public class JetpackLogic
 		if (stack != null && jetpack.isJetpackActive(stack))
 		{
 			CompoundTag nbtData = StackUtil.getOrCreateNbtData(stack);
-			boolean hoverMode = nbtData.getBoolean("hoverMode");
-			byte toggleTimer = nbtData.getByte("toggleTimer");
+			boolean hoverMode = nbtData.getBoolean("hover_mode");
+			byte toggleTimer = nbtData.getByte("toggle_timer");
 			boolean jetpackUsed = false;
 
 			if (IC2.keyboard.isJumpKeyDown(player) && IC2.keyboard.isModeSwitchKeyDown(player) && toggleTimer == 0)
@@ -133,13 +133,13 @@ public class JetpackLogic
 				hoverMode = !hoverMode;
 				if (!world.isClientSide())
 				{
-					nbtData.putBoolean("hoverMode", hoverMode);
+					nbtData.putBoolean("hover_mode", hoverMode);
 					if (hoverMode)
 					{
-						IC2.sideProxy.messagePlayer(player, "Hover Mode enabled.");
+						IC2.sideProxy.messagePlayer(player, "ic2.hover_mode.enabled");
 					} else
 					{
-						IC2.sideProxy.messagePlayer(player, "Hover Mode disabled.");
+						IC2.sideProxy.messagePlayer(player, "ic2.hover_mode.disabled");
 					}
 				}
 			}
@@ -149,14 +149,14 @@ public class JetpackLogic
 				jetpackUsed = useJetpack(player, hoverMode, jetpack, stack);
 				if (player.onGround() && hoverMode && !world.isClientSide())
 				{
-					nbtData.putBoolean("hoverMode", false);
-					IC2.sideProxy.messagePlayer(player, "Hover Mode disabled.");
+					nbtData.putBoolean("hover_mode", false);
+					IC2.sideProxy.messagePlayer(player, "ic2.hover_mode.disabled");
 				}
 			}
 
 			if (!world.isClientSide() && toggleTimer > 0)
 			{
-				nbtData.putByte("toggleTimer", --toggleTimer);
+				nbtData.putByte("toggle_timer", --toggleTimer);
 			}
 
 			if (jetpackUsed)

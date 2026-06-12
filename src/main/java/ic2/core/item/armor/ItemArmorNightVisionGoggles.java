@@ -4,7 +4,6 @@ import ic2.api.item.ElectricItem;
 import ic2.api.item.IElectricItem;
 import ic2.api.item.IItemHudInfo;
 import ic2.core.IC2;
-import ic2.core.item.ElectricItemManager;
 import ic2.core.ref.Ic2ArmorMaterials;
 import ic2.core.util.StackUtil;
 
@@ -12,17 +11,15 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Item.Properties;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 
 public class ItemArmorNightVisionGoggles extends ItemArmorUtility implements IElectricItem, IItemHudInfo
 {
@@ -63,7 +60,7 @@ public class ItemArmorNightVisionGoggles extends ItemArmorUtility implements IEl
 		return info;
 	}
 
-	public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected)
+	public void inventoryTick(@NotNull ItemStack stack, @NotNull Level world, @NotNull Entity entity, int slot, boolean selected)
 	{
 		super.inventoryTick(stack, world, entity, slot, selected);
 		if (entity instanceof Player player)
@@ -72,7 +69,7 @@ public class ItemArmorNightVisionGoggles extends ItemArmorUtility implements IEl
 			{
 				CompoundTag nbtData = StackUtil.getOrCreateNbtData(stack);
 				boolean active = nbtData.getBoolean("active");
-				byte toggleTimer = nbtData.getByte("toggleTimer");
+				byte toggleTimer = nbtData.getByte("toggle_timer");
 				if (IC2.keyboard.isAltKeyDown(player) && IC2.keyboard.isModeSwitchKeyDown(player) && toggleTimer == 0)
 				{
 					toggleTimer = 10;
@@ -82,17 +79,17 @@ public class ItemArmorNightVisionGoggles extends ItemArmorUtility implements IEl
 						nbtData.putBoolean("active", active);
 						if (active)
 						{
-							IC2.sideProxy.messagePlayer(player, "Nightvision enabled.");
+							IC2.sideProxy.messagePlayer(player, "ic2.night_vision.mode.enabled");
 						} else
 						{
-							IC2.sideProxy.messagePlayer(player, "Nightvision disabled.");
+							IC2.sideProxy.messagePlayer(player, "ic2.night_vision.mode.disabled");
 						}
 					}
 				}
 
 				if (IC2.sideProxy.isSimulating() && toggleTimer > 0)
 				{
-					nbtData.putByte("toggleTimer", --toggleTimer);
+					nbtData.putByte("toggle_timer", --toggleTimer);
 				}
 
 				if (active && IC2.sideProxy.isSimulating())
@@ -113,15 +110,7 @@ public class ItemArmorNightVisionGoggles extends ItemArmorUtility implements IEl
 		}
 	}
 
-	public void fillItemCategory(CreativeModeTab tab, NonNullList<ItemStack> subItems)
-	{
-		if (true)
-		{
-			ElectricItemManager.addChargeVariants(this, subItems);
-		}
-	}
-
-	public boolean isValidRepairItem(ItemStack par1ItemStack, ItemStack par2ItemStack)
+	public boolean isValidRepairItem(@NotNull ItemStack par1ItemStack, @NotNull ItemStack par2ItemStack)
 	{
 		return false;
 	}

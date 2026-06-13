@@ -2,6 +2,7 @@ package ic2.forge;
 
 import ic2.core.event.EventHandler;
 import ic2.core.network.NetworkManager;
+import ic2.core.loot.Ic2LootNbtProviderTypes;
 import ic2.core.ref.Ic2Fluids;
 import ic2.data.Ic2DataGenerators;
 
@@ -113,6 +114,15 @@ public final class FmlMod
 		if (event.getRegistryKey() == ForgeRegistries.Keys.FLUID_TYPES)
 		{
 			EnvFluidHandlerForge.registerPendingFluidTypes();
+		}
+	}
+
+	@SubscribeEvent
+	public void registerLootNbtProviders(RegisterEvent event)
+	{
+		if (event.getRegistryKey() == Registries.LOOT_NBT_PROVIDER_TYPE)
+		{
+			Ic2LootNbtProviderTypes.init();
 		}
 	}
 

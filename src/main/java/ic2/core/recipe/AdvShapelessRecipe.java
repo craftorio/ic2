@@ -104,7 +104,8 @@ public class AdvShapelessRecipe implements CraftingRecipe
 		return AdvRecipe.canShow(this.input, this.output, this.hidden);
 	}
 
-	public NonNullList<ItemStack> getRemainder(CraftingContainer inv)
+	@Override
+	public NonNullList<ItemStack> getRemainingItems(CraftingContainer inv)
 	{
 		if (this.consuming)
 		{

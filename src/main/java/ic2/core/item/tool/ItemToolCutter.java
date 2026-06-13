@@ -14,10 +14,10 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Item.Properties;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 
 public class ItemToolCutter extends ItemToolCrafting implements IEnhancedOverlayProvider
 {
@@ -26,7 +26,7 @@ public class ItemToolCutter extends ItemToolCrafting implements IEnhancedOverlay
 		super(settings);
 	}
 
-	public InteractionResult useOn(UseOnContext context)
+	public @NotNull InteractionResult useOn(UseOnContext context)
 	{
 		Level world = context.getLevel();
 		BlockPos pos = context.getClickedPos();
@@ -51,7 +51,7 @@ public class ItemToolCutter extends ItemToolCrafting implements IEnhancedOverlay
 		return InteractionResult.PASS;
 	}
 
-	public boolean removeInsulation(Player player, InteractionHand hand, BlockState state, Level world, BlockPos pos)
+	public void removeInsulation(Player player, InteractionHand hand, BlockState state, Level world, BlockPos pos)
 	{
 		CableBlock cable = (CableBlock) state.getBlock();
 		if (cable.tryRemoveInsulation(state, world, pos, true) && StackUtil.damage(player, hand, StackUtil.sameItem(this), 3))
@@ -65,10 +65,6 @@ public class ItemToolCutter extends ItemToolCrafting implements IEnhancedOverlay
 				StackUtil.dropAsEntity(world, pos, new ItemStack(Ic2Items.RUBBER));
 			}
 
-			return true;
-		} else
-		{
-			return false;
 		}
 	}
 

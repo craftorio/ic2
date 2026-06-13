@@ -595,7 +595,7 @@ public final class StackUtil
 				}
 			}
 
-			return true;
+			return false;
 		}
 
 		return true;

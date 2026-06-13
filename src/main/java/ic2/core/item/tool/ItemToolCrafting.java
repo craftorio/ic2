@@ -12,21 +12,19 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.Item.Properties;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 
 public class ItemToolCrafting extends Item implements IBoxable, IItemHudInfo
 {
-	public static final String TOOLTIP_USES_LEFT = "ic2.tooltip.tool.uses_left";
-
 	public ItemToolCrafting(Properties settings)
 	{
 		super(settings);
 	}
 
-	public void appendHoverText(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag advanced)
+	public void appendHoverText(@NotNull ItemStack stack, Level world, List<Component> tooltip, @NotNull TooltipFlag advanced)
 	{
-		tooltip.add(Component.translatable("ic2.tooltip.tool.uses_left", new Object[] { getRemainingUses(stack) }));
+		tooltip.add(Component.translatable("ic2.tooltip.tool.uses_left", getRemainingUses(stack)));
 	}
 
 	@Override

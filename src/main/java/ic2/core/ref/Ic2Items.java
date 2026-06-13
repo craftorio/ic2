@@ -516,7 +516,6 @@ public final class Ic2Items
 	public static final Item NETHERRACK_DUST = register("netherrack_dust", new Item(new Properties()));
 	public static final Item MIXED_METAL_INGOT = register("mixed_metal_ingot", new Item(new Properties()));
 	public static final Item BRONZE_INGOT = register("bronze_ingot", new Item(new Properties()));
-	public static final Item COPPER_INGOT = register("copper_ingot", new Item(new Properties()));
 	public static final Item LEAD_INGOT = register("lead_ingot", new Item(new Properties()));
 	public static final Item SILVER_INGOT = register("silver_ingot", new Item(new Properties()));
 	public static final Item STEEL_INGOT = register("steel_ingot", new Item(new Properties()));
@@ -1351,7 +1350,6 @@ public final class Ic2Items
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> COPPER_BOILER);
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> COPPER_CASING);
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> COPPER_DUST);
-		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> COPPER_INGOT);
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> COPPER_PLATE);
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> CRUSHED_COPPER);
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> CRUSHED_GOLD);

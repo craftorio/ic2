@@ -27,9 +27,9 @@ public final class BiomeUtil
 {
 	private static final Field field_ChunkSection_biomeContainer = ReflectionUtil.getField(LevelChunkSection.class, "biomeContainer", "field_34556", "biomes");
 
-	public static Biome getBiome(Level world, ResourceKey<Biome> key)
+	public static Holder<Biome> getBiome(Level world, ResourceKey<Biome> key)
 	{
-		return (Biome) world.registryAccess().registryOrThrow(Registries.BIOME).get(key);
+		return world.registryAccess().registryOrThrow(Registries.BIOME).getHolderOrThrow(key);
 	}
 
 	public static Holder<Biome> getOriginalBiome(LevelReader world, BlockPos pos)
@@ -42,25 +42,27 @@ public final class BiomeUtil
 		return world.getBiome(pos);
 	}
 
-	public static void setBiome(LevelReader world, BlockPos pos, Biome biome)
+	public static void setBiome(LevelReader world, BlockPos pos, Holder<Biome> biome)
 	{
 		Objects.requireNonNull(biome, "null biome");
-		int x = pos.getX() >> 4;
-		int z = pos.getZ() >> 4;
-		ChunkAccess chunk = world.getChunk(x, z, ChunkStatus.BIOMES);
+		int chunkX = pos.getX() >> 4;
+		int chunkZ = pos.getZ() >> 4;
+		int biomeX = (pos.getX() >> 2) & 3;
+		int biomeZ = (pos.getZ() >> 2) & 3;
+		ChunkAccess chunk = world.getChunk(chunkX, chunkZ, ChunkStatus.BIOMES);
 
 		for (LevelChunkSection section : chunk.getSections())
 		{
-			PalettedContainer<Biome> biomeContainer = ReflectionUtil.getFieldValue(field_ChunkSection_biomeContainer, section);
+			PalettedContainer<Holder<Biome>> biomeContainer = ReflectionUtil.getFieldValue(field_ChunkSection_biomeContainer, section);
 
-			for (int y = 0; y < 3; y++)
+			for (int y = 0; y < 4; y++)
 			{
-				biomeContainer.set(x >> 2, y, z >> 2, biome);
+				biomeContainer.getAndSetUnchecked(biomeX, y, biomeZ, biome);
 			}
 		}
 	}
 
-	public static void setBiomeAndNotify(Level world, BlockPos pos, Biome biome)
+	public static void setBiomeAndNotify(Level world, BlockPos pos, Holder<Biome> biome)
 	{
 		setBiome(world, pos, biome);
 		ChunkSource chunkManager = world.getChunkSource();

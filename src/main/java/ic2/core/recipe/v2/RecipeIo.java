@@ -296,7 +296,7 @@ public class RecipeIo
 
 	public static Integer readIntegerOutput(FriendlyByteBuf buf)
 	{
-		return buf.readVarInt();
+		return buf.readInt();
 	}
 
 	public static RecipeOutputWeighted readWeightedOutput(FriendlyByteBuf buf, RecipeOutputWeighted outputs)

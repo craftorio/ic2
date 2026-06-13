@@ -77,7 +77,7 @@ public final class FmlMod
 			.registerExtensionPoint(
 				DisplayTest.class,
 				() -> new DisplayTest(
-					() -> "OH, NO!\uD83D\uDE31\uD83D\uDE31\uD83D\uDE31\uD83D\uDE31\uD83D\uDE31\uD83D\uDE31\uD83D\uDE31\uD83D\uDE31\uD83D\uDE31\uD83D\uDE31\uD83D\uDE31\uD83D\uDE31\uD83D\uDE31\uD83D\uDE31\uD83D\uDE31\uD83D\uDE31\uD83D\uDE31",
+					() -> "OH, NO!",
 					(in, net) -> true
 				)
 			);

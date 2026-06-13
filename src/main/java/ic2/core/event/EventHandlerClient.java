@@ -1,13 +1,15 @@
 package ic2.core.event;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import ic2.api.energy.EnergyNet;
 import ic2.api.item.ElectricItem;
 import ic2.api.item.IEnhancedOverlayProvider;
 import ic2.core.IC2;
-import ic2.core.fluid.FluidHandler;
 import ic2.core.block.comp.Energy;
 import ic2.core.block.tileentity.Ic2TileEntity;
 import ic2.core.block.tileentity.Ic2TileEntityBlock;
+import ic2.core.block.wiring.tileentity.TileEntityElectricBlock;
+import ic2.core.fluid.FluidHandler;
 import ic2.core.item.IHandHeldInventory;
 import ic2.core.item.tool.AbstractItemNanoSaber;
 import ic2.core.item.tool.ContainerToolbox;
@@ -162,6 +164,15 @@ public class EventHandlerClient
 				} else if (!energy.getSinkDirs().isEmpty())
 				{
 					out.add(Component.translatable("ic2.item.tooltip.power_tier", energy.getSinkTier()).withStyle(ChatFormatting.GRAY));
+				}
+
+				if (dummyTe instanceof TileEntityElectricBlock electricBlock)
+				{
+					out.add(Component.translatable("ic2.item.tooltip.Output",
+						Math.round(EnergyNet.instance.getPowerFromTier(energy.getSourceTier()))));
+					out.add(Component.translatable("ic2.item.tooltip.Capacity", electricBlock.getCapacity()));
+					double stored = stack.hasTag() ? stack.getTag().getDouble("energy") : 0.0;
+					out.add(Component.translatable("ic2.item.tooltip.Store", (long) stored));
 				}
 			}
 		}

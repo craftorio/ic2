@@ -8,11 +8,15 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.minecraft.core.NonNullList;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.Item.Properties;
+import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
 
 public abstract class BaseElectricItem extends Item implements IElectricItem, IItemHudInfo
 {
@@ -58,6 +62,11 @@ public abstract class BaseElectricItem extends Item implements IElectricItem, II
 		List<String> info = new LinkedList<>();
 		info.add(ElectricItem.manager.getToolTip(stack));
 		return info;
+	}
+
+	public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag context)
+	{
+		ElectricItemTooltipHandler.addTooltip(stack, tooltip);
 	}
 
 	public void fillItemCategory(CreativeModeTab tab, NonNullList<ItemStack> subItems)

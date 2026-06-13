@@ -39,6 +39,7 @@ public class ItemWindMeter extends ItemElectricTool implements PriorityUsableIte
 	@Override
 	public void appendHoverText(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag advanced)
 	{
+		super.appendHoverText(stack, world, tooltip, advanced);
 		tooltip.add(Component.translatable("ic2.wind_meter.tooltipA"));
 		tooltip.add(Component.translatable("ic2.wind_meter.tooltipB"));
 	}

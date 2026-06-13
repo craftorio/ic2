@@ -897,5 +897,8 @@
 	"death.attack.ic2.reactorExplosion": "%1$s was killed by a nuclear reactor meltdown",
 	"death.attack.ic2.reactorExplosion.player": "%1$s was killed by a nuclear reactor meltdown whilst trying to escape %2$s",
 	"death.attack.ic2.radiation": "%1$s died of radiation poisoning",
-	"death.attack.ic2.radiation.player": "%1$s died of radiation poisoning whilst trying to escape %2$s"
+	"death.attack.ic2.radiation.player": "%1$s died of radiation poisoning whilst trying to escape %2$s",
+	"ic2.item.tooltip.Output": "Output: %s EU/t",
+	"ic2.item.tooltip.Capacity": "Capacity: %s EU",
+	"ic2.item.tooltip.Store": "Stored: %s EU"
 }

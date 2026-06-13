@@ -951,5 +951,8 @@
 	"advancements.ic2.teleportFarAway": "很远很远的地方",
 	"advancements.ic2.teleportFarAway.desc": "传送至少1km",
 	"advancements.ic2.terraformEndCultivation": "末地如天堂",
-	"advancements.ic2.terraformEndCultivation.desc": "将末地转化为现实世界的模样"
+	"advancements.ic2.terraformEndCultivation.desc": "将末地转化为现实世界的模样",
+	"ic2.item.tooltip.Output": "输出: %s EU/t",
+	"ic2.item.tooltip.Capacity": "容量: %s EU",
+	"ic2.item.tooltip.Store": "存储: %s EU"
 }

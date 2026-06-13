@@ -10,7 +10,7 @@
       "item": "ic2:rubber"
     },
     "W": {
-      "item": "minecraft:white_wool"
+      "tag": "minecraft:wool"
     }
   },
   "result": {

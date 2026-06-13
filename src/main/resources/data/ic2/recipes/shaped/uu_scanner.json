@@ -1,0 +1,31 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "ABA",
+    "CDC",
+    "EFE"
+  ],
+  "key": {
+    "A": {
+      "item": "ic2:iron_plate"
+    },
+    "B": {
+      "item": "ic2:reinforced_glass"
+    },
+    "C": {
+      "item": "ic2:eletric_motor"
+    },
+    "D": {
+      "item": "ic2:luminator"
+    },
+    "E": {
+      "item": "ic2:advanced_circuit"
+    },
+    "F": {
+      "item": "ic2:advanced_machine"
+    }
+  },
+  "result": {
+    "item": "ic2:quantum_chestplate"
+  }
+}

@@ -29,7 +29,7 @@ import mezz.jei.api.recipe.RecipeType;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
-public class DynamicCategory extends IORecipeCategory
+public class DynamicCategory extends IORecipeCategory<IORecipeWrapper>
 {
 	protected final int xOffset;
 	protected final int yOffset;
@@ -44,27 +44,14 @@ public class DynamicCategory extends IORecipeCategory
 		super(teBlock);
 		this.recipeType = recipeType;
 		this.initializeWidgets(guiHelper, GuiParser.parse(ForgeRegistries.BLOCKS.getKey(teBlock), teBlock.getDummyTe().getClass()));
-		int minX = 1000;
-		int minY = 1000;
-		int maxX = -1000;
-		int maxY = -1000;
-
-		for (Tuple.T2<IDrawable, SlotPosition> element : this.elements)
-		{
-			minX = Math.min(minX, element.b.x());
-			minY = Math.min(minY, element.b.y());
-			maxX = Math.max(maxX, element.b.x() + element.a.getWidth());
-			maxY = Math.max(maxY, element.b.y() + element.a.getHeight());
-		}
-
-		int width = maxX - minX;
-		int height = maxY - minY;
-		this.xOffset = -minX;
-		this.yOffset = -minY;
-		this.background = guiHelper.createBlankDrawable(width, height);
+		this.xOffset = this.calcOffset(true);
+		this.yOffset = this.calcOffset(false);
+		this.background = guiHelper.createBlankDrawable(this.calcSize(true), this.calcSize(false));
 	}
 
-	private void initializeWidgets(IGuiHelper guiHelper, GuiParser.ParentNode parentNode)
+	static void parseWidgets(Ic2TileEntityBlock block, IGuiHelper guiHelper, GuiParser.ParentNode parentNode,
+	                         List<Tuple.T2<IDrawable, SlotPosition>> elements,
+	                         List<SlotPosition> inputSlots, List<SlotPosition> outputSlots)
 	{
 		label99:
 		for (GuiParser.Node rawNode : parentNode.getNodes())
@@ -82,7 +69,7 @@ public class DynamicCategory extends IORecipeCategory
 						node.style.properties.bgWidth,
 						node.style.properties.bgHeight
 					);
-					this.elements.add(new Tuple.T2<>(energyBackground, pos));
+					elements.add(new Tuple.T2<>(energyBackground, pos));
 					energyBackground = guiHelper.createDrawable(
 						node.style.properties.texture,
 						node.style.properties.uInner,
@@ -98,7 +85,7 @@ public class DynamicCategory extends IORecipeCategory
 							: (node.style.properties.vertical ? StartDirection.BOTTOM : StartDirection.LEFT),
 						true
 					);
-					this.elements.add(new Tuple.T2<>(energyAnimated, new SlotPosition(node.x, node.y)));
+					elements.add(new Tuple.T2<>(energyAnimated, new SlotPosition(node.x, node.y)));
 					break;
 				}
 				case gauge:
@@ -109,7 +96,7 @@ public class DynamicCategory extends IORecipeCategory
 					IDrawableStatic guageBackground = guiHelper.createDrawable(
 						properties.texture, properties.uBgActive, properties.vBgActive, properties.bgWidth, properties.bgHeight
 					);
-					this.elements.add(new Tuple.T2<>(guageBackground, pos));
+					elements.add(new Tuple.T2<>(guageBackground, pos));
 					guageBackground = guiHelper.createDrawable(
 						properties.texture, properties.uInner, properties.vInner, properties.innerWidth, properties.innerHeight
 					);
@@ -119,17 +106,26 @@ public class DynamicCategory extends IORecipeCategory
 						gaugeForeground = guageBackground;
 					} else
 					{
+						int speed = 200;
+						if ("progress".equals(node.name))
+						{
+							Ic2TileEntity te = block.getDummyTe();
+							if (te instanceof TileEntityStandardMachine)
+							{
+								speed = ((TileEntityStandardMachine<?, ?, ?>) te).defaultOperationLength / 3;
+							}
+						}
 						gaugeForeground = guiHelper.createAnimatedDrawable(
 							guageBackground,
-							this.getProcessSpeed(node.name),
+							speed,
 							properties.reverse
-								? (properties.vertical ? StartDirection.BOTTOM : StartDirection.RIGHT)
+								? (properties.vertical ? StartDirection.BOTTOM : StartDirection.TOP)
 								: (properties.vertical ? StartDirection.TOP : StartDirection.LEFT),
 							false
 						);
 					}
 
-					this.elements.add(new Tuple.T2<>(gaugeForeground, new SlotPosition(node.x, node.y)));
+					elements.add(new Tuple.T2<>(gaugeForeground, new SlotPosition(node.x, node.y)));
 					break;
 				}
 				case image:
@@ -139,7 +135,7 @@ public class DynamicCategory extends IORecipeCategory
 					IDrawable image = guiHelper.drawableBuilder(node.src, node.u1, node.v1, node.width, node.height)
 						.setTextureSize(node.baseWidth, node.baseHeight)
 						.build();
-					this.elements.add(new Tuple.T2<>(image, pos));
+					elements.add(new Tuple.T2<>(image, pos));
 					break;
 				}
 				case slot:
@@ -149,7 +145,7 @@ public class DynamicCategory extends IORecipeCategory
 					IDrawable drawable = guiHelper.createDrawable(
 						GuiElement.commonTexture, pos.style().u, pos.style().v, pos.style().width, pos.style().height
 					);
-					this.elements.add(new Tuple.T2<>(drawable, pos));
+					elements.add(new Tuple.T2<>(drawable, pos));
 					int extraX = (node.style.width - 16) / 2;
 					int extraY = (node.style.height - 16) / 2;
 					String slotName = node.name.toLowerCase(Locale.ENGLISH);
@@ -157,21 +153,21 @@ public class DynamicCategory extends IORecipeCategory
 					{
 						if (slotName.contains("output"))
 						{
-							this.outputSlots.add(new SlotPosition(pos, extraX, extraY));
+							outputSlots.add(new SlotPosition(pos, extraX, extraY));
 						}
 						break;
 					}
 
-					this.inputSlots.add(new SlotPosition(pos, extraX, extraY));
+					inputSlots.add(new SlotPosition(pos, extraX, extraY));
 					break;
 				}
 				case slotgrid:
 				{
 					GuiParser.SlotGridNode node = (GuiParser.SlotGridNode) rawNode;
-					TileEntityInventory dummyTe = (TileEntityInventory) this.block.getDummyTe();
+					TileEntityInventory dummyTe = (TileEntityInventory) block.getDummyTe();
 					if (dummyTe == null)
 					{
-						throw new NullPointerException("Received null dummy for " + this.block + " in the JeiPlugin.");
+						throw new NullPointerException("Received null dummy for " + block + " in the JeiPlugin.");
 					}
 
 					InvSlot slot = dummyTe.getInventorySlot(node.name);
@@ -200,13 +196,13 @@ public class DynamicCategory extends IORecipeCategory
 								}
 
 								SlotPosition posx = new SlotPosition(node.x + i * node.style.width, node.y + j * node.style.height, node.style);
-								this.elements.add(new Tuple.T2<>(drawable, posx));
+								elements.add(new Tuple.T2<>(drawable, posx));
 								if (isInput)
 								{
-									this.inputSlots.add(new SlotPosition(posx, extraX, extraY));
+									inputSlots.add(new SlotPosition(posx, extraX, extraY));
 								} else if (isOutput)
 								{
-									this.outputSlots.add(new SlotPosition(posx, extraX, extraY));
+									outputSlots.add(new SlotPosition(posx, extraX, extraY));
 								}
 							}
 						}
@@ -218,11 +214,38 @@ public class DynamicCategory extends IORecipeCategory
 					GuiParser.EnvironmentNode node = (GuiParser.EnvironmentNode) rawNode;
 					if (node.environment == GuiEnvironment.JEI)
 					{
-						this.initializeWidgets(guiHelper, node);
+						parseWidgets(block, guiHelper, node, elements, inputSlots, outputSlots);
 					}
 				}
 			}
 		}
+	}
+
+	private void initializeWidgets(IGuiHelper guiHelper, GuiParser.ParentNode parentNode)
+	{
+		parseWidgets(this.block, guiHelper, parentNode, this.elements, this.inputSlots, this.outputSlots);
+	}
+
+	private int calcOffset(boolean isX)
+	{
+		int min = 1000;
+		for (Tuple.T2<IDrawable, SlotPosition> element : this.elements)
+		{
+			min = Math.min(min, isX ? element.b.x() : element.b.y());
+		}
+		return -min;
+	}
+
+	private int calcSize(boolean isX)
+	{
+		int min = 1000;
+		int max = -1000;
+		for (Tuple.T2<IDrawable, SlotPosition> element : this.elements)
+		{
+			min = Math.min(min, isX ? element.b.x() : element.b.y());
+			max = Math.max(max, (isX ? element.b.x() : element.b.y()) + (isX ? element.a.getWidth() : element.a.getHeight()));
+		}
+		return max - min;
 	}
 
 	public void setRecipe(@NotNull IRecipeLayoutBuilder builder, @NotNull IORecipeWrapper recipe, @NotNull IFocusGroup focuses)
@@ -271,19 +294,5 @@ public class DynamicCategory extends IORecipeCategory
 	protected List<SlotPosition> getOutputSlotPos()
 	{
 		return this.outputSlots;
-	}
-
-	protected int getProcessSpeed(String name)
-	{
-		if ("progress".equals(name))
-		{
-			Ic2TileEntity te = this.block.getDummyTe();
-			if (te instanceof TileEntityStandardMachine)
-			{
-				return ((TileEntityStandardMachine<?, ?, ?>) te).defaultOperationLength / 3;
-			}
-		}
-
-		return 200;
 	}
 }

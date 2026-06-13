@@ -5,6 +5,10 @@ import ic2.core.IC2;
 import ic2.core.recipe.v2.RecipeHolder;
 import ic2.core.ref.Ic2Blocks;
 import ic2.core.ref.Ic2RecipeTypes;
+import ic2.integration.jei.recipe.machine.CannerBottleCategory;
+import ic2.integration.jei.recipe.machine.CannerBottleRecipeWrapper;
+import ic2.integration.jei.recipe.machine.CannerEnrichCategory;
+import ic2.integration.jei.recipe.machine.CannerEnrichRecipeWrapper;
 import ic2.integration.jei.recipe.machine.DynamicCategory;
 import ic2.integration.jei.recipe.machine.IORecipeWrapper;
 import ic2.integration.jei.recipe.machine.MetalFormerCategory;
@@ -39,6 +43,8 @@ public class Ic2JeiPlugin implements IModPlugin
 	private final RecipeType<IORecipeWrapper> METAL_FORMER_ROLLING = RecipeType.create("ic2", "metal_former_rolling", IORecipeWrapper.class);
 	private final RecipeType<IORecipeWrapper> METAL_FORMER_CUTTING = RecipeType.create("ic2", "metal_former_cutting", IORecipeWrapper.class);
 	private final RecipeType<IORecipeWrapper> ORE_WASHER = RecipeType.create("ic2", "ore_washer", IORecipeWrapper.class);
+	private final RecipeType<CannerBottleRecipeWrapper> CANNER_BOTTLE = RecipeType.create("ic2", "canner_bottle", CannerBottleRecipeWrapper.class);
+	private final RecipeType<CannerEnrichRecipeWrapper> CANNER_ENRICH = RecipeType.create("ic2", "canner_enrich", CannerEnrichRecipeWrapper.class);
 
 	public ResourceLocation getPluginUid()
 	{
@@ -58,6 +64,8 @@ public class Ic2JeiPlugin implements IModPlugin
 		registration.addRecipeCategories(new MetalFormerCategory(this.METAL_FORMER_ROLLING, 1, guiHelper));
 		registration.addRecipeCategories(new MetalFormerCategory(this.METAL_FORMER_CUTTING, 2, guiHelper));
 		registration.addRecipeCategories(new DynamicCategory(Ic2Blocks.ORE_WASHING_PLANT, this.ORE_WASHER, guiHelper));
+		registration.addRecipeCategories(new CannerBottleCategory((ic2.core.block.tileentity.Ic2TileEntityBlock) Ic2Blocks.SOLID_CANNER, this.CANNER_BOTTLE, guiHelper));
+		registration.addRecipeCategories(new CannerEnrichCategory(this.CANNER_ENRICH, guiHelper));
 	}
 
 	public void registerRecipeCatalysts(IRecipeCatalystRegistration registration)
@@ -72,6 +80,8 @@ public class Ic2JeiPlugin implements IModPlugin
 			new ItemStack(Ic2Blocks.METAL_FORMER),
 			this.METAL_FORMER_CUTTING, this.METAL_FORMER_EXTRUDING, this.METAL_FORMER_ROLLING);
 		registration.addRecipeCatalyst(new ItemStack(Ic2Blocks.ORE_WASHING_PLANT), this.ORE_WASHER);
+		registration.addRecipeCatalyst(new ItemStack(Ic2Blocks.SOLID_CANNER), this.CANNER_BOTTLE);
+		registration.addRecipeCatalyst(new ItemStack(Ic2Blocks.CANNER), this.CANNER_BOTTLE, this.CANNER_ENRICH);
 	}
 
 	public void registerRecipes(@NotNull IRecipeRegistration registration)
@@ -92,5 +102,13 @@ public class Ic2JeiPlugin implements IModPlugin
 		registerBasic.accept(this.METAL_FORMER_EXTRUDING, Ic2RecipeTypes.METAL_FORMER_EXTRUDING);
 		registerBasic.accept(this.METAL_FORMER_ROLLING, Ic2RecipeTypes.METAL_FORMER_ROLLING);
 		registerBasic.accept(this.ORE_WASHER, Ic2RecipeTypes.ORE_WASHER);
+
+		List<CannerBottleRecipeWrapper> cannerBottleRecipes = recipeManager.getAllRecipesFor(Ic2RecipeTypes.CANNER_BOTTLE)
+			.stream().map(r -> new CannerBottleRecipeWrapper(r.recipe())).toList();
+		registration.addRecipes(this.CANNER_BOTTLE, cannerBottleRecipes);
+
+		List<CannerEnrichRecipeWrapper> cannerEnrichRecipes = recipeManager.getAllRecipesFor(Ic2RecipeTypes.CANNER_ENRICH)
+			.stream().map(r -> new CannerEnrichRecipeWrapper(r.recipe())).toList();
+		registration.addRecipes(this.CANNER_ENRICH, cannerEnrichRecipes);
 	}
 }

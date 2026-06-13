@@ -1,0 +1,22 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "ABA",
+    "CBC",
+    "B B"
+  ],
+  "key": {
+    "A": {
+      "item": "ic2:advanced_circuit"
+    },
+    "B": {
+      "item": "ic2:iron_casing"
+    },
+    "C": {
+      "item": "ic2:energy_crystal"
+    }
+  },
+  "result": {
+    "item": "ic2:energy_pack"
+  }
+}

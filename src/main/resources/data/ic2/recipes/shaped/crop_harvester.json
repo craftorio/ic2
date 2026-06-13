@@ -1,0 +1,28 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "ABA",
+    "CDC",
+    "EEE"
+  ],
+  "key": {
+    "A": {
+      "item": "ic2:circuit"
+    },
+    "B": {
+      "item": "minecraft:chest"
+    },
+    "C": {
+      "item": "minecraft:shears"
+    },
+    "D": {
+      "item": "ic2:machine"
+    },
+    "E": {
+      "item": "ic2:crop_stick"
+    }
+  },
+  "result": {
+    "item": "ic2:crop_harvester"
+  }
+}

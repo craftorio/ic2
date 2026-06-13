@@ -1,0 +1,22 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "ABA",
+    "BCB",
+    "ABA"
+  ],
+  "key": {
+    "A": {
+      "item": "minecraft:iron_fence"
+    },
+    "B": {
+      "item": "ic2:tin_plate"
+    },
+    "C": {
+      "item": "ic2:heat_vent"
+    }
+  },
+  "result": {
+    "item": "ic2:component_heat_vent"
+  }
+}

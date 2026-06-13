@@ -1,0 +1,28 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "ABA",
+    "CDC",
+    "CEC"
+  ],
+  "key": {
+    "A": {
+      "item": "ic2:coil"
+    },
+    "B": {
+      "item": "ic2:mining_laser"
+    },
+    "C": {
+      "item": "minecraft:iron_ingot"
+    },
+    "D": {
+      "item": "ic2:advanced_machine"
+    },
+    "E": {
+      "item": "ic2:electric_motor"
+    }
+  },
+  "result": {
+    "item": "ic2:centrifuge"
+  }
+}

@@ -10,7 +10,7 @@ import java.util.List;
 
 import net.minecraft.world.item.ItemStack;
 
-public class IORecipeWrapper
+public class IORecipeWrapper implements IJeiRecipeWrapper
 {
 	private final IRecipeInput input;
 	private final Collection<ItemStack> output;

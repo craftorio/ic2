@@ -14,7 +14,7 @@ import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
-public abstract class IORecipeCategory implements IRecipeCategory<IORecipeWrapper>
+public abstract class IORecipeCategory<T extends IJeiRecipeWrapper> implements IRecipeCategory<T>
 {
 	protected final Ic2TileEntityBlock block;
 
@@ -32,7 +32,7 @@ public abstract class IORecipeCategory implements IRecipeCategory<IORecipeWrappe
 
 	protected abstract List<SlotPosition> getOutputSlotPos();
 
-	protected void addRecipeSlots(IRecipeLayoutBuilder builder, IORecipeWrapper recipe, IFocusGroup focuses, int xOffset, int yOffset)
+	protected void addRecipeSlots(IRecipeLayoutBuilder builder, T recipe, IFocusGroup focuses, int xOffset, int yOffset)
 	{
 		List<SlotPosition> inputSlots = this.getInputSlotPos();
 		List<List<ItemStack>> inputStacks = recipe.getInputs();

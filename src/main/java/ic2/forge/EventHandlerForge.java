@@ -20,7 +20,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.WorldlyContainer;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -52,6 +51,7 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.InvWrapper;
 import net.minecraftforge.items.wrapper.SidedInvWrapper;
+import org.jetbrains.annotations.NotNull;
 
 public final class EventHandlerForge
 {
@@ -325,7 +325,7 @@ public final class EventHandlerForge
 					private final LazyOptional<IItemHandlerModifiable>[] caps = SidedInvWrapper.create((WorldlyContainer) be, Util.ALL_DIRS);
 
 					@Override
-					public <T> LazyOptional<T> getCapability(Capability<T> capability, Direction facing)
+					public <T> @NotNull LazyOptional<T> getCapability(@NotNull Capability<T> capability, Direction facing)
 					{
 						return (LazyOptional<T>) (facing != null && capability == ForgeCapabilities.ITEM_HANDLER ? this.caps[facing.ordinal()] : LazyOptional.empty());
 					}
@@ -337,7 +337,7 @@ public final class EventHandlerForge
 					private final LazyOptional<IItemHandler> cap = LazyOptional.of(() -> new InvWrapper((Container) be));
 
 					@Override
-					public <T> LazyOptional<T> getCapability(Capability<T> capability, Direction facing)
+					public <T> @NotNull LazyOptional<T> getCapability(@NotNull Capability<T> capability, Direction facing)
 					{
 						return (LazyOptional<T>) (capability == ForgeCapabilities.ITEM_HANDLER ? this.cap : LazyOptional.empty());
 					}

@@ -125,6 +125,7 @@
 	"block.ic2.teleporter": "Teleporter",
 	"block.ic2.terraformer": "Terraformer",
 	"block.ic2.tesla_coil": "Tesla Coil",
+	"block.ic2.luminator": "Luminator",
 	"block.ic2.canner": "Fluid/Solid Canning Machine",
 	"block.ic2.compressor": "Compressor",
 	"block.ic2.electric_furnace": "Electric Furnace",

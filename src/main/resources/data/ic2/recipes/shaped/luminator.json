@@ -1,0 +1,26 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "ICI",
+    "GTG",
+    "GGG"
+  ],
+  "key": {
+    "I": {
+      "item": "ic2:iron_casing"
+    },
+    "C": {
+      "item": "ic2:insulated_copper_cable"
+    },
+    "T": {
+      "item": "ic2:tin_cable"
+    },
+    "G": {
+      "item": "minecraft:glass"
+    }
+  },
+  "result": {
+    "item": "ic2:luminator",
+    "count": 8
+  }
+}

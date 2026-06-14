@@ -513,7 +513,7 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 		{
 			if (world.isClientSide)
 			{
-				world.playLocalSound(this.pos, SoundEvents.GENERIC_EXTINGUISH_FIRE, SoundSource.BLOCKS, 10, 1, false);
+				world.playLocalSound(this.pos, SoundEvents.GENERIC_EXTINGUISH_FIRE, SoundSource.BLOCKS, 4f, 1, true);
 				world.addParticle(ParticleTypes.SMOKE, pos.getX() + new Random().nextFloat(), pos.getY() + 0.95F, pos.getZ() + new Random().nextFloat(), 0.0, 0.0, 0.0);
 			}
 			world.removeBlock(this.pos, false);

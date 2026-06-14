@@ -130,15 +130,9 @@ public class NetworkManagerClient extends NetworkManager
 			} else
 			{
 				Player player = Minecraft.getInstance().player;
-				if ((StackUtil.isEmpty(player.getInventory().getSelected()) || !(player.getInventory().getSelected().getItem() instanceof IHandHeldInventory))
-					&& (StackUtil.isEmpty(player.getOffhandItem()) || !(player.getOffhandItem().getItem() instanceof IHandHeldInventory)))
+				if ((StackUtil.isEmpty(player.getInventory().getSelected()) || !(player.getInventory().getSelected().getItem() instanceof IHandHeldInventory)) && (StackUtil.isEmpty(player.getOffhandItem()) || !(player.getOffhandItem().getItem() instanceof IHandHeldInventory)))
 				{
-					IC2.sideProxy
-						.displayError(
-							"An unknown GUI type was attempted to be displayed.\nThis could happen due to corrupted data from a player or a bug.\n\n(Technical information: "
-								+ inventory
-								+ ")"
-						);
+					IC2.sideProxy.displayError("An unknown GUI type was attempted to be displayed.\nThis could happen due to corrupted data from a player or a bug.\n\n(Technical information: " + inventory + ")");
 				} else
 				{
 					buffer.writeBoolean(true);
@@ -234,16 +228,12 @@ public class NetworkManagerClient extends NetworkManager
 					{
 						final Object teDeferred = DataEncoder.decodeDeferred(is, BlockEntity.class);
 						final int event = is.readInt();
-						IC2.sideProxy.requestTick(false, new Runnable()
+						IC2.sideProxy.requestTick(false, () ->
 						{
-							@Override
-							public void run()
+							BlockEntity te = DataEncoder.getValue(teDeferred, null);
+							if (te instanceof INetworkTileEntityEventListener)
 							{
-								BlockEntity te = DataEncoder.getValue(teDeferred, null);
-								if (te instanceof INetworkTileEntityEventListener)
-								{
-									((INetworkTileEntityEventListener) te).onNetworkEvent(event);
-								}
+								((INetworkTileEntityEventListener) te).onNetworkEvent(event);
 							}
 						});
 						break;
@@ -253,31 +243,22 @@ public class NetworkManagerClient extends NetworkManager
 						final GameProfile profile = DataEncoder.decode(is, GameProfile.class);
 						final ItemStack stack = DataEncoder.decode(is, ItemStack.class);
 						final int event = is.readInt();
-						IC2.sideProxy
-							.requestTick(
-								false,
-								new Runnable()
-								{
-									@Override
-									public void run()
-									{
-										Level world = Minecraft.getInstance().level;
+						IC2.sideProxy.requestTick(false, () ->
+						{
+							Level world = Minecraft.getInstance().level;
 
-										for (Player player : world.players())
-										{
-											if (profile.getId() != null && profile.getId().equals(player.getGameProfile().getId())
-												|| profile.getId() == null && profile.getName().equals(player.getGameProfile().getName()))
-											{
-												if (stack.getItem() instanceof INetworkItemEventListener)
-												{
-													((INetworkItemEventListener) stack.getItem()).onNetworkEvent(stack, player, event);
-												}
-												break;
-											}
-										}
+							for (Player player1 : world.players())
+							{
+								if (profile.getId() != null && profile.getId().equals(player1.getGameProfile().getId()) || profile.getId() == null && profile.getName().equals(player1.getGameProfile().getName()))
+								{
+									if (stack.getItem() instanceof INetworkItemEventListener)
+									{
+										((INetworkItemEventListener) stack.getItem()).onNetworkEvent(stack, player1, event);
 									}
+									break;
 								}
-							);
+							}
+						});
 						break;
 					}
 					case ExplosionEffect:
@@ -285,57 +266,31 @@ public class NetworkManagerClient extends NetworkManager
 						Object worldDeferred = DataEncoder.decodeDeferred(is, Level.class);
 						Vec3 pos = DataEncoder.decode(is, Vec3.class);
 						Ic2Explosion.Type type = DataEncoder.decodeEnum(is, Ic2Explosion.Type.class);
-						IC2.sideProxy
-							.requestTick(
-								false,
-								() ->
+						IC2.sideProxy.requestTick(false, () ->
+						{
+							Level world = DataEncoder.getValue(worldDeferred, null);
+							if (world != null && type != null)
+							{
+								switch (type)
 								{
-									Level world = DataEncoder.getValue(worldDeferred, null);
-									if (world != null && type != null)
-									{
-										switch (type)
-										{
-											case Normal:
-												world.playLocalSound(
-													pos.x,
-													pos.y,
-													pos.z,
-													SoundEvents.GENERIC_EXPLODE,
-													SoundSource.BLOCKS,
-													4.0F,
-													(1.0F + (world.random.nextFloat() - world.random.nextFloat()) * 0.2F) * 0.7F,
-													true
-												);
-												world.addParticle(ParticleTypes.EXPLOSION_EMITTER, pos.x, pos.y, pos.z, 0.0, 0.0, 0.0);
-												break;
-											case Electrical:
-												world.playLocalSound(
-													pos.x, pos.y, pos.z, Ic2SoundEvents.MACHINE_OVERLOAD, SoundSource.BLOCKS, 1.0F, 1.0F, true
-												);
-												world.addParticle(ParticleTypes.EXPLOSION_EMITTER, pos.x, pos.y, pos.z, 0.0, 0.0, 0.0);
-												break;
-											case Heat:
-												world.playLocalSound(
-													pos.x,
-													pos.y,
-													pos.z,
-													SoundEvents.FIRE_EXTINGUISH,
-													SoundSource.BLOCKS,
-													4.0F,
-													(1.0F + (world.random.nextFloat() - world.random.nextFloat()) * 0.2F) * 0.7F,
-													true
-												);
-												world.addParticle(ParticleTypes.EXPLOSION_EMITTER, pos.x, pos.y, pos.z, 0.0, 0.0, 0.0);
-												break;
-											case Nuclear:
-												world.playLocalSound(
-													pos.x, pos.y, pos.z, Ic2SoundEvents.BLOCK_NUKE_EXPLODE, SoundSource.BLOCKS, 1.0F, 1.0F, true
-												);
-												world.addParticle(ParticleTypes.EXPLOSION_EMITTER, pos.x, pos.y, pos.z, 0.0, 0.0, 0.0);
-										}
-									}
+									case Normal:
+										world.playLocalSound(pos.x, pos.y, pos.z, SoundEvents.GENERIC_EXPLODE, SoundSource.BLOCKS, 4.0F, (1.0F + (world.random.nextFloat() - world.random.nextFloat()) * 0.2F) * 0.7F, true);
+										world.addParticle(ParticleTypes.EXPLOSION_EMITTER, pos.x, pos.y, pos.z, 0.0, 0.0, 0.0);
+										break;
+									case Electrical:
+										world.playLocalSound(pos.x, pos.y, pos.z, Ic2SoundEvents.MACHINE_OVERLOAD, SoundSource.BLOCKS, 1.0F, 1.0F, true);
+										world.addParticle(ParticleTypes.EXPLOSION_EMITTER, pos.x, pos.y, pos.z, 0.0, 0.0, 0.0);
+										break;
+									case Heat:
+										world.playLocalSound(pos.x, pos.y, pos.z, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 4.0F, (1.0F + (world.random.nextFloat() - world.random.nextFloat()) * 0.2F) * 0.7F, true);
+										world.addParticle(ParticleTypes.EXPLOSION_EMITTER, pos.x, pos.y, pos.z, 0.0, 0.0, 0.0);
+										break;
+									case Nuclear:
+										world.playLocalSound(pos.x, pos.y, pos.z, Ic2SoundEvents.BLOCK_NUKE_EXPLODE, SoundSource.BLOCKS, 1.0F, 1.0F, true);
+										world.addParticle(ParticleTypes.EXPLOSION_EMITTER, pos.x, pos.y, pos.z, 0.0, 0.0, 0.0);
 								}
-							);
+							}
+						});
 						break;
 					}
 					case Rpc:
@@ -360,29 +315,25 @@ public class NetworkManagerClient extends NetworkManager
 
 						final byte[] data = new byte[dataLen];
 						is.readFully(data);
-						IC2.sideProxy.requestTick(false, new Runnable()
+						IC2.sideProxy.requestTick(false, () ->
 						{
-							@Override
-							public void run()
+							Level world = Minecraft.getInstance().level;
+							if (Util.getDimId(world).equals(dimensionId))
 							{
-								Level world = Minecraft.getInstance().level;
-								if (Util.getDimId(world).equals(dimensionId))
+								BlockEntity teRaw = world.getBlockEntity(pos);
+								if (teRaw instanceof Ic2TileEntity)
 								{
-									BlockEntity teRaw = world.getBlockEntity(pos);
-									if (teRaw instanceof Ic2TileEntity)
+									TileEntityComponent component = ((Ic2TileEntity) teRaw).getComponent(componentCls);
+									if (component != null)
 									{
-										TileEntityComponent component = ((Ic2TileEntity) teRaw).getComponent(componentCls);
-										if (component != null)
-										{
-											DataInputStream dataIs = new DataInputStream(new ByteArrayInputStream(data));
+										DataInputStream dataIs = new DataInputStream(new ByteArrayInputStream(data));
 
-											try
-											{
-												component.onNetworkUpdate(dataIs);
-											} catch (IOException e)
-											{
-												throw new RuntimeException(e);
-											}
+										try
+										{
+											component.onNetworkUpdate(dataIs);
+										} catch (IOException e)
+										{
+											throw new RuntimeException(e);
 										}
 									}
 								}
@@ -400,15 +351,11 @@ public class NetworkManagerClient extends NetworkManager
 	private static void processChatPacket(GrowingBuffer buffer)
 	{
 		final String messages = buffer.readString();
-		IC2.sideProxy.requestTick(false, new Runnable()
+		IC2.sideProxy.requestTick(false, () ->
 		{
-			@Override
-			public void run()
+			for (String line : messages.split("[\\r\\n]+"))
 			{
-				for (String line : messages.split("[\\r\\n]+"))
-				{
-					IC2.sideProxy.messagePlayer(null, line);
-				}
+				IC2.sideProxy.messagePlayer(null, line);
 			}
 		});
 	}

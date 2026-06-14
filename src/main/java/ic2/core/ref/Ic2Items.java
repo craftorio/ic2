@@ -414,6 +414,7 @@ public final class Ic2Items
 		"terraformer", new BlockItem(Ic2Blocks.TERRAFORMER, new Properties().rarity(Rarity.UNCOMMON))
 	);
 	public static final Item TESLA_COIL = register("tesla_coil", new BlockItem(Ic2Blocks.TESLA_COIL, new Properties()));
+	public static final Item LUMINATOR_FLAT = register("luminator", new BlockItem(Ic2Blocks.LUMINATOR_FLAT, new Properties()));
 	public static final Item ELECTROLYZER = register("electrolyzer", new BlockItem(Ic2Blocks.ELECTROLYZER, new Properties()));
 	public static final Item CHUNK_LOADER = register(
 		"chunk_loader", new BlockItem(Ic2Blocks.CHUNK_LOADER, new Properties().rarity(Rarity.UNCOMMON))
@@ -1316,6 +1317,7 @@ public final class Ic2Items
 		addToCreativeTab(Ic2ItemGroupType.MACHINES, () -> TELEPORTER);
 		addToCreativeTab(Ic2ItemGroupType.MACHINES, () -> TERRAFORMER);
 		addToCreativeTab(Ic2ItemGroupType.MACHINES, () -> TESLA_COIL);
+		addToCreativeTab(Ic2ItemGroupType.MACHINES, () -> LUMINATOR_FLAT);
 		addToCreativeTab(Ic2ItemGroupType.MACHINES, () -> TRADE_O_MAT);
 		addToCreativeTab(Ic2ItemGroupType.MACHINES, () -> UU_ASSEMBLY_BENCH);
 		addToCreativeTab(Ic2ItemGroupType.MACHINES, () -> UU_SCANNER);

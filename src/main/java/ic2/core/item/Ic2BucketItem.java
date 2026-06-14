@@ -19,7 +19,6 @@ import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUtils;
-import net.minecraft.world.item.Item.Properties;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -38,28 +37,24 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult.Type;
 import net.minecraftforge.event.ForgeEventFactory;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class Ic2BucketItem extends BucketItem
 {
 	protected Fluid fluid;
-	private final List<Fluid> drainableFluidList;
 
 	public Ic2BucketItem(Fluid fluid, Properties settings)
 	{
 		super(() -> fluid, settings);
 		this.fluid = fluid;
-		this.drainableFluidList = this.getDrainableFluidList();
+		this.getDrainableFluidList();
 	}
 
-	public InteractionResultHolder<ItemStack> use(Level world, Player user, InteractionHand hand)
+	public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level world, Player user, @NotNull InteractionHand hand)
 	{
 		ItemStack itemStack = user.getItemInHand(hand);
-		BlockHitResult blockHitResult = getPlayerPOVHitResult(
-			world,
-			user,
-			this.fluid == Fluids.EMPTY ? net.minecraft.world.level.ClipContext.Fluid.SOURCE_ONLY : net.minecraft.world.level.ClipContext.Fluid.NONE
-		);
+		BlockHitResult blockHitResult = getPlayerPOVHitResult(world, user, this.fluid == Fluids.EMPTY ? net.minecraft.world.level.ClipContext.Fluid.SOURCE_ONLY : net.minecraft.world.level.ClipContext.Fluid.NONE);
 		InteractionResultHolder<ItemStack> ret = ForgeEventFactory.onBucketUse(user, world, itemStack, blockHitResult);
 		if (ret != null)
 		{
@@ -84,9 +79,9 @@ public abstract class Ic2BucketItem extends BucketItem
 			return InteractionResultHolder.fail(itemStack);
 		}
 
+		BlockState blockState = world.getBlockState(blockPos);
 		if (this.fluid == Fluids.EMPTY)
 		{
-			BlockState blockState = world.getBlockState(blockPos);
 			if (blockState.getBlock() instanceof BucketPickup bucketPickUpFluid)
 			{
 				ItemStack afterDrainingItemStack = this.tryDrainFluid(world, blockPos, blockState);
@@ -108,7 +103,6 @@ public abstract class Ic2BucketItem extends BucketItem
 			return InteractionResultHolder.fail(itemStack);
 		} else
 		{
-			BlockState blockState = world.getBlockState(blockPos);
 			BlockPos fluidDrainablePos = this.canBlockContainFluid(world, blockPos, blockState) ? blockPos : blockPos1;
 			if (this.bucketUseOnBlock(new UseOnContext(user, hand, blockHitResult)))
 			{
@@ -150,9 +144,9 @@ public abstract class Ic2BucketItem extends BucketItem
 			}
 		}
 
-		if (state.getBlock() instanceof SimpleWaterloggedBlock && (Boolean) state.getValue(BlockStateProperties.WATERLOGGED))
+		if (state.getBlock() instanceof SimpleWaterloggedBlock && state.getValue(BlockStateProperties.WATERLOGGED))
 		{
-			world.setBlock(pos, (BlockState) state.setValue(BlockStateProperties.WATERLOGGED, false), 3);
+			world.setBlock(pos, state.setValue(BlockStateProperties.WATERLOGGED, false), 3);
 			if (!state.canSurvive(world, pos))
 			{
 				world.destroyBlock(pos, true);
@@ -191,9 +185,7 @@ public abstract class Ic2BucketItem extends BucketItem
 		BlockState blockState = world.getBlockState(pos);
 		Block block = blockState.getBlock();
 		boolean bl = blockState.canBeReplaced(this.fluid);
-		boolean bl2 = blockState.isAir()
-			|| bl
-			|| block instanceof LiquidBlockContainer && ((LiquidBlockContainer) block).canPlaceLiquid(world, pos, blockState, this.fluid);
+		boolean bl2 = blockState.isAir() || bl || block instanceof LiquidBlockContainer && ((LiquidBlockContainer) block).canPlaceLiquid(world, pos, blockState, this.fluid);
 		if (!bl2)
 		{
 			return hitResult != null && this.emptyContents(player, world, hitResult.getBlockPos().relative(hitResult.getDirection()), null);
@@ -211,7 +203,6 @@ public abstract class Ic2BucketItem extends BucketItem
 				world.addParticle(ParticleTypes.LARGE_SMOKE, i + Math.random(), j + Math.random(), k + Math.random(), 0.0, 0.0, 0.0);
 			}
 
-			return true;
 		} else
 		{
 			if (block instanceof LiquidBlockContainer && this.fluid == Fluids.WATER)
@@ -232,17 +223,16 @@ public abstract class Ic2BucketItem extends BucketItem
 			}
 
 			this.playEmptySound(player, world, pos);
-			return true;
 		}
+		return true;
 	}
 
-	protected boolean canBlockContainFluid(Level worldIn, BlockPos posIn, BlockState blockstate)
+	protected boolean canBlockContainFluid(@NotNull Level worldIn, @NotNull BlockPos posIn, BlockState blockstate)
 	{
-		return blockstate.getBlock() instanceof LiquidBlockContainer
-			&& ((LiquidBlockContainer) blockstate.getBlock()).canPlaceLiquid(worldIn, posIn, blockstate, this.fluid);
+		return blockstate.getBlock() instanceof LiquidBlockContainer && ((LiquidBlockContainer) blockstate.getBlock()).canPlaceLiquid(worldIn, posIn, blockstate, this.fluid);
 	}
 
-	protected void playEmptySound(@Nullable Player player, LevelAccessor world, BlockPos pos)
+	protected void playEmptySound(@Nullable Player player, LevelAccessor world, @NotNull BlockPos pos)
 	{
 		SoundEvent soundEvent = this.fluid.is(FluidTags.LAVA) ? SoundEvents.BUCKET_EMPTY_LAVA : SoundEvents.BUCKET_EMPTY;
 		world.playSound(player, pos, soundEvent, SoundSource.BLOCKS, 1.0F, 1.0F);

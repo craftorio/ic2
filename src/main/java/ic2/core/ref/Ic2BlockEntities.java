@@ -93,6 +93,7 @@ import ic2.core.block.tileentity.Ic2SignBlockEntity;
 import ic2.core.block.tileentity.TileEntityWall;
 import ic2.core.block.wiring.tileentity.TileEntityChargepadBatBox;
 import ic2.core.block.wiring.tileentity.TileEntityChargepadCESU;
+import ic2.core.block.wiring.tileentity.TileEntityLuminator;
 import ic2.core.block.wiring.tileentity.TileEntityChargepadMFE;
 import ic2.core.block.wiring.tileentity.TileEntityChargepadMFSU;
 import ic2.core.block.wiring.tileentity.TileEntityElectricBatBox;
@@ -160,6 +161,7 @@ public final class Ic2BlockEntities
 	public static final BlockEntityType<TileEntityTeleporter> TELEPORTER = register("teleporter", TileEntityTeleporter::new, Ic2Blocks.TELEPORTER);
 	public static final BlockEntityType<TileEntityTerra> TERRAFORMER = register("terraformer", TileEntityTerra::new, Ic2Blocks.TERRAFORMER);
 	public static final BlockEntityType<TileEntityTesla> TESLA_COIL = register("tesla_coil", TileEntityTesla::new, Ic2Blocks.TESLA_COIL);
+	public static final BlockEntityType<TileEntityLuminator> LUMINATOR_FLAT = register("luminator", TileEntityLuminator::new, Ic2Blocks.LUMINATOR_FLAT);
 	public static final BlockEntityType<TileEntityCanner> CANNER = register("canner", TileEntityCanner::new, Ic2Blocks.CANNER);
 	public static final BlockEntityType<TileEntityCompressor> COMPRESSOR = register("compressor", TileEntityCompressor::new, Ic2Blocks.COMPRESSOR);
 	public static final BlockEntityType<TileEntityElectricFurnace> ELECTRIC_FURNACE = register("electric_furnace", TileEntityElectricFurnace::new, Ic2Blocks.ELECTRIC_FURNACE);

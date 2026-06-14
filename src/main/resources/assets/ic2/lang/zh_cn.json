@@ -155,6 +155,7 @@
 	"block.ic2.teleporter": "传送机",
 	"block.ic2.terraformer": "地形转换机 ",
 	"block.ic2.tesla_coil": "特斯拉线圈",
+		"block.ic2.luminator": "日光灯",
 	"block.ic2.canner": "流体/固体装罐机",
 	"block.ic2.compressor": "压缩机",
 	"block.ic2.electric_furnace": "电炉",

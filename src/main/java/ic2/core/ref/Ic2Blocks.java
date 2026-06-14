@@ -110,6 +110,7 @@ import ic2.core.block.wiring.FoamCableBlock;
 import ic2.core.block.wiring.SplitterCableBlock;
 import ic2.core.block.wiring.SplitterFoamCableBlock;
 import ic2.core.block.wiring.tileentity.TileEntityChargepadBatBox;
+import ic2.core.block.wiring.tileentity.TileEntityLuminator;
 import ic2.core.block.wiring.tileentity.TileEntityChargepadCESU;
 import ic2.core.block.wiring.tileentity.TileEntityChargepadMFE;
 import ic2.core.block.wiring.tileentity.TileEntityChargepadMFSU;
@@ -289,6 +290,7 @@ public final class Ic2Blocks
 	public static final Block TELEPORTER = register("teleporter", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL), TileEntityTeleporter.class, true, Ic2TileEntityBlock.DefaultDrop.AdvMachine, Util.noFacings, false));
 	public static final Block TERRAFORMER = register("terraformer", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL), TileEntityTerra.class, true, Ic2TileEntityBlock.DefaultDrop.AdvMachine, Util.noFacings, false));
 	public static final Block TESLA_COIL = register("tesla_coil", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL), TileEntityTesla.class, false, Ic2TileEntityBlock.DefaultDrop.Machine, Util.horizontalFacings, true));
+	public static final Block LUMINATOR_FLAT = register("luminator", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(5.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL).noOcclusion(), TileEntityLuminator.class, true, Ic2TileEntityBlock.DefaultDrop.Self, Util.allFacings, false));
 	public static final Block CANNER = register("canner", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL), TileEntityCanner.class, true, Ic2TileEntityBlock.DefaultDrop.Machine, Util.horizontalFacings, true));
 	public static final Ic2TileEntityBlock COMPRESSOR = register("compressor", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL), TileEntityCompressor.class, true, Ic2TileEntityBlock.DefaultDrop.Machine, Util.horizontalFacings, true));
 	public static final Block ELECTRIC_FURNACE = register("electric_furnace", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL), TileEntityElectricFurnace.class, true, Ic2TileEntityBlock.DefaultDrop.Self, Util.horizontalFacings, true));

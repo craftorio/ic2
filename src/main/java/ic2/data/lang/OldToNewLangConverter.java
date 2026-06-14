@@ -287,7 +287,6 @@ public class OldToNewLangConverter implements DataProvider
 			"netherrack",
 			"alloy",
 			"uranium",
-			"refined_iron",
 			"steel",
 			"hydrated_tin"
 		};

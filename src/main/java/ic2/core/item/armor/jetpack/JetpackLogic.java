@@ -12,6 +12,7 @@ public class JetpackLogic
 {
 	public static boolean useJetpack(Player player, boolean hoverMode, IJetpack jetpack, ItemStack stack)
 	{
+		
 		if (jetpack.getChargeLevel(stack) <= 0.0)
 		{
 			return false;

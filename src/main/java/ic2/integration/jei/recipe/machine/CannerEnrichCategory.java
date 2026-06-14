@@ -69,9 +69,7 @@ public class CannerEnrichCategory implements IRecipeCategory<CannerEnrichRecipeW
 	@Override
 	public void setRecipe(@NotNull IRecipeLayoutBuilder builder, @NotNull CannerEnrichRecipeWrapper recipe, @NotNull IFocusGroup focuses)
 	{
-		builder.addSlot(RecipeIngredientRole.INPUT, 12, 11)
-			.addFluidStack(recipe.getFluidInput().getFluid(), recipe.getFluidInput().getAmount())
-			.setFluidRenderer(8000, false, 18, 18);
+		builder.addSlot(RecipeIngredientRole.INPUT, 12, 11).addFluidStack(recipe.getFluidInput().getFluid(), recipe.getFluidInput().getAmount()).setFluidRenderer(8000, false, 18, 18);
 
 		IRecipeSlotBuilder additiveSlot = builder.addSlot(RecipeIngredientRole.INPUT, 48, 11);
 		List<ItemStack> additiveInputs = recipe.getAdditiveInputs();
@@ -80,9 +78,7 @@ public class CannerEnrichCategory implements IRecipeCategory<CannerEnrichRecipeW
 			additiveSlot.addItemStacks(additiveInputs);
 		}
 
-		builder.addSlot(RecipeIngredientRole.OUTPUT, 105, 11)
-			.addFluidStack(recipe.getFluidOutput().getFluid(), recipe.getFluidOutput().getAmount())
-			.setFluidRenderer(8000, false, 18, 18);
+		builder.addSlot(RecipeIngredientRole.OUTPUT, 105, 11).addFluidStack(recipe.getFluidOutput().getFluid(), recipe.getFluidOutput().getAmount()).setFluidRenderer(8000, false, 18, 18);
 	}
 
 	@Override

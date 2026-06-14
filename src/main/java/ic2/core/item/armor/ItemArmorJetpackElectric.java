@@ -3,8 +3,16 @@ package ic2.core.item.armor;
 import ic2.api.item.ElectricItem;
 import ic2.core.item.armor.jetpack.IJetpack;
 import ic2.core.ref.Ic2ArmorMaterials;
+import ic2.core.util.KeyboardClient;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
+
+import javax.annotation.Nullable;
+import java.util.List;
 
 public class ItemArmorJetpackElectric extends ItemArmorElectric implements IJetpack
 {
@@ -65,5 +73,15 @@ public class ItemArmorJetpackElectric extends ItemArmorElectric implements IJetp
 	public double getDamageAbsorptionRatio()
 	{
 		return 0.0;
+	}
+
+	@Override
+	public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag context)
+	{
+		super.appendHoverText(stack, world, tooltip, context);
+		if (this.getEquipmentSlot() == EquipmentSlot.CHEST)
+		{
+			tooltip.add(Component.translatable("item.ic2.tooltip.jetpack.toggle", Minecraft.getInstance().options.keyJump.getKey().getDisplayName(), KeyboardClient.modeSwitchKey.getKey().getDisplayName()));
+		}
 	}
 }

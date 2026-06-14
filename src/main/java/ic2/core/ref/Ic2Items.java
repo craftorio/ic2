@@ -521,7 +521,6 @@ public final class Ic2Items
 	public static final Item SILVER_INGOT = register("silver_ingot", new Item(new Properties()));
 	public static final Item STEEL_INGOT = register("steel_ingot", new Item(new Properties()));
 	public static final Item TIN_INGOT = register("tin_ingot", new Item(new Properties()));
-	public static final Item REFINED_IRON_INGOT = register("refined_iron_ingot", new Item(new Properties()));
 	public static final Item URANIUM_INGOT = register("uranium_ingot", new Item(new Properties()));
 	public static final Item BRONZE_PLATE = register("bronze_plate", new Item(new Properties()));
 	public static final Item COPPER_PLATE = register("copper_plate", new Item(new Properties()));
@@ -1429,7 +1428,6 @@ public final class Ic2Items
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> RAW_LEAD);
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> RAW_TIN);
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> RAW_URANIUM);
-		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> REFINED_IRON_INGOT);
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> RESIN);
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> RE_ENRICHED_URANIUM);
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> RTG_PELLET);

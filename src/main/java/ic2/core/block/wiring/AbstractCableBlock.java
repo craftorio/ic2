@@ -100,12 +100,7 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 			ret = ret.setValue(foamProperty, from.getValue(foamProperty));
 		} else
 		{
-			ret = ret.setValue(UP, from.getValue(UP))
-				.setValue(DOWN, from.getValue(DOWN))
-				.setValue(NORTH, from.getValue(NORTH))
-				.setValue(EAST, from.getValue(EAST))
-				.setValue(SOUTH, from.getValue(SOUTH))
-				.setValue(WEST, from.getValue(WEST));
+			ret = ret.setValue(UP, from.getValue(UP)).setValue(DOWN, from.getValue(DOWN)).setValue(NORTH, from.getValue(NORTH)).setValue(EAST, from.getValue(EAST)).setValue(SOUTH, from.getValue(SOUTH)).setValue(WEST, from.getValue(WEST));
 		}
 
 		return ret;
@@ -169,11 +164,7 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 		boolean isConnectedEast = this.isConnectedWith(state, null, world, pos.east());
 		boolean isConnectedSouth = this.isConnectedWith(state, null, world, pos.south());
 		boolean isConnectedWest = this.isConnectedWith(state, null, world, pos.west());
-		return state.setValue(DOWN, isConnectedDown).setValue(UP, isConnectedUp)
-			.setValue(NORTH, isConnectedNorth)
-			.setValue(EAST, isConnectedEast)
-			.setValue(SOUTH, isConnectedSouth)
-			.setValue(WEST, isConnectedWest);
+		return state.setValue(DOWN, isConnectedDown).setValue(UP, isConnectedUp).setValue(NORTH, isConnectedNorth).setValue(EAST, isConnectedEast).setValue(SOUTH, isConnectedSouth).setValue(WEST, isConnectedWest);
 	}
 
 	public boolean isConnectedWith(BlockState state, BlockState neighborState, Level world, BlockPos neighborPos)
@@ -485,9 +476,7 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 				return 2.147483647E9;
 			} else
 			{
-				return AbstractCableBlock.this.type.capacity < 128
-					? EnergyNet.instance.getPowerFromTier(AbstractCableBlock.this.insulation)
-					: EnergyNet.instance.getPowerFromTier(AbstractCableBlock.this.insulation + 1);
+				return AbstractCableBlock.this.type.capacity < 128 ? EnergyNet.instance.getPowerFromTier(AbstractCableBlock.this.insulation) : EnergyNet.instance.getPowerFromTier(AbstractCableBlock.this.insulation + 1);
 			}
 		}
 
@@ -508,6 +497,7 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 		{
 			AbstractCableBlock.this.tryRemoveInsulation(this.state, this.world, this.pos, false);
 		}
+
 		@Override
 		public void removeConductor()
 		{
@@ -515,6 +505,7 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 			world.addParticle(ParticleTypes.SMOKE, pos.getX() + new Random().nextFloat(), pos.getY() + 0.95F, pos.getZ() + new Random().nextFloat(), 0.0, 0.0, 0.0);
 			world.removeBlock(this.pos, false);
 		}
+
 		private void setState(BlockState state)
 		{
 			assert state != this.state;

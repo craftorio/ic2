@@ -5,6 +5,7 @@ import ic2.api.item.HudMode;
 import ic2.api.item.IItemHudProvider;
 import ic2.core.IC2;
 import ic2.core.init.Localization;
+import ic2.core.util.KeyboardClient;
 import ic2.core.util.StackUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -15,10 +16,15 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.Nullable;
+import java.util.List;
 
 public class ItemArmorNanoSuit extends ItemArmorElectric implements IItemHudProvider
 {
@@ -132,6 +138,16 @@ public class ItemArmorNanoSuit extends ItemArmorElectric implements IItemHudProv
 					player.removeEffect(MobEffects.NIGHT_VISION);
 				}
 			}
+		}
+	}
+
+	@Override
+	public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag context)
+	{
+		super.appendHoverText(stack, world, tooltip, context);
+		if (this.getEquipmentSlot() == EquipmentSlot.HEAD)
+		{
+			tooltip.add(Component.translatable("item.ic2.tooltip.night_vision.toggle", KeyboardClient.altKey.getKey().getDisplayName(), KeyboardClient.modeSwitchKey.getKey().getDisplayName()));
 		}
 	}
 

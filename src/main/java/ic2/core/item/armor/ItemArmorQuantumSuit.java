@@ -12,7 +12,9 @@ import ic2.core.item.ItemTinCan;
 import ic2.core.item.armor.jetpack.IJetpack;
 import ic2.core.ref.Ic2Items;
 import ic2.core.util.ConfigUtil;
+import ic2.core.util.KeyboardClient;
 import ic2.core.util.StackUtil;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.InteractionResult;
@@ -26,14 +28,18 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.DyeableLeatherItem;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nullable;
 import java.util.IdentityHashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack, IHazmatLike, IItemHudProvider, DyeableLeatherItem
@@ -165,6 +171,21 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 	public int getEnchantmentValue()
 	{
 		return 0;
+	}
+
+	@Override
+	public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag context)
+	{
+		super.appendHoverText(stack, world, tooltip, context);
+		if (this.getEquipmentSlot() == EquipmentSlot.HEAD)
+		{
+			tooltip.add(Component.translatable("item.ic2.tooltip.night_vision.toggle", KeyboardClient.altKey.getKey().getDisplayName(), KeyboardClient.modeSwitchKey.getKey().getDisplayName()));
+		}
+		if (this.getEquipmentSlot() == EquipmentSlot.CHEST)
+		{
+			tooltip.add(Component.translatable("item.ic2.tooltip.jetpack.toggle", Minecraft.getInstance().options.keyJump.getKey().getDisplayName(), KeyboardClient.modeSwitchKey.getKey().getDisplayName()));
+		}
+		
 	}
 
 	@Override

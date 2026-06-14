@@ -1,6 +1,7 @@
 package ic2.core.block.storage.tank;
 
 import ic2.api.util.FluidContainerOutputMode;
+import ic2.api.network.INetworkClientTileEntityEventListener;
 import ic2.core.ContainerBase;
 import ic2.core.IHasGui;
 import ic2.core.block.comp.Fluids;
@@ -39,7 +40,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public abstract class TileEntityTank extends TileEntityInventory implements IHasGui, Ic2FluidBlock, FluidBeBridge
+public abstract class TileEntityTank extends TileEntityInventory implements IHasGui, Ic2FluidBlock, FluidBeBridge, INetworkClientTileEntityEventListener
 {
 	protected final Fluids fluidsComponent = this.addComponent(new Fluids(this));
 	@GuiSynced
@@ -117,6 +118,67 @@ public abstract class TileEntityTank extends TileEntityInventory implements IHas
 		} else
 		{
 			return InteractionResult.PASS;
+		}
+	}
+
+	@Override
+	public void onNetworkEvent(Player player, int event)
+	{
+		if (event != 0) return;
+
+		ItemStack carried = player.containerMenu.getCarried();
+		if (StackUtil.isEmpty(carried) || !LiquidUtil.isFluidContainer(carried)) return;
+
+		ItemStack single = StackUtil.copyWithSize(carried, 1);
+		ItemStack remaining = StackUtil.getSize(carried) > 1 ? StackUtil.decSize(carried.copy()) : StackUtil.emptyStack;
+
+		Ic2FluidStack tankFs = this.contents.getFluidStack();
+
+		// 先尝试从储罐向容器填充液体
+		if (tankFs != null && !tankFs.isEmpty())
+		{
+			LiquidUtil.FluidOperationResult result = LiquidUtil.fillContainer(single.copy(), tankFs.copy(), FluidContainerOutputMode.InPlacePreferred);
+			if (result != null)
+			{
+				this.contents.drainMb(result.fluidChange.getAmountMb(), false);
+				player.containerMenu.setCarried(result.inPlaceOutput);
+				if (!StackUtil.isEmpty(remaining) && !StackUtil.storeInventoryItem(remaining, player, false))
+				{
+					player.drop(remaining, false);
+				}
+				if (result.extraOutput != null && !StackUtil.storeInventoryItem(result.extraOutput, player, false))
+				{
+					player.drop(result.extraOutput, false);
+				}
+				player.containerMenu.broadcastChanges();
+				return;
+			}
+		}
+
+		// 再尝试从容器向储罐排入液体
+		int space = this.contents.getCapacity() - (tankFs != null ? tankFs.getAmountMb() : 0);
+		if (space > 0)
+		{
+			LiquidUtil.FluidOperationResult result = LiquidUtil.drainContainer(
+				single.copy(),
+				tankFs != null && !tankFs.isEmpty() ? tankFs.getFluid() : null,
+				space,
+				FluidContainerOutputMode.InPlacePreferred
+			);
+			if (result != null)
+			{
+				this.contents.fillMb(result.fluidChange, false);
+				player.containerMenu.setCarried(result.inPlaceOutput);
+				if (!StackUtil.isEmpty(remaining) && !StackUtil.storeInventoryItem(remaining, player, false))
+				{
+					player.drop(remaining, false);
+				}
+				if (result.extraOutput != null && !StackUtil.storeInventoryItem(result.extraOutput, player, false))
+				{
+					player.drop(result.extraOutput, false);
+				}
+				player.containerMenu.broadcastChanges();
+			}
 		}
 	}
 

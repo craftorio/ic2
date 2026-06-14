@@ -1,8 +1,11 @@
 package ic2.core.gui;
 
+import ic2.core.IC2;
 import ic2.core.Ic2Gui;
 import ic2.core.fluid.Ic2FluidStack;
 import ic2.core.fluid.Ic2FluidTank;
+import net.minecraft.world.Container;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class TankFluidSlot extends AbstractFluidSlot
 {
@@ -28,5 +31,20 @@ public class TankFluidSlot extends AbstractFluidSlot
 	protected Ic2FluidStack getFluidStack()
 	{
 		return this.tank.getFluidStack();
+	}
+
+	@Override
+	protected boolean onMouseClick(int mouseX, int mouseY, MouseButton button)
+	{
+		if (button == MouseButton.left)
+		{
+			Container base = this.getBase();
+			if (base instanceof BlockEntity)
+			{
+				IC2.network.get(false).initiateClientTileEntityEvent((BlockEntity) base, 0);
+				return true;
+			}
+		}
+		return false;
 	}
 }

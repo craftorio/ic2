@@ -9,8 +9,7 @@
       "entries": [
         {
           "type": "item",
-          "entryName": "copper_ingot",
-          "name": "ic2:ingot",
+          "name": "minecraft:copper_ingot",
           "weight": 9,
           "functions": [
             {
@@ -19,17 +18,12 @@
                 "min": 2,
                 "max": 6
               }
-            },
-            {
-              "function": "set_data",
-              "data": 2
             }
           ]
         },
         {
           "type": "item",
-          "entryName": "tin_ingot",
-          "name": "ic2:ingot",
+          "name": "ic2:tin_ingot",
           "weight": 8,
           "functions": [
             {
@@ -38,41 +32,20 @@
                 "min": 1,
                 "max": 5
               }
-            },
-            {
-              "function": "set_data",
-              "data": 6
             }
           ]
         },
         {
           "type": "item",
-          "entryName": "iridium_ore",
-          "name": "ic2:misc_resource",
-          "weight": 1,
-          "functions": [
-            {
-              "function": "set_data",
-              "data": 1
-            }
-          ]
-        },
-        {
-          "type": "item",
-          "entryName": "iridium_shard",
-          "name": "ic2:misc_resource",
+          "name": "ic2:iridium_shard",
           "weight": 8,
           "functions": [
             {
               "function": "set_count",
               "count": {
-                "min": 2,
-                "max": 5
+                "min": 1,
+                "max": 2
               }
-            },
-            {
-              "function": "set_data",
-              "data": 2
             }
           ]
         },
@@ -108,7 +81,7 @@
         },
         {
           "type": "empty",
-          "weight": 44
+          "weight": 43
         }
       ]
     }

@@ -9,8 +9,7 @@
       "entries": [
         {
           "type": "item",
-          "entryName": "copper_ingot",
-          "name": "ic2:ingot",
+          "name": "minecraft:copper_ingot",
           "weight": 9,
           "functions": [
             {
@@ -19,17 +18,12 @@
                 "min": 2,
                 "max": 6
               }
-            },
-            {
-              "function": "set_data",
-              "data": 2
             }
           ]
         },
         {
           "type": "item",
-          "entryName": "tin_ingot",
-          "name": "ic2:ingot",
+          "name": "ic2:tin_ingot",
           "weight": 8,
           "functions": [
             {
@@ -38,54 +32,84 @@
                 "min": 1,
                 "max": 5
               }
-            },
-            {
-              "function": "set_data",
-              "data": 6
             }
           ]
         },
         {
           "type": "item",
-          "entryName": "iridium_shard",
-          "name": "ic2:misc_resource",
+          "name": "ic2:iridium_shard",
           "weight": 8,
           "functions": [
             {
               "function": "set_count",
               "count": {
-                "min": 2,
-                "max": 5
+                "min": 3,
+                "max": 7
               }
-            },
-            {
-              "function": "set_data",
-              "data": 2
             }
           ]
         },
         {
           "type": "item",
           "name": "ic2:bronze_pickaxe",
-          "weight": 1
+          "weight": 3
         },
         {
           "type": "item",
-          "name": "ic2:filled_tin_can",
-          "weight": 8,
+          "name": "ic2:bronze_sword",
+          "weight": 3
+        },
+        {
+          "type": "item",
+          "name": "ic2:bronze_helmet",
+          "weight": 3
+        },
+        {
+          "type": "item",
+          "name": "ic2:bronze_chestplate",
+          "weight": 3
+        },
+        {
+          "type": "item",
+          "name": "ic2:bronze_leggings",
+          "weight": 3
+        },
+        {
+          "type": "item",
+          "name": "ic2:bronze_boots",
+          "weight": 3
+        },
+        {
+          "type": "item",
+          "name": "ic2:bronze_ingot",
+          "weight": 5,
           "functions": [
             {
               "function": "set_count",
               "count": {
-                "min": 4,
-                "max": 16
+                "min": 2,
+                "max": 4
+              }
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "ic2:rubber_sapling",
+          "weight": 4,
+          "functions": [
+            {
+              "function": "set_count",
+              "count": {
+                "min": 1,
+                "max": 4
               }
             }
           ]
         },
         {
           "type": "empty",
-          "weight": 34
+          "weight": 52
         }
       ]
     }

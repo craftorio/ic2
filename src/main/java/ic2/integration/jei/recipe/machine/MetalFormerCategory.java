@@ -6,7 +6,6 @@ import ic2.core.ref.Ic2Items;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.RecipeType;
-import net.minecraft.client.Minecraft;
 import net.minecraft.world.item.ItemStack;
 
 public class MetalFormerCategory extends DynamicCategory
@@ -26,6 +25,6 @@ public class MetalFormerCategory extends DynamicCategory
 	public void draw(IORecipeWrapper recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY)
 	{
 		super.draw(recipe, recipeSlotsView, guiGraphics, mouseX, mouseY);
-		guiGraphics.renderItem(ICONS[this.mode], 70 + this.xOffset, 35 + this.yOffset);
+		guiGraphics.renderItem(ICONS[this.mode], 65 + this.xOffset, 53 + this.yOffset);
 	}
 }

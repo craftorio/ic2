@@ -19,18 +19,18 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class CannerEnrichCategory implements IRecipeCategory<CannerEnrichRecipeWrapper>
+public class CannerBottleLiquidCategory implements IRecipeCategory<CannerBottleLiquidRecipeWrapper>
 {
 	private static final ResourceLocation GUI_TEXTURE = IC2.getIdentifier("textures/gui/guicanner.png");
-	private final RecipeType<CannerEnrichRecipeWrapper> recipeType;
+	private final RecipeType<CannerBottleLiquidRecipeWrapper> recipeType;
 
-	public CannerEnrichCategory(RecipeType<CannerEnrichRecipeWrapper> recipeType, IGuiHelper guiHelper)
+	public CannerBottleLiquidCategory(RecipeType<CannerBottleLiquidRecipeWrapper> recipeType, IGuiHelper guiHelper)
 	{
 		this.recipeType = recipeType;
 	}
 
 	@Override
-	public @NotNull RecipeType<CannerEnrichRecipeWrapper> getRecipeType()
+	public @NotNull RecipeType<CannerBottleLiquidRecipeWrapper> getRecipeType()
 	{
 		return this.recipeType;
 	}
@@ -38,7 +38,7 @@ public class CannerEnrichCategory implements IRecipeCategory<CannerEnrichRecipeW
 	@Override
 	public @NotNull Component getTitle()
 	{
-		return Component.translatable("ic2.Canner.gui.switch.EnrichLiquid");
+		return Component.translatable("ic2.Canner.gui.switch.BottleLiquid");
 	}
 
 	@Override
@@ -60,27 +60,27 @@ public class CannerEnrichCategory implements IRecipeCategory<CannerEnrichRecipeW
 	}
 
 	@Override
-	public void setRecipe(@NotNull IRecipeLayoutBuilder builder, @NotNull CannerEnrichRecipeWrapper recipe, @NotNull IFocusGroup focuses)
+	public void setRecipe(@NotNull IRecipeLayoutBuilder builder, @NotNull CannerBottleLiquidRecipeWrapper recipe, @NotNull IFocusGroup focuses)
 	{
 		builder.addSlot(RecipeIngredientRole.INPUT, 12, 11)
 			.addFluidStack(recipe.getFluidInput().getFluid(), recipe.getFluidInput().getAmount())
 			.setFluidRenderer(8000, false, 18, 18);
 
-		IRecipeSlotBuilder additiveSlot = builder.addSlot(RecipeIngredientRole.INPUT, 48, 11);
-		List<ItemStack> additiveInputs = recipe.getAdditiveInputs();
-		if (!additiveInputs.isEmpty())
+		IRecipeSlotBuilder containerSlot = builder.addSlot(RecipeIngredientRole.INPUT, 48, 11);
+		List<ItemStack> emptyContainers = recipe.getEmptyContainers();
+		if (!emptyContainers.isEmpty())
 		{
-			additiveSlot.addItemStacks(additiveInputs);
+			containerSlot.addItemStacks(emptyContainers);
 		}
 
 		builder.addSlot(RecipeIngredientRole.OUTPUT, 105, 11)
-			.addFluidStack(recipe.getFluidOutput().getFluid(), recipe.getFluidOutput().getAmount())
-			.setFluidRenderer(8000, false, 18, 18);
+			.addItemStack(recipe.getFilledContainer());
 	}
 
 	@Override
-	public void draw(@NotNull CannerEnrichRecipeWrapper recipe, @NotNull IRecipeSlotsView recipeSlotsView, @NotNull GuiGraphics guiGraphics, double mouseX, double mouseY)
+	public void draw(@NotNull CannerBottleLiquidRecipeWrapper recipe, @NotNull IRecipeSlotsView recipeSlotsView, @NotNull GuiGraphics guiGraphics, double mouseX, double mouseY)
 	{
 		guiGraphics.blit(GUI_TEXTURE, 74, 13, 233, 0, 23, 14);
+		guiGraphics.blit(GUI_TEXTURE, 36, 8, 3, 4, 18, 23);
 	}
 }

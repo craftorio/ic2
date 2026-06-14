@@ -1,20 +1,31 @@
 package ic2.integration.jei;
 
 import ic2.api.recipe.IRecipeInput;
+import ic2.api.util.FluidContainerOutputMode;
 import ic2.core.IC2;
+import ic2.core.fluid.Ic2FluidStack;
 import ic2.core.recipe.v2.RecipeHolder;
 import ic2.core.ref.Ic2Blocks;
 import ic2.core.ref.Ic2RecipeTypes;
+import ic2.core.util.LiquidUtil;
+import ic2.core.util.StackUtil;
 import ic2.integration.jei.recipe.machine.CannerBottleCategory;
+import ic2.integration.jei.recipe.machine.CannerBottleLiquidCategory;
+import ic2.integration.jei.recipe.machine.CannerBottleLiquidRecipeWrapper;
 import ic2.integration.jei.recipe.machine.CannerBottleRecipeWrapper;
+import ic2.integration.jei.recipe.machine.CannerEmptyLiquidCategory;
+import ic2.integration.jei.recipe.machine.CannerEmptyLiquidRecipeWrapper;
 import ic2.integration.jei.recipe.machine.CannerEnrichCategory;
 import ic2.integration.jei.recipe.machine.CannerEnrichRecipeWrapper;
 import ic2.integration.jei.recipe.machine.DynamicCategory;
 import ic2.integration.jei.recipe.machine.IORecipeWrapper;
 import ic2.integration.jei.recipe.machine.MetalFormerCategory;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BiConsumer;
 
 import mezz.jei.api.IModPlugin;
@@ -25,7 +36,9 @@ import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeManager;
 import org.jetbrains.annotations.NotNull;
@@ -45,6 +58,8 @@ public class Ic2JeiPlugin implements IModPlugin
 	private final RecipeType<IORecipeWrapper> ORE_WASHER = RecipeType.create("ic2", "ore_washer", IORecipeWrapper.class);
 	private final RecipeType<CannerBottleRecipeWrapper> CANNER_BOTTLE = RecipeType.create("ic2", "canner_bottle", CannerBottleRecipeWrapper.class);
 	private final RecipeType<CannerEnrichRecipeWrapper> CANNER_ENRICH = RecipeType.create("ic2", "canner_enrich", CannerEnrichRecipeWrapper.class);
+	private final RecipeType<CannerBottleLiquidRecipeWrapper> CANNER_BOTTLE_LIQUID = RecipeType.create("ic2", "canner_bottle_liquid", CannerBottleLiquidRecipeWrapper.class);
+	private final RecipeType<CannerEmptyLiquidRecipeWrapper> CANNER_EMPTY_LIQUID = RecipeType.create("ic2", "canner_empty_liquid", CannerEmptyLiquidRecipeWrapper.class);
 
 	public ResourceLocation getPluginUid()
 	{
@@ -66,6 +81,8 @@ public class Ic2JeiPlugin implements IModPlugin
 		registration.addRecipeCategories(new DynamicCategory(Ic2Blocks.ORE_WASHING_PLANT, this.ORE_WASHER, guiHelper));
 		registration.addRecipeCategories(new CannerBottleCategory((ic2.core.block.tileentity.Ic2TileEntityBlock) Ic2Blocks.SOLID_CANNER, this.CANNER_BOTTLE, guiHelper));
 		registration.addRecipeCategories(new CannerEnrichCategory(this.CANNER_ENRICH, guiHelper));
+		registration.addRecipeCategories(new CannerBottleLiquidCategory(this.CANNER_BOTTLE_LIQUID, guiHelper));
+		registration.addRecipeCategories(new CannerEmptyLiquidCategory(this.CANNER_EMPTY_LIQUID));
 	}
 
 	public void registerRecipeCatalysts(IRecipeCatalystRegistration registration)
@@ -81,7 +98,7 @@ public class Ic2JeiPlugin implements IModPlugin
 			this.METAL_FORMER_CUTTING, this.METAL_FORMER_EXTRUDING, this.METAL_FORMER_ROLLING);
 		registration.addRecipeCatalyst(new ItemStack(Ic2Blocks.ORE_WASHING_PLANT), this.ORE_WASHER);
 		registration.addRecipeCatalyst(new ItemStack(Ic2Blocks.SOLID_CANNER), this.CANNER_BOTTLE);
-		registration.addRecipeCatalyst(new ItemStack(Ic2Blocks.CANNER), this.CANNER_BOTTLE, this.CANNER_ENRICH);
+		registration.addRecipeCatalyst(new ItemStack(Ic2Blocks.CANNER), this.CANNER_BOTTLE, this.CANNER_ENRICH, this.CANNER_BOTTLE_LIQUID, this.CANNER_EMPTY_LIQUID);
 	}
 
 	public void registerRecipes(@NotNull IRecipeRegistration registration)
@@ -110,5 +127,68 @@ public class Ic2JeiPlugin implements IModPlugin
 		List<CannerEnrichRecipeWrapper> cannerEnrichRecipes = recipeManager.getAllRecipesFor(Ic2RecipeTypes.CANNER_ENRICH)
 			.stream().map(r -> new CannerEnrichRecipeWrapper(r.recipe())).toList();
 		registration.addRecipes(this.CANNER_ENRICH, cannerEnrichRecipes);
+
+		List<CannerEmptyLiquidRecipeWrapper> emptyLiquidRecipes = new ArrayList<>();
+		List<CannerBottleLiquidRecipeWrapper> bottleLiquidRecipes = new ArrayList<>();
+		Map<String, CannerBottleLiquidRecipeWrapper> bottleLiquidDedup = new HashMap<>();
+		generateCannerFluidContainerRecipes(emptyLiquidRecipes, bottleLiquidRecipes, bottleLiquidDedup);
+		registration.addRecipes(this.CANNER_EMPTY_LIQUID, emptyLiquidRecipes);
+		registration.addRecipes(this.CANNER_BOTTLE_LIQUID, bottleLiquidRecipes);
+	}
+
+	private static void generateCannerFluidContainerRecipes(
+			List<CannerEmptyLiquidRecipeWrapper> emptyLiquidRecipes,
+			List<CannerBottleLiquidRecipeWrapper> bottleLiquidRecipes,
+			Map<String, CannerBottleLiquidRecipeWrapper> bottleLiquidDedup)
+	{
+		for (Item item : BuiltInRegistries.ITEM)
+		{
+			ItemStack stack = new ItemStack(item);
+			if (!LiquidUtil.isDrainableFluidContainer(stack))
+			{
+				continue;
+			}
+
+			ItemStack filledStack = stack.copy();
+			LiquidUtil.FluidOperationResult result = LiquidUtil.drainContainer(
+				filledStack, null, Integer.MAX_VALUE, FluidContainerOutputMode.EmptyFullToOutput);
+			if (result == null)
+			{
+				continue;
+			}
+
+			List<ItemStack> drainedContainers = new ArrayList<>();
+			if (!StackUtil.isEmpty(result.inPlaceOutput))
+			{
+				drainedContainers.add(result.inPlaceOutput.copy());
+			}
+			if (result.extraOutput != null && !StackUtil.isEmpty(result.extraOutput))
+			{
+				drainedContainers.add(result.extraOutput.copy());
+			}
+
+			Ic2FluidStack fluid = result.fluidChange;
+			if (fluid == null || fluid.isEmpty())
+			{
+				continue;
+			}
+
+			emptyLiquidRecipes.add(new CannerEmptyLiquidRecipeWrapper(
+				stack.copy(), drainedContainers, fluid.copy()));
+
+			for (ItemStack drainedContainer : drainedContainers)
+			{
+				String dedupKey = BuiltInRegistries.ITEM.getKey(drainedContainer.getItem()) + "|"
+					+ BuiltInRegistries.FLUID.getKey(fluid.getFluid());
+				if (!bottleLiquidDedup.containsKey(dedupKey))
+				{
+					List<ItemStack> emptyInputs = List.of(drainedContainer.copy());
+					CannerBottleLiquidRecipeWrapper wrapper = new CannerBottleLiquidRecipeWrapper(
+						emptyInputs, fluid.copy(), stack.copy());
+					bottleLiquidRecipes.add(wrapper);
+					bottleLiquidDedup.put(dedupKey, wrapper);
+				}
+			}
+		}
 	}
 }

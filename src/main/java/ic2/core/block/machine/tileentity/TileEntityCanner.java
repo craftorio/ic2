@@ -37,8 +37,7 @@ import net.minecraft.world.level.block.state.BlockState;
 public class TileEntityCanner extends TileEntityStandardMachine<Object, Object, Object> implements INetworkClientTileEntityEventListener
 {
 	private TileEntityCanner.Mode mode = TileEntityCanner.Mode.BottleSolid;
-	public static final int eventSetModeBase = 0;
-	public static final int eventSwapTanks = 0 + TileEntityCanner.Mode.values.length + 1;
+	public static final int eventSwapTanks = Mode.values.length + 1;
 	public final Ic2FluidTank inputTank;
 	public final Ic2FluidTank outputTank;
 	public final InvSlotConsumableCanner canInputSlot;
@@ -119,9 +118,7 @@ public class TileEntityCanner extends TileEntityStandardMachine<Object, Object, 
 			return Collections.emptyList();
 		} else
 		{
-			return output instanceof IEmptyFluidContainerRecipeManager.Output
-				? ((IEmptyFluidContainerRecipeManager.Output) output).container
-				: super.getOutput(output);
+			return output instanceof IEmptyFluidContainerRecipeManager.Output ? ((IEmptyFluidContainerRecipeManager.Output) output).container : super.getOutput(output);
 		}
 	}
 
@@ -253,9 +250,9 @@ public class TileEntityCanner extends TileEntityStandardMachine<Object, Object, 
 	@Override
 	public void onNetworkEvent(Player player, int event)
 	{
-		if (event >= 0 && event < 0 + TileEntityCanner.Mode.values.length)
+		if (event >= 0 && event < Mode.values.length)
 		{
-			this.setMode(TileEntityCanner.Mode.values[event - 0]);
+			this.setMode(TileEntityCanner.Mode.values[event]);
 		} else if (event == eventSwapTanks)
 		{
 			this.switchTanks();
@@ -291,40 +288,28 @@ public class TileEntityCanner extends TileEntityStandardMachine<Object, Object, 
 		}
 	}
 
-	private boolean switchTanks()
+	private void switchTanks()
 	{
 		if (this.progress != 0)
 		{
-			return false;
+			return;
 		}
 
 		Ic2FluidStack inputStack = this.inputTank.getFluidStack();
 		Ic2FluidStack outputStack = this.outputTank.getFluidStack();
 		this.inputTank.setFluidStack(outputStack);
 		this.outputTank.setFluidStack(inputStack);
-		return true;
 	}
 
 	@Override
 	public Set<UpgradableProperty> getUpgradableProperties()
 	{
-		return EnumSet.of(
-			UpgradableProperty.Processing,
-			UpgradableProperty.Transformer,
-			UpgradableProperty.EnergyStorage,
-			UpgradableProperty.ItemConsuming,
-			UpgradableProperty.ItemProducing,
-			UpgradableProperty.FluidConsuming,
-			UpgradableProperty.FluidProducing
-		);
+		return EnumSet.of(UpgradableProperty.Processing, UpgradableProperty.Transformer, UpgradableProperty.EnergyStorage, UpgradableProperty.ItemConsuming, UpgradableProperty.ItemProducing, UpgradableProperty.FluidConsuming, UpgradableProperty.FluidProducing);
 	}
 
 	public enum Mode
 	{
-		BottleSolid,
-		EmptyLiquid,
-		BottleLiquid,
-		EnrichLiquid;
+		BottleSolid, EmptyLiquid, BottleLiquid, EnrichLiquid;
 
 		public static final TileEntityCanner.Mode[] values = values();
 	}

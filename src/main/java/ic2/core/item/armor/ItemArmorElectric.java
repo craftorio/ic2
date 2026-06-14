@@ -57,45 +57,66 @@ public abstract class ItemArmorElectric extends ItemArmorIC2 implements IElectri
 
 	public abstract double getDamageAbsorptionRatio();
 
-	public static boolean damageArmor(Player entity, DamageSource source, float amount)
+	protected double getBaseAbsorptionRatio()
+	{
+		return switch (this.getEquipmentSlot())
+		{
+			case HEAD -> 0.15;
+			case CHEST -> 0.4;
+			case LEGS -> 0.3;
+			case FEET -> 0.15;
+			default -> 0.0;
+		};
+	}
+
+	public static float damageArmor(Player entity, DamageSource source, float amount)
 	{
 		if (source == null || amount <= 0.0F || source.is(DamageTypeTags.BYPASSES_ENCHANTMENTS))
 		{
-			return false;
+			return amount;
 		}
 
-		boolean hasArmor = false;
-		boolean fullAbsorb = true;
+		float remainingDamage = amount;
 
 		for (EquipmentSlot slot : EquipmentSlot.values())
 		{
+			if (slot.getType() != EquipmentSlot.Type.ARMOR)
+			{
+				continue;
+			}
+
 			ItemStack stack = entity.getItemBySlot(slot);
 			if (stack.getItem() instanceof ItemArmorElectric electricArmor)
 			{
-				hasArmor = true;
-				double absorbedDamage = amount * electricArmor.getDamageAbsorptionRatio();
-				double needed = absorbedDamage * electricArmor.getEnergyPerDamage();
-				if (!ElectricItem.manager.canUse(stack, needed))
+				double absorptionRatio = electricArmor.getBaseAbsorptionRatio() * electricArmor.getDamageAbsorptionRatio();
+				if (absorptionRatio <= 0.0)
 				{
-					fullAbsorb = false;
+					continue;
 				}
-			}
-		}
 
-		if (hasArmor && fullAbsorb)
-		{
-			for (EquipmentSlot slot : EquipmentSlot.values())
-			{
-				ItemStack stack = entity.getItemBySlot(slot);
-				if (stack.getItem() instanceof ItemArmorElectric electricArmor)
+				int energyPerDamage = electricArmor.getEnergyPerDamage();
+				if (energyPerDamage <= 0)
 				{
-					double absorbedDamage = amount * electricArmor.getDamageAbsorptionRatio();
+					continue;
+				}
+
+				double availableEnergy = ElectricItem.manager.getCharge(stack);
+				double maxAbsorbDamage = availableEnergy / energyPerDamage;
+				double absorbedDamage = Math.min(remainingDamage * absorptionRatio, maxAbsorbDamage);
+
+				if (absorbedDamage > 0.0)
+				{
 					electricArmor.damageArmor(entity, stack, source, absorbedDamage, slot);
+					remainingDamage -= (float) absorbedDamage;
+					if (remainingDamage <= 0.0F)
+					{
+						break;
+					}
 				}
 			}
 		}
 
-		return hasArmor && fullAbsorb;
+		return remainingDamage;
 	}
 
 	public boolean isEnchantable(ItemStack stack)

@@ -44,13 +44,7 @@ public class ItemArmorNanoSuit extends ItemArmorElectric implements IItemHudProv
 	@Override
 	public double getDamageAbsorptionRatio()
 	{
-		return switch (this.getEquipmentSlot())
-		{
-			case HEAD, FEET -> 0.15;
-			case CHEST -> 0.4;
-			case LEGS -> 0.3;
-			default -> 0.0;
-		};
+		return 0.9;
 	}
 
 	public boolean absorbFall(ItemStack stack, LivingEntity entity, float distance)
@@ -123,19 +117,21 @@ public class ItemArmorNanoSuit extends ItemArmorElectric implements IItemHudProv
 					nbtData.putByte("toggle_timer", --toggleTimer);
 				}
 
-				if (isNightVisionEnabled && IC2.sideProxy.isSimulating())
+				if (isNightVisionEnabled && IC2.sideProxy.isSimulating() && ElectricItem.manager.use(stack, 1.0, player))
 				{
 					int skylight = player.getCommandSenderWorld().getMaxLocalRawBrightness(BlockPos.containing(player.position()));
-					if (skylight <= 8 && ElectricItem.manager.use(stack, 1.0, player))
+					if (skylight > 8)
 					{
-						player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 300, 0, true, true));
-						return;
+						player.removeEffect(MobEffects.NIGHT_VISION);
+						player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 100, 0, true, true));
 					}
-				}
+					else
+					{
+						player.removeEffect(MobEffects.BLINDNESS);
+						player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 300, 0, true, true));
+					}
 
-				if (IC2.sideProxy.isSimulating())
-				{
-					player.removeEffect(MobEffects.NIGHT_VISION);
+					ret = true;
 				}
 			}
 		}

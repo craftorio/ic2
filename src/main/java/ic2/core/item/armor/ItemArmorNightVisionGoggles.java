@@ -97,19 +97,20 @@ public class ItemArmorNightVisionGoggles extends ItemArmorUtility implements IEl
 					nbtData.putByte("toggle_timer", --toggleTimer);
 				}
 
-				if (active && IC2.sideProxy.isSimulating())
+				if (active && IC2.sideProxy.isSimulating() && ElectricItem.manager.use(stack, 1.0, player))
 				{
 					int skylight = player.getCommandSenderWorld().getMaxLocalRawBrightness(BlockPos.containing(player.position()));
-					if (skylight <= 8 && ElectricItem.manager.use(stack, 1.0, player))
+					if (skylight > 8)
 					{
-						player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 300, 0, true, true));
-						return;
+						player.removeEffect(MobEffects.NIGHT_VISION);
+						player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 100, 0, true, true));
 					}
-				}
+					else
+					{
+						player.removeEffect(MobEffects.BLINDNESS);
+						player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 300, 0, true, true));
+					}
 
-				if (IC2.sideProxy.isSimulating())
-				{
-					player.removeEffect(MobEffects.NIGHT_VISION);
 				}
 			}
 		}

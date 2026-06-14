@@ -69,13 +69,7 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 	@Override
 	public double getDamageAbsorptionRatio()
 	{
-		return switch (this.getEquipmentSlot())
-		{
-			case HEAD, FEET -> 0.15;
-			case CHEST -> 0.48;
-			case LEGS -> 0.3;
-			default -> 0.0;
-		};
+		return this.getEquipmentSlot() == EquipmentSlot.CHEST ? 1.2 : 1.0;
 	}
 
 	public boolean hasCustomColor(@NotNull ItemStack stack)

@@ -33,7 +33,7 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.event.entity.living.MobSpawnEvent;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
@@ -194,12 +194,17 @@ public final class EventHandlerForge
 		}
 	}
 
-	@SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
-	public void onEntityAttacked(LivingAttackEvent event)
+	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	public void onEntityAttacked(LivingHurtEvent event)
 	{
-		if (EventHandler.onEntityAttacked(event.getEntity(), event.getSource(), event.getAmount()))
+		float remaining = EventHandler.onEntityAttacked(event.getEntity(), event.getSource(), event.getAmount());
+		if (remaining <= 0.0F)
 		{
 			event.setCanceled(true);
+		}
+		else
+		{
+			event.setAmount(remaining);
 		}
 	}
 

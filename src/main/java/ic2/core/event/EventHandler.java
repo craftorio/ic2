@@ -302,13 +302,12 @@ public final class EventHandler
 		return !(item instanceof IEntityAttackableItem) || ((IEntityAttackableItem) item).onAttackEntity(player, target);
 	}
 
-	// True means cancelling this damage event
-	public static boolean onEntityAttacked(LivingEntity victim, DamageSource source, float amount)
+	public static float onEntityAttacked(LivingEntity victim, DamageSource source, float amount)
 	{
 		if (victim instanceof Player player)
 		{
 			return ItemArmorElectric.damageArmor(player, source, amount);
 		}
-		return false;
+		return amount;
 	}
 }

@@ -128,6 +128,10 @@ public abstract class TileEntityStandardMachine<RI, RO, I>
 		boolean needsInvUpdate = false;
 		MachineRecipeResult<RI, RO, I> result;
 		RI input;
+		if (this.inputSlot == null)
+		{
+			return;
+		}
 		if (this.recipeResult == null
 			|| (result = this.inputSlot.process()) == null
 			|| (input = result.getRecipe().getInput()) != null && !input.equals(this.recipeResult.getRecipe().getInput()))

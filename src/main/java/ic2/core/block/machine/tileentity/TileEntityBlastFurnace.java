@@ -83,7 +83,7 @@ public class TileEntityBlastFurnace extends TileEntityInventory implements IUpgr
 	{
 		super.updateEntityServer();
 		boolean needsInvUpdate = false;
-		this.heatup();
+		this.heatUp();
 		MachineRecipeResult<IRecipeInput, Collection<ItemStack>, ItemStack> result = this.getOutput();
 		if (result != null && this.isHot())
 		{
@@ -170,7 +170,7 @@ public class TileEntityBlastFurnace extends TileEntityInventory implements IUpgr
 		nbt.putInt("progress", this.progress);
 	}
 
-	private void heatup()
+	private void heatUp()
 	{
 		int coolingPerTick = 1;
 		int heatRequested = 0;

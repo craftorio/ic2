@@ -133,19 +133,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.DoorBlock;
-import net.minecraft.world.level.block.FenceBlock;
-import net.minecraft.world.level.block.FenceGateBlock;
-import net.minecraft.world.level.block.LeavesBlock;
-import net.minecraft.world.level.block.PressurePlateBlock;
-import net.minecraft.world.level.block.RotatedPillarBlock;
-import net.minecraft.world.level.block.SaplingBlock;
-import net.minecraft.world.level.block.SlabBlock;
-import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.block.StairBlock;
-import net.minecraft.world.level.block.TrapDoorBlock;
-import net.minecraft.world.level.block.ButtonBlock;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.PressurePlateBlock.Sensitivity;
 import net.minecraft.world.level.block.grower.AbstractTreeGrower;
 import net.minecraft.world.level.block.state.BlockState;
@@ -183,10 +171,10 @@ public final class Ic2Blocks
 	public static final Block REACTOR_VESSEL = register("reactor_vessel", new Block(Properties.of().strength(40.0F, 90.0F).requiresCorrectToolForDrops()));
 	public static final Block SILVER_BLOCK = register("silver_block", new Block(Properties.of().strength(4.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL)));
 	public static final LeavesBlock RUBBER_LEAVES = register("rubber_leaves", new LeavesBlock(Properties.of().strength(0.2F).randomTicks().sound(SoundType.GRASS).noOcclusion().isValidSpawn(Ic2Blocks::canSpawnOnLeaves).isSuffocating(Ic2Blocks::never).isViewBlocking(Ic2Blocks::never)));
-	public static final RubberLogBlock RUBBER_LOG = register("rubber_log", new RubberLogBlock(Properties.of().mapColor(state -> state.getValue(RotatedPillarBlock.AXIS) == Axis.Y ? MapColor.PODZOL : MapColor.COLOR_BROWN).randomTicks().strength(1.0F).sound(SoundType.WOOD)));
-	public static final RotatedPillarBlock STRIPPED_RUBBER_LOG = register("stripped_rubber_log", new RotatedPillarBlock(Properties.of().mapColor(state -> state.getValue(RotatedPillarBlock.AXIS) == Axis.Y ? MapColor.PODZOL : MapColor.COLOR_BROWN).strength(1.0F).sound(SoundType.WOOD)));
-	public static final RubberWoodBlock RUBBER_WOOD = register("rubber_wood", new RubberWoodBlock(Properties.of().mapColor(MapColor.COLOR_BROWN).strength(1.0F).sound(SoundType.WOOD)));
-	public static final Block STRIPPED_RUBBER_WOOD = register("stripped_rubber_wood", new Block(Properties.of().mapColor(MapColor.PODZOL).strength(1.0F).sound(SoundType.WOOD)));
+	public static final RubberLogBlock RUBBER_LOG = register("rubber_log", new RubberLogBlock(Properties.of().mapColor(state -> state.getValue(RotatedPillarBlock.AXIS) == Axis.Y ? MapColor.PODZOL : MapColor.COLOR_BROWN).randomTicks().strength(2.0F, 3.0f).sound(SoundType.WOOD)));
+	public static final RotatedPillarBlock STRIPPED_RUBBER_LOG = register("stripped_rubber_log", new RotatedPillarBlock(Properties.of().mapColor(state -> state.getValue(RotatedPillarBlock.AXIS) == Axis.Y ? MapColor.PODZOL : MapColor.COLOR_BROWN).strength(2.0F, 3.0f).sound(SoundType.WOOD)));
+	public static final RubberWoodBlock RUBBER_WOOD = register("rubber_wood", new RubberWoodBlock(Properties.of().mapColor(MapColor.COLOR_BROWN).strength(2.0F, 3.0f).sound(SoundType.WOOD)));
+	public static final Block STRIPPED_RUBBER_WOOD = register("stripped_rubber_wood", new Block(Properties.of().mapColor(MapColor.PODZOL).strength(2.0F, 3.0f).sound(SoundType.WOOD)));
 	public static final Block RUBBER_SAPLING = register("rubber_sapling", new SaplingBlock(new AbstractTreeGrower()
 	{
 		protected ResourceKey<ConfiguredFeature<?, ?>> getConfiguredFeature(@NotNull RandomSource random, boolean bees)

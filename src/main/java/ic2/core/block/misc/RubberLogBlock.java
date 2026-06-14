@@ -20,12 +20,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
-import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.BlockHitResult;
+import org.jetbrains.annotations.NotNull;
 
 public class RubberLogBlock extends RotatedPillarBlock
 {
@@ -34,42 +33,41 @@ public class RubberLogBlock extends RotatedPillarBlock
 	public RubberLogBlock(Properties settings)
 	{
 		super(settings);
-		this.registerDefaultState((BlockState) this.defaultBlockState().setValue(stateProperty, RubberLogBlock.RubberWoodState.plain));
+		this.registerDefaultState(this.defaultBlockState().setValue(stateProperty, RubberWoodState.plain));
 	}
 
-	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
+	protected void createBlockStateDefinition(@NotNull Builder<Block, BlockState> builder)
 	{
 		super.createBlockStateDefinition(builder);
-		builder.add(new Property[] { stateProperty });
+		builder.add(stateProperty);
 	}
 
-	public BlockState getStateForPlacement(BlockPlaceContext ctx)
+	public @NotNull BlockState getStateForPlacement(BlockPlaceContext ctx)
 	{
-		return (BlockState) ((BlockState) this.defaultBlockState().setValue(AXIS, ctx.getClickedFace().getAxis()))
-			.setValue(stateProperty, RubberLogBlock.RubberWoodState.plain);
+		return this.defaultBlockState().setValue(AXIS, ctx.getClickedFace().getAxis()).setValue(stateProperty, RubberWoodState.plain);
 	}
 
-	public void randomTick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random)
+	public void randomTick(@NotNull BlockState state, @NotNull ServerLevel world, @NotNull BlockPos pos, RandomSource random)
 	{
 		if (random.nextInt(7) == 0)
 		{
-			RubberLogBlock.RubberWoodState rwState = (RubberLogBlock.RubberWoodState) state.getValue(stateProperty);
+			RubberLogBlock.RubberWoodState rwState = state.getValue(stateProperty);
 			if (!rwState.canRegenerate())
 			{
 				return;
 			}
 
-			world.setBlockAndUpdate(pos, (BlockState) state.setValue(stateProperty, rwState.getWet()));
+			world.setBlockAndUpdate(pos, state.setValue(stateProperty, rwState.getWet()));
 		}
 	}
 
 	public PushReaction getPistonPushReaction(BlockState state)
 	{
-		Axis axis = (Axis) state.getValue(AXIS);
+		Axis axis = state.getValue(AXIS);
 		return axis != Axis.X && axis != Axis.Y && axis != Axis.Z ? PushReaction.BLOCK : PushReaction.NORMAL;
 	}
 
-	public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit)
+	public @NotNull InteractionResult use(@NotNull BlockState state, @NotNull Level world, @NotNull BlockPos pos, Player player, @NotNull InteractionHand hand, @NotNull BlockHitResult hit)
 	{
 		ItemStack mainHandItem = player.getMainHandItem();
 		if (!(mainHandItem.getItem() instanceof AxeItem))
@@ -77,19 +75,9 @@ public class RubberLogBlock extends RotatedPillarBlock
 			return super.use(state, world, pos, player, hand, hit);
 		}
 
-		WorldUtil.strip(
-			state,
-			world,
-			pos,
-			player,
-			mainHandItem,
-			(BlockState) Ic2Blocks.STRIPPED_RUBBER_LOG.defaultBlockState().setValue(RotatedPillarBlock.AXIS, (Axis) state.getValue(RotatedPillarBlock.AXIS))
-		);
-		RubberLogBlock.RubberWoodState resinState = (RubberLogBlock.RubberWoodState) state.getValue(stateProperty);
-		if (resinState == RubberLogBlock.RubberWoodState.wet_north
-			|| resinState == RubberLogBlock.RubberWoodState.wet_south
-			|| resinState == RubberLogBlock.RubberWoodState.wet_west
-			|| resinState == RubberLogBlock.RubberWoodState.wet_east)
+		WorldUtil.strip(state, world, pos, player, mainHandItem, Ic2Blocks.STRIPPED_RUBBER_LOG.defaultBlockState().setValue(RotatedPillarBlock.AXIS, state.getValue(RotatedPillarBlock.AXIS)));
+		RubberLogBlock.RubberWoodState resinState = state.getValue(stateProperty);
+		if (resinState == RubberLogBlock.RubberWoodState.wet_north || resinState == RubberLogBlock.RubberWoodState.wet_south || resinState == RubberLogBlock.RubberWoodState.wet_west || resinState == RubberLogBlock.RubberWoodState.wet_east)
 		{
 			this.dropResin(world, pos, world.random.nextInt(2) + 1);
 		}
@@ -101,9 +89,9 @@ public class RubberLogBlock extends RotatedPillarBlock
 	{
 		for (int i = 0; i < amount; i++)
 		{
-			ItemEntity entityitem = new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), new ItemStack(Ic2Items.RESIN));
-			entityitem.setDefaultPickUpDelay();
-			world.addFreshEntity(entityitem);
+			ItemEntity entity = new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), new ItemStack(Ic2Items.RESIN));
+			entity.setDefaultPickUpDelay();
+			world.addFreshEntity(entity);
 		}
 	}
 
@@ -129,7 +117,7 @@ public class RubberLogBlock extends RotatedPillarBlock
 			this.wet = wet;
 		}
 
-		public String getSerializedName()
+		public @NotNull String getSerializedName()
 		{
 			return this.name();
 		}
@@ -158,23 +146,6 @@ public class RubberLogBlock extends RotatedPillarBlock
 		public RubberLogBlock.RubberWoodState getDry()
 		{
 			return !this.isPlain() && this.wet ? values[this.ordinal() - 4] : this;
-		}
-
-		public static RubberLogBlock.RubberWoodState getWet(Direction facing)
-		{
-			switch (facing)
-			{
-				case NORTH:
-					return wet_north;
-				case SOUTH:
-					return wet_south;
-				case WEST:
-					return wet_west;
-				case EAST:
-					return wet_east;
-				default:
-					throw new IllegalArgumentException("incompatible facing: " + facing);
-			}
 		}
 	}
 }

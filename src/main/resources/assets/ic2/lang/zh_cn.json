@@ -33,7 +33,6 @@
 	"ic2.frequency_transmitter.link_target": "已连接到目标 (%s,%s,%s)",
 	"ic2.frequency_transmitter.cannot_link_to_self": "无法连接到自己",
 	"ic2.frequency_transmitter.link_already_established": "连接未改变",
-	
 	"item.ic2.tooltip.jetpack.toggle": "按%s+%s切换悬停",
 	"ic2.frequency_transmitter.tooltip.blank": "<空>",
 	"ic2.frequency_transmitter.tooltip.target": "目标：(%s,%s,%s)",

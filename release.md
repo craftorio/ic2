@@ -51,6 +51,7 @@
 - 国际化混乱应用，有 `Localization.translate -> String` 和 `Component.translatable -> Component`
 - 区块生成卡顿
 - 日光灯不能用（仅限合成）
+- 橡胶木告示牌材质
 
 ## 翻译
 

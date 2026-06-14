@@ -186,7 +186,7 @@ public final class EnvProxyForge implements EnvProxy
 	@Override
 	public WoodType registerSignType(String name)
 	{
-		return WoodType.register(new WoodType(name, BlockSetType.OAK));
+		return WoodType.register(new WoodType("ic2:" + name, BlockSetType.OAK));
 	}
 
 	@Override

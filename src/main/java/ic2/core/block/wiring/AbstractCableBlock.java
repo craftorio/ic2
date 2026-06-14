@@ -511,11 +511,8 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 		@Override
 		public void removeConductor()
 		{
-			if (world.isClientSide)
-			{
-				world.playLocalSound(this.pos, SoundEvents.GENERIC_EXTINGUISH_FIRE, SoundSource.BLOCKS, 4f, 1, true);
-				world.addParticle(ParticleTypes.SMOKE, pos.getX() + new Random().nextFloat(), pos.getY() + 0.95F, pos.getZ() + new Random().nextFloat(), 0.0, 0.0, 0.0);
-			}
+			world.playSound(null, pos, SoundEvents.GENERIC_EXTINGUISH_FIRE, SoundSource.BLOCKS, 4.0F, 1.0F);
+			world.addParticle(ParticleTypes.SMOKE, pos.getX() + new Random().nextFloat(), pos.getY() + 0.95F, pos.getZ() + new Random().nextFloat(), 0.0, 0.0, 0.0);
 			world.removeBlock(this.pos, false);
 		}
 		private void setState(BlockState state)

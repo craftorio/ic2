@@ -2,8 +2,6 @@ package ic2.integration.jei.recipe.machine;
 
 import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.IC2;
-import ic2.core.ref.Ic2Blocks;
-import ic2.integration.jeirei.SlotPosition;
 
 import java.util.List;
 
@@ -26,13 +24,15 @@ public class CannerEnrichCategory implements IRecipeCategory<CannerEnrichRecipeW
 {
 	private static final ResourceLocation ARROW_TEXTURE = IC2.getIdentifier("textures/gui/overlay/canner_arrow");
 	private final RecipeType<CannerEnrichRecipeWrapper> recipeType;
-	private final IDrawable background;
+	private final int width;
+	private final int height;
 	private final IDrawableStatic arrow;
 
 	public CannerEnrichCategory(RecipeType<CannerEnrichRecipeWrapper> recipeType, IGuiHelper guiHelper)
 	{
 		this.recipeType = recipeType;
-		this.background = guiHelper.createBlankDrawable(132, 54);
+		this.width = 132;
+		this.height = 54;
 		this.arrow = guiHelper.createDrawable(ARROW_TEXTURE, 0, 0, 12, 18);
 	}
 
@@ -43,15 +43,21 @@ public class CannerEnrichCategory implements IRecipeCategory<CannerEnrichRecipeW
 	}
 
 	@Override
-	public Component getTitle()
+	public @NotNull Component getTitle()
 	{
 		return Component.translatable("ic2.Canner.gui.switch.EnrichLiquid");
 	}
 
 	@Override
-	public IDrawable getBackground()
+	public int getWidth()
 	{
-		return this.background;
+		return this.width;
+	}
+
+	@Override
+	public int getHeight()
+	{
+		return this.height;
 	}
 
 	@Override
@@ -80,7 +86,7 @@ public class CannerEnrichCategory implements IRecipeCategory<CannerEnrichRecipeW
 	}
 
 	@Override
-	public void draw(CannerEnrichRecipeWrapper recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY)
+	public void draw(@NotNull CannerEnrichRecipeWrapper recipe, @NotNull IRecipeSlotsView recipeSlotsView, @NotNull GuiGraphics guiGraphics, double mouseX, double mouseY)
 	{
 		this.arrow.draw(guiGraphics, 76, 12);
 	}

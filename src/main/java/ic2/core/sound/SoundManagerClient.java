@@ -123,6 +123,7 @@ public class SoundManagerClient extends SoundManager
 
 	public static SoundInstance onSoundPlayed(SoundInstance sound)
 	{
+		if (sound == null) return null;
 		SoundSource category = sound.getSource();
 		String name = sound.getLocation().getPath();
 		if (category == SoundSource.BLOCKS && name.endsWith(".hit") || category == SoundSource.BLOCKS && name.endsWith(".break"))

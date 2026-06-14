@@ -71,12 +71,6 @@ public class CannerBottleCategory extends IORecipeCategory<CannerBottleRecipeWra
 	}
 
 	@Override
-	public IDrawable getBackground()
-	{
-		return this.background;
-	}
-
-	@Override
 	public int getWidth()
 	{
 		return this.background.getWidth();

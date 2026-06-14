@@ -16,25 +16,19 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.Item.Properties;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.jetbrains.annotations.NotNull;
 
 public class ItemFrequencyTransmitter extends Item
 {
-	private static final String targetSetNbt = "targetSet";
-	private static final String targetJustSetNbt = "targetJustSet";
-	private static final String targetXNbt = "targetX";
-	private static final String targetYNbt = "targetY";
-	private static final String targetZNbt = "targetZ";
-
 	public ItemFrequencyTransmitter(Properties settings)
 	{
 		super(settings);
 	}
 
-	public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand)
+	public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level world, @NotNull Player player, @NotNull InteractionHand hand)
 	{
 		ItemStack stack = StackUtil.get(player, hand);
 		if (IC2.sideProxy.isSimulating())
@@ -44,7 +38,7 @@ public class ItemFrequencyTransmitter extends Item
 			if (nbtData.getBoolean("targetSet") && !hadJustSet)
 			{
 				nbtData.putBoolean("targetSet", false);
-				IC2.sideProxy.messagePlayer(player, "Frequency Transmitter unlinked");
+				IC2.sideProxy.messagePlayer(player, "ic2.frequency_transmitter.unlink_target");
 			}
 
 			if (hadJustSet)
@@ -53,10 +47,10 @@ public class ItemFrequencyTransmitter extends Item
 			}
 		}
 
-		return new InteractionResultHolder(InteractionResult.SUCCESS, stack);
+		return new InteractionResultHolder<>(InteractionResult.SUCCESS, stack);
 	}
 
-	public InteractionResult useOn(UseOnContext context)
+	public @NotNull InteractionResult useOn(UseOnContext context)
 	{
 		Level world = context.getLevel();
 		Player player = context.getPlayer();
@@ -81,13 +75,13 @@ public class ItemFrequencyTransmitter extends Item
 			{
 				targetSet = true;
 				target = tp.getBlockPos();
-				IC2.sideProxy.messagePlayer(player, "Frequency Transmitter linked to Teleporter.");
+				IC2.sideProxy.messagePlayer(player, "ic2.frequency_transmitter.link_target", target.getX(), target.getY(), target.getZ());
 			} else if (tp.getBlockPos().equals(target))
 			{
-				IC2.sideProxy.messagePlayer(player, "Can't link Teleporter to itself.");
+				IC2.sideProxy.messagePlayer(player, "ic2.frequency_transmitter.cannot_link_to_self");
 			} else if (tp.hasTarget() && tp.getTarget().equals(target))
 			{
-				IC2.sideProxy.messagePlayer(player, "Teleportation link unchanged.");
+				IC2.sideProxy.messagePlayer(player, "ic2.frequency_transmitter.link_already_established");
 			} else
 			{
 				BlockEntity targetTe = world.getBlockEntity(target);
@@ -95,7 +89,7 @@ public class ItemFrequencyTransmitter extends Item
 				{
 					tp.setTarget(target);
 					((TileEntityTeleporter) targetTe).setTarget(pos);
-					IC2.sideProxy.messagePlayer(player, "Teleportation link established.");
+					IC2.sideProxy.messagePlayer(player, "ic2.frequency_transmitter.link_target", target.getX(), target.getY(), target.getZ());
 				} else
 				{
 					justSetTarget = false;
@@ -112,17 +106,12 @@ public class ItemFrequencyTransmitter extends Item
 		}
 	}
 
-	public void appendHoverText(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag advanced)
+	public void appendHoverText(@NotNull ItemStack stack, Level world, @NotNull List<Component> tooltip, @NotNull TooltipFlag advanced)
 	{
 		CompoundTag nbtData = StackUtil.getOrCreateNbtData(stack);
 		if (nbtData.getBoolean("targetSet"))
 		{
-			tooltip.add(
-				Component.translatable(
-					"ic2.frequency_transmitter.tooltip.target",
-					new Object[] { nbtData.getInt("targetX"), nbtData.getInt("targetY"), nbtData.getInt("targetZ") }
-				)
-			);
+			tooltip.add(Component.translatable("ic2.frequency_transmitter.tooltip.target", nbtData.getInt("targetX"), nbtData.getInt("targetY"), nbtData.getInt("targetZ")));
 		} else
 		{
 			tooltip.add(Component.translatable("ic2.frequency_transmitter.tooltip.blank"));

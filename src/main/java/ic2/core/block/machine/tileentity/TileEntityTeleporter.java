@@ -48,7 +48,6 @@ public class TileEntityTeleporter extends TileEntityBase implements INetworkTile
 	private BlockPos target;
 	private int targetCheckTicker = IC2.random.nextInt(1024);
 	private int cooldown = 0;
-	private static final int EventTeleport = 0;
 
 	public TileEntityTeleporter(BlockPos pos, BlockState state)
 	{
@@ -105,18 +104,7 @@ public class TileEntityTeleporter extends TileEntityBase implements INetworkTile
 				entitiesNearby = Collections.emptyList();
 			} else
 			{
-				entitiesNearby = world.getEntitiesOfClass(
-					Entity.class,
-					new AABB(
-						this.worldPosition.getX() - 1,
-						this.worldPosition.getY(),
-						this.worldPosition.getZ() - 1,
-						this.worldPosition.getX() + 2,
-						this.worldPosition.getY() + 3,
-						this.worldPosition.getZ() + 2
-					),
-					EntitySelector.ENTITY_STILL_ALIVE
-				);
+				entitiesNearby = world.getEntitiesOfClass(Entity.class, new AABB(this.worldPosition.getX() - 1, this.worldPosition.getY(), this.worldPosition.getZ() - 1, this.worldPosition.getX() + 2, this.worldPosition.getY() + 3, this.worldPosition.getZ() + 2), EntitySelector.ENTITY_STILL_ALIVE);
 			}
 
 			if (!entitiesNearby.isEmpty() && this.verifyTarget())
@@ -198,18 +186,12 @@ public class TileEntityTeleporter extends TileEntityBase implements INetworkTile
 					user.teleportTo(this.target.getX() + 0.5, this.target.getY() + 1.5 + user.getMyRidingOffset(), this.target.getZ() + 0.5);
 				} else
 				{
-					user.absMoveTo(
-						this.target.getX() + 0.5,
-						this.target.getY() + 1.5 + user.getMyRidingOffset(),
-						this.target.getZ() + 0.5,
-						user.getYRot(),
-						user.getXRot()
-					);
+					user.absMoveTo(this.target.getX() + 0.5, this.target.getY() + 1.5 + user.getMyRidingOffset(), this.target.getZ() + 0.5, user.getYRot(), user.getXRot());
 				}
 
 				BlockEntity te = this.getLevel().getBlockEntity(this.target);
 				assert te instanceof TileEntityTeleporter;
-				((TileEntityTeleporter) te).onTeleportTo(this, user);
+				((TileEntityTeleporter) te).onTeleportTo();
 				IC2.network.get(true).initiateTileEntityEvent(this, 0, true);
 				if (user instanceof Player && distance >= 1000.0)
 				{
@@ -221,19 +203,19 @@ public class TileEntityTeleporter extends TileEntityBase implements INetworkTile
 
 	public void spawnBlueParticles(int n, BlockPos pos)
 	{
-		this.spawnParticles(n, pos, -1, 0, 1);
+		this.spawnParticles(n, pos, 0, 1);
 	}
 
 	public void spawnGreenParticles(int n, BlockPos pos)
 	{
-		this.spawnParticles(n, pos, -1, 1, 0);
+		this.spawnParticles(n, pos, 1, 0);
 	}
 
-	private void spawnParticles(int n, BlockPos pos, int red, int green, int blue)
+	private void spawnParticles(int n, BlockPos pos, int green, int blue)
 	{
 		Level world = this.getLevel();
 		RandomSource rnd = world.random;
-		DustParticleOptions effect = new DustParticleOptions(new Vector3f(red / 255.0F, green / 255.0F, blue / 255.0F), 1.0F);
+		DustParticleOptions effect = new DustParticleOptions(new Vector3f(-1 / 255.0F, green / 255.0F, blue / 255.0F), 1.0F);
 
 		for (int i = 0; i < n; i++)
 		{
@@ -249,9 +231,7 @@ public class TileEntityTeleporter extends TileEntityBase implements INetworkTile
 
 		for (Direction dir : Util.ALL_DIRS)
 		{
-			if (world.getBlockEntity(this.worldPosition.relative(dir)) instanceof IEnergyStorage energySource
-				&& energySource.isTeleporterCompatible(dir.getOpposite())
-				&& energySource.getStored() > 0)
+			if (world.getBlockEntity(this.worldPosition.relative(dir)) instanceof IEnergyStorage energySource && energySource.isTeleporterCompatible(dir.getOpposite()) && energySource.getStored() > 0)
 			{
 				energySources.add(energySource);
 			}
@@ -362,7 +342,7 @@ public class TileEntityTeleporter extends TileEntityBase implements INetworkTile
 		return StackUtil.isEmpty(stack) ? 0 : 100 * StackUtil.getSize(stack) / stack.getMaxStackSize();
 	}
 
-	private void onTeleportTo(TileEntityTeleporter from, Entity entity)
+	private void onTeleportTo()
 	{
 		this.cooldown = 20;
 	}
@@ -407,39 +387,19 @@ public class TileEntityTeleporter extends TileEntityBase implements INetworkTile
 	@Override
 	public void onNetworkEvent(int event)
 	{
-		switch (event)
+		if (event == 0)
 		{
-			case 0:
-				if (this.level == null)
-				{
-					return;
-				}
+			if (this.level == null)
+			{
+				return;
+			}
 
-				this.level
-					.playLocalSound(
-						this.worldPosition.getX(),
-						this.worldPosition.getY(),
-						this.worldPosition.getZ(),
-						Ic2SoundEvents.MACHINE_TELEPORTER_USE,
-						SoundSource.BLOCKS,
-						1.0F,
-						1.0F,
-						true
-					);
-				this.spawnBlueParticles(20, this.worldPosition);
-				this.spawnBlueParticles(20, this.target);
-				break;
-			default:
-				IC2.sideProxy
-					.displayError(
-						"An unknown event type was received over multiplayer.\nThis could happen due to corrupted data or a bug.\n\n(Technical information: event ID "
-							+ event
-							+ ", tile entity below)\nT: "
-							+ this
-							+ " ("
-							+ this.worldPosition
-							+ ")"
-					);
+			this.level.playLocalSound(this.worldPosition.getX(), this.worldPosition.getY(), this.worldPosition.getZ(), Ic2SoundEvents.MACHINE_TELEPORTER_USE, SoundSource.BLOCKS, 1.0F, 1.0F, true);
+			this.spawnBlueParticles(20, this.worldPosition);
+			this.spawnBlueParticles(20, this.target);
+		} else
+		{
+			IC2.sideProxy.displayError("An unknown event type was received over multiplayer.\nThis could happen due to corrupted data or a bug.\n\n(Technical information: event ID " + event + ", tile entity below)\nT: " + this + " (" + this.worldPosition + ")");
 		}
 	}
 }

@@ -69,6 +69,14 @@
       "ic2:tools/shutdown"
     ]
   },
+  "item.jetpack.loop": {
+    "sounds": [
+      {
+        "name": "ic2:tools/jetpack/jetpack_loop",
+        "stream": true
+      }
+    ]
+  },
   "item.laser.shoot": {
     "sounds": [
       "ic2:tools/laser/shoot"

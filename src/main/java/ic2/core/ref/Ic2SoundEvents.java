@@ -12,6 +12,7 @@ public class Ic2SoundEvents
 	public static final SoundEvent ITEM_CROWBAR_USE = register("item.crowbar.use");
 	public static final SoundEvent ITEM_ELECTRIC_SHUTDOWN = register("item.electric.shutdown");
 	public static final SoundEvent ITEM_BATTERY_USE = register("item.battery.use");
+	public static final SoundEvent ITEM_JETPACK_LOOP = register("item.jetpack.loop");
 	public static final SoundEvent ITEM_TREETAP_ELECTRIC_USE = register("item.treetap.electric.use");
 	public static final SoundEvent ITEM_CHAINSAW_IDLE = register("item.chainsaw.idle");
 	public static final SoundEvent ITEM_CHAINSAW_STOP = register("item.chainsaw.stop");

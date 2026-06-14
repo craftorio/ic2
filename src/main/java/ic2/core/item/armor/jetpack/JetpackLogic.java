@@ -1,8 +1,11 @@
 package ic2.core.item.armor.jetpack;
 
 import ic2.core.IC2;
+import ic2.core.ref.Ic2SoundEvents;
+import ic2.core.sound.Sound;
 import ic2.core.util.StackUtil;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -10,6 +13,8 @@ import net.minecraft.world.phys.Vec3;
 
 public class JetpackLogic
 {
+	private static boolean lastJetpackUsed;
+	private static Sound jetpackSound;
 	public static boolean useJetpack(Player player, boolean hoverMode, IJetpack jetpack, ItemStack stack)
 	{
 		
@@ -49,12 +54,12 @@ public class JetpackLogic
 			if (forwarder > 0.0F)
 			{
 				float yaw = player.getYRot() * (float) Math.PI / 180.0F;
-				motionX += -Math.sin(yaw) * 0.4F * forwarder;
-				motionZ += Math.cos(yaw) * 0.4F * forwarder;
+				float forward = 0.4F * forwarder + boost;
+				float thrust = forward * (0.02F + boost);
+				motionX += -Math.sin(yaw) * thrust;
+				motionZ += Math.cos(yaw) * thrust;
 				if (boost != 0.0F && !player.onGround())
 				{
-					motionX += -Math.sin(yaw) * boost;
-					motionZ += Math.cos(yaw) * boost;
 					iBoostingJetpack.useBoostPower(stack, boost);
 				}
 			}
@@ -160,10 +165,48 @@ public class JetpackLogic
 				nbtData.putByte("toggle_timer", --toggleTimer);
 			}
 
+			if (world.isClientSide() && player == IC2.sideProxy.getPlayerInstance())
+			{
+				if (lastJetpackUsed != jetpackUsed)
+				{
+					if (jetpackUsed)
+					{
+						if (jetpackSound == null)
+						{
+							jetpackSound = IC2.soundManager.createSound(
+								player, Ic2SoundEvents.ITEM_JETPACK_LOOP, SoundSource.PLAYERS, player, 1.0F, 1.0F
+							);
+						}
+
+						if (jetpackSound != null)
+						{
+							jetpackSound.play();
+						}
+					} else if (jetpackSound != null)
+					{
+						IC2.soundManager.removeSound(player, jetpackSound);
+						jetpackSound = null;
+					}
+
+					lastJetpackUsed = jetpackUsed;
+				}
+			}
+
 			if (jetpackUsed)
 			{
 				player.inventoryMenu.broadcastChanges();
 			}
 		}
+	}
+
+	public static void stopJetpackSound(Player player)
+	{
+		if (jetpackSound != null)
+		{
+			IC2.soundManager.removeSound(player, jetpackSound);
+			jetpackSound = null;
+		}
+
+		lastJetpackUsed = false;
 	}
 }

@@ -12,6 +12,9 @@ public class JetpackHandler
 		if (!chestStack.isEmpty() && chestStack.getItem() instanceof IJetpack jetpack)
 		{
 			JetpackLogic.onArmorTick(player.level(), player, chestStack, jetpack);
+		} else
+		{
+			JetpackLogic.stopJetpackSound(player);
 		}
 	}
 }

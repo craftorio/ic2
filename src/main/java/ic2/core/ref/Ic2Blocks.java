@@ -28,7 +28,6 @@ import ic2.core.block.kineticgenerator.tileentity.TileEntityWaterKineticGenerato
 import ic2.core.block.kineticgenerator.tileentity.TileEntityWindKineticGenerator;
 import ic2.core.block.machine.MiningPipeBlock;
 import ic2.core.block.machine.tileentity.TileEntityAdvMiner;
-import ic2.core.block.machine.tileentity.TileEntityAssemblyBench;
 import ic2.core.block.machine.tileentity.TileEntityBatchCrafter;
 import ic2.core.block.machine.tileentity.TileEntityBlastFurnace;
 import ic2.core.block.machine.tileentity.TileEntityBlockCutter;
@@ -54,7 +53,6 @@ import ic2.core.block.machine.tileentity.TileEntityItemBuffer;
 import ic2.core.block.machine.tileentity.TileEntityLiquidHeatExchanger;
 import ic2.core.block.machine.tileentity.TileEntityMacerator;
 import ic2.core.block.machine.tileentity.TileEntityMagnetizer;
-import ic2.core.block.machine.tileentity.TileEntityMassFabricator;
 import ic2.core.block.machine.tileentity.TileEntityMatter;
 import ic2.core.block.machine.tileentity.TileEntityMetalFormer;
 import ic2.core.block.machine.tileentity.TileEntityMiner;
@@ -298,8 +296,6 @@ public final class Ic2Blocks
 	public static final Block CROP_HARVESTER = register("crop_harvester", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL), TileEntityCropHarvester.class, false, Ic2TileEntityBlock.DefaultDrop.Machine, Util.horizontalFacings, true));
 	public static final Block CROPMATRON = register("cropmatron", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL), TileEntityCropmatron.class, true, Ic2TileEntityBlock.DefaultDrop.Machine, Util.horizontalFacings, true));
 	public static final Block MINER = register("miner", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL), TileEntityMiner.class, true, Ic2TileEntityBlock.DefaultDrop.Self, Util.horizontalFacings, true));
-	public static final Block MASS_FABRICATOR = register("mass_fabricator", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL), TileEntityMassFabricator.class, true, Ic2TileEntityBlock.DefaultDrop.AdvMachine, Util.horizontalFacings, true));
-	public static final Block UU_ASSEMBLY_BENCH = register("uu_assembly_bench", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL), TileEntityAssemblyBench.class, true, Ic2TileEntityBlock.DefaultDrop.AdvMachine, Util.horizontalFacings, true));
 	public static final Block MATTER_GENERATOR = register("matter_generator", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL), TileEntityMatter.class, true, Ic2TileEntityBlock.DefaultDrop.AdvMachine, Util.horizontalFacings, true));
 	public static final Block PATTERN_STORAGE = register("pattern_storage", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL), TileEntityPatternStorage.class, false, Ic2TileEntityBlock.DefaultDrop.AdvMachine, Util.horizontalFacings, true));
 	public static final Block REPLICATOR = register("replicator", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL), TileEntityReplicator.class, true, Ic2TileEntityBlock.DefaultDrop.AdvMachine, Util.horizontalFacings, true));

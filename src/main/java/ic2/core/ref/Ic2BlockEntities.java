@@ -22,7 +22,6 @@ import ic2.core.block.kineticgenerator.tileentity.TileEntityStirlingKineticGener
 import ic2.core.block.kineticgenerator.tileentity.TileEntityWaterKineticGenerator;
 import ic2.core.block.kineticgenerator.tileentity.TileEntityWindKineticGenerator;
 import ic2.core.block.machine.tileentity.TileEntityAdvMiner;
-import ic2.core.block.machine.tileentity.TileEntityAssemblyBench;
 import ic2.core.block.machine.tileentity.TileEntityBatchCrafter;
 import ic2.core.block.machine.tileentity.TileEntityBlastFurnace;
 import ic2.core.block.machine.tileentity.TileEntityBlockCutter;
@@ -48,7 +47,6 @@ import ic2.core.block.machine.tileentity.TileEntityItemBuffer;
 import ic2.core.block.machine.tileentity.TileEntityLiquidHeatExchanger;
 import ic2.core.block.machine.tileentity.TileEntityMacerator;
 import ic2.core.block.machine.tileentity.TileEntityMagnetizer;
-import ic2.core.block.machine.tileentity.TileEntityMassFabricator;
 import ic2.core.block.machine.tileentity.TileEntityMatter;
 import ic2.core.block.machine.tileentity.TileEntityMetalFormer;
 import ic2.core.block.machine.tileentity.TileEntityMiner;
@@ -181,8 +179,6 @@ public final class Ic2BlockEntities
 	public static final BlockEntityType<TileEntityCropHarvester> CROP_HARVESTER = register("crop_harvester", TileEntityCropHarvester::new, Ic2Blocks.CROP_HARVESTER);
 	public static final BlockEntityType<TileEntityCropmatron> CROPMATRON = register("cropmatron", TileEntityCropmatron::new, Ic2Blocks.CROPMATRON);
 	public static final BlockEntityType<TileEntityMiner> MINER = register("miner", TileEntityMiner::new, Ic2Blocks.MINER);
-	public static final BlockEntityType<TileEntityMassFabricator> MASS_FABRICATOR = register("mass_fabricator", TileEntityMassFabricator::new, Ic2Blocks.MASS_FABRICATOR);
-	public static final BlockEntityType<TileEntityAssemblyBench> UU_ASSEMBLY_BENCH = register("uu_assembly_bench", TileEntityAssemblyBench::new, Ic2Blocks.UU_ASSEMBLY_BENCH);
 	public static final BlockEntityType<TileEntityMatter> MATTER_GENERATOR = register("matter_generator", TileEntityMatter::new, Ic2Blocks.MATTER_GENERATOR);
 	public static final BlockEntityType<TileEntityPatternStorage> PATTERN_STORAGE = register("pattern_storage", TileEntityPatternStorage::new, Ic2Blocks.PATTERN_STORAGE);
 	public static final BlockEntityType<TileEntityReplicator> REPLICATOR = register("replicator", TileEntityReplicator::new, Ic2Blocks.REPLICATOR);

@@ -1,0 +1,22 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "A",
+    "B",
+    "C"
+  ],
+  "key": {
+    "A": {
+      "item": "ic2:circuit"
+    },
+    "B": {
+      "item": "ic2:lava_cell"
+    },
+    "C": {
+      "item": "ic2:dense_copper_plate"
+    }
+  },
+  "result": {
+    "item": "ic2:heatpack"
+  }
+}

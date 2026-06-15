@@ -2,11 +2,13 @@ package ic2.core.item.tool;
 
 import ic2.api.item.ElectricItem;
 import ic2.api.item.IBoxable;
+import ic2.core.IC2;
 import ic2.core.IHasGui;
 import ic2.core.item.BaseElectricItem;
 import ic2.core.item.IHandHeldInventory;
 import ic2.core.ref.Ic2SoundEvents;
 import ic2.core.util.ItemComparableItemStack;
+import ic2.core.util.LogCategory;
 import ic2.core.util.StackUtil;
 import ic2.core.util.Tuple;
 
@@ -23,16 +25,15 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.Item.Properties;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 
 public class ItemScanner extends BaseElectricItem implements IBoxable, IHandHeldInventory
 {
@@ -45,10 +46,10 @@ public class ItemScanner extends BaseElectricItem implements IBoxable, IHandHeld
 	public void appendHoverText(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag advanced)
 	{
 		super.appendHoverText(stack, world, tooltip, advanced);
-		tooltip.add(Component.translatable("ic2.scanner.range", new Object[] { this.getScanRange() + "" }).withStyle(ChatFormatting.GRAY));
+		tooltip.add(Component.translatable("ic2.scanner.range", this.getScanRange()).withStyle(ChatFormatting.GRAY));
 	}
 
-	public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand)
+	public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level world, @NotNull Player player, @NotNull InteractionHand hand)
 	{
 		ItemStack stack = StackUtil.get(player, hand);
 		if ((this.tier != 1 || ElectricItem.manager.use(stack, 50.0, player)) && (this.tier != 2 || ElectricItem.manager.use(stack, 250.0, player)))
@@ -65,10 +66,10 @@ public class ItemScanner extends BaseElectricItem implements IBoxable, IHandHeld
 				player.playSound(Ic2SoundEvents.ITEM_SCANNER_USE, 1.0F, 1.0F);
 			}
 
-			return new InteractionResultHolder(InteractionResult.SUCCESS, stack);
+			return new InteractionResultHolder<>(InteractionResult.SUCCESS, stack);
 		} else
 		{
-			return new InteractionResultHolder(InteractionResult.FAIL, stack);
+			return new InteractionResultHolder<>(InteractionResult.FAIL, stack);
 		}
 	}
 
@@ -80,7 +81,7 @@ public class ItemScanner extends BaseElectricItem implements IBoxable, IHandHeld
 			if (scanner.isThisContainer(stack))
 			{
 				scanner.saveAsThrown(stack);
-				((ServerPlayer) player).closeContainer();
+				player.closeContainer();
 			}
 		}
 

@@ -385,7 +385,7 @@ public class NetworkManager implements INetworkManager
 			buffer.flip();
 			if (!this.isClient())
 			{
-				if (container.getPlayer() != null && String.valueOf(container.getPlayer()).startsWith("ServerPlayerEntity"))
+				if (container.getPlayer() instanceof ServerPlayer)
 				{
 					this.sendS2CPacket((ServerPlayer) container.getPlayer(), buffer, false);
 				}

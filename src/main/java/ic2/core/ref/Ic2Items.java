@@ -408,9 +408,7 @@ public final class Ic2Items
 	public static final Item COAL_CHUNK = register("coal_chunk", new Item(new Properties()));
 	public static final Item INDUTRIAL_DIAMOND = register("industrial_diamond", new Item(new Properties()));
 	public static final Item PLANT_BALL = register("plant_ball", new Item(new Properties()));
-	public static final Item COMPRESSED_PLANTS = register("compressed_plants", new Item(new Properties()));
 	public static final Item BIO_CHAFF = register("bio_chaff", new Item(new Properties()));
-	public static final Item COMPRESSED_HYDRATED_COAL = register("compressed_hydrated_coal", new Item(new Properties()));
 	public static final Item SCRAP = register("scrap", new Item(new Properties()));
 	public static final Item SCRAP_BOX = register("scrap_box", new Item(new Properties()));
 	public static final Item CF_POWDER = register("cf_powder", new Item(new Properties()));
@@ -427,7 +425,6 @@ public final class Ic2Items
 	public static final Item STEAM_TURBINE = register("steam_turbine", new Item(new Properties()));
 	public static final Item JETPACK_ATTACHMENT_PLATE = register("jetpack_attachment_plate", new Item(new Properties()));
 	public static final Item COIN = register("coin", new Item(new Properties()));
-	public static final Item EMPTY_FUEL_CAN = register("empty_fuel_can", new Item(new Properties()));
 	public static final Item BRONZE_ROTOR_BLADE = register("bronze_rotor_blade", new Item(new Properties()));
 	public static final Item BRONZE_SHAFT = register("bronze_shaft", new Item(new Properties()));
 	public static final Item REACTOR_COOLANT_CELL = register("reactor_coolant_cell", new ItemReactorHeatStorage(new Properties(), 10000));
@@ -541,10 +538,6 @@ public final class Ic2Items
 	public static final Item LAVA_CELL = register("lava_cell", new ItemClassicCell(new Properties(), Fluids.LAVA, 1));
 	public static final Item AIR_CELL = register("air_cell", new ItemClassicCell(new Properties(), Ic2Fluids.AIR.still(), 1));
 	public static final Item ELECTROLYZED_WATER_CELL = register("electrolyzed_water_cell", new ItemClassicCell(new Properties(), null, 1));
-	public static final Item BIOFUEL_CELL = register("biofuel_cell", new ItemClassicCell(new Properties(), null, 1));
-	public static final Item COALFUEL_CELL = register("coalfuel_cell", new ItemClassicCell(new Properties(), null, 1));
-	public static final Item BIO_CELL = register("bio_cell", new ItemClassicCell(new Properties(), null, 1));
-	public static final Item HYDRATED_COAL_CELL = register("hydrated_coal_cell", new ItemClassicCell(new Properties(), null, 1));
 	public static final ItemClassicCell WEED_EX_CELL = register("weed_ex_cell", new ItemClassicCell(new Properties().stacksTo(1), null, 64));
 	public static final ItemClassicCell HYDRATION_CELL = register("hydration_cell", new ItemClassicCell(new Properties().stacksTo(1), null, 10000));
 	public static final Item UU_MATTER_CELL = register("uu_matter_cell", new ItemClassicCell(new Properties(), Ic2Fluids.UU_MATTER.still(), 1));
@@ -574,7 +567,6 @@ public final class Ic2Items
 	public static final Item FLUID_PULLING_UPGRADE = register("fluid_pulling_upgrade", new ItemUpgradeModule(new Properties(), ItemUpgradeModule.UpgradeType.fluid_pulling));
 	public static final Item REMOTE_INTERFACE_UPGRADE = register("remote_interface_upgrade", new ItemUpgradeModule(new Properties(), ItemUpgradeModule.UpgradeType.remote_interface));
 	public static final Item FILLED_TIN_CAN = register("filled_tin_can", new ItemTinCan(new Properties()));
-	public static final Item FILLED_FUEL_CAN = register("filled_fuel_can", new Item(new Properties().craftRemainder(EMPTY_FUEL_CAN)));
 	public static final Item BLANK_TFBP = register("blank_tfbp", new Tfbp(new Properties().stacksTo(1), 0.0, 0, null));
 	public static final Item CHILLING_TFBP = register("chilling_tfbp", new Tfbp(new Properties().stacksTo(1), 2000.0, 50, new Chilling()));
 	public static final Item CULTIVATION_TFBP = register("cultivation_tfbp", new Tfbp(new Properties().stacksTo(1), 4000.0, 40, new Cultivation()));
@@ -853,8 +845,6 @@ public final class Ic2Items
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> COAL_FUEL_DUST);
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> COIL);
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> COIN);
-		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> COMPRESSED_HYDRATED_COAL);
-		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> COMPRESSED_PLANTS);
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> COPPER_BOILER);
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> COPPER_CASING);
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> COPPER_DUST);
@@ -885,7 +875,6 @@ public final class Ic2Items
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> DIAMOND_CUTTING_BLADE);
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> DIAMOND_DUST);
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> ELECTRIC_MOTOR);
-		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> EMPTY_FUEL_CAN);
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> ENERGIUM_DUST);
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> FUEL_ROD);
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> GOLD_CASING);
@@ -1026,8 +1015,6 @@ public final class Ic2Items
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> ADVANCED_RE_BATTERY);
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> ADVANCED_SCANNER);
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> AIR_CELL);
-		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> BIOFUEL_CELL);
-		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> BIO_CELL);
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> BLACK_PAINTER);
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> BLANK_TFBP);
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> BLUE_PAINTER);
@@ -1043,7 +1030,6 @@ public final class Ic2Items
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> CARBON_ROTOR);
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> CHAINSAW);
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> CHILLING_TFBP);
-		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> COALFUEL_CELL);
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> CROWBAR);
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> CULTIVATION_TFBP);
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> CUTTER);
@@ -1059,7 +1045,6 @@ public final class Ic2Items
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> EMPTY_CELL);
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> ENERGY_CRYSTAL);
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> ENERGY_STORAGE_UPGRADE);
-		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> FILLED_FUEL_CAN);
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> FILLED_TIN_CAN);
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> FLATIFICATION_TFBP);
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> FLUID_EJECTOR_UPGRADE);
@@ -1068,7 +1053,6 @@ public final class Ic2Items
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> FREQUENCY_TRANSMITTER);
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> GRAY_PAINTER);
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> GREEN_PAINTER);
-		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> HYDRATED_COAL_CELL);
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> IRIDIUM_DRILL);
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> IRON_ROTOR);
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> IRRIGATION_TFBP);

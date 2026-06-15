@@ -249,7 +249,7 @@ public class TileEntityScanner extends TileEntityElectricMachine implements IHas
 		} else if (this.diskSlot.get().getItem() instanceof ItemCrystalMemory)
 		{
 			ItemStack crystalMemory = this.diskSlot.get();
-			((ItemCrystalMemory) crystalMemory.getItem()).writecontentsTag(crystalMemory, stack);
+			((ItemCrystalMemory) crystalMemory.getItem()).writeContentsTag(crystalMemory, stack);
 			return true;
 		} else
 		{
@@ -289,11 +289,6 @@ public class TileEntityScanner extends TileEntityElectricMachine implements IHas
 	public int getSubPercentageDoneScaled(int width)
 	{
 		return width * (100 * this.progress % 3300) / 3300;
-	}
-
-	public boolean isDone()
-	{
-		return this.progress >= 3300;
 	}
 
 	public TileEntityScanner.State getState()

@@ -21,15 +21,7 @@ public class GuiScanner extends Ic2Gui<ContainerScanner>
 	{
 		super(container, playerInventory, title);
 		this.addElement(EnergyGauge.asBolt(this, 12, 25, container.base));
-		this.addElement(
-			new CustomButton(this, 102, 49, 12, 12, 176, 57, background, this.createEventSender(0))
-				.withEnableHandler(
-					() -> container.base.getState() == TileEntityScanner.State.COMPLETED
-						|| container.base.getState() == TileEntityScanner.State.TRANSFER_ERROR
-						|| container.base.getState() == TileEntityScanner.State.FAILED
-				)
-				.withTooltip("ic2.Scanner.gui.button.delete")
-		);
+		this.addElement(new CustomButton(this, 102, 49, 12, 12, 176, 57, background, this.createEventSender(0)).withEnableHandler(() -> container.base.getState() == TileEntityScanner.State.COMPLETED || container.base.getState() == TileEntityScanner.State.TRANSFER_ERROR || container.base.getState() == TileEntityScanner.State.FAILED).withTooltip("ic2.Scanner.gui.button.delete"));
 		this.addElement(new CustomButton(this, 143, 49, 24, 12, 176, 69, background, this.createEventSender(1)).withEnableHandler(() -> container.base.getState() == TileEntityScanner.State.COMPLETED || container.base.getState() == TileEntityScanner.State.TRANSFER_ERROR).withTooltip("ic2.Scanner.gui.button.save"));
 		this.info[1] = Localization.translate("ic2.Scanner.gui.info1");
 		this.info[2] = Localization.translate("ic2.Scanner.gui.info2");
@@ -95,7 +87,7 @@ public class GuiScanner extends Ic2Gui<ContainerScanner>
 		int scanning = te.getSubPercentageDoneScaled(66);
 		if (scanning > 0)
 		{
-			this.drawTexturedRect(guiGraphics.pose(), this.leftPos + 30, this.topPos + 20, 176.0, 14.0, scanning, 43.0);
+			this.drawTexturedRect(guiGraphics.pose(), 30, 20, 176.0, 14.0, scanning, 43.0);
 		}
 	}
 

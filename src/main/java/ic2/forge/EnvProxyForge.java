@@ -213,7 +213,7 @@ public final class EnvProxyForge implements EnvProxy
 	public GameEvent registerGameEvent(String id, int range)
 	{
 		ResourceLocation identifier = IC2.getIdentifier(id);
-		return (GameEvent) Registry.register(BuiltInRegistries.GAME_EVENT, identifier, new GameEvent(identifier.toString(), range));
+		return Registry.register(BuiltInRegistries.GAME_EVENT, identifier, new GameEvent(identifier.toString(), range));
 	}
 
 	@Override
@@ -248,7 +248,7 @@ public final class EnvProxyForge implements EnvProxy
 	@Override
 	public <T extends FoliagePlacer> FoliagePlacerType<T> registerFoliagePlacer(ResourceLocation id, Codec<T> codec)
 	{
-		FoliagePlacerType<T> type = new FoliagePlacerType(codec);
+		FoliagePlacerType<T> type = new FoliagePlacerType<>(codec);
 		foliagePlacerRegistry.register(id.getPath(), () -> type);
 		return type;
 	}

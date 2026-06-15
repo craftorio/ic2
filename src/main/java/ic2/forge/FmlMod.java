@@ -11,10 +11,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
-import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.data.event.GatherDataEvent;
@@ -55,6 +52,7 @@ public final class FmlMod
 		EnvProxyForge.recipeSerializerRegistry.register(modEventBus);
 		EnvFluidHandlerForge.fluidRegistry.register(modEventBus);
 		EnvFluidHandlerForge.fluidTypeRegistry.register(modEventBus);
+		Ic2LootModifier.lootModifiersRegistry.register(modEventBus);
 		if (FMLEnvironment.dist.isClient())
 		{
 			modEventBus.register(new ClientModEventHandlerForge());
@@ -199,21 +197,8 @@ public final class FmlMod
 		{
 			for (EnvProxyForge.ConfiguredFeatureRegistration<?, ?> reg : EnvProxyForge.configuredFeatureRegistrations)
 			{
-				@SuppressWarnings({ "unchecked", "rawtypes" })
 				ConfiguredFeature<?, ?> cf = new ConfiguredFeature(reg.feature(), reg.config());
 				event.register(Registries.CONFIGURED_FEATURE, reg.id(), () -> cf);
-			}
-		} else if (event.getRegistryKey() == Registries.FEATURE)
-		{
-			for (EnvProxyForge.PlacedFeatureRegistration<?> reg : EnvProxyForge.placedFeatureRegistrations)
-			{
-				ResourceKey<PlacedFeature> placedKey = ResourceKey.create(Registries.PLACED_FEATURE, ResourceLocation.parse(reg.id().toString()));
-				// TODO: Fix for 1.20.1 - reg.placedFeature().complete(Registry.registerForHolder(ForgeRegistries.PLACED_FEATURES, placedKey, new PlacedFeature(reg.feature().join().value(), reg.modifiers())));
-			}
-
-			for (EnvProxyForge.PlacementModifierTypeRegistration reg : EnvProxyForge.placementModifierTypeRegistrations)
-			{
-				// TODO: Fix for 1.20.1 - Registry.register(ForgeRegistries.PLACEMENT_MODIFIER_TYPES, reg.id(), reg.type());
 			}
 		}
 	}

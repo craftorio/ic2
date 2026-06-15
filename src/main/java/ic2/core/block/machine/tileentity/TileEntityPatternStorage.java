@@ -164,7 +164,7 @@ public class TileEntityPatternStorage extends TileEntityInventory implements IHa
 					ItemStack crystalMemory = this.diskSlot.get();
 					if (crystalMemory.getItem() instanceof ItemCrystalMemory)
 					{
-						((ItemCrystalMemory) crystalMemory.getItem()).writecontentsTag(crystalMemory, this.patterns.get(this.index));
+						((ItemCrystalMemory) crystalMemory.getItem()).writeContentsTag(crystalMemory, this.patterns.get(this.index));
 					}
 				}
 				break;

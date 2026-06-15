@@ -22,8 +22,6 @@ import net.minecraft.world.item.ItemStack;
 
 public class UuGraph
 {
-	private static final List<UuGraph.Node> emptyList = List.of();
-	private static final double epsilon = 1.0E-9;
 	private static final Map<LeanItemStack, UuGraph.Node> nodes = new HashMap<>();
 	private static final Map<Item, Set<UuGraph.Node>> itemNodes = new IdentityHashMap<>();
 	private static final List<UuGraph.InitialValue> initialValues = new ArrayList<>();

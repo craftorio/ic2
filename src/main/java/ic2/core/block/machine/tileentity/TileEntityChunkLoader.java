@@ -19,7 +19,6 @@ import ic2.core.profile.NotClassic;
 import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.util.ConfigUtil;
 import ic2.core.util.LogCategory;
-import it.unimi.dsi.fastutil.longs.LongIterator;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
 
@@ -41,18 +40,15 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 @NotClassic
-public class TileEntityChunkloader extends TileEntityInventory implements INetworkClientTileEntityEventListener, IHasGui, IUpgradableBlock
+public class TileEntityChunkLoader extends TileEntityInventory implements INetworkClientTileEntityEventListener, IHasGui, IUpgradableBlock
 {
 	private final LongSet loadedChunks = new LongOpenHashSet();
 	public final InvSlotUpgrade upgradeSlot;
 	public final InvSlotDischarge dischargeSlot;
 	public final Energy energy;
-	private static final int defaultTier = 1;
-	private static final int defaultEnergyStorage = 2500;
-	private static final int range = 4;
 	private final double euPerChunk = ConfigUtil.getFloat(MainConfig.get(), "balance/euPerChunk");
 
-	public TileEntityChunkloader(BlockPos pos, BlockState state)
+	public TileEntityChunkLoader(BlockPos pos, BlockState state)
 	{
 		super(Ic2BlockEntities.CHUNK_LOADER, pos, state);
 		this.upgradeSlot = new InvSlotUpgrade(this, "upgrade", 4);
@@ -80,9 +76,9 @@ public class TileEntityChunkloader extends TileEntityInventory implements INetwo
 		ListTag list = nbt.getList("loadedChunks", 4);
 		this.loadedChunks.clear();
 
-		for (int i = 0; i < list.size(); i++)
+		for (net.minecraft.nbt.Tag tag : list)
 		{
-			this.loadedChunks.add(((LongTag) list.get(i)).getAsLong());
+			this.loadedChunks.add(((LongTag) tag).getAsLong());
 		}
 	}
 
@@ -92,11 +88,9 @@ public class TileEntityChunkloader extends TileEntityInventory implements INetwo
 		super.saveAdditional(nbt);
 		ListTag list = new ListTag();
 		nbt.put("loadedChunks", list);
-		LongIterator var3 = this.loadedChunks.iterator();
 
-		while (var3.hasNext())
+		for (long pos : this.loadedChunks)
 		{
-			long pos = (Long) var3.next();
 			list.add(LongTag.valueOf(pos));
 		}
 	}

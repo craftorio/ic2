@@ -28,7 +28,7 @@ import ic2.core.block.machine.tileentity.TileEntityBlastFurnace;
 import ic2.core.block.machine.tileentity.TileEntityBlockCutter;
 import ic2.core.block.machine.tileentity.TileEntityCanner;
 import ic2.core.block.machine.tileentity.TileEntityCentrifuge;
-import ic2.core.block.machine.tileentity.TileEntityChunkloader;
+import ic2.core.block.machine.tileentity.TileEntityChunkLoader;
 import ic2.core.block.machine.tileentity.TileEntityCompressor;
 import ic2.core.block.machine.tileentity.TileEntityCondenser;
 import ic2.core.block.machine.tileentity.TileEntityCropHarvester;
@@ -204,7 +204,7 @@ public final class Ic2BlockEntities
 	public static final BlockEntityType<TileEntityTransformerHV> HV_TRANSFORMER = register("hv_transformer", TileEntityTransformerHV::new, Ic2Blocks.HV_TRANSFORMER);
 	public static final BlockEntityType<TileEntityTransformerEV> EV_TRANSFORMER = register("ev_transformer", TileEntityTransformerEV::new, Ic2Blocks.EV_TRANSFORMER);
 	public static final BlockEntityType<TileEntityTank> TANK = register("tank", TileEntityTank::new, Ic2Blocks.TANK);
-	public static final BlockEntityType<TileEntityChunkloader> CHUNK_LOADER = register("chunk_loader", TileEntityChunkloader::new, Ic2Blocks.CHUNK_LOADER);
+	public static final BlockEntityType<TileEntityChunkLoader> CHUNK_LOADER = register("chunk_loader", TileEntityChunkLoader::new, Ic2Blocks.CHUNK_LOADER);
 	public static final BlockEntityType<TileEntityCreativeGenerator> CREATIVE_GENERATOR = register("creative_generator", TileEntityCreativeGenerator::new, Ic2Blocks.CREATIVE_GENERATOR);
 	public static final BlockEntityType<TileEntitySteamRepressurizer> STEAM_REPRESSURIZER = register("steam_repressurizer", TileEntitySteamRepressurizer::new, Ic2Blocks.STEAM_REPRESSURIZER);
 	public static final BlockEntityType<TileEntityWeightedFluidDistributor> WEIGHTED_FLUID_DISTRIBUTOR = register("weighted_fluid_distributor", TileEntityWeightedFluidDistributor::new, Ic2Blocks.WEIGHTED_FLUID_DISTRIBUTOR);

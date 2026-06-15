@@ -1,15 +1,16 @@
 package ic2.core.block.machine.gui;
 
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.platform.NativeImage;
 import ic2.core.IC2;
 import ic2.core.Ic2Gui;
 import ic2.core.block.machine.container.ContainerChunkLoader;
 import ic2.core.gui.EnergyGauge;
-import ic2.core.util.LogCategory;
 import it.unimi.dsi.fastutil.longs.LongSet;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.core.BlockPos.MutableBlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
@@ -20,9 +21,13 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.levelgen.Heightmap.Types;
 import net.minecraft.world.level.material.MapColor;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class GuiChunkLoader extends Ic2Gui<ContainerChunkLoader>
 {
 	private static final ResourceLocation background = ResourceLocation.fromNamespaceAndPath("ic2", "textures/gui/guichunkloader.png");
+	private final Map<Long, ResourceLocation> chunkTextureIds = new HashMap<>();
 
 	public GuiChunkLoader(ContainerChunkLoader container, Inventory playerInventory, Component title)
 	{
@@ -41,6 +46,7 @@ public class GuiChunkLoader extends Ic2Gui<ContainerChunkLoader>
 	{
 		ChunkPos mainChunk = new ChunkPos(((ContainerChunkLoader) this.menu).base.getBlockPos());
 		LongSet loadedChunks = ((ContainerChunkLoader) this.menu).base.getLoadedChunks();
+		Level world = ((ContainerChunkLoader) this.menu).base.getLevel();
 		int amountLoadedChunks = 0;
 
 		for (int i = -4; i <= 4; i++)
@@ -48,16 +54,19 @@ public class GuiChunkLoader extends Ic2Gui<ContainerChunkLoader>
 			for (int j = -4; j <= 4; j++)
 			{
 				ChunkPos currentChunk = new ChunkPos(mainChunk.x + i, mainChunk.z + j);
-				int xpos = -this.leftPos + 89 + 16 * i;
-				int ypos = -this.topPos + 80 + 16 * j;
-				this.drawChunkAt(guiGraphics, xpos, ypos, currentChunk);
+				int xpos = 89 + 16 * i;
+				int ypos = 80 + 16 * j;
+
+				ResourceLocation texLoc = this.getChunkTexture(world, currentChunk);
+				guiGraphics.blit(texLoc, xpos, ypos, 0, 0, 16, 16, 16, 16);
+
 				if (loadedChunks.contains(currentChunk.toLong()))
 				{
-					this.drawColoredRect(guiGraphics.pose(), xpos, ypos, 16, 16, 805371648);
+					this.drawColoredRect(guiGraphics.pose(), xpos - this.leftPos, ypos - this.topPos, 16, 16, 805371648);
 					amountLoadedChunks++;
 				} else
 				{
-					this.drawColoredRect(guiGraphics.pose(), xpos, ypos, 16, 16, 822018048);
+					this.drawColoredRect(guiGraphics.pose(), xpos - this.leftPos, ypos - this.topPos, 16, 16, 822018048);
 				}
 			}
 		}
@@ -66,9 +75,34 @@ public class GuiChunkLoader extends Ic2Gui<ContainerChunkLoader>
 		super.drawForegroundLayer(guiGraphics, mouseX, mouseY);
 	}
 
-	private void drawChunkAt(GuiGraphics guiGraphics, int x, int y, ChunkPos chunkPos)
+	private ResourceLocation getChunkTexture(Level world, ChunkPos chunkPos)
 	{
-		Level world = ((ContainerChunkLoader) this.menu).base.getLevel();
+		long key = chunkPos.toLong();
+		return this.chunkTextureIds.computeIfAbsent(key, k ->
+		{
+			NativeImage img = this.createChunkImage(world, chunkPos);
+			DynamicTexture tex = new DynamicTexture(img);
+			ResourceLocation loc = ResourceLocation.fromNamespaceAndPath("ic2", "chunkloader_" + chunkPos.x + "_" + chunkPos.z);
+			Minecraft.getInstance().getTextureManager().register(loc, tex);
+			return loc;
+		});
+	}
+
+	private NativeImage createChunkImage(Level world, ChunkPos chunkPos)
+	{
+		NativeImage img = new NativeImage(16, 16, false);
+		if (!world.hasChunk(chunkPos.x, chunkPos.z))
+		{
+			for (int cx = 0; cx < 16; cx++)
+			{
+				for (int cz = 0; cz < 16; cz++)
+				{
+					img.setPixelRGBA(cx, cz, 0xFF000000);
+				}
+			}
+			return img;
+		}
+
 		LevelChunk chunk = world.getChunk(chunkPos.x, chunkPos.z);
 		MutableBlockPos worldPos = new MutableBlockPos();
 
@@ -84,17 +118,20 @@ public class GuiChunkLoader extends Ic2Gui<ContainerChunkLoader>
 					state = chunk.getBlockState(worldPos);
 				}
 
-				this.drawColoredRect(guiGraphics.pose(), x + cx, y + cz, 1, 1, this.getColor(state, world, worldPos));
+				int argb = this.getColor(state, world, worldPos);
+				int abgr = (argb & 0xFF00FF00) | ((argb & 0xFF) << 16) | ((argb >> 16) & 0xFF);
+				img.setPixelRGBA(cx, cz, abgr);
 			}
 		}
+		return img;
 	}
 
-	private int getColor(BlockState state, Level world, BlockPos pos)
+	private int getColor(BlockState state, Level world, MutableBlockPos pos)
 	{
 		MapColor color = state.getMapColor(world, pos);
 		if (color == null)
 		{
-			IC2.log.error(LogCategory.General, "BlockState " + state + " does not have a MapColor set. Please report to the mod author of that mod.");
+			IC2.log.warn(ic2.core.util.LogCategory.General, "BlockState " + state + " does not have a MapColor set. Please report to the mod author of that mod.");
 			return 0;
 		} else
 		{
@@ -136,5 +173,16 @@ public class GuiChunkLoader extends Ic2Gui<ContainerChunkLoader>
 			.initiateClientTileEntityEvent(
 				((ContainerChunkLoader) this.menu).base, chunk.x - mainChunk.x + 8 & 15 | (chunk.z - mainChunk.z + 8 & 15) << 4
 			);
+	}
+
+	@Override
+	public void removed()
+	{
+		super.removed();
+		for (Map.Entry<Long, ResourceLocation> entry : this.chunkTextureIds.entrySet())
+		{
+			Minecraft.getInstance().getTextureManager().release(entry.getValue());
+		}
+		this.chunkTextureIds.clear();
 	}
 }

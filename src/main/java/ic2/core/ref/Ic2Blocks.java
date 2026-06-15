@@ -34,7 +34,7 @@ import ic2.core.block.machine.tileentity.TileEntityBlastFurnace;
 import ic2.core.block.machine.tileentity.TileEntityBlockCutter;
 import ic2.core.block.machine.tileentity.TileEntityCanner;
 import ic2.core.block.machine.tileentity.TileEntityCentrifuge;
-import ic2.core.block.machine.tileentity.TileEntityChunkloader;
+import ic2.core.block.machine.tileentity.TileEntityChunkLoader;
 import ic2.core.block.machine.tileentity.TileEntityCompressor;
 import ic2.core.block.machine.tileentity.TileEntityCondenser;
 import ic2.core.block.machine.tileentity.TileEntityCropHarvester;
@@ -351,7 +351,7 @@ public final class Ic2Blocks
 	public static final Block HV_TRANSFORMER = register("hv_transformer", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL), TileEntityTransformerHV.class, true, Ic2TileEntityBlock.DefaultDrop.Machine, Util.allFacings, true));
 	public static final Block EV_TRANSFORMER = register("ev_transformer", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL), TileEntityTransformerEV.class, true, Ic2TileEntityBlock.DefaultDrop.Machine, Util.allFacings, true));
 	public static final Block TANK = register("tank", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL), TileEntityTank.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.horizontalFacings, true));
-	public static final Block CHUNK_LOADER = register("chunk_loader", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL), TileEntityChunkloader.class, true, Ic2TileEntityBlock.DefaultDrop.Self, Util.horizontalFacings, true));
+	public static final Block CHUNK_LOADER = register("chunk_loader", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL), TileEntityChunkLoader.class, true, Ic2TileEntityBlock.DefaultDrop.Self, Util.horizontalFacings, true));
 	public static final Block CREATIVE_GENERATOR = register("creative_generator", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(-1.0F, Float.POSITIVE_INFINITY).sound(SoundType.METAL), TileEntityCreativeGenerator.class, true, Ic2TileEntityBlock.DefaultDrop.None, Util.noFacings, false));
 	public static final Block STEAM_REPRESSURIZER = register("steam_repressurizer", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL), TileEntitySteamRepressurizer.class, true, Ic2TileEntityBlock.DefaultDrop.Machine, Util.noFacings, true));
 	public static final Block WEIGHTED_FLUID_DISTRIBUTOR = register("weighted_fluid_distributor", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL), TileEntityWeightedFluidDistributor.class, false, Ic2TileEntityBlock.DefaultDrop.Machine, Util.allFacings, true));

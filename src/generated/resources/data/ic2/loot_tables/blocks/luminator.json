@@ -11,7 +11,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "ic2:advanced_machine"
+          "name": "ic2:luminator"
         }
       ],
       "rolls": 1.0

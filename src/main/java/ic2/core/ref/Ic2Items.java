@@ -137,10 +137,6 @@ public final class Ic2Items
 	public static final Item RUBBER_STAIRS = register("rubber_stairs", new BlockItem(Ic2Blocks.RUBBER_STAIRS, new Properties()));
 	public static final Item RUBBER_TRAPDOOR = register("rubber_trapdoor", new BlockItem(Ic2Blocks.RUBBER_TRAPDOOR, new Properties()));
 	public static final Item MINING_PIPE = register("mining_pipe", new BlockItem(Ic2Blocks.MINING_PIPE, new Properties()));
-	public static final Item WOODEN_SCAFFOLD = register("wooden_scaffold", new BlockItem(Ic2Blocks.WOODEN_SCAFFOLD, new Properties()));
-	public static final Item REINFORCED_WOODEN_SCAFFOLD = register("reinforced_wooden_scaffold", new BlockItem(Ic2Blocks.REINFORCED_WOODEN_SCAFFOLD, new Properties()));
-	public static final Item IRON_SCAFFOLD = register("iron_scaffold", new BlockItem(Ic2Blocks.IRON_SCAFFOLD, new Properties()));
-	public static final Item REINFORCED_IRON_SCAFFOLD = register("reinforced_iron_scaffold", new BlockItem(Ic2Blocks.REINFORCED_IRON_SCAFFOLD, new Properties()));
 	public static final Item IRON_FENCE = register("iron_fence", new BlockItem(Ic2Blocks.IRON_FENCE, new Properties()));
 	public static final Item RESIN_SHEET = register("resin_sheet", new BlockItem(Ic2Blocks.RESIN_SHEET, new Properties()));
 	public static final Item RUBBER_SHEET = register("rubber_sheet", new BlockItem(Ic2Blocks.RUBBER_SHEET, new Properties()));
@@ -674,7 +670,6 @@ public final class Ic2Items
 		addToCreativeTab(Ic2ItemGroupType.GENERAL, () -> IRIDIUM_STORAGE_BOX);
 		addToCreativeTab(Ic2ItemGroupType.GENERAL, () -> IRIDIUM_TANK);
 		addToCreativeTab(Ic2ItemGroupType.GENERAL, () -> IRON_FENCE);
-		addToCreativeTab(Ic2ItemGroupType.GENERAL, () -> IRON_SCAFFOLD);
 		addToCreativeTab(Ic2ItemGroupType.GENERAL, () -> IRON_STORAGE_BOX);
 		addToCreativeTab(Ic2ItemGroupType.GENERAL, () -> IRON_TANK);
 		addToCreativeTab(Ic2ItemGroupType.GENERAL, () -> LEAD_BLOCK);
@@ -693,9 +688,7 @@ public final class Ic2Items
 		addToCreativeTab(Ic2ItemGroupType.GENERAL, () -> RED_WALL);
 		addToCreativeTab(Ic2ItemGroupType.GENERAL, () -> REINFORCED_DOOR);
 		addToCreativeTab(Ic2ItemGroupType.GENERAL, () -> REINFORCED_GLASS);
-		addToCreativeTab(Ic2ItemGroupType.GENERAL, () -> REINFORCED_IRON_SCAFFOLD);
 		addToCreativeTab(Ic2ItemGroupType.GENERAL, () -> REINFORCED_STONE);
-		addToCreativeTab(Ic2ItemGroupType.GENERAL, () -> REINFORCED_WOODEN_SCAFFOLD);
 		addToCreativeTab(Ic2ItemGroupType.GENERAL, () -> RESIN_SHEET);
 		addToCreativeTab(Ic2ItemGroupType.GENERAL, () -> RUBBER_BUTTON);
 		addToCreativeTab(Ic2ItemGroupType.GENERAL, () -> RUBBER_DOOR);
@@ -723,7 +716,6 @@ public final class Ic2Items
 		addToCreativeTab(Ic2ItemGroupType.GENERAL, () -> URANIUM_BLOCK);
 		addToCreativeTab(Ic2ItemGroupType.GENERAL, () -> URANIUM_ORE);
 		addToCreativeTab(Ic2ItemGroupType.GENERAL, () -> WHITE_WALL);
-		addToCreativeTab(Ic2ItemGroupType.GENERAL, () -> WOODEN_SCAFFOLD);
 		addToCreativeTab(Ic2ItemGroupType.GENERAL, () -> WOODEN_STORAGE_BOX);
 		addToCreativeTab(Ic2ItemGroupType.GENERAL, () -> WOOL_SHEET);
 		addToCreativeTab(Ic2ItemGroupType.GENERAL, () -> YELLOW_WALL);
@@ -1121,7 +1113,6 @@ public final class Ic2Items
 		IC2.envProxy.registerBurnTime(Items.SUGAR_CANE, 50);
 		IC2.envProxy.registerBurnTime(Items.CACTUS, 50);
 		IC2.envProxy.registerBurnTime(RUBBER_SAPLING, 80);
-		IC2.envProxy.registerBurnTime(WOODEN_SCAFFOLD, 300);
 		IC2.envProxy.registerBurnTime(WOODEN_STORAGE_BOX, 1200);
 		IC2.envProxy.registerBurnTime(WOODEN_ROTOR_BLADE, 300);
 		IC2.envProxy.registerBurnTime(WOODEN_ROTOR, 300);

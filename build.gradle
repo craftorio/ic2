@@ -49,16 +49,11 @@ minecraft {
             property 'forge.enabledGameTestNamespaces', mod_id
         }
 
-        data {
-            workingDirectory project.file('run-data')
-            args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
-        }
     }
 }
 
 sourceSets {
     main {
-        resources { srcDir 'src/generated/resources' }
         java { exclude 'ic2_old/**' }
     }
 }

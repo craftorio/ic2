@@ -40,17 +40,16 @@ import net.minecraft.world.phys.Vec3;
 
 public class TileEntityLuminator extends Ic2TileEntity
 {
-	private static final int manualChargeCapacity = 10000;
 	private static final Map<Direction, List<AABB>> aabbMap = getAabbMap();
 	private final Energy energy = this.addComponent(Energy.asBasicSink(this, 5.0));
 	private final Redstone redstone = this.addComponent(new Redstone(this));
-	private final ComparatorEmitter comparator = this.addComponent(new ComparatorEmitter(this));
 	private boolean invertRedstone;
 
 	public TileEntityLuminator(BlockPos pos, BlockState state)
 	{
 		super(Ic2BlockEntities.LUMINATOR_FLAT, pos, state);
-		this.comparator.setUpdate(this.energy::getComparatorValue);
+		ComparatorEmitter comparator = this.addComponent(new ComparatorEmitter(this));
+		comparator.setUpdate(this.energy::getComparatorValue);
 	}
 
 	@Override
@@ -72,20 +71,7 @@ public class TileEntityLuminator extends Ic2TileEntity
 	{
 		this.energy.setDirections(Collections.singleton(this.getFacing().getOpposite()), Collections.emptySet());
 		super.onLoaded();
-		TickHandler.requestSingleWorldTick(this.getLevel(), new IWorldTickCallback()
-		{
-			@Override
-			public void onTick(Level world)
-			{
-				TileEntityLuminator.this.checkPlacement();
-			}
-		});
-	}
-
-	@Override
-	protected Direction getPlacementFacing(LivingEntity placer, Direction facing)
-	{
-		return facing;
+		TickHandler.requestSingleWorldTick(this.getLevel(), world -> TileEntityLuminator.this.checkPlacement());
 	}
 
 	@Override
@@ -136,7 +122,7 @@ public class TileEntityLuminator extends Ic2TileEntity
 
 	private void checkPlacement()
 	{
-		Level world = this.getLevel();
+		Level  world = this.getLevel();
 		if (!isValidPosition(world, this.worldPosition.relative(this.getFacing().getOpposite()), this.getFacing()))
 		{
 			world.destroyBlock(this.worldPosition, true);
@@ -179,7 +165,7 @@ public class TileEntityLuminator extends Ic2TileEntity
 		super.onEntityCollision(entity);
 		if (this.getActive() && entity instanceof Monster)
 		{
-			boolean isUndead = entity instanceof LivingEntity && ((LivingEntity) entity).getMobType() == MobType.UNDEAD;
+			boolean isUndead = ((LivingEntity) entity).getMobType() == MobType.UNDEAD;
 			entity.setRemainingFireTicks(isUndead ? 20 : 10);
 		}
 	}
@@ -221,21 +207,19 @@ public class TileEntityLuminator extends Ic2TileEntity
 	private static Map<Direction, List<AABB>> getAabbMap()
 	{
 		Map<Direction, List<AABB>> ret = new EnumMap<>(Direction.class);
-		double height = 0.0625;
-		double remHeight = 0.9375;
 
 		for (Direction side : Direction.values())
 		{
 			int dx = side.getStepX();
 			int dy = side.getStepY();
 			int dz = side.getStepZ();
-			double xS = (dx + 1) / 2 * 0.9375;
-			double yS = (dy + 1) / 2 * 0.9375;
-			double zS = (dz + 1) / 2 * 0.9375;
-			double xE = 0.0625 + (dx + 2) / 2 * 0.9375;
-			double yE = 0.0625 + (dy + 2) / 2 * 0.9375;
-			double zE = 0.0625 + (dz + 2) / 2 * 0.9375;
-			ret.put(side.getOpposite(), Arrays.asList(new AABB(xS, yS, zS, xE, yE, zE)));
+			double xS = (double) (dx + 1) / 2 * 0.9375;
+			double yS = (double) (dy + 1) / 2 * 0.9375;
+			double zS = (double) (dz + 1) / 2 * 0.9375;
+			double xE = 0.0625 + (double) (dx + 2) / 2 * 0.9375;
+			double yE = 0.0625 + (double) (dy + 2) / 2 * 0.9375;
+			double zE = 0.0625 + (double) (dz + 2) / 2 * 0.9375;
+			ret.put(side.getOpposite(), List.of(new AABB(xS, yS, zS, xE, yE, zE)));
 		}
 
 		return ret;

@@ -1,7 +1,0 @@
-{
-  "parent": "block/cube_column",
-  "textures": {
-    "side": "ic2:block/wood_scaffold_sides",
-    "end": "ic2:block/wood_scaffold_bottomtop"
-  }
-}

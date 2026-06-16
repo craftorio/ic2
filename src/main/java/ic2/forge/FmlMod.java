@@ -4,7 +4,6 @@ import ic2.core.event.EventHandler;
 import ic2.core.network.NetworkManager;
 import ic2.core.loot.Ic2LootNbtProviderTypes;
 import ic2.core.ref.Ic2Fluids;
-import ic2.data.Ic2DataGenerators;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,8 +12,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.data.ExistingFileHelper;
-import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.IExtensionPoint.DisplayTest;
@@ -32,7 +29,6 @@ public final class FmlMod
 {
 	private List<Runnable> toRunAfterRegistryInit = new ArrayList<>();
 	public static FmlMod instance;
-	public static ExistingFileHelper existingFileHelper;
 	private static final AtomicInteger loadState = new AtomicInteger();
 	private final FMLJavaModLoadingContext ctx;
 
@@ -97,13 +93,6 @@ public final class FmlMod
 		}
 
 		EventHandler.onInitLate();
-	}
-
-	@SubscribeEvent
-	public void initData(GatherDataEvent event)
-	{
-		existingFileHelper = event.getExistingFileHelper();
-		Ic2DataGenerators.setup(event.getGenerator(), event.getLookupProvider(), event.getExistingFileHelper());
 	}
 
 	@SubscribeEvent

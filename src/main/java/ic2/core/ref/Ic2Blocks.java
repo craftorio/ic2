@@ -77,7 +77,6 @@ import ic2.core.block.machine.tileentity.TileEntityWeightedItemDistributor;
 import ic2.core.block.misc.FoamBlock;
 import ic2.core.block.misc.RubberLogBlock;
 import ic2.core.block.misc.RubberWoodBlock;
-import ic2.core.block.misc.ScaffoldBlock;
 import ic2.core.block.misc.WallBlock;
 import ic2.core.block.personal.TileEntityEnergyOMat;
 import ic2.core.block.personal.TileEntityPersonalChest;
@@ -203,10 +202,6 @@ public final class Ic2Blocks
 	{
 	});
 	public static final Block RUBBER_WALL_SIGN = register("rubber_wall_sign", new Ic2WallSignBlock(Properties.of().mapColor(RUBBER_LOG.defaultMapColor()).noCollission().strength(1.0F).sound(SoundType.WOOD).lootFrom(ForgeRegistries.BLOCKS.getDelegateOrThrow(RUBBER_SIGN)), Ic2SignType.RUBBER));
-	public static final Block WOODEN_SCAFFOLD = register("wooden_scaffold", new ScaffoldBlock(Properties.of().noOcclusion().strength(0.5F, 0.12F).randomTicks().sound(SoundType.WOOD), 2));
-	public static final Block REINFORCED_WOODEN_SCAFFOLD = register("reinforced_wooden_scaffold", new ScaffoldBlock(Properties.of().noOcclusion().strength(0.6F, 0.24F).randomTicks().sound(SoundType.WOOD), 5));
-	public static final Block IRON_SCAFFOLD = register("iron_scaffold", new ScaffoldBlock(Properties.of().noOcclusion().strength(0.8F, 6.0F).randomTicks().sound(SoundType.METAL), 5));
-	public static final Block REINFORCED_IRON_SCAFFOLD = register("reinforced_iron_scaffold", new ScaffoldBlock(Properties.of().noOcclusion().strength(1.0F, 8.0F).randomTicks().sound(SoundType.METAL), 12));
 	public static final Block IRON_FENCE = register("iron_fence", new Ic2FenceBlock(Properties.of().strength(5.0F, 10.0F), true));
 	public static final Block RESIN_SHEET = register("resin_sheet", new Ic2SheetBlock(Properties.of().strength(1.6F, 0.5F)));
 	public static final Block RUBBER_SHEET = register("rubber_sheet", new Ic2SheetBlock(Properties.of().strength(0.8F, 2.0F)));
@@ -449,7 +444,5 @@ public final class Ic2Blocks
 	{
 		IC2.envProxy.registerFlammableBlock(RUBBER_LEAVES, 20, 30);
 		IC2.envProxy.registerFlammableBlock(RUBBER_LOG, 20, 4);
-		IC2.envProxy.registerFlammableBlock(WOODEN_SCAFFOLD, 8, 20);
-		IC2.envProxy.registerFlammableBlock(REINFORCED_WOODEN_SCAFFOLD, 8, 20);
 	}
 }

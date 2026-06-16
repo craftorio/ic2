@@ -39,7 +39,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
@@ -54,7 +53,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWrenchable, BreakableBlock, RetexturableBlock
 {
 	private static final BlockEntityTicker<Ic2TileEntity> TICKER = (world, pos, state, be) -> be.tick();
-	private static final String facingPropertyName = "facing";
 	public static final Property<Direction> anyFacingProperty = DirectionProperty.create("facing", Util.allFacings);
 	public static final Property<Direction> horizontalFacingProperty = DirectionProperty.create("facing", Util.horizontalFacings);
 	public static final Property<Direction> verticalFacingProperty = DirectionProperty.create("facing", Util.verticalFacings);
@@ -70,17 +68,9 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 	private final Set<Direction> supportedFacings;
 	private final Supplier<Ic2TileEntity> dummyTe;
 	public final Property<Direction> facingProperty;
-	private boolean enableWorldTick;
 	public static final BooleanProperty ACTIVE = BooleanProperty.create("active");
 
-	public static Ic2TileEntityBlock create(
-		Properties settings,
-		Class<? extends Ic2TileEntity> teClass,
-		boolean canActive,
-		Ic2TileEntityBlock.DefaultDrop defaultDrop,
-		Set<Direction> supportedFacings,
-		boolean allowWrenchRotating
-	)
+	public static Ic2TileEntityBlock create(Properties settings, Class<? extends Ic2TileEntity> teClass, boolean canActive, Ic2TileEntityBlock.DefaultDrop defaultDrop, Set<Direction> supportedFacings, boolean allowWrenchRotating)
 	{
 		Ic2TileEntityBlock.InitData data = new Ic2TileEntityBlock.InitData(supportedFacings, canActive, teClass, null, -1);
 		pendingInitData.set(data);
@@ -89,15 +79,7 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 		return ret;
 	}
 
-	public static Ic2TileEntityBlock create(
-		Properties settings,
-		Class<? extends Ic2TileEntity> teClass,
-		boolean canActive,
-		Ic2TileEntityBlock.DefaultDrop defaultDrop,
-		Set<Direction> supportedFacings,
-		boolean allowWrenchRotating,
-		Ic2CropType cropType
-	)
+	public static Ic2TileEntityBlock create(Properties settings, Class<? extends Ic2TileEntity> teClass, boolean canActive, Ic2TileEntityBlock.DefaultDrop defaultDrop, Set<Direction> supportedFacings, boolean allowWrenchRotating, Ic2CropType cropType)
 	{
 		Ic2TileEntityBlock.InitData data = new Ic2TileEntityBlock.InitData(supportedFacings, canActive, teClass, cropType, cropType.getMaxAge());
 		pendingInitData.set(data);
@@ -106,15 +88,7 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 		return ret;
 	}
 
-	private Ic2TileEntityBlock(
-		Properties settings,
-		Class<? extends Ic2TileEntity> teClass,
-		boolean canActive,
-		Ic2TileEntityBlock.InitData data,
-		Ic2TileEntityBlock.DefaultDrop defaultDrop,
-		boolean allowWrenchRotating,
-		Ic2CropType cropType
-	)
+	private Ic2TileEntityBlock(Properties settings, Class<? extends Ic2TileEntity> teClass, boolean canActive, Ic2TileEntityBlock.InitData data, Ic2TileEntityBlock.DefaultDrop defaultDrop, boolean allowWrenchRotating, Ic2CropType cropType)
 	{
 		this(settings, teClass, canActive, data, defaultDrop, allowWrenchRotating);
 		if (teClass.equals(TileEntityCrop.class))
@@ -124,14 +98,7 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 		}
 	}
 
-	private Ic2TileEntityBlock(
-		Properties settings,
-		Class<? extends Ic2TileEntity> teClass,
-		boolean canActive,
-		Ic2TileEntityBlock.InitData data,
-		Ic2TileEntityBlock.DefaultDrop defaultDrop,
-		boolean allowWrenchRotating
-	)
+	private Ic2TileEntityBlock(Properties settings, Class<? extends Ic2TileEntity> teClass, boolean canActive, Ic2TileEntityBlock.InitData data, Ic2TileEntityBlock.DefaultDrop defaultDrop, boolean allowWrenchRotating)
 	{
 		super(settings);
 		assert data == pendingInitData.get();
@@ -175,7 +142,7 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 	{
 		return this.teClass;
 	}
-
+	
 	public boolean canActive()
 	{
 		return this.canActive;
@@ -331,9 +298,7 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 
 	public boolean canSurvive(BlockState state, LevelReader world, BlockPos pos)
 	{
-		return this.cropType == null
-			? super.canSurvive(state, world, pos)
-			: CropSoilType.contains(world.getBlockState(pos.below()).getBlock()) && super.canSurvive(state, world, pos);
+		return this.cropType == null ? super.canSurvive(state, world, pos) : CropSoilType.contains(world.getBlockState(pos.below()).getBlock()) && super.canSurvive(state, world, pos);
 	}
 
 	public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos)
@@ -509,17 +474,7 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 	}
 
 	@Override
-	public boolean retexture(
-		BlockState state,
-		Level world,
-		BlockPos pos,
-		Direction side,
-		Player player,
-		BlockState refState,
-		String refVariant,
-		Direction refSide,
-		int[] refColorMultipliers
-	)
+	public boolean retexture(BlockState state, Level world, BlockPos pos, Direction side, Player player, BlockState refState, String refVariant, Direction refSide, int[] refColorMultipliers)
 	{
 		Ic2TileEntity te = getTe(world, pos);
 		if (te == null)
@@ -544,11 +499,7 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 
 	public enum DefaultDrop
 	{
-		Self,
-		None,
-		Generator,
-		Machine,
-		AdvMachine
+		Self, None, Generator, Machine, AdvMachine
 	}
 
 	private record InitData(Set<Direction> supportedFacings, boolean canActive, Class<?> teClass, Ic2CropType cropType,

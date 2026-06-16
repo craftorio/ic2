@@ -30,7 +30,7 @@ public class MainConfig
 
 		File configFile = getFile();
 
-		if (configFile != null && configFile.exists())
+		if (configFile.exists())
 		{
 			try
 			{
@@ -103,9 +103,10 @@ public class MainConfig
 		}
 
 		List<String> blacklist = ConfigUtil.asList(ConfigUtil.getString(config, "balance/recyclerBlacklist"));
-		if (blacklist.contains("ic2:blockScaffold"))
+		// TODO
+		if (blacklist.contains("TODO"))
 		{
-			blacklist.set(blacklist.indexOf("ic2:blockScaffold"), "ic2:scaffold");
+			// blacklist.set();
 			config.set("balance/recyclerBlacklist", Joiner.on(", ").join(blacklist));
 		}
 

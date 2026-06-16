@@ -13,7 +13,6 @@ import ic2.core.recipe.input.RecipeInputFluidContainer;
 import ic2.core.recipe.input.RecipeInputIngredient;
 import ic2.core.recipe.input.RecipeInputItemStack;
 import ic2.core.recipe.input.RecipeInputMultiple;
-import ic2.data.recipe.helper.WeightedMachineRecipeGenerator;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -178,7 +177,7 @@ public class RecipeIo
 		return json;
 	}
 
-	public static JsonObject resultToJson(WeightedMachineRecipeGenerator.WeightedItemStack stack)
+	public static JsonObject resultToJson(WeightedItemStack stack)
 	{
 		JsonObject json = new JsonObject();
 		json.addProperty("item", BuiltInRegistries.ITEM.getKey(stack.itemStack.getItem()).toString());

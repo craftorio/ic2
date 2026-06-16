@@ -363,7 +363,6 @@ public final class Ic2Items
 	public static final Item SMALL_URANIUM_238 = register("small_uranium_238", new ItemNuclearResource(new Properties(), 10, 90));
 	public static final Item SMALL_PLUTONIUM = register("small_plutonium", new ItemNuclearResource(new Properties(), 150, 100));
 	public static final Item URANIUM_PELLET = register("uranium_pellet", new ItemNuclearResource(new Properties(), 60, 100));
-	public static final Item MOX_PELLET = register("mox_pellet", new ItemNuclearResource(new Properties(), 300, 100));
 	public static final Item RTG_PELLET = register("rtg_pellet", new ItemNuclearResource(new Properties().stacksTo(1), 2, 90));
 	public static final Item DEPLETED_URANIUM_FUEL_ROD = register("depleted_uranium_fuel_rod", new ItemNuclearResource(new Properties(), 10, 100));
 	public static final Item DEPLETED_DUAL_URANIUM_FUEL_ROD = register("depleted_dual_uranium_fuel_rod", new ItemNuclearResource(new Properties(), 10, 100));
@@ -898,7 +897,6 @@ public final class Ic2Items
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> LITHIUM_DUST);
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> MIXED_METAL_INGOT);
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> MOX);
-		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> MOX_PELLET);
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> NEAR_DEPLETED_URANIUM);
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> NETHERRACK_DUST);
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> OBSIDIAN_DUST);

@@ -1,0 +1,18 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "CRC",
+    "CCC"
+  ],
+  "key": {
+    "C": {
+      "item": "ic2:carbon_plate"
+    },
+    "R": {
+      "item": "ic2:rubber_boat"
+    }
+  },
+  "result": {
+    "item": "ic2:carbon_boat"
+  }
+}

@@ -11,8 +11,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.vehicle.Boat;
-import net.minecraft.world.entity.vehicle.Boat.Status;
-import net.minecraft.world.entity.vehicle.Boat.Type;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
@@ -20,10 +18,22 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.AABB;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class AbstractBoatEntity extends Boat
 {
 	protected boolean isExtraItemDropped = false;
+
+	private static Field getFieldSafe(Class<?> clazz, String srgName, String mcpName) throws NoSuchFieldException
+	{
+		try
+		{
+			return clazz.getDeclaredField(srgName);
+		} catch (NoSuchFieldException e)
+		{
+			return clazz.getDeclaredField(mcpName);
+		}
+	}
 
 	public AbstractBoatEntity(EntityType<? extends Boat> entityType, Level world)
 	{
@@ -37,10 +47,6 @@ public abstract class AbstractBoatEntity extends Boat
 		this.xo = x;
 		this.yo = y;
 		this.zo = z;
-	}
-
-	public void setBoatType(Type type)
-	{
 	}
 
 	public ItemStack getExtraDropItemStack()
@@ -76,8 +82,8 @@ public abstract class AbstractBoatEntity extends Boat
 
 		try
 		{
-			Field waterLevelField = boatEntityClass.getDeclaredField("waterLevel");
-			Field landFrictionField = boatEntityClass.getDeclaredField("landFriction");
+			Field waterLevelField = getFieldSafe(boatEntityClass, "f_38277_", "waterLevel");
+			Field landFrictionField = getFieldSafe(boatEntityClass, "f_38278_", "landFriction");
 			waterLevelField.setAccessible(true);
 			landFrictionField.setAccessible(true);
 			Status location = this.getUnderWaterLocation();
@@ -112,7 +118,7 @@ public abstract class AbstractBoatEntity extends Boat
 
 		try
 		{
-			Field waterLevelField = boatEntityClass.getDeclaredField("waterLevel");
+			Field waterLevelField = getFieldSafe(boatEntityClass, "f_38277_", "waterLevel");
 			waterLevelField.setAccessible(true);
 			AABB box = this.getBoundingBox();
 			int i = Mth.floor(box.minX);
@@ -193,7 +199,7 @@ public abstract class AbstractBoatEntity extends Boat
 
 		try
 		{
-			Field lastYdField = boatEntityClass.getDeclaredField("lastYd");
+			Field lastYdField = getFieldSafe(boatEntityClass, "f_38281_", "lastYd");
 			lastYdField.setAccessible(true);
 			AABB box = this.getBoundingBox();
 			int i = Mth.floor(box.minX);
@@ -259,7 +265,7 @@ public abstract class AbstractBoatEntity extends Boat
 		}
 	}
 
-	public ItemEntity spawnAtLocation(ItemLike item)
+	public ItemEntity spawnAtLocation(@NotNull ItemLike item)
 	{
 		if (item == this.getOverrideBoatType().getBaseItem())
 		{

@@ -1,0 +1,17 @@
+{
+  "type": "ic2:shapeless",
+  "ingredients": [
+    {
+      "item": "ic2:broken_rubber_boat"
+    },
+    {
+      "item": "ic2:rubber"
+    },
+    {
+      "item": "ic2:rubber"
+    }
+  ],
+  "result": {
+    "item": "ic2:rubber_boat"
+  }
+}

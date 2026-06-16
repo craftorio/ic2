@@ -1,10 +1,13 @@
 package ic2.core.block.storage.tank;
 
+import ic2.api.upgrade.IUpgradableBlock;
+import ic2.api.upgrade.UpgradableProperty;
 import ic2.api.util.FluidContainerOutputMode;
 import ic2.api.network.INetworkClientTileEntityEventListener;
 import ic2.core.ContainerBase;
 import ic2.core.IHasGui;
 import ic2.core.block.comp.Fluids;
+import ic2.core.block.invslot.InvSlotUpgrade;
 import ic2.core.block.tileentity.TileEntityInventory;
 import ic2.core.fluid.FluidBeBridge;
 import ic2.core.fluid.FluidHandler;
@@ -19,7 +22,9 @@ import ic2.core.util.LiquidUtil;
 import ic2.core.util.StackUtil;
 
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 
 import net.minecraft.core.BlockPos;
@@ -40,8 +45,9 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public abstract class TileEntityTank extends TileEntityInventory implements IHasGui, Ic2FluidBlock, FluidBeBridge, INetworkClientTileEntityEventListener
+public abstract class TileEntityTank extends TileEntityInventory implements IHasGui, Ic2FluidBlock, FluidBeBridge, INetworkClientTileEntityEventListener, IUpgradableBlock
 {
+	public final InvSlotUpgrade upgradeSlot = new InvSlotUpgrade(this, "upgrade", 4);
 	protected final Fluids fluidsComponent = this.addComponent(new Fluids(this));
 	@GuiSynced
 	protected final Fluids.InternalFluidTank contents;
@@ -50,12 +56,6 @@ public abstract class TileEntityTank extends TileEntityInventory implements IHas
 	{
 		super(type, pos, state);
 		this.contents = this.fluidsComponent.addTank("contents", 1000 * bucketMultiplier);
-	}
-
-	@Override
-	protected List<ItemStack> getAuxDrops(int fortune)
-	{
-		return Collections.emptyList();
 	}
 
 	@Override
@@ -254,5 +254,30 @@ public abstract class TileEntityTank extends TileEntityInventory implements IHas
 	public int fillMb(BlockState state, Level world, BlockPos pos, BlockEntity be, Direction side, Ic2FluidStack fillFs, boolean simulate)
 	{
 		return this.fluidsComponent.fillMb(side, fillFs, simulate);
+	}
+
+	@Override
+	protected void updateEntityServer()
+	{
+		super.updateEntityServer();
+		this.upgradeSlot.tick();
+	}
+
+	@Override
+	public double getEnergy()
+	{
+		return 0.0;
+	}
+
+	@Override
+	public boolean useEnergy(double amount)
+	{
+		return false;
+	}
+
+	@Override
+	public Set<UpgradableProperty> getUpgradableProperties()
+	{
+		return EnumSet.of(UpgradableProperty.FluidConsuming, UpgradableProperty.FluidProducing);
 	}
 }

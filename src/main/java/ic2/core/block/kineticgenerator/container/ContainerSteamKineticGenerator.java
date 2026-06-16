@@ -23,7 +23,7 @@ public class ContainerSteamKineticGenerator extends ContainerFullInv<TileEntityS
 	{
 		List<String> ret = super.getNetworkedFields();
 		ret.add("distilledWaterTank");
-		ret.add("kUoutput");
+		ret.add("kuOutput");
 		ret.add("ventingSteam");
 		ret.add("throttled");
 		ret.add("isTurbineFilledWithWater");

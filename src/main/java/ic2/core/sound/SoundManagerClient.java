@@ -35,16 +35,18 @@ public class SoundManagerClient extends SoundManager
 	public Sound createSound(Object obj, SoundEvent soundEvent, SoundSource soundCategory, LivingEntity entity, float volume, float pitch)
 	{
 		super.createSound(obj, soundEvent, soundCategory, entity, volume, pitch);
-		SoundClient soundClient = new SoundClient(soundEvent, soundCategory, entity, volume, pitch);
-		this.objectToSoundMap.computeIfAbsent(new SoundManagerClient.WeakObject(obj), k -> new ArrayList<>()).add(soundClient);
-		return soundClient;
+		return registerSound(obj, new SoundClient(soundEvent, soundCategory, entity, volume, pitch));
 	}
 
 	@Override
 	public Sound createSound(Object obj, SoundEvent soundEvent, SoundSource soundCategory, BlockPos pos, float volume, float pitch)
 	{
 		super.createSound(obj, soundEvent, soundCategory, pos, volume, pitch);
-		SoundClient soundClient = new SoundClient(soundEvent, soundCategory, pos, volume, pitch);
+		return registerSound(obj, new SoundClient(soundEvent, soundCategory, pos, volume, pitch));
+	}
+
+	private Sound registerSound(Object obj, SoundClient soundClient)
+	{
 		this.objectToSoundMap.computeIfAbsent(new SoundManagerClient.WeakObject(obj), k -> new ArrayList<>()).add(soundClient);
 		return soundClient;
 	}
@@ -110,7 +112,7 @@ public class SoundManagerClient extends SoundManager
 		SoundManagerClient.WeakObject weakObject = new SoundManagerClient.WeakObject(obj);
 		if (this.objectToSoundMap.containsKey(weakObject))
 		{
-			this.objectToSoundMap.get(weakObject).remove(sound);
+			this.objectToSoundMap.get(weakObject).remove((SoundClient) sound);
 		}
 	}
 
@@ -138,9 +140,9 @@ public class SoundManagerClient extends SoundManager
 			if (stack != null && stack.getItem() instanceof IHitSoundOverride hitSoundOverride)
 			{
 				Level world = player.getCommandSenderWorld();
-				BlockHitResult mop = getMovingObjectPositionFromPlayer(world, player, false);
+				BlockHitResult mop = getMovingObjectPositionFromPlayer(world, player);
 				BlockPos pos = new BlockPos((int) sound.getX(), (int) sound.getY(), (int) sound.getZ());
-				if (mop != null && mop.getType() == Type.BLOCK && pos.equals(mop.getBlockPos()))
+				if (mop.getType() == Type.BLOCK && pos.equals(mop.getBlockPos()))
 				{
 					SoundEvent replaceSound;
 					if (name.endsWith(".hit"))
@@ -163,7 +165,7 @@ public class SoundManagerClient extends SoundManager
 		return sound;
 	}
 
-	private static BlockHitResult getMovingObjectPositionFromPlayer(Level worldIn, Player playerIn, boolean useLiquids)
+	private static BlockHitResult getMovingObjectPositionFromPlayer(Level worldIn, Player playerIn)
 	{
 		float f = playerIn.getXRot();
 		float f1 = playerIn.getYRot();
@@ -179,7 +181,7 @@ public class SoundManagerClient extends SoundManager
 		float f7 = f2 * f4;
 		double d3 = 5.0;
 		Vec3 vec31 = vec3.add(f6 * d3, f5 * d3, f7 * d3);
-		return worldIn.clip(new ClipContext(vec3, vec31, Block.OUTLINE, useLiquids ? Fluid.ANY : Fluid.NONE, playerIn));
+		return worldIn.clip(new ClipContext(vec3, vec31, Block.OUTLINE, Fluid.NONE, playerIn));
 	}
 
 	public static class WeakObject extends WeakReference<Object>

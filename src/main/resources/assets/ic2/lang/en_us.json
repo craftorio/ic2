@@ -867,6 +867,7 @@
 	"ic2.tooltip.mode.single": "Single",
 	"ic2.tooltip.tool.uses_left": "Uses Left: %s",
 	"ic2.tooltip.upgrade.ejector": "Automatically output to the %1$s side",
+	"ic2.jetpackAttached": "Electric Jetpack Attached",
 	"ic2.tooltip.upgrade.ejector.anyside": "first valid",
 	"ic2.tooltip.upgrade.overclocker.power": "Increase power to %1$s%%",
 	"ic2.tooltip.upgrade.overclocker.time": "Decrease process time to %1$s%%",

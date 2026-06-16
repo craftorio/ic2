@@ -2,6 +2,7 @@ package ic2.core.ref;
 
 import com.google.gson.JsonObject;
 import ic2.core.IC2;
+import ic2.core.item.armor.jetpack.JetpackAttachmentRecipe;
 import ic2.core.recipe.AdvRecipe;
 import ic2.core.recipe.AdvShapelessRecipe;
 import ic2.core.recipe.v2.BasicMachineRecipeSerializer;
@@ -20,6 +21,7 @@ public final class Ic2RecipeSerializers
 {
 	public static final RecipeSerializer<AdvRecipe> SHAPED = register("shaped", new AdvRecipe.Serializer());
 	public static final RecipeSerializer<AdvShapelessRecipe> SHAPELESS = register("shapeless", new AdvShapelessRecipe.Serializer());
+	public static final RecipeSerializer<JetpackAttachmentRecipe> JETPACK_ATTACHMENT = register("jetpack_attachment", new JetpackAttachmentRecipe.Serializer());
 	public static final WeightedMachineRecipeSerializer MACERATOR = register("macerator", new WeightedMachineRecipeSerializer(Ic2RecipeTypes.MACERATOR, null));
 	public static final BasicMachineRecipeSerializer EXTRACTOR = register("extractor", new BasicMachineRecipeSerializer(Ic2RecipeTypes.EXTRACTOR, null));
 	public static final BasicMachineRecipeSerializer COMPRESSOR = register("compressor", new BasicMachineRecipeSerializer(Ic2RecipeTypes.COMPRESSOR, null));

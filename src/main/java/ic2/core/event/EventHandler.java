@@ -28,6 +28,7 @@ import ic2.core.item.ElectricItemManager;
 import ic2.core.item.GatewayElectricItemManager;
 import ic2.core.item.armor.ItemArmorElectric;
 import ic2.core.item.armor.ItemArmorHazmat;
+import ic2.core.item.armor.jetpack.JetpackAttachmentRecipe;
 import ic2.core.item.armor.jetpack.JetpackHandler;
 import ic2.core.item.armor.ItemArmorNanoSuit;
 import ic2.core.item.armor.ItemArmorQuantumSuit;
@@ -112,6 +113,8 @@ public final class EventHandler
 
 	public static void onInit()
 	{
+		JetpackHandler.init();
+		JetpackAttachmentRecipe.init();
 	}
 
 	public static void onInitLate()

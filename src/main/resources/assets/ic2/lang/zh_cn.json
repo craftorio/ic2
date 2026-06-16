@@ -852,6 +852,7 @@
 	"ic2.tooltip.mode.single": "单块",
 	"ic2.tooltip.tool.uses_left": "剩余使用次数: %s",
 	"ic2.tooltip.upgrade.ejector": "自动输出到%1$s方向",
+	"ic2.jetpackAttached": "已连接电力喷气背包",
 	"ic2.tooltip.upgrade.ejector.anyside": "第一格有效",
 	"ic2.tooltip.upgrade.overclocker.power": "能量增加到%1$s%%",
 	"ic2.tooltip.upgrade.overclocker.time": "加工用时缩短为%1$s%%",

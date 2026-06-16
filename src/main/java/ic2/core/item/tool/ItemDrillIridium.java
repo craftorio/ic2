@@ -80,7 +80,6 @@ public class ItemDrillIridium extends ItemDrill
 		if (!world.isClientSide && IC2.keyboard.isModeSwitchKeyDown(player))
 		{
 			Map<Enchantment, Integer> enchantmentMap = new IdentityHashMap<>();
-			enchantmentMap.put(Enchantments.BLOCK_FORTUNE, 3);
 			ItemStack stack = StackUtil.get(player, hand);
 			if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, stack) == 0)
 			{
@@ -88,6 +87,7 @@ public class ItemDrillIridium extends ItemDrill
 				IC2.sideProxy.messagePlayer(player, "item.ic2.mining_laser.tooltip.mode", "item.ic2.mining_laser.tooltip.mode.silkTouch");
 			} else
 			{
+				enchantmentMap.put(Enchantments.BLOCK_FORTUNE, 3);
 				IC2.sideProxy.messagePlayer(player, "item.ic2.mining_laser.tooltip.mode", "item.ic2.mining_laser.tooltip.mode.normal");
 			}
 

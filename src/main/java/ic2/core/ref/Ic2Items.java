@@ -54,6 +54,7 @@ import ic2.core.item.tool.Ic2Axe;
 import ic2.core.item.tool.Ic2Hoe;
 import ic2.core.item.tool.Ic2Pickaxe;
 import ic2.core.item.tool.ItemDebug;
+import ic2.core.item.tool.ItemSprayer;
 import ic2.core.item.tool.ItemDrill;
 import ic2.core.item.tool.ItemDrillIridium;
 import ic2.core.item.tool.ItemElectricToolChainsaw;
@@ -577,6 +578,7 @@ public final class Ic2Items
 	public static final Item BRONZE_HELMET = register("bronze_helmet", new ItemArmorIC2(Ic2ArmorMaterials.BRONZE, EquipmentSlot.HEAD, new Properties()));
 	public static final Item BRONZE_LEGGINGS = register("bronze_leggings", new ItemArmorIC2(Ic2ArmorMaterials.BRONZE, EquipmentSlot.LEGS, new Properties()));
 	public static final Item CF_PACK = register("cf_pack", new ItemArmorCFPack(new Properties()));
+	public static final Item FOAM_SPRAYER = register("foam_sprayer", new ItemSprayer(new Properties().stacksTo(1)));
 	public static final Item HAZMAT_CHESTPLATE = register("hazmat_chestplate", new ItemArmorHazmat(EquipmentSlot.CHEST, new Properties()));
 	public static final Item HAZMAT_HELMET = register("hazmat_helmet", new ItemArmorHazmat(EquipmentSlot.HEAD, new Properties()));
 	public static final Item HAZMAT_LEGGINGS = register("hazmat_leggings", new ItemArmorHazmat(EquipmentSlot.LEGS, new Properties()));
@@ -1042,6 +1044,7 @@ public final class Ic2Items
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> FLUID_EJECTOR_UPGRADE);
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> FLUID_PULLING_UPGRADE);
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> FORGE_HAMMER);
+		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> FOAM_SPRAYER);
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> FREQUENCY_TRANSMITTER);
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> GRAY_PAINTER);
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> GREEN_PAINTER);

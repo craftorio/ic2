@@ -94,7 +94,7 @@ public class JetpackLogic
 
 			if (IC2.keyboard.isSneakKeyDown(player))
 			{
-				maxHoverY += -jetpack.getHoverMultiplier(stack, false);
+				maxHoverY -= jetpack.getHoverMultiplier(stack, false);
 				if (iBoostingJetpack != null)
 				{
 					maxHoverY *= iBoostingJetpack.getHoverBoost(player, stack, false);

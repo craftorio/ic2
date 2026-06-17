@@ -5,9 +5,9 @@ import ic2.core.proxy.SideProxyClient;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -29,7 +29,7 @@ import net.minecraft.world.phys.HitResult.Type;
 
 public class SoundManagerClient extends SoundManager
 {
-	private final Map<SoundManagerClient.WeakObject, List<SoundClient>> objectToSoundMap = new HashMap<>();
+	private final Map<SoundManagerClient.WeakObject, List<SoundClient>> objectToSoundMap = new ConcurrentHashMap<>();
 
 	@Override
 	public Sound createSound(Object obj, SoundEvent soundEvent, SoundSource soundCategory, LivingEntity entity, float volume, float pitch)

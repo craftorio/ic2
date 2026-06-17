@@ -397,6 +397,7 @@
 	"item.ic2.scrap_box": "废料盒",
 	"item.ic2.cf_powder": "建筑泡沫粉",
 	"item.ic2.foam_sprayer": "建筑泡沫喷枪",
+	"item.ic2.foam_sprayer.tooltip.content": "可用：%s mB",
 	"item.ic2.pellet": "建筑泡沫颗粒",
 	"item.ic2.raw_crystal_memory": "粗制的模式存储水晶",
 	"item.ic2.crystal_memory": "模式存储水晶",

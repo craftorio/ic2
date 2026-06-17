@@ -16,14 +16,12 @@ import ic2.core.ref.Ic2Items;
 import ic2.core.util.StackUtil;
 import ic2.core.util.Util;
 
-import java.util.ArrayDeque;
-import java.util.HashSet;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -31,11 +29,14 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Fluid;
+import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.Nullable;
 
 public class ItemSprayer extends Item implements StandardFluidItem, IBoxable
 {
@@ -46,7 +47,19 @@ public class ItemSprayer extends Item implements StandardFluidItem, IBoxable
 	{
 		super(settings);
 	}
-
+	@Override
+	public void appendHoverText(@NotNull ItemStack item, @Nullable Level level, @NotNull List<Component> components, @NotNull TooltipFlag flag)
+	{
+		int all = 0;
+		Ic2FluidStack fluid = Ic2FluidStack.get(item);
+		if (!fluid.isEmpty())
+		{
+			all = fluid.getAmountMb();
+		}
+		
+		components.add(Component.translatable("item.ic2.foam_sprayer.tooltip.content", String.valueOf(all)));
+	}
+	
 	@Override
 	public int getCapacityMb(ItemStack stack)
 	{
@@ -58,15 +71,9 @@ public class ItemSprayer extends Item implements StandardFluidItem, IBoxable
 	{
 		return fs.getFluid() == Ic2Fluids.CONSTRUCTION_FOAM.still();
 	}
-
+	
 	@Override
-	public boolean canDrain(ItemStack stack)
-	{
-		return true;
-	}
-
-	@Override
-	public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand)
+	public @NotNull InteractionResultHolder<ItemStack> use(Level world, @NotNull Player player, @NotNull InteractionHand hand)
 	{
 		ItemStack stack = StackUtil.get(player, hand);
 		if (!world.isClientSide && IC2.keyboard.isModeSwitchKeyDown(player))
@@ -84,7 +91,7 @@ public class ItemSprayer extends Item implements StandardFluidItem, IBoxable
 	}
 
 	@Override
-	public InteractionResult useOn(UseOnContext context)
+	public @NotNull InteractionResult useOn(UseOnContext context)
 	{
 		Level world = context.getLevel();
 		BlockPos pos = context.getClickedPos();
@@ -236,17 +243,12 @@ public class ItemSprayer extends Item implements StandardFluidItem, IBoxable
 
 	private static boolean canPlaceFoam(Level world, BlockPos pos, Target target)
 	{
-		switch (target)
+		return switch (target)
 		{
-			case ANY:
-				return world.getBlockState(pos).canBeReplaced();
-			case SCAFFOLD:
-				return world.getBlockState(pos).is(Blocks.SCAFFOLDING);
-			case CABLE:
-				return world.getBlockState(pos).getBlock() instanceof CableBlock;
-			default:
-				return false;
-		}
+			case ANY -> world.getBlockState(pos).canBeReplaced();
+			case SCAFFOLD -> world.getBlockState(pos).is(Blocks.SCAFFOLDING);
+			case CABLE -> world.getBlockState(pos).getBlock() instanceof CableBlock;
+		};
 	}
 
 	private enum Target

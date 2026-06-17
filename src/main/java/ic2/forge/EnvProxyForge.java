@@ -2,6 +2,8 @@ package ic2.forge;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.serialization.Codec;
+import ic2.api.crops.Crops;
+import ic2.api.crops.CropCard;
 import ic2.api.energy.ProfileEvent;
 import ic2.api.event.ExplosionEvent;
 import ic2.api.event.RetextureEvent;
@@ -10,6 +12,7 @@ import ic2.core.IC2;
 import ic2.core.Ic2ItemGroupType;
 import ic2.core.fluid.EnvFluidHandler;
 import ic2.core.item.ElectricItemManager;
+import ic2.core.item.ItemCropSeed;
 import ic2.core.item.EnvItemHandler;
 import ic2.core.item.armor.ItemArmorFluidTank;
 import ic2.core.ref.Ic2Items;
@@ -299,6 +302,14 @@ public final class EnvProxyForge implements EnvProxy
 							tankItem.filltank(filledStack);
 							output.accept(filledStack);
 						}
+					}
+				}
+
+				if (groupType == Ic2ItemGroupType.FARMING)
+				{
+					for (CropCard crop : Crops.instance.getCrops())
+					{
+						output.accept(ItemCropSeed.generateItemStackFromValues(crop, 1, 1, 1, 4));
 					}
 				}
 			})

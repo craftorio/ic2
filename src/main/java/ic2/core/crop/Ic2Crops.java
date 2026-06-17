@@ -31,7 +31,6 @@ import ic2.core.crop.cropcard.CropWheat;
 import ic2.core.crop.cropcard.GenericCropCard;
 import ic2.core.proxy.EnvProxy;
 import ic2.core.ref.Ic2BlockTags;
-import net.minecraft.core.registries.BuiltInRegistries;
 import ic2.core.ref.Ic2Blocks;
 import ic2.core.ref.Ic2Items;
 
@@ -47,7 +46,6 @@ import java.util.NoSuchElementException;
 import java.util.Map.Entry;
 
 import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
@@ -58,6 +56,8 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.NotNull;
 
 public class Ic2Crops extends Crops
 {
@@ -277,13 +277,15 @@ public class Ic2Crops extends Crops
 		.setDrops(new ItemStack(Ic2Items.COAL_DUST))
 		.setSpecialDrops(new ItemStack[] { new ItemStack(Items.COAL), new ItemStack(Items.COAL) })
 		.setAfterHarvestSize(1);
-	static boolean needsToPost = true;
 	private final Map<String, Map<String, CropCard>> cropMap = new HashMap<>();
 
 	public static void init()
 	{
 		Crops.instance = new Ic2Crops();
 		Crops.weed = new CropWeed(Ic2CropType.weed);
+		Crops.instance.addBiomehumidityBonus(EnvProxy.BiomeType.WATER, 10);
+		Crops.instance.addBiomehumidityBonus(EnvProxy.BiomeType.WET, 10);
+		Crops.instance.addBiomehumidityBonus(EnvProxy.BiomeType.DRY, -10);
 		Crops.instance.addBiomenutrientsBonus(EnvProxy.BiomeType.JUNGLE, 10);
 		Crops.instance.addBiomenutrientsBonus(EnvProxy.BiomeType.SWAMP, 10);
 		Crops.instance.addBiomenutrientsBonus(EnvProxy.BiomeType.MUSHROOM, 5);
@@ -384,10 +386,6 @@ public class Ic2Crops extends Crops
 		Crops.instance.registerBaseSeed(new ItemStack(Ic2Items.MILK_WART), cropMilkWart, 0, 1, 1, 1);
 	}
 
-	public static void ensureInit()
-	{
-	}
-
 	@Override
 	public void addBiomenutrientsBonus(EnvProxy.BiomeType type, int nutrientsBonus)
 	{
@@ -403,7 +401,7 @@ public class Ic2Crops extends Crops
 	@Override
 	public int getHumidityBiomeBonus(Holder<Biome> biome)
 	{
-		Integer ret = 0;
+		int ret = 0;
 
 		for (EnvProxy.BiomeType type : IC2.envProxy.getBiomeTypes(biome))
 		{
@@ -420,7 +418,7 @@ public class Ic2Crops extends Crops
 	@Override
 	public int getNutrientBiomeBonus(Holder<Biome> biome)
 	{
-		Integer ret = 0;
+		int ret = 0;
 
 		for (EnvProxy.BiomeType type : IC2.envProxy.getBiomeTypes(biome))
 		{
@@ -444,7 +442,7 @@ public class Ic2Crops extends Crops
 	@Override
 	public CropCard getCropCard(ItemStack stack)
 	{
-		ResourceLocation identifier = BuiltInRegistries.ITEM.getKey(stack.getItem());
+		ResourceLocation identifier = ForgeRegistries.ITEMS.getKey(stack.getItem());
 		if (stack.is(ItemTags.SAPLINGS) && identifier.getNamespace().equals("minecraft"))
 		{
 			return this.getCropCard("ic2", identifier.getPath());
@@ -464,7 +462,7 @@ public class Ic2Crops extends Crops
 	@Override
 	public CropCard getCropCard(Block cropBlock)
 	{
-		ResourceLocation cropIdentifier = BuiltInRegistries.BLOCK.getKey(cropBlock);
+		ResourceLocation cropIdentifier = ForgeRegistries.BLOCKS.getKey(cropBlock);
 		String cropOwner = cropIdentifier.getNamespace();
 		String cropName = cropIdentifier.getPath().replace("_crop", "");
 		return this.getCropCard(cropOwner, cropName);
@@ -473,12 +471,12 @@ public class Ic2Crops extends Crops
 	@Override
 	public Collection<CropCard> getCrops()
 	{
-		return new AbstractCollection<CropCard>()
+		return new AbstractCollection<>()
 		{
 			@Override
-			public Iterator<CropCard> iterator()
+			public @NotNull Iterator<CropCard> iterator()
 			{
-				return new Iterator<CropCard>()
+				return new Iterator<>()
 				{
 					private final Iterator<Map<String, CropCard>> mapIterator = Ic2Crops.this.cropMap.values().iterator();
 					private Iterator<CropCard> iterator = this.getNextIterator();
@@ -554,12 +552,7 @@ public class Ic2Crops extends Crops
 			throw new IllegalArgumentException("The crop owner=" + owner + " id=" + id + " uses a non-lower case owner");
 		}
 
-		Map<String, CropCard> map = this.cropMap.get(owner);
-		if (map == null)
-		{
-			map = new HashMap<>();
-			this.cropMap.put(owner, map);
-		}
+		Map<String, CropCard> map = this.cropMap.computeIfAbsent(owner, k -> new HashMap<>());
 
 		CropCard prev = map.put(id, crop);
 		if (prev != null)
@@ -569,18 +562,17 @@ public class Ic2Crops extends Crops
 	}
 
 	@Override
-	public boolean registerBaseSeed(ItemStack stack, CropCard crop, int size, int growth, int gain, int resistance)
+	public void registerBaseSeed(ItemStack stack, CropCard crop, int size, int growth, int gain, int resistance)
 	{
 		for (ItemStack key : this.baseSeeds.keySet())
 		{
 			if (key.getItem() == stack.getItem() && key.getDamageValue() == stack.getDamageValue())
 			{
-				return false;
+				return;
 			}
 		}
 
 		this.baseSeeds.put(stack, new BaseSeed(crop, size, growth, gain, resistance));
-		return true;
 	}
 
 	@Override

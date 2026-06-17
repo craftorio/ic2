@@ -51,7 +51,7 @@ public abstract class TileEntityExplosive extends TileEntityInventory implements
 		}
 
 		this.explode(player, false);
-		return InteractionResult.CONSUME;
+		return InteractionResult.SUCCESS;
 	}
 
 	@Override

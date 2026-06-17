@@ -543,7 +543,7 @@ public class TileEntityCrop extends Ic2TileEntity implements ICropTile
 		tileEntityCrop.setStatGrowth(statGr);
 		tileEntityCrop.setStatResistance(statRe);
 		tileEntityCrop.setScanLevel(scan);
-		NetworkHelper.sendInitialData(this);
+		NetworkHelper.sendInitialData(tileEntityCrop);
 		return true;
 	}
 
@@ -656,7 +656,7 @@ public class TileEntityCrop extends Ic2TileEntity implements ICropTile
 		TileEntityCrop tileEntityCrop = this.transformCropBlock(crop.getCropBlock());
 		tileEntityCrop.updateTerrainHumidity();
 		tileEntityCrop.updateTerrainNutrients();
-		tileEntityCrop.updateTerrainNutrients();
+		tileEntityCrop.updateTerrainAirQuality();
 	}
 
 	@Override

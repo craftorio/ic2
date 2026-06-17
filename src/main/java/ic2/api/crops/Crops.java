@@ -8,6 +8,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
+import net.minecraftforge.eventbus.api.Event;
 
 public abstract class Crops
 {
@@ -32,7 +33,23 @@ public abstract class Crops
 
 	public abstract void registerCrop(CropCard var1);
 
-	public abstract boolean registerBaseSeed(ItemStack var1, CropCard var2, int var3, int var4, int var5, int var6);
+	public abstract void registerBaseSeed(ItemStack var1, CropCard var2, int var3, int var4, int var5, int var6);
 
 	public abstract BaseSeed getBaseSeed(ItemStack var1);
+
+	public static class CropRegisterEvent extends Event
+	{
+		public void register(CropCard crop)
+		{
+			Crops.instance.registerCrop(crop);
+		}
+
+		public void register(CropCard... crops)
+		{
+			for (CropCard crop : crops)
+			{
+				this.register(crop);
+			}
+		}
+	}
 }

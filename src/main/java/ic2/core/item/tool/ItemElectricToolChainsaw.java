@@ -6,15 +6,19 @@ import ic2.core.IC2;
 import ic2.core.IHitSoundOverride;
 import ic2.core.ref.Ic2SoundEvents;
 import ic2.core.ref.Ic2ToolMaterials;
+import ic2.core.util.KeyboardClient;
 import ic2.core.util.StackUtil;
 import ic2.core.util.Util;
 
 import java.util.Collections;
+import java.util.List;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
@@ -27,7 +31,7 @@ import net.minecraft.world.entity.Shearable;
 import net.minecraft.world.entity.monster.piglin.PiglinAi;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Item.Properties;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -35,6 +39,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.gameevent.GameEvent.Context;
+import net.minecraftforge.common.IForgeShearable;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class ItemElectricToolChainsaw extends ItemElectricTool implements IHitSoundOverride, BlockBreakableItem, IEntityAttackableItem
@@ -53,7 +59,14 @@ public class ItemElectricToolChainsaw extends ItemElectricTool implements IHitSo
 	}
 
 	@Override
-	public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand)
+	public void appendHoverText(ItemStack stack, Level world, List<Component> list, TooltipFlag par4)
+	{
+		super.appendHoverText(stack, world, list, par4);
+		list.add(Component.translatable("item.ic2.tooltip.mode.switch", KeyboardClient.modeSwitchKey.getKey().getDisplayName(), Minecraft.getInstance().options.keyUse.getKey().getDisplayName()));
+	}
+
+	@Override
+	public @NotNull InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand)
 	{
 		if (world.isClientSide)
 		{
@@ -133,12 +146,10 @@ public class ItemElectricToolChainsaw extends ItemElectricTool implements IHitSo
 		}
 	}
 
-	public InteractionResult interactLivingEntity(ItemStack stack, Player user, LivingEntity entity, InteractionHand hand)
+	public @NotNull InteractionResult interactLivingEntity(@NotNull ItemStack stack, @NotNull Player user, @NotNull LivingEntity entity, @NotNull InteractionHand hand)
 	{
-		if (entity instanceof Shearable shearable
-			&& !StackUtil.getOrCreateNbtData(stack).getBoolean("disableShear")
-			&& this.consumeEnergy(stack, this.operationEnergyCost, user)
-			&& shearable.readyForShearing())
+		// TODO: Use IForgeShearable
+		if (entity instanceof Shearable shearable && !StackUtil.getOrCreateNbtData(stack).getBoolean("disableShear") && this.consumeEnergy(stack, this.operationEnergyCost, user) && shearable.readyForShearing())
 		{
 			shearable.shear(SoundSource.PLAYERS);
 			this.playUsingSound(user);

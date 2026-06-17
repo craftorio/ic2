@@ -86,20 +86,17 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.function.Supplier;
 
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.food.FoodProperties.Builder;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.DoubleHighBlockItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.Rarity;
-import net.minecraft.world.item.ShovelItem;
-import net.minecraft.world.item.SignItem;
-import net.minecraft.world.item.SwordItem;
-import net.minecraft.world.item.Tiers;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.Item.Properties;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluids;
+import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.Nullable;
 
 public final class Ic2Items
 {
@@ -419,7 +416,16 @@ public final class Ic2Items
 	public static final Item CARBON_ROTOR_BLADE = register("carbon_rotor_blade", new Item(new Properties()));
 	public static final Item STEAM_TURBINE_BLADE = register("steam_turbine_blade", new Item(new Properties()));
 	public static final Item STEAM_TURBINE = register("steam_turbine", new Item(new Properties()));
-	public static final Item JETPACK_ATTACHMENT_PLATE = register("jetpack_attachment_plate", new Item(new Properties()));
+	public static final Item JETPACK_ATTACHMENT_PLATE = register("jetpack_attachment_plate", new Item(new Properties())
+	{
+		@Override
+		public void appendHoverText(@NotNull ItemStack item, @Nullable Level level, @NotNull List<Component> components, @NotNull TooltipFlag flag)
+		{
+			components.add(Component.translatable("ic2.tooltip.jetpack_attachment.craft"));
+			components.add(Component.translatable("ic2.tooltip.jetpack_attachment.attach"));
+			components.add(Component.translatable("ic2.tooltip.jetpack_attachment.warning"));
+		}
+	});
 	public static final Item COIN = register("coin", new Item(new Properties()));
 	public static final Item BRONZE_ROTOR_BLADE = register("bronze_rotor_blade", new Item(new Properties()));
 	public static final Item BRONZE_SHAFT = register("bronze_shaft", new Item(new Properties()));

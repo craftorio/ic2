@@ -3,7 +3,6 @@ package ic2.core.entity.boat;
 import ic2.api.entity.boat.AbstractBoatEntity;
 import ic2.api.entity.boat.BoatType;
 import ic2.api.item.ElectricItem;
-import ic2.core.IC2;
 import ic2.core.ref.Ic2BoatTypes;
 import ic2.core.ref.Ic2Items;
 import ic2.core.util.StackUtil;
@@ -19,11 +18,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ElectricBoatEntity extends AbstractBoatEntity
 {
-	private int movementTicks = 0;
-	private int decelTimer = 0;
-	private int decelStartTicks = 0;
-	private static final int MAX_ACCELERATION_TICKS = 80;
-	private static final int MAX_DECEL_TICKS = 40;
+	private boolean hasPower = false;
 
 	public ElectricBoatEntity(EntityType<? extends AbstractBoatEntity> entityType, Level world)
 	{
@@ -69,29 +64,20 @@ public class ElectricBoatEntity extends AbstractBoatEntity
 	{
 		return super.canFloatOn(fluidState);
 	}
-
-	private double getSpeedMultiplier()
-	{
-		if (movementTicks <= 0) return 1.0;
-		double x = Math.min(movementTicks, MAX_ACCELERATION_TICKS) / (double) MAX_ACCELERATION_TICKS;
-		return 1.0 + 0.6 * x;
-	}
-
 	@Override
 	protected float getBlockSpeedFactor()
 	{
-		return (float) (super.getBlockSpeedFactor() * getSpeedMultiplier());
+		return super.getBlockSpeedFactor() * (hasPower ? 1.5f : 0.25f);
 	}
-
+	
 	@Override
 	public void tick()
 	{
-		Entity driver = this.getControllingPassenger();
-		boolean hasPower = false;
-		if (driver instanceof Player && IC2.keyboard.isForwardKeyDown((Player) driver))
+		hasPower = false;
+		if (getControllingPassenger() instanceof Player player)
 		{
-			int powerCost = movementTicks < MAX_ACCELERATION_TICKS ? 8 : 4;
-			for (ItemStack stack : ((Player) driver).getInventory().armor)
+			int powerCost = 4;
+			for (ItemStack stack : player.getInventory().armor)
 			{
 				if (!StackUtil.isEmpty(stack) && ElectricItem.manager.discharge(stack, powerCost, Integer.MAX_VALUE, true, true, true) == powerCost)
 				{
@@ -100,34 +86,9 @@ public class ElectricBoatEntity extends AbstractBoatEntity
 					break;
 				}
 			}
+			
 		}
-
-		if (hasPower)
-		{
-			decelTimer = 0;
-			if (movementTicks < MAX_ACCELERATION_TICKS)
-			{
-				movementTicks++;
-			}
-		}
-		else if (movementTicks > 0)
-		{
-			if (decelTimer == 0)
-			{
-				decelStartTicks = movementTicks;
-			}
-			decelTimer++;
-			double totalDecelTime = Math.max((double) decelStartTicks / MAX_ACCELERATION_TICKS * MAX_DECEL_TICKS, 1.0);
-			double progress = Math.min(decelTimer / totalDecelTime, 1.0);
-			double smoothstep = 3.0 * progress * progress - 2.0 * progress * progress * progress;
-			movementTicks = (int) Math.round(decelStartTicks * (1.0 - smoothstep));
-			if (progress >= 1.0)
-			{
-				movementTicks = 0;
-				decelTimer = 0;
-			}
-		}
-
+		
 		super.tick();
 
 		if (!this.level().isClientSide && this.level().getFluidState(this.blockPosition()).is(FluidTags.LAVA))

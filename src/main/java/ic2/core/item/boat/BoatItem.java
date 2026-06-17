@@ -18,7 +18,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Item.Properties;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ClipContext.Fluid;
 import net.minecraft.world.level.gameevent.GameEvent;
@@ -27,6 +26,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.HitResult.Type;
+import org.jetbrains.annotations.NotNull;
 
 public class BoatItem extends Item
 {
@@ -41,7 +41,7 @@ public class BoatItem extends Item
 		this.boatEntityType = boatEntityType;
 	}
 
-	public InteractionResultHolder<ItemStack> use(Level world, Player user, InteractionHand hand)
+	public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level world, Player user, @NotNull InteractionHand hand)
 	{
 		ItemStack itemStack = user.getItemInHand(hand);
 		BlockHitResult hitResult = getPlayerPOVHitResult(world, user, Fluid.ANY);
@@ -103,10 +103,8 @@ public class BoatItem extends Item
 
 		try
 		{
-			Constructor constructor = this.boatEntityClass.getConstructor(EntityType.class, Level.class, double.class, double.class, double.class);
-			return (Boat) constructor.newInstance(
-				this.boatEntityType, world, hitResult.getLocation().x, hitResult.getLocation().y, hitResult.getLocation().z
-			);
+			Constructor<? extends Boat> constructor = this.boatEntityClass.getConstructor(EntityType.class, Level.class, double.class, double.class, double.class);
+			return constructor.newInstance(this.boatEntityType, world, hitResult.getLocation().x, hitResult.getLocation().y, hitResult.getLocation().z);
 		} catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e)
 		{
 			throw new RuntimeException(e);

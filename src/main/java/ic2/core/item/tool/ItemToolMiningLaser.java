@@ -315,7 +315,7 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
 
 	public boolean shootLaser(Level world, Vector3 start, Vector3 dir, LivingEntity owner, float range, float power, int blockBreaks, boolean explosive, boolean smelt)
 	{
-		LaserBulletEntity entity = new LaserBulletEntity(world, start, dir, owner, range, power, blockBreaks, explosive);
+		LaserBulletEntity entity = new LaserBulletEntity(world, start, owner, range, power, blockBreaks, explosive);
 		entity.init(owner, range, power, blockBreaks, explosive, smelt, true);
 		this.setLaserVelocity(entity, owner, dir);
 		world.addFreshEntity(entity);

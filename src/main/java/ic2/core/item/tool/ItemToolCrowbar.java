@@ -27,13 +27,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.TieredItem;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.Item.Properties;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 
 public class ItemToolCrowbar extends TieredItem implements IEnhancedOverlayProvider, PriorityUsableItem
 {
@@ -62,7 +62,6 @@ public class ItemToolCrowbar extends TieredItem implements IEnhancedOverlayProvi
 		}
 
 		BlockState state = world.getBlockState(pos);
-		Block block = state.getBlock();
 		if (state.isAir())
 		{
 			return InteractionResult.FAIL;
@@ -83,7 +82,6 @@ public class ItemToolCrowbar extends TieredItem implements IEnhancedOverlayProvi
 				} else
 				{
 					IC2.soundManager.playOnce(Ic2SoundEvents.ITEM_CROWBAR_USE, SoundSource.BLOCKS, 1.0F, 1.0F, player);
-					IC2.sideProxy.messagePlayer(player, Localization.translate("Attachment removed"));
 				}
 			}
 
@@ -94,21 +92,20 @@ public class ItemToolCrowbar extends TieredItem implements IEnhancedOverlayProvi
 		}
 	}
 
-	public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair)
+	public boolean isValidRepairItem(@NotNull ItemStack toRepair, @NotNull ItemStack repair)
 	{
-		return repair != null && Util.matchesOD(repair, Ic2ItemTags.BRONZE_INGOTS);
+		return Util.matchesOD(repair, Ic2ItemTags.BRONZE_INGOTS);
 	}
 
-	public boolean isEnchantable(ItemStack stack)
+	public boolean isEnchantable(@NotNull ItemStack stack)
 	{
 		return false;
 	}
 
 	@OnlyIn(Dist.CLIENT)
-	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> info, TooltipFlag flagIn)
+	public void appendHoverText(@NotNull ItemStack stack, Level worldIn, List<Component> info, @NotNull TooltipFlag flagIn)
 	{
-		info.add(Component.translatable(Minecraft.getInstance().options.keyRight.getName() + ":"));
-		info.add(Component.literal(" Remove attachments from blocks"));
+		info.add(Component.translatable("item.ic2.crowbar.tooltip.remove", Minecraft.getInstance().options.keyRight.getName()));
 	}
 
 	@Override

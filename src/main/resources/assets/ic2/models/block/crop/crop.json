@@ -1,5 +1,6 @@
 {
   "parent": "block/crop",
+  "render_type": "cutout",
   "textures": {
     "crop": "ic2:block/crop/stick"
   }

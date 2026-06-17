@@ -1124,7 +1124,7 @@ public class TileEntityCrop extends Ic2TileEntity implements ICropTile
 			BlockState newState = cropBlock.defaultBlockState();
 			if (!newState.is(Ic2Blocks.CROP_STICK))
 			{
-				newState = newState.setValue(ic2CropBlock.getAgeProperty(), Integer.valueOf(this.currentAge));
+				newState = newState.setValue(ic2CropBlock.getAgeProperty(), (int) this.currentAge);
 			}
 
 			this.level.setBlockAndUpdate(this.worldPosition, newState);

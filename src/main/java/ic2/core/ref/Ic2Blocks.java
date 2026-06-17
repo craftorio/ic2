@@ -119,7 +119,6 @@ import ic2.core.block.wiring.tileentity.TileEntityTransformerEV;
 import ic2.core.block.wiring.tileentity.TileEntityTransformerHV;
 import ic2.core.block.wiring.tileentity.TileEntityTransformerLV;
 import ic2.core.block.wiring.tileentity.TileEntityTransformerMV;
-import ic2.core.crop.CropStickBlock;
 import ic2.core.crop.Ic2CropType;
 import ic2.core.crop.TileEntityCrop;
 import ic2.core.util.Util;
@@ -350,7 +349,7 @@ public final class Ic2Blocks
 	public static final Block RCI_RSH = register("rci_rsh", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL), TileEntityRCI_RSH.class, true, Ic2TileEntityBlock.DefaultDrop.AdvMachine, Util.allFacings, true));
 	public static final Block RCI_LZH = register("rci_lzh", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL), TileEntityRCI_LZH.class, true, Ic2TileEntityBlock.DefaultDrop.AdvMachine, Util.allFacings, true));
 	private static final Properties cropSettings = Properties.of().strength(0.8F, 0.2F).sound(SoundType.CROP).noCollission();
-	public static final Block CROP_STICK = register("crop_stick", new CropStickBlock(cropSettings));
+	public static final Block CROP_STICK = register("crop_stick", Ic2TileEntityBlock.create(cropSettings, TileEntityCrop.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.noFacings, false, Ic2CropType.none));
 	public static final Block WEED_CROP = register("weed_crop", Ic2TileEntityBlock.create(cropSettings, TileEntityCrop.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.noFacings, false, Ic2CropType.weed));
 	public static final Block WHEAT_CROP = register("wheat_crop", Ic2TileEntityBlock.create(cropSettings, TileEntityCrop.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.noFacings, false, Ic2CropType.wheat));
 	public static final Block CARROTS_CROP = register("carrots_crop", Ic2TileEntityBlock.create(cropSettings, TileEntityCrop.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.noFacings, false, Ic2CropType.carrots));

@@ -249,6 +249,7 @@
 	"item.ic2.crop_analyzer": "作物分析仪",
 	"item.ic2.empty_cell": "空单元",
 	"item.ic2.crowbar": "撬棍",
+	"item.ic2.crowbar.tooltip.remove": "按%s移除覆盖板",
 	"item.ic2.night_vision_goggles": "夜视镜",
 	"item.ic2.broken_rubber_boat": "损坏的橡胶船",
 	"item.ic2.rubber_boat": "橡胶船",

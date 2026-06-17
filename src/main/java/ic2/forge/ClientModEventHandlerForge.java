@@ -4,6 +4,7 @@ import ic2.core.event.EventHandlerClient;
 import ic2.forge.model.BeModelLoader;
 import ic2.forge.model.CableModelLoader;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.client.event.EntityRenderersEvent;
@@ -90,6 +91,14 @@ public final class ClientModEventHandlerForge
 	@SubscribeEvent
 	public void onClientSetup(FMLClientSetupEvent event)
 	{
+		for (ClientEnvProxyForge.BlockLayerRegistration reg : ClientEnvProxyForge.blockLayerRegistrations)
+		{
+			for (var block : reg.blocks())
+			{
+				ItemBlockRenderTypes.setRenderLayer(block, reg.layer());
+			}
+		}
+
 		EventHandlerClient.onClientSetup();
 	}
 }

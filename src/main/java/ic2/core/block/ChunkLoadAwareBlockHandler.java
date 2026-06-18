@@ -55,6 +55,7 @@ public final class ChunkLoadAwareBlockHandler
 				if (container.maybeHas(stateMap::containsKey))
 				{
 					Level world = chunk.getLevel();
+					if (world.isClientSide) return;
 					MutableBlockPos pos = new MutableBlockPos();
 					pos.set(chunk.getPos().getMinBlockX(), chunk.getMinBuildHeight() + sectionIdx * 16, chunk.getPos().getMinBlockZ());
 					BlockState lastState = null;

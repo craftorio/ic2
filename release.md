@@ -25,7 +25,6 @@
 - 模式扫描机GUI的错位（TileEntityScanner）
 - 蒸汽动能发生机的显示重叠（GuiSteamKineticGenerator）
 - 流体单元倒不出来
-- 矿石矿辞
 
 ### 不急
 

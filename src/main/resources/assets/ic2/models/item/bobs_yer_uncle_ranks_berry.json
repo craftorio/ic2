@@ -1,0 +1,6 @@
+{
+  "parent": "ic2:item/default",
+  "textures": {
+    "layer0": "ic2:block/crop/bobs_yer_uncle_ranks_berries_0"
+  }
+}

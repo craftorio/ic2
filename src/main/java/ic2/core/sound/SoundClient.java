@@ -23,6 +23,14 @@ public class SoundClient extends Sound
 	{
 	}
 
+	public void setSourceItem(net.minecraft.world.item.Item item)
+	{
+		if (this.entityTrackingInstance != null)
+		{
+			this.entityTrackingInstance.setSourceItem(item);
+		}
+	}
+
 	public SoundClient(SoundEvent soundEvent, SoundSource soundCategory, BlockPos pos, float volume, float pitch)
 	{
 		this();

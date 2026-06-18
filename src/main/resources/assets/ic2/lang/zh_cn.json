@@ -234,7 +234,7 @@
 	"ic2.tooltip.jetpack_attachment.craft": "与胸甲和电力喷气背包一起合成。",
 	"ic2.tooltip.jetpack_attachment.attach": "将喷气背包附加到胸甲。",
 	"ic2.tooltip.jetpack_attachment.warning": "附加后无法卸下，且不会显示电量。后果自负！",
-	"ic2.crop_analyzer.crop_name": "作物名称：",
+	"ic2.crop_analyzer.crop_name": "作物名称：%s",
 	"ic2.crop.analyzer.crop_discovered_by": "发现者：%s",
 	"ic2.crop_analyzer.crop_age": "作物年龄：%s",
 	"ic2.crop_analyzer.crop_nutrients": "作物养分：%s/200",

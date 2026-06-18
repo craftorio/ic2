@@ -236,17 +236,23 @@ public abstract class ItemElectricTool extends DiggerItem implements IElectricIt
 		boolean isEquipped = flag && entity instanceof LivingEntity;
 		if (IC2.sideProxy.isRendering())
 		{
-			if (isEquipped && !this.wasEquipped)
+			if (isEquipped)
 			{
-				this.initSound((LivingEntity) entity, itemstack);
-				if (this.idleSound != null)
+				if (!this.wasEquipped)
+				{
+					this.initSound((LivingEntity) entity, itemstack);
+					if (this.idleSound != null)
+					{
+						this.idleSound.play();
+					}
+
+					if (this.startSound != null)
+					{
+						this.startSound.playOnce();
+					}
+				} else if (this.idleSound != null && !this.idleSound.isPlaying())
 				{
 					this.idleSound.play();
-				}
-
-				if (this.startSound != null)
-				{
-					this.startSound.playOnce();
 				}
 			} else if (!isEquipped && this.idleSound != null && entity instanceof LivingEntity theEntity)
 			{
@@ -272,6 +278,7 @@ public abstract class ItemElectricTool extends DiggerItem implements IElectricIt
 		if (this.idleSound == null && (idleEvent = this.getIdleSound(entity, stack)) != null)
 		{
 			this.idleSound = IC2.soundManager.createSound(entity, idleEvent, SoundSource.PLAYERS, entity, 1.0F, 1.0F);
+				this.idleSound.setSourceItem(this);
 		}
 
 		SoundEvent startEvent;

@@ -27,6 +27,10 @@ public class Sound
 	{
 	}
 
+	public void setSourceItem(net.minecraft.world.item.Item item)
+	{
+	}
+
 	public void tick()
 	{
 	}

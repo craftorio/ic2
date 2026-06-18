@@ -69,7 +69,7 @@ public class ItemCropAnalyzer extends BaseElectricItem implements IHandHeldInven
 				if (ElectricItem.manager.discharge(StackUtil.get(player, context.getHand()), HandHeldCropAnalyzer.energyForLevel(2), 3, true, false, false) > 0.0)
 				{
 					CropCard plant = crop.getCrop();
-					player.sendSystemMessage(Component.translatable("ic2.crop_analyzer.crop_name", plant.getUnlocalizedName()));
+					player.sendSystemMessage(Component.translatable("ic2.crop_analyzer.crop_name", Component.translatable(plant.getUnlocalizedName())));
 					player.sendSystemMessage(Component.translatable("ic2.crop.analyzer.crop_discovered_by", plant.getDiscoveredBy()));
 					player.sendSystemMessage(Component.translatable("ic2.crop_analyzer.crop_age", crop.getCurrentAge()));
 					player.sendSystemMessage(Component.translatable("ic2.crop_analyzer.crop_nutrients", crop.getStorageNutrients()));

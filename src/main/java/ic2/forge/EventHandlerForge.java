@@ -102,6 +102,7 @@ public final class EventHandlerForge
 		}
 	}
 
+	@SubscribeEvent
 	public void onChunkLoad(ChunkEvent.Load event)
 	{
 		ChunkAccess chunk = event.getChunk();

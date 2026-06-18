@@ -1,4 +1,4 @@
-# 2.10.17-ex120
+# 2.10.18-ex120
 
 我们很高兴宣布：适用于 1.20.1 Forge 版本的 IndustrialCraft 2 终于发布了！
 
@@ -19,7 +19,6 @@
 ### 紧急
 
 - 创造模式物品栏乱序（目前是按照注册顺序的，后续会调整为分类顺序）
-- 杂交系统的完全体产生中
 - 小撮钻石粉和末影珍珠粉没有材质，是杂交产物。
 - 添加：RE充电电池、高级充电电池、能量水晶充电电池、兰波顿充电电池
 - 模式扫描机GUI的错位（TileEntityScanner）
@@ -40,7 +39,7 @@
 - 国际化混乱应用，有 `Localization.translate -> String` 和 `Component.translatable -> Component`
 - 日光灯不能用（仅限合成）
 - 橡胶木告示牌材质
-- 重做电力网络。导线仍然存在较轻微连接问题；适配其他电力网络，例如 FE（Forge Energy）、RF（Redstone Flux）等
+- 适配其他电力网络，例如 FE（Forge Energy）、RF（Redstone Flux）等
 - 重做声音系统
 - 增加一些功能的按键切换 tooltip 以及关闭功能（相对原版新增）
   - （新增）电力喷气背包和量子胸甲的飞行模式开关以及 tooltip

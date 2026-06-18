@@ -34,6 +34,7 @@
 - 纳米剑 `nano_saber`: 右键激活不显示
 - 国际化混乱应用，有 `Localization.translate -> String` 和 `Component.translatable -> Component`
 - 日光灯不能用（仅限合成）
+- 适配其他电力网络，例如 FE（Forge Energy）、RF（Redstone Flux）等
 - 重做声音系统
 - 增加一些功能的按键切换 tooltip 以及关闭功能（相对原版新增）
   - （新增）电力喷气背包和量子胸甲的飞行模式开关以及 tooltip

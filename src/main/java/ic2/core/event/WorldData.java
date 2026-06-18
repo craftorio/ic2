@@ -3,7 +3,7 @@ package ic2.core.event;
 import ic2.core.IC2;
 import ic2.core.WindSim;
 import ic2.core.block.personal.TradingMarket;
-import ic2.core.energy.EnergyNetLocal;
+import ic2.core.energy.grid.EnergyNetLocal;
 import ic2.core.network.TeUpdateDataServer;
 import ic2.core.util.Util;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;

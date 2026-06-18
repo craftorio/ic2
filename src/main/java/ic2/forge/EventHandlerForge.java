@@ -6,9 +6,7 @@ import ic2.api.energy.event.EnergyTileUnloadEvent;
 import ic2.api.event.RetextureEvent;
 import ic2.api.tile.RetexturableBlock;
 import ic2.core.IC2;
-import ic2.core.block.comp.Energy;
 import ic2.core.block.tileentity.Ic2TileEntity;
-import ic2.core.energy.fe.EnergyFEAdapter;
 import ic2.core.event.EventHandler;
 import ic2.core.event.TickHandler;
 import ic2.core.fluid.FluidBeBridge;
@@ -49,7 +47,6 @@ import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.InvWrapper;
@@ -60,7 +57,6 @@ public final class EventHandlerForge
 {
 	private static final ResourceLocation fluidCapId = IC2.getIdentifier("fluid");
 	private static final ResourceLocation itemCapId = IC2.getIdentifier("item");
-	private static final ResourceLocation feEnergyCapId = IC2.getIdentifier("fe_energy");
 
 	@SubscribeEvent
 	public void serverStart(ServerStartingEvent event)
@@ -352,12 +348,6 @@ public final class EventHandlerForge
 						return (LazyOptional<T>) (capability == ForgeCapabilities.ITEM_HANDLER ? this.cap : LazyOptional.empty());
 					}
 				});
-			}
-
-			Ic2TileEntity te = (Ic2TileEntity) be;
-			if (te.hasComponent(Energy.class))
-			{
-				event.addCapability(feEnergyCapId, EnergyFEAdapter.createProvider(te.getComponent(Energy.class)));
 			}
 		}
 	}

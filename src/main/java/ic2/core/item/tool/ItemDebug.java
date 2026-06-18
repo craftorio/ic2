@@ -16,7 +16,7 @@ import ic2.core.block.generator.tileentity.TileEntityBaseGenerator;
 import ic2.core.block.personal.IPersonalBlock;
 import ic2.core.block.tileentity.Ic2TileEntity;
 import ic2.core.crop.TileEntityCrop;
-import ic2.core.energy.EnergyNetGlobal;
+import ic2.core.energy.grid.EnergyNetGlobal;
 import ic2.core.item.InfiniteElectricItemManager;
 import ic2.core.item.PriorityUsableItem;
 import ic2.core.util.StackUtil;

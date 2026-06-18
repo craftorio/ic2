@@ -1,4 +1,4 @@
-package ic2.core.energy;
+package ic2.core.energy.grid;
 
 import ic2.api.energy.NodeStats;
 

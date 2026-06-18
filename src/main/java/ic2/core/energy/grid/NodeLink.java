@@ -1,4 +1,4 @@
-package ic2.core.energy;
+package ic2.core.energy.grid;
 
 import ic2.api.energy.EnergyNet;
 import ic2.api.energy.tile.IEnergyTile;
@@ -10,7 +10,7 @@ import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 
-class NodeLink
+public class NodeLink
 {
 	Node nodeA;
 	Node nodeB;
@@ -19,9 +19,9 @@ class NodeLink
 	double loss;
 	List<Node> skippedNodes = new ArrayList<>();
 
-	NodeLink(Node nodeA1, Node nodeB1, double loss1)
+	NodeLink(Node nodeA, Node nodeB, double loss)
 	{
-		this(nodeA1, nodeB1, loss1, null, null);
+		this(nodeA, nodeB, loss, null, null);
 		this.calculateDirections();
 	}
 
@@ -41,7 +41,7 @@ class NodeLink
 		this.dirFromB = dirFromB;
 	}
 
-	Node getNeighbor(Node node)
+	public Node getNeighbor(Node node)
 	{
 		return this.nodeA == node ? this.nodeB : this.nodeA;
 	}
@@ -49,6 +49,11 @@ class NodeLink
 	Node getNeighbor(int uid)
 	{
 		return this.nodeA.uid == uid ? this.nodeB : this.nodeA;
+	}
+
+	public double getLoss()
+	{
+		return this.loss;
 	}
 
 	void replaceNode(Node oldNode, Node newNode)
@@ -67,7 +72,7 @@ class NodeLink
 		}
 	}
 
-	Direction getDirFrom(Node node)
+	public Direction getDirFrom(Node node)
 	{
 		if (this.nodeA == node)
 		{
@@ -76,15 +81,6 @@ class NodeLink
 		{
 			return this.nodeB == node ? this.dirFromB : null;
 		}
-	}
-
-	void updateCurrent()
-	{
-		assert !Double.isNaN(this.nodeA.getVoltage());
-		assert !Double.isNaN(this.nodeB.getVoltage());
-		double currentAB = (this.nodeA.getVoltage() - this.nodeB.getVoltage()) / this.loss;
-		this.nodeA.addCurrent(-currentAB);
-		this.nodeB.addCurrent(currentAB);
 	}
 
 	@Override
@@ -99,7 +95,7 @@ class NodeLink
 		{
 			for (IEnergyTile posB : this.nodeB.tile.subTiles)
 			{
-				BlockPos delta = EnergyNet.instance.getPos(posA).subtract(EnergyNet.instance.getPos(posB));
+				BlockPos delta = EnergyNet.instance.getPos(posB).subtract(EnergyNet.instance.getPos(posA));
 
 				for (Direction dir : Util.ALL_DIRS)
 				{

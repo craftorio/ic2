@@ -1172,10 +1172,10 @@ public class TileEntityCrop extends Ic2TileEntity implements ICropTile
 	// Please report this to the Vineflower issue tracker, at https://github.com/Vineflower/vineflower/issues with a copy of the class file (if you have the rights to distribute it!)
 	private boolean attemptCrossing()
 	{
-		//if (IC2.random.nextInt(3) != 0)
-		//{
-		//	return false;
-		//}
+		if (IC2.random.nextInt(3) != 0)
+		{
+			return false;
+		}
 
 		List<TileEntityCrop> neighbours = new ArrayList<>(4);
 		this.checkCrossingAvailability(this.worldPosition.north(), neighbours);

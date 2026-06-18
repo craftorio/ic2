@@ -129,8 +129,7 @@ public class HandHeldCropAnalyzer extends HandHeldInventory
 		}
 
 		double need = energyForLevel(level);
-		double got = ElectricItem.manager.discharge(this.containerStack, need, 2, true, false, false);
-		if (Math.abs(got - need) > 0.01)
+		if (!ElectricItem.manager.use(this.containerStack, need, this.player))
 		{
 			return;
 		}

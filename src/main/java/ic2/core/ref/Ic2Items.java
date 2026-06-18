@@ -545,7 +545,7 @@ public final class Ic2Items
 	public static final Item LAVA_CELL = register("lava_cell", new ItemClassicCell(new Properties(), Fluids.LAVA, 1));
 	public static final Item AIR_CELL = register("air_cell", new ItemClassicCell(new Properties(), Ic2Fluids.AIR.still(), 1));
 	public static final Item ELECTROLYZED_WATER_CELL = register("electrolyzed_water_cell", new ItemClassicCell(new Properties(), null, 1));
-	public static final ItemClassicCell WEED_EX_CELL = register("weed_ex_cell", new ItemClassicCell(new Properties().stacksTo(1), null, 64));
+	public static final Item WEED_EX_CELL = register("weed_ex_cell", new ItemClassicCell(new Properties(), Ic2Fluids.WEED_EX.still(), 1));
 	public static final ItemClassicCell HYDRATION_CELL = register("hydration_cell", new ItemClassicCell(new Properties().stacksTo(1), null, 10000));
 	public static final Item UU_MATTER_CELL = register("uu_matter_cell", new ItemClassicCell(new Properties(), Ic2Fluids.UU_MATTER.still(), 1));
 	public static final Item CONSTRUCTION_FOAM_CELL = register("construction_foam_cell", new ItemClassicCell(new Properties(), Ic2Fluids.CONSTRUCTION_FOAM.still(), 1));

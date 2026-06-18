@@ -268,6 +268,11 @@ public class JetpackHandler implements IBackupElectricItemManager
 		if (hasJetpackAttached(event.getItemStack()))
 		{
 			event.getToolTip().add(net.minecraft.network.chat.Component.literal(ChatFormatting.YELLOW + Localization.translate("ic2.jetpackAttached")));
+			String energyTooltip = ElectricItem.manager.getToolTip(event.getItemStack());
+			if (energyTooltip != null && !energyTooltip.trim().isEmpty())
+			{
+				event.getToolTip().add(net.minecraft.network.chat.Component.literal(energyTooltip));
+			}
 		}
 	}
 

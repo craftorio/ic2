@@ -36,4 +36,11 @@ public class ContainerAnalyzer extends ContainerHandHeldInventory<HandHeldCropAn
 		this.addSlot(new SlotDischarge(analyzer, 2, HandHeldCropAnalyzer.SLOT_BATTERY, 152, 7));
 		this.addPlayerInventorySlots(analyzer.player.getInventory(), 223);
 	}
+
+	@Override
+	public void broadcastChanges()
+	{
+		this.base.tryScan();
+		super.broadcastChanges();
+	}
 }

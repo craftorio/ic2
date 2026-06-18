@@ -1,12 +1,12 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_empty_cell": {
+    "has_bucket": {
       "conditions": {
         "items": [
           {
             "items": [
-              "ic2:empty_cell"
+              "minecraft:bucket"
             ]
           }
         ]
@@ -39,7 +39,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "ic2:shaped/weed_ex_cell"
+        "recipe": "ic2:shapeless/weed_ex_bucket"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -48,13 +48,13 @@
     [
       "has_redstone",
       "has_grin_powder",
-      "has_empty_cell",
+      "has_bucket",
       "has_the_recipe"
     ]
   ],
   "rewards": {
     "recipes": [
-      "ic2:shaped/weed_ex_cell"
+      "ic2:shapeless/weed_ex_bucket"
     ]
   },
   "sends_telemetry_event": true

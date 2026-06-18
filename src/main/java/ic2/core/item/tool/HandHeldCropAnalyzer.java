@@ -19,20 +19,37 @@ public class HandHeldCropAnalyzer extends HandHeldInventory
 	public static final int SLOT_OUTPUT = 1;
 	public static final int SLOT_BATTERY = 2;
 
+	private boolean scanning;
+
 	public HandHeldCropAnalyzer(Player player, InteractionHand hand, ItemStack containerStack)
 	{
 		super(player, hand, containerStack, 3);
 	}
 
-	public int getScannedLevel()
+	private ItemStack getAnalyzedStack()
 	{
 		ItemStack output = this.inventory[SLOT_OUTPUT];
-		return !StackUtil.isEmpty(output) && output.getItem() instanceof ICropSeed ? ((ICropSeed) output.getItem()).getScannedFromStack(output) : -1;
+		if (!StackUtil.isEmpty(output) && output.getItem() instanceof ICropSeed)
+		{
+			return output;
+		}
+		ItemStack input = this.inventory[SLOT_INPUT];
+		if (!StackUtil.isEmpty(input) && input.getItem() instanceof ICropSeed)
+		{
+			return input;
+		}
+		return StackUtil.emptyStack;
+	}
+
+	public int getScannedLevel()
+	{
+		ItemStack stack = this.getAnalyzedStack();
+		return !StackUtil.isEmpty(stack) && stack.getItem() instanceof ICropSeed ? ((ICropSeed) stack.getItem()).getScannedFromStack(stack) : -1;
 	}
 
 	public CropCard getCrop()
 	{
-		return Crops.instance.getCropCard(this.inventory[SLOT_OUTPUT]);
+		return Crops.instance.getCropCard(this.getAnalyzedStack());
 	}
 
 	public String getSeedName()
@@ -82,20 +99,20 @@ public class HandHeldCropAnalyzer extends HandHeldInventory
 
 	public int getSeedGrowth()
 	{
-		ItemStack output = this.inventory[SLOT_OUTPUT];
-		return !StackUtil.isEmpty(output) && output.getItem() instanceof ICropSeed ? ((ICropSeed) output.getItem()).getGrowthFromStack(output) : -1;
+		ItemStack stack = this.getAnalyzedStack();
+		return !StackUtil.isEmpty(stack) && stack.getItem() instanceof ICropSeed ? ((ICropSeed) stack.getItem()).getGrowthFromStack(stack) : -1;
 	}
 
 	public int getSeedGain()
 	{
-		ItemStack output = this.inventory[SLOT_OUTPUT];
-		return !StackUtil.isEmpty(output) && output.getItem() instanceof ICropSeed ? ((ICropSeed) output.getItem()).getGainFromStack(output) : -1;
+		ItemStack stack = this.getAnalyzedStack();
+		return !StackUtil.isEmpty(stack) && stack.getItem() instanceof ICropSeed ? ((ICropSeed) stack.getItem()).getGainFromStack(stack) : -1;
 	}
 
 	public int getSeedResistance()
 	{
-		ItemStack output = this.inventory[SLOT_OUTPUT];
-		return !StackUtil.isEmpty(output) && output.getItem() instanceof ICropSeed ? ((ICropSeed) output.getItem()).getResistanceFromStack(output) : -1;
+		ItemStack stack = this.getAnalyzedStack();
+		return !StackUtil.isEmpty(stack) && stack.getItem() instanceof ICropSeed ? ((ICropSeed) stack.getItem()).getResistanceFromStack(stack) : -1;
 	}
 
 	public static int energyForLevel(int level)
@@ -111,33 +128,43 @@ public class HandHeldCropAnalyzer extends HandHeldInventory
 
 	public void tryScan()
 	{
-		ItemStack input = this.inventory[SLOT_INPUT];
-		ItemStack output = this.inventory[SLOT_OUTPUT];
+		if (scanning) return;
+		scanning = true;
 
-		if (!StackUtil.isEmpty(output) || StackUtil.isEmpty(input) || !(input.getItem() instanceof ICropSeed seed))
+		try
 		{
-			return;
-		}
+			ItemStack input = this.inventory[SLOT_INPUT];
+			ItemStack output = this.inventory[SLOT_OUTPUT];
 
-		int level = seed.getScannedFromStack(input);
-		if (level >= 4)
-		{
+			if (!StackUtil.isEmpty(output) || StackUtil.isEmpty(input) || !(input.getItem() instanceof ICropSeed seed))
+			{
+				return;
+			}
+
+			int level = seed.getScannedFromStack(input);
+			if (level >= 4)
+			{
+				this.inventory[SLOT_OUTPUT] = input;
+				this.inventory[SLOT_INPUT] = StackUtil.emptyStack;
+				this.save();
+				return;
+			}
+
+			double need = energyForLevel(level);
+			if (!ElectricItem.manager.use(this.containerStack, need, this.player))
+			{
+				return;
+			}
+
+			seed.incrementScannedFromStack(input);
 			this.inventory[SLOT_OUTPUT] = input;
 			this.inventory[SLOT_INPUT] = StackUtil.emptyStack;
 			this.save();
-			return;
 		}
-
-		double need = energyForLevel(level);
-		if (!ElectricItem.manager.use(this.containerStack, need, this.player))
+		finally
 		{
-			return;
+			scanning = false;
 		}
-
-		seed.incrementScannedFromStack(input);
-		this.inventory[SLOT_OUTPUT] = input;
-		this.inventory[SLOT_INPUT] = StackUtil.emptyStack;
-		this.save();
 	}
 
 	@Override

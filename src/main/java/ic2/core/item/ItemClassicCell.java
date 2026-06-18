@@ -113,15 +113,6 @@ public class ItemClassicCell extends Ic2BucketItem implements Ic2FluidItem
 		{
 			if (crop.applyWeedEx(50, true, manual, false) > 0)
 			{
-				int uses = this.getUsage(stack) + 1;
-				if (uses >= this.charges)
-				{
-					stack = StackUtil.decSize(stack);
-				} else
-				{
-					this.setUsage(stack, uses);
-				}
-
 				return true;
 			}
 		} else if (this == Ic2Items.HYDRATION_CELL)

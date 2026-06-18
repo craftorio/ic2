@@ -20,15 +20,6 @@ public class GuiCropAnalyzer extends Ic2Gui<ContainerAnalyzer>
 	}
 
 	@Override
-	public void containerTick()
-	{
-		super.containerTick();
-		ContainerAnalyzer container = this.getContainer();
-		HandHeldCropAnalyzer analyzer = container.base;
-		analyzer.tryScan();
-	}
-
-	@Override
 	protected void drawForegroundLayer(GuiGraphics guiGraphics, int mouseX, int mouseY)
 	{
 		super.drawForegroundLayer(guiGraphics, mouseX, mouseY);

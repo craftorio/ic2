@@ -1,0 +1,17 @@
+{
+  "type": "ic2:shapeless",
+  "ingredients": [
+    {
+      "item": "minecraft:bucket"
+    },
+    {
+      "item": "minecraft:redstone"
+    },
+    {
+      "item": "ic2:grin_powder"
+    }
+  ],
+  "result": {
+    "item": "ic2:weed_ex_bucket"
+  }
+}

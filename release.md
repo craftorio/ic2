@@ -24,6 +24,8 @@
 - 添加：RE充电电池、高级充电电池、能量水晶充电电池、兰波顿充电电池
 - 模式扫描机GUI的错位（TileEntityScanner）
 - 蒸汽动能发生机的显示重叠（GuiSteamKineticGenerator）
+- 流体单元倒不出来
+- 矿石矿辞
 
 ### 不急
 

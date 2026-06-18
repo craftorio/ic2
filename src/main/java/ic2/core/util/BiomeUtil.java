@@ -22,10 +22,24 @@ import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.PalettedContainer;
+import net.minecraft.world.level.chunk.PalettedContainerRO;
 
 public final class BiomeUtil
 {
-	private static final Field field_ChunkSection_biomeContainer = ReflectionUtil.getField(LevelChunkSection.class, "biomeContainer", "field_34556", "biomes");
+	private static final Field field_ChunkSection_biomeContainer = findBiomeContainerField();
+
+	private static Field findBiomeContainerField()
+	{
+		for (Field f : LevelChunkSection.class.getDeclaredFields())
+		{
+			if (f.getType() == PalettedContainerRO.class)
+			{
+				f.setAccessible(true);
+				return f;
+			}
+		}
+		return null;
+	}
 
 	public static Holder<Biome> getBiome(Level world, ResourceKey<Biome> key)
 	{
@@ -45,6 +59,8 @@ public final class BiomeUtil
 	public static void setBiome(LevelReader world, BlockPos pos, Holder<Biome> biome)
 	{
 		Objects.requireNonNull(biome, "null biome");
+		if (field_ChunkSection_biomeContainer == null) return;
+
 		int chunkX = pos.getX() >> 4;
 		int chunkZ = pos.getZ() >> 4;
 		int biomeX = (pos.getX() >> 2) & 3;
@@ -53,12 +69,15 @@ public final class BiomeUtil
 
 		for (LevelChunkSection section : chunk.getSections())
 		{
-			PalettedContainer<Holder<Biome>> biomeContainer = ReflectionUtil.getFieldValue(field_ChunkSection_biomeContainer, section);
+			PalettedContainerRO<Holder<Biome>> roContainer = section.getBiomes();
+			PalettedContainer<Holder<Biome>> mutableContainer = roContainer.recreate();
 
 			for (int y = 0; y < 4; y++)
 			{
-				biomeContainer.getAndSetUnchecked(biomeX, y, biomeZ, biome);
+				mutableContainer.getAndSetUnchecked(biomeX, y, biomeZ, biome);
 			}
+
+			ReflectionUtil.setValue(section, field_ChunkSection_biomeContainer, mutableContainer);
 		}
 	}
 

@@ -113,3 +113,29 @@ tasks.build {
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
+
+tasks.register('syncVersion') {
+    doLast {
+        def version = mod_version
+        def badgeVersion = version.replace('-', '--')
+
+        def readmeFile = file('README.md')
+        def readmeContent = readmeFile.text
+        readmeContent = readmeContent.replaceAll(
+            /(Version-)[^"<\s]+(-blue)/,
+            "\$1${badgeVersion}\$2"
+        )
+        readmeContent = readmeContent.replaceAll(
+            /alt="Version [^"]+"/,
+            "alt=\"Version ${version}\""
+        )
+        readmeFile.text = readmeContent
+
+        def releaseFile = file('release.md')
+        def releaseContent = releaseFile.text
+        releaseContent = releaseContent.replaceAll(/^# .+/, "# ${version}")
+        releaseFile.text = releaseContent
+
+        logger.warn("Notice: current version is: ${version}")
+    }
+}

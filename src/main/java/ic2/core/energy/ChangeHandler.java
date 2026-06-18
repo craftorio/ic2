@@ -1,4 +1,4 @@
-package ic2.core.energy.grid;
+package ic2.core.energy;
 
 import ic2.api.energy.EnergyNet;
 import ic2.api.energy.IEnergyNetEventReceiver;

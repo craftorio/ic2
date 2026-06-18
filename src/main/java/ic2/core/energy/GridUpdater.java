@@ -1,4 +1,4 @@
-package ic2.core.energy.grid;
+package ic2.core.energy;
 
 import ic2.api.energy.tile.IEnergyTile;
 import ic2.core.IC2;
@@ -19,7 +19,7 @@ class GridUpdater implements Runnable
 	private final Queue<GridChange> changes = new ArrayDeque<>();
 	private final GridUpdater.GridCalcTask[] calcTaskCache = new GridUpdater.GridCalcTask[16];
 	private final AtomicInteger pendingCalculations = new AtomicInteger(0);
-	private boolean busy;
+	private volatile boolean busy;
 	private boolean isChangeStep;
 
 	GridUpdater(EnergyNetLocal enet)
@@ -151,9 +151,6 @@ class GridUpdater implements Runnable
 
 	private void updateGrid()
 	{
-		long startTime = 0L;
-		int totalChanges = this.changes.size();
-
 		try
 		{
 			GridChange change;
@@ -231,9 +228,17 @@ class GridUpdater implements Runnable
 		@Override
 		public void run()
 		{
-			EnergyNetGlobal.getCalculator().runAsyncStep(this.grid);
-			this.grid = null;
-			GridUpdater.this.onTaskDone();
+			try
+			{
+				EnergyNetGlobal.getCalculator().runAsyncStep(this.grid);
+			} catch (Exception e)
+			{
+				IC2.log.error(LogCategory.EnergyNet, e, "Unhandled exception in GridCalcTask.");
+			} finally
+			{
+				this.grid = null;
+				GridUpdater.this.onTaskDone();
+			}
 		}
 	}
 
@@ -244,9 +249,17 @@ class GridUpdater implements Runnable
 		@Override
 		public void run()
 		{
-			EnergyNetGlobal.getCalculator().handleGridChange(this.grid);
-			this.grid = null;
-			GridUpdater.this.onTaskDone();
+			try
+			{
+				EnergyNetGlobal.getCalculator().handleGridChange(this.grid);
+			} catch (Exception e)
+			{
+				IC2.log.error(LogCategory.EnergyNet, e, "Unhandled exception in GridUpdateTask.");
+			} finally
+			{
+				this.grid = null;
+				GridUpdater.this.onTaskDone();
+			}
 		}
 	}
 }

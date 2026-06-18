@@ -1,60 +1,57 @@
 package ic2.core.energy;
 
 import ic2.api.energy.EnergyNet;
-import ic2.api.energy.NodeStats;
 import ic2.api.energy.tile.IEnergyConductor;
 import ic2.api.energy.tile.IEnergySink;
 import ic2.api.energy.tile.IEnergySource;
 import ic2.api.energy.tile.IEnergyTile;
-import ic2.api.energy.tile.IMetaDelegate;
-import ic2.core.energy.grid.NodeType;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
-class Tile
+public final class Tile
 {
-	final IEnergyTile mainTile;
+	private final IEnergyTile mainTile;
 	final List<IEnergyTile> subTiles;
 	final List<Node> nodes = new ArrayList<>();
-	final double maxCurrent;
+	private boolean disabled;
+	private double amount;
+	private int packetCount;
 
-	Tile(EnergyNetLocal energyNet, IEnergyTile mainTile)
+	Tile(EnergyNetLocal enet, IEnergyTile mainTile, List<IEnergyTile> subTiles)
 	{
 		this.mainTile = mainTile;
-		if (mainTile instanceof IMetaDelegate)
-		{
-			this.subTiles = new ArrayList<>(((IMetaDelegate) mainTile).getSubTiles());
-			if (this.subTiles.isEmpty())
-			{
-				throw new RuntimeException("Tile " + mainTile + " must return at least 1 sub tile for IMetaDelegate.getSubTiles().");
-			}
-		} else
-		{
-			this.subTiles = Arrays.asList(mainTile);
-		}
-
+		this.subTiles = subTiles;
 		if (mainTile instanceof IEnergySource)
 		{
-			this.nodes.add(new Node(energyNet, this, NodeType.Source));
+			this.nodes.add(new Node(enet.allocateNodeId(), this, NodeType.Source));
 		}
 
 		if (mainTile instanceof IEnergySink)
 		{
-			this.nodes.add(new Node(energyNet, this, NodeType.Sink));
+			this.nodes.add(new Node(enet.allocateNodeId(), this, NodeType.Sink));
 		}
 
 		if (mainTile instanceof IEnergyConductor)
 		{
-			this.nodes.add(new Node(energyNet, this, NodeType.Conductor));
-			this.maxCurrent = ((IEnergyConductor) mainTile).getConductorBreakdownEnergy();
-		} else
-		{
-			this.maxCurrent = Double.MAX_VALUE;
+			this.nodes.add(new Node(enet.allocateNodeId(), this, NodeType.Conductor));
 		}
+	}
+
+	public IEnergyTile getMainTile()
+	{
+		return this.mainTile;
+	}
+
+	public Collection<Node> getNodes()
+	{
+		return this.nodes;
 	}
 
 	void addExtraNode(Node node)
@@ -85,11 +82,14 @@ class Tile
 		if (canBeRemoved)
 		{
 			this.nodes.remove(node);
-			return true;
-		} else
-		{
-			return false;
 		}
+
+		return canBeRemoved;
+	}
+
+	public Collection<IEnergyTile> getSubTiles()
+	{
+		return this.subTiles;
 	}
 
 	IEnergyTile getSubTileAt(BlockPos pos)
@@ -105,15 +105,64 @@ class Tile
 		return null;
 	}
 
-	Iterable<NodeStats> getStats()
+	void setDisabled()
 	{
-		List<NodeStats> ret = new ArrayList<>(this.nodes.size());
+		this.disabled = true;
+	}
 
-		for (Node node : this.nodes)
+	public boolean isDisabled()
+	{
+		return this.disabled;
+	}
+
+	public double getAmount()
+	{
+		return this.amount;
+	}
+
+	public void setAmount(double amount)
+	{
+		this.amount = amount;
+	}
+
+	public int getPacketCount()
+	{
+		return this.packetCount;
+	}
+
+	public void setSourceData(double amount, int packetCount)
+	{
+		this.amount = amount;
+		this.packetCount = packetCount;
+	}
+
+	@Override
+	public String toString()
+	{
+		String ret = getTeClassName(this.mainTile);
+		Level world = EnergyNet.instance.getWorld(this.mainTile);
+		MinecraftServer server = world.getServer();
+		if (server != null && server.isSameThread())
 		{
-			ret.add(node.getStats());
+			BlockPos pos = EnergyNet.instance.getPos(this.mainTile);
+			if (world.isLoaded(pos))
+			{
+				BlockEntity te = world.getBlockEntity(pos);
+				if (te != null)
+				{
+					ret = ret + "|" + getTeClassName(te);
+				} else
+				{
+					ret = ret + "|" + world.getBlockState(pos);
+				}
+			}
 		}
 
 		return ret;
+	}
+
+	private static String getTeClassName(Object o)
+	{
+		return o.getClass().getSimpleName().replace("TileEntity", "");
 	}
 }

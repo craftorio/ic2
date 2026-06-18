@@ -1,90 +1,55 @@
 package ic2.core.energy;
 
-import ic2.api.energy.NodeStats;
 import ic2.api.energy.tile.IEnergyConductor;
 import ic2.api.energy.tile.IEnergySink;
 import ic2.api.energy.tile.IEnergySource;
-import ic2.core.IC2;
-import ic2.core.energy.grid.NodeType;
-import ic2.core.util.LogCategory;
-import ic2.core.util.Util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-class Node
+public final class Node
 {
 	final int uid;
 	final Tile tile;
 	final NodeType nodeType;
-	private final Node parent;
 	private boolean isExtraNode = false;
-	private int tier;
-	private double amount;
-	private double resistance;
-	private double voltage;
-	private double currentIn;
-	private double currentOut;
 	private Grid grid;
 	List<NodeLink> links = new ArrayList<>();
-	private final MutableNodeStats lastNodeStats = new MutableNodeStats();
 
-	Node(EnergyNetLocal energyNet, Tile tile1, NodeType nodeType1)
+	Node(int uid, Tile tile, NodeType nodeType)
 	{
-		if (energyNet == null)
+		if (tile == null)
 		{
-			throw new NullPointerException("The energyNet parameter must not be null.");
+			throw new NullPointerException("null tile");
 		}
 
-		if (tile1 == null)
+		if (nodeType == null)
 		{
-			throw new NullPointerException("The tile parameter must not be null.");
+			throw new NullPointerException("null node type");
 		}
 
-		assert nodeType1 != NodeType.Conductor || tile1.mainTile instanceof IEnergyConductor;
-		assert nodeType1 != NodeType.Sink || tile1.mainTile instanceof IEnergySink;
-		assert nodeType1 != NodeType.Source || tile1.mainTile instanceof IEnergySource;
-		this.uid = EnergyNetLocal.getNextNodeUid();
-		this.tile = tile1;
-		this.nodeType = nodeType1;
-		this.parent = null;
+		assert nodeType != NodeType.Conductor || tile.getMainTile() instanceof IEnergyConductor;
+		assert nodeType != NodeType.Sink || tile.getMainTile() instanceof IEnergySink;
+		assert nodeType != NodeType.Source || tile.getMainTile() instanceof IEnergySource;
+		this.uid = uid;
+		this.tile = tile;
+		this.nodeType = nodeType;
 	}
 
-	Node(Node node)
+	public Tile getTile()
 	{
-		this.uid = node.uid;
-		this.tile = node.tile;
-		this.nodeType = node.nodeType;
-		this.parent = node;
-		assert this.nodeType != NodeType.Conductor || this.tile.mainTile instanceof IEnergyConductor;
-		assert this.nodeType != NodeType.Sink || this.tile.mainTile instanceof IEnergySink;
-		assert this.nodeType != NodeType.Source || this.tile.mainTile instanceof IEnergySource;
-
-		for (NodeLink link : node.links)
-		{
-			assert link.getNeighbor(node).links.contains(link);
-			this.links.add(new NodeLink(link));
-		}
+		return this.tile;
 	}
 
-	double getInnerLoss()
+	public NodeType getType()
 	{
-		switch (this.nodeType)
-		{
-			case Source:
-				return 0.4;
-			case Sink:
-				return 0.4;
-			case Conductor:
-				return ((IEnergyConductor) this.tile.mainTile).getConductionLoss();
-			default:
-				throw new RuntimeException("invalid nodetype: " + this.nodeType);
-		}
+		return this.nodeType;
 	}
 
 	boolean isExtraNode()
 	{
-		return this.getTop().isExtraNode;
+		return this.isExtraNode;
 	}
 
 	void setExtraNode(boolean isExtraNode)
@@ -94,90 +59,61 @@ class Node
 			throw new IllegalStateException("A conductor can't be an extra node.");
 		}
 
-		this.getTop().isExtraNode = isExtraNode;
+		this.isExtraNode = isExtraNode;
 	}
 
-	int getTier()
+	public Grid getGrid()
 	{
-		return this.getTop().tier;
+		return this.grid;
 	}
 
-	void setTier(int tier)
+	void setGrid(Grid grid)
 	{
-		if (tier >= 0 && !Double.isNaN(tier))
+		if (grid == null)
 		{
-			if (tier > 20 && (tier != Integer.MAX_VALUE || this.nodeType != NodeType.Sink))
-			{
-				if (Util.inDev())
-				{
-					IC2.log.debug(LogCategory.EnergyNet, "Restricting node %s to tier 20, requested %d.", this, tier);
-				}
-
-				tier = 20;
-			}
-		} else
-		{
-			assert false;
-			if (EnergyNetGlobal.debugGrid)
-			{
-				IC2.log.warn(LogCategory.EnergyNet, "Node %s / te %s is using the invalid tier %d.", this, this.tile.mainTile, tier);
-			}
-
-			tier = 0;
+			throw new NullPointerException("null grid");
 		}
 
-		this.getTop().tier = tier;
+		assert this.grid == null;
+		this.grid = grid;
 	}
 
-	double getAmount()
+	void clearGrid()
 	{
-		return this.getTop().amount;
+		assert this.grid != null;
+		this.grid = null;
 	}
 
-	void setAmount(double amount)
+	public Collection<NodeLink> getLinks()
 	{
-		this.getTop().amount = amount;
+		return this.links;
 	}
 
-	double getResistance()
+	public NodeLink getLinkTo(Node node)
 	{
-		return this.getTop().resistance;
-	}
-
-	void setResistance(double resistance)
-	{
-		this.getTop().resistance = resistance;
-	}
-
-	double getVoltage()
-	{
-		return this.getTop().voltage;
-	}
-
-	void setVoltage(double voltage)
-	{
-		this.getTop().voltage = voltage;
-	}
-
-	double getMaxCurrent()
-	{
-		return this.tile.maxCurrent;
-	}
-
-	void resetCurrents()
-	{
-		this.getTop().currentIn = 0.0;
-		this.getTop().currentOut = 0.0;
-	}
-
-	void addCurrent(double current)
-	{
-		if (current >= 0.0)
+		for (NodeLink link : this.links)
 		{
-			this.getTop().currentIn += current;
-		} else
+			if (link.getNeighbor(this) == node)
+			{
+				return link;
+			}
+		}
+
+		return null;
+	}
+
+	double getInnerLoss()
+	{
+		switch (this.nodeType)
 		{
-			this.getTop().currentOut += -current;
+			case Source:
+				return 0.0;
+			case Sink:
+				return 0.0;
+			case Conductor:
+				return ((IEnergyConductor) this.tile.getMainTile()).getConductionLoss();
+			default:
+				throw new RuntimeException("invalid nodetype: " + this.nodeType);
 		}
 	}
 
@@ -197,62 +133,6 @@ class Node
 				type = "C";
 		}
 
-		return this.tile.mainTile.getClass().getSimpleName().replace("TileEntity", "") + "|" + type + "|" + this.tier + "|" + this.uid;
-	}
-
-	Node getTop()
-	{
-		return this.parent != null ? this.parent.getTop() : this;
-	}
-
-	NodeLink getConnectionTo(Node node)
-	{
-		for (NodeLink link : this.links)
-		{
-			if (link.getNeighbor(this) == node)
-			{
-				return link;
-			}
-		}
-
-		return null;
-	}
-
-	NodeStats getStats()
-	{
-		return this.lastNodeStats;
-	}
-
-	void updateStats()
-	{
-		if (EnergyNetLocal.useLinearTransferModel)
-		{
-			this.lastNodeStats.set(this.currentIn * this.voltage, this.currentOut * this.voltage, this.voltage);
-		} else
-		{
-			this.lastNodeStats.set(this.currentIn, this.currentOut, this.voltage);
-		}
-	}
-
-	Grid getGrid()
-	{
-		return this.getTop().grid;
-	}
-
-	void setGrid(Grid grid)
-	{
-		if (grid == null)
-		{
-			throw new NullPointerException("null grid");
-		}
-
-		assert this.getTop().grid == null;
-		this.getTop().grid = grid;
-	}
-
-	void clearGrid()
-	{
-		assert this.getTop().grid != null;
-		this.getTop().grid = null;
+		return this.tile + "|" + type + "|" + this.uid;
 	}
 }

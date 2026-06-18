@@ -1,4 +1,4 @@
-package ic2.core.energy.grid;
+package ic2.core.energy;
 
 import ic2.api.energy.tile.IEnergyTile;
 
@@ -23,6 +23,6 @@ class GridChange
 	enum Type
 	{
 		ADDITION,
-		REMOVAL;
+		REMOVAL
 	}
 }

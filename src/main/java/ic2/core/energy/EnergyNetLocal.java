@@ -2,452 +2,237 @@ package ic2.core.energy;
 
 import ic2.api.energy.EnergyNet;
 import ic2.api.energy.NodeStats;
-import ic2.api.energy.tile.IEnergyAcceptor;
-import ic2.api.energy.tile.IEnergyEmitter;
-import ic2.api.energy.tile.IEnergySink;
-import ic2.api.energy.tile.IEnergySource;
 import ic2.api.energy.tile.IEnergyTile;
-import ic2.api.energy.tile.IMetaDelegate;
 import ic2.core.IC2;
-import ic2.core.energy.grid.GridInfo;
-import ic2.core.energy.grid.IEnergyCalculator;
-import ic2.core.energy.grid.NodeType;
-import ic2.core.event.TickHandler;
-import ic2.core.init.MainConfig;
-import ic2.core.util.ConfigUtil;
 import ic2.core.util.LogCategory;
 import ic2.core.util.Util;
 
 import java.io.PrintStream;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.IdentityHashMap;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
-import java.util.WeakHashMap;
-import java.util.Map.Entry;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.SectionPos;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.chunk.ChunkSource;
 
-public final class EnergyNetLocal implements IEnergyCalculator
+public class EnergyNetLocal
 {
-	public static final boolean useLinearTransferModel = ConfigUtil.getBool(MainConfig.get(), "misc/useLinearTransferModel");
-	public static final double nonConductorResistance = 0.2;
-	public static final double sourceResistanceFactor = 0.0625;
-	public static final double sinkResistanceFactor = 1.0;
-	public static final double sourceCurrent = 17.0;
-	public static final boolean enableCache = true;
-	private static int nextGridUid = 0;
-	private static int nextNodeUid = 0;
+	static final GridChange QUEUE_DELAY_CHANGE = new GridChange(null, null, null);
 	private final Level world;
-	protected final Set<Grid> grids = new HashSet<>();
-	protected List<Change> changes = new ArrayList<>();
-	private final Map<BlockPos, Tile> registeredTiles = new HashMap<>();
-	private final Map<IEnergyTile, Integer> pendingAdds = new WeakHashMap<>();
-	private final Set<Tile> removedTiles = new HashSet<>();
-	private boolean locked = false;
-	private static final long logSuppressionTimeout = 300000000000L;
-	private final Map<String, Long> recentLogs = new HashMap<>();
+	private final Queue<GridChange> gridChangesQueue = new ArrayDeque<>();
+	private final Map<IEnergyTile, GridChange> gridAdditionsMap = new IdentityHashMap<>();
+	private final Set<IEnergyTile> ioTilesToNotify = Collections.newSetFromMap(new IdentityHashMap<>());
+	private final GridUpdater updater = new GridUpdater(this);
+	int nextNodeId;
+	int nextGridId;
+	final Map<IEnergyTile, Tile> registeredIoTiles = new IdentityHashMap<>();
+	final Map<BlockPos, Tile> registeredTiles = new HashMap<>();
+	final Set<Tile> sources = Collections.newSetFromMap(new IdentityHashMap<>());
+	private final List<Grid> grids = new ArrayList<>();
 
-	public EnergyNetLocal()
+	public static EnergyNetLocal create(Level world)
 	{
-		this.world = null;
-		throw new UnsupportedOperationException();
+		return new EnergyNetLocal(world);
 	}
 
-	@Override
-	public void handleGridChange(ic2.core.energy.grid.Grid grid)
+	private EnergyNetLocal(Level world)
 	{
-		throw new UnsupportedOperationException();
-	}
+		this.world = world;
 
-	@Override
-	public boolean runSyncStep(ic2.core.energy.grid.EnergyNetLocal enet)
-	{
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public boolean runSyncStep(ic2.core.energy.grid.Grid grid)
-	{
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void runAsyncStep(ic2.core.energy.grid.Grid grid)
-	{
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public NodeStats getNodeStats(ic2.core.energy.grid.Tile tile)
-	{
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void dumpNodeInfo(ic2.core.energy.grid.Node node, String prefix, PrintStream console, PrintStream chat)
-	{
-		throw new UnsupportedOperationException();
-	}
-
-	protected void addTile(IEnergyTile mainTile)
-	{
-		this.addTile(mainTile, 0);
-	}
-
-	protected void addTile(IEnergyTile mainTile, int retry)
-	{
-		if (EnergyNetGlobal.debugTileManagement)
+		for (int i = 0; i < 1; i++)
 		{
-			IC2.log
-				.debug(
-					LogCategory.EnergyNet,
-					"EnergyNet.addTile(%s, %d), world=%s, chunk=%s, this=%s",
-					mainTile,
-					retry,
-					EnergyNet.instance.getWorld(mainTile),
-					EnergyNet.instance.getWorld(mainTile).getChunkAt(EnergyNet.instance.getPos(mainTile)),
-					this
-				);
+			this.gridChangesQueue.add(QUEUE_DELAY_CHANGE);
+		}
+	}
+
+	IEnergyTile getIoTile(BlockPos pos)
+	{
+		Tile tile = this.getTile(pos);
+		if (tile != null)
+		{
+			return tile.getMainTile();
 		}
 
-		if (EnergyNetGlobal.checkApi && !Util.checkInterfaces(mainTile.getClass()))
-		{
-			IC2.log.warn(LogCategory.EnergyNet, "EnergyNet.addTile: %s doesn't implement its advertised interfaces completely.", mainTile);
-		}
+		IEnergyTile ret = null;
 
-		if (mainTile instanceof BlockEntity && ((BlockEntity) mainTile).isRemoved())
+		for (GridChange change : this.gridChangesQueue)
 		{
-			this.logWarn("EnergyNet.addTile: " + mainTile + " is invalid (TileEntity.isInvalid()), aborting");
-		} else if (this.world != IC2.sideProxy.getWorld(this.world.getServer(), Util.getDimId(this.world)))
-		{
-			this.logDebug("EnergyNet.addTile: " + mainTile + " is in an unloaded world, aborting");
-		} else if (this.locked)
-		{
-			this.logDebug("EnergyNet.addTileEntity: adding " + mainTile + " while locked, postponing.");
-			this.pendingAdds.put(mainTile, retry);
-		} else
-		{
-			Tile tile = new Tile(this, mainTile);
-			if (EnergyNetGlobal.debugTileManagement)
+			if (change != QUEUE_DELAY_CHANGE && change.pos.equals(pos))
 			{
-				List<String> posStrings = new ArrayList<>(tile.subTiles.size());
-
-				for (IEnergyTile subTile : tile.subTiles)
-				{
-					posStrings.add(String.format("%s (%s)", subTile, EnergyNet.instance.getPos(subTile)));
-				}
-
-				IC2.log.debug(LogCategory.EnergyNet, "positions: %s", posStrings);
+				ret = change.type == GridChange.Type.REMOVAL ? null : change.ioTile;
 			}
-
-			ListIterator<IEnergyTile> it = tile.subTiles.listIterator();
-
-			while (it.hasNext())
-			{
-				IEnergyTile subTile = it.next();
-				BlockPos pos = EnergyNet.instance.getPos(subTile).immutable();
-				Tile conflicting = this.registeredTiles.get(pos);
-				boolean abort = false;
-				if (conflicting != null)
-				{
-					if (mainTile == conflicting.mainTile)
-					{
-						this.logDebug("EnergyNet.addTileEntity: " + subTile + " (" + mainTile + ") is already added using the same position, aborting");
-					} else if (retry < 2)
-					{
-						this.pendingAdds.put(mainTile, retry + 1);
-					} else if ((!(conflicting.mainTile instanceof BlockEntity) || !((BlockEntity) mainTile).isRemoved()) && !EnergyNetGlobal.replaceConflicting)
-					{
-						this.logWarn(
-							"EnergyNet.addTileEntity: "
-								+ subTile
-								+ " ("
-								+ mainTile
-								+ ") is still conflicting with "
-								+ conflicting.mainTile
-								+ " using the same position (overlapping), aborting"
-						);
-					} else
-					{
-						this.logDebug(
-							"EnergyNet.addTileEntity: "
-								+ subTile
-								+ " ("
-								+ mainTile
-								+ ") is conflicting with "
-								+ conflicting.mainTile
-								+ " (invalid="
-								+ (conflicting.mainTile instanceof BlockEntity && ((BlockEntity) conflicting.mainTile).isRemoved())
-								+ ") using the same position, which is abandoned (prev. te not removed), replacing"
-						);
-						this.removeTile(conflicting.mainTile);
-						conflicting = null;
-					}
-
-					if (conflicting != null)
-					{
-						abort = true;
-					}
-				}
-
-				if (!abort && !this.world.isLoaded(pos))
-				{
-					if (retry < 1)
-					{
-						this.logWarn("EnergyNet.addTileEntity: " + subTile + " (" + mainTile + ") was added too early, postponing");
-						this.pendingAdds.put(mainTile, retry + 1);
-					} else
-					{
-						this.logWarn("EnergyNet.addTileEntity: " + subTile + " (" + mainTile + ") unloaded, aborting");
-					}
-
-					abort = true;
-				}
-
-				if (abort)
-				{
-					it.previous();
-
-					while (it.hasPrevious())
-					{
-						subTile = it.previous();
-						this.registeredTiles.remove(EnergyNet.instance.getPos(subTile));
-					}
-
-					return;
-				}
-
-				this.registeredTiles.put(pos, tile);
-				this.notifyLoadedNeighbors(pos, tile.subTiles);
-			}
-
-			this.addTileToGrids(tile);
-			if (EnergyNetGlobal.verifyGrid())
-			{
-				for (Node node : tile.nodes)
-				{
-					assert node.getGrid() != null;
-				}
-			}
-		}
-	}
-
-	private void notifyLoadedNeighbors(BlockPos pos, List<IEnergyTile> excluded)
-	{
-		Set<BlockPos> excludedPositions = new HashSet<>(excluded.size());
-
-		for (IEnergyTile subTile : excluded)
-		{
-			excludedPositions.add(EnergyNet.instance.getPos(subTile).immutable());
-		}
-
-		Block block = this.world.getBlockState(pos).getBlock();
-		int ocx = pos.getX() >> 4;
-		int ocz = pos.getZ() >> 4;
-
-		for (Direction dir : Util.ALL_DIRS)
-		{
-			BlockPos cPos = pos.relative(dir);
-			if (!excludedPositions.contains(cPos))
-			{
-				int ccx = cPos.getX() >> 4;
-				int ccz = cPos.getZ() >> 4;
-				if (dir.getAxis().isVertical() || ccx == ocx && ccz == ocz || this.world.isLoaded(cPos))
-				{
-					this.world.getBlockState(cPos).neighborChanged(this.world, cPos, block, pos, false);
-				}
-			}
-		}
-	}
-
-	protected void removeTile(IEnergyTile mainTile)
-	{
-		if (this.locked)
-		{
-			throw new IllegalStateException("removeTile isn't allowed from this context");
-		}
-
-		if (EnergyNetGlobal.debugTileManagement)
-		{
-			IC2.log
-				.debug(
-					LogCategory.EnergyNet,
-					"EnergyNet.removeTile(%s), world=%s, chunk=%s, this=%s",
-					mainTile,
-					EnergyNet.instance.getWorld(mainTile),
-					EnergyNet.instance.getWorld(mainTile).getChunkAt(EnergyNet.instance.getPos(mainTile)),
-					this
-				);
-		}
-
-		List<IEnergyTile> subTiles;
-		if (mainTile instanceof IMetaDelegate)
-		{
-			subTiles = ((IMetaDelegate) mainTile).getSubTiles();
-		} else
-		{
-			subTiles = Arrays.asList(mainTile);
-		}
-
-		boolean wasPending = this.pendingAdds.remove(mainTile) != null;
-		if (EnergyNetGlobal.debugTileManagement)
-		{
-			List<String> posStrings = new ArrayList<>(subTiles.size());
-
-			for (IEnergyTile subTile : subTiles)
-			{
-				posStrings.add(String.format("%s (%s)", subTile, EnergyNet.instance.getPos(subTile)));
-			}
-
-			IC2.log.debug(LogCategory.EnergyNet, "positions: %s", posStrings);
-		}
-
-		boolean removed = false;
-
-		for (IEnergyTile subTile : subTiles)
-		{
-			BlockPos pos = EnergyNet.instance.getPos(subTile);
-			Tile tile = this.registeredTiles.get(pos);
-			if (tile == null)
-			{
-				if (!wasPending)
-				{
-					this.logDebug("EnergyNet.removeTileEntity: " + subTile + " (" + mainTile + ") wasn't found (added), skipping");
-				}
-			} else if (tile.mainTile != mainTile)
-			{
-				this.logWarn("EnergyNet.removeTileEntity: " + subTile + " (" + mainTile + ") doesn't match the registered tile " + tile.mainTile + ", skipping");
-			} else
-			{
-				if (!removed)
-				{
-					assert new HashSet<>(subTiles).equals(new HashSet<>(tile.subTiles));
-					this.removeTileFromGrids(tile);
-					removed = true;
-					this.removedTiles.add(tile);
-				}
-
-				this.registeredTiles.remove(pos);
-				if (this.world.isLoaded(pos))
-				{
-					this.notifyLoadedNeighbors(pos, tile.subTiles);
-				}
-			}
-		}
-	}
-
-	protected double getTotalEnergyEmitted(BlockEntity tileEntity)
-	{
-		BlockPos coords = new BlockPos(tileEntity.getBlockPos());
-		Tile tile = this.registeredTiles.get(coords);
-		if (tile == null)
-		{
-			this.logWarn("EnergyNet.getTotalEnergyEmitted: " + tileEntity + " is not added to the enet, aborting");
-			return 0.0;
-		}
-
-		double ret = 0.0;
-
-		for (NodeStats stat : tile.getStats())
-		{
-			ret += stat.getEnergyOut();
 		}
 
 		return ret;
 	}
 
-	protected double getTotalEnergySunken(BlockEntity tileEntity)
+	IEnergyTile getSubTile(BlockPos pos)
 	{
-		BlockPos coords = new BlockPos(tileEntity.getBlockPos());
-		Tile tile = this.registeredTiles.get(coords);
-		if (tile == null)
+		Tile tile = this.getTile(pos);
+		if (tile != null)
 		{
-			this.logWarn("EnergyNet.getTotalEnergySunken: " + tileEntity + " is not added to the enet, aborting");
-			return 0.0;
+			return tile.getSubTileAt(pos);
 		}
 
-		double ret = 0.0;
+		IEnergyTile ret = null;
 
-		for (NodeStats stat : tile.getStats())
+		for (GridChange change : this.gridChangesQueue)
 		{
-			ret += stat.getEnergyIn();
+			if (change != QUEUE_DELAY_CHANGE)
+			{
+				for (IEnergyTile subtile : change.subTiles != null ? change.subTiles : Collections.singletonList(change.ioTile))
+				{
+					if (EnergyNet.instance.getPos(subtile).equals(pos))
+					{
+						ret = change.type == GridChange.Type.REMOVAL ? null : change.ioTile;
+						break;
+					}
+				}
+			}
 		}
 
 		return ret;
 	}
 
-	protected NodeStats getNodeStats(IEnergyTile energyTile)
+	public Tile getTile(BlockPos pos)
 	{
-		BlockPos coords = EnergyNet.instance.getPos(energyTile);
-		Tile tile = this.registeredTiles.get(coords);
-		if (tile == null)
+		if (this.updater.isInChangeStep())
 		{
-			this.logWarn("EnergyNet.getTotalEnergySunken: " + energyTile + " is not added to the enet");
-			return new NodeStats(0.0, 0.0, 0.0);
+			this.updater.awaitCompletion();
 		}
 
-		double in = 0.0;
-		double out = 0.0;
-		double voltage = 0.0;
-
-		for (NodeStats stat : tile.getStats())
-		{
-			in += stat.getEnergyIn();
-			out += stat.getEnergyOut();
-			voltage = Math.max(voltage, stat.getVoltage());
-		}
-
-		return new NodeStats(in, out, voltage);
-	}
-
-	protected Tile getTile(BlockPos pos)
-	{
 		return this.registeredTiles.get(pos);
 	}
 
-	public boolean dumpDebugInfo(PrintStream console, PrintStream chat, BlockPos pos)
+	void addTile(IEnergyTile ioTile, BlockPos pos)
 	{
-		Tile tile = this.registeredTiles.get(pos);
+		GridChange change = new GridChange(GridChange.Type.ADDITION, pos, ioTile);
+		GridChange prev;
+		if ((prev = this.gridAdditionsMap.put(ioTile, change)) != null)
+		{
+			this.gridAdditionsMap.put(ioTile, prev);
+			if (EnergyNetSettings.logGridUpdateIssues)
+			{
+				IC2.log.warn(LogCategory.EnergyNet, "Tile %s was attempted to be queued twice for addition.", Util.toString(ioTile, this.getWorld(), pos));
+			}
+		} else
+		{
+			this.gridChangesQueue.add(change);
+		}
+	}
+
+	void removeTile(IEnergyTile ioTile, BlockPos pos)
+	{
+		GridChange addition = this.gridAdditionsMap.remove(ioTile);
+		if (addition != null)
+		{
+			if (EnergyNetSettings.logGridUpdatesVerbose)
+			{
+				IC2.log.debug(LogCategory.EnergyNet, "Removing tile %s by cancelling a pending addition.", Util.toString(ioTile, this.getWorld(), pos));
+			}
+
+			this.gridChangesQueue.remove(addition);
+		} else
+		{
+			this.gridChangesQueue.add(new GridChange(GridChange.Type.REMOVAL, pos, ioTile));
+			Tile tile = this.registeredIoTiles.get(ioTile);
+			if (tile != null)
+			{
+				tile.setDisabled();
+				if (EnergyNetSettings.logGridUpdatesVerbose)
+				{
+					IC2.log.debug(LogCategory.EnergyNet, "Disabled tile %s.", Util.toString(ioTile, this.getWorld(), pos));
+				}
+			} else if (EnergyNetSettings.logGridUpdatesVerbose)
+			{
+				IC2.log.warn(LogCategory.EnergyNet, "Missing tile %s.", Util.toString(ioTile, this.getWorld(), pos));
+			}
+		}
+	}
+
+	public Collection<Tile> getSources()
+	{
+		return this.sources;
+	}
+
+	NodeStats getNodeStats(IEnergyTile ioTile)
+	{
+		this.updater.awaitCompletion();
+		Tile tile = this.registeredIoTiles.get(ioTile);
+		return tile == null ? null : EnergyNetGlobal.getCalculator().getNodeStats(tile);
+	}
+
+	int getAdjacentConnections(IEnergyTile queryTile)
+	{
+		Tile tile = this.registeredIoTiles.get(queryTile);
 		if (tile == null)
 		{
-			return false;
+			return 0;
 		}
 
-		chat.println("Tile " + tile + " info:");
-		chat.println(" main: " + tile.mainTile);
-		chat.println(" sub: " + tile.subTiles);
-		chat.println(" nodes: " + tile.nodes.size());
-		Set<Grid> processedGrids = new HashSet<>();
+		BlockPos pos = EnergyNet.instance.getPos(queryTile);
+		int ret = 0;
 
-		for (Node node : tile.nodes)
+		for (Node node : tile.getNodes())
 		{
-			Grid grid = node.getGrid();
-			if (processedGrids.add(grid))
+			for (NodeLink link : node.getLinks())
 			{
-				grid.dumpNodeInfo(chat, true, node);
-				grid.dumpStats(chat, true);
-				grid.dumpMatrix(console, true, true, true);
-				console.println("dumping graph for " + grid);
-				grid.dumpGraph(true);
+				Node neighbor = link.getNeighbor(node);
+
+				for (IEnergyTile neighborTile : neighbor.getTile().getSubTiles())
+				{
+					BlockPos neighborPos = EnergyNet.instance.getPos(neighborTile);
+					Direction dir = getDirBetween(pos, neighborPos);
+					if (dir != null)
+					{
+						ret |= 1 << dir.ordinal();
+					}
+				}
 			}
 		}
 
-		return true;
+		return ret;
 	}
 
-	public List<GridInfo> getGridInfos()
+	private static Direction getDirBetween(BlockPos from, BlockPos to)
 	{
+		int dx = to.getX() - from.getX();
+		int dy = to.getY() - from.getY();
+		int dz = to.getZ() - from.getZ();
+		int abs = Math.abs(dx) + Math.abs(dy) + Math.abs(dz);
+		if (abs != 1)
+		{
+			return null;
+		} else if (dx != 0)
+		{
+			return dx > 0 ? Direction.EAST : Direction.WEST;
+		} else if (dy != 0)
+		{
+			return dy > 0 ? Direction.UP : Direction.DOWN;
+		} else
+		{
+			return dz > 0 ? Direction.SOUTH : Direction.NORTH;
+		}
+	}
+
+	public Collection<GridInfo> getGridInfos()
+	{
+		if (this.updater.isInChangeStep())
+		{
+			this.updater.awaitCompletion();
+		}
+
 		List<GridInfo> ret = new ArrayList<>();
 
 		for (Grid grid : this.grids)
@@ -458,500 +243,143 @@ public final class EnergyNetLocal implements IEnergyCalculator
 		return ret;
 	}
 
-	protected void onTickEnd()
+	boolean dumpDebugInfo(BlockPos pos, PrintStream console, PrintStream chat)
 	{
-		if (IC2.sideProxy.isSimulating())
+		this.updater.awaitCompletion();
+		Tile tile = this.registeredTiles.get(pos);
+		if (tile == null)
 		{
-			this.locked = true;
-
-			for (Grid grid : this.grids)
-			{
-				grid.finishCalculation();
-				grid.updateStats();
-			}
-
-			this.locked = false;
-			this.processChanges();
-			if (!this.pendingAdds.isEmpty())
-			{
-				List<Entry<IEnergyTile, Integer>> pending = new ArrayList<>(this.pendingAdds.entrySet());
-				this.pendingAdds.clear();
-
-				for (Entry<IEnergyTile, Integer> entry : pending)
-				{
-					this.addTile(entry.getKey(), entry.getValue());
-				}
-			}
-
-			this.locked = true;
-
-			for (Grid grid : this.grids)
-			{
-				grid.prepareCalculation();
-			}
-
-			List<Runnable> tasks = new ArrayList<>();
-
-			for (Grid grid : this.grids)
-			{
-				Runnable task = grid.startCalculation();
-				if (task != null)
-				{
-					tasks.add(task);
-				}
-			}
-
-			IC2.threadPool.executeAll(tasks);
-			this.locked = false;
+			return false;
 		}
-	}
 
-	protected void addChange(Node node, Direction dir, double amount, double voltage)
-	{
-		this.changes.add(new Change(node, dir, amount, voltage));
-	}
-
-	protected static int getNextGridUid()
-	{
-		return nextGridUid++;
-	}
-
-	protected static int getNextNodeUid()
-	{
-		return nextNodeUid++;
-	}
-
-	private void addTileToGrids(Tile tile)
-	{
-		List<Node> extraNodes = new ArrayList<>();
+		chat.println("Tile " + tile + " info:");
+		chat.println(" disabled: " + tile.isDisabled());
+		chat.println(" main: " + tile.getMainTile());
+		chat.println(" sub: " + tile.subTiles);
+		chat.println(" nodes: " + tile.nodes.size());
+		Set<Grid> processedGrids = new HashSet<>();
 
 		for (Node node : tile.nodes)
 		{
-			if (EnergyNetGlobal.debugGrid)
+			Grid grid = node.getGrid();
+			if (processedGrids.add(grid))
 			{
-				IC2.log.debug(LogCategory.EnergyNet, "Adding node %s.", node);
-			}
-
-			List<Node> neighbors = new ArrayList<>();
-
-			for (IEnergyTile subTile : tile.subTiles)
-			{
-				for (Direction dir : Util.ALL_DIRS)
-				{
-					BlockPos coords = EnergyNet.instance.getPos(subTile).relative(dir);
-					Tile neighborTile = this.registeredTiles.get(coords);
-					if (neighborTile != null && neighborTile != node.tile)
-					{
-						for (Node neighbor : neighborTile.nodes)
-						{
-							if (!neighbor.isExtraNode())
-							{
-								boolean canEmit = false;
-								if ((node.nodeType == NodeType.Source || node.nodeType == NodeType.Conductor) && neighbor.nodeType != NodeType.Source)
-								{
-									IEnergyEmitter emitter = (IEnergyEmitter) (subTile instanceof IEnergyEmitter ? subTile : node.tile.mainTile);
-									IEnergyTile neighborSubTe = neighborTile.getSubTileAt(coords);
-									IEnergyAcceptor acceptor = (IEnergyAcceptor) (neighborSubTe instanceof IEnergyAcceptor ? neighborSubTe : neighbor.tile.mainTile);
-									canEmit = emitter.emitsEnergyTo((IEnergyAcceptor) neighbor.tile.mainTile, dir)
-										&& acceptor.acceptsEnergyFrom((IEnergyEmitter) node.tile.mainTile, dir.getOpposite());
-								}
-
-								boolean canAccept = false;
-								if (!canEmit && (node.nodeType == NodeType.Sink || node.nodeType == NodeType.Conductor) && neighbor.nodeType != NodeType.Sink)
-								{
-									IEnergyAcceptor acceptor = (IEnergyAcceptor) (subTile instanceof IEnergyAcceptor ? subTile : node.tile.mainTile);
-									IEnergyTile neighborSubTe = neighborTile.getSubTileAt(coords);
-									IEnergyEmitter emitter = (IEnergyEmitter) (neighborSubTe instanceof IEnergyEmitter ? neighborSubTe : neighbor.tile.mainTile);
-									canAccept = acceptor.acceptsEnergyFrom((IEnergyEmitter) neighbor.tile.mainTile, dir)
-										&& emitter.emitsEnergyTo((IEnergyAcceptor) node.tile.mainTile, dir.getOpposite());
-								}
-
-								if (canEmit || canAccept)
-								{
-									neighbors.add(neighbor);
-								}
-							}
-						}
-					}
-				}
-			}
-
-			if (neighbors.isEmpty())
-			{
-				if (EnergyNetGlobal.debugGrid)
-				{
-					IC2.log.debug(LogCategory.EnergyNet, "Creating new grid for %s.", node);
-				}
-
-				Grid grid = new Grid(this);
-				grid.add(node, neighbors);
-			} else
-			{
-				switch (node.nodeType)
-				{
-					case Conductor:
-						Grid grid = null;
-
-						for (Node neighbor : neighbors)
-						{
-							if (neighbor.nodeType == NodeType.Conductor || neighbor.links.isEmpty())
-							{
-								if (EnergyNetGlobal.debugGrid)
-								{
-									IC2.log.debug(LogCategory.EnergyNet, "Using %s for %s with neighbors %s.", neighbor.getGrid(), node, neighbors);
-								}
-
-								grid = neighbor.getGrid();
-								break;
-							}
-						}
-
-						if (grid == null)
-						{
-							if (EnergyNetGlobal.debugGrid)
-							{
-								IC2.log.debug(LogCategory.EnergyNet, "Creating new grid for %s with neighbors %s.", node, neighbors);
-							}
-
-							grid = new Grid(this);
-						}
-
-						Map<Node, Node> neighborReplacements = new HashMap<>();
-						ListIterator<Node> it = neighbors.listIterator();
-
-						while (it.hasNext())
-						{
-							Node neighbor = it.next();
-							if (neighbor.getGrid() != grid)
-							{
-								if (neighbor.nodeType != NodeType.Conductor && !neighbor.links.isEmpty())
-								{
-									boolean found = false;
-
-									for (int i = 0; i < it.previousIndex(); i++)
-									{
-										Node neighbor2 = neighbors.get(i);
-										if (neighbor2.tile == neighbor.tile && neighbor2.nodeType == neighbor.nodeType && neighbor2.getGrid() == grid)
-										{
-											if (EnergyNetGlobal.debugGrid)
-											{
-												IC2.log.debug(LogCategory.EnergyNet, "Using neighbor node %s instead of %s.", neighbor2, neighbors);
-											}
-
-											found = true;
-											it.set(neighbor2);
-											break;
-										}
-									}
-
-									if (!found)
-									{
-										if (EnergyNetGlobal.debugGrid)
-										{
-											IC2.log.debug(LogCategory.EnergyNet, "Creating new extra node for neighbor %s.", neighbor);
-										}
-
-										neighbor = new Node(this, neighbor.tile, neighbor.nodeType);
-										neighbor.tile.addExtraNode(neighbor);
-										grid.add(neighbor, Collections.emptyList());
-										it.set(neighbor);
-										assert neighbor.getGrid() != null;
-									}
-								} else
-								{
-									grid.merge(neighbor.getGrid(), neighborReplacements);
-								}
-							}
-						}
-
-						it = neighbors.listIterator();
-
-						while (it.hasNext())
-						{
-							Node neighbor = it.next();
-							Node replacement = neighborReplacements.get(neighbor);
-							if (replacement != null)
-							{
-								neighbor = replacement;
-								it.set(replacement);
-							}
-
-							assert neighbor.getGrid() == grid;
-						}
-
-						grid.add(node, neighbors);
-						assert node.getGrid() != null;
-						break;
-					case Sink:
-					case Source:
-						List<List<Node>> neighborGroups = new ArrayList<>();
-
-						for (Node neighbor : neighbors)
-						{
-							boolean found = false;
-							if (node.nodeType == NodeType.Conductor)
-							{
-								for (List<Node> nodeList : neighborGroups)
-								{
-									Node neighbor2 = nodeList.get(0);
-									if (neighbor2.nodeType == NodeType.Conductor && neighbor2.getGrid() == neighbor.getGrid())
-									{
-										nodeList.add(neighbor);
-										found = true;
-										break;
-									}
-								}
-							}
-
-							if (!found)
-							{
-								List<Node> nodeList = new ArrayList<>();
-								nodeList.add(neighbor);
-								neighborGroups.add(nodeList);
-							}
-						}
-
-						if (EnergyNetGlobal.debugGrid)
-						{
-							IC2.log.debug(LogCategory.EnergyNet, "Neighbor groups detected for %s: %s.", node, neighborGroups);
-						}
-
-						assert !neighborGroups.isEmpty();
-
-						for (int i = 0; i < neighborGroups.size(); i++)
-						{
-							List<Node> nodeList = neighborGroups.get(i);
-							Node neighbor = nodeList.get(0);
-							if (neighbor.nodeType != NodeType.Conductor && !neighbor.links.isEmpty())
-							{
-								assert nodeList.size() == 1;
-								if (EnergyNetGlobal.debugGrid)
-								{
-									IC2.log.debug(LogCategory.EnergyNet, "Creating new extra node for neighbor %s.", neighbor);
-								}
-
-								neighbor = new Node(this, neighbor.tile, neighbor.nodeType);
-								neighbor.tile.addExtraNode(neighbor);
-								new Grid(this).add(neighbor, Collections.emptyList());
-								nodeList.set(0, neighbor);
-								assert neighbor.getGrid() != null;
-							}
-
-							Node currentNode;
-							if (i == 0)
-							{
-								currentNode = node;
-							} else
-							{
-								if (EnergyNetGlobal.debugGrid)
-								{
-									IC2.log.debug(LogCategory.EnergyNet, "Creating new extra node for %s.", node);
-								}
-
-								currentNode = new Node(this, tile, node.nodeType);
-								currentNode.setExtraNode(true);
-								extraNodes.add(currentNode);
-							}
-
-							neighbor.getGrid().add(currentNode, nodeList);
-							assert currentNode.getGrid() != null;
-						}
-				}
+				grid.dumpNodeInfo(node, " ", console, chat);
+				grid.dumpInfo(" ", console, chat);
+				grid.dumpGraph();
 			}
 		}
 
-		for (Node node : extraNodes)
+		return true;
+	}
+
+	public void onTickStart()
+	{
+		if (this.updater.isInChangeStep())
 		{
-			tile.addExtraNode(node);
+			this.updater.awaitCompletion();
+			if (!this.ioTilesToNotify.isEmpty())
+			{
+				ChunkSource chunkManager = this.world.getChunkSource();
+				int lastX = Integer.MIN_VALUE;
+				int lastZ = Integer.MIN_VALUE;
+				boolean lastLoaded = false;
+
+				for (IEnergyTile tile : this.ioTilesToNotify)
+				{
+					BlockPos pos = EnergyNet.instance.getPos(tile);
+					int x = SectionPos.blockToSectionCoord(pos.getX());
+					int z = SectionPos.blockToSectionCoord(pos.getZ());
+					if (x != lastX || z != lastZ)
+					{
+						lastLoaded = chunkManager.hasChunk(x, z);
+						lastX = x;
+						lastZ = z;
+					}
+
+					if (lastLoaded)
+					{
+						tile.onConnectionChange();
+					}
+				}
+
+				this.ioTilesToNotify.clear();
+			}
+
+			this.updater.startTransferCalc();
 		}
 	}
 
-	private void removeTileFromGrids(Tile tile)
+	public void onTickEnd()
 	{
-		for (Node node : tile.nodes)
+		this.updater.awaitCompletion();
+		if (!this.gridChangesQueue.isEmpty() && this.gridChangesQueue.peek() != QUEUE_DELAY_CHANGE)
 		{
-			node.getGrid().remove(node);
+			this.updater.startChangeCalc(this.gridChangesQueue, this.gridAdditionsMap);
+		} else
+		{
+			this.gridChangesQueue.poll();
+			this.updater.startTransferCalc();
 		}
+
+		this.gridChangesQueue.add(QUEUE_DELAY_CHANGE);
+		assert !this.gridChangesQueue.isEmpty();
 	}
 
-	private void processChanges()
+	public Level getWorld()
 	{
-		for (Tile tile : this.removedTiles)
-		{
-			Iterator<Change> it = this.changes.iterator();
-
-			while (it.hasNext())
-			{
-				Change change = it.next();
-				if (change.node.tile == tile)
-				{
-					Tile replacement = this.registeredTiles.get(EnergyNet.instance.getPos(change.node.tile.mainTile));
-					boolean validReplacement = false;
-					if (replacement != null)
-					{
-						for (Node node : replacement.nodes)
-						{
-							if (node.nodeType == change.node.nodeType && node.getGrid() == change.node.getGrid())
-							{
-								if (EnergyNetGlobal.debugGrid)
-								{
-									IC2.log.debug(LogCategory.EnergyNet, "Redirecting change %s to replacement node %s.", change, node);
-								}
-
-								change.node = node;
-								validReplacement = true;
-								break;
-							}
-						}
-					}
-
-					if (!validReplacement)
-					{
-						it.remove();
-						List<Change> sameGridSourceChanges = new ArrayList<>();
-
-						for (Change change2 : this.changes)
-						{
-							if (change2.node.nodeType == NodeType.Source && change.node.getGrid() == change2.node.getGrid())
-							{
-								sameGridSourceChanges.add(change2);
-							}
-						}
-
-						if (EnergyNetGlobal.debugGrid)
-						{
-							IC2.log.debug(LogCategory.EnergyNet, "Redistributing change %s to remaining source nodes %s.", change, sameGridSourceChanges);
-						}
-
-						for (Change change2 : sameGridSourceChanges)
-						{
-							change2.setAmount(change2.getAmount() - Math.abs(change.getAmount()) / sameGridSourceChanges.size());
-						}
-					}
-				}
-			}
-		}
-
-		this.removedTiles.clear();
-
-		for (Change change : this.changes)
-		{
-			if (change.node.nodeType == NodeType.Sink)
-			{
-				assert change.getAmount() > 0.0;
-				IEnergySink sink = (IEnergySink) change.node.tile.mainTile;
-				double returned = sink.injectEnergy(change.dir, change.getAmount(), change.getVoltage());
-				if (EnergyNetGlobal.debugGrid)
-				{
-					IC2.log.debug(LogCategory.EnergyNet, "Applied change %s, %f EU returned.", change, returned);
-				}
-
-				if (returned > 0.0)
-				{
-					List<Change> sameGridSourceChanges = new ArrayList<>();
-
-					for (Change change2 : this.changes)
-					{
-						if (change2.node.nodeType == NodeType.Source && change.node.getGrid() == change2.node.getGrid())
-						{
-							sameGridSourceChanges.add(change2);
-						}
-					}
-
-					if (EnergyNetGlobal.debugGrid)
-					{
-						IC2.log.debug(LogCategory.EnergyNet, "Redistributing returned amount to source nodes %s.", sameGridSourceChanges);
-					}
-
-					for (Change change2 : sameGridSourceChanges)
-					{
-						change2.setAmount(change2.getAmount() - returned / sameGridSourceChanges.size());
-					}
-				}
-			}
-		}
-
-		for (Change change : this.changes)
-		{
-			if (change.node.nodeType == NodeType.Source)
-			{
-				assert change.getAmount() <= 0.0;
-				if (!(change.getAmount() >= 0.0))
-				{
-					IEnergySource source = (IEnergySource) change.node.tile.mainTile;
-					source.drawEnergy(change.getAmount());
-					if (EnergyNetGlobal.debugGrid)
-					{
-						IC2.log.debug(LogCategory.EnergyNet, "Applied change %s.", change);
-					}
-				}
-			}
-		}
-
-		this.changes.clear();
+		return this.world;
 	}
 
-	private void logDebug(String msg)
+	int allocateNodeId()
 	{
-		if (this.shouldLog(msg))
-		{
-			IC2.log.debug(LogCategory.EnergyNet, msg);
-			if (EnergyNetGlobal.debugTileManagement)
-			{
-				IC2.log.debug(LogCategory.EnergyNet, new Throwable(), "stack trace");
-				if (TickHandler.getLastDebugTrace() != null)
-				{
-					IC2.log.debug(LogCategory.EnergyNet, TickHandler.getLastDebugTrace(), "parent stack trace");
-				}
-			}
-		}
+		return this.nextNodeId++;
 	}
 
-	private void logWarn(String msg)
+	int allocateGridId()
 	{
-		if (this.shouldLog(msg))
-		{
-			IC2.log.warn(LogCategory.EnergyNet, msg);
-			if (EnergyNetGlobal.debugTileManagement)
-			{
-				IC2.log.debug(LogCategory.EnergyNet, new Throwable(), "stack trace");
-				if (TickHandler.getLastDebugTrace() != null)
-				{
-					IC2.log.debug(LogCategory.EnergyNet, TickHandler.getLastDebugTrace(), "parent stack trace");
-				}
-			}
-		}
+		return this.nextGridId++;
 	}
 
-	private boolean shouldLog(String msg)
+	void addTileToNotify(IEnergyTile ioTile)
 	{
-		if (EnergyNetGlobal.logAll)
-		{
-			return true;
-		}
-
-		this.cleanRecentLogs();
-		msg = msg.replaceAll("@[0-9a-f]+", "@x");
-		long time = System.nanoTime();
-		Long lastLog = this.recentLogs.put(msg, time);
-		return lastLog == null || lastLog < time - 300000000000L;
+		this.ioTilesToNotify.add(ioTile);
 	}
 
-	private void cleanRecentLogs()
+	void removeTileToNotify(IEnergyTile ioTile)
 	{
-		if (this.recentLogs.size() >= 100)
-		{
-			long minTime = System.nanoTime() - 300000000000L;
-			Iterator<Long> it = this.recentLogs.values().iterator();
+		this.ioTilesToNotify.remove(ioTile);
+	}
 
-			while (it.hasNext())
-			{
-				long recTime = it.next();
-				if (recTime < minTime)
-				{
-					it.remove();
-				}
-			}
-		}
+	boolean hasGrid(Grid grid)
+	{
+		return this.grids.contains(grid);
+	}
+
+	boolean hasGrids()
+	{
+		return !this.grids.isEmpty();
+	}
+
+	Collection<Grid> getGrids()
+	{
+		return this.grids;
+	}
+
+	void addGrid(Grid grid)
+	{
+		assert !this.hasGrid(grid);
+		this.grids.add(grid);
+	}
+
+	void removeGrid(Grid grid)
+	{
+		boolean removed = this.grids.remove(grid);
+		assert removed;
+	}
+
+	void shuffleGrids()
+	{
+		Collections.shuffle(this.grids);
 	}
 }

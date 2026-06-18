@@ -1,4 +1,4 @@
-package ic2.core.energy.grid;
+package ic2.core.energy;
 
 public class GridInfo
 {

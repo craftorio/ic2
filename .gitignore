@@ -6,6 +6,7 @@
 build/
 run/
 out/
+mcmodsrepo/
 
 gradle-wrapper.jar
 

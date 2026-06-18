@@ -1,8 +1,9 @@
 plugins {
     id 'eclipse'
-    id 'idea' // idea plugin, every sync gradle will run this
+    id 'idea'
     id 'maven-publish'
     id 'net.minecraftforge.gradle' version '[6.0,6.2)'
+    id "com.gradleup.shadow" version "9.2.0"
 }
 
 version = System.getenv("MOD_VERSION") ?: mod_version
@@ -26,21 +27,17 @@ minecraft {
     runs {
         configureEach {
             workingDirectory project.file('run')
-
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
-
             mods {
                 "${mod_id}" {
                     source sourceSets.main
                 }
             }
         }
-
         client {
             property 'forge.enabledGameTestNamespaces', mod_id
         }
-
         server {
             property 'forge.enabledGameTestNamespaces', mod_id
             args '--nogui'
@@ -48,13 +45,6 @@ minecraft {
         gameTestServer {
             property 'forge.enabledGameTestNamespaces', mod_id
         }
-
-    }
-}
-
-sourceSets {
-    main {
-        java { exclude 'ic2_old/**' }
     }
 }
 
@@ -62,20 +52,44 @@ repositories {
     maven { url = "https://maven.blamejared.com/" }
 }
 
+configurations {
+    shade
+    implementation.extendsFrom shade
+}
+
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     compileOnly 'mezz.jei:jei-1.20.1-forge-api:15.20.0.130'
     runtimeOnly fg.deobf('mezz.jei:jei-1.20.1-forge:15.20.0.130')
-    implementation 'org.ejml:ejml-all:0.45.1'
+    
+    shade "org.ejml:ejml-core:0.45.1"
+    shade "org.ejml:ejml-ddense:0.45.1"
+
+    minecraftLibrary "org.ejml:ejml-core:0.45.1"
+    minecraftLibrary "org.ejml:ejml-ddense:0.45.1"
+}
+
+jar {
+    archiveClassifier.set("slim")
+}
+
+shadowJar {
+    archiveClassifier.set("")
+    configurations = [project.configurations.shade]
+    finalizedBy 'reobfShadowJar'
+}
+
+reobf {
+    shadowJar { }
 }
 
 tasks.named('processResources', ProcessResources).configure {
     var replaceProperties = [
-            minecraft_version: minecraft_version, minecraft_version_range: minecraft_version_range,
-            forge_version: forge_version, forge_version_range: forge_version_range,
-            loader_version_range: loader_version_range,
-            mod_id: mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
-            mod_authors: mod_authors, mod_description: mod_description,
+        minecraft_version: minecraft_version, minecraft_version_range: minecraft_version_range,
+        forge_version: forge_version, forge_version_range: forge_version_range,
+        loader_version_range: loader_version_range,
+        mod_id: mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
+        mod_authors: mod_authors, mod_description: mod_description,
     ]
     inputs.properties replaceProperties
 
@@ -84,120 +98,18 @@ tasks.named('processResources', ProcessResources).configure {
     }
 }
 
-tasks.named('jar', Jar).configure {
-    manifest {
-        attributes([
-                'Specification-Title'     : mod_id,
-                'Specification-Vendor'    : mod_authors,
-                'Specification-Version'   : '1',
-                'Implementation-Title'    : project.name,
-                'Implementation-Version'  : project.jar.archiveVersion,
-                'Implementation-Vendor'   : mod_authors,
-                'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
-        ])
-    }
-    finalizedBy 'reobfJar'
-}
-
 publishing {
     publications {
         register('mavenJava', MavenPublication) {
             artifact jar
         }
     }
-    repositories {
-        maven {
-            url "file://${project.projectDir}/mcmodsrepo"
-        }
-    }
+}
+
+tasks.build {
+    dependsOn 'shadowJar'
 }
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
-}
-
-tasks.named('idea').configure {
-    dependsOn syncVersion
-}
-
-tasks.register('syncVersion') {
-    description = '同步 mod_version 到 release.md 和 README.md，并校验版本号递增'
-    group = 'versioning'
-
-    doLast {
-        def versionPattern = /^2\.10\.(\d+)-ex120$/
-
-        // 1. 读取 gradle.properties 中的 mod_version
-        def propsFile = file('gradle.properties')
-        def props = new Properties()
-        propsFile.withInputStream { props.load(it) }
-        def currentVersion = props['mod_version']
-
-        def matcher = currentVersion =~ versionPattern
-        if (!matcher) {
-            throw new GradleException("版本格式不正确: $currentVersion，期望格式: 2.10.xxx-ex120")
-        }
-        def currentXxx = matcher[0][1] as int
-
-        // 2. 读取上一次同步时存储的版本
-        def versionFile = file('build/syncVersion/lastVersion.txt')
-        def lastXxx = -1
-        def lastVersion = '无'
-        if (versionFile.exists()) {
-            lastVersion = versionFile.text.trim()
-            def lastMatcher = lastVersion =~ versionPattern
-            if (lastMatcher) {
-                lastXxx = lastMatcher[0][1] as int
-            }
-        }
-
-        // 3. 比较版本号：xxx 必须大于上一次
-        if (currentXxx <= lastXxx) {
-            def lineNum = 1
-            propsFile.eachLine { line ->
-                if (line.startsWith('mod_version=')) {
-                    throw new GradleException("gradle.properties:${lineNum}: 目前版本是${currentVersion}，但上一次同步时版本是${lastVersion}")
-                }
-                lineNum++
-            }
-            return
-        }
-
-        // 4. 写入当前版本到自动生成的文件
-        versionFile.parentFile.mkdirs()
-        versionFile.text = currentVersion
-        println "syncVersion: 版本已记录为 $currentVersion"
-
-        // 5. 更新 release.md 第一行标题
-        def releaseFile = file('release.md')
-        if (releaseFile.exists()) {
-            def releaseLines = releaseFile.readLines()
-            releaseLines[0] = "# $currentVersion"
-            releaseFile.text = releaseLines.join('\n') + '\n'
-            println "syncVersion: release.md 标题已更新为 # $currentVersion"
-        } else {
-            println "syncVersion: 未找到 release.md，跳过"
-        }
-
-        // 6. 更新 README.md 中的 Version badge
-        def readmeFile = file('README.md')
-        if (readmeFile.exists()) {
-            def readmeText = readmeFile.text
-            // shields.io 中 '-' 需要转义为 '--'
-            def shieldsVersion = currentVersion.replace('-', '--')
-            def badgePattern = ~/<img src="https:\/\/img\.shields\.io\/badge\/Version-[^"]+" alt="Version [^"]*">/
-            def newBadge = "<img src=\"https://img.shields.io/badge/Version-${shieldsVersion}-blue\" alt=\"Version ${currentVersion}\">"
-            if (readmeText.find(badgePattern)) {
-                readmeText = readmeText.replaceAll(badgePattern, newBadge)
-                readmeFile.text = readmeText
-                println "syncVersion: README.md Version badge 已更新"
-            } else {
-                println "syncVersion: 未在 README.md 中找到 Version badge，跳过"
-            }
-        } else {
-            println "syncVersion: 未找到 README.md，跳过"
-        }
-
-        println "syncVersion: 同步完成 ($currentVersion)"
-    }
 }

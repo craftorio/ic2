@@ -1,10 +1,8 @@
-package ic2.core.energy.leg;
+package ic2.core.energy.grid;
 
 import ic2.api.energy.EnergyNet;
 import ic2.api.energy.tile.IEnergyConductor;
 import ic2.api.energy.tile.IEnergyTile;
-import ic2.core.energy.grid.Node;
-import ic2.core.energy.grid.NodeLink;
 
 import java.util.List;
 

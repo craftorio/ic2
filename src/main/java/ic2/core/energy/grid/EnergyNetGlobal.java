@@ -6,7 +6,7 @@ import ic2.api.energy.NodeStats;
 import ic2.api.energy.tile.IEnergyTile;
 import ic2.api.info.ILocatable;
 import ic2.core.IC2;
-import ic2.core.energy.leg.EnergyCalculatorLeg;
+// EnergyCalculatorUnified replaces EnergyCalculatorLeg
 import ic2.core.event.WorldData;
 import ic2.core.util.LogCategory;
 import ic2.core.util.Util;
@@ -30,7 +30,7 @@ public class EnergyNetGlobal implements IEnergyNet
 		{
 		}
 
-		calculator = new EnergyCalculatorLeg();
+		calculator = new EnergyCalculatorUnified();
 		return new EnergyNetGlobal();
 	}
 

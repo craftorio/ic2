@@ -14,6 +14,5 @@ public class EnergyNetSettings
 	public static final boolean logGridCalculationPerformance = false;
 	public static final boolean roundLossDown = ConfigUtil.getBool(MainConfig.get(), "misc/roundEnetLoss");
 	public static final int changesQueueDelay = 1;
-	public static final double nonConductorResistance = 0.001;
 	public static final int bfsThreshold = 2048;
 }

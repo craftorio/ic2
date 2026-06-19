@@ -62,11 +62,7 @@ dependencies {
     compileOnly 'mezz.jei:jei-1.20.1-forge-api:15.20.0.130'
     runtimeOnly fg.deobf('mezz.jei:jei-1.20.1-forge:15.20.0.130')
 
-    shade "org.ejml:ejml-core:0.45.1"
-    shade "org.ejml:ejml-ddense:0.45.1"
-
-    minecraftLibrary "org.ejml:ejml-core:0.45.1"
-    minecraftLibrary "org.ejml:ejml-ddense:0.45.1"
+    // EJML removed — no longer used by energy net
 }
 
 jar {

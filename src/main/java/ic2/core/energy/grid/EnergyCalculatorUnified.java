@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.IdentityHashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +35,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
@@ -62,17 +60,14 @@ public class EnergyCalculatorUnified implements IEnergyCalculator
 			int packets = 1;
 			IMultiEnergySource multiSource;
 			double amount;
-			if (!tile.isDisabled() && (amount = source.getOfferedEnergy()) > 0.0
-				&& (!(source instanceof IMultiEnergySource) || !(multiSource = (IMultiEnergySource) source).sendMultipleEnergyPackets()
-					|| (packets = multiSource.getMultipleEnergyPacketAmount()) > 0))
+			if (!tile.isDisabled() && (amount = source.getOfferedEnergy()) > 0.0 && (!(source instanceof IMultiEnergySource) || !(multiSource = (IMultiEnergySource) source).sendMultipleEnergyPackets() || (packets = multiSource.getMultipleEnergyPacketAmount()) > 0))
 			{
 				int tier = source.getSourceTier();
 				if (tier < 0)
 				{
 					if (EnergyNetSettings.logGridCalculationIssues)
 					{
-						IC2.log.warn(LogCategory.EnergyNet, "Tile %s reported an invalid tier (%d).",
-							Util.toString(source, enet.getWorld(), EnergyNet.instance.getPos(source)), tier);
+						IC2.log.warn(LogCategory.EnergyNet, "Tile %s reported an invalid tier (%d).", Util.toString(source, enet.getWorld(), EnergyNet.instance.getPos(source)), tier);
 					}
 
 					tile.setSourceData(0.0, 0);
@@ -235,7 +230,7 @@ public class EnergyCalculatorUnified implements IEnergyCalculator
 				printPathEnergy = true;
 			} else if (n == 8)
 			{
-				chat.printf("%s ... (%d more)%n", paths.size() - 8);
+				chat.printf("%d more %n", paths.size() - 8);
 			}
 
 			n++;
@@ -331,22 +326,12 @@ public class EnergyCalculatorUnified implements IEnergyCalculator
 						{
 							double loss = lossMap.get(node);
 
-							Iterable<NodeLink> links = node.getLinks();
-							if (optGraph != null)
+							List<OptLink> optLinks = optGraph.nodeToLinks.get(node);
+							if (optLinks != null)
 							{
-								List<OptLink> optLinks = optGraph.nodeToLinks.get(node);
-								if (optLinks != null)
+								for (OptLink optLink : optLinks)
 								{
-									for (OptLink optLink : optLinks)
-									{
-										processLink(optLink, node, srcNode, loss, lossMap, parentMap, queue, paths, data, sinkCount);
-									}
-								}
-							} else
-							{
-								for (NodeLink link : links)
-								{
-									processLink(link, node, srcNode, loss, lossMap, parentMap, queue, paths, data, sinkCount);
+									processLink(optLink, node, srcNode, loss, lossMap, parentMap, queue, paths, data, sinkCount);
 								}
 							}
 						}
@@ -371,9 +356,7 @@ public class EnergyCalculatorUnified implements IEnergyCalculator
 		}
 	}
 
-	private static void processLink(NodeLink link, Node node, Node srcNode, double loss,
-		Map<Node, Double> lossMap, Map<Node, Node> parentMap, Queue<Node> queue,
-		Map<IEnergyTile, EnergyPath> paths, GridData data, int sinkCount)
+	private static void processLink(NodeLink link, Node node, Node srcNode, double loss, Map<Node, Double> lossMap, Map<Node, Node> parentMap, Queue<Node> queue, Map<IEnergyTile, EnergyPath> paths, GridData data, int sinkCount)
 	{
 		Node neighbor = link.getNeighbor(node);
 		if (neighbor.getType() == NodeType.Source)
@@ -431,9 +414,7 @@ public class EnergyCalculatorUnified implements IEnergyCalculator
 		}
 	}
 
-	private static void processLink(OptLink optLink, Node node, Node srcNode, double loss,
-		Map<Node, Double> lossMap, Map<Node, Node> parentMap, Queue<Node> queue,
-		Map<IEnergyTile, EnergyPath> paths, GridData data, int sinkCount)
+	private static void processLink(OptLink optLink, Node node, Node srcNode, double loss, Map<Node, Double> lossMap, Map<Node, Node> parentMap, Queue<Node> queue, Map<IEnergyTile, EnergyPath> paths, GridData data, int sinkCount)
 	{
 		Node neighbor = optLink.getNeighbor(node);
 		if (neighbor.getType() == NodeType.Source)
@@ -494,7 +475,85 @@ public class EnergyCalculatorUnified implements IEnergyCalculator
 
 	private static OptimizedGraph buildOptimizedGraph(Collection<Node> nodes)
 	{
-		return null;
+		Map<Node, List<OptLink>> nodeToLinks = new IdentityHashMap<>();
+
+		for (Node node : nodes)
+		{
+			nodeToLinks.put(node, new ArrayList<>());
+		}
+
+		for (Node node : nodes)
+		{
+			for (NodeLink link : node.getLinks())
+			{
+				if (link.nodeA == node)
+				{
+					OptLink optLink = new OptLink(link.nodeA, link.nodeB, link.getLoss(), new ArrayList<>());
+					nodeToLinks.get(link.nodeA).add(optLink);
+					nodeToLinks.get(link.nodeB).add(optLink);
+				}
+			}
+		}
+
+		boolean changed;
+		do
+		{
+			changed = false;
+			java.util.Iterator<java.util.Map.Entry<Node, List<OptLink>>> it = nodeToLinks.entrySet().iterator();
+
+			while (it.hasNext())
+			{
+				java.util.Map.Entry<Node, List<OptLink>> entry = it.next();
+				Node node = entry.getKey();
+				if (node.getType() != NodeType.Conductor) continue;
+
+				List<OptLink> links = entry.getValue();
+				if (links.isEmpty())
+				{
+					it.remove();
+					changed = true;
+				} else if (links.size() == 1)
+				{
+					OptLink link = links.get(0);
+					Node neighbor = link.getNeighbor(node);
+					List<OptLink> neighborLinks = nodeToLinks.get(neighbor);
+					if (neighborLinks != null)
+					{
+						neighborLinks.remove(link);
+					}
+					it.remove();
+					changed = true;
+				} else if (links.size() == 2)
+				{
+					OptLink link1 = links.get(0);
+					OptLink link2 = links.get(1);
+					Node neighbor1 = link1.getNeighbor(node);
+					Node neighbor2 = link2.getNeighbor(node);
+
+					List<OptLink> links1 = nodeToLinks.get(neighbor1);
+					List<OptLink> links2 = nodeToLinks.get(neighbor2);
+					if (links1 != null) links1.remove(link1);
+					if (links2 != null) links2.remove(link2);
+
+					if (neighbor1 != neighbor2)
+					{
+						List<Node> skipped = new ArrayList<>(link1.skippedNodes);
+						skipped.add(node);
+						skipped.addAll(link2.skippedNodes);
+
+						double combinedLoss = link1.loss + link2.loss;
+						OptLink merged = new OptLink(neighbor1, neighbor2, combinedLoss, skipped);
+						if (links1 != null) links1.add(merged);
+						if (links2 != null) links2.add(merged);
+					}
+
+					it.remove();
+					changed = true;
+				}
+			}
+		} while (changed);
+
+		return new OptimizedGraph(nodeToLinks);
 	}
 
 	private static List<Node> reconstructPath(Node srcNode, Node dstNode, Map<Node, Node> path)
@@ -735,9 +794,7 @@ public class EnergyCalculatorUnified implements IEnergyCalculator
 
 				if (amount > path.minInsulationEnergyAbsorption)
 				{
-					List<LivingEntity> nearbyEntities = world.getEntitiesOfClass(LivingEntity.class,
-						new AABB(path.minX - 1, path.minY - 1, path.minZ - 1, path.maxX + 2, path.maxY + 2, path.maxZ + 2),
-						EntitySelector.LIVING_ENTITY_STILL_ALIVE);
+					List<LivingEntity> nearbyEntities = world.getEntitiesOfClass(LivingEntity.class, new AABB(path.minX - 1, path.minY - 1, path.minZ - 1, path.maxX + 2, path.maxY + 2, path.maxZ + 2), EntitySelector.LIVING_ENTITY_STILL_ALIVE);
 					if (!nearbyEntities.isEmpty())
 					{
 						Map<LivingEntity, MutableDouble> localShockEnergyMap = new IdentityHashMap<>();
@@ -757,9 +814,7 @@ public class EnergyCalculatorUnified implements IEnergyCalculator
 									for (LivingEntity entity : nearbyEntities)
 									{
 										MutableDouble prev = localShockEnergyMap.get(entity);
-										if ((prev == null || !(prev.doubleValue() >= shockEnergy))
-											&& entity.getBoundingBox().intersects(new AABB(pos.getX() - 1, pos.getY() - 1, pos.getZ() - 1,
-												pos.getX() + 2, pos.getY() + 2, pos.getZ() + 2)))
+										if ((prev == null || !(prev.doubleValue() >= shockEnergy)) && entity.getBoundingBox().intersects(new AABB(pos.getX() - 1, pos.getY() - 1, pos.getZ() - 1, pos.getX() + 2, pos.getY() + 2, pos.getZ() + 2)))
 										{
 											if (prev == null)
 											{
@@ -847,8 +902,7 @@ public class EnergyCalculatorUnified implements IEnergyCalculator
 				IEnergySink mainTile = (IEnergySink) tile.getMainTile();
 				BlockPos pos = EnergyNet.instance.getPos(subTile);
 				BlockEntity realTe = world.getBlockEntity(pos);
-				if (!(mainTile instanceof IOverloadHandler handler && handler.onOverload(tier))
-					&& !(realTe instanceof IOverloadHandler handler2 && handler2.onOverload(tier)))
+				if (!(mainTile instanceof IOverloadHandler handler && handler.onOverload(tier)) && !(realTe instanceof IOverloadHandler handler2 && handler2.onOverload(tier)))
 				{
 					float power = 2.5F;
 					if (mainTile instanceof IExplosionPowerOverride override)
@@ -869,7 +923,6 @@ public class EnergyCalculatorUnified implements IEnergyCalculator
 						power = override.getExplosionPower(tier, power);
 					}
 
-					Player closestPlayer = world.getNearestPlayer(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 20.0, false);
 					world.removeBlock(pos, false);
 					Ic2Explosion explosion = new Ic2Explosion(world, null, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, power, 0.75F, Ic2Explosion.Type.Electrical);
 					explosion.doExplosion();
@@ -890,35 +943,16 @@ public class EnergyCalculatorUnified implements IEnergyCalculator
 		return ret;
 	}
 
-	private static class OptLink
+	private record OptLink(Node nodeA, Node nodeB, double loss, List<Node> skippedNodes)
 	{
-		final Node nodeA;
-		final Node nodeB;
-		final double loss;
-		final List<Node> skippedNodes;
-
-		OptLink(Node nodeA, Node nodeB, double loss, List<Node> skippedNodes)
-		{
-			this.nodeA = nodeA;
-			this.nodeB = nodeB;
-			this.loss = loss;
-			this.skippedNodes = skippedNodes;
-		}
-
 		Node getNeighbor(Node node)
 		{
 			return nodeA == node ? nodeB : nodeA;
 		}
 	}
 
-	private static class OptimizedGraph
+	private record OptimizedGraph(Map<Node, List<OptLink>> nodeToLinks)
 	{
-		final Map<Node, List<OptLink>> nodeToLinks;
-
-		OptimizedGraph(Map<Node, List<OptLink>> nodeToLinks)
-		{
-			this.nodeToLinks = nodeToLinks;
-		}
 	}
 
 	private static class GridData

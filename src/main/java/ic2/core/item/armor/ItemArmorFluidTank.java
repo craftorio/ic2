@@ -3,22 +3,19 @@ package ic2.core.item.armor;
 import ic2.api.item.IItemHudInfo;
 import ic2.core.fluid.Ic2FluidStack;
 import ic2.core.fluid.StandardFluidItem;
-import ic2.core.init.Localization;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.Item.Properties;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class ItemArmorFluidTank extends ItemArmorUtility implements StandardFluidItem, IItemHudInfo
 {
@@ -44,7 +41,7 @@ public abstract class ItemArmorFluidTank extends ItemArmorUtility implements Sta
 		return fs.getFluid() == this.allowfluid;
 	}
 
-	public void filltank(ItemStack stack)
+	public void fillTank(ItemStack stack)
 	{
 		this.fillMb(stack, Ic2FluidStack.create(this.allowfluid, Integer.MAX_VALUE), false, null);
 	}
@@ -59,7 +56,7 @@ public abstract class ItemArmorFluidTank extends ItemArmorUtility implements Sta
 		return this.getCharge(stack) / this.capacity;
 	}
 
-	public double getMaxCharge(ItemStack stack)
+	public double getMaxCharge()
 	{
 		return this.capacity;
 	}
@@ -69,23 +66,23 @@ public abstract class ItemArmorFluidTank extends ItemArmorUtility implements Sta
 		return Ic2FluidStack.get(stack).isEmpty();
 	}
 
-	public void appendHoverText(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag advanced)
+	public void appendHoverText(@NotNull ItemStack stack, Level world, @NotNull List<Component> tooltip, @NotNull TooltipFlag advanced)
 	{
 		super.appendHoverText(stack, world, tooltip, advanced);
-		tooltip.add(Component.literal(getContentDescription(stack)));
+		tooltip.add(getTooltipComponent(stack));
 	}
 
-	public boolean isBarVisible(ItemStack stack)
+	public boolean isBarVisible(@NotNull ItemStack stack)
 	{
 		return true;
 	}
 
-	public int getBarWidth(ItemStack stack)
+	public int getBarWidth(@NotNull ItemStack stack)
 	{
 		return (int) Math.round(this.getChargeLevel(stack) * 13.0);
 	}
 
-	public int getBarColor(ItemStack stack)
+	public int getBarColor(@NotNull ItemStack stack)
 	{
 		return Mth.hsvToRgb((float) (this.getChargeLevel(stack) / 3.0), 1.0F, 1.0F);
 	}
@@ -94,19 +91,24 @@ public abstract class ItemArmorFluidTank extends ItemArmorUtility implements Sta
 	public List<String> getHudInfo(ItemStack stack, boolean advanced)
 	{
 		List<String> info = new ArrayList<>();
-		info.add(getContentDescription(stack));
+		info.add(getTooltipComponent(stack).getString());
 		return info;
 	}
 
-	private static String getContentDescription(ItemStack stack)
+	private static Component getTooltipComponent(ItemStack stack)
 	{
 		Ic2FluidStack fs = Ic2FluidStack.get(stack);
-		return !fs.isEmpty()
-			? String.format("< %s, %d mB >", BuiltInRegistries.FLUID.getKey(fs.getFluid()), fs.getAmountMb())
-			: Localization.translate("ic2.item.FluidContainer.Empty");
+		if (fs.isEmpty())
+		{
+			return Component.translatable("ic2.item.fluid_container.empty");
+		}
+		else
+		{
+			return Component.translatable("ic2.item.fluid_container.with_fluid", Component.translatable(fs.getFluidTypeKey()), fs.getAmountMb());
+		}
 	}
 
-	public boolean isValidRepairItem(ItemStack par1ItemStack, ItemStack par2ItemStack)
+	public boolean isValidRepairItem(@NotNull ItemStack par1ItemStack, @NotNull ItemStack par2ItemStack)
 	{
 		return false;
 	}

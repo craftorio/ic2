@@ -87,8 +87,7 @@ public final class ClientModEventHandlerForge
 			event.register(keybinding);
 		}
 	}
-
-	// TODO
+	
 	@SubscribeEvent
 	public void onClientSetup(FMLClientSetupEvent event)
 	{

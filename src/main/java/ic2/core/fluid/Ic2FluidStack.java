@@ -5,11 +5,20 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public interface Ic2FluidStack
 {
 	Ic2FluidStack EMPTY = create(Fluids.EMPTY, 0);
-	int BUCKET_MB = 1000;
+	
+	default String getFluidTypeKey()
+	{
+		// Returns a string like: `fluid_type.ic2.xxx` for the fluid type, or null if the stack is empty.
+		if (isEmpty()) return null;
+		
+		return "fluid_type." + String.valueOf(ForgeRegistries.FLUIDS.getKey(getFluid())).replace(':', '.');
+		
+	}
 
 	static Ic2FluidStack create(Fluid fluid, int amount)
 	{

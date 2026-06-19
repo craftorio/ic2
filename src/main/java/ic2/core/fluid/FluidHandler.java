@@ -198,4 +198,6 @@ public final class FluidHandler
 	{
 		return BuiltInRegistries.FLUID.stream().filter(fluid -> fluid.isSource(fluid.defaultFluidState()) && fluid != Fluids.EMPTY).toList();
 	}
+	
+	
 }

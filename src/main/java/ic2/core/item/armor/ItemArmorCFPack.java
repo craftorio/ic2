@@ -15,12 +15,9 @@ public class ItemArmorCFPack extends ItemArmorFluidTank
 
 	public void fillItemCategory(CreativeModeTab tab, NonNullList<ItemStack> subItems)
 	{
-		if (true)
-		{
-			ItemStack stack = new ItemStack(this);
-			this.filltank(stack);
-			subItems.add(stack);
-			subItems.add(new ItemStack(this));
-		}
+		ItemStack stack = new ItemStack(this);
+		this.fillTank(stack);
+		subItems.add(stack);
+		subItems.add(new ItemStack(this));
 	}
 }

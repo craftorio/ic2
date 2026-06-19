@@ -59,8 +59,7 @@ public abstract class AbstractFluidSlot extends GuiElement<TankFluidSlot>
 			Fluid fluid = fs.getFluid();
 			if (fluid != null)
 			{
-				ret.add(Component.literal(Util.getName(fs.getFluid()).toString()));
-				ret.add(Component.translatable("fluid_type." + Util.getName(fs.getFluid()).toString().replace(':', '.')));
+				ret.add(Component.translatable(fs.getFluidTypeKey()));
 				ret.add(Component.translatable("ic2.generic.text.amount", fs.getAmountMb()));
 				String translateKey = FluidHandler.isGaseous(fluid) ? "ic2.generic.text.gas" : "ic2.generic.text.liquid";
 				ret.add(Component.translatable("ic2.generic.text.state", Component.translatable(translateKey)));

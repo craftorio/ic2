@@ -17,13 +17,10 @@ public class ItemArmorJetpack extends ItemArmorFluidTank implements IJetpack
 
 	public void fillItemCategory(CreativeModeTab group, NonNullList<ItemStack> stacks)
 	{
-		if (true)
-		{
-			ItemStack stack = new ItemStack(this);
-			this.filltank(stack);
-			stacks.add(stack);
-			stacks.add(new ItemStack(this));
-		}
+		ItemStack stack = new ItemStack(this);
+		this.fillTank(stack);
+		stacks.add(stack);
+		stacks.add(new ItemStack(this));
 	}
 
 	@Override
@@ -64,7 +61,7 @@ public class ItemArmorJetpack extends ItemArmorFluidTank implements IJetpack
 	@Override
 	public double getChargeLevel(ItemStack stack)
 	{
-		return this.getCharge(stack) / this.getMaxCharge(stack);
+		return this.getCharge(stack) / this.getMaxCharge();
 	}
 
 	@Override

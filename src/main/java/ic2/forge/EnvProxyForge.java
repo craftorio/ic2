@@ -35,7 +35,6 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.data.worldgen.features.FeatureUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -299,7 +298,7 @@ public final class EnvProxyForge implements EnvProxy
 						if (item instanceof ItemArmorFluidTank tankItem)
 						{
 							ItemStack filledStack = new ItemStack(item);
-							tankItem.filltank(filledStack);
+							tankItem.fillTank(filledStack);
 							output.accept(filledStack);
 						}
 					}

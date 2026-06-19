@@ -1,5 +1,5 @@
 {
-  "parent": "ic2:ic2/build_terraformer",
+  "parent": "ic2:ic2/build_generator/build_compressor/build_matter_gen/build_terraformer",
   "display": {
     "icon": {
       "item": "ic2:cultivation_tfbp"

@@ -1,5 +1,5 @@
 {
-  "parent": "ic2:ic2/build_teleporter",
+  "parent": "ic2:ic2/build_generator/build_batbox/build_mfeu/build_mfsu/build_teleporter",
   "display": {
     "icon": {
       "item": "ic2:teleporter"

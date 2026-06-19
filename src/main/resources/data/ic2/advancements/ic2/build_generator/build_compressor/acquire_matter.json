@@ -1,0 +1,50 @@
+{
+  "parent": "ic2:ic2/build_generator/build_compressor/build_matter_gen",
+  "display": {
+    "icon": {
+      "item": "ic2:uu_matter_cell"
+    },
+    "title": {
+      "translate": "advancements.ic2.acquire_matter"
+    },
+    "description": {
+      "translate": "advancements.ic2.acquire_matter.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "ic2:uu_matter_cell": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:uu_matter_cell"
+            ]
+          }
+        ]
+      }
+    },
+    "ic2:uu_matter_bucket": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:uu_matter_bucket"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "ic2:uu_matter_cell",
+      "ic2:uu_matter_bucket"
+    ]
+  ]
+}

@@ -1,5 +1,6 @@
 package ic2.forge;
 
+import ic2.core.block.misc.PahoehoeLavaBlock;
 import ic2.core.fluid.EnvFluidHandler;
 import ic2.core.fluid.Ic2FluidStack;
 import ic2.core.util.StackUtil;
@@ -110,10 +111,10 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 			ret.still(still);
 			ret.flowing(flowing);
 			ForgeRegistries.FLUIDS.register(ResourceLocation.fromNamespaceAndPath(id.getNamespace(), "flowing_" + id.getPath()), flowing);
-			LiquidBlock fluidBlock = new LiquidBlock(
-				(FlowingFluid) ret.still(),
-				Block.Properties.copy(Blocks.WATER).noLootTable().noCollission().randomTicks().pushReaction(net.minecraft.world.level.material.PushReaction.DESTROY)
-			);
+			Block.Properties fluidBlockProperties = Block.Properties.copy(Blocks.WATER).noLootTable().noCollission().randomTicks().pushReaction(net.minecraft.world.level.material.PushReaction.DESTROY);
+			LiquidBlock fluidBlock = id.getPath().equals("pahoehoe_lava")
+				? new PahoehoeLavaBlock((FlowingFluid) ret.still(), fluidBlockProperties)
+				: new LiquidBlock((FlowingFluid) ret.still(), fluidBlockProperties);
 			ForgeRegistries.BLOCKS.register(ResourceLocation.fromNamespaceAndPath(id.getNamespace(), "fluid_block_" + id.getPath()), fluidBlock);
 			fluidBlockRef.set(fluidBlock);
 		});

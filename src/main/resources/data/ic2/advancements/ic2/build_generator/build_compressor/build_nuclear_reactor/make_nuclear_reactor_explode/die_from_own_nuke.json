@@ -1,5 +1,5 @@
 {
-  "parent": "ic2:ic2/build_generator/build_compressor/make_nuclear_reactor_explode",
+  "parent": "ic2:ic2/build_generator/build_compressor/build_nuclear_reactor/make_nuclear_reactor_explode",
   "display": {
     "icon": {
       "item": "ic2:nuke"

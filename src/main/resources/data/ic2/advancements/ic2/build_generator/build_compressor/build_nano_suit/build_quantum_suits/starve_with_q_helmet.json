@@ -1,5 +1,5 @@
 {
-  "parent": "ic2:ic2/build_generator/build_compressor/build_quantum_suits",
+  "parent": "ic2:ic2/build_generator/build_compressor/build_nano_suit/build_quantum_suits",
   "display": {
     "icon": {
       "item": "ic2:quantum_helmet"

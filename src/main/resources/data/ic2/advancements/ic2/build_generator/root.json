@@ -1,5 +1,5 @@
 {
-  "parent": "ic2:ic2/acquire_insulated_cable",
+  "parent": "ic2:ic2/acquire_resin/acquire_insulated_cable",
   "display": {
     "icon": {
       "item": "ic2:generator"

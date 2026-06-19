@@ -1,28 +1,28 @@
 {
-  "parent": "ic2:ic2/build_generator/build_drill/build_ddrill",
+  "parent": "ic2:ic2/build_generator/build_batbox/build_mfeu/build_mfsu",
   "display": {
     "icon": {
-      "item": "ic2:iridium_drill"
+      "item": "ic2:teleporter"
     },
     "title": {
-      "translate": "advancements.ic2.build_iridium_drill"
+      "translate": "advancements.ic2.build_teleporter"
     },
     "description": {
-      "translate": "advancements.ic2.build_iridium_drill.desc"
+      "translate": "advancements.ic2.build_teleporter.desc"
     },
-    "frame": "goal",
+    "frame": "task",
     "show_toast": true,
     "announce_to_chat": true,
     "hidden": false
   },
   "criteria": {
-    "ic2:iridium_drill": {
+    "ic2:teleporter": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
             "items": [
-              "ic2:iridium_drill"
+              "ic2:teleporter"
             ]
           }
         ]
@@ -31,7 +31,7 @@
   },
   "requirements": [
     [
-      "ic2:iridium_drill"
+      "ic2:teleporter"
     ]
   ]
 }

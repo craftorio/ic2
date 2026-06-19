@@ -86,17 +86,6 @@ public class ItemClassicCell extends Ic2BucketItem implements Ic2FluidItem
 	@Override
 	public boolean emptyContents(@Nullable Player player, Level world, BlockPos pos, @Nullable BlockHitResult hitResult)
 	{
-		if (!(this.fluid instanceof net.minecraft.world.level.material.FlowingFluid))
-		{
-			return false;
-		}
-
-		net.minecraft.world.level.block.state.BlockState legacyBlock = this.fluid.defaultFluidState().createLegacyBlock();
-		if (legacyBlock.isAir())
-		{
-			return false;
-		}
-
 		return super.emptyContents(player, world, pos, hitResult);
 	}
 

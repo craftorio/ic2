@@ -1,5 +1,5 @@
 {
-  "parent": "ic2:ic2/build_elec_furnace",
+  "parent": "ic2:ic2/build_generator/build_elec_furnace",
   "display": {
     "icon": {
       "item": "ic2:induction_furnace"

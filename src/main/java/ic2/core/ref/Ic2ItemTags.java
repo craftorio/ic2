@@ -40,12 +40,12 @@ public final class Ic2ItemTags
 	public static final TagKey<Item> STEEL_PLATES = createResource("steel", "plates");
 	public static final TagKey<Item> ORES = create("c:ores", "forge:ores");
 	public static final TagKey<Item> LEAD_ORES = createResource("lead", "ores");
-	public static final TagKey<Item> LEAD_RAW_ORES = createResource("lead", "raw_ores");
+	public static final TagKey<Item> LEAD_raw_materials = createResource("lead", "raw_materials");
 	public static final TagKey<Item> SILVER_ORES = createResource("silver", "ores");
-	public static final TagKey<Item> TIN_RAW_ORES = createResource("tin", "raw_ores");
+	public static final TagKey<Item> TIN_raw_materials = createResource("tin", "raw_materials");
 	public static final TagKey<Item> TIN_ORES = createResource("tin", "ores");
 	public static final TagKey<Item> URANIUM_ORES = createResource("uranium", "ores");
-	public static final TagKey<Item> URANIUM_RAW_ORES = createResource("uranium", "raw_ores");
+	public static final TagKey<Item> URANIUM_raw_materials = createResource("uranium", "raw_materials");
 	public static final TagKey<Item> LEAD_BLOCKS = createResource("lead", "blocks");
 	public static final TagKey<Item> TIN_BLOCKS = createResource("tin", "blocks");
 	public static final TagKey<Item> URANIUM_BLOCKS = createResource("uranium", "blocks");

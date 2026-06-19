@@ -1,7 +1,7 @@
 {
   "type": "ic2:macerator",
   "ingredient": {
-    "tag": "forge:raw_ores/tin"
+    "tag": "forge:raw_materials/tin"
   },
   "result": {
     "item": "ic2:crushed_tin",

@@ -90,7 +90,7 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 						@Override
 						public ResourceLocation getFlowingTexture()
 						{
-							return flowingSpriteId;
+							return flowingSpriteId != null ? flowingSpriteId : stillSpriteId;
 						}
 					});
 				}
@@ -103,25 +103,19 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 		pendingFluidRegistrations.add(() ->
 		{
 			ForgeFlowingFluid.Properties properties = new ForgeFlowingFluid.Properties(fluidTypeRef::get, ret::still, ret::flowing).bucket(ret::bucket);
-			if (flowingSpriteId != null)
-			{
-				properties.block(fluidBlockRef::get);
-			}
+			properties.block(fluidBlockRef::get);
 			Fluid still = new ForgeFlowingFluid.Source(properties);
-			Fluid flowing = flowingSpriteId != null ? new ForgeFlowingFluid.Flowing(properties) : null;
+			Fluid flowing = new ForgeFlowingFluid.Flowing(properties);
 			ForgeRegistries.FLUIDS.register(id, still);
 			ret.still(still);
 			ret.flowing(flowing);
-			if (flowing != null)
-			{
-				ForgeRegistries.FLUIDS.register(ResourceLocation.fromNamespaceAndPath(id.getNamespace(), "flowing_" + id.getPath()), flowing);
-				LiquidBlock fluidBlock = new LiquidBlock(
-					(FlowingFluid) ret.still(),
-					Block.Properties.copy(Blocks.WATER).noLootTable().noCollission().randomTicks().pushReaction(net.minecraft.world.level.material.PushReaction.DESTROY)
-				);
-				ForgeRegistries.BLOCKS.register(ResourceLocation.fromNamespaceAndPath(id.getNamespace(), "fluid_block_" + id.getPath()), fluidBlock);
-				fluidBlockRef.set(fluidBlock);
-			}
+			ForgeRegistries.FLUIDS.register(ResourceLocation.fromNamespaceAndPath(id.getNamespace(), "flowing_" + id.getPath()), flowing);
+			LiquidBlock fluidBlock = new LiquidBlock(
+				(FlowingFluid) ret.still(),
+				Block.Properties.copy(Blocks.WATER).noLootTable().noCollission().randomTicks().pushReaction(net.minecraft.world.level.material.PushReaction.DESTROY)
+			);
+			ForgeRegistries.BLOCKS.register(ResourceLocation.fromNamespaceAndPath(id.getNamespace(), "fluid_block_" + id.getPath()), fluidBlock);
+			fluidBlockRef.set(fluidBlock);
 		});
 
 		ResourceLocation bucketId = ResourceLocation.fromNamespaceAndPath(id.getNamespace(), id.getPath() + "_bucket");

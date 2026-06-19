@@ -1,0 +1,31 @@
+{
+  "parent": "ic2:ic2/build_generator/build_compressor/make_nuclear_reactor_explode",
+  "display": {
+    "icon": {
+      "item": "ic2:nuke"
+    },
+    "title": {
+      "translate": "advancements.ic2.dieFromOwnNuke"
+    },
+    "description": {
+      "translate": "advancements.ic2.dieFromOwnNuke.desc"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "impossible": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "impossible"
+    ]
+  ],
+  "rewards": {
+    "experience": 100
+  }
+}

@@ -12,8 +12,11 @@ import ic2.core.util.Log;
 import ic2.core.util.PriorityExecutor;
 import ic2.core.util.SideGateway;
 import ic2.forge.EnvProxyForge;
+import net.minecraft.advancements.Advancement;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.level.Level;
 import org.apache.logging.log4j.LogManager;
@@ -26,7 +29,6 @@ public class IC2
 	public static final SideGateway network;
 	public static final Keyboard keyboard;
 	public static final SoundManager soundManager;
-	public static Ic2Achievements achievements;
 	public static final CreativeModeTab tabIc2General;
 	public static final CreativeModeTab tabIc2GeneratorsAndWiring;
 	public static final CreativeModeTab tabIc2Reactor;
@@ -62,6 +64,18 @@ public class IC2
 	public static ResourceLocation getIdentifier(String name)
 	{
 		return ResourceLocation.fromNamespaceAndPath("ic2", name);
+	}
+
+	public static void grantAdvancement(Player player, String path)
+	{
+		if (player instanceof ServerPlayer sp)
+		{
+			Advancement adv = sp.server.getAdvancements().getAdvancement(ResourceLocation.fromNamespaceAndPath("ic2", path));
+			if (adv != null)
+			{
+				sp.getAdvancements().award(adv, "impossible");
+			}
+		}
 	}
 
 	private static EnvProxy createEnvProxy()

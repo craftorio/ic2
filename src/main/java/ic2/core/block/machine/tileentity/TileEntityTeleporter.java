@@ -195,7 +195,7 @@ public class TileEntityTeleporter extends TileEntityBase implements INetworkTile
 				IC2.network.get(true).initiateTileEntityEvent(this, 0, true);
 				if (user instanceof Player && distance >= 1000.0)
 				{
-					IC2.achievements.issueAchievement((Player) user, "teleportFarAway");
+					IC2.grantAdvancement((Player) user, "ic2/teleport_far_away");
 				}
 			}
 		}

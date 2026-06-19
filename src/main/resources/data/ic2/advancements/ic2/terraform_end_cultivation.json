@@ -1,0 +1,31 @@
+{
+  "parent": "ic2:ic2/root",
+  "display": {
+    "icon": {
+      "item": "ic2:cultivation_tfbp"
+    },
+    "title": {
+      "translate": "advancements.ic2.terraformEndCultivation"
+    },
+    "description": {
+      "translate": "advancements.ic2.terraformEndCultivation.desc"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "impossible": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "impossible"
+    ]
+  ],
+  "rewards": {
+    "experience": 100
+  }
+}

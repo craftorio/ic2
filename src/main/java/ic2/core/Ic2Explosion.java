@@ -191,9 +191,9 @@ public class Ic2Explosion extends Explosion
 				{
 					Entity entity = entry.entity;
 					entity.hurt(this.damageSource, (float) entry.damage);
-					if (entity instanceof Player player && this.isNuclear() && this.igniter != null && player == this.igniter && player.getHealth() <= 0.0F)
+					if (entity instanceof Player player && this.type == Type.Nuclear && this.igniter != null && player == this.igniter && player.getHealth() <= 0.0F)
 					{
-						IC2.achievements.issueAchievement(player, "dieFromOwnNuke");
+						IC2.grantAdvancement(player, "ic2/die_from_own_nuke");
 					}
 
 					double motionSq = Util.square(entry.motionX) + Util.square(entry.motionY) + Util.square(entry.motionZ);

@@ -24,7 +24,6 @@ import ic2.core.network.GuiSynced;
 import ic2.core.profile.NotClassic;
 import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.ref.Ic2Fluids;
-import ic2.core.ref.Ic2Items;
 
 import java.util.Collection;
 import java.util.EnumSet;
@@ -53,17 +52,7 @@ public class TileEntityBlastFurnace extends TileEntityInventory implements IUpgr
 	@GuiSynced
 	protected float guiProgress;
 	public final InvSlotProcessableGeneric inputSlot = new InvSlotProcessableGeneric(this, "input", 1, Recipes.blast_furnace);
-	public final InvSlotOutput outputSlot = new InvSlotOutput(this, "output", 2)
-	{
-		@Override
-		public void onPickupFromSlot(Player player, ItemStack stack)
-		{
-			if (player != null && stack.getItem() == Ic2Items.STEEL_INGOT)
-			{
-				IC2.achievements.issueAchievement(player, "acquireRefinedIron");
-			}
-		}
-	};
+	public final InvSlotOutput outputSlot = new InvSlotOutput(this, "output", 2);
 	public final InvSlotConsumableLiquidByList tankInputSlot = new InvSlotConsumableLiquidByList(this, "cellInput", 1, Ic2Fluids.AIR.still());
 	public final InvSlotOutput tankOutputSlot = new InvSlotOutput(this, "cellOutput", 1);
 	public final InvSlotUpgrade upgradeSlot = new InvSlotUpgrade(this, "upgrade", 2);

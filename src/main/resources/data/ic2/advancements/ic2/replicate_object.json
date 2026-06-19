@@ -1,0 +1,28 @@
+{
+  "parent": "ic2:ic2/build_generator/build_compressor/acquire_matter",
+  "display": {
+    "icon": {
+      "item": "ic2:replicator"
+    },
+    "title": {
+      "translate": "advancements.ic2.replicateObject"
+    },
+    "description": {
+      "translate": "advancements.ic2.replicateObject.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "impossible": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "impossible"
+    ]
+  ]
+}

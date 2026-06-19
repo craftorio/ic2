@@ -12,8 +12,10 @@ import java.util.List;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
@@ -24,6 +26,7 @@ import net.minecraft.world.entity.animal.Sheep;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BannerBlock;
@@ -50,6 +53,15 @@ public class ItemToolPainter extends ItemToolCrafting implements IBoxable
 	{
 		super(settings);
 		this.color = color;
+	}
+
+	@Override
+	public void appendHoverText(@NotNull ItemStack stack, Level world, List<Component> tooltip, @NotNull TooltipFlag advanced)
+	{
+		if (this.color != null)
+		{
+			super.appendHoverText(stack, world, tooltip, advanced);
+		}
 	}
 
 	public @NotNull InteractionResult useOn(@NotNull UseOnContext context)
@@ -79,7 +91,7 @@ public class ItemToolPainter extends ItemToolCrafting implements IBoxable
 				player.playSound(Ic2SoundEvents.ITEM_PAINTER_USE, 1.0F, 1.0F);
 			}
 
-			return world.isClientSide ? InteractionResult.PASS : InteractionResult.SUCCESS;
+			return InteractionResult.SUCCESS;
 		} else
 		{
 			return InteractionResult.PASS;
@@ -234,7 +246,7 @@ public class ItemToolPainter extends ItemToolCrafting implements IBoxable
 		ResourceLocation identifier = ResourceLocation.withDefaultNamespace(color.getName() + "_" + vanillaColorBlock.id);
 		return ForgeRegistries.BLOCKS.getValue(identifier).withPropertiesOf(state);
 	}
-
+	
 	public @NotNull InteractionResult interactLivingEntity(@NotNull ItemStack stack, @NotNull Player user, LivingEntity entity, InteractionHand hand)
 	{
 		if (this.color == null)
@@ -251,7 +263,7 @@ public class ItemToolPainter extends ItemToolCrafting implements IBoxable
 		}
 	}
 
-	public InteractionResultHolder<ItemStack> use(Level world, @NotNull Player player, InteractionHand hand)
+	public @NotNull InteractionResultHolder<ItemStack> use(Level world, @NotNull Player player, InteractionHand hand)
 	{
 		ItemStack stack = StackUtil.get(player, hand);
 		if (!world.isClientSide && IC2.keyboard.isModeSwitchKeyDown(player))
@@ -267,10 +279,10 @@ public class ItemToolPainter extends ItemToolCrafting implements IBoxable
 				IC2.sideProxy.messagePlayer(player, "Painter automatic refill mode disabled");
 			}
 
-			return new InteractionResultHolder(InteractionResult.SUCCESS, stack);
+			return new InteractionResultHolder<>(InteractionResult.SUCCESS, stack);
 		} else
 		{
-			return new InteractionResultHolder(InteractionResult.PASS, stack);
+			return new InteractionResultHolder<>(InteractionResult.PASS, stack);
 		}
 	}
 
@@ -296,6 +308,7 @@ public class ItemToolPainter extends ItemToolCrafting implements IBoxable
 				player.setItemInHand(hand, consumedStack);
 				StackUtil.addToPlayerInventory(player, new ItemStack(Ic2Items.PAINTER, 1));
 			}
+			player.playSound(SoundEvents.ITEM_BREAK);
 		}
 	}
 

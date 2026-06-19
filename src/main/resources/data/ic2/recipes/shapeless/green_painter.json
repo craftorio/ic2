@@ -8,6 +8,7 @@
       "item": "minecraft:green_dye"
     }
   ],
+  "consuming": true,
   "result": {
     "item": "ic2:green_painter"
   }

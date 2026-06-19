@@ -8,6 +8,7 @@
       "item": "minecraft:yellow_dye"
     }
   ],
+  "consuming": true,
   "result": {
     "item": "ic2:yellow_painter"
   }

@@ -8,6 +8,7 @@
       "item": "minecraft:blue_dye"
     }
   ],
+  "consuming": true,
   "result": {
     "item": "ic2:blue_painter"
   }

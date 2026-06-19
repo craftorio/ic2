@@ -8,6 +8,7 @@
       "item": "minecraft:light_gray_dye"
     }
   ],
+  "consuming": true,
   "result": {
     "item": "ic2:light_gray_painter"
   }

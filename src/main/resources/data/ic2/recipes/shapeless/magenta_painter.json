@@ -8,6 +8,7 @@
       "item": "minecraft:magenta_dye"
     }
   ],
+  "consuming": true,
   "result": {
     "item": "ic2:magenta_painter"
   }

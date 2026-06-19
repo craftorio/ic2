@@ -8,6 +8,7 @@
       "item": "minecraft:red_dye"
     }
   ],
+  "consuming": true,
   "result": {
     "item": "ic2:red_painter"
   }

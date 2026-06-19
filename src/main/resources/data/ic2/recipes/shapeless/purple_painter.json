@@ -8,6 +8,7 @@
       "item": "minecraft:purple_dye"
     }
   ],
+  "consuming": true,
   "result": {
     "item": "ic2:purple_painter"
   }

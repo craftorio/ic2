@@ -8,6 +8,7 @@
       "item": "minecraft:orange_dye"
     }
   ],
+  "consuming": true,
   "result": {
     "item": "ic2:orange_painter"
   }

@@ -1,6 +1,13 @@
 package ic2.forge;
 
+import ic2.core.block.misc.AirBlock;
+import ic2.core.block.misc.ConstructionFoamBlock;
+import ic2.core.block.misc.HotCoolantBlock;
+import ic2.core.block.misc.HotWaterBlock;
+import ic2.core.block.misc.HydrogenBlock;
 import ic2.core.block.misc.PahoehoeLavaBlock;
+import ic2.core.block.misc.SteamBlock;
+import ic2.core.block.misc.UUMatterBlock;
 import ic2.core.fluid.EnvFluidHandler;
 import ic2.core.fluid.Ic2FluidStack;
 import ic2.core.util.StackUtil;
@@ -112,9 +119,7 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 			ret.flowing(flowing);
 			ForgeRegistries.FLUIDS.register(ResourceLocation.fromNamespaceAndPath(id.getNamespace(), "flowing_" + id.getPath()), flowing);
 			Block.Properties fluidBlockProperties = Block.Properties.copy(Blocks.WATER).noLootTable().noCollission().randomTicks().pushReaction(net.minecraft.world.level.material.PushReaction.DESTROY);
-			LiquidBlock fluidBlock = id.getPath().equals("pahoehoe_lava")
-				? new PahoehoeLavaBlock((FlowingFluid) ret.still(), fluidBlockProperties)
-				: new LiquidBlock((FlowingFluid) ret.still(), fluidBlockProperties);
+				LiquidBlock fluidBlock = createFluidBlock(id.getPath(), (FlowingFluid) ret.still(), fluidBlockProperties);
 			ForgeRegistries.BLOCKS.register(ResourceLocation.fromNamespaceAndPath(id.getNamespace(), "fluid_block_" + id.getPath()), fluidBlock);
 			fluidBlockRef.set(fluidBlock);
 		});
@@ -610,6 +615,22 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 		}
 
 		pendingFluidRegistrations.clear();
+	}
+
+	private static LiquidBlock createFluidBlock(String fluidName, FlowingFluid fluid, Block.Properties properties)
+	{
+		switch (fluidName)
+		{
+			case "hot_coolant": return new HotCoolantBlock(fluid, properties);
+			case "air": return new AirBlock(fluid, properties);
+			case "hydrogen": return new HydrogenBlock(fluid, properties);
+			case "hot_water": return new HotWaterBlock(fluid, properties);
+			case "uu_matter": return new UUMatterBlock(fluid, properties);
+			case "construction_foam": return new ConstructionFoamBlock(fluid, properties);
+			case "steam": case "superheated_steam": return new SteamBlock(fluid, properties);
+			case "pahoehoe_lava": return new PahoehoeLavaBlock(fluid, properties);
+			default: return new LiquidBlock(fluid, properties);
+		}
 	}
 
 }

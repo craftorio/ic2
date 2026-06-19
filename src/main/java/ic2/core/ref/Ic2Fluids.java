@@ -34,8 +34,8 @@ public final class Ic2Fluids
 		"hot_water", 1000, 1000, 0, 350, false, "fluid_water", "fluid_water", -632884747
 	);
 	public static final EnvFluidHandler.FluidRefs WEED_EX = create("weed_ex", 1000, 1000, 0, 300, false, "weed_ex", null, -16298220);
-	public static final EnvFluidHandler.FluidRefs AIR = create("air", 0, 500, 0, 300, true, "fluid_2", null, 1610481149);
-	public static final EnvFluidHandler.FluidRefs HYDROGEN = create("hydrogen", 0, 500, 0, 300, true, "fluid_2", null, -2034379563);
+	public static final EnvFluidHandler.FluidRefs AIR = create("air", -100, 500, 0, 300, true, "fluid_2", null, 1610481149);
+	public static final EnvFluidHandler.FluidRefs HYDROGEN = create("hydrogen", -100, 500, 0, 300, true, "fluid_2", null, -2034379563);
 	public static final EnvFluidHandler.FluidRefs OXYGEN = create("oxygen", 0, 500, 0, 300, true, "fluid_2", null, -2034581547);
 	public static final EnvFluidHandler.FluidRefs HEAVY_WATER = create("heavy_water", 1000, 1000, 0, 300, false, "fluid", "fluid", -45191196);
 

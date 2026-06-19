@@ -5,6 +5,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
@@ -45,6 +46,16 @@ public class PahoehoeLavaBlock extends LiquidBlock
 		if (state.getValue(LiquidBlock.LEVEL) == 0 && isTouchingWater(world, pos))
 		{
 			world.setBlockAndUpdate(pos, Blocks.BASALT.defaultBlockState());
+		}
+	}
+
+	@Override
+	public void entityInside(BlockState state, Level world, BlockPos pos, Entity entity)
+	{
+		if (!world.isClientSide)
+		{
+			entity.hurt(world.damageSources().lava(), 4.0F);
+			entity.setSecondsOnFire(30);
 		}
 	}
 

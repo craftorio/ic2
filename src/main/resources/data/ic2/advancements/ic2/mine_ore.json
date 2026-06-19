@@ -88,6 +88,43 @@
         ]
       }
     },
+    "ic2:raw_lead": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:raw_lead"
+            ]
+          }
+        ]
+      }
+    },
+    "ic2:lead_ore": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:lead_ore"
+            ]
+          }
+        ]
+      }
+    },
+    "ic2:deepslate_lead_ore": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:deepslate_lead_ore"
+            ]
+          }
+        ]
+      }
+    },
+    
     "ic2:raw_uranium": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
@@ -133,6 +170,9 @@
       "ic2:raw_tin",
       "ic2:tin_ore",
       "ic2:deepslate_tin_ore",
+      "ic2:raw_lead",
+      "ic2:lead_ore",
+      "ic2:deepslate_lead_ore",
       "ic2:raw_uranium",
       "ic2:uranium_ore",
       "ic2:deepslate_uranium_ore"

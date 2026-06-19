@@ -5,10 +5,10 @@
       "item": "ic2:nano_chestplate"
     },
     "title": {
-      "translate": "advancements.ic2.buildNanoSuit"
+      "translate": "advancements.ic2.build_nano_suit"
     },
     "description": {
-      "translate": "advancements.ic2.buildNanoSuit.desc"
+      "translate": "advancements.ic2.build_nano_suit.desc"
     },
     "frame": "task",
     "show_toast": true,

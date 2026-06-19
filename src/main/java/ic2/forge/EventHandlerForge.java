@@ -9,6 +9,7 @@ import ic2.core.IC2;
 import ic2.core.block.tileentity.Ic2TileEntity;
 import ic2.core.event.EventHandler;
 import ic2.core.event.TickHandler;
+import ic2.core.item.armor.jetpack.JetpackHandler;
 import ic2.core.fluid.FluidBeBridge;
 import ic2.core.fluid.Ic2FluidBlock;
 import ic2.core.fluid.Ic2FluidItem;
@@ -33,6 +34,7 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.event.entity.living.MobSpawnEvent;
@@ -157,6 +159,17 @@ public final class EventHandlerForge
 	public void onLivingSpecialSpawn(MobSpawnEvent.FinalizeSpawn event)
 	{
 		EventHandler.onLivingSpecialSpawn(event.getEntity());
+	}
+
+	@SubscribeEvent
+	public void onLivingDeath(LivingDeathEvent event)
+	{
+		if (event.getEntity() instanceof net.minecraft.world.entity.player.Player player
+			&& event.getSource() == player.level().damageSources().fall()
+			&& JetpackHandler.hasJetpack(player.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.CHEST)))
+		{
+			IC2.grantAdvancement(player, "ic2/fall_with_jetpack");
+		}
 	}
 
 	@SubscribeEvent(priority = EventPriority.LOW)

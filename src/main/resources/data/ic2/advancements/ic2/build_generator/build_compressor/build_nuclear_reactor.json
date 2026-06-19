@@ -5,10 +5,10 @@
       "item": "ic2:nuclear_reactor"
     },
     "title": {
-      "translate": "advancements.ic2.buildNuclearReactor"
+      "translate": "advancements.ic2.build_nuclear_reactor"
     },
     "description": {
-      "translate": "advancements.ic2.buildNuclearReactor.desc"
+      "translate": "advancements.ic2.build_nuclear_reactor.desc"
     },
     "frame": "task",
     "show_toast": true,

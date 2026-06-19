@@ -1,16 +1,16 @@
 {
-  "parent": "ic2:ic2/build_generator/build_compressor/make_nuclear_reactor_explode",
+  "parent": "ic2:ic2/build_generator/root",
   "display": {
     "icon": {
-      "item": "ic2:nuke"
+      "item": "ic2:machine"
     },
     "title": {
-      "translate": "advancements.ic2.die_from_own_nuke"
+      "translate": "advancements.ic2.explode_machine"
     },
     "description": {
-      "translate": "advancements.ic2.die_from_own_nuke.desc"
+      "translate": "advancements.ic2.explode_machine.desc"
     },
-    "frame": "challenge",
+    "frame": "task",
     "show_toast": true,
     "announce_to_chat": true,
     "hidden": false
@@ -24,8 +24,5 @@
     [
       "impossible"
     ]
-  ],
-  "rewards": {
-    "experience": 100
-  }
+  ]
 }

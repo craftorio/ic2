@@ -5,10 +5,10 @@
       "item": "ic2:compressor"
     },
     "title": {
-      "translate": "advancements.ic2.buildCompressor"
+      "translate": "advancements.ic2.build_compressor"
     },
     "description": {
-      "translate": "advancements.ic2.buildCompressor.desc"
+      "translate": "advancements.ic2.build_compressor.desc"
     },
     "frame": "task",
     "show_toast": true,

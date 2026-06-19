@@ -5,10 +5,10 @@
       "item": "ic2:batbox"
     },
     "title": {
-      "translate": "advancements.ic2.buildBatBox"
+      "translate": "advancements.ic2.build_batbox"
     },
     "description": {
-      "translate": "advancements.ic2.buildBatBox.desc"
+      "translate": "advancements.ic2.build_batbox.desc"
     },
     "frame": "task",
     "show_toast": true,

@@ -5,10 +5,10 @@
       "item": "ic2:replicator"
     },
     "title": {
-      "translate": "advancements.ic2.replicateObject"
+      "translate": "advancements.ic2.replicate_object"
     },
     "description": {
-      "translate": "advancements.ic2.replicateObject.desc"
+      "translate": "advancements.ic2.replicate_object.desc"
     },
     "frame": "task",
     "show_toast": true,

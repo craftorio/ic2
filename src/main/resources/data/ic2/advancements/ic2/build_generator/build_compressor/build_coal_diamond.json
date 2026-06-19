@@ -5,10 +5,10 @@
       "item": "ic2:industrial_diamond"
     },
     "title": {
-      "translate": "advancements.ic2.buildCoalDiamond"
+      "translate": "advancements.ic2.build_coal_diamond"
     },
     "description": {
-      "translate": "advancements.ic2.buildCoalDiamond.desc"
+      "translate": "advancements.ic2.build_coal_diamond.desc"
     },
     "frame": "task",
     "show_toast": true,

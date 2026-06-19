@@ -5,10 +5,10 @@
       "item": "ic2:nano_saber"
     },
     "title": {
-      "translate": "advancements.ic2.buildNanoSaber"
+      "translate": "advancements.ic2.build_nano_saber"
     },
     "description": {
-      "translate": "advancements.ic2.buildNanoSaber.desc"
+      "translate": "advancements.ic2.build_nano_saber.desc"
     },
     "frame": "task",
     "show_toast": true,

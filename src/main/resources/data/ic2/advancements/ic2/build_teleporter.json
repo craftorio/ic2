@@ -1,14 +1,14 @@
 {
-  "parent": "ic2:ic2/build_generator/build_compressor/build_energy_crystal",
+  "parent": "ic2:ic2/build_generator/build_batbox/build_mfsu",
   "display": {
     "icon": {
-      "item": "ic2:mass_fabricator"
+      "item": "ic2:teleporter"
     },
     "title": {
-      "translate": "advancements.ic2.buildMassFab"
+      "translate": "advancements.ic2.build_teleporter"
     },
     "description": {
-      "translate": "advancements.ic2.buildMassFab.desc"
+      "translate": "advancements.ic2.build_teleporter.desc"
     },
     "frame": "task",
     "show_toast": true,
@@ -16,13 +16,13 @@
     "hidden": false
   },
   "criteria": {
-    "ic2:mass_fabricator": {
+    "ic2:teleporter": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
             "items": [
-              "ic2:mass_fabricator"
+              "ic2:teleporter"
             ]
           }
         ]
@@ -31,7 +31,7 @@
   },
   "requirements": [
     [
-      "ic2:mass_fabricator"
+      "ic2:teleporter"
     ]
   ]
 }

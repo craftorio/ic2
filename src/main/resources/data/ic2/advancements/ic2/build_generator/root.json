@@ -5,10 +5,10 @@
       "item": "ic2:generator"
     },
     "title": {
-      "translate": "advancements.ic2.buildGenerator"
+      "translate": "advancements.ic2.build_generator"
     },
     "description": {
-      "translate": "advancements.ic2.buildGenerator.desc"
+      "translate": "advancements.ic2.build_generator.desc"
     },
     "frame": "task",
     "show_toast": true,

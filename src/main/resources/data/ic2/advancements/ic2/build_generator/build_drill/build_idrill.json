@@ -5,10 +5,10 @@
       "item": "ic2:iridium_drill"
     },
     "title": {
-      "translate": "advancements.ic2.buildIDrill"
+      "translate": "advancements.ic2.build_iridium_drill"
     },
     "description": {
-      "translate": "advancements.ic2.buildIDrill.desc"
+      "translate": "advancements.ic2.build_iridium_drill.desc"
     },
     "frame": "goal",
     "show_toast": true,

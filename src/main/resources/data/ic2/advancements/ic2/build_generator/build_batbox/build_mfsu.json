@@ -5,10 +5,10 @@
       "item": "ic2:mfsu"
     },
     "title": {
-      "translate": "advancements.ic2.buildMFS"
+      "translate": "advancements.ic2.build_mfsu"
     },
     "description": {
-      "translate": "advancements.ic2.buildMFS.desc"
+      "translate": "advancements.ic2.build_mfsu.desc"
     },
     "frame": "task",
     "show_toast": true,

@@ -5,10 +5,10 @@
       "item": "ic2:macerator"
     },
     "title": {
-      "translate": "advancements.ic2.buildMacerator"
+      "translate": "advancements.ic2.build_macerator"
     },
     "description": {
-      "translate": "advancements.ic2.buildMacerator.desc"
+      "translate": "advancements.ic2.build_macerator.desc"
     },
     "frame": "task",
     "show_toast": true,

@@ -5,10 +5,10 @@
       "item": "ic2:quantum_chestplate"
     },
     "title": {
-      "translate": "advancements.ic2.buildQuantumSuits"
+      "translate": "advancements.ic2.build_quantum_suits"
     },
     "description": {
-      "translate": "advancements.ic2.buildQuantumSuits.desc"
+      "translate": "advancements.ic2.build_quantum_suits.desc"
     },
     "frame": "challenge",
     "show_toast": true,

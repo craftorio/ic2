@@ -1,0 +1,141 @@
+{
+  "parent": "ic2:ic2/root",
+  "display": {
+    "icon": {
+      "item": "ic2:copper_ore"
+    },
+    "title": {
+      "translate": "advancements.ic2.mine_ore"
+    },
+    "description": {
+      "translate": "advancements.ic2.mine_ore.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "minecraft:raw_copper": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:raw_copper"
+            ]
+          }
+        ]
+      }
+    },
+    "minecraft:copper_ore": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:copper_ore"
+            ]
+          }
+        ]
+      }
+    },
+    "minecraft:deepslate_copper_ore": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:deepslate_copper_ore"
+            ]
+          }
+        ]
+      }
+    },
+    "ic2:raw_tin": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:raw_tin"
+            ]
+          }
+        ]
+      }
+    },
+    "ic2:tin_ore": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:tin_ore"
+            ]
+          }
+        ]
+      }
+    },
+    "ic2:deepslate_tin_ore": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:deepslate_tin_ore"
+            ]
+          }
+        ]
+      }
+    },
+    "ic2:raw_uranium": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:raw_uranium"
+            ]
+          }
+        ]
+      }
+    },
+    "ic2:uranium_ore": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:uranium_ore"
+            ]
+          }
+        ]
+      }
+    },
+    "ic2:deepslate_uranium_ore": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:deepslate_uranium_ore"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "minecraft:raw_copper",
+      "minecraft:copper_ore",
+      "minecraft:deepslate_copper_ore",
+      "ic2:raw_tin",
+      "ic2:tin_ore",
+      "ic2:deepslate_tin_ore",
+      "ic2:raw_uranium",
+      "ic2:uranium_ore",
+      "ic2:deepslate_uranium_ore"
+    ]
+  ]
+}

@@ -5,10 +5,10 @@
       "item": "ic2:quantum_helmet"
     },
     "title": {
-      "translate": "advancements.ic2.starveWithQHelmet"
+      "translate": "advancements.ic2.starve_with_quantum_helmet"
     },
     "description": {
-      "translate": "advancements.ic2.starveWithQHelmet.desc"
+      "translate": "advancements.ic2.starve_with_quantum_helmet.desc"
     },
     "frame": "challenge",
     "show_toast": true,

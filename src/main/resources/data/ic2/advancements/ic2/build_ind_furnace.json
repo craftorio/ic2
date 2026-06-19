@@ -1,14 +1,14 @@
 {
-  "parent": "ic2:ic2/build_generator/build_compressor/root",
+  "parent": "ic2:ic2/build_elec_furnace",
   "display": {
     "icon": {
-      "item": "ic2:energy_crystal"
+      "item": "ic2:induction_furnace"
     },
     "title": {
-      "translate": "advancements.ic2.build_energy_crystal"
+      "translate": "advancements.ic2.build_induction_furnace"
     },
     "description": {
-      "translate": "advancements.ic2.build_energy_crystal.desc"
+      "translate": "advancements.ic2.build_induction_furnace.desc"
     },
     "frame": "task",
     "show_toast": true,
@@ -16,13 +16,13 @@
     "hidden": false
   },
   "criteria": {
-    "ic2:energy_crystal": {
+    "ic2:induction_furnace": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
             "items": [
-              "ic2:energy_crystal"
+              "ic2:induction_furnace"
             ]
           }
         ]
@@ -31,7 +31,7 @@
   },
   "requirements": [
     [
-      "ic2:energy_crystal"
+      "ic2:induction_furnace"
     ]
   ]
 }

@@ -1,14 +1,14 @@
 {
-  "parent": "ic2:ic2/build_generator/build_compressor/build_mass_fab",
+  "parent": "ic2:ic2/build_generator/root",
   "display": {
     "icon": {
-      "item": "ic2:uu_matter"
+      "item": "ic2:electric_furnace"
     },
     "title": {
-      "translate": "advancements.ic2.acquireMatter"
+      "translate": "advancements.ic2.build_electric_furnace"
     },
     "description": {
-      "translate": "advancements.ic2.acquireMatter.desc"
+      "translate": "advancements.ic2.build_electric_furnace.desc"
     },
     "frame": "task",
     "show_toast": true,
@@ -16,13 +16,13 @@
     "hidden": false
   },
   "criteria": {
-    "ic2:uu_matter": {
+    "ic2:electric_furnace": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
             "items": [
-              "ic2:uu_matter"
+              "ic2:electric_furnace"
             ]
           }
         ]
@@ -31,7 +31,7 @@
   },
   "requirements": [
     [
-      "ic2:uu_matter"
+      "ic2:electric_furnace"
     ]
   ]
 }

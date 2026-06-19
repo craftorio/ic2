@@ -284,6 +284,7 @@ public class EnergyCalculatorUnified implements IEnergyCalculator
 			{
 				OptimizedGraph optGraph = buildOptimizedGraph(nodes);
 				Map<Node, Node> parentMap = new IdentityHashMap<>();
+				Map<Node, OptLink> incomingLinkMap = new IdentityHashMap<>();
 				final Map<Node, Double> lossMap = new IdentityHashMap<>();
 				Queue<Node> queue;
 				if (sources.size() <= EnergyNetSettings.bfsThreshold)
@@ -316,7 +317,7 @@ public class EnergyCalculatorUnified implements IEnergyCalculator
 									loss = Math.floor(loss);
 								}
 
-								paths.put(tile, new EnergyPath(srcNode, node, reconstructPath(srcNode, node, parentMap), loss));
+								paths.put(tile, new EnergyPath(srcNode, node, reconstructPathWithLinks(srcNode, node, parentMap, incomingLinkMap), loss));
 								if (paths.size() == sinkCount)
 								{
 									break;
@@ -331,7 +332,7 @@ public class EnergyCalculatorUnified implements IEnergyCalculator
 							{
 								for (OptLink optLink : optLinks)
 								{
-									processLink(optLink, node, srcNode, loss, lossMap, parentMap, queue, paths, data, sinkCount);
+									processLink(optLink, node, srcNode, loss, lossMap, parentMap, incomingLinkMap, queue, paths, data, sinkCount);
 								}
 							}
 						}
@@ -344,6 +345,7 @@ public class EnergyCalculatorUnified implements IEnergyCalculator
 
 					lossMap.clear();
 					parentMap.clear();
+					incomingLinkMap.clear();
 					paths.clear();
 					queue.clear();
 				}
@@ -414,7 +416,7 @@ public class EnergyCalculatorUnified implements IEnergyCalculator
 		}
 	}
 
-	private static void processLink(OptLink optLink, Node node, Node srcNode, double loss, Map<Node, Double> lossMap, Map<Node, Node> parentMap, Queue<Node> queue, Map<IEnergyTile, EnergyPath> paths, GridData data, int sinkCount)
+	private static void processLink(OptLink optLink, Node node, Node srcNode, double loss, Map<Node, Double> lossMap, Map<Node, Node> parentMap, Map<Node, OptLink> incomingLinkMap, Queue<Node> queue, Map<IEnergyTile, EnergyPath> paths, GridData data, int sinkCount)
 	{
 		Node neighbor = optLink.getNeighbor(node);
 		if (neighbor.getType() == NodeType.Source)
@@ -444,7 +446,7 @@ public class EnergyCalculatorUnified implements IEnergyCalculator
 
 						if (pathToHere == null)
 						{
-							pathToHere = reconstructPath(srcNode, node, parentMap);
+							pathToHere = reconstructPathWithLinks(srcNode, node, parentMap, incomingLinkMap);
 						}
 
 						List<Node> conductors = new ArrayList<>(pathToHere.size() + optLink.skippedNodes.size() + cPath.conductors.size());
@@ -468,6 +470,7 @@ public class EnergyCalculatorUnified implements IEnergyCalculator
 
 				lossMap.put(neighbor, newLoss);
 				parentMap.put(neighbor, node);
+				incomingLinkMap.put(neighbor, optLink);
 				queue.add(neighbor);
 			}
 		}
@@ -565,6 +568,41 @@ public class EnergyCalculatorUnified implements IEnergyCalculator
 		{
 			assert node != null;
 			ret.add(node);
+		}
+
+		Collections.reverse(ret);
+		return ret;
+	}
+
+	private static List<Node> reconstructPathWithLinks(Node srcNode, Node dstNode, Map<Node, Node> parentMap, Map<Node, OptLink> incomingLinkMap)
+	{
+		List<Node> ret = new ArrayList<>();
+		Node node = dstNode;
+
+		while (true)
+		{
+			Node parent = parentMap.get(node);
+			if (parent == null) break;
+
+			OptLink link = incomingLinkMap.get(node);
+			if (link != null)
+			{
+				List<Node> skipped;
+				if (link.nodeA == parent)
+				{
+					skipped = new ArrayList<>(link.skippedNodes);
+					Collections.reverse(skipped);
+				}
+				else
+				{
+					skipped = link.skippedNodes;
+				}
+				ret.addAll(skipped);
+			}
+
+			if (parent == srcNode) break;
+			ret.add(parent);
+			node = parent;
 		}
 
 		Collections.reverse(ret);

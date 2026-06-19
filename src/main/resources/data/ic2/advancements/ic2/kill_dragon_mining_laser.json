@@ -1,0 +1,47 @@
+{
+  "parent": "ic2:ic2/build_mining_laser",
+  "display": {
+    "icon": {
+      "item": "ic2:mining_laser"
+    },
+    "title": {
+      "translate": "advancements.ic2.kill_dragon_with_mining_laser"
+    },
+    "description": {
+      "translate": "advancements.ic2.kill_dragon_with_mining_laser.desc"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "ic2:kill_dragon_mining_laser": {
+      "trigger": "minecraft:player_killed_entity",
+      "conditions": {
+        "entity": {
+          "type": "minecraft:ender_dragon"
+        },
+        "killing_blow": {
+          "source_entity": {
+            "equipment": {
+              "mainhand": {
+                "items": [
+                  "ic2:mining_laser"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "ic2:kill_dragon_mining_laser"
+    ]
+  ],
+  "rewards": {
+    "experience": 150
+  }
+}

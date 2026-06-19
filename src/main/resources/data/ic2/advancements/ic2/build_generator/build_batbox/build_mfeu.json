@@ -5,10 +5,10 @@
       "item": "ic2:mfe"
     },
     "title": {
-      "translate": "advancements.ic2.buildMFE"
+      "translate": "advancements.ic2.build_mfe"
     },
     "description": {
-      "translate": "advancements.ic2.buildMFE.desc"
+      "translate": "advancements.ic2.build_mfe.desc"
     },
     "frame": "task",
     "show_toast": true,

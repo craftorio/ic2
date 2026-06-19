@@ -196,6 +196,11 @@ public class Ic2Explosion extends Explosion
 						IC2.grantAdvancement(player, "ic2/die_from_own_nuke");
 					}
 
+					if (entity instanceof Player player && this.type == Type.Electrical)
+					{
+						IC2.grantAdvancement(player, "ic2/explode_machine");
+					}
+
 					double motionSq = Util.square(entry.motionX) + Util.square(entry.motionY) + Util.square(entry.motionZ);
 					double reduction = motionSq > 3600.0 ? Math.sqrt(3600.0 / motionSq) : 1.0;
 					entity.setDeltaMovement(entity.getDeltaMovement().add(entry.motionX * reduction, entry.motionY * reduction, entry.motionZ * reduction));

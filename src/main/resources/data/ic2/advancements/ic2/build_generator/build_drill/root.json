@@ -5,10 +5,10 @@
       "item": "ic2:drill"
     },
     "title": {
-      "translate": "advancements.ic2.buildDrill"
+      "translate": "advancements.ic2.build_drill"
     },
     "description": {
-      "translate": "advancements.ic2.buildDrill.desc"
+      "translate": "advancements.ic2.build_drill.desc"
     },
     "frame": "task",
     "show_toast": true,

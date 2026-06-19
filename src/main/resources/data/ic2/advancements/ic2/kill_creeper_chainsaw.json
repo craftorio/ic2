@@ -1,0 +1,47 @@
+{
+  "parent": "ic2:ic2/build_chainsaw",
+  "display": {
+    "icon": {
+      "item": "ic2:chainsaw"
+    },
+    "title": {
+      "translate": "advancements.ic2.kill_creeper_with_chainsaw"
+    },
+    "description": {
+      "translate": "advancements.ic2.kill_creeper_with_chainsaw.desc"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "ic2:kill_creeper_chainsaw": {
+      "trigger": "minecraft:player_killed_entity",
+      "conditions": {
+        "entity": {
+          "type": "minecraft:creeper"
+        },
+        "killing_blow": {
+          "source_entity": {
+            "equipment": {
+              "mainhand": {
+                "items": [
+                  "ic2:chainsaw"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "ic2:kill_creeper_chainsaw"
+    ]
+  ],
+  "rewards": {
+    "experience": 50
+  }
+}

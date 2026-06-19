@@ -5,10 +5,10 @@
       "item": "ic2:extractor"
     },
     "title": {
-      "translate": "advancements.ic2.buildExtractor"
+      "translate": "advancements.ic2.build_extractor"
     },
     "description": {
-      "translate": "advancements.ic2.buildExtractor.desc"
+      "translate": "advancements.ic2.build_extractor.desc"
     },
     "frame": "task",
     "show_toast": true,

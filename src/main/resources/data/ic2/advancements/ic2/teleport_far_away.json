@@ -1,14 +1,14 @@
 {
-  "parent": "ic2:ic2/root",
+  "parent": "ic2:ic2/build_teleporter",
   "display": {
     "icon": {
       "item": "ic2:teleporter"
     },
     "title": {
-      "translate": "advancements.ic2.teleportFarAway"
+      "translate": "advancements.ic2.teleport_far_away"
     },
     "description": {
-      "translate": "advancements.ic2.teleportFarAway.desc"
+      "translate": "advancements.ic2.teleport_far_away.desc"
     },
     "frame": "challenge",
     "show_toast": true,

@@ -5,10 +5,10 @@
       "item": "ic2:reactor_chamber"
     },
     "title": {
-      "translate": "advancements.ic2.makeNuclearReactorExplode"
+      "translate": "advancements.ic2.make_nuclear_reactor_explode"
     },
     "description": {
-      "translate": "advancements.ic2.makeNuclearReactorExplode.desc"
+      "translate": "advancements.ic2.make_nuclear_reactor_explode.desc"
     },
     "frame": "challenge",
     "show_toast": true,

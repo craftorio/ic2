@@ -5,10 +5,10 @@
       "item": "ic2:steel_ingot"
     },
     "title": {
-      "translate": "advancements.ic2.acquireRefinedIron"
+      "translate": "advancements.ic2.acquire_steel"
     },
     "description": {
-      "translate": "advancements.ic2.acquireRefinedIron.desc"
+      "translate": "advancements.ic2.acquire_steel.desc"
     },
     "frame": "task",
     "show_toast": true,

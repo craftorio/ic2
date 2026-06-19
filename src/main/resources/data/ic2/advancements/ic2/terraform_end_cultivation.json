@@ -1,14 +1,14 @@
 {
-  "parent": "ic2:ic2/root",
+  "parent": "ic2:ic2/build_terraformer",
   "display": {
     "icon": {
       "item": "ic2:cultivation_tfbp"
     },
     "title": {
-      "translate": "advancements.ic2.terraformEndCultivation"
+      "translate": "advancements.ic2.terraform_end_cultivation"
     },
     "description": {
-      "translate": "advancements.ic2.terraformEndCultivation.desc"
+      "translate": "advancements.ic2.terraform_end_cultivation.desc"
     },
     "frame": "challenge",
     "show_toast": true,

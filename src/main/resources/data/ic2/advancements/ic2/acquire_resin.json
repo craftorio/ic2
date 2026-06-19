@@ -5,10 +5,10 @@
       "item": "ic2:resin"
     },
     "title": {
-      "translate": "advancements.ic2.acquireResin"
+      "translate": "advancements.ic2.acquire_resin"
     },
     "description": {
-      "translate": "advancements.ic2.acquireResin.desc"
+      "translate": "advancements.ic2.acquire_resin.desc"
     },
     "frame": "task",
     "show_toast": true,

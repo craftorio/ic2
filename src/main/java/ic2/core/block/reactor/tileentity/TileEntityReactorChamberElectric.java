@@ -108,7 +108,7 @@ public class TileEntityReactorChamberElectric extends Ic2TileEntity implements C
 		Level world = this.getLevel();
 		world.removeBlock(this.worldPosition, false);
 
-		for (ItemStack drop : this.getSelfDrops(0, wrench))
+		for (ItemStack drop : this.getSelfDrops(wrench))
 		{
 			StackUtil.dropAsEntity(world, this.worldPosition, drop);
 		}

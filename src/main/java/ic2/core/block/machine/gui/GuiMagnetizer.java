@@ -5,7 +5,6 @@ import ic2.core.Ic2Gui;
 import ic2.core.block.inherit.Ic2FenceBlock;
 import ic2.core.block.machine.container.ContainerMagnetizer;
 import ic2.core.gui.EnergyGauge;
-import ic2.core.init.Localization;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
@@ -28,12 +27,12 @@ public class GuiMagnetizer extends Ic2Gui<ContainerMagnetizer>
 	protected void drawForegroundLayer(GuiGraphics guiGraphics, int mouseX, int mouseY)
 	{
 		super.drawForegroundLayer(guiGraphics, mouseX, mouseY);
-		if (Ic2FenceBlock.hasMetalShoes(((ContainerMagnetizer) this.menu).getPlayer()))
+		if (Ic2FenceBlock.hasMetalShoes(this.menu.getPlayer()))
 		{
-			this.drawString(guiGraphics, 18, 66, Localization.translate("ic2.Magnetizer.gui.hasMetalShoes"), 4259648);
+			this.drawString(guiGraphics, 18, 66, Component.translatable("ic2.Magnetizer.gui.hasMetalShoes").getString(), 4259648);
 		} else
 		{
-			this.drawString(guiGraphics, 18, 66, Localization.translate("ic2.Magnetizer.gui.noMetalShoes"), 16728128);
+			this.drawString(guiGraphics, 18, 66, Component.translatable("ic2.Magnetizer.gui.noMetalShoes").getString(), 16728128);
 		}
 	}
 }

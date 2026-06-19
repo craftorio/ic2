@@ -5,7 +5,6 @@ import ic2.core.IC2;
 import ic2.core.block.generator.tileentity.TileEntityWindGenerator;
 import ic2.core.block.kineticgenerator.tileentity.TileEntityWindKineticGenerator;
 import ic2.core.event.WorldData;
-import ic2.core.init.Localization;
 import ic2.core.item.PriorityUsableItem;
 import ic2.core.profile.NotClassic;
 import ic2.core.util.StackUtil;
@@ -20,10 +19,10 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.Item.Properties;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.jetbrains.annotations.NotNull;
 
 @NotClassic
 public class ItemWindMeter extends ItemElectricTool implements PriorityUsableItem
@@ -67,10 +66,10 @@ public class ItemWindMeter extends ItemElectricTool implements PriorityUsableIte
 			{
 				if (windyTE.hasRotor())
 				{
-					IC2.sideProxy.messagePlayer(player, Localization.translate("ic2.wind_meter.info.rotor.blocked"));
+					IC2.sideProxy.messagePlayer(player, Component.translatable("ic2.wind_meter.info.rotor.blocked").getString());
 				} else
 				{
-					IC2.sideProxy.messagePlayer(player, Localization.translate("ic2.wind_meter.info.rotor.none"));
+					IC2.sideProxy.messagePlayer(player, Component.translatable("ic2.wind_meter.info.rotor.none").getString());
 				}
 
 				return InteractionResult.FAIL;
@@ -82,31 +81,30 @@ public class ItemWindMeter extends ItemElectricTool implements PriorityUsableIte
 					float displayWind = roundWind(windyTE.calcWindStrength());
 					if (displayWind <= 0.0F)
 					{
-						IC2.sideProxy.messagePlayer(player, Localization.translate("ic2.wind_meter.info.obstructed", windyTE.getObstructions()));
+						IC2.sideProxy.messagePlayer(player, Component.translatable("ic2.wind_meter.info.obstructed", windyTE.getObstructions()).getString());
 					} else
 					{
-						IC2.sideProxy.messagePlayer(player, Localization.translate("ic2.wind_meter.info.effective", displayWind));
+						IC2.sideProxy.messagePlayer(player, Component.translatable("ic2.wind_meter.info.effective", displayWind).getString());
 					}
 				} else
 				{
-					IC2.sideProxy.messagePlayer(player, Localization.translate("ic2.wind_meter.info.blocked", windyTE.getRotorDiameter() * 3));
+					IC2.sideProxy.messagePlayer(player, Component.translatable("ic2.wind_meter.info.blocked", windyTE.getRotorDiameter() * 3).getString());
 				}
 
 				return InteractionResult.SUCCESS;
 			}
-		} else if (te instanceof TileEntityWindGenerator)
+		} else if (te instanceof TileEntityWindGenerator windyTE)
 		{
 			this.consumeEnergy(stack, this.operationEnergyCost, player);
-			TileEntityWindGenerator windyTE = (TileEntityWindGenerator) te;
 			double obstructiveFactor = windyTE.getObstructions() / 567.0;
 			double wind = obstructiveFactor >= 1.0 ? 0.0 : WorldData.get(world).windSim.getWindAt(pos.getY()) * (1.0 - obstructiveFactor);
 			float displayWind = roundWind(wind);
 			if (displayWind <= 0.0F)
 			{
-				IC2.sideProxy.messagePlayer(player, Localization.translate("ic2.wind_meter.info.obstructed", windyTE.getObstructions()));
+				IC2.sideProxy.messagePlayer(player, Component.translatable("ic2.wind_meter.info.obstructed", windyTE.getObstructions()).getString());
 			} else
 			{
-				IC2.sideProxy.messagePlayer(player, Localization.translate("ic2.wind_meter.info.effective", displayWind));
+				IC2.sideProxy.messagePlayer(player, Component.translatable("ic2.wind_meter.info.effective", displayWind).getString());
 			}
 
 			return InteractionResult.SUCCESS;
@@ -117,17 +115,17 @@ public class ItemWindMeter extends ItemElectricTool implements PriorityUsableIte
 	}
 
 	@Override
-	public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand)
+	public @NotNull InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand)
 	{
 		ItemStack stack = StackUtil.get(player, hand);
 		if (!IC2.sideProxy.isSimulating())
 		{
-			return new InteractionResultHolder(InteractionResult.PASS, stack);
+			return new InteractionResultHolder<>(InteractionResult.PASS, stack);
 		}
 
 		if (!this.consumeEnergy(stack, this.operationEnergyCost, player))
 		{
-			return new InteractionResultHolder(InteractionResult.PASS, stack);
+			return new InteractionResultHolder<>(InteractionResult.PASS, stack);
 		}
 
 		double windStrength = WorldData.get(world).windSim.getWindAt(player.getY());
@@ -136,8 +134,8 @@ public class ItemWindMeter extends ItemElectricTool implements PriorityUsableIte
 			windStrength = 0.0;
 		}
 
-		IC2.sideProxy.messagePlayer(player, Localization.translate("ic2.wind_meter.info", roundWind(windStrength)));
-		return new InteractionResultHolder(InteractionResult.SUCCESS, stack);
+		IC2.sideProxy.messagePlayer(player, Component.translatable("ic2.wind_meter.info", roundWind(windStrength)).getString());
+		return new InteractionResultHolder<>(InteractionResult.SUCCESS, stack);
 	}
 
 	private static float roundWind(double windStrength)

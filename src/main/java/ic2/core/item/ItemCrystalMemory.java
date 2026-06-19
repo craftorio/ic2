@@ -1,6 +1,5 @@
 package ic2.core.item;
 
-import ic2.core.init.Localization;
 import ic2.core.profile.NotClassic;
 import ic2.core.util.StackUtil;
 import ic2.core.util.Util;
@@ -31,7 +30,7 @@ public class ItemCrystalMemory extends Item
 		if (!StackUtil.isEmpty(recorded))
 		{
 			tooltip.add(Component.translatable("item.ic2.crystal_memory.tooltip.item", Component.translatable(recorded.getDescriptionId())).withStyle(ChatFormatting.GRAY));
-			tooltip.add(Component.literal(Localization.translate("item.ic2.crystal_memory.tooltip.uu_matter") + " " + Util.toSiString(UuIndex.instance.getInBuckets(recorded), 4) + "B").withStyle(ChatFormatting.GRAY));
+			tooltip.add(Component.literal(Component.translatable("item.ic2.crystal_memory.tooltip.uu_matter") + " " + Util.toSiString(UuIndex.instance.getInBuckets(recorded), 4) + "B").withStyle(ChatFormatting.GRAY));
 		} else
 		{
 			tooltip.add(Component.translatable("item.ic2.crystal_memory.tooltip.empty").withStyle(ChatFormatting.GRAY));

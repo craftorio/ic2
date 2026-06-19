@@ -11,7 +11,6 @@ import ic2.core.block.invslot.InvSlotConsumableLiquidByTank;
 import ic2.core.block.invslot.InvSlotOutput;
 import ic2.core.block.machine.container.ContainerFluidRegulator;
 import ic2.core.fluid.Ic2FluidTank;
-import ic2.core.init.Localization;
 import ic2.core.network.GrowingBuffer;
 import ic2.core.network.GuiSynced;
 import ic2.core.profile.NotClassic;
@@ -24,6 +23,7 @@ import java.util.EnumSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -47,9 +47,7 @@ public class TileEntityFluidRegulator extends TileEntityElectricMachine implemen
 	{
 		super(Ic2BlockEntities.FLUID_REGULATOR, pos, state, 10000, 4);
 		this.fluidTank = this.fluids.addTank("fluidTank", 10000, InvSlot.Access.NONE);
-		this.wasserinputSlot = new InvSlotConsumableLiquidByTank(
-			this, "wasserinputSlot", InvSlot.Access.I, 1, InvSlot.InvSide.TOP, InvSlotConsumableLiquid.OpType.Drain, this.fluidTank
-		);
+		this.wasserinputSlot = new InvSlotConsumableLiquidByTank(this, "wasserinputSlot", InvSlot.Access.I, 1, InvSlot.InvSide.TOP, InvSlotConsumableLiquid.OpType.Drain, this.fluidTank);
 		this.wasseroutputSlot = new InvSlotOutput(this, "wasseroutputSlot", 1);
 		this.newActive = false;
 		this.outputmb = 0;
@@ -187,38 +185,19 @@ public class TileEntityFluidRegulator extends TileEntityElectricMachine implemen
 		return new ContainerFluidRegulator(syncId, inventory, this);
 	}
 
-	public int gaugeLiquidScaled(int i, int tank)
-	{
-		switch (tank)
-		{
-			case 0:
-				if (this.fluidTank.getFluidAmount() <= 0)
-				{
-					return 0;
-				}
-
-				return this.fluidTank.getFluidAmount() * i / this.fluidTank.getCapacity();
-			default:
-				return 0;
-		}
-	}
-
-	public int getoutputmb()
+	public int getOutputMb()
 	{
 		return this.outputmb;
 	}
 
-	public String getmodegui()
+	public String getModeGui()
 	{
-		switch (this.mode)
+		return switch (this.mode)
 		{
-			case 0:
-				return Localization.translate("ic2.generic.text.sec");
-			case 1:
-				return Localization.translate("ic2.generic.text.tick");
-			default:
-				return "";
-		}
+			case 0 -> Component.translatable("ic2.generic.text.sec").getString();
+			case 1 -> Component.translatable("ic2.generic.text.tick").getString();
+			default -> "";
+		};
 	}
 
 	public Ic2FluidTank getFluidTank()

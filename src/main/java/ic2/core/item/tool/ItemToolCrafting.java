@@ -2,7 +2,6 @@ package ic2.core.item.tool;
 
 import ic2.api.item.IBoxable;
 import ic2.api.item.IItemHudInfo;
-import ic2.core.init.Localization;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -37,7 +36,7 @@ public class ItemToolCrafting extends Item implements IBoxable, IItemHudInfo
 	public List<String> getHudInfo(ItemStack stack, boolean advanced)
 	{
 		List<String> info = new LinkedList<>();
-		info.add(Localization.translate("ic2.tooltip.tool.uses_left", getRemainingUses(stack)).formatted(ChatFormatting.GRAY));
+		info.add(Component.translatable("ic2.tooltip.tool.uses_left", getRemainingUses(stack)).getString().formatted(ChatFormatting.GRAY));
 		return info;
 	}
 

@@ -7,10 +7,8 @@ import ic2.core.IHasGui;
 import ic2.core.block.comp.Components;
 import ic2.core.block.comp.Energy;
 import ic2.core.block.comp.TileEntityComponent;
-import ic2.core.event.IWorldTickCallback;
 import ic2.core.event.TickHandler;
 import ic2.core.gui.dynamic.IGuiConditionProvider;
-import ic2.core.init.Localization;
 import ic2.core.ref.Ic2Items;
 import ic2.core.util.LogCategory;
 import ic2.core.util.Util;
@@ -26,10 +24,8 @@ import java.util.Set;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
@@ -45,9 +41,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
@@ -56,16 +50,9 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public abstract class Ic2TileEntity extends BlockEntity implements INetworkDataProvider, INetworkUpdateListener, IGuiConditionProvider
 {
-	public static final String teBlockName = "teBlk";
-	protected static final int lightOpacityTranslucent = 0;
-	protected static final int lightOpacityOpaque = 255;
 	private static final List<AABB> defaultAabbs = List.of(new AABB(0.0, 0.0, 0.0, 1.0, 1.0, 1.0));
 	private static final List<TileEntityComponent> emptyComponents = Collections.emptyList();
 	private static final Map<Class<?>, Ic2TileEntity.TickSubscription> tickSubscriptions = new IdentityHashMap<>();
-	private static final byte loadStateInitial = 0;
-	private static final byte loadStateQueued = 1;
-	private static final byte loadStateLoaded = 2;
-	private static final byte loadStateUnloaded = 3;
 	private static final boolean debugLoad = System.getProperty("ic2.te.debugload") != null;
 	private Map<Class<? extends TileEntityComponent>, TileEntityComponent> components;
 	private List<TileEntityComponent> updatableComponents;
@@ -240,11 +227,6 @@ public abstract class Ic2TileEntity extends BlockEntity implements INetworkDataP
 		}
 	}
 
-	public final boolean canTick()
-	{
-		return this.enableWorldTick || this.updatableComponents != null;
-	}
-
 	public final void tick()
 	{
 		if (this.loadState == 2)
@@ -307,12 +289,12 @@ public abstract class Ic2TileEntity extends BlockEntity implements INetworkDataP
 	{
 	}
 
-	protected VoxelShape getOutlineShape(CollisionContext context)
+	protected VoxelShape getOutlineShape()
 	{
 		return this.getShape(false);
 	}
 
-	protected VoxelShape getCollisionShape(CollisionContext context)
+	protected VoxelShape getCollisionShape()
 	{
 		return this.getShape(true);
 	}
@@ -360,34 +342,7 @@ public abstract class Ic2TileEntity extends BlockEntity implements INetworkDataP
 	protected void onEntityCollision(Entity entity)
 	{
 	}
-
-	protected boolean isNormalCube()
-	{
-		List<AABB> aabbs = this.getAabbs(false);
-		if (aabbs == defaultAabbs)
-		{
-			return true;
-		}
-
-		if (aabbs.size() != 1)
-		{
-			return false;
-		}
-
-		AABB aabb = aabbs.get(0);
-		return aabb.minX <= 0.0 && aabb.minY <= 0.0 && aabb.minZ <= 0.0 && aabb.maxX >= 1.0 && aabb.maxY >= 1.0 && aabb.maxZ >= 1.0;
-	}
-
-	protected int getLightOpacity()
-	{
-		return this.isNormalCube() ? 255 : 0;
-	}
-
-	protected int getLightValue()
-	{
-		return 0;
-	}
-
+	
 	protected InteractionResult onActivated(Player player, InteractionHand hand, Direction side, Vec3 hit)
 	{
 		if (!(this instanceof IHasGui) || this.level == null)
@@ -436,14 +391,14 @@ public abstract class Ic2TileEntity extends BlockEntity implements INetworkDataP
 		return true;
 	}
 
-	protected ItemStack getPickBlock(Player player, BlockHitResult target)
+	protected ItemStack getPickBlock()
 	{
 		return new ItemStack(this.teBlock);
 	}
 
-	protected List<ItemStack> getSelfDrops(int fortune, boolean wrench)
+	protected List<ItemStack> getSelfDrops(boolean wrench)
 	{
-		ItemStack drop = this.getPickBlock(null, null);
+		ItemStack drop = this.getPickBlock();
 		drop = this.adjustDrop(drop, wrench);
 		return drop == null ? Collections.emptyList() : List.of(drop);
 	}
@@ -488,11 +443,6 @@ public abstract class Ic2TileEntity extends BlockEntity implements INetworkDataP
 	protected boolean wrenchCanRemove(Player player)
 	{
 		return true;
-	}
-
-	protected Direction getPlacementFacing(LivingEntity placer, Direction facing)
-	{
-		return facing;
 	}
 
 	protected List<AABB> getAabbs(boolean forCollision)
@@ -579,10 +529,10 @@ public abstract class Ic2TileEntity extends BlockEntity implements INetworkDataP
 			Energy energy = this.getComponent(Energy.class);
 			if (!energy.getSourceDirs().isEmpty())
 			{
-				tooltip.add(Localization.translate("ic2.item.tooltip.power_tier", energy.getSourceTier()));
+				tooltip.add(Component.translatable("ic2.item.tooltip.power_tier", energy.getSourceTier()).getString());
 			} else if (!energy.getSinkDirs().isEmpty())
 			{
-				tooltip.add(Localization.translate("ic2.item.tooltip.power_tier", energy.getSinkTier()));
+				tooltip.add(Component.translatable("ic2.item.tooltip.power_tier", energy.getSinkTier()).getString());
 			}
 		}
 	}

@@ -6,7 +6,6 @@ import ic2.api.item.IHazmatLike;
 import ic2.api.item.IItemHudProvider;
 import ic2.core.IC2;
 import ic2.core.Ic2Potion;
-import ic2.core.init.Localization;
 import ic2.core.init.MainConfig;
 import ic2.core.item.ItemTinCan;
 import ic2.core.item.armor.jetpack.IJetpack;
@@ -142,7 +141,7 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 		return ElectricItem.manager.getCharge(stack) > 0.0;
 	}
 
-	public boolean absorbFall(ItemStack stack, LivingEntity entity, float distance)
+	public boolean absorbFall(ItemStack stack, float distance)
 	{
 		int fallDamage = Math.max((int) distance - 10, 0);
 		double energyCost = this.getEnergyPerDamage() * fallDamage;
@@ -295,7 +294,7 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 				if (IC2.sideProxy.isSimulating())
 				{
 					nbtData.putShort("hud_mode", hudmode);
-					IC2.sideProxy.messagePlayer(player, Localization.translate(HudMode.getFromID(hudmode).getTranslationKey()));
+					IC2.sideProxy.messagePlayer(player, Component.translatable(HudMode.getFromID(hudmode).getTranslationKey()).getString());
 				}
 			}
 
@@ -308,15 +307,7 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 			{
 				BlockPos pos = BlockPos.containing(player.position());
 				int skylight = player.getCommandSenderWorld().getMaxLocalRawBrightness(pos);
-				if (skylight > 8)
-				{
-					player.removeEffect(MobEffects.NIGHT_VISION);
-					player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 100, 0, true, true));
-				} else
-				{
-					player.removeEffect(MobEffects.BLINDNESS);
-					player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 300, 0, true, true));
-				}
+				ItemArmorNanoSuit.affectPlayer(player, skylight);
 
 				ret = true;
 			}
@@ -468,22 +459,4 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 	{
 		return HudMode.getFromID(StackUtil.getOrCreateNbtData(stack).getShort("hud_mode"));
 	}
-
-	public static boolean isWearingFullSet(Player player)
-	{
-		for (EquipmentSlot slot : EquipmentSlot.values())
-		{
-			if (slot.getType() == EquipmentSlot.Type.ARMOR)
-			{
-				ItemStack armor = player.getItemBySlot(slot);
-				if (!(armor.getItem() instanceof ItemArmorQuantumSuit))
-				{
-					return false;
-				}
-			}
-		}
-
-		return true;
-	}
-
 }

@@ -6,9 +6,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
 
 @NotClassic
-public class TileEntityChargepadMFSU extends TileEntityChargepadBlock
+public class TileEntityChargePadMFSU extends TileEntityChargePadBlock
 {
-	public TileEntityChargepadMFSU(BlockPos pos, BlockState state)
+	public TileEntityChargePadMFSU(BlockPos pos, BlockState state)
 	{
 		super(Ic2BlockEntities.MFSU_CHARGEPAD, pos, state, 4, 2048, 40000000);
 	}

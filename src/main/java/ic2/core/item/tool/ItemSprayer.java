@@ -9,7 +9,6 @@ import ic2.core.block.wiring.CableFoam;
 import ic2.core.block.wiring.FoamCableBlock;
 import ic2.core.fluid.Ic2FluidStack;
 import ic2.core.fluid.StandardFluidItem;
-import ic2.core.init.Localization;
 import ic2.core.ref.Ic2Blocks;
 import ic2.core.ref.Ic2Fluids;
 import ic2.core.ref.Ic2Items;
@@ -82,8 +81,8 @@ public class ItemSprayer extends Item implements StandardFluidItem, IBoxable
 			int mode = nbtData.getInt("mode");
 			mode = mode == 0 ? 1 : 0;
 			nbtData.putInt("mode", mode);
-			String sMode = Localization.translate(mode == 0 ? "ic2.tooltip.mode.normal" : "ic2.tooltip.mode.single");
-			IC2.sideProxy.messagePlayer(player, Localization.translate("ic2.tooltip.mode", sMode));
+			String sMode = Component.translatable(mode == 0 ? "ic2.tooltip.mode.normal" : "ic2.tooltip.mode.single").getString();
+			IC2.sideProxy.messagePlayer(player, Component.translatable("ic2.tooltip.mode", sMode).getString());
 			return new InteractionResultHolder<>(InteractionResult.SUCCESS, stack);
 		}
 

@@ -11,7 +11,6 @@ import ic2.api.upgrade.UpgradeRegistry;
 import ic2.core.IC2;
 import ic2.core.IHasGui;
 import ic2.core.gui.dynamic.DynamicHandHeldContainer;
-import ic2.core.init.Localization;
 import ic2.core.item.EnvItemHandler;
 import ic2.core.item.IHandHeldSubInventory;
 import ic2.core.item.tool.HandHeldInventory;
@@ -40,6 +39,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSubInventory, IItemHudInfo
@@ -65,43 +65,27 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 	}
 
 	@OnlyIn(Dist.CLIENT)
-	public void appendHoverText(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag advanced)
+	public void appendHoverText(@NotNull ItemStack stack, Level world, @NotNull List<Component> tooltip, @NotNull TooltipFlag advanced)
 	{
 		super.appendHoverText(stack, world, tooltip, advanced);
 		switch (this.type)
 		{
 			case overclocker:
-				tooltip.add(
-					Component.translatable(
-							"ic2.tooltip.upgrade.overclocker.time",
-							decimalformat.format(100.0 * Math.pow(this.getProcessTimeMultiplier(stack, null), StackUtil.getSize(stack))))
-						.withStyle(ChatFormatting.GRAY)
-				);
-				tooltip.add(
-					Component.translatable(
-							"ic2.tooltip.upgrade.overclocker.power",
-							decimalformat.format(100.0 * Math.pow(this.getEnergyDemandMultiplier(stack, null), StackUtil.getSize(stack))))
-						.withStyle(ChatFormatting.GRAY)
-				);
+				tooltip.add(Component.translatable("ic2.tooltip.upgrade.overclocker.time", decimalformat.format(100.0 * Math.pow(this.getProcessTimeMultiplier(stack, null), StackUtil.getSize(stack)))).withStyle(ChatFormatting.GRAY));
+				tooltip.add(Component.translatable("ic2.tooltip.upgrade.overclocker.power", decimalformat.format(100.0 * Math.pow(this.getEnergyDemandMultiplier(stack, null), StackUtil.getSize(stack)))).withStyle(ChatFormatting.GRAY));
 				break;
 			case transformer:
-				tooltip.add(
-					Component.translatable("ic2.tooltip.upgrade.transformer", this.getExtraTier(stack, null) * StackUtil.getSize(stack))
-						.withStyle(ChatFormatting.GRAY)
-				);
+				tooltip.add(Component.translatable("ic2.tooltip.upgrade.transformer", this.getExtraTier(stack, null) * StackUtil.getSize(stack)).withStyle(ChatFormatting.GRAY));
 				break;
 			case energy_storage:
-				tooltip.add(
-					Component.translatable("ic2.tooltip.upgrade.storage", this.getExtraEnergyStorage(stack, null) * StackUtil.getSize(stack))
-						.withStyle(ChatFormatting.GRAY)
-				);
+				tooltip.add(Component.translatable("ic2.tooltip.upgrade.storage", this.getExtraEnergyStorage(stack, null) * StackUtil.getSize(stack)).withStyle(ChatFormatting.GRAY));
 				break;
 			case ejector:
 			case advanced_ejector:
 			case fluid_ejector:
 			{
 				String side = getSideName(stack);
-				tooltip.add(Component.translatable("ic2.tooltip.upgrade.ejector", Localization.translate(side)).withStyle(ChatFormatting.GRAY));
+				tooltip.add(Component.translatable("ic2.tooltip.upgrade.ejector", Component.translatable(side)).withStyle(ChatFormatting.GRAY));
 				break;
 			}
 			case pulling:
@@ -109,7 +93,7 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 			case fluid_pulling:
 			{
 				String side = getSideName(stack);
-				tooltip.add(Component.translatable("ic2.tooltip.upgrade.pulling", Localization.translate(side)).withStyle(ChatFormatting.GRAY));
+				tooltip.add(Component.translatable("ic2.tooltip.upgrade.pulling", Component.translatable(side)).withStyle(ChatFormatting.GRAY));
 				break;
 			}
 			case redstone_inverter:
@@ -139,7 +123,7 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 		};
 	}
 
-	public InteractionResult useOn(UseOnContext context)
+	public @NotNull InteractionResult useOn(UseOnContext context)
 	{
 		ItemStack stack = context.getItemInHand();
 		if (this.type.directional)
@@ -160,13 +144,11 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 				{
 					case ejector:
 					case advanced_ejector, fluid_ejector:
-						IC2.sideProxy
-							.messagePlayer(context.getPlayer(), Localization.translate("ic2.tooltip.upgrade.ejector", Localization.translate(getSideName(stack))));
+						IC2.sideProxy.messagePlayer(context.getPlayer(), Component.translatable("ic2.tooltip.upgrade.ejector", Component.translatable(getSideName(stack))).getString());
 						break;
 					case pulling:
 					case advanced_pulling, fluid_pulling:
-						IC2.sideProxy
-							.messagePlayer(context.getPlayer(), Localization.translate("ic2.tooltip.upgrade.pulling", Localization.translate(getSideName(stack))));
+						IC2.sideProxy.messagePlayer(context.getPlayer(), Component.translatable("ic2.tooltip.upgrade.pulling", Component.translatable(getSideName(stack))).getString());
 						break;
 				}
 			}
@@ -178,7 +160,7 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 		}
 	}
 
-	public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand)
+	public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level world, Player player, @NotNull InteractionHand hand)
 	{
 		ItemStack stack = player.getItemInHand(hand);
 		return switch (this.type)
@@ -413,7 +395,6 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 		{
 			private boolean hasInitialised = false;
 			private Set<ItemStack> filters;
-			private UpgradeSettings damage;
 			private UpgradeSettings energy;
 			private NbtSettings nbt;
 
@@ -422,7 +403,6 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 				assert !this.hasInitialised;
 				CompoundTag tag = StackUtil.getOrCreateNbtData(stack);
 				this.filters = this.getFilterStacks(tag);
-				this.damage = null;
 				this.nbt = NbtSettings.getFromNBT(HandHeldAdvancedUpgrade.getTag(tag, "nbt").getByte("type"));
 				this.energy = new UpgradeSettings(HandHeldAdvancedUpgrade.getTag(tag, "energy"));
 				this.hasInitialised = true;
@@ -449,14 +429,6 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 
 				return ret;
 			}
-
-			private boolean checkDamage(ItemStack stack, ItemStack filter)
-			{
-				assert this.damage.active;
-				assert this.damage.comparison == ComparisonType.DIRECT;
-				return filter.getDamageValue() == stack.getDamageValue();
-			}
-
 			private boolean checkNBT(ItemStack stack, ItemStack filter)
 			{
 				return switch (this.nbt)
@@ -480,8 +452,6 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 				{
 					this.initialise();
 				}
-
-				boolean checkDamage = false;
 				boolean checkEnergy;
 				if (!this.energy.comparison.ignoreFilters())
 				{
@@ -502,10 +472,12 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 
 				for (ItemStack filter : this.filters)
 				{
-					if (filter.getItem() == stack.getItem() && (!checkDamage || this.checkDamage(stack, filter))
-						&& this.checkNBT(stack, filter) && (!checkEnergy || this.checkEnergy(stack, filter)))
+					if (filter.getItem() == stack.getItem())
 					{
-						return true;
+						if (this.checkNBT(stack, filter) && (!checkEnergy || this.checkEnergy(stack, filter)))
+						{
+							return true;
+						}
 					}
 				}
 
@@ -573,17 +545,7 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 
 	public enum UpgradeType
 	{
-		overclocker(false),
-		transformer(false),
-		energy_storage(false),
-		redstone_inverter(false),
-		ejector(true),
-		advanced_ejector(true),
-		pulling(true),
-		advanced_pulling(true),
-		fluid_ejector(true),
-		fluid_pulling(true),
-		remote_interface(false);
+		overclocker(false), transformer(false), energy_storage(false), redstone_inverter(false), ejector(true), advanced_ejector(true), pulling(true), advanced_pulling(true), fluid_ejector(true), fluid_pulling(true), remote_interface(false);
 
 		public final boolean directional;
 

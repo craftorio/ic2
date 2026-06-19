@@ -9,12 +9,10 @@ import ic2.core.block.comp.ComparatorEmitter;
 import ic2.core.block.comp.Energy;
 import ic2.core.block.comp.Redstone;
 import ic2.core.block.tileentity.Ic2TileEntity;
-import ic2.core.event.IWorldTickCallback;
 import ic2.core.event.TickHandler;
 import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.util.StackUtil;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
@@ -151,12 +149,6 @@ public class TileEntityLuminator extends Ic2TileEntity
 	protected List<AABB> getAabbs(boolean forCollision)
 	{
 		return aabbMap.get(this.getFacing());
-	}
-
-	@Override
-	protected int getLightValue()
-	{
-		return this.getActive() ? 15 : 0;
 	}
 
 	@Override

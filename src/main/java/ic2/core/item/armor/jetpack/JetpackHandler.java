@@ -3,7 +3,6 @@ package ic2.core.item.armor.jetpack;
 import ic2.api.item.ElectricItem;
 import ic2.api.item.IBackupElectricItemManager;
 import ic2.api.item.IElectricItem;
-import ic2.core.init.Localization;
 import ic2.core.ref.Ic2Items;
 import ic2.core.util.ReflectionUtil;
 import ic2.core.util.StackUtil;
@@ -17,6 +16,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
+import net.minecraft.network.chat.Component;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -61,8 +61,7 @@ public class JetpackHandler implements IBackupElectricItemManager
 		if (hasJetpack(stack))
 		{
 			JetpackLogic.onArmorTick(player.level(), player, stack, getJetpack(stack));
-		}
-		else
+		} else
 		{
 			JetpackLogic.stopJetpackSound(player);
 		}
@@ -87,8 +86,7 @@ public class JetpackHandler implements IBackupElectricItemManager
 			{
 				stack.setTag(null);
 			}
-		}
-		else if (Mob.getEquipmentSlotForItem(stack) == EquipmentSlot.CHEST)
+		} else if (Mob.getEquipmentSlotForItem(stack) == EquipmentSlot.CHEST)
 		{
 			StackUtil.getOrCreateNbtData(stack).putBoolean("hasIC2Jetpack", true);
 		}
@@ -96,10 +94,7 @@ public class JetpackHandler implements IBackupElectricItemManager
 
 	public static boolean hasJetpackAttached(ItemStack stack)
 	{
-		return !StackUtil.isEmpty(stack)
-			&& Mob.getEquipmentSlotForItem(stack) == EquipmentSlot.CHEST
-			&& stack.hasTag()
-			&& stack.getTag().getBoolean("hasIC2Jetpack");
+		return !StackUtil.isEmpty(stack) && Mob.getEquipmentSlotForItem(stack) == EquipmentSlot.CHEST && stack.hasTag() && stack.getTag().getBoolean("hasIC2Jetpack");
 	}
 
 	public static boolean hasJetpack(ItemStack stack)
@@ -163,16 +158,14 @@ public class JetpackHandler implements IBackupElectricItemManager
 					{
 						stack.setTag(null);
 					}
-				}
-				else
+				} else
 				{
 					stack.getTag().putDouble("charge", charge);
 				}
 			}
 
 			return amount;
-		}
-		else
+		} else
 		{
 			return 0.0;
 		}
@@ -267,7 +260,7 @@ public class JetpackHandler implements IBackupElectricItemManager
 	{
 		if (hasJetpackAttached(event.getItemStack()))
 		{
-			event.getToolTip().add(net.minecraft.network.chat.Component.literal(ChatFormatting.YELLOW + Localization.translate("ic2.jetpackAttached")));
+			event.getToolTip().add(Component.translatable("ic2.jetpackAttached", ChatFormatting.YELLOW));
 			String energyTooltip = ElectricItem.manager.getToolTip(event.getItemStack());
 			if (energyTooltip != null && !energyTooltip.trim().isEmpty())
 			{
@@ -291,7 +284,7 @@ public class JetpackHandler implements IBackupElectricItemManager
 
 	@SubscribeEvent
 	@OnlyIn(Dist.CLIENT)
-	@SuppressWarnings({"unchecked", "rawtypes"})
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void render(RenderLivingEvent.Pre<LivingEntity, ?> event)
 	{
 		LivingEntity entity = event.getEntity();

@@ -15,7 +15,6 @@ import ic2.core.block.invslot.InvSlotDischarge;
 import ic2.core.block.tileentity.Ic2TileEntityBlock;
 import ic2.core.block.tileentity.TileEntityInventory;
 import ic2.core.block.wiring.ContainerElectricBlock;
-import ic2.core.init.Localization;
 import ic2.core.init.MainConfig;
 import ic2.core.network.GrowingBuffer;
 import ic2.core.util.ConfigUtil;
@@ -28,6 +27,7 @@ import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -56,11 +56,7 @@ public abstract class TileEntityElectricBlock extends TileEntityInventory implem
 		this.output = output;
 		this.chargeSlot = new InvSlotCharge(this, tier);
 		this.dischargeSlot = new InvSlotDischarge(this, InvSlot.Access.IO, tier, InvSlot.InvSide.BOTTOM);
-		this.energy = this.addComponent(
-			new Energy(this, maxStorage, EnumSet.complementOf(EnumSet.of(Direction.DOWN)), EnumSet.of(Direction.DOWN), tier, tier, true)
-				.addManagedSlot(this.chargeSlot)
-				.addManagedSlot(this.dischargeSlot)
-		);
+		this.energy = this.addComponent(new Energy(this, maxStorage, EnumSet.complementOf(EnumSet.of(Direction.DOWN)), EnumSet.of(Direction.DOWN), tier, tier, true).addManagedSlot(this.chargeSlot).addManagedSlot(this.dischargeSlot));
 		this.rsEmitter = this.addComponent(new RedstoneEmitter(this));
 		this.redstone = this.addComponent(new Redstone(this));
 		this.comparator.setUpdate(this.energy::getComparatorValue);
@@ -115,19 +111,15 @@ public abstract class TileEntityElectricBlock extends TileEntityInventory implem
 
 	protected boolean shouldEmitRedstone()
 	{
-		switch (this.redstoneMode)
+		return switch (this.redstoneMode)
 		{
-			case 1:
-				return this.energy.getEnergy() >= this.energy.getCapacity() - this.output * 20.0;
-			case 2:
-				return this.energy.getEnergy() > this.output && this.energy.getEnergy() < this.energy.getCapacity() - this.output;
-			case 3:
-				return this.energy.getEnergy() < this.energy.getCapacity() - this.output;
-			case 4:
-				return this.energy.getEnergy() < this.output;
-			default:
-				return false;
-		}
+			case 1 -> this.energy.getEnergy() >= this.energy.getCapacity() - this.output * 20.0;
+			case 2 ->
+				this.energy.getEnergy() > this.output && this.energy.getEnergy() < this.energy.getCapacity() - this.output;
+			case 3 -> this.energy.getEnergy() < this.energy.getCapacity() - this.output;
+			case 4 -> this.energy.getEnergy() < this.output;
+			default -> false;
+		};
 	}
 
 	protected boolean shouldEmitEnergy()
@@ -138,7 +130,7 @@ public abstract class TileEntityElectricBlock extends TileEntityInventory implem
 			return !redstone;
 		} else
 		{
-			return this.redstoneMode != 6 ? true : !redstone || this.energy.getEnergy() > this.energy.getCapacity() - this.output * 20.0;
+			return this.redstoneMode != 6 || !redstone || this.energy.getEnergy() > this.energy.getCapacity() - this.output * 20.0;
 		}
 	}
 
@@ -156,7 +148,7 @@ public abstract class TileEntityElectricBlock extends TileEntityInventory implem
 
 	public String getRedstoneMode()
 	{
-		return this.redstoneMode < redstoneModes && this.redstoneMode >= 0 ? Localization.translate("ic2.EUStorage.gui.mod.redstone" + this.redstoneMode) : "";
+		return this.redstoneMode < redstoneModes && this.redstoneMode >= 0 ? Component.translatable("ic2.EUStorage.gui.mod.redstone" + this.redstoneMode).getString() : "";
 	}
 
 	@Override
@@ -168,11 +160,6 @@ public abstract class TileEntityElectricBlock extends TileEntityInventory implem
 			CompoundTag nbt = StackUtil.getOrCreateNbtData(stack);
 			this.energy.addEnergy(nbt.getDouble("energy"));
 		}
-	}
-
-	public void onUpgraded()
-	{
-		this.rerender();
 	}
 
 	@Override
@@ -240,23 +227,7 @@ public abstract class TileEntityElectricBlock extends TileEntityInventory implem
 	public void addInformation(ItemStack stack, List<String> tooltip, TooltipFlag advanced)
 	{
 		super.addInformation(stack, tooltip, advanced);
-		tooltip.add(
-			String.format(
-				"%s %.0f %s %s %d %s",
-				Localization.translate("ic2.item.tooltip.Output"),
-				EnergyNet.instance.getPowerFromTier(this.energy.getSourceTier()),
-				Localization.translate("ic2.generic.text.EUt"),
-				Localization.translate("ic2.item.tooltip.Capacity"),
-				this.getCapacity(),
-				Localization.translate("ic2.generic.text.EU")
-			)
-		);
-		tooltip.add(
-			Localization.translate("ic2.item.tooltip.Store")
-				+ " "
-				+ (long) StackUtil.getOrCreateNbtData(stack).getDouble("energy")
-				+ " "
-				+ Localization.translate("ic2.generic.text.EU")
-		);
+		tooltip.add(String.format("%s %.0f %s %s %d %s", Component.translatable("ic2.item.tooltip.Output"), EnergyNet.instance.getPowerFromTier(this.energy.getSourceTier()), Component.translatable("ic2.generic.text.EUt"), Component.translatable("ic2.item.tooltip.Capacity"), this.getCapacity(), Component.translatable("ic2.generic.text.EU")));
+		tooltip.add(Component.translatable("ic2.item.tooltip.Store") + " " + (long) StackUtil.getOrCreateNbtData(stack).getDouble("energy") + " " + Component.translatable("ic2.generic.text.EU"));
 	}
 }

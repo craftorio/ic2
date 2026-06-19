@@ -1,7 +1,6 @@
 package ic2.core.gui.dynamic;
 
 import com.google.common.base.Supplier;
-import ic2.core.init.Localization;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -29,13 +28,13 @@ public class TextProvider
 			@Override
 			public String getRaw(Object base, Map<String, TextProvider.ITextProvider> tokens)
 			{
-				return (String) supplier.get();
+				return supplier.get();
 			}
 
 			@Override
 			public String getConstant(Class<?> baseClass)
 			{
-				return (String) supplier.get();
+				return supplier.get();
 			}
 		};
 	}
@@ -168,7 +167,7 @@ public class TextProvider
 
 	private static void finish(StringBuilder part, List<TextProvider.AbstractTextProvider> providers)
 	{
-		if (part.length() != 0)
+		if (!part.isEmpty())
 		{
 			providers.add(new TextProvider.Constant(part.toString()));
 			part.setLength(0);
@@ -240,12 +239,7 @@ public class TextProvider
 				}
 
 				subject = invokeMethodOptional(method, subject);
-				if (subject == null)
-				{
-					return null;
-				}
 
-				subjectClass = subject.getClass();
 			} else
 			{
 				Field field = getFieldOptional(subjectClass, part);
@@ -255,13 +249,13 @@ public class TextProvider
 				}
 
 				subject = getFieldValueOptional(field, subject);
-				if (subject == null)
-				{
-					return null;
-				}
 
-				subjectClass = subject.getClass();
 			}
+			if (subject == null)
+			{
+				return null;
+			}
+			subjectClass = subject.getClass();
 
 			start = end + 1;
 		} while (end != path.length());
@@ -299,10 +293,6 @@ public class TextProvider
 			throw new RuntimeException(e);
 		}
 
-		if (ret == null)
-		{
-		}
-
 		return ret;
 	}
 
@@ -334,10 +324,6 @@ public class TextProvider
 		} catch (Exception e)
 		{
 			throw new RuntimeException(e);
-		}
-
-		if (ret == null)
-		{
 		}
 
 		return ret;
@@ -524,7 +510,7 @@ public class TextProvider
 		public String getRaw(Object base, Map<String, TextProvider.ITextProvider> tokens)
 		{
 			String key = this.key.getRaw(base, tokens);
-			return key == null ? null : Localization.translate(key);
+			return key == null ? null : Component.translatable(key).getString();
 		}
 
 		@Override
@@ -567,7 +553,7 @@ public class TextProvider
 				cArgs[i] = arg;
 			}
 
-			return Localization.translate(format, cArgs);
+			return Component.translatable(format, cArgs).getString();
 		}
 
 		@Override

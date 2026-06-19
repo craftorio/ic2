@@ -3,13 +3,11 @@ package ic2.core.item.upgrade;
 import ic2.core.IC2;
 import ic2.core.Ic2Gui;
 import ic2.core.gui.Button;
-import ic2.core.gui.IClickHandler;
-import ic2.core.gui.MouseButton;
 import ic2.core.gui.VanillaButton;
-import ic2.core.init.Localization;
 import ic2.core.item.tool.HandHeldInventory;
 import ic2.core.util.StackUtil;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 
 public abstract class HandHeldUpgradeOption extends HandHeldInventory
 {
@@ -26,15 +24,8 @@ public abstract class HandHeldUpgradeOption extends HandHeldInventory
 		return HandHeldAdvancedUpgrade.getTag(StackUtil.getOrCreateNbtData(this.containerStack), this.name);
 	}
 
-	Button<?> getBackButton(Ic2Gui<?> gui, int x, int y)
+	Button<?> getBackButton(Ic2Gui<?> gui, int y)
 	{
-		return new VanillaButton(gui, x, y, 50, 15, new IClickHandler()
-		{
-			@Override
-			public void onClick(MouseButton button)
-			{
-				IC2.network.get(false).requestGUI(HandHeldUpgradeOption.this);
-			}
-		}).withText(Localization.translate("ic2.upgrade.advancedGUI.back"));
+		return new VanillaButton(gui, 10, y, 50, 15, button -> IC2.network.get(false).requestGUI(HandHeldUpgradeOption.this)).withText(Component.translatable("ic2.upgrade.advancedGUI.back").getString());
 	}
 }

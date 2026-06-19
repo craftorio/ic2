@@ -1,7 +1,6 @@
 package ic2.forge;
 
 import ic2.core.fluid.Ic2FluidStack;
-import ic2.core.init.Localization;
 import ic2.core.proxy.ClientEnvProxy;
 import ic2.core.proxy.SideProxyClient;
 
@@ -19,6 +18,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -130,7 +130,7 @@ public final class ClientEnvProxyForge implements ClientEnvProxy
 	@Override
 	public String getFluidName(Ic2FluidStack stack)
 	{
-		return Localization.translate(stack.getFluid().getFluidType().getDescriptionId(EnvFluidHandlerForge.getForgeFs(stack)));
+		return Component.translatable(stack.getFluid().getFluidType().getDescriptionId(EnvFluidHandlerForge.getForgeFs(stack))).getString();
 	}
 
 	record BerRegistration<T extends BlockEntity>(BlockEntityType<? extends T> blockEntityType, BlockEntityRendererProvider<T> blockEntityRendererProvider)

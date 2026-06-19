@@ -3,7 +3,6 @@ package ic2.core.block.personal;
 import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.Ic2Gui;
 import ic2.core.gui.VanillaButton;
-import ic2.core.init.Localization;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
@@ -29,9 +28,9 @@ public class GuiEnergyOMatOpen extends Ic2Gui<ContainerEnergyOMatOpen>
 	protected void drawForegroundLayer(GuiGraphics guiGraphics, int mouseX, int mouseY)
 	{
 		super.drawForegroundLayer(guiGraphics, mouseX, mouseY);
-		this.drawString(guiGraphics, 8, this.imageHeight - 96 + 2, Localization.translate("container.inventory"), 4210752);
-		this.drawString(guiGraphics, 100, 60, Localization.translate("ic2.container.personalTrader.offer"), 4210752);
-		this.drawString(guiGraphics, 100, 68, ((ContainerEnergyOMatOpen) this.menu).base.euOffer + " EU", 4210752);
+		this.drawString(guiGraphics, 8, this.imageHeight - 96 + 2, Component.translatable("container.inventory").getString(), 4210752);
+		this.drawString(guiGraphics, 100, 60, Component.translatable("ic2.container.personalTrader.offer").getString(), 4210752);
+		this.drawString(guiGraphics, 100, 68, this.menu.base.euOffer + " EU", 4210752);
 	}
 
 	@Override

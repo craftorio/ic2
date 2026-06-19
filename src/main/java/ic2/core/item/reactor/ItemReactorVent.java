@@ -17,9 +17,9 @@ public class ItemReactorVent extends ItemReactorHeatStorage
 	}
 
 	@Override
-	public void processChamber(ItemStack stack, IReactor reactor, int x, int y, boolean heatrun)
+	public void processChamber(ItemStack stack, IReactor reactor, int x, int y, boolean heatRun)
 	{
-		if (heatrun)
+		if (heatRun)
 		{
 			if (this.reactorVent > 0)
 			{

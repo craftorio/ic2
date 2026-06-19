@@ -21,9 +21,9 @@ public class ItemReactorHeatSwitch extends ItemReactorHeatStorage
 	}
 
 	@Override
-	public void processChamber(ItemStack stack, IReactor reactor, int x, int y, boolean heatrun)
+	public void processChamber(ItemStack stack, IReactor reactor, int x, int y, boolean heatRun)
 	{
-		if (heatrun)
+		if (heatRun)
 		{
 			int myHeat = 0;
 			ArrayList<ItemReactorHeatSwitch.ItemStackCoord> heatAcceptors = new ArrayList<>();

@@ -6,7 +6,7 @@ import ic2.core.block.generator.gui.GuiSolarGenerator;
 import ic2.core.block.heatgenerator.gui.GuiElectricHeatGenerator;
 import ic2.core.block.heatgenerator.gui.GuiFluidHeatGenerator;
 import ic2.core.block.heatgenerator.gui.GuiRTHeatGenerator;
-import ic2.core.block.kineticgenerator.gui.GuiElectricKineticGenertor;
+import ic2.core.block.kineticgenerator.gui.GuiElectricKineticGenerator;
 import ic2.core.block.kineticgenerator.gui.GuiSteamKineticGenerator;
 import ic2.core.block.kineticgenerator.gui.GuiStirlingKineticGenerator;
 import ic2.core.block.kineticgenerator.gui.GuiWaterKineticGenerator;
@@ -102,7 +102,7 @@ public final class SideProxyClient implements SideProxy
 		envProxy.registerScreen(Ic2ScreenHandlers.ELECTRIC_HEAT_GENERATOR, GuiElectricHeatGenerator::new);
 		envProxy.registerScreen(Ic2ScreenHandlers.FLUID_HEAT_GENERATOR, GuiFluidHeatGenerator::new);
 		envProxy.registerScreen(Ic2ScreenHandlers.RT_HEAT_GENERATOR, GuiRTHeatGenerator::new);
-		envProxy.registerScreen(Ic2ScreenHandlers.ELECTRIC_KINETIC_GENERATOR, GuiElectricKineticGenertor::new);
+		envProxy.registerScreen(Ic2ScreenHandlers.ELECTRIC_KINETIC_GENERATOR, GuiElectricKineticGenerator::new);
 		envProxy.registerScreen(Ic2ScreenHandlers.STEAM_KINETIC_GENERATOR, GuiSteamKineticGenerator::new);
 		envProxy.registerScreen(Ic2ScreenHandlers.STIRLING_KINETIC_GENERATOR, GuiStirlingKineticGenerator::new);
 		envProxy.registerScreen(Ic2ScreenHandlers.WATER_KINETIC_GENERATOR, GuiWaterKineticGenerator::new);

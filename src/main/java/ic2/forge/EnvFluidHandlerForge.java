@@ -295,11 +295,13 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 		} else if (amount == 0)
 		{
 			return Ic2FluidStack.EMPTY;
-		} else if (stack.getCount() != 1)
-		{
-			throw new IllegalArgumentException("invalid stack size: " + stack.getCount());
 		} else
 		{
+			if (stack.getCount() != 1)
+			{
+				stack = StackUtil.copyWithSize(stack, 1);
+			}
+
 			IFluidHandlerItem handler = getFluidHandler(stack);
 			if (handler == null)
 			{
@@ -331,11 +333,13 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 		} else if (drainFs.isEmpty())
 		{
 			return 0;
-		} else if (stack.getCount() != 1)
-		{
-			throw new IllegalArgumentException("invalid stack size: " + stack.getCount());
 		} else
 		{
+			if (stack.getCount() != 1)
+			{
+				stack = StackUtil.copyWithSize(stack, 1);
+			}
+
 			IFluidHandlerItem handler = getFluidHandler(stack);
 			if (handler == null)
 			{
@@ -373,7 +377,7 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 
 		if (stack.getCount() != 1)
 		{
-			throw new IllegalArgumentException("invalid stack size: " + stack.getCount());
+			stack = StackUtil.copyWithSize(stack, 1);
 		}
 
 		IFluidHandlerItem handler = getFluidHandler(stack);

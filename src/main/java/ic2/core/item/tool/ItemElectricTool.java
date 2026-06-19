@@ -5,7 +5,6 @@ import ic2.api.item.IElectricItem;
 import ic2.api.item.IItemHudInfo;
 import ic2.api.network.INetworkItemEventListener;
 import ic2.core.IC2;
-import ic2.core.init.Localization;
 import ic2.core.item.ElectricItemManager;
 import ic2.core.item.ElectricItemTooltipHandler;
 import ic2.core.ref.Ic2BlockTags;
@@ -40,7 +39,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.Tiers;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.Item.Properties;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -69,9 +67,7 @@ public abstract class ItemElectricTool extends DiggerItem implements IElectricIt
 		this(settings, 2.0F, -3.0F, operationEnergyCost, material, effectiveBlocks);
 	}
 
-	private ItemElectricTool(
-		Properties settings, float attackDamage, float attackSpeed, int operationEnergyCost, Tier material, Collection<TagKey<Block>> effectiveBlocks
-	)
+	private ItemElectricTool(Properties settings, float attackDamage, float attackSpeed, int operationEnergyCost, Tier material, Collection<TagKey<Block>> effectiveBlocks)
 	{
 		super(attackDamage, attackSpeed, material, effectiveBlocks.isEmpty() ? Ic2BlockTags.EMPTY : effectiveBlocks.iterator().next(), settings);
 		this.operationEnergyCost = operationEnergyCost;
@@ -123,7 +119,7 @@ public abstract class ItemElectricTool extends DiggerItem implements IElectricIt
 	{
 		List<String> info = new LinkedList<>();
 		info.add(ElectricItem.manager.getToolTip(stack));
-		info.add(Localization.translate("ic2.item.tooltip.power_tier", this.tier));
+		info.add(Component.translatable("ic2.item.tooltip.power_tier", this.tier).getString());
 		return info;
 	}
 
@@ -147,9 +143,7 @@ public abstract class ItemElectricTool extends DiggerItem implements IElectricIt
 	public boolean isCorrectToolForDrops(BlockState state)
 	{
 		int level = this.getTier().getLevel();
-		return (level >= 3 || !state.is(BlockTags.NEEDS_DIAMOND_TOOL))
-			&& (level >= 2 || !state.is(BlockTags.NEEDS_IRON_TOOL))
-			&& (level >= 1 || !state.is(BlockTags.NEEDS_STONE_TOOL)) && this.isEffective(state);
+		return (level >= 3 || !state.is(BlockTags.NEEDS_DIAMOND_TOOL)) && (level >= 2 || !state.is(BlockTags.NEEDS_IRON_TOOL)) && (level >= 1 || !state.is(BlockTags.NEEDS_STONE_TOOL)) && this.isEffective(state);
 	}
 
 	private boolean isEffective(BlockState state)
@@ -214,11 +208,6 @@ public abstract class ItemElectricTool extends DiggerItem implements IElectricIt
 		return false;
 	}
 
-	public void fillItemCategory(CreativeModeTab tab, NonNullList<ItemStack> subItems)
-	{
-		ElectricItemManager.addChargeVariants(this, subItems);
-	}
-
 	public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag context)
 	{
 		ElectricItemTooltipHandler.addTooltip(stack, tooltip);
@@ -254,7 +243,7 @@ public abstract class ItemElectricTool extends DiggerItem implements IElectricIt
 				{
 					this.idleSound.play();
 				}
-			} else if (!isEquipped && this.idleSound != null && entity instanceof LivingEntity theEntity)
+			} else if (this.idleSound != null && entity instanceof LivingEntity theEntity)
 			{
 				ItemStack stack = theEntity.getItemBySlot(EquipmentSlot.MAINHAND);
 				if (stack.getItem() != this || stack == itemstack)
@@ -278,7 +267,7 @@ public abstract class ItemElectricTool extends DiggerItem implements IElectricIt
 		if (this.idleSound == null && (idleEvent = this.getIdleSound(entity, stack)) != null)
 		{
 			this.idleSound = IC2.soundManager.createSound(entity, idleEvent, SoundSource.PLAYERS, entity, 1.0F, 1.0F);
-				this.idleSound.setSourceItem(this);
+			this.idleSound.setSourceItem(this);
 		}
 
 		SoundEvent startEvent;

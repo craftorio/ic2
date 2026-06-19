@@ -11,7 +11,6 @@ import ic2.core.gui.LinkedGauge;
 import ic2.core.gui.TankGauge;
 import ic2.core.gui.TextLabel;
 import ic2.core.gui.dynamic.TextProvider;
-import ic2.core.init.Localization;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
@@ -24,84 +23,19 @@ public class GuiNuclearReactor extends Ic2Gui<ContainerNuclearReactor>
 	public GuiNuclearReactor(ContainerNuclearReactor container, Inventory playerInventory, Component title)
 	{
 		super(container, playerInventory, title, 212, 243);
-		IEnableHandler enableHandler = new IEnableHandler()
-		{
-			@Override
-			public boolean isEnabled()
-			{
-				return ((ContainerNuclearReactor) GuiNuclearReactor.this.menu).base.isFluidCooled();
-			}
-		};
+		IEnableHandler enableHandler = GuiNuclearReactor.this.menu.base::isFluidCooled;
 		this.addElement(TankGauge.createBorderless(this, 10, 54, container.base.getinputtank(), true).withEnableHandler(enableHandler));
 		this.addElement(TankGauge.createBorderless(this, 190, 54, container.base.getoutputtank(), false).withEnableHandler(enableHandler));
-		this.addElement(
-			new LinkedGauge(this, 7, 136, container.base, "heat", Gauge.GaugeStyle.HeatNuclearReactor)
-				.withTooltip(
-					new Supplier<String>()
-					{
-						public String get()
-						{
-							return Localization.translate(
-								"ic2.NuclearReactor.gui.info.temp", ((ContainerNuclearReactor) GuiNuclearReactor.this.menu).base.getGuiValue("heat") * 100.0
-							);
-						}
-					}
-				)
-		);
-		this.addElement(
-			TextLabel.create(
-				this,
-				107,
-				136,
-				200,
-				13,
-				TextProvider.of(
-					new Supplier<String>()
-					{
-						public String get()
-						{
-							return ((ContainerNuclearReactor) GuiNuclearReactor.this.menu).base.isFluidCooled()
-								? Localization.translate(
-								"ic2.NuclearReactor.gui.info.HUoutput", ((ContainerNuclearReactor) GuiNuclearReactor.this.menu).base.EmitHeat
-							)
-								: Localization.translate(
-								"ic2.NuclearReactor.gui.info.EUoutput",
-								Math.round(((ContainerNuclearReactor) GuiNuclearReactor.this.menu).base.getOfferedEnergy())
-							);
-						}
-					}
-				),
-				5752026,
-				false,
-				4,
-				0,
-				false,
-				true
-			)
-		);
-		this.addElement(
-			new Area(this, 5, 160, 18, 18)
-				.withTooltip(
-					new Supplier<String>()
-					{
-						public String get()
-						{
-							return ((ContainerNuclearReactor) GuiNuclearReactor.this.menu).base.isFluidCooled()
-								? "ic2.NuclearReactor.gui.mode.fluid"
-								: "ic2.NuclearReactor.gui.mode.electric";
-						}
-					}
-				)
-		);
+		this.addElement(new LinkedGauge(this, 7, 136, container.base, "heat", Gauge.GaugeStyle.HeatNuclearReactor).withTooltip((Supplier<String>) () -> Component.translatable("ic2.NuclearReactor.gui.info.temp", GuiNuclearReactor.this.menu.base.getGuiValue("heat") * 100.0).getString()));
+		this.addElement(TextLabel.create(this, 107, 136, 200, 13, TextProvider.of(() -> GuiNuclearReactor.this.menu.base.isFluidCooled() ? Component.translatable("ic2.NuclearReactor.gui.info.HUoutput", GuiNuclearReactor.this.menu.base.EmitHeat).getString() : Component.translatable("ic2.NuclearReactor.gui.info.EUoutput", Math.round(GuiNuclearReactor.this.menu.base.getOfferedEnergy())).getString()), 5752026, false, 4, 0, false, true));
+		this.addElement(new Area(this, 5, 160, 18, 18).withTooltip((Supplier<String>) () -> GuiNuclearReactor.this.menu.base.isFluidCooled() ? "ic2.NuclearReactor.gui.mode.fluid" : "ic2.NuclearReactor.gui.mode.electric"));
 	}
 
 	@Override
 	protected void renderBg(GuiGraphics guiGraphics, float delta, int mouseX, int mouseY)
 	{
 		super.renderBg(guiGraphics, delta, mouseX, mouseY);
-		int size = ((ContainerNuclearReactor) this.menu).base.getReactorSize();
-		int startX = 26;
-		int startY = 25;
+		int size = this.menu.base.getReactorSize();
 		this.bindTexture();
 
 		for (int y = 0; y < 6; y++)
@@ -112,9 +46,9 @@ public class GuiNuclearReactor extends Ic2Gui<ContainerNuclearReactor>
 			}
 		}
 
-		if (((ContainerNuclearReactor) this.menu).base.isFluidCooled())
+		if (this.menu.base.isFluidCooled())
 		{
-			int heat = ((ContainerNuclearReactor) this.menu).base.gaugeHeatScaled(160);
+			int heat = this.menu.base.gaugeHeatScaled(160);
 			this.drawTexturedRect(guiGraphics.pose(), 186 - heat, 23.0, 0.0, 243.0, heat, 2.0);
 			this.drawTexturedRect(guiGraphics.pose(), 186 - heat, 41.0, 0.0, 243.0, heat, 2.0);
 			this.drawTexturedRect(guiGraphics.pose(), 186 - heat, 59.0, 0.0, 243.0, heat, 2.0);
@@ -128,6 +62,6 @@ public class GuiNuclearReactor extends Ic2Gui<ContainerNuclearReactor>
 	@Override
 	protected ResourceLocation getTextureLocation()
 	{
-		return ((ContainerNuclearReactor) this.menu).base.isFluidCooled() ? backgroundFluid : background;
+		return this.menu.base.isFluidCooled() ? backgroundFluid : background;
 	}
 }

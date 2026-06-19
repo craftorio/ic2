@@ -9,7 +9,6 @@ import ic2.core.gui.IEnableHandler;
 import ic2.core.gui.ItemImage;
 import ic2.core.gui.TextLabel;
 import ic2.core.gui.dynamic.TextProvider;
-import ic2.core.init.Localization;
 import ic2.core.util.Util;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -27,54 +26,23 @@ public class GuiPatternStorage extends Ic2Gui<ContainerPatternStorage>
 		this.addElement(new CustomButton(this, 36, 19, 9, 18, this.createEventSender(1)).withTooltip("ic2.PatternStorage.gui.info.next"));
 		this.addElement(new CustomButton(this, 10, 37, 16, 8, this.createEventSender(2)).withTooltip("ic2.PatternStorage.gui.info.export"));
 		this.addElement(new CustomButton(this, 26, 37, 16, 8, this.createEventSender(3)).withTooltip("ic2.PatternStorage.gui.info.import"));
-		this.addElement(TextLabel.create(this, this.imageWidth / 2, 30, TextProvider.of(new Supplier<String>()
+		this.addElement(TextLabel.create(this, this.imageWidth / 2, 30, TextProvider.of(() ->
 		{
-			public String get()
-			{
-				TileEntityPatternStorage te = container.base;
-				return Math.min(te.index + 1, te.maxIndex) + " / " + te.maxIndex;
-			}
+			TileEntityPatternStorage te = container.base;
+			return Math.min(te.index + 1, te.maxIndex) + " / " + te.maxIndex;
 		}), 4210752, false, true, false));
 		this.addElement(TextLabel.create(this, 10, 48, TextProvider.ofTranslated("ic2.generic.text.Name"), 16777215, false));
 		this.addElement(TextLabel.create(this, 10, 59, TextProvider.ofTranslated("ic2.generic.text.UUMatte"), 16777215, false));
 		this.addElement(TextLabel.create(this, 10, 70, TextProvider.ofTranslated("ic2.generic.text.Energy"), 16777215, false));
-		IEnableHandler patternInfoEnabler = new IEnableHandler()
+		IEnableHandler patternInfoEnabler = () -> container.base.pattern != null;
+		this.addElement(TextLabel.create(this, 80, 48, TextProvider.of(() ->
 		{
-			@Override
-			public boolean isEnabled()
-			{
-				return container.base.pattern != null;
-			}
-		};
-		this.addElement(TextLabel.create(this, 80, 48, TextProvider.of(new Supplier<String>()
-		{
-			public String get()
-			{
-				ItemStack pattern = container.base.pattern;
-				return pattern != null ? pattern.getHoverName().getString() : null;
-			}
+			ItemStack pattern = container.base.pattern;
+			return pattern != null ? pattern.getHoverName().getString() : null;
 		}), 16777215, false).withEnableHandler(patternInfoEnabler));
-		this.addElement(TextLabel.create(this, 80, 59, TextProvider.of(new Supplier<String>()
-		{
-			public String get()
-			{
-				return Util.toSiString(container.base.patternUu, 4) + Localization.translate("ic2.generic.text.bucketUnit");
-			}
-		}), 16777215, false).withEnableHandler(patternInfoEnabler));
-		this.addElement(TextLabel.create(this, 80, 70, TextProvider.of(new Supplier<String>()
-		{
-			public String get()
-			{
-				return Util.toSiString(container.base.patternEu, 4) + Localization.translate("ic2.generic.text.EU");
-			}
-		}), 16777215, false).withEnableHandler(patternInfoEnabler));
-		this.addElement(new ItemImage(this, 152, 29, new Supplier<ItemStack>()
-		{
-			public ItemStack get()
-			{
-				return container.base.pattern;
-			}
-		}));
+		this.addElement(TextLabel.create(this, 80, 59, TextProvider.of(() -> Util.toSiString(container.base.patternUu, 4) + Component.translatable("ic2.generic.text.bucketUnit")), 16777215, false).withEnableHandler(patternInfoEnabler));
+		this.addElement(TextLabel.create(this, 80, 70, TextProvider.of(() -> Util.toSiString(container.base.patternEu, 4) + Component.translatable("ic2.generic.text.EU")), 16777215, false).withEnableHandler(patternInfoEnabler));
+		this.addElement(new ItemImage(this, 152, 29, (Supplier<ItemStack>) () -> container.base.pattern));
 	}
 
 	@Override

@@ -4,7 +4,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.Ic2Gui;
 import ic2.core.block.machine.container.ContainerMatter;
 import ic2.core.gui.TankGauge;
-import ic2.core.init.Localization;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
@@ -18,8 +17,8 @@ public class GuiMatter extends Ic2Gui<ContainerMatter>
 	{
 		super(container, playerInventory, title);
 		this.addElement(TankGauge.createNormal(this, 96, 22, container.base.fluidTank));
-		this.progressLabel = Localization.translate("ic2.Matter.gui.info.progress");
-		this.amplifierLabel = Localization.translate("ic2.Matter.gui.info.amplifier");
+		this.progressLabel = Component.translatable("ic2.Matter.gui.info.progress").getString();
+		this.amplifierLabel = Component.translatable("ic2.Matter.gui.info.amplifier").getString();
 	}
 
 	@Override
@@ -27,11 +26,11 @@ public class GuiMatter extends Ic2Gui<ContainerMatter>
 	{
 		super.drawForegroundLayer(guiGraphics, mouseX, mouseY);
 		this.drawString(guiGraphics, 8, 22, this.progressLabel, 4210752);
-		this.drawString(guiGraphics, 18, 31, ((ContainerMatter) this.menu).base.getProgressAsString(), 4210752);
-		if (((ContainerMatter) this.menu).base.scrap > 0)
+		this.drawString(guiGraphics, 18, 31, this.menu.base.getProgressAsString(), 4210752);
+		if (this.menu.base.scrap > 0)
 		{
 			this.drawString(guiGraphics, 8, 46, this.amplifierLabel, 4210752);
-			this.drawString(guiGraphics, 8, 58, ((ContainerMatter) this.menu).base.scrap + "", 4210752);
+			this.drawString(guiGraphics, 8, 58, this.menu.base.scrap + "", 4210752);
 		}
 	}
 

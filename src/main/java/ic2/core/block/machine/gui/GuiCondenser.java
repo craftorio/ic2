@@ -8,7 +8,6 @@ import ic2.core.gui.Gauge;
 import ic2.core.gui.LinkedGauge;
 import ic2.core.gui.SlotGrid;
 import ic2.core.gui.TankGauge;
-import ic2.core.init.Localization;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
@@ -20,13 +19,7 @@ public class GuiCondenser extends Ic2Gui<ContainerCondenser>
 	public GuiCondenser(ContainerCondenser container, Inventory playerInventory, Component title)
 	{
 		super(container, playerInventory, title, 184);
-		Supplier<String> ventTooltipSupplier = new Supplier<String>()
-		{
-			public String get()
-			{
-				return Localization.translate("ic2.Condenser.gui.tooltipvent", (short) 2);
-			}
-		};
+		Supplier<String> ventTooltipSupplier = () -> Component.translatable("ic2.Condenser.gui.tooltipvent", (short) 2).getString();
 		this.addElement(new SlotGrid(this, 25, 25, 1, 2, SlotGrid.SlotStyle.Normal).withTooltip(ventTooltipSupplier));
 		this.addElement(new SlotGrid(this, 133, 25, 1, 2, SlotGrid.SlotStyle.Normal).withTooltip(ventTooltipSupplier));
 		this.addElement(EnergyGauge.asBolt(this, 12, 26, container.base));

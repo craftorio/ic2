@@ -7,7 +7,6 @@ import ic2.core.gui.Image;
 import ic2.core.gui.TankGauge;
 import ic2.core.gui.TextLabel;
 import ic2.core.gui.dynamic.TextProvider;
-import ic2.core.init.Localization;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
@@ -27,7 +26,7 @@ public class GuiSteamKineticGenerator extends Ic2Gui<ContainerSteamKineticGenera
 			// TODO: What Supplier used? Google?
 			public String get()
 			{
-				return Localization.translate(this.getRaw());
+				return Component.translatable(this.getRaw()).getString();
 			}
 
 			private String getRaw()
@@ -44,7 +43,7 @@ public class GuiSteamKineticGenerator extends Ic2Gui<ContainerSteamKineticGenera
 				}
 			}
 		}), () -> container.base.hasTurbine() && !container.base.isTurbineBlockedByWater() ? 2157374 : 14946604, false, 4, 0, false, true));
-		this.addElement(TextLabel.create(this, 8, 68, 160, 13, TextProvider.of(() -> Localization.translate("ic2.SteamKineticGenerator.gui.turbine.ouput", container.base.getKUoutput())), 2157374, false, 4, 0, false, true).withEnableHandler(() -> container.base.hasTurbine() && !container.base.isTurbineBlockedByWater()));
+		this.addElement(TextLabel.create(this, 8, 68, 160, 13, TextProvider.of(() -> Component.translatable("ic2.SteamKineticGenerator.gui.turbine.ouput", container.base.getKUoutput()).getString()), 2157374, false, 4, 0, false, true).withEnableHandler(() -> container.base.hasTurbine() && !container.base.isTurbineBlockedByWater()));
 	}
 
 	@Override

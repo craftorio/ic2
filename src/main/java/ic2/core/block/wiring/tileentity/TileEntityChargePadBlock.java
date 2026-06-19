@@ -1,18 +1,17 @@
 package ic2.core.block.wiring.tileentity;
 
+import net.minecraft.network.chat.Component;
 import org.joml.Vector3f;
 import ic2.api.item.ElectricItem;
 import ic2.core.ContainerBase;
 import ic2.core.IC2;
 import ic2.core.block.wiring.ContainerChargepadBlock;
-import ic2.core.init.Localization;
 import ic2.core.network.GrowingBuffer;
 import ic2.core.ref.Ic2Items;
 import ic2.core.util.Util;
 
 import java.util.EnumSet;
 import java.util.List;
-
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -30,7 +29,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public abstract class TileEntityChargepadBlock extends TileEntityElectricBlock
+public abstract class TileEntityChargePadBlock extends TileEntityElectricBlock
 {
 	private static final List<AABB> aabbs = List.of(new AABB(0.0, 0.0, 0.0, 1.0, 0.9375, 1.0));
 	private static final DustParticleOptions effect = new DustParticleOptions(new Vector3f(0.2F, 0.2F, 1.0F), 1.0F);
@@ -38,7 +37,7 @@ public abstract class TileEntityChargepadBlock extends TileEntityElectricBlock
 	private Player player = null;
 	public static byte redstoneModes = 2;
 
-	public TileEntityChargepadBlock(BlockEntityType<? extends TileEntityChargepadBlock> type, BlockPos pos, BlockState state, int tier, int output, int maxStorage)
+	public TileEntityChargePadBlock(BlockEntityType<? extends TileEntityChargePadBlock> type, BlockPos pos, BlockState state, int tier, int output, int maxStorage)
 	{
 		super(type, pos, state, tier, output, maxStorage);
 		this.energy.setDirections(EnumSet.complementOf(EnumSet.copyOf(Util.verticalFacings)), EnumSet.of(Direction.DOWN));
@@ -215,7 +214,7 @@ public abstract class TileEntityChargepadBlock extends TileEntityElectricBlock
 	@Override
 	public String getRedstoneMode()
 	{
-		return this.redstoneMode <= 1 && this.redstoneMode >= 0 ? Localization.translate("ic2.blockChargepad.gui.mod.redstone" + this.redstoneMode) : "";
+		return this.redstoneMode <= 1 && this.redstoneMode >= 0 ? Component.translatable("ic2.blockChargepad.gui.mod.redstone" + this.redstoneMode).getString() : "";
 	}
 
 	protected boolean chargeItem(ItemStack stack, int chargeFactor)

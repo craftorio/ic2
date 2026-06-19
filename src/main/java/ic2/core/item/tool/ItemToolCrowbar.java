@@ -3,7 +3,6 @@ package ic2.core.item.tool;
 import ic2.api.item.IEnhancedOverlayProvider;
 import ic2.core.IC2;
 import ic2.core.block.transport.cover.ICoverHolder;
-import ic2.core.init.Localization;
 import ic2.core.item.PriorityUsableItem;
 import ic2.core.ref.Ic2ItemTags;
 import ic2.core.ref.Ic2SoundEvents;
@@ -29,7 +28,6 @@ import net.minecraft.world.item.TieredItem;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -42,7 +40,7 @@ public class ItemToolCrowbar extends TieredItem implements IEnhancedOverlayProvi
 		super(material, settings);
 	}
 
-	public boolean canTakeDamage(ItemStack stack, int amount)
+	public boolean canTakeDamage()
 	{
 		return true;
 	}
@@ -56,7 +54,7 @@ public class ItemToolCrowbar extends TieredItem implements IEnhancedOverlayProvi
 		BlockPos pos = context.getClickedPos();
 		Direction side = context.getClickedFace();
 		Vec3 hitPos = context.getClickLocation();
-		if (!this.canTakeDamage(stack, 1))
+		if (!this.canTakeDamage())
 		{
 			return InteractionResult.FAIL;
 		}

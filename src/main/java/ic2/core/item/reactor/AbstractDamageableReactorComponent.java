@@ -2,7 +2,6 @@ package ic2.core.item.reactor;
 
 import ic2.api.reactor.IReactor;
 import ic2.api.reactor.IReactorComponent;
-import ic2.core.init.Localization;
 import ic2.core.util.Util;
 
 import java.util.List;
@@ -14,12 +13,11 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.Item.Properties;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class AbstractDamageableReactorComponent extends Item implements IReactorComponent
 {
-	public static final String TOOLTIP_DURABILITY = "ic2.reactoritem.durability";
 	private final int maxUse;
 
 	protected AbstractDamageableReactorComponent(Properties settings, int maxUse)
@@ -29,7 +27,7 @@ public abstract class AbstractDamageableReactorComponent extends Item implements
 	}
 
 	@Override
-	public void processChamber(ItemStack stack, IReactor reactor, int x, int y, boolean heatrun)
+	public void processChamber(ItemStack stack, IReactor reactor, int x, int y, boolean heatRun)
 	{
 	}
 
@@ -73,7 +71,7 @@ public abstract class AbstractDamageableReactorComponent extends Item implements
 	{
 		super.appendHoverText(stack, world, tooltip, advanced);
 		tooltip.add(
-			Component.literal(Localization.translate("ic2.reactoritem.durability") + " " + (this.getMaxUse() - this.getUse(stack)) + "/" + this.getMaxUse())
+			Component.literal(Component.translatable("ic2.reactoritem.durability") + " " + (this.getMaxUse() - this.getUse(stack)) + "/" + this.getMaxUse())
 				.withStyle(ChatFormatting.GRAY)
 		);
 	}
@@ -110,17 +108,17 @@ public abstract class AbstractDamageableReactorComponent extends Item implements
 		return Util.limit((double) this.getUse(stack) / this.maxUse, 0.0, 1.0);
 	}
 
-	public boolean isBarVisible(ItemStack stack)
+	public boolean isBarVisible(@NotNull ItemStack stack)
 	{
 		return true;
 	}
 
-	public int getBarWidth(ItemStack stack)
+	public int getBarWidth(@NotNull ItemStack stack)
 	{
 		return (int) Math.round((1.0 - this.getUseFraction(stack)) * 13.0);
 	}
 
-	public int getBarColor(ItemStack stack)
+	public int getBarColor(@NotNull ItemStack stack)
 	{
 		return Mth.hsvToRgb((float) ((1.0 - this.getUseFraction(stack)) / 3.0), 1.0F, 1.0F);
 	}

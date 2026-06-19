@@ -4,8 +4,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.Ic2Gui;
 import ic2.core.fluid.FluidHandler;
 import ic2.core.fluid.Ic2FluidStack;
-import ic2.core.init.Localization;
-import ic2.core.util.Util;
 
 import java.util.List;
 
@@ -15,15 +13,6 @@ import net.minecraft.world.level.material.Fluid;
 
 public abstract class AbstractFluidSlot extends GuiElement<TankFluidSlot>
 {
-	public static final int posU = 8;
-	public static final int posV = 160;
-	public static final int normalWidth = 18;
-	public static final int normalHeight = 18;
-	public static final int fluidOffsetX = 1;
-	public static final int fluidOffsetY = 1;
-	public static final int fluidNetWidth = 16;
-	public static final int fluidNetHeight = 16;
-
 	protected AbstractFluidSlot(Ic2Gui<?> gui, int x, int y, int width, int height)
 	{
 		super(gui, x, y, width, height);

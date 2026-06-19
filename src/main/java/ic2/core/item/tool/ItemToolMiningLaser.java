@@ -3,7 +3,6 @@ package ic2.core.item.tool;
 import ic2.api.network.INetworkItemEventListener;
 import ic2.core.IC2;
 import ic2.core.entity.LaserBulletEntity;
-import ic2.core.init.Localization;
 import ic2.core.item.PriorityUsableItem;
 import ic2.core.ref.Ic2SoundEvents;
 import ic2.core.util.KeyboardClient;
@@ -58,32 +57,32 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
 	{
 		super.appendHoverText(stack, world, list, par4);
 		CompoundTag nbtData = StackUtil.getOrCreateNbtData(stack);
-		String mode;
+		Component mode;
 		switch (nbtData.getInt("laser_setting"))
 		{
 			case 0:
-				mode = Localization.translate("item.ic2.mining_laser.tooltip.mode.mining");
+				mode = Component.translatable("item.ic2.mining_laser.tooltip.mode.mining");
 				break;
 			case 1:
-				mode = Localization.translate("item.ic2.mining_laser.tooltip.mode.lowFocus");
+				mode = Component.translatable("item.ic2.mining_laser.tooltip.mode.lowFocus");
 				break;
 			case 2:
-				mode = Localization.translate("item.ic2.mining_laser.tooltip.mode.longRange");
+				mode = Component.translatable("item.ic2.mining_laser.tooltip.mode.longRange");
 				break;
 			case 3:
-				mode = Localization.translate("item.ic2.mining_laser.tooltip.mode.horizontal");
+				mode = Component.translatable("item.ic2.mining_laser.tooltip.mode.horizontal");
 				break;
 			case 4:
-				mode = Localization.translate("item.ic2.mining_laser.tooltip.mode.superHeat");
+				mode = Component.translatable("item.ic2.mining_laser.tooltip.mode.superHeat");
 				break;
 			case 5:
-				mode = Localization.translate("item.ic2.mining_laser.tooltip.mode.scatter");
+				mode = Component.translatable("item.ic2.mining_laser.tooltip.mode.scatter");
 				break;
 			case 6:
-				mode = Localization.translate("item.ic2.mining_laser.tooltip.mode.explosive");
+				mode = Component.translatable("item.ic2.mining_laser.tooltip.mode.explosive");
 				break;
 			case 7:
-				mode = Localization.translate("item.ic2.mining_laser.tooltip.mode.3x3");
+				mode = Component.translatable("item.ic2.mining_laser.tooltip.mode.3x3");
 				break;
 			default:
 				return;
@@ -97,9 +96,9 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
 	public List<String> getHudInfo(ItemStack stack, boolean advanced)
 	{
 		CompoundTag nbtData = StackUtil.getOrCreateNbtData(stack);
-		String mode = Localization.translate(getModeString(nbtData.getInt("laser_setting")));
+		Component mode = Component.translatable(getModeString(nbtData.getInt("laser_setting")));
 		List<String> info = new LinkedList<>(super.getHudInfo(stack, advanced));
-		info.add(Localization.translate("item.ic2.mining_laser.tooltip.mode", mode));
+		info.add(Component.translatable("item.ic2.mining_laser.tooltip.mode", mode).getString());
 		return info;
 	}
 

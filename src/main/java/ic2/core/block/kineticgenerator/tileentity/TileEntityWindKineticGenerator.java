@@ -10,7 +10,6 @@ import ic2.core.block.invslot.InvSlotConsumableClass;
 import ic2.core.block.invslot.InvSlotConsumableKineticRotor;
 import ic2.core.block.kineticgenerator.container.ContainerWindKineticGenerator;
 import ic2.core.event.WorldData;
-import ic2.core.init.Localization;
 import ic2.core.init.MainConfig;
 import ic2.core.network.GrowingBuffer;
 import ic2.core.profile.NotClassic;
@@ -25,12 +24,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.core.Direction.Axis;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.PathNavigationRegion;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
 @NotClassic
@@ -43,7 +42,6 @@ public class TileEntityWindKineticGenerator extends TileEntityAbstractKineticGen
 	private float rotationSpeed;
 	private float angle = 0.0F;
 	private long lastCheck;
-	private static final double efficiencyRollOffExponent = 2.0;
 	public static final float outputModifier = 10.0F * ConfigUtil.getFloat(MainConfig.get(), "balance/energy/kineticgenerator/wind");
 	private static final ResourceLocation woodenRotorTexture = ResourceLocation.fromNamespaceAndPath("ic2", "textures/item/rotor/wood_rotor_model.png");
 
@@ -51,9 +49,7 @@ public class TileEntityWindKineticGenerator extends TileEntityAbstractKineticGen
 	{
 		super(Ic2BlockEntities.WIND_KINETIC_GENERATOR, pos, state);
 		this.updateTicker = IC2.random.nextInt(this.getTickRate());
-		this.rotorSlot = new InvSlotConsumableKineticRotor(
-			this, "rotorslot", InvSlot.Access.IO, 1, InvSlot.InvSide.ANY, IKineticRotor.GearboxType.WIND, "rotorSlot"
-		);
+		this.rotorSlot = new InvSlotConsumableKineticRotor(this, "rotorslot", InvSlot.Access.IO, 1, InvSlot.InvSide.ANY, IKineticRotor.GearboxType.WIND, "rotorSlot");
 	}
 
 	@Override
@@ -144,11 +140,7 @@ public class TileEntityWindKineticGenerator extends TileEntityAbstractKineticGen
 
 	public String getRotorHealth()
 	{
-		return !this.rotorSlot.isEmpty()
-			? Localization.translate(
-			"ic2.WindKineticGenerator.gui.rotorhealth", (int) (100.0F - (float) this.rotorSlot.get().getDamageValue() / this.rotorSlot.get().getMaxDamage() * 100.0F), "%"
-		)
-			: "";
+		return !this.rotorSlot.isEmpty() ? Component.translatable("ic2.wind_kinetic_generator.gui.rotorhealth", (int) (100.0F - (float) this.rotorSlot.get().getDamageValue() / this.rotorSlot.get().getMaxDamage() * 100.0F), "%").getString() : "";
 	}
 
 	@Override
@@ -182,9 +174,7 @@ public class TileEntityWindKineticGenerator extends TileEntityAbstractKineticGen
 		Direction rightDir = fwdDir.getClockWise(Axis.Y);
 		int xMaxDist = Math.abs(length * fwdDir.getStepX() + box * rightDir.getStepX());
 		int zMaxDist = Math.abs(length * fwdDir.getStepZ() + box * rightDir.getStepZ());
-		PathNavigationRegion chunkCache = new PathNavigationRegion(
-			this.getLevel(), this.worldPosition.offset(-xMaxDist, -box, -zMaxDist), this.worldPosition.offset(xMaxDist, box, zMaxDist)
-		);
+		PathNavigationRegion chunkCache = new PathNavigationRegion(this.getLevel(), this.worldPosition.offset(-xMaxDist, -box, -zMaxDist), this.worldPosition.offset(xMaxDist, box, zMaxDist));
 		int ret = 0;
 		int xCord = this.worldPosition.getX();
 		int yCord = this.worldPosition.getY();
@@ -207,7 +197,6 @@ public class TileEntityWindKineticGenerator extends TileEntityAbstractKineticGen
 					assert Math.abs(x - xCord) <= xMaxDist;
 					assert Math.abs(z - zCord) <= zMaxDist;
 					BlockState state = chunkCache.getBlockState(pos);
-					Block block = state.getBlock();
 					if (!state.isAir())
 					{
 						occupied = true;
@@ -301,9 +290,7 @@ public class TileEntityWindKineticGenerator extends TileEntityAbstractKineticGen
 	public ResourceLocation getRotorRenderTexture()
 	{
 		ItemStack stack = this.rotorSlot.get();
-		return !StackUtil.isEmpty(stack) && stack.getItem() instanceof IKineticRotor
-			? ((IKineticRotor) stack.getItem()).getRotorRenderTexture(stack)
-			: woodenRotorTexture;
+		return !StackUtil.isEmpty(stack) && stack.getItem() instanceof IKineticRotor ? ((IKineticRotor) stack.getItem()).getRotorRenderTexture(stack) : woodenRotorTexture;
 	}
 
 	public boolean isRotorOverloaded()

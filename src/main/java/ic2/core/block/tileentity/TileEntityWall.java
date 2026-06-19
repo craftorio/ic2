@@ -12,11 +12,9 @@ import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.BlockHitResult;
 
 public class TileEntityWall extends Ic2TileEntity
 {
@@ -108,7 +106,7 @@ public class TileEntityWall extends Ic2TileEntity
 	}
 
 	@Override
-	protected ItemStack getPickBlock(Player player, BlockHitResult target)
+	protected ItemStack getPickBlock()
 	{
 		return new ItemStack(WallBlock.get(this.color));
 	}

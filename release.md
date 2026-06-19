@@ -1,4 +1,4 @@
-# 2.10.21-ex120
+# 2.10.22-ex120
 
 我们很高兴宣布：适用于 1.20.1 Forge 版本的 IndustrialCraft 2 **正式版** 终于发布了！
 
@@ -29,7 +29,6 @@
 ### 已经在修了
 
 - 纳米剑 `nano_saber`: 右键激活不显示
-- 国际化混乱应用，有 `Localization.translate -> String` 和 `Component.translatable -> Component`
 - 日光灯不能用（仅限合成）
 - 适配其他电力网络，例如 FE（Forge Energy）、RF（Redstone Flux）等
 - 重做声音系统（隐藏式字幕）

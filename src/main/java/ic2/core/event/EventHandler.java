@@ -260,10 +260,10 @@ public final class EventHandler
 					return ((ItemArmorHazmat) armorItem).absorbFall(armor, entity, distance);
 				} else if (armorItem == Ic2Items.NANO_BOOTS)
 				{
-					return ((ItemArmorNanoSuit) armorItem).absorbFall(armor, entity, distance);
+					return ((ItemArmorNanoSuit) armorItem).absorbFall(armor, distance);
 				} else
 				{
-					return armorItem == Ic2Items.QUANTUM_BOOTS && ((ItemArmorQuantumSuit) armorItem).absorbFall(armor, entity, distance);
+					return armorItem == Ic2Items.QUANTUM_BOOTS && ((ItemArmorQuantumSuit) armorItem).absorbFall(armor, distance);
 				}
 			}
 		}

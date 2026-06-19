@@ -4,7 +4,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.Ic2Gui;
 import ic2.core.fluid.Ic2FluidStack;
 import ic2.core.fluid.Ic2FluidTank;
-import ic2.core.init.Localization;
 import ic2.core.proxy.SideProxyClient;
 import ic2.core.util.Util;
 
@@ -16,16 +15,7 @@ import net.minecraft.world.level.material.Fluid;
 
 public class TankGauge extends GuiElement<TankGauge>
 {
-	public static final int filledBackgroundU = 6;
-	public static final int filledScaleU = 38;
-	public static final int emptyU = 70;
 	public static final int v = 100;
-	public static final int normalWidth = 20;
-	public static final int normalHeight = 55;
-	public static final int fluidOffsetX = 4;
-	public static final int fluidOffsetY = 4;
-	public static final int fluidNetWidth = 12;
-	public static final int fluidNetHeight = 47;
 	private final Ic2FluidTank tank;
 	private final TankGauge.TankGuiStyle style;
 
@@ -117,9 +107,7 @@ public class TankGauge extends GuiElement<TankGauge>
 			Fluid fluid = fs.getFluid();
 			if (fluid != null)
 			{
-				ret.add(
-					Component.literal(SideProxyClient.envProxy.getFluidName(fs) + ": " + fs.getAmountMb() + " " + Localization.translate("ic2.generic.text.mb"))
-				);
+				ret.add(Component.literal(SideProxyClient.envProxy.getFluidName(fs) + ": " + fs.getAmountMb() + " " + Component.translatable("ic2.generic.text.mb")));
 			} else
 			{
 				ret.add(Component.literal("invalid fluid stack"));
@@ -134,10 +122,7 @@ public class TankGauge extends GuiElement<TankGauge>
 
 	private enum TankGuiStyle
 	{
-		Normal(true, true, false),
-		Borderless(false, true, false),
-		BorderlessMirrored(false, true, true),
-		Plain(false, false, false);
+		Normal(true, true, false), Borderless(false, true, false), BorderlessMirrored(false, true, true), Plain(false, false, false);
 
 		public final boolean withBorder;
 		public final boolean withGauge;

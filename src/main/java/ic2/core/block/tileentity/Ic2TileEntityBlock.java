@@ -369,7 +369,7 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 			return !this.hasCollision ? Shapes.empty() : Shapes.block();
 		} else
 		{
-			return be.getOutlineShape(context);
+			return be.getOutlineShape();
 		}
 	}
 
@@ -381,7 +381,7 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 			return !this.hasCollision ? Shapes.empty() : Shapes.block();
 		} else
 		{
-			return be.getCollisionShape(context);
+			return be.getCollisionShape();
 		}
 	}
 

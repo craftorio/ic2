@@ -45,7 +45,6 @@ import net.minecraft.world.level.block.FarmBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.mutable.MutableObject;
@@ -863,12 +862,6 @@ public class TileEntityCrop extends Ic2TileEntity implements ICropTile
 	}
 
 	@Override
-	public int getLightValue()
-	{
-		return this.crop == null ? 0 : this.crop.getEmittedLight(this);
-	}
-
-	@Override
 	public boolean pick()
 	{
 		if (this.crop == null)
@@ -1083,12 +1076,6 @@ public class TileEntityCrop extends Ic2TileEntity implements ICropTile
 		return ItemCropSeed.generateItemStackFromValues(crop, growth, gain, resistance, scan);
 	}
 
-	@Override
-	protected int getLightOpacity()
-	{
-		return 0;
-	}
-
 	public TileEntityCrop transformCropBlock(CropCard crop, int age)
 	{
 		if (this.level == null)
@@ -1163,7 +1150,7 @@ public class TileEntityCrop extends Ic2TileEntity implements ICropTile
 	}
 
 	@Override
-	protected ItemStack getPickBlock(Player player, BlockHitResult target)
+	protected ItemStack getPickBlock()
 	{
 		return this.crop == null ? new ItemStack(Ic2Items.CROP_STICK) : this.generateSeeds(this.crop, this.statGrowth, this.statGain, this.statResistance, this.scanLevel);
 	}

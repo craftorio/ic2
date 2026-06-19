@@ -9,7 +9,6 @@ import ic2.core.block.invslot.InvSlot;
 import ic2.core.block.invslot.InvSlotConsumableClass;
 import ic2.core.block.invslot.InvSlotConsumableKineticRotor;
 import ic2.core.block.kineticgenerator.container.ContainerWaterKineticGenerator;
-import ic2.core.init.Localization;
 import ic2.core.init.MainConfig;
 import ic2.core.network.GrowingBuffer;
 import ic2.core.profile.NotClassic;
@@ -26,6 +25,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.core.Direction.Axis;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.world.entity.player.Inventory;
@@ -47,8 +47,6 @@ public class TileEntityWaterKineticGenerator extends TileEntityAbstractKineticGe
 	private long lastCheck;
 	private float angle = 0.0F;
 	private float rotationSpeed;
-	private static final float rotationModifier = 0.1F;
-	private static final double efficiencyRollOffExponent = 2.0;
 	private static final float outputModifier = 0.2F * ConfigUtil.getFloat(MainConfig.get(), "balance/energy/kineticgenerator/water");
 	private static final ResourceLocation woodenRotorTexture = ResourceLocation.fromNamespaceAndPath("ic2", "textures/item/rotor/wood_rotor_model.png");
 
@@ -59,11 +57,6 @@ public class TileEntityWaterKineticGenerator extends TileEntityAbstractKineticGe
 		this.rotorSlot = new InvSlotConsumableKineticRotor(
 			this, "rotorslot", InvSlot.Access.IO, 1, InvSlot.InvSide.ANY, IKineticRotor.GearboxType.WATER, "rotorSlot"
 		);
-	}
-
-	protected int getTickRate()
-	{
-		return 20;
 	}
 
 	@Override
@@ -250,15 +243,15 @@ public class TileEntityWaterKineticGenerator extends TileEntityAbstractKineticGe
 		Direction fwdDir = this.getFacing();
 		Direction rightDir = fwdDir.getClockWise(Axis.Y);
 		int ret = 0;
-		int xCoord = this.worldPosition.getX();
-		int yCoord = this.worldPosition.getY();
-		int zCoord = this.worldPosition.getZ();
+		int xCord = this.worldPosition.getX();
+		int yCord = this.worldPosition.getY();
+		int zCord = this.worldPosition.getZ();
 		Level world = this.getLevel();
 		MutableBlockPos pos = new MutableBlockPos();
 
 		for (int up = -box; up <= box; up++)
 		{
-			int y = yCoord + up;
+			int y = yCord + up;
 
 			for (int right = -box; right <= box; right++)
 			{
@@ -266,8 +259,8 @@ public class TileEntityWaterKineticGenerator extends TileEntityAbstractKineticGe
 
 				for (int fwd = lentemp - length; fwd <= length; fwd++)
 				{
-					int x = xCoord + fwd * fwdDir.getStepX() + right * rightDir.getStepX();
-					int z = zCoord + fwd * fwdDir.getStepZ() + right * rightDir.getStepZ();
+					int x = xCord + fwd * fwdDir.getStepX() + right * rightDir.getStepX();
+					int z = zCord + fwd * fwdDir.getStepZ() + right * rightDir.getStepZ();
 					pos.set(x, y, z);
 					if (world.getBlockState(pos).getBlock() != Blocks.WATER)
 					{
@@ -359,7 +352,7 @@ public class TileEntityWaterKineticGenerator extends TileEntityAbstractKineticGe
 
 	public String getRotorHealth()
 	{
-		return !this.rotorSlot.isEmpty() ? Localization.translate("ic2.WaterKineticGenerator.gui.rotorhealth", (int) (100.0F - (float) this.rotorSlot.get().getDamageValue() / this.rotorSlot.get().getMaxDamage() * 100.0F), "%") : "";
+		return !this.rotorSlot.isEmpty() ? Component.translatable("ic2.WaterKineticGenerator.gui.rotorhealth", (int) (100.0F - (float) this.rotorSlot.get().getDamageValue() / this.rotorSlot.get().getMaxDamage() * 100.0F), "%").getString() : "";
 	}
 
 	@Override

@@ -5,7 +5,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.Ic2Gui;
 import ic2.core.gui.EnergyGauge;
 import ic2.core.gui.VanillaButton;
-import ic2.core.init.Localization;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
@@ -29,12 +28,12 @@ public class GuiElectricBlock extends Ic2Gui<ContainerElectricBlock>
 		int rightTextHeight = 24;
 		int color = 4207152;
 		super.drawForegroundLayer(guiGraphics, mouseX, mouseY);
-		this.drawString(guiGraphics, 8, 74, Localization.translate("ic2.EUStorage.gui.info.armor"), color);
-		this.drawString(guiGraphics, 79, rightTextHeight, Localization.translate("ic2.EUStorage.gui.info.level", this.menu.base.energy.getSourceTier()), color);
+		this.drawString(guiGraphics, 8, 74, Component.translatable("ic2.EUStorage.gui.info.armor").getString(), color);
+		this.drawString(guiGraphics, 79, rightTextHeight, Component.translatable("ic2.EUStorage.gui.info.level", this.menu.base.energy.getSourceTier()).getString(), color);
 		int e = (int) Math.min(this.menu.base.energy.getEnergy(), this.menu.base.energy.getCapacity());
 		this.drawString(guiGraphics, 110, rightTextHeight + 10, " " + e, color);
 		this.drawString(guiGraphics, 110, rightTextHeight + 20, "/" + (int) this.menu.base.energy.getCapacity(), color);
-		String output = Localization.translate("ic2.EUStorage.gui.info.output", this.menu.base.getOutput());
+		String output = Component.translatable("ic2.EUStorage.gui.info.output", this.menu.base.getOutput()).getString();
 		this.drawString(guiGraphics, 85, rightTextHeight + 35, output, color);
 	}
 

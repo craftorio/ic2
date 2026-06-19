@@ -68,7 +68,7 @@ public class HandHeldOre extends HandHeldUpgradeOption
 		public GuiEditOre(HandHeldOre.ContainerEditOre container, Inventory playerInventory, Component title)
 		{
 			super(container, playerInventory, title, 200);
-			this.addElement(container.base.getBackButton(this, 10, 96));
+			this.addElement(container.base.getBackButton(this, 96));
 			List<ScrollableList.IListItem> items = new ArrayList<>();
 
 			for (String name : new String[] { "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten" })

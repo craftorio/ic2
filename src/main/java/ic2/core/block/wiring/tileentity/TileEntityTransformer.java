@@ -7,7 +7,6 @@ import ic2.core.IHasGui;
 import ic2.core.block.comp.Energy;
 import ic2.core.block.tileentity.TileEntityInventory;
 import ic2.core.block.wiring.ContainerTransformer;
-import ic2.core.init.Localization;
 import ic2.core.network.GrowingBuffer;
 
 import java.util.Collections;
@@ -17,6 +16,7 @@ import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -39,10 +39,7 @@ public abstract class TileEntityTransformer extends TileEntityInventory implemen
 	{
 		super(type, pos, state);
 		this.defaultTier = tier;
-		this.energy = this.addComponent(
-			new Energy(this, EnergyNet.instance.getPowerFromTier(tier) * 8.0, Collections.emptySet(), Collections.emptySet(), tier, tier, true)
-				.setMultiSource(true)
-		);
+		this.energy = this.addComponent(new Energy(this, EnergyNet.instance.getPowerFromTier(tier) * 8.0, Collections.emptySet(), Collections.emptySet(), tier, tier, true).setMultiSource(true));
 	}
 
 	@Override
@@ -147,17 +144,7 @@ public abstract class TileEntityTransformer extends TileEntityInventory implemen
 	public void addInformation(ItemStack stack, List<String> tooltip, TooltipFlag advanced)
 	{
 		super.addInformation(stack, tooltip, advanced);
-		tooltip.add(
-			String.format(
-				"%s %.0f %s %s %.0f %s",
-				Localization.translate("ic2.item.tooltip.Low"),
-				EnergyNet.instance.getPowerFromTier(this.energy.getSinkTier()),
-				Localization.translate("ic2.generic.text.EUt"),
-				Localization.translate("ic2.item.tooltip.High"),
-				EnergyNet.instance.getPowerFromTier(this.energy.getSourceTier() + 1),
-				Localization.translate("ic2.generic.text.EUt")
-			)
-		);
+		tooltip.add(String.format("%s %.0f %s %s %.0f %s", Component.translatable("ic2.item.tooltip.Low").getString(), EnergyNet.instance.getPowerFromTier(this.energy.getSinkTier()), Component.translatable("ic2.generic.text.EUt").getString(), Component.translatable("ic2.item.tooltip.High").getString(), EnergyNet.instance.getPowerFromTier(this.energy.getSourceTier() + 1), Component.translatable("ic2.generic.text.EUt").getString()));
 	}
 
 	@Override
@@ -189,9 +176,7 @@ public abstract class TileEntityTransformer extends TileEntityInventory implemen
 
 	public enum Mode
 	{
-		redstone,
-		stepdown,
-		stepup;
+		redstone, stepdown, stepup;
 
 		static final TileEntityTransformer.Mode[] VALUES = values();
 	}

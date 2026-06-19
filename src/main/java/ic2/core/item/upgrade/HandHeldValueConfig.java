@@ -7,7 +7,6 @@ import ic2.core.ContainerBase;
 import ic2.core.IC2;
 import ic2.core.gui.EnumCycleHandler;
 import ic2.core.gui.GuiDefaultBackground;
-import ic2.core.gui.IClickHandler;
 import ic2.core.gui.IEnableHandler;
 import ic2.core.gui.MouseButton;
 import ic2.core.gui.SlotGrid;
@@ -15,7 +14,6 @@ import ic2.core.gui.TextBox;
 import ic2.core.gui.TextLabel;
 import ic2.core.gui.VanillaButton;
 import ic2.core.gui.dynamic.TextProvider;
-import ic2.core.init.Localization;
 import ic2.core.item.ContainerHandHeldInventory;
 import ic2.core.network.GrowingBuffer;
 import ic2.core.ref.Ic2ScreenHandlers;
@@ -139,234 +137,118 @@ public class HandHeldValueConfig extends HandHeldUpgradeOption
 		public GuiValueConfig(HandHeldValueConfig.ContainerValueConfig container, Inventory playerInventory, Component title)
 		{
 			super(container, playerInventory, title);
-			this.addElement(container.base.getBackButton(this, 10, 62));
-			this.addElement(new VanillaButton(this, 10, 25, 75, 15, new EnumCycleHandler<ComparisonType>(ComparisonType.VALUES, container.comparisonType)
+			this.addElement(container.base.getBackButton(this, 62));
+			this.addElement(new VanillaButton(this, 10, 25, 75, 15, new EnumCycleHandler<>(ComparisonType.VALUES, container.comparisonType)
 			{
 				@Override
 				public void onClick(MouseButton button)
 				{
 					super.onClick(button);
-					((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).comparisonType = this.getCurrentValue();
-					IC2.network.get(false).sendContainerField((ContainerBase<?>) GuiValueConfig.this.menu, "comparisonType");
+					GuiValueConfig.this.menu.comparisonType = this.getCurrentValue();
+					IC2.network.get(false).sendContainerField(GuiValueConfig.this.menu, "comparisonType");
 				}
-			}).withText(new Supplier<String>()
-			{
-				public String get()
-				{
-					return Localization.translate(((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).comparisonType.name);
-				}
-			}).withTooltip(new Supplier<String>()
+			}).withText((Supplier<String>) () -> Component.translatable(GuiValueConfig.this.menu.comparisonType.name).getString()).withTooltip(new Supplier<>()
 			{
 				private final String name;
 
 				{
-					this.name = Localization.translate("ic2.upgrade.advancedGUI." + container.base.name);
+					this.name = Component.translatable("ic2.upgrade.advancedGUI." + container.base.name).getString();
 				}
 
 				public String get()
 				{
-					return Localization.translate(((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).comparisonType.name + ".desc", this.name);
+					return Component.translatable(GuiValueConfig.this.menu.comparisonType.name + ".desc", this.name).getString();
 				}
 			}));
-			IEnableHandler rangeEnabled = new IEnableHandler()
+			IEnableHandler rangeEnabled = () -> GuiValueConfig.this.menu.comparisonType == ComparisonType.RANGE;
+			IEnableHandler filtersEnabled = () -> !GuiValueConfig.this.menu.comparisonType.ignoreFilters();
+			this.addElement(new MoveableButton(this, 75, 43, 60, 43, 17, 15, new EnumCycleHandler<>(ComparisonSettings.VALUES, container.normalSetting)
 			{
 				@Override
-				public boolean isEnabled()
+				public void onClick(MouseButton button)
 				{
-					return ((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).comparisonType == ComparisonType.RANGE;
-				}
-			};
-			IEnableHandler filtersEnabled = new IEnableHandler()
-			{
-				@Override
-				public boolean isEnabled()
-				{
-					return !((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).comparisonType.ignoreFilters();
-				}
-			};
-			this.addElement(
-				new MoveableButton(
-					this,
-					75,
-					43,
-					60,
-					43,
-					17,
-					15,
-					new EnumCycleHandler<ComparisonSettings>(ComparisonSettings.VALUES, container.normalSetting)
+					super.onClick(button);
+					GuiValueConfig.this.menu.normalSetting = this.getCurrentValue();
+					IC2.network.get(false).sendContainerField(GuiValueConfig.this.menu, "normalSetting");
+					switch (this.getCurrentValue())
 					{
-						@Override
-						public void onClick(MouseButton button)
-						{
-							super.onClick(button);
-							((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).normalSetting = this.getCurrentValue();
-							IC2.network.get(false).sendContainerField((ContainerBase<?>) GuiValueConfig.this.menu, "normalSetting");
-							switch ((ComparisonSettings) this.getCurrentValue())
+						case LESS:
+						case LESS_OR_EQUAL:
+							if (GuiValueConfig.this.menu.extraSetting != ComparisonSettings.LESS && GuiValueConfig.this.menu.extraSetting != ComparisonSettings.LESS_OR_EQUAL)
 							{
-								case LESS:
-								case LESS_OR_EQUAL:
-									if (((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).extraSetting != ComparisonSettings.LESS
-										&& ((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).extraSetting != ComparisonSettings.LESS_OR_EQUAL)
-									{
-										((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).extraSetting = ComparisonSettings.LESS;
-										IC2.network.get(false).sendContainerField((ContainerBase<?>) GuiValueConfig.this.menu, "extraSetting");
-									}
-									break;
-								case GREATER:
-								case GREATER_OR_EQUAL:
-									if (((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).extraSetting != ComparisonSettings.GREATER
-										&& ((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).extraSetting
-										!= ComparisonSettings.GREATER_OR_EQUAL)
-									{
-										((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).extraSetting = ComparisonSettings.GREATER;
-										IC2.network.get(false).sendContainerField((ContainerBase<?>) GuiValueConfig.this.menu, "extraSetting");
-									}
-									break;
-								default:
-									throw new IllegalStateException("Unexpected other setting: " + this.getCurrentValue());
+								GuiValueConfig.this.menu.extraSetting = ComparisonSettings.LESS;
+								IC2.network.get(false).sendContainerField(GuiValueConfig.this.menu, "extraSetting");
 							}
-						}
-					}
-				)
-					.withMoveHandler(rangeEnabled)
-					.withEnableHandler(filtersEnabled)
-					.withText(new Supplier<String>()
-					{
-						public String get()
-						{
-							return ((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).normalSetting.symbol;
-						}
-					})
-					.withTooltip(new Supplier<String>()
-					{
-						public String get()
-						{
-							return Localization.translate(((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).normalSetting.name);
-						}
-					})
-			);
-			this.addElement(
-				new VanillaButton(
-					this,
-					105,
-					43,
-					17,
-					15,
-					new IClickHandler()
-					{
-						@Override
-						public void onClick(MouseButton button)
-						{
-							if (button == MouseButton.left || button == MouseButton.right)
+							break;
+						case GREATER:
+						case GREATER_OR_EQUAL:
+							if (GuiValueConfig.this.menu.extraSetting != ComparisonSettings.GREATER && GuiValueConfig.this.menu.extraSetting != ComparisonSettings.GREATER_OR_EQUAL)
 							{
-								switch (((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).normalSetting)
-								{
-									case LESS:
-									case LESS_OR_EQUAL:
-										if (((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).extraSetting == ComparisonSettings.LESS)
-										{
-											((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).extraSetting = ComparisonSettings.LESS_OR_EQUAL;
-										} else
-										{
-											((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).extraSetting = ComparisonSettings.LESS;
-										}
-										break;
-									case GREATER:
-									case GREATER_OR_EQUAL:
-										if (((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).extraSetting == ComparisonSettings.GREATER)
-										{
-											((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).extraSetting = ComparisonSettings.GREATER_OR_EQUAL;
-										} else
-										{
-											((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).extraSetting = ComparisonSettings.GREATER;
-										}
-										break;
-									default:
-										throw new IllegalStateException(
-											"Unexpected other setting: " + ((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).normalSetting
-										);
-								}
+								GuiValueConfig.this.menu.extraSetting = ComparisonSettings.GREATER;
+								IC2.network.get(false).sendContainerField(GuiValueConfig.this.menu, "extraSetting");
+							}
+							break;
+						default:
+							throw new IllegalStateException("Unexpected other setting: " + this.getCurrentValue());
+					}
+				}
+			}).withMoveHandler(rangeEnabled).withEnableHandler(filtersEnabled).withText((Supplier<String>) () -> GuiValueConfig.this.menu.normalSetting.symbol).withTooltip((Supplier<String>) () -> Component.translatable(GuiValueConfig.this.menu.normalSetting.name).getString()));
+			this.addElement(new VanillaButton(this, 105, 43, 17, 15, button ->
+			{
+				if (button == MouseButton.left || button == MouseButton.right)
+				{
+					switch (GuiValueConfig.this.menu.normalSetting)
+					{
+						case LESS:
+						case LESS_OR_EQUAL:
+							if (GuiValueConfig.this.menu.extraSetting == ComparisonSettings.LESS)
+							{
+								GuiValueConfig.this.menu.extraSetting = ComparisonSettings.LESS_OR_EQUAL;
+							} else
+							{
+								GuiValueConfig.this.menu.extraSetting = ComparisonSettings.LESS;
+							}
+							break;
+						case GREATER:
+						case GREATER_OR_EQUAL:
+							if (GuiValueConfig.this.menu.extraSetting == ComparisonSettings.GREATER)
+							{
+								GuiValueConfig.this.menu.extraSetting = ComparisonSettings.GREATER_OR_EQUAL;
+							} else
+							{
+								GuiValueConfig.this.menu.extraSetting = ComparisonSettings.GREATER;
+							}
+							break;
+						default:
+							throw new IllegalStateException("Unexpected other setting: " + ((ContainerValueConfig) GuiValueConfig.this.menu).normalSetting);
+					}
 
-								IC2.network.get(false).sendContainerField((ContainerBase<?>) GuiValueConfig.this.menu, "extraSetting");
-							}
-						}
-					}
-				)
-					.withEnableHandler(rangeEnabled)
-					.withText(new Supplier<String>()
-					{
-						public String get()
-						{
-							return ((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).extraSetting.symbol;
-						}
-					})
-					.withTooltip(new Supplier<String>()
-					{
-						public String get()
-						{
-							return Localization.translate(((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).extraSetting.name);
-						}
-					})
-			);
-			Predicate<String> numberOnly = new Predicate<String>()
+					IC2.network.get(false).sendContainerField(GuiValueConfig.this.menu, "extraSetting");
+				}
+			}).withEnableHandler(rangeEnabled).withText((Supplier<String>) () -> GuiValueConfig.this.menu.extraSetting.symbol).withTooltip((Supplier<String>) () -> Component.translatable(GuiValueConfig.this.menu.extraSetting.name).getString()));
+			Predicate<String> numberOnly = input ->
 			{
-				public boolean apply(String input)
+				try
 				{
-					try
-					{
-						return Integer.parseInt(input) >= 0;
-					} catch (NumberFormatException e)
-					{
-						return input.isEmpty();
-					}
+					return Integer.parseInt(input) >= 0;
+				} catch (NumberFormatException e)
+				{
+					return input.isEmpty();
 				}
 			};
-			final MoveableTextBox textBox = new MoveableTextBox(this, 40, 43, 25, 43, 30, 15, ((HandHeldValueConfig.ContainerValueConfig) this.menu).normalBox);
-			this.addElement(textBox.withMoveHandler(rangeEnabled).withTextWatcher(new TextBox.ITextBoxWatcher()
+			final MoveableTextBox textBox = new MoveableTextBox(this, 40, 43, 25, 43, 30, 15, this.menu.normalBox);
+			this.addElement(textBox.withMoveHandler(rangeEnabled).withTextWatcher((oldValue, newValue) ->
 			{
-				@Override
-				public void onChanged(String oldValue, String newValue)
-				{
-					((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).normalBox = newValue;
-					IC2.network.get(false).sendContainerField((ContainerBase<?>) GuiValueConfig.this.menu, "normalBox");
-				}
+				GuiValueConfig.this.menu.normalBox = newValue;
+				IC2.network.get(false).sendContainerField(GuiValueConfig.this.menu, "normalBox");
 			}).withTextValidator(numberOnly).withEnableHandler(filtersEnabled));
-			this.addElement(
-				new TextBox(this, 125, 43, 30, 15, ((HandHeldValueConfig.ContainerValueConfig) this.menu).extraBox)
-					.withTextWatcher(new TextBox.ITextBoxWatcher()
-					{
-						@Override
-						public void onChanged(String oldValue, String newValue)
-						{
-							((HandHeldValueConfig.ContainerValueConfig) GuiValueConfig.this.menu).extraBox = newValue;
-							IC2.network.get(false).sendContainerField((ContainerBase<?>) GuiValueConfig.this.menu, "extraBox");
-						}
-					})
-					.withTextValidator(numberOnly)
-					.withEnableHandler(rangeEnabled)
-			);
-			this.addElement(
-				TextLabel.create(this, 100, 47, TextProvider.ofTranslated("ic2.upgrade.advancedGUI." + container.base.name), 4210752, false)
-					.withEnableHandler(new IEnableHandler()
-					{
-						@Override
-						public boolean isEnabled()
-						{
-							return textBox.isEnabled() && !textBox.isMoved();
-						}
-					})
-			);
-			this.addElement(
-				TextLabel.create(this, 80, 47, TextProvider.ofTranslated("ic2.upgrade.advancedGUI." + container.base.name), 4210752, false)
-					.withEnableHandler(new IEnableHandler()
-					{
-						@Override
-						public boolean isEnabled()
-						{
-							return textBox.isEnabled() && textBox.isMoved();
-						}
-					})
-			);
+			this.addElement(new TextBox(this, 125, 43, 30, 15, this.menu.extraBox).withTextWatcher((oldValue, newValue) ->
+			{
+				GuiValueConfig.this.menu.extraBox = newValue;
+				IC2.network.get(false).sendContainerField(GuiValueConfig.this.menu, "extraBox");
+			}).withTextValidator(numberOnly).withEnableHandler(rangeEnabled));
+			this.addElement(TextLabel.create(this, 100, 47, TextProvider.ofTranslated("ic2.upgrade.advancedGUI." + container.base.name), 4210752, false).withEnableHandler(() -> textBox.isEnabled() && !textBox.isMoved()));
+			this.addElement(TextLabel.create(this, 80, 47, TextProvider.ofTranslated("ic2.upgrade.advancedGUI." + container.base.name), 4210752, false).withEnableHandler(() -> textBox.isEnabled() && textBox.isMoved()));
 			this.addElement(new SlotGrid(this, 7, 7, 9, 1, SlotGrid.SlotStyle.Normal));
 			this.addElement(new SlotGrid(this, 7, 83, 9, 3, SlotGrid.SlotStyle.Normal));
 			this.addElement(new SlotGrid(this, 7, 141, 9, 1, SlotGrid.SlotStyle.Normal));

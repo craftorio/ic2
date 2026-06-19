@@ -4,7 +4,6 @@ import ic2.api.item.ElectricItem;
 import ic2.api.item.HudMode;
 import ic2.api.item.IItemHudProvider;
 import ic2.core.IC2;
-import ic2.core.init.Localization;
 import ic2.core.util.KeyboardClient;
 import ic2.core.util.StackUtil;
 import net.minecraft.core.BlockPos;
@@ -13,7 +12,6 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.network.chat.Component;
@@ -47,7 +45,7 @@ public class ItemArmorNanoSuit extends ItemArmorElectric implements IItemHudProv
 		return 0.9;
 	}
 
-	public boolean absorbFall(ItemStack stack, LivingEntity entity, float distance)
+	public boolean absorbFall(ItemStack stack, float distance)
 	{
 		int fallDamage = Math.max((int) distance - 3, 0);
 		if (fallDamage >= 8)
@@ -108,32 +106,41 @@ public class ItemArmorNanoSuit extends ItemArmorElectric implements IItemHudProv
 					if (IC2.sideProxy.isSimulating())
 					{
 						nbtData.putShort("hud_mode", hubmode);
-						IC2.sideProxy.messagePlayer(player, Localization.translate(HudMode.getFromID(hubmode).getTranslationKey()));
+						IC2.sideProxy.messagePlayer(player, Component.translatable(HudMode.getFromID(hubmode).getTranslationKey()).getString());
 					}
 				}
 
-				if (IC2.sideProxy.isSimulating() && toggleTimer > 0)
-				{
-					nbtData.putByte("toggle_timer", --toggleTimer);
-				}
-
-				if (isNightVisionEnabled && IC2.sideProxy.isSimulating() && ElectricItem.manager.use(stack, 1.0, player))
-				{
-					int skylight = player.getCommandSenderWorld().getMaxLocalRawBrightness(BlockPos.containing(player.position()));
-					if (skylight > 8)
-					{
-						player.removeEffect(MobEffects.NIGHT_VISION);
-						player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 100, 0, true, true));
-					}
-					else
-					{
-						player.removeEffect(MobEffects.BLINDNESS);
-						player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 300, 0, true, true));
-					}
-
-					ret = true;
-				}
+				getNightVisionOrNot(stack, player, nbtData, toggleTimer, isNightVisionEnabled);
 			}
+		}
+	}
+
+	static void getNightVisionOrNot(@NotNull ItemStack stack, Player player, CompoundTag nbtData, byte toggleTimer, boolean isNightVisionEnabled)
+	{
+		if (IC2.sideProxy.isSimulating() && toggleTimer > 0)
+		{
+			nbtData.putByte("toggle_timer", --toggleTimer);
+		}
+
+		if (isNightVisionEnabled && IC2.sideProxy.isSimulating() && ElectricItem.manager.use(stack, 1.0, player))
+		{
+			int skylight = player.getCommandSenderWorld().getMaxLocalRawBrightness(BlockPos.containing(player.position()));
+			affectPlayer(player, skylight);
+
+		}
+	}
+
+	static void affectPlayer(Player player, int skylight)
+	{
+		if (skylight > 8)
+		{
+			player.removeEffect(MobEffects.NIGHT_VISION);
+			player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 100, 0, true, true));
+		}
+		else
+		{
+			player.removeEffect(MobEffects.BLINDNESS);
+			player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 300, 0, true, true));
 		}
 	}
 

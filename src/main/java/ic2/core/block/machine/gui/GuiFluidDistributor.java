@@ -5,7 +5,6 @@ import ic2.core.IC2;
 import ic2.core.Ic2Gui;
 import ic2.core.block.machine.container.ContainerFluidDistributor;
 import ic2.core.gui.TankGauge;
-import ic2.core.init.Localization;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
@@ -22,9 +21,9 @@ public class GuiFluidDistributor extends Ic2Gui<ContainerFluidDistributor>
 	protected void drawForegroundLayer(GuiGraphics guiGraphics, int mouseX, int mouseY)
 	{
 		super.drawForegroundLayer(guiGraphics, mouseX, mouseY);
-		this.drawString(guiGraphics, 116, 47, Localization.translate("ic2.FluidDistributor.gui.mode.info"), 5752026);
+		this.drawString(guiGraphics, 116, 47, Component.translatable("ic2.fluid_distributor.gui.mode.info").getString(), 5752026);
 
-		String drawnString = this.menu.base.getActive() ? Localization.translate("ic2.FluidDistributor.gui.mode.concentrate") : Localization.translate("ic2.FluidDistributor.gui.mode.distribute");
+		String drawnString = this.menu.base.getActive() ? Component.translatable("ic2.fluid_distributor.gui.mode.concentrate").getString() : Component.translatable("ic2.fluid_distributor.gui.mode.distribute").getString();
 		this.drawString(guiGraphics, 99, 71, drawnString, 5752026);
 	}
 

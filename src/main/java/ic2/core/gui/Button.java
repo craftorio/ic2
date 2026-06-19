@@ -2,18 +2,17 @@ package ic2.core.gui;
 
 import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.Ic2Gui;
-import ic2.core.init.Localization;
 import ic2.core.proxy.SideProxyClient;
 
 import java.util.function.Supplier;
 
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.ItemStack;
 
 public abstract class Button<T extends Button<T>> extends GuiElement<T>
 {
-	private static final int iconSize = 16;
 	private final IClickHandler handler;
 	private Supplier<String> textProvider;
 	private Supplier<ItemStack> iconProvider;
@@ -26,13 +25,7 @@ public abstract class Button<T extends Button<T>> extends GuiElement<T>
 
 	public T withText(String text)
 	{
-		return this.withText(new Supplier<String>()
-		{
-			public String get()
-			{
-				return text;
-			}
-		});
+		return this.withText(() -> text);
 	}
 
 	public T withText(Supplier<String> textProvider)
@@ -60,13 +53,13 @@ public abstract class Button<T extends Button<T>> extends GuiElement<T>
 			String text = this.textProvider.get();
 			if (text != null && !text.isEmpty())
 			{
-				text = Localization.translate(text);
+				text = Component.translatable(text).getString();
 				this.gui.drawXYCenteredString(guiGraphics, this.x + this.width / 2, this.y + this.height / 2, text, this.getTextColor(mouseX, mouseY), true);
 			}
 		} else if (this.iconProvider != null)
 		{
 			ItemStack stack = this.iconProvider.get();
-			if (stack != null && stack.getItem() != null)
+			if (stack != null)
 			{
 				this.gui.drawItem(this.x + (this.width - 16) / 2, this.y + (this.height - 16) / 2, stack);
 			}

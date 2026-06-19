@@ -148,7 +148,7 @@ final class DynamicBeModelForge extends DynamicBeModel<List<List<BakedQuad>>> im
 	@Override
 	public TextureAtlasSprite getParticleIcon()
 	{
-		return null;
+		return this.baseModel.getParticleIcon();
 	}
 
 	private static List<BakedQuad> getObscuredQuads(Obscuration.ObscurationData data, Direction targetFace)
@@ -247,12 +247,12 @@ final class DynamicBeModelForge extends DynamicBeModel<List<List<BakedQuad>>> im
 		for (int v = 0; v < 4; v++)
 		{
 			int off = v * stride + 3;
-			int argb = oldData[off];
-			int a = (argb >>> 24) & 0xFF;
-			int nr = (int) (((argb >>> 16) & 0xFF) * r);
-			int ng = (int) (((argb >>> 8) & 0xFF) * g);
-			int nb = (int) ((argb & 0xFF) * b);
-			newData[off] = (a << 24) | (nr << 16) | (ng << 8) | nb;
+			int packedColor = oldData[off];
+			int a = (packedColor >>> 24) & 0xFF;
+			int red = (int) ((packedColor & 0xFF) * r);
+			int green = (int) (((packedColor >>> 8) & 0xFF) * g);
+			int blue = (int) (((packedColor >>> 16) & 0xFF) * b);
+			newData[off] = (a << 24) | (blue << 16) | (green << 8) | red;
 		}
 
 		return new BakedQuad(newData, quad.getTintIndex(), quad.getDirection(), quad.getSprite(), quad.isShade());

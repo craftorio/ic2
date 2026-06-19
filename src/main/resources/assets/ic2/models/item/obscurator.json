@@ -1,6 +1,5 @@
 {
-  "parent": "ic2:item/default",
-  "textures": {
-    "layer0": "ic2:item/tool/electric/obscurator"
-  }
+  "loader": "ic2:mask_overlay",
+  "base": "ic2:item/obscurator_raw",
+  "mask": "ic2:item/tool/electric/obscurator_mask"
 }

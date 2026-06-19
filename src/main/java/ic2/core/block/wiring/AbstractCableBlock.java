@@ -293,6 +293,11 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 		}
 	}
 
+	public double getLoss()
+	{
+		return this.type.loss;
+	}
+
 	public boolean hasColor()
 	{
 		return this.hasColor;

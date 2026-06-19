@@ -364,6 +364,7 @@
 	"ic2.crop_analyzer.crop_weed_extra": "杂草：%s/100",
 	"ic2.crop_analyzer.crop.growth_points": "作物生长点数：%s/%s",
 	"ic2.crop.seeds": "种子袋",
+	"ic2.crop.acorns": "深色橡树树苗",
 	"item.ic2.uu_matter_bucket": "UU物质桶",
 	"item.ic2.construction_foam_bucket": "建筑泡沫桶",
 	"item.ic2.coolant_bucket": "冷却液桶",
@@ -1124,5 +1125,19 @@
 	"advancements.ic2.terraform_end_cultivation.desc": "将末地转化为现实世界的模样",
 	"ic2.item.tooltip.Output": "输出: %s EU/t",
 	"ic2.item.tooltip.Capacity": "容量: %s EU",
-	"ic2.item.tooltip.Store": "存储: %s EU"
+	"ic2.item.tooltip.Store": "存储: %s EU",
+	"item.ic2.copper_cable.tooltip": "流失量：%s EU/t",
+	"item.ic2.insulated_copper_cable.tooltip": "流失量：%s EU/t",
+	"item.ic2.glass_fibre_cable.tooltip": "流失量：%s EU/t",
+	"item.ic2.gold_cable.tooltip": "流失量：%s EU/t",
+	"item.ic2.insulated_gold_cable.tooltip": "流失量：%s EU/t",
+	"item.ic2.double_insulated_gold_cable.tooltip": "流失量：%s EU/t",
+	"item.ic2.iron_cable.tooltip": "流失量：%s EU/t",
+	"item.ic2.insulated_iron_cable.tooltip": "流失量：%s EU/t",
+	"item.ic2.double_insulated_iron_cable.tooltip": "流失量：%s EU/t",
+	"item.ic2.triple_insulated_iron_cable.tooltip": "流失量：%s EU/t",
+	"item.ic2.tin_cable.tooltip": "流失量：%s EU/t",
+	"item.ic2.insulated_tin_cable.tooltip": "流失量：%s EU/t",
+	"item.ic2.detector_cable.tooltip": "流失量：%s EU/t",
+	"item.ic2.splitter_cable.tooltip": "流失量：%s EU/t"
 }

@@ -1,6 +1,5 @@
 package ic2.core.item.tool;
 
-import com.google.common.collect.UnmodifiableIterator;
 import ic2.api.item.IBoxable;
 import ic2.core.IC2;
 import ic2.core.ref.Ic2Items;
@@ -12,7 +11,6 @@ import ic2.core.util.VanillaColorBlockId;
 import java.util.List;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -41,6 +39,7 @@ import net.minecraft.world.level.block.WallBannerBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
 public class ItemToolPainter extends ItemToolCrafting implements IBoxable
@@ -205,7 +204,7 @@ public class ItemToolPainter extends ItemToolCrafting implements IBoxable
 				return true;
 			} else
 			{
-				ResourceLocation identifier = BuiltInRegistries.BLOCK.getKey(block);
+				ResourceLocation identifier = ForgeRegistries.BLOCKS.getKey(block);
 				if (identifier.getNamespace().equals("minecraft") && identifier.getPath().contains("concrete"))
 				{
 					world.setBlockAndUpdate(pos, getColorBlockState(color.dyeColor, VanillaColorBlockId.CONCRETE));
@@ -220,23 +219,23 @@ public class ItemToolPainter extends ItemToolCrafting implements IBoxable
 
 	public static boolean canColor(Block block, DyeColor color)
 	{
-		ResourceLocation identifier = BuiltInRegistries.BLOCK.getKey(block);
+		ResourceLocation identifier = ForgeRegistries.BLOCKS.getKey(block);
 		return !identifier.getPath().contains(color.getName());
 	}
 
 	public static BlockState getColorBlockState(DyeColor color, VanillaColorBlockId vanillaColorBlock)
 	{
-		ResourceLocation identifier = ResourceLocation.fromNamespaceAndPath("minecraft", color.getName() + "_" + vanillaColorBlock.id);
-		return BuiltInRegistries.BLOCK.get(identifier).defaultBlockState();
+		ResourceLocation identifier = ResourceLocation.withDefaultNamespace(color.getName() + "_" + vanillaColorBlock.id);
+		return ForgeRegistries.BLOCKS.getValue(identifier).defaultBlockState();
 	}
 
 	public static BlockState getBlockStateWithProperties(DyeColor color, VanillaColorBlockId vanillaColorBlock, BlockState state)
 	{
-		ResourceLocation identifier = ResourceLocation.fromNamespaceAndPath("minecraft", color.getName() + "_" + vanillaColorBlock.id);
-		return BuiltInRegistries.BLOCK.get(identifier).withPropertiesOf(state);
+		ResourceLocation identifier = ResourceLocation.withDefaultNamespace(color.getName() + "_" + vanillaColorBlock.id);
+		return ForgeRegistries.BLOCKS.getValue(identifier).withPropertiesOf(state);
 	}
 
-	public InteractionResult interactLivingEntity(ItemStack stack, Player user, LivingEntity entity, InteractionHand hand)
+	public @NotNull InteractionResult interactLivingEntity(@NotNull ItemStack stack, @NotNull Player user, LivingEntity entity, InteractionHand hand)
 	{
 		if (this.color == null)
 		{
@@ -252,7 +251,7 @@ public class ItemToolPainter extends ItemToolCrafting implements IBoxable
 		}
 	}
 
-	public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand)
+	public InteractionResultHolder<ItemStack> use(Level world, @NotNull Player player, InteractionHand hand)
 	{
 		ItemStack stack = StackUtil.get(player, hand);
 		if (!world.isClientSide && IC2.keyboard.isModeSwitchKeyDown(player))

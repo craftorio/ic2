@@ -77,8 +77,7 @@ public class GuiScanner extends Ic2Gui<ContainerScanner>
 				this.drawString(guiGraphics, 105, 36, Util.toSiString(te.patternEu, 4) + "EU", 16777215);
 		}
 	}
-
-	// TODO: 模式扫描机
+	
 	@Override
 	protected void renderBg(GuiGraphics guiGraphics, float delta, int mouseX, int mouseY)
 	{

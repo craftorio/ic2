@@ -32,7 +32,7 @@ public class GuiCropAnalyzer extends Ic2Gui<ContainerAnalyzer>
 
 		if (scannedLevel >= 1)
 		{
-			this.drawString(guiGraphics, 8, 37, Component.translatable(analyzer.getSeedName()).toString(), 0xFFFFFF);
+			this.drawString(guiGraphics, 8, 37, Component.translatable(analyzer.getSeedName()).getString(), 0xFFFFFF);
 		}
 
 		if (scannedLevel >= 2)

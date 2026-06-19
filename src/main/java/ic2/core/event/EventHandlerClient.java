@@ -8,6 +8,7 @@ import ic2.core.IC2;
 import ic2.core.block.comp.Energy;
 import ic2.core.block.tileentity.Ic2TileEntity;
 import ic2.core.block.tileentity.Ic2TileEntityBlock;
+import ic2.core.block.wiring.AbstractCableBlock;
 import ic2.core.block.wiring.tileentity.TileEntityElectricBlock;
 import ic2.core.fluid.FluidHandler;
 import ic2.core.item.IHandHeldInventory;
@@ -32,6 +33,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
@@ -175,6 +177,11 @@ public class EventHandlerClient
 					out.add(Component.translatable("ic2.item.tooltip.Store", (long) stored));
 				}
 			}
+		}
+		else if (stack.getItem() instanceof BlockItem blockItem && blockItem.getBlock() instanceof AbstractCableBlock cableBlock)
+		{
+			ResourceLocation rl = ForgeRegistries.ITEMS.getKey(blockItem);
+			out.add(Component.translatable("item.ic2." + rl.getPath() + ".tooltip", cableBlock.getLoss()).withStyle(ChatFormatting.GRAY));
 		}
 	}
 

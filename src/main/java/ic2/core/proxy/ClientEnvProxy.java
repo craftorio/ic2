@@ -75,12 +75,12 @@ public interface ClientEnvProxy
 
 			for (int j = 0; j < 3; j++)
 			{
-				positions[i * 4 + j] = Float.intBitsToFloat(data[offset + posOffset + j]);
+				positions[i * 3 + j] = Float.intBitsToFloat(data[offset + posOffset + j]);
 			}
 
 			for (int j = 0; j < 2; j++)
 			{
-				uvs[i * 4 + j] = Float.intBitsToFloat(data[offset + uvOffset + j]);
+				uvs[i * 2 + j] = Float.intBitsToFloat(data[offset + uvOffset + j]);
 			}
 		}
 

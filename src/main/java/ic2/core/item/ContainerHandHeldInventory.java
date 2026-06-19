@@ -32,12 +32,12 @@ public class ContainerHandHeldInventory<T extends HandHeldInventory> extends Con
 			case THROW:
 				if (slot >= 0 && slot < this.slots.size())
 				{
-					stack = ((Slot) this.slots.get(slot)).getItem();
+					stack = this.slots.get(slot).getItem();
 					closeGUI = this.base.isThisContainer(stack);
 				}
 				break;
 			case QUICK_MOVE:
-				if (slot >= 0 && slot < this.slots.size() && this.base.isThisContainer(((Slot) this.slots.get(slot)).getItem()))
+				if (slot >= 0 && slot < this.slots.size() && this.base.isThisContainer(this.slots.get(slot).getItem()))
 				{
 					return;
 				}
@@ -49,13 +49,13 @@ public class ContainerHandHeldInventory<T extends HandHeldInventory> extends Con
 				int newSlot = -1;
 				if (this.base.isThisContainer(player.getInventory().getItem(button)))
 				{
-					Slot targetSlot = (Slot) this.slots.get(slot);
+					Slot targetSlot = this.slots.get(slot);
 					int targetIdx = targetSlot.getContainerSlot();
 					if (targetSlot.container == player.getInventory() && targetIdx >= 0 && targetIdx < 9)
 					{
 						newSlot = targetIdx;
 					}
-				} else if (this.base.isThisContainer(((Slot) this.slots.get(slot)).getItem()))
+				} else if (this.base.isThisContainer(this.slots.get(slot).getItem()))
 				{
 					newSlot = button;
 				}
@@ -72,9 +72,8 @@ public class ContainerHandHeldInventory<T extends HandHeldInventory> extends Con
 		super.clicked(slot, button, type, player);
 		if (closeGUI && !player.getCommandSenderWorld().isClientSide)
 		{
-			assert stack != null;
 			this.base.saveAsThrown(stack);
-			((ServerPlayer) player).closeContainer();
+			player.closeContainer();
 		} else if (type == ClickType.CLONE)
 		{
 			ItemStack held = this.getCarried();

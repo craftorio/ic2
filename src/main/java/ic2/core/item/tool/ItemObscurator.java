@@ -15,7 +15,6 @@ import ic2.core.util.Util;
 import ic2.core.util.Vector3;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
@@ -30,7 +29,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Item.Properties;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -38,8 +36,6 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class ItemObscurator extends BaseElectricItem implements PriorityUsableItem, IPlayerItemDataListener
 {
-	private final int scanOperationCost = 20000;
-	private final int printOperationCost = 5000;
 	private static final int[] noTint = new int[] { -1 };
 	private static final int[] zeroTint = new int[] { 0 };
 	private static final int[] defaultColorMultiplier = new int[] { 16777215 };
@@ -48,14 +44,6 @@ public class ItemObscurator extends BaseElectricItem implements PriorityUsableIt
 	public ItemObscurator(Properties settings)
 	{
 		super(settings, 100000.0, 250.0, 2);
-	}
-
-	@Override
-	public List<String> getHudInfo(ItemStack stack, boolean advanced)
-	{
-		List<String> info = new LinkedList<>();
-		info.add(ElectricItem.manager.getToolTip(stack));
-		return info;
 	}
 
 	@Override
@@ -151,7 +139,7 @@ public class ItemObscurator extends BaseElectricItem implements PriorityUsableIt
 				{
 					if (data[3] instanceof int[])
 					{
-						ItemStack stack = (ItemStack) player.getInventory().items.get(slot);
+						ItemStack stack = player.getInventory().items.get(slot);
 						if (ElectricItem.manager.use(stack, 20000.0, player))
 						{
 							CompoundTag nbt = StackUtil.getOrCreateNbtData(stack);
@@ -229,6 +217,7 @@ public class ItemObscurator extends BaseElectricItem implements PriorityUsableIt
 		nbt.remove("refColorMul");
 	}
 
+	// TODO
 	public static ItemObscurator.ObscuredRenderInfo getRenderInfo(BlockState state, Direction side)
 	{
 		if (ItemBlockRenderTypes.getChunkRenderType(state) == RenderType.translucent())
@@ -237,12 +226,13 @@ public class ItemObscurator extends BaseElectricItem implements PriorityUsableIt
 		}
 
 		BakedModel model = ModelUtil.getBlockModel(state);
-		if (model == null)
-		{
-			return null;
-		}
 
 		RandomSource rand = RandomSource.create(42L);
+		// @Nullable BlockState state,
+		//    @Nullable Direction side,
+		//    @NotNull RandomSource rand,
+		//    @NotNull ModelData data,
+		//    @Nullable RenderType renderType
 		List<BakedQuad> faceQuads = model.getQuads(state, side, rand);
 		if (faceQuads.isEmpty())
 		{
@@ -264,14 +254,12 @@ public class ItemObscurator extends BaseElectricItem implements PriorityUsableIt
 			int xS = (dx + 1) / 2;
 			int yS = (dy + 1) / 2;
 			int zS = (dz + 1) / 2;
-			int vertices = 4;
-			int positionElements = 3;
 			int firstVertex = -1;
 
 			for (int v = 0; v < 4; v++)
 			{
 				int vo = v * 3;
-				if (Util.isSimilar(positions[vo + 0], xS) && Util.isSimilar(positions[vo + 1], yS) && Util.isSimilar(positions[vo + 2], zS))
+				if (Util.isSimilar(positions[vo], xS) && Util.isSimilar(positions[vo + 1], yS) && Util.isSimilar(positions[vo + 2], zS))
 				{
 					firstVertex = v;
 					break;

@@ -289,7 +289,7 @@ public final class Util
 		} else
 		{
 			// TODO
-			return getBlock(ResourceLocation.withDefaultNamespace(name));
+			return getBlock(ResourceLocation.parse(name));
 		}
 	}
 

@@ -2,13 +2,11 @@ package ic2.core.item.tool;
 
 import ic2.api.item.ElectricItem;
 import ic2.api.item.IBoxable;
-import ic2.core.IC2;
 import ic2.core.IHasGui;
 import ic2.core.item.BaseElectricItem;
 import ic2.core.item.IHandHeldInventory;
 import ic2.core.ref.Ic2SoundEvents;
 import ic2.core.util.ItemComparableItemStack;
-import ic2.core.util.LogCategory;
 import ic2.core.util.StackUtil;
 import ic2.core.util.Tuple;
 

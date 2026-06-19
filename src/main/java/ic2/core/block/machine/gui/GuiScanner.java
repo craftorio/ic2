@@ -78,6 +78,7 @@ public class GuiScanner extends Ic2Gui<ContainerScanner>
 		}
 	}
 
+	// TODO: 模式扫描机
 	@Override
 	protected void renderBg(GuiGraphics guiGraphics, float delta, int mouseX, int mouseY)
 	{
@@ -87,6 +88,7 @@ public class GuiScanner extends Ic2Gui<ContainerScanner>
 		int scanning = te.getSubPercentageDoneScaled(66);
 		if (scanning > 0)
 		{
+			// x, y, width, height, texture_x, y(yes)
 			this.drawTexturedRect(guiGraphics.pose(), 30, 20, 176.0, 14.0, scanning, 43.0);
 		}
 	}

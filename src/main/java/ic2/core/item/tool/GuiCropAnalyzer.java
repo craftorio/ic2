@@ -25,9 +25,6 @@ public class GuiCropAnalyzer extends Ic2Gui<ContainerAnalyzer>
 		super.drawForegroundLayer(guiGraphics, mouseX, mouseY);
 		HandHeldCropAnalyzer analyzer = this.getContainer().base;
 		int scannedLevel = analyzer.getScannedLevel();
-
-		this.drawString(guiGraphics, 74, 11, Component.translatable(Ic2Items.CROP_SEED_BACK.getDescriptionId()).getString(), 0x404040);
-
 		if (scannedLevel == 0)
 		{
 			this.drawString(guiGraphics, 8, 37, "UNKNOWN", 0xFFFFFF);
@@ -35,7 +32,7 @@ public class GuiCropAnalyzer extends Ic2Gui<ContainerAnalyzer>
 
 		if (scannedLevel >= 1)
 		{
-			this.drawString(guiGraphics, 8, 37, analyzer.getSeedName(), 0xFFFFFF);
+			this.drawString(guiGraphics, 8, 37, Component.translatable(analyzer.getSeedName()).toString(), 0xFFFFFF);
 		}
 
 		if (scannedLevel >= 2)
@@ -57,7 +54,7 @@ public class GuiCropAnalyzer extends Ic2Gui<ContainerAnalyzer>
 			this.drawString(guiGraphics, 118, 50, Integer.toString(analyzer.getSeedGrowth()), 0xAE26E6);
 			this.drawString(guiGraphics, 118, 73, "Gain:", 0xEEC900);
 			this.drawString(guiGraphics, 118, 86, Integer.toString(analyzer.getSeedGain()), 0xEEC900);
-			this.drawString(guiGraphics, 118, 109, "Resis.:", 0x00CED1);
+			this.drawString(guiGraphics, 118, 109, "Resistance:", 0x00CED1);
 			this.drawString(guiGraphics, 118, 122, Integer.toString(analyzer.getSeedResistance()), 0x00CED1);
 		}
 	}

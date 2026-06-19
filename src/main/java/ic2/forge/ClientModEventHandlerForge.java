@@ -88,6 +88,7 @@ public final class ClientModEventHandlerForge
 		}
 	}
 
+	// TODO
 	@SubscribeEvent
 	public void onClientSetup(FMLClientSetupEvent event)
 	{

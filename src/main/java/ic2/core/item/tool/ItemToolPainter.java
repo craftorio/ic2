@@ -12,7 +12,6 @@ import ic2.core.util.VanillaColorBlockId;
 import java.util.List;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -27,7 +26,6 @@ import net.minecraft.world.entity.animal.Sheep;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Item.Properties;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BannerBlock;
@@ -43,11 +41,11 @@ import net.minecraft.world.level.block.WallBannerBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
+import org.jetbrains.annotations.NotNull;
 
 public class ItemToolPainter extends ItemToolCrafting implements IBoxable
 {
-	Ic2Color color = null;
-	private static final int maxDamage = 32;
+	Ic2Color color;
 
 	public ItemToolPainter(Properties settings, Ic2Color color)
 	{
@@ -55,7 +53,7 @@ public class ItemToolPainter extends ItemToolCrafting implements IBoxable
 		this.color = color;
 	}
 
-	public InteractionResult useOn(UseOnContext context)
+	public @NotNull InteractionResult useOn(@NotNull UseOnContext context)
 	{
 		if (this.color == null)
 		{
@@ -77,7 +75,7 @@ public class ItemToolPainter extends ItemToolCrafting implements IBoxable
 		if (this.colorBlock(world, pos, block, state, this.color))
 		{
 			this.damagePainter(stack, player, hand, this.color);
-			if (world.isClientSide && player != null)
+			if (world.isClientSide)
 			{
 				player.playSound(Ic2SoundEvents.ITEM_PAINTER_USE, 1.0F, 1.0F);
 			}
@@ -92,18 +90,16 @@ public class ItemToolPainter extends ItemToolCrafting implements IBoxable
 	private boolean colorBlock(Level world, BlockPos pos, Block block, BlockState state, Ic2Color color)
 	{
 		DyeColor newColor = color.dyeColor;
-		UnmodifiableIterator tagList = state.getValues().keySet().iterator();
 
-		while (tagList.hasNext())
+		for (Property<?> value : state.getValues().keySet())
 		{
-			Property<?> property = (Property<?>) tagList.next();
+			Property<DyeColor> property = (Property<DyeColor>) value;
 			if (property.getValueClass() == DyeColor.class)
 			{
-				Property<DyeColor> typedProperty = (Property<DyeColor>) property;
-				DyeColor oldColor = (DyeColor) state.getValue(typedProperty);
-				if (oldColor != newColor && typedProperty.getPossibleValues().contains(newColor))
+				DyeColor oldColor = state.getValue(property);
+				if (oldColor != newColor && property.getPossibleValues().contains(newColor))
 				{
-					world.setBlockAndUpdate(pos, (BlockState) state.setValue(typedProperty, newColor));
+					world.setBlockAndUpdate(pos, state.setValue(property, newColor));
 					return true;
 				}
 
@@ -231,13 +227,13 @@ public class ItemToolPainter extends ItemToolCrafting implements IBoxable
 	public static BlockState getColorBlockState(DyeColor color, VanillaColorBlockId vanillaColorBlock)
 	{
 		ResourceLocation identifier = ResourceLocation.fromNamespaceAndPath("minecraft", color.getName() + "_" + vanillaColorBlock.id);
-		return ((Block) BuiltInRegistries.BLOCK.get(identifier)).defaultBlockState();
+		return BuiltInRegistries.BLOCK.get(identifier).defaultBlockState();
 	}
 
 	public static BlockState getBlockStateWithProperties(DyeColor color, VanillaColorBlockId vanillaColorBlock, BlockState state)
 	{
 		ResourceLocation identifier = ResourceLocation.fromNamespaceAndPath("minecraft", color.getName() + "_" + vanillaColorBlock.id);
-		return ((Block) BuiltInRegistries.BLOCK.get(identifier)).withPropertiesOf(state);
+		return BuiltInRegistries.BLOCK.get(identifier).withPropertiesOf(state);
 	}
 
 	public InteractionResult interactLivingEntity(ItemStack stack, Player user, LivingEntity entity, InteractionHand hand)

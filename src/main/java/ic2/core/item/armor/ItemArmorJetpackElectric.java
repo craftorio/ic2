@@ -18,7 +18,7 @@ public class ItemArmorJetpackElectric extends ItemArmorElectric implements IJetp
 {
 	public ItemArmorJetpackElectric()
 	{
-		super(Ic2ArmorMaterials.JET_PACK, EquipmentSlot.CHEST, new Properties(), 30000.0, 60.0, 1);
+		super(Ic2ArmorMaterials.JET_PACK_ELECTRIC, EquipmentSlot.CHEST, new Properties(), 30000.0, 60.0, 1);
 	}
 
 	@Override

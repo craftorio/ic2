@@ -21,6 +21,7 @@ public enum Ic2ArmorMaterials implements ArmorMaterial
 	HAZMAT("ic2:ic2_hazmat", SoundEvents.ARMOR_EQUIP_LEATHER),
 	CF_PACK("ic2:ic2_cf_pack", SoundEvents.ARMOR_EQUIP_IRON),
 	JET_PACK("ic2:ic2_jet_pack", SoundEvents.ARMOR_EQUIP_IRON),
+	JET_PACK_ELECTRIC("ic2:ic2_jet_pack_electric", SoundEvents.ARMOR_EQUIP_IRON),
 	BAT_PACK("ic2:ic2_bat_pack", SoundEvents.ARMOR_EQUIP_IRON),
 	ADVANCED_BAT_PACK("ic2:ic2_advanced_bat_pack", SoundEvents.ARMOR_EQUIP_IRON),
 	ENERGY_PACK("ic2:ic2_energy_pack", SoundEvents.ARMOR_EQUIP_IRON),

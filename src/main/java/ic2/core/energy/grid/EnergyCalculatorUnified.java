@@ -32,6 +32,7 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
@@ -453,7 +454,8 @@ public class EnergyCalculatorUnified implements IEnergyCalculator
 						conductors.addAll(pathToHere);
 						conductors.addAll(optLink.skippedNodes);
 						conductors.addAll(cPath.conductors);
-						paths.put(tile, new EnergyPath(srcNode, cPath.target, conductors, cLoss));
+						Direction targetDir = cPath.conductors.isEmpty() ? cPath.targetDirection : null;
+						paths.put(tile, new EnergyPath(srcNode, cPath.target, conductors, cLoss, targetDir));
 					}
 				}
 			}

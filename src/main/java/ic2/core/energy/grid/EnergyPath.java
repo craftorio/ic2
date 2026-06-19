@@ -32,12 +32,23 @@ class EnergyPath
 
 	EnergyPath(Node source, Node target, List<Node> conductors, double loss)
 	{
+		this(source, target, conductors, loss, null);
+	}
+
+	EnergyPath(Node source, Node target, List<Node> conductors, double loss, Direction knownTargetDirection)
+	{
 		this.source = source;
 		this.target = target;
 		this.conductors = conductors;
 		this.loss = loss;
-		NodeLink lastLink = conductors.isEmpty() ? source.getLinkTo(target) : target.getLinkTo(conductors.get(conductors.size() - 1));
-		this.targetDirection = lastLink.getDirFrom(target);
+		if (knownTargetDirection != null)
+		{
+			this.targetDirection = knownTargetDirection;
+		} else
+		{
+			NodeLink lastLink = conductors.isEmpty() ? source.getLinkTo(target) : target.getLinkTo(conductors.get(conductors.size() - 1));
+			this.targetDirection = lastLink != null ? lastLink.getDirFrom(target) : null;
+		}
 		int minX = Integer.MAX_VALUE;
 		int minY = Integer.MAX_VALUE;
 		int minZ = Integer.MAX_VALUE;

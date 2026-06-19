@@ -12,6 +12,7 @@
 	"ic2.hover_mode.disabled": "已关闭悬停",
 	"ic2.night_vision.mode.enabled": "已开启夜视",
 	"ic2.night_vision.mode.disabled": "已关闭夜视",
+	"effect.ic2.radiation": "辐射",
 	"fluid_type.ic2.uu_matter": "UU物质",
 	"fluid_type.ic2.construction_foam": "建筑泡沫",
 	"fluid_type.ic2.coolant": "冷却液",

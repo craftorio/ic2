@@ -85,10 +85,11 @@ public class ItemToolPainter extends ItemToolCrafting implements IBoxable
 		Block block = state.getBlock();
 		if (this.colorBlock(world, pos, block, state, this.color))
 		{
-			this.damagePainter(stack, player, hand, this.color);
+			boolean isDamaged = this.damagePainter(stack, player, hand, this.color);
 			if (world.isClientSide)
 			{
 				player.playSound(Ic2SoundEvents.ITEM_PAINTER_USE, 1.0F, 1.0F);
+				if (isDamaged) player.playSound(SoundEvents.ITEM_BREAK, 1.0F, 1.0F);
 			}
 
 			return InteractionResult.SUCCESS;
@@ -286,7 +287,7 @@ public class ItemToolPainter extends ItemToolCrafting implements IBoxable
 		}
 	}
 
-	public void damagePainter(ItemStack stack, Player player, InteractionHand hand, Ic2Color color)
+	public boolean damagePainter(ItemStack stack, Player player, InteractionHand hand, Ic2Color color)
 	{
 		assert color != null;
 		stack.hurt(1, player.getRandom(), player instanceof ServerPlayer ? (ServerPlayer) player : null);
@@ -296,20 +297,21 @@ public class ItemToolPainter extends ItemToolCrafting implements IBoxable
 			if (!nbtData.getBoolean("autoRefill"))
 			{
 				player.setItemInHand(hand, new ItemStack(Ic2Items.PAINTER, 1));
-				return;
+				return false;
 			}
 
 			ItemStack consumedStack = StackUtil.consumeFromPlayerInventoryAndGet(player, StackUtil.sameItem(stack.getItem()), 1, true);
 			if (consumedStack.isEmpty())
 			{
 				player.setItemInHand(hand, new ItemStack(Ic2Items.PAINTER, 1));
+				return true;
 			} else
 			{
 				player.setItemInHand(hand, consumedStack);
 				StackUtil.addToPlayerInventory(player, new ItemStack(Ic2Items.PAINTER, 1));
 			}
-			player.playSound(SoundEvents.ITEM_BREAK);
 		}
+		return false;
 	}
 
 	@Override

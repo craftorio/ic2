@@ -1,0 +1,19 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "AAA",
+    "ABA",
+    "AAA"
+  ],
+  "key": {
+    "A": {
+      "tag": "forge:gems/diamond"
+    },
+    "B": {
+      "item": "ic2:steel_cutting_blade"
+    }
+  },
+  "result": {
+    "item": "ic2:diamond_cutting_blade"
+  }
+}

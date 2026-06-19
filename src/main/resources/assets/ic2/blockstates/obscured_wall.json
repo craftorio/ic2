@@ -1,7 +1,7 @@
 {
   "variants": {
     "": {
-      "model": "ic2:block/cf/obscured_wall"
+      "model": "ic2:block/be/cf/obscured_wall"
     }
   }
 }

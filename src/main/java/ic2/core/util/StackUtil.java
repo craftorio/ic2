@@ -539,9 +539,9 @@ public final class StackUtil
 		return emptyStack;
 	}
 
-	public static boolean addToPlayerInventory(Player player, ItemStack stack)
+	public static void addToPlayerInventory(Player player, ItemStack stack)
 	{
-		return player.getInventory().add(stack);
+		player.getInventory().add(stack);
 	}
 
 	public static boolean consumeFromPlayerInventory(Player player, Predicate<ItemStack> request, int amount, boolean simulate)

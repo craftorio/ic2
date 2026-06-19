@@ -1,0 +1,21 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "ABA",
+    "ACA"
+  ],
+  "key": {
+    "A": {
+      "item": "ic2:carbon_plate"
+    },
+    "B": {
+      "item": "ic2:energy_crystal"
+    },
+    "C": {
+      "item": "ic2:night_vision_goggles"
+    }
+  },
+  "result": {
+    "item": "ic2:nano_helmet"
+  }
+}

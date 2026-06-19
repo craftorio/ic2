@@ -1,13 +1,16 @@
 package ic2.forge.model;
 
 import ic2.core.block.DynamicBeModel;
+import ic2.core.block.comp.Obscuration;
 import ic2.core.block.tileentity.Ic2TileEntity;
 import ic2.core.util.Util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
@@ -54,9 +57,35 @@ final class DynamicBeModelForge extends DynamicBeModel<List<List<BakedQuad>>> im
 
 	public @NotNull ModelData getModelData(@NotNull BlockAndTintGetter world, @NotNull BlockPos pos, @NotNull BlockState state, @NotNull ModelData tileData)
 	{
-		BlockEntity be;
+		BlockEntity be = null;
 		boolean active = this.block.canActive() && (be = world.getBlockEntity(pos)) instanceof Ic2TileEntity && ((Ic2TileEntity) be).getActive();
 		List<List<BakedQuad>> mesh = this.getMesh(state, active);
+
+		if (be instanceof Ic2TileEntity te)
+		{
+			Obscuration component = te.getComponent(Obscuration.class);
+			if (component != null)
+			{
+				Obscuration.ObscurationData[] data = component.getRenderState();
+				if (data != null)
+				{
+					mesh = new ArrayList<>(mesh);
+
+					for (int face = 0; face < 6; face++)
+					{
+						if (data[face] != null)
+						{
+							List<BakedQuad> obscured = getObscuredQuads(data[face], Util.ALL_DIRS[face]);
+							if (obscured != null)
+							{
+								mesh.set(face, obscured);
+							}
+						}
+					}
+				}
+			}
+		}
+
 		tileData = tileData.derive().with(MESH_DATA, mesh).build();
 		assert tileData.get(MESH_DATA) == mesh;
 		return tileData;
@@ -71,6 +100,8 @@ final class DynamicBeModelForge extends DynamicBeModel<List<List<BakedQuad>>> im
 	protected List<List<BakedQuad>> generateMesh(BakedModel baseModel, int rot, boolean rotX)
 	{
 		List<List<BakedQuad>> mesh = new ArrayList<>(7);
+
+		for (int i = 0; i < 7; i++) mesh.add(null);
 
 		for (int i = 0; i < 7; i++)
 		{
@@ -118,5 +149,112 @@ final class DynamicBeModelForge extends DynamicBeModel<List<List<BakedQuad>>> im
 	public TextureAtlasSprite getParticleIcon()
 	{
 		return null;
+	}
+
+	private static List<BakedQuad> getObscuredQuads(Obscuration.ObscurationData data, Direction targetFace)
+	{
+		BakedModel refModel = Minecraft.getInstance().getBlockRenderer().getBlockModelShaper().getBlockModel(data.state);
+		RandomSource rand = RandomSource.create(42L);
+		List<BakedQuad> refQuads = refModel.getQuads(data.state, data.side, rand, ModelData.EMPTY, null);
+
+		if (refQuads.isEmpty())
+		{
+			return null;
+		}
+
+		List<BakedQuad> result = new ArrayList<>(refQuads.size());
+
+		for (int i = 0; i < refQuads.size(); i++)
+		{
+			BakedQuad quad = refQuads.get(i);
+
+			if (data.side != targetFace)
+			{
+				quad = transformQuadFace(quad, data.side, targetFace);
+			}
+
+			if (data.colorMultipliers != null && i < data.colorMultipliers.length && data.colorMultipliers[i] != -1)
+			{
+				quad = tintQuad(quad, data.colorMultipliers[i]);
+			}
+
+			result.add(quad);
+		}
+
+		return result;
+	}
+
+	private static BakedQuad transformQuadFace(BakedQuad quad, Direction fromFace, Direction toFace)
+	{
+		int[] oldData = quad.getVertices();
+		int[] newData = Arrays.copyOf(oldData, oldData.length);
+		int stride = oldData.length >>> 2;
+
+		for (int v = 0; v < 4; v++)
+		{
+			int off = v * stride;
+			float x = Float.intBitsToFloat(oldData[off]);
+			float y = Float.intBitsToFloat(oldData[off + 1]);
+			float z = Float.intBitsToFloat(oldData[off + 2]);
+
+			float[] uv = posToUV(fromFace, x, y, z);
+			float[] newPos = uvToPos(toFace, uv[0], uv[1]);
+
+			newData[off] = Float.floatToRawIntBits(newPos[0]);
+			newData[off + 1] = Float.floatToRawIntBits(newPos[1]);
+			newData[off + 2] = Float.floatToRawIntBits(newPos[2]);
+		}
+
+		return new BakedQuad(newData, quad.getTintIndex(), toFace, quad.getSprite(), quad.isShade());
+	}
+
+	private static float[] posToUV(Direction face, float x, float y, float z)
+	{
+		return switch (face)
+		{
+			case NORTH -> new float[] { x, y };
+			case SOUTH -> new float[] { 1 - x, y };
+			case WEST -> new float[] { 1 - z, y };
+			case EAST -> new float[] { z, y };
+			case DOWN -> new float[] { x, 1 - z };
+			case UP -> new float[] { x, z };
+		};
+	}
+
+	private static float[] uvToPos(Direction face, float u, float v)
+	{
+		return switch (face)
+		{
+			case NORTH -> new float[] { u, v, 0 };
+			case SOUTH -> new float[] { 1 - u, v, 1 };
+			case WEST -> new float[] { 0, v, 1 - u };
+			case EAST -> new float[] { 1, v, u };
+			case DOWN -> new float[] { u, 0, 1 - v };
+			case UP -> new float[] { u, 1, v };
+		};
+	}
+
+	private static BakedQuad tintQuad(BakedQuad quad, int color)
+	{
+		int[] oldData = quad.getVertices();
+		int[] newData = Arrays.copyOf(oldData, oldData.length);
+		int stride = oldData.length >>> 2;
+
+		float r = ((color >>> 16) & 0xFF) / 255f;
+		float g = ((color >>> 8) & 0xFF) / 255f;
+		float b = (color & 0xFF) / 255f;
+
+		for (int v = 0; v < 4; v++)
+		{
+			int off = v * stride + 3;
+			int argb = oldData[off];
+			int a = (argb >>> 24) & 0xFF;
+			int nr = (int) (((argb >>> 16) & 0xFF) * r);
+			int ng = (int) (((argb >>> 8) & 0xFF) * g);
+			int nb = (int) ((argb & 0xFF) * b);
+			newData[off] = (a << 24) | (nr << 16) | (ng << 8) | nb;
+		}
+
+		return new BakedQuad(newData, quad.getTintIndex(), quad.getDirection(), quad.getSprite(), quad.isShade());
 	}
 }

@@ -28,25 +28,24 @@ import java.util.UUID;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ColumnPos;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.component.CustomData;
 
 public final class DataEncoder
 {
@@ -204,9 +203,9 @@ public final class DataEncoder
 				break;
 			case ChunkPos:
 			{
-				ColumnPos pos = (ColumnPos) o;
-				os.writeInt(pos.x());
-				os.writeInt(pos.z());
+				ChunkPos pos = (ChunkPos) o;
+				os.writeInt(pos.x);
+				os.writeInt(pos.z);
 				break;
 			}
 			case Collection:
@@ -236,12 +235,12 @@ public final class DataEncoder
 				{
 					encode(os, output.fluid, false);
 					os.writeInt(output.fluidAmount);
-					os.writeByte(output.tankDirection.get3DDataValue());
+					os.writeByte(output.tankDirection.ordinal());
 				}
 				break;
 			case Enchantment:
-				encode(os, BuiltInRegistries.ENCHANTMENT.getKey((Enchantment) o), false);
-				break;
+				throw new UnsupportedOperationException("Enchantment encoding not yet migrated to 1.21.1 data-driven enchantment system");
+			// break;
 			case Enum:
 				os.writeVarInt(((Enum<?>) o).ordinal());
 				break;
@@ -293,14 +292,14 @@ public final class DataEncoder
 				{
 					os.writeByte(StackUtil.getSize(stack));
 					encode(os, stack.getItem(), false);
-					encode(os, stack.getTag(), true);
+					encode(os, stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag(), true);
 				}
 				break;
 			case Long:
 				os.writeLong((Long) o);
 				break;
 			case NBTTagCompound:
-				NbtIo.write((CompoundTag) o, os);
+				NbtIo.writeUnnamedTag((CompoundTag) o, os);
 				break;
 			case Null:
 				if (!withType)
@@ -520,7 +519,7 @@ public final class DataEncoder
 			case Character:
 				return is.readChar();
 			case ChunkPos:
-				return new ColumnPos(is.readInt(), is.readInt());
+				return new ChunkPos(is.readInt(), is.readInt());
 			case Collection:
 			{
 				final Object ret = decode(is, DataEncoder.EncodedType.Array);
@@ -548,13 +547,14 @@ public final class DataEncoder
 				for (byte i = 0; i < max; i++)
 				{
 					outputs[i] = new IElectrolyzerRecipeManager.ElectrolyzerOutput(
-						(Fluid) decode(is, DataEncoder.EncodedType.Fluid), is.readInt(), Direction.from3DDataValue(is.readByte())
+						(Fluid) decode(is, DataEncoder.EncodedType.Fluid), is.readInt(), Direction.values()[is.readUnsignedByte()]
 					);
 				}
 
 				return new IElectrolyzerRecipeManager.ElectrolyzerRecipe(inputAmount, EUaTick, ticksNeeded, outputs);
 			case Enchantment:
-				return BuiltInRegistries.ENCHANTMENT.get((ResourceLocation) decode(is, DataEncoder.EncodedType.ResourceLocation));
+				throw new UnsupportedOperationException("Enchantment decoding not yet migrated to 1.21.1 data-driven enchantment system");
+			// return null;
 			case Enum:
 				return is.readVarInt();
 			case Float:
@@ -604,13 +604,13 @@ public final class DataEncoder
 				Item item = decode(is, Item.class);
 				CompoundTag nbt = (CompoundTag) decode(is);
 				ItemStack ret = new ItemStack(item, size);
-				ret.set(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.of(nbt));
+				ret.set(DataComponents.CUSTOM_DATA, CustomData.of(nbt));
 				return ret;
 			}
 			case Long:
 				return is.readLong();
 			case NBTTagCompound:
-				return NbtIo.read(is, NbtAccounter.UNLIMITED);
+				return NbtIo.read(is, NbtAccounter.unlimitedHeap());
 			case Null:
 				return null;
 			case Object:
@@ -666,7 +666,7 @@ public final class DataEncoder
 			if (srcT.getItem() == dstT.getItem())
 			{
 				dstT.setCount(srcT.getCount());
-				dstT.set(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.of(srcT.getTag()));
+				dstT.set(DataComponents.CUSTOM_DATA, CustomData.of(srcT.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag()));
 				return true;
 			} else
 			{
@@ -898,7 +898,7 @@ public final class DataEncoder
 		Potion(MobEffect.class),
 		Enchantment(Enchantment.class),
 		BlockPos(BlockPos.class),
-		ChunkPos(ColumnPos.class),
+		ChunkPos(ChunkPos.class),
 		Vec3(Vec3.class),
 		Fluid(Fluid.class),
 		FluidStack(Ic2FluidStack.class),

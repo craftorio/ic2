@@ -2,7 +2,6 @@ package ic2.core.util;
 
 import ic2.core.IC2;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -12,6 +11,7 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CoderResult;
 
 import org.apache.logging.log4j.Level;
+import org.jetbrains.annotations.NotNull;
 
 class LogOutputStream extends OutputStream
 {
@@ -36,14 +36,14 @@ class LogOutputStream extends OutputStream
 	}
 
 	@Override
-	public void write(int b) throws IOException
+	public void write(int b)
 	{
 		this.inputBuffer.put((byte) b);
 		this.runDecoder();
 	}
 
 	@Override
-	public void write(byte[] b, int off, int len) throws IOException
+	public void write(byte @NotNull [] b, int off, int len)
 	{
 		while (len > 0)
 		{
@@ -56,16 +56,16 @@ class LogOutputStream extends OutputStream
 	}
 
 	@Override
-	public void flush() throws IOException
+	public void flush()
 	{
 		this.runDecoder();
 	}
 
 	@Override
-	public void close() throws IOException
+	public void close()
 	{
 		this.flush();
-		if (this.output.length() > 0)
+		if (!this.output.isEmpty())
 		{
 			this.log.log(this.category, this.level, this.output.toString());
 			this.output.setLength(0);
@@ -73,7 +73,7 @@ class LogOutputStream extends OutputStream
 	}
 
 	@Override
-	protected void finalize() throws Throwable
+	protected void finalize()
 	{
 		if (this.inputBuffer.position() > 0)
 		{

@@ -91,7 +91,7 @@ public interface EnvProxy
 
 	SoundEvent registerSoundEvent(String var1);
 
-	GameEvent registerGameEvent(String var1, int var2);
+	Holder<GameEvent> registerGameEvent(String var1, int var2);
 
 	<FC extends FeatureConfiguration, F extends Feature<FC>> CompletableFuture<Holder<ConfiguredFeature<FC, ?>>> registerConfiguredFeature(
 		ResourceLocation var1, F var2, FC var3

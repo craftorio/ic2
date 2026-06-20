@@ -18,14 +18,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
+import net.minecraft.core.Holder;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -33,6 +33,7 @@ import net.minecraft.world.level.material.Fluid;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.component.CustomData;
 
 public class RecipeIo
 {
@@ -59,9 +60,9 @@ public class RecipeIo
 
 			if (object.has("nbt"))
 			{
-				Item item = GsonHelper.getAsItem(object, "item");
+				Holder<Item> item = GsonHelper.getAsItem(object, "item");
 				ItemStack stack = new ItemStack(item, count);
-				stack.setTag(asNbt(object.get("data"), "data"));
+				stack.set(DataComponents.CUSTOM_DATA, CustomData.of(asNbt(object.get("nbt"), "nbt")));
 				return new RecipeInputItemStack(stack);
 			}
 
@@ -77,7 +78,7 @@ public class RecipeIo
 			}
 		}
 
-		return new RecipeInputIngredient(Ingredient.fromJson(json), count);
+		return new RecipeInputIngredient(Ingredient.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow(), count);
 	}
 
 	private static RecipeInputMultiple parseMultiple(JsonArray array, int count)
@@ -147,22 +148,22 @@ public class RecipeIo
 
 	public static ItemStack parseOutput(JsonObject json)
 	{
-		Item item = GsonHelper.getAsItem(json, "item");
+		Holder<Item> item = GsonHelper.getAsItem(json, "item");
 		int count = GsonHelper.getAsInt(json, "count", 1);
 		CompoundTag nbt = getNbt(json, "nbt", null);
 		ItemStack stack = new ItemStack(item, count);
-		stack.set(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.of(nbt));
+		stack.set(DataComponents.CUSTOM_DATA, CustomData.of(nbt));
 		return stack;
 	}
 
 	public static void parseWeightedOutput(JsonObject json, RecipeOutputWeighted randomOutput)
 	{
-		Item item = GsonHelper.getAsItem(json, "item");
+		Holder<Item> item = GsonHelper.getAsItem(json, "item");
 		int count = GsonHelper.getAsInt(json, "count", 1);
 		int weight = GsonHelper.getAsInt(json, "weight", 1);
 		CompoundTag nbt = getNbt(json, "nbt", null);
 		ItemStack stack = new ItemStack(item, count);
-		stack.set(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.of(nbt));
+		stack.set(DataComponents.CUSTOM_DATA, CustomData.of(nbt));
 		randomOutput.addOutput(stack, weight);
 	}
 
@@ -199,48 +200,54 @@ public class RecipeIo
 		return json;
 	}
 
-	public static void writeInput(FriendlyByteBuf buf, IRecipeInput input)
+	public static void writeInput(RegistryFriendlyByteBuf buf, IRecipeInput input)
 	{
-		if (input instanceof RecipeInputFluidContainer fluidContainer)
+		switch (input)
 		{
-			buf.writeByte(0);
-			buf.writeVarInt(BuiltInRegistries.FLUID.getId(fluidContainer.fluid));
-			buf.writeVarInt(fluidContainer.amount);
-		} else if (input instanceof RecipeInputIngredient ingredient)
-		{
-			buf.writeByte(1);
-			ingredient.getIngredient().toNetwork(buf);
-			buf.writeVarInt(ingredient.getAmount());
-		} else if (input instanceof RecipeInputItemStack stack)
-		{
-			buf.writeByte(2);
-			buf.writeItem(stack.input);
-		} else
-		{
-			if (!(input instanceof RecipeInputMultiple mult))
+			case RecipeInputFluidContainer fluidContainer ->
 			{
-				throw new IllegalArgumentException("Unkown RecipeInput type: " + input.getClass().getName());
+				buf.writeByte(0);
+				buf.writeVarInt(BuiltInRegistries.FLUID.getId(fluidContainer.fluid));
+				buf.writeVarInt(fluidContainer.amount);
 			}
-
-			buf.writeByte(3);
-			buf.writeVarInt(mult.inputs.length);
-
-			for (IRecipeInput i : mult.inputs)
+			case RecipeInputIngredient ingredient ->
 			{
-				writeInput(buf, i);
+				buf.writeByte(1);
+				Ingredient.CONTENTS_STREAM_CODEC.encode(buf, ingredient.getIngredient());
+				buf.writeVarInt(ingredient.getAmount());
 			}
+			case RecipeInputItemStack stack ->
+			{
+				buf.writeByte(2);
+				ItemStack.STREAM_CODEC.encode(buf, stack.input);
+			}
+			case null, default ->
+			{
+				if (!(input instanceof RecipeInputMultiple mult))
+				{
+					throw new IllegalArgumentException("Unkown RecipeInput type: " + input.getClass().getName());
+				}
 
-			buf.writeVarInt(mult.getAmount());
+				buf.writeByte(3);
+				buf.writeVarInt(mult.inputs.length);
+
+				for (IRecipeInput i : mult.inputs)
+				{
+					writeInput(buf, i);
+				}
+
+				buf.writeVarInt(mult.getAmount());
+			}
 		}
 	}
 
-	public static IRecipeInput readInput(FriendlyByteBuf buf)
+	public static IRecipeInput readInput(RegistryFriendlyByteBuf buf)
 	{
 		return switch (buf.readByte())
 		{
 			case 0 -> new RecipeInputFluidContainer(BuiltInRegistries.FLUID.byId(buf.readVarInt()), buf.readVarInt());
-			case 1 -> new RecipeInputIngredient(Ingredient.fromNetwork(buf), buf.readVarInt());
-			case 2 -> new RecipeInputItemStack(buf.readItem());
+			case 1 -> new RecipeInputIngredient(Ingredient.CONTENTS_STREAM_CODEC.decode(buf), buf.readVarInt());
+			case 2 -> new RecipeInputItemStack(ItemStack.STREAM_CODEC.decode(buf));
 			case 3 ->
 			{
 				IRecipeInput[] inputs = new IRecipeInput[buf.readVarInt()];
@@ -256,68 +263,68 @@ public class RecipeIo
 		};
 	}
 
-	public static void writeOutput(FriendlyByteBuf buf, Collection<ItemStack> output)
+	public static void writeOutput(RegistryFriendlyByteBuf buf, Collection<ItemStack> output)
 	{
 		buf.writeVarInt(output.size());
 
 		for (ItemStack stack : output)
 		{
-			buf.writeItem(stack);
+			ItemStack.STREAM_CODEC.encode(buf, stack);
 		}
 	}
 
-	public static void writeIntegerOutput(FriendlyByteBuf buf, int output)
+	public static void writeIntegerOutput(RegistryFriendlyByteBuf buf, int output)
 	{
 		buf.writeInt(output);
 	}
 
-	public static void writeWeightedOutput(FriendlyByteBuf buf, RecipeOutputWeighted outputs)
+	public static void writeWeightedOutput(RegistryFriendlyByteBuf buf, RecipeOutputWeighted outputs)
 	{
 		buf.writeVarInt(outputs.getOutputs().size());
 		outputs.forEach((stack, weight) ->
 		{
-			buf.writeItem(stack);
+			ItemStack.STREAM_CODEC.encode(buf, stack);
 			buf.writeInt(weight);
 		});
 	}
 
-	public static Collection<ItemStack> readOutput(FriendlyByteBuf buf)
+	public static Collection<ItemStack> readOutput(RegistryFriendlyByteBuf buf)
 	{
 		int amount = buf.readVarInt();
 		List<ItemStack> stacks = new ArrayList<>(amount);
 
 		for (int i = 0; i < amount; i++)
 		{
-			stacks.add(buf.readItem());
+			stacks.add(ItemStack.STREAM_CODEC.decode(buf));
 		}
 
 		return stacks;
 	}
 
-	public static Integer readIntegerOutput(FriendlyByteBuf buf)
+	public static Integer readIntegerOutput(RegistryFriendlyByteBuf buf)
 	{
 		return buf.readInt();
 	}
 
-	public static RecipeOutputWeighted readWeightedOutput(FriendlyByteBuf buf, RecipeOutputWeighted outputs)
+	public static RecipeOutputWeighted readWeightedOutput(RegistryFriendlyByteBuf buf, RecipeOutputWeighted outputs)
 	{
 		int amount = buf.readVarInt();
 
 		for (int i = 0; i < amount; i++)
 		{
-			outputs.addOutput(buf.readItem(), buf.readInt());
+			outputs.addOutput(ItemStack.STREAM_CODEC.decode(buf), buf.readInt());
 		}
 
 		return outputs;
 	}
 
-	public static void writeFluidStack(FriendlyByteBuf buf, Ic2FluidStack stack)
+	public static void writeFluidStack(RegistryFriendlyByteBuf buf, Ic2FluidStack stack)
 	{
 		buf.writeVarInt(BuiltInRegistries.FLUID.getId(stack.getFluid()));
 		buf.writeVarInt(stack.getAmountMb());
 	}
 
-	public static Ic2FluidStack readFluidStack(FriendlyByteBuf buf)
+	public static Ic2FluidStack readFluidStack(RegistryFriendlyByteBuf buf)
 	{
 		return FluidHandler.createFluidStackMb(BuiltInRegistries.FLUID.byId(buf.readVarInt()), buf.readVarInt(), null);
 	}

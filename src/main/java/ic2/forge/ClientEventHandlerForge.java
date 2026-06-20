@@ -16,9 +16,6 @@ import net.neoforged.neoforge.client.event.sound.PlaySoundEvent;
 import net.neoforged.neoforge.client.event.sound.SoundEngineLoadEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.event.tick.ServerTickEvent;
-import net.neoforged.neoforge.event.tick.LevelTickEvent;
-import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.bus.api.EventPriority;
@@ -27,12 +24,9 @@ import net.neoforged.bus.api.SubscribeEvent;
 public final class ClientEventHandlerForge
 {
 	@SubscribeEvent
-	public void onClientTick(ClientTickEvent.Post event)
+	public void onClientTick(ClientTickEvent.Pre event)
 	{
-		if (event.phase == TickEvent.Phase.START)
-		{
-			TickHandler.onClientTick();
-		}
+		TickHandler.onClientTick();
 	}
 
 	@SubscribeEvent
@@ -82,7 +76,7 @@ public final class ClientEventHandlerForge
 	public void onDrawBlockHighlight(RenderHighlightEvent.Block event)
 	{
 		EventHandlerClient.onDrawBlockHighlight(
-			SideProxyClient.mc.player, event.getTarget(), event.getPartialTick(), event.getPoseStack(), event.getMultiBufferSource()
+			SideProxyClient.mc.player, event.getTarget(), event.getDeltaTracker().getGameTimeDeltaPartialTick(false), event.getPoseStack(), event.getMultiBufferSource()
 		);
 	}
 
@@ -90,7 +84,7 @@ public final class ClientEventHandlerForge
 	public void onDrawBlockHighlightLast(RenderHighlightEvent.Block event)
 	{
 		if (EventHandlerClient.onDrawBlockHighlightLast(
-			SideProxyClient.mc.player, event.getTarget(), event.getPartialTick(), event.getPoseStack(), event.getMultiBufferSource()
+			SideProxyClient.mc.player, event.getTarget(), event.getDeltaTracker().getGameTimeDeltaPartialTick(false), event.getPoseStack(), event.getMultiBufferSource()
 		))
 		{
 			event.setCanceled(true);
@@ -112,7 +106,7 @@ public final class ClientEventHandlerForge
 	@SubscribeEvent
 	public void onRenderHotBar(RenderGuiLayerEvent.Post event)
 	{
-		if (event.getOverlay() == VanillaGuiOverlay.HOTBAR.type())
+		if (event.getName().equals(VanillaGuiLayers.HOTBAR))
 		{
 			EventHandlerClient.onRenderHotBar();
 		}

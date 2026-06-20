@@ -1,6 +1,5 @@
 package ic2.core.block.kineticgenerator.gui;
 
-import com.google.common.base.Supplier;
 import ic2.core.Ic2Gui;
 import ic2.core.block.kineticgenerator.container.ContainerSteamKineticGenerator;
 import ic2.core.gui.Image;
@@ -10,6 +9,8 @@ import ic2.core.gui.dynamic.TextProvider;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+
+import java.util.function.Supplier;
 
 public class GuiSteamKineticGenerator extends Ic2Gui<ContainerSteamKineticGenerator>
 {
@@ -23,7 +24,6 @@ public class GuiSteamKineticGenerator extends Ic2Gui<ContainerSteamKineticGenera
 		this.addElement(Image.create(this, 110, 20, 30, 26, TEXTURE, 256, 256, 176, 0, 206, 26).withEnableHandler(() -> container.base.hasTurbine() && container.base.isThrottled()).withTooltip("ic2.SteamKineticGenerator.gui.condensationwarrning"));
 		this.addElement(TextLabel.create(this, 8, 51, 160, 13, TextProvider.of(new Supplier<>()
 		{
-			// TODO: What Supplier used? Google?
 			public String get()
 			{
 				return Component.translatable(this.getRaw()).getString();

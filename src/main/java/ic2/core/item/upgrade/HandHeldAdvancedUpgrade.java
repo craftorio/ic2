@@ -40,7 +40,7 @@ public class HandHeldAdvancedUpgrade extends HandHeldInventory implements IHolog
 
 	private static ItemStack checkContainerStack(Player player, ItemStack containerStack)
 	{
-		if (!player.getCommandSenderWorld().isClientSide
+		if (!player.level().isClientSide
 			&& player.containerMenu instanceof ContainerHandHeldInventory
 			&& ((ContainerHandHeldInventory) player.containerMenu).base instanceof HandHeldUpgradeOption)
 		{
@@ -67,8 +67,7 @@ public class HandHeldAdvancedUpgrade extends HandHeldInventory implements IHolog
 		super.save();
 		if (IC2.sideProxy.isSimulating())
 		{
-			CompoundTag nbt = this.containerStack.getTag();
-			assert nbt != null;
+			CompoundTag nbt = StackUtil.getOrCreateNbtData(this.containerStack);
 			writeTag(nbt, "meta", this.meta);
 			CompoundTag tag = getTag(nbt, "nbt");
 			tag.putBoolean("active", this.nbt.enabled());

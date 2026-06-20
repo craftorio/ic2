@@ -212,10 +212,10 @@ public class ItemToolPainter extends ItemToolCrafting implements IBoxable
 					return false;
 				}
 
-				CompoundTag shulkerNbt = shulkerBlockEntity.saveWithId();
+				CompoundTag shulkerNbt = shulkerBlockEntity.saveWithId(world.registryAccess());
 				BlockState newShulkerBoxState = ShulkerBoxBlock.getBlockByColor(color.dyeColor).withPropertiesOf(state);
 				world.setBlockAndUpdate(pos, newShulkerBoxState);
-				BlockEntity newShulkerBlockEntity = BlockEntity.loadStatic(pos, newShulkerBoxState, shulkerNbt);
+				BlockEntity newShulkerBlockEntity = BlockEntity.loadStatic(pos, newShulkerBoxState, shulkerNbt, world.registryAccess());
 				world.setBlockEntity(newShulkerBlockEntity);
 				return true;
 			} else
@@ -293,7 +293,7 @@ public class ItemToolPainter extends ItemToolCrafting implements IBoxable
 	public boolean damagePainter(ItemStack stack, Player player, InteractionHand hand, Ic2Color color)
 	{
 		assert color != null;
-		stack.hurt(1, player.getRandom(), player instanceof ServerPlayer ? (ServerPlayer) player : null);
+		stack.hurtAndBreak(1, player, hand == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND);
 		if (stack.getDamageValue() >= stack.getMaxDamage())
 		{
 			CompoundTag nbtData = StackUtil.getOrCreateNbtData(stack);

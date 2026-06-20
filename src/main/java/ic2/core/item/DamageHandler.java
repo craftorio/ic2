@@ -50,17 +50,16 @@ public class DamageHandler
 			return false;
 		} else if (src != null)
 		{
-			stack.hurtAndBreak(damage, src, player ->
-			{
-				if (hand != null)
-				{
-					player.onEquippedItemBroken(hand);
-				}
-			});
+			EquipmentSlot slot = hand == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
+			stack.hurtAndBreak(damage, src, slot);
 			return true;
 		} else
 		{
-			return stack.hurt(damage, IC2.random, src instanceof ServerPlayer ? (ServerPlayer) src : null);
+			if (stack.isDamageableItem())
+			{
+				stack.setDamageValue(stack.getDamageValue() + damage);
+			}
+			return true;
 		}
 	}
 }

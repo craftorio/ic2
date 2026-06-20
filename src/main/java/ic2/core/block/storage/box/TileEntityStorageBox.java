@@ -59,7 +59,7 @@ public abstract class TileEntityStorageBox extends TileEntityInventory implement
 		CompoundTag nbt = StackUtil.getOrCreateNbtData(drop);
 		if (!this.inventory.isEmpty())
 		{
-			this.inventory.writeToNbt(nbt);
+			this.inventory.writeToNbt(nbt, this.getLevel().registryAccess());
 		}
 
 		return drop;

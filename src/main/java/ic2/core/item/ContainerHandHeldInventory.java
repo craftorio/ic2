@@ -9,6 +9,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 
 public class ContainerHandHeldInventory<T extends HandHeldInventory> extends ContainerBase<T>
@@ -80,7 +81,9 @@ public class ContainerHandHeldInventory<T extends HandHeldInventory> extends Con
 			ItemStack held = this.getCarried();
 			if (this.base.isThisContainer(held))
 			{
-				held.getTag().remove("uid");
+				CompoundTag tag = held.getOrDefault(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.EMPTY).copyTag();
+				tag.remove("uid");
+				held.set(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.of(tag));
 			}
 		}
 	}

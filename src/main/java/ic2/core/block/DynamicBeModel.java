@@ -76,7 +76,7 @@ public abstract class DynamicBeModel<T> implements UnbakedModel, BakedModel
 		}
 	}
 
-	public BakedModel bake(ModelBaker loader, @NotNull Function<Material, TextureAtlasSprite> textureGetter, @NotNull ModelState rotationContainer, @NotNull ResourceLocation modelId)
+	public BakedModel bake(ModelBaker loader, @NotNull Function<Material, TextureAtlasSprite> textureGetter, @NotNull ModelState rotationContainer)
 	{
 		this.baseModel = loader.bake(this.backingModelId, rotationContainer, textureGetter);
 		if (this.baseModel == null)

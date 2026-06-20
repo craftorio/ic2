@@ -106,7 +106,7 @@ public abstract class DynamicCableModel<T, E> implements UnbakedModel, BakedMode
 		return new Material(atlas, IC2.getIdentifier(path));
 	}
 
-	public BakedModel bake(ModelBaker loader, Function<Material, TextureAtlasSprite> textureGetter, ModelState rotationContainer, ResourceLocation modelId)
+	public BakedModel bake(ModelBaker loader, Function<Material, TextureAtlasSprite> textureGetter, ModelState rotationContainer)
 	{
 		this.blackSprite = textureGetter.apply(getTextureId(this.type, this.insulation, DyeColor.BLACK, this.active));
 		if (!this.foam.isPresent())

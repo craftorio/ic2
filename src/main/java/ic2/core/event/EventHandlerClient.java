@@ -176,7 +176,7 @@ public class EventHandlerClient
 					out.add(Component.translatable("ic2.item.tooltip.Output",
 						Math.round(EnergyNet.instance.getPowerFromTier(energy.getSourceTier()))));
 					out.add(Component.translatable("ic2.item.tooltip.Capacity", electricBlock.getCapacity()));
-					double stored = stack.has(net.minecraft.core.component.DataComponents.CUSTOM_DATA) ? stack.getTag().getDouble("energy") : 0.0;
+					double stored = stack.has(net.minecraft.core.component.DataComponents.CUSTOM_DATA) ? stack.getOrDefault(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.EMPTY).copyTag().getDouble("energy") : 0.0;
 					out.add(Component.translatable("ic2.item.tooltip.Store", (long) stored));
 				}
 			}

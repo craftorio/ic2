@@ -41,7 +41,7 @@ public class LayerJetpackOverride extends RenderLayer<LivingEntity, HumanoidMode
 			model.leftArm.visible = true;
 			model.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
 
-			VertexConsumer consumer = ItemRenderer.getArmorFoilBuffer(bufferSource, RenderType.armorCutoutNoCull(TEXTURE), false, chestStack.hasFoil());
+			VertexConsumer consumer = ItemRenderer.getArmorFoilBuffer(bufferSource, RenderType.armorCutoutNoCull(TEXTURE), chestStack.hasFoil());
 			model.renderToBuffer(poseStack, consumer, packedLight, OverlayTexture.NO_OVERLAY, FastColor.ARGB32.colorFromFloat(1.0F, 1.0F, 1.0F, 1.0F));
 			restoreVisibility(model, saved);
 		}

@@ -68,7 +68,8 @@ public class TileEntityPersonalChest extends TileEntityInventory implements IPer
 		super.loadAdditional(nbt, registries);
 		if (nbt.contains("ownerGameProfile"))
 		{
-			this.owner = NbtUtils.readGameProfile(nbt.getCompound("ownerGameProfile"));
+			CompoundTag ownerNbt = nbt.getCompound("ownerGameProfile");
+			this.owner = new GameProfile(ownerNbt.getUUID("Id"), ownerNbt.getString("Name"));
 		}
 	}
 
@@ -79,7 +80,8 @@ public class TileEntityPersonalChest extends TileEntityInventory implements IPer
 		if (this.owner != null)
 		{
 			CompoundTag ownerNbt = new CompoundTag();
-			NbtUtils.writeGameProfile(ownerNbt, this.owner);
+			ownerNbt.putUUID("Id", this.owner.getId());
+			ownerNbt.putString("Name", this.owner.getName());
 			nbt.put("ownerGameProfile", ownerNbt);
 		}
 	}

@@ -6,6 +6,11 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 
 public class CableBlock extends AbstractCableBlock
 {
+	@Override
+	protected com.mojang.serialization.MapCodec<CableBlock> codec() {
+		return simpleCodec(properties -> new CableBlock(properties, this.type, this.insulation, this.foamCableBlock));
+	}
+
 	private final FoamCableBlock foamCableBlock;
 
 	public static CableBlock create(Properties settings, CableType type, int insulation, FoamCableBlock foamCableBlock)

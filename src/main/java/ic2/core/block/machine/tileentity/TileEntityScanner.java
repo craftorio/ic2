@@ -184,9 +184,9 @@ public class TileEntityScanner extends TileEntityElectricMachine implements IHas
 		super.loadAdditional(nbt, registries);
 		this.progress = nbt.getInt("progress");
 		CompoundTag contentTag = nbt.getCompound("currentStack");
-		this.currentStack = ItemStack.of(contentTag);
+		this.currentStack = ItemStack.parseOptional(registries, contentTag);
 		contentTag = nbt.getCompound("pattern");
-		this.pattern = ItemStack.of(contentTag);
+		this.pattern = ItemStack.parseOptional(registries, contentTag);
 		int stateIdx = nbt.getInt("state");
 		this.state = stateIdx < TileEntityScanner.State.values().length ? TileEntityScanner.State.values()[stateIdx] : TileEntityScanner.State.IDLE;
 		this.refreshInfo();
@@ -199,16 +199,12 @@ public class TileEntityScanner extends TileEntityElectricMachine implements IHas
 		nbt.putInt("progress", this.progress);
 		if (!StackUtil.isEmpty(this.currentStack))
 		{
-			CompoundTag contentTag = new CompoundTag();
-			this.currentStack.save(contentTag);
-			nbt.put("currentStack", contentTag);
+			nbt.put("currentStack", this.currentStack.save(registries));
 		}
 
 		if (!StackUtil.isEmpty(this.pattern))
 		{
-			CompoundTag contentTag = new CompoundTag();
-			this.pattern.save(contentTag);
-			nbt.put("pattern", contentTag);
+			nbt.put("pattern", this.pattern.save(registries));
 		}
 
 		nbt.putInt("state", this.state.ordinal());
@@ -250,7 +246,7 @@ public class TileEntityScanner extends TileEntityElectricMachine implements IHas
 		} else if (this.diskSlot.get().getItem() instanceof ItemCrystalMemory)
 		{
 			ItemStack crystalMemory = this.diskSlot.get();
-			((ItemCrystalMemory) crystalMemory.getItem()).writeContentsTag(crystalMemory, stack);
+			((ItemCrystalMemory) crystalMemory.getItem()).writeContentsTag(crystalMemory, stack, this.level.registryAccess());
 			return true;
 		} else
 		{

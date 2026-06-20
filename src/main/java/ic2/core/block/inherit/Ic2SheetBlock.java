@@ -90,7 +90,7 @@ public class Ic2SheetBlock extends Block
 		for (Direction facing : Util.HORIZONTAL_DIRS)
 		{
 			state = world.getBlockState(pos.relative(facing));
-			if (state == Ic2Blocks.RUBBER_SHEET.defaultBlockState() || state.getBlock().isCollisionShapeFullBlock(state, world, pos))
+			if (state == Ic2Blocks.RUBBER_SHEET.defaultBlockState() || Block.isShapeFullBlock(state.getCollisionShape(world, pos)))
 			{
 				return true;
 			}
@@ -103,7 +103,7 @@ public class Ic2SheetBlock extends Block
 	{
 		pos = pos.below();
 		BlockState state = world.getBlockState(pos);
-		return state.getBlock().isCollisionShapeFullBlock(state, world, pos);
+		return Block.isShapeFullBlock(state.getCollisionShape(world, pos));
 	}
 
 	public void neighborChanged(BlockState state, Level world, BlockPos pos, Block block, BlockPos fromPos, boolean notify)
@@ -178,7 +178,7 @@ public class Ic2SheetBlock extends Block
 				{
 					cPos.move(axis, dir);
 					BlockState state = world.getBlockState(cPos);
-					if (state.getBlock().isCollisionShapeFullBlock(state, world, cPos))
+					if (Block.isShapeFullBlock(state.getCollisionShape(world, cPos)))
 					{
 						supported = true;
 						break;
@@ -191,7 +191,7 @@ public class Ic2SheetBlock extends Block
 
 					cPos.move(Direction.DOWN);
 					BlockState baseState = world.getBlockState(cPos);
-					if (baseState.getBlock().isCollisionShapeFullBlock(baseState, world, cPos))
+					if (Block.isShapeFullBlock(baseState.getCollisionShape(world, cPos)))
 					{
 						supported = true;
 						break;

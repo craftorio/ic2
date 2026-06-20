@@ -1,6 +1,5 @@
 package ic2.core.block.machine.gui;
 
-import com.google.common.base.Supplier;
 import ic2.core.Ic2Gui;
 import ic2.core.block.machine.container.ContainerMetalFormer;
 import ic2.core.gui.CustomGauge;
@@ -20,13 +19,13 @@ public class GuiMetalFormer extends Ic2Gui<ContainerMetalFormer>
 		super(container, playerInventory, title);
 		this.addElement(EnergyGauge.asBolt(this, 20, 37, container.base));
 		this.addElement(CustomGauge.create(this, 52, 39, container.base::getProgress, Gauge.GaugeStyle.ProgressMetalFormer));
-		this.addElement(new VanillaButton(this, 65, 53, 20, 20, this.createEventSender(0)).withIcon((Supplier<ItemStack>) () -> switch (container.base.getMode())
+		this.addElement(new VanillaButton(this, 65, 53, 20, 20, this.createEventSender(0)).withIcon(() -> switch (container.base.getMode())
 		{
 			case 0 -> new ItemStack(Ic2Items.COPPER_CABLE);
 			case 1 -> new ItemStack(Ic2Items.FORGE_HAMMER);
 			case 2 -> new ItemStack(Ic2Items.CUTTER);
 			default -> null;
-		}).withTooltip((Supplier<String>) () -> switch (container.base.getMode())
+		}).withTooltip(() -> switch (container.base.getMode())
 		{
 			case 0 -> Component.translatable("ic2.MetalFormer.gui.switch.Extruding").getString();
 			case 1 -> Component.translatable("ic2.MetalFormer.gui.switch.Rolling").getString();

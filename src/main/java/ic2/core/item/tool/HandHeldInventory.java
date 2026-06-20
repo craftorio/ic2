@@ -15,9 +15,11 @@ import net.minecraft.CrashReportDetail;
 import net.minecraft.ReportedException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -53,7 +55,7 @@ public abstract class HandHeldInventory implements IHasGui
 				int slot = slotNbt.getByte("Slot");
 				if (slot >= 0 && slot < this.inventory.length)
 				{
-					this.inventory[slot] = ItemStack.of(slotNbt);
+					this.inventory[slot] = ItemStack.parseOptional(this.player.level().registryAccess(), slotNbt);
 				}
 			}
 		}
@@ -180,8 +182,8 @@ public abstract class HandHeldInventory implements IHasGui
 	{
 		if (!StackUtil.isEmpty(stack) && stack.getItem() == this.containerStack.getItem())
 		{
-			CompoundTag nbt = stack.getTag();
-			return nbt != null && nbt.getInt("uid") == this.getUid();
+			CompoundTag nbt = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).getUnsafe();
+			return !nbt.isEmpty() && nbt.getInt("uid") == this.getUid();
 		} else
 		{
 			return false;
@@ -239,7 +241,7 @@ public abstract class HandHeldInventory implements IHasGui
 					{
 						CompoundTag nbt = new CompoundTag();
 						nbt.putByte("Slot", (byte) i);
-						this.inventory[i].save(nbt);
+						this.inventory[i].save(this.player.level().registryAccess(), nbt);
 						contentList.add(nbt);
 					}
 				}
@@ -254,7 +256,7 @@ public abstract class HandHeldInventory implements IHasGui
 					CrashReport crash = new CrashReport("Hand held container stack vanished", e);
 					CrashReportCategory category = crash.addCategory("Container stack");
 					category.setDetail("Stack", StackUtil.toStringSafe(this.containerStack));
-					category.setDetail("NBT", this.containerStack.getTag());
+					category.setDetail("NBT", this.containerStack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).getUnsafe());
 					category.setDetail("Position", this.getPlayerInventoryIndex());
 					category.setDetail("Had thrown", dropItself);
 					category = crash.addCategory("Container info");
@@ -310,7 +312,7 @@ public abstract class HandHeldInventory implements IHasGui
 			{
 				CompoundTag nbt = new CompoundTag();
 				nbt.putByte("Slot", (byte) i);
-				this.inventory[i].save(nbt);
+				this.inventory[i].save(this.player.level().registryAccess(), nbt);
 				contentList.add(nbt);
 			}
 		}

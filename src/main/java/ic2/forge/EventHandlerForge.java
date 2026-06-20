@@ -17,7 +17,7 @@ import ic2.core.util.LogCategory;
 import ic2.core.util.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.WorldlyContainer;
@@ -28,12 +28,10 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.neoforged.neoforge.capabilities.Capability;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.ICapabilityProvider;
-import net.neoforged.neoforge.common.util.LazyOptional;
-import net.neoforged.neoforge.event.AttachCapabilitiesEvent;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.capabilities.IBlockCapabilityProvider;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
@@ -41,7 +39,6 @@ import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingFallEvent;
 import net.neoforged.neoforge.event.entity.living.FinalizeSpawnEvent;
-import net.neoforged.neoforge.event.entity.living.MobSpawnEvent;
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
@@ -53,17 +50,9 @@ import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import net.neoforged.neoforge.items.wrapper.InvWrapper;
 import net.neoforged.neoforge.items.wrapper.SidedInvWrapper;
-import org.jetbrains.annotations.NotNull;
-
 public final class EventHandlerForge {
-
-    private static final ResourceLocation fluidCapId = IC2.getIdentifier("fluid");
-
-    private static final ResourceLocation itemCapId = IC2.getIdentifier("item");
 
     @SubscribeEvent
     public void serverStart(ServerStartingEvent event) {
@@ -118,27 +107,23 @@ public final class EventHandlerForge {
     }
 
     @SubscribeEvent
-    public void onWorldTick(LevelTickEvent.Post event) {
-        Level world = event.getLevel();
-        if (event.phase == TickEvent.Phase.START) {
-            TickHandler.onWorldTickStart(world);
-        } else {
-            TickHandler.onWorldTickEnd(world);
-        }
+    public void onWorldTickStart(LevelTickEvent.Pre event) {
+        TickHandler.onWorldTickStart(event.getLevel());
     }
 
     @SubscribeEvent
-    public void onServerTick(ServerTickEvent.Post event) {
-        if (event.phase == TickEvent.Phase.START) {
-            TickHandler.onServerTick();
-        }
+    public void onWorldTickEnd(LevelTickEvent.Post event) {
+        TickHandler.onWorldTickEnd(event.getLevel());
     }
 
     @SubscribeEvent
-    public void onPlayerTick(PlayerTickEvent.Post event) {
-        if (event.phase == TickEvent.Phase.START) {
-            EventHandler.onPlayerTick(event.getEntity());
-        }
+    public void onServerTick(ServerTickEvent.Pre event) {
+        TickHandler.onServerTick();
+    }
+
+    @SubscribeEvent
+    public void onPlayerTick(PlayerTickEvent.Pre event) {
+        EventHandler.onPlayerTick(event.getEntity());
     }
 
     @SubscribeEvent
@@ -162,9 +147,7 @@ public final class EventHandlerForge {
 
     @SubscribeEvent
     public void onPlayerLeftClickEmpty(PlayerInteractEvent.LeftClickEmpty event) {
-        if (EventHandler.onEntitySwingHand(event.getEntity(), event.getHand())) {
-            event.setCanceled(true);
-        }
+        EventHandler.onEntitySwingHand(event.getEntity(), event.getHand());
     }
 
     @SubscribeEvent
@@ -182,12 +165,12 @@ public final class EventHandlerForge {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onEntityAttacked(LivingDamageEvent event) {
-        float remaining = EventHandler.onEntityAttacked(event.getEntity(), event.getSource(), event.getAmount());
+    public void onEntityAttacked(LivingDamageEvent.Pre event) {
+        float remaining = EventHandler.onEntityAttacked(event.getEntity(), event.getSource(), event.getNewDamage());
         if (remaining <= 0.0F) {
-            event.setCanceled(true);
+            event.setNewDamage(0.0F);
         } else {
-            event.setAmount(remaining);
+            event.setNewDamage(remaining);
         }
     }
 
@@ -226,7 +209,7 @@ public final class EventHandlerForge {
     @SubscribeEvent
     public void onRetexture(RetextureEvent event) {
         Block block = event.state.getBlock();
-        if (block instanceof RetexturableBlock && ((RetexturableBlock) block).retexture(event.state, (Level) event.getLevel(), event.pos, event.side, event.getEntity(), event.refState, event.refVariant, event.refSide, event.refColorMultipliers)) {
+        if (block instanceof RetexturableBlock && ((RetexturableBlock) block).retexture(event.state, (Level) event.getLevel(), event.pos, event.side, event.player, event.refState, event.refVariant, event.refSide, event.refColorMultipliers)) {
             event.applied = true;
             event.setCanceled(true);
         }
@@ -251,49 +234,48 @@ public final class EventHandlerForge {
     }
 
     @SubscribeEvent
-    public void onAttachBlockEntityCapabilities(AttachCapabilitiesEvent<BlockEntity> event) {
-        final BlockEntity be = event.getObject();
-        if (be instanceof Ic2TileEntity) {
-            if (be instanceof FluidBeBridge bridge) {
-                Ic2FluidBlock fb = bridge.getFluidBlock();
-                if (fb != null && fb.isFluidBlock(null, null, null, be)) {
-                    event.addCapability(fluidCapId, new BlockFluidCapImpl(fb, be));
-                }
-            } else {
-                event.addCapability(fluidCapId, new LazyBlockFluidCapImpl(be));
-            }
-            if (be instanceof WorldlyContainer) {
-                event.addCapability(itemCapId, new ICapabilityProvider() {
+    public void onRegisterCapabilities(RegisterCapabilitiesEvent event) {
+        // Register fluid handlers and item handlers for IC2 blocks
+        for (Block block : BuiltInRegistries.BLOCK) {
+            if (BuiltInRegistries.BLOCK.getKey(block).getNamespace().equals("ic2")) {
+                // Fluid handler capability for blocks
+                event.registerBlock(Capabilities.FluidHandler.BLOCK,
+                    (level, pos, state, be, side) -> {
+                        if (be instanceof Ic2TileEntity) {
+                            if (be instanceof FluidBeBridge bridge) {
+                                Ic2FluidBlock fb = bridge.getFluidBlock();
+                                if (fb != null && fb.isFluidBlock(null, null, null, be)) {
+                                    return new BlockFluidCapImpl(fb, be).getCapability(level, pos, state, be, side);
+                                }
+                            }
+                            return new LazyBlockFluidCapImpl(be).getCapability(level, pos, state, be, side);
+                        }
+                        return null;
+                    },
+                    block);
 
-                    private final LazyOptional<IItemHandlerModifiable>[] caps = SidedInvWrapper.create((WorldlyContainer) be, Util.ALL_DIRS);
-
-                    @Override
-                    @NotNull
-                    public <T> LazyOptional<T> getCapability(@NotNull Capability<T> capability, Direction facing) {
-                        return (LazyOptional<T>) (facing != null && capability == Capabilities.ItemHandler.BLOCK ? this.caps[facing.ordinal()] : LazyOptional.empty());
-                    }
-                });
-            } else if (be instanceof Container) {
-                event.addCapability(itemCapId, new ICapabilityProvider() {
-
-                    private final LazyOptional<IItemHandler> cap = LazyOptional.of(() -> new InvWrapper((Container) be));
-
-                    @Override
-                    @NotNull
-                    public <T> LazyOptional<T> getCapability(@NotNull Capability<T> capability, Direction facing) {
-                        return (LazyOptional<T>) (capability == Capabilities.ItemHandler.BLOCK ? this.cap : LazyOptional.empty());
-                    }
-                });
+                // Item handler capability for blocks
+                event.registerBlock(Capabilities.ItemHandler.BLOCK,
+                    (level, pos, state, be, side) -> {
+                        if (be instanceof WorldlyContainer wc) {
+                            return new SidedInvWrapper(wc, side);
+                        }
+                        if (be instanceof Container cont) {
+                            return new InvWrapper(cont);
+                        }
+                        return null;
+                    },
+                    block);
             }
         }
-    }
 
-    @SubscribeEvent
-    public void onAttachItemStackCapabilities(AttachCapabilitiesEvent<ItemStack> event) {
-        ItemStack stack = event.getObject();
-        Item item = stack.getItem();
-        if (item instanceof Ic2FluidItem) {
-            event.addCapability(fluidCapId, new ItemFluidCapImpl(stack));
+        // Register fluid handler capability for IC2 fluid items
+        for (Item item : BuiltInRegistries.ITEM) {
+            if (item instanceof Ic2FluidItem) {
+                event.registerItem(Capabilities.FluidHandler.ITEM,
+                    (stack, unused) -> new ItemFluidCapImpl(stack),
+                    item);
+            }
         }
     }
 }

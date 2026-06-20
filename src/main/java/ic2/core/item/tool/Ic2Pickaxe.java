@@ -6,8 +6,8 @@ import net.minecraft.world.item.Item.Properties;
 
 public class Ic2Pickaxe extends PickaxeItem
 {
-	public Ic2Pickaxe(Tier material, int attackDamage, float attackSpeed, Properties settings)
+	public Ic2Pickaxe(Tier material, Properties settings)
 	{
-		super(material, attackDamage, attackSpeed, settings);
+		super(material, settings);
 	}
 }

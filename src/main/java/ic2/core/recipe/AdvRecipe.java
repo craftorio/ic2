@@ -5,6 +5,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.DynamicOps;
+import com.mojang.serialization.JsonOps;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.MapLike;
+import com.mojang.serialization.RecordBuilder;
 import ic2.api.item.ElectricItem;
 import ic2.api.recipe.IRecipeInput;
 import ic2.compat.Ic2CraftingRecipe;
@@ -21,21 +27,21 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Stream;
 
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
-import net.minecraft.world.Container;
-import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
-import net.minecraft.core.RegistryAccess;
 
 public class AdvRecipe implements Ic2CraftingRecipe
 {
@@ -167,14 +173,14 @@ public class AdvRecipe implements Ic2CraftingRecipe
 		}
 	}
 
-	public boolean matches(@NotNull CraftingContainer inventoryCrafting, @NotNull Level world)
+	public boolean matches(CraftingInput input, Level level)
 	{
-		return this.assemble(inventoryCrafting) != StackUtil.emptyStack;
+		return this.assemble(input) != StackUtil.emptyStack;
 	}
 
-	public ItemStack assemble(CraftingContainer inventoryCrafting)
+	public ItemStack assemble(CraftingInput inventoryCrafting)
 	{
-		int size = inventoryCrafting.getContainerSize();
+		int size = inventoryCrafting.size();
 		int mask = 0;
 
 		for (int i = 0; i < size; i++)
@@ -212,12 +218,8 @@ public class AdvRecipe implements Ic2CraftingRecipe
 		return StackUtil.emptyStack;
 	}
 
-	public ItemStack getResultItem()
-	{
-		return this.output;
-	}
-
-	public @NotNull ItemStack getResultItem(@NotNull RegistryAccess registryAccess)
+	@Override
+	public ItemStack getResultItem(HolderLookup.Provider registries)
 	{
 		return this.output;
 	}
@@ -245,9 +247,9 @@ public class AdvRecipe implements Ic2CraftingRecipe
 		return false;
 	}
 
-	private ItemStack checkItems(Container inventory, IRecipeInput[] request)
+	private ItemStack checkItems(CraftingInput inventory, IRecipeInput[] request)
 	{
-		int size = inventory.getContainerSize();
+		int size = inventory.size();
 		double outputCharge = 0.0;
 		int i = 0;
 		int j = 0;
@@ -274,9 +276,9 @@ public class AdvRecipe implements Ic2CraftingRecipe
 	}
 
 	@Override
-	public NonNullList<ItemStack> getRemainingItems(CraftingContainer inv)
+	public NonNullList<ItemStack> getRemainingItems(CraftingInput inv)
 	{
-		return this.consuming ? NonNullList.withSize(inv.getContainerSize(), StackUtil.emptyStack) : Ic2CraftingRecipe.super.getRemainingItems(inv);
+		return this.consuming ? NonNullList.withSize(inv.size(), StackUtil.emptyStack) : Ic2CraftingRecipe.super.getRemainingItems(inv);
 	}
 
 	public boolean canCraftInDimensions(int x, int y)
@@ -333,9 +335,9 @@ public class AdvRecipe implements Ic2CraftingRecipe
 	}
 
 	@Override
-	public @NotNull ItemStack assemble(@NotNull CraftingContainer inventory, @NotNull RegistryAccess registryAccess)
+	public @NotNull ItemStack assemble(@NotNull CraftingInput input, @NotNull HolderLookup.Provider registries)
 	{
-		return this.assemble(inventory);
+		return this.assemble(input);
 	}
 
 	public @NotNull CraftingBookCategory category()
@@ -363,7 +365,7 @@ public class AdvRecipe implements Ic2CraftingRecipe
 			return AdvRecipe.create(id, width, height, ingredients, result, consuming, hidden);
 		}
 
-		public AdvRecipe fromNetwork(@NotNull ResourceLocation id, FriendlyByteBuf buf)
+		public AdvRecipe fromNetwork(@NotNull ResourceLocation id, RegistryFriendlyByteBuf buf)
 		{
 			IRecipeInput[] ingredients = new IRecipeInput[buf.readVarInt()];
 
@@ -372,10 +374,10 @@ public class AdvRecipe implements Ic2CraftingRecipe
 				ingredients[i] = RecipeIo.readInput(buf);
 			}
 
-			return new AdvRecipe(id, buf.readVarInt(), buf.readVarInt(), buf.readBoolean(), buf.readInt(), ingredients, buf.readItem(), buf.readBoolean(), buf.readBoolean());
+			return new AdvRecipe(id, buf.readVarInt(), buf.readVarInt(), buf.readBoolean(), buf.readInt(), ingredients, ItemStack.STREAM_CODEC.decode(buf), buf.readBoolean(), buf.readBoolean());
 		}
 
-		public void toNetwork(FriendlyByteBuf buf, AdvRecipe recipe)
+		public void toNetwork(RegistryFriendlyByteBuf buf, AdvRecipe recipe)
 		{
 			buf.writeVarInt(recipe.input.length);
 
@@ -388,7 +390,7 @@ public class AdvRecipe implements Ic2CraftingRecipe
 			buf.writeVarInt(recipe.inputHeight);
 			buf.writeBoolean(recipe.inputMirrored != null);
 			buf.writeInt(recipe.masks[0]);
-			buf.writeItem(recipe.output);
+			ItemStack.STREAM_CODEC.encode(buf, recipe.output);
 			buf.writeBoolean(recipe.consuming);
 			buf.writeBoolean(recipe.hidden);
 		}
@@ -478,6 +480,53 @@ public class AdvRecipe implements Ic2CraftingRecipe
 			{
 				return ingredients;
 			}
+		}
+
+		@Override
+		public MapCodec<AdvRecipe> codec()
+		{
+			return new MapCodec<>()
+			{
+				@Override
+				public <T> Stream<T> keys(DynamicOps<T> ops)
+				{
+					return Stream.of(ops.createString("key"), ops.createString("pattern"), ops.createString("result"), ops.createString("type"));
+				}
+
+				@Override
+				public <T> DataResult<AdvRecipe> decode(DynamicOps<T> ops, MapLike<T> input)
+				{
+					JsonObject json = new JsonObject();
+					input.entries().forEach(pair ->
+					{
+						String key = ops.getStringValue(pair.getFirst()).getOrThrow();
+						JsonElement value = ops.convertTo(JsonOps.INSTANCE, pair.getSecond());
+						json.add(key, value);
+					});
+					try
+					{
+						return DataResult.success(fromJson(ResourceLocation.fromNamespaceAndPath("ic2", "shaped"), json));
+					} catch (Exception e)
+					{
+						return DataResult.error(() -> "Failed to decode AdvRecipe: " + e.getMessage());
+					}
+				}
+
+				@Override
+				public <T> RecordBuilder<T> encode(AdvRecipe input, DynamicOps<T> ops, RecordBuilder<T> prefix)
+				{
+					return prefix.withErrorsFrom(DataResult.error(() -> "Encoding AdvRecipe not supported"));
+				}
+			};
+		}
+
+		@Override
+		public StreamCodec<RegistryFriendlyByteBuf, AdvRecipe> streamCodec()
+		{
+			return StreamCodec.of(
+					this::toNetwork,
+					buf -> this.fromNetwork(ResourceLocation.fromNamespaceAndPath("ic2", "shaped"), buf)
+			);
 		}
 	}
 }

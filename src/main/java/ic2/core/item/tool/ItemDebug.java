@@ -61,6 +61,7 @@ import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.component.CustomData;
 
 public class ItemDebug extends Item implements PriorityUsableItem, ISpecialElectricItem, IBoxable
 {
@@ -344,7 +345,7 @@ public class ItemDebug extends Item implements PriorityUsableItem, ISpecialElect
 			ItemStack entStack = ((ItemEntity) entity).getItem();
 			String name = Util.getName(entStack.getItem()).toString();
 			output.both("[%s] item id: %s size: %s name: %s", plat, name, StackUtil.getSize(entStack), entStack.getDescriptionId());
-			output.console("NBT: %s", entStack.getTag());
+			output.console("NBT: %s", entStack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).getUnsafe());
 		}
 
 		output.flush(player);
@@ -353,8 +354,8 @@ public class ItemDebug extends Item implements PriorityUsableItem, ISpecialElect
 
 	private static ItemDebug.Mode getMode(ItemStack stack)
 	{
-		CompoundTag nbt = stack.getTag();
-		int modeIdx = nbt != null ? nbt.getInt("mode") : 0;
+		CompoundTag nbt = StackUtil.getOrCreateNbtData(stack);
+		int modeIdx = nbt.getInt("mode");
 		if (modeIdx < 0 || modeIdx >= ItemDebug.Mode.modes.length)
 		{
 			modeIdx = 0;
@@ -365,7 +366,7 @@ public class ItemDebug extends Item implements PriorityUsableItem, ISpecialElect
 
 	private static void setMode(ItemStack stack, ItemDebug.Mode mode)
 	{
-		stack.getOrDefault(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.EMPTY).copyTag().putInt("mode", mode.ordinal());
+		CustomData.update(DataComponents.CUSTOM_DATA, stack, tag -> tag.putInt("mode", mode.ordinal()));
 	}
 
 	private static String getPlatform(Level world)

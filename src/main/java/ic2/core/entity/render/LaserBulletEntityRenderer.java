@@ -38,23 +38,24 @@ public class LaserBulletEntityRenderer extends EntityRenderer<LaserBulletEntity>
 		VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(RenderType.entityCutout(this.getTextureLocation(entity)));
 		Pose entry = matrixStack.last();
 		Matrix4f matrix4f = entry.pose();
-		Matrix3f matrix3f = entry.normal();
-		this.vertex(matrix4f, matrix3f, vertexConsumer, -7, -2, -2, 0.0F, 0.15625F, -1, 0, 0, i);
-		this.vertex(matrix4f, matrix3f, vertexConsumer, -7, -2, 2, 0.15625F, 0.15625F, -1, 0, 0, i);
-		this.vertex(matrix4f, matrix3f, vertexConsumer, -7, 2, 2, 0.15625F, 0.3125F, -1, 0, 0, i);
-		this.vertex(matrix4f, matrix3f, vertexConsumer, -7, 2, -2, 0.0F, 0.3125F, -1, 0, 0, i);
-		this.vertex(matrix4f, matrix3f, vertexConsumer, -7, 2, -2, 0.0F, 0.15625F, 1, 0, 0, i);
-		this.vertex(matrix4f, matrix3f, vertexConsumer, -7, 2, 2, 0.15625F, 0.15625F, 1, 0, 0, i);
-		this.vertex(matrix4f, matrix3f, vertexConsumer, -7, -2, 2, 0.15625F, 0.3125F, 1, 0, 0, i);
-		this.vertex(matrix4f, matrix3f, vertexConsumer, -7, -2, -2, 0.0F, 0.3125F, 1, 0, 0, i);
+		this.vertex(matrix4f, entry, vertexConsumer, -7, -2, -2, 0.0F, 0.15625F, -1, 0, 0, i);
+		this.vertex(matrix4f, entry, vertexConsumer, -7, -2, 2, 0.15625F, 0.15625F, -1, 0, 0, i);
+		this.vertex(matrix4f, entry, vertexConsumer, -7, 2, 2, 0.15625F, 0.3125F, -1, 0, 0, i);
+		this.vertex(matrix4f, entry, vertexConsumer, -7, 2, -2, 0.0F, 0.3125F, -1, 0, 0, i);
+		this.vertex(matrix4f, entry, vertexConsumer, -7, 2, -2, 0.0F, 0.15625F, 1, 0, 0, i);
+		this.vertex(matrix4f, entry, vertexConsumer, -7, 2, 2, 0.15625F, 0.15625F, 1, 0, 0, i);
+		this.vertex(matrix4f, entry, vertexConsumer, -7, -2, 2, 0.15625F, 0.3125F, 1, 0, 0, i);
+		this.vertex(matrix4f, entry, vertexConsumer, -7, -2, -2, 0.0F, 0.3125F, 1, 0, 0, i);
 
 		for (int u = 0; u < 4; u++)
 		{
 			matrixStack.mulPose(Axis.XP.rotationDegrees(90.0F));
-			this.vertex(matrix4f, matrix3f, vertexConsumer, -8, -2, 0, 0.0F, 0.0F, 0, 1, 0, i);
-			this.vertex(matrix4f, matrix3f, vertexConsumer, 8, -2, 0, 0.5F, 0.0F, 0, 1, 0, i);
-			this.vertex(matrix4f, matrix3f, vertexConsumer, 8, 2, 0, 0.5F, 0.15625F, 0, 1, 0, i);
-			this.vertex(matrix4f, matrix3f, vertexConsumer, -8, 2, 0, 0.0F, 0.15625F, 0, 1, 0, i);
+			entry = matrixStack.last();
+			matrix4f = entry.pose();
+			this.vertex(matrix4f, entry, vertexConsumer, -8, -2, 0, 0.0F, 0.0F, 0, 1, 0, i);
+			this.vertex(matrix4f, entry, vertexConsumer, 8, -2, 0, 0.5F, 0.0F, 0, 1, 0, i);
+			this.vertex(matrix4f, entry, vertexConsumer, 8, 2, 0, 0.5F, 0.15625F, 0, 1, 0, i);
+			this.vertex(matrix4f, entry, vertexConsumer, -8, 2, 0, 0.0F, 0.15625F, 0, 1, 0, i);
 		}
 
 		matrixStack.popPose();
@@ -63,11 +64,11 @@ public class LaserBulletEntityRenderer extends EntityRenderer<LaserBulletEntity>
 
 	public void vertex(
 		Matrix4f positionMatrix,
-		Matrix3f normalMatrix,
+		PoseStack.Pose pose,
 		VertexConsumer vertexConsumer,
-		int x,
-		int y,
-		int z,
+		float x,
+		float y,
+		float z,
 		float u,
 		float v,
 		int normalX,
@@ -76,12 +77,12 @@ public class LaserBulletEntityRenderer extends EntityRenderer<LaserBulletEntity>
 		int light
 	)
 	{
-		vertexConsumer.vertex(positionMatrix, x, y, z)
-			.color(255, 255, 255, 255)
+		vertexConsumer.addVertex(positionMatrix, x, y, z)
+			.setColor(255, 255, 255, 255)
 			.setUv(u, v)
 			.setOverlay(OverlayTexture.NO_OVERLAY)
 			.setLight(light)
-			.normal(normalMatrix, normalX, normalY, normalZ)
+			.setNormal(pose, normalX, normalY, normalZ)
 			;
 	}
 

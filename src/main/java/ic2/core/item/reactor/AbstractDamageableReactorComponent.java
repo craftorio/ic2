@@ -16,6 +16,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.component.CustomData;
 
 public abstract class AbstractDamageableReactorComponent extends Item implements IReactorComponent
 {
@@ -85,18 +86,18 @@ public abstract class AbstractDamageableReactorComponent extends Item implements
 
 	protected int getUse(ItemStack stack)
 	{
-		CompoundTag nbt = stack.getTag();
-		return nbt != null ? nbt.getInt("use") : 0;
+		CompoundTag nbt = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
+		return nbt.getInt("use");
 	}
 
 	public void setUse(ItemStack stack, int use)
 	{
-		stack.getOrDefault(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.EMPTY).copyTag().putInt("use", use);
+		CustomData.update(DataComponents.CUSTOM_DATA, stack, tag -> tag.putInt("use", use));
 	}
 
 	protected void incrementUse(ItemStack stack)
 	{
-		stack.getOrDefault(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.EMPTY).copyTag().putInt("use", Math.min(this.getUse(stack) + 1, this.maxUse));
+		CustomData.update(DataComponents.CUSTOM_DATA, stack, tag -> tag.putInt("use", Math.min(tag.getInt("use") + 1, this.maxUse)));
 	}
 
 	protected int getMaxUse()

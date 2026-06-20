@@ -249,7 +249,7 @@ public class ItemToolWrench extends Item implements PriorityUsableItem, IBoxable
 
 	public void damage(ItemStack is, int damage, Player player, InteractionHand hand)
 	{
-		is.hurtAndBreak(damage, player, p -> p.onEquippedItemBroken(hand));
+		is.hurtAndBreak(damage, player, hand == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND);
 	}
 
 	@Override

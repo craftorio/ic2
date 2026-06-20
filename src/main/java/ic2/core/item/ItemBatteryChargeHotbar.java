@@ -42,10 +42,7 @@ public class ItemBatteryChargeHotbar extends ItemBattery implements IBoxable
 		Mode mode = getMode(stack);
 		tooltip.add(Component.translatable("ic2.tooltip.mode",
 			Component.translatable("ic2.tooltip.mode." + mode.name().toLowerCase(Locale.ENGLISH))));
-		if (world.isClientSide)
-		{
-			showBoxableTip(tooltip, mode);
-		}
+		showBoxableTip(tooltip, mode);
 	}
 
 	@OnlyIn(Dist.CLIENT)

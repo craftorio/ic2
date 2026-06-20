@@ -9,7 +9,7 @@ public class SplitterFoamCableBlock extends AbstractSplitterCableBlock
     public static final com.mojang.serialization.MapCodec<SplitterFoamCableBlock> CODEC = simpleCodec(SplitterFoamCableBlock::new);
 
     @Override
-    protected com.mojang.serialization.MapCodec<? extends net.minecraft.world.level.block.Block> codec() {
+    protected com.mojang.serialization.MapCodec<SplitterFoamCableBlock> codec() {
         return CODEC;
     }
 

@@ -11,9 +11,9 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 
 public class Ic2SignBlock extends StandingSignBlock
 {
-	public Ic2SignBlock(Properties settings, WoodType signType)
+	public Ic2SignBlock(WoodType signType, Properties settings)
 	{
-		super(settings, signType);
+		super(signType, settings);
 	}
 
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state)

@@ -6,8 +6,8 @@ import net.minecraft.world.item.Item.Properties;
 
 public class Ic2Axe extends AxeItem
 {
-	public Ic2Axe(Tier material, float attackDamage, float attackSpeed, Properties settings)
+	public Ic2Axe(Tier material, Properties settings)
 	{
-		super(material, attackDamage, attackSpeed, settings);
+		super(material, settings);
 	}
 }

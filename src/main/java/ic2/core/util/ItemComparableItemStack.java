@@ -4,6 +4,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.component.CustomData;
 
 public class ItemComparableItemStack
 {
@@ -14,36 +15,33 @@ public class ItemComparableItemStack
 	public ItemComparableItemStack(ItemStack stack, boolean copyNbt)
 	{
 		this.item = stack.getItem();
-		CompoundTag nbt = stack.getTag();
-		if (nbt != null)
+		CompoundTag nbt = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).getUnsafe();
+		if (nbt.isEmpty())
 		{
+			nbt = null;
+		} else
+		{
+			if (copyNbt)
+			{
+				nbt = nbt.copy();
+			}
+
+			boolean copied = copyNbt;
+
+			for (String key : StackUtil.ignoredNbtKeys)
+			{
+				if (!copied && nbt.contains(key))
+				{
+					nbt = nbt.copy();
+					copied = true;
+				}
+
+				nbt.remove(key);
+			}
+
 			if (nbt.isEmpty())
 			{
 				nbt = null;
-			} else
-			{
-				if (copyNbt)
-				{
-					nbt = nbt.copy();
-				}
-
-				boolean copied = copyNbt;
-
-				for (String key : StackUtil.ignoredNbtKeys)
-				{
-					if (!copied && nbt.contains(key))
-					{
-						nbt = nbt.copy();
-						copied = true;
-					}
-
-					nbt.remove(key);
-				}
-
-				if (nbt.isEmpty())
-				{
-					nbt = null;
-				}
 			}
 		}
 

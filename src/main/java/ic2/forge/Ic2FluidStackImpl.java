@@ -5,30 +5,29 @@ import ic2.core.fluid.Ic2FluidStack;
 import java.util.Objects;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.core.RegistryAccess;
+import org.jetbrains.annotations.NotNull;
 
-final class Ic2FluidStackImpl implements Ic2FluidStack
+record Ic2FluidStackImpl(FluidStack parent) implements Ic2FluidStack
 {
-	final FluidStack parent;
-
-	public Ic2FluidStackImpl(FluidStack parent)
+	Ic2FluidStackImpl
 	{
 		if (parent == null)
 		{
 			throw new NullPointerException();
 		}
 
-		this.parent = parent;
 	}
 
 	@Override
 	public Ic2FluidStack copy()
 	{
-		return this.parent.getTag() == null ? Ic2FluidStack.create(this.parent.getFluid(), this.parent.getAmount()) : new Ic2FluidStackImpl(this.parent.copy());
+		return this.parent.isComponentsPatchEmpty() ? Ic2FluidStack.create(this.parent.getFluid(), this.parent.getAmount()) : new Ic2FluidStackImpl(this.parent.copy());
 	}
 
 	@Override
@@ -40,13 +39,13 @@ final class Ic2FluidStackImpl implements Ic2FluidStack
 	@Override
 	public boolean hasExactFluid(Fluid fluid)
 	{
-		return this.parent.getTag() == null && fluid == this.parent.getFluid();
+		return this.parent.isComponentsPatchEmpty() && fluid == this.parent.getFluid();
 	}
 
 	@Override
 	public boolean hasExactFluid(Ic2FluidStack fs)
 	{
-		return fs instanceof Ic2FluidStackImpl ? this.parent.isFluidEqual(((Ic2FluidStackImpl) fs).parent) : this.hasExactFluid(fs.getFluid());
+		return fs instanceof Ic2FluidStackImpl ? FluidStack.isSameFluidSameComponents(this.parent, ((Ic2FluidStackImpl) fs).parent) : this.hasExactFluid(fs.getFluid());
 	}
 
 	@Override
@@ -69,7 +68,17 @@ final class Ic2FluidStackImpl implements Ic2FluidStack
 	@Override
 	public void toNbt(CompoundTag nbt)
 	{
-		this.parent.writeToNBT(net.minecraft.core.RegistryAccess.EMPTY, nbt);
+		ResourceLocation key = BuiltInRegistries.FLUID.getKey(this.parent.getFluid());
+		nbt.putString("FluidName", key.toString());
+		nbt.putInt("Amount", this.parent.getAmount());
+		if (!this.parent.isComponentsPatchEmpty())
+		{
+			Tag saved = this.parent.saveOptional(RegistryAccess.EMPTY);
+			if (saved instanceof CompoundTag tag)
+			{
+				nbt.put("Tag", tag);
+			}
+		}
 	}
 
 	@Override
@@ -86,7 +95,7 @@ final class Ic2FluidStackImpl implements Ic2FluidStack
 				return false;
 			} else
 			{
-				return o instanceof Ic2FluidStackImpl ? Objects.equals(this.parent.getTag(), ((Ic2FluidStackImpl) o).parent.getTag()) : this.parent.getTag() == null;
+				return o instanceof Ic2FluidStackImpl ? Objects.equals(this.parent.getComponentsPatch(), ((Ic2FluidStackImpl) o).parent.getComponentsPatch()) : this.parent.isComponentsPatchEmpty();
 			}
 		}
 	}
@@ -98,14 +107,9 @@ final class Ic2FluidStackImpl implements Ic2FluidStack
 	}
 
 	@Override
-	public String toString()
+	public @NotNull String toString()
 	{
 		Fluid fluid = this.parent.getFluid();
-		return String.format(
-			"%dx%s@%s",
-			this.parent.getAmount(),
-			fluid != null ? BuiltInRegistries.FLUID.getKey(fluid) : "(null)",
-			this.parent.getTag() != null ? this.parent.getTag().toString() : "(-)"
-		);
+		return String.format("%dx%s@%s", this.parent.getAmount(), BuiltInRegistries.FLUID.getKey(fluid), !this.parent.isComponentsPatchEmpty() ? this.parent.getComponentsPatch().toString() : "(-)");
 	}
 }

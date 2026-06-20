@@ -1,7 +1,6 @@
 package ic2.core.item.upgrade;
 
 import com.google.common.base.Predicate;
-import com.google.common.base.Supplier;
 import ic2.api.network.ClientModifiable;
 import ic2.core.ContainerBase;
 import ic2.core.IC2;
@@ -19,13 +18,14 @@ import ic2.core.network.GrowingBuffer;
 import ic2.core.ref.Ic2ScreenHandlers;
 import ic2.core.slot.SlotHologramSlot;
 
-
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+
+import java.util.function.Supplier;
 
 public class HandHeldValueConfig extends HandHeldUpgradeOption
 {
@@ -147,7 +147,7 @@ public class HandHeldValueConfig extends HandHeldUpgradeOption
 					GuiValueConfig.this.menu.comparisonType = this.getCurrentValue();
 					IC2.network.get(false).sendContainerField(GuiValueConfig.this.menu, "comparisonType");
 				}
-			}).withText((Supplier<String>) () -> Component.translatable(GuiValueConfig.this.menu.comparisonType.name).getString()).withTooltip(new Supplier<>()
+			}).withText(() -> Component.translatable(GuiValueConfig.this.menu.comparisonType.name).getString()).withTooltip(new Supplier<>()
 			{
 				private final String name;
 
@@ -192,7 +192,7 @@ public class HandHeldValueConfig extends HandHeldUpgradeOption
 							throw new IllegalStateException("Unexpected other setting: " + this.getCurrentValue());
 					}
 				}
-			}).withMoveHandler(rangeEnabled).withEnableHandler(filtersEnabled).withText((Supplier<String>) () -> GuiValueConfig.this.menu.normalSetting.symbol).withTooltip((Supplier<String>) () -> Component.translatable(GuiValueConfig.this.menu.normalSetting.name).getString()));
+			}).withMoveHandler(rangeEnabled).withEnableHandler(filtersEnabled).withText(() -> GuiValueConfig.this.menu.normalSetting.symbol).withTooltip(() -> Component.translatable(GuiValueConfig.this.menu.normalSetting.name).getString()));
 			this.addElement(new VanillaButton(this, 105, 43, 17, 15, button ->
 			{
 				if (button == MouseButton.left || button == MouseButton.right)
@@ -225,7 +225,7 @@ public class HandHeldValueConfig extends HandHeldUpgradeOption
 
 					IC2.network.get(false).sendContainerField(GuiValueConfig.this.menu, "extraSetting");
 				}
-			}).withEnableHandler(rangeEnabled).withText((Supplier<String>) () -> GuiValueConfig.this.menu.extraSetting.symbol).withTooltip((Supplier<String>) () -> Component.translatable(GuiValueConfig.this.menu.extraSetting.name).getString()));
+			}).withEnableHandler(rangeEnabled).withText(() -> GuiValueConfig.this.menu.extraSetting.symbol).withTooltip(() -> Component.translatable(GuiValueConfig.this.menu.extraSetting.name).getString()));
 			Predicate<String> numberOnly = input ->
 			{
 				try

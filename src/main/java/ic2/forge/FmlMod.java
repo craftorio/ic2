@@ -12,11 +12,10 @@ import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.IExtensionPoint.DisplayTest;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent;
-import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.fml.loading.FMLLoader;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.neoforged.neoforge.registries.RegisterEvent;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
@@ -31,12 +30,12 @@ public final class FmlMod {
 
     private static final AtomicInteger loadState = new AtomicInteger();
 
-    private final FMLJavaModLoadingContext ctx;
+    private final ModContainer modContainer;
 
-    public FmlMod(FMLJavaModLoadingContext ctx, ModContainer modContainer) {
+    public FmlMod(ModContainer modContainer) {
         instance = this;
-        this.ctx = ctx;
-        IEventBus modEventBus = this.ctx.getModEventBus();
+        this.modContainer = modContainer;
+        IEventBus modEventBus = modContainer.getEventBus();
         modEventBus.register(this);
         EnvProxyForge.blockEntityRegistry.register(modEventBus);
         EnvProxyForge.creativeTabRegistry.register(modEventBus);
@@ -49,7 +48,7 @@ public final class FmlMod {
         EnvFluidHandlerForge.fluidRegistry.register(modEventBus);
         EnvFluidHandlerForge.fluidTypeRegistry.register(modEventBus);
         Ic2LootModifier.lootModifiersRegistry.register(modEventBus);
-        if (FMLEnvironment.dist.isClient()) {
+        if (FMLLoader.getDist().isClient()) {
             modEventBus.register(new ClientModEventHandlerForge());
         }
         Ic2Fluids.init();
@@ -58,11 +57,11 @@ public final class FmlMod {
     @SubscribeEvent
     public void load(FMLCommonSetupEvent event) {
         NeoForge.EVENT_BUS.register(new EventHandlerForge());
-        if (FMLEnvironment.dist.isClient()) {
+        if (FMLLoader.getDist().isClient()) {
             NeoForge.EVENT_BUS.register(new ClientEventHandlerForge());
         }
-        NetworkRegistry.newEventChannel(NetworkManager.channelId, () -> "0", v -> true, v -> true).registerObject(new ForgeNetworkHandler());
-        this.ctx.registerExtensionPoint(DisplayTest.class, () -> new DisplayTest(() -> "OH, NO!", (in, net) -> true));
+        // TODO: Migrate to 1.21.1 networking API (RegisterPayloadHandlersEvent)
+        // NetworkRegistry.newEventChannel(NetworkManager.channelId, () -> "0", v -> true, v -> true).registerObject(new ForgeNetworkHandler());
         if (!loadState.compareAndSet(1, 2)) {
             throw new IllegalStateException();
         }
@@ -124,7 +123,7 @@ public final class FmlMod {
 
     @SubscribeEvent
     public void registerLate(RegisterEvent event) {
-        if (event.getRegistryKey() == ForgeRegistries.Keys.HOLDER_SET_TYPES) {
+        if (event.getRegistryKey() == NeoForgeRegistries.Keys.HOLDER_SET_TYPES) {
             for (Runnable runnable : this.toRunAfterRegistryInit) {
                 runnable.run();
             }
@@ -144,7 +143,7 @@ public final class FmlMod {
     public void registerFeatures(RegisterEvent event) {
         if (event.getRegistryKey() == Registries.CONFIGURED_FEATURE) {
             for (EnvProxyForge.ConfiguredFeatureRegistration<?, ?> reg : EnvProxyForge.configuredFeatureRegistrations) {
-                ConfiguredFeature<?, ?> cf = new ConfiguredFeature(reg.feature(), reg.config());
+                ConfiguredFeature cf = new ConfiguredFeature(reg.feature(), reg.config());
                 event.register(Registries.CONFIGURED_FEATURE, reg.id(), () -> cf);
             }
         }

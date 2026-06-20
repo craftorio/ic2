@@ -52,7 +52,7 @@ public abstract class TileEntityInventory extends Ic2TileEntity implements World
 		for (InvSlot invSlot : this.invSlots)
 		{
 			CompoundTag invSlotTag = new CompoundTag();
-			invSlot.writeToNbt(invSlotTag);
+			invSlot.writeToNbt(invSlotTag, registries);
 			invSlotsTag.put(invSlot.name, invSlotTag);
 		}
 

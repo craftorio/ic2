@@ -8,6 +8,7 @@ import ic2.core.uu.UuIndex;
 import java.util.List;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
@@ -41,14 +42,12 @@ public class ItemCrystalMemory extends Item
 	{
 		CompoundTag nbt = StackUtil.getOrCreateNbtData(stack);
 		CompoundTag contentTag = nbt.getCompound("Pattern");
-		return ItemStack.of(contentTag);
+		return ItemStack.parseOptional(RegistryAccess.EMPTY, contentTag);
 	}
 
-	public void writeContentsTag(ItemStack stack, ItemStack recorded)
+	public void writeContentsTag(ItemStack stack, ItemStack recorded, net.minecraft.core.HolderLookup.Provider registries)
 	{
 		CompoundTag nbt = StackUtil.getOrCreateNbtData(stack);
-		CompoundTag contentTag = new CompoundTag();
-		recorded.save(contentTag);
-		nbt.put("Pattern", contentTag);
+		nbt.put("Pattern", recorded.save(registries));
 	}
 }

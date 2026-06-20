@@ -1,6 +1,5 @@
 package ic2.core.block.machine.gui;
 
-import com.google.common.base.Supplier;
 import ic2.core.Ic2Gui;
 import ic2.core.block.machine.container.ContainerReplicator;
 import ic2.core.block.machine.tileentity.TileEntityReplicator;
@@ -14,7 +13,6 @@ import ic2.core.util.Util;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.item.ItemStack;
 public class GuiReplicator extends Ic2Gui<ContainerReplicator>
 {
 	public GuiReplicator(ContainerReplicator container, Inventory playerInventory, Component title)
@@ -22,7 +20,7 @@ public class GuiReplicator extends Ic2Gui<ContainerReplicator>
 		super(container, playerInventory, title, 184);
 		this.addElement(EnergyGauge.asBolt(this, 136, 84, container.base));
 		this.addElement(TankGauge.createNormal(this, 27, 30, container.base.fluidTank));
-		this.addElement(new ItemImage(this, 91, 17, (Supplier<ItemStack>) () -> container.base.pattern).withTooltip((Supplier<String>) () ->
+		this.addElement(new ItemImage(this, 91, 17, () -> container.base.pattern).withTooltip(() ->
 		{
 			TileEntityReplicator te = container.base;
 			if (te.pattern == null)

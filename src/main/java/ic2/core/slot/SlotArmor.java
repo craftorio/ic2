@@ -4,7 +4,6 @@ import com.mojang.datafixers.util.Pair;
 import ic2.core.util.ReflectionUtil;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.Slot;
@@ -27,7 +26,7 @@ public class SlotArmor extends Slot
 	public boolean mayPlace(ItemStack stack)
 	{
 		Item item = stack.getItem();
-		return item == null ? false : Mob.getEquipmentSlotForItem(stack) == this.armorType;
+		return item == null ? false : stack.getEquipmentSlot() == this.armorType;
 	}
 
 	public Pair<ResourceLocation, ResourceLocation> getNoItemIcon()

@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
@@ -61,7 +62,7 @@ public class WorldUtil
 		}
 
 		world.setBlock(pos, strippedBlockState, 11);
-		mainHandItem.hurtAndBreak(1, player, p -> p.onEquippedItemBroken(player.getUsedItemHand()));
+		mainHandItem.hurtAndBreak(1, player, player.getUsedItemHand() == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND);
 	}
 
 	public interface ITileEntityResultHandler

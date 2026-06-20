@@ -89,8 +89,7 @@ public class MaskOverlayItemModel implements Ic2Model, BakedModel
 		ModelBaker bakery,
 		Function<Material, TextureAtlasSprite> spriteGetter,
 		ModelState modelTransform,
-		ItemOverrides overrides,
-		ResourceLocation modelLocation
+		ItemOverrides overrides
 	)
 	{
 		this.baseModel = bakery.bake(this.baseModelLocation, modelTransform, spriteGetter);

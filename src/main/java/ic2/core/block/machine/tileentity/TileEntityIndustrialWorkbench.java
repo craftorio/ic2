@@ -37,6 +37,7 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.component.CustomData;
 
 @NotClassic
 public class TileEntityIndustrialWorkbench extends TileEntityInventory implements IHasGui
@@ -59,7 +60,7 @@ public class TileEntityIndustrialWorkbench extends TileEntityInventory implement
 	public void onPlaced(ItemStack stack, LivingEntity placer, Direction facing)
 	{
 		super.onPlaced(stack, placer, facing);
-		if (!stack.has(net.minecraft.core.component.DataComponents.CUSTOM_DATA) || !stack.getTag().contains("PLACED"))
+		if (!stack.has(DataComponents.CUSTOM_DATA) || !stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).getUnsafe().contains("PLACED"))
 		{
 			this.leftCrafting.tool.put(new ItemStack(Ic2Items.FORGE_HAMMER));
 			this.rightCrafting.tool.put(new ItemStack(Ic2Items.CUTTER));
@@ -294,12 +295,12 @@ public class TileEntityIndustrialWorkbench extends TileEntityInventory implement
 					return false;
 				}
 
-				if (this.recipe != null && this.recipe.matches(this.crafting, world))
+				if (this.recipe != null && this.recipe.matches(this.crafting.asCraftInput(), world))
 				{
 					return true;
 				}
 
-				this.recipe = (CraftingRecipe) world.getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, this.crafting, world).orElse(null);
+				this.recipe = (CraftingRecipe) world.getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, this.crafting.asCraftInput(), world).map(r -> r.value()).orElse(null);
 				return this.recipe != null;
 			} else
 			{
@@ -314,7 +315,7 @@ public class TileEntityIndustrialWorkbench extends TileEntityInventory implement
 				return StackUtil.emptyStack;
 			}
 			Level world = this.tool.base.getParent().getLevel();
-			return this.recipe.assemble(this.crafting, world.registryAccess());
+			return this.recipe.assemble(this.crafting.asCraftInput(), world.registryAccess());
 		}
 	}
 }

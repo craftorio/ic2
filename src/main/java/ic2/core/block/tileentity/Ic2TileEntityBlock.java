@@ -20,7 +20,6 @@ import java.util.function.Supplier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -50,6 +49,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.NotNull;
 
 public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWrenchable, BreakableBlock, RetexturableBlock
 {
@@ -109,6 +109,7 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 		this.allowWrenchRotating = allowWrenchRotating;
 		this.supportedFacings = data.supportedFacings;
 		this.facingProperty = this.supportedFacings.size() > 1 ? (Property<Direction>) this.stateDefinition.getProperty("facing") : null;
+		// TODO
 		this.dummyTe = Suppliers.memoize(() -> this.newBlockEntity(BlockPos.ZERO, this.defaultBlockState()));
 	}
 
@@ -143,7 +144,7 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 	{
 		return this.teClass;
 	}
-	
+
 	public boolean canActive()
 	{
 		return this.canActive;
@@ -180,7 +181,7 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 		return this.supportedFacings;
 	}
 
-	public Ic2TileEntity newBlockEntity(BlockPos pos, BlockState state)
+	public Ic2TileEntity newBlockEntity(@NotNull BlockPos pos, @NotNull BlockState state)
 	{
 		try
 		{
@@ -191,12 +192,12 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 		}
 	}
 
-	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type)
+	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(@NotNull Level world, @NotNull BlockState state, @NotNull BlockEntityType<T> type)
 	{
 		return (BlockEntityTicker<T>) TICKER;
 	}
 
-	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
+	protected void createBlockStateDefinition(@NotNull Builder<Block, BlockState> builder)
 	{
 		Ic2TileEntityBlock.InitData data = pendingInitData.get();
 		Set<Direction> facings = data.supportedFacings;
@@ -297,12 +298,12 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 		}
 	}
 
-	public boolean canSurvive(BlockState state, LevelReader world, BlockPos pos)
+	public boolean canSurvive(@NotNull BlockState state, @NotNull LevelReader world, @NotNull BlockPos pos)
 	{
 		return this.cropType == null ? super.canSurvive(state, world, pos) : CropSoilType.contains(world.getBlockState(pos.below()).getBlock()) && super.canSurvive(state, world, pos);
 	}
 
-	public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos)
+	public @NotNull BlockState updateShape(@NotNull BlockState state, @NotNull Direction direction, @NotNull BlockState neighborState, @NotNull LevelAccessor world, @NotNull BlockPos pos, @NotNull BlockPos neighborPos)
 	{
 		if (this.cropType == null)
 		{
@@ -313,7 +314,7 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 		}
 	}
 
-	public void neighborChanged(BlockState state, Level world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify)
+	public void neighborChanged(@NotNull BlockState state, @NotNull Level world, @NotNull BlockPos pos, @NotNull Block sourceBlock, @NotNull BlockPos sourcePos, boolean notify)
 	{
 		super.neighborChanged(state, world, pos, sourceBlock, sourcePos, notify);
 		Ic2TileEntity tileEntity = getTe(world, pos);
@@ -323,7 +324,7 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 		}
 	}
 
-	public void entityInside(BlockState state, Level world, BlockPos pos, Entity entity)
+	public void entityInside(@NotNull BlockState state, @NotNull Level world, @NotNull BlockPos pos, @NotNull Entity entity)
 	{
 		if (this.cropType != null && entity instanceof Ravager && world.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING))
 		{
@@ -352,7 +353,7 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 		}
 	}
 
-	public void setPlacedBy(Level world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack)
+	public void setPlacedBy(@NotNull Level world, @NotNull BlockPos pos, @NotNull BlockState state, LivingEntity placer, @NotNull ItemStack stack)
 	{
 		Ic2TileEntity te = getTe(world, pos);
 		if (te != null)
@@ -362,7 +363,7 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 		}
 	}
 
-	public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context)
+	public @NotNull VoxelShape getShape(@NotNull BlockState state, @NotNull BlockGetter world, @NotNull BlockPos pos, @NotNull CollisionContext context)
 	{
 		Ic2TileEntity be = getTe(world, pos);
 		if (be == null)
@@ -374,7 +375,7 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 		}
 	}
 
-	public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context)
+	public @NotNull VoxelShape getCollisionShape(@NotNull BlockState state, @NotNull BlockGetter world, @NotNull BlockPos pos, @NotNull CollisionContext context)
 	{
 		Ic2TileEntity be = getTe(world, pos);
 		if (be == null)
@@ -386,7 +387,7 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 		}
 	}
 
-	public VoxelShape getOcclusionShape(BlockState state, BlockGetter world, BlockPos pos)
+	public @NotNull VoxelShape getOcclusionShape(@NotNull BlockState state, @NotNull BlockGetter world, @NotNull BlockPos pos)
 	{
 		Ic2TileEntity be = getTe(world, pos);
 		if (be == null)
@@ -398,7 +399,7 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 		}
 	}
 
-	public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit)
+	public InteractionResult use(Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit)
 	{
 		if (player.isShiftKeyDown())
 		{
@@ -415,7 +416,7 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 		return world.getBlockEntity(pos) instanceof Ic2TileEntity ic2TileEntity ? ic2TileEntity.onClicked(player) : InteractionResult.PASS;
 	}
 
-	public void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean moved)
+	public void onRemove(BlockState state, @NotNull Level world, @NotNull BlockPos pos, BlockState newState, boolean moved)
 	{
 		if (!state.is(newState.getBlock()) && !moved)
 		{
@@ -426,7 +427,7 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 					Block.popResource(world, pos, stack);
 				}
 
-				super.onRemove(state, world, pos, newState, moved);
+				super.onRemove(state, world, pos, newState, false);
 			}
 		} else
 		{
@@ -503,8 +504,7 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 		Self, None, Generator, Machine, AdvMachine
 	}
 
-	private record InitData(Set<Direction> supportedFacings, boolean canActive, Class<?> teClass, Ic2CropType cropType,
-	                        int maxAge)
+	private record InitData(Set<Direction> supportedFacings, boolean canActive, Class<?> teClass, Ic2CropType cropType, int maxAge)
 	{
 	}
 }

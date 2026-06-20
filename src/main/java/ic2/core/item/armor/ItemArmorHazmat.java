@@ -27,7 +27,7 @@ public class ItemArmorHazmat extends ItemArmorUtility implements IHazmatLike
 	{
 		for (EquipmentSlot slot : EquipmentSlot.values())
 		{
-			if (slot.getType() == EquipmentSlot.Type.ARMOR)
+			if (slot.getType() == EquipmentSlot.Type.HUMANOID_ARMOR)
 			{
 				ItemStack stack = living.getItemBySlot(slot);
 				if (stack == null || !(stack.getItem() instanceof IHazmatLike))
@@ -69,7 +69,7 @@ public class ItemArmorHazmat extends ItemArmorUtility implements IHazmatLike
 			int armorDamage = (fallDamage + 1) / 2;
 			if (armorDamage > 0 && armorDamage <= stack.getMaxDamage() - stack.getDamageValue())
 			{
-				stack.hurtAndBreak(armorDamage, entity, player -> player.onEquippedItemBroken(this.getEquipmentSlot()));
+				stack.hurtAndBreak(armorDamage, entity, this.getEquipmentSlot());
 				return true;
 			} else
 			{

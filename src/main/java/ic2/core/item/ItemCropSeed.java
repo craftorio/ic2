@@ -26,6 +26,7 @@ import net.minecraft.world.item.Item.Properties;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.component.CustomData;
 
 public class ItemCropSeed extends Item implements ICropSeed
 {
@@ -125,8 +126,8 @@ public class ItemCropSeed extends Item implements ICropSeed
 	@Override
 	public CropCard getCropFromStack(ItemStack is)
 	{
-		CompoundTag nbt = is.getTag();
-		if (nbt != null && nbt.contains("owner", 8) && nbt.contains("id", 8))
+		CompoundTag nbt = is.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).getUnsafe();
+		if (is.has(DataComponents.CUSTOM_DATA) && nbt.contains("owner", 8) && nbt.contains("id", 8))
 		{
 			String owner = nbt.getString("owner");
 			String id = nbt.getString("id");
@@ -140,8 +141,8 @@ public class ItemCropSeed extends Item implements ICropSeed
 	@Override
 	public void setCropFromStack(ItemStack is, CropCard crop)
 	{
-		CompoundTag nbt = is.getTag();
-		if (nbt != null)
+		CompoundTag nbt = is.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).getUnsafe();
+		if (is.has(DataComponents.CUSTOM_DATA))
 		{
 			nbt.putString("owner", crop.getOwner());
 			nbt.putString("id", crop.getId());
@@ -151,15 +152,15 @@ public class ItemCropSeed extends Item implements ICropSeed
 	@Override
 	public int getGrowthFromStack(ItemStack is)
 	{
-		CompoundTag nbt = is.getTag();
-		return nbt == null ? -1 : nbt.getByte("growth");
+		CompoundTag nbt = is.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).getUnsafe();
+		return !is.has(DataComponents.CUSTOM_DATA) ? -1 : nbt.getByte("growth");
 	}
 
 	@Override
 	public void setGrowthFromStack(ItemStack is, int value)
 	{
-		CompoundTag nbt = is.getTag();
-		if (nbt != null)
+		CompoundTag nbt = is.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).getUnsafe();
+		if (is.has(DataComponents.CUSTOM_DATA))
 		{
 			nbt.putByte("growth", (byte) value);
 		}
@@ -168,15 +169,15 @@ public class ItemCropSeed extends Item implements ICropSeed
 	@Override
 	public int getGainFromStack(ItemStack is)
 	{
-		CompoundTag nbt = is.getTag();
-		return nbt == null ? -1 : nbt.getByte("gain");
+		CompoundTag nbt = is.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).getUnsafe();
+		return !is.has(DataComponents.CUSTOM_DATA) ? -1 : nbt.getByte("gain");
 	}
 
 	@Override
 	public void setGainFromStack(ItemStack is, int value)
 	{
-		CompoundTag nbt = is.getTag();
-		if (nbt != null)
+		CompoundTag nbt = is.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).getUnsafe();
+		if (is.has(DataComponents.CUSTOM_DATA))
 		{
 			nbt.putByte("gain", (byte) value);
 		}
@@ -185,15 +186,15 @@ public class ItemCropSeed extends Item implements ICropSeed
 	@Override
 	public int getResistanceFromStack(ItemStack is)
 	{
-		CompoundTag nbt = is.getTag();
-		return nbt == null ? -1 : nbt.getByte("resistance");
+		CompoundTag nbt = is.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).getUnsafe();
+		return !is.has(DataComponents.CUSTOM_DATA) ? -1 : nbt.getByte("resistance");
 	}
 
 	@Override
 	public void setResistanceFromStack(ItemStack is, int value)
 	{
-		CompoundTag nbt = is.getTag();
-		if (nbt != null)
+		CompoundTag nbt = is.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).getUnsafe();
+		if (is.has(DataComponents.CUSTOM_DATA))
 		{
 			nbt.putByte("resistance", (byte) value);
 		}
@@ -202,15 +203,15 @@ public class ItemCropSeed extends Item implements ICropSeed
 	@Override
 	public int getScannedFromStack(ItemStack is)
 	{
-		CompoundTag nbt = is.getTag();
-		return nbt == null ? -1 : nbt.getByte("scan");
+		CompoundTag nbt = is.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).getUnsafe();
+		return !is.has(DataComponents.CUSTOM_DATA) ? -1 : nbt.getByte("scan");
 	}
 
 	@Override
 	public void setScannedFromStack(ItemStack is, int value)
 	{
-		CompoundTag nbt = is.getTag();
-		if (nbt != null)
+		CompoundTag nbt = is.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).getUnsafe();
+		if (is.has(DataComponents.CUSTOM_DATA))
 		{
 			nbt.putByte("scan", (byte) value);
 		}
@@ -219,8 +220,8 @@ public class ItemCropSeed extends Item implements ICropSeed
 	@Override
 	public void incrementScannedFromStack(ItemStack is)
 	{
-		CompoundTag nbt = is.getTag();
-		if (nbt != null)
+		CompoundTag nbt = is.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).getUnsafe();
+		if (is.has(DataComponents.CUSTOM_DATA))
 		{
 			nbt.putByte("scan", (byte) (this.getScannedFromStack(is) + 1));
 		}

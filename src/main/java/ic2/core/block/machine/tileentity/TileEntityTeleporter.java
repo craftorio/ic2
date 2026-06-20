@@ -185,10 +185,10 @@ public class TileEntityTeleporter extends TileEntityBase implements INetworkTile
 				this.consumeEnergy(energyCost);
 				if (user instanceof ServerPlayer)
 				{
-					user.teleportTo(this.target.getX() + 0.5, this.target.getY() + 1.5 + user.getMyRidingOffset(), this.target.getZ() + 0.5);
+					user.teleportTo(this.target.getX() + 0.5, this.target.getY() + 1.5 + user.getVehicleAttachmentPoint(user).y, this.target.getZ() + 0.5);
 				} else
 				{
-					user.absMoveTo(this.target.getX() + 0.5, this.target.getY() + 1.5 + user.getMyRidingOffset(), this.target.getZ() + 0.5, user.getYRot(), user.getXRot());
+					user.absMoveTo(this.target.getX() + 0.5, this.target.getY() + 1.5 + user.getVehicleAttachmentPoint(user).y, this.target.getZ() + 0.5, user.getYRot(), user.getXRot());
 				}
 
 				BlockEntity te = this.getLevel().getBlockEntity(this.target);

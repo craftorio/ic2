@@ -7,7 +7,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 public class DetectorCableBlock extends AbstractDetectorCableBlock
 {
     @Override
-    protected com.mojang.serialization.MapCodec<? extends net.minecraft.world.level.block.Block> codec() {
+    protected com.mojang.serialization.MapCodec<DetectorCableBlock> codec() {
         return simpleCodec(properties -> new DetectorCableBlock(properties, this.foamCableBlock));
     }
 

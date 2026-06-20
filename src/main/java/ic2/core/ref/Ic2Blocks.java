@@ -122,6 +122,7 @@ import ic2.core.block.wiring.tileentity.TileEntityTransformerMV;
 import ic2.core.crop.Ic2CropType;
 import ic2.core.crop.TileEntityCrop;
 import ic2.core.util.Util;
+import java.util.Optional;
 import net.minecraft.core.BlockPos;
 
 import net.minecraft.core.Direction.Axis;
@@ -130,7 +131,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.*;
-import net.minecraft.world.level.block.PressurePlateBlock.Sensitivity;
 import net.minecraft.world.level.block.grower.TreeGrower;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
@@ -170,36 +170,35 @@ public final class Ic2Blocks
 	public static final RotatedPillarBlock STRIPPED_RUBBER_LOG = register("stripped_rubber_log", new RotatedPillarBlock(Properties.of().mapColor(state -> state.getValue(RotatedPillarBlock.AXIS) == Axis.Y ? MapColor.PODZOL : MapColor.COLOR_BROWN).strength(2.0F, 3.0f).sound(SoundType.WOOD)));
 	public static final RubberWoodBlock RUBBER_WOOD = register("rubber_wood", new RubberWoodBlock(Properties.of().mapColor(MapColor.COLOR_BROWN).strength(2.0F, 3.0f).sound(SoundType.WOOD)));
 	public static final Block STRIPPED_RUBBER_WOOD = register("stripped_rubber_wood", new Block(Properties.of().mapColor(MapColor.PODZOL).strength(2.0F, 3.0f).sound(SoundType.WOOD)));
-	public static final Block RUBBER_SAPLING = register("rubber_sapling", new SaplingBlock(new TreeGrower()
-	{
-		private ResourceKey<ConfiguredFeature<?, ?>> getConfiguredFeature(@NotNull RandomSource random, boolean bees)
-		{
-			return ResourceKey.create(Registries.CONFIGURED_FEATURE, IC2.getIdentifier("rubber_tree"));
-		}
-	}, Properties.of().noCollission().randomTicks().instabreak().sound(SoundType.GRASS))
+	public static final Block RUBBER_SAPLING = register("rubber_sapling", new SaplingBlock(new TreeGrower(
+		"rubber",
+		Optional.of(ResourceKey.create(Registries.CONFIGURED_FEATURE, IC2.getIdentifier("rubber_tree"))),
+		Optional.empty(),
+		Optional.empty()
+	), Properties.of().noCollission().randomTicks().instabreak().sound(SoundType.GRASS))
 	{
 	});
 	public static final Block RUBBER_PLANKS = register("rubber_planks", new Block(Properties.of().mapColor(MapColor.PODZOL).strength(2.0F, 3.0F).sound(SoundType.WOOD)));
-	public static final Block RUBBER_BUTTON = register("rubber_button", new ButtonBlock(Properties.of().noCollission().strength(0.5F).sound(SoundType.WOOD), BlockSetType.OAK, 30, false)
+	public static final Block RUBBER_BUTTON = register("rubber_button", new ButtonBlock(BlockSetType.OAK, 30, Properties.of().noCollission().strength(0.5F).sound(SoundType.WOOD))
 	{
 	});
-	public static final Block RUBBER_DOOR = register("rubber_door", new DoorBlock(Properties.of().mapColor(RUBBER_PLANKS.defaultMapColor()).strength(3.0F).sound(SoundType.WOOD).noOcclusion(), BlockSetType.OAK)
+	public static final Block RUBBER_DOOR = register("rubber_door", new DoorBlock(BlockSetType.OAK, Properties.of().mapColor(RUBBER_PLANKS.defaultMapColor()).strength(3.0F).sound(SoundType.WOOD).noOcclusion())
 	{
 	});
 	public static final Block RUBBER_FENCE = register("rubber_fence", new FenceBlock(Properties.of().mapColor(RUBBER_PLANKS.defaultMapColor()).strength(2.0F, 3.0F).sound(SoundType.WOOD)));
-	public static final Block RUBBER_FENCE_GATE = register("rubber_fence_gate", new FenceGateBlock(Properties.of().mapColor(RUBBER_PLANKS.defaultMapColor()).strength(2.0F, 3.0F).sound(SoundType.WOOD), WoodType.OAK));
-	public static final Block RUBBER_PRESSURE_PLATE = register("rubber_pressure_plate", new PressurePlateBlock(Sensitivity.EVERYTHING, Properties.of().mapColor(RUBBER_PLANKS.defaultMapColor()).noCollission().strength(0.5F).sound(SoundType.WOOD), BlockSetType.OAK)
+	public static final Block RUBBER_FENCE_GATE = register("rubber_fence_gate", new FenceGateBlock(WoodType.OAK, Properties.of().mapColor(RUBBER_PLANKS.defaultMapColor()).strength(2.0F, 3.0F).sound(SoundType.WOOD)));
+	public static final Block RUBBER_PRESSURE_PLATE = register("rubber_pressure_plate", new PressurePlateBlock(BlockSetType.OAK, Properties.of().mapColor(RUBBER_PLANKS.defaultMapColor()).noCollission().strength(0.5F).sound(SoundType.WOOD))
 	{
 	});
-	public static final Block RUBBER_SIGN = register("rubber_sign", new Ic2SignBlock(Properties.of().mapColor(RUBBER_LOG.defaultMapColor()).noCollission().strength(1.0F).sound(SoundType.WOOD), Ic2SignType.RUBBER));
+	public static final Block RUBBER_SIGN = register("rubber_sign", new Ic2SignBlock(Ic2SignType.RUBBER, Properties.of().mapColor(RUBBER_LOG.defaultMapColor()).noCollission().strength(1.0F).sound(SoundType.WOOD)));
 	public static final Block RUBBER_SLAB = register("rubber_slab", new SlabBlock(Properties.of().mapColor(MapColor.WOOD).strength(2.0F, 3.0F).sound(SoundType.WOOD)));
-	public static final Block RUBBER_STAIRS = register("rubber_stairs", new StairBlock(RUBBER_PLANKS::defaultBlockState, Properties.of().mapColor(MapColor.PODZOL).strength(2.0F, 3.0F).sound(SoundType.WOOD))
+	public static final Block RUBBER_STAIRS = register("rubber_stairs", new StairBlock(RUBBER_PLANKS.defaultBlockState(), Properties.of().mapColor(MapColor.PODZOL).strength(2.0F, 3.0F).sound(SoundType.WOOD))
 	{
 	});
-	public static final Block RUBBER_TRAPDOOR = register("rubber_trapdoor", new TrapDoorBlock(Properties.of().mapColor(MapColor.PODZOL).strength(3.0F).sound(SoundType.WOOD).noOcclusion().isValidSpawn(Ic2Blocks::never), BlockSetType.OAK)
+	public static final Block RUBBER_TRAPDOOR = register("rubber_trapdoor", new TrapDoorBlock(BlockSetType.OAK, Properties.of().mapColor(MapColor.PODZOL).strength(3.0F).sound(SoundType.WOOD).noOcclusion().isValidSpawn(Ic2Blocks::never))
 	{
 	});
-	public static final Block RUBBER_WALL_SIGN = register("rubber_wall_sign", new Ic2WallSignBlock(Properties.of().mapColor(RUBBER_LOG.defaultMapColor()).noCollission().strength(1.0F).sound(SoundType.WOOD).lootFrom(BuiltInRegistries.BLOCK.getDelegateOrThrow(RUBBER_SIGN)), Ic2SignType.RUBBER));
+	public static final Block RUBBER_WALL_SIGN = register("rubber_wall_sign", new Ic2WallSignBlock(Ic2SignType.RUBBER, Properties.of().mapColor(RUBBER_LOG.defaultMapColor()).noCollission().strength(1.0F).sound(SoundType.WOOD)));
 	public static final Block IRON_FENCE = register("iron_fence", new Ic2FenceBlock(Properties.of().strength(5.0F, 10.0F), true));
 	public static final Block RESIN_SHEET = register("resin_sheet", new Ic2SheetBlock(Properties.of().strength(1.6F, 0.5F)));
 	public static final Block RUBBER_SHEET = register("rubber_sheet", new Ic2SheetBlock(Properties.of().strength(0.8F, 2.0F)));
@@ -226,7 +225,7 @@ public final class Ic2Blocks
 	public static final Block OBSCURED_WALL = register("obscured_wall", Ic2TileEntityBlock.create(wallSettings, TileEntityWall.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.noFacings, false));
 	public static final Block MINING_PIPE = register("mining_pipe", new MiningPipeBlock(Properties.of().strength(6.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL)));
 	public static final Block MINING_PIPE_TIP = register("mining_pipe_tip", new Block(Properties.of().strength(6.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL)));
-	public static final Block REINFORCED_DOOR = register("reinforced_door", new DoorBlock(Properties.of().strength(50.0F, 150.0F).sound(SoundType.METAL), BlockSetType.IRON)
+	public static final Block REINFORCED_DOOR = register("reinforced_door", new DoorBlock(BlockSetType.IRON, Properties.of().strength(50.0F, 150.0F).sound(SoundType.METAL))
 	{
 	});
 	public static final Block ITNT = register("itnt", Ic2TileEntityBlock.create(Properties.of().strength(0.0F, 0.0F).sound(SoundType.GRASS), TileEntityITnt.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.noFacings, false));

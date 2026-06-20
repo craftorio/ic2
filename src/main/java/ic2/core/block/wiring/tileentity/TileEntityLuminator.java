@@ -158,7 +158,7 @@ public class TileEntityLuminator extends Ic2TileEntity
 		super.onEntityCollision(entity);
 		if (this.getActive() && entity instanceof Monster)
 		{
-			boolean isUndead = ((LivingEntity) entity).getMobType() == MobType.UNDEAD;
+			boolean isUndead = entity.getType().is(EntityTypeTags.UNDEAD);
 			entity.setRemainingFireTicks(isUndead ? 20 : 10);
 		}
 	}

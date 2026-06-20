@@ -2,29 +2,18 @@ package ic2.forge;
 
 import ic2.core.fluid.Ic2FluidItem;
 import ic2.core.fluid.Ic2FluidStack;
-import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.capabilities.Capability;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.capabilities.ICapabilityProvider;
-import net.neoforged.neoforge.common.util.LazyOptional;
-import net.neoforged.neoforge.common.util.NonNullSupplier;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
 import org.apache.commons.lang3.mutable.Mutable;
 
-final class ItemFluidCapImpl implements ICapabilityProvider, IFluidHandlerItem, NonNullSupplier<IFluidHandlerItem>, Mutable<ItemStack> {
+final class ItemFluidCapImpl implements IFluidHandlerItem, Mutable<ItemStack> {
 
     private ItemStack stack;
 
     public ItemFluidCapImpl(ItemStack stack) {
         this.stack = stack;
-    }
-
-    @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> capability, Direction facing) {
-        return capability == Capabilities.FluidHandler.BLOCK_ITEM ? (LazyOptional<T>) LazyOptional.of(this) : LazyOptional.empty();
     }
 
     @Override
@@ -95,10 +84,6 @@ final class ItemFluidCapImpl implements ICapabilityProvider, IFluidHandlerItem, 
     @Override
     public ItemStack getContainer() {
         return this.stack;
-    }
-
-    public IFluidHandlerItem get() {
-        return this;
     }
 
     public ItemStack getValue() {

@@ -1,6 +1,5 @@
 package ic2.core.block.machine.gui;
 
-import com.google.common.base.Supplier;
 import ic2.core.Ic2Gui;
 import ic2.core.block.machine.container.ContainerCondenser;
 import ic2.core.gui.EnergyGauge;
@@ -11,6 +10,8 @@ import ic2.core.gui.TankGauge;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+
+import java.util.function.Supplier;
 
 public class GuiCondenser extends Ic2Gui<ContainerCondenser>
 {

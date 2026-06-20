@@ -1,6 +1,5 @@
 package ic2.core.block.machine.gui;
 
-import com.google.common.base.Supplier;
 import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.IC2;
 import ic2.core.Ic2Gui;
@@ -38,7 +37,7 @@ public class GuiCanner extends Ic2Gui<ContainerCanner>
 				IC2.network.get(false).initiateClientTileEntityEvent(GuiCanner.this.menu.base, value);
 			}
 		});
-		this.addElement(new CustomButton(this, 63, 81, 50, 14, cycleHandler, texture, cycleHandler).withTooltip((Supplier<String>) () -> switch (GuiCanner.this.menu.base.getMode())
+		this.addElement(new CustomButton(this, 63, 81, 50, 14, cycleHandler, texture, cycleHandler).withTooltip(() -> switch (GuiCanner.this.menu.base.getMode())
 		{
 			case BottleSolid -> "ic2.Canner.gui.switch.BottleSolid";
 			case EmptyLiquid -> "ic2.Canner.gui.switch.EmptyLiquid";

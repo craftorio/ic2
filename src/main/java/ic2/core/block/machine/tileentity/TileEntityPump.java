@@ -31,11 +31,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.core.HolderLookup;
 
 public class TileEntityPump extends TileEntityElectricMachine implements IHasGui, IUpgradableBlock, IGuiValueProvider
 {
@@ -47,7 +45,6 @@ public class TileEntityPump extends TileEntityElectricMachine implements IHasGui
 	public final int defaultOperationLength;
 	private Sound sound;
 	private TileEntityMiner miner = null;
-	public boolean redstonePowered = false;
 	public final InvSlotConsumableLiquid containerSlot;
 	public final InvSlotOutput outputSlot;
 	public final InvSlotUpgrade upgradeSlot;
@@ -68,7 +65,7 @@ public class TileEntityPump extends TileEntityElectricMachine implements IHasGui
 		this.defaultEnergyConsume = this.energyConsume = 1;
 		this.defaultOperationLength = this.operationLength = 20;
 		this.defaultTier = 1;
-		this.defaultEnergyStorage = 1 * this.operationLength;
+		this.defaultEnergyStorage = this.operationLength;
 		this.fluids = this.addComponent(new Fluids(this));
 		this.fluidTank = this.fluids.addTankExtract("fluid", 8000);
 	}

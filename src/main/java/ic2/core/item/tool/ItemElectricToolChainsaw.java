@@ -93,7 +93,7 @@ public class ItemElectricToolChainsaw extends ItemElectricTool implements IHitSo
 	@Override
 	public boolean isCorrectToolForDrops(@NotNull ItemStack stack, @NotNull BlockState state)
 	{
-		return super.isCorrectToolForDrops(state) || state.is(Blocks.COBWEB) || Util.canShear(state);
+		return super.isCorrectToolForDrops(stack, state) || state.is(Blocks.COBWEB) || Util.canShear(state);
 	}
 
 	@Override

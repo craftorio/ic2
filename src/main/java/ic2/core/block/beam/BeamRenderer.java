@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -65,12 +66,13 @@ public class BeamRenderer extends EntityRenderer<ParticleEntity>
 				v = v1;
 			}
 
-			vertexConsumer.vertex(positionMatrix, x, y, 0.0F)
-				.color(red, green, blue, alpha)
+			Vector3f normalVec = normalMatrix.transform(0.0F, 1.0F, 0.0F, new Vector3f());
+			vertexConsumer.addVertex(positionMatrix, x, y, 0.0F)
+				.setColor(red, green, blue, alpha)
 				.setUv(u, v)
 				.setOverlay(OverlayTexture.NO_OVERLAY)
 				.setLight(light)
-				.normal(normalMatrix, 0.0F, 1.0F, 0.0F)
+				.setNormal(normalVec.x(), normalVec.y(), normalVec.z())
 				;
 		}
 

@@ -74,7 +74,8 @@ public class TileEntityTradeOMat
 		super.loadAdditional(nbt, registries);
 		if (nbt.contains("ownerGameProfile"))
 		{
-			this.owner = NbtUtils.readGameProfile(nbt.getCompound("ownerGameProfile"));
+			CompoundTag ownerNbt = nbt.getCompound("ownerGameProfile");
+			this.owner = new GameProfile(ownerNbt.getUUID("Id"), ownerNbt.getString("Name"));
 		}
 
 		this.totalTradeCount = nbt.getInt("totalTradeCount");
@@ -91,7 +92,8 @@ public class TileEntityTradeOMat
 		if (this.owner != null)
 		{
 			CompoundTag ownerNbt = new CompoundTag();
-			NbtUtils.writeGameProfile(ownerNbt, this.owner);
+			ownerNbt.putUUID("Id", this.owner.getId());
+			ownerNbt.putString("Name", this.owner.getName());
 			nbt.put("ownerGameProfile", ownerNbt);
 		}
 

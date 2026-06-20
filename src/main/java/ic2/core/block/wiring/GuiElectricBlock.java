@@ -1,6 +1,5 @@
 package ic2.core.block.wiring;
 
-import com.google.common.base.Supplier;
 import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.Ic2Gui;
 import ic2.core.gui.EnergyGauge;
@@ -19,7 +18,7 @@ public class GuiElectricBlock extends Ic2Gui<ContainerElectricBlock>
 	{
 		super(container, playerInventory, title, 196);
 		this.addElement(EnergyGauge.asBar(this, 79, 38, container.base));
-		this.addElement(new VanillaButton(this, 152, 4, 20, 20, this.createEventSender(0)).withIcon((Supplier<ItemStack>) () -> new ItemStack(Items.REDSTONE)).withTooltip((Supplier<String>) container.base::getRedstoneMode));
+		this.addElement(new VanillaButton(this, 152, 4, 20, 20, this.createEventSender(0)).withIcon(() -> new ItemStack(Items.REDSTONE)).withTooltip(container.base::getRedstoneMode));
 	}
 
 	@Override

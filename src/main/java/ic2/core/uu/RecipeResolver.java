@@ -21,8 +21,9 @@ public class RecipeResolver implements IRecipeResolver
 	{
 		List<RecipeTransformation> ret = new ArrayList<>();
 
-		for (Recipe<?> irecipe : IC2.sideProxy.getRecipeManager().getRecipes())
+		for (net.minecraft.world.item.crafting.RecipeHolder<?> holder : IC2.sideProxy.getRecipeManager().getRecipes())
 		{
+			Recipe<?> irecipe = holder.value();
 			NonNullList<Ingredient> inputs = irecipe.getIngredients();
 			ItemStack output = irecipe.getResultItem((net.minecraft.core.RegistryAccess) null);
 			if (!StackUtil.isEmpty(output) && !inputs.isEmpty())

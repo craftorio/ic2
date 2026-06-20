@@ -15,7 +15,10 @@ import ic2.core.util.KeyboardClient;
 import ic2.core.util.StackUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.effect.MobEffect;
@@ -41,17 +44,17 @@ import net.minecraft.core.Holder;
 public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack, IHazmatLike, IItemHudProvider
 {
 	public static final int[] CHARGED_PROTECTION = new int[] { 3, 6, 8, 3 };
-	protected static final Map<MobEffect, Integer> potionRemovalCost = new IdentityHashMap<>();
+	protected static final Map<Holder<MobEffect>, Integer> potionRemovalCost = new IdentityHashMap<>();
 	private float jumpCharge;
 
 	static
 	{
 		potionRemovalCost.put(MobEffects.POISON, 10000);
-		potionRemovalCost.put(Ic2Potion.radiation, 10000);
+		potionRemovalCost.put(BuiltInRegistries.MOB_EFFECT.wrapAsHolder(Ic2Potion.radiation), 10000);
 		potionRemovalCost.put(MobEffects.WITHER, 25000);
 	}
 
-	public ItemArmorQuantumSuit(ArmorMaterial material, EquipmentSlot armorType, Properties settings)
+	public ItemArmorQuantumSuit(Holder<ArmorMaterial> material, EquipmentSlot armorType, Properties settings)
 	{
 		super(material, armorType, settings, 1.0E7, 12000.0, 4);
 	}
@@ -81,8 +84,16 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 			nbt.remove("color");
 			if (nbt.isEmpty())
 			{
-				assert stack.getTag() != null;
-				stack.getTag().remove("display");
+				CustomData customData = stack.get(DataComponents.CUSTOM_DATA);
+				if (customData != null)
+				{
+					CompoundTag rootNbt = customData.getUnsafe();
+					rootNbt.remove("display");
+					if (rootNbt.isEmpty())
+					{
+						stack.remove(DataComponents.CUSTOM_DATA);
+					}
+				}
 			}
 		}
 	}
@@ -102,7 +113,8 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 
 	private CompoundTag getDisplayNbt(ItemStack stack, boolean create)
 	{
-		CompoundTag nbt = stack.getTag();
+		CustomData customData = stack.get(DataComponents.CUSTOM_DATA);
+		CompoundTag nbt = customData != null ? customData.getUnsafe() : null;
 		if (nbt == null)
 		{
 			if (!create)
@@ -111,7 +123,7 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 			}
 
 			nbt = new CompoundTag();
-			stack.set(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.of(nbt));
+			stack.set(DataComponents.CUSTOM_DATA, CustomData.of(nbt));
 		}
 
 		CompoundTag ret;
@@ -151,14 +163,12 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 		return true;
 	}
 
-	@Override
 	public @NotNull Rarity getRarity(@NotNull ItemStack stack)
 	{
 		return Rarity.RARE;
 	}
 
-	@Override
-	public int getEnchantmentValue()
+	public int getEnchantmentValue(ItemStack stack)
 	{
 		return 0;
 	}

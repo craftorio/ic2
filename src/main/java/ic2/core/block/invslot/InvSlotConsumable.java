@@ -38,7 +38,7 @@ public abstract class InvSlotConsumable extends InvSlot
 	{
 		ItemStack ret = null;
 
-		for (int i = 0; i < this.getContainerSize(); i++)
+		for (int i = 0; i < this.size(); i++)
 		{
 			ItemStack stack = this.get(i);
 			if (StackUtil.getSize(stack) >= 1
@@ -99,7 +99,7 @@ public abstract class InvSlotConsumable extends InvSlot
 		int damageApplied = 0;
 		ItemStack target = null;
 
-		for (int i = 0; i < this.getContainerSize() && amount > 0; i++)
+		for (int i = 0; i < this.size() && amount > 0; i++)
 		{
 			ItemStack stack = this.get(i);
 			if (!StackUtil.isEmpty(stack))

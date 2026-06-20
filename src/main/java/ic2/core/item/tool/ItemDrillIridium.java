@@ -5,9 +5,11 @@ import ic2.core.profile.NotClassic;
 import ic2.core.ref.Ic2Items;
 import ic2.core.util.StackUtil;
 
-import java.util.IdentityHashMap;
-import java.util.Map;
-
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -16,9 +18,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
@@ -43,11 +44,6 @@ public class ItemDrillIridium extends ItemDrill
 			return 5.0F;
 		}
 
-		public int getLevel()
-		{
-			return 100;
-		}
-
 		public int getEnchantmentValue()
 		{
 			return 20;
@@ -56,6 +52,11 @@ public class ItemDrillIridium extends ItemDrill
 		public Ingredient getRepairIngredient()
 		{
 			return Ingredient.of(new ItemLike[] { Ic2Items.IRIDIUM });
+		}
+
+		public net.minecraft.tags.TagKey<net.minecraft.world.level.block.Block> getIncorrectBlocksForDrops()
+		{
+			return BlockTags.INCORRECT_FOR_NETHERITE_TOOL;
 		}
 	};
 
@@ -68,9 +69,10 @@ public class ItemDrillIridium extends ItemDrill
 	protected ItemStack getItemStack(double charge)
 	{
 		ItemStack ret = super.getItemStack(charge);
-		Map<Enchantment, Integer> enchantmentMap = new IdentityHashMap<>();
-		enchantmentMap.put(Enchantments.BLOCK_FORTUNE, 3);
-		EnchantmentHelper.setEnchantments(enchantmentMap, ret);
+		ItemEnchantments.Mutable enchantments = new ItemEnchantments.Mutable(ItemEnchantments.EMPTY);
+		var enchantmentRegistry = RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY).lookupOrThrow(Registries.ENCHANTMENT);
+		enchantments.set(enchantmentRegistry.getOrThrow(Enchantments.FORTUNE), 3);
+		ret.set(DataComponents.ENCHANTMENTS, enchantments.toImmutable());
 		return ret;
 	}
 
@@ -79,19 +81,20 @@ public class ItemDrillIridium extends ItemDrill
 	{
 		if (!world.isClientSide && IC2.keyboard.isModeSwitchKeyDown(player))
 		{
-			Map<Enchantment, Integer> enchantmentMap = new IdentityHashMap<>();
 			ItemStack stack = StackUtil.get(player, hand);
-			if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, stack) == 0)
+			var enchantmentRegistry = player.registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
+			ItemEnchantments.Mutable enchantments = new ItemEnchantments.Mutable(ItemEnchantments.EMPTY);
+			if (stack.getOrDefault(DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY).getLevel(enchantmentRegistry.getOrThrow(Enchantments.SILK_TOUCH)) == 0)
 			{
-				enchantmentMap.put(Enchantments.SILK_TOUCH, 1);
+				enchantments.set(enchantmentRegistry.getOrThrow(Enchantments.SILK_TOUCH), 1);
 				IC2.sideProxy.messagePlayer(player, "item.ic2.mining_laser.tooltip.mode", "item.ic2.mining_laser.tooltip.mode.silkTouch");
 			} else
 			{
-				enchantmentMap.put(Enchantments.BLOCK_FORTUNE, 3);
+				enchantments.set(enchantmentRegistry.getOrThrow(Enchantments.FORTUNE), 3);
 				IC2.sideProxy.messagePlayer(player, "item.ic2.mining_laser.tooltip.mode", "item.ic2.mining_laser.tooltip.mode.normal");
 			}
 
-			EnchantmentHelper.setEnchantments(enchantmentMap, stack);
+			stack.set(DataComponents.ENCHANTMENTS, enchantments.toImmutable());
 		}
 
 		return super.use(world, player, hand);

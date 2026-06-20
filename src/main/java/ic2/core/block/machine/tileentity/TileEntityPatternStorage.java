@@ -94,7 +94,7 @@ public class TileEntityPatternStorage extends TileEntityInventory implements IHa
 		for (int i = 0; i < patternList.size(); i++)
 		{
 			CompoundTag contentTag = patternList.getCompound(i);
-			ItemStack Item = ItemStack.of(contentTag);
+			ItemStack Item = ItemStack.parseOptional(this.level.registryAccess(), contentTag);
 			this.addPattern(Item);
 		}
 
@@ -107,8 +107,7 @@ public class TileEntityPatternStorage extends TileEntityInventory implements IHa
 
 		for (ItemStack stack : this.patterns)
 		{
-			CompoundTag contentTag = new CompoundTag();
-			stack.save(net.minecraft.core.RegistryAccess.EMPTY, contentTag);
+			CompoundTag contentTag = (CompoundTag) stack.save(this.level.registryAccess());
 			list.add(contentTag);
 		}
 
@@ -166,7 +165,7 @@ public class TileEntityPatternStorage extends TileEntityInventory implements IHa
 					ItemStack crystalMemory = this.diskSlot.get();
 					if (crystalMemory.getItem() instanceof ItemCrystalMemory)
 					{
-						((ItemCrystalMemory) crystalMemory.getItem()).writeContentsTag(crystalMemory, this.patterns.get(this.index));
+						((ItemCrystalMemory) crystalMemory.getItem()).writeContentsTag(crystalMemory, this.patterns.get(this.index), this.getLevel().registryAccess());
 					}
 				}
 				break;

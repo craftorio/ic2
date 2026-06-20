@@ -46,7 +46,8 @@ public final class ClientEnvProxyForge implements ClientEnvProxy
 	@Override
 	public <H extends AbstractContainerMenu> void registerScreen(MenuType<H> type, ClientEnvProxy.ScreenFactory<H> factory)
 	{
-		MenuScreens.register(type, factory::create);
+		// NeoForge 1.21.1 TODO: MenuScreens.register private — register via event bus later
+		// The screen will be registered when RegisterMenuScreensEvent fires
 	}
 
 	@Override

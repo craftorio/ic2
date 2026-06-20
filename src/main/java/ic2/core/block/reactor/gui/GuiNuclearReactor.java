@@ -1,6 +1,5 @@
 package ic2.core.block.reactor.gui;
 
-import com.google.common.base.Supplier;
 import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.Ic2Gui;
 import ic2.core.block.reactor.container.ContainerNuclearReactor;
@@ -25,9 +24,9 @@ public class GuiNuclearReactor extends Ic2Gui<ContainerNuclearReactor>
 		IEnableHandler enableHandler = GuiNuclearReactor.this.menu.base::isFluidCooled;
 		this.addElement(TankGauge.createBorderless(this, 10, 54, container.base.getinputtank(), true).withEnableHandler(enableHandler));
 		this.addElement(TankGauge.createBorderless(this, 190, 54, container.base.getoutputtank(), false).withEnableHandler(enableHandler));
-		this.addElement(new LinkedGauge(this, 7, 136, container.base, "heat", Gauge.GaugeStyle.HeatNuclearReactor).withTooltip((Supplier<String>) () -> Component.translatable("ic2.NuclearReactor.gui.info.temp", GuiNuclearReactor.this.menu.base.getGuiValue("heat") * 100.0).getString()));
+		this.addElement(new LinkedGauge(this, 7, 136, container.base, "heat", Gauge.GaugeStyle.HeatNuclearReactor).withTooltip(() -> Component.translatable("ic2.NuclearReactor.gui.info.temp", GuiNuclearReactor.this.menu.base.getGuiValue("heat") * 100.0).getString()));
 		this.addElement(TextLabel.create(this, 107, 136, 200, 13, TextProvider.of(() -> GuiNuclearReactor.this.menu.base.isFluidCooled() ? Component.translatable("ic2.NuclearReactor.gui.info.HUoutput", GuiNuclearReactor.this.menu.base.EmitHeat).getString() : Component.translatable("ic2.NuclearReactor.gui.info.EUoutput", Math.round(GuiNuclearReactor.this.menu.base.getOfferedEnergy())).getString()), 5752026, false, 4, 0, false, true));
-		this.addElement(new Area(this, 5, 160, 18, 18).withTooltip((Supplier<String>) () -> GuiNuclearReactor.this.menu.base.isFluidCooled() ? "ic2.NuclearReactor.gui.mode.fluid" : "ic2.NuclearReactor.gui.mode.electric"));
+		this.addElement(new Area(this, 5, 160, 18, 18).withTooltip(() -> GuiNuclearReactor.this.menu.base.isFluidCooled() ? "ic2.NuclearReactor.gui.mode.fluid" : "ic2.NuclearReactor.gui.mode.electric"));
 	}
 
 	@Override

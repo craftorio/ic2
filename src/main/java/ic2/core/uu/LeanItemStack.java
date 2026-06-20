@@ -6,6 +6,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.component.CustomData;
 
 class LeanItemStack
 {
@@ -26,12 +27,12 @@ class LeanItemStack
 
 	public LeanItemStack(ItemStack stack)
 	{
-		this(stack.getItem(), stack.getTag(), StackUtil.getSize(stack));
+		this(stack.getItem(), stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).getUnsafe(), StackUtil.getSize(stack));
 	}
 
 	public LeanItemStack(ItemStack stack, int size)
 	{
-		this(stack.getItem(), stack.getTag(), size);
+		this(stack.getItem(), stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).getUnsafe(), size);
 	}
 
 	public LeanItemStack(Item item, CompoundTag nbt, int size)

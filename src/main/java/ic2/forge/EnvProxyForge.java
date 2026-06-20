@@ -143,7 +143,7 @@ public final class EnvProxyForge implements EnvProxy
 	@Override
 	public void registerBlock(ResourceLocation id, Block block)
 	{
-		BuiltInRegistries.BLOCK.register(id, block);
+		Registry.register(BuiltInRegistries.BLOCK, id, block);
 	}
 
 	@Override
@@ -175,7 +175,7 @@ public final class EnvProxyForge implements EnvProxy
 	@Override
 	public void registerItem(ResourceLocation id, Item item)
 	{
-		BuiltInRegistries.ITEM.register(id, item);
+		Registry.register(BuiltInRegistries.ITEM, id, item);
 	}
 
 	@Override
@@ -206,15 +206,15 @@ public final class EnvProxyForge implements EnvProxy
 	{
 		ResourceLocation identifier = IC2.getIdentifier(id);
 		SoundEvent soundEvent = SoundEvent.createVariableRangeEvent(identifier);
-		BuiltInRegistries.SOUND_EVENT.register(identifier, soundEvent);
+		Registry.register(BuiltInRegistries.SOUND_EVENT, identifier, soundEvent);
 		return soundEvent;
 	}
 
 	@Override
-	public GameEvent registerGameEvent(String id, int range)
+	public Holder<GameEvent> registerGameEvent(String id, int range)
 	{
 		ResourceLocation identifier = IC2.getIdentifier(id);
-		return Registry.register(BuiltInRegistries.GAME_EVENT, identifier, new GameEvent(identifier.toString(), range));
+		return Registry.registerForHolder(BuiltInRegistries.GAME_EVENT, identifier, new GameEvent(range));
 	}
 
 	@Override
@@ -249,7 +249,7 @@ public final class EnvProxyForge implements EnvProxy
 	@Override
 	public <T extends FoliagePlacer> FoliagePlacerType<T> registerFoliagePlacer(ResourceLocation id, Codec<T> codec)
 	{
-		FoliagePlacerType<T> type = new FoliagePlacerType<>(codec);
+		FoliagePlacerType<T> type = new FoliagePlacerType<>(codec.fieldOf("config"));
 		foliagePlacerRegistry.register(id.getPath(), () -> type);
 		return type;
 	}
@@ -443,7 +443,7 @@ public final class EnvProxyForge implements EnvProxy
 	public boolean announceExplosion(Level world, Entity entity, Vec3 pos, double power, LivingEntity igniter, int radiationRange, double rangeLimit)
 	{
 		ExplosionEvent event = new ExplosionEvent(world, entity, pos, power, igniter, radiationRange, rangeLimit);
-		return !NeoForge.EVENT_BUS.post(event);
+		return !NeoForge.EVENT_BUS.post(event).isCanceled();
 	}
 
 	static void registerPendingItems()

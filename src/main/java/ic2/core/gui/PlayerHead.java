@@ -7,6 +7,7 @@ import ic2.core.util.StackUtil;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.WeakHashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -54,15 +55,18 @@ public class PlayerHead extends ItemImage
 
 		public ItemStack get()
 		{
-			CompletableFuture<GameProfile> future = new CompletableFuture<>();
-			SkullBlockEntity.updateGameprofile(this.profile, future::complete);
-
 			try
 			{
-				return PlayerHead.IMAGE_MAKER.computeIfAbsent(future.get(), resolvedProfile ->
+				GameProfile resolvedProfile = SkullBlockEntity.fetchGameProfile(this.profile.getName())
+					.get()
+					.orElse(this.profile);
+				return PlayerHead.IMAGE_MAKER.computeIfAbsent(resolvedProfile, rp ->
 				{
 					ItemStack skull = new ItemStack(Items.PLAYER_HEAD);
-					StackUtil.getOrCreateNbtData(skull).put("SkullOwner", NbtUtils.writeGameProfile(new CompoundTag(), resolvedProfile));
+					CompoundTag profileTag = new CompoundTag();
+					profileTag.putUUID("Id", rp.getId());
+					profileTag.putString("Name", rp.getName());
+					StackUtil.getOrCreateNbtData(skull).put("SkullOwner", profileTag);
 					return skull;
 				});
 			} catch (InterruptedException | ExecutionException e)

@@ -2,6 +2,7 @@ package ic2.core.recipe.input;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mojang.serialization.JsonOps;
 
 import java.util.Arrays;
 import java.util.List;
@@ -47,7 +48,7 @@ public class RecipeInputIngredient extends RecipeInputBase
 	@Override
 	public JsonElement toJson()
 	{
-		JsonElement element = this.ingredient.toJson();
+		JsonElement element = Ingredient.CODEC.encodeStart(JsonOps.INSTANCE, this.ingredient).getOrThrow();
 		if (this.amount == 1)
 		{
 			return element;

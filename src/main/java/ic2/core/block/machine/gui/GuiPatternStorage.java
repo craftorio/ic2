@@ -1,6 +1,5 @@
 package ic2.core.block.machine.gui;
 
-import com.google.common.base.Supplier;
 import ic2.core.Ic2Gui;
 import ic2.core.block.machine.container.ContainerPatternStorage;
 import ic2.core.block.machine.tileentity.TileEntityPatternStorage;
@@ -41,7 +40,7 @@ public class GuiPatternStorage extends Ic2Gui<ContainerPatternStorage>
 		}), 16777215, false).withEnableHandler(patternInfoEnabler));
 		this.addElement(TextLabel.create(this, 80, 59, TextProvider.of(() -> Util.toSiString(container.base.patternUu, 4) + Component.translatable("ic2.generic.text.bucketUnit")), 16777215, false).withEnableHandler(patternInfoEnabler));
 		this.addElement(TextLabel.create(this, 80, 70, TextProvider.of(() -> Util.toSiString(container.base.patternEu, 4) + Component.translatable("ic2.generic.text.EU").getString()), 16777215, false).withEnableHandler(patternInfoEnabler));
-		this.addElement(new ItemImage(this, 152, 29, (Supplier<ItemStack>) () -> container.base.pattern));
+		this.addElement(new ItemImage(this, 152, 29, () -> container.base.pattern));
 	}
 
 	@Override

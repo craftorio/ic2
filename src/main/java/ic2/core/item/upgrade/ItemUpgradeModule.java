@@ -21,14 +21,14 @@ import ic2.core.util.Util;
 import java.text.DecimalFormat;
 import java.util.*;
 
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Direction;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.InteractionResult;
@@ -65,7 +65,6 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 		return info;
 	}
 
-	@OnlyIn(Dist.CLIENT)
 	public void appendHoverText(@NotNull ItemStack stack, Item.TooltipContext world, @NotNull List<Component> tooltip, @NotNull TooltipFlag advanced)
 	{
 		super.appendHoverText(stack, world, tooltip, advanced);
@@ -185,7 +184,7 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 		{
 			case advanced_ejector:
 			case advanced_pulling:
-				if (!player.getCommandSenderWorld().isClientSide && !StackUtil.isEmpty(stack) && player.containerMenu instanceof DynamicHandHeldContainer)
+				if (!player.level().isClientSide && !StackUtil.isEmpty(stack) && player.containerMenu instanceof DynamicHandHeldContainer)
 				{
 					HandHeldInventory base = ((DynamicHandHeldContainer<?>) player.containerMenu).base;
 					if (base instanceof HandHeldAdvancedUpgrade && base.isThisContainer(stack))
@@ -420,7 +419,7 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 					int slot = slotNbt.getByte("Slot");
 					if (slot >= 0 && slot < 9)
 					{
-						ItemStack filter = ItemStack.of(slotNbt);
+						ItemStack filter = ItemStack.parseOptional(RegistryAccess.EMPTY, slotNbt);
 						if (!StackUtil.isEmpty(filter))
 						{
 							ret.add(filter);
@@ -435,7 +434,7 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 				return switch (this.nbt)
 				{
 					case IGNORED -> true;
-					case FUZZY -> StackUtil.checkNbtEquality(stack.getTag(), filter.getTag());
+					case FUZZY -> StackUtil.checkNbtEquality(stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).getUnsafe(), filter.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).getUnsafe());
 					case EXACT -> StackUtil.checkNbtEqualityStrict(stack, filter);
 				};
 			}

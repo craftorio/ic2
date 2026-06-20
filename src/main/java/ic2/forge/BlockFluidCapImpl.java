@@ -3,45 +3,43 @@ package ic2.forge;
 import ic2.core.fluid.FluidTankInfo;
 import ic2.core.fluid.Ic2FluidBlock;
 import ic2.core.util.Util;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.capabilities.Capability;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.capabilities.ICapabilityProvider;
-import net.neoforged.neoforge.common.util.LazyOptional;
-import net.neoforged.neoforge.common.util.NonNullSupplier;
+import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.capabilities.IBlockCapabilityProvider;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import org.jetbrains.annotations.Nullable;
 
-final class BlockFluidCapImpl implements ICapabilityProvider {
+final class BlockFluidCapImpl implements IBlockCapabilityProvider<IFluidHandler, @Nullable Direction> {
 
     private final Ic2FluidBlock parent;
 
     private final BlockEntity be;
 
-    private final LazyOptional<IFluidHandler>[] sides;
+    private final SideHandler[] sides;
 
     public BlockFluidCapImpl(Ic2FluidBlock fluidBlock, BlockEntity be) {
         this.parent = fluidBlock;
         this.be = be;
-        this.sides = new LazyOptional[Util.ALL_DIRS.length];
+        this.sides = new SideHandler[Util.ALL_DIRS.length];
         for (Direction dir : Util.ALL_DIRS) {
-            this.sides[dir.ordinal()] = LazyOptional.of(new BlockFluidCapImpl.SideHandler(dir));
+            this.sides[dir.ordinal()] = new SideHandler(dir);
         }
     }
 
     @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> capability, Direction facing) {
-        if (capability != Capabilities.FluidHandler.BLOCK) {
-            return LazyOptional.empty();
+    @Nullable
+    public IFluidHandler getCapability(Level level, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, @Nullable Direction context) {
+        if (context == null) {
+            return this.sides[0];
         }
-        if (facing == null) {
-            return (LazyOptional<T>) this.sides[0];
-        }
-        return (LazyOptional<T>) this.sides[facing.ordinal()];
+        return this.sides[context.ordinal()];
     }
 
-    private class SideHandler implements IFluidHandler, NonNullSupplier<IFluidHandler> {
+    private class SideHandler implements IFluidHandler {
 
         private final Direction side;
 
@@ -120,10 +118,6 @@ final class BlockFluidCapImpl implements ICapabilityProvider {
         @Override
         public int fill(FluidStack resource, IFluidHandler.FluidAction action) {
             return resource != null && !resource.isEmpty() ? BlockFluidCapImpl.this.parent.fillMb(null, null, null, BlockFluidCapImpl.this.be, this.side, new Ic2FluidStackImpl(resource), action.simulate()) : 0;
-        }
-
-        public IFluidHandler get() {
-            return this;
         }
     }
 }

@@ -63,7 +63,7 @@ public interface ClientEnvProxy
 	{
 		VertexFormat format = DefaultVertexFormat.BLOCK;
 		int[] data = quad.getVertices();
-		int stride = format.getIntegerSize();
+		int stride = format.getVertexSize() / 4;
 		int posOffset = 0;
 		int uvOffset = 4;
 		final float[] positions = new float[12];

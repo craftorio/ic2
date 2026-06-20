@@ -487,11 +487,11 @@ public final class Ic2Items
 	public static final Item METER = register("meter", new ItemToolMeter(new Properties().stacksTo(1)));
 	public static final Item TREETAP = register("treetap", new ItemTreetap(new Properties().durability(16)));
 	public static final Item WRENCH = register("wrench", new ItemToolWrench(new Properties().durability(120)));
-	public static final Item BRONZE_AXE = register("bronze_axe", new Ic2Axe(Ic2ToolMaterials.BRONZE, 6.0F, -3.1F, new Properties()));
-	public static final Item BRONZE_HOE = register("bronze_hoe", new Ic2Hoe(Ic2ToolMaterials.BRONZE, -2, -1.0F, new Properties()));
-	public static final Item BRONZE_SWORD = register("bronze_sword", new SwordItem(Ic2ToolMaterials.BRONZE, 3, -2.4F, new Properties()));
-	public static final Item BRONZE_SHOVEL = register("bronze_shovel", new ShovelItem(Ic2ToolMaterials.BRONZE, 1.5F, -3.0F, new Properties()));
-	public static final Item BRONZE_PICKAXE = register("bronze_pickaxe", new Ic2Pickaxe(Ic2ToolMaterials.BRONZE, 1, -2.8F, new Properties()));
+	public static final Item BRONZE_AXE = register("bronze_axe", new Ic2Axe(Ic2ToolMaterials.BRONZE, new Properties().attributes(AxeItem.createAttributes(Ic2ToolMaterials.BRONZE, 6.0F, -3.1F))));
+	public static final Item BRONZE_HOE = register("bronze_hoe", new Ic2Hoe(Ic2ToolMaterials.BRONZE, new Properties().attributes(HoeItem.createAttributes(Ic2ToolMaterials.BRONZE, -2, -1.0F))));
+	public static final Item BRONZE_SWORD = register("bronze_sword", new SwordItem(Ic2ToolMaterials.BRONZE, new Properties().attributes(SwordItem.createAttributes(Ic2ToolMaterials.BRONZE, 3, -2.4F))));
+	public static final Item BRONZE_SHOVEL = register("bronze_shovel", new ShovelItem(Ic2ToolMaterials.BRONZE, new Properties().attributes(ShovelItem.createAttributes(Ic2ToolMaterials.BRONZE, 1.5F, -3.0F))));
+	public static final Item BRONZE_PICKAXE = register("bronze_pickaxe", new Ic2Pickaxe(Ic2ToolMaterials.BRONZE, new Properties().attributes(PickaxeItem.createAttributes(Ic2ToolMaterials.BRONZE, 1, -2.8F))));
 	public static final Item FREQUENCY_TRANSMITTER = register("frequency_transmitter", new ItemFrequencyTransmitter(new Properties().stacksTo(1)));
 	public static final Item CROWBAR = register("crowbar", new ItemToolCrowbar(Tiers.IRON, new Properties().durability(250)));
 	public static final Item ADVANCED_SCANNER = register("advanced_scanner", new ItemScannerAdv(new Properties().stacksTo(1)));

@@ -33,6 +33,7 @@ import org.jetbrains.annotations.Nullable;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.component.CustomData;
 
 public class ItemClassicCell extends Ic2BucketItem implements Ic2FluidItem
 {
@@ -141,18 +142,17 @@ public class ItemClassicCell extends Ic2BucketItem implements Ic2FluidItem
 			return 0;
 		}
 
-		CompoundTag nbt = stack.getTag();
-		return nbt != null ? nbt.getInt("uses") : 0;
+		return stack.has(DataComponents.CUSTOM_DATA) ? stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).getUnsafe().getInt("uses") : 0;
 	}
 
 	private void setUsage(ItemStack stack, int uses)
 	{
 		if (uses <= 0)
 		{
-			stack.set(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.of(null));
+			CustomData.update(DataComponents.CUSTOM_DATA, stack, tag -> tag.remove("uses"));
 		} else
 		{
-			stack.getOrDefault(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.EMPTY).copyTag().putInt("uses", uses);
+			StackUtil.getOrCreateNbtData(stack).putInt("uses", uses);
 		}
 	}
 

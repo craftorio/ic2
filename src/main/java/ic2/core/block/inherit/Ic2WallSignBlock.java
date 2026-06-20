@@ -11,9 +11,9 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 
 public class Ic2WallSignBlock extends WallSignBlock
 {
-	public Ic2WallSignBlock(Properties settings, WoodType signType)
+	public Ic2WallSignBlock(WoodType signType, Properties settings)
 	{
-		super(settings, signType);
+		super(signType, settings);
 	}
 
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state)

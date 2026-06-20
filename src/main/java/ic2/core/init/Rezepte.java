@@ -43,9 +43,10 @@ public class Rezepte
 		{
 			MatterAmplifierRecipeManager manager = new MatterAmplifierRecipeManager();
 
-			for (RecipeHolder<IRecipeInput, Integer> holder : recipeManager.getAllRecipesFor(Ic2RecipeTypes.MATTER_FABRICATOR))
+			for (var holder : recipeManager.getAllRecipesFor(Ic2RecipeTypes.MATTER_FABRICATOR))
 			{
-				manager.addRecipe(holder.recipe().getInput(), holder.recipe().getOutput(), null, false);
+				RecipeHolder<IRecipeInput, Integer> ic2Holder = holder.value();
+				manager.addRecipe(ic2Holder.recipe().getInput(), ic2Holder.recipe().getOutput(), null, false);
 			}
 
 			return manager;
@@ -54,9 +55,10 @@ public class Rezepte
 		{
 			CannerBottleRecipeManager manager = new CannerBottleRecipeManager();
 
-			for (RecipeHolder<ICannerBottleRecipeManager.Input, ItemStack> holder : recipeManager.getAllRecipesFor(Ic2RecipeTypes.CANNER_BOTTLE))
+			for (var holder : recipeManager.getAllRecipesFor(Ic2RecipeTypes.CANNER_BOTTLE))
 			{
-				manager.addRecipe(holder.recipe().getInput(), holder.recipe().getOutput(), null, false);
+				RecipeHolder<ICannerBottleRecipeManager.Input, ItemStack> ic2Holder = holder.value();
+				manager.addRecipe(ic2Holder.recipe().getInput(), ic2Holder.recipe().getOutput(), null, false);
 			}
 
 			return manager;
@@ -65,9 +67,10 @@ public class Rezepte
 		{
 			CannerEnrichRecipeManager manager = new CannerEnrichRecipeManager();
 
-			for (RecipeHolder<ICannerEnrichRecipeManager.Input, Ic2FluidStack> holder : recipeManager.getAllRecipesFor(Ic2RecipeTypes.CANNER_ENRICH))
+			for (var holder : recipeManager.getAllRecipesFor(Ic2RecipeTypes.CANNER_ENRICH))
 			{
-				manager.addRecipe(holder.recipe().getInput(), holder.recipe().getOutput(), null, false);
+				RecipeHolder<ICannerEnrichRecipeManager.Input, Ic2FluidStack> ic2Holder = holder.value();
+				manager.addRecipe(ic2Holder.recipe().getInput(), ic2Holder.recipe().getOutput(), null, false);
 			}
 
 			return manager;
@@ -85,9 +88,10 @@ public class Rezepte
 		{
 			BasicMachineRecipeManager manager = new BasicMachineRecipeManager();
 
-			for (RecipeHolder<IRecipeInput, Collection<ItemStack>> holder : recipeManager.getAllRecipesFor(recipeType))
+			for (var holder : recipeManager.getAllRecipesFor(recipeType))
 			{
-				manager.addRecipe(holder.recipe(), false);
+				RecipeHolder<IRecipeInput, Collection<ItemStack>> ic2Holder = holder.value();
+				manager.addRecipe(ic2Holder.recipe(), false);
 			}
 
 			return manager;

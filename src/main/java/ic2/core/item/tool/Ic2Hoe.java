@@ -6,8 +6,8 @@ import net.minecraft.world.item.Item.Properties;
 
 public class Ic2Hoe extends HoeItem
 {
-	public Ic2Hoe(Tier material, int attackDamage, float attackSpeed, Properties settings)
+	public Ic2Hoe(Tier material, Properties settings)
 	{
-		super(material, attackDamage, attackSpeed, settings);
+		super(material, settings);
 	}
 }

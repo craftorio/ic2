@@ -3,29 +3,23 @@ package ic2.core.recipe.v2;
 import ic2.api.recipe.MachineRecipe;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
-import net.minecraft.core.RegistryAccess;
 
 public record RecipeHolder<I, O>(MachineRecipe<I, O> recipe, ResourceLocation id, RecipeSerializer<?> serializer,
                                  RecipeType<?> type)
-	implements Recipe<Container>
+	implements Recipe<RecipeInput>
 {
-	public boolean matches(Container inventory, Level world)
+	public boolean matches(RecipeInput input, Level level)
 	{
 		throw new UnsupportedOperationException("Not supported for IC2 machine recipes.");
 	}
 
-	public ItemStack assemble(Container inventory)
-	{
-		throw new UnsupportedOperationException("Not supported for IC2 machine recipes.");
-	}
-
-	public ItemStack assemble(Container inventory, HolderLookup.Provider registryAccess)
+	public ItemStack assemble(RecipeInput input, HolderLookup.Provider registries)
 	{
 		throw new UnsupportedOperationException("Not supported for IC2 machine recipes.");
 	}
@@ -35,12 +29,7 @@ public record RecipeHolder<I, O>(MachineRecipe<I, O> recipe, ResourceLocation id
 		throw new UnsupportedOperationException("Not supported for IC2 machine recipes.");
 	}
 
-	public ItemStack getResultItem()
-	{
-		return ItemStack.EMPTY;
-	}
-
-	public ItemStack getResultItem(RegistryAccess registryAccess)
+	public ItemStack getResultItem(HolderLookup.Provider registries)
 	{
 		return ItemStack.EMPTY;
 	}

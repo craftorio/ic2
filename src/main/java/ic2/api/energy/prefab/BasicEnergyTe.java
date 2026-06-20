@@ -29,11 +29,11 @@ public class BasicEnergyTe<T extends BasicEnergyTile> extends BlockEntity
 	}
 
 	protected void loadAdditional(CompoundTag nbt, net.minecraft.core.HolderLookup.Provider registries) {
-		this.energyBuffer.readFromNBT(net.minecraft.core.RegistryAccess.EMPTY, nbt);
+		this.energyBuffer.readFromNBT(nbt);
 	}
 
 	protected void saveAdditional(CompoundTag nbt, net.minecraft.core.HolderLookup.Provider registries) {
-		this.energyBuffer.writeToNBT(net.minecraft.core.RegistryAccess.EMPTY, nbt);
+		this.energyBuffer.writeToNBT(nbt);
 	}
 
 	public static class Sink extends BasicEnergyTe<BasicSink>

@@ -3,6 +3,7 @@ package ic2.core.fluid;
 import ic2.core.util.Util;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
 import org.apache.commons.lang3.mutable.Mutable;
 import net.minecraft.core.component.DataComponents;
 
@@ -218,8 +219,8 @@ public interface StandardFluidItem extends Ic2FluidItem
 
 	static Ic2FluidStack getFs(ItemStack stack)
 	{
-		CompoundTag nbt = stack.getTag();
-		if (nbt == null)
+		CompoundTag nbt = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).getUnsafe();
+		if (nbt.isEmpty())
 		{
 			return null;
 		} else
@@ -230,11 +231,11 @@ public interface StandardFluidItem extends Ic2FluidItem
 
 	static void setFs(ItemStack stack, Ic2FluidStack fs)
 	{
-		CompoundTag nbt = stack.getTag();
-		if (nbt == null)
+		CompoundTag nbt = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).getUnsafe();
+		if (nbt.isEmpty())
 		{
 			nbt = new CompoundTag();
-			stack.set(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.of(nbt));
+			stack.set(DataComponents.CUSTOM_DATA, CustomData.of(nbt));
 		}
 
 		if (fs != null && !fs.isEmpty())

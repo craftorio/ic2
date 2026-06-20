@@ -1,6 +1,5 @@
 package ic2.core.block.machine.gui;
 
-import com.google.common.base.Supplier;
 import ic2.core.Ic2Gui;
 import ic2.core.block.machine.container.ContainerSortingMachine;
 import ic2.core.gui.CustomButton;
@@ -53,7 +52,7 @@ public class GuiSortingMachine extends Ic2Gui<ContainerSortingMachine>
 				{
 					return container.base.defaultRoute != cDir ? 15 : 33;
 				}
-			}, texture, this.createEventSender(dir.ordinal())).withTooltip((Supplier<String>) () -> container.base.defaultRoute != cDir ? "ic2.SortingMachine.whitelist" : "ic2.SortingMachine.default"));
+			}, texture, this.createEventSender(dir.ordinal())).withTooltip(() -> container.base.defaultRoute != cDir ? "ic2.SortingMachine.whitelist" : "ic2.SortingMachine.default"));
 		}
 	}
 

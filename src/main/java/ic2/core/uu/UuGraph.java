@@ -98,7 +98,7 @@ public class UuGraph
 			return exactNode.stack.toMcStack();
 		} else
 		{
-			LeanItemStack search = new LeanItemStack(stack.getItem(), stack.getTag(), StackUtil.getSize(stack));
+			LeanItemStack search = new LeanItemStack(stack.getItem(), stack.getOrDefault(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.EMPTY).copyTag(), StackUtil.getSize(stack));
 			Collection<UuGraph.Node> nodes = getAll(search);
 			if (nodes.isEmpty())
 			{

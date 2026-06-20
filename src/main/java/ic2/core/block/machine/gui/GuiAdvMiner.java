@@ -1,6 +1,5 @@
 package ic2.core.block.machine.gui;
 
-import com.google.common.base.Supplier;
 import net.minecraft.client.gui.GuiGraphics;
 import ic2.core.Ic2Gui;
 import ic2.core.block.machine.container.ContainerAdvMiner;
@@ -19,7 +18,7 @@ public class GuiAdvMiner extends Ic2Gui<ContainerAdvMiner>
 		this.addElement(EnergyGauge.asBolt(this, 12, 55, container.base));
 		this.addElement(BasicButton.create(this, 133, 101, this.createEventSender(0), BasicButton.ButtonStyle.AdvMinerReset).withTooltip("ic2.AdvMiner.gui.switch.reset"));
 		this.addElement(BasicButton.create(this, 123, 27, this.createEventSender(1), BasicButton.ButtonStyle.AdvMinerMode).withTooltip("ic2.AdvMiner.gui.switch.mode"));
-		this.addElement(BasicButton.create(this, 129, 45, this.createEventSender(2), BasicButton.ButtonStyle.AdvMinerSilkTouch).withTooltip((Supplier<String>) () -> Component.translatable("ic2.AdvMiner.gui.switch.silktouch", container.base.silkTouch).getString()));
+		this.addElement(BasicButton.create(this, 129, 45, this.createEventSender(2), BasicButton.ButtonStyle.AdvMinerSilkTouch).withTooltip(() -> Component.translatable("ic2.AdvMiner.gui.switch.silktouch", container.base.silkTouch).getString()));
 	}
 
 	@Override

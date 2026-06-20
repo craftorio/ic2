@@ -287,8 +287,8 @@ public class Ic2Crops extends Crops
 			return this.getCropCard("ic2", identifier.getPath());
 		} else
 		{
-			CompoundTag nbt = stack.getTag();
-			if (nbt == null)
+			CompoundTag nbt = stack.getOrDefault(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.EMPTY).copyTag();
+			if (nbt.isEmpty())
 			{
 				return null;
 			} else

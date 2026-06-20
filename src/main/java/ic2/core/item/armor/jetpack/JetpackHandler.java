@@ -20,7 +20,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
@@ -31,11 +30,11 @@ import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.event.tick.ServerTickEvent;
-import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.Equipable;
+import net.minecraft.world.item.component.CustomData;
 
 public class JetpackHandler implements IBackupElectricItemManager
 {
@@ -80,25 +79,38 @@ public class JetpackHandler implements IBackupElectricItemManager
 
 		if (!value)
 		{
-			if (!stack.has(net.minecraft.core.component.DataComponents.CUSTOM_DATA))
+			if (!stack.has(DataComponents.CUSTOM_DATA))
 			{
 				return;
 			}
 
-			stack.getTag().remove("hasIC2Jetpack");
-			if (stack.getTag().isEmpty())
+			CompoundTag tag = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
+			tag.remove("hasIC2Jetpack");
+			if (tag.isEmpty())
 			{
-				stack.set(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.of(null));
+				stack.remove(DataComponents.CUSTOM_DATA);
 			}
-		} else if (Mob.getEquipmentSlotForItem(stack) == EquipmentSlot.CHEST)
+			else
+			{
+				stack.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
+			}
+		} else
 		{
-			StackUtil.getOrCreateNbtData(stack).putBoolean("hasIC2Jetpack", true);
+			Equipable equipable = Equipable.get(stack);
+			if (equipable != null && equipable.getEquipmentSlot() == EquipmentSlot.CHEST)
+			{
+				StackUtil.getOrCreateNbtData(stack).putBoolean("hasIC2Jetpack", true);
+			}
 		}
 	}
 
 	public static boolean hasJetpackAttached(ItemStack stack)
 	{
-		return !StackUtil.isEmpty(stack) && Mob.getEquipmentSlotForItem(stack) == EquipmentSlot.CHEST && stack.has(net.minecraft.core.component.DataComponents.CUSTOM_DATA) && stack.getTag().getBoolean("hasIC2Jetpack");
+		if (StackUtil.isEmpty(stack)) return false;
+		Equipable equipable = Equipable.get(stack);
+		return equipable != null && equipable.getEquipmentSlot() == EquipmentSlot.CHEST
+			&& stack.has(DataComponents.CUSTOM_DATA)
+			&& stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).getUnsafe().getBoolean("hasIC2Jetpack");
 	}
 
 	public static boolean hasJetpack(ItemStack stack)
@@ -130,7 +142,7 @@ public class JetpackHandler implements IBackupElectricItemManager
 			amount = Math.min(amount, getTransferLimit());
 		}
 
-		double charge = stack.has(net.minecraft.core.component.DataComponents.CUSTOM_DATA) ? stack.getTag().getDouble("charge") : 0.0;
+		double charge = stack.has(DataComponents.CUSTOM_DATA) ? stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).getUnsafe().getDouble("charge") : 0.0;
 		amount = Math.min(amount, this.getMaxCharge(stack) - charge);
 		if (!simulate)
 		{
@@ -143,28 +155,24 @@ public class JetpackHandler implements IBackupElectricItemManager
 	@Override
 	public double discharge(ItemStack stack, double amount, int tier, boolean ignoreTransferLimit, boolean externally, boolean simulate)
 	{
-		if (!externally && this.getTier(stack) <= tier && stack.has(net.minecraft.core.component.DataComponents.CUSTOM_DATA))
+		if (!externally && this.getTier(stack) <= tier && stack.has(DataComponents.CUSTOM_DATA))
 		{
 			if (!ignoreTransferLimit)
 			{
 				amount = Math.min(amount, getTransferLimit());
 			}
 
-			double charge = stack.getTag().getDouble("charge");
+			double charge = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).getUnsafe().getDouble("charge");
 			amount = Math.min(amount, charge);
 			if (!simulate)
 			{
 				charge -= amount;
 				if (charge == 0.0)
 				{
-					stack.getTag().remove("charge");
-					if (stack.getTag().isEmpty())
-					{
-						stack.set(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.of(null));
-					}
+					CustomData.update(DataComponents.CUSTOM_DATA, stack, tag -> tag.remove("charge"));
 				} else
 				{
-					stack.getTag().putDouble("charge", charge);
+					StackUtil.getOrCreateNbtData(stack).putDouble("charge", charge);
 				}
 			}
 
@@ -239,22 +247,19 @@ public class JetpackHandler implements IBackupElectricItemManager
 	@SubscribeEvent
 	public void tick(PlayerTickEvent.Post event)
 	{
-		if (event.phase == TickEvent.Phase.START)
+		if (playerArmorBuffer.containsKey(event.getEntity()))
 		{
-			if (playerArmorBuffer.containsKey(event.getEntity()))
+			ItemStack stack = event.getEntity().getItemBySlot(EquipmentSlot.CHEST);
+			ItemStack lastStack = playerArmorBuffer.get(event.getEntity());
+			if (!StackUtil.isEmpty(lastStack) && hasJetpackAttached(lastStack) && StackUtil.isEmpty(stack))
 			{
-				ItemStack stack = event.getEntity().getItemBySlot(EquipmentSlot.CHEST);
-				ItemStack lastStack = playerArmorBuffer.get(event.getEntity());
-				if (!StackUtil.isEmpty(lastStack) && hasJetpackAttached(lastStack) && StackUtil.isEmpty(stack))
-				{
-					ItemStack newJetpack = jetpack.copy();
-					double oldCharge = ElectricItem.manager.getCharge(lastStack);
-					ElectricItem.manager.charge(newJetpack, oldCharge, Integer.MAX_VALUE, true, false);
-					event.getEntity().setItemSlot(EquipmentSlot.CHEST, newJetpack);
-				}
-
-				playerArmorBuffer.remove(event.getEntity());
+				ItemStack newJetpack = jetpack.copy();
+				double oldCharge = ElectricItem.manager.getCharge(lastStack);
+				ElectricItem.manager.charge(newJetpack, oldCharge, Integer.MAX_VALUE, true, false);
+				event.getEntity().setItemSlot(EquipmentSlot.CHEST, newJetpack);
 			}
+
+			playerArmorBuffer.remove(event.getEntity());
 		}
 	}
 

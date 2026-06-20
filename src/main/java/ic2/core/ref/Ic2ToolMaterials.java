@@ -2,14 +2,17 @@ package ic2.core.ref;
 
 import java.util.function.Supplier;
 
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Block;
 
 public enum Ic2ToolMaterials implements Tier
 {
-	BRONZE(2, 350, 6.0F, 2.0F, 14, () -> Ingredient.of(Ic2Items.BRONZE_INGOT)),
-	CHAINSAW(3, 250, 12.0F, 9.0F, 14, Ingredient::of);
+	BRONZE(2, 350, 6.0F, 2.0F, 14, () -> Ingredient.of(Ic2Items.BRONZE_INGOT), BlockTags.INCORRECT_FOR_IRON_TOOL),
+	CHAINSAW(3, 250, 12.0F, 9.0F, 14, Ingredient::of, BlockTags.INCORRECT_FOR_DIAMOND_TOOL);
 
 	private final int miningLevel;
 	private final int itemDurability;
@@ -17,8 +20,9 @@ public enum Ic2ToolMaterials implements Tier
 	private final float attackDamage;
 	private final int enchantability;
 	private final Supplier<Ingredient> repairIngredient;
+	private final TagKey<Block> incorrectBlocksForDrops;
 
-	Ic2ToolMaterials(int miningLevel, int itemDurability, float miningSpeed, float attackDamage, int enchantability, Supplier<Ingredient> repairIngredient)
+	Ic2ToolMaterials(int miningLevel, int itemDurability, float miningSpeed, float attackDamage, int enchantability, Supplier<Ingredient> repairIngredient, TagKey<Block> incorrectBlocksForDrops)
 	{
 		this.miningLevel = miningLevel;
 		this.itemDurability = itemDurability;
@@ -26,6 +30,7 @@ public enum Ic2ToolMaterials implements Tier
 		this.attackDamage = attackDamage;
 		this.enchantability = enchantability;
 		this.repairIngredient = repairIngredient;
+		this.incorrectBlocksForDrops = incorrectBlocksForDrops;
 	}
 
 	public int getUses()
@@ -56,5 +61,10 @@ public enum Ic2ToolMaterials implements Tier
 	public Ingredient getRepairIngredient()
 	{
 		return this.repairIngredient.get();
+	}
+
+	public TagKey<Block> getIncorrectBlocksForDrops()
+	{
+		return this.incorrectBlocksForDrops;
 	}
 }

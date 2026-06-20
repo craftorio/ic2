@@ -106,7 +106,7 @@ public class Ic2JeiPlugin implements IModPlugin
 		RecipeManager recipeManager = Minecraft.getInstance().level.getRecipeManager();
 		BiConsumer<RecipeType<IORecipeWrapper>, net.minecraft.world.item.crafting.RecipeType<RecipeHolder<IRecipeInput, Collection<ItemStack>>>> registerBasic = (id, type) ->
 		{
-			List<IORecipeWrapper> recipeList = recipeManager.getAllRecipesFor(type).stream().map(r -> new IORecipeWrapper(r.recipe())).toList();
+			List<IORecipeWrapper> recipeList = recipeManager.getAllRecipesFor(type).stream().map(r -> new IORecipeWrapper(r.value().recipe())).toList();
 			registration.addRecipes(id, recipeList);
 		};
 		registerBasic.accept(this.BLAST_FURNACE, Ic2RecipeTypes.BLAST_FURNACE);
@@ -121,11 +121,11 @@ public class Ic2JeiPlugin implements IModPlugin
 		registerBasic.accept(this.ORE_WASHER, Ic2RecipeTypes.ORE_WASHER);
 
 		List<CannerBottleRecipeWrapper> cannerBottleRecipes = recipeManager.getAllRecipesFor(Ic2RecipeTypes.CANNER_BOTTLE)
-			.stream().map(r -> new CannerBottleRecipeWrapper(r.recipe())).toList();
+			.stream().map(r -> new CannerBottleRecipeWrapper(r.value().recipe())).toList();
 		registration.addRecipes(this.CANNER_BOTTLE, cannerBottleRecipes);
 
 		List<CannerEnrichRecipeWrapper> cannerEnrichRecipes = recipeManager.getAllRecipesFor(Ic2RecipeTypes.CANNER_ENRICH)
-			.stream().map(r -> new CannerEnrichRecipeWrapper(r.recipe())).toList();
+			.stream().map(r -> new CannerEnrichRecipeWrapper(r.value().recipe())).toList();
 		registration.addRecipes(this.CANNER_ENRICH, cannerEnrichRecipes);
 
 		List<CannerEmptyLiquidRecipeWrapper> emptyLiquidRecipes = new ArrayList<>();

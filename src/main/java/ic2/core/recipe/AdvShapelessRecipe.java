@@ -1,8 +1,15 @@
 package ic2.core.recipe;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.DynamicOps;
+import com.mojang.serialization.JsonOps;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.MapLike;
+import com.mojang.serialization.RecordBuilder;
 import ic2.api.item.ElectricItem;
 import ic2.api.recipe.IRecipeInput;
 import ic2.core.IC2;
@@ -14,18 +21,21 @@ import ic2.core.util.StackUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 import net.minecraft.core.NonNullList;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
-import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
-import net.minecraft.core.RegistryAccess;
 
 public class AdvShapelessRecipe implements CraftingRecipe
 {
@@ -44,14 +54,15 @@ public class AdvShapelessRecipe implements CraftingRecipe
 		this.consuming = consuming;
 	}
 
-	public boolean matches(CraftingContainer inventorycrafting, Level world)
+	@Override
+	public boolean matches(CraftingInput inventorycrafting, Level world)
 	{
 		return this.assemble(inventorycrafting) != StackUtil.emptyStack;
 	}
 
-	public ItemStack assemble(CraftingContainer inventorycrafting)
+	public ItemStack assemble(CraftingInput inventorycrafting)
 	{
-		int offerSize = inventorycrafting.getContainerSize();
+		int offerSize = inventorycrafting.size();
 		if (offerSize < this.input.length)
 		{
 			return StackUtil.emptyStack;
@@ -90,12 +101,8 @@ public class AdvShapelessRecipe implements CraftingRecipe
 		return ret;
 	}
 
-	public ItemStack getResultItem()
-	{
-		return this.output;
-	}
-
-	public ItemStack getResultItem(net.minecraft.core.RegistryAccess registryAccess)
+	@Override
+	public ItemStack getResultItem(HolderLookup.Provider registries)
 	{
 		return this.output;
 	}
@@ -106,14 +113,14 @@ public class AdvShapelessRecipe implements CraftingRecipe
 	}
 
 	@Override
-	public NonNullList<ItemStack> getRemainingItems(CraftingContainer inv)
+	public NonNullList<ItemStack> getRemainingItems(CraftingInput inv)
 	{
 		if (this.consuming)
 		{
-			return NonNullList.withSize(inv.getContainerSize(), StackUtil.emptyStack);
+			return NonNullList.withSize(inv.size(), StackUtil.emptyStack);
 		}
 
-		NonNullList<ItemStack> defaultedList = NonNullList.withSize(inv.getContainerSize(), ItemStack.EMPTY);
+		NonNullList<ItemStack> defaultedList = NonNullList.withSize(inv.size(), ItemStack.EMPTY);
 
 		for (int i = 0; i < defaultedList.size(); i++)
 		{
@@ -168,14 +175,14 @@ public class AdvShapelessRecipe implements CraftingRecipe
 	}
 
 	@Override
-	public ItemStack assemble(net.minecraft.world.inventory.CraftingContainer inventory, net.minecraft.core.RegistryAccess registryAccess)
+	public ItemStack assemble(CraftingInput inventory, HolderLookup.Provider registries)
 	{
 		return this.assemble(inventory);
 	}
 
-	public net.minecraft.world.item.crafting.CraftingBookCategory category()
+	public CraftingBookCategory category()
 	{
-		return net.minecraft.world.item.crafting.CraftingBookCategory.MISC;
+		return CraftingBookCategory.MISC;
 	}
 
 	public RecipeSerializer<?> getSerializer()
@@ -216,7 +223,7 @@ public class AdvShapelessRecipe implements CraftingRecipe
 			return inputs;
 		}
 
-		public AdvShapelessRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buf)
+		public AdvShapelessRecipe fromNetwork(ResourceLocation id, RegistryFriendlyByteBuf buf)
 		{
 			IRecipeInput[] inputs = new IRecipeInput[buf.readVarInt()];
 
@@ -225,10 +232,10 @@ public class AdvShapelessRecipe implements CraftingRecipe
 				inputs[i] = RecipeIo.readInput(buf);
 			}
 
-			return new AdvShapelessRecipe(id, inputs, buf.readItem(), buf.readBoolean(), buf.readBoolean());
+			return new AdvShapelessRecipe(id, inputs, ItemStack.STREAM_CODEC.decode(buf), buf.readBoolean(), buf.readBoolean());
 		}
 
-		public void toNetwork(FriendlyByteBuf buf, AdvShapelessRecipe recipe)
+		public void toNetwork(RegistryFriendlyByteBuf buf, AdvShapelessRecipe recipe)
 		{
 			buf.writeVarInt(recipe.input.length);
 
@@ -237,9 +244,56 @@ public class AdvShapelessRecipe implements CraftingRecipe
 				RecipeIo.writeInput(buf, input);
 			}
 
-			buf.writeItem(recipe.output);
+			ItemStack.STREAM_CODEC.encode(buf, recipe.output);
 			buf.writeBoolean(recipe.hidden);
 			buf.writeBoolean(recipe.consuming);
+		}
+
+		@Override
+		public MapCodec<AdvShapelessRecipe> codec()
+		{
+			return new MapCodec<>()
+			{
+				@Override
+				public <T> Stream<T> keys(DynamicOps<T> ops)
+				{
+					return Stream.of(ops.createString("ingredients"), ops.createString("result"), ops.createString("type"));
+				}
+
+				@Override
+				public <T> DataResult<AdvShapelessRecipe> decode(DynamicOps<T> ops, MapLike<T> input)
+				{
+					JsonObject json = new JsonObject();
+					input.entries().forEach(pair ->
+					{
+						String key = ops.getStringValue(pair.getFirst()).getOrThrow();
+						JsonElement value = ops.convertTo(JsonOps.INSTANCE, pair.getSecond());
+						json.add(key, value);
+					});
+					try
+					{
+						return DataResult.success(fromJson(ResourceLocation.fromNamespaceAndPath("ic2", "shapeless"), json));
+					} catch (Exception e)
+					{
+						return DataResult.error(() -> "Failed to decode AdvShapelessRecipe: " + e.getMessage());
+					}
+				}
+
+				@Override
+				public <T> RecordBuilder<T> encode(AdvShapelessRecipe input, DynamicOps<T> ops, RecordBuilder<T> prefix)
+				{
+					return prefix.withErrorsFrom(DataResult.error(() -> "Encoding AdvShapelessRecipe not supported"));
+				}
+			};
+		}
+
+		@Override
+		public StreamCodec<RegistryFriendlyByteBuf, AdvShapelessRecipe> streamCodec()
+		{
+			return StreamCodec.of(
+					this::toNetwork,
+					buf -> this.fromNetwork(ResourceLocation.fromNamespaceAndPath("ic2", "shapeless"), buf)
+			);
 		}
 	}
 }

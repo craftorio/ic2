@@ -6,6 +6,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -13,7 +14,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -33,7 +34,7 @@ public class UUMatterBlock extends LiquidBlock
 	}
 
 	@Override
-	public void entityInside(BlockState state, Level world, BlockPos pos, Entity entity)
+	public void stepOn(Level world, BlockPos pos, BlockState state, Entity entity)
 	{
 		if (!world.isClientSide && entity instanceof LivingEntity living)
 		{
@@ -42,19 +43,18 @@ public class UUMatterBlock extends LiquidBlock
 	}
 
 	@Override
-	public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit)
+	protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit)
 	{
-		ItemStack heldItem = player.getMainHandItem();
-		if (heldItem.is(Items.GLASS_BOTTLE) && state.getValue(LiquidBlock.LEVEL) == 0)
+		if (stack.is(Items.GLASS_BOTTLE) && state.getValue(LiquidBlock.LEVEL) == 0)
 		{
 			if (!world.isClientSide)
 			{
-				ItemStack waterBottle = PotionUtils.setPotion(new ItemStack(Items.POTION), Potions.WATER);
+				ItemStack waterBottle = PotionContents.createItemStack(Items.POTION, Potions.WATER);
 				if (!player.getAbilities().instabuild)
 				{
-					heldItem.shrink(1);
+					stack.shrink(1);
 				}
-				if (heldItem.isEmpty())
+				if (stack.isEmpty())
 				{
 					player.setItemInHand(hand, waterBottle);
 				}
@@ -64,9 +64,9 @@ public class UUMatterBlock extends LiquidBlock
 				}
 			}
 			world.playSound(player, pos, SoundEvents.BOTTLE_FILL, SoundSource.BLOCKS, 1.0F, 1.0F);
-			return InteractionResult.sidedSuccess(world.isClientSide);
+			return ItemInteractionResult.sidedSuccess(world.isClientSide);
 		}
-		return InteractionResult.PASS;
+		return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
 	}
 
 	@Override
@@ -77,7 +77,7 @@ public class UUMatterBlock extends LiquidBlock
 		FluidState neighborFluidState = world.getFluidState(neighborPos);
 		Fluid neighborFluid = neighborFluidState.getType();
 
-		if (!neighborFluidState.isEmpty() && neighborFluid != getFluid())
+		if (!neighborFluidState.isEmpty() && !neighborFluidState.getType().isSame(state.getFluidState().getType()))
 		{
 			if (neighborFluidState.is(FluidTags.LAVA))
 			{

@@ -57,7 +57,7 @@ public class TileEntitySortingMachine extends TileEntityElectricMachine implemen
 		{
 			CompoundTag filterTag = filtersTag.getCompound(i);
 			int index = filterTag.getByte("index") & 255;
-			ItemStack stack = ItemStack.of(filterTag);
+			ItemStack stack = ItemStack.parseOptional(registries, filterTag);
 			this.filters[index / 7][index % 7] = stack;
 		}
 
@@ -79,9 +79,8 @@ public class TileEntitySortingMachine extends TileEntityElectricMachine implemen
 			ItemStack stack = this.filters[i / 7][i % 7];
 			if (stack != null)
 			{
-				CompoundTag contentTag = new CompoundTag();
+				CompoundTag contentTag = (CompoundTag) stack.save(registries);
 				contentTag.putByte("index", (byte) i);
-				stack.save(net.minecraft.core.RegistryAccess.EMPTY, contentTag);
 				filtersTag.add(contentTag);
 			}
 		}

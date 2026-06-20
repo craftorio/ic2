@@ -188,8 +188,8 @@ public abstract class TileEntityTank extends TileEntityInventory implements IHas
 	public void addInformation(ItemStack stack, List<String> info, TooltipFlag advanced)
 	{
 		info.add("Capacity: " + this.contents.getCapacity() + " mB");
-		CompoundTag nbt = stack.getTag();
-		if (nbt != null && !nbt.contains("Empty"))
+		CompoundTag nbt = stack.getOrDefault(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.EMPTY).copyTag();
+		if (!nbt.isEmpty() && !nbt.contains("Empty"))
 		{
 			Ic2FluidStack fluidStack = Ic2FluidStack.read(nbt);
 			if (fluidStack != null && !fluidStack.isEmpty())

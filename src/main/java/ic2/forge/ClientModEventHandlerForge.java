@@ -6,6 +6,7 @@ import ic2.forge.model.CableModelLoader;
 import ic2.forge.model.MaskOverlayItemLoader;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
@@ -76,9 +77,9 @@ public final class ClientModEventHandlerForge
 	@SubscribeEvent
 	public void onModelRegistry(ModelEvent.RegisterGeometryLoaders event)
 	{
-		event.register("be", new BeModelLoader());
-		event.register("cable", new CableModelLoader());
-			event.register("mask_overlay", new MaskOverlayItemLoader());
+		event.register(ResourceLocation.fromNamespaceAndPath("ic2", "be"), new BeModelLoader());
+		event.register(ResourceLocation.fromNamespaceAndPath("ic2", "cable"), new CableModelLoader());
+		event.register(ResourceLocation.fromNamespaceAndPath("ic2", "mask_overlay"), new MaskOverlayItemLoader());
 	}
 
 	@SubscribeEvent
@@ -89,7 +90,7 @@ public final class ClientModEventHandlerForge
 			event.register(keybinding);
 		}
 	}
-	
+
 	@SubscribeEvent
 	public void onClientSetup(FMLClientSetupEvent event)
 	{

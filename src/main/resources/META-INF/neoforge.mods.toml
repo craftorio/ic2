@@ -1,14 +1,21 @@
 modLoader="javafml"
 loaderVersion="${loader_version_range}"
 license="${mod_license}"
+issueTrackerURL="https://github.com/NeptuneZhao/ic2/issues"
 
 [[mods]]
 modId="${mod_id}"
 version="${mod_version}"
 displayName="${mod_name}"
-logoFile=""
-credits="${mod_authors}"
+displayURL="https://github.com/NeptuneZhao/ic2/"
+credits="IC2"
 authors="${mod_authors}"
 description='''
 ${mod_description}
 '''
+
+# A URL to query for updates for this mod. See the JSON update specification https://docs.neoforged.net/docs/misc/updatechecker/
+# updateJSONURL="https://change.me.example.invalid/updates.json"
+
+# A file name (in the root of the mod JAR) containing a logo for display
+# logoFile="examplemod.png"

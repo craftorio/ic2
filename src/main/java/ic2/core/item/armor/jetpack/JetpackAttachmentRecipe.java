@@ -1,6 +1,11 @@
 package ic2.core.item.armor.jetpack;
 
 import com.google.gson.JsonObject;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.DynamicOps;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.MapLike;
+import com.mojang.serialization.RecordBuilder;
 import ic2.api.item.ElectricItem;
 import ic2.core.init.MainConfig;
 import ic2.core.ref.Ic2Items;
@@ -10,34 +15,29 @@ import ic2.core.util.ConfigUtil;
 import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
-import net.minecraft.core.RegistryAccess;
 
-public class JetpackAttachmentRecipe implements CraftingRecipe
+public record JetpackAttachmentRecipe(ResourceLocation id) implements CraftingRecipe
 {
 	public static final Set<Item> blacklistedItems = Collections.newSetFromMap(new IdentityHashMap<>());
-	private final ResourceLocation id;
-
-	public JetpackAttachmentRecipe(ResourceLocation id)
-	{
-		this.id = id;
-	}
 
 	public static void init()
 	{
@@ -52,18 +52,18 @@ public class JetpackAttachmentRecipe implements CraftingRecipe
 		blacklistedItems.add(Items.ELYTRA);
 	}
 
-	public boolean matches(@NotNull CraftingContainer inv, @NotNull Level world)
+	public boolean matches(@NotNull CraftingInput inv, @NotNull Level world)
 	{
 		return !this.assemble(inv, null).isEmpty();
 	}
 
-	public @NotNull ItemStack assemble(@NotNull CraftingContainer inv, HolderLookup.Provider registryAccess)
+	public @NotNull ItemStack assemble(@NotNull CraftingInput inv, HolderLookup.@NotNull Provider registryAccess)
 	{
 		ItemStack jetpack = ItemStack.EMPTY;
 		ItemStack armor = ItemStack.EMPTY;
 		boolean attachmentPlate = false;
 
-		for (int i = 0; i < inv.getContainerSize(); i++)
+		for (int i = 0; i < inv.size(); i++)
 		{
 			ItemStack currentStack = inv.getItem(i);
 			if (!currentStack.isEmpty())
@@ -77,8 +77,7 @@ public class JetpackAttachmentRecipe implements CraftingRecipe
 					}
 
 					jetpack = currentStack;
-				}
-				else if (Mob.getEquipmentSlotForItem(currentStack) == EquipmentSlot.CHEST && !blacklistedItems.contains(item))
+				} else if (currentStack.getEquipmentSlot() == EquipmentSlot.CHEST && !blacklistedItems.contains(item))
 				{
 					if (!armor.isEmpty())
 					{
@@ -86,8 +85,7 @@ public class JetpackAttachmentRecipe implements CraftingRecipe
 					}
 
 					armor = currentStack;
-				}
-				else
+				} else
 				{
 					if (item != Ic2Items.JETPACK_ATTACHMENT_PLATE || attachmentPlate)
 					{
@@ -105,43 +103,49 @@ public class JetpackAttachmentRecipe implements CraftingRecipe
 			JetpackHandler.setJetpackAttached(ret, true);
 			ElectricItem.manager.charge(ret, ElectricItem.manager.getCharge(jetpack), Integer.MAX_VALUE, true, false);
 			return ret;
-		}
-		else
+		} else
 		{
 			return ItemStack.EMPTY;
 		}
 	}
 
-	public @NotNull ItemStack getResultItem(@NotNull RegistryAccess registryAccess)
+	@Override
+	public @NotNull ItemStack getResultItem(HolderLookup.@NotNull Provider registries)
 	{
 		return ItemStack.EMPTY;
 	}
 
+	@Override
 	public boolean canCraftInDimensions(int x, int y)
 	{
 		return x * y >= 3;
 	}
 
+	@Override
 	public boolean isSpecial()
 	{
 		return true;
 	}
 
+	@Override
 	public @NotNull NonNullList<Ingredient> getIngredients()
 	{
 		return NonNullList.create();
 	}
 
+	@Override
 	public @NotNull RecipeSerializer<?> getSerializer()
 	{
 		return Ic2RecipeSerializers.JETPACK_ATTACHMENT;
 	}
 
-	public @NotNull ResourceLocation getId()
+	@Override
+	public @NotNull ResourceLocation id()
 	{
 		return this.id;
 	}
 
+	@Override
 	public @NotNull CraftingBookCategory category()
 	{
 		return CraftingBookCategory.MISC;
@@ -161,6 +165,46 @@ public class JetpackAttachmentRecipe implements CraftingRecipe
 
 		public void toNetwork(@NotNull FriendlyByteBuf buf, @NotNull JetpackAttachmentRecipe recipe)
 		{
+		}
+
+		@Override
+		public MapCodec<JetpackAttachmentRecipe> codec()
+		{
+			return new MapCodec<>()
+			{
+				@Override
+				public <T> Stream<T> keys(DynamicOps<T> ops)
+				{
+					return Stream.of(ops.createString("type"));
+				}
+
+				@Override
+				public <T> DataResult<JetpackAttachmentRecipe> decode(DynamicOps<T> ops, MapLike<T> input)
+				{
+					try
+					{
+						return DataResult.success(fromJson(ResourceLocation.fromNamespaceAndPath("ic2", "jetpack_attachment"), new JsonObject()));
+					} catch (Exception e)
+					{
+						return DataResult.error(() -> "Failed to decode JetpackAttachmentRecipe: " + e.getMessage());
+					}
+				}
+
+				@Override
+				public <T> RecordBuilder<T> encode(JetpackAttachmentRecipe input, DynamicOps<T> ops, RecordBuilder<T> prefix)
+				{
+					return prefix.withErrorsFrom(DataResult.error(() -> "Encoding JetpackAttachmentRecipe not supported"));
+				}
+			};
+		}
+
+		@Override
+		public StreamCodec<RegistryFriendlyByteBuf, JetpackAttachmentRecipe> streamCodec()
+		{
+			return StreamCodec.of(
+				this::toNetwork,
+				buf -> this.fromNetwork(ResourceLocation.fromNamespaceAndPath("ic2", "jetpack_attachment"), buf)
+			);
 		}
 	}
 }

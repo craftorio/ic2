@@ -21,7 +21,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
@@ -49,6 +48,7 @@ public abstract class ItemElectricTool extends DiggerItem implements IElectricIt
 	protected Sound startSound;
 	protected Sound stopSound;
 	protected boolean wasEquipped;
+	protected float speed;
 
 	protected ItemElectricTool(Properties settings, int operationEnergyCost)
 	{
@@ -62,9 +62,10 @@ public abstract class ItemElectricTool extends DiggerItem implements IElectricIt
 
 	private ItemElectricTool(Properties settings, float attackDamage, float attackSpeed, int operationEnergyCost, Tier material, Collection<TagKey<Block>> effectiveBlocks)
 	{
-		super(attackDamage, attackSpeed, material, effectiveBlocks.isEmpty() ? Ic2BlockTags.EMPTY : effectiveBlocks.iterator().next(), settings);
+		super(material, effectiveBlocks.isEmpty() ? Ic2BlockTags.EMPTY : effectiveBlocks.iterator().next(), settings.attributes(DiggerItem.createAttributes(material, attackDamage, attackSpeed)));
 		this.operationEnergyCost = operationEnergyCost;
 		this.effectiveBlocks = effectiveBlocks;
+		this.speed = material.getSpeed();
 	}
 
 	public static boolean consumeEnergy(ItemStack stack, double amount, int tier, LivingEntity entity)
@@ -135,8 +136,7 @@ public abstract class ItemElectricTool extends DiggerItem implements IElectricIt
 
 	public boolean isCorrectToolForDrops(@NotNull ItemStack stack, @NotNull BlockState state)
 	{
-		int level = this.getTier().getLevel();
-		return (level >= 3 || !state.is(BlockTags.NEEDS_DIAMOND_TOOL)) && (level >= 2 || !state.is(BlockTags.NEEDS_IRON_TOOL)) && (level >= 1 || !state.is(BlockTags.NEEDS_STONE_TOOL)) && this.isEffective(state);
+		return !state.is(this.getTier().getIncorrectBlocksForDrops()) && this.isEffective(state);
 	}
 
 	private boolean isEffective(BlockState state)

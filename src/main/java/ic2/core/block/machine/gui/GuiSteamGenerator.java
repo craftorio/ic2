@@ -1,6 +1,5 @@
 package ic2.core.block.machine.gui;
 
-import com.google.common.base.Supplier;
 import ic2.core.IC2;
 import ic2.core.Ic2Gui;
 import ic2.core.block.machine.container.ContainerSteamGenerator;
@@ -23,8 +22,8 @@ public class GuiSteamGenerator extends Ic2Gui<ContainerSteamGenerator>
 	{
 		super(container, playerInventory, title, 220);
 		this.addElement(TankGauge.createPlain(this, 10, 155, 75, 47, container.base.waterTank));
-		this.addElement(new LinkedGauge(this, 13, 70, container.base, "heat", Gauge.GaugeStyle.HeatSteamGenerator).withTooltip((Supplier<String>) () -> Component.translatable("ic2.SteamGenerator.gui.systemheat", GuiSteamGenerator.this.menu.base.getSystemHeat()).getString()));
-		this.addElement(new LinkedGauge(this, 155, 61, container.base, "calcification", Gauge.GaugeStyle.CalcificationSteamGenerator).withTooltip((Supplier<String>) () -> Component.translatable("ic2.SteamGenerator.gui.calcification", GuiSteamGenerator.this.menu.base.getCalcification()) + "%"));
+		this.addElement(new LinkedGauge(this, 13, 70, container.base, "heat", Gauge.GaugeStyle.HeatSteamGenerator).withTooltip(() -> Component.translatable("ic2.SteamGenerator.gui.systemheat", GuiSteamGenerator.this.menu.base.getSystemHeat()).getString()));
+		this.addElement(new LinkedGauge(this, 155, 61, container.base, "calcification", Gauge.GaugeStyle.CalcificationSteamGenerator).withTooltip(() -> Component.translatable("ic2.SteamGenerator.gui.calcification", GuiSteamGenerator.this.menu.base.getCalcification()) + "%"));
 		this.addElement(TextLabel.create(this, 91, 172, 59, 13, TextProvider.of(() -> GuiSteamGenerator.this.menu.base.getInputMB() + Component.translatable("ic2.generic.text.mb").getString() + Component.translatable("ic2.generic.text.tick")), 2157374, false, true, true).withTooltip("ic2.SteamGenerator.gui.info.waterinput"));
 		this.addElement(TextLabel.create(this, 31, 133, 111, 13, TextProvider.of(() -> Component.translatable("ic2.SteamGenerator.gui.heatInput", GuiSteamGenerator.this.menu.base.getHeatInput()).getString()), 2157374, false, 4, 0, false, true).withTooltip("ic2.SteamGenerator.gui.info.heatinput"));
 		this.addElement(TextLabel.create(this, 22, 35, 42, 13, TextProvider.of(() -> Component.translatable("ic2.SteamGenerator.gui.pressurevalve", GuiSteamGenerator.this.menu.base.getPressure()).getString()), 2157374, false, 4, 0, false, true).withTooltip("ic2.SteamGenerator.gui.info.pressvalve"));

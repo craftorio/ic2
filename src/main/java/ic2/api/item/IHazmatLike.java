@@ -18,7 +18,7 @@ public interface IHazmatLike
 	{
 		for (EquipmentSlot slot : EquipmentSlot.values())
 		{
-			if (slot.getType() == Type.ARMOR)
+			if (slot.getType() == Type.HUMANOID_ARMOR)
 			{
 				ItemStack stack = living.getItemBySlot(slot);
 				if (stack == null || !(stack.getItem() instanceof IHazmatLike))

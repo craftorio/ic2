@@ -10,7 +10,10 @@ import java.util.List;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
 
 public class RecipeInputItemStack extends RecipeInputBase
 {
@@ -65,7 +68,9 @@ public class RecipeInputItemStack extends RecipeInputBase
 	{
 		JsonObject obj = new JsonObject();
 		obj.addProperty("item", BuiltInRegistries.ITEM.getKey(this.input.getItem()).toString());
-		obj.add("data", (JsonElement) NbtOps.INSTANCE.convertTo(JsonOps.INSTANCE, this.input.getTag()));
+		CustomData data = this.input.get(DataComponents.CUSTOM_DATA);
+		CompoundTag tag = data != null ? data.getUnsafe() : null;
+		obj.add("data", (JsonElement) NbtOps.INSTANCE.convertTo(JsonOps.INSTANCE, tag));
 		if (this.input.getCount() != 1)
 		{
 			obj.addProperty("count", this.input.getCount());

@@ -7,7 +7,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 public class SplitterCableBlock extends AbstractSplitterCableBlock
 {
     @Override
-    protected com.mojang.serialization.MapCodec<? extends net.minecraft.world.level.block.Block> codec() {
+    protected com.mojang.serialization.MapCodec<SplitterCableBlock> codec() {
         return simpleCodec(properties -> new SplitterCableBlock(properties, this.foamCableBlock));
     }
 

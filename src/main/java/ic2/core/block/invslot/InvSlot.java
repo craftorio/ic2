@@ -14,6 +14,8 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.world.entity.player.Player;
@@ -70,7 +72,7 @@ public class InvSlot implements Iterable<ItemStack>
 		{
 			CompoundTag contentTag = contentsTag.getCompound(i);
 			int index = contentTag.getByte("Index") & 255;
-			if (index >= this.getContainerSize())
+			if (index >= this.size())
 			{
 				IC2.log
 					.error(
@@ -82,7 +84,7 @@ public class InvSlot implements Iterable<ItemStack>
 					);
 			} else
 			{
-				ItemStack stack = ItemStack.of(contentTag);
+				ItemStack stack = ItemStack.parseOptional(RegistryAccess.EMPTY, contentTag);
 				if (StackUtil.isEmpty(stack))
 				{
 					IC2.log
@@ -120,7 +122,7 @@ public class InvSlot implements Iterable<ItemStack>
 		this.onChanged();
 	}
 
-	public void writeToNbt(CompoundTag nbt)
+	public void writeToNbt(CompoundTag nbt, HolderLookup.Provider registries)
 	{
 		ListTag contentsTag = new ListTag();
 
@@ -129,10 +131,9 @@ public class InvSlot implements Iterable<ItemStack>
 			ItemStack content = this.contents[i];
 			if (!StackUtil.isEmpty(content))
 			{
-				CompoundTag contentTag = new CompoundTag();
-				contentTag.putByte("Index", (byte) i);
-				content.save(contentTag);
-				contentsTag.add(contentTag);
+				CompoundTag savedTag = (CompoundTag) content.save(registries);
+				savedTag.putByte("Index", (byte) i);
+				contentsTag.add(savedTag);
 			}
 		}
 

@@ -73,7 +73,7 @@ public class InvSlotOutput extends InvSlot
 					label74:
 					for (int pass = 0; pass < 2; pass++)
 					{
-						for (int i = 0; i < this.getContainerSize(); i++)
+						for (int i = 0; i < this.size(); i++)
 						{
 							ItemStack existingStack = this.get(i);
 							int space = this.getStackSizeLimit();

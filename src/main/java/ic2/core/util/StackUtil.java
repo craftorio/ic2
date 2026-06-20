@@ -29,6 +29,10 @@ import java.util.function.Predicate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.ItemTags;
@@ -42,11 +46,14 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
@@ -56,7 +63,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.core.component.DataComponents;
 
 public final class StackUtil
 {
@@ -263,11 +269,11 @@ public final class StackUtil
 
 	public static CompoundTag getOrCreateNbtData(ItemStack stack)
 	{
-		CompoundTag ret = stack.getTag();
-		if (ret == null)
+		CompoundTag ret = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).getUnsafe();
+		if (!stack.has(DataComponents.CUSTOM_DATA))
 		{
 			ret = new CompoundTag();
-			stack.set(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.of(ret));
+			stack.set(DataComponents.CUSTOM_DATA, CustomData.of(ret));
 		}
 
 		return ret;
@@ -290,7 +296,7 @@ public final class StackUtil
 
 	private static boolean checkNbtEquality(ItemStack a, ItemStack b)
 	{
-		return checkNbtEquality(a.getTag(), b.getTag());
+		return checkNbtEquality(a.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).getUnsafe(), b.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).getUnsafe());
 	}
 
 	public static boolean checkNbtEquality(CompoundTag a, CompoundTag b)
@@ -343,9 +349,9 @@ public final class StackUtil
 
 	public static boolean checkNbtEqualityStrict(ItemStack a, ItemStack b)
 	{
-		CompoundTag nbtA = a.getTag();
-		CompoundTag nbtB = b.getTag();
-		return nbtA == nbtB ? true : nbtA != null && nbtB != null && nbtA.equals(nbtB);
+		CompoundTag nbtA = a.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).getUnsafe();
+		CompoundTag nbtB = b.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).getUnsafe();
+		return nbtA == nbtB || nbtA.equals(nbtB);
 	}
 
 	public static Predicate<ItemStack> sameStack(ItemStack stack)
@@ -647,7 +653,7 @@ public final class StackUtil
 
 		if (!player.getAbilities().instabuild && stack.isDamageableItem())
 		{
-			stack.hurtAndBreak(amount, player, p -> p.onEquippedItemBroken(hand));
+			stack.hurtAndBreak(amount, (ServerLevel) player.level(), player, item -> {});
 			ItemStack ret;
 			if (isEmpty(stack))
 			{
@@ -784,7 +790,7 @@ public final class StackUtil
 
 		for (ItemStack stack : stacks)
 		{
-			dropAsEntity(source.level(), source.getBlockPos(), stack);
+			dropAsEntity(source.getLevel(), source.getBlockPos(), stack);
 		}
 
 		stacks.clear();
@@ -850,12 +856,17 @@ public final class StackUtil
 		}
 
 		ItemStack stack = new ItemStack(Items.DIAMOND_PICKAXE);
+		var enchantmentLookup = RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY).lookupOrThrow(Registries.ENCHANTMENT);
 		if (silkTouch)
 		{
-			EnchantmentHelper.setEnchantments(Collections.singletonMap(Enchantments.SILK_TOUCH, fortune), stack);
+			ItemEnchantments.Mutable enchSilk = new ItemEnchantments.Mutable(ItemEnchantments.EMPTY);
+				enchSilk.set(enchantmentLookup.getOrThrow(Enchantments.SILK_TOUCH), fortune);
+				EnchantmentHelper.setEnchantments(stack, enchSilk.toImmutable());
 		} else if (fortune > 0)
 		{
-			EnchantmentHelper.setEnchantments(Collections.singletonMap(Enchantments.BLOCK_FORTUNE, fortune), stack);
+			ItemEnchantments.Mutable enchFortune = new ItemEnchantments.Mutable(ItemEnchantments.EMPTY);
+				enchFortune.set(enchantmentLookup.getOrThrow(Enchantments.FORTUNE), fortune);
+				EnchantmentHelper.setEnchantments(stack, enchFortune.toImmutable());
 		}
 
 		return Block.getDrops(state, (ServerLevel) world, pos, world.getBlockEntity(pos), player, stack);

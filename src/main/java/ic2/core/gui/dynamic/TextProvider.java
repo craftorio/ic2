@@ -1,7 +1,5 @@
 package ic2.core.gui.dynamic;
 
-import com.google.common.base.Supplier;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -20,8 +18,8 @@ public class TextProvider
 	{
 		return text.isEmpty() ? new TextProvider.ConstantEmpty() : new TextProvider.Constant(text);
 	}
-
-	public static TextProvider.ITextProvider of(Supplier<String> supplier)
+	
+	public static TextProvider.ITextProvider of(java.util.function.Supplier<String> supplier)
 	{
 		return new TextProvider.AbstractTextProvider()
 		{

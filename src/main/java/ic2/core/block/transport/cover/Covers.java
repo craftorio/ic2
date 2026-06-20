@@ -35,7 +35,7 @@ public class Covers extends TileEntityComponent
 	public ItemStack removeCover(Direction side)
 	{
 		ItemStack ret = this.covers[side.ordinal()];
-		ret.set(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.of(null));
+		ret.remove(net.minecraft.core.component.DataComponents.CUSTOM_DATA);
 		this.covers[side.ordinal()] = null;
 		return ret;
 	}
@@ -65,7 +65,7 @@ public class Covers extends TileEntityComponent
 				IC2.log.error(LogCategory.Block, "Can't load cover for %s, index %d is out of bounds.", Util.toString(this.parent), index);
 			} else
 			{
-				ItemStack cover = ItemStack.of(coverTag);
+				ItemStack cover = ItemStack.parseOptional(this.parent.getLevel().registryAccess(), coverTag);
 				if (StackUtil.isEmpty(cover))
 				{
 					IC2.log
@@ -110,9 +110,8 @@ public class Covers extends TileEntityComponent
 			ItemStack cover = this.covers[facing.ordinal()];
 			if (!StackUtil.isEmpty(cover))
 			{
-				CompoundTag coverTag = new CompoundTag();
+				CompoundTag coverTag = (CompoundTag) cover.save(this.parent.getLevel().registryAccess());
 				coverTag.putByte("facing", (byte) facing.ordinal());
-				cover.save(coverTag);
 				coversTag.add(coverTag);
 			}
 		}

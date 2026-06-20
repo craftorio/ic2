@@ -59,7 +59,7 @@ public abstract class TileEntityExplosive extends TileEntityInventory implements
 	protected void onExploded(Explosion explosion)
 	{
 		super.onExploded(explosion);
-		Entity source = explosion.getDamageSource().getEntity();
+		Entity source = explosion.getDirectSourceEntity();
 		this.explode(source instanceof LivingEntity living ? living : null, true);
 	}
 

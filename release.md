@@ -22,6 +22,8 @@
 - 拟态板材质更改失败 `ItemObscurator`
 - 日光灯不能用（仅限合成）
 - 适配其他电力网络，例如 FE（Forge Energy）、RF（Redstone Flux）等
+- 红色蘑菇2阶段材质
+- 橡树树苗、深色橡树、丛林、云杉材质紫黑
 
 ### 不急
 

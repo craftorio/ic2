@@ -78,7 +78,7 @@ public class CropBaseSapling extends CropBase
 			drops.add(new ItemStack(Items.APPLE));
 		}
 
-		return drops.toArray(new ItemStack[drops.size()]);
+		return drops.toArray(new ItemStack[0]);
 	}
 
 	@Override

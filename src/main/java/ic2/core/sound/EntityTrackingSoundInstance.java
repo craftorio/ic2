@@ -41,7 +41,7 @@ public class EntityTrackingSoundInstance extends EntityBoundSoundInstance implem
 			if (livingEntity.getItemBySlot(EquipmentSlot.MAINHAND).getItem() != this.sourceItem
 					&& livingEntity.getItemBySlot(EquipmentSlot.OFFHAND).getItem() != this.sourceItem)
 			{
-				this.stop();
+				Minecraft.getInstance().execute(this::stop);
 			}
 		}
 	}

@@ -13,7 +13,6 @@ import net.neoforged.neoforge.client.event.RenderLivingEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.client.event.ViewportEvent;
 import net.neoforged.neoforge.client.event.sound.PlaySoundEvent;
-import net.neoforged.neoforge.client.event.sound.SoundEngineLoadEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
@@ -27,12 +26,6 @@ public final class ClientEventHandlerForge
 	public void onClientTick(ClientTickEvent.Pre event)
 	{
 		TickHandler.onClientTick();
-	}
-
-	@SubscribeEvent
-	public void onSoundSetup(SoundEngineLoadEvent event)
-	{
-		EventHandlerClient.onSoundSetup();
 	}
 
 	@SubscribeEvent
@@ -92,7 +85,7 @@ public final class ClientEventHandlerForge
 	}
 
 	@SubscribeEvent
-	public void onGuiCreate(ScreenEvent.Init event)
+	public void onGuiCreate(ScreenEvent.Init.Post event)
 	{
 		EventHandlerClient.onGuiCreate(event.getScreen(), event.getListenersList(), event::addListener);
 	}

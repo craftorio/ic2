@@ -31,7 +31,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -776,14 +775,7 @@ public class NetworkManager implements INetworkManager
 		byte[] bytes = new byte[data.readableBytes()];
 		data.readBytes(bytes);
 		ServerGamePacketListenerImpl handler = player.connection;
-		Packet<?> packet = new ClientboundCustomPayloadPacket(new CustomPacketPayload()
-		{
-			@Override
-			public CustomPacketPayload.Type<? extends CustomPacketPayload> type()
-			{
-				return new CustomPacketPayload.Type<>(channelId);
-			}
-		});
+		Packet<?> packet = new ClientboundCustomPayloadPacket(new Ic2NetworkPayload(bytes));
 		handler.send(packet);
 	}
 

@@ -1,0 +1,20 @@
+{
+  "variants": {
+    "level=0": { "model": "ic2:block/fluid_block_air" },
+    "level=1": { "model": "ic2:block/fluid_block_air" },
+    "level=2": { "model": "ic2:block/fluid_block_air" },
+    "level=3": { "model": "ic2:block/fluid_block_air" },
+    "level=4": { "model": "ic2:block/fluid_block_air" },
+    "level=5": { "model": "ic2:block/fluid_block_air" },
+    "level=6": { "model": "ic2:block/fluid_block_air" },
+    "level=7": { "model": "ic2:block/fluid_block_air" },
+    "level=8": { "model": "ic2:block/fluid_block_air" },
+    "level=9": { "model": "ic2:block/fluid_block_air" },
+    "level=10": { "model": "ic2:block/fluid_block_air" },
+    "level=11": { "model": "ic2:block/fluid_block_air" },
+    "level=12": { "model": "ic2:block/fluid_block_air" },
+    "level=13": { "model": "ic2:block/fluid_block_air" },
+    "level=14": { "model": "ic2:block/fluid_block_air" },
+    "level=15": { "model": "ic2:block/fluid_block_air" }
+  }
+}

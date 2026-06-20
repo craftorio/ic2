@@ -1,0 +1,20 @@
+{
+  "variants": {
+    "level=0": { "model": "ic2:block/fluid_block_hot_coolant" },
+    "level=1": { "model": "ic2:block/fluid_block_hot_coolant" },
+    "level=2": { "model": "ic2:block/fluid_block_hot_coolant" },
+    "level=3": { "model": "ic2:block/fluid_block_hot_coolant" },
+    "level=4": { "model": "ic2:block/fluid_block_hot_coolant" },
+    "level=5": { "model": "ic2:block/fluid_block_hot_coolant" },
+    "level=6": { "model": "ic2:block/fluid_block_hot_coolant" },
+    "level=7": { "model": "ic2:block/fluid_block_hot_coolant" },
+    "level=8": { "model": "ic2:block/fluid_block_hot_coolant" },
+    "level=9": { "model": "ic2:block/fluid_block_hot_coolant" },
+    "level=10": { "model": "ic2:block/fluid_block_hot_coolant" },
+    "level=11": { "model": "ic2:block/fluid_block_hot_coolant" },
+    "level=12": { "model": "ic2:block/fluid_block_hot_coolant" },
+    "level=13": { "model": "ic2:block/fluid_block_hot_coolant" },
+    "level=14": { "model": "ic2:block/fluid_block_hot_coolant" },
+    "level=15": { "model": "ic2:block/fluid_block_hot_coolant" }
+  }
+}

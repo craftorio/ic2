@@ -1,0 +1,20 @@
+{
+  "variants": {
+    "level=0": { "model": "ic2:block/fluid_block_creosote" },
+    "level=1": { "model": "ic2:block/fluid_block_creosote" },
+    "level=2": { "model": "ic2:block/fluid_block_creosote" },
+    "level=3": { "model": "ic2:block/fluid_block_creosote" },
+    "level=4": { "model": "ic2:block/fluid_block_creosote" },
+    "level=5": { "model": "ic2:block/fluid_block_creosote" },
+    "level=6": { "model": "ic2:block/fluid_block_creosote" },
+    "level=7": { "model": "ic2:block/fluid_block_creosote" },
+    "level=8": { "model": "ic2:block/fluid_block_creosote" },
+    "level=9": { "model": "ic2:block/fluid_block_creosote" },
+    "level=10": { "model": "ic2:block/fluid_block_creosote" },
+    "level=11": { "model": "ic2:block/fluid_block_creosote" },
+    "level=12": { "model": "ic2:block/fluid_block_creosote" },
+    "level=13": { "model": "ic2:block/fluid_block_creosote" },
+    "level=14": { "model": "ic2:block/fluid_block_creosote" },
+    "level=15": { "model": "ic2:block/fluid_block_creosote" }
+  }
+}

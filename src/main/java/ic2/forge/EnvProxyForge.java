@@ -1,7 +1,7 @@
 package ic2.forge;
 
 import com.mojang.authlib.GameProfile;
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import ic2.api.crops.Crops;
 import ic2.api.crops.CropCard;
 import ic2.api.energy.ProfileEvent;
@@ -193,7 +193,7 @@ public final class EnvProxyForge implements EnvProxy
 	@Override
 	public void registerStatusEffect(ResourceLocation id, MobEffect effect)
 	{
-		statusEffectRegistry.register(id.getPath(), () -> effect);
+		Registry.register(BuiltInRegistries.MOB_EFFECT, id, effect);
 	}
 
 	@Override
@@ -247,9 +247,9 @@ public final class EnvProxyForge implements EnvProxy
 	}
 
 	@Override
-	public <T extends FoliagePlacer> FoliagePlacerType<T> registerFoliagePlacer(ResourceLocation id, Codec<T> codec)
+	public <T extends FoliagePlacer> FoliagePlacerType<T> registerFoliagePlacer(ResourceLocation id, MapCodec<T> codec)
 	{
-		FoliagePlacerType<T> type = new FoliagePlacerType<>(codec.fieldOf("config"));
+		FoliagePlacerType<T> type = new FoliagePlacerType<>(codec);
 		foliagePlacerRegistry.register(id.getPath(), () -> type);
 		return type;
 	}

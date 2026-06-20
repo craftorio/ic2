@@ -30,9 +30,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -383,14 +381,7 @@ public class NetworkManagerClient extends NetworkManager
 			ByteBuf data = makePacket(buffer, true);
 			byte[] bytes = new byte[data.readableBytes()];
 			data.readBytes(bytes);
-			handler.getConnection().send(new ServerboundCustomPayloadPacket(new CustomPacketPayload()
-			{
-				@Override
-				public CustomPacketPayload.Type<? extends CustomPacketPayload> type()
-				{
-					return new CustomPacketPayload.Type<>(channelId);
-				}
-			}));
+			handler.getConnection().send(new ServerboundCustomPayloadPacket(new Ic2NetworkPayload(bytes)));
 		}
 	}
 }

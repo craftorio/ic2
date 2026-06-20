@@ -6,32 +6,19 @@ import ic2.api.energy.event.EnergyTileUnloadEvent;
 import ic2.api.event.RetextureEvent;
 import ic2.api.tile.RetexturableBlock;
 import ic2.core.IC2;
-import ic2.core.block.tileentity.Ic2TileEntity;
 import ic2.core.event.EventHandler;
 import ic2.core.event.TickHandler;
 import ic2.core.item.armor.jetpack.JetpackHandler;
-import ic2.core.fluid.FluidBeBridge;
-import ic2.core.fluid.Ic2FluidBlock;
-import ic2.core.fluid.Ic2FluidItem;
 import ic2.core.util.LogCategory;
 import ic2.core.util.Util;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.world.Container;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.capabilities.ICapabilityProvider;
-import net.neoforged.neoforge.capabilities.IBlockCapabilityProvider;
-import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
@@ -50,8 +37,6 @@ import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.items.wrapper.InvWrapper;
-import net.neoforged.neoforge.items.wrapper.SidedInvWrapper;
 public final class EventHandlerForge {
 
     @SubscribeEvent
@@ -233,49 +218,4 @@ public final class EventHandlerForge {
         }
     }
 
-    @SubscribeEvent
-    public void onRegisterCapabilities(RegisterCapabilitiesEvent event) {
-        // Register fluid handlers and item handlers for IC2 blocks
-        for (Block block : BuiltInRegistries.BLOCK) {
-            if (BuiltInRegistries.BLOCK.getKey(block).getNamespace().equals("ic2")) {
-                // Fluid handler capability for blocks
-                event.registerBlock(Capabilities.FluidHandler.BLOCK,
-                    (level, pos, state, be, side) -> {
-                        if (be instanceof Ic2TileEntity) {
-                            if (be instanceof FluidBeBridge bridge) {
-                                Ic2FluidBlock fb = bridge.getFluidBlock();
-                                if (fb != null && fb.isFluidBlock(null, null, null, be)) {
-                                    return new BlockFluidCapImpl(fb, be).getCapability(level, pos, state, be, side);
-                                }
-                            }
-                            return new LazyBlockFluidCapImpl(be).getCapability(level, pos, state, be, side);
-                        }
-                        return null;
-                    },
-                    block);
-
-                // Item handler capability for blocks
-                event.registerBlock(Capabilities.ItemHandler.BLOCK,
-                    (level, pos, state, be, side) -> {
-                        if (be instanceof WorldlyContainer wc) {
-                            return new SidedInvWrapper(wc, side);
-                        }
-                        if (be instanceof Container cont) {
-                            return new InvWrapper(cont);
-                        }
-                        return null;
-                    },
-                    block);
-            }
-        }
-
-        // Register fluid handler capability for IC2 fluid items
-        for (Item item : BuiltInRegistries.ITEM) {
-            if (item instanceof Ic2FluidItem) {
-                event.registerItem(Capabilities.FluidHandler.ITEM,
-                    (stack, unused) -> new ItemFluidCapImpl(stack),
-                    item);
-            }
-        }
-    }
 }

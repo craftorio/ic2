@@ -12,6 +12,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
+import net.neoforged.neoforge.client.event.sound.SoundEngineLoadEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
@@ -103,5 +104,11 @@ public final class ClientModEventHandlerForge
 		}
 
 		EventHandlerClient.onClientSetup();
+	}
+
+	@SubscribeEvent
+	public void onSoundSetup(SoundEngineLoadEvent event)
+	{
+		EventHandlerClient.onSoundSetup();
 	}
 }

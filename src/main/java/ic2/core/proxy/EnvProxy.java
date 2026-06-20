@@ -1,7 +1,7 @@
 package ic2.core.proxy;
 
 import com.mojang.authlib.GameProfile;
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import ic2.core.Ic2ItemGroupType;
 import ic2.core.fluid.EnvFluidHandler;
 import ic2.core.item.EnvItemHandler;
@@ -105,7 +105,7 @@ public interface EnvProxy
 
 	void registerPlacementModifierType(ResourceLocation var1, PlacementModifierType<?> var2);
 
-	<T extends FoliagePlacer> FoliagePlacerType<T> registerFoliagePlacer(ResourceLocation var1, Codec<T> var2);
+	<T extends FoliagePlacer> FoliagePlacerType<T> registerFoliagePlacer(ResourceLocation var1, MapCodec<T> var2);
 
 	<T extends Recipe<?>> RecipeType<T> registerRecipeType(ResourceLocation var1);
 

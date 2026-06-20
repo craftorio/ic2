@@ -1,7 +1,7 @@
 {
   "type": "ic2:metal_former_rolling",
   "ingredient": {
-    "tag": "forge:plates/steel"
+    "tag": "c:plates/steel"
   },
   "result": {
     "item": "ic2:steel_casing",

@@ -2,7 +2,7 @@
   "parent": "ic2:ic2/build_generator/build_batbox/root",
   "display": {
     "icon": {
-      "item": "ic2:jetpack_electric"
+      "id": "ic2:jetpack_electric"
     },
     "title": {
       "translate": "advancements.ic2.build_jetpack"

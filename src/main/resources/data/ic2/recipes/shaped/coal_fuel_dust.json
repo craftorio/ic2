@@ -7,7 +7,7 @@
   ],
   "key": {
     "C": {
-      "tag": "forge:dusts/coal"
+      "tag": "c:dusts/coal"
     },
     "W": {
       "fluid": "minecraft:water",

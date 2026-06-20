@@ -2,7 +2,7 @@
   "parent": "ic2:ic2/build_generator/build_compressor/build_matter_gen/build_terraformer",
   "display": {
     "icon": {
-      "item": "ic2:cultivation_tfbp"
+      "id": "ic2:cultivation_tfbp"
     },
     "title": {
       "translate": "advancements.ic2.terraform_end_cultivation"

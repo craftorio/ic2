@@ -10,7 +10,7 @@
       "item": "ic2:dense_iron_plate"
     },
     "B": {
-      "tag": "forge:stone"
+      "tag": "c:stone"
     }
   },
   "result": {

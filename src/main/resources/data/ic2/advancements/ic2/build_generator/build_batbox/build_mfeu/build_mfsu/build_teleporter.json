@@ -2,7 +2,7 @@
   "parent": "ic2:ic2/build_generator/build_batbox/build_mfeu/build_mfsu",
   "display": {
     "icon": {
-      "item": "ic2:teleporter"
+      "id": "ic2:teleporter"
     },
     "title": {
       "translate": "advancements.ic2.build_teleporter"

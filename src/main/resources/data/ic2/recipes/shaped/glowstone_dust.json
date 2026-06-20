@@ -10,7 +10,7 @@
       "item": "minecraft:redstone"
     },
     "G": {
-      "tag": "forge:dusts/gold"
+      "tag": "c:dusts/gold"
     }
   },
   "hidden": true,

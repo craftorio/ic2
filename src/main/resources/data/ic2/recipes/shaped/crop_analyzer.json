@@ -13,7 +13,7 @@
       "item": "minecraft:redstone"
     },
     "C": {
-      "tag": "forge:glass"
+      "tag": "c:glass"
     },
     "D": {
       "item": "ic2:circuit"

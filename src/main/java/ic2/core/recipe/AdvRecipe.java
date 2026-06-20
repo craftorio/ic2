@@ -19,7 +19,6 @@ import ic2.core.recipe.v2.RecipeIo;
 import ic2.core.ref.Ic2RecipeSerializers;
 import ic2.core.util.ConfigUtil;
 import ic2.core.util.StackUtil;
-import ic2.core.util.Util;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,7 +44,6 @@ import org.jetbrains.annotations.NotNull;
 
 public class AdvRecipe implements Ic2CraftingRecipe
 {
-	private static final boolean debug = Util.hasAssertions();
 	public final ItemStack output;
 	public final IRecipeInput[] input;
 	public final IRecipeInput[] inputMirrored;
@@ -173,7 +171,7 @@ public class AdvRecipe implements Ic2CraftingRecipe
 		}
 	}
 
-	public boolean matches(CraftingInput input, Level level)
+	public boolean matches(@NotNull CraftingInput input, @NotNull Level level)
 	{
 		return this.assemble(input) != StackUtil.emptyStack;
 	}
@@ -219,19 +217,14 @@ public class AdvRecipe implements Ic2CraftingRecipe
 	}
 
 	@Override
-	public ItemStack getResultItem(HolderLookup.Provider registries)
+	public @NotNull ItemStack getResultItem(HolderLookup.@NotNull Provider registries)
 	{
 		return this.output;
 	}
 
-	public static boolean canShow(Object[] input, ItemStack output, boolean hidden)
+	public static boolean canShow(boolean hidden)
 	{
 		return !hidden || !ConfigUtil.getBool(MainConfig.get(), "misc/hideSecretRecipes");
-	}
-
-	public boolean canShow()
-	{
-		return canShow(this.input, this.output, this.hidden);
 	}
 
 	private static boolean checkMask(int mask, int[] request)
@@ -276,7 +269,7 @@ public class AdvRecipe implements Ic2CraftingRecipe
 	}
 
 	@Override
-	public NonNullList<ItemStack> getRemainingItems(CraftingInput inv)
+	public @NotNull NonNullList<ItemStack> getRemainingItems(@NotNull CraftingInput inv)
 	{
 		return this.consuming ? NonNullList.withSize(inv.size(), StackUtil.emptyStack) : Ic2CraftingRecipe.super.getRemainingItems(inv);
 	}
@@ -483,7 +476,7 @@ public class AdvRecipe implements Ic2CraftingRecipe
 		}
 
 		@Override
-		public MapCodec<AdvRecipe> codec()
+		public @NotNull MapCodec<AdvRecipe> codec()
 		{
 			return new MapCodec<>()
 			{
@@ -521,12 +514,9 @@ public class AdvRecipe implements Ic2CraftingRecipe
 		}
 
 		@Override
-		public StreamCodec<RegistryFriendlyByteBuf, AdvRecipe> streamCodec()
+		public @NotNull StreamCodec<RegistryFriendlyByteBuf, AdvRecipe> streamCodec()
 		{
-			return StreamCodec.of(
-					this::toNetwork,
-					buf -> this.fromNetwork(ResourceLocation.fromNamespaceAndPath("ic2", "shaped"), buf)
-			);
+			return StreamCodec.of(this::toNetwork, buf -> this.fromNetwork(ResourceLocation.fromNamespaceAndPath("ic2", "shaped"), buf));
 		}
 	}
 }

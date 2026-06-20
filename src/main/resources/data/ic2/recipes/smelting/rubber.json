@@ -4,7 +4,7 @@
   "ingredient": {
     "item": "ic2:resin"
   },
-  "result": "ic2:rubber",
+  "result": { "id": "ic2:rubber" },
   "experience": 0.3,
   "cookingtime": 200
 }

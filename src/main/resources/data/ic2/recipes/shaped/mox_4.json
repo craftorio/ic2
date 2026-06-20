@@ -7,10 +7,10 @@
   ],
   "key": {
     "U": {
-      "tag": "forge:ingots/uranium"
+      "tag": "c:ingots/uranium"
     },
     "C": {
-      "tag": "forge:ingots/plutonium"
+      "tag": "c:ingots/plutonium"
     }
   },
   "group": "mox",

@@ -10,7 +10,7 @@
       "item": "ic2:uranium_238"
     },
     "C": {
-      "tag": "forge:ingots/plutonium"
+      "tag": "c:ingots/plutonium"
     }
   },
   "group": "mox",

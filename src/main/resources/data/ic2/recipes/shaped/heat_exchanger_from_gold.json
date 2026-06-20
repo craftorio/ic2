@@ -10,7 +10,7 @@
       "item": "ic2:heat_exchanger"
     },
     "G": {
-      "tag": "forge:plates/gold"
+      "tag": "c:plates/gold"
     }
   },
   "result": {

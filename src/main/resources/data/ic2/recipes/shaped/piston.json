@@ -10,7 +10,7 @@
       "item": "minecraft:cobblestone"
     },
     "X": {
-      "tag": "forge:ingots/bronze"
+      "tag": "c:ingots/bronze"
     },
     "R": {
       "item": "minecraft:redstone"

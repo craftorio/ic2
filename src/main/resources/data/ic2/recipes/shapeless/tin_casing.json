@@ -2,7 +2,7 @@
   "type": "ic2:shapeless",
   "ingredients": [
     {
-      "tag": "forge:plates/tin"
+      "tag": "c:plates/tin"
     },
     {
       "tag": "ic2:forge_hammers"

@@ -2,7 +2,7 @@
   "parent": "ic2:ic2/build_generator/build_drill/build_ddrill",
   "display": {
     "icon": {
-      "item": "ic2:iridium_drill"
+      "id": "ic2:iridium_drill"
     },
     "title": {
       "translate": "advancements.ic2.build_iridium_drill"

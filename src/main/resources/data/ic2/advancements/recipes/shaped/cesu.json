@@ -29,7 +29,7 @@
       "conditions": {
         "items": [
           {
-            "tag": "forge:plates/bronze"
+            "tag": "c:plates/bronze"
           }
         ]
       },

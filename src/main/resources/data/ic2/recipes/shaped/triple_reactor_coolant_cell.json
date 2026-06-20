@@ -10,7 +10,7 @@
       "item": "ic2:reactor_coolant_cell"
     },
     "T": {
-      "tag": "forge:plates/tin"
+      "tag": "c:plates/tin"
     }
   },
   "result": {

@@ -2,7 +2,7 @@
   "parent": "ic2:ic2/build_generator/root",
   "display": {
     "icon": {
-      "item": "ic2:electric_furnace"
+      "id": "ic2:electric_furnace"
     },
     "title": {
       "translate": "advancements.ic2.build_electric_furnace"

@@ -1,7 +1,7 @@
 {
   "type": "ic2:macerator",
   "ingredient": {
-    "tag": "forge:ores/lead"
+    "tag": "c:ores/lead"
   },
   "weighted": true,
   "result": [

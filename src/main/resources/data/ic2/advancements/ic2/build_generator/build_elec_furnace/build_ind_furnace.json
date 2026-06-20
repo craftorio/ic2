@@ -2,7 +2,7 @@
   "parent": "ic2:ic2/build_generator/build_elec_furnace",
   "display": {
     "icon": {
-      "item": "ic2:induction_furnace"
+      "id": "ic2:induction_furnace"
     },
     "title": {
       "translate": "advancements.ic2.build_induction_furnace"

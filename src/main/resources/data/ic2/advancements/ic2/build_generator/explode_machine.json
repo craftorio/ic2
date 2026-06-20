@@ -2,7 +2,7 @@
   "parent": "ic2:ic2/build_generator/root",
   "display": {
     "icon": {
-      "item": "ic2:machine"
+      "id": "ic2:machine"
     },
     "title": {
       "translate": "advancements.ic2.explode_machine"

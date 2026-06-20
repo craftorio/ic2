@@ -1,7 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "ic2:wrench"
+      "id": "ic2:wrench"
     },
     "title": {
       "translate": "advancements.ic2.root"

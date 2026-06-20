@@ -7,7 +7,7 @@
   ],
   "key": {
     "R": {
-      "tag": "forge:plates/steel"
+      "tag": "c:plates/steel"
     },
     "A": {
       "item": "ic2:alloy"
@@ -16,7 +16,7 @@
       "item": "ic2:carbon_plate"
     },
     "I": {
-      "tag": "forge:nuggets/iridium"
+      "tag": "c:nuggets/iridium"
     }
   },
   "result": {

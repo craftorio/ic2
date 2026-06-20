@@ -1,7 +1,7 @@
 {
   "type": "ic2:compressor",
   "ingredient": {
-    "tag": "forge:ingots/silver",
+    "tag": "c:ingots/silver",
     "count": 9
   },
   "result": {

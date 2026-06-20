@@ -2,7 +2,7 @@
   "parent": "ic2:ic2/build_generator/root",
   "display": {
     "icon": {
-      "item": "ic2:compressor"
+      "id": "ic2:compressor"
     },
     "title": {
       "translate": "advancements.ic2.build_compressor"

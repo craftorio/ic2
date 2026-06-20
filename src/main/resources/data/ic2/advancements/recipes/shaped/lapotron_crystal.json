@@ -17,7 +17,7 @@
       "conditions": {
         "items": [
           {
-            "tag": "forge:dusts/lapis"
+            "tag": "c:dusts/lapis"
           }
         ]
       },

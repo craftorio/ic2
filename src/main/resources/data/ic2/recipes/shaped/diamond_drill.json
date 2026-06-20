@@ -6,7 +6,7 @@
   ],
   "key": {
     "D": {
-      "tag": "forge:gems/diamond"
+      "tag": "c:gems/diamond"
     },
     "d": {
       "item": "ic2:drill"

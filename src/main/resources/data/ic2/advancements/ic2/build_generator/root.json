@@ -2,7 +2,7 @@
   "parent": "ic2:ic2/acquire_resin/acquire_insulated_cable",
   "display": {
     "icon": {
-      "item": "ic2:generator"
+      "id": "ic2:generator"
     },
     "title": {
       "translate": "advancements.ic2.build_generator"

@@ -7,10 +7,10 @@
   ],
   "key": {
     "I": {
-      "tag": "forge:plates/iron"
+      "tag": "c:plates/iron"
     },
     "L": {
-      "tag": "forge:plates/lead"
+      "tag": "c:plates/lead"
     }
   },
   "result": {

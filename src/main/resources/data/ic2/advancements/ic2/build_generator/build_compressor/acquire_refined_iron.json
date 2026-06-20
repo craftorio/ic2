@@ -2,7 +2,7 @@
   "parent": "ic2:ic2/build_generator/build_compressor/root",
   "display": {
     "icon": {
-      "item": "ic2:steel_ingot"
+      "id": "ic2:steel_ingot"
     },
     "title": {
       "translate": "advancements.ic2.acquire_steel"

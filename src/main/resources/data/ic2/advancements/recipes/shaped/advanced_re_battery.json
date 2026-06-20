@@ -17,7 +17,7 @@
       "conditions": {
         "items": [
           {
-            "tag": "forge:dusts/lead"
+            "tag": "c:dusts/lead"
           }
         ]
       },
@@ -27,7 +27,7 @@
       "conditions": {
         "items": [
           {
-            "tag": "forge:dusts/sulfur"
+            "tag": "c:dusts/sulfur"
           }
         ]
       },

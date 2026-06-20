@@ -8,7 +8,7 @@
       "item": "ic2:mox_fuel_rod"
     },
     "I": {
-      "tag": "forge:plates/iron"
+      "tag": "c:plates/iron"
     }
   },
   "result": {

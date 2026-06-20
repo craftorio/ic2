@@ -2,7 +2,7 @@
   "parent": "ic2:ic2/build_generator/build_compressor/root",
   "display": {
     "icon": {
-      "item": "ic2:uranium"
+      "id": "ic2:uranium"
     },
     "title": {
       "translate": "advancements.ic2.compress_uranium"

@@ -2,7 +2,7 @@
   "parent": "ic2:ic2/acquire_resin",
   "display": {
     "icon": {
-      "item": "ic2:copper_cable"
+      "id": "ic2:copper_cable"
     },
     "title": {
       "translate": "advancements.ic2.build_cable"

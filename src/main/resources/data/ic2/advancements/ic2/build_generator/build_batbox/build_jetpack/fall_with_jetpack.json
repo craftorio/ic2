@@ -2,7 +2,7 @@
   "parent": "ic2:ic2/build_generator/build_batbox/build_jetpack",
   "display": {
     "icon": {
-      "item": "ic2:jetpack"
+      "id": "ic2:jetpack"
     },
     "title": {
       "translate": "advancements.ic2.fall_with_jetpack"

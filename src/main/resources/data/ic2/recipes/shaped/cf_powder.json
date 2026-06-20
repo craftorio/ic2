@@ -13,7 +13,7 @@
       "item": "minecraft:clay_ball"
     },
     "S": {
-      "tag": "forge:dusts/stone"
+      "tag": "c:dusts/stone"
     }
   },
   "result": {

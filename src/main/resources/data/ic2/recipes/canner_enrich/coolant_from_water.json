@@ -5,7 +5,7 @@
     "amount": 1000
   },
   "additive_ingredient": {
-    "tag": "forge:dusts/lapis",
+    "tag": "c:dusts/lapis",
     "count": 8
   },
   "result": {

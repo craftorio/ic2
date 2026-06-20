@@ -10,7 +10,7 @@
       "item": "ic2:empty_cell"
     },
     "P": {
-      "tag": "forge:plates/bronze"
+      "tag": "c:plates/bronze"
     }
   },
   "consuming": true,

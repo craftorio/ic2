@@ -10,7 +10,7 @@
       "item": "ic2:dense_iron_plate"
     },
     "A": {
-      "tag": "forge:ingots/plutonium"
+      "tag": "c:ingots/plutonium"
     }
   },
   "group": "rtg_pellet",

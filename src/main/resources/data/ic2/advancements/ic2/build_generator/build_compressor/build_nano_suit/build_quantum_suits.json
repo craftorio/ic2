@@ -2,7 +2,7 @@
   "parent": "ic2:ic2/build_generator/build_compressor/build_nano_suit",
   "display": {
     "icon": {
-      "item": "ic2:quantum_chestplate"
+      "id": "ic2:quantum_chestplate"
     },
     "title": {
       "translate": "advancements.ic2.build_quantum_suits"

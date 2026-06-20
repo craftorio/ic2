@@ -2,7 +2,7 @@
   "parent": "ic2:ic2/build_generator/build_compressor/root",
   "display": {
     "icon": {
-      "item": "ic2:energy_crystal"
+      "id": "ic2:energy_crystal"
     },
     "title": {
       "translate": "advancements.ic2.build_energy_crystal"

@@ -10,7 +10,7 @@
       "item": "minecraft:redstone"
     },
     "C": {
-      "tag": "forge:dusts/coal"
+      "tag": "c:dusts/coal"
     }
   },
   "hidden": true,

@@ -2,7 +2,7 @@
   "parent": "ic2:ic2/build_generator/build_compressor/root",
   "display": {
     "icon": {
-      "item": "ic2:industrial_diamond"
+      "id": "ic2:industrial_diamond"
     },
     "title": {
       "translate": "advancements.ic2.build_coal_diamond"

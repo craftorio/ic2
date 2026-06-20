@@ -269,14 +269,12 @@ public final class StackUtil
 
 	public static CompoundTag getOrCreateNbtData(ItemStack stack)
 	{
-		CompoundTag ret = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).getUnsafe();
 		if (!stack.has(DataComponents.CUSTOM_DATA))
 		{
-			ret = new CompoundTag();
-			stack.set(DataComponents.CUSTOM_DATA, CustomData.of(ret));
+			stack.set(DataComponents.CUSTOM_DATA, CustomData.of(new CompoundTag()));
 		}
 
-		return ret;
+		return stack.get(DataComponents.CUSTOM_DATA).getUnsafe();
 	}
 
 	public static boolean checkItemEquality(ItemStack a, ItemStack b)

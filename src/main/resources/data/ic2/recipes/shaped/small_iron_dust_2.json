@@ -7,10 +7,10 @@
   ],
   "key": {
     "C": {
-      "tag": "forge:dusts/copper"
+      "tag": "c:dusts/copper"
     },
     "T": {
-      "tag": "forge:dusts/tin"
+      "tag": "c:dusts/tin"
     }
   },
   "hidden": true,

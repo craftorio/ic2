@@ -2,7 +2,7 @@
   "type": "ic2:shapeless",
   "ingredients": [
     {
-      "tag": "forge:ingots/tin"
+      "tag": "c:ingots/tin"
     },
     {
       "tag": "ic2:forge_hammers"

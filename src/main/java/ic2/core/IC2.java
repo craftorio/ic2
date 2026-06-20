@@ -1,7 +1,5 @@
 package ic2.core;
 
-import ic2.core.network.NetworkManager;
-import ic2.core.network.NetworkManagerClient;
 import ic2.core.proxy.EnvProxy;
 import ic2.core.proxy.SideProxy;
 import ic2.core.proxy.SideProxyClient;
@@ -12,12 +10,10 @@ import ic2.core.util.Log;
 import ic2.core.util.PriorityExecutor;
 import ic2.core.util.SideGateway;
 import ic2.forge.EnvProxyForge;
-import net.minecraft.advancements.Advancement;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.level.Level;
 import org.apache.logging.log4j.LogManager;

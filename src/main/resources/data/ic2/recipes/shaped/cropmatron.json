@@ -16,7 +16,7 @@
       "item": "ic2:circuit"
     },
     "B": {
-      "tag": "forge:chests/wooden"
+      "tag": "c:chests/wooden"
     },
     "U": {
       "item": "ic2:empty_cell"

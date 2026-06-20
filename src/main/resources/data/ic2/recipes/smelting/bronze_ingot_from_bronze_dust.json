@@ -5,7 +5,7 @@
   "ingredient": {
     "item": "ic2:bronze_dust"
   },
-  "result": "ic2:bronze_ingot",
+  "result": { "id": "ic2:bronze_ingot" },
   "experience": 0.0,
   "cookingtime": 200
 }

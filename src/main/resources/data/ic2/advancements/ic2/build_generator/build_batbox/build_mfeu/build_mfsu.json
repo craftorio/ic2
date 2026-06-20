@@ -2,7 +2,7 @@
   "parent": "ic2:ic2/build_generator/build_batbox/build_mfeu",
   "display": {
     "icon": {
-      "item": "ic2:mfsu"
+      "id": "ic2:mfsu"
     },
     "title": {
       "translate": "advancements.ic2.build_mfsu"

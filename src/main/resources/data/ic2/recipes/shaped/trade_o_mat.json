@@ -9,7 +9,7 @@
       "item": "minecraft:redstone"
     },
     "C": {
-      "tag": "forge:chests/wooden"
+      "tag": "c:chests/wooden"
     },
     "M": {
       "item": "ic2:machine"

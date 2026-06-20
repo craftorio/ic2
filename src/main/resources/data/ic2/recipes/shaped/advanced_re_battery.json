@@ -10,10 +10,10 @@
       "item": "ic2:bronze_casing"
     },
     "S": {
-      "tag": "forge:dusts/sulfur"
+      "tag": "c:dusts/sulfur"
     },
     "L": {
-      "tag": "forge:dusts/lead"
+      "tag": "c:dusts/lead"
     },
     "C": {
       "item": "ic2:insulated_copper_cable"

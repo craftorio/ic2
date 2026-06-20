@@ -7,10 +7,10 @@
   ],
   "key": {
     "A": {
-      "tag": "forge:plates/steel"
+      "tag": "c:plates/steel"
     },
     "B": {
-      "tag": "forge:ingots/steel"
+      "tag": "c:ingots/steel"
     }
   },
   "result": {

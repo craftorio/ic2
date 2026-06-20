@@ -13,7 +13,7 @@
       "item": "ic2:alloy"
     },
     "S": {
-      "tag": "forge:plates/steel"
+      "tag": "c:plates/steel"
     },
     "C": {
       "item": "ic2:carbon_plate"

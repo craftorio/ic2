@@ -5,7 +5,7 @@
       "conditions": {
         "items": [
           {
-            "tag": "forge:dusts/coal"
+            "tag": "c:dusts/coal"
           }
         ]
       },
@@ -15,7 +15,7 @@
       "conditions": {
         "items": [
           {
-            "tag": "forge:dusts/tin"
+            "tag": "c:dusts/tin"
           }
         ]
       },
@@ -25,7 +25,7 @@
       "conditions": {
         "items": [
           {
-            "tag": "forge:plates/copper"
+            "tag": "c:plates/copper"
           }
         ]
       },

@@ -2,7 +2,7 @@
   "type": "ic2:shapeless",
   "ingredients": [
     {
-      "tag": "forge:plates/gold"
+      "tag": "c:plates/gold"
     },
     {
       "tag": "ic2:wire_cutters"

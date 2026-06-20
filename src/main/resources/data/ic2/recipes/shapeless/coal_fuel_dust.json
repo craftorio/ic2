@@ -2,7 +2,7 @@
   "type": "ic2:shapeless",
   "ingredients": [
     {
-      "tag": "forge:dusts/coal"
+      "tag": "c:dusts/coal"
     },
     {
       "fluid": "minecraft:water",

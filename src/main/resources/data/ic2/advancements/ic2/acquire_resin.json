@@ -2,7 +2,7 @@
   "parent": "ic2:ic2/root",
   "display": {
     "icon": {
-      "item": "ic2:resin"
+      "id": "ic2:resin"
     },
     "title": {
       "translate": "advancements.ic2.acquire_resin"

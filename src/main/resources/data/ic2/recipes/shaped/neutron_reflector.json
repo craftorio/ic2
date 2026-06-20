@@ -7,13 +7,13 @@
   ],
   "key": {
     "c": {
-      "tag": "forge:dusts/coal"
+      "tag": "c:dusts/coal"
     },
     "C": {
-      "tag": "forge:plates/copper"
+      "tag": "c:plates/copper"
     },
     "T": {
-      "tag": "forge:dusts/tin"
+      "tag": "c:dusts/tin"
     }
   },
   "result": {

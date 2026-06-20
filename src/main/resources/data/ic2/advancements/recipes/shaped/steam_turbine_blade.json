@@ -5,7 +5,7 @@
       "conditions": {
         "items": [
           {
-            "tag": "forge:ingots/steel"
+            "tag": "c:ingots/steel"
           }
         ]
       },
@@ -15,7 +15,7 @@
       "conditions": {
         "items": [
           {
-            "tag": "forge:plates/steel"
+            "tag": "c:plates/steel"
           }
         ]
       },

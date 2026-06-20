@@ -7,7 +7,7 @@
   ],
   "key": {
     "T": {
-      "tag": "forge:plates/tin"
+      "tag": "c:plates/tin"
     },
     "P": {
       "item": "minecraft:sticky_piston"

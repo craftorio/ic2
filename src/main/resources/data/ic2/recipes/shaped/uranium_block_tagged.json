@@ -7,7 +7,7 @@
   ],
   "key": {
     "U": {
-      "tag": "forge:ingots/uranium"
+      "tag": "c:ingots/uranium"
     }
   },
   "group": "uranium_block",

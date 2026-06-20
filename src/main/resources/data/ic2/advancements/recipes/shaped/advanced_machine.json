@@ -41,7 +41,7 @@
       "conditions": {
         "items": [
           {
-            "tag": "forge:plates/steel"
+            "tag": "c:plates/steel"
           }
         ]
       },

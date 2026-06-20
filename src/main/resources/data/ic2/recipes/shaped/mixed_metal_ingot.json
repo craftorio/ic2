@@ -7,13 +7,13 @@
   ],
   "key": {
     "I": {
-      "tag": "forge:plates/iron"
+      "tag": "c:plates/iron"
     },
     "B": {
-      "tag": "forge:plates/bronze"
+      "tag": "c:plates/bronze"
     },
     "T": {
-      "tag": "forge:plates/tin"
+      "tag": "c:plates/tin"
     }
   },
   "result": {

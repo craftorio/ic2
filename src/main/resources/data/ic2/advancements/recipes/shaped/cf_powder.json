@@ -17,7 +17,7 @@
       "conditions": {
         "items": [
           {
-            "tag": "forge:dusts/stone"
+            "tag": "c:dusts/stone"
           }
         ]
       },

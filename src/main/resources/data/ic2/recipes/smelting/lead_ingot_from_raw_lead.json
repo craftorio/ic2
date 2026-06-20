@@ -3,7 +3,7 @@
   "ingredient": {
     "item": "ic2:raw_lead"
   },
-  "result": "ic2:lead_ingot",
+  "result": { "id": "ic2:lead_ingot" },
   "experience": 0.5,
   "cookingtime": 200
 }

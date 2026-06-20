@@ -1,7 +1,7 @@
 {
   "type": "ic2:blast_furnace",
   "ingredient": {
-    "tag": "forge:dusts/iron"
+    "tag": "c:dusts/iron"
   },
   "result": [
     {

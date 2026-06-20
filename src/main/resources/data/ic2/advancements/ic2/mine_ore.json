@@ -2,7 +2,7 @@
   "parent": "ic2:ic2/root",
   "display": {
     "icon": {
-      "item": "ic2:copper_ore"
+      "id": "ic2:copper_ore"
     },
     "title": {
       "translate": "advancements.ic2.mine_ore"

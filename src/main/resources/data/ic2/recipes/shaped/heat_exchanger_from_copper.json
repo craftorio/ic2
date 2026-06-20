@@ -10,10 +10,10 @@
       "item": "ic2:circuit"
     },
     "T": {
-      "tag": "forge:plates/tin"
+      "tag": "c:plates/tin"
     },
     "C": {
-      "tag": "forge:plates/copper"
+      "tag": "c:plates/copper"
     }
   },
   "result": {

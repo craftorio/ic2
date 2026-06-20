@@ -10,7 +10,7 @@
       "item": "minecraft:glass"
     },
     "R": {
-      "tag": "forge:dusts/silver"
+      "tag": "c:dusts/silver"
     },
     "D": {
       "item": "ic2:energium_dust"

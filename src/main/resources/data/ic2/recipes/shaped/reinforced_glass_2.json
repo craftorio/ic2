@@ -7,7 +7,7 @@
   ],
   "key": {
     "G": {
-      "tag": "forge:glass"
+      "tag": "c:glass"
     },
     "A": {
       "item": "ic2:alloy"

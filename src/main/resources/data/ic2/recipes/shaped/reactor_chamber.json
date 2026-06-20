@@ -7,7 +7,7 @@
   ],
   "key": {
     "I": {
-      "tag": "forge:plates/lead"
+      "tag": "c:plates/lead"
     },
     "C": {
       "item": "ic2:machine"

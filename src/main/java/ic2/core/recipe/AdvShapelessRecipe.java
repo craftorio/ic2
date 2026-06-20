@@ -109,7 +109,7 @@ public class AdvShapelessRecipe implements CraftingRecipe
 
 	public boolean canShow()
 	{
-		return AdvRecipe.canShow(this.input, this.output, this.hidden);
+		return AdvRecipe.canShow(this.hidden);
 	}
 
 	@Override

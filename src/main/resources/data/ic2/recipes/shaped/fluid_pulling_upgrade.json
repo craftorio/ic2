@@ -10,7 +10,7 @@
       "item": "ic2:electric_motor"
     },
     "T": {
-      "tag": "forge:plates/tin"
+      "tag": "c:plates/tin"
     },
     "X": {
       "item": "ic2:treetap"

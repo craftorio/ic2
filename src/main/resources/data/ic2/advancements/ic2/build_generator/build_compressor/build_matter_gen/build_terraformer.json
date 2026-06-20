@@ -2,7 +2,7 @@
   "parent": "ic2:ic2/build_generator/build_compressor/build_matter_gen",
   "display": {
     "icon": {
-      "item": "ic2:terraformer"
+      "id": "ic2:terraformer"
     },
     "title": {
       "translate": "advancements.ic2.build_terraformer"

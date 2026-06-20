@@ -10,10 +10,10 @@
       "item": "ic2:uranium_fuel_rod"
     },
     "I": {
-      "tag": "forge:plates/iron"
+      "tag": "c:plates/iron"
     },
     "C": {
-      "tag": "forge:plates/copper"
+      "tag": "c:plates/copper"
     }
   },
   "group": "quad_uranium_fuel_rod",

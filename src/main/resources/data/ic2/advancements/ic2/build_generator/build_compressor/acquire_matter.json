@@ -2,7 +2,7 @@
   "parent": "ic2:ic2/build_generator/build_compressor/build_matter_gen",
   "display": {
     "icon": {
-      "item": "ic2:uu_matter_cell"
+      "id": "ic2:uu_matter_cell"
     },
     "title": {
       "translate": "advancements.ic2.acquire_matter"

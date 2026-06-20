@@ -5,7 +5,7 @@
   "ingredient": {
     "item": "ic2:deepslate_lead_ore"
   },
-  "result": "ic2:lead_ingot",
+  "result": { "id": "ic2:lead_ingot" },
   "experience": 0.5,
   "cookingtime": 200
 }

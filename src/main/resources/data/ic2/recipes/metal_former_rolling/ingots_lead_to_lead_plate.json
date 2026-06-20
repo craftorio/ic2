@@ -1,7 +1,7 @@
 {
   "type": "ic2:metal_former_rolling",
   "ingredient": {
-    "tag": "forge:ingots/lead"
+    "tag": "c:ingots/lead"
   },
   "result": {
     "item": "ic2:lead_plate"

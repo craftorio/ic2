@@ -2,7 +2,7 @@
   "parent": "ic2:ic2/build_generator/build_chainsaw",
   "display": {
     "icon": {
-      "item": "ic2:chainsaw"
+      "id": "ic2:chainsaw"
     },
     "title": {
       "translate": "advancements.ic2.kill_creeper_with_chainsaw"

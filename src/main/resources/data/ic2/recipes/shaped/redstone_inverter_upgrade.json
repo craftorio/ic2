@@ -10,7 +10,7 @@
       "item": "minecraft:lever"
     },
     "T": {
-      "tag": "forge:plates/tin"
+      "tag": "c:plates/tin"
     }
   },
   "group": "redstone_inverter_upgrade",

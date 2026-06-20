@@ -73,7 +73,7 @@ public abstract class AbstractDamageableReactorComponent extends Item implements
 	{
 		super.appendHoverText(stack, world, tooltip, advanced);
 		tooltip.add(
-			Component.literal(Component.translatable("ic2.reactoritem.durability") + " " + (this.getMaxUse() - this.getUse(stack)) + "/" + this.getMaxUse())
+			Component.literal(Component.translatable("ic2.reactoritem.durability").getString() + " " + (this.getMaxUse() - this.getUse(stack)) + "/" + this.getMaxUse())
 				.withStyle(ChatFormatting.GRAY)
 		);
 	}

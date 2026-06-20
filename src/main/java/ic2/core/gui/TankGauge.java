@@ -107,7 +107,7 @@ public class TankGauge extends GuiElement<TankGauge>
 			Fluid fluid = fs.getFluid();
 			if (fluid != null)
 			{
-				ret.add(Component.literal(SideProxyClient.envProxy.getFluidName(fs) + ": " + fs.getAmountMb() + " " + Component.translatable("ic2.generic.text.mb")));
+				ret.add(Component.literal(SideProxyClient.envProxy.getFluidName(fs) + ": " + fs.getAmountMb() + " " + Component.translatable("ic2.generic.text.mb").getString()));
 			} else
 			{
 				ret.add(Component.literal("invalid fluid stack"));

@@ -36,7 +36,7 @@ public class GuiScanner extends Ic2Gui<ContainerScanner>
 	protected void drawForegroundLayer(GuiGraphics guiGraphics, int mouseX, int mouseY)
 	{
 		super.drawForegroundLayer(guiGraphics, mouseX, mouseY);
-		this.drawString(guiGraphics, 123, 6, this.info[5] + ":", 4210752);
+		this.drawString(guiGraphics, 123, 6, this.info[5].getString() + ":", 4210752);
 		TileEntityScanner te = this.menu.base;
 		switch (te.getState())
 		{

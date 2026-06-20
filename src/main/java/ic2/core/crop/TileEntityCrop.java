@@ -667,6 +667,8 @@ public class TileEntityCrop extends Ic2TileEntity implements ICropTile
 	@Override
 	public void setCurrentAge(int size)
 	{
+		int maxAge = ((Ic2TileEntityBlock) this.getBlockType()).getCropMaxAge();
+		if (size > maxAge) size = maxAge;
 		this.currentAge = (byte) size;
 		this.withCropAge(size);
 	}
@@ -1088,6 +1090,7 @@ public class TileEntityCrop extends Ic2TileEntity implements ICropTile
 			BlockState newState = cropBlock.defaultBlockState();
 			if (!newState.is(Ic2Blocks.CROP_STICK))
 			{
+				if (age > cropBlock.getCropMaxAge()) age = cropBlock.getCropMaxAge();
 				newState = newState.setValue(cropBlock.getAgeProperty(), age);
 			}
 

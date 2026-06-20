@@ -6,8 +6,10 @@ import java.util.Objects;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.core.RegistryAccess;
 
 final class Ic2FluidStackImpl implements Ic2FluidStack
 {
@@ -67,7 +69,7 @@ final class Ic2FluidStackImpl implements Ic2FluidStack
 	@Override
 	public void toNbt(CompoundTag nbt)
 	{
-		this.parent.writeToNBT(nbt);
+		this.parent.writeToNBT(net.minecraft.core.RegistryAccess.EMPTY, nbt);
 	}
 
 	@Override
@@ -102,7 +104,7 @@ final class Ic2FluidStackImpl implements Ic2FluidStack
 		return String.format(
 			"%dx%s@%s",
 			this.parent.getAmount(),
-			fluid != null ? ForgeRegistries.FLUIDS.getKey(fluid) : "(null)",
+			fluid != null ? BuiltInRegistries.FLUID.getKey(fluid) : "(null)",
 			this.parent.getTag() != null ? this.parent.getTag().toString() : "(-)"
 		);
 	}

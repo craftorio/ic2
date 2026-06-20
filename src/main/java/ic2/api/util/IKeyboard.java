@@ -1,6 +1,7 @@
 package ic2.api.util;
 
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.EquipmentSlot;
 
 public interface IKeyboard
 {

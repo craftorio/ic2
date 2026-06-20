@@ -38,7 +38,7 @@ public final class Ic2ItemTags
 	public static final TagKey<Item> LAPIS_PLATES = createResource("lapis", "plates");
 	public static final TagKey<Item> OBSIDIAN_PLATES = createResource("obsidian", "plates");
 	public static final TagKey<Item> STEEL_PLATES = createResource("steel", "plates");
-	public static final TagKey<Item> ORES = create("c:ores", "forge:ores");
+	public static final TagKey<Item> ORES = create("c:ores", "c:ores");
 	public static final TagKey<Item> LEAD_ORES = createResource("lead", "ores");
 	public static final TagKey<Item> LEAD_raw_materials = createResource("lead", "raw_materials");
 	public static final TagKey<Item> SILVER_ORES = createResource("silver", "ores");
@@ -51,8 +51,8 @@ public final class Ic2ItemTags
 	public static final TagKey<Item> URANIUM_BLOCKS = createResource("uranium", "blocks");
 	public static final TagKey<Item> BRONZE_BLOCKS = createResource("bronze", "blocks");
 	public static final TagKey<Item> STEEL_BLOCKS = createResource("steel", "blocks");
-	public static final TagKey<Item> DIAMONDS = create("c:diamonds", "forge:gems/diamond");
-	public static final TagKey<Item> WOODEN_CHESTS = create("c:wooden_chests", "forge:chests/wooden");
+	public static final TagKey<Item> DIAMONDS = create("c:diamonds", "c:gems/diamond");
+	public static final TagKey<Item> WOODEN_CHESTS = create("c:wooden_chests", "c:chests/wooden");
 	public static final TagKey<Item> RUBBER_LOGS = create("rubber_logs");
 	public static final TagKey<Item> FORGE_HAMMERS = create("forge_hammers");
 	public static final TagKey<Item> WIRE_CUTTERS = create("wire_cutters");

@@ -16,8 +16,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.world.item.Item;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -41,7 +42,7 @@ public class ItemScanner extends BaseElectricItem implements IBoxable, IHandHeld
 	}
 
 	@OnlyIn(Dist.CLIENT)
-	public void appendHoverText(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag advanced)
+	public void appendHoverText(ItemStack stack, Item.TooltipContext world, List<Component> tooltip, TooltipFlag advanced)
 	{
 		super.appendHoverText(stack, world, tooltip, advanced);
 		tooltip.add(Component.translatable("ic2.scanner.range", this.getScanRange()).withStyle(ChatFormatting.GRAY));
@@ -71,7 +72,7 @@ public class ItemScanner extends BaseElectricItem implements IBoxable, IHandHeld
 		}
 	}
 
-	public boolean onDroppedByPlayer(ItemStack stack, Player player)
+	public boolean onDroppedByPlayer(@NotNull ItemStack stack, Player player)
 	{
 		if (!player.getCommandSenderWorld().isClientSide && !StackUtil.isEmpty(stack) && player.containerMenu instanceof ContainerToolScanner)
 		{

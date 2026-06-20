@@ -14,7 +14,6 @@ import ic2.core.gui.dynamic.TextProvider;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-
 public class GuiNuclearReactor extends Ic2Gui<ContainerNuclearReactor>
 {
 	private static final ResourceLocation background = ResourceLocation.fromNamespaceAndPath("ic2", "textures/gui/guinuclearreactor.png");

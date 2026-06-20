@@ -2,7 +2,7 @@ package ic2.api.energy.event;
 
 import ic2.api.energy.EnergyNet;
 import ic2.api.energy.tile.IEnergyTile;
-import net.minecraftforge.event.level.LevelEvent;
+import net.neoforged.neoforge.event.level.LevelEvent;
 
 public class EnergyTileEvent extends LevelEvent
 {

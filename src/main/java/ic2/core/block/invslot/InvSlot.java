@@ -17,6 +17,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 
 public class InvSlot implements Iterable<ItemStack>
@@ -69,7 +70,7 @@ public class InvSlot implements Iterable<ItemStack>
 		{
 			CompoundTag contentTag = contentsTag.getCompound(i);
 			int index = contentTag.getByte("Index") & 255;
-			if (index >= this.size())
+			if (index >= this.getContainerSize())
 			{
 				IC2.log
 					.error(

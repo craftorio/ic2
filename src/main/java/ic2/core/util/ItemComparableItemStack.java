@@ -3,6 +3,7 @@ package ic2.core.util;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.component.DataComponents;
 
 public class ItemComparableItemStack
 {
@@ -114,7 +115,7 @@ public class ItemComparableItemStack
 		}
 
 		ItemStack ret = new ItemStack(this.item, size);
-		ret.setTag(this.nbt);
+		ret.set(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.of(this.nbt));
 		return ret;
 	}
 }

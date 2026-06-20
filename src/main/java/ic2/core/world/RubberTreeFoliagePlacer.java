@@ -14,11 +14,12 @@ import net.minecraft.world.level.levelgen.feature.configurations.TreeConfigurati
 import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacer;
 import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacerType;
 import org.jetbrains.annotations.NotNull;
+import com.mojang.serialization.MapCodec;
 
 public final class RubberTreeFoliagePlacer extends FoliagePlacer
 {
 	public static final RubberTreeFoliagePlacer INSTANCE = new RubberTreeFoliagePlacer(ConstantInt.of(2), ConstantInt.of(0));
-	public static final Codec<RubberTreeFoliagePlacer> CODEC = RecordCodecBuilder.create(instance ->
+	public static final MapCodec<RubberTreeFoliagePlacer> CODEC = RecordCodecBuilder.mapCodec(instance ->
 		instance.group(
 			IntProvider.CODEC.fieldOf("radius").forGetter(placer -> placer.radius),
 			IntProvider.CODEC.fieldOf("offset").forGetter(placer -> placer.offset)

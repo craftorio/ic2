@@ -19,11 +19,12 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 
 @NotClassic
@@ -35,13 +36,13 @@ public class ItemBatteryChargeHotbar extends ItemBattery implements IBoxable
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag context)
+	public void appendHoverText(ItemStack stack, Item.TooltipContext world, List<Component> tooltip, TooltipFlag context)
 	{
 		super.appendHoverText(stack, world, tooltip, context);
 		Mode mode = getMode(stack);
 		tooltip.add(Component.translatable("ic2.tooltip.mode",
 			Component.translatable("ic2.tooltip.mode." + mode.name().toLowerCase(Locale.ENGLISH))));
-		if (world != null && world.isClientSide)
+		if (world.isClientSide)
 		{
 			showBoxableTip(tooltip, mode);
 		}

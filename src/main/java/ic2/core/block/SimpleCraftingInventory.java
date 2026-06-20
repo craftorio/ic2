@@ -4,6 +4,7 @@ import ic2.core.block.invslot.InvSlot;
 import ic2.core.util.StackUtil;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.StackedContents;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
@@ -22,13 +23,11 @@ public abstract class SimpleCraftingInventory implements CraftingContainer
 		this.size = width * height;
 	}
 
-	@Override
 	public int getWidth()
 	{
 		return this.width;
 	}
 
-	@Override
 	public int getHeight()
 	{
 		return this.height;

@@ -27,9 +27,12 @@ import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.HolderLookup;
 
 @NotClassic
 public class TileEntitySteamRepressurizer extends TileEntityInventory implements IHasGui
@@ -51,16 +54,15 @@ public class TileEntitySteamRepressurizer extends TileEntityInventory implements
 	}
 
 	@Override
-	public void load(CompoundTag nbt)
-	{
-		super.load(nbt);
+	protected void loadAdditional(CompoundTag nbt, net.minecraft.core.HolderLookup.Provider registries) {
+		super.loadAdditional(nbt, registries);
 		this.currentHeat = nbt.getInt("heat");
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag nbt)
+	public void saveAdditional(CompoundTag nbt, net.minecraft.core.HolderLookup.Provider registries)
 	{
-		super.saveAdditional(nbt);
+		super.saveAdditional(nbt, registries);
 		nbt.putInt("heat", this.currentHeat);
 	}
 

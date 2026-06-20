@@ -2,14 +2,12 @@ package ic2.core.block.beam;
 
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.Entity.RemovalReason;
 import net.minecraft.world.level.Level;
+import net.minecraft.network.syncher.SynchedEntityData;
 
 public class ParticleEntity extends Entity
 {
@@ -33,7 +31,7 @@ public class ParticleEntity extends Entity
 		this.setDeltaMovement(dir.getStepX() * 0.5, dir.getStepY() * 0.5, dir.getStepZ() * 0.5);
 	}
 
-	protected void defineSynchedData()
+	protected void defineSynchedData(SynchedEntityData.Builder builder)
 	{
 	}
 
@@ -45,10 +43,6 @@ public class ParticleEntity extends Entity
 	{
 	}
 
-	public Packet<ClientGamePacketListener> getAddEntityPacket()
-	{
-		return new ClientboundAddEntityPacket(this);
-	}
 
 	public void tick()
 	{

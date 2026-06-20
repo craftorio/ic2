@@ -19,7 +19,7 @@ import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
-import net.minecraftforge.items.ItemStackHandler;
+import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -49,7 +49,7 @@ final class EnvItemHandlerForge implements EnvItemHandler
 	@Nullable
 	private static EnvItemHandlerForge.HandlerForge getStorage(BlockEntity source, Direction dir, @Nullable Set<Container> personalInventories)
 	{
-		BlockEntity target = source.getLevel().getBlockEntity(source.getBlockPos().relative(dir));
+		BlockEntity target = source.level().getBlockEntity(source.getBlockPos().relative(dir));
 		GameProfile profile = source instanceof IPersonalBlock ? ((IPersonalBlock) source).getOwner() : null;
 		return EnvItemHandlerForge.HandlerForge.ofNullable(getStorage(target, dir.getOpposite(), profile, personalInventories), dir);
 	}
@@ -87,7 +87,7 @@ final class EnvItemHandlerForge implements EnvItemHandler
 		for (int i = 0; i < storage.getSlots(); i++)
 		{
 			ItemStack itemStack = storage.getStackInSlot(i);
-			if (storage.canInsertItem(i, stack) && (itemStack.isEmpty() || ItemStack.isSameItemSameTags(itemStack, stack) && itemStack.getCount() < itemStack.getMaxStackSize()))
+			if (storage.canInsertItem(i, stack) && (itemStack.isEmpty() || ItemStack.isSameItemSameComponents(itemStack, stack) && itemStack.getCount() < itemStack.getMaxStackSize()))
 			{
 				ItemStack remainStack = storage.insertItem(i, stack, simulate);
 				return stack.getCount() - remainStack.getCount();

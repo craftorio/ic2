@@ -67,11 +67,11 @@ public class BeamRenderer extends EntityRenderer<ParticleEntity>
 
 			vertexConsumer.vertex(positionMatrix, x, y, 0.0F)
 				.color(red, green, blue, alpha)
-				.uv(u, v)
-				.overlayCoords(OverlayTexture.NO_OVERLAY)
-				.uv2(light)
+				.setUv(u, v)
+				.setOverlay(OverlayTexture.NO_OVERLAY)
+				.setLight(light)
 				.normal(normalMatrix, 0.0F, 1.0F, 0.0F)
-				.endVertex();
+				;
 		}
 
 		matrices.popPose();

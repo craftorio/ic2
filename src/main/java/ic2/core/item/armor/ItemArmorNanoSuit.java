@@ -13,15 +13,11 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.*;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Rarity;
-import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 public class ItemArmorNanoSuit extends ItemArmorElectric implements IItemHudProvider
@@ -145,18 +141,13 @@ public class ItemArmorNanoSuit extends ItemArmorElectric implements IItemHudProv
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag context)
+	public void appendHoverText(ItemStack stack, Item.TooltipContext world, List<Component> tooltip, TooltipFlag context)
 	{
 		super.appendHoverText(stack, world, tooltip, context);
 		if (this.getEquipmentSlot() == EquipmentSlot.HEAD)
 		{
 			tooltip.add(Component.translatable("item.ic2.tooltip.night_vision.toggle", KeyboardClient.altKey.getKey().getDisplayName(), KeyboardClient.modeSwitchKey.getKey().getDisplayName()));
 		}
-	}
-
-	public @NotNull Rarity getRarity(@NotNull ItemStack stack)
-	{
-		return Rarity.UNCOMMON;
 	}
 
 	@Override

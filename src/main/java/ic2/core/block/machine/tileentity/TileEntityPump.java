@@ -31,9 +31,11 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.HolderLookup;
 
 public class TileEntityPump extends TileEntityElectricMachine implements IHasGui, IUpgradableBlock, IGuiValueProvider
 {
@@ -95,16 +97,15 @@ public class TileEntityPump extends TileEntityElectricMachine implements IHasGui
 	}
 
 	@Override
-	public void load(CompoundTag nbt)
-	{
-		super.load(nbt);
+	protected void loadAdditional(CompoundTag nbt, net.minecraft.core.HolderLookup.Provider registries) {
+		super.loadAdditional(nbt, registries);
 		this.progress = nbt.getShort("progress");
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag nbt)
+	public void saveAdditional(CompoundTag nbt, net.minecraft.core.HolderLookup.Provider registries)
 	{
-		super.saveAdditional(nbt);
+		super.saveAdditional(nbt, registries);
 		nbt.putShort("progress", this.progress);
 	}
 

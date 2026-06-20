@@ -5,7 +5,6 @@ import ic2.api.item.IElectricItem;
 import ic2.api.item.IItemHudInfo;
 import ic2.api.network.INetworkItemEventListener;
 import ic2.core.IC2;
-import ic2.core.item.ElectricItemManager;
 import ic2.core.item.ElectricItemTooltipHandler;
 import ic2.core.ref.Ic2BlockTags;
 import ic2.core.ref.Ic2SoundEvents;
@@ -19,7 +18,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -27,23 +25,18 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.DiggerItem;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Tier;
-import net.minecraft.world.item.Tiers;
-import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class ItemElectricTool extends DiggerItem implements IElectricItem, INetworkItemEventListener, IItemHudInfo
 {
@@ -123,24 +116,24 @@ public abstract class ItemElectricTool extends DiggerItem implements IElectricIt
 		return info;
 	}
 
-	public InteractionResult useOn(UseOnContext context)
+	public @NotNull InteractionResult useOn(UseOnContext context)
 	{
 		ElectricItem.manager.use(context.getItemInHand(), 0.0, context.getPlayer());
 		return super.useOn(context);
 	}
 
-	public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand)
+	public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level world, @NotNull Player player, @NotNull InteractionHand hand)
 	{
 		ElectricItem.manager.use(StackUtil.get(player, hand), 0.0, player);
 		return super.use(world, player, hand);
 	}
 
-	public float getDestroySpeed(ItemStack stack, BlockState state)
+	public float getDestroySpeed(@NotNull ItemStack stack, @NotNull BlockState state)
 	{
 		return this.isEffective(state) && ElectricItem.manager.canUse(stack, this.operationEnergyCost) ? this.speed : 1.0F;
 	}
 
-	public boolean isCorrectToolForDrops(BlockState state)
+	public boolean isCorrectToolForDrops(@NotNull ItemStack stack, @NotNull BlockState state)
 	{
 		int level = this.getTier().getLevel();
 		return (level >= 3 || !state.is(BlockTags.NEEDS_DIAMOND_TOOL)) && (level >= 2 || !state.is(BlockTags.NEEDS_IRON_TOOL)) && (level >= 1 || !state.is(BlockTags.NEEDS_STONE_TOOL)) && this.isEffective(state);
@@ -157,11 +150,6 @@ public abstract class ItemElectricTool extends DiggerItem implements IElectricIt
 		}
 
 		return false;
-	}
-
-	public boolean hurtEnemy(ItemStack itemstack, LivingEntity entityliving, LivingEntity entityliving1)
-	{
-		return true;
 	}
 
 	public int getEnchantmentValue()
@@ -193,7 +181,7 @@ public abstract class ItemElectricTool extends DiggerItem implements IElectricIt
 		return this.transferLimit;
 	}
 
-	public boolean mineBlock(ItemStack stack, Level world, BlockState state, BlockPos pos, LivingEntity user)
+	public boolean mineBlock(@NotNull ItemStack stack, @NotNull Level world, BlockState state, BlockPos pos, LivingEntity user)
 	{
 		if (state.getDestroySpeed(world, pos) != 0.0F)
 		{
@@ -203,12 +191,12 @@ public abstract class ItemElectricTool extends DiggerItem implements IElectricIt
 		return true;
 	}
 
-	public boolean isEnchantable(ItemStack stack)
+	public boolean isEnchantable(@NotNull ItemStack stack)
 	{
 		return false;
 	}
 
-	public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag context)
+	public void appendHoverText(@NotNull ItemStack stack, Item.@NotNull TooltipContext world, @NotNull List<Component> tooltip, @NotNull TooltipFlag context)
 	{
 		ElectricItemTooltipHandler.addTooltip(stack, tooltip);
 	}
@@ -220,7 +208,7 @@ public abstract class ItemElectricTool extends DiggerItem implements IElectricIt
 		return ret;
 	}
 
-	public void inventoryTick(ItemStack itemstack, Level world, Entity entity, int i, boolean flag)
+	public void inventoryTick(@NotNull ItemStack itemstack, @NotNull Level world, @NotNull Entity entity, int i, boolean flag)
 	{
 		boolean isEquipped = flag && entity instanceof LivingEntity;
 		if (IC2.sideProxy.isRendering())
@@ -304,7 +292,7 @@ public abstract class ItemElectricTool extends DiggerItem implements IElectricIt
 		}
 	}
 
-	public boolean onDroppedByPlayer(ItemStack stack, Player player)
+	public boolean onDroppedByPlayer(@NotNull ItemStack stack, @NotNull Player player)
 	{
 		this.clearSound(player);
 		return true;
@@ -330,17 +318,17 @@ public abstract class ItemElectricTool extends DiggerItem implements IElectricIt
 		return Ic2SoundEvents.ITEM_ELECTRIC_SHUTDOWN;
 	}
 
-	public boolean isBarVisible(ItemStack stack)
+	public boolean isBarVisible(@NotNull ItemStack stack)
 	{
 		return true;
 	}
 
-	public int getBarWidth(ItemStack stack)
+	public int getBarWidth(@NotNull ItemStack stack)
 	{
 		return (int) Math.round(ElectricItem.manager.getChargeLevel(stack) * 13.0);
 	}
 
-	public int getBarColor(ItemStack stack)
+	public int getBarColor(@NotNull ItemStack stack)
 	{
 		return Mth.hsvToRgb((float) (ElectricItem.manager.getChargeLevel(stack) / 3.0), 1.0F, 1.0F);
 	}

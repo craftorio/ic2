@@ -24,6 +24,7 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 
 public class ItemDrill extends ItemElectricTool implements IMiningDrill, IHitSoundOverride
 {
@@ -39,7 +40,7 @@ public class ItemDrill extends ItemElectricTool implements IMiningDrill, IHitSou
 	}
 
 	@Override
-	public float getDestroySpeed(ItemStack stack, BlockState state)
+	public float getDestroySpeed(@NotNull ItemStack stack, @NotNull BlockState state)
 	{
 		float speed = super.getDestroySpeed(stack, state);
 		if (speed == 1.0F)

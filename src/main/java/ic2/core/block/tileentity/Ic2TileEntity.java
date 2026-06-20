@@ -27,6 +27,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -44,9 +45,11 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.core.HolderLookup;
 
 public abstract class Ic2TileEntity extends BlockEntity implements INetworkDataProvider, INetworkUpdateListener, IGuiConditionProvider
 {
@@ -174,8 +177,7 @@ public abstract class Ic2TileEntity extends BlockEntity implements INetworkDataP
 		}
 	}
 
-	public void load(CompoundTag nbt)
-	{
+	protected void loadAdditional(CompoundTag nbt, net.minecraft.core.HolderLookup.Provider registries) {
 		this.active = nbt.getBoolean("active");
 		if (this.components != null && nbt.contains("components", 10))
 		{
@@ -197,7 +199,7 @@ public abstract class Ic2TileEntity extends BlockEntity implements INetworkDataP
 		}
 	}
 
-	public void saveAdditional(CompoundTag nbt)
+	public void saveAdditional(CompoundTag nbt, net.minecraft.core.HolderLookup.Provider registries)
 	{
 		nbt.putBoolean("active", this.active);
 		if (this.components != null)
@@ -265,7 +267,7 @@ public abstract class Ic2TileEntity extends BlockEntity implements INetworkDataP
 	public List<String> getNetworkedFields()
 	{
 		List<String> ret = new ArrayList<>(3);
-		ret.add("teBlk=" + ForgeRegistries.BLOCKS.getKey(this.teBlock));
+		ret.add("teBlk=" + BuiltInRegistries.BLOCK.getKey(this.teBlock));
 		ret.add("active");
 		return ret;
 	}

@@ -10,6 +10,7 @@ import java.util.function.Predicate;
 
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySelector;
@@ -22,9 +23,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ClipContext.Fluid;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.HitResult.Type;
 import org.jetbrains.annotations.NotNull;
 
@@ -43,7 +44,7 @@ public class BoatItem extends Item
 
 	public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level world, Player user, @NotNull InteractionHand hand)
 	{
-		ItemStack itemStack = user.getItemInHand(hand);
+		ItemStack itemStack = user.getMainHandItem();
 		BlockHitResult hitResult = getPlayerPOVHitResult(world, user, Fluid.ANY);
 		if (hitResult.getType() == Type.MISS)
 		{

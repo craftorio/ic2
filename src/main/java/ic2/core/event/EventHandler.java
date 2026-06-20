@@ -53,10 +53,10 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.monster.Skeleton;
@@ -193,7 +193,7 @@ public final class EventHandler
 
 	public static InteractionResult onBlockStartBreak(Player player, Level world, InteractionHand hand, BlockPos pos, Direction direction)
 	{
-		if (player.getItemInHand(hand).getItem() instanceof BlockBreakableItem blockBreakableItem)
+		if (player.getMainHandItem().getItem() instanceof BlockBreakableItem blockBreakableItem)
 		{
 			InteractionResult actionResult = blockBreakableItem.onBlockStartBreak(player, world, hand, pos, direction);
 			if (actionResult != InteractionResult.PASS)
@@ -271,7 +271,7 @@ public final class EventHandler
 
 	public static boolean onEntitySwingHand(LivingEntity entity, InteractionHand hand)
 	{
-		ItemStack stack = entity.getItemInHand(hand);
+		ItemStack stack = entity.getMainHandItem();
 		if (stack.getItem() instanceof ISwingSoundItem swingSoundItem)
 		{
 			SoundEvent swingSound = swingSoundItem.getSwingSound(entity, hand);

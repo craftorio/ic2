@@ -44,7 +44,7 @@ public class UUMatterBlock extends LiquidBlock
 	@Override
 	public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit)
 	{
-		ItemStack heldItem = player.getItemInHand(hand);
+		ItemStack heldItem = player.getMainHandItem();
 		if (heldItem.is(Items.GLASS_BOTTLE) && state.getValue(LiquidBlock.LEVEL) == 0)
 		{
 			if (!world.isClientSide)

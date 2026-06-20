@@ -19,11 +19,13 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.HolderLookup;
 
 public abstract class TileEntityTransformer extends TileEntityInventory implements IHasGui, INetworkClientTileEntityEventListener
 {
@@ -43,9 +45,8 @@ public abstract class TileEntityTransformer extends TileEntityInventory implemen
 	}
 
 	@Override
-	public void load(CompoundTag nbt)
-	{
-		super.load(nbt);
+	protected void loadAdditional(CompoundTag nbt, net.minecraft.core.HolderLookup.Provider registries) {
+		super.loadAdditional(nbt, registries);
 		int mode = nbt.getInt("mode");
 		if (mode >= 0 && mode < TileEntityTransformer.Mode.VALUES.length)
 		{
@@ -57,9 +58,9 @@ public abstract class TileEntityTransformer extends TileEntityInventory implemen
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag nbt)
+	public void saveAdditional(CompoundTag nbt, net.minecraft.core.HolderLookup.Provider registries)
 	{
-		super.saveAdditional(nbt);
+		super.saveAdditional(nbt, registries);
 		nbt.putInt("mode", this.configuredMode.ordinal());
 	}
 

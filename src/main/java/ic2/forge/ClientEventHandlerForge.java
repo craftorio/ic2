@@ -7,24 +7,27 @@ import ic2.core.proxy.SideProxyClient;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraftforge.client.event.RenderGuiOverlayEvent;
-import net.minecraftforge.client.event.RenderHighlightEvent;
-import net.minecraftforge.client.event.RenderLivingEvent;
-import net.minecraftforge.client.event.ScreenEvent;
-import net.minecraftforge.client.event.ViewportEvent;
-import net.minecraftforge.client.event.sound.PlaySoundEvent;
-import net.minecraftforge.client.event.sound.SoundEngineLoadEvent;
-import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.player.ItemTooltipEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
+import net.neoforged.neoforge.client.event.RenderHighlightEvent;
+import net.neoforged.neoforge.client.event.RenderLivingEvent;
+import net.neoforged.neoforge.client.event.ScreenEvent;
+import net.neoforged.neoforge.client.event.ViewportEvent;
+import net.neoforged.neoforge.client.event.sound.PlaySoundEvent;
+import net.neoforged.neoforge.client.event.sound.SoundEngineLoadEvent;
+import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import net.neoforged.neoforge.event.tick.LevelTickEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public final class ClientEventHandlerForge
 {
 	@SubscribeEvent
-	public void onClientTick(TickEvent.ClientTickEvent event)
+	public void onClientTick(ClientTickEvent.Post event)
 	{
 		if (event.phase == TickEvent.Phase.START)
 		{
@@ -107,7 +110,7 @@ public final class ClientEventHandlerForge
 	}
 
 	@SubscribeEvent
-	public void onRenderHotBar(RenderGuiOverlayEvent.Post event)
+	public void onRenderHotBar(RenderGuiLayerEvent.Post event)
 	{
 		if (event.getOverlay() == VanillaGuiOverlay.HOTBAR.type())
 		{

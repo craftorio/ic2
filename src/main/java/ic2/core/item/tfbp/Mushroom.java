@@ -46,7 +46,7 @@ public class Mushroom extends TerraformerBase
 							{
 								if (block != dependancy && block != Blocks.BROWN_MUSHROOM_BLOCK && block != Blocks.RED_MUSHROOM_BLOCK)
 								{
-									if (!state.isAir() && (block == Blocks.DIRT || block == Blocks.GRASS))
+									if (!state.isAir() && (block == Blocks.DIRT || block == Blocks.SHORT_GRASS))
 									{
 										BlockPos dstPos = new BlockPos(cPos);
 										world.setBlockAndUpdate(dstPos, dependancy.defaultBlockState());

@@ -69,7 +69,7 @@ public class ItemArmorHazmat extends ItemArmorUtility implements IHazmatLike
 			int armorDamage = (fallDamage + 1) / 2;
 			if (armorDamage > 0 && armorDamage <= stack.getMaxDamage() - stack.getDamageValue())
 			{
-				stack.hurtAndBreak(armorDamage, entity, player -> player.broadcastBreakEvent(this.getEquipmentSlot()));
+				stack.hurtAndBreak(armorDamage, entity, player -> player.onEquippedItemBroken(this.getEquipmentSlot()));
 				return true;
 			} else
 			{

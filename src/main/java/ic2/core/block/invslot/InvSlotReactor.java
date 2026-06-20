@@ -61,7 +61,7 @@ public class InvSlotReactor extends InvSlot
 
 	private int mapIndex(int index)
 	{
-		int size = this.size();
+		int size = this.getContainerSize();
 		int cols = size / 6;
 		if (index < size)
 		{

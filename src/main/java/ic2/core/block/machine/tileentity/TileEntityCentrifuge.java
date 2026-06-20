@@ -18,6 +18,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.HolderLookup;
 
 @NotClassic
 public class TileEntityCentrifuge extends TileEntityStandardMachine<IRecipeInput, Collection<ItemStack>, ItemStack>
@@ -37,16 +38,15 @@ public class TileEntityCentrifuge extends TileEntityStandardMachine<IRecipeInput
 	}
 
 	@Override
-	public void load(CompoundTag nbt)
-	{
-		super.load(nbt);
+	protected void loadAdditional(CompoundTag nbt, net.minecraft.core.HolderLookup.Provider registries) {
+		super.loadAdditional(nbt, registries);
 		this.heat = nbt.getShort("heat");
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag nbt)
+	public void saveAdditional(CompoundTag nbt, net.minecraft.core.HolderLookup.Provider registries)
 	{
-		super.saveAdditional(nbt);
+		super.saveAdditional(nbt, registries);
 		nbt.putShort("heat", this.heat);
 	}
 

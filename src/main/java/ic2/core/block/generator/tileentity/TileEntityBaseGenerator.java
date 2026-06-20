@@ -13,8 +13,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.HolderLookup;
 
 public abstract class TileEntityBaseGenerator extends TileEntityBase implements IHasGui
 {
@@ -36,16 +38,15 @@ public abstract class TileEntityBaseGenerator extends TileEntityBase implements 
 	}
 
 	@Override
-	public void load(CompoundTag nbt)
-	{
-		super.load(nbt);
+	protected void loadAdditional(CompoundTag nbt, net.minecraft.core.HolderLookup.Provider registries) {
+		super.loadAdditional(nbt, registries);
 		this.fuel = nbt.getInt("fuel");
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag nbt)
+	public void saveAdditional(CompoundTag nbt, net.minecraft.core.HolderLookup.Provider registries)
 	{
-		super.saveAdditional(nbt);
+		super.saveAdditional(nbt, registries);
 		nbt.putInt("fuel", this.fuel);
 	}
 

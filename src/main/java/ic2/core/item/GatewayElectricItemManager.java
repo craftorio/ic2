@@ -7,6 +7,7 @@ import ic2.api.item.ISpecialElectricItem;
 import ic2.core.util.StackUtil;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 

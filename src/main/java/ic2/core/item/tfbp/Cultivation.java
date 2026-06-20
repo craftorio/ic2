@@ -81,11 +81,11 @@ public class Cultivation extends TerraformerBase
 		Block block = world.getBlockState(pos).getBlock();
 		if (block == Blocks.DIRT)
 		{
-			world.setBlockAndUpdate(pos, Blocks.GRASS.defaultBlockState());
+			world.setBlockAndUpdate(pos, Blocks.SHORT_GRASS.defaultBlockState());
 			return true;
 		} else
 		{
-			return block == Blocks.GRASS ? growPlantsOn(world, pos) : false;
+			return block == Blocks.SHORT_GRASS ? growPlantsOn(world, pos) : false;
 		}
 	}
 

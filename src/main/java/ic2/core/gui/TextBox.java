@@ -138,8 +138,7 @@ public class TextBox extends GuiElement<TextBox>
 		}
 	}
 
-	@Override
-	public void tick()
+		public void tick()
 	{
 		super.tick();
 		this.cursorTick++;
@@ -248,11 +247,11 @@ public class TextBox extends GuiElement<TextBox>
 		RenderSystem.setShaderColor(0.0F, 0.0F, 1.0F, 1.0F);
 		RenderSystem.enableColorLogicOp();
 		RenderSystem.logicOp(LogicOp.OR_REVERSE);
-		buffer.begin(Mode.QUADS, DefaultVertexFormat.POSITION);
-		buffer.vertex(startX, endY, 0.0).endVertex();
-		buffer.vertex(endX, endY, 0.0).endVertex();
-		buffer.vertex(endX, startY, 0.0).endVertex();
-		buffer.vertex(startX, startY, 0.0).endVertex();
+		buffer = Tesselator.getInstance().begin(Mode.QUADS, DefaultVertexFormat.POSITION);
+		buffer.vertex(startX, endY, 0.0);
+		buffer.vertex(endX, endY, 0.0);
+		buffer.vertex(endX, startY, 0.0);
+		buffer.vertex(startX, startY, 0.0);
 		tessellator.end();
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.disableColorLogicOp();

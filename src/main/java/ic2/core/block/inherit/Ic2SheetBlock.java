@@ -9,6 +9,7 @@ import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -20,9 +21,17 @@ import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 
 public class Ic2SheetBlock extends Block
 {
+    public static final com.mojang.serialization.MapCodec<Ic2SheetBlock> CODEC = simpleCodec(Ic2SheetBlock::new);
+
+    @Override
+    protected com.mojang.serialization.MapCodec<? extends net.minecraft.world.level.block.Block> codec() {
+        return CODEC;
+    }
+
 	private static final VoxelShape aabb = Shapes.box(0.0, 0.0, 0.0, 1.0, 0.125, 1.0);
 	private static final Direction[] positiveHorizontalFacings = new Direction[] { Direction.EAST, Direction.SOUTH };
 

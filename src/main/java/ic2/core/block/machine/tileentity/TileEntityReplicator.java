@@ -33,10 +33,12 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.HolderLookup;
 
 @NotClassic
 public class TileEntityReplicator extends TileEntityElectricMachine implements IHasGui, IUpgradableBlock, INetworkClientTileEntityEventListener
@@ -267,9 +269,8 @@ public class TileEntityReplicator extends TileEntityElectricMachine implements I
 	}
 
 	@Override
-	public void load(CompoundTag nbt)
-	{
-		super.load(nbt);
+	protected void loadAdditional(CompoundTag nbt, net.minecraft.core.HolderLookup.Provider registries) {
+		super.loadAdditional(nbt, registries);
 		this.extraUuStored = nbt.getDouble("extraUuStored");
 		this.uuProcessed = nbt.getDouble("uuProcessed");
 		this.index = nbt.getInt("index");
@@ -280,9 +281,9 @@ public class TileEntityReplicator extends TileEntityElectricMachine implements I
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag nbt)
+	public void saveAdditional(CompoundTag nbt, net.minecraft.core.HolderLookup.Provider registries)
 	{
-		super.saveAdditional(nbt);
+		super.saveAdditional(nbt, registries);
 		nbt.putDouble("extraUuStored", this.extraUuStored);
 		nbt.putDouble("uuProcessed", this.uuProcessed);
 		nbt.putInt("index", this.index);

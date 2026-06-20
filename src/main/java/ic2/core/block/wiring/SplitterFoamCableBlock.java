@@ -2,9 +2,17 @@ package ic2.core.block.wiring;
 
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 
 public class SplitterFoamCableBlock extends AbstractSplitterCableBlock
 {
+    public static final com.mojang.serialization.MapCodec<SplitterFoamCableBlock> CODEC = simpleCodec(SplitterFoamCableBlock::new);
+
+    @Override
+    protected com.mojang.serialization.MapCodec<? extends net.minecraft.world.level.block.Block> codec() {
+        return CODEC;
+    }
+
 	public static SplitterFoamCableBlock create(Properties settings)
 	{
 		prepareCreate(CableType.splitter, 0);

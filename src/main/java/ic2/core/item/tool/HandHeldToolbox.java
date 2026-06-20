@@ -5,6 +5,7 @@ import ic2.core.ContainerBase;
 import ic2.core.network.GrowingBuffer;
 import ic2.core.util.StackUtil;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;

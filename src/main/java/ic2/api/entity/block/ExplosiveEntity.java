@@ -3,9 +3,6 @@ package ic2.api.entity.block;
 import ic2.core.Ic2Explosion;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -66,9 +63,9 @@ public abstract class ExplosiveEntity extends Entity
 		this.blocksBuilding = true;
 	}
 
-	protected void defineSynchedData()
+	protected void defineSynchedData(SynchedEntityData.Builder builder)
 	{
-		this.entityData.define(FUSE, 80);
+		builder.define(FUSE, 80);
 	}
 
 	public boolean canBeCollidedWith()
@@ -167,10 +164,6 @@ public abstract class ExplosiveEntity extends Entity
 		return (Integer) this.entityData.get(FUSE);
 	}
 
-	public Packet<ClientGamePacketListener> getAddEntityPacket()
-	{
-		return new ClientboundAddEntityPacket(this);
-	}
 
 	public ExplosiveEntity setCausingEntity(LivingEntity igniter1)
 	{

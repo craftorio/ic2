@@ -58,7 +58,7 @@ public class InvSlotUpgrade extends InvSlot
 		IUpgradableBlock block = (IUpgradableBlock) this.base;
 		List<Redstone.IRedstoneModifier> newRedstoneModifiers = new ArrayList<>();
 
-		for (int i = 0; i < this.size(); i++)
+		for (int i = 0; i < this.getContainerSize(); i++)
 		{
 			ItemStack stack = this.get(i);
 			if (!StackUtil.isEmpty(stack) && this.accepts(stack))
@@ -195,7 +195,7 @@ public class InvSlotUpgrade extends InvSlot
 		IUpgradableBlock block = (IUpgradableBlock) this.base;
 		boolean ret = false;
 
-		for (int i = 0; i < this.size(); i++)
+		for (int i = 0; i < this.getContainerSize(); i++)
 		{
 			ItemStack stack = this.get(i);
 			if (!StackUtil.isEmpty(stack) && stack.getItem() instanceof IUpgradeItem && ((IUpgradeItem) stack.getItem()).onTick(stack, block))

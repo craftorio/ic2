@@ -5,7 +5,7 @@ import ic2.core.fluid.Ic2FluidStack;
 import java.util.List;
 
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 
 public class CannerBottleLiquidRecipeWrapper
 {

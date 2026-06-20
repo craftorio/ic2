@@ -129,7 +129,7 @@ public abstract class ItemArmorElectric extends ItemArmorIC2 implements IElectri
 		ElectricItemManager.addChargeVariants(this, subItems);
 	}
 
-	public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag context)
+	public void appendHoverText(ItemStack stack, Item.TooltipContext world, List<Component> tooltip, TooltipFlag context)
 	{
 		ElectricItemTooltipHandler.addTooltip(stack, tooltip);
 	}

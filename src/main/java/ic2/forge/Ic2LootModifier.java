@@ -14,13 +14,16 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
-import net.minecraftforge.common.loot.IGlobalLootModifier;
-import net.minecraftforge.common.loot.LootModifier;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.neoforge.common.loot.IGlobalLootModifier;
+import net.neoforged.neoforge.common.loot.LootModifier;
+import net.neoforged.neoforge.registries.DeferredRegister;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
+import com.mojang.serialization.MapCodec;
 
 public class Ic2LootModifier extends LootModifier
 {
@@ -39,9 +42,9 @@ public class Ic2LootModifier extends LootModifier
 		Map.entry(BuiltInLootTables.VILLAGE_TOOLSMITH, ResourceLocation.fromNamespaceAndPath("ic2", "chests/village_toolsmith"))
 	);
 
-	public static final Codec<Ic2LootModifier> CODEC = RecordCodecBuilder.create(instance -> codecStart(instance).apply(instance, Ic2LootModifier::new));
+	public static final MapCodec<Ic2LootModifier> CODEC = RecordCodecBuilder.mapCodec(instance -> codecStart(instance).apply(instance, Ic2LootModifier::new));
 	
-	public static final DeferredRegister<Codec<? extends IGlobalLootModifier>> lootModifiersRegistry = DeferredRegister.create(ForgeRegistries.Keys.GLOBAL_LOOT_MODIFIER_SERIALIZERS, "ic2");
+	public static final DeferredRegister<Codec<? extends IGlobalLootModifier>> lootModifiersRegistry = DeferredRegister.create(NeoForgeRegistries.Keys.GLOBAL_LOOT_MODIFIER_SERIALIZERS, "ic2");
 	
 	static
 	{

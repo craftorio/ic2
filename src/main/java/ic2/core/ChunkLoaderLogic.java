@@ -21,6 +21,7 @@ import net.minecraft.server.level.TicketType;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.core.HolderLookup;
 
 public final class ChunkLoaderLogic
 {
@@ -227,7 +228,7 @@ public final class ChunkLoaderLogic
 			}
 		}
 
-		public CompoundTag save(CompoundTag nbt)
+		public CompoundTag save(CompoundTag nbt, HolderLookup.Provider registries)
 		{
 			ListTag loaders = new ListTag();
 			nbt.put("loaders", loaders);

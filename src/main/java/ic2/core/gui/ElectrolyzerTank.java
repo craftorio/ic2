@@ -30,8 +30,7 @@ public class ElectrolyzerTank extends AbstractFluidSlot
 		return this.output != null;
 	}
 
-	@Override
-	public void tick()
+		public void tick()
 	{
 		this.output = null;
 		if (this.electrolyzer.hasRecipe())

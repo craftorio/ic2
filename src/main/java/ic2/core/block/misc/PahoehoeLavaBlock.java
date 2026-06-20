@@ -55,7 +55,7 @@ public class PahoehoeLavaBlock extends LiquidBlock
 		if (!world.isClientSide)
 		{
 			entity.hurt(world.damageSources().lava(), 4.0F);
-			entity.setSecondsOnFire(30);
+			entity.igniteForSeconds(30);
 		}
 	}
 

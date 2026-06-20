@@ -10,6 +10,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -28,6 +29,13 @@ import org.jetbrains.annotations.NotNull;
 
 public class RubberLogBlock extends RotatedPillarBlock
 {
+    public static final com.mojang.serialization.MapCodec<RubberLogBlock> CODEC = simpleCodec(RubberLogBlock::new);
+
+    @Override
+    public com.mojang.serialization.MapCodec<? extends net.minecraft.world.level.block.RotatedPillarBlock> codec() {
+        return CODEC;
+    }
+
 	public static final EnumProperty<RubberLogBlock.RubberWoodState> stateProperty = EnumProperty.create("state", RubberLogBlock.RubberWoodState.class);
 
 	public RubberLogBlock(Properties settings)

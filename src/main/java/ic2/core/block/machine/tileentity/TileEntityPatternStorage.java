@@ -27,8 +27,11 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.RegistryAccess;
 
 @NotClassic
 public class TileEntityPatternStorage extends TileEntityInventory implements IHasGui, INetworkClientTileEntityEventListener, IPatternStorage
@@ -48,16 +51,15 @@ public class TileEntityPatternStorage extends TileEntityInventory implements IHa
 	}
 
 	@Override
-	public void load(CompoundTag nbt)
-	{
-		super.load(nbt);
+	protected void loadAdditional(CompoundTag nbt, net.minecraft.core.HolderLookup.Provider registries) {
+		super.loadAdditional(nbt, registries);
 		this.readContents(nbt);
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag nbt)
+	public void saveAdditional(CompoundTag nbt, net.minecraft.core.HolderLookup.Provider registries)
 	{
-		super.saveAdditional(nbt);
+		super.saveAdditional(nbt, registries);
 		this.writeContentsAsNbtList(nbt);
 	}
 
@@ -106,7 +108,7 @@ public class TileEntityPatternStorage extends TileEntityInventory implements IHa
 		for (ItemStack stack : this.patterns)
 		{
 			CompoundTag contentTag = new CompoundTag();
-			stack.save(contentTag);
+			stack.save(net.minecraft.core.RegistryAccess.EMPTY, contentTag);
 			list.add(contentTag);
 		}
 

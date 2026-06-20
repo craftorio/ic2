@@ -10,6 +10,7 @@ import net.minecraft.tags.FluidTags;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -70,8 +71,7 @@ public class ElectricBoatEntity extends AbstractBoatEntity
 		return super.getBlockSpeedFactor() * (hasPower ? 1.5f : 0.25f);
 	}
 	
-	@Override
-	public void tick()
+		public void tick()
 	{
 		hasPower = false;
 		if (getControllingPassenger() instanceof Player player)
@@ -96,7 +96,7 @@ public class ElectricBoatEntity extends AbstractBoatEntity
 			Entity rider = this.getControllingPassenger();
 			if (rider != null)
 			{
-				rider.setSecondsOnFire(5);
+				rider.igniteForSeconds(5);
 			}
 		}
 	}

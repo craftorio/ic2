@@ -23,15 +23,19 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.RenderLivingEvent;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.living.LivingAttackEvent;
-import net.minecraftforge.event.entity.player.ItemTooltipEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.event.TickEvent;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.client.event.RenderLivingEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
+import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import net.neoforged.neoforge.event.tick.LevelTickEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import net.minecraft.core.component.DataComponents;
 
 public class JetpackHandler implements IBackupElectricItemManager
 {
@@ -46,7 +50,7 @@ public class JetpackHandler implements IBackupElectricItemManager
 
 	private JetpackHandler()
 	{
-		MinecraftForge.EVENT_BUS.register(this);
+		NeoForge.EVENT_BUS.register(this);
 		ElectricItem.registerBackupManager(this);
 	}
 
@@ -76,7 +80,7 @@ public class JetpackHandler implements IBackupElectricItemManager
 
 		if (!value)
 		{
-			if (!stack.hasTag())
+			if (!stack.has(net.minecraft.core.component.DataComponents.CUSTOM_DATA))
 			{
 				return;
 			}
@@ -84,7 +88,7 @@ public class JetpackHandler implements IBackupElectricItemManager
 			stack.getTag().remove("hasIC2Jetpack");
 			if (stack.getTag().isEmpty())
 			{
-				stack.setTag(null);
+				stack.set(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.of(null));
 			}
 		} else if (Mob.getEquipmentSlotForItem(stack) == EquipmentSlot.CHEST)
 		{
@@ -94,7 +98,7 @@ public class JetpackHandler implements IBackupElectricItemManager
 
 	public static boolean hasJetpackAttached(ItemStack stack)
 	{
-		return !StackUtil.isEmpty(stack) && Mob.getEquipmentSlotForItem(stack) == EquipmentSlot.CHEST && stack.hasTag() && stack.getTag().getBoolean("hasIC2Jetpack");
+		return !StackUtil.isEmpty(stack) && Mob.getEquipmentSlotForItem(stack) == EquipmentSlot.CHEST && stack.has(net.minecraft.core.component.DataComponents.CUSTOM_DATA) && stack.getTag().getBoolean("hasIC2Jetpack");
 	}
 
 	public static boolean hasJetpack(ItemStack stack)
@@ -126,7 +130,7 @@ public class JetpackHandler implements IBackupElectricItemManager
 			amount = Math.min(amount, getTransferLimit());
 		}
 
-		double charge = stack.hasTag() ? stack.getTag().getDouble("charge") : 0.0;
+		double charge = stack.has(net.minecraft.core.component.DataComponents.CUSTOM_DATA) ? stack.getTag().getDouble("charge") : 0.0;
 		amount = Math.min(amount, this.getMaxCharge(stack) - charge);
 		if (!simulate)
 		{
@@ -139,7 +143,7 @@ public class JetpackHandler implements IBackupElectricItemManager
 	@Override
 	public double discharge(ItemStack stack, double amount, int tier, boolean ignoreTransferLimit, boolean externally, boolean simulate)
 	{
-		if (!externally && this.getTier(stack) <= tier && stack.hasTag())
+		if (!externally && this.getTier(stack) <= tier && stack.has(net.minecraft.core.component.DataComponents.CUSTOM_DATA))
 		{
 			if (!ignoreTransferLimit)
 			{
@@ -156,7 +160,7 @@ public class JetpackHandler implements IBackupElectricItemManager
 					stack.getTag().remove("charge");
 					if (stack.getTag().isEmpty())
 					{
-						stack.setTag(null);
+						stack.set(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.of(null));
 					}
 				} else
 				{
@@ -233,23 +237,23 @@ public class JetpackHandler implements IBackupElectricItemManager
 	}
 
 	@SubscribeEvent
-	public void tick(TickEvent.PlayerTickEvent event)
+	public void tick(PlayerTickEvent.Post event)
 	{
 		if (event.phase == TickEvent.Phase.START)
 		{
-			if (playerArmorBuffer.containsKey(event.player))
+			if (playerArmorBuffer.containsKey(event.getEntity()))
 			{
-				ItemStack stack = event.player.getItemBySlot(EquipmentSlot.CHEST);
-				ItemStack lastStack = playerArmorBuffer.get(event.player);
+				ItemStack stack = event.getEntity().getItemBySlot(EquipmentSlot.CHEST);
+				ItemStack lastStack = playerArmorBuffer.get(event.getEntity());
 				if (!StackUtil.isEmpty(lastStack) && hasJetpackAttached(lastStack) && StackUtil.isEmpty(stack))
 				{
 					ItemStack newJetpack = jetpack.copy();
 					double oldCharge = ElectricItem.manager.getCharge(lastStack);
 					ElectricItem.manager.charge(newJetpack, oldCharge, Integer.MAX_VALUE, true, false);
-					event.player.setItemSlot(EquipmentSlot.CHEST, newJetpack);
+					event.getEntity().setItemSlot(EquipmentSlot.CHEST, newJetpack);
 				}
 
-				playerArmorBuffer.remove(event.player);
+				playerArmorBuffer.remove(event.getEntity());
 			}
 		}
 	}
@@ -270,7 +274,7 @@ public class JetpackHandler implements IBackupElectricItemManager
 	}
 
 	@SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
-	public void livingAttack(LivingAttackEvent event)
+	public void livingAttack(LivingIncomingDamageEvent event)
 	{
 		if (event.getEntity() instanceof Player player && event.getSource() != null && !event.getSource().is(DamageTypeTags.BYPASSES_INVULNERABILITY))
 		{

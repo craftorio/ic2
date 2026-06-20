@@ -19,12 +19,14 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.Sheep;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
@@ -42,7 +44,8 @@ import net.minecraft.world.level.block.WallBannerBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import org.jetbrains.annotations.NotNull;
 
 public class ItemToolPainter extends ItemToolCrafting implements IBoxable
@@ -56,7 +59,7 @@ public class ItemToolPainter extends ItemToolCrafting implements IBoxable
 	}
 
 	@Override
-	public void appendHoverText(@NotNull ItemStack stack, Level world, List<Component> tooltip, @NotNull TooltipFlag advanced)
+	public void appendHoverText(@NotNull ItemStack stack, Item.TooltipContext world, List<Component> tooltip, @NotNull TooltipFlag advanced)
 	{
 		if (this.color != null)
 		{
@@ -217,7 +220,7 @@ public class ItemToolPainter extends ItemToolCrafting implements IBoxable
 				return true;
 			} else
 			{
-				ResourceLocation identifier = ForgeRegistries.BLOCKS.getKey(block);
+				ResourceLocation identifier = BuiltInRegistries.BLOCK.getKey(block);
 				if (identifier.getNamespace().equals("minecraft") && identifier.getPath().contains("concrete"))
 				{
 					world.setBlockAndUpdate(pos, getColorBlockState(color.dyeColor, VanillaColorBlockId.CONCRETE));
@@ -232,20 +235,20 @@ public class ItemToolPainter extends ItemToolCrafting implements IBoxable
 
 	public static boolean canColor(Block block, DyeColor color)
 	{
-		ResourceLocation identifier = ForgeRegistries.BLOCKS.getKey(block);
+		ResourceLocation identifier = BuiltInRegistries.BLOCK.getKey(block);
 		return !identifier.getPath().contains(color.getName());
 	}
 
 	public static BlockState getColorBlockState(DyeColor color, VanillaColorBlockId vanillaColorBlock)
 	{
 		ResourceLocation identifier = ResourceLocation.withDefaultNamespace(color.getName() + "_" + vanillaColorBlock.id);
-		return ForgeRegistries.BLOCKS.getValue(identifier).defaultBlockState();
+		return BuiltInRegistries.BLOCK.get(identifier).defaultBlockState();
 	}
 
 	public static BlockState getBlockStateWithProperties(DyeColor color, VanillaColorBlockId vanillaColorBlock, BlockState state)
 	{
 		ResourceLocation identifier = ResourceLocation.withDefaultNamespace(color.getName() + "_" + vanillaColorBlock.id);
-		return ForgeRegistries.BLOCKS.getValue(identifier).withPropertiesOf(state);
+		return BuiltInRegistries.BLOCK.get(identifier).withPropertiesOf(state);
 	}
 	
 	public @NotNull InteractionResult interactLivingEntity(@NotNull ItemStack stack, @NotNull Player user, LivingEntity entity, InteractionHand hand)

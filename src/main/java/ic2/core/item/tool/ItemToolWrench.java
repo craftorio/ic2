@@ -23,6 +23,7 @@ import net.minecraft.core.Direction.AxisDirection;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -248,7 +249,7 @@ public class ItemToolWrench extends Item implements PriorityUsableItem, IBoxable
 
 	public void damage(ItemStack is, int damage, Player player, InteractionHand hand)
 	{
-		is.hurtAndBreak(damage, player, p -> p.broadcastBreakEvent(hand));
+		is.hurtAndBreak(damage, player, p -> p.onEquippedItemBroken(hand));
 	}
 
 	@Override

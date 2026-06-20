@@ -78,11 +78,11 @@ public class LaserBulletEntityRenderer extends EntityRenderer<LaserBulletEntity>
 	{
 		vertexConsumer.vertex(positionMatrix, x, y, z)
 			.color(255, 255, 255, 255)
-			.uv(u, v)
-			.overlayCoords(OverlayTexture.NO_OVERLAY)
-			.uv2(light)
+			.setUv(u, v)
+			.setOverlay(OverlayTexture.NO_OVERLAY)
+			.setLight(light)
 			.normal(normalMatrix, normalX, normalY, normalZ)
-			.endVertex();
+			;
 	}
 
 	public ResourceLocation getTextureLocation(LaserBulletEntity entity)

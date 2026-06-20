@@ -6,6 +6,7 @@ import ic2.core.IC2;
 import ic2.core.ref.Ic2SoundEvents;
 import ic2.core.util.StackUtil;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;

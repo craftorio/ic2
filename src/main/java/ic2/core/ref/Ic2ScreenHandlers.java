@@ -68,6 +68,7 @@ import java.io.IOException;
 import java.util.function.BiFunction;
 
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -200,7 +201,7 @@ public final class Ic2ScreenHandlers
 				}
 
 				hand = Util.HANDS[handOrdinal];
-				currentItem = player.getItemInHand(hand);
+				currentItem = player.getMainHandItem();
 			} else
 			{
 				if (currentItemPosition != player.getInventory().selected)
@@ -233,7 +234,7 @@ public final class Ic2ScreenHandlers
 
 	public static void writeManagedItemData(Player player, InteractionHand hand, Integer subGuiId, GrowingBuffer buffer)
 	{
-		Item item = player.getItemInHand(hand).getItem();
+		Item item = player.getMainHandItem().getItem();
 		assert item instanceof IHandHeldInventory;
 		int slot;
 		if (hand == InteractionHand.MAIN_HAND)

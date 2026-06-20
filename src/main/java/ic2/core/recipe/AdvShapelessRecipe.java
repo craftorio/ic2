@@ -25,6 +25,7 @@ import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
+import net.minecraft.core.RegistryAccess;
 
 public class AdvShapelessRecipe implements CraftingRecipe
 {

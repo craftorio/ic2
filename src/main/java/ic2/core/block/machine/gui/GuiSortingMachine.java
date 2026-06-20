@@ -53,13 +53,7 @@ public class GuiSortingMachine extends Ic2Gui<ContainerSortingMachine>
 				{
 					return container.base.defaultRoute != cDir ? 15 : 33;
 				}
-			}, texture, this.createEventSender(dir.ordinal())).withTooltip(new Supplier<String>()
-			{
-				public String get()
-				{
-					return container.base.defaultRoute != cDir ? "ic2.SortingMachine.whitelist" : "ic2.SortingMachine.default";
-				}
-			}));
+			}, texture, this.createEventSender(dir.ordinal())).withTooltip((Supplier<String>) () -> container.base.defaultRoute != cDir ? "ic2.SortingMachine.whitelist" : "ic2.SortingMachine.default"));
 		}
 	}
 

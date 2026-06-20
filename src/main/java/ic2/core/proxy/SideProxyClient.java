@@ -44,7 +44,7 @@ import ic2.core.block.personal.GuiTradeOMatClosed;
 import ic2.core.block.personal.GuiTradeOMatOpen;
 import ic2.core.block.reactor.gui.GuiNuclearReactor;
 import ic2.core.block.renderer.KineticGeneratorRenderer;
-import ic2.core.block.wiring.GuiChargepadBlock;
+import ic2.core.block.wiring.GuiChargePadBlock;
 import ic2.core.block.wiring.GuiElectricBlock;
 import ic2.core.block.wiring.GuiTransformer;
 import ic2.core.entity.render.BoatEntityRenderer;
@@ -133,7 +133,7 @@ public final class SideProxyClient implements SideProxy
 		envProxy.registerScreen(Ic2ScreenHandlers.ENERGY_O_MAT_OPEN, GuiEnergyOMatOpen::new);
 		envProxy.registerScreen(Ic2ScreenHandlers.TRADE_O_MAT_CLOSED, GuiTradeOMatClosed::new);
 		envProxy.registerScreen(Ic2ScreenHandlers.TRADE_O_MAT_OPEN, GuiTradeOMatOpen::new);
-		envProxy.registerScreen(Ic2ScreenHandlers.CHARGEPAD, GuiChargepadBlock::new);
+		envProxy.registerScreen(Ic2ScreenHandlers.CHARGEPAD, GuiChargePadBlock::new);
 		envProxy.registerScreen(Ic2ScreenHandlers.ENERGY_STORAGE, GuiElectricBlock::new);
 		envProxy.registerScreen(Ic2ScreenHandlers.ELECTROLYZER, GuiElectrolyzer::new);
 		envProxy.registerScreen(Ic2ScreenHandlers.TRANSFORMER, GuiTransformer::new);

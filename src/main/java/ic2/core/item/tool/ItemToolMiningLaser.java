@@ -28,6 +28,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
@@ -47,13 +48,13 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
 	}
 
 	@Override
-	public boolean isBarVisible(ItemStack stack)
+	public boolean isBarVisible(@NotNull ItemStack stack)
 	{
 		return !stack.getHoverName().getString().equals("ic2:tab_icon");
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, Level world, List<Component> list, TooltipFlag par4)
+	public void appendHoverText(@NotNull ItemStack stack, Item.@NotNull TooltipContext world, @NotNull List<Component> list, @NotNull TooltipFlag par4)
 	{
 		super.appendHoverText(stack, world, list, par4);
 		CompoundTag nbtData = StackUtil.getOrCreateNbtData(stack);
@@ -103,7 +104,7 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
 	}
 
 	@Override
-	public @NotNull InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand)
+	public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level world, @NotNull Player player, @NotNull InteractionHand hand)
 	{
 		ItemStack stack = StackUtil.get(player, hand);
 		if (!IC2.sideProxy.isSimulating())
@@ -193,7 +194,7 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
 	}
 
 	@Override
-	public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context)
+	public @NotNull InteractionResult onItemUseFirst(@NotNull ItemStack stack, UseOnContext context)
 	{
 		Level world = context.getLevel();
 		Player player = context.getPlayer();

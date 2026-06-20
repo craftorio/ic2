@@ -25,23 +25,20 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ArmorMaterial;
-import net.minecraft.world.item.DyeableLeatherItem;
+import net.minecraft.world.item.*;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Rarity;
-import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
 import java.util.IdentityHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack, IHazmatLike, IItemHudProvider, DyeableLeatherItem
+import net.minecraft.core.Holder;
+
+public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack, IHazmatLike, IItemHudProvider
 {
 	public static final int[] CHARGED_PROTECTION = new int[] { 3, 6, 8, 3 };
 	protected static final Map<MobEffect, Integer> potionRemovalCost = new IdentityHashMap<>();
@@ -114,7 +111,7 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 			}
 
 			nbt = new CompoundTag();
-			stack.setTag(nbt);
+			stack.set(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.of(nbt));
 		}
 
 		CompoundTag ret;
@@ -167,7 +164,7 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag context)
+	public void appendHoverText(ItemStack stack, Item.TooltipContext world, List<Component> tooltip, TooltipFlag context)
 	{
 		super.appendHoverText(stack, world, tooltip, context);
 		if (this.getEquipmentSlot() == EquipmentSlot.HEAD)
@@ -248,7 +245,7 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 
 			for (MobEffectInstance effect : new LinkedList<>(player.getActiveEffects()))
 			{
-				MobEffect potion = effect.getEffect();
+				Holder<MobEffect> potion = effect.getEffect();
 				Integer cost = potionRemovalCost.get(potion);
 				if (cost != null)
 				{

@@ -5,6 +5,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.RegistryAccess;
 
 public class BasicEnergyTe<T extends BasicEnergyTile> extends BlockEntity
 {
@@ -26,14 +28,12 @@ public class BasicEnergyTe<T extends BasicEnergyTile> extends BlockEntity
 		this.energyBuffer.invalidate();
 	}
 
-	public void load(CompoundTag nbt)
-	{
-		this.energyBuffer.readFromNBT(nbt);
+	protected void loadAdditional(CompoundTag nbt, net.minecraft.core.HolderLookup.Provider registries) {
+		this.energyBuffer.readFromNBT(net.minecraft.core.RegistryAccess.EMPTY, nbt);
 	}
 
-	protected void saveAdditional(CompoundTag nbt)
-	{
-		this.energyBuffer.writeToNBT(nbt);
+	protected void saveAdditional(CompoundTag nbt, net.minecraft.core.HolderLookup.Provider registries) {
+		this.energyBuffer.writeToNBT(net.minecraft.core.RegistryAccess.EMPTY, nbt);
 	}
 
 	public static class Sink extends BasicEnergyTe<BasicSink>

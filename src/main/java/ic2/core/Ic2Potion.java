@@ -14,7 +14,7 @@ public class Ic2Potion extends MobEffect
 		super(type, liquidColor);
 	}
 
-	public void applyEffectTick(LivingEntity entity, int amplifier)
+	public boolean applyEffectTick(LivingEntity entity, int amplifier)
 	{
 		if (this == radiation)
 		{
@@ -26,7 +26,7 @@ public class Ic2Potion extends MobEffect
 		}
 	}
 
-	public boolean isDurationEffectTick(int duration, int amplifier)
+	public boolean shouldApplyEffectTickThisTick(int duration, int amplifier)
 	{
 		if (this == radiation)
 		{

@@ -17,6 +17,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
@@ -36,7 +37,7 @@ public class ItemWindMeter extends ItemElectricTool implements PriorityUsableIte
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag advanced)
+	public void appendHoverText(@NotNull ItemStack stack, Item.@NotNull TooltipContext world, @NotNull List<Component> tooltip, @NotNull TooltipFlag advanced)
 	{
 		super.appendHoverText(stack, world, tooltip, advanced);
 		tooltip.add(Component.translatable("ic2.wind_meter.tooltipA"));
@@ -44,7 +45,7 @@ public class ItemWindMeter extends ItemElectricTool implements PriorityUsableIte
 	}
 
 	@Override
-	public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context)
+	public @NotNull InteractionResult onItemUseFirst(@NotNull ItemStack stack, UseOnContext context)
 	{
 		Player player = context.getPlayer();
 		Level world = context.getLevel();
@@ -115,7 +116,7 @@ public class ItemWindMeter extends ItemElectricTool implements PriorityUsableIte
 	}
 
 	@Override
-	public @NotNull InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand)
+	public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level world, @NotNull Player player, @NotNull InteractionHand hand)
 	{
 		ItemStack stack = StackUtil.get(player, hand);
 		if (!IC2.sideProxy.isSimulating())

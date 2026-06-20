@@ -18,7 +18,7 @@ public class CustomGauge extends Gauge<CustomGauge>
 
 	public CustomGauge(Ic2Gui<?> gui, int x, int y, CustomGauge.IGaugeRatioProvider provider, Gauge.GaugeProperties properties)
 	{
-		super(gui, x, y, properties);
+		super(gui, properties.attributes(createAttributes(gui, x, y)));
 		this.provider = provider;
 	}
 

@@ -2,9 +2,15 @@ package ic2.core.block.wiring;
 
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 
 public class DetectorCableBlock extends AbstractDetectorCableBlock
 {
+    @Override
+    protected com.mojang.serialization.MapCodec<? extends net.minecraft.world.level.block.Block> codec() {
+        return simpleCodec(properties -> new DetectorCableBlock(properties, this.foamCableBlock));
+    }
+
 	private final DetectorFoamCableBlock foamCableBlock;
 
 	public static DetectorCableBlock create(Properties settings, DetectorFoamCableBlock foamCableBlock)

@@ -3,6 +3,7 @@ package ic2.core.item;
 import ic2.core.IC2;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -53,7 +54,7 @@ public class DamageHandler
 			{
 				if (hand != null)
 				{
-					player.broadcastBreakEvent(hand);
+					player.onEquippedItemBroken(hand);
 				}
 			});
 			return true;

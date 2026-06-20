@@ -1,9 +1,7 @@
 package ic2.forge;
 
 import ic2.core.IC2;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.network.NetworkEvent;
-
+import net.neoforged.bus.api.SubscribeEvent;
 final class ForgeNetworkHandler
 {
 	@SubscribeEvent

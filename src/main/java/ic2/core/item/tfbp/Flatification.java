@@ -22,7 +22,7 @@ public class Flatification extends TerraformerBase
 	{
 		removable.add(Blocks.SNOW);
 		removable.add(Blocks.ICE);
-		removable.add(Blocks.GRASS);
+		removable.add(Blocks.SHORT_GRASS);
 		removable.add(Blocks.STONE);
 		removable.add(Blocks.GRAVEL);
 		removable.add(Blocks.SAND);

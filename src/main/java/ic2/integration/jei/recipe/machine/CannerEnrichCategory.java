@@ -41,13 +41,11 @@ public class CannerEnrichCategory implements IRecipeCategory<CannerEnrichRecipeW
 		return Component.translatable("ic2.Canner.gui.switch.EnrichLiquid");
 	}
 
-	@Override
 	public int getWidth()
 	{
 		return 132;
 	}
 
-	@Override
 	public int getHeight()
 	{
 		return 54;

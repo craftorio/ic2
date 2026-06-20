@@ -2,22 +2,22 @@ package ic2.compat;
 
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.crafting.CraftingRecipe;
-import net.minecraftforge.common.crafting.IShapedRecipe;
 
-public interface Ic2CraftingRecipe extends CraftingRecipe, IShapedRecipe<CraftingContainer>
+
+public interface Ic2CraftingRecipe extends CraftingRecipe, ShapedRecipe
 {
 	int getIc2RecipeWidth();
 
 	int getIc2RecipeHeight();
 
 	@Override
-	default int getRecipeHeight()
+	default int getHeight()
 	{
 		return this.getIc2RecipeHeight();
 	}
 
 	@Override
-	default int getRecipeWidth()
+	default int getWidth()
 	{
 		return this.getIc2RecipeWidth();
 	}

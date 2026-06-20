@@ -17,9 +17,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.level.Level;
 import org.apache.logging.log4j.LogManager;
+import net.minecraft.advancements.AdvancementHolder;
 
 public class IC2
 {
@@ -70,7 +72,7 @@ public class IC2
 	{
 		if (player instanceof ServerPlayer sp)
 		{
-			Advancement adv = sp.server.getAdvancements().getAdvancement(ResourceLocation.fromNamespaceAndPath("ic2", path));
+			AdvancementHolder adv = sp.server.getAdvancements().get(ResourceLocation.fromNamespaceAndPath("ic2", path));
 			if (adv != null)
 			{
 				sp.getAdvancements().award(adv, "impossible");

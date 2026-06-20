@@ -17,6 +17,7 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParam;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.level.storage.loot.providers.nbt.LootNbtProviderType;
 import net.minecraft.world.level.storage.loot.providers.nbt.NbtProvider;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class Ic2BlockNbtProvider implements NbtProvider
@@ -36,7 +37,7 @@ public class Ic2BlockNbtProvider implements NbtProvider
 		if (blockEntity instanceof Ic2TileEntity tileEntity)
 		{
 			ItemStack stack = tileEntity.adjustDrop(state.getBlock().asItem().getDefaultInstance(), false);
-			if (stack.hasTag())
+			if (stack.has(net.minecraft.core.component.DataComponents.CUSTOM_DATA))
 			{
 				return stack.getTag();
 			}
@@ -45,12 +46,12 @@ public class Ic2BlockNbtProvider implements NbtProvider
 		return null;
 	}
 
-	public Set<LootContextParam<?>> getReferencedContextParams()
+	public @NotNull Set<LootContextParam<?>> getReferencedContextParams()
 	{
 		return ImmutableSet.of();
 	}
 
-	public LootNbtProviderType getType()
+	public @NotNull LootNbtProviderType getType()
 	{
 		return Ic2LootNbtProviderTypes.BLOCK_NBT;
 	}

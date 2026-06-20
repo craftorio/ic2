@@ -4,6 +4,7 @@ import ic2.core.util.Util;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import org.apache.commons.lang3.mutable.Mutable;
+import net.minecraft.core.component.DataComponents;
 
 public interface StandardFluidItem extends Ic2FluidItem
 {
@@ -233,7 +234,7 @@ public interface StandardFluidItem extends Ic2FluidItem
 		if (nbt == null)
 		{
 			nbt = new CompoundTag();
-			stack.setTag(nbt);
+			stack.set(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.of(nbt));
 		}
 
 		if (fs != null && !fs.isEmpty())

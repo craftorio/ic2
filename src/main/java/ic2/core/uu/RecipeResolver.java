@@ -10,6 +10,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.core.RegistryAccess;
 
 public class RecipeResolver implements IRecipeResolver
 {

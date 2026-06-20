@@ -42,8 +42,7 @@ public class RubberBoatEntity extends AbstractBoatEntity
 		return super.getBlockSpeedFactor() * 1.05F;
 	}
 
-	@Override
-	public void tick()
+		public void tick()
 	{
 		super.tick();
 		if (!this.level().isClientSide && this.level().getFluidState(this.blockPosition()).is(FluidTags.LAVA))

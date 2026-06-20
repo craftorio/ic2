@@ -5,6 +5,7 @@ import ic2.core.util.Util;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.component.DataComponents;
 
 class LeanItemStack
 {
@@ -91,7 +92,7 @@ class LeanItemStack
 		}
 
 		ItemStack ret = new ItemStack(this.item, this.size);
-		ret.setTag(this.nbt);
+		ret.set(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.of(this.nbt));
 		return ret;
 	}
 

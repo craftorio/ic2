@@ -22,11 +22,12 @@ import java.util.List;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.ResultContainer;
 import net.minecraft.world.item.Item;
@@ -35,6 +36,7 @@ import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.component.DataComponents;
 
 @NotClassic
 public class TileEntityIndustrialWorkbench extends TileEntityInventory implements IHasGui
@@ -57,7 +59,7 @@ public class TileEntityIndustrialWorkbench extends TileEntityInventory implement
 	public void onPlaced(ItemStack stack, LivingEntity placer, Direction facing)
 	{
 		super.onPlaced(stack, placer, facing);
-		if (!stack.hasTag() || !stack.getTag().contains("PLACED"))
+		if (!stack.has(net.minecraft.core.component.DataComponents.CUSTOM_DATA) || !stack.getTag().contains("PLACED"))
 		{
 			this.leftCrafting.tool.put(new ItemStack(Ic2Items.FORGE_HAMMER));
 			this.rightCrafting.tool.put(new ItemStack(Ic2Items.CUTTER));

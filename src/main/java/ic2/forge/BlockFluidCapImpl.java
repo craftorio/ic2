@@ -5,164 +5,125 @@ import ic2.core.fluid.Ic2FluidBlock;
 import ic2.core.util.Util;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.common.util.NonNullSupplier;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.capabilities.Capability;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.ICapabilityProvider;
+import net.neoforged.neoforge.common.util.LazyOptional;
+import net.neoforged.neoforge.common.util.NonNullSupplier;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
-final class BlockFluidCapImpl implements ICapabilityProvider
-{
-	private final Ic2FluidBlock parent;
-	private final BlockEntity be;
-	private final LazyOptional<IFluidHandler>[] sides;
+final class BlockFluidCapImpl implements ICapabilityProvider {
 
-	public BlockFluidCapImpl(Ic2FluidBlock fluidBlock, BlockEntity be)
-	{
-		this.parent = fluidBlock;
-		this.be = be;
-		this.sides = new LazyOptional[Util.ALL_DIRS.length];
+    private final Ic2FluidBlock parent;
 
-		for (Direction dir : Util.ALL_DIRS)
-		{
-			this.sides[dir.ordinal()] = LazyOptional.of(new BlockFluidCapImpl.SideHandler(dir));
-		}
-	}
+    private final BlockEntity be;
 
-	@Override
-	public <T> LazyOptional<T> getCapability(Capability<T> capability, Direction facing)
-	{
-		if (capability != ForgeCapabilities.FLUID_HANDLER)
-		{
-			return LazyOptional.empty();
-		}
+    private final LazyOptional<IFluidHandler>[] sides;
 
-		if (facing == null)
-		{
-			return (LazyOptional<T>) this.sides[0];
-		}
+    public BlockFluidCapImpl(Ic2FluidBlock fluidBlock, BlockEntity be) {
+        this.parent = fluidBlock;
+        this.be = be;
+        this.sides = new LazyOptional[Util.ALL_DIRS.length];
+        for (Direction dir : Util.ALL_DIRS) {
+            this.sides[dir.ordinal()] = LazyOptional.of(new BlockFluidCapImpl.SideHandler(dir));
+        }
+    }
 
-		return (LazyOptional<T>) this.sides[facing.ordinal()];
-	}
+    @Override
+    public <T> LazyOptional<T> getCapability(Capability<T> capability, Direction facing) {
+        if (capability != Capabilities.FluidHandler.BLOCK) {
+            return LazyOptional.empty();
+        }
+        if (facing == null) {
+            return (LazyOptional<T>) this.sides[0];
+        }
+        return (LazyOptional<T>) this.sides[facing.ordinal()];
+    }
 
-	private class SideHandler implements IFluidHandler, NonNullSupplier<IFluidHandler>
-	{
-		private final Direction side;
+    private class SideHandler implements IFluidHandler, NonNullSupplier<IFluidHandler> {
 
-		SideHandler(Direction side)
-		{
-			this.side = side;
-		}
+        private final Direction side;
 
-		@Override
-		public int getTanks()
-		{
-			FluidTankInfo[] infos = BlockFluidCapImpl.this.parent.getTankInfos(null, null, null, BlockFluidCapImpl.this.be);
-			if (infos == null)
-			{
-				return 0;
-			}
+        SideHandler(Direction side) {
+            this.side = side;
+        }
 
-			int sideMaskReq = 1 << this.side.ordinal();
-			int ret = 0;
+        @Override
+        public int getTanks() {
+            FluidTankInfo[] infos = BlockFluidCapImpl.this.parent.getTankInfos(null, null, null, BlockFluidCapImpl.this.be);
+            if (infos == null) {
+                return 0;
+            }
+            int sideMaskReq = 1 << this.side.ordinal();
+            int ret = 0;
+            for (FluidTankInfo info : infos) {
+                if (((info.getDrainSideMask() | info.getFillSideMask()) & sideMaskReq) != 0) {
+                    ret++;
+                }
+            }
+            return ret;
+        }
 
-			for (FluidTankInfo info : infos)
-			{
-				if (((info.getDrainSideMask() | info.getFillSideMask()) & sideMaskReq) != 0)
-				{
-					ret++;
-				}
-			}
+        private FluidTankInfo getTankInfo(int tank) {
+            FluidTankInfo[] infos = BlockFluidCapImpl.this.parent.getTankInfos(null, null, null, BlockFluidCapImpl.this.be);
+            if (infos == null) {
+                return null;
+            }
+            int sideMaskReq = 1 << this.side.ordinal();
+            for (FluidTankInfo info : infos) {
+                if (((info.getDrainSideMask() | info.getFillSideMask()) & sideMaskReq) != 0 && tank-- == 0) {
+                    return info;
+                }
+            }
+            return null;
+        }
 
-			return ret;
-		}
+        @Override
+        public int getTankCapacity(int tank) {
+            FluidTankInfo info = this.getTankInfo(tank);
+            return info != null ? info.getCapacity() : 0;
+        }
 
-		private FluidTankInfo getTankInfo(int tank)
-		{
-			FluidTankInfo[] infos = BlockFluidCapImpl.this.parent.getTankInfos(null, null, null, BlockFluidCapImpl.this.be);
-			if (infos == null)
-			{
-				return null;
-			}
+        @Override
+        public FluidStack getFluidInTank(int tank) {
+            FluidTankInfo info = this.getTankInfo(tank);
+            return info != null ? EnvFluidHandlerForge.getForgeFs(info.getContent()) : FluidStack.EMPTY;
+        }
 
-			int sideMaskReq = 1 << this.side.ordinal();
+        @Override
+        public boolean isFluidValid(int tank, FluidStack fs) {
+            FluidTankInfo info = this.getTankInfo(tank);
+            return info != null && info.getCapacity() > 0;
+        }
 
-			for (FluidTankInfo info : infos)
-			{
-				if (((info.getDrainSideMask() | info.getFillSideMask()) & sideMaskReq) != 0 && tank-- == 0)
-				{
-					return info;
-				}
-			}
+        @Override
+        public FluidStack drain(int amount, IFluidHandler.FluidAction action) {
+            return amount <= 0 ? FluidStack.EMPTY : EnvFluidHandlerForge.getForgeFs(BlockFluidCapImpl.this.parent.drainMb(null, null, null, BlockFluidCapImpl.this.be, this.side, amount, action.simulate()));
+        }
 
-			return null;
-		}
+        @Override
+        public FluidStack drain(FluidStack resource, IFluidHandler.FluidAction action) {
+            if (resource != null && !resource.isEmpty()) {
+                int amount = BlockFluidCapImpl.this.parent.drainMb(null, null, null, BlockFluidCapImpl.this.be, this.side, new Ic2FluidStackImpl(resource), action.simulate());
+                if (amount <= 0) {
+                    return FluidStack.EMPTY;
+                }
+                resource = resource.copy();
+                resource.setAmount(amount);
+                return resource;
+            } else {
+                return FluidStack.EMPTY;
+            }
+        }
 
-		@Override
-		public int getTankCapacity(int tank)
-		{
-			FluidTankInfo info = this.getTankInfo(tank);
-			return info != null ? info.getCapacity() : 0;
-		}
+        @Override
+        public int fill(FluidStack resource, IFluidHandler.FluidAction action) {
+            return resource != null && !resource.isEmpty() ? BlockFluidCapImpl.this.parent.fillMb(null, null, null, BlockFluidCapImpl.this.be, this.side, new Ic2FluidStackImpl(resource), action.simulate()) : 0;
+        }
 
-		@Override
-		public FluidStack getFluidInTank(int tank)
-		{
-			FluidTankInfo info = this.getTankInfo(tank);
-			return info != null ? EnvFluidHandlerForge.getForgeFs(info.getContent()) : FluidStack.EMPTY;
-		}
-
-		@Override
-		public boolean isFluidValid(int tank, FluidStack fs)
-		{
-			FluidTankInfo info = this.getTankInfo(tank);
-			return info != null && info.getCapacity() > 0;
-		}
-
-		@Override
-		public FluidStack drain(int amount, IFluidHandler.FluidAction action)
-		{
-			return amount <= 0
-				? FluidStack.EMPTY
-				: EnvFluidHandlerForge.getForgeFs(
-				BlockFluidCapImpl.this.parent.drainMb(null, null, null, BlockFluidCapImpl.this.be, this.side, amount, action.simulate())
-			);
-		}
-
-		@Override
-		public FluidStack drain(FluidStack resource, IFluidHandler.FluidAction action)
-		{
-			if (resource != null && !resource.isEmpty())
-			{
-				int amount = BlockFluidCapImpl.this.parent
-					.drainMb(null, null, null, BlockFluidCapImpl.this.be, this.side, new Ic2FluidStackImpl(resource), action.simulate());
-				if (amount <= 0)
-				{
-					return FluidStack.EMPTY;
-				}
-
-				resource = resource.copy();
-				resource.setAmount(amount);
-				return resource;
-			} else
-			{
-				return FluidStack.EMPTY;
-			}
-		}
-
-		@Override
-		public int fill(FluidStack resource, IFluidHandler.FluidAction action)
-		{
-			return resource != null && !resource.isEmpty()
-				? BlockFluidCapImpl.this.parent.fillMb(null, null, null, BlockFluidCapImpl.this.be, this.side, new Ic2FluidStackImpl(resource), action.simulate())
-				: 0;
-		}
-
-		public IFluidHandler get()
-		{
-			return this;
-		}
-	}
+        public IFluidHandler get() {
+            return this;
+        }
+    }
 }

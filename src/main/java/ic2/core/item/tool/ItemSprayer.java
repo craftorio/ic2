@@ -22,9 +22,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -47,7 +47,7 @@ public class ItemSprayer extends Item implements StandardFluidItem, IBoxable
 		super(settings);
 	}
 	@Override
-	public void appendHoverText(@NotNull ItemStack item, @Nullable Level level, @NotNull List<Component> components, @NotNull TooltipFlag flag)
+	public void appendHoverText(@NotNull ItemStack item, Item.TooltipContext level, @NotNull List<Component> components, @NotNull TooltipFlag flag)
 	{
 		int all = 0;
 		Ic2FluidStack fluid = Ic2FluidStack.get(item);

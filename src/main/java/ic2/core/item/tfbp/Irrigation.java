@@ -37,7 +37,7 @@ public class Irrigation extends TerraformerBase
 
 		BlockState state = world.getBlockState(pos);
 		Block block = state.getBlock();
-		if (block instanceof BonemealableBlock && ((BonemealableBlock) block).isValidBonemealTarget(world, pos, state, false))
+		if (block instanceof BonemealableBlock && ((BonemealableBlock) block).isValidBonemealTarget(world, pos, state))
 		{
 			((BonemealableBlock) block).performBonemeal((ServerLevel) world, world.random, pos, state);
 			return true;
@@ -122,9 +122,9 @@ public class Irrigation extends TerraformerBase
 				Block block = world.getBlockState(pos).getBlock();
 				if (block == Blocks.DIRT)
 				{
-					world.setBlockAndUpdate(pos, Blocks.GRASS.defaultBlockState());
+					world.setBlockAndUpdate(pos, Blocks.SHORT_GRASS.defaultBlockState());
 					return true;
-				} else if (block == Blocks.GRASS)
+				} else if (block == Blocks.SHORT_GRASS)
 				{
 					world.setBlockAndUpdate(pos.above(), Blocks.TALL_GRASS.defaultBlockState());
 					return true;

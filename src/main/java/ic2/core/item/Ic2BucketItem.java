@@ -13,6 +13,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BucketItem;
@@ -36,7 +37,7 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult.Type;
-import net.minecraftforge.event.ForgeEventFactory;
+import net.neoforged.neoforge.event.EventHooks;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -53,9 +54,9 @@ public abstract class Ic2BucketItem extends BucketItem
 
 	public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level world, Player user, @NotNull InteractionHand hand)
 	{
-		ItemStack itemStack = user.getItemInHand(hand);
+		ItemStack itemStack = user.getMainHandItem();
 		BlockHitResult blockHitResult = getPlayerPOVHitResult(world, user, this.fluid == Fluids.EMPTY ? net.minecraft.world.level.ClipContext.Fluid.SOURCE_ONLY : net.minecraft.world.level.ClipContext.Fluid.NONE);
-		InteractionResultHolder<ItemStack> ret = ForgeEventFactory.onBucketUse(user, world, itemStack, blockHitResult);
+		InteractionResultHolder<ItemStack> ret = EventHooks.onBucketUse(user, world, itemStack, blockHitResult);
 		if (ret != null)
 		{
 			return ret;

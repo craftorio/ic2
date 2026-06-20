@@ -16,6 +16,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 
 public abstract class AbstractDetectorCableBlock extends AbstractCableBlock
 {

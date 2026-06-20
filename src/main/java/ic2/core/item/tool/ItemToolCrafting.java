@@ -21,7 +21,7 @@ public class ItemToolCrafting extends Item implements IBoxable, IItemHudInfo
 		super(settings);
 	}
 
-	public void appendHoverText(@NotNull ItemStack stack, Level world, List<Component> tooltip, @NotNull TooltipFlag advanced)
+	public void appendHoverText(@NotNull ItemStack stack, Item.TooltipContext world, List<Component> tooltip, @NotNull TooltipFlag advanced)
 	{
 		tooltip.add(Component.translatable("ic2.tooltip.tool.uses_left", getRemainingUses(stack)));
 	}

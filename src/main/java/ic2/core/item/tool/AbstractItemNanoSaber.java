@@ -16,10 +16,10 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -59,7 +59,7 @@ public abstract class AbstractItemNanoSaber extends ItemElectricTool implements 
 	}
 
 	@Override
-	public float getDestroySpeed(ItemStack stack, BlockState state)
+	public float getDestroySpeed(@NotNull ItemStack stack, @NotNull BlockState state)
 	{
 		if (isActive(stack))
 		{
@@ -143,13 +143,13 @@ public abstract class AbstractItemNanoSaber extends ItemElectricTool implements 
 	}
 
 	@Override
-	public InteractionResult useOn(UseOnContext context)
+	public @NotNull InteractionResult useOn(UseOnContext context)
 	{
 		return super.useOn(context);
 	}
 
 	@Override
-	public InteractionResultHolder<ItemStack> use(@NotNull Level world, Player player, InteractionHand hand)
+	public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level world, @NotNull Player player, @NotNull InteractionHand hand)
 	{
 		ItemStack stack = StackUtil.get(player, hand);
 		if (world.isClientSide)
@@ -175,7 +175,7 @@ public abstract class AbstractItemNanoSaber extends ItemElectricTool implements 
 	}
 
 	@Override
-	public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean par5)
+	public void inventoryTick(@NotNull ItemStack stack, @NotNull Level world, @NotNull Entity entity, int slot, boolean par5)
 	{
 		super.inventoryTick(stack, world, entity, slot, par5 && isActive(stack));
 		CompoundTag nbt = StackUtil.getOrCreateNbtData(stack);
@@ -246,6 +246,6 @@ public abstract class AbstractItemNanoSaber extends ItemElectricTool implements 
 	@Override
 	public SoundEvent getSwingSound(LivingEntity entity, InteractionHand hand)
 	{
-		return isActive(entity.getItemInHand(hand)) ? this.getRandomSwingSound() : null;
+		return isActive(entity.getMainHandItem()) ? this.getRandomSwingSound() : null;
 	}
 }

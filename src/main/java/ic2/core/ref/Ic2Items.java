@@ -420,7 +420,7 @@ public final class Ic2Items
 	public static final Item JETPACK_ATTACHMENT_PLATE = register("jetpack_attachment_plate", new Item(new Properties())
 	{
 		@Override
-		public void appendHoverText(@NotNull ItemStack item, @Nullable Level level, @NotNull List<Component> components, @NotNull TooltipFlag flag)
+		public void appendHoverText(@NotNull ItemStack item, Item.TooltipContext level, @NotNull List<Component> components, @NotNull TooltipFlag flag)
 		{
 			components.add(Component.translatable("ic2.tooltip.jetpack_attachment.craft"));
 			components.add(Component.translatable("ic2.tooltip.jetpack_attachment.attach"));
@@ -479,7 +479,7 @@ public final class Ic2Items
 	public static final Item MILK_WART = register("milk_wart", new Item(new Properties()));
 	public static final Item SMALL_DIAMOND_DUST = register("small_diamond_dust", new Item(new Properties()));
 	public static final Item ENDER_PEARL_DUST = register("ender_pearl_dust", new Item(new Properties()));
-	public static final Item TERRA_WART = register("terra_wart", new ItemTerraWart(new Properties().food(new Builder().nutrition(0).saturationMod(1.0F).alwaysEat().build()).rarity(Rarity.RARE)));
+	public static final Item TERRA_WART = register("terra_wart", new ItemTerraWart(new Properties().food(new Builder().nutrition(0).saturationModifier(1.0F).alwaysEdible().build()).rarity(Rarity.RARE)));
 	public static final Item CUTTER = register("cutter", new ItemToolCutter(new Properties().durability(60)));
 	public static final Item DEBUG_ITEM = register("debug_item", new ItemDebug(new Properties().stacksTo(1)));
 	public static final Item FORGE_HAMMER = register("forge_hammer", new ItemToolCrafting(new Properties().durability(80)));

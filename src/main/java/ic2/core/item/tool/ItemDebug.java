@@ -42,6 +42,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -59,6 +60,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.core.component.DataComponents;
 
 public class ItemDebug extends Item implements PriorityUsableItem, ISpecialElectricItem, IBoxable
 {
@@ -363,7 +365,7 @@ public class ItemDebug extends Item implements PriorityUsableItem, ISpecialElect
 
 	private static void setMode(ItemStack stack, ItemDebug.Mode mode)
 	{
-		stack.getOrCreateTag().putInt("mode", mode.ordinal());
+		stack.getOrDefault(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.EMPTY).copyTag().putInt("mode", mode.ordinal());
 	}
 
 	private static String getPlatform(Level world)

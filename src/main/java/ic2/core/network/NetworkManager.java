@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.zip.DeflaterOutputStream;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.Connection;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundCustomPayloadPacket;
@@ -600,7 +599,7 @@ public class NetworkManager implements INetworkManager
 								{
 									for (InteractionHand hand : Util.HANDS)
 									{
-										ItemStack stack = player.getItemInHand(hand);
+										ItemStack stack = player.getMainHandItem();
 										if (stack.getItem() instanceof IHandHeldInventory)
 										{
 											IHasGui gui = ((IHandHeldInventory) stack.getItem()).getInventory(player, hand, stack);

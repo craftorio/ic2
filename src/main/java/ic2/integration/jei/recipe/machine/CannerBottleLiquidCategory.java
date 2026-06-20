@@ -41,13 +41,11 @@ public class CannerBottleLiquidCategory implements IRecipeCategory<CannerBottleL
 		return Component.translatable("ic2.Canner.gui.switch.BottleLiquid");
 	}
 
-	@Override
 	public int getWidth()
 	{
 		return 132;
 	}
 
-	@Override
 	public int getHeight()
 	{
 		return 54;

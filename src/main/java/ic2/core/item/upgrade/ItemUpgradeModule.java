@@ -21,8 +21,8 @@ import ic2.core.util.Util;
 import java.text.DecimalFormat;
 import java.util.*;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Direction;
@@ -30,6 +30,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
@@ -65,7 +66,7 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 	}
 
 	@OnlyIn(Dist.CLIENT)
-	public void appendHoverText(@NotNull ItemStack stack, Level world, @NotNull List<Component> tooltip, @NotNull TooltipFlag advanced)
+	public void appendHoverText(@NotNull ItemStack stack, Item.TooltipContext world, @NotNull List<Component> tooltip, @NotNull TooltipFlag advanced)
 	{
 		super.appendHoverText(stack, world, tooltip, advanced);
 		switch (this.type)
@@ -162,7 +163,7 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 
 	public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level world, Player player, @NotNull InteractionHand hand)
 	{
-		ItemStack stack = player.getItemInHand(hand);
+		ItemStack stack = player.getMainHandItem();
 		return switch (this.type)
 		{
 			case advanced_ejector, advanced_pulling ->

@@ -3,6 +3,7 @@ package ic2.core.slot;
 import ic2.core.block.invslot.InvSlot;
 import ic2.core.util.StackUtil;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 
 public class SlotInvSlotReadOnly extends SlotInvSlot

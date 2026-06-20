@@ -5,11 +5,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Item.Properties;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 
 public class ItemTreetapElectric extends ItemElectricTool
 {
@@ -22,7 +22,7 @@ public class ItemTreetapElectric extends ItemElectricTool
 	}
 
 	@Override
-	public InteractionResult useOn(UseOnContext context)
+	public @NotNull InteractionResult useOn(UseOnContext context)
 	{
 		Level world = context.getLevel();
 		BlockPos pos = context.getClickedPos();

@@ -3,89 +3,68 @@ package ic2.api.event;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.event.level.LevelEvent;
-import net.minecraftforge.eventbus.api.Cancelable;
+import net.neoforged.neoforge.event.level.LevelEvent;
+import net.neoforged.bus.api.ICancellableEvent;
 
-@Cancelable
-public class RetextureEvent extends LevelEvent
-{
-	public final BlockPos pos;
-	public final BlockState state;
-	public final Direction side;
-	public final Player player;
-	public final BlockState refState;
-	public final String refVariant;
-	public final Direction refSide;
-	public final int[] refColorMultipliers;
-	public boolean applied = false;
+public class RetextureEvent extends LevelEvent implements ICancellableEvent {
 
-	public RetextureEvent(
-		Level world,
-		BlockPos pos,
-		BlockState state,
-		Direction side,
-		Player player,
-		BlockState refState,
-		String refVariant,
-		Direction refSide,
-		int[] refColorMultipliers
-	)
-	{
-		super(world);
-		if (world == null)
-		{
-			throw new NullPointerException("null world");
-		}
+    public final BlockPos pos;
 
-		if (world.isClientSide)
-		{
-			throw new IllegalStateException("remote world");
-		}
+    public final BlockState state;
 
-		if (pos == null)
-		{
-			throw new NullPointerException("null pos");
-		}
+    public final Direction side;
 
-		if (state == null)
-		{
-			throw new NullPointerException("null state");
-		}
+    public final Player player;
 
-		if (side == null)
-		{
-			throw new NullPointerException("null side");
-		}
+    public final BlockState refState;
 
-		if (refState == null)
-		{
-			throw new NullPointerException("null refState");
-		}
+    public final String refVariant;
 
-		if (refVariant == null)
-		{
-			throw new NullPointerException("null refVariant");
-		}
+    public final Direction refSide;
 
-		if (refSide == null)
-		{
-			throw new NullPointerException("null refSide");
-		}
+    public final int[] refColorMultipliers;
 
-		if (refColorMultipliers == null)
-		{
-			throw new NullPointerException("null refColorMultipliers");
-		}
+    public boolean applied = false;
 
-		this.pos = pos;
-		this.state = state;
-		this.side = side;
-		this.player = player;
-		this.refState = refState;
-		this.refVariant = refVariant;
-		this.refSide = refSide;
-		this.refColorMultipliers = refColorMultipliers;
-	}
+    public RetextureEvent(Level world, BlockPos pos, BlockState state, Direction side, Player player, BlockState refState, String refVariant, Direction refSide, int[] refColorMultipliers) {
+        super(world);
+        if (world == null) {
+            throw new NullPointerException("null world");
+        }
+        if (world.isClientSide) {
+            throw new IllegalStateException("remote world");
+        }
+        if (pos == null) {
+            throw new NullPointerException("null pos");
+        }
+        if (state == null) {
+            throw new NullPointerException("null state");
+        }
+        if (side == null) {
+            throw new NullPointerException("null side");
+        }
+        if (refState == null) {
+            throw new NullPointerException("null refState");
+        }
+        if (refVariant == null) {
+            throw new NullPointerException("null refVariant");
+        }
+        if (refSide == null) {
+            throw new NullPointerException("null refSide");
+        }
+        if (refColorMultipliers == null) {
+            throw new NullPointerException("null refColorMultipliers");
+        }
+        this.pos = pos;
+        this.state = state;
+        this.side = side;
+        this.player = player;
+        this.refState = refState;
+        this.refVariant = refVariant;
+        this.refSide = refSide;
+        this.refColorMultipliers = refColorMultipliers;
+    }
 }

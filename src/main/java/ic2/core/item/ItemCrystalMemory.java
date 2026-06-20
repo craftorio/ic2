@@ -24,7 +24,7 @@ public class ItemCrystalMemory extends Item
 		super(settings);
 	}
 
-	public void appendHoverText(@NotNull ItemStack stack, Level world, @NotNull List<Component> tooltip, @NotNull TooltipFlag advanced)
+	public void appendHoverText(@NotNull ItemStack stack, Item.TooltipContext world, @NotNull List<Component> tooltip, @NotNull TooltipFlag advanced)
 	{
 		ItemStack recorded = this.readItemStack(stack);
 		if (!StackUtil.isEmpty(recorded))

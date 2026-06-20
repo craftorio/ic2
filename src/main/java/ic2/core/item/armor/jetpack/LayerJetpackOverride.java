@@ -13,9 +13,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
+import net.minecraft.util.FastColor;
 
 @OnlyIn(Dist.CLIENT)
 public class LayerJetpackOverride extends RenderLayer<LivingEntity, HumanoidModel<LivingEntity>>
@@ -41,7 +42,7 @@ public class LayerJetpackOverride extends RenderLayer<LivingEntity, HumanoidMode
 			model.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
 
 			VertexConsumer consumer = ItemRenderer.getArmorFoilBuffer(bufferSource, RenderType.armorCutoutNoCull(TEXTURE), false, chestStack.hasFoil());
-			model.renderToBuffer(poseStack, consumer, packedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+			model.renderToBuffer(poseStack, consumer, packedLight, OverlayTexture.NO_OVERLAY, FastColor.ARGB32.colorFromFloat(1.0F, 1.0F, 1.0F, 1.0F));
 			restoreVisibility(model, saved);
 		}
 	}

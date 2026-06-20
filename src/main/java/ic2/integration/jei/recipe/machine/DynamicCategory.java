@@ -26,7 +26,8 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeType;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import org.jetbrains.annotations.NotNull;
 
 public class DynamicCategory extends IORecipeCategory<IORecipeWrapper>
@@ -43,7 +44,7 @@ public class DynamicCategory extends IORecipeCategory<IORecipeWrapper>
 	{
 		super(teBlock);
 		this.recipeType = recipeType;
-		this.initializeWidgets(guiHelper, GuiParser.parse(ForgeRegistries.BLOCKS.getKey(teBlock), teBlock.getDummyTe().getClass()));
+		this.initializeWidgets(guiHelper, GuiParser.parse(BuiltInRegistries.BLOCK.getKey(teBlock), teBlock.getDummyTe().getClass()));
 		this.xOffset = this.calcOffset(true);
 		this.yOffset = this.calcOffset(false);
 		this.background = guiHelper.createBlankDrawable(this.calcSize(true), this.calcSize(false));
@@ -266,13 +267,11 @@ public class DynamicCategory extends IORecipeCategory<IORecipeWrapper>
 		return this.recipeType;
 	}
 
-	@Override
 	public int getWidth()
 	{
 		return this.background.getWidth();
 	}
 
-	@Override
 	public int getHeight()
 	{
 		return this.background.getHeight();

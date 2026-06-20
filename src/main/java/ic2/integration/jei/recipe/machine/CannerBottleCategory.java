@@ -15,7 +15,8 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeType;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import org.jetbrains.annotations.NotNull;
 
 public class CannerBottleCategory extends IORecipeCategory<CannerBottleRecipeWrapper>
@@ -33,7 +34,7 @@ public class CannerBottleCategory extends IORecipeCategory<CannerBottleRecipeWra
 		super(teBlock);
 		this.recipeType = recipeType;
 		DynamicCategory.parseWidgets(teBlock, guiHelper,
-			GuiParser.parse(ForgeRegistries.BLOCKS.getKey(teBlock), teBlock.getDummyTe().getClass()),
+			GuiParser.parse(BuiltInRegistries.BLOCK.getKey(teBlock), teBlock.getDummyTe().getClass()),
 			this.elements, this.inputSlots, this.outputSlots);
 
 		int minX = 1000, minY = 1000, maxX = -1000, maxY = -1000;
@@ -70,13 +71,11 @@ public class CannerBottleCategory extends IORecipeCategory<CannerBottleRecipeWra
 		return this.recipeType;
 	}
 
-	@Override
 	public int getWidth()
 	{
 		return this.background.getWidth();
 	}
 
-	@Override
 	public int getHeight()
 	{
 		return this.background.getHeight();

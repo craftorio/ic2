@@ -30,6 +30,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Shearable;
 import net.minecraft.world.entity.monster.piglin.PiglinAi;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
@@ -39,7 +40,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.gameevent.GameEvent.Context;
-import net.minecraftforge.common.IForgeShearable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -59,14 +59,14 @@ public class ItemElectricToolChainsaw extends ItemElectricTool implements IHitSo
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, Level world, List<Component> list, TooltipFlag par4)
+	public void appendHoverText(@NotNull ItemStack stack, Item.@NotNull TooltipContext world, @NotNull List<Component> list, @NotNull TooltipFlag par4)
 	{
 		super.appendHoverText(stack, world, list, par4);
 		list.add(Component.translatable("item.ic2.tooltip.mode.switch", KeyboardClient.modeSwitchKey.getKey().getDisplayName(), Minecraft.getInstance().options.keyUse.getKey().getDisplayName()));
 	}
 
 	@Override
-	public @NotNull InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand)
+	public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level world, @NotNull Player player, @NotNull InteractionHand hand)
 	{
 		if (world.isClientSide)
 		{
@@ -91,13 +91,13 @@ public class ItemElectricToolChainsaw extends ItemElectricTool implements IHitSo
 	}
 
 	@Override
-	public boolean isCorrectToolForDrops(BlockState state)
+	public boolean isCorrectToolForDrops(@NotNull ItemStack stack, @NotNull BlockState state)
 	{
 		return super.isCorrectToolForDrops(state) || state.is(Blocks.COBWEB) || Util.canShear(state);
 	}
 
 	@Override
-	public float getDestroySpeed(ItemStack stack, BlockState state)
+	public float getDestroySpeed(@NotNull ItemStack stack, @NotNull BlockState state)
 	{
 		return !this.canUse(stack) || !state.is(BlockTags.MINEABLE_WITH_AXE) && !state.is(Blocks.COBWEB) && !Util.canShear(state) ? 1.0F : this.speed;
 	}
@@ -129,7 +129,7 @@ public class ItemElectricToolChainsaw extends ItemElectricTool implements IHitSo
 	public InteractionResult onBlockStartBreak(Player player, Level world, InteractionHand hand, BlockPos pos, Direction direction)
 	{
 		BlockState state = world.getBlockState(pos);
-		ItemStack stack = player.getItemInHand(hand);
+		ItemStack stack = player.getMainHandItem();
 		if (!this.isShearMode(stack) || !Util.canShear(state))
 		{
 			return InteractionResult.PASS;
@@ -148,7 +148,7 @@ public class ItemElectricToolChainsaw extends ItemElectricTool implements IHitSo
 
 	public @NotNull InteractionResult interactLivingEntity(@NotNull ItemStack stack, @NotNull Player user, @NotNull LivingEntity entity, @NotNull InteractionHand hand)
 	{
-		// TODO: Use IForgeShearable
+		// TODO: Use IShearable
 		if (entity instanceof Shearable shearable && !StackUtil.getOrCreateNbtData(stack).getBoolean("disableShear") && this.consumeEnergy(stack, this.operationEnergyCost, user) && shearable.readyForShearing())
 		{
 			shearable.shear(SoundSource.PLAYERS);

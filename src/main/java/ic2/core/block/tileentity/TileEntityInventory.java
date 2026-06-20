@@ -15,9 +15,11 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.HolderLookup;
 
 public abstract class TileEntityInventory extends Ic2TileEntity implements WorldlyContainer, IInventorySlotHolder<TileEntityInventory>
 {
@@ -31,9 +33,8 @@ public abstract class TileEntityInventory extends Ic2TileEntity implements World
 	}
 
 	@Override
-	public void load(CompoundTag nbt)
-	{
-		super.load(nbt);
+	protected void loadAdditional(CompoundTag nbt, net.minecraft.core.HolderLookup.Provider registries) {
+		super.loadAdditional(nbt, registries);
 		CompoundTag invSlotsTag = nbt.getCompound("InvSlots");
 
 		for (InvSlot invSlot : this.invSlots)
@@ -43,9 +44,9 @@ public abstract class TileEntityInventory extends Ic2TileEntity implements World
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag nbt)
+	public void saveAdditional(CompoundTag nbt, net.minecraft.core.HolderLookup.Provider registries)
 	{
-		super.saveAdditional(nbt);
+		super.saveAdditional(nbt, registries);
 		CompoundTag invSlotsTag = new CompoundTag();
 
 		for (InvSlot invSlot : this.invSlots)

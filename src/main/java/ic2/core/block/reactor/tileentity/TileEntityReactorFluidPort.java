@@ -1,6 +1,5 @@
 package ic2.core.block.reactor.tileentity;
 
-import com.google.common.base.Supplier;
 import ic2.api.reactor.IReactorChamber;
 import ic2.api.upgrade.IUpgradableBlock;
 import ic2.api.upgrade.UpgradableProperty;
@@ -16,7 +15,6 @@ import ic2.core.profile.NotClassic;
 import ic2.core.ref.Ic2BlockEntities;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
@@ -25,7 +23,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
-
 @NotClassic
 public class TileEntityReactorFluidPort extends TileEntityInventory implements IHasGui, IUpgradableBlock, IReactorChamber
 {
@@ -36,13 +33,10 @@ public class TileEntityReactorFluidPort extends TileEntityInventory implements I
 	public TileEntityReactorFluidPort(BlockPos pos, BlockState state)
 	{
 		super(Ic2BlockEntities.REACTOR_FLUID_PORT, pos, state);
-		this.fluids.addUnmanagedTankHook(new Supplier<Collection<Fluids.InternalFluidTank>>()
+		this.fluids.addUnmanagedTankHook(() ->
 		{
-			public Collection<Fluids.InternalFluidTank> get()
-			{
-				TileEntityNuclearReactorElectric reactor = TileEntityReactorFluidPort.this.getReactorInstance();
-				return reactor == null ? Collections.emptySet() : Arrays.asList(reactor.inputTank, reactor.outputTank);
-			}
+			TileEntityNuclearReactorElectric reactor = TileEntityReactorFluidPort.this.getReactorInstance();
+			return reactor == null ? Collections.emptySet() : Arrays.asList(reactor.inputTank, reactor.outputTank);
 		});
 	}
 

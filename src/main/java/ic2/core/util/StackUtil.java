@@ -35,6 +35,7 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
@@ -55,6 +56,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.core.component.DataComponents;
 
 public final class StackUtil
 {
@@ -82,7 +84,7 @@ public final class StackUtil
 
 	public static boolean isEmpty(Player player, InteractionHand hand)
 	{
-		return isEmpty(player.getItemInHand(hand));
+		return isEmpty(player.getMainHandItem());
 	}
 
 	public static int getSize(ItemStack stack)
@@ -265,7 +267,7 @@ public final class StackUtil
 		if (ret == null)
 		{
 			ret = new CompoundTag();
-			stack.setTag(ret);
+			stack.set(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.of(ret));
 		}
 
 		return ret;
@@ -645,7 +647,7 @@ public final class StackUtil
 
 		if (!player.getAbilities().instabuild && stack.isDamageableItem())
 		{
-			stack.hurtAndBreak(amount, player, p -> p.broadcastBreakEvent(hand));
+			stack.hurtAndBreak(amount, player, p -> p.onEquippedItemBroken(hand));
 			ItemStack ret;
 			if (isEmpty(stack))
 			{
@@ -666,7 +668,7 @@ public final class StackUtil
 
 	public static ItemStack get(Player player, InteractionHand hand)
 	{
-		return player.getItemInHand(hand);
+		return player.getMainHandItem();
 	}
 
 	public static void set(Player player, InteractionHand hand, ItemStack stack)
@@ -782,7 +784,7 @@ public final class StackUtil
 
 		for (ItemStack stack : stacks)
 		{
-			dropAsEntity(source.getLevel(), source.getBlockPos(), stack);
+			dropAsEntity(source.level(), source.getBlockPos(), stack);
 		}
 
 		stacks.clear();
@@ -804,7 +806,7 @@ public final class StackUtil
 		int oldSize = getSize(stack);
 		Player player = Ic2Player.get(world);
 		InteractionHand hand = InteractionHand.MAIN_HAND;
-		ItemStack prev = player.getItemInHand(hand);
+		ItemStack prev = player.getMainHandItem();
 		player.setItemInHand(hand, stack);
 		InteractionResult result = item.useOn(
 			new UseOnContext(player, hand, new BlockHitResult(Vec3.atLowerCornerOf(pos).add(0.5, 1.0, 0.5), Direction.DOWN, pos, false))

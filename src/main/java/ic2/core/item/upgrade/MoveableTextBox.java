@@ -32,8 +32,7 @@ class MoveableTextBox extends TextBox
 		return this.moveHandler != null && this.moveHandler.isEnabled();
 	}
 
-	@Override
-	public void tick()
+		public void tick()
 	{
 		super.tick();
 		if (this.isMoved())

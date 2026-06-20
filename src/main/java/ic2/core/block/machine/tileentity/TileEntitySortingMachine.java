@@ -25,8 +25,11 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.RegistryAccess;
 
 @NotClassic
 public class TileEntitySortingMachine extends TileEntityElectricMachine implements IHasGui, INetworkClientTileEntityEventListener, IUpgradableBlock
@@ -46,9 +49,8 @@ public class TileEntitySortingMachine extends TileEntityElectricMachine implemen
 	}
 
 	@Override
-	public void load(CompoundTag nbt)
-	{
-		super.load(nbt);
+	protected void loadAdditional(CompoundTag nbt, net.minecraft.core.HolderLookup.Provider registries) {
+		super.loadAdditional(nbt, registries);
 		ListTag filtersTag = nbt.getList("filters", 10);
 
 		for (int i = 0; i < filtersTag.size(); i++)
@@ -67,9 +69,9 @@ public class TileEntitySortingMachine extends TileEntityElectricMachine implemen
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag nbt)
+	public void saveAdditional(CompoundTag nbt, net.minecraft.core.HolderLookup.Provider registries)
 	{
-		super.saveAdditional(nbt);
+		super.saveAdditional(nbt, registries);
 		ListTag filtersTag = new ListTag();
 
 		for (int i = 0; i < 42; i++)
@@ -79,7 +81,7 @@ public class TileEntitySortingMachine extends TileEntityElectricMachine implemen
 			{
 				CompoundTag contentTag = new CompoundTag();
 				contentTag.putByte("index", (byte) i);
-				stack.save(contentTag);
+				stack.save(net.minecraft.core.RegistryAccess.EMPTY, contentTag);
 				filtersTag.add(contentTag);
 			}
 		}

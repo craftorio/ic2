@@ -109,7 +109,7 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks)
 	{
 		this.guiGraphics = guiGraphics;
-		this.renderBackground(guiGraphics);
+		this.renderBackground(guiGraphics, mouseX, mouseY, partialTicks);
 		super.render(guiGraphics, mouseX, mouseY, partialTicks);
 		this.renderTooltip(guiGraphics, mouseX, mouseY);
 	}
@@ -215,7 +215,7 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 		return ret;
 	}
 
-	public boolean mouseScrolled(double mouseX, double mouseY, double scrollDelta)
+	public boolean mouseScrolled(double mouseX, double mouseY, double scrollDelta, double scrollY)
 	{
 		if (this.elementMethods.contains(GuiElement.ImplementedMethod.onMouseScroll))
 		{
@@ -237,7 +237,7 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 			}
 		}
 
-		return super.mouseScrolled(mouseX, mouseY, scrollDelta);
+		return super.mouseScrolled(mouseX, mouseY, 0, scrollDelta);
 	}
 
 	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
@@ -403,11 +403,11 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 		int z = 0;
 		RenderSystem.setShader(GameRenderer::getPositionTexShader);
 		BufferBuilder buffer = Tesselator.getInstance().getBuilder();
-		buffer.begin(Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-		buffer.vertex(matrix, (float) x, (float) y, z).uv((float) uS, (float) vS).endVertex();
-		buffer.vertex(matrix, (float) x, (float) yE, z).uv((float) uS, (float) vE).endVertex();
-		buffer.vertex(matrix, (float) xE, (float) yE, z).uv((float) uE, (float) vE).endVertex();
-		buffer.vertex(matrix, (float) xE, (float) y, z).uv((float) uE, (float) vS).endVertex();
+		buffer = Tesselator.getInstance().begin(Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+		buffer.addVertex(matrix, (float) x, (float) y, z).setUv((float) uS, (float) vS);
+		buffer.addVertex(matrix, (float) x, (float) yE, z).setUv((float) uS, (float) vE);
+		buffer.addVertex(matrix, (float) xE, (float) yE, z).setUv((float) uE, (float) vE);
+		buffer.addVertex(matrix, (float) xE, (float) y, z).setUv((float) uE, (float) vS);
 		BufferUploader.drawWithShader(buffer.end());
 	}
 
@@ -444,7 +444,7 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 		int z = 0;
 		RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
 		BufferBuilder buffer = Tesselator.getInstance().getBuilder();
-		buffer.begin(Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+		buffer = Tesselator.getInstance().begin(Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
 		double xS = x;
 
 		while (xS < x + width)
@@ -479,10 +479,10 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 
 				double yE = Math.min(yS + maxHeight, y + height);
 				double vE = vS + (yE - yS) / scale * spriteHeight;
-				buffer.vertex(matrix, (float) xS, (float) yS, z).uv((float) uS, (float) vS).color(r, g, b, a).endVertex();
-				buffer.vertex(matrix, (float) xS, (float) yE, z).uv((float) uS, (float) vE).color(r, g, b, a).endVertex();
-				buffer.vertex(matrix, (float) xE, (float) yE, z).uv((float) uE, (float) vE).color(r, g, b, a).endVertex();
-				buffer.vertex(matrix, (float) xE, (float) yS, z).uv((float) uE, (float) vS).color(r, g, b, a).endVertex();
+				buffer.addVertex(matrix, (float) xS, (float) yS, z).setUv((float) uS, (float) vS).color(r, g, b, a);
+				buffer.addVertex(matrix, (float) xS, (float) yE, z).setUv((float) uS, (float) vE).color(r, g, b, a);
+				buffer.addVertex(matrix, (float) xE, (float) yE, z).setUv((float) uE, (float) vE).color(r, g, b, a);
+				buffer.addVertex(matrix, (float) xE, (float) yS, z).setUv((float) uE, (float) vS).color(r, g, b, a);
 				yS += maxHeight;
 			}
 
@@ -526,11 +526,11 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 
 		RenderSystem.setShader(GameRenderer::getPositionColorShader);
 		BufferBuilder buffer = Tesselator.getInstance().getBuilder();
-		buffer.begin(Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-		buffer.vertex(matrix, x, y, z).color(color).endVertex();
-		buffer.vertex(matrix, x, yE, z).color(color).endVertex();
-		buffer.vertex(matrix, xE, yE, z).color(color).endVertex();
-		buffer.vertex(matrix, xE, y, z).color(color).endVertex();
+		buffer = Tesselator.getInstance().begin(Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+		buffer.addVertex(matrix, x, y, z).color(color);
+		buffer.addVertex(matrix, x, yE, z).color(color);
+		buffer.addVertex(matrix, xE, yE, z).color(color);
+		buffer.addVertex(matrix, xE, y, z).color(color);
 		BufferUploader.drawWithShader(buffer.end());
 		if (blend)
 		{

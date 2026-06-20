@@ -13,7 +13,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
-
 public class GuiMetalFormer extends Ic2Gui<ContainerMetalFormer>
 {
 	public GuiMetalFormer(ContainerMetalFormer container, Inventory playerInventory, Component title)

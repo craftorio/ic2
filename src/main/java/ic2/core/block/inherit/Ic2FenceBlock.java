@@ -16,6 +16,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -32,9 +33,15 @@ import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 
 public class Ic2FenceBlock extends FenceBlock
 {
+    @Override
+    protected com.mojang.serialization.MapCodec<? extends net.minecraft.world.level.block.Block> codec() {
+        return simpleCodec(properties -> new Ic2FenceBlock(properties, this.canBoost));
+    }
+
 	public static final Map<Direction, BooleanProperty> connectProperties = getConnectProperties();
 	public final boolean canBoost;
 

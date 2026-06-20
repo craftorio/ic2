@@ -11,7 +11,7 @@ import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.crafting.Ingredient;
 import org.jetbrains.annotations.NotNull;
 
-public enum Ic2ArmorMaterials implements ArmorMaterial
+public enum Ic2ArmorMaterials extends ArmorMaterial
 {
 	BRONZE("ic2:ic2_bronze", 15, new int[] { 2, 5, 6, 2 }, 9, SoundEvents.ARMOR_EQUIP_IRON, 0.0F, 0.0F, () -> Ingredient.of(Ic2Items.BRONZE_INGOT)),
 	ALLOY("ic2:ic2_alloy", 50, new int[] { 4, 7, 9, 4 }, 12, SoundEvents.ARMOR_EQUIP_IRON, 2.0F, 0.0F, () -> Ingredient.of(Ic2Items.ALLOY)),

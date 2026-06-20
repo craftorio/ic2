@@ -32,8 +32,7 @@ public class EntityTrackingSoundInstance extends EntityBoundSoundInstance implem
 		this.sourceItem = item;
 	}
 
-	@Override
-	public void tick()
+		public void tick()
 	{
 		super.tick();
 		if (this.sourceItem != null && this.entity instanceof LivingEntity livingEntity)

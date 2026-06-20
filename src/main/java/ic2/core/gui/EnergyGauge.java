@@ -39,7 +39,7 @@ public class EnergyGauge extends Gauge<EnergyGauge>
 		List<Component> ret = super.getToolTip();
 		double amount = this.energy.getEnergy();
 		double capacity = this.energy.getCapacity();
-		ret.add(Component.literal(Util.toSiString(amount, 4) + "/" + Util.toSiString(capacity, 4) + " " + Component.translatable("ic2.generic.text.EU")));
+		ret.add(Component.literal(Util.toSiString(amount, 4) + "/" + Util.toSiString(capacity, 4) + " " + Component.translatable("ic2.generic.text.EU").getString()));
 		return ret;
 	}
 

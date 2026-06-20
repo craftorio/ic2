@@ -81,12 +81,12 @@ public class Ic2Crops extends Crops
 	public static CropCard cropBrownMushroom = new CropBaseMushroom(Ic2CropType.brownMushroom, Ic2Blocks.BROWN_MUSHROOM_CROP, new String[] { "Brown", "Food", "Mushroom" }, new ItemStack(Blocks.BROWN_MUSHROOM));
 	public static CropCard cropNetherWart = new CropNetherWart(Ic2CropType.netherWart);
 	public static CropCard cropTerraWart = new CropTerraWart(Ic2CropType.terraWart);
-	public static CropCard cropOakSapling = new CropBaseSapling(Ic2CropType.oakSapling, Ic2Blocks.OAK_SAPLING_CROP, "acorns", new ItemStack(Blocks.OAK_LOG), new ItemStack(Blocks.OAK_SAPLING));
-	public static CropCard cropSpruceSapling = new CropBaseSapling(Ic2CropType.spruceSapling, Ic2Blocks.SPRUCE_SAPLING_CROP, "pine_cones", new ItemStack(Blocks.SPRUCE_LOG), new ItemStack(Blocks.SPRUCE_SAPLING));
-	public static CropCard cropBirchSapling = new CropBaseSapling(Ic2CropType.birchSapling, Ic2Blocks.BIRCH_SAPLING_CROP, "catkins", new ItemStack(Blocks.BIRCH_LOG), new ItemStack(Blocks.BIRCH_SAPLING));
+	public static CropCard cropOakSapling = new CropBaseSapling(Ic2CropType.oakSapling, Ic2Blocks.OAK_SAPLING_CROP, "seedling", new ItemStack(Blocks.OAK_LOG), new ItemStack(Blocks.OAK_SAPLING));
+	public static CropCard cropSpruceSapling = new CropBaseSapling(Ic2CropType.spruceSapling, Ic2Blocks.SPRUCE_SAPLING_CROP, "seedling", new ItemStack(Blocks.SPRUCE_LOG), new ItemStack(Blocks.SPRUCE_SAPLING));
+	public static CropCard cropBirchSapling = new CropBaseSapling(Ic2CropType.birchSapling, Ic2Blocks.BIRCH_SAPLING_CROP, "seedling", new ItemStack(Blocks.BIRCH_LOG), new ItemStack(Blocks.BIRCH_SAPLING));
 	public static CropCard cropJungleSapling = new CropBaseSapling(Ic2CropType.jungleSapling, Ic2Blocks.JUNGLE_SAPLING_CROP, "seedling", new ItemStack(Blocks.JUNGLE_LOG), new ItemStack(Blocks.JUNGLE_SAPLING));
 	public static CropCard cropAcaciaSapling = new CropBaseSapling(Ic2CropType.acaciaSapling, Ic2Blocks.ACACIA_SAPLING_CROP, "seedling", new ItemStack(Blocks.ACACIA_LOG), new ItemStack(Blocks.ACACIA_SAPLING));
-	public static CropCard cropDarkOakSapling = new CropBaseSapling(Ic2CropType.darkOakSapling, Ic2Blocks.DARK_OAK_SAPLING_CROP, "acorns", new ItemStack(Blocks.DARK_OAK_LOG), new ItemStack(Blocks.DARK_OAK_SAPLING));
+	public static CropCard cropDarkOakSapling = new CropBaseSapling(Ic2CropType.darkOakSapling, Ic2Blocks.DARK_OAK_SAPLING_CROP, "seedling", new ItemStack(Blocks.DARK_OAK_LOG), new ItemStack(Blocks.DARK_OAK_SAPLING));
 	public static CropCard cropFerru = new CropBaseMetalCommon(Ic2CropType.ferru, Ic2Blocks.FERRU_CROP, new String[] { "Gray", "Leaves", "Metal" }, Arrays.asList(BlockTags.IRON_ORES, Ic2BlockTags.IRON_BLOCKS), new ItemStack(Ic2Items.SMALL_IRON_DUST));
 	public static CropCard cropCyprium = new CropBaseMetalCommon(Ic2CropType.cyprium, Ic2Blocks.CYPRIUM_CROP, new String[] { "Orange", "Leaves", "Metal" }, Arrays.asList(BlockTags.COPPER_ORES, Ic2BlockTags.COPPER_BLOCKS), new ItemStack(Ic2Items.SMALL_COPPER_DUST));
 	public static CropCard cropStagnium = new CropBaseMetalCommon(Ic2CropType.stagnium, Ic2Blocks.STAGNIUM_CROP, new String[] { "Shiny", "Leaves", "Metal" }, Arrays.asList(Ic2BlockTags.TIN_ORES, Ic2BlockTags.TIN_BLOCKS), new ItemStack(Ic2Items.SMALL_TIN_DUST));

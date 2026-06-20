@@ -41,7 +41,7 @@ public class GuiPatternStorage extends Ic2Gui<ContainerPatternStorage>
 			return pattern != null ? pattern.getHoverName().getString() : null;
 		}), 16777215, false).withEnableHandler(patternInfoEnabler));
 		this.addElement(TextLabel.create(this, 80, 59, TextProvider.of(() -> Util.toSiString(container.base.patternUu, 4) + Component.translatable("ic2.generic.text.bucketUnit")), 16777215, false).withEnableHandler(patternInfoEnabler));
-		this.addElement(TextLabel.create(this, 80, 70, TextProvider.of(() -> Util.toSiString(container.base.patternEu, 4) + Component.translatable("ic2.generic.text.EU")), 16777215, false).withEnableHandler(patternInfoEnabler));
+		this.addElement(TextLabel.create(this, 80, 70, TextProvider.of(() -> Util.toSiString(container.base.patternEu, 4) + Component.translatable("ic2.generic.text.EU").getString()), 16777215, false).withEnableHandler(patternInfoEnabler));
 		this.addElement(new ItemImage(this, 152, 29, (Supplier<ItemStack>) () -> container.base.pattern));
 	}
 

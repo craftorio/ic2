@@ -1,5 +1,5 @@
 {
-  "parent": "block/crop",
+  "parent": "block/cross",
   "render_type": "cutout_mipped",
   "textures": {
     "cross": "ic2:block/crop/oak_sapling_2"

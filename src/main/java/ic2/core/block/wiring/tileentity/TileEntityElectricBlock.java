@@ -227,7 +227,7 @@ public abstract class TileEntityElectricBlock extends TileEntityInventory implem
 	public void addInformation(ItemStack stack, List<String> tooltip, TooltipFlag advanced)
 	{
 		super.addInformation(stack, tooltip, advanced);
-		tooltip.add(String.format("%s %.0f %s %s %d %s", Component.translatable("ic2.item.tooltip.Output"), EnergyNet.instance.getPowerFromTier(this.energy.getSourceTier()), Component.translatable("ic2.generic.text.EUt"), Component.translatable("ic2.item.tooltip.Capacity"), this.getCapacity(), Component.translatable("ic2.generic.text.EU")));
+		tooltip.add(String.format("%s %.0f %s %s %d %s", Component.translatable("ic2.item.tooltip.Output").getString(), EnergyNet.instance.getPowerFromTier(this.energy.getSourceTier()), Component.translatable("ic2.generic.text.EUt").getString(), Component.translatable("ic2.item.tooltip.Capacity").getString(), this.getCapacity(), Component.translatable("ic2.generic.text.EU").getString()));
 		tooltip.add(Component.translatable("ic2.item.tooltip.Store") + " " + (long) StackUtil.getOrCreateNbtData(stack).getDouble("energy") + " " + Component.translatable("ic2.generic.text.EU"));
 	}
 }

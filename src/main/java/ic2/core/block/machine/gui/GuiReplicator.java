@@ -31,8 +31,8 @@ public class GuiReplicator extends Ic2Gui<ContainerReplicator>
 				return null;
 			}
 
-			String uuReq = Util.toSiString(te.patternUu, 4) + Component.translatable("ic2.generic.text.bucketUnit");
-			String euReq = Util.toSiString(te.patternEu, 4) + Component.translatable("ic2.generic.text.EU");
+			String uuReq = Util.toSiString(te.patternUu, 4) + Component.translatable("ic2.generic.text.bucketUnit").getString();
+			String euReq = Util.toSiString(te.patternEu, 4) + Component.translatable("ic2.generic.text.EU").getString();
 			return te.pattern.getHoverName() + " UU: " + uuReq + " EU: " + euReq;
 		}));
 		this.addElement(new CustomButton(this, 80, 16, 9, 18, this.createEventSender(0)).withTooltip("ic2.Replicator.gui.info.last"));

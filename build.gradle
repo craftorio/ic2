@@ -12,7 +12,6 @@ version = mod_version
 group = mod_group_id
 
 sourceSets.main.resources {
-    srcDir('src/main/resources')
     exclude("**/*.bbmodel")
 }
 

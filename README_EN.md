@@ -36,6 +36,8 @@ We know why you're here, so we kept changes to an absolute minimum. Here is ever
 
 ## Copyright Statement
 
+[Quote from the original IC2 Dev Team's statement](https://forum.industrial-craft.net/thread/9843-mc-1-7-ic%C2%B2-v-2-1-x-2-2-x-experimental/?postID=131008#post131008)
+
 The repository is licensed as All Rights Reserved / No License. The copyright of this project belongs to the original IC2 Dev Team. We do not own the copyright of IC2's code and resource files, nor do we claim to own the copyright of IC2's code and resource files. We are simply decompiling, fixing, porting, and maintaining IC2.
 
 ## Quick Start

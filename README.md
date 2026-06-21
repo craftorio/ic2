@@ -1,5 +1,5 @@
 
-# IndustrialCraft 2 重构项目
+# 工业时代2 源代码
 
 <img src="https://img.shields.io/badge/Minecraft-1.12.2-brightgreen" alt="Minecraft 1.12.2">
 <img src="https://img.shields.io/badge/Forge-14.23.5.2864-orange" alt="Forge 14.23.5.2864">
@@ -19,3 +19,7 @@ gradlew runClient
 .\gradlew build
 .\gradlew runClient
 ```
+
+## 许可证
+
+本分支的代码和资源文件归属 IC2 Dev Team。仅供学习和研究。

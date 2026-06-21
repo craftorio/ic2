@@ -1,4 +1,4 @@
-# 2.10.22-ex120
+# 2.10.23-ex120
 
 我们很高兴宣布：适用于 1.20.1 Forge 版本的 IndustrialCraft 2 **正式版** 终于发布了！
 
@@ -21,7 +21,6 @@
 - 蒸汽动能发生机的显示重叠（GuiSteamKineticGenerator）
 - 拟态板材质更改失败 `ItemObscurator`
 - 日光灯不能用（仅限合成）
-- 适配其他电力网络，例如 FE（Forge Energy）、RF（Redstone Flux）等
 
 ### 不急
 
@@ -44,4 +43,4 @@
 - 删除：旧版粉色粘球形态的 UU 物质、精炼铁锭
 - 翻译：以中文为基准, 重做翻译（翻译有小巧思，致歉）。全部扁平化
 - 矿脉生成，请使用 [JustEnoughResources](https://github.com/way2muchnoise/JustEnoughResources) 查看。
-- 没有管道
+- 尚未添加管道系统

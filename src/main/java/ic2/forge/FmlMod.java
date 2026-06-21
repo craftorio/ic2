@@ -4,6 +4,7 @@ import ic2.core.event.EventHandler;
 import ic2.core.network.NetworkManager;
 import ic2.core.loot.Ic2LootNbtProviderTypes;
 import ic2.core.ref.Ic2Fluids;
+import ic2.integration.ae2.Ic2Ae2Plugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,6 +63,7 @@ public final class FmlMod
 	public void load(FMLCommonSetupEvent event)
 	{
 		MinecraftForge.EVENT_BUS.register(new EventHandlerForge());
+		MinecraftForge.EVENT_BUS.register(new Ic2Ae2Plugin.ForgeEventHandler());
 		if (FMLEnvironment.dist.isClient())
 		{
 			MinecraftForge.EVENT_BUS.register(new ClientEventHandlerForge());

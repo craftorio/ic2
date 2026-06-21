@@ -48,17 +48,21 @@ minecraft {
 }
 
 repositories {
+    mavenCentral()
     maven { url = "https://maven.blamejared.com/" }
+    maven { url "https://api.modrinth.com/maven" }
 }
 
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-    compileOnly 'mezz.jei:jei-1.20.1-forge-api:15.20.0.130'
-    runtimeOnly fg.deobf('mezz.jei:jei-1.20.1-forge:15.20.0.130')
+    compileOnly "mezz.jei:jei-1.20.1-forge-api:${jei_version}"
+    runtimeOnly fg.deobf("mezz.jei:jei-1.20.1-forge:${jei_version}")
+    
+    implementation fg.deobf("maven.modrinth:ae2:7KVs6HMQ")
+    // compileOnly "org.appliedenergistics:appliedenergistics2:${ae2_version}:api"
 }
 
 reobf {
-    
 }
 
 tasks.named('processResources', ProcessResources).configure {
@@ -104,12 +108,24 @@ tasks.register('syncVersion') {
             "alt=\"Version ${version}\""
         )
         readmeFile.text = readmeContent
+        
+        def readmeEnFile = file("README_EN.md")
+        def readmeEnContent = readmeEnFile.text
+        readmeEnContent = readmeEnContent.replaceAll(
+                /(Version-)[^"<\s]+(-blue)/,
+                "\$1${badgeVersion}\$2"
+        )
+        readmeEnContent = readmeEnContent.replaceAll(
+                /alt="Version [^"]+"/,
+                "alt=\"Version ${version}\""
+        )
+        readmeEnFile.text = readmeEnContent
 
         def releaseFile = file('release.md')
         def releaseContent = releaseFile.text
         releaseContent = releaseContent.replaceAll(/^# .+/, "# ${version}")
         releaseFile.text = releaseContent
 
-        logger.warn("Notice: current version is: ${version}")
+        logger.error("Notice: current version is: ${version}")
     }
 }

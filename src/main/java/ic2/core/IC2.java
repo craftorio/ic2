@@ -1,7 +1,5 @@
 package ic2.core;
 
-import ic2.core.network.NetworkManager;
-import ic2.core.network.NetworkManagerClient;
 import ic2.core.proxy.EnvProxy;
 import ic2.core.proxy.SideProxy;
 import ic2.core.proxy.SideProxyClient;
@@ -37,9 +35,6 @@ public class IC2
 	public static final CreativeModeTab tabIc2Combat;
 	public static final CreativeModeTab tabIc2Farming;
 	public static final CreativeModeTab tabIc2Materials;
-	public static final int setBlockNotify = 1;
-	public static final int setBlockUpdate = 2;
-	public static final int setBlockNoUpdateFromClient = 4;
 	public static final PriorityExecutor threadPool;
 	public static final RandomSource random;
 	public static boolean initialized;

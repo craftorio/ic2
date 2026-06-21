@@ -844,7 +844,7 @@
 	"ic2.meter.mode.Voltage": "Voltage",
 	"ic2.meter.mode.reset": "Reset",
 	"ic2.meter.mode.switch": "Switch to:",
-	"ic2.reactoritem.durability": "Durability:",
+	"ic2.reactoritem.durability": "Durability: %s/%s",
 	"item.ic2.mining_laser.tooltip.mode": "Mode: %1$s",
 	"item.ic2.mining_laser.tooltip.mode.3x3": "3x3",
 	"item.ic2.mining_laser.tooltip.mode.boxable": "Only boxable in disabled state",

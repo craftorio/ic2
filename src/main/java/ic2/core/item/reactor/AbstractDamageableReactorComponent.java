@@ -67,13 +67,10 @@ public abstract class AbstractDamageableReactorComponent extends Item implements
 		return 0.0F;
 	}
 
-	public void appendHoverText(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag advanced)
+	public void appendHoverText(@NotNull ItemStack stack, Level world, @NotNull List<Component> tooltip, @NotNull TooltipFlag advanced)
 	{
 		super.appendHoverText(stack, world, tooltip, advanced);
-		tooltip.add(
-			Component.literal(Component.translatable("ic2.reactoritem.durability") + " " + (this.getMaxUse() - this.getUse(stack)) + "/" + this.getMaxUse())
-				.withStyle(ChatFormatting.GRAY)
-		);
+		tooltip.add(Component.translatable("ic2.reactoritem.durability", this.getMaxUse() - this.getUse(stack), this.getMaxUse()).withStyle(ChatFormatting.GRAY));
 	}
 
 	@Override

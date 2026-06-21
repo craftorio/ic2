@@ -22,14 +22,14 @@ public class GuiTransformer extends Ic2Gui<ContainerTransformer>
 		super(container, playerInventory, title, 219);
 		this.addElement(TextLabel.create(this, 8, 28, TextProvider.ofTranslated("ic2.Transformer.gui.Output"), 4210752, true));
 		this.addElement(TextLabel.create(this, 8, 44, TextProvider.ofTranslated("ic2.Transformer.gui.Input"), 4210752, true));
-		this.addElement(TextLabel.create(this, 52, 28, TextProvider.of(() -> this.menu.base.getoutputflow() + " " + Component.translatable("ic2.generic.text.EUt")), 2157374, true));
-		this.addElement(TextLabel.create(this, 52, 44, TextProvider.of(() -> this.menu.base.getinputflow() + " " + Component.translatable("ic2.generic.text.EUt")), 2157374, true));
+		this.addElement(TextLabel.create(this, 52, 28, TextProvider.of(() -> this.menu.base.getOutputFlow() + " " + Component.translatable("ic2.generic.text.EUt").getString()), 2157374, true));
+		this.addElement(TextLabel.create(this, 52, 44, TextProvider.of(() -> this.menu.base.getInputFlow() + " " + Component.translatable("ic2.generic.text.EUt").getString()), 2157374, true));
 		this.addElement(new VanillaButton(this, 7, 65, 144, 20, this.createEventSender(0)).withText(Component.translatable("ic2.Transformer.gui.switch.mode1").getString()));
 		this.addElement(new VanillaButton(this, 7, 85, 144, 20, this.createEventSender(1)).withText(Component.translatable("ic2.Transformer.gui.switch.mode2").getString()));
 		this.addElement(new VanillaButton(this, 7, 105, 144, 20, this.createEventSender(2)).withText(Component.translatable("ic2.Transformer.gui.switch.mode3").getString()));
 		this.addElement(new ItemImage(this, 152, 67, () -> new ItemStack(Ic2Items.WRENCH)).withEnableHandler(() -> this.menu.base.getMode() == TileEntityTransformer.Mode.redstone));
-		this.addElement(new ItemImage(this, 152, 87, () -> new ItemStack(Ic2Items.WRENCH)).withEnableHandler(() -> this.menu.base.getMode() == TileEntityTransformer.Mode.stepdown));
-		this.addElement(new ItemImage(this, 152, 107, () -> new ItemStack(Ic2Items.WRENCH)).withEnableHandler(() -> this.menu.base.getMode() == TileEntityTransformer.Mode.stepup));
+		this.addElement(new ItemImage(this, 152, 87, () -> new ItemStack(Ic2Items.WRENCH)).withEnableHandler(() -> this.menu.base.getMode() == TileEntityTransformer.Mode.stepDown));
+		this.addElement(new ItemImage(this, 152, 107, () -> new ItemStack(Ic2Items.WRENCH)).withEnableHandler(() -> this.menu.base.getMode() == TileEntityTransformer.Mode.stepUp));
 	}
 
 	@Override

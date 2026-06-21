@@ -102,8 +102,8 @@ public abstract class TileEntityTransformer extends TileEntityInventory implemen
 		TileEntityTransformer.Mode newMode = switch (this.configuredMode)
 		{
 			case redstone ->
-				this.getLevel().hasNeighborSignal(this.worldPosition) ? TileEntityTransformer.Mode.stepup : TileEntityTransformer.Mode.stepdown;
-			case stepdown, stepup -> this.configuredMode;
+				this.getLevel().hasNeighborSignal(this.worldPosition) ? TileEntityTransformer.Mode.stepUp : TileEntityTransformer.Mode.stepDown;
+			case stepDown, stepUp -> this.configuredMode;
 		};
 
 		this.energy.setEnabled(true);
@@ -159,24 +159,24 @@ public abstract class TileEntityTransformer extends TileEntityInventory implemen
 		return new ContainerTransformer(syncId, inventory, this);
 	}
 
-	public double getinputflow()
+	public double getInputFlow()
 	{
 		return !this.isStepUp() ? this.inputFlow : this.outputFlow;
 	}
 
-	public double getoutputflow()
+	public double getOutputFlow()
 	{
 		return this.isStepUp() ? this.inputFlow : this.outputFlow;
 	}
 
 	private boolean isStepUp()
 	{
-		return this.transformMode == TileEntityTransformer.Mode.stepup;
+		return this.transformMode == TileEntityTransformer.Mode.stepUp;
 	}
 
 	public enum Mode
 	{
-		redstone, stepdown, stepup;
+		redstone, stepDown, stepUp;
 
 		static final TileEntityTransformer.Mode[] VALUES = values();
 	}

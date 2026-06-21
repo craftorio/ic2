@@ -4,10 +4,10 @@ import ic2.core.IHitSoundOverride;
 import ic2.core.proxy.SideProxyClient;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -47,7 +47,7 @@ public class SoundManagerClient extends SoundManager
 
 	private Sound registerSound(Object obj, SoundClient soundClient)
 	{
-		this.objectToSoundMap.computeIfAbsent(new SoundManagerClient.WeakObject(obj), k -> new ArrayList<>()).add(soundClient);
+		this.objectToSoundMap.computeIfAbsent(new SoundManagerClient.WeakObject(obj), k -> new CopyOnWriteArrayList<>()).add(soundClient);
 		return soundClient;
 	}
 
@@ -84,12 +84,13 @@ public class SoundManagerClient extends SoundManager
 	{
 		super.stopAll(obj);
 		SoundManagerClient.WeakObject weakObject = new SoundManagerClient.WeakObject(obj);
-		if (!this.objectToSoundMap.containsKey(weakObject))
+		List<SoundClient> list = this.objectToSoundMap.get(weakObject);
+		if (list == null)
 		{
 			return null;
 		}
 
-		this.objectToSoundMap.get(weakObject).forEach(SoundClient::stop);
+		list.forEach(SoundClient::stop);
 		return weakObject;
 	}
 
@@ -110,10 +111,11 @@ public class SoundManagerClient extends SoundManager
 		super.removeSound(obj, sound);
 		sound.stop();
 		SoundManagerClient.WeakObject weakObject = new SoundManagerClient.WeakObject(obj);
-		if (this.objectToSoundMap.containsKey(weakObject))
+		this.objectToSoundMap.computeIfPresent(weakObject, (k, list) ->
 		{
-			this.objectToSoundMap.get(weakObject).remove((SoundClient) sound);
-		}
+			list.remove((SoundClient) sound);
+			return list;
+		});
 	}
 
 	@Override
@@ -186,22 +188,30 @@ public class SoundManagerClient extends SoundManager
 
 	public static class WeakObject extends WeakReference<Object>
 	{
+		private final int cachedHashCode;
+
 		public WeakObject(Object referent)
 		{
 			super(referent);
+			this.cachedHashCode = referent.hashCode();
 		}
 
 		@Override
 		public boolean equals(Object object)
 		{
-			return object instanceof SoundManagerClient.WeakObject ? ((SoundManagerClient.WeakObject) object).get() == this.get() : this.get() == object;
+			if (object instanceof SoundManagerClient.WeakObject)
+			{
+				Object thisRef = this.get();
+				return thisRef != null && thisRef == ((SoundManagerClient.WeakObject) object).get();
+			}
+
+			return false;
 		}
 
 		@Override
 		public int hashCode()
 		{
-			Object object = this.get();
-			return object == null ? 0 : object.hashCode();
+			return this.cachedHashCode;
 		}
 	}
 }

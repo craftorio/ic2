@@ -1,7 +1,7 @@
 package ic2.core.sound;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SoundInstance;
@@ -15,7 +15,7 @@ public class SoundClient extends Sound
 	private RepeatablePositionedSoundInstance repeatInstance = null;
 	private PositionedSoundInstance onceInstance = null;
 	private EntityTrackingSoundInstance entityTrackingInstance = null;
-	private final List<SoundInstance> startedSoundList = new ArrayList<>();
+	private final List<SoundInstance> startedSoundList = new CopyOnWriteArrayList<>();
 	private boolean isStarted = false;
 	public net.minecraft.client.sounds.SoundManager vanillaManager = Minecraft.getInstance().getSoundManager();
 

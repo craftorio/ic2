@@ -33,12 +33,27 @@ We know why you're here, so we kept changes to an absolute minimum. Here is ever
 - **Adjusted ore generation parameters for tin, lead, and uranium** (relative to `2.9.40-ex119`). Vanilla IC2 biases tin toward mountain biomes, but players demand tin far more than lead and tend to dig deep rather than climb high. We redistributed tin's vertical spread while keeping its total abundance slightly above lead's, resulting in a more sensible gameplay pace.
 - **Adjusted the wireless charging behavior of the charge pad**. The original charge pad could only charge items on the player that were at or below the pad's voltage tier, and couldn't charge items above the pad's voltage tier at all. We changed it so that the station can charge any item on the player, but the charging speed is still limited by the station's voltage tier.
 
-
 ## Copyright Statement
 
 [Quote from the original IC2 Dev Team's statement](https://forum.industrial-craft.net/thread/9843-mc-1-7-ic%C2%B2-v-2-1-x-2-2-x-experimental/?postID=131008#post131008)
 
 The repository is licensed as All Rights Reserved / No License. The copyright of this project belongs to the original IC2 Dev Team. We do not own the copyright of IC2's code and resource files, nor do we claim to own the copyright of IC2's code and resource files. We are simply decompiling, fixing, porting, and maintaining IC2.
+
+### Mod File
+
+The decompiled code (this repository) is still a derivative work of the original. The repository holder (me) holds the copyright to the original code I added, but cannot unilaterally decide the licensing of the entire project.
+
+Whether commercial servers are allowed to use this mod is not something I can decide on my own, because the original author still holds the copyright to the underlying code.
+
+I cannot legally claim that **any commercial server can freely use this mod**, because that involves copyright that I do not have the authority to dispose of.
+
+Although I could write *commercial use allowed*, if the original author does not allow it, then that authorization would not actually apply to the parts of the code that the original author holds the copyright to.
+
+From a copyright perspective, the original author could theoretically request the repository to be taken down, stop distribution, or even oppose any form of public dissemination, whether commercial or not.
+
+### Modpack
+
+Based on the above, you need to include the mod's source, provide an English description and descriptions in other languages, and include the original Dev Team's specified link: `https://industrial-craft.net/` or `https://forum.industrial-craft.net/` .
 
 ## Quick Start
 

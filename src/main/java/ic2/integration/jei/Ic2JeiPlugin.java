@@ -3,10 +3,15 @@ package ic2.integration.jei;
 import ic2.api.recipe.IRecipeInput;
 import ic2.api.util.FluidContainerOutputMode;
 import ic2.core.IC2;
+import ic2.core.block.machine.container.ContainerBatchCrafter;
+import ic2.core.block.machine.container.ContainerIndustrialWorkbench;
+import ic2.core.block.machine.container.ContainerMetalFormer;
 import ic2.core.fluid.Ic2FluidStack;
+import ic2.core.gui.dynamic.DynamicContainer;
 import ic2.core.recipe.v2.RecipeHolder;
 import ic2.core.ref.Ic2Blocks;
 import ic2.core.ref.Ic2RecipeTypes;
+import ic2.core.ref.Ic2ScreenHandlers;
 import ic2.core.util.LiquidUtil;
 import ic2.core.util.StackUtil;
 import ic2.integration.jei.recipe.machine.CannerBottleCategory;
@@ -26,6 +31,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 
 import mezz.jei.api.IModPlugin;
@@ -33,13 +39,19 @@ import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.RecipeTypes;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.RecipeType;
+import mezz.jei.api.recipe.transfer.IRecipeTransferInfo;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
+import mezz.jei.api.registration.IRecipeTransferRegistration;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
@@ -100,6 +112,25 @@ public class Ic2JeiPlugin implements IModPlugin
 		registration.addRecipeCatalyst(new ItemStack(Ic2Blocks.CANNER), this.CANNER_BOTTLE, this.CANNER_ENRICH, this.CANNER_BOTTLE_LIQUID, this.CANNER_EMPTY_LIQUID);
 		registration.addRecipeCatalyst(new ItemStack(Ic2Blocks.INDUSTRIAL_WORKBENCH), RecipeTypes.CRAFTING);
 		registration.addRecipeCatalyst(new ItemStack(Ic2Blocks.BATCH_CRAFTER), RecipeTypes.CRAFTING);
+	}
+
+	@SuppressWarnings({"rawtypes", "unchecked"})
+	public void registerRecipeTransferHandlers(IRecipeTransferRegistration registration)
+	{
+		registration.addRecipeTransferHandler(new CraftingTransferInfo<>(ContainerIndustrialWorkbench.class, Ic2ScreenHandlers.INDUSTRIAL_WORKBENCH, 36, 37, 45));
+		registration.addRecipeTransferHandler(new CraftingTransferInfo<>(ContainerBatchCrafter.class, Ic2ScreenHandlers.BATCH_CRAFTER, 46, 37, 45));
+
+		registration.addRecipeTransferHandler(new IOTransferInfo(ContainerMetalFormer.class, Ic2ScreenHandlers.METAL_FORMER, this.METAL_FORMER_EXTRUDING, 37, List.of(38), 0, 36));
+		registration.addRecipeTransferHandler(new IOTransferInfo(ContainerMetalFormer.class, Ic2ScreenHandlers.METAL_FORMER, this.METAL_FORMER_ROLLING, 37, List.of(38), 0, 36));
+		registration.addRecipeTransferHandler(new IOTransferInfo(ContainerMetalFormer.class, Ic2ScreenHandlers.METAL_FORMER, this.METAL_FORMER_CUTTING, 37, List.of(38), 0, 36));
+
+		registration.addRecipeTransferHandler(new IOTransferInfo(DynamicContainer.class, Ic2ScreenHandlers.DYNAMIC_BE, this.MACERATOR, 0, List.of(1), 7, 36));
+		registration.addRecipeTransferHandler(new IOTransferInfo(DynamicContainer.class, Ic2ScreenHandlers.DYNAMIC_BE, this.COMPRESSOR, 0, List.of(1), 7, 36));
+		registration.addRecipeTransferHandler(new IOTransferInfo(DynamicContainer.class, Ic2ScreenHandlers.DYNAMIC_BE, this.EXTRACTOR, 0, List.of(1), 7, 36));
+		registration.addRecipeTransferHandler(new IOTransferInfo(DynamicContainer.class, Ic2ScreenHandlers.DYNAMIC_BE, this.CENTRIFUGE, 0, List.of(2, 3, 4), 9, 36));
+		registration.addRecipeTransferHandler(new IOTransferInfo(DynamicContainer.class, Ic2ScreenHandlers.DYNAMIC_BE, this.BLOCK_CUTTER, 0, List.of(1), 8, 36));
+		registration.addRecipeTransferHandler(new IOTransferInfo(DynamicContainer.class, Ic2ScreenHandlers.DYNAMIC_BE, this.BLAST_FURNACE, 0, List.of(1, 2), 7, 36));
+		registration.addRecipeTransferHandler(new IOTransferInfo(DynamicContainer.class, Ic2ScreenHandlers.DYNAMIC_BE, this.ORE_WASHER, 0, List.of(1, 2, 3), 11, 36));
 	}
 
 	public void registerRecipes(@NotNull IRecipeRegistration registration)
@@ -181,6 +212,141 @@ public class Ic2JeiPlugin implements IModPlugin
 					bottleLiquidDedup.put(dedupKey, wrapper);
 				}
 			}
+		}
+	}
+
+	private static class CraftingTransferInfo<C extends AbstractContainerMenu> implements IRecipeTransferInfo<C, CraftingRecipe>
+	{
+		private final Class<C> containerClass;
+		private final MenuType<C> menuType;
+		private final int outputSlot;
+		private final int inputStart;
+		private final int inputEnd;
+
+		CraftingTransferInfo(Class<C> containerClass, MenuType<C> menuType, int outputSlot, int inputStart, int inputEnd)
+		{
+			this.containerClass = containerClass;
+			this.menuType = menuType;
+			this.outputSlot = outputSlot;
+			this.inputStart = inputStart;
+			this.inputEnd = inputEnd;
+		}
+
+		@Override
+		public Class<? extends C> getContainerClass()
+		{
+			return this.containerClass;
+		}
+
+		@Override
+		public Optional<MenuType<C>> getMenuType()
+		{
+			return Optional.of(this.menuType);
+		}
+
+		@Override
+		public RecipeType<CraftingRecipe> getRecipeType()
+		{
+			return RecipeTypes.CRAFTING;
+		}
+
+		@Override
+		public boolean canHandle(C container, CraftingRecipe recipe)
+		{
+			return true;
+		}
+
+		@Override
+		public List<Slot> getRecipeSlots(C container, CraftingRecipe recipe)
+		{
+			List<Slot> slots = new ArrayList<>(10);
+			slots.add(container.getSlot(this.outputSlot));
+			for (int i = this.inputStart; i <= this.inputEnd; i++)
+			{
+				slots.add(container.getSlot(i));
+			}
+			return slots;
+		}
+
+		@Override
+		public List<Slot> getInventorySlots(C container, CraftingRecipe recipe)
+		{
+			List<Slot> slots = new ArrayList<>(36);
+			for (int i = 0; i < 36; i++)
+			{
+				slots.add(container.getSlot(i));
+			}
+			return slots;
+		}
+	}
+
+	private static class IOTransferInfo implements IRecipeTransferInfo<AbstractContainerMenu, IORecipeWrapper>
+	{
+		private final Class<? extends AbstractContainerMenu> containerClass;
+		private final MenuType<?> menuType;
+		private final RecipeType<IORecipeWrapper> recipeType;
+		private final int inputSlot;
+		private final List<Integer> outputSlots;
+		private final int inventoryStart;
+		private final int inventoryCount;
+
+		IOTransferInfo(Class<? extends AbstractContainerMenu> containerClass, MenuType<?> menuType, RecipeType<IORecipeWrapper> recipeType, int inputSlot, List<Integer> outputSlots, int inventoryStart, int inventoryCount)
+		{
+			this.containerClass = containerClass;
+			this.menuType = menuType;
+			this.recipeType = recipeType;
+			this.inputSlot = inputSlot;
+			this.outputSlots = outputSlots;
+			this.inventoryStart = inventoryStart;
+			this.inventoryCount = inventoryCount;
+		}
+
+		@Override
+		public Class<? extends AbstractContainerMenu> getContainerClass()
+		{
+			return this.containerClass;
+		}
+
+		@Override
+		@SuppressWarnings("unchecked")
+		public Optional<MenuType<AbstractContainerMenu>> getMenuType()
+		{
+			return Optional.of((MenuType<AbstractContainerMenu>) this.menuType);
+		}
+
+		@Override
+		public RecipeType<IORecipeWrapper> getRecipeType()
+		{
+			return this.recipeType;
+		}
+
+		@Override
+		public boolean canHandle(AbstractContainerMenu container, IORecipeWrapper recipe)
+		{
+			return true;
+		}
+
+		@Override
+		public List<Slot> getRecipeSlots(AbstractContainerMenu container, IORecipeWrapper recipe)
+		{
+			List<Slot> slots = new ArrayList<>(1 + this.outputSlots.size());
+			slots.add(container.getSlot(this.inputSlot));
+			for (int idx : this.outputSlots)
+			{
+				slots.add(container.getSlot(idx));
+			}
+			return slots;
+		}
+
+		@Override
+		public List<Slot> getInventorySlots(AbstractContainerMenu container, IORecipeWrapper recipe)
+		{
+			List<Slot> slots = new ArrayList<>(this.inventoryCount);
+			for (int i = this.inventoryStart; i < this.inventoryStart + this.inventoryCount; i++)
+			{
+				slots.add(container.getSlot(i));
+			}
+			return slots;
 		}
 	}
 }

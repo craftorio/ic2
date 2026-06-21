@@ -144,7 +144,7 @@ public class GuiIndustrialWorkbench extends Ic2Gui<ContainerIndustrialWorkbench>
 					assert base.hasLevel();
 					BlockEntity neighbour = base.getLevel().getBlockEntity(base.getBlockPos().relative(side));
 					assert neighbour instanceof IHasGui;
-					return IHasGui.getBeName(neighbour).getString() + "\n" + ChatFormatting.DARK_GRAY + Component.translatable(this.getSideName());
+					return IHasGui.getBeName(neighbour).getString() + "\n" + ChatFormatting.DARK_GRAY + Component.translatable(this.getSideName()).getString();
 				}
 			}));
 		}

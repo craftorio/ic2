@@ -11,6 +11,8 @@ import net.minecraft.world.inventory.DataSlot;
 
 public class ContainerMeter extends ContainerHandHeldInventory<HandHeldMeter>
 {
+	private static final int SCALE = 1000;
+
 	private IEnergyTile uut;
 	private DataSlot resultAvg = DataSlot.standalone();
 	private DataSlot resultMin = DataSlot.standalone();
@@ -47,24 +49,25 @@ public class ContainerMeter extends ContainerHandHeldInventory<HandHeldMeter>
 					case EnergyGain -> stats.getEnergyIn() - stats.getEnergyOut();
 					case Voltage -> stats.getVoltage();
 				};
+				int scaled = (int) Math.round(result * SCALE);
 				if (this.resultCount.get() == 0)
 				{
-					this.resultAvg.set((int) result);
-					this.resultMin.set((int) result);
-					this.resultMax.set((int) result);
+					this.resultAvg.set(scaled);
+					this.resultMin.set(scaled);
+					this.resultMax.set(scaled);
 				} else
 				{
-					if (result < this.resultMin.get())
+					if (scaled < this.resultMin.get())
 					{
-						this.resultMin.set((int) result);
+						this.resultMin.set(scaled);
 					}
 
-					if (result > this.resultMax.get())
+					if (scaled > this.resultMax.get())
 					{
-						this.resultMax.set((int) result);
+						this.resultMax.set(scaled);
 					}
 
-					this.resultAvg.set((int) ((this.resultAvg.get() * this.resultCount.get() + result) / (this.resultCount.get() + 1)));
+					this.resultAvg.set((int) (((long) this.resultAvg.get() * this.resultCount.get() + scaled) / (this.resultCount.get() + 1)));
 				}
 
 				this.resultCount.set(this.resultCount.get() + 1);
@@ -74,17 +77,17 @@ public class ContainerMeter extends ContainerHandHeldInventory<HandHeldMeter>
 
 	public double getResultAvg()
 	{
-		return this.resultAvg.get();
+		return this.resultAvg.get() / (double) SCALE;
 	}
 
 	public double getResultMin()
 	{
-		return this.resultMin.get();
+		return this.resultMin.get() / (double) SCALE;
 	}
 
 	public double getResultMax()
 	{
-		return this.resultMax.get();
+		return this.resultMax.get() / (double) SCALE;
 	}
 
 	public int getResultCount()

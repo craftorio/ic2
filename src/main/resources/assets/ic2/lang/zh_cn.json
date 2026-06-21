@@ -1146,5 +1146,9 @@
 	"item.ic2.tin_cable.tooltip": "流失量：%s EU/t",
 	"item.ic2.insulated_tin_cable.tooltip": "流失量：%s EU/t",
 	"item.ic2.detector_cable.tooltip": "流失量：%s EU/t",
-	"item.ic2.splitter_cable.tooltip": "流失量：%s EU/t"
+	"item.ic2.splitter_cable.tooltip": "流失量：%s EU/t",
+	"ic2.jei.transfer.error.fluid_mismatch": "输入罐内流体不匹配，需要：%s",
+	"ic2.jei.transfer.error.missing_additive": "背包中缺少添加剂物品",
+	"ic2.jei.transfer.error.missing_container": "背包中缺少空容器",
+	"ic2.jei.transfer.error.missing_filled_container": "背包中缺少已填充的容器"
 }

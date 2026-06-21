@@ -144,7 +144,7 @@ public class EnergyCalculatorUnified implements IEnergyCalculator
 			}
 		}
 
-		return new NodeStats(in, out, EnergyNet.instance.getTierFromPower(max));
+		return new NodeStats(in, out, max);
 	}
 
 	private static Collection<EnergyPath> getPaths(Node node, GridData data)

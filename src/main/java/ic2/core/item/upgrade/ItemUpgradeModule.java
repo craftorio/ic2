@@ -323,7 +323,10 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 			{
 				for (EnvItemHandler.AdjacentInventory inv : getTargetInventories(stack, te))
 				{
-					StackUtil.ENV.transfer(StackUtil.ENV.wrapInventory(te, inv.getSide()), inv, (int) pow);
+					if (StackUtil.ENV.transfer(StackUtil.ENV.wrapInventory(te, inv.getSide()), inv, (int) pow) > 0)
+					{
+						ret = true;
+					}
 				}
 				break;
 			}
@@ -331,7 +334,10 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 			{
 				for (EnvItemHandler.AdjacentInventory inv : getTargetInventories(stack, te))
 				{
-					StackUtil.ENV.transfer(StackUtil.ENV.wrapInventory(te, inv.getSide()), inv, (int) pow, stackChecker(stack));
+					if (StackUtil.ENV.transfer(StackUtil.ENV.wrapInventory(te, inv.getSide()), inv, (int) pow, stackChecker(stack)) > 0)
+					{
+						ret = true;
+					}
 				}
 				break;
 			}
@@ -355,7 +361,10 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 			{
 				for (EnvItemHandler.AdjacentInventory inv : getTargetInventories(stack, te))
 				{
-					StackUtil.ENV.transfer(inv, StackUtil.ENV.wrapInventory(te, inv.getSide()), (int) pow);
+					if (StackUtil.ENV.transfer(inv, StackUtil.ENV.wrapInventory(te, inv.getSide()), (int) pow) > 0)
+					{
+						ret = true;
+					}
 				}
 				break;
 			}
@@ -363,7 +372,10 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 			{
 				for (EnvItemHandler.AdjacentInventory inv : getTargetInventories(stack, te))
 				{
-					StackUtil.ENV.transfer(inv, StackUtil.ENV.wrapInventory(te, inv.getSide()), (int) pow, stackChecker(stack));
+					if (StackUtil.ENV.transfer(inv, StackUtil.ENV.wrapInventory(te, inv.getSide()), (int) pow, stackChecker(stack)) > 0)
+					{
+						ret = true;
+					}
 				}
 				break;
 			}
@@ -491,7 +503,16 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 		Direction dir = getDirection(stack);
 		if (dir == null)
 		{
-			return StackUtil.ENV.getAdjacentInventories(parent);
+			List<EnvItemHandler.AdjacentInventory> inventories = new ArrayList<>(6);
+			for (Direction d : Util.ALL_DIRS)
+			{
+				EnvItemHandler.AdjacentInventory inv = StackUtil.ENV.getAdjacentInventory(parent, d);
+				if (inv != null)
+				{
+					inventories.add(inv);
+				}
+			}
+			return inventories;
 		}
 
 		EnvItemHandler.AdjacentInventory inv = StackUtil.ENV.getAdjacentInventory(parent, dir);
@@ -503,7 +524,16 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 		Direction dir = getDirection(stack);
 		if (dir == null)
 		{
-			return LiquidUtil.getAdjacentHandlers(parent);
+			List<LiquidUtil.AdjacentFluidHandler> handlers = new ArrayList<>(6);
+			for (Direction d : Util.ALL_DIRS)
+			{
+				LiquidUtil.AdjacentFluidHandler fh = LiquidUtil.getAdjacentHandler(parent, d);
+				if (fh != null)
+				{
+					handlers.add(fh);
+				}
+			}
+			return handlers;
 		}
 
 		LiquidUtil.AdjacentFluidHandler fh = LiquidUtil.getAdjacentHandler(parent, dir);

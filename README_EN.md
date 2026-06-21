@@ -39,6 +39,8 @@ We know why you're here, so we kept changes to an absolute minimum. Here is ever
 
 The repository is licensed as All Rights Reserved / No License. The copyright of this project belongs to the original IC2 Dev Team. We do not own the copyright of IC2's code and resource files, nor do we claim to own the copyright of IC2's code and resource files. We are simply decompiling, fixing, porting, and maintaining IC2.
 
+Based on this -- which may never receive the original author's authorization -- we will focus on refactoring the code architecture once there are no clear bugs in this branch. As for textures and resource files, it's still unclear -- we want to preserve the original feel while avoiding copyright issues.
+
 ### Mod File
 
 The decompiled code (this repository) is still a derivative work of the original. The repository holder (me) holds the copyright to the original code I added, but cannot unilaterally decide the licensing of the entire project.

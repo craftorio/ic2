@@ -14,6 +14,7 @@ import ic2.core.block.invslot.InvSlotUpgrade;
 import ic2.core.block.machine.container.ContainerAdvMiner;
 import ic2.core.block.tileentity.Ic2TileEntityBlock;
 import ic2.core.fluid.FluidHandler;
+import ic2.core.item.EnvItemHandler;
 import ic2.core.init.MainConfig;
 import ic2.core.init.OreValues;
 import ic2.core.item.tool.ItemScanner;
@@ -24,6 +25,7 @@ import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.ref.Ic2Items;
 import ic2.core.util.ConfigUtil;
 import ic2.core.util.StackUtil;
+import ic2.core.util.Util;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -52,14 +54,9 @@ public class TileEntityAdvMiner extends TileEntityElectricMachine implements IHa
 	public final int workTick;
 	public boolean blacklist = true;
 	public boolean silkTouch = false;
-	public boolean redstonePowered = false;
-	private final int scanEnergy = 64;
-	private final int mineEnergy = 512;
 	private BlockPos mineTarget;
 	private short ticker = 0;
-	public final InvSlotConsumableId scannerSlot = new InvSlotConsumableId(
-		this, "scanner", InvSlot.Access.IO, 1, InvSlot.InvSide.BOTTOM, Ic2Items.SCANNER, Ic2Items.ADVANCED_SCANNER
-	);
+	public final InvSlotConsumableId scannerSlot = new InvSlotConsumableId(this, "scanner", InvSlot.Access.IO, 1, InvSlot.InvSide.BOTTOM, Ic2Items.SCANNER, Ic2Items.ADVANCED_SCANNER);
 	public final InvSlotUpgrade upgradeSlot = new InvSlotUpgrade(this, "upgrade", 4);
 	public final InvSlot filterSlot = new InvSlot(this, "list", null, 15);
 	protected final Redstone redstone;
@@ -221,7 +218,7 @@ public class TileEntityAdvMiner extends TileEntityElectricMachine implements IHa
 				if (!state.isAir() && this.canMine(scanPos, block, state))
 				{
 					this.mineTarget = new BlockPos(scanPos);
-					this.doMine(this.mineTarget, block, state);
+					this.doMine(this.mineTarget, state);
 					break;
 				}
 
@@ -243,12 +240,41 @@ public class TileEntityAdvMiner extends TileEntityElectricMachine implements IHa
 		}
 	}
 
-	public void doMine(BlockPos pos, Block block, BlockState state)
+	public void doMine(BlockPos pos, BlockState state)
 	{
 		Level world = this.getLevel();
-		StackUtil.distributeDrops(this, new ArrayList<>(StackUtil.getDrops(world, pos, state, null, 0, this.silkTouch)));
+		List<ItemStack> drops = StackUtil.getDrops(world, pos, state, null, 0, this.silkTouch);
 		world.removeBlock(pos, false);
 		this.energy.useEnergy(512.0);
+		if (!drops.isEmpty())
+		{
+			List<ItemStack> remainder = new ArrayList<>();
+			for (ItemStack drop : drops)
+			{
+				ItemStack remaining = drop.copy();
+				for (Direction dir : Util.ALL_DIRS)
+				{
+					EnvItemHandler.AdjacentInventory inv = StackUtil.ENV.getAdjacentInventory(this, dir);
+					if (inv != null)
+					{
+						int deposited = StackUtil.ENV.deposit(inv, remaining, false);
+						if (deposited > 0)
+						{
+							remaining.shrink(deposited);
+							if (remaining.isEmpty()) break;
+						}
+					}
+				}
+				if (!remaining.isEmpty())
+				{
+					remainder.add(remaining);
+				}
+			}
+			for (ItemStack stack : remainder)
+			{
+				StackUtil.dropAsEntity(world, pos, stack);
+			}
+		}
 	}
 
 	public boolean canMine(BlockPos pos, Block block, BlockState state)

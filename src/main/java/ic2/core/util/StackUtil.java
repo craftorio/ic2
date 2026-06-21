@@ -850,7 +850,7 @@ public final class StackUtil
 		ItemStack stack = new ItemStack(Items.DIAMOND_PICKAXE);
 		if (silkTouch)
 		{
-			EnchantmentHelper.setEnchantments(Collections.singletonMap(Enchantments.SILK_TOUCH, fortune), stack);
+			EnchantmentHelper.setEnchantments(Collections.singletonMap(Enchantments.SILK_TOUCH, 1), stack);
 		} else if (fortune > 0)
 		{
 			EnchantmentHelper.setEnchantments(Collections.singletonMap(Enchantments.BLOCK_FORTUNE, fortune), stack);

@@ -2,7 +2,7 @@
   "parent": "ic2:ic2/build_generator/build_compressor/build_energy_crystal",
   "display": {
     "icon": {
-      "item": "ic2:mass_fabricator"
+      "item": "ic2:matter_generator"
     },
     "title": {
       "translate": "advancements.ic2.build_matter_gen"

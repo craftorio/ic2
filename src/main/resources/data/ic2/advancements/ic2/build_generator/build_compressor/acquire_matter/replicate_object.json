@@ -2,7 +2,7 @@
   "parent": "ic2:ic2/build_generator/build_compressor/acquire_matter",
   "display": {
     "icon": {
-      "item": "ic2:replicator"
+      "item": "ic2:crystal_memory"
     },
     "title": {
       "translate": "advancements.ic2.replicate_object"

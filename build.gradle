@@ -58,7 +58,7 @@ dependencies {
     compileOnly "mezz.jei:jei-1.20.1-forge-api:${jei_version}"
     runtimeOnly fg.deobf("mezz.jei:jei-1.20.1-forge:${jei_version}")
     
-    implementation fg.deobf("maven.modrinth:ae2:7KVs6HMQ")
+    compileOnly fg.deobf("maven.modrinth:ae2:7KVs6HMQ")
     // compileOnly "org.appliedenergistics:appliedenergistics2:${ae2_version}:api"
 }
 

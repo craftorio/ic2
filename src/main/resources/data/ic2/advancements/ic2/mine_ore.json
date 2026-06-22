@@ -2,7 +2,7 @@
   "parent": "ic2:ic2/root",
   "display": {
     "icon": {
-      "item": "ic2:copper_ore"
+      "item": "ic2:raw_tin"
     },
     "title": {
       "translate": "advancements.ic2.mine_ore"
@@ -124,7 +124,6 @@
         ]
       }
     },
-    
     "ic2:raw_uranium": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {

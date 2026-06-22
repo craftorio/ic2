@@ -28,9 +28,9 @@ import net.minecraft.world.level.block.state.BlockState;
 @NotClassic
 public class TileEntityWeightedItemDistributor extends TileEntityInventory implements IHasGui, IWeightedDistributor
 {
+	public final InvSlot buffer = new InvSlot(this, "buffer", InvSlot.Access.I, 9);
 	@ClientModifiable
 	protected List<Direction> priority = new ArrayList<>(5);
-	public final InvSlot buffer = new InvSlot(this, "buffer", InvSlot.Access.I, 9);
 
 	public TileEntityWeightedItemDistributor(BlockPos pos, BlockState state)
 	{

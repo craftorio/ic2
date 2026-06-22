@@ -8,8 +8,13 @@ public enum NbtSettings
 	FUZZY,
 	EXACT;
 
-	final String name = "ic2.upgrade.advancedGUI." + this.name().toLowerCase(Locale.ENGLISH);
 	public static final NbtSettings[] VALUES = values();
+	final String name = "ic2.upgrade.advancedGUI." + this.name().toLowerCase(Locale.ENGLISH);
+
+	public static NbtSettings getFromNBT(byte type)
+	{
+		return VALUES[type];
+	}
 
 	public boolean enabled()
 	{
@@ -19,10 +24,5 @@ public enum NbtSettings
 	public byte getForNBT()
 	{
 		return (byte) this.ordinal();
-	}
-
-	public static NbtSettings getFromNBT(byte type)
-	{
-		return VALUES[type];
 	}
 }

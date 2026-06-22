@@ -5,11 +5,10 @@ import ic2.core.IHasGui;
 import ic2.core.block.invslot.InvSlotConsumable;
 import ic2.core.block.invslot.InvSlotConsumableId;
 import ic2.core.gui.dynamic.DynamicContainer;
-import ic2.core.init.MainConfig;
+import ic2.core.init.IC2Config;
 import ic2.core.network.GrowingBuffer;
 import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.ref.Ic2Items;
-import ic2.core.util.ConfigUtil;
 import ic2.core.util.StackUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
@@ -21,7 +20,6 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class TileEntityNuke extends TileEntityBridgeNuke implements IHasGui
 {
-	public int RadiationRange;
 	public final InvSlotConsumable outsideSlot;
 	public final InvSlotConsumable insideSlot = new InvSlotConsumableId(
 		this,
@@ -34,6 +32,7 @@ public class TileEntityNuke extends TileEntityBridgeNuke implements IHasGui
 		Ic2Items.PLUTONIUM,
 		Ic2Items.SMALL_PLUTONIUM
 	);
+	public int RadiationRange;
 
 	public TileEntityNuke(BlockPos pos, BlockState state)
 	{
@@ -110,7 +109,7 @@ public class TileEntityNuke extends TileEntityBridgeNuke implements IHasGui
 			}
 		}
 
-		ret = Math.min(ret, ConfigUtil.getFloat(MainConfig.get(), "protection/nukeExplosionPowerLimit"));
+		ret = Math.min(ret, (float) IC2Config.protection.nukeExplosionPowerLimit.get().floatValue());
 		return (float) ret;
 	}
 

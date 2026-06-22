@@ -16,16 +16,16 @@ import java.util.Set;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 public class InvSlot implements Iterable<ItemStack>
 {
 	public final IInventorySlotHolder<?> base;
 	public final String name;
-	private final ItemStack[] contents;
-	protected final InvSlot.Access access;
 	public final InvSlot.InvSide preferredSide;
+	protected final InvSlot.Access access;
+	private final ItemStack[] contents;
 	private int stackSizeLimit;
 
 	public InvSlot(IInventorySlotHolder<?> base, String name, InvSlot.Access access, int count)
@@ -273,9 +273,9 @@ public class InvSlot implements Iterable<ItemStack>
 	}
 
 	@Override
-	public Iterator<ItemStack> iterator()
+	public @NotNull Iterator<ItemStack> iterator()
 	{
-		return new Iterator<ItemStack>()
+		return new Iterator<>()
 		{
 			private int idx = 0;
 
@@ -307,18 +307,18 @@ public class InvSlot implements Iterable<ItemStack>
 	@Override
 	public String toString()
 	{
-		String ret = this.name + "[" + this.contents.length + "]: ";
+		StringBuilder ret = new StringBuilder(this.name + "[" + this.contents.length + "]: ");
 
 		for (int i = 0; i < this.contents.length; i++)
 		{
-			ret = ret + this.contents[i];
+			ret.append(this.contents[i]);
 			if (i < this.contents.length - 1)
 			{
-				ret = ret + ", ";
+				ret.append(", ");
 			}
 		}
 
-		return ret;
+		return ret.toString();
 	}
 
 	protected ItemStack[] backup()
@@ -341,13 +341,10 @@ public class InvSlot implements Iterable<ItemStack>
 			throw new IllegalArgumentException("invalid array size");
 		}
 
-		for (int i = 0; i < this.contents.length; i++)
-		{
-			this.contents[i] = backup[i];
-		}
+		System.arraycopy(backup, 0, this.contents, 0, this.contents.length);
 	}
 
-	public void onPickupFromSlot(Player player, ItemStack stack)
+	public void onPickupFromSlot()
 	{
 	}
 
@@ -377,7 +374,7 @@ public class InvSlot implements Iterable<ItemStack>
 		SIDE(Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST),
 		NOTSIDE();
 
-		private Set<Direction> acceptedSides;
+		private final Set<Direction> acceptedSides;
 
 		InvSide(Direction... sides)
 		{

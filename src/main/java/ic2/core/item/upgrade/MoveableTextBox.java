@@ -6,11 +6,11 @@ import ic2.core.gui.TextBox;
 
 class MoveableTextBox extends TextBox
 {
-	private IEnableHandler moveHandler;
 	protected int normalX;
 	protected int normalY;
 	protected int shiftedX;
 	protected int shiftedY;
+	private IEnableHandler moveHandler;
 
 	public MoveableTextBox(Ic2Gui<?> gui, int normalX, int normalY, int shiftedX, int shiftedY, int width, int height, String text)
 	{

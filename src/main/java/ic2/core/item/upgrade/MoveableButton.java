@@ -7,11 +7,11 @@ import ic2.core.gui.VanillaButton;
 
 class MoveableButton extends VanillaButton
 {
-	private IEnableHandler moveHandler;
 	protected int normalX;
 	protected int normalY;
 	protected int shiftedX;
 	protected int shiftedY;
+	private IEnableHandler moveHandler;
 
 	public MoveableButton(Ic2Gui<?> gui, int normalX, int normalY, int shiftedX, int shiftedY, int width, int height, IClickHandler handler)
 	{

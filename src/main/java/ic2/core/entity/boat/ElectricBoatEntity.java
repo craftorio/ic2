@@ -64,12 +64,13 @@ public class ElectricBoatEntity extends AbstractBoatEntity
 	{
 		return super.canFloatOn(fluidState);
 	}
+
 	@Override
 	protected float getBlockSpeedFactor()
 	{
 		return super.getBlockSpeedFactor() * (hasPower ? 1.5f : 0.25f);
 	}
-	
+
 	@Override
 	public void tick()
 	{
@@ -86,9 +87,9 @@ public class ElectricBoatEntity extends AbstractBoatEntity
 					break;
 				}
 			}
-			
+
 		}
-		
+
 		super.tick();
 
 		if (!this.level().isClientSide && this.level().getFluidState(this.blockPosition()).is(FluidTags.LAVA))

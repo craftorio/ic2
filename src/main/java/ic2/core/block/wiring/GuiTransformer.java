@@ -14,8 +14,8 @@ import net.minecraft.world.item.ItemStack;
 
 public class GuiTransformer extends Ic2Gui<ContainerTransformer>
 {
-	public String[] mode = new String[] { "", "", "", "" };
 	private static final ResourceLocation background = ResourceLocation.fromNamespaceAndPath("ic2", "textures/gui/guitransfomer.png");
+	public String[] mode = new String[] { "", "", "", "" };
 
 	public GuiTransformer(ContainerTransformer container, Inventory playerInventory, Component title)
 	{

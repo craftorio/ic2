@@ -10,10 +10,10 @@ import net.minecraft.world.item.ItemStack;
 
 public class MetalFormerCategory extends DynamicCategory
 {
-	private final int mode;
 	private static final ItemStack[] ICONS = new ItemStack[] {
 		new ItemStack(Ic2Items.COPPER_CABLE), new ItemStack(Ic2Items.FORGE_HAMMER), new ItemStack(Ic2Items.CUTTER)
 	};
+	private final int mode;
 
 	public MetalFormerCategory(RecipeType<IORecipeWrapper> recipeType, int mode, IGuiHelper guiHelper)
 	{

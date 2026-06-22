@@ -14,65 +14,6 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class Irrigation extends TerraformerBase
 {
-	@Override
-	boolean terraform(Level world, BlockPos pos)
-	{
-		if (world.random.nextInt(48000) == 0)
-		{
-			world.getLevelData().setRaining(true);
-			return true;
-		}
-
-		pos = TileEntityTerra.getFirstBlockFrom(world, pos, 10);
-		if (pos == null)
-		{
-			return false;
-		}
-
-		if (TileEntityTerra.switchGround(world, pos, Blocks.SAND, Blocks.DIRT.defaultBlockState(), true))
-		{
-			TileEntityTerra.switchGround(world, pos, Blocks.SAND, Blocks.DIRT.defaultBlockState(), true);
-			return true;
-		}
-
-		BlockState state = world.getBlockState(pos);
-		Block block = state.getBlock();
-		if (block instanceof BonemealableBlock && ((BonemealableBlock) block).isValidBonemealTarget(world, pos, state, false))
-		{
-			((BonemealableBlock) block).performBonemeal((ServerLevel) world, world.random, pos, state);
-			return true;
-		}
-
-		if (block != Blocks.TALL_GRASS)
-		{
-			if (state.is(BlockTags.LOGS))
-			{
-				BlockPos above = pos.above();
-				world.setBlockAndUpdate(above, state);
-				BlockState leaves = getLeaves(world, pos);
-				if (leaves != null)
-				{
-					createLeaves(world, above, leaves);
-				}
-
-				return true;
-			} else if (block == Blocks.FIRE)
-			{
-				world.removeBlock(pos, false);
-				return true;
-			} else
-			{
-				return false;
-			}
-		} else
-		{
-			return spreadGrass(world, pos.north())
-				|| spreadGrass(world, pos.east())
-				|| spreadGrass(world, pos.south())
-				|| spreadGrass(world, pos.west());
-		}
-	}
-
 	private static BlockState getLeaves(Level world, BlockPos pos)
 	{
 		for (Direction facing : Util.HORIZONTAL_DIRS)
@@ -133,6 +74,65 @@ public class Irrigation extends TerraformerBase
 					return false;
 				}
 			}
+		}
+	}
+
+	@Override
+	boolean terraform(Level world, BlockPos pos)
+	{
+		if (world.random.nextInt(48000) == 0)
+		{
+			world.getLevelData().setRaining(true);
+			return true;
+		}
+
+		pos = TileEntityTerra.getFirstBlockFrom(world, pos, 10);
+		if (pos == null)
+		{
+			return false;
+		}
+
+		if (TileEntityTerra.switchGround(world, pos, Blocks.SAND, Blocks.DIRT.defaultBlockState(), true))
+		{
+			TileEntityTerra.switchGround(world, pos, Blocks.SAND, Blocks.DIRT.defaultBlockState(), true);
+			return true;
+		}
+
+		BlockState state = world.getBlockState(pos);
+		Block block = state.getBlock();
+		if (block instanceof BonemealableBlock && ((BonemealableBlock) block).isValidBonemealTarget(world, pos, state, false))
+		{
+			((BonemealableBlock) block).performBonemeal((ServerLevel) world, world.random, pos, state);
+			return true;
+		}
+
+		if (block != Blocks.TALL_GRASS)
+		{
+			if (state.is(BlockTags.LOGS))
+			{
+				BlockPos above = pos.above();
+				world.setBlockAndUpdate(above, state);
+				BlockState leaves = getLeaves(world, pos);
+				if (leaves != null)
+				{
+					createLeaves(world, above, leaves);
+				}
+
+				return true;
+			} else if (block == Blocks.FIRE)
+			{
+				world.removeBlock(pos, false);
+				return true;
+			} else
+			{
+				return false;
+			}
+		} else
+		{
+			return spreadGrass(world, pos.north())
+				|| spreadGrass(world, pos.east())
+				|| spreadGrass(world, pos.south())
+				|| spreadGrass(world, pos.west());
 		}
 	}
 }

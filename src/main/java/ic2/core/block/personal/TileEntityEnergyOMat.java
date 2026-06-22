@@ -48,17 +48,17 @@ public class TileEntityEnergyOMat
 	INetworkClientTileEntityEventListener,
 	IUpgradableBlock
 {
-	public int euOffer = 1000;
-	private GameProfile owner = null;
-	private boolean addedToEnergyNet = false;
-	public int paidFor;
-	public double euBuffer;
-	private int euBufferMax = 10000;
-	private int tier = 1;
 	public final InvSlot demandSlot = new InvSlot(this, "demand", InvSlot.Access.NONE, 1);
 	public final InvSlotConsumableLinked inputSlot = new InvSlotConsumableLinked(this, "input", 1, this.demandSlot);
 	public final InvSlotCharge chargeSlot = new InvSlotCharge(this, 1);
 	public final InvSlotUpgrade upgradeSlot = new InvSlotUpgrade(this, "upgrade", 1);
+	public int euOffer = 1000;
+	public int paidFor;
+	public double euBuffer;
+	private GameProfile owner = null;
+	private boolean addedToEnergyNet = false;
+	private int euBufferMax = 10000;
+	private int tier = 1;
 
 	public TileEntityEnergyOMat(BlockPos pos, BlockState state)
 	{

@@ -58,79 +58,6 @@ public class HandHeldValueConfig extends HandHeldUpgradeOption
 		return new HandHeldValueConfig.ContainerValueConfig(syncId);
 	}
 
-	public class ContainerValueConfig extends ContainerHandHeldInventory<HandHeldValueConfig>
-	{
-		@ClientModifiable
-		protected ComparisonType comparisonType = HandHeldValueConfig.this.initialComparisonType;
-		@ClientModifiable
-		protected String normalBox = HandHeldValueConfig.this.initialNormalBox;
-		@ClientModifiable
-		protected String extraBox = HandHeldValueConfig.this.initialExtraBox;
-		@ClientModifiable
-		protected ComparisonSettings normalSetting = HandHeldValueConfig.this.initialNormalSetting;
-		@ClientModifiable
-		protected ComparisonSettings extraSetting = HandHeldValueConfig.this.initialExtraSetting;
-
-		public ContainerValueConfig(int syncId)
-		{
-			super(Ic2ScreenHandlers.ADVANCED_UPGRADE_VALUE_CONFIG, syncId, HandHeldValueConfig.this);
-			this.addPlayerInventorySlots(this.player.getInventory(), 166);
-
-			for (byte slot = 0; slot < 9; slot++)
-			{
-				this.addSlot(new SlotHologramSlot(HandHeldValueConfig.this.inventory, slot, 8 + 18 * slot, 8, 1, HandHeldValueConfig.this.makeSaveCallback()));
-			}
-		}
-
-		@Override
-		public void removed(Player player)
-		{
-			CompoundTag nbt = HandHeldValueConfig.this.getNBT();
-			nbt.putBoolean("active", this.comparisonType.enabled());
-			ComparisonType saveType = this.comparisonType;
-			switch (this.comparisonType)
-			{
-				case COMPARISON:
-					if (this.normalBox.isEmpty())
-					{
-						saveType = ComparisonType.DIRECT;
-					} else
-					{
-						nbt.putString("normal", this.normalBox);
-						nbt.putByte("normalComp", this.normalSetting.getForNBT());
-					}
-				case RANGE:
-					if (this.normalBox.isEmpty())
-					{
-						if (this.extraBox.isEmpty())
-						{
-							saveType = ComparisonType.DIRECT;
-						} else
-						{
-							saveType = ComparisonType.COMPARISON;
-							nbt.putString("normal", this.extraBox);
-							nbt.putByte("normalComp", this.extraSetting.getForNBT());
-						}
-					} else
-					{
-						nbt.putString("normal", this.normalBox);
-						nbt.putByte("normalComp", this.normalSetting.getForNBT());
-						if (this.extraBox.isEmpty())
-						{
-							saveType = ComparisonType.COMPARISON;
-						} else
-						{
-							nbt.putString("extra", this.extraBox);
-							nbt.putByte("extraComp", this.extraSetting.getForNBT());
-						}
-					}
-				default:
-					nbt.putByte("type", saveType.getForNBT());
-					super.removed(player);
-			}
-		}
-	}
-
 	@OnlyIn(Dist.CLIENT)
 	public static class GuiValueConfig extends GuiDefaultBackground<HandHeldValueConfig.ContainerValueConfig>
 	{
@@ -252,6 +179,79 @@ public class HandHeldValueConfig extends HandHeldUpgradeOption
 			this.addElement(new SlotGrid(this, 7, 7, 9, 1, SlotGrid.SlotStyle.Normal));
 			this.addElement(new SlotGrid(this, 7, 83, 9, 3, SlotGrid.SlotStyle.Normal));
 			this.addElement(new SlotGrid(this, 7, 141, 9, 1, SlotGrid.SlotStyle.Normal));
+		}
+	}
+
+	public class ContainerValueConfig extends ContainerHandHeldInventory<HandHeldValueConfig>
+	{
+		@ClientModifiable
+		protected ComparisonType comparisonType = HandHeldValueConfig.this.initialComparisonType;
+		@ClientModifiable
+		protected String normalBox = HandHeldValueConfig.this.initialNormalBox;
+		@ClientModifiable
+		protected String extraBox = HandHeldValueConfig.this.initialExtraBox;
+		@ClientModifiable
+		protected ComparisonSettings normalSetting = HandHeldValueConfig.this.initialNormalSetting;
+		@ClientModifiable
+		protected ComparisonSettings extraSetting = HandHeldValueConfig.this.initialExtraSetting;
+
+		public ContainerValueConfig(int syncId)
+		{
+			super(Ic2ScreenHandlers.ADVANCED_UPGRADE_VALUE_CONFIG, syncId, HandHeldValueConfig.this);
+			this.addPlayerInventorySlots(this.player.getInventory(), 166);
+
+			for (byte slot = 0; slot < 9; slot++)
+			{
+				this.addSlot(new SlotHologramSlot(HandHeldValueConfig.this.inventory, slot, 8 + 18 * slot, 8, 1, HandHeldValueConfig.this.makeSaveCallback()));
+			}
+		}
+
+		@Override
+		public void removed(Player player)
+		{
+			CompoundTag nbt = HandHeldValueConfig.this.getNBT();
+			nbt.putBoolean("active", this.comparisonType.enabled());
+			ComparisonType saveType = this.comparisonType;
+			switch (this.comparisonType)
+			{
+				case COMPARISON:
+					if (this.normalBox.isEmpty())
+					{
+						saveType = ComparisonType.DIRECT;
+					} else
+					{
+						nbt.putString("normal", this.normalBox);
+						nbt.putByte("normalComp", this.normalSetting.getForNBT());
+					}
+				case RANGE:
+					if (this.normalBox.isEmpty())
+					{
+						if (this.extraBox.isEmpty())
+						{
+							saveType = ComparisonType.DIRECT;
+						} else
+						{
+							saveType = ComparisonType.COMPARISON;
+							nbt.putString("normal", this.extraBox);
+							nbt.putByte("normalComp", this.extraSetting.getForNBT());
+						}
+					} else
+					{
+						nbt.putString("normal", this.normalBox);
+						nbt.putByte("normalComp", this.normalSetting.getForNBT());
+						if (this.extraBox.isEmpty())
+						{
+							saveType = ComparisonType.COMPARISON;
+						} else
+						{
+							nbt.putString("extra", this.extraBox);
+							nbt.putByte("extraComp", this.extraSetting.getForNBT());
+						}
+					}
+				default:
+					nbt.putByte("type", saveType.getForNBT());
+					super.removed(player);
+			}
 		}
 	}
 }

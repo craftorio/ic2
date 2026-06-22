@@ -1,10 +1,9 @@
 package ic2.core.block.generator.tileentity;
 
 import ic2.api.energy.tile.IKineticSource;
-import ic2.core.init.MainConfig;
+import ic2.core.init.IC2Config;
 import ic2.core.profile.NotClassic;
 import ic2.core.ref.Ic2BlockEntities;
-import ic2.core.util.ConfigUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
@@ -15,7 +14,7 @@ import net.minecraft.world.level.block.state.BlockState;
 @NotClassic
 public class TileEntityKineticGenerator extends TileEntityConversionGenerator
 {
-	private final double euPerKu = 0.25 * ConfigUtil.getFloat(MainConfig.get(), "balance/energy/generator/Kinetic");
+	private final double euPerKu = 0.25 * (float) IC2Config.balance.energy.generator.kinetic.get().floatValue();
 	protected IKineticSource source;
 
 	public TileEntityKineticGenerator(BlockPos pos, BlockState state)

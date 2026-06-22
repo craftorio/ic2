@@ -9,8 +9,13 @@ public enum ComparisonType
 	COMPARISON,
 	RANGE;
 
-	final String name = "ic2.upgrade.advancedGUI." + this.name().toLowerCase(Locale.ENGLISH);
 	public static final ComparisonType[] VALUES = values();
+	final String name = "ic2.upgrade.advancedGUI." + this.name().toLowerCase(Locale.ENGLISH);
+
+	public static ComparisonType getFromNBT(byte type)
+	{
+		return VALUES[type];
+	}
 
 	public boolean enabled()
 	{
@@ -25,10 +30,5 @@ public enum ComparisonType
 	public byte getForNBT()
 	{
 		return (byte) this.ordinal();
-	}
-
-	public static ComparisonType getFromNBT(byte type)
-	{
-		return VALUES[type];
 	}
 }

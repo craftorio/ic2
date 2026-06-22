@@ -55,6 +55,24 @@ public class ItemToolPainter extends ItemToolCrafting implements IBoxable
 		this.color = color;
 	}
 
+	public static boolean canColor(Block block, DyeColor color)
+	{
+		ResourceLocation identifier = ForgeRegistries.BLOCKS.getKey(block);
+		return !identifier.getPath().contains(color.getName());
+	}
+
+	public static BlockState getColorBlockState(DyeColor color, VanillaColorBlockId vanillaColorBlock)
+	{
+		ResourceLocation identifier = ResourceLocation.withDefaultNamespace(color.getName() + "_" + vanillaColorBlock.id);
+		return ForgeRegistries.BLOCKS.getValue(identifier).defaultBlockState();
+	}
+
+	public static BlockState getBlockStateWithProperties(DyeColor color, VanillaColorBlockId vanillaColorBlock, BlockState state)
+	{
+		ResourceLocation identifier = ResourceLocation.withDefaultNamespace(color.getName() + "_" + vanillaColorBlock.id);
+		return ForgeRegistries.BLOCKS.getValue(identifier).withPropertiesOf(state);
+	}
+
 	@Override
 	public void appendHoverText(@NotNull ItemStack stack, Level world, List<Component> tooltip, @NotNull TooltipFlag advanced)
 	{
@@ -230,24 +248,6 @@ public class ItemToolPainter extends ItemToolCrafting implements IBoxable
 		}
 	}
 
-	public static boolean canColor(Block block, DyeColor color)
-	{
-		ResourceLocation identifier = ForgeRegistries.BLOCKS.getKey(block);
-		return !identifier.getPath().contains(color.getName());
-	}
-
-	public static BlockState getColorBlockState(DyeColor color, VanillaColorBlockId vanillaColorBlock)
-	{
-		ResourceLocation identifier = ResourceLocation.withDefaultNamespace(color.getName() + "_" + vanillaColorBlock.id);
-		return ForgeRegistries.BLOCKS.getValue(identifier).defaultBlockState();
-	}
-
-	public static BlockState getBlockStateWithProperties(DyeColor color, VanillaColorBlockId vanillaColorBlock, BlockState state)
-	{
-		ResourceLocation identifier = ResourceLocation.withDefaultNamespace(color.getName() + "_" + vanillaColorBlock.id);
-		return ForgeRegistries.BLOCKS.getValue(identifier).withPropertiesOf(state);
-	}
-	
 	public @NotNull InteractionResult interactLivingEntity(@NotNull ItemStack stack, @NotNull Player user, LivingEntity entity, InteractionHand hand)
 	{
 		if (this.color == null)

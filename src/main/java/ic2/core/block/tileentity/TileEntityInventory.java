@@ -21,13 +21,55 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public abstract class TileEntityInventory extends Ic2TileEntity implements WorldlyContainer, IInventorySlotHolder<TileEntityInventory>
 {
-	private final List<InvSlot> invSlots = new ArrayList<>();
 	protected final ComparatorEmitter comparator = this.addComponent(new ComparatorEmitter(this));
+	private final List<InvSlot> invSlots = new ArrayList<>();
 
 	public TileEntityInventory(BlockEntityType<? extends TileEntityInventory> type, BlockPos pos, BlockState state)
 	{
 		super(type, pos, state);
 		this.comparator.setUpdate(this::calcRedstoneFromInvSlots);
+	}
+
+	private static int getIndex(int loc)
+	{
+		return loc >>> 16;
+	}
+
+	private static int getOffset(int loc)
+	{
+		return loc & 65535;
+	}
+
+	protected static int calcRedstoneFromInvSlots(InvSlot... slots)
+	{
+		return calcRedstoneFromInvSlots(Arrays.asList(slots));
+	}
+
+	protected static int calcRedstoneFromInvSlots(Iterable<InvSlot> invSlots)
+	{
+		int space = 0;
+		int used = 0;
+
+		for (InvSlot slot : invSlots)
+		{
+			if (!(slot instanceof InvSlotUpgrade))
+			{
+				int size = slot.size();
+				int limit = slot.getStackSizeLimit();
+				space += size * limit;
+
+				for (int i = 0; i < size; i++)
+				{
+					ItemStack stack = slot.get(i);
+					if (!StackUtil.isEmpty(stack))
+					{
+						used += Math.min(limit, stack.getCount() * limit / stack.getMaxStackSize());
+					}
+				}
+			}
+		}
+
+		return used != 0 && space != 0 ? 1 + used * 14 / space : 0;
 	}
 
 	@Override
@@ -359,16 +401,6 @@ public abstract class TileEntityInventory extends Ic2TileEntity implements World
 		return -1;
 	}
 
-	private static int getIndex(int loc)
-	{
-		return loc >>> 16;
-	}
-
-	private static int getOffset(int loc)
-	{
-		return loc & 65535;
-	}
-
 	private InvSlot getAt(int loc)
 	{
 		assert loc != -1;
@@ -411,40 +443,8 @@ public abstract class TileEntityInventory extends Ic2TileEntity implements World
 		return ret;
 	}
 
-	protected static int calcRedstoneFromInvSlots(InvSlot... slots)
-	{
-		return calcRedstoneFromInvSlots(Arrays.asList(slots));
-	}
-
 	protected int calcRedstoneFromInvSlots()
 	{
 		return calcRedstoneFromInvSlots(this.invSlots);
-	}
-
-	protected static int calcRedstoneFromInvSlots(Iterable<InvSlot> invSlots)
-	{
-		int space = 0;
-		int used = 0;
-
-		for (InvSlot slot : invSlots)
-		{
-			if (!(slot instanceof InvSlotUpgrade))
-			{
-				int size = slot.size();
-				int limit = slot.getStackSizeLimit();
-				space += size * limit;
-
-				for (int i = 0; i < size; i++)
-				{
-					ItemStack stack = slot.get(i);
-					if (!StackUtil.isEmpty(stack))
-					{
-						used += Math.min(limit, stack.getCount() * limit / stack.getMaxStackSize());
-					}
-				}
-			}
-		}
-
-		return used != 0 && space != 0 ? 1 + used * 14 / space : 0;
 	}
 }

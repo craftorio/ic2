@@ -19,6 +19,35 @@ import net.minecraft.world.item.ItemStack;
 
 public class ElectricItemManager implements IElectricItemManager
 {
+	private static int mapChargeLevelToDamage(double charge, double maxCharge, int maxDamage)
+	{
+		if (maxDamage < 2)
+		{
+			return 0;
+		}
+
+		maxDamage--;
+		return maxDamage - (int) Util.map(charge, maxCharge, maxDamage);
+	}
+
+	public static ItemStack getCharged(Item item, double charge)
+	{
+		if (!(item instanceof IElectricItem))
+		{
+			throw new IllegalArgumentException("no electric item");
+		}
+
+		ItemStack ret = new ItemStack(item);
+		ElectricItem.manager.charge(ret, charge, Integer.MAX_VALUE, true, false);
+		return ret;
+	}
+
+	public static void addChargeVariants(Item item, List<ItemStack> list)
+	{
+		list.add(getCharged(item, 0.0));
+		list.add(getCharged(item, Double.POSITIVE_INFINITY));
+	}
+
 	@Override
 	public double charge(ItemStack stack, double amount, int tier, boolean ignoreTransferLimit, boolean simulate)
 	{
@@ -65,17 +94,6 @@ public class ElectricItemManager implements IElectricItemManager
 		{
 			return 0.0;
 		}
-	}
-
-	private static int mapChargeLevelToDamage(double charge, double maxCharge, int maxDamage)
-	{
-		if (maxDamage < 2)
-		{
-			return 0;
-		}
-
-		maxDamage--;
-		return maxDamage - (int) Util.map(charge, maxCharge, maxDamage);
 	}
 
 	@Override
@@ -225,24 +243,6 @@ public class ElectricItemManager implements IElectricItemManager
 		double charge = ElectricItem.manager.getCharge(stack);
 		double space = ElectricItem.manager.charge(stack, Double.POSITIVE_INFINITY, Integer.MAX_VALUE, true, true);
 		return Util.toSiString(charge, 3) + "/" + Util.toSiString(charge + space, 3) + " EU";
-	}
-
-	public static ItemStack getCharged(Item item, double charge)
-	{
-		if (!(item instanceof IElectricItem))
-		{
-			throw new IllegalArgumentException("no electric item");
-		}
-
-		ItemStack ret = new ItemStack(item);
-		ElectricItem.manager.charge(ret, charge, Integer.MAX_VALUE, true, false);
-		return ret;
-	}
-
-	public static void addChargeVariants(Item item, List<ItemStack> list)
-	{
-		list.add(getCharged(item, 0.0));
-		list.add(getCharged(item, Double.POSITIVE_INFINITY));
 	}
 
 	@Override

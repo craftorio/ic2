@@ -29,7 +29,7 @@ import net.minecraft.world.level.Level;
 
 public class ContainerIndustrialWorkbench extends ContainerFullInv<TileEntityIndustrialWorkbench>
 {
-	protected final CraftingContainer craftMatrix = new SimpleCraftingInventory.InvSlotCraftingInventory(this.base.craftingGrid, 3)
+	public static final int WIDTH = 194;	protected final CraftingContainer craftMatrix = new SimpleCraftingInventory.InvSlotCraftingInventory(this.base.craftingGrid, 3)
 	{
 		@Override
 		protected void set(int index, ItemStack stack)
@@ -46,8 +46,7 @@ public class ContainerIndustrialWorkbench extends ContainerFullInv<TileEntityInd
 			return stack;
 		}
 	};
-	protected final Container craftResult = new ResultContainer();
-	protected final Slot[] outputs = new Slot[3];
+	public static final int HEIGHT = 228;
 	public final Player player;
 	public final int indexOutput;
 	public final int indexGridStart;
@@ -56,9 +55,8 @@ public class ContainerIndustrialWorkbench extends ContainerFullInv<TileEntityInd
 	public final int indexBufferEnd;
 	public final int indexOutputHammer;
 	public final int indexOutputCutter;
-	public static final int WIDTH = 194;
-	public static final int HEIGHT = 228;
-
+	protected final Container craftResult = new ResultContainer();
+	protected final Slot[] outputs = new Slot[3];
 	public ContainerIndustrialWorkbench(int syncId, Inventory playerInventory, TileEntityIndustrialWorkbench tileEntity)
 	{
 		super(Ic2ScreenHandlers.INDUSTRIAL_WORKBENCH, syncId, playerInventory, tileEntity, 228);
@@ -260,4 +258,6 @@ public class ContainerIndustrialWorkbench extends ContainerFullInv<TileEntityInd
 
 		return sourceItemStack;
 	}
+
+
 }

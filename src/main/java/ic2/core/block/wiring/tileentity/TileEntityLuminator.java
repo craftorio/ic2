@@ -50,6 +50,44 @@ public class TileEntityLuminator extends Ic2TileEntity
 		comparator.setUpdate(this.energy::getComparatorValue);
 	}
 
+	public static boolean isValidPosition(Level world, BlockPos pos, Direction side)
+	{
+		if (!world.isClientSide)
+		{
+			if (world.getBlockState(pos).isFaceSturdy(world, pos, side, SupportType.FULL))
+			{
+				return true;
+			}
+
+			IEnergyTile tile = EnergyNet.instance.getSubTile(world, pos);
+			return tile instanceof IEnergyEmitter;
+		} else
+		{
+			return true;
+		}
+	}
+
+	private static Map<Direction, List<AABB>> getAabbMap()
+	{
+		Map<Direction, List<AABB>> ret = new EnumMap<>(Direction.class);
+
+		for (Direction side : Direction.values())
+		{
+			int dx = side.getStepX();
+			int dy = side.getStepY();
+			int dz = side.getStepZ();
+			double xS = (double) (dx + 1) / 2 * 0.9375;
+			double yS = (double) (dy + 1) / 2 * 0.9375;
+			double zS = (double) (dz + 1) / 2 * 0.9375;
+			double xE = 0.0625 + (double) (dx + 2) / 2 * 0.9375;
+			double yE = 0.0625 + (double) (dy + 2) / 2 * 0.9375;
+			double zE = 0.0625 + (double) (dz + 2) / 2 * 0.9375;
+			ret.put(side.getOpposite(), List.of(new AABB(xS, yS, zS, xE, yE, zE)));
+		}
+
+		return ret;
+	}
+
 	@Override
 	public void load(CompoundTag nbt)
 	{
@@ -100,8 +138,7 @@ public class TileEntityLuminator extends Ic2TileEntity
 			{
 				ElectricItem.manager.discharge(stack, amount, this.energy.getSinkTier(), true, true, false);
 				this.energy.forceAddEnergy(amount);
-			}
-			else
+			} else
 			{
 				this.invertRedstone = !this.invertRedstone;
 				IC2.network.get(true).updateTileEntityField(this, "invertRedstone");
@@ -120,28 +157,10 @@ public class TileEntityLuminator extends Ic2TileEntity
 
 	private void checkPlacement()
 	{
-		Level  world = this.getLevel();
+		Level world = this.getLevel();
 		if (!isValidPosition(world, this.worldPosition.relative(this.getFacing().getOpposite()), this.getFacing()))
 		{
 			world.destroyBlock(this.worldPosition, true);
-		}
-	}
-
-	public static boolean isValidPosition(Level world, BlockPos pos, Direction side)
-	{
-		if (!world.isClientSide)
-		{
-			if (world.getBlockState(pos).isFaceSturdy(world, pos, side, SupportType.FULL))
-			{
-				return true;
-			}
-
-			IEnergyTile tile = EnergyNet.instance.getSubTile(world, pos);
-			return tile instanceof IEnergyEmitter;
-		}
-		else
-		{
-			return true;
 		}
 	}
 
@@ -194,26 +213,5 @@ public class TileEntityLuminator extends Ic2TileEntity
 	private void updateLight()
 	{
 		this.getLevel().getChunkSource().getLightEngine().checkBlock(this.worldPosition);
-	}
-
-	private static Map<Direction, List<AABB>> getAabbMap()
-	{
-		Map<Direction, List<AABB>> ret = new EnumMap<>(Direction.class);
-
-		for (Direction side : Direction.values())
-		{
-			int dx = side.getStepX();
-			int dy = side.getStepY();
-			int dz = side.getStepZ();
-			double xS = (double) (dx + 1) / 2 * 0.9375;
-			double yS = (double) (dy + 1) / 2 * 0.9375;
-			double zS = (double) (dz + 1) / 2 * 0.9375;
-			double xE = 0.0625 + (double) (dx + 2) / 2 * 0.9375;
-			double yE = 0.0625 + (double) (dy + 2) / 2 * 0.9375;
-			double zE = 0.0625 + (double) (dz + 2) / 2 * 0.9375;
-			ret.put(side.getOpposite(), List.of(new AABB(xS, yS, zS, xE, yE, zE)));
-		}
-
-		return ret;
 	}
 }

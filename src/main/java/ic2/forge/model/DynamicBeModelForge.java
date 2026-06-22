@@ -41,114 +41,9 @@ final class DynamicBeModelForge extends DynamicBeModel<List<List<BakedQuad>>> im
 		super(id);
 	}
 
-	@Override
-	public BakedModel bake(
-		IGeometryBakingContext owner,
-		ModelBaker bakery,
-		Function<Material, TextureAtlasSprite> spriteGetter,
-		ModelState modelTransform,
-		ItemOverrides overrides,
-		ResourceLocation modelLocation
-	)
-	{
-		return super.bake(bakery, spriteGetter, modelTransform, modelLocation);
-	}
-
-
-	public @NotNull ModelData getModelData(@NotNull BlockAndTintGetter world, @NotNull BlockPos pos, @NotNull BlockState state, @NotNull ModelData tileData)
-	{
-		BlockEntity be = null;
-		boolean active = this.block.canActive() && (be = world.getBlockEntity(pos)) instanceof Ic2TileEntity && ((Ic2TileEntity) be).getActive();
-		List<List<BakedQuad>> mesh = this.getMesh(state, active);
-
-		if (be instanceof Ic2TileEntity te)
-		{
-			Obscuration component = te.getComponent(Obscuration.class);
-			if (component != null)
-			{
-				Obscuration.ObscurationData[] data = component.getRenderState();
-				if (data != null)
-				{
-					mesh = new ArrayList<>(mesh);
-
-					for (int face = 0; face < 6; face++)
-					{
-						if (data[face] != null)
-						{
-							List<BakedQuad> obscured = getObscuredQuads(data[face], Util.ALL_DIRS[face]);
-							if (obscured != null)
-							{
-								mesh.set(face, obscured);
-							}
-						}
-					}
-				}
-			}
-		}
-
-		tileData = tileData.derive().with(MESH_DATA, mesh).build();
-		assert tileData.get(MESH_DATA) == mesh;
-		return tileData;
-	}
-
-	public @NotNull List<BakedQuad> getQuads(BlockState state, Direction side, @NotNull RandomSource rand, ModelData extraData, @Nullable RenderType renderType)
-	{
-		List<List<BakedQuad>> mesh = extraData.get(MESH_DATA);
-		return mesh.get(getIdx(side));
-	}
-
-	protected List<List<BakedQuad>> generateMesh(BakedModel baseModel, int rot, boolean rotX)
-	{
-		List<List<BakedQuad>> mesh = new ArrayList<>(7);
-
-		for (int i = 0; i < 7; i++) mesh.add(null);
-
-		for (int i = 0; i < 7; i++)
-		{
-			Direction face = i < 6 ? Util.ALL_DIRS[i] : null;
-			List<BakedQuad> quads = baseModel.getQuads(null, face, null, null, null);
-			int writeIdx = i;
-			if (rot != 0)
-			{
-				if (face != null)
-				{
-					writeIdx = rotateFace(face, rot, rotX).ordinal();
-				}
-
-				if (!quads.isEmpty())
-				{
-					List<BakedQuad> newQuads = new ArrayList<>(quads.size());
-
-					for (BakedQuad quad : quads)
-					{
-						newQuads.add(rotateQuad(quad, rot, rotX));
-					}
-
-					quads = newQuads;
-				}
-			}
-
-			mesh.set(writeIdx, quads);
-		}
-
-		return mesh;
-	}
-
 	private static int getIdx(Direction dir)
 	{
 		return dir == null ? 6 : dir.ordinal();
-	}
-
-	@Override
-	public @NotNull TextureAtlasSprite getParticleIcon(@NotNull ModelData modelData)
-	{
-		return super.getParticleIcon(modelData);
-	}
-
-	@Override
-	public TextureAtlasSprite getParticleIcon()
-	{
-		return this.baseModel.getParticleIcon();
 	}
 
 	private static List<BakedQuad> getObscuredQuads(Obscuration.ObscurationData data, Direction targetFace)
@@ -256,5 +151,109 @@ final class DynamicBeModelForge extends DynamicBeModel<List<List<BakedQuad>>> im
 		}
 
 		return new BakedQuad(newData, quad.getTintIndex(), quad.getDirection(), quad.getSprite(), quad.isShade());
+	}
+
+	@Override
+	public BakedModel bake(
+		IGeometryBakingContext owner,
+		ModelBaker bakery,
+		Function<Material, TextureAtlasSprite> spriteGetter,
+		ModelState modelTransform,
+		ItemOverrides overrides,
+		ResourceLocation modelLocation
+	)
+	{
+		return super.bake(bakery, spriteGetter, modelTransform, modelLocation);
+	}
+
+	public @NotNull ModelData getModelData(@NotNull BlockAndTintGetter world, @NotNull BlockPos pos, @NotNull BlockState state, @NotNull ModelData tileData)
+	{
+		BlockEntity be = null;
+		boolean active = this.block.canActive() && (be = world.getBlockEntity(pos)) instanceof Ic2TileEntity && ((Ic2TileEntity) be).getActive();
+		List<List<BakedQuad>> mesh = this.getMesh(state, active);
+
+		if (be instanceof Ic2TileEntity te)
+		{
+			Obscuration component = te.getComponent(Obscuration.class);
+			if (component != null)
+			{
+				Obscuration.ObscurationData[] data = component.getRenderState();
+				if (data != null)
+				{
+					mesh = new ArrayList<>(mesh);
+
+					for (int face = 0; face < 6; face++)
+					{
+						if (data[face] != null)
+						{
+							List<BakedQuad> obscured = getObscuredQuads(data[face], Util.ALL_DIRS[face]);
+							if (obscured != null)
+							{
+								mesh.set(face, obscured);
+							}
+						}
+					}
+				}
+			}
+		}
+
+		tileData = tileData.derive().with(MESH_DATA, mesh).build();
+		assert tileData.get(MESH_DATA) == mesh;
+		return tileData;
+	}
+
+	public @NotNull List<BakedQuad> getQuads(BlockState state, Direction side, @NotNull RandomSource rand, ModelData extraData, @Nullable RenderType renderType)
+	{
+		List<List<BakedQuad>> mesh = extraData.get(MESH_DATA);
+		return mesh.get(getIdx(side));
+	}
+
+	protected List<List<BakedQuad>> generateMesh(BakedModel baseModel, int rot, boolean rotX)
+	{
+		List<List<BakedQuad>> mesh = new ArrayList<>(7);
+
+		for (int i = 0; i < 7; i++) mesh.add(null);
+
+		for (int i = 0; i < 7; i++)
+		{
+			Direction face = i < 6 ? Util.ALL_DIRS[i] : null;
+			List<BakedQuad> quads = baseModel.getQuads(null, face, null, null, null);
+			int writeIdx = i;
+			if (rot != 0)
+			{
+				if (face != null)
+				{
+					writeIdx = rotateFace(face, rot, rotX).ordinal();
+				}
+
+				if (!quads.isEmpty())
+				{
+					List<BakedQuad> newQuads = new ArrayList<>(quads.size());
+
+					for (BakedQuad quad : quads)
+					{
+						newQuads.add(rotateQuad(quad, rot, rotX));
+					}
+
+					quads = newQuads;
+				}
+			}
+
+			mesh.set(writeIdx, quads);
+		}
+
+		return mesh;
+	}
+
+	@Override
+	public @NotNull TextureAtlasSprite getParticleIcon(@NotNull ModelData modelData)
+	{
+		return super.getParticleIcon(modelData);
+	}
+
+	@Override
+	public TextureAtlasSprite getParticleIcon()
+	{
+		return this.baseModel.getParticleIcon();
 	}
 }

@@ -41,6 +41,29 @@ public class IC2
 	public static boolean suddenlyHoes;
 	public static boolean seasonal;
 
+	static
+	{
+		envProxy = createEnvProxy();
+		sideProxy = createSideProxy();
+		log = new Log(LogManager.getLogger("ic2"));
+		network = new SideGateway();
+		keyboard = sideProxy.getKeyboard();
+		soundManager = sideProxy.getSoundManager();
+		tabIc2General = envProxy.createItemGroup(getIdentifier("general"), new ItemGroupIconSupplier(Ic2ItemGroupType.GENERAL), Ic2ItemGroupType.GENERAL);
+		tabIc2GeneratorsAndWiring = envProxy.createItemGroup(getIdentifier("generators_and_wiring"), new ItemGroupIconSupplier(Ic2ItemGroupType.GENERATORS_AND_WIRING), Ic2ItemGroupType.GENERATORS_AND_WIRING);
+		tabIc2Reactor = envProxy.createItemGroup(getIdentifier("reactor"), new ItemGroupIconSupplier(Ic2ItemGroupType.REACTOR), Ic2ItemGroupType.REACTOR);
+		tabIc2Machines = envProxy.createItemGroup(getIdentifier("machines"), new ItemGroupIconSupplier(Ic2ItemGroupType.MACHINES), Ic2ItemGroupType.MACHINES);
+		tabIc2ToolsAndUtilities = envProxy.createItemGroup(getIdentifier("tools_and_utilities"), new ItemGroupIconSupplier(Ic2ItemGroupType.TOOLS_AND_UTILITIES), Ic2ItemGroupType.TOOLS_AND_UTILITIES);
+		tabIc2Combat = envProxy.createItemGroup(getIdentifier("combat"), new ItemGroupIconSupplier(Ic2ItemGroupType.COMBAT), Ic2ItemGroupType.COMBAT);
+		tabIc2Farming = envProxy.createItemGroup(getIdentifier("farming"), new ItemGroupIconSupplier(Ic2ItemGroupType.FARMING), Ic2ItemGroupType.FARMING);
+		tabIc2Materials = envProxy.createItemGroup(getIdentifier("materials"), new ItemGroupIconSupplier(Ic2ItemGroupType.MATERIALS), Ic2ItemGroupType.MATERIALS);
+		threadPool = new PriorityExecutor(Math.max(Runtime.getRuntime().availableProcessors(), 2));
+		random = RandomSource.createNewThreadLocalInstance();
+		initialized = false;
+		suddenlyHoes = false;
+		seasonal = false;
+	}
+
 	public static int getSeaLevel(Level world)
 	{
 		return world.getSeaLevel();
@@ -81,28 +104,5 @@ public class IC2
 	private static SideProxy createSideProxy()
 	{
 		return envProxy.isClientEnv() ? new SideProxyClient() : new SideProxyServer();
-	}
-
-	static
-	{
-		envProxy = createEnvProxy();
-		sideProxy = createSideProxy();
-		log = new Log(LogManager.getLogger("ic2"));
-		network = new SideGateway();
-		keyboard = sideProxy.getKeyboard();
-		soundManager = sideProxy.getSoundManager();
-		tabIc2General = envProxy.createItemGroup(getIdentifier("general"), new ItemGroupIconSupplier(Ic2ItemGroupType.GENERAL), Ic2ItemGroupType.GENERAL);
-		tabIc2GeneratorsAndWiring = envProxy.createItemGroup(getIdentifier("generators_and_wiring"), new ItemGroupIconSupplier(Ic2ItemGroupType.GENERATORS_AND_WIRING), Ic2ItemGroupType.GENERATORS_AND_WIRING);
-		tabIc2Reactor = envProxy.createItemGroup(getIdentifier("reactor"), new ItemGroupIconSupplier(Ic2ItemGroupType.REACTOR), Ic2ItemGroupType.REACTOR);
-		tabIc2Machines = envProxy.createItemGroup(getIdentifier("machines"), new ItemGroupIconSupplier(Ic2ItemGroupType.MACHINES), Ic2ItemGroupType.MACHINES);
-		tabIc2ToolsAndUtilities = envProxy.createItemGroup(getIdentifier("tools_and_utilities"), new ItemGroupIconSupplier(Ic2ItemGroupType.TOOLS_AND_UTILITIES), Ic2ItemGroupType.TOOLS_AND_UTILITIES);
-		tabIc2Combat = envProxy.createItemGroup(getIdentifier("combat"), new ItemGroupIconSupplier(Ic2ItemGroupType.COMBAT), Ic2ItemGroupType.COMBAT);
-		tabIc2Farming = envProxy.createItemGroup(getIdentifier("farming"), new ItemGroupIconSupplier(Ic2ItemGroupType.FARMING), Ic2ItemGroupType.FARMING);
-		tabIc2Materials = envProxy.createItemGroup(getIdentifier("materials"), new ItemGroupIconSupplier(Ic2ItemGroupType.MATERIALS), Ic2ItemGroupType.MATERIALS);
-		threadPool = new PriorityExecutor(Math.max(Runtime.getRuntime().availableProcessors(), 2));
-		random = RandomSource.createNewThreadLocalInstance();
-		initialized = false;
-		suddenlyHoes = false;
-		seasonal = false;
 	}
 }

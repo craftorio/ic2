@@ -1,9 +1,7 @@
 package ic2.core.gui.dynamic;
 
 import ic2.api.network.INetworkClientTileEntityEventListener;
-import ic2.core.ContainerBase;
 import ic2.core.IC2;
-import ic2.core.Ic2Gui;
 import ic2.core.block.IInventorySlotHolder;
 import ic2.core.block.comp.Energy;
 import ic2.core.block.comp.Fluids;
@@ -17,7 +15,6 @@ import ic2.core.gui.GuiElement;
 import ic2.core.gui.IClickHandler;
 import ic2.core.gui.Image;
 import ic2.core.gui.LinkedGauge;
-import ic2.core.gui.MouseButton;
 import ic2.core.gui.RecipeButton;
 import ic2.core.gui.SlotGrid;
 import ic2.core.gui.TankFluidSlot;
@@ -35,15 +32,15 @@ import net.minecraft.world.entity.player.Inventory;
 
 public class DynamicGui<T extends Container> extends GuiDefaultBackground<DynamicContainer<T>>
 {
-	public static <T extends Container> DynamicGui<T> create(DynamicContainer<T> container, Inventory playerInventory, Component title)
-	{
-		return new DynamicGui<>(container, playerInventory, title);
-	}
-
 	protected DynamicGui(DynamicContainer<T> container, Inventory playerInventory, Component title)
 	{
 		super(container, playerInventory, title, container.guiNode.width, container.guiNode.height);
 		this.initializeWidgets(playerInventory, container.guiNode);
+	}
+
+	public static <T extends Container> DynamicGui<T> create(DynamicContainer<T> container, Inventory playerInventory, Component title)
+	{
+		return new DynamicGui<>(container, playerInventory, title);
 	}
 
 	private void initializeWidgets(Inventory playerInventory, GuiParser.ParentNode parentNode)
@@ -194,7 +191,7 @@ public class DynamicGui<T extends Container> extends GuiDefaultBackground<Dynami
 					if (size > node.offset)
 					{
 						GuiParser.SlotGridNode.SlotGridDimension dim = node.getDimension(size);
-						parentNode.addElement(this, new SlotGrid(this, node.x, node.y, dim.cols, dim.rows, node.style, 0, node.spacing));
+						parentNode.addElement(this, new SlotGrid(this, node.x, node.y, dim.cols(), dim.rows(), node.style, 0, node.spacing));
 					}
 					break;
 				}

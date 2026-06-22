@@ -12,6 +12,45 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class Chilling extends TerraformerBase
 {
+	private static boolean isSurroundedBySnow(Level world, BlockPos pos)
+	{
+		for (Direction dir : Util.HORIZONTAL_DIRS)
+		{
+			if (!isSnowHere(world, pos.relative(dir)))
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	private static boolean isSnowHere(Level world, BlockPos pos)
+	{
+		int prevY = pos.getY();
+		pos = TileEntityTerra.getFirstBlockFrom(world, pos, 16);
+		if (pos != null && prevY <= pos.getY())
+		{
+			Block block = world.getBlockState(pos).getBlock();
+			if (block != Blocks.SNOW_BLOCK && block != Blocks.SNOW)
+			{
+				pos = pos.above();
+				if (Blocks.SNOW.defaultBlockState().canSurvive(world, pos) || block == Blocks.ICE)
+				{
+					world.setBlockAndUpdate(pos, Blocks.SNOW.defaultBlockState());
+				}
+
+				return false;
+			} else
+			{
+				return true;
+			}
+		} else
+		{
+			return false;
+		}
+	}
+
 	@Override
 	boolean terraform(Level world, BlockPos pos)
 	{
@@ -62,44 +101,5 @@ public class Chilling extends TerraformerBase
 
 		world.setBlockAndUpdate(pos, Blocks.SNOW.defaultBlockState());
 		return true;
-	}
-
-	private static boolean isSurroundedBySnow(Level world, BlockPos pos)
-	{
-		for (Direction dir : Util.HORIZONTAL_DIRS)
-		{
-			if (!isSnowHere(world, pos.relative(dir)))
-			{
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	private static boolean isSnowHere(Level world, BlockPos pos)
-	{
-		int prevY = pos.getY();
-		pos = TileEntityTerra.getFirstBlockFrom(world, pos, 16);
-		if (pos != null && prevY <= pos.getY())
-		{
-			Block block = world.getBlockState(pos).getBlock();
-			if (block != Blocks.SNOW_BLOCK && block != Blocks.SNOW)
-			{
-				pos = pos.above();
-				if (Blocks.SNOW.defaultBlockState().canSurvive(world, pos) || block == Blocks.ICE)
-				{
-					world.setBlockAndUpdate(pos, Blocks.SNOW.defaultBlockState());
-				}
-
-				return false;
-			} else
-			{
-				return true;
-			}
-		} else
-		{
-			return false;
-		}
 	}
 }

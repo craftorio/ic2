@@ -9,7 +9,6 @@ import ic2.core.block.machine.tileentity.TileEntityCanner;
 import ic2.core.gui.CustomButton;
 import ic2.core.gui.CycleHandler;
 import ic2.core.gui.EnergyGauge;
-import ic2.core.gui.IEnableHandler;
 import ic2.core.gui.INumericValueHandler;
 import ic2.core.gui.RecipeButton;
 import ic2.core.gui.TankGauge;
@@ -30,34 +29,23 @@ public class GuiCanner extends Ic2Gui<ContainerCanner>
 			@Override
 			public int getValue()
 			{
-				return ((ContainerCanner) GuiCanner.this.menu).base.getMode().ordinal();
+				return GuiCanner.this.menu.base.getMode().ordinal();
 			}
 
 			@Override
 			public void onChange(int value)
 			{
-				IC2.network.get(false).initiateClientTileEntityEvent(((ContainerCanner) GuiCanner.this.menu).base, 0 + value);
+				IC2.network.get(false).initiateClientTileEntityEvent(GuiCanner.this.menu.base, value);
 			}
 		});
-		this.addElement(new CustomButton(this, 63, 81, 50, 14, cycleHandler, texture, cycleHandler).withTooltip(new Supplier<String>()
-		{
-			public String get()
+		this.addElement(new CustomButton(this, 63, 81, 50, 14, cycleHandler, texture, cycleHandler).withTooltip((Supplier<String>) () ->
+			switch (GuiCanner.this.menu.base.getMode())
 			{
-				switch (((ContainerCanner) GuiCanner.this.menu).base.getMode())
-				{
-					case BottleSolid:
-						return "ic2.Canner.gui.switch.BottleSolid";
-					case EmptyLiquid:
-						return "ic2.Canner.gui.switch.EmptyLiquid";
-					case BottleLiquid:
-						return "ic2.Canner.gui.switch.BottleLiquid";
-					case EnrichLiquid:
-						return "ic2.Canner.gui.switch.EnrichLiquid";
-					default:
-						return null;
-				}
-			}
-		}));
+				case BottleSolid -> "ic2.Canner.gui.switch.BottleSolid";
+				case EmptyLiquid -> "ic2.Canner.gui.switch.EmptyLiquid";
+				case BottleLiquid -> "ic2.Canner.gui.switch.BottleLiquid";
+				case EnrichLiquid -> "ic2.Canner.gui.switch.EnrichLiquid";
+			}));
 		this.addElement(new CustomButton(this, 77, 64, 22, 13, this.createEventSender(TileEntityCanner.eventSwapTanks)).withTooltip("ic2.Canner.gui.switchTanks"));
 		this.addElement(TankGauge.createNormal(this, 39, 42, container.base.getInputTank()));
 		this.addElement(TankGauge.createNormal(this, 117, 42, container.base.getOutputTank()));
@@ -65,14 +53,7 @@ public class GuiCanner extends Ic2Gui<ContainerCanner>
 		{
 			for (final TileEntityCanner.Mode mode : TileEntityCanner.Mode.values)
 			{
-				this.addElement(new RecipeButton(this, 74, 22, 23, 14, new String[] { "canner_" + mode }).withEnableHandler(new IEnableHandler()
-				{
-					@Override
-					public boolean isEnabled()
-					{
-						return ((ContainerCanner) GuiCanner.this.menu).base.getMode() == mode;
-					}
-				}));
+				this.addElement(new RecipeButton(this, 74, 22, 23, 14, new String[] { "canner_" + mode }).withEnableHandler(() -> GuiCanner.this.menu.base.getMode() == mode));
 			}
 		}
 	}
@@ -82,7 +63,7 @@ public class GuiCanner extends Ic2Gui<ContainerCanner>
 	{
 		super.renderBg(guiGraphics, delta, mouseX, mouseY);
 		this.bindTexture();
-		switch (((ContainerCanner) this.menu).base.getMode())
+		switch (this.menu.base.getMode())
 		{
 			case BottleSolid:
 				this.drawTexturedRect(guiGraphics.pose(), 59.0, 53.0, 9.0, 18.0, 3.0, 4.0);
@@ -98,7 +79,7 @@ public class GuiCanner extends Ic2Gui<ContainerCanner>
 			case EnrichLiquid:
 		}
 
-		int progressSize = Math.round(((ContainerCanner) this.menu).base.getProgress() * 23.0F);
+		int progressSize = Math.round(this.menu.base.getProgress() * 23.0F);
 		if (progressSize > 0)
 		{
 			this.drawTexturedRect(guiGraphics.pose(), 74.0, 22.0, progressSize, 14.0, 233.0, 0.0);

@@ -31,12 +31,11 @@ public abstract class DynamicBeModel<T> implements UnbakedModel, BakedModel
 {
 	protected final Ic2TileEntityBlock block;
 	private final ResourceLocation backingModelId;
-	protected BakedModel baseModel;
-	private BakedModel activeBaseModel;
 	private final List<T> cache;
 	private final int cacheSize;
-
 	private final StampedLock cacheLock = new StampedLock();
+	protected BakedModel baseModel;
+	private BakedModel activeBaseModel;
 
 	protected DynamicBeModel(ResourceLocation id)
 	{
@@ -52,6 +51,82 @@ public abstract class DynamicBeModel<T> implements UnbakedModel, BakedModel
 		this.cacheSize = (this.block.facingProperty != null ? 6 : 1) * (this.block.canActive() ? 2 : 1);
 		this.cache = new ArrayList<>(cacheSize);
 		for (int i = 0; i < cacheSize; i++) this.cache.add(null);
+	}
+
+	protected static BakedQuad rotateQuad(BakedQuad quad, int rot, boolean rotX)
+	{
+		rot &= 3;
+		if (rot == 0)
+		{
+			return quad;
+		}
+
+		int[] data = quad.getVertices();
+		int[] newData = Arrays.copyOf(data, data.length);
+		int stride = data.length >>> 2;
+		int offsetA;
+		int offsetB;
+		if (rotX)
+		{
+			offsetA = 2;
+			offsetB = 1;
+		} else
+		{
+			offsetA = 0;
+			offsetB = 2;
+		}
+
+		for (int i = 0; i < 4; i++)
+		{
+			int offset = i * stride;
+			float a = Float.intBitsToFloat(data[offset + offsetA]);
+			float b = Float.intBitsToFloat(data[offset + offsetB]);
+			float na;
+			b = switch (rot)
+			{
+				case 1 ->
+				{
+					na = 1.0F - b;
+					yield a;
+				}
+				case 2 ->
+				{
+					na = 1.0F - a;
+					yield 1.0F - b;
+				}
+				case 3 ->
+				{
+					na = b;
+					yield 1.0F - a;
+				}
+				default -> throw new IllegalStateException();
+			};
+
+			newData[offset + offsetA] = Float.floatToRawIntBits(na);
+			newData[offset + offsetB] = Float.floatToRawIntBits(b);
+		}
+
+		return new BakedQuad(newData, quad.getTintIndex(), rotateFace(quad.getDirection(), rot, rotX), quad.getSprite(), quad.isShade());
+	}
+
+	protected static Direction rotateFace(Direction face, int count, boolean rotX)
+	{
+		count &= 3;
+		if (rotX && face.getAxis() != Axis.X)
+		{
+			for (int i = 0; i < count; i++)
+			{
+				face = face.getClockWise(Axis.X);
+			}
+		} else if (!rotX && face.getAxis() != Axis.Y)
+		{
+			for (int i = 0; i < count; i++)
+			{
+				face = face.getClockWise();
+			}
+		}
+
+		return face;
 	}
 
 	public @NotNull Collection<ResourceLocation> getDependencies()
@@ -204,80 +279,4 @@ public abstract class DynamicBeModel<T> implements UnbakedModel, BakedModel
 	}
 
 	protected abstract T generateMesh(BakedModel var1, int var2, boolean var3);
-
-	protected static BakedQuad rotateQuad(BakedQuad quad, int rot, boolean rotX)
-	{
-		rot &= 3;
-		if (rot == 0)
-		{
-			return quad;
-		}
-
-		int[] data = quad.getVertices();
-		int[] newData = Arrays.copyOf(data, data.length);
-		int stride = data.length >>> 2;
-		int offsetA;
-		int offsetB;
-		if (rotX)
-		{
-			offsetA = 2;
-			offsetB = 1;
-		} else
-		{
-			offsetA = 0;
-			offsetB = 2;
-		}
-
-		for (int i = 0; i < 4; i++)
-		{
-			int offset = i * stride;
-			float a = Float.intBitsToFloat(data[offset + offsetA]);
-			float b = Float.intBitsToFloat(data[offset + offsetB]);
-			float na;
-			b = switch (rot)
-			{
-				case 1 ->
-				{
-					na = 1.0F - b;
-					yield a;
-				}
-				case 2 ->
-				{
-					na = 1.0F - a;
-					yield 1.0F - b;
-				}
-				case 3 ->
-				{
-					na = b;
-					yield 1.0F - a;
-				}
-				default -> throw new IllegalStateException();
-			};
-
-			newData[offset + offsetA] = Float.floatToRawIntBits(na);
-			newData[offset + offsetB] = Float.floatToRawIntBits(b);
-		}
-
-		return new BakedQuad(newData, quad.getTintIndex(), rotateFace(quad.getDirection(), rot, rotX), quad.getSprite(), quad.isShade());
-	}
-
-	protected static Direction rotateFace(Direction face, int count, boolean rotX)
-	{
-		count &= 3;
-		if (rotX && face.getAxis() != Axis.X)
-		{
-			for (int i = 0; i < count; i++)
-			{
-				face = face.getClockWise(Axis.X);
-			}
-		} else if (!rotX && face.getAxis() != Axis.Y)
-		{
-			for (int i = 0; i < count; i++)
-			{
-				face = face.getClockWise();
-			}
-		}
-
-		return face;
-	}
 }

@@ -12,23 +12,15 @@ import net.minecraft.world.entity.LivingEntity;
 
 public class SoundClient extends Sound
 {
+	private final List<SoundInstance> startedSoundList = new CopyOnWriteArrayList<>();
+	public net.minecraft.client.sounds.SoundManager vanillaManager = Minecraft.getInstance().getSoundManager();
 	private RepeatablePositionedSoundInstance repeatInstance = null;
 	private PositionedSoundInstance onceInstance = null;
 	private EntityTrackingSoundInstance entityTrackingInstance = null;
-	private final List<SoundInstance> startedSoundList = new CopyOnWriteArrayList<>();
 	private boolean isStarted = false;
-	public net.minecraft.client.sounds.SoundManager vanillaManager = Minecraft.getInstance().getSoundManager();
 
 	protected SoundClient()
 	{
-	}
-
-	public void setSourceItem(net.minecraft.world.item.Item item)
-	{
-		if (this.entityTrackingInstance != null)
-		{
-			this.entityTrackingInstance.setSourceItem(item);
-		}
 	}
 
 	public SoundClient(SoundEvent soundEvent, SoundSource soundCategory, BlockPos pos, float volume, float pitch)
@@ -42,6 +34,14 @@ public class SoundClient extends Sound
 	{
 		this();
 		this.entityTrackingInstance = new EntityTrackingSoundInstance(soundEvent, soundCategory, volume, pitch, entity);
+	}
+
+	public void setSourceItem(net.minecraft.world.item.Item item)
+	{
+		if (this.entityTrackingInstance != null)
+		{
+			this.entityTrackingInstance.setSourceItem(item);
+		}
 	}
 
 	@Override

@@ -1,13 +1,12 @@
 package ic2.core.item.tool;
 
 import ic2.api.item.IBoxable;
-import ic2.api.tile.IWrenchable;
+import ic2.api.tile.IWrenchAble;
 import ic2.core.IC2;
-import ic2.core.init.MainConfig;
+import ic2.core.init.IC2Config;
 import ic2.core.item.PriorityUsableItem;
 import ic2.core.ref.Ic2ItemTags;
 import ic2.core.ref.Ic2SoundEvents;
-import ic2.core.util.ConfigUtil;
 import ic2.core.util.LogCategory;
 import ic2.core.util.StackUtil;
 import ic2.core.util.Util;
@@ -16,8 +15,6 @@ import java.util.List;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Direction.AxisDirection;
 import net.minecraft.server.level.ServerLevel;
@@ -27,7 +24,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Item.Properties;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -35,51 +31,17 @@ import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.NotNull;
 
 public class ItemToolWrench extends Item implements PriorityUsableItem, IBoxable
 {
-	private static final boolean logEmptyWrenchDrops = ConfigUtil.getBool(MainConfig.get(), "debug/logEmptyWrenchDrops");
-	public static final int wrenchUseFailed = -1;
-	public static final int wrenchUsePass = -2;
-
 	public ItemToolWrench(Properties settings)
 	{
 		super(settings);
 	}
 
-	public boolean canTakeDamage(ItemStack stack, int amount)
-	{
-		return true;
-	}
-
-	@Override
-	public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context)
-	{
-		if (!this.canTakeDamage(stack, 1))
-		{
-			return InteractionResult.FAIL;
-		}
-
-		Player player = context.getPlayer();
-		if (player == null)
-		{
-			return InteractionResult.PASS;
-		}
-
-		int useResult = onWrenchUse(player, stack, context, this.canTakeDamage(stack, 10));
-		switch (useResult)
-		{
-			case -2:
-				return InteractionResult.PASS;
-			case -1:
-				return InteractionResult.FAIL;
-			default:
-				this.damage(stack, useResult, player, context.getHand());
-				return InteractionResult.SUCCESS;
-		}
-	}
-
-	public static int onWrenchUse(Player player, ItemStack stack, UseOnContext context, boolean removeBlock)
+	public static int onWrenchUse(Player player, UseOnContext context, boolean removeBlock)
 	{
 		ItemToolWrench.WrenchResult result = wrenchBlock(context.getLevel(), context.getClickedPos(), context.getClickedFace(), player, removeBlock);
 		if (result != ItemToolWrench.WrenchResult.Nothing)
@@ -106,9 +68,9 @@ public class ItemToolWrench extends Item implements PriorityUsableItem, IBoxable
 			return ItemToolWrench.WrenchResult.Nothing;
 		}
 
-		if (block instanceof IWrenchable wrenchable)
+		if (block instanceof IWrenchAble wrenchAble)
 		{
-			Direction currentFacing = wrenchable.getFacing(world, pos);
+			Direction currentFacing = wrenchAble.getFacing(world, pos);
 			Direction newFacing = currentFacing;
 			if (IC2.keyboard.isAltKeyDown(player))
 			{
@@ -125,12 +87,12 @@ public class ItemToolWrench extends Item implements PriorityUsableItem, IBoxable
 				newFacing = getNewFacing(side, player);
 			}
 
-			if (newFacing != currentFacing && wrenchable.setFacing(world, pos, newFacing, player))
+			if (newFacing != currentFacing && wrenchAble.setFacing(world, pos, newFacing, player))
 			{
 				return ItemToolWrench.WrenchResult.Rotated;
 			}
 
-			if (remove && wrenchable.wrenchCanRemove(world, pos, player))
+			if (remove && wrenchAble.wrenchCanRemove(world, pos, player))
 			{
 				if (world.isClientSide)
 				{
@@ -143,7 +105,7 @@ public class ItemToolWrench extends Item implements PriorityUsableItem, IBoxable
 				}
 
 				BlockEntity te = world.getBlockEntity(pos);
-				if (ConfigUtil.getBool(MainConfig.get(), "protection/wrenchLogging"))
+				if (IC2Config.protection.wrenchLogging.get())
 				{
 					String playerName = player.getGameProfile().getName() + "/" + player.getGameProfile().getId();
 					IC2.log
@@ -163,14 +125,14 @@ public class ItemToolWrench extends Item implements PriorityUsableItem, IBoxable
 					block.destroy(world, pos, state);
 				}
 
-				List<ItemStack> drops = wrenchable.getWrenchDrops(world, pos, state, te, player, 0);
+				List<ItemStack> drops = wrenchAble.getWrenchDrops(world, pos, state, te, player, 0);
 				if (drops != null && !drops.isEmpty())
 				{
 					for (ItemStack stack : drops)
 					{
 						StackUtil.dropAsEntity(world, pos, stack);
 					}
-				} else if (logEmptyWrenchDrops)
+				} else if (IC2Config.debug.logEmptyWrenchDrops.get())
 				{
 					IC2.log
 						.warn(LogCategory.General, "The block %s (te %s) at %s didn't yield any wrench drops.", state, getTeName(te), Util.formatPosition(world, pos));
@@ -198,14 +160,9 @@ public class ItemToolWrench extends Item implements PriorityUsableItem, IBoxable
 			} else if (side.getAxis().isHorizontal())
 			{
 				Property<?> property = state.getBlock().getStateDefinition().getProperty("facing");
-				Direction facing;
+				Direction facing = (Direction) state.getValue(property);
 				Direction newFacing;
-				if (property != null
-					&& property.getValueClass() == Direction.class
-					&& (facing = (Direction) state.getValue(property)) != null
-					&& facing.getAxis().isHorizontal()
-					&& (newFacing = getNewFacing(side, player)) != facing
-					&& property.getPossibleValues().contains(newFacing))
+				if (property.getValueClass() == Direction.class && facing.getAxis().isHorizontal() && (newFacing = getNewFacing(side, player)) != facing && property.getPossibleValues().contains(newFacing))
 				{
 					if (facing.getOpposite() == newFacing)
 					{
@@ -243,7 +200,39 @@ public class ItemToolWrench extends Item implements PriorityUsableItem, IBoxable
 
 	private static String getTeName(BlockEntity te)
 	{
-		return te != null ? BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(te.getType()).toString() : "none";
+		return te != null ? ForgeRegistries.BLOCK_ENTITY_TYPES.getKey(te.getType()).toString() : "none";
+	}
+
+	public boolean canTakeDamage()
+	{
+		return true;
+	}
+
+	@Override
+	public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context)
+	{
+		if (!this.canTakeDamage())
+		{
+			return InteractionResult.FAIL;
+		}
+
+		Player player = context.getPlayer();
+		if (player == null)
+		{
+			return InteractionResult.PASS;
+		}
+
+		int useResult = onWrenchUse(player, context, this.canTakeDamage());
+		return switch (useResult)
+		{
+			case -2 -> InteractionResult.PASS;
+			case -1 -> InteractionResult.FAIL;
+			default ->
+			{
+				this.damage(stack, useResult, player, context.getHand());
+				yield InteractionResult.SUCCESS;
+			}
+		};
 	}
 
 	public void damage(ItemStack is, int damage, Player player, InteractionHand hand)
@@ -257,15 +246,15 @@ public class ItemToolWrench extends Item implements PriorityUsableItem, IBoxable
 		return true;
 	}
 
-	public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair)
+	public boolean isValidRepairItem(@NotNull ItemStack toRepair, ItemStack repair)
 	{
-		return repair != null && repair.is(Ic2ItemTags.BRONZE_INGOTS);
+		return repair.is(Ic2ItemTags.BRONZE_INGOTS);
 	}
 
-	private enum WrenchResult
+	public enum WrenchResult
 	{
 		Rotated,
 		Removed,
-		Nothing;
+		Nothing
 	}
 }

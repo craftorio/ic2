@@ -12,10 +12,21 @@ import net.minecraft.world.item.ItemStack;
 
 public class InvSlotScannable extends InvSlotConsumable
 {
+	static
+	{
+		RpcHandler.registerProvider(new InvSlotScannable.ServerScannableCheck());
+	}
+
 	public InvSlotScannable(IInventorySlotHolder<?> base1, String name1, int count)
 	{
 		super(base1, name1, count);
 		this.setStackSizeLimit(1);
+	}
+
+	private static boolean isValidStack(ItemStack stack)
+	{
+		stack = UuGraph.find(stack);
+		return !StackUtil.isEmpty(stack) && UuIndex.instance.get(stack) < Double.POSITIVE_INFINITY;
 	}
 
 	@Override
@@ -28,17 +39,6 @@ public class InvSlotScannable extends InvSlotConsumable
 
 		// Client side: accept everything, server will validate via isValidStack
 		return true;
-	}
-
-	private static boolean isValidStack(ItemStack stack)
-	{
-		stack = UuGraph.find(stack);
-		return !StackUtil.isEmpty(stack) && UuIndex.instance.get(stack) < Double.POSITIVE_INFINITY;
-	}
-
-	static
-	{
-		RpcHandler.registerProvider(new InvSlotScannable.ServerScannableCheck());
 	}
 
 	public static class ServerScannableCheck implements IRpcProvider<Boolean>

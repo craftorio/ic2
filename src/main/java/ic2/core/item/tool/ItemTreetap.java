@@ -34,29 +34,6 @@ public class ItemTreetap extends Item implements IBoxable
 		super(settings);
 	}
 
-	public InteractionResult useOn(UseOnContext context)
-	{
-		Level world = context.getLevel();
-		BlockPos pos = context.getClickedPos();
-		BlockState state = world.getBlockState(pos);
-		Block block = state.getBlock();
-		if (block == Ic2Blocks.RUBBER_LOG)
-		{
-			Player player = context.getPlayer();
-			if (attemptExtract(player, world, pos, context.getClickedFace(), state, null, false))
-			{
-				StackUtil.damage(player, context.getHand(), StackUtil.anyStack, 1);
-				return InteractionResult.SUCCESS;
-			} else
-			{
-				return InteractionResult.FAIL;
-			}
-		} else
-		{
-			return InteractionResult.PASS;
-		}
-	}
-
 	public static boolean attemptExtract(Player player, Level world, BlockPos pos, Direction side, BlockState state, List<ItemStack> stacks, boolean isElectric)
 	{
 		assert state.getBlock() == Ic2Blocks.RUBBER_LOG;
@@ -136,14 +113,37 @@ public class ItemTreetap extends Item implements IBoxable
 		}
 	}
 
+	public static SoundEvent getToolUseSound(boolean isElectric)
+	{
+		return isElectric ? Ic2SoundEvents.ITEM_TREETAP_ELECTRIC_USE : Ic2SoundEvents.ITEM_TREETAP_USE;
+	}
+
+	public InteractionResult useOn(UseOnContext context)
+	{
+		Level world = context.getLevel();
+		BlockPos pos = context.getClickedPos();
+		BlockState state = world.getBlockState(pos);
+		Block block = state.getBlock();
+		if (block == Ic2Blocks.RUBBER_LOG)
+		{
+			Player player = context.getPlayer();
+			if (attemptExtract(player, world, pos, context.getClickedFace(), state, null, false))
+			{
+				StackUtil.damage(player, context.getHand(), StackUtil.anyStack, 1);
+				return InteractionResult.SUCCESS;
+			} else
+			{
+				return InteractionResult.FAIL;
+			}
+		} else
+		{
+			return InteractionResult.PASS;
+		}
+	}
+
 	@Override
 	public boolean canBeStoredInToolbox(ItemStack itemstack)
 	{
 		return true;
-	}
-
-	public static SoundEvent getToolUseSound(boolean isElectric)
-	{
-		return isElectric ? Ic2SoundEvents.ITEM_TREETAP_ELECTRIC_USE : Ic2SoundEvents.ITEM_TREETAP_USE;
 	}
 }

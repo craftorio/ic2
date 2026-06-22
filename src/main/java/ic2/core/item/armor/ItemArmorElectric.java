@@ -53,22 +53,6 @@ public abstract class ItemArmorElectric extends ItemArmorIC2 implements IElectri
 		this.tier = tier;
 	}
 
-	public abstract int getEnergyPerDamage();
-
-	public abstract double getDamageAbsorptionRatio();
-
-	protected double getBaseAbsorptionRatio()
-	{
-		return switch (this.getEquipmentSlot())
-		{
-			case HEAD -> 0.15;
-			case CHEST -> 0.4;
-			case LEGS -> 0.3;
-			case FEET -> 0.15;
-			default -> 0.0;
-		};
-	}
-
 	public static float damageArmor(Player entity, DamageSource source, float amount)
 	{
 		if (source == null || amount <= 0.0F || source.is(DamageTypeTags.BYPASSES_ENCHANTMENTS))
@@ -117,6 +101,22 @@ public abstract class ItemArmorElectric extends ItemArmorIC2 implements IElectri
 		}
 
 		return remainingDamage;
+	}
+
+	public abstract int getEnergyPerDamage();
+
+	public abstract double getDamageAbsorptionRatio();
+
+	protected double getBaseAbsorptionRatio()
+	{
+		return switch (this.getEquipmentSlot())
+		{
+			case HEAD -> 0.15;
+			case CHEST -> 0.4;
+			case LEGS -> 0.3;
+			case FEET -> 0.15;
+			default -> 0.0;
+		};
 	}
 
 	public boolean isEnchantable(ItemStack stack)

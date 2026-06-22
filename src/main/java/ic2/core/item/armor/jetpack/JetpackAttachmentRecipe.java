@@ -2,11 +2,12 @@ package ic2.core.item.armor.jetpack;
 
 import com.google.gson.JsonObject;
 import ic2.api.item.ElectricItem;
-import ic2.core.init.MainConfig;
+import ic2.core.init.IC2Config;
 import ic2.core.ref.Ic2Items;
 import ic2.core.ref.Ic2RecipeSerializers;
 import ic2.core.util.ConfigUtil;
 
+import java.text.ParseException;
 import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.Set;
@@ -40,9 +41,15 @@ public class JetpackAttachmentRecipe implements CraftingRecipe
 
 	public static void init()
 	{
-		for (ItemStack stack : ConfigUtil.asStackList(MainConfig.get(), "recipes/jetpackAttachmentBlacklist"))
+		try
 		{
-			blacklistedItems.add(stack.getItem());
+			for (ItemStack stack : ConfigUtil.asStackList(IC2Config.recipes.jetpackAttachmentBlacklist.get()))
+			{
+				blacklistedItems.add(stack.getItem());
+			}
+		} catch (ParseException pe)
+		{
+			throw new RuntimeException(pe);
 		}
 
 		blacklistedItems.add(Ic2Items.JETPACK);
@@ -76,8 +83,7 @@ public class JetpackAttachmentRecipe implements CraftingRecipe
 					}
 
 					jetpack = currentStack;
-				}
-				else if (Mob.getEquipmentSlotForItem(currentStack) == EquipmentSlot.CHEST && !blacklistedItems.contains(item))
+				} else if (Mob.getEquipmentSlotForItem(currentStack) == EquipmentSlot.CHEST && !blacklistedItems.contains(item))
 				{
 					if (!armor.isEmpty())
 					{
@@ -85,8 +91,7 @@ public class JetpackAttachmentRecipe implements CraftingRecipe
 					}
 
 					armor = currentStack;
-				}
-				else
+				} else
 				{
 					if (item != Ic2Items.JETPACK_ATTACHMENT_PLATE || attachmentPlate)
 					{
@@ -104,8 +109,7 @@ public class JetpackAttachmentRecipe implements CraftingRecipe
 			JetpackHandler.setJetpackAttached(ret, true);
 			ElectricItem.manager.charge(ret, ElectricItem.manager.getCharge(jetpack), Integer.MAX_VALUE, true, false);
 			return ret;
-		}
-		else
+		} else
 		{
 			return ItemStack.EMPTY;
 		}

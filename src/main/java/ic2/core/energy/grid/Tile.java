@@ -17,9 +17,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 
 public final class Tile
 {
-	private final IEnergyTile mainTile;
 	final List<IEnergyTile> subTiles;
 	final List<Node> nodes = new ArrayList<>();
+	private final IEnergyTile mainTile;
 	private boolean disabled;
 	private double amount;
 	private int packetCount;
@@ -42,6 +42,11 @@ public final class Tile
 		{
 			this.nodes.add(new Node(enet.allocateNodeId(), this, NodeType.Conductor));
 		}
+	}
+
+	private static String getTeClassName(Object o)
+	{
+		return o.getClass().getSimpleName().replace("TileEntity", "");
 	}
 
 	public IEnergyTile getMainTile()
@@ -159,10 +164,5 @@ public final class Tile
 		}
 
 		return ret;
-	}
-
-	private static String getTeClassName(Object o)
-	{
-		return o.getClass().getSimpleName().replace("TileEntity", "");
 	}
 }

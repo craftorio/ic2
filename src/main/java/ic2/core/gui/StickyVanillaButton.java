@@ -11,14 +11,14 @@ public class StickyVanillaButton extends VanillaButton
 		super(gui, x, y, width, height, handler);
 	}
 
-	public void setOn(boolean on)
-	{
-		this.isOn = on;
-	}
-
 	public boolean isOn()
 	{
 		return this.isOn;
+	}
+
+	public void setOn(boolean on)
+	{
+		this.isOn = on;
 	}
 
 	public StickyVanillaButton withDisableHandler(IEnableHandler handler)

@@ -7,6 +7,38 @@ import org.apache.commons.lang3.mutable.Mutable;
 
 public interface StandardFluidItem extends Ic2FluidItem
 {
+	static Ic2FluidStack getFs(ItemStack stack)
+	{
+		CompoundTag nbt = stack.getTag();
+		if (nbt == null)
+		{
+			return null;
+		} else
+		{
+			return !nbt.contains("Fluid", 10) ? null : Ic2FluidStack.read(nbt.getCompound("Fluid"));
+		}
+	}
+
+	static void setFs(ItemStack stack, Ic2FluidStack fs)
+	{
+		CompoundTag nbt = stack.getTag();
+		if (nbt == null)
+		{
+			nbt = new CompoundTag();
+			stack.setTag(nbt);
+		}
+
+		if (fs != null && !fs.isEmpty())
+		{
+			CompoundTag fsNbt = new CompoundTag();
+			fs.toNbt(fsNbt);
+			nbt.put("Fluid", fsNbt);
+		} else
+		{
+			nbt.remove("Fluid");
+		}
+	}
+
 	default boolean canDrain(ItemStack stack)
 	{
 		return true;
@@ -213,38 +245,6 @@ public interface StandardFluidItem extends Ic2FluidItem
 		}
 
 		return amount;
-	}
-
-	static Ic2FluidStack getFs(ItemStack stack)
-	{
-		CompoundTag nbt = stack.getTag();
-		if (nbt == null)
-		{
-			return null;
-		} else
-		{
-			return !nbt.contains("Fluid", 10) ? null : Ic2FluidStack.read(nbt.getCompound("Fluid"));
-		}
-	}
-
-	static void setFs(ItemStack stack, Ic2FluidStack fs)
-	{
-		CompoundTag nbt = stack.getTag();
-		if (nbt == null)
-		{
-			nbt = new CompoundTag();
-			stack.setTag(nbt);
-		}
-
-		if (fs != null && !fs.isEmpty())
-		{
-			CompoundTag fsNbt = new CompoundTag();
-			fs.toNbt(fsNbt);
-			nbt.put("Fluid", fsNbt);
-		} else
-		{
-			nbt.remove("Fluid");
-		}
 	}
 
 	default void updateDamage(ItemStack stack, int amount)

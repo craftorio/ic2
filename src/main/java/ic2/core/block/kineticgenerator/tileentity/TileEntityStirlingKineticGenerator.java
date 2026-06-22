@@ -36,30 +36,26 @@ import net.minecraft.world.level.block.state.BlockState;
 @NotClassic
 public class TileEntityStirlingKineticGenerator extends TileEntityAbstractKineticGenerator implements IUpgradableBlock, IHasGui
 {
+	protected final Fluids fluids = this.addComponent(new Fluids(this));
+	private final int maxHeatBuffer;
 	public Ic2FluidTank inputTank;
 	public Ic2FluidTank outputTank;
-	public InvSlotOutput hotoutputSlot;
-	public InvSlotOutput cooloutputSlot;
-	public InvSlotConsumableLiquidByTank hotfluidinputSlot;
-	public InvSlotConsumableLiquidByManager coolfluidinputSlot;
+	public InvSlotOutput hotOutputSlot;
+	public InvSlotOutput coolOutputSlot;
+	public InvSlotConsumableLiquidByTank hotFluidInputSlot;
+	public InvSlotConsumableLiquidByManager coolFluidInputSlot;
 	public InvSlotUpgrade upgradeSlot;
-	private int heatbuffer = 0;
-	private final int maxHeatbuffer;
-	private boolean newActive;
+	private int heatBuffer = 0;
 	private int liquidHeatStored;
-	protected final Fluids fluids = this.addComponent(new Fluids(this));
-	private static final int PARTS_KU = 3;
-	private static final int PARTS_LIQUID = 1;
-	private static final int PARTS_TOTAL = 4;
 
 	public TileEntityStirlingKineticGenerator(BlockPos pos, BlockState state)
 	{
 		super(Ic2BlockEntities.STIRLING_KINETIC_GENERATOR, pos, state);
 		this.inputTank = this.fluids.addTankInsert("inputTank", 2000, Fluids.fluidPredicate(Recipes.liquidHeatUpManager.getSingleDirectionLiquidManager()));
 		this.outputTank = this.fluids.addTankExtract("outputTank", 2000);
-		this.hotoutputSlot = new InvSlotOutput(this, "hotOutputSlot", 1);
-		this.cooloutputSlot = new InvSlotOutput(this, "outputSlot", 1);
-		this.coolfluidinputSlot = new InvSlotConsumableLiquidByManager(
+		this.hotOutputSlot = new InvSlotOutput(this, "hotOutputSlot", 1);
+		this.coolOutputSlot = new InvSlotOutput(this, "outputSlot", 1);
+		this.coolFluidInputSlot = new InvSlotConsumableLiquidByManager(
 			this,
 			"coolfluidinputSlot",
 			InvSlot.Access.I,
@@ -68,11 +64,11 @@ public class TileEntityStirlingKineticGenerator extends TileEntityAbstractKineti
 			InvSlotConsumableLiquid.OpType.Drain,
 			Recipes.liquidHeatUpManager.getSingleDirectionLiquidManager()
 		);
-		this.hotfluidinputSlot = new InvSlotConsumableLiquidByTank(
+		this.hotFluidInputSlot = new InvSlotConsumableLiquidByTank(
 			this, "hotfluidoutputSlot", InvSlot.Access.I, 1, InvSlot.InvSide.BOTTOM, InvSlotConsumableLiquid.OpType.Fill, this.outputTank
 		);
 		this.upgradeSlot = new InvSlotUpgrade(this, "upgrade", 3);
-		this.maxHeatbuffer = 1000;
+		this.maxHeatBuffer = 1000;
 		this.maxKuBuffer = 2000;
 	}
 
@@ -82,7 +78,7 @@ public class TileEntityStirlingKineticGenerator extends TileEntityAbstractKineti
 		super.load(nbt);
 		this.inputTank.fromNbt(nbt.getCompound("inputTank"));
 		this.outputTank.fromNbt(nbt.getCompound("outputTank"));
-		this.heatbuffer = nbt.getInt("heatbuffer");
+		this.heatBuffer = nbt.getInt("heatbuffer");
 		this.kuBuffer = nbt.getInt("kubuffer");
 		this.liquidHeatStored = nbt.getInt("liquidHeatStored");
 	}
@@ -97,7 +93,7 @@ public class TileEntityStirlingKineticGenerator extends TileEntityAbstractKineti
 		CompoundTag outputTankTag = new CompoundTag();
 		this.outputTank.toNbt(outputTankTag);
 		nbt.put("outputTank", outputTankTag);
-		nbt.putInt("heatbuffer", this.heatbuffer);
+		nbt.putInt("heatbuffer", this.heatBuffer);
 		nbt.putInt("kUBuffer", this.kuBuffer);
 		nbt.putInt("liquidHeatStored", this.liquidHeatStored);
 	}
@@ -106,14 +102,14 @@ public class TileEntityStirlingKineticGenerator extends TileEntityAbstractKineti
 	protected void updateEntityServer()
 	{
 		super.updateEntityServer();
-		this.coolfluidinputSlot.processIntoTank(this.inputTank, this.cooloutputSlot);
-		this.hotfluidinputSlot.processFromTank(this.outputTank, this.hotoutputSlot);
-		if (this.heatbuffer < this.maxHeatbuffer)
+		this.coolFluidInputSlot.processIntoTank(this.inputTank, this.coolOutputSlot);
+		this.hotFluidInputSlot.processFromTank(this.outputTank, this.hotOutputSlot);
+		if (this.heatBuffer < this.maxHeatBuffer)
 		{
-			this.heatbuffer = this.heatbuffer + this.drawHu(this.maxHeatbuffer - this.heatbuffer);
+			this.heatBuffer = this.heatBuffer + this.drawHu(this.maxHeatBuffer - this.heatBuffer);
 		}
 
-		this.newActive = false;
+		boolean newActive = false;
 		if (this.inputTank.getFluidAmount() > 0
 			&& this.outputTank.getFluidAmount() < this.outputTank.getCapacity()
 			&& Recipes.liquidHeatUpManager.getSingleDirectionLiquidManager().acceptsFluid(this.inputTank.getFluidStack().getFluid())
@@ -123,22 +119,21 @@ public class TileEntityStirlingKineticGenerator extends TileEntityAbstractKineti
 				.getHeatExchangeProperty(this.inputTank.getFluidStack().getFluid());
 			if (this.outputTank.isEmpty() || this.outputTank.hasExactFluid(property.outputFluid))
 			{
-				int heatbufferToUse = this.heatbuffer / 4;
+				int heatbufferToUse = this.heatBuffer / 4;
 				heatbufferToUse = Math.min(
 					heatbufferToUse,
 					(
 						Math.min(this.outputTank.getCapacity() - this.outputTank.getFluidAmount(), this.inputTank.getFluidAmount()) * property.huPerMB
 							- this.liquidHeatStored
 					)
-						/ 1
 				);
 				heatbufferToUse = Math.min(heatbufferToUse, (this.maxKuBuffer - this.kuBuffer) / 3);
 				if (heatbufferToUse > 0)
 				{
 					this.kuBuffer += heatbufferToUse * 3 * 4;
-					this.liquidHeatStored += heatbufferToUse * 1;
-					this.heatbuffer -= heatbufferToUse * 4;
-					this.newActive = true;
+					this.liquidHeatStored += heatbufferToUse;
+					this.heatBuffer -= heatbufferToUse * 4;
+					newActive = true;
 				}
 
 				if (this.liquidHeatStored >= property.huPerMB)
@@ -153,9 +148,9 @@ public class TileEntityStirlingKineticGenerator extends TileEntityAbstractKineti
 			}
 		}
 
-		if (this.getActive() != this.newActive)
+		if (this.getActive() != newActive)
 		{
-			this.setActive(this.newActive);
+			this.setActive(newActive);
 		}
 
 		this.upgradeSlot.tick();

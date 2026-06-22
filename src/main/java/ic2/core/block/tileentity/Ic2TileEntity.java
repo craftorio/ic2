@@ -54,17 +54,88 @@ public abstract class Ic2TileEntity extends BlockEntity implements INetworkDataP
 	private static final List<TileEntityComponent> emptyComponents = Collections.emptyList();
 	private static final Map<Class<?>, Ic2TileEntity.TickSubscription> tickSubscriptions = new IdentityHashMap<>();
 	private static final boolean debugLoad = System.getProperty("ic2.te.debugload") != null;
+	protected final Ic2TileEntityBlock teBlock;
 	private Map<Class<? extends TileEntityComponent>, TileEntityComponent> components;
 	private List<TileEntityComponent> updatableComponents;
 	private boolean active = false;
 	private byte loadState = 0;
-	protected final Ic2TileEntityBlock teBlock;
 	private boolean enableWorldTick;
 
 	public Ic2TileEntity(BlockEntityType<?> type, BlockPos pos, BlockState state)
 	{
 		super(type, pos, state);
 		this.teBlock = (Ic2TileEntityBlock) state.getBlock();
+	}
+
+	private static synchronized Ic2TileEntity.TickSubscription getTickSubscription(Class<?> cls)
+	{
+		Ic2TileEntity.TickSubscription subscription = tickSubscriptions.get(cls);
+		if (subscription == null)
+		{
+			boolean hasUpdateClient = false;
+			boolean hasUpdateServer = false;
+			boolean isClient = IC2.envProxy.isClientEnv();
+
+			for (Class<?> curCls = cls; curCls != Ic2TileEntity.class && (!hasUpdateClient && isClient || !hasUpdateServer); curCls = curCls.getSuperclass())
+			{
+				if (!hasUpdateClient && isClient)
+				{
+					boolean found = true;
+
+					try
+					{
+						curCls.getDeclaredMethod("updateEntityClient");
+					} catch (NoSuchMethodException e)
+					{
+						found = false;
+					}
+
+					if (found)
+					{
+						hasUpdateClient = true;
+					}
+				}
+
+				if (!hasUpdateServer)
+				{
+					boolean found = true;
+
+					try
+					{
+						curCls.getDeclaredMethod("updateEntityServer");
+					} catch (NoSuchMethodException e)
+					{
+						found = false;
+					}
+
+					if (found)
+					{
+						hasUpdateServer = true;
+					}
+				}
+			}
+
+			if (hasUpdateClient)
+			{
+				if (hasUpdateServer)
+				{
+					subscription = Ic2TileEntity.TickSubscription.Both;
+				} else
+				{
+					subscription = Ic2TileEntity.TickSubscription.Client;
+				}
+			} else if (hasUpdateServer)
+			{
+				subscription = Ic2TileEntity.TickSubscription.Server;
+			} else
+			{
+				subscription = Ic2TileEntity.TickSubscription.None;
+			}
+
+			tickSubscriptions.put(cls, subscription);
+		}
+
+		return subscription;
 	}
 
 	public final Ic2TileEntityBlock getBlockType()
@@ -342,7 +413,7 @@ public abstract class Ic2TileEntity extends BlockEntity implements INetworkDataP
 	protected void onEntityCollision(Entity entity)
 	{
 	}
-	
+
 	protected InteractionResult onActivated(Player player, InteractionHand hand, Direction side, Vec3 hit)
 	{
 		if (!(this instanceof IHasGui) || this.level == null)
@@ -582,77 +653,6 @@ public abstract class Ic2TileEntity extends BlockEntity implements INetworkDataP
 		{
 			this.level.setBlockAndUpdate(this.worldPosition, state.setValue(Ic2TileEntityBlock.ACTIVE, this.active));
 		}
-	}
-
-	private static synchronized Ic2TileEntity.TickSubscription getTickSubscription(Class<?> cls)
-	{
-		Ic2TileEntity.TickSubscription subscription = tickSubscriptions.get(cls);
-		if (subscription == null)
-		{
-			boolean hasUpdateClient = false;
-			boolean hasUpdateServer = false;
-			boolean isClient = IC2.envProxy.isClientEnv();
-
-			for (Class<?> curCls = cls; curCls != Ic2TileEntity.class && (!hasUpdateClient && isClient || !hasUpdateServer); curCls = curCls.getSuperclass())
-			{
-				if (!hasUpdateClient && isClient)
-				{
-					boolean found = true;
-
-					try
-					{
-						curCls.getDeclaredMethod("updateEntityClient");
-					} catch (NoSuchMethodException e)
-					{
-						found = false;
-					}
-
-					if (found)
-					{
-						hasUpdateClient = true;
-					}
-				}
-
-				if (!hasUpdateServer)
-				{
-					boolean found = true;
-
-					try
-					{
-						curCls.getDeclaredMethod("updateEntityServer");
-					} catch (NoSuchMethodException e)
-					{
-						found = false;
-					}
-
-					if (found)
-					{
-						hasUpdateServer = true;
-					}
-				}
-			}
-
-			if (hasUpdateClient)
-			{
-				if (hasUpdateServer)
-				{
-					subscription = Ic2TileEntity.TickSubscription.Both;
-				} else
-				{
-					subscription = Ic2TileEntity.TickSubscription.Client;
-				}
-			} else if (hasUpdateServer)
-			{
-				subscription = Ic2TileEntity.TickSubscription.Server;
-			} else
-			{
-				subscription = Ic2TileEntity.TickSubscription.None;
-			}
-
-			tickSubscriptions.put(cls, subscription);
-		}
-
-		return subscription;
 	}
 
 	private enum TickSubscription

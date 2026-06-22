@@ -9,12 +9,11 @@ import ic2.core.block.invslot.InvSlotConsumable;
 import ic2.core.block.invslot.InvSlotConsumableItemStack;
 import ic2.core.block.invslot.InvSlotDischarge;
 import ic2.core.block.tileentity.TileEntityHeatSourceInventory;
-import ic2.core.init.MainConfig;
+import ic2.core.init.IC2Config;
 import ic2.core.network.GrowingBuffer;
 import ic2.core.profile.NotClassic;
 import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.ref.Ic2Items;
-import ic2.core.util.ConfigUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -24,11 +23,11 @@ import net.minecraft.world.level.block.state.BlockState;
 @NotClassic
 public class TileEntityElectricHeatGenerator extends TileEntityHeatSourceInventory implements IHasGui
 {
-	private boolean newActive;
+	public static final double outputMultiplier = IC2Config.balance.energy.heatGenerator.electric.get();
 	public final InvSlotDischarge dischargeSlot;
 	public final InvSlotConsumable coilSlot = new InvSlotConsumableItemStack(this, "CoilSlot", 10, new ItemStack(Ic2Items.COIL));
 	protected final Energy energy;
-	public static final double outputMultiplier = ConfigUtil.getFloat(MainConfig.get(), "balance/energy/heatgenerator/electric");
+	private boolean newActive;
 
 	public TileEntityElectricHeatGenerator(BlockPos pos, BlockState state)
 	{

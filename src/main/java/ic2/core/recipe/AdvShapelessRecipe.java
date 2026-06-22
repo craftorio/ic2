@@ -184,6 +184,18 @@ public class AdvShapelessRecipe implements CraftingRecipe
 
 	public static class Serializer implements RecipeSerializer<AdvShapelessRecipe>
 	{
+		private static IRecipeInput[] getIngredients(JsonArray json)
+		{
+			IRecipeInput[] inputs = new IRecipeInput[json.size()];
+
+			for (int i = 0; i < json.size(); i++)
+			{
+				inputs[i] = RecipeIo.parseInput(json.get(i));
+			}
+
+			return inputs;
+		}
+
 		public AdvShapelessRecipe fromJson(ResourceLocation id, JsonObject json)
 		{
 			IRecipeInput[] ingredients = getIngredients(GsonHelper.getAsJsonArray(json, "ingredients"));
@@ -201,18 +213,6 @@ public class AdvShapelessRecipe implements CraftingRecipe
 			boolean consuming = GsonHelper.getAsBoolean(json, "consuming", false);
 			boolean hidden = GsonHelper.getAsBoolean(json, "hidden", false);
 			return new AdvShapelessRecipe(id, ingredients, result, hidden, consuming);
-		}
-
-		private static IRecipeInput[] getIngredients(JsonArray json)
-		{
-			IRecipeInput[] inputs = new IRecipeInput[json.size()];
-
-			for (int i = 0; i < json.size(); i++)
-			{
-				inputs[i] = RecipeIo.parseInput(json.get(i));
-			}
-
-			return inputs;
 		}
 
 		public AdvShapelessRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buf)

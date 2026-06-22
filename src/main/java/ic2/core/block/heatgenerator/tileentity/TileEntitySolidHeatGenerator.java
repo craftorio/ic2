@@ -8,13 +8,12 @@ import ic2.core.block.invslot.InvSlotOutput;
 import ic2.core.block.tileentity.TileEntityHeatSourceInventory;
 import ic2.core.gui.dynamic.DynamicContainer;
 import ic2.core.gui.dynamic.IGuiValueProvider;
-import ic2.core.init.MainConfig;
+import ic2.core.init.IC2Config;
 import ic2.core.network.GrowingBuffer;
 import ic2.core.network.GuiSynced;
 import ic2.core.profile.NotClassic;
 import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.ref.Ic2Items;
-import ic2.core.util.ConfigUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Inventory;
@@ -25,16 +24,16 @@ import net.minecraft.world.level.block.state.BlockState;
 @NotClassic
 public class TileEntitySolidHeatGenerator extends TileEntityHeatSourceInventory implements IHasGui, IGuiValueProvider
 {
-	private int heatbuffer = 0;
+	public static final int emittedHU = Math.round(20.0F * (float) IC2Config.balance.energy.heatGenerator.solid.get().floatValue());
+	public final InvSlotConsumableFuel fuelSlot = new InvSlotConsumableFuel(this, "fuel", 1, false);
+	public final InvSlotOutput outputslot = new InvSlotOutput(this, "output", 1);
 	public int activityMeter = 0;
 	public int ticksSinceLastActiveUpdate;
 	@GuiSynced
 	public int fuel = 0;
 	@GuiSynced
 	public int itemFuelTime = 0;
-	public final InvSlotConsumableFuel fuelSlot = new InvSlotConsumableFuel(this, "fuel", 1, false);
-	public final InvSlotOutput outputslot = new InvSlotOutput(this, "output", 1);
-	public static final int emittedHU = Math.round(20.0F * ConfigUtil.getFloat(MainConfig.get(), "balance/energy/heatgenerator/solid"));
+	private int heatbuffer = 0;
 
 	public TileEntitySolidHeatGenerator(BlockPos pos, BlockState state)
 	{

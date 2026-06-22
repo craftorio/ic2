@@ -35,11 +35,6 @@ public class WorldData
 {
 	private static ConcurrentMap<ResourceLocation, WorldData> idxClient = IC2.envProxy.isClientEnv() ? new ConcurrentHashMap<>() : null;
 	private static ConcurrentMap<ResourceLocation, WorldData> idxServer = new ConcurrentHashMap<>();
-	final Queue<IWorldTickCallback> singleUpdates = new ConcurrentLinkedQueue<>();
-	final Set<IWorldTickCallback> continuousUpdates = new HashSet<>();
-	boolean continuousUpdatesInUse = false;
-	final List<IWorldTickCallback> continuousUpdatesToAdd = new ArrayList<>();
-	final List<IWorldTickCallback> continuousUpdatesToRemove = new ArrayList<>();
 	public final EnergyNetLocal energyNet;
 	public final Map<BlockEntity, TeUpdateDataServer> tesToUpdate = new IdentityHashMap<>();
 	public final TradingMarket tradeMarket;
@@ -49,6 +44,11 @@ public class WorldData
 	public final Set<LevelChunk> pendingUnloadChunks = Collections.newSetFromMap(new IdentityHashMap<>());
 	public final Long2ObjectMap<Set<BlockPos>> loadedChunks;
 	public final Object2ObjectMap<BlockPos, LongSet> chunkLoaders;
+	final Queue<IWorldTickCallback> singleUpdates = new ConcurrentLinkedQueue<>();
+	final Set<IWorldTickCallback> continuousUpdates = new HashSet<>();
+	final List<IWorldTickCallback> continuousUpdatesToAdd = new ArrayList<>();
+	final List<IWorldTickCallback> continuousUpdatesToRemove = new ArrayList<>();
+	boolean continuousUpdatesInUse = false;
 
 	private WorldData(Level world)
 	{

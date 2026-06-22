@@ -7,9 +7,9 @@ import net.minecraft.world.item.ItemStack;
 
 public final class ElectricItem
 {
+	private static final List<IBackupElectricItemManager> backupManagers = new ArrayList<>();
 	public static IElectricItemManager manager;
 	public static IElectricItemManager rawManager;
-	private static final List<IBackupElectricItemManager> backupManagers = new ArrayList<>();
 
 	public static void registerBackupManager(IBackupElectricItemManager manager)
 	{

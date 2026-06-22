@@ -9,12 +9,11 @@ import ic2.core.block.invslot.InvSlot;
 import ic2.core.block.invslot.InvSlotConsumableClass;
 import ic2.core.block.invslot.InvSlotConsumableKineticRotor;
 import ic2.core.block.kineticgenerator.container.ContainerWaterKineticGenerator;
-import ic2.core.init.MainConfig;
+import ic2.core.init.IC2Config;
 import ic2.core.network.GrowingBuffer;
 import ic2.core.profile.NotClassic;
 import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.util.BiomeUtil;
-import ic2.core.util.ConfigUtil;
 import ic2.core.util.StackUtil;
 import ic2.core.util.Util;
 
@@ -39,6 +38,7 @@ import net.minecraft.world.level.block.state.BlockState;
 @NotClassic
 public class TileEntityWaterKineticGenerator extends TileEntityAbstractKineticGenerator implements IRotorProvider, IHasGui
 {
+	private static final ResourceLocation woodenRotorTexture = ResourceLocation.fromNamespaceAndPath("ic2", "textures/item/rotor/wood_rotor_model.png");
 	public InvSlotConsumableClass rotorSlot;
 	public TileEntityWaterKineticGenerator.BiomeState type = TileEntityWaterKineticGenerator.BiomeState.UNKNOWN;
 	private boolean rightFacing;
@@ -47,8 +47,6 @@ public class TileEntityWaterKineticGenerator extends TileEntityAbstractKineticGe
 	private long lastCheck;
 	private float angle = 0.0F;
 	private float rotationSpeed;
-	private static final float outputModifier = 0.2F * ConfigUtil.getFloat(MainConfig.get(), "balance/energy/kineticgenerator/water");
-	private static final ResourceLocation woodenRotorTexture = ResourceLocation.fromNamespaceAndPath("ic2", "textures/item/rotor/wood_rotor_model.png");
 
 	public TileEntityWaterKineticGenerator(BlockPos pos, BlockState state)
 	{
@@ -329,7 +327,7 @@ public class TileEntityWaterKineticGenerator extends TileEntityAbstractKineticGe
 
 	public int getKuOutput()
 	{
-		return this.getActive() ? (int) Math.abs(this.waterFlow * outputModifier) : 0;
+		return this.getActive() ? (int) Math.abs(this.waterFlow * 0.2F * (float) IC2Config.balance.energy.kineticGenerator.water.get().floatValue()) : 0;
 	}
 
 	public float getEfficiency()

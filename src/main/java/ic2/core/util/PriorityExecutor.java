@@ -65,6 +65,13 @@ public class PriorityExecutor extends ThreadPoolExecutor
 		this.getQueue().addAll(tasks);
 	}
 
+	public enum Priority
+	{
+		High,
+		Default,
+		Low;
+	}
+
 	public interface CustomPriority
 	{
 		PriorityExecutor.Priority getPriority();
@@ -334,17 +341,10 @@ public class PriorityExecutor extends ThreadPoolExecutor
 		}
 	}
 
-	public enum Priority
-	{
-		High,
-		Default,
-		Low;
-	}
-
 	private static class ThreadFactoryImpl implements ThreadFactory
 	{
-		private final ThreadGroup group = Thread.currentThread().getThreadGroup();
 		private static final AtomicInteger number = new AtomicInteger(1);
+		private final ThreadGroup group = Thread.currentThread().getThreadGroup();
 
 		ThreadFactoryImpl()
 		{

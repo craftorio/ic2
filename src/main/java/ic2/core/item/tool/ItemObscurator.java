@@ -46,113 +46,6 @@ public class ItemObscurator extends BaseElectricItem implements PriorityUsableIt
 		super(settings, 100000.0, 250.0, 2);
 	}
 
-	@Override
-	public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context)
-	{
-		Level world = context.getLevel();
-		BlockPos pos = context.getClickedPos();
-		Direction side = context.getClickedFace();
-		Player player = context.getPlayer();
-		if (!player.isShiftKeyDown() && !world.isClientSide && ElectricItem.manager.canUse(stack, 5000.0))
-		{
-			CompoundTag nbt = StackUtil.getOrCreateNbtData(stack);
-			BlockState refState;
-			Direction refSide;
-			int[] colorMultipliers;
-			if ((refState = getState(nbt)) != null && (refSide = getSide(nbt)) != null && (colorMultipliers = getColorMultipliers(nbt)) != null)
-			{
-				BlockState state = world.getBlockState(pos);
-				Block block = state.getBlock();
-				String refVariant = getVariant(nbt);
-				boolean applied;
-				if (block instanceof RetexturableBlock)
-				{
-					applied = ((RetexturableBlock) block).retexture(state, world, pos, side, player, refState, refVariant, refSide, colorMultipliers);
-				} else
-				{
-					applied = IC2.envProxy.announceRetexture(world, pos, state, side, player, refState, refVariant, refSide, colorMultipliers);
-				}
-
-				if (applied)
-				{
-					ElectricItem.manager.use(stack, 5000.0, player);
-					return InteractionResult.SUCCESS;
-				} else
-				{
-					return InteractionResult.PASS;
-				}
-			} else
-			{
-				clear(nbt);
-				return InteractionResult.PASS;
-			}
-		} else if (player.isShiftKeyDown() && world.isClientSide && ElectricItem.manager.canUse(stack, 20000.0))
-		{
-			return this.scanBlock(stack, player, world, pos, side) ? InteractionResult.SUCCESS : InteractionResult.PASS;
-		} else
-		{
-			return InteractionResult.PASS;
-		}
-	}
-
-	private boolean scanBlock(ItemStack stack, Player player, Level world, BlockPos pos, Direction side)
-	{
-		assert world.isClientSide;
-		BlockState state = world.getBlockState(pos);
-		if (state.isAir())
-		{
-			return false;
-		}
-
-		ItemObscurator.ObscuredRenderInfo renderInfo = getRenderInfo(state, side);
-		if (renderInfo == null)
-		{
-			return false;
-		}
-
-		String variant = ModelUtil.getVariant(state);
-		int[] colorMultipliers = new int[renderInfo.tints.length];
-
-		for (int i = 0; i < renderInfo.tints.length; i++)
-		{
-			colorMultipliers[i] = SideProxyClient.mc.getBlockColors().getColor(state, world, pos, renderInfo.tints[i]);
-		}
-
-		CompoundTag nbt = StackUtil.getOrCreateNbtData(stack);
-		if (getState(nbt) == state && variant.equals(getVariant(nbt)) && getSide(nbt) == side && Arrays.equals(getColorMultipliers(nbt), colorMultipliers))
-		{
-			return false;
-		}
-
-		IC2.network.get(false).sendPlayerItemData(player, player.getInventory().selected, state.getBlock(), variant, side, colorMultipliers);
-		return true;
-	}
-
-	@Override
-	public void onPlayerItemNetworkData(Player player, int slot, Object... data)
-	{
-		if (data[0] instanceof Block)
-		{
-			if (data[1] instanceof String)
-			{
-				if (data[2] instanceof Integer)
-				{
-					if (data[3] instanceof int[])
-					{
-						ItemStack stack = player.getInventory().items.get(slot);
-						if (ElectricItem.manager.use(stack, 20000.0, player))
-						{
-							CompoundTag nbt = StackUtil.getOrCreateNbtData(stack);
-							setState(nbt, (Block) data[0], (String) data[1]);
-							setSide(nbt, (Integer) data[2]);
-							setColorMultipliers(nbt, (int[]) data[3]);
-						}
-					}
-				}
-			}
-		}
-	}
-
 	public static BlockState getState(CompoundTag nbt)
 	{
 		String blockName = nbt.getString("refBlock");
@@ -343,6 +236,113 @@ public class ItemObscurator extends BaseElectricItem implements PriorityUsableIt
 		}
 
 		return colorMultipliers;
+	}
+
+	@Override
+	public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context)
+	{
+		Level world = context.getLevel();
+		BlockPos pos = context.getClickedPos();
+		Direction side = context.getClickedFace();
+		Player player = context.getPlayer();
+		if (!player.isShiftKeyDown() && !world.isClientSide && ElectricItem.manager.canUse(stack, 5000.0))
+		{
+			CompoundTag nbt = StackUtil.getOrCreateNbtData(stack);
+			BlockState refState;
+			Direction refSide;
+			int[] colorMultipliers;
+			if ((refState = getState(nbt)) != null && (refSide = getSide(nbt)) != null && (colorMultipliers = getColorMultipliers(nbt)) != null)
+			{
+				BlockState state = world.getBlockState(pos);
+				Block block = state.getBlock();
+				String refVariant = getVariant(nbt);
+				boolean applied;
+				if (block instanceof RetexturableBlock)
+				{
+					applied = ((RetexturableBlock) block).retexture(state, world, pos, side, player, refState, refVariant, refSide, colorMultipliers);
+				} else
+				{
+					applied = IC2.envProxy.announceRetexture(world, pos, state, side, player, refState, refVariant, refSide, colorMultipliers);
+				}
+
+				if (applied)
+				{
+					ElectricItem.manager.use(stack, 5000.0, player);
+					return InteractionResult.SUCCESS;
+				} else
+				{
+					return InteractionResult.PASS;
+				}
+			} else
+			{
+				clear(nbt);
+				return InteractionResult.PASS;
+			}
+		} else if (player.isShiftKeyDown() && world.isClientSide && ElectricItem.manager.canUse(stack, 20000.0))
+		{
+			return this.scanBlock(stack, player, world, pos, side) ? InteractionResult.SUCCESS : InteractionResult.PASS;
+		} else
+		{
+			return InteractionResult.PASS;
+		}
+	}
+
+	private boolean scanBlock(ItemStack stack, Player player, Level world, BlockPos pos, Direction side)
+	{
+		assert world.isClientSide;
+		BlockState state = world.getBlockState(pos);
+		if (state.isAir())
+		{
+			return false;
+		}
+
+		ItemObscurator.ObscuredRenderInfo renderInfo = getRenderInfo(state, side);
+		if (renderInfo == null)
+		{
+			return false;
+		}
+
+		String variant = ModelUtil.getVariant(state);
+		int[] colorMultipliers = new int[renderInfo.tints.length];
+
+		for (int i = 0; i < renderInfo.tints.length; i++)
+		{
+			colorMultipliers[i] = SideProxyClient.mc.getBlockColors().getColor(state, world, pos, renderInfo.tints[i]);
+		}
+
+		CompoundTag nbt = StackUtil.getOrCreateNbtData(stack);
+		if (getState(nbt) == state && variant.equals(getVariant(nbt)) && getSide(nbt) == side && Arrays.equals(getColorMultipliers(nbt), colorMultipliers))
+		{
+			return false;
+		}
+
+		IC2.network.get(false).sendPlayerItemData(player, player.getInventory().selected, state.getBlock(), variant, side, colorMultipliers);
+		return true;
+	}
+
+	@Override
+	public void onPlayerItemNetworkData(Player player, int slot, Object... data)
+	{
+		if (data[0] instanceof Block)
+		{
+			if (data[1] instanceof String)
+			{
+				if (data[2] instanceof Integer)
+				{
+					if (data[3] instanceof int[])
+					{
+						ItemStack stack = player.getInventory().items.get(slot);
+						if (ElectricItem.manager.use(stack, 20000.0, player))
+						{
+							CompoundTag nbt = StackUtil.getOrCreateNbtData(stack);
+							setState(nbt, (Block) data[0], (String) data[1]);
+							setSide(nbt, (Integer) data[2]);
+							setColorMultipliers(nbt, (int[]) data[3]);
+						}
+					}
+				}
+			}
+		}
 	}
 
 	public static class ObscuredRenderInfo

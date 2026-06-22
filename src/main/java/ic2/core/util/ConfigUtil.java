@@ -2,7 +2,6 @@ package ic2.core.util;
 
 import ic2.api.recipe.IRecipeInput;
 import ic2.api.recipe.Recipes;
-import ic2.core.IC2;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -21,141 +20,6 @@ public class ConfigUtil
 	{
 		str = str.trim();
 		return str.isEmpty() ? Collections.emptyList() : Arrays.asList(str.split("\\s*,\\s*"));
-	}
-
-	public static List<IRecipeInput> asRecipeInputList(Config config, String key)
-	{
-		Config.Value value = config.get(key);
-
-		try
-		{
-			try
-			{
-				return asRecipeInputList(value.getString());
-			} catch (ParseException e)
-			{
-				throw new Config.ParseException("Invalid value", value, e);
-			}
-		} catch (Config.ParseException e)
-		{
-			displayError(e, key);
-			return null;
-		}
-	}
-
-	public static List<ItemStack> asStackList(Config config, String key)
-	{
-		Config.Value value = config.get(key);
-
-		try
-		{
-			try
-			{
-				return asStackList(value.getString());
-			} catch (ParseException e)
-			{
-				throw new Config.ParseException("Invalid value", value, e);
-			}
-		} catch (Config.ParseException e)
-		{
-			displayError(e, key);
-			return null;
-		}
-	}
-
-	public static ItemStack asStack(Config config, String key)
-	{
-		Config.Value value = config.get(key);
-
-		try
-		{
-			try
-			{
-				return asStack(value.getString());
-			} catch (ParseException e)
-			{
-				throw new Config.ParseException("Invalid value", value, e);
-			}
-		} catch (Config.ParseException e)
-		{
-			displayError(e, key);
-			return null;
-		}
-	}
-
-	public static String getString(Config config, String key)
-	{
-		return config.get(key).getString();
-	}
-
-	public static boolean getBool(Config config, String key)
-	{
-		Config.Value value = config.get(key);
-
-		try
-		{
-			return value.getBool();
-		} catch (Config.ParseException e)
-		{
-			displayError(e, key);
-			return false;
-		}
-	}
-
-	public static int getInt(Config config, String key)
-	{
-		Config.Value value = config.get(key);
-
-		try
-		{
-			return value.getInt();
-		} catch (Config.ParseException e)
-		{
-			displayError(e, key);
-			return 0;
-		}
-	}
-
-	public static float getFloat(Config config, String key)
-	{
-		Config.Value value = config.get(key);
-
-		try
-		{
-			return value.getFloat();
-		} catch (Config.ParseException e)
-		{
-			displayError(e, key);
-			return 0.0F;
-		}
-	}
-
-	public static double getDouble(Config config, String key)
-	{
-		Config.Value value = config.get(key);
-
-		try
-		{
-			return value.getDouble();
-		} catch (Config.ParseException e)
-		{
-			displayError(e, key);
-			return 0.0;
-		}
-	}
-
-	public static int[] asIntArray(Config config, String key)
-	{
-		Config.Value value = config.get(key);
-
-		try
-		{
-			return asList(value.getString()).stream().mapToInt(Integer::parseInt).toArray();
-		} catch (NumberFormatException e)
-		{
-			displayError(new Config.ParseException("Invalid value", value, e), key);
-			return new int[0];
-		}
 	}
 
 	public static List<ItemStack> asStackList(String str) throws ParseException
@@ -261,15 +125,14 @@ public class ConfigUtil
 		return fromStack(stack, true);
 	}
 
-	public static IRecipeInput asRecipeInput(Config.Value value)
+	public static IRecipeInput asRecipeInput(String str) throws ParseException
 	{
-		try
-		{
-			return asRecipeInput(value.getString());
-		} catch (ParseException e)
-		{
-			throw new Config.ParseException("Invalid value", value, e);
-		}
+		return asRecipeInput(str, false);
+	}
+
+	public static IRecipeInput asRecipeInputWithAmount(String str) throws ParseException
+	{
+		return asRecipeInput(str, true);
 	}
 
 	private static IRecipeInput asRecipeInput(String str, boolean checkAmount) throws ParseException
@@ -320,26 +183,5 @@ public class ConfigUtil
 		{
 			return null;
 		}
-	}
-
-	public static IRecipeInput asRecipeInput(String str) throws ParseException
-	{
-		return asRecipeInput(str, false);
-	}
-
-	public static IRecipeInput asRecipeInputWithAmount(String str) throws ParseException
-	{
-		return asRecipeInput(str, true);
-	}
-
-	private static void displayError(Config.ParseException e, String key)
-	{
-		IC2.sideProxy
-			.displayError(
-				"The IC2 config file contains an invalid entry for %s.\n\n%s%s",
-				key,
-				e.getMessage(),
-				e.getCause() != null ? "\n\n" + e.getCause().getMessage() : ""
-			);
 	}
 }

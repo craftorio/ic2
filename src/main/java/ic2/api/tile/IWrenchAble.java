@@ -10,14 +10,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
-public interface IWrenchable
+public interface IWrenchAble
 {
 	Direction getFacing(Level var1, BlockPos var2);
-
-	default boolean canSetFacing(Level world, BlockPos pos, Direction newDirection, Player player)
-	{
-		return true;
-	}
 
 	boolean setFacing(Level var1, BlockPos var2, Direction var3, Player var4);
 

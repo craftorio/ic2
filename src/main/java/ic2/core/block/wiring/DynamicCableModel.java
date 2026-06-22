@@ -39,11 +39,11 @@ public abstract class DynamicCableModel<T, E> implements UnbakedModel, BakedMode
 	private final int insulation;
 	private final CableFoam foam;
 	private final boolean active;
+	private final Int2ObjectMap<T> cache = new Int2ObjectOpenHashMap<>();
+	private final StampedLock cacheLock = new StampedLock();
 	private Map<DyeColor, TextureAtlasSprite> sprites;
 	private TextureAtlasSprite blackSprite;
 	private TextureAtlasSprite particleTexture;
-	private final Int2ObjectMap<T> cache = new Int2ObjectOpenHashMap<>();
-	private final StampedLock cacheLock = new StampedLock();
 
 	protected DynamicCableModel(CableType type, int insulation, CableFoam foam, boolean active)
 	{
@@ -51,32 +51,6 @@ public abstract class DynamicCableModel<T, E> implements UnbakedModel, BakedMode
 		this.insulation = insulation;
 		this.foam = foam;
 		this.active = active;
-	}
-
-	public Collection<ResourceLocation> getDependencies()
-	{
-		return Collections.emptyList();
-	}
-
-	public void resolveParents(Function<ResourceLocation, UnbakedModel> resolver)
-	{
-	}
-
-	public Collection<Material> getMaterials(Function<ResourceLocation, UnbakedModel> unbakedModelGetter, Set<Pair<String, String>> unresolvedTextureReferences)
-	{
-		if (this.insulation < this.type.minColoredInsulation)
-		{
-			return Collections.singletonList(getTextureId(this.type, this.insulation, DyeColor.BLACK, this.active));
-		}
-
-		List<Material> ret = new ArrayList<>(16);
-
-		for (DyeColor color : DyeColor.values())
-		{
-			ret.add(getTextureId(this.type, this.insulation, color, false));
-		}
-
-		return ret;
 	}
 
 	private static Material getTextureId(CableType type, int insulation, DyeColor color, boolean active)
@@ -104,6 +78,32 @@ public abstract class DynamicCableModel<T, E> implements UnbakedModel, BakedMode
 	{
 		ResourceLocation atlas = TextureAtlas.LOCATION_BLOCKS;
 		return new Material(atlas, IC2.getIdentifier(path));
+	}
+
+	public Collection<ResourceLocation> getDependencies()
+	{
+		return Collections.emptyList();
+	}
+
+	public void resolveParents(Function<ResourceLocation, UnbakedModel> resolver)
+	{
+	}
+
+	public Collection<Material> getMaterials(Function<ResourceLocation, UnbakedModel> unbakedModelGetter, Set<Pair<String, String>> unresolvedTextureReferences)
+	{
+		if (this.insulation < this.type.minColoredInsulation)
+		{
+			return Collections.singletonList(getTextureId(this.type, this.insulation, DyeColor.BLACK, this.active));
+		}
+
+		List<Material> ret = new ArrayList<>(16);
+
+		for (DyeColor color : DyeColor.values())
+		{
+			ret.add(getTextureId(this.type, this.insulation, color, false));
+		}
+
+		return ret;
 	}
 
 	public BakedModel bake(ModelBaker loader, Function<Material, TextureAtlasSprite> textureGetter, ModelState rotationContainer, ResourceLocation modelId)

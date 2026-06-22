@@ -13,8 +13,8 @@ import java.util.Queue;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Item.Properties;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 
 public class ItemReactorUranium extends AbstractDamageableReactorComponent
 {
@@ -31,6 +31,21 @@ public class ItemReactorUranium extends AbstractDamageableReactorComponent
 		this.numberOfCells = cells;
 	}
 
+	protected static int checkPulsable(IReactor reactor, int x, int y, ItemStack stack, int mex, int mey)
+	{
+		ItemStack other = reactor.getItemAt(x, y);
+		return other != null
+			&& other.getItem() instanceof IReactorComponent
+			&& ((IReactorComponent) other.getItem()).acceptUraniumPulse(other, reactor, stack, x, y, mex, mey, true)
+			? 1
+			: 0;
+	}
+
+	protected static int triangularNumber(int x)
+	{
+		return (x * x + x) / 2;
+	}
+
 	@Override
 	public void processChamber(ItemStack stack, IReactor reactor, int x, int y, boolean heatRun)
 	{
@@ -45,22 +60,17 @@ public class ItemReactorUranium extends AbstractDamageableReactorComponent
 				{
 					for (int i = 0; i < pulses; i++)
 					{
-						this.acceptUraniumPulse(stack, reactor, stack, x, y, x, y, heatRun);
+						this.acceptUraniumPulse(stack, reactor, stack, x, y, x, y, false);
 					}
-
-					pulses += checkPulseable(reactor, x - 1, y, stack, x, y, heatRun)
-						+ checkPulseable(reactor, x + 1, y, stack, x, y, heatRun)
-						+ checkPulseable(reactor, x, y - 1, stack, x, y, heatRun)
-						+ checkPulseable(reactor, x, y + 1, stack, x, y, heatRun);
 				} else
 				{
-					pulses += checkPulseable(reactor, x - 1, y, stack, x, y, heatRun)
-						+ checkPulseable(reactor, x + 1, y, stack, x, y, heatRun)
-						+ checkPulseable(reactor, x, y - 1, stack, x, y, heatRun)
-						+ checkPulseable(reactor, x, y + 1, stack, x, y, heatRun);
+					pulses += checkPulsable(reactor, x - 1, y, stack, x, y)
+						+ checkPulsable(reactor, x + 1, y, stack, x, y)
+						+ checkPulsable(reactor, x, y - 1, stack, x, y)
+						+ checkPulsable(reactor, x, y + 1, stack, x, y);
 					int heat = triangularNumber(pulses) * 4;
 					heat = this.getFinalHeat(stack, reactor, x, y, heat);
-					Queue<ItemReactorUranium.ItemStackCoord> heatAcceptors = new ArrayDeque<>();
+					Queue<ItemStackCoordination> heatAcceptors = new ArrayDeque<>();
 					this.checkHeatAcceptor(reactor, x - 1, y, heatAcceptors);
 					this.checkHeatAcceptor(reactor, x + 1, y, heatAcceptors);
 					this.checkHeatAcceptor(reactor, x, y - 1, heatAcceptors);
@@ -68,12 +78,12 @@ public class ItemReactorUranium extends AbstractDamageableReactorComponent
 
 					while (!heatAcceptors.isEmpty() && heat > 0)
 					{
-						int dheat = heat / heatAcceptors.size();
-						heat -= dheat;
-						ItemReactorUranium.ItemStackCoord acceptor = heatAcceptors.remove();
+						int dHeat = heat / heatAcceptors.size();
+						heat -= dHeat;
+						ItemStackCoordination acceptor = heatAcceptors.remove();
 						IReactorComponent acceptorComp = (IReactorComponent) acceptor.stack.getItem();
-						dheat = acceptorComp.alterHeat(acceptor.stack, reactor, acceptor.x, acceptor.y, dheat);
-						heat += dheat;
+						dHeat = acceptorComp.alterHeat(acceptor.stack, reactor, acceptor.x, acceptor.y, dHeat);
+						heat += dHeat;
 					}
 
 					if (heat > 0)
@@ -104,39 +114,24 @@ public class ItemReactorUranium extends AbstractDamageableReactorComponent
 		{
 			case 1 -> Ic2Items.DEPLETED_URANIUM_FUEL_ROD;
 			case 2 -> Ic2Items.DEPLETED_DUAL_URANIUM_FUEL_ROD;
-			default -> throw new RuntimeException("invalid cell count: " + this.numberOfCells);
 			case 4 -> Ic2Items.DEPLETED_QUAD_URANIUM_FUEL_ROD;
+			default -> throw new RuntimeException("invalid cell count: " + this.numberOfCells);
 		});
 	}
 
-	protected static int checkPulseable(IReactor reactor, int x, int y, ItemStack stack, int mex, int mey, boolean heatrun)
-	{
-		ItemStack other = reactor.getItemAt(x, y);
-		return other != null
-			&& other.getItem() instanceof IReactorComponent
-			&& ((IReactorComponent) other.getItem()).acceptUraniumPulse(other, reactor, stack, x, y, mex, mey, heatrun)
-			? 1
-			: 0;
-	}
-
-	protected static int triangularNumber(int x)
-	{
-		return (x * x + x) / 2;
-	}
-
-	protected void checkHeatAcceptor(IReactor reactor, int x, int y, Collection<ItemReactorUranium.ItemStackCoord> heatAcceptors)
+	protected void checkHeatAcceptor(IReactor reactor, int x, int y, Collection<ItemStackCoordination> heatAcceptors)
 	{
 		ItemStack stack = reactor.getItemAt(x, y);
 		if (stack != null && stack.getItem() instanceof IReactorComponent && ((IReactorComponent) stack.getItem()).canStoreHeat(stack, reactor, x, y))
 		{
-			heatAcceptors.add(new ItemReactorUranium.ItemStackCoord(stack, x, y));
+			heatAcceptors.add(new ItemStackCoordination(stack, x, y));
 		}
 	}
 
 	@Override
-	public boolean acceptUraniumPulse(ItemStack stack, IReactor reactor, ItemStack pulsingStack, int youX, int youY, int pulseX, int pulseY, boolean heatrun)
+	public boolean acceptUraniumPulse(ItemStack stack, IReactor reactor, ItemStack pulsingStack, int youX, int youY, int pulseX, int pulseY, boolean heatRun)
 	{
-		if (!heatrun)
+		if (!heatRun)
 		{
 			reactor.addOutput(1.0F);
 		}
@@ -150,7 +145,7 @@ public class ItemReactorUranium extends AbstractDamageableReactorComponent
 		return 2 * this.numberOfCells;
 	}
 
-	public void inventoryTick(ItemStack stack, Level world, Entity entity, int slotIndex, boolean isCurrentItem)
+	public void inventoryTick(@NotNull ItemStack stack, @NotNull Level world, @NotNull Entity entity, int slotIndex, boolean isCurrentItem)
 	{
 		if (entity instanceof LivingEntity entityLiving && !ItemArmorHazmat.hasCompleteHazmat(entityLiving))
 		{
@@ -158,17 +153,7 @@ public class ItemReactorUranium extends AbstractDamageableReactorComponent
 		}
 	}
 
-	private static class ItemStackCoord
+	public record ItemStackCoordination(ItemStack stack, int x, int y)
 	{
-		public final ItemStack stack;
-		public final int x;
-		public final int y;
-
-		public ItemStackCoord(ItemStack stack, int x, int y)
-		{
-			this.stack = stack;
-			this.x = x;
-			this.y = y;
-		}
 	}
 }

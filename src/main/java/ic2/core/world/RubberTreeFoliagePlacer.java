@@ -26,13 +26,18 @@ public final class RubberTreeFoliagePlacer extends FoliagePlacer
 	);
 	public static final FoliagePlacerType<?> TYPE = registerFoliagePlacer();
 
+	RubberTreeFoliagePlacer(IntProvider radius, IntProvider offset)
+	{
+		super(radius, offset);
+	}
+
 	public static void init()
 	{
 	}
 
-	RubberTreeFoliagePlacer(IntProvider radius, IntProvider offset)
+	private static <T extends FoliagePlacer> FoliagePlacerType<T> registerFoliagePlacer()
 	{
-		super(radius, offset);
+		return IC2.envProxy.registerFoliagePlacer(IC2.getIdentifier("rubber_tree"), (Codec<T>) RubberTreeFoliagePlacer.CODEC);
 	}
 
 	protected @NotNull FoliagePlacerType<?> type()
@@ -113,10 +118,5 @@ public final class RubberTreeFoliagePlacer extends FoliagePlacer
 	protected boolean shouldSkipLocation(@NotNull RandomSource random, int dx, int y, int dz, int radius, boolean giantTrunk)
 	{
 		return false;
-	}
-
-	private static <T extends FoliagePlacer> FoliagePlacerType<T> registerFoliagePlacer()
-	{
-		return IC2.envProxy.registerFoliagePlacer(IC2.getIdentifier("rubber_tree"), (Codec<T>) RubberTreeFoliagePlacer.CODEC);
 	}
 }

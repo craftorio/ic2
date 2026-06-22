@@ -51,8 +51,14 @@ import org.apache.commons.lang3.mutable.MutableObject;
 
 public class TileEntityCrop extends Ic2TileEntity implements ICropTile
 {
-	public boolean dirty = true;
+	public static final boolean debug = System.getProperty("ic2.crops.debug") != null;
+	public static final boolean debugChance = debug && System.getProperty("ic2.crops.debug").contains("chance");
+	public static final boolean debugGrowth = debug && System.getProperty("ic2.crops.debug").contains("growth");
+	public static final boolean debugWeedWork = debug && System.getProperty("ic2.crops.debug").contains("weedwork");
+	public static final boolean debugCollision = debug && System.getProperty("ic2.crops.debug").contains("collision");
+	public static final boolean debugTerrain = debug && System.getProperty("ic2.crops.debug").contains("terrain");
 	public static int tickRate = 256;
+	public boolean dirty = true;
 	private CropCard crop;
 	private byte statGrowth;
 	private byte statGain;
@@ -67,12 +73,6 @@ public class TileEntityCrop extends Ic2TileEntity implements ICropTile
 	private short growthPoints = 0;
 	private byte scanLevel;
 	private CompoundTag customData = new CompoundTag();
-	public static final boolean debug = System.getProperty("ic2.crops.debug") != null;
-	public static final boolean debugChance = debug && System.getProperty("ic2.crops.debug").contains("chance");
-	public static final boolean debugGrowth = debug && System.getProperty("ic2.crops.debug").contains("growth");
-	public static final boolean debugWeedWork = debug && System.getProperty("ic2.crops.debug").contains("weedwork");
-	public static final boolean debugCollision = debug && System.getProperty("ic2.crops.debug").contains("collision");
-	public static final boolean debugTerrain = debug && System.getProperty("ic2.crops.debug").contains("terrain");
 
 	public TileEntityCrop(BlockPos pos, BlockState state)
 	{

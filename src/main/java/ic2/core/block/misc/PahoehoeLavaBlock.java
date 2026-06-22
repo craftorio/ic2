@@ -21,6 +21,19 @@ public class PahoehoeLavaBlock extends LiquidBlock
 		super(fluid, properties);
 	}
 
+	private static boolean isTouchingWater(LevelAccessor world, BlockPos pos)
+	{
+		for (Direction dir : Direction.values())
+		{
+			if (world.getFluidState(pos.relative(dir)).is(FluidTags.WATER))
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	@Override
 	public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean movedByPiston)
 	{
@@ -57,18 +70,5 @@ public class PahoehoeLavaBlock extends LiquidBlock
 			entity.hurt(world.damageSources().lava(), 4.0F);
 			entity.setSecondsOnFire(30);
 		}
-	}
-
-	private static boolean isTouchingWater(LevelAccessor world, BlockPos pos)
-	{
-		for (Direction dir : Direction.values())
-		{
-			if (world.getFluidState(pos.relative(dir)).is(FluidTags.WATER))
-			{
-				return true;
-			}
-		}
-
-		return false;
 	}
 }

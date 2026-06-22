@@ -18,14 +18,13 @@ import ic2.core.block.machine.container.ContainerFermenter;
 import ic2.core.block.tileentity.TileEntityInventory;
 import ic2.core.fluid.Ic2FluidTank;
 import ic2.core.gui.dynamic.IGuiValueProvider;
-import ic2.core.init.MainConfig;
+import ic2.core.init.IC2Config;
 import ic2.core.network.GrowingBuffer;
 import ic2.core.profile.NotClassic;
 import ic2.core.recipe.FermenterRecipeManager;
 import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.ref.Ic2Fluids;
 import ic2.core.ref.Ic2Items;
-import ic2.core.util.ConfigUtil;
 
 import java.util.EnumSet;
 import java.util.Set;
@@ -42,8 +41,6 @@ import net.minecraft.world.level.block.state.BlockState;
 @NotClassic
 public class TileEntityFermenter extends TileEntityInventory implements IHasGui, IGuiValueProvider, IUpgradableBlock
 {
-	private final Ic2FluidTank inputTank;
-	private final Ic2FluidTank outputTank;
 	public final InvSlotConsumableLiquidByManager fluidInputCellInSlot;
 	public final InvSlotConsumableLiquidByTank fluidOutputCellInSlot;
 	public final InvSlotOutput fluidInputCellOutSlot;
@@ -51,9 +48,11 @@ public class TileEntityFermenter extends TileEntityInventory implements IHasGui,
 	public final InvSlotOutput fertiliserSlot;
 	public final InvSlotUpgrade upgradeSlot;
 	protected final Fluids fluids;
-	private int heatBuffer = 0;
+	private final Ic2FluidTank inputTank;
+	private final Ic2FluidTank outputTank;
+	private final int maxProgress = IC2Config.balance.fermenter.biomassPerFertilizier.get();
 	public int progress = 0;
-	private final int maxProgress = ConfigUtil.getInt(MainConfig.get(), "balance/fermenter/biomass_per_fertilizier");
+	private int heatBuffer = 0;
 	private boolean newActive = false;
 
 	public TileEntityFermenter(BlockPos pos, BlockState state)
@@ -80,10 +79,10 @@ public class TileEntityFermenter extends TileEntityInventory implements IHasGui,
 		Recipes.fermenter
 			.addRecipe(
 				Ic2Fluids.BIOMASS.still(),
-				ConfigUtil.getInt(MainConfig.get(), "balance/fermenter/need_amount_biomass_per_run"),
-				ConfigUtil.getInt(MainConfig.get(), "balance/fermenter/hU_per_run"),
+				IC2Config.balance.fermenter.needAmountBiomassPerRun.get(),
+				IC2Config.balance.fermenter.hUPerRun.get(),
 				Ic2Fluids.BIOGAS.still(),
-				ConfigUtil.getInt(MainConfig.get(), "balance/fermenter/output_amount_biogas_per_run")
+				IC2Config.balance.fermenter.outputAmountBiogasPerRun.get()
 			);
 	}
 
@@ -177,7 +176,7 @@ public class TileEntityFermenter extends TileEntityInventory implements IHasGui,
 				return 0.0;
 			}
 
-			double maxHeatBuff = ConfigUtil.getInt(MainConfig.get(), "balance/fermenter/hU_per_run");
+			double maxHeatBuff = IC2Config.balance.fermenter.hUPerRun.get();
 			if (!this.inputTank.isEmpty())
 			{
 				IFermenterRecipeManager.FermentationProperty fp = Recipes.fermenter.getFermentationInformation(this.inputTank.getFluidStack().getFluid());

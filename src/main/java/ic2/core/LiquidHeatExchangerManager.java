@@ -4,7 +4,7 @@ import ic2.api.recipe.ILiquidAcceptManager;
 import ic2.api.recipe.ILiquidHeatExchangerManager;
 import ic2.api.recipe.Recipes;
 import ic2.core.fluid.FluidHandler;
-import ic2.core.init.MainConfig;
+import ic2.core.init.IC2Config;
 import ic2.core.util.LogCategory;
 
 import java.util.Collections;
@@ -80,7 +80,7 @@ public class LiquidHeatExchangerManager implements ILiquidHeatExchangerManager
 
 	private void displayError(String msg)
 	{
-		if (MainConfig.ignoreInvalidRecipes)
+		if (IC2Config.recipes.ignoreInvalidRecipes.get())
 		{
 			IC2.log.warn(LogCategory.Recipe, msg);
 		} else

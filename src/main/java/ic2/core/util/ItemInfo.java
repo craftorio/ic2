@@ -3,7 +3,7 @@ package ic2.core.util;
 import ic2.api.info.IInfoProvider;
 import ic2.core.IC2;
 import ic2.core.fluid.Ic2FluidStack;
-import ic2.core.init.MainConfig;
+import ic2.core.init.IC2Config;
 import ic2.core.ref.Ic2Items;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -38,7 +38,7 @@ public class ItemInfo implements IInfoProvider
 		}
 
 		if ((StackUtil.checkItemEquality(stack, Ic2Items.SCRAP) || StackUtil.checkItemEquality(stack, Ic2Items.SCRAP_BOX))
-			&& !ConfigUtil.getBool(MainConfig.get(), "misc/allowBurningScrap"))
+			&& !IC2Config.misc.allowBurningScrap.get())
 		{
 			return 0;
 		}

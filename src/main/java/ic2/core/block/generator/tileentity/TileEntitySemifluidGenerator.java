@@ -9,13 +9,12 @@ import ic2.core.block.invslot.InvSlotConsumableLiquidByManager;
 import ic2.core.block.invslot.InvSlotOutput;
 import ic2.core.fluid.Ic2FluidStack;
 import ic2.core.fluid.Ic2FluidTank;
-import ic2.core.init.MainConfig;
+import ic2.core.init.IC2Config;
 import ic2.core.network.GuiSynced;
 import ic2.core.profile.NotClassic;
 import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.ref.Ic2Fluids;
 import ic2.core.ref.Ic2SoundEvents;
-import ic2.core.util.ConfigUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.level.block.state.BlockState;
@@ -41,9 +40,9 @@ public class TileEntitySemifluidGenerator extends TileEntityBaseGenerator
 	public static void init()
 	{
 		Recipes.semiFluidGenerator = new SemiFluidFuelManager();
-		if (ConfigUtil.getFloat(MainConfig.get(), "balance/energy/generator/semiFluidBiogas") > 0.0F)
+		if ((float) IC2Config.balance.energy.generator.semiFluidBiogas.get().floatValue() > 0.0F)
 		{
-			addFuel(Ic2Fluids.BIOGAS.still(), 10, Math.round(16.0F * ConfigUtil.getFloat(MainConfig.get(), "balance/energy/generator/semiFluidBiogas")));
+			addFuel(Ic2Fluids.BIOGAS.still(), 10, Math.round(16.0F * (float) IC2Config.balance.energy.generator.semiFluidBiogas.get().floatValue()));
 		}
 	}
 

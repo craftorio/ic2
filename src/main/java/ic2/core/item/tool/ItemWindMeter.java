@@ -35,6 +35,11 @@ public class ItemWindMeter extends ItemElectricTool implements PriorityUsableIte
 		this.tier = 1;
 	}
 
+	private static float roundWind(double windStrength)
+	{
+		return (float) Math.round(windStrength * 100.0) / 100.0F;
+	}
+
 	@Override
 	public void appendHoverText(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag advanced)
 	{
@@ -136,10 +141,5 @@ public class ItemWindMeter extends ItemElectricTool implements PriorityUsableIte
 
 		IC2.sideProxy.messagePlayer(player, Component.translatable("ic2.wind_meter.info", roundWind(windStrength)).getString());
 		return new InteractionResultHolder<>(InteractionResult.SUCCESS, stack);
-	}
-
-	private static float roundWind(double windStrength)
-	{
-		return (float) Math.round(windStrength * 100.0) / 100.0F;
 	}
 }

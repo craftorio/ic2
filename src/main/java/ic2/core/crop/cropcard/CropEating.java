@@ -41,6 +41,25 @@ public class CropEating extends Ic2CropCard
 		super(cropType);
 	}
 
+	private static boolean hasMetalAromor(LivingEntity entity)
+	{
+		if (!(entity instanceof Player player))
+		{
+			return false;
+		} else
+		{
+			for (ItemStack stack : player.getInventory().armor)
+			{
+				if (stack != null && ItemWrapper.isMetalArmor(stack, player))
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+	}
+
 	@Override
 	public Block getCropBlock()
 	{
@@ -163,24 +182,5 @@ public class CropEating extends Ic2CropCard
 
 		multiplier /= 1.0F + crop.getTerrainAirQuality() / 10.0F;
 		return (int) (super.getGrowthDuration(crop) * multiplier);
-	}
-
-	private static boolean hasMetalAromor(LivingEntity entity)
-	{
-		if (!(entity instanceof Player player))
-		{
-			return false;
-		} else
-		{
-			for (ItemStack stack : player.getInventory().armor)
-			{
-				if (stack != null && ItemWrapper.isMetalArmor(stack, player))
-				{
-					return true;
-				}
-			}
-
-			return false;
-		}
 	}
 }

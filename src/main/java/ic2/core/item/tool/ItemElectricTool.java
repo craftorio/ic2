@@ -47,8 +47,8 @@ import org.jetbrains.annotations.Nullable;
 
 public abstract class ItemElectricTool extends DiggerItem implements IElectricItem, INetworkItemEventListener, IItemHudInfo
 {
-	public double operationEnergyCost;
 	private final Collection<TagKey<Block>> effectiveBlocks;
+	public double operationEnergyCost;
 	public int maxCharge;
 	public int transferLimit;
 	public int tier;

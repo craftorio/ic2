@@ -80,32 +80,6 @@ public abstract class BasicSinkSource extends BasicEnergyTile implements IEnergy
 		}
 	}
 
-	public void setSinkTier(int tier)
-	{
-		if (tier < 0)
-		{
-			throw new IllegalArgumentException("invalid tier: " + tier);
-		}
-
-		this.sinkTier = tier;
-	}
-
-	public void setSourceTier(int tier)
-	{
-		if (tier < 0)
-		{
-			throw new IllegalArgumentException("invalid tier: " + tier);
-		}
-
-		double power = EnergyNet.instance.getPowerFromTier(tier);
-		if (this.getCapacity() < power)
-		{
-			this.setCapacity(power);
-		}
-
-		this.sourceTier = tier;
-	}
-
 	@Override
 	public double getDemandedEnergy()
 	{
@@ -125,6 +99,16 @@ public abstract class BasicSinkSource extends BasicEnergyTile implements IEnergy
 		return this.sinkTier;
 	}
 
+	public void setSinkTier(int tier)
+	{
+		if (tier < 0)
+		{
+			throw new IllegalArgumentException("invalid tier: " + tier);
+		}
+
+		this.sinkTier = tier;
+	}
+
 	@Override
 	public double getOfferedEnergy()
 	{
@@ -141,6 +125,22 @@ public abstract class BasicSinkSource extends BasicEnergyTile implements IEnergy
 	public int getSourceTier()
 	{
 		return this.sourceTier;
+	}
+
+	public void setSourceTier(int tier)
+	{
+		if (tier < 0)
+		{
+			throw new IllegalArgumentException("invalid tier: " + tier);
+		}
+
+		double power = EnergyNet.instance.getPowerFromTier(tier);
+		if (this.getCapacity() < power)
+		{
+			this.setCapacity(power);
+		}
+
+		this.sourceTier = tier;
 	}
 
 	@Override

@@ -28,6 +28,13 @@ public class DynamicContainer<T extends Container> extends ContainerBase<T>
 	private static final Map<Class<?>, List<String>> networkedFieldCache = new IdentityHashMap<>();
 	final GuiParser.GuiNode guiNode;
 
+	protected DynamicContainer(MenuType<DynamicContainer<T>> type, int syncId, Inventory playerInventory, T base, GuiParser.GuiNode guiNode)
+	{
+		super(type, syncId, playerInventory, base);
+		this.guiNode = guiNode;
+		this.initialize(playerInventory, guiNode, guiNode);
+	}
+
 	public static DynamicContainer<TileEntityInventory> create(int syncId, Inventory playerInventory, TileEntityInventory base)
 	{
 		return new DynamicContainer(
@@ -44,13 +51,6 @@ public class DynamicContainer<T extends Container> extends ContainerBase<T>
 	)
 	{
 		return new DynamicContainer<>(type, syncId, playerInventory, base, guiNode);
-	}
-
-	protected DynamicContainer(MenuType<DynamicContainer<T>> type, int syncId, Inventory playerInventory, T base, GuiParser.GuiNode guiNode)
-	{
-		super(type, syncId, playerInventory, base);
-		this.guiNode = guiNode;
-		this.initialize(playerInventory, guiNode, guiNode);
 	}
 
 	private void initialize(Inventory playerInventory, GuiParser.GuiNode guiNode, GuiParser.ParentNode parentNode)
@@ -126,8 +126,8 @@ public class DynamicContainer<T extends Container> extends ContainerBase<T>
 						int x0 = node.x + (node.style.width - 16) / 2;
 						int y0 = node.y + (node.style.height - 16) / 2;
 						GuiParser.SlotGridNode.SlotGridDimension dim = node.getDimension(size);
-						int rows = dim.rows;
-						int cols = dim.cols;
+						int rows = dim.rows();
+						int cols = dim.cols();
 						int width = node.style.width + node.spacing;
 						int height = node.style.height + node.spacing;
 						int idx = node.offset;

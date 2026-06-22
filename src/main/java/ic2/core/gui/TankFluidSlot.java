@@ -11,11 +11,6 @@ public class TankFluidSlot extends AbstractFluidSlot
 {
 	final Ic2FluidTank tank;
 
-	public static TankFluidSlot createFluidSlot(Ic2Gui<?> gui, int x, int y, Ic2FluidTank tank)
-	{
-		return new TankFluidSlot(gui, x, y, 18, 18, tank);
-	}
-
 	protected TankFluidSlot(Ic2Gui<?> gui, int x, int y, int width, int height, Ic2FluidTank tank)
 	{
 		super(gui, x, y, width, height);
@@ -25,6 +20,11 @@ public class TankFluidSlot extends AbstractFluidSlot
 		}
 
 		this.tank = tank;
+	}
+
+	public static TankFluidSlot createFluidSlot(Ic2Gui<?> gui, int x, int y, Ic2FluidTank tank)
+	{
+		return new TankFluidSlot(gui, x, y, 18, 18, tank);
 	}
 
 	@Override

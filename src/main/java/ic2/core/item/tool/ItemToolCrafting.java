@@ -21,6 +21,11 @@ public class ItemToolCrafting extends Item implements IBoxable, IItemHudInfo
 		super(settings);
 	}
 
+	protected static int getRemainingUses(ItemStack stack)
+	{
+		return stack.getMaxDamage() - stack.getDamageValue();
+	}
+
 	public void appendHoverText(@NotNull ItemStack stack, Level world, List<Component> tooltip, @NotNull TooltipFlag advanced)
 	{
 		tooltip.add(Component.translatable("ic2.tooltip.tool.uses_left", getRemainingUses(stack)));
@@ -38,10 +43,5 @@ public class ItemToolCrafting extends Item implements IBoxable, IItemHudInfo
 		List<String> info = new LinkedList<>();
 		info.add(Component.translatable("ic2.tooltip.tool.uses_left", getRemainingUses(stack)).getString().formatted(ChatFormatting.GRAY));
 		return info;
-	}
-
-	protected static int getRemainingUses(ItemStack stack)
-	{
-		return stack.getMaxDamage() - stack.getDamageValue();
 	}
 }

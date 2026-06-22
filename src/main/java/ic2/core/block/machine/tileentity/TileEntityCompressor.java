@@ -30,8 +30,8 @@ import net.minecraft.world.level.material.Fluids;
 
 public class TileEntityCompressor extends TileEntityStandardMachine<IRecipeInput, Collection<ItemStack>, ItemStack>
 {
-	protected boolean usingPumpRecipe;
 	protected final Set<TileEntityPump> pumps = new HashSet<>(12, 0.5F);
+	protected boolean usingPumpRecipe;
 
 	public TileEntityCompressor(BlockPos pos, BlockState state)
 	{

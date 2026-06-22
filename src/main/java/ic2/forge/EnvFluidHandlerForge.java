@@ -54,6 +54,91 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 	private static final java.util.List<Runnable> pendingFluidTypeRegistrations = new java.util.ArrayList<>();
 	private static final java.util.List<Runnable> pendingFluidRegistrations = new java.util.ArrayList<>();
 
+	private static IFluidHandlerItem getFluidHandler(ItemStack stack)
+	{
+		return stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM, null).orElse(null);
+	}
+
+	private static void updateResultStack(Mutable<ItemStack> out, IFluidHandlerItem handler)
+	{
+		if (out != null)
+		{
+			assert out.getValue() != null;
+			ItemStack container = handler.getContainer();
+			out.setValue(container);
+		}
+	}
+
+	private static IFluidHandler getFluidHandler(BlockState state, Level world, BlockPos pos, BlockEntity be, Direction side)
+	{
+		if (be == null)
+		{
+			if (state.hasBlockEntity())
+			{
+				be = world.getBlockEntity(pos);
+			}
+
+			if (be == null)
+			{
+				return null;
+			}
+		}
+
+		return be.getCapability(ForgeCapabilities.FLUID_HANDLER, side).orElse(null);
+	}
+
+	private static IFluidHandler.FluidAction getAction(boolean simulate)
+	{
+		return simulate ? IFluidHandler.FluidAction.SIMULATE : IFluidHandler.FluidAction.EXECUTE;
+	}
+
+	static FluidStack getForgeFs(Ic2FluidStack fs)
+	{
+		if (fs == null || fs.isEmpty())
+		{
+			return FluidStack.EMPTY;
+		} else
+		{
+			return fs instanceof Ic2FluidStackImpl ? ((Ic2FluidStackImpl) fs).parent : new FluidStack(fs.getFluid(), fs.getAmountMb());
+		}
+	}
+
+	static void registerPendingFluidTypes()
+	{
+		for (Runnable r : pendingFluidTypeRegistrations)
+		{
+			r.run();
+		}
+
+		pendingFluidTypeRegistrations.clear();
+	}
+
+	static void registerPendingFluids()
+	{
+		for (Runnable r : pendingFluidRegistrations)
+		{
+			r.run();
+		}
+
+		pendingFluidRegistrations.clear();
+	}
+
+	private static LiquidBlock createFluidBlock(String fluidName, FlowingFluid fluid, Block.Properties properties)
+	{
+		return switch (fluidName)
+		{
+			case "hot_coolant" -> new HotCoolantBlock(fluid, properties);
+			case "air" -> new AirBlock(fluid, properties);
+			case "hydrogen" -> new HydrogenBlock(fluid, properties);
+			case "hot_water" -> new HotWaterBlock(fluid, properties);
+			case "uu_matter" -> new UUMatterBlock(fluid, properties);
+			case "construction_foam" -> new ConstructionFoamBlock(fluid, properties);
+			case "steam", "superheated_steam" -> new SteamBlock(fluid, properties);
+			case "pahoehoe_lava" -> new PahoehoeLavaBlock(fluid, properties);
+			default -> new LiquidBlock(() -> fluid, properties);
+		};
+	}
+
 	@Override
 	public EnvFluidHandler.FluidRefs createFluid(
 		ResourceLocation id,
@@ -119,7 +204,7 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 			ret.flowing(flowing);
 			ForgeRegistries.FLUIDS.register(ResourceLocation.fromNamespaceAndPath(id.getNamespace(), "flowing_" + id.getPath()), flowing);
 			Block.Properties fluidBlockProperties = Block.Properties.copy(Blocks.WATER).noLootTable().noCollission().randomTicks().pushReaction(net.minecraft.world.level.material.PushReaction.DESTROY);
-				LiquidBlock fluidBlock = createFluidBlock(id.getPath(), (FlowingFluid) ret.still(), fluidBlockProperties);
+			LiquidBlock fluidBlock = createFluidBlock(id.getPath(), (FlowingFluid) ret.still(), fluidBlockProperties);
 			ForgeRegistries.BLOCKS.register(ResourceLocation.fromNamespaceAndPath(id.getNamespace(), "fluid_block_" + id.getPath()), fluidBlock);
 			fluidBlockRef.set(fluidBlock);
 		});
@@ -397,21 +482,6 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 		return ret;
 	}
 
-	private static IFluidHandlerItem getFluidHandler(ItemStack stack)
-	{
-		return stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM, null).orElse(null);
-	}
-
-	private static void updateResultStack(Mutable<ItemStack> out, IFluidHandlerItem handler)
-	{
-		if (out != null)
-		{
-			assert out.getValue() != null;
-			ItemStack container = handler.getContainer();
-			out.setValue(container);
-		}
-	}
-
 	@Override
 	public boolean isFluidBlock(BlockState state, Level world, BlockPos pos, BlockEntity be, Direction side)
 	{
@@ -498,29 +568,6 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 		return Math.max(ret, 0);
 	}
 
-	private static IFluidHandler getFluidHandler(BlockState state, Level world, BlockPos pos, BlockEntity be, Direction side)
-	{
-		if (be == null)
-		{
-			if (state.hasBlockEntity())
-			{
-				be = world.getBlockEntity(pos);
-			}
-
-			if (be == null)
-			{
-				return null;
-			}
-		}
-
-		return be.getCapability(ForgeCapabilities.FLUID_HANDLER, side).orElse(null);
-	}
-
-	private static IFluidHandler.FluidAction getAction(boolean simulate)
-	{
-		return simulate ? IFluidHandler.FluidAction.SIMULATE : IFluidHandler.FluidAction.EXECUTE;
-	}
-
 	@Override
 	public Fluid getWorldFluid(BlockState state, Level world, BlockPos pos)
 	{
@@ -588,53 +635,6 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 			return Ic2FluidStack.create(fluid, 1000);
 		}
 		return null;
-	}
-
-	static FluidStack getForgeFs(Ic2FluidStack fs)
-	{
-		if (fs == null || fs.isEmpty())
-		{
-			return FluidStack.EMPTY;
-		} else
-		{
-			return fs instanceof Ic2FluidStackImpl ? ((Ic2FluidStackImpl) fs).parent : new FluidStack(fs.getFluid(), fs.getAmountMb());
-		}
-	}
-
-	static void registerPendingFluidTypes()
-	{
-		for (Runnable r : pendingFluidTypeRegistrations)
-		{
-			r.run();
-		}
-
-		pendingFluidTypeRegistrations.clear();
-	}
-
-	static void registerPendingFluids()
-	{
-		for (Runnable r : pendingFluidRegistrations)
-		{
-			r.run();
-		}
-
-		pendingFluidRegistrations.clear();
-	}
-
-	private static LiquidBlock createFluidBlock(String fluidName, FlowingFluid fluid, Block.Properties properties)
-	{
-		switch (fluidName)
-		{
-			case "hot_coolant": return new HotCoolantBlock(fluid, properties);
-			case "air": return new AirBlock(fluid, properties);
-			case "hydrogen": return new HydrogenBlock(fluid, properties);
-			case "hot_water": return new HotWaterBlock(fluid, properties);
-			case "uu_matter": return new UUMatterBlock(fluid, properties);
-			case "construction_foam": return new ConstructionFoamBlock(fluid, properties);
-			case "steam": case "superheated_steam": return new SteamBlock(fluid, properties);
-			case "pahoehoe_lava": return new PahoehoeLavaBlock(fluid, properties);
-			default: return new LiquidBlock(fluid, properties);
-		}
 	}
 
 }

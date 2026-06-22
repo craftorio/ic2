@@ -29,22 +29,17 @@ import net.minecraft.world.level.chunk.ChunkSource;
 public class EnergyNetLocal
 {
 	static final GridChange QUEUE_DELAY_CHANGE = new GridChange(null, null, null);
+	final Map<IEnergyTile, Tile> registeredIoTiles = new IdentityHashMap<>();
+	final Map<BlockPos, Tile> registeredTiles = new HashMap<>();
+	final Set<Tile> sources = Collections.newSetFromMap(new IdentityHashMap<>());
 	private final Level world;
 	private final Queue<GridChange> gridChangesQueue = new ArrayDeque<>();
 	private final Map<IEnergyTile, GridChange> gridAdditionsMap = new IdentityHashMap<>();
 	private final Set<IEnergyTile> ioTilesToNotify = Collections.newSetFromMap(new IdentityHashMap<>());
 	private final GridUpdater updater = new GridUpdater(this);
+	private final List<Grid> grids = new ArrayList<>();
 	int nextNodeId;
 	int nextGridId;
-	final Map<IEnergyTile, Tile> registeredIoTiles = new IdentityHashMap<>();
-	final Map<BlockPos, Tile> registeredTiles = new HashMap<>();
-	final Set<Tile> sources = Collections.newSetFromMap(new IdentityHashMap<>());
-	private final List<Grid> grids = new ArrayList<>();
-
-	public static EnergyNetLocal create(Level world)
-	{
-		return new EnergyNetLocal(world);
-	}
 
 	private EnergyNetLocal(Level world)
 	{
@@ -53,6 +48,32 @@ public class EnergyNetLocal
 		for (int i = 0; i < 1; i++)
 		{
 			this.gridChangesQueue.add(QUEUE_DELAY_CHANGE);
+		}
+	}
+
+	public static EnergyNetLocal create(Level world)
+	{
+		return new EnergyNetLocal(world);
+	}
+
+	private static Direction getDirBetween(BlockPos from, BlockPos to)
+	{
+		int dx = to.getX() - from.getX();
+		int dy = to.getY() - from.getY();
+		int dz = to.getZ() - from.getZ();
+		int abs = Math.abs(dx) + Math.abs(dy) + Math.abs(dz);
+		if (abs != 1)
+		{
+			return null;
+		} else if (dx != 0)
+		{
+			return dx > 0 ? Direction.EAST : Direction.WEST;
+		} else if (dy != 0)
+		{
+			return dy > 0 ? Direction.UP : Direction.DOWN;
+		} else
+		{
+			return dz > 0 ? Direction.SOUTH : Direction.NORTH;
 		}
 	}
 
@@ -203,27 +224,6 @@ public class EnergyNetLocal
 		}
 
 		return ret;
-	}
-
-	private static Direction getDirBetween(BlockPos from, BlockPos to)
-	{
-		int dx = to.getX() - from.getX();
-		int dy = to.getY() - from.getY();
-		int dz = to.getZ() - from.getZ();
-		int abs = Math.abs(dx) + Math.abs(dy) + Math.abs(dz);
-		if (abs != 1)
-		{
-			return null;
-		} else if (dx != 0)
-		{
-			return dx > 0 ? Direction.EAST : Direction.WEST;
-		} else if (dy != 0)
-		{
-			return dy > 0 ? Direction.UP : Direction.DOWN;
-		} else
-		{
-			return dz > 0 ? Direction.SOUTH : Direction.NORTH;
-		}
 	}
 
 	public Collection<GridInfo> getGridInfos()

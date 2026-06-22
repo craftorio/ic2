@@ -10,9 +10,15 @@ import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 public class DynamicHandHeldContainer<T extends HandHeldInventory> extends DynamicContainer<T>
 {
+	protected DynamicHandHeldContainer(MenuType<DynamicContainer<T>> type, int syncId, Inventory playerInventory, T base, GuiParser.GuiNode guiNode)
+	{
+		super(type, syncId, playerInventory, base, guiNode);
+	}
+
 	public static DynamicHandHeldContainer<HandHeldInventory> create(int syncId, Inventory playerInventory, HandHeldInventory base, GuiParser.GuiNode guiNode)
 	{
 		return new DynamicHandHeldContainer<>(Ic2ScreenHandlers.DYNAMIC_ITEM, syncId, playerInventory, base, guiNode);
@@ -23,11 +29,6 @@ public class DynamicHandHeldContainer<T extends HandHeldInventory> extends Dynam
 	)
 	{
 		return new DynamicHandHeldContainer<>(type, syncId, playerInventory, base, guiNode);
-	}
-
-	protected DynamicHandHeldContainer(MenuType<DynamicContainer<T>> type, int syncId, Inventory playerInventory, T base, GuiParser.GuiNode guiNode)
-	{
-		super(type, syncId, playerInventory, base, guiNode);
 	}
 
 	@Override
@@ -44,7 +45,7 @@ public class DynamicHandHeldContainer<T extends HandHeldInventory> extends Dynam
 	}
 
 	@Override
-	public void clicked(int slot, int button, ClickType type, Player player)
+	public void clicked(int slot, int button, @NotNull ClickType type, @NotNull Player player)
 	{
 		ItemStack stack = null;
 		boolean thrown = false;

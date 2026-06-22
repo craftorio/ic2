@@ -7,15 +7,15 @@ public class BasicButton extends Button<BasicButton>
 {
 	private final BasicButton.ButtonStyle style;
 
-	public static BasicButton create(Ic2Gui<?> gui, int x, int y, IClickHandler handler, BasicButton.ButtonStyle style)
-	{
-		return new BasicButton(gui, x, y, handler, style);
-	}
-
 	protected BasicButton(Ic2Gui<?> gui, int x, int y, IClickHandler handler, BasicButton.ButtonStyle style)
 	{
 		super(gui, x, y, style.width, style.height, handler);
 		this.style = style;
+	}
+
+	public static BasicButton create(Ic2Gui<?> gui, int x, int y, IClickHandler handler, BasicButton.ButtonStyle style)
+	{
+		return new BasicButton(gui, x, y, handler, style);
 	}
 
 	@Override

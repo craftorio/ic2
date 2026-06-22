@@ -72,6 +72,6 @@ public class SlotInvSlot extends Slot
 	public void onTake(Player player, ItemStack stack)
 	{
 		super.onTake(player, stack);
-		this.invSlot.onPickupFromSlot(player, stack);
+		this.invSlot.onPickupFromSlot();
 	}
 }

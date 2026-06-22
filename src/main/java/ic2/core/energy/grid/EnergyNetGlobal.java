@@ -24,6 +24,10 @@ public class EnergyNetGlobal implements IEnergyNet
 	private static final List<IEnergyNetEventReceiver> eventReceivers = new CopyOnWriteArrayList<>();
 	private static IEnergyCalculator calculator;
 
+	private EnergyNetGlobal()
+	{
+	}
+
 	public static EnergyNetGlobal create()
 	{
 		if (System.getProperty("IC2ExpEnet") != null)
@@ -34,8 +38,38 @@ public class EnergyNetGlobal implements IEnergyNet
 		return new EnergyNetGlobal();
 	}
 
-	private EnergyNetGlobal()
+	private static void addTile(IEnergyTile tile, Level world, BlockPos pos)
 	{
+		if (EnergyNetSettings.logEnetApiAccessTraces)
+		{
+			IC2.log.debug(LogCategory.EnergyNet, new Throwable("Called from:"), "API addTile %s.", Util.toString(tile, world, pos));
+		} else if (EnergyNetSettings.logEnetApiAccesses)
+		{
+			IC2.log.debug(LogCategory.EnergyNet, "API addTile %s.", Util.toString(tile, world, pos));
+		}
+
+		getLocal(world).addTile(tile, pos);
+	}
+
+	static Iterable<IEnergyNetEventReceiver> getEventReceivers()
+	{
+		return eventReceivers;
+	}
+
+	static IEnergyCalculator getCalculator()
+	{
+		return calculator;
+	}
+
+	public static EnergyNetLocal getLocal(Level world)
+	{
+		if (world.isClientSide)
+		{
+			throw new IllegalStateException("not applicable clientside");
+		}
+
+		assert world.getServer().isSameThread();
+		return WorldData.get(world).energyNet;
 	}
 
 	@Override
@@ -88,19 +122,6 @@ public class EnergyNetGlobal implements IEnergyNet
 		}
 
 		addTile(tile, tile.getWorldObj(), tile.getPosition());
-	}
-
-	private static void addTile(IEnergyTile tile, Level world, BlockPos pos)
-	{
-		if (EnergyNetSettings.logEnetApiAccessTraces)
-		{
-			IC2.log.debug(LogCategory.EnergyNet, new Throwable("Called from:"), "API addTile %s.", Util.toString(tile, world, pos));
-		} else if (EnergyNetSettings.logEnetApiAccesses)
-		{
-			IC2.log.debug(LogCategory.EnergyNet, "API addTile %s.", Util.toString(tile, world, pos));
-		}
-
-		getLocal(world).addTile(tile, pos);
 	}
 
 	@Override
@@ -208,26 +229,5 @@ public class EnergyNetGlobal implements IEnergyNet
 	public synchronized void unregisterEventReceiver(IEnergyNetEventReceiver receiver)
 	{
 		eventReceivers.remove(receiver);
-	}
-
-	static Iterable<IEnergyNetEventReceiver> getEventReceivers()
-	{
-		return eventReceivers;
-	}
-
-	static IEnergyCalculator getCalculator()
-	{
-		return calculator;
-	}
-
-	public static EnergyNetLocal getLocal(Level world)
-	{
-		if (world.isClientSide)
-		{
-			throw new IllegalStateException("not applicable clientside");
-		}
-
-		assert world.getServer().isSameThread();
-		return WorldData.get(world).energyNet;
 	}
 }

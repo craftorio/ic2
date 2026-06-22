@@ -28,10 +28,10 @@ import net.minecraft.world.level.block.state.BlockState;
 public abstract class TileEntityTransformer extends TileEntityInventory implements IHasGui, INetworkClientTileEntityEventListener
 {
 	private static final TileEntityTransformer.Mode defaultMode = TileEntityTransformer.Mode.redstone;
+	protected final Energy energy;
+	private final int defaultTier;
 	private double inputFlow = 0.0;
 	private double outputFlow = 0.0;
-	private final int defaultTier;
-	protected final Energy energy;
 	private TileEntityTransformer.Mode configuredMode = defaultMode;
 	private TileEntityTransformer.Mode transformMode = null;
 

@@ -34,26 +34,26 @@ public abstract class TileEntityStandardMachine<RI, RO, I>
 	INetworkTileEntityEventListener,
 	IUpgradableBlock
 {
-	protected Collection<ItemStack> processResult = null;
-	protected MachineRecipeResult<RI, RO, I> recipeResult = null;
-	protected short progress = 0;
-	public final int defaultEnergyConsume;
-	public final int defaultOperationLength;
-	public final int defaultTier;
-	public final int defaultEnergyStorage;
-	public int energyConsume;
-	public int operationLength;
-	public int operationsPerTick;
-	@GuiSynced
-	protected float guiProgress;
-	public Sound sound;
 	protected static final int EventStart = 0;
 	protected static final int EventInterrupt = 1;
 	protected static final int EventFinish = 2;
 	protected static final int EventStop = 3;
-	public InvSlotProcessable<RI, RO, I> inputSlot;
+	public final int defaultEnergyConsume;
+	public final int defaultOperationLength;
+	public final int defaultTier;
+	public final int defaultEnergyStorage;
 	public final InvSlotOutput outputSlot;
 	public final InvSlotUpgrade upgradeSlot;
+	public int energyConsume;
+	public int operationLength;
+	public int operationsPerTick;
+	public Sound sound;
+	public InvSlotProcessable<RI, RO, I> inputSlot;
+	protected Collection<ItemStack> processResult = null;
+	protected MachineRecipeResult<RI, RO, I> recipeResult = null;
+	protected short progress = 0;
+	@GuiSynced
+	protected float guiProgress;
 
 	public TileEntityStandardMachine(
 		BlockEntityType<? extends TileEntityStandardMachine<RI, RO, I>> type, BlockPos pos, BlockState state, int energyPerTick, int length, int outputSlots
@@ -80,6 +80,26 @@ public abstract class TileEntityStandardMachine<RI, RO, I>
 		this.outputSlot = new InvSlotOutput(this, "output", outputSlots);
 		this.upgradeSlot = new InvSlotUpgrade(this, "upgrade", 4);
 		this.comparator.setUpdate(() -> this.progress * 15 / this.operationLength);
+	}
+
+	private static <RI> boolean isSameRecipeInput(RI a, RI b)
+	{
+		if (a == b)
+		{
+			return true;
+		}
+
+		if (a == null || b == null)
+		{
+			return false;
+		}
+
+		if (a instanceof ItemStack aStack && b instanceof ItemStack bStack)
+		{
+			return StackUtil.checkItemEqualityStrict(aStack, bStack);
+		}
+
+		return a.equals(b);
 	}
 
 	@Override
@@ -190,26 +210,6 @@ public abstract class TileEntityStandardMachine<RI, RO, I>
 		this.dischargeSlot.setTier(tier);
 		this.energy.setCapacity(this.upgradeSlot.getEnergyStorage(this.defaultEnergyStorage, this.defaultOperationLength, this.defaultEnergyConsume));
 		this.progress = (short) Math.floor(previousProgress * this.operationLength + 0.1);
-	}
-
-	private static <RI> boolean isSameRecipeInput(RI a, RI b)
-	{
-		if (a == b)
-		{
-			return true;
-		}
-
-		if (a == null || b == null)
-		{
-			return false;
-		}
-
-		if (a instanceof ItemStack aStack && b instanceof ItemStack bStack)
-		{
-			return StackUtil.checkItemEqualityStrict(aStack, bStack);
-		}
-
-		return a.equals(b);
 	}
 
 	private boolean canOperate()

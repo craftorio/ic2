@@ -16,7 +16,7 @@ public class RubberBoatEntity extends AbstractBoatEntity
 	{
 		super(entityType, world);
 	}
-	
+
 	@SuppressWarnings("unused")
 	public RubberBoatEntity(EntityType<? extends AbstractBoatEntity> entityType, Level world, double x, double y, double z)
 	{

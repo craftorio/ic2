@@ -4,7 +4,7 @@ import ic2.core.block.IInventorySlotHolder;
 import ic2.core.fluid.Ic2FluidStack;
 import ic2.core.fluid.Ic2FluidTank;
 
-import java.util.Arrays;
+import java.util.Collections;
 
 import net.minecraft.world.level.material.Fluid;
 
@@ -36,6 +36,6 @@ public class InvSlotConsumableLiquidByTank extends InvSlotConsumableLiquid
 	protected Iterable<Fluid> getPossibleFluids()
 	{
 		Ic2FluidStack fs = this.tank.getFluidStack();
-		return fs != null ? Arrays.asList(fs.getFluid()) : null;
+		return fs != null ? Collections.singletonList(fs.getFluid()) : null;
 	}
 }

@@ -39,6 +39,30 @@ public class Fluids extends TileEntityComponent implements Ic2FluidBlock
 		super(parent);
 	}
 
+	public static Predicate<Fluid> fluidPredicate(Fluid... fluids)
+	{
+		Collection<Fluid> acceptedFluids;
+		if (fluids.length > 10)
+		{
+			acceptedFluids = new HashSet<>(Arrays.asList(fluids));
+		} else
+		{
+			acceptedFluids = Arrays.asList(fluids);
+		}
+
+		return acceptedFluids::contains;
+	}
+
+	public static Predicate<Fluid> fluidPredicate(TagKey<Fluid> tag)
+	{
+		return f -> f.is(tag);
+	}
+
+	public static Predicate<Fluid> fluidPredicate(ILiquidAcceptManager manager)
+	{
+		return manager::acceptsFluid;
+	}
+
 	public Fluids.InternalFluidTank addTankInsert(String name, int capacity)
 	{
 		return this.addTankInsert(name, capacity, Predicates.alwaysTrue());
@@ -325,30 +349,6 @@ public class Fluids extends TileEntityComponent implements Ic2FluidBlock
 		{
 			return 0;
 		}
-	}
-
-	public static Predicate<Fluid> fluidPredicate(Fluid... fluids)
-	{
-		Collection<Fluid> acceptedFluids;
-		if (fluids.length > 10)
-		{
-			acceptedFluids = new HashSet<>(Arrays.asList(fluids));
-		} else
-		{
-			acceptedFluids = Arrays.asList(fluids);
-		}
-
-		return acceptedFluids::contains;
-	}
-
-	public static Predicate<Fluid> fluidPredicate(TagKey<Fluid> tag)
-	{
-		return f -> f.is(tag);
-	}
-
-	public static Predicate<Fluid> fluidPredicate(ILiquidAcceptManager manager)
-	{
-		return manager::acceptsFluid;
 	}
 
 	public Iterable<Fluids.InternalFluidTank> getAllTanks()

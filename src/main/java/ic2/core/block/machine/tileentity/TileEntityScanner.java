@@ -31,15 +31,15 @@ import net.minecraft.world.level.block.state.BlockState;
 @NotClassic
 public class TileEntityScanner extends TileEntityElectricMachine implements IHasGui, INetworkClientTileEntityEventListener
 {
-	private ItemStack currentStack = StackUtil.emptyStack;
-	private ItemStack pattern = StackUtil.emptyStack;
-	public int progress = 0;
 	public final int duration = 3300;
 	public final InvSlotConsumable inputSlot;
 	public final InvSlot diskSlot;
-	private TileEntityScanner.State state = TileEntityScanner.State.IDLE;
+	public int progress = 0;
 	public double patternUu;
 	public double patternEu;
+	private ItemStack currentStack = StackUtil.emptyStack;
+	private ItemStack pattern = StackUtil.emptyStack;
+	private TileEntityScanner.State state = TileEntityScanner.State.IDLE;
 
 	public TileEntityScanner(BlockPos pos, BlockState state)
 	{

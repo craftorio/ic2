@@ -56,6 +56,172 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 		IC2.envProxy.runAfterRegistryInit(() -> UpgradeRegistry.register(new ItemStack(this, 1)));
 	}
 
+	private static String getSideName(ItemStack stack)
+	{
+		Direction dir = getDirection(stack);
+		if (dir == null)
+		{
+			return "ic2.tooltip.upgrade.ejector.anyside";
+		}
+
+		return switch (dir)
+		{
+			case WEST -> "ic2.dir.west";
+			case EAST -> "ic2.dir.east";
+			case DOWN -> "ic2.dir.bottom";
+			case UP -> "ic2.dir.top";
+			case NORTH -> "ic2.dir.north";
+			case SOUTH -> "ic2.dir.south";
+		};
+	}
+
+	private static Predicate<ItemStack> stackChecker(ItemStack stack)
+	{
+		return new Predicate<>()
+		{
+			private boolean hasInitialised = false;
+			private Set<ItemStack> filters;
+			private UpgradeSettings energy;
+			private NbtSettings nbt;
+
+			private void initialise()
+			{
+				assert !this.hasInitialised;
+				CompoundTag tag = StackUtil.getOrCreateNbtData(stack);
+				this.filters = this.getFilterStacks(tag);
+				this.nbt = NbtSettings.getFromNBT(HandHeldAdvancedUpgrade.getTag(tag, "nbt").getByte("type"));
+				this.energy = new UpgradeSettings(HandHeldAdvancedUpgrade.getTag(tag, "energy"));
+				this.hasInitialised = true;
+			}
+
+			private Set<ItemStack> getFilterStacks(CompoundTag nbt)
+			{
+				Set<ItemStack> ret = new HashSet<>();
+				ListTag contentList = nbt.getList("Items", 10);
+
+				for (int tag = 0; tag < contentList.size(); tag++)
+				{
+					CompoundTag slotNbt = contentList.getCompound(tag);
+					int slot = slotNbt.getByte("Slot");
+					if (slot >= 0 && slot < 9)
+					{
+						ItemStack filter = ItemStack.of(slotNbt);
+						if (!StackUtil.isEmpty(filter))
+						{
+							ret.add(filter);
+						}
+					}
+				}
+
+				return ret;
+			}
+
+			private boolean checkNBT(ItemStack stack, ItemStack filter)
+			{
+				return switch (this.nbt)
+				{
+					case IGNORED -> true;
+					case FUZZY -> StackUtil.checkNbtEquality(stack.getTag(), filter.getTag());
+					case EXACT -> StackUtil.checkNbtEqualityStrict(stack, filter);
+				};
+			}
+
+			private boolean checkEnergy(ItemStack stack, ItemStack filter)
+			{
+				assert this.energy.active;
+				assert this.energy.comparison == ComparisonType.DIRECT;
+				return filter.getItem() instanceof IElectricItem && Util.isSimilar(ElectricItem.manager.getCharge(stack), ElectricItem.manager.getCharge(filter));
+			}
+
+			public boolean apply(ItemStack stack)
+			{
+				if (!this.hasInitialised)
+				{
+					this.initialise();
+				}
+				boolean checkEnergy;
+				if (!this.energy.comparison.ignoreFilters())
+				{
+					if (!(stack.getItem() instanceof IElectricItem) || !this.energy.doComparison((int) ElectricItem.manager.getCharge(stack)))
+					{
+						return false;
+					}
+
+					checkEnergy = false;
+				} else
+				{
+					checkEnergy = this.energy.active;
+					if (checkEnergy && !(stack.getItem() instanceof IElectricItem))
+					{
+						return false;
+					}
+				}
+
+				for (ItemStack filter : this.filters)
+				{
+					if (filter.getItem() == stack.getItem())
+					{
+						if (this.checkNBT(stack, filter) && (!checkEnergy || this.checkEnergy(stack, filter)))
+						{
+							return true;
+						}
+					}
+				}
+
+				return this.filters.isEmpty() && this.energy.active && !checkEnergy;
+			}
+		};
+	}
+
+	private static List<? extends EnvItemHandler.AdjacentInventory> getTargetInventories(ItemStack stack, BlockEntity parent)
+	{
+		Direction dir = getDirection(stack);
+		if (dir == null)
+		{
+			List<EnvItemHandler.AdjacentInventory> inventories = new ArrayList<>(6);
+			for (Direction d : Util.ALL_DIRS)
+			{
+				EnvItemHandler.AdjacentInventory inv = StackUtil.ENV.getAdjacentInventory(parent, d);
+				if (inv != null)
+				{
+					inventories.add(inv);
+				}
+			}
+			return inventories;
+		}
+
+		EnvItemHandler.AdjacentInventory inv = StackUtil.ENV.getAdjacentInventory(parent, dir);
+		return inv == null ? emptyInvList : Collections.singletonList(inv);
+	}
+
+	private static List<LiquidUtil.AdjacentFluidHandler> getTargetFluidHandlers(ItemStack stack, BlockEntity parent)
+	{
+		Direction dir = getDirection(stack);
+		if (dir == null)
+		{
+			List<LiquidUtil.AdjacentFluidHandler> handlers = new ArrayList<>(6);
+			for (Direction d : Util.ALL_DIRS)
+			{
+				LiquidUtil.AdjacentFluidHandler fh = LiquidUtil.getAdjacentHandler(parent, d);
+				if (fh != null)
+				{
+					handlers.add(fh);
+				}
+			}
+			return handlers;
+		}
+
+		LiquidUtil.AdjacentFluidHandler fh = LiquidUtil.getAdjacentHandler(parent, dir);
+		return fh == null ? emptyFhList : Collections.singletonList(fh);
+	}
+
+	@Nullable
+	public static Direction getDirection(ItemStack stack)
+	{
+		int rawDir = StackUtil.getOrCreateNbtData(stack).getByte("dir");
+		return rawDir >= 1 && rawDir <= 6 ? Util.ALL_DIRS[rawDir - 1] : null;
+	}
+
 	@Override
 	public List<String> getHudInfo(ItemStack stack, boolean advanced)
 	{
@@ -102,25 +268,6 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 			case remote_interface:
 				tooltip.add(Component.translatable("ic2.tooltip.upgrade.remote_interface", StackUtil.getSize(stack)).withStyle(ChatFormatting.GRAY));
 		}
-	}
-
-	private static String getSideName(ItemStack stack)
-	{
-		Direction dir = getDirection(stack);
-		if (dir == null)
-		{
-			return "ic2.tooltip.upgrade.ejector.anyside";
-		}
-
-		return switch (dir)
-		{
-			case WEST -> "ic2.dir.west";
-			case EAST -> "ic2.dir.east";
-			case DOWN -> "ic2.dir.bottom";
-			case UP -> "ic2.dir.top";
-			case NORTH -> "ic2.dir.north";
-			case SOUTH -> "ic2.dir.south";
-		};
 	}
 
 	public @NotNull InteractionResult useOn(UseOnContext context)
@@ -401,145 +548,6 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 		return ret;
 	}
 
-	private static Predicate<ItemStack> stackChecker(ItemStack stack)
-	{
-		return new Predicate<>()
-		{
-			private boolean hasInitialised = false;
-			private Set<ItemStack> filters;
-			private UpgradeSettings energy;
-			private NbtSettings nbt;
-
-			private void initialise()
-			{
-				assert !this.hasInitialised;
-				CompoundTag tag = StackUtil.getOrCreateNbtData(stack);
-				this.filters = this.getFilterStacks(tag);
-				this.nbt = NbtSettings.getFromNBT(HandHeldAdvancedUpgrade.getTag(tag, "nbt").getByte("type"));
-				this.energy = new UpgradeSettings(HandHeldAdvancedUpgrade.getTag(tag, "energy"));
-				this.hasInitialised = true;
-			}
-
-			private Set<ItemStack> getFilterStacks(CompoundTag nbt)
-			{
-				Set<ItemStack> ret = new HashSet<>();
-				ListTag contentList = nbt.getList("Items", 10);
-
-				for (int tag = 0; tag < contentList.size(); tag++)
-				{
-					CompoundTag slotNbt = contentList.getCompound(tag);
-					int slot = slotNbt.getByte("Slot");
-					if (slot >= 0 && slot < 9)
-					{
-						ItemStack filter = ItemStack.of(slotNbt);
-						if (!StackUtil.isEmpty(filter))
-						{
-							ret.add(filter);
-						}
-					}
-				}
-
-				return ret;
-			}
-			private boolean checkNBT(ItemStack stack, ItemStack filter)
-			{
-				return switch (this.nbt)
-				{
-					case IGNORED -> true;
-					case FUZZY -> StackUtil.checkNbtEquality(stack.getTag(), filter.getTag());
-					case EXACT -> StackUtil.checkNbtEqualityStrict(stack, filter);
-				};
-			}
-
-			private boolean checkEnergy(ItemStack stack, ItemStack filter)
-			{
-				assert this.energy.active;
-				assert this.energy.comparison == ComparisonType.DIRECT;
-				return filter.getItem() instanceof IElectricItem && Util.isSimilar(ElectricItem.manager.getCharge(stack), ElectricItem.manager.getCharge(filter));
-			}
-
-			public boolean apply(ItemStack stack)
-			{
-				if (!this.hasInitialised)
-				{
-					this.initialise();
-				}
-				boolean checkEnergy;
-				if (!this.energy.comparison.ignoreFilters())
-				{
-					if (!(stack.getItem() instanceof IElectricItem) || !this.energy.doComparison((int) ElectricItem.manager.getCharge(stack)))
-					{
-						return false;
-					}
-
-					checkEnergy = false;
-				} else
-				{
-					checkEnergy = this.energy.active;
-					if (checkEnergy && !(stack.getItem() instanceof IElectricItem))
-					{
-						return false;
-					}
-				}
-
-				for (ItemStack filter : this.filters)
-				{
-					if (filter.getItem() == stack.getItem())
-					{
-						if (this.checkNBT(stack, filter) && (!checkEnergy || this.checkEnergy(stack, filter)))
-						{
-							return true;
-						}
-					}
-				}
-
-				return this.filters.isEmpty() && this.energy.active && !checkEnergy;
-			}
-		};
-	}
-
-	private static List<? extends EnvItemHandler.AdjacentInventory> getTargetInventories(ItemStack stack, BlockEntity parent)
-	{
-		Direction dir = getDirection(stack);
-		if (dir == null)
-		{
-			List<EnvItemHandler.AdjacentInventory> inventories = new ArrayList<>(6);
-			for (Direction d : Util.ALL_DIRS)
-			{
-				EnvItemHandler.AdjacentInventory inv = StackUtil.ENV.getAdjacentInventory(parent, d);
-				if (inv != null)
-				{
-					inventories.add(inv);
-				}
-			}
-			return inventories;
-		}
-
-		EnvItemHandler.AdjacentInventory inv = StackUtil.ENV.getAdjacentInventory(parent, dir);
-		return inv == null ? emptyInvList : Collections.singletonList(inv);
-	}
-
-	private static List<LiquidUtil.AdjacentFluidHandler> getTargetFluidHandlers(ItemStack stack, BlockEntity parent)
-	{
-		Direction dir = getDirection(stack);
-		if (dir == null)
-		{
-			List<LiquidUtil.AdjacentFluidHandler> handlers = new ArrayList<>(6);
-			for (Direction d : Util.ALL_DIRS)
-			{
-				LiquidUtil.AdjacentFluidHandler fh = LiquidUtil.getAdjacentHandler(parent, d);
-				if (fh != null)
-				{
-					handlers.add(fh);
-				}
-			}
-			return handlers;
-		}
-
-		LiquidUtil.AdjacentFluidHandler fh = LiquidUtil.getAdjacentHandler(parent, dir);
-		return fh == null ? emptyFhList : Collections.singletonList(fh);
-	}
-
 	@Override
 	public Collection<ItemStack> onProcessEnd(ItemStack stack, IUpgradableBlock parent, Collection<ItemStack> output)
 	{
@@ -564,13 +572,6 @@ public class ItemUpgradeModule extends Item implements IFullUpgrade, IHandHeldSu
 			case advanced_ejector, advanced_pulling -> HandHeldAdvancedUpgrade.delegate(player, hand, stack, ID);
 			default -> null;
 		};
-	}
-
-	@Nullable
-	public static Direction getDirection(ItemStack stack)
-	{
-		int rawDir = StackUtil.getOrCreateNbtData(stack).getByte("dir");
-		return rawDir >= 1 && rawDir <= 6 ? Util.ALL_DIRS[rawDir - 1] : null;
 	}
 
 	public enum UpgradeType

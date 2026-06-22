@@ -5,8 +5,8 @@ import ic2.core.gui.dynamic.IGuiValueProvider;
 
 public class LinkedGauge extends Gauge<LinkedGauge>
 {
-	private final IGuiValueProvider provider;
 	protected final String name;
+	private final IGuiValueProvider provider;
 
 	public LinkedGauge(Ic2Gui<?> gui, int x, int y, IGuiValueProvider provider, String name, Gauge.IGaugeStyle style)
 	{

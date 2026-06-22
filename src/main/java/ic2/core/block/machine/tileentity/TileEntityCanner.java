@@ -36,12 +36,12 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class TileEntityCanner extends TileEntityStandardMachine<Object, Object, Object> implements INetworkClientTileEntityEventListener
 {
-	private TileEntityCanner.Mode mode = TileEntityCanner.Mode.BottleSolid;
 	public static final int eventSwapTanks = Mode.values.length + 1;
 	public final Ic2FluidTank inputTank;
 	public final Ic2FluidTank outputTank;
 	public final InvSlotConsumableCanner canInputSlot;
 	protected final Fluids fluids;
+	private TileEntityCanner.Mode mode = TileEntityCanner.Mode.BottleSolid;
 
 	public TileEntityCanner(BlockPos pos, BlockState state)
 	{

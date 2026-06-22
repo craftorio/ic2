@@ -186,11 +186,11 @@ public class DynamicCategory extends IORecipeCategory<IORecipeWrapper>
 						int extraX = (node.style.width - 16) / 2;
 						int extraY = (node.style.height - 16) / 2;
 
-						for (int i = 0; i < dim.cols; i++)
+						for (int i = 0; i < dim.cols(); i++)
 						{
-							for (int j = 0; j < dim.rows; j++)
+							for (int j = 0; j < dim.rows(); j++)
 							{
-								if (i * dim.rows + j > size)
+								if (i * dim.rows() + j > size)
 								{
 									continue label99;
 								}

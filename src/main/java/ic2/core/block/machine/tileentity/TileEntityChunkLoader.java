@@ -13,11 +13,10 @@ import ic2.core.block.invslot.InvSlotDischarge;
 import ic2.core.block.invslot.InvSlotUpgrade;
 import ic2.core.block.machine.container.ContainerChunkLoader;
 import ic2.core.block.tileentity.TileEntityInventory;
-import ic2.core.init.MainConfig;
+import ic2.core.init.IC2Config;
 import ic2.core.network.GrowingBuffer;
 import ic2.core.profile.NotClassic;
 import ic2.core.ref.Ic2BlockEntities;
-import ic2.core.util.ConfigUtil;
 import ic2.core.util.LogCategory;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
@@ -42,11 +41,11 @@ import net.minecraft.world.level.block.state.BlockState;
 @NotClassic
 public class TileEntityChunkLoader extends TileEntityInventory implements INetworkClientTileEntityEventListener, IHasGui, IUpgradableBlock
 {
-	private final LongSet loadedChunks = new LongOpenHashSet();
 	public final InvSlotUpgrade upgradeSlot;
 	public final InvSlotDischarge dischargeSlot;
 	public final Energy energy;
-	private final double euPerChunk = ConfigUtil.getFloat(MainConfig.get(), "balance/euPerChunk");
+	private final LongSet loadedChunks = new LongOpenHashSet();
+	private final double euPerChunk = IC2Config.balance.euPerChunk.get();
 
 	public TileEntityChunkLoader(BlockPos pos, BlockState state)
 	{

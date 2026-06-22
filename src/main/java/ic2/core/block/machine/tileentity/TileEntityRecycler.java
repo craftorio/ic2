@@ -9,7 +9,7 @@ import ic2.api.recipe.Recipes;
 import ic2.api.upgrade.UpgradableProperty;
 import ic2.core.IC2;
 import ic2.core.block.invslot.InvSlotProcessableGeneric;
-import ic2.core.init.MainConfig;
+import ic2.core.init.IC2Config;
 import ic2.core.recipe.BasicListRecipeManager;
 import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.ref.Ic2Items;
@@ -17,6 +17,7 @@ import ic2.core.ref.Ic2SoundEvents;
 import ic2.core.util.ConfigUtil;
 import ic2.core.util.StackUtil;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -46,20 +47,31 @@ public class TileEntityRecycler extends TileEntityStandardMachine<IRecipeInput, 
 
 	public static void initLate()
 	{
-		for (IRecipeInput input : ConfigUtil.asRecipeInputList(MainConfig.get(), "balance/recyclerBlacklist"))
+		try
 		{
-			Recipes.recyclerBlacklist.add(input);
-		}
+			for (IRecipeInput input : ConfigUtil.asRecipeInputList(IC2Config.balance.recyclerBlacklist.get()))
+			{
+				Recipes.recyclerBlacklist.add(input);
+			}
 
-		for (IRecipeInput input : ConfigUtil.asRecipeInputList(MainConfig.get(), "balance/recyclerWhitelist"))
+			for (IRecipeInput input : ConfigUtil.asRecipeInputList(IC2Config.balance.recyclerWhitelist.get()))
+			{
+				Recipes.recyclerWhitelist.add(input);
+			}
+		} catch (ParseException pe)
 		{
-			Recipes.recyclerWhitelist.add(input);
+			throw new RuntimeException(pe);
 		}
 	}
 
 	public static int recycleChance()
 	{
 		return 8;
+	}
+
+	public static boolean getIsItemBlacklisted(ItemStack aStack)
+	{
+		return Recipes.recyclerWhitelist.isEmpty() ? Recipes.recyclerBlacklist.contains(aStack) : !Recipes.recyclerWhitelist.contains(aStack);
 	}
 
 	@Override
@@ -72,11 +84,6 @@ public class TileEntityRecycler extends TileEntityStandardMachine<IRecipeInput, 
 	public SoundEvent getInterruptSoundEvent()
 	{
 		return Ic2SoundEvents.MACHINE_INTERRUPT1;
-	}
-
-	public static boolean getIsItemBlacklisted(ItemStack aStack)
-	{
-		return Recipes.recyclerWhitelist.isEmpty() ? Recipes.recyclerBlacklist.contains(aStack) : !Recipes.recyclerWhitelist.contains(aStack);
 	}
 
 	@Override
@@ -107,6 +114,11 @@ public class TileEntityRecycler extends TileEntityStandardMachine<IRecipeInput, 
 		{
 		}
 
+		private static Collection<ItemStack> getOutput(ItemStack input)
+		{
+			return TileEntityRecycler.getIsItemBlacklisted(input) ? Collections.emptyList() : Collections.singletonList(new ItemStack(Ic2Items.SCRAP));
+		}
+
 		public boolean addRecipe(IRecipeInput input, Collection<ItemStack> output, CompoundTag metadata, boolean replace)
 		{
 			return false;
@@ -132,11 +144,6 @@ public class TileEntityRecycler extends TileEntityStandardMachine<IRecipeInput, 
 			}
 
 			return ret;
-		}
-
-		private static Collection<ItemStack> getOutput(ItemStack input)
-		{
-			return TileEntityRecycler.getIsItemBlacklisted(input) ? Collections.emptyList() : Collections.singletonList(new ItemStack(Ic2Items.SCRAP));
 		}
 
 		public MachineRecipeResult<IRecipeInput, Collection<ItemStack>, ItemStack> apply(ItemStack input, boolean acceptTest)

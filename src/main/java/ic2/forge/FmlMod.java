@@ -1,6 +1,8 @@
 package ic2.forge;
 
 import ic2.core.event.EventHandler;
+import ic2.core.init.IC2ClientConfig;
+import ic2.core.init.IC2Config;
 import ic2.core.network.NetworkManager;
 import ic2.core.loot.Ic2LootNbtProviderTypes;
 import ic2.core.ref.Ic2Fluids;
@@ -16,7 +18,9 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.IExtensionPoint.DisplayTest;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -28,10 +32,10 @@ import net.minecraftforge.registries.RegisterEvent;
 @Mod("ic2")
 public final class FmlMod
 {
-	private List<Runnable> toRunAfterRegistryInit = new ArrayList<>();
-	public static FmlMod instance;
 	private static final AtomicInteger loadState = new AtomicInteger();
+	public static FmlMod instance;
 	private final FMLJavaModLoadingContext ctx;
+	private List<Runnable> toRunAfterRegistryInit = new ArrayList<>();
 
 	public FmlMod(FMLJavaModLoadingContext ctx)
 	{
@@ -53,9 +57,11 @@ public final class FmlMod
 		if (FMLEnvironment.dist.isClient())
 		{
 			modEventBus.register(new ClientModEventHandlerForge());
+			ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, IC2ClientConfig.SPEC);
 		}
 
 		Ic2Fluids.init();
+		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, IC2Config.SPEC);
 	}
 
 

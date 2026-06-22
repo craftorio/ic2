@@ -39,15 +39,15 @@ public class TileEntitySolarDistiller extends TileEntityInventory implements IHa
 {
 	public final Ic2FluidTank inputTank;
 	public final Ic2FluidTank outputTank;
-	private int tickRate;
-	private int updateTicker;
-	private float skyLight;
 	public final InvSlotOutput waterOutputSlot;
 	public final InvSlotOutput destiwateroutputSlott;
 	public final InvSlotConsumableLiquidByList waterinputSlot;
 	public final InvSlotConsumableLiquidByTank destiwaterinputSlot;
 	public final InvSlotUpgrade upgradeSlot;
 	protected final Fluids fluids = this.addComponent(new Fluids(this));
+	private int tickRate;
+	private int updateTicker;
+	private float skyLight;
 
 	public TileEntitySolarDistiller(BlockPos pos, BlockState state)
 	{
@@ -120,29 +120,6 @@ public class TileEntitySolarDistiller extends TileEntityInventory implements IHa
 		} else
 		{
 			return IC2.envProxy.biomeHasType(biome, EnvProxy.BiomeType.COLD) ? 144 : 72;
-		}
-	}
-
-	public int gaugeLiquidScaled(int i, int tank)
-	{
-		switch (tank)
-		{
-			case 0:
-				if (this.inputTank.getFluidAmount() <= 0)
-				{
-					return 0;
-				}
-
-				return this.inputTank.getFluidAmount() * i / this.inputTank.getCapacity();
-			case 1:
-				if (this.outputTank.getFluidAmount() <= 0)
-				{
-					return 0;
-				}
-
-				return this.outputTank.getFluidAmount() * i / this.outputTank.getCapacity();
-			default:
-				return 0;
 		}
 	}
 

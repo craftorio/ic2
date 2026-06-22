@@ -45,16 +45,6 @@ public class BasicSink extends BasicEnergyTile implements IEnergySink
 		this.tier = tier;
 	}
 
-	public void setSinkTier(int tier)
-	{
-		if (tier < 0)
-		{
-			throw new IllegalArgumentException("invalid tier: " + tier);
-		}
-
-		this.tier = tier;
-	}
-
 	@Override
 	public boolean acceptsEnergyFrom(IEnergyEmitter emitter, Direction direction)
 	{
@@ -78,6 +68,16 @@ public class BasicSink extends BasicEnergyTile implements IEnergySink
 	public int getSinkTier()
 	{
 		return this.tier;
+	}
+
+	public void setSinkTier(int tier)
+	{
+		if (tier < 0)
+		{
+			throw new IllegalArgumentException("invalid tier: " + tier);
+		}
+
+		this.tier = tier;
 	}
 
 	@Override

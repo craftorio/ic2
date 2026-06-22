@@ -36,6 +36,12 @@ public enum CableFoam implements StringRepresentable
 	private final String name;
 	private final DyeColor color;
 
+	CableFoam(String name, DyeColor color)
+	{
+		this.name = name;
+		this.color = color;
+	}
+
 	public static CableFoam get(String name)
 	{
 		return NAME_MAP.get(name);
@@ -46,10 +52,31 @@ public enum CableFoam implements StringRepresentable
 		return COLOR_MAP.get(color);
 	}
 
-	CableFoam(String name, DyeColor color)
+	private static Map<String, CableFoam> createNameMap()
 	{
-		this.name = name;
-		this.color = color;
+		Map<String, CableFoam> ret = new HashMap<>();
+
+		for (CableFoam v : VALUES)
+		{
+			ret.put(v.name, v);
+		}
+
+		return ret;
+	}
+
+	private static Map<DyeColor, CableFoam> createColorMap()
+	{
+		Map<DyeColor, CableFoam> ret = new EnumMap<>(DyeColor.class);
+
+		for (CableFoam v : VALUES)
+		{
+			if (v.color != null)
+			{
+				ret.put(v.color, v);
+			}
+		}
+
+		return ret;
 	}
 
 	public boolean isPresent()
@@ -81,32 +108,5 @@ public enum CableFoam implements StringRepresentable
 	public String getSerializedName()
 	{
 		return this.name;
-	}
-
-	private static Map<String, CableFoam> createNameMap()
-	{
-		Map<String, CableFoam> ret = new HashMap<>();
-
-		for (CableFoam v : VALUES)
-		{
-			ret.put(v.name, v);
-		}
-
-		return ret;
-	}
-
-	private static Map<DyeColor, CableFoam> createColorMap()
-	{
-		Map<DyeColor, CableFoam> ret = new EnumMap<>(DyeColor.class);
-
-		for (CableFoam v : VALUES)
-		{
-			if (v.color != null)
-			{
-				ret.put(v.color, v);
-			}
-		}
-
-		return ret;
 	}
 }

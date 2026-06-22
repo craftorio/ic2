@@ -2,11 +2,10 @@ package ic2.core.block.generator.tileentity;
 
 import ic2.core.block.invslot.InvSlotConsumable;
 import ic2.core.block.invslot.InvSlotConsumableItemStack;
-import ic2.core.init.MainConfig;
+import ic2.core.init.IC2Config;
 import ic2.core.profile.NotClassic;
 import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.ref.Ic2Items;
-import ic2.core.util.ConfigUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
@@ -15,11 +14,10 @@ import net.minecraft.world.level.block.state.BlockState;
 public class TileEntityRTGenerator extends TileEntityBaseGenerator
 {
 	public final InvSlotConsumable fuelSlot = new InvSlotConsumableItemStack(this, "fuel", 6, new ItemStack(Ic2Items.RTG_PELLET));
-	private static final float efficiency = ConfigUtil.getFloat(MainConfig.get(), "balance/energy/generator/radioisotope");
 
 	public TileEntityRTGenerator(BlockPos pos, BlockState state)
 	{
-		super(Ic2BlockEntities.RT_GENERATOR, pos, state, Math.round(16.0F * efficiency), 1, 20000);
+		super(Ic2BlockEntities.RT_GENERATOR, pos, state, Math.round(16.0F * (float) IC2Config.balance.energy.generator.radioisotope.get().floatValue()), 1, 20000);
 		this.fuelSlot.setStackSizeLimit(1);
 	}
 
@@ -41,7 +39,7 @@ public class TileEntityRTGenerator extends TileEntityBaseGenerator
 			return false;
 		}
 
-		this.energy.addEnergy(Math.pow(2.0, counter - 1) * efficiency);
+		this.energy.addEnergy(Math.pow(2.0, counter - 1) * (float) IC2Config.balance.energy.generator.radioisotope.get().floatValue());
 		return true;
 	}
 

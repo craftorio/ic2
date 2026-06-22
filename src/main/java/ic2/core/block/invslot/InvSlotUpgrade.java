@@ -34,15 +34,15 @@ public class InvSlotUpgrade extends InvSlot
 	public int extraTier;
 	private List<Redstone.IRedstoneModifier> redstoneModifiers = Collections.emptyList();
 
-	public static InvSlotUpgrade createUnchecked(IInventorySlotHolder<?> base, String name, int count)
-	{
-		return new InvSlotUpgrade((IInventorySlotHolder<?> & IUpgradableBlock) base, name, count);
-	}
-
 	public <T extends IInventorySlotHolder<?> & IUpgradableBlock> InvSlotUpgrade(T base, String name, int count)
 	{
 		super(base, name, InvSlot.Access.NONE, count);
 		this.resetRates();
+	}
+
+	public static InvSlotUpgrade createUnchecked(IInventorySlotHolder<?> base, String name, int count)
+	{
+		return new InvSlotUpgrade((IInventorySlotHolder<?> & IUpgradableBlock) base, name, count);
 	}
 
 	@Override

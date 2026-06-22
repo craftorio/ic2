@@ -14,32 +14,6 @@ public class Image extends GuiElement<Image>
 	private final boolean autoWidth;
 	private final boolean autoHeight;
 
-	public static Image create(
-		Ic2Gui<?> gui, int x, int y, int width, int height, ResourceLocation texture, int baseWidth, int baseHeight, int uS, int vS, int uE, int vE
-	)
-	{
-		return create(gui, x, y, width, height, texture, baseWidth, baseHeight, new OverlaySupplier(uS, vS, uE, vE));
-	}
-
-	public static Image create(
-		Ic2Gui<?> gui, int x, int y, int width, int height, ResourceLocation texture, int baseWidth, int baseHeight, IOverlaySupplier overlay
-	)
-	{
-		boolean autoWidth = width < 0;
-		boolean autoHeight = height < 0;
-		if (autoWidth)
-		{
-			width = 0;
-		}
-
-		if (autoHeight)
-		{
-			height = 0;
-		}
-
-		return new Image(gui, x, y, width, height, texture, baseWidth, baseHeight, overlay, autoWidth, autoHeight);
-	}
-
 	protected Image(
 		Ic2Gui<?> gui,
 		int x,
@@ -71,6 +45,32 @@ public class Image extends GuiElement<Image>
 		this.overlay = overlay;
 		this.autoWidth = autoWidth;
 		this.autoHeight = autoHeight;
+	}
+
+	public static Image create(
+		Ic2Gui<?> gui, int x, int y, int width, int height, ResourceLocation texture, int baseWidth, int baseHeight, int uS, int vS, int uE, int vE
+	)
+	{
+		return create(gui, x, y, width, height, texture, baseWidth, baseHeight, new OverlaySupplier(uS, vS, uE, vE));
+	}
+
+	public static Image create(
+		Ic2Gui<?> gui, int x, int y, int width, int height, ResourceLocation texture, int baseWidth, int baseHeight, IOverlaySupplier overlay
+	)
+	{
+		boolean autoWidth = width < 0;
+		boolean autoHeight = height < 0;
+		if (autoWidth)
+		{
+			width = 0;
+		}
+
+		if (autoHeight)
+		{
+			height = 0;
+		}
+
+		return new Image(gui, x, y, width, height, texture, baseWidth, baseHeight, overlay, autoWidth, autoHeight);
 	}
 
 	@Override

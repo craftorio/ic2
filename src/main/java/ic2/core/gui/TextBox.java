@@ -18,6 +18,10 @@ import net.minecraft.client.renderer.GameRenderer;
 
 public class TextBox extends GuiElement<TextBox>
 {
+	protected static final int enabledColour = 14737632;
+	protected static final int disabledColour = 7368816;
+	protected static final int invalidColour = -3092272;
+	protected final boolean drawBackground;
 	protected String text;
 	protected boolean focused;
 	protected int cursor;
@@ -28,10 +32,6 @@ public class TextBox extends GuiElement<TextBox>
 	protected IEnableHandler enableHandler;
 	protected Predicate<String> validator = Predicates.alwaysTrue();
 	protected TextBox.ITextBoxWatcher watcher;
-	protected final boolean drawBackground;
-	protected static final int enabledColour = 14737632;
-	protected static final int disabledColour = 7368816;
-	protected static final int invalidColour = -3092272;
 
 	public TextBox(Ic2Gui<?> gui, int x, int y, int width, int height)
 	{
@@ -79,6 +79,11 @@ public class TextBox extends GuiElement<TextBox>
 		return this.enableHandler == null || this.enableHandler.isEnabled();
 	}
 
+	public boolean isFocused()
+	{
+		return this.focused;
+	}
+
 	public void setFocused(boolean focused)
 	{
 		if (focused && !this.focused)
@@ -87,11 +92,6 @@ public class TextBox extends GuiElement<TextBox>
 		}
 
 		this.focused = focused;
-	}
-
-	public boolean isFocused()
-	{
-		return this.focused;
 	}
 
 	public void setMaxTextLength(int length)

@@ -14,13 +14,6 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class Mushroom extends TerraformerBase
 {
-	@Override
-	boolean terraform(Level world, BlockPos pos)
-	{
-		pos = TileEntityTerra.getFirstSolidBlockFrom(world, pos, 20);
-		return pos == null ? false : growBlockWithDependancy(world, pos, Blocks.BROWN_MUSHROOM_BLOCK, Blocks.BROWN_MUSHROOM);
-	}
-
 	private static boolean growBlockWithDependancy(Level world, BlockPos pos, Block target, Block dependancy)
 	{
 		MutableBlockPos cPos = new MutableBlockPos();
@@ -139,5 +132,12 @@ public class Mushroom extends TerraformerBase
 
 			return false;
 		}
+	}
+
+	@Override
+	boolean terraform(Level world, BlockPos pos)
+	{
+		pos = TileEntityTerra.getFirstSolidBlockFrom(world, pos, 20);
+		return pos == null ? false : growBlockWithDependancy(world, pos, Blocks.BROWN_MUSHROOM_BLOCK, Blocks.BROWN_MUSHROOM);
 	}
 }

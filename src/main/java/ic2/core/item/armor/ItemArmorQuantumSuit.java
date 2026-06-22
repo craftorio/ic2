@@ -6,11 +6,11 @@ import ic2.api.item.IHazmatLike;
 import ic2.api.item.IItemHudProvider;
 import ic2.core.IC2;
 import ic2.core.Ic2Potion;
-import ic2.core.init.MainConfig;
+import ic2.core.init.IC2ClientConfig;
 import ic2.core.item.ItemTinCan;
 import ic2.core.item.armor.jetpack.IJetpack;
 import ic2.core.ref.Ic2Items;
-import ic2.core.util.ConfigUtil;
+
 import ic2.core.util.KeyboardClient;
 import ic2.core.util.StackUtil;
 import net.minecraft.client.Minecraft;
@@ -45,7 +45,6 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 {
 	public static final int[] CHARGED_PROTECTION = new int[] { 3, 6, 8, 3 };
 	protected static final Map<MobEffect, Integer> potionRemovalCost = new IdentityHashMap<>();
-	private float jumpCharge;
 
 	static
 	{
@@ -53,6 +52,8 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 		potionRemovalCost.put(Ic2Potion.radiation, 10000);
 		potionRemovalCost.put(MobEffects.WITHER, 25000);
 	}
+
+	private float jumpCharge;
 
 	public ItemArmorQuantumSuit(ArmorMaterial material, EquipmentSlot armorType, Properties settings)
 	{
@@ -178,7 +179,7 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 		{
 			tooltip.add(Component.translatable("item.ic2.tooltip.jetpack.toggle", Minecraft.getInstance().options.keyJump.getKey().getDisplayName(), KeyboardClient.modeSwitchKey.getKey().getDisplayName()));
 		}
-		
+
 	}
 
 	@Override
@@ -320,7 +321,7 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 			boolean enableQuantumSpeedOnSprint;
 			if (IC2.sideProxy.isRendering())
 			{
-				enableQuantumSpeedOnSprint = ConfigUtil.getBool(MainConfig.get(), "misc/quantumSpeedOnSprint");
+				enableQuantumSpeedOnSprint = IC2ClientConfig.misc.quantumSpeedOnSprint.get();
 			} else
 			{
 				enableQuantumSpeedOnSprint = true;

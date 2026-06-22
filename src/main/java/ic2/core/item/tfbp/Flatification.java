@@ -17,6 +17,11 @@ public class Flatification extends TerraformerBase
 {
 	static Set<Block> removable = Collections.newSetFromMap(new IdentityHashMap<>());
 
+	private static boolean canRemove(Block block)
+	{
+		return removable.contains(block) || block.builtInRegistryHolder().is(BlockTags.SAPLINGS) || block.builtInRegistryHolder().is(BlockTags.LOGS);
+	}
+
 	@Override
 	void init()
 	{
@@ -75,10 +80,5 @@ public class Flatification extends TerraformerBase
 		{
 			return false;
 		}
-	}
-
-	private static boolean canRemove(Block block)
-	{
-		return removable.contains(block) || block.builtInRegistryHolder().is(BlockTags.SAPLINGS) || block.builtInRegistryHolder().is(BlockTags.LOGS);
 	}
 }

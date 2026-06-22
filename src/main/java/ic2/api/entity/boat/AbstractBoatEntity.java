@@ -24,17 +24,6 @@ public abstract class AbstractBoatEntity extends Boat
 {
 	protected boolean isExtraItemDropped = false;
 
-	private static Field getFieldSafe(Class<?> clazz, String srgName, String mcpName) throws NoSuchFieldException
-	{
-		try
-		{
-			return clazz.getDeclaredField(srgName);
-		} catch (NoSuchFieldException e)
-		{
-			return clazz.getDeclaredField(mcpName);
-		}
-	}
-
 	public AbstractBoatEntity(EntityType<? extends Boat> entityType, Level world)
 	{
 		super(entityType, world);
@@ -47,6 +36,17 @@ public abstract class AbstractBoatEntity extends Boat
 		this.xo = x;
 		this.yo = y;
 		this.zo = z;
+	}
+
+	private static Field getFieldSafe(Class<?> clazz, String srgName, String mcpName) throws NoSuchFieldException
+	{
+		try
+		{
+			return clazz.getDeclaredField(srgName);
+		} catch (NoSuchFieldException e)
+		{
+			return clazz.getDeclaredField(mcpName);
+		}
 	}
 
 	public ItemStack getExtraDropItemStack()
@@ -244,11 +244,6 @@ public abstract class AbstractBoatEntity extends Boat
 		{
 			throw new RuntimeException(e);
 		}
-	}
-
-	public void tick()
-	{
-		super.tick();
 	}
 
 	protected void checkFallDamage(double heightDifference, boolean onGround, BlockState state, BlockPos landedPosition)

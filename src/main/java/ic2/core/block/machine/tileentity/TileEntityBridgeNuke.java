@@ -3,8 +3,7 @@ package ic2.core.block.machine.tileentity;
 import ic2.api.entity.block.ExplosiveEntity;
 import ic2.core.IC2;
 import ic2.core.entity.block.NukeEntity;
-import ic2.core.init.MainConfig;
-import ic2.core.util.ConfigUtil;
+import ic2.core.init.IC2Config;
 import ic2.core.util.LogCategory;
 import ic2.core.util.Util;
 import net.minecraft.core.BlockPos;
@@ -41,7 +40,7 @@ public abstract class TileEntityBridgeNuke extends TileEntityExplosive
 	@Override
 	protected ExplosiveEntity getEntity(LivingEntity igniter)
 	{
-		if (!ConfigUtil.getBool(MainConfig.get(), "protection/enableNuke"))
+		if (!IC2Config.protection.enableNuke.get())
 		{
 			return null;
 		}

@@ -15,7 +15,7 @@ import ic2.core.block.invslot.InvSlotConsumableId;
 import ic2.core.block.invslot.InvSlotUpgrade;
 import ic2.core.block.machine.container.ContainerMiner;
 import ic2.core.fluid.FluidHandler;
-import ic2.core.init.MainConfig;
+import ic2.core.init.IC2Config;
 import ic2.core.init.OreValues;
 import ic2.core.item.tool.ItemScanner;
 import ic2.core.network.GrowingBuffer;
@@ -24,7 +24,6 @@ import ic2.core.ref.Ic2BlockTags;
 import ic2.core.ref.Ic2Blocks;
 import ic2.core.ref.Ic2Items;
 import ic2.core.ref.Ic2SoundEvents;
-import ic2.core.util.ConfigUtil;
 import ic2.core.util.LiquidUtil;
 import ic2.core.util.StackUtil;
 import ic2.core.util.Util;
@@ -51,25 +50,25 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class TileEntityMiner extends TileEntityElectricMachine implements IHasGui, IUpgradableBlock
 {
-	private TileEntityMiner.Mode lastMode = TileEntityMiner.Mode.None;
-	public int progress = 0;
-	private int scannedLevel = -1;
-	private int scanRange = 0;
-	private int lastX;
-	private int lastZ;
-	public boolean pumpMode = false;
-	public boolean canProvideLiquid = false;
-	public BlockPos liquidPos;
 	public final InvSlot buffer;
 	public final InvSlotUpgrade upgradeSlot;
 	public final InvSlotConsumable drillSlot;
 	public final InvSlotConsumable pipeSlot;
 	public final InvSlotConsumable scannerSlot;
+	public int progress = 0;
+	public boolean pumpMode = false;
+	public boolean canProvideLiquid = false;
+	public BlockPos liquidPos;
 	boolean tickingUpgrades = false;
+	private TileEntityMiner.Mode lastMode = TileEntityMiner.Mode.None;
+	private int scannedLevel = -1;
+	private int scanRange = 0;
+	private int lastX;
+	private int lastZ;
 
 	public TileEntityMiner(BlockPos pos, BlockState state)
 	{
-		super(Ic2BlockEntities.MINER, pos, state, 1000, ConfigUtil.getInt(MainConfig.get(), "balance/minerDischargeTier"), false);
+		super(Ic2BlockEntities.MINER, pos, state, 1000, IC2Config.balance.minerDischargeTier.get(), false);
 		this.drillSlot = new InvSlotConsumableClass(this, "drill", InvSlot.Access.IO, 1, InvSlot.InvSide.TOP, IMiningDrill.class)
 		{
 			@Override

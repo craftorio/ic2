@@ -28,8 +28,8 @@ import net.minecraft.world.inventory.InventoryMenu;
 
 public abstract class GuiElement<T extends GuiElement<T>>
 {
-	protected static final int hoverColor = -2130706433;
 	public static final ResourceLocation commonTexture = ResourceLocation.fromNamespaceAndPath("ic2", "textures/gui/common.png");
+	protected static final int hoverColor = -2130706433;
 	private static final Map<Class<?>, Set<GuiElement.ImplementedMethod>> IMPLEMENTED_METHOD_CACHE = new IdentityHashMap<>();
 	protected final Ic2Gui<?> gui;
 	protected int x;
@@ -56,6 +56,51 @@ public abstract class GuiElement<T extends GuiElement<T>>
 		this.y = y;
 		this.width = width;
 		this.height = height;
+	}
+
+	private static void addLines(List<Component> list, String str)
+	{
+		int startPos = 0;
+
+		int pos;
+		while ((pos = str.indexOf(10, startPos)) != -1)
+		{
+			list.add(processText(str.substring(startPos, pos)));
+			startPos = pos + 1;
+		}
+
+		if (startPos == 0)
+		{
+			list.add(processText(str));
+		} else
+		{
+			list.add(processText(str.substring(startPos)));
+		}
+	}
+
+	protected static Component processText(String text)
+	{
+		return Component.translatable(text);
+	}
+
+	protected static void bindTexture(ResourceLocation texture)
+	{
+		Ic2Gui.bindTexture(texture);
+	}
+
+	public static void bindCommonTexture()
+	{
+		Ic2Gui.bindTexture(commonTexture);
+	}
+
+	protected static void bindBlockTexture()
+	{
+		Ic2Gui.bindTexture(InventoryMenu.BLOCK_ATLAS);
+	}
+
+	protected static TextureAtlas getBlockTextureMap()
+	{
+		return (TextureAtlas) Minecraft.getInstance().getTextureManager().getTexture(InventoryMenu.BLOCK_ATLAS);
 	}
 
 	public final boolean isEnabled()
@@ -114,26 +159,6 @@ public abstract class GuiElement<T extends GuiElement<T>>
 		}
 	}
 
-	private static void addLines(List<Component> list, String str)
-	{
-		int startPos = 0;
-
-		int pos;
-		while ((pos = str.indexOf(10, startPos)) != -1)
-		{
-			list.add(processText(str.substring(startPos, pos)));
-			startPos = pos + 1;
-		}
-
-		if (startPos == 0)
-		{
-			list.add(processText(str));
-		} else
-		{
-			list.add(processText(str.substring(startPos)));
-		}
-	}
-
 	public boolean onMouseClick(int mouseX, int mouseY, MouseButton button, boolean onThis)
 	{
 		return onThis && this.onMouseClick(mouseX, mouseY, button);
@@ -183,11 +208,6 @@ public abstract class GuiElement<T extends GuiElement<T>>
 		return new ArrayList<>();
 	}
 
-	protected static Component processText(String text)
-	{
-		return Component.translatable(text);
-	}
-
 	protected final Container getBase()
 	{
 		return this.gui.getContainer().base;
@@ -198,26 +218,6 @@ public abstract class GuiElement<T extends GuiElement<T>>
 		Map<String, TextProvider.ITextProvider> ret = new HashMap<>();
 		ret.put("name", TextProvider.of(this.gui.getTitle()));
 		return ret;
-	}
-
-	protected static void bindTexture(ResourceLocation texture)
-	{
-		Ic2Gui.bindTexture(texture);
-	}
-
-	public static void bindCommonTexture()
-	{
-		Ic2Gui.bindTexture(commonTexture);
-	}
-
-	protected static void bindBlockTexture()
-	{
-		Ic2Gui.bindTexture(InventoryMenu.BLOCK_ATLAS);
-	}
-
-	protected static TextureAtlas getBlockTextureMap()
-	{
-		return (TextureAtlas) Minecraft.getInstance().getTextureManager().getTexture(InventoryMenu.BLOCK_ATLAS);
 	}
 
 	public final Set<GuiElement.ImplementedMethod> getImplementedMethods()

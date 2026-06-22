@@ -27,8 +27,8 @@ public class TileEntityMetalFormer
 	extends TileEntityStandardMachine<IRecipeInput, Collection<ItemStack>, ItemStack>
 	implements INetworkClientTileEntityEventListener
 {
-	private int mode;
 	public static final int EventSwitch = 0;
+	private int mode;
 
 	public TileEntityMetalFormer(BlockPos pos, BlockState state)
 	{

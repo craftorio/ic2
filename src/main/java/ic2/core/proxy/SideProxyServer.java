@@ -31,6 +31,54 @@ public final class SideProxyServer implements SideProxy
 	private static final Keyboard keyboard = new Keyboard();
 	private static final Queue<Runnable> pendingTasks = new ArrayDeque<>();
 
+	static void displayError0(String error, Object... args)
+	{
+		if (args.length > 0)
+		{
+			error = String.format(error, args);
+		}
+
+		error = "IndustrialCraft 2 Error\n\n == = IndustrialCraft 2 Error = == \n\n" + error + "\n\n == == == == == == == == == == ==\n";
+		error = error.replace("\n", System.lineSeparator());
+		throw new RuntimeException(error);
+	}
+
+	static void displayError(SideProxy sideProxy, Exception e, String error, Object... args)
+	{
+		if (args.length > 0)
+		{
+			error = String.format(error, args);
+		}
+
+		sideProxy.displayError("An unexpected Exception occured.\n\n" + getStackTrace(e) + "\n" + error);
+	}
+
+	private static String getStackTrace(Exception e)
+	{
+		StringWriter writer = new StringWriter();
+		PrintWriter printWriter = new PrintWriter(writer);
+		e.printStackTrace(printWriter);
+		return writer.toString();
+	}
+
+	static Component[] getMessageComponents(Object... args)
+	{
+		Component[] encodedArgs = new Component[args.length];
+
+		for (int i = 0; i < args.length; i++)
+		{
+			if (args[i] instanceof String && ((String) args[i]).contains("ic2."))
+			{
+				encodedArgs[i] = Component.translatable((String) args[i]);
+			} else
+			{
+				encodedArgs[i] = Component.literal(args[i].toString());
+			}
+		}
+
+		return encodedArgs;
+	}
+
 	@Override
 	public void preInit()
 	{
@@ -122,40 +170,10 @@ public final class SideProxyServer implements SideProxy
 		displayError0(error, args);
 	}
 
-	static void displayError0(String error, Object... args)
-	{
-		if (args.length > 0)
-		{
-			error = String.format(error, args);
-		}
-
-		error = "IndustrialCraft 2 Error\n\n == = IndustrialCraft 2 Error = == \n\n" + error + "\n\n == == == == == == == == == == ==\n";
-		error = error.replace("\n", System.lineSeparator());
-		throw new RuntimeException(error);
-	}
-
 	@Override
 	public void displayError(Exception e, String error, Object... args)
 	{
 		displayError(this, e, error, args);
-	}
-
-	static void displayError(SideProxy sideProxy, Exception e, String error, Object... args)
-	{
-		if (args.length > 0)
-		{
-			error = String.format(error, args);
-		}
-
-		sideProxy.displayError("An unexpected Exception occured.\n\n" + getStackTrace(e) + "\n" + error);
-	}
-
-	private static String getStackTrace(Exception e)
-	{
-		StringWriter writer = new StringWriter();
-		PrintWriter printWriter = new PrintWriter(writer);
-		e.printStackTrace(printWriter);
-		return writer.toString();
 	}
 
 	@Override
@@ -212,24 +230,6 @@ public final class SideProxyServer implements SideProxy
 
 			player.displayClientMessage(msg, false);
 		}
-	}
-
-	static Component[] getMessageComponents(Object... args)
-	{
-		Component[] encodedArgs = new Component[args.length];
-
-		for (int i = 0; i < args.length; i++)
-		{
-			if (args[i] instanceof String && ((String) args[i]).contains("ic2."))
-			{
-				encodedArgs[i] = Component.translatable((String) args[i]);
-			} else
-			{
-				encodedArgs[i] = Component.literal(args[i].toString());
-			}
-		}
-
-		return encodedArgs;
 	}
 
 	@Override

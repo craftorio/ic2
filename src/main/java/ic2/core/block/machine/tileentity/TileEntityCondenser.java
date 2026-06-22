@@ -33,18 +33,18 @@ import net.minecraft.world.level.block.state.BlockState;
 @NotClassic
 public class TileEntityCondenser extends TileEntityElectricMachine implements IHasGui, IGuiValueProvider, IUpgradableBlock
 {
-	private final short passiveCooling = 100;
-	private final short coolingPerVent = 100;
 	public final short ventEUCost = 2;
-	public int progress = 0;
 	public final int maxProgress = 10000;
-	private final Ic2FluidTank inputTank;
-	private final Ic2FluidTank outputTank;
 	public final InvSlotConsumableLiquidByTank waterInputSlot;
 	public final InvSlotOutput waterOutputSlot;
 	public final InvSlotConsumableId ventSlots;
 	public final InvSlotUpgrade upgradeSlot;
 	protected final Fluids fluids = this.addComponent(new Fluids(this));
+	private final short passiveCooling = 100;
+	private final short coolingPerVent = 100;
+	private final Ic2FluidTank inputTank;
+	private final Ic2FluidTank outputTank;
+	public int progress = 0;
 
 	public TileEntityCondenser(BlockPos pos, BlockState state)
 	{
@@ -173,29 +173,6 @@ public class TileEntityCondenser extends TileEntityElectricMachine implements IH
 		} else
 		{
 			throw new IllegalArgumentException("Invalid Gui value: " + name);
-		}
-	}
-
-	public int gaugeLiquidScaled(int i, int tank)
-	{
-		switch (tank)
-		{
-			case 0:
-				if (this.inputTank.getFluidAmount() <= 0)
-				{
-					return 0;
-				}
-
-				return this.inputTank.getFluidAmount() * i / this.inputTank.getCapacity();
-			case 1:
-				if (this.outputTank.getFluidAmount() <= 0)
-				{
-					return 0;
-				}
-
-				return this.outputTank.getFluidAmount() * i / this.outputTank.getCapacity();
-			default:
-				return 0;
 		}
 	}
 

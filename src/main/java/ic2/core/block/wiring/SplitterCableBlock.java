@@ -7,16 +7,16 @@ public class SplitterCableBlock extends AbstractSplitterCableBlock
 {
 	private final SplitterFoamCableBlock foamCableBlock;
 
-	public static SplitterCableBlock create(Properties settings, SplitterFoamCableBlock foamCableBlock)
-	{
-		prepareCreate(CableType.splitter, 0);
-		return new SplitterCableBlock(settings, foamCableBlock);
-	}
-
 	protected SplitterCableBlock(Properties settings, SplitterFoamCableBlock foamCableBlock)
 	{
 		super(settings, CableType.splitter, 0);
 		this.foamCableBlock = foamCableBlock;
+	}
+
+	public static SplitterCableBlock create(Properties settings, SplitterFoamCableBlock foamCableBlock)
+	{
+		prepareCreate(CableType.splitter, 0);
+		return new SplitterCableBlock(settings, foamCableBlock);
 	}
 
 	@Override

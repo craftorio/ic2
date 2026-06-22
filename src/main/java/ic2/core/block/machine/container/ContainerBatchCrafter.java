@@ -21,8 +21,8 @@ import net.minecraft.world.item.ItemStack;
 
 public class ContainerBatchCrafter extends ContainerElectricMachine<TileEntityBatchCrafter>
 {
-	protected final Int2IntMap indexToSlot = new Int2IntOpenHashMap();
 	public static final int HEIGHT = 206;
+	protected final Int2IntMap indexToSlot = new Int2IntOpenHashMap();
 
 	public ContainerBatchCrafter(int syncId, Inventory playerInventory, TileEntityBatchCrafter tileEntity)
 	{

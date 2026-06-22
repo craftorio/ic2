@@ -32,6 +32,7 @@ import net.minecraft.world.level.Level;
 public class Energy extends TileEntityComponent
 {
 	private static final boolean debugLoad = System.getProperty("ic2.comp.energy.debugload") != null;
+	private final boolean fullEnergy;
 	private double capacity;
 	private double storage;
 	private int sinkTier;
@@ -45,27 +46,6 @@ public class Energy extends TileEntityComponent
 	private boolean loaded;
 	private boolean receivingDisabled;
 	private boolean sendingSidabled;
-	private final boolean fullEnergy;
-
-	public static Energy asBasicSink(Ic2TileEntity parent, double capacity)
-	{
-		return asBasicSink(parent, capacity, 1);
-	}
-
-	public static Energy asBasicSink(Ic2TileEntity parent, double capacity, int tier)
-	{
-		return new Energy(parent, capacity, Util.allFacings, Collections.emptySet(), tier);
-	}
-
-	public static Energy asBasicSource(Ic2TileEntity parent, double capacity)
-	{
-		return asBasicSource(parent, capacity, 1);
-	}
-
-	public static Energy asBasicSource(Ic2TileEntity parent, double capacity, int tier)
-	{
-		return new Energy(parent, capacity, Collections.emptySet(), Util.allFacings, tier);
-	}
 
 	public Energy(Ic2TileEntity parent, double capacity)
 	{
@@ -90,6 +70,26 @@ public class Energy extends TileEntityComponent
 		this.fullEnergy = fullEnergy;
 	}
 
+	public static Energy asBasicSink(Ic2TileEntity parent, double capacity)
+	{
+		return asBasicSink(parent, capacity, 1);
+	}
+
+	public static Energy asBasicSink(Ic2TileEntity parent, double capacity, int tier)
+	{
+		return new Energy(parent, capacity, Util.allFacings, Collections.emptySet(), tier);
+	}
+
+	public static Energy asBasicSource(Ic2TileEntity parent, double capacity)
+	{
+		return asBasicSource(parent, capacity, 1);
+	}
+
+	public static Energy asBasicSource(Ic2TileEntity parent, double capacity, int tier)
+	{
+		return new Energy(parent, capacity, Collections.emptySet(), Util.allFacings, tier);
+	}
+
 	public Energy addManagedSlot(InvSlot slot)
 	{
 		if (!(slot instanceof IChargingSlot) && !(slot instanceof IDischargingSlot))
@@ -103,17 +103,6 @@ public class Energy extends TileEntityComponent
 		}
 
 		this.managedSlots.add(slot);
-		return this;
-	}
-
-	public Energy setMultiSource(boolean multiSource)
-	{
-		this.multiSource = multiSource;
-		if (!multiSource)
-		{
-			this.sourcePackets = 1;
-		}
-
 		return this;
 	}
 
@@ -354,17 +343,28 @@ public class Energy extends TileEntityComponent
 		return this.multiSource;
 	}
 
+	public Energy setMultiSource(boolean multiSource)
+	{
+		this.multiSource = multiSource;
+		if (!multiSource)
+		{
+			this.sourcePackets = 1;
+		}
+
+		return this;
+	}
+
+	public int getPacketOutput()
+	{
+		return this.sourcePackets;
+	}
+
 	public void setPacketOutput(int number)
 	{
 		if (this.multiSource)
 		{
 			this.sourcePackets = number;
 		}
-	}
-
-	public int getPacketOutput()
-	{
-		return this.sourcePackets;
 	}
 
 	public void setDirections(Set<Direction> sinkDirections, Set<Direction> sourceDirections)
@@ -472,7 +472,7 @@ public class Energy extends TileEntityComponent
 			: this.sourcePackets;
 	}
 
-	private abstract class EnergyNetDelegate implements ILocatable, IEnergyTile
+	private abstract static class EnergyNetDelegate implements ILocatable, IEnergyTile
 	{
 		private final Ic2TileEntity parent;
 

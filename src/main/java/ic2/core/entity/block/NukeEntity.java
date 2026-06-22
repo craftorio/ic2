@@ -30,7 +30,7 @@ public class NukeEntity extends ExplosiveEntity
 		if (!StackUtil.isEmpty(stack) && stack.getItem() instanceof ItemToolWrench)
 		{
 			ItemToolWrench wrench = (ItemToolWrench) stack.getItem();
-			if (wrench.canTakeDamage(stack, 1))
+			if (wrench.canTakeDamage())
 			{
 				if (this.level().isClientSide)
 				{

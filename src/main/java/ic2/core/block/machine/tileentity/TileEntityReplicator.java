@@ -45,16 +45,6 @@ public class TileEntityReplicator extends TileEntityElectricMachine implements I
 	private static final double euPerTickBase = 512.0;
 	private static final int defaultTier = 4;
 	private static final int defaultEnergyStorage = 2000000;
-	private double uuPerTick = 1.0E-4;
-	private double euPerTick = 512.0;
-	private double extraUuStored = 0.0;
-	public double uuProcessed = 0.0;
-	public ItemStack pattern;
-	private TileEntityReplicator.Mode mode = TileEntityReplicator.Mode.STOPPED;
-	public int index;
-	public int maxIndex;
-	public double patternUu;
-	public double patternEu;
 	public final InvSlotConsumableLiquid fluidSlot = new InvSlotConsumableLiquidByList(this, "fluid", 1, Ic2Fluids.UU_MATTER.still());
 	public final InvSlotOutput cellSlot = new InvSlotOutput(this, "cell", 1);
 	public final InvSlotOutput outputSlot = new InvSlotOutput(this, "output", 1);
@@ -62,11 +52,27 @@ public class TileEntityReplicator extends TileEntityElectricMachine implements I
 	@GuiSynced
 	public final Ic2FluidTank fluidTank;
 	protected final Fluids fluids = this.addComponent(new Fluids(this));
+	public double uuProcessed = 0.0;
+	public ItemStack pattern;
+	public int index;
+	public int maxIndex;
+	public double patternUu;
+	public double patternEu;
+	private double uuPerTick = 1.0E-4;
+	private double euPerTick = 512.0;
+	private double extraUuStored = 0.0;
+	private TileEntityReplicator.Mode mode = TileEntityReplicator.Mode.STOPPED;
 
 	public TileEntityReplicator(BlockPos pos, BlockState state)
 	{
 		super(Ic2BlockEntities.REPLICATOR, pos, state, 2000000, 4);
 		this.fluidTank = this.fluids.addTank("fluidTank", 16000, Fluids.fluidPredicate(Ic2Fluids.UU_MATTER.still()));
+	}
+
+	private static int applyModifier(int base, int extra, double multiplier)
+	{
+		double ret = Math.round(((double) base + extra) * multiplier);
+		return ret > 2.147483647E9 ? Integer.MAX_VALUE : (int) ret;
 	}
 
 	@Override
@@ -220,12 +226,6 @@ public class TileEntityReplicator extends TileEntityElectricMachine implements I
 		this.euPerTick = (512.0 + this.upgradeSlot.extraEnergyDemand) * this.upgradeSlot.energyDemandMultiplier;
 		this.energy.setSinkTier(applyModifier(4, this.upgradeSlot.extraTier, 1.0));
 		this.energy.setCapacity(applyModifier(2000000, this.upgradeSlot.extraEnergyStorage, this.upgradeSlot.energyStorageMultiplier));
-	}
-
-	private static int applyModifier(int base, int extra, double multiplier)
-	{
-		double ret = Math.round(((double) base + extra) * multiplier);
-		return ret > 2.147483647E9 ? Integer.MAX_VALUE : (int) ret;
 	}
 
 	@Override

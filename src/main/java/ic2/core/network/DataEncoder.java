@@ -912,21 +912,8 @@ public final class DataEncoder
 		Collection(Collection.class),
 		Object(Object.class);
 
-		final Class<?> cls;
-		final boolean threadSafe;
 		static final DataEncoder.EncodedType[] types = values();
 		static final Map<Class<?>, DataEncoder.EncodedType> classToTypeMap = new IdentityHashMap<>(types.length - 2);
-
-		EncodedType(Class<?> cls)
-		{
-			this(cls, true);
-		}
-
-		EncodedType(Class<?> cls, boolean threadSafe)
-		{
-			this.cls = cls;
-			this.threadSafe = threadSafe;
-		}
 
 		static
 		{
@@ -942,6 +929,20 @@ public final class DataEncoder
 			{
 				throw new RuntimeException("too many types");
 			}
+		}
+
+		final Class<?> cls;
+		final boolean threadSafe;
+
+		EncodedType(Class<?> cls)
+		{
+			this(cls, true);
+		}
+
+		EncodedType(Class<?> cls, boolean threadSafe)
+		{
+			this.cls = cls;
+			this.threadSafe = threadSafe;
 		}
 	}
 

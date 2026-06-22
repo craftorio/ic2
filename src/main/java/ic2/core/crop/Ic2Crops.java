@@ -61,9 +61,6 @@ import org.jetbrains.annotations.NotNull;
 
 public class Ic2Crops extends Crops
 {
-	private final Map<EnvProxy.BiomeType, Integer> humidityBiomeTypeBonus = new IdentityHashMap<>();
-	private final Map<EnvProxy.BiomeType, Integer> nutrientBiomeTypeBonus = new IdentityHashMap<>();
-	private final Map<ItemStack, BaseSeed> baseSeeds = new HashMap<>();
 	public static CropCard cropWheat = new CropWheat(Ic2CropType.wheat);
 	public static CropCard cropPumpkin = new CropPumpkin(Ic2CropType.pumpkin);
 	public static CropCard cropMelon = new CropMelon(Ic2CropType.melon);
@@ -115,6 +112,9 @@ public class Ic2Crops extends Crops
 	public static CropCard cropSpidernip = GenericCropCard.create(Ic2CropType.spidernip, Ic2Blocks.SPIDERNIP_CROP).setDiscoveredBy("Mr. Kenny").setProperties(new CropProperties(4, 2, 1, 4, 1, 3)).setAttributes(new String[] { "Toxic", "Silk", "Spider", "Flower", "Ingredient", "Addictive" }).setMaxSize(4).setDrops(new ItemStack(Items.STRING)).setSpecialDrops(new ItemStack[] { new ItemStack(Items.SPIDER_EYE), new ItemStack(Blocks.COBWEB) }).setGrowthSpeed(600).setAfterHarvestSize(1);
 	public static CropCard cropTearstalks = GenericCropCard.create(Ic2CropType.tearstalks, Ic2Blocks.TEARSTALKS_CROP).setDiscoveredBy("Neowulf").setProperties(new CropProperties(8, 1, 2, 0, 0, 0)).setAttributes(new String[] { "Healing", "Nether", "Ingredient", "Reed", "Ghast" }).setMaxSize(4).setDrops(new ItemStack(Items.GHAST_TEAR)).setAfterHarvestSize(1);
 	public static CropCard cropWithereed = GenericCropCard.create(Ic2CropType.withereed, Ic2Blocks.WITHEREED_CROP).setDiscoveredBy("CovertJaguar").setProperties(new CropProperties(8, 2, 0, 4, 1, 3)).setAttributes(new String[] { "Fire", "Undead", "Reed", "Coal", "Rotten", "Wither" }).setMaxSize(4).setDrops(new ItemStack(Ic2Items.COAL_DUST)).setSpecialDrops(new ItemStack[] { new ItemStack(Items.COAL), new ItemStack(Items.COAL) }).setAfterHarvestSize(1);
+	private final Map<EnvProxy.BiomeType, Integer> humidityBiomeTypeBonus = new IdentityHashMap<>();
+	private final Map<EnvProxy.BiomeType, Integer> nutrientBiomeTypeBonus = new IdentityHashMap<>();
+	private final Map<ItemStack, BaseSeed> baseSeeds = new HashMap<>();
 	private final Map<String, Map<String, CropCard>> cropMap = new HashMap<>();
 
 	public static void init()

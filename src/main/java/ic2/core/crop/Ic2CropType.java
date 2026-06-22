@@ -64,11 +64,11 @@ public enum Ic2CropType implements StringRepresentable, ICropType
 	tearstalks("tearstalks", Ic2Blocks.TEARSTALKS_CROP, 3),
 	withereed("withereed", Ic2Blocks.WITHEREED_CROP, 3);
 
+	private static final Ic2CropType[] values = values();
 	private final String owner;
 	private final String name;
 	private final Block cropBlock;
 	private final int maxAge;
-	private static final Ic2CropType[] values = values();
 
 	Ic2CropType(String cropName, Block cropBlock, int maxAge)
 	{
@@ -84,6 +84,16 @@ public enum Ic2CropType implements StringRepresentable, ICropType
 		this.owner = owner;
 		this.cropBlock = cropBlock;
 		this.maxAge = maxAge;
+	}
+
+	public static CropCard getCropCard(Ic2CropType cropType)
+	{
+		return Crops.instance.getCropCard(cropType.getOwner(), cropType.getName());
+	}
+
+	public static Ic2CropType getCropType(CropCard cropCard)
+	{
+		return valueOf(Util.toCamel(cropCard.getId()));
 	}
 
 	public String getSerializedName()
@@ -113,15 +123,5 @@ public enum Ic2CropType implements StringRepresentable, ICropType
 	public int getMaxAge()
 	{
 		return this.maxAge;
-	}
-
-	public static CropCard getCropCard(Ic2CropType cropType)
-	{
-		return Crops.instance.getCropCard(cropType.getOwner(), cropType.getName());
-	}
-
-	public static Ic2CropType getCropType(CropCard cropCard)
-	{
-		return valueOf(Util.toCamel(cropCard.getId()));
 	}
 }

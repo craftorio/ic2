@@ -62,7 +62,7 @@ public class GuiParser
 				{
 					is.close();
 				}
-			} catch (IOException var12)
+			} catch (Exception ignored)
 			{
 			}
 		}
@@ -84,6 +84,46 @@ public class GuiParser
 		} catch (ParserConfigurationException e)
 		{
 			throw new RuntimeException(e);
+		}
+	}
+
+	public enum NodeType
+	{
+		gui,
+		environment,
+		key,
+		only,
+		tooltip,
+		button,
+		energygauge,
+		gauge,
+		image,
+		playerinventory,
+		slot,
+		slotgrid,
+		slothologram,
+		text,
+		fluidtank,
+		fluidslot;
+
+		private static final Map<String, GuiParser.NodeType> map = getMap();
+
+		public static GuiParser.NodeType get(String name)
+		{
+			return map.get(name);
+		}
+
+		private static Map<String, GuiParser.NodeType> getMap()
+		{
+			GuiParser.NodeType[] values = values();
+			Map<String, GuiParser.NodeType> ret = new HashMap<>(values.length);
+
+			for (GuiParser.NodeType type : values)
+			{
+				ret.put(type.name(), type);
+			}
+
+			return ret;
 		}
 	}
 
@@ -110,8 +150,8 @@ public class GuiParser
 		final int eventID;
 		final String eventName;
 		final ItemStack icon;
-		TextProvider.ITextProvider text;
 		final GuiParser.ButtonNode.ButtonType type;
+		TextProvider.ITextProvider text;
 
 		ButtonNode(GuiParser.ParentNode parent, Attributes attributes) throws SAXException
 		{
@@ -178,7 +218,7 @@ public class GuiParser
 		}
 
 		@Override
-		public void setContent(String content) throws SAXException
+		public void setContent(String content)
 		{
 			this.text = TextProvider.parse(content, this.parent.getBaseClass());
 		}
@@ -389,9 +429,9 @@ public class GuiParser
 
 	public static class GuiNode extends GuiParser.ParentNode
 	{
-		private final Class<?> baseClass;
 		final int width;
 		final int height;
+		private final Class<?> baseClass;
 
 		GuiNode(Attributes attributes, Class<?> baseClass) throws SAXException
 		{
@@ -479,6 +519,12 @@ public class GuiParser
 	{
 		protected final boolean inverted;
 
+		protected KeyOnlyNode(GuiParser.ParentNode parent, boolean inverted)
+		{
+			super(parent);
+			this.inverted = inverted;
+		}
+
 		static GuiParser.KeyOnlyNode getForKey(GuiParser.ParentNode parent, Attributes attributes) throws SAXException
 		{
 			String key = XmlUtil.getAttr(attributes, "key");
@@ -496,12 +542,6 @@ public class GuiParser
 			{
 				throw new SAXException("Invalid/Unsupported key name: " + key);
 			}
-		}
-
-		protected KeyOnlyNode(GuiParser.ParentNode parent, boolean inverted)
-		{
-			super(parent);
-			this.inverted = inverted;
 		}
 
 		@Override
@@ -522,19 +562,19 @@ public class GuiParser
 
 	public static class LogicalNode extends GuiParser.ParentNode
 	{
-		final String condition;
 		protected final boolean inverted;
-
-		static GuiParser.LogicalNode getForValue(GuiParser.ParentNode parent, Attributes attributes) throws SAXException
-		{
-			return new GuiParser.LogicalNode(parent, XmlUtil.getAttr(attributes, "if"), attributes.getValue("inverted") != null);
-		}
+		final String condition;
 
 		protected LogicalNode(GuiParser.ParentNode parent, String condition, boolean inverted)
 		{
 			super(parent);
 			this.condition = condition;
 			this.inverted = inverted;
+		}
+
+		static GuiParser.LogicalNode getForValue(GuiParser.ParentNode parent, Attributes attributes) throws SAXException
+		{
+			return new GuiParser.LogicalNode(parent, XmlUtil.getAttr(attributes, "if"), attributes.getValue("inverted") != null);
 		}
 
 		@Override
@@ -574,46 +614,6 @@ public class GuiParser
 		}
 	}
 
-	public enum NodeType
-	{
-		gui,
-		environment,
-		key,
-		only,
-		tooltip,
-		button,
-		energygauge,
-		gauge,
-		image,
-		playerinventory,
-		slot,
-		slotgrid,
-		slothologram,
-		text,
-		fluidtank,
-		fluidslot;
-
-		private static Map<String, GuiParser.NodeType> map = getMap();
-
-		public static GuiParser.NodeType get(String name)
-		{
-			return map.get(name);
-		}
-
-		private static Map<String, GuiParser.NodeType> getMap()
-		{
-			GuiParser.NodeType[] values = values();
-			Map<String, GuiParser.NodeType> ret = new HashMap<>(values.length);
-
-			for (GuiParser.NodeType type : values)
-			{
-				ret.put(type.name(), type);
-			}
-
-			return ret;
-		}
-	}
-
 	public abstract static class ParentNode extends GuiParser.Node
 	{
 		final List<GuiParser.Node> children = new ArrayList<>();
@@ -643,7 +643,7 @@ public class GuiParser
 			Collection<IEnableHandler> handlers = this.addHandlers(gui, element, new ArrayList<>());
 			if (!handlers.isEmpty())
 			{
-				element.withEnableHandler(IEnableHandler.EnableHandlers.and(handlers.toArray(new IEnableHandler[handlers.size()])));
+				element.withEnableHandler(IEnableHandler.EnableHandlers.and(handlers.toArray(new IEnableHandler[0])));
 			}
 
 			gui.addElement(element);
@@ -821,7 +821,7 @@ public class GuiParser
 		}
 
 		@Override
-		public void endElement(String uri, String localName, String qName) throws SAXException
+		public void endElement(String uri, String localName, String qName)
 		{
 			if (this.currentNode == this.parentNode)
 			{
@@ -929,16 +929,8 @@ public class GuiParser
 			}
 		}
 
-		public static class SlotGridDimension
+		public record SlotGridDimension(int rows, int cols)
 		{
-			public final int rows;
-			public final int cols;
-
-			public SlotGridDimension(int rows, int cols)
-			{
-				this.rows = rows;
-				this.cols = cols;
-			}
 		}
 	}
 
@@ -993,7 +985,6 @@ public class GuiParser
 
 	public static class TextNode extends GuiParser.Node
 	{
-		private static final int defaultColor = 4210752;
 		public final int x;
 		public final int y;
 		public final int width;
@@ -1039,7 +1030,7 @@ public class GuiParser
 		}
 
 		@Override
-		public void setContent(String content) throws SAXException
+		public void setContent(String content)
 		{
 			this.text = TextProvider.parse(content, this.parent.getBaseClass());
 		}

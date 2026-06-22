@@ -97,14 +97,6 @@ public class Keyboard implements IKeyboard
 		return this.get(player, watcher.getRepresentation());
 	}
 
-	public interface IKeyWatcher
-	{
-		@OnlyIn(Dist.CLIENT)
-		void checkForKey(Set<Keyboard.Key> var1);
-
-		Keyboard.Key getRepresentation();
-	}
-
 	public enum Key
 	{
 		alt,
@@ -147,5 +139,13 @@ public class Keyboard implements IKeyboard
 
 			return ret;
 		}
+	}
+
+	public interface IKeyWatcher
+	{
+		@OnlyIn(Dist.CLIENT)
+		void checkForKey(Set<Keyboard.Key> var1);
+
+		Keyboard.Key getRepresentation();
 	}
 }

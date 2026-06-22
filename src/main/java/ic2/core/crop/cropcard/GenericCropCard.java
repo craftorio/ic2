@@ -25,6 +25,7 @@ public class GenericCropCard extends Ic2CropCard
 {
 	protected final ICropType cropType;
 	protected final Block cropBlock;
+	protected final List<BaseSeed> baseSeeds = new ArrayList<>(0);
 	protected String discoveredBy;
 	protected CropProperties properties;
 	protected String[] attributes;
@@ -36,7 +37,6 @@ public class GenericCropCard extends Ic2CropCard
 	protected int optimalHarvestSize;
 	protected int afterHarvestSize;
 	protected List<TagKey<Block>> rootRequirements;
-	protected final List<BaseSeed> baseSeeds = new ArrayList<>(0);
 
 	public GenericCropCard(ICropType cropType, Block cropBlock)
 	{
@@ -62,16 +62,34 @@ public class GenericCropCard extends Ic2CropCard
 		return this.discoveredBy;
 	}
 
+	public GenericCropCard setDiscoveredBy(String discoveredBy)
+	{
+		this.discoveredBy = discoveredBy;
+		return this;
+	}
+
 	@Override
 	public CropProperties getProperties()
 	{
 		return this.properties;
 	}
 
+	public GenericCropCard setProperties(CropProperties properties)
+	{
+		this.properties = properties;
+		return this;
+	}
+
 	@Override
 	public String[] getAttributes()
 	{
 		return this.attributes;
+	}
+
+	public GenericCropCard setAttributes(String[] attributes)
+	{
+		this.attributes = attributes;
+		return this;
 	}
 
 	@Override
@@ -231,24 +249,6 @@ public class GenericCropCard extends Ic2CropCard
 		return this;
 	}
 
-	public GenericCropCard setDiscoveredBy(String discoveredBy)
-	{
-		this.discoveredBy = discoveredBy;
-		return this;
-	}
-
-	public GenericCropCard setProperties(CropProperties properties)
-	{
-		this.properties = properties;
-		return this;
-	}
-
-	public GenericCropCard setAttributes(String[] attributes)
-	{
-		this.attributes = attributes;
-		return this;
-	}
-
 	public GenericCropCard setMaxSize(int maxSize)
 	{
 		this.maxSize = maxSize;
@@ -330,7 +330,7 @@ public class GenericCropCard extends Ic2CropCard
 		return array;
 	}
 
-	private static class BaseSeed
+	protected static class BaseSeed
 	{
 		private final ItemStack seed;
 		private final int size;

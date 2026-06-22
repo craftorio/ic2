@@ -15,8 +15,7 @@ public final class SideGateway
 			if (IC2.envProxy.isClientEnv())
 			{
 				this.clientInstance = (NetworkManager) Class.forName("ic2.core.network.NetworkManagerClient").getConstructor().newInstance();
-			}
-			else
+			} else
 			{
 				this.clientInstance = null;
 			}

@@ -7,16 +7,16 @@ public class CableBlock extends AbstractCableBlock
 {
 	private final FoamCableBlock foamCableBlock;
 
-	public static CableBlock create(Properties settings, CableType type, int insulation, FoamCableBlock foamCableBlock)
-	{
-		prepareCreate(type, insulation);
-		return new CableBlock(settings, type, insulation, foamCableBlock);
-	}
-
 	protected CableBlock(Properties settings, CableType type, int insulation, FoamCableBlock foamCableBlock)
 	{
 		super(settings, type, insulation);
 		this.foamCableBlock = foamCableBlock;
+	}
+
+	public static CableBlock create(Properties settings, CableType type, int insulation, FoamCableBlock foamCableBlock)
+	{
+		prepareCreate(type, insulation);
+		return new CableBlock(settings, type, insulation, foamCableBlock);
 	}
 
 	@Override

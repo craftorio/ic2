@@ -24,6 +24,8 @@ import java.util.Map;
 
 public class Ic2LootModifier extends LootModifier
 {
+	public static final Codec<Ic2LootModifier> CODEC = RecordCodecBuilder.create(instance -> codecStart(instance).apply(instance, Ic2LootModifier::new));
+	public static final DeferredRegister<Codec<? extends IGlobalLootModifier>> lootModifiersRegistry = DeferredRegister.create(ForgeRegistries.Keys.GLOBAL_LOOT_MODIFIER_SERIALIZERS, "ic2");
 	private static final Map<ResourceLocation, ResourceLocation> AllLootTables = Map.ofEntries(
 		Map.entry(BuiltInLootTables.ABANDONED_MINESHAFT, ResourceLocation.fromNamespaceAndPath("ic2", "chests/abandoned_mineshaft")),
 		Map.entry(BuiltInLootTables.DESERT_PYRAMID, ResourceLocation.fromNamespaceAndPath("ic2", "chests/desert_pyramid")),
@@ -39,10 +41,6 @@ public class Ic2LootModifier extends LootModifier
 		Map.entry(BuiltInLootTables.VILLAGE_TOOLSMITH, ResourceLocation.fromNamespaceAndPath("ic2", "chests/village_toolsmith"))
 	);
 
-	public static final Codec<Ic2LootModifier> CODEC = RecordCodecBuilder.create(instance -> codecStart(instance).apply(instance, Ic2LootModifier::new));
-	
-	public static final DeferredRegister<Codec<? extends IGlobalLootModifier>> lootModifiersRegistry = DeferredRegister.create(ForgeRegistries.Keys.GLOBAL_LOOT_MODIFIER_SERIALIZERS, "ic2");
-	
 	static
 	{
 		lootModifiersRegistry.register("inject", () -> CODEC);

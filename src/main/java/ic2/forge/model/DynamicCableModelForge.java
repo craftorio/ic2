@@ -43,6 +43,39 @@ final class DynamicCableModelForge extends DynamicCableModel<List<BakedQuad>[], 
 		super(type, insulation, foam, active);
 	}
 
+	private static float map(float value, float start, float end)
+	{
+		return start + value * (end - start);
+	}
+
+	private static void vertex(int vertex, float x, float y, float z, float u, float v, int normals, int[] out)
+	{
+		int offset = vertex * 8;
+		out[offset++] = Float.floatToRawIntBits(x);
+		out[offset++] = Float.floatToRawIntBits(y);
+		out[offset++] = Float.floatToRawIntBits(z);
+		out[offset++] = -1;
+		out[offset++] = Float.floatToRawIntBits(u);
+		out[offset++] = Float.floatToRawIntBits(v);
+		out[++offset] = normals;
+	}
+
+	private static int packNormals(float nx, float ny, float nz)
+	{
+		return mapFloatToByte(nx) | mapFloatToByte(ny) << 8 | mapFloatToByte(nz) << 16;
+	}
+
+	private static int mapFloatToByte(float f)
+	{
+		assert f >= -1.0F && f <= 1.0F;
+		return Math.round(f * 127.0F) & 0xFF;
+	}
+
+	private static int getIdx(Direction dir)
+	{
+		return dir == null ? 6 : dir.ordinal();
+	}
+
 	@Override
 	public BakedModel bake(
 		IGeometryBakingContext owner,
@@ -55,7 +88,6 @@ final class DynamicCableModelForge extends DynamicCableModel<List<BakedQuad>[], 
 	{
 		return super.bake(bakery, spriteGetter, modelTransform, modelLocation);
 	}
-
 
 	public ModelData getModelData(BlockAndTintGetter world, BlockPos pos, BlockState state, ModelData tileData)
 	{
@@ -215,38 +247,5 @@ final class DynamicCableModelForge extends DynamicCableModel<List<BakedQuad>[], 
 		BakedQuad quad = new BakedQuad(data, -1, face, texture, true);
 		Direction cullFace = Math.abs(depth) < 1.0E-5 ? face : null;
 		emitter[getIdx(cullFace)].add(quad);
-	}
-
-	private static float map(float value, float start, float end)
-	{
-		return start + value * (end - start);
-	}
-
-	private static void vertex(int vertex, float x, float y, float z, float u, float v, int normals, int[] out)
-	{
-		int offset = vertex * 8;
-		out[offset++] = Float.floatToRawIntBits(x);
-		out[offset++] = Float.floatToRawIntBits(y);
-		out[offset++] = Float.floatToRawIntBits(z);
-		out[offset++] = -1;
-		out[offset++] = Float.floatToRawIntBits(u);
-		out[offset++] = Float.floatToRawIntBits(v);
-		out[++offset] = normals;
-	}
-
-	private static int packNormals(float nx, float ny, float nz)
-	{
-		return mapFloatToByte(nx) | mapFloatToByte(ny) << 8 | mapFloatToByte(nz) << 16;
-	}
-
-	private static int mapFloatToByte(float f)
-	{
-		assert f >= -1.0F && f <= 1.0F;
-		return Math.round(f * 127.0F) & 0xFF;
-	}
-
-	private static int getIdx(Direction dir)
-	{
-		return dir == null ? 6 : dir.ordinal();
 	}
 }

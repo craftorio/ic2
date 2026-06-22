@@ -21,11 +21,11 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class TileEntityMagnetizer extends TileEntityElectricMachine implements IHasGui, IUpgradableBlock
 {
-	public InvSlotUpgrade upgradeSlot = new InvSlotUpgrade(this, "upgrade", 4);
 	public static final int defaultMaxEnergy = 100;
 	public static final int defaultTier = 1;
 	private static final double boostEnergy = 2.0;
 	protected final Redstone redstone = this.addComponent(new Redstone(this));
+	public InvSlotUpgrade upgradeSlot = new InvSlotUpgrade(this, "upgrade", 4);
 
 	public TileEntityMagnetizer(BlockPos pos, BlockState state)
 	{

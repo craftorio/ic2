@@ -86,7 +86,7 @@ class ChangeHandler
 					}
 				} else
 				{
-					change.subTiles = Arrays.asList(ioTile);
+					change.subTiles = Collections.singletonList(ioTile);
 				}
 			}
 

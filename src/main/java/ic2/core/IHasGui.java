@@ -19,6 +19,20 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 
 public interface IHasGui extends Container
 {
+	static Component getBeName(BlockEntity be)
+	{
+		ResourceLocation id = Util.getName(be.getBlockState().getBlock());
+		return Component.translatable(String.format("container.%s.%s", id.getNamespace(), id.getPath().replace('/', '.')));
+	}
+
+	static Component getItemName(Item item, Integer subGuiId)
+	{
+		ResourceLocation id = Util.getName(item);
+		return Component.translatable(
+			String.format("container.%s.%s%s", id.getNamespace(), id.getPath().replace('/', '.'), subGuiId != null ? String.format(".%d", subGuiId) : "")
+		);
+	}
+
 	ContainerBase<?> createServerScreenHandler(int var1, Player var2);
 
 	default void writeScreenOpenData(Player player, InteractionHand hand, GrowingBuffer buffer) throws IOException
@@ -59,12 +73,6 @@ public interface IHasGui extends Container
 		}, buffer);
 	}
 
-	static Component getBeName(BlockEntity be)
-	{
-		ResourceLocation id = Util.getName(be.getBlockState().getBlock());
-		return Component.translatable(String.format("container.%s.%s", id.getNamespace(), id.getPath().replace('/', '.')));
-	}
-
 	default boolean openManagedItem(Player player, InteractionHand hand, Integer subGuiId)
 	{
 		GrowingBuffer buffer = new GrowingBuffer(50);
@@ -92,13 +100,5 @@ public interface IHasGui extends Container
 				return IHasGui.getItemName(item, subGuiId);
 			}
 		}, buffer);
-	}
-
-	static Component getItemName(Item item, Integer subGuiId)
-	{
-		ResourceLocation id = Util.getName(item);
-		return Component.translatable(
-			String.format("container.%s.%s%s", id.getNamespace(), id.getPath().replace('/', '.'), subGuiId != null ? String.format(".%d", subGuiId) : "")
-		);
 	}
 }

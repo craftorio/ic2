@@ -40,28 +40,6 @@ public class HandHeldOre extends HandHeldUpgradeOption
 		return new HandHeldOre.ContainerEditOre(syncId);
 	}
 
-	public class ContainerEditOre extends ContainerHandHeldInventory<HandHeldOre>
-	{
-		static final int HEIGHT = 200;
-
-		public ContainerEditOre(int syncId)
-		{
-			super(Ic2ScreenHandlers.ADVANCED_UPGRADE_EDIT_ORE, syncId, HandHeldOre.this);
-			this.addPlayerInventorySlots(this.player.getInventory(), 200);
-
-			for (byte slot = 0; slot < 9; slot++)
-			{
-				this.addSlot(new SlotHologramSlot(HandHeldOre.this.inventory, slot, 8 + 18 * slot, 8, 1, HandHeldOre.this.makeSaveCallback()));
-			}
-		}
-
-		@Override
-		public void removed(Player player)
-		{
-			super.removed(player);
-		}
-	}
-
 	@OnlyIn(Dist.CLIENT)
 	public static class GuiEditOre extends GuiDefaultBackground<HandHeldOre.ContainerEditOre>
 	{
@@ -103,6 +81,28 @@ public class HandHeldOre extends HandHeldUpgradeOption
 				System.out.println(this.number + " clicked with " + button);
 				return false;
 			}
+		}
+	}
+
+	public class ContainerEditOre extends ContainerHandHeldInventory<HandHeldOre>
+	{
+		static final int HEIGHT = 200;
+
+		public ContainerEditOre(int syncId)
+		{
+			super(Ic2ScreenHandlers.ADVANCED_UPGRADE_EDIT_ORE, syncId, HandHeldOre.this);
+			this.addPlayerInventorySlots(this.player.getInventory(), 200);
+
+			for (byte slot = 0; slot < 9; slot++)
+			{
+				this.addSlot(new SlotHologramSlot(HandHeldOre.this.inventory, slot, 8 + 18 * slot, 8, 1, HandHeldOre.this.makeSaveCallback()));
+			}
+		}
+
+		@Override
+		public void removed(Player player)
+		{
+			super.removed(player);
 		}
 	}
 }

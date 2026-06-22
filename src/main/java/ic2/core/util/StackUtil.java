@@ -58,6 +58,10 @@ import net.minecraft.world.phys.Vec3;
 
 public final class StackUtil
 {
+	public static final Predicate<ItemStack> anyStack = stack -> true;
+	public static final ItemStack emptyStack = ItemStack.EMPTY;
+	public static final EnvItemHandler ENV = IC2.envProxy.createItemHandler();
+	static final Set<String> ignoredNbtKeys = new HashSet<>(Arrays.asList("damage", "charge", "energy", "advDmg"));
 	private static final List<TagKey<Item>> oreTags = List.of(
 		Ic2ItemTags.ORES,
 		ItemTags.COAL_ORES,
@@ -69,11 +73,7 @@ public final class StackUtil
 		ItemTags.LAPIS_ORES,
 		ItemTags.REDSTONE_ORES
 	);
-	static final Set<String> ignoredNbtKeys = new HashSet<>(Arrays.asList("damage", "charge", "energy", "advDmg"));
-	public static final Predicate<ItemStack> anyStack = stack -> true;
-	public static final ItemStack emptyStack = ItemStack.EMPTY;
 	private static final int[] emptySlotArray = new int[0];
-	public static final EnvItemHandler ENV = IC2.envProxy.createItemHandler();
 
 	public static boolean isEmpty(ItemStack stack)
 	{

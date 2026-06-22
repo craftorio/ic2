@@ -15,12 +15,10 @@ import ic2.core.util.DelegatingInventory;
 import ic2.core.util.StackUtil;
 import ic2.core.util.Util;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.WeakHashMap;
-
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -34,7 +32,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -46,11 +43,10 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class TileEntityPersonalChest extends TileEntityInventory implements IPersonalBlock, IHasGui
 {
-	private GameProfile owner = null;
-	private static final int openingSteps = 10;
-	private static final List<AABB> aabbs = Arrays.asList(new AABB(0.0, 0.0, 0.0, 1.0, 1.0, 1.0));
+	private static final List<AABB> aabbs = List.of(new AABB(0.0, 0.0, 0.0, 1.0, 1.0, 1.0));
 	public final InvSlot contentSlot;
 	private final Set<Player> usingPlayers = Collections.newSetFromMap(new WeakHashMap<>());
+	private GameProfile owner = null;
 	private int usingPlayerCount;
 	private byte lidAngle;
 	private byte prevLidAngle;
@@ -59,6 +55,35 @@ public class TileEntityPersonalChest extends TileEntityInventory implements IPer
 	{
 		super(Ic2BlockEntities.PERSONAL_CHEST, pos, state);
 		this.contentSlot = new InvSlot(this, "content", InvSlot.Access.NONE, 54);
+	}
+
+	public static <T extends BlockEntity & IPersonalBlock> boolean checkAccess(T te, GameProfile profile)
+	{
+		if (profile == null)
+		{
+			return te.getOwner() == null;
+		}
+
+		GameProfile teOwner = te.getOwner();
+		if (!te.getLevel().isClientSide)
+		{
+			if (teOwner == null)
+			{
+				te.setOwner(profile);
+				IC2.network.get(true).updateTileEntityField(te, "owner");
+				return true;
+			}
+
+			if (te.getLevel().getServer().getPlayerList().isOp(profile))
+			{
+				return true;
+			}
+		} else if (teOwner == null)
+		{
+			return true;
+		}
+
+		return teOwner.getId() != null ? teOwner.getId().equals(profile.getId()) : teOwner.getName().equals(profile.getName());
 	}
 
 	@Override
@@ -256,35 +281,6 @@ public class TileEntityPersonalChest extends TileEntityInventory implements IPer
 				return TileEntityPersonalChest.this.contentSlot.accepts(stack);
 			}
 		});
-	}
-
-	public static <T extends BlockEntity & IPersonalBlock> boolean checkAccess(T te, GameProfile profile)
-	{
-		if (profile == null)
-		{
-			return te.getOwner() == null;
-		}
-
-		GameProfile teOwner = te.getOwner();
-		if (!te.getLevel().isClientSide)
-		{
-			if (teOwner == null)
-			{
-				te.setOwner(profile);
-				IC2.network.get(true).updateTileEntityField(te, "owner");
-				return true;
-			}
-
-			if (te.getLevel().getServer().getPlayerList().isOp(profile))
-			{
-				return true;
-			}
-		} else if (teOwner == null)
-		{
-			return true;
-		}
-
-		return teOwner.getId() != null ? teOwner.getId().equals(profile.getId()) : teOwner.getName().equals(profile.getName());
 	}
 
 	@Override

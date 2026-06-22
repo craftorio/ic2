@@ -28,6 +28,16 @@ public enum Ic2Color
 	public static final Ic2Color[] values = values();
 	private static final Map<DyeColor, Ic2Color> dyeColorMap = new EnumMap<>(DyeColor.class);
 	private static final Map<Integer, Ic2Color> colorMap = new HashMap<>();
+
+	static
+	{
+		for (Ic2Color color : values)
+		{
+			dyeColorMap.put(color.dyeColor, color);
+			colorMap.put(color.color, color);
+		}
+	}
+
 	public final DyeColor dyeColor;
 	public final int color;
 
@@ -35,16 +45,6 @@ public enum Ic2Color
 	{
 		this.dyeColor = mcColor;
 		this.color = color;
-	}
-
-	public int getId()
-	{
-		return this.ordinal();
-	}
-
-	public int getColor()
-	{
-		return this.color;
 	}
 
 	public static Ic2Color get(DyeColor mcColor)
@@ -57,12 +57,13 @@ public enum Ic2Color
 		return colorMap.get(color);
 	}
 
-	static
+	public int getId()
 	{
-		for (Ic2Color color : values)
-		{
-			dyeColorMap.put(color.dyeColor, color);
-			colorMap.put(color.color, color);
-		}
+		return this.ordinal();
+	}
+
+	public int getColor()
+	{
+		return this.color;
 	}
 }

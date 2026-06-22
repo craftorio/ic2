@@ -3,7 +3,7 @@ package ic2.core.block.tileentity;
 import com.google.common.base.Suppliers;
 import ic2.api.block.BreakableBlock;
 import ic2.api.crops.CropSoilType;
-import ic2.api.tile.IWrenchable;
+import ic2.api.tile.IWrenchAble;
 import ic2.api.tile.RetexturableBlock;
 import ic2.core.block.comp.Obscuration;
 import ic2.core.crop.Ic2CropType;
@@ -50,43 +50,25 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWrenchable, BreakableBlock, RetexturableBlock
+public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWrenchAble, BreakableBlock, RetexturableBlock
 {
-	private static final BlockEntityTicker<Ic2TileEntity> TICKER = (world, pos, state, be) -> be.tick();
 	public static final Property<Direction> anyFacingProperty = DirectionProperty.create("facing", Util.allFacings);
 	public static final Property<Direction> horizontalFacingProperty = DirectionProperty.create("facing", Util.horizontalFacings);
 	public static final Property<Direction> verticalFacingProperty = DirectionProperty.create("facing", Util.verticalFacings);
 	public static final BooleanProperty CROSSING_BASE = BooleanProperty.create("crossing_base");
+	public static final BooleanProperty ACTIVE = BooleanProperty.create("active");
+	private static final BlockEntityTicker<Ic2TileEntity> TICKER = (world, pos, state, be) -> be.tick();
 	private static final Map<Integer, IntegerProperty> ageProperties = new HashMap<>();
-	private int cropMaxAge = -1;
-	private Ic2CropType cropType;
 	private static final ThreadLocal<Ic2TileEntityBlock.InitData> pendingInitData = new ThreadLocal<>();
+	public final Property<Direction> facingProperty;
 	private final Class<? extends Ic2TileEntity> teClass;
 	private final boolean canActive;
 	private final Ic2TileEntityBlock.DefaultDrop defaultDrop;
 	private final boolean allowWrenchRotating;
 	private final Set<Direction> supportedFacings;
 	private final Supplier<Ic2TileEntity> dummyTe;
-	public final Property<Direction> facingProperty;
-	public static final BooleanProperty ACTIVE = BooleanProperty.create("active");
-
-	public static Ic2TileEntityBlock create(Properties settings, Class<? extends Ic2TileEntity> teClass, boolean canActive, Ic2TileEntityBlock.DefaultDrop defaultDrop, Set<Direction> supportedFacings, boolean allowWrenchRotating)
-	{
-		Ic2TileEntityBlock.InitData data = new Ic2TileEntityBlock.InitData(supportedFacings, canActive, teClass, null, -1);
-		pendingInitData.set(data);
-		Ic2TileEntityBlock ret = new Ic2TileEntityBlock(settings, teClass, canActive, data, defaultDrop, allowWrenchRotating);
-		pendingInitData.remove();
-		return ret;
-	}
-
-	public static Ic2TileEntityBlock create(Properties settings, Class<? extends Ic2TileEntity> teClass, boolean canActive, Ic2TileEntityBlock.DefaultDrop defaultDrop, Set<Direction> supportedFacings, boolean allowWrenchRotating, Ic2CropType cropType)
-	{
-		Ic2TileEntityBlock.InitData data = new Ic2TileEntityBlock.InitData(supportedFacings, canActive, teClass, cropType, cropType.getMaxAge());
-		pendingInitData.set(data);
-		Ic2TileEntityBlock ret = new Ic2TileEntityBlock(settings, teClass, canActive, data, defaultDrop, allowWrenchRotating, cropType);
-		pendingInitData.remove();
-		return ret;
-	}
+	private int cropMaxAge = -1;
+	private Ic2CropType cropType;
 
 	private Ic2TileEntityBlock(Properties settings, Class<? extends Ic2TileEntity> teClass, boolean canActive, Ic2TileEntityBlock.InitData data, Ic2TileEntityBlock.DefaultDrop defaultDrop, boolean allowWrenchRotating, Ic2CropType cropType)
 	{
@@ -109,6 +91,30 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 		this.supportedFacings = data.supportedFacings;
 		this.facingProperty = this.supportedFacings.size() > 1 ? (Property<Direction>) this.stateDefinition.getProperty("facing") : null;
 		this.dummyTe = Suppliers.memoize(() -> this.newBlockEntity(BlockPos.ZERO, this.defaultBlockState()));
+	}
+
+	public static Ic2TileEntityBlock create(Properties settings, Class<? extends Ic2TileEntity> teClass, boolean canActive, Ic2TileEntityBlock.DefaultDrop defaultDrop, Set<Direction> supportedFacings, boolean allowWrenchRotating)
+	{
+		Ic2TileEntityBlock.InitData data = new Ic2TileEntityBlock.InitData(supportedFacings, canActive, teClass, null, -1);
+		pendingInitData.set(data);
+		Ic2TileEntityBlock ret = new Ic2TileEntityBlock(settings, teClass, canActive, data, defaultDrop, allowWrenchRotating);
+		pendingInitData.remove();
+		return ret;
+	}
+
+	public static Ic2TileEntityBlock create(Properties settings, Class<? extends Ic2TileEntity> teClass, boolean canActive, Ic2TileEntityBlock.DefaultDrop defaultDrop, Set<Direction> supportedFacings, boolean allowWrenchRotating, Ic2CropType cropType)
+	{
+		Ic2TileEntityBlock.InitData data = new Ic2TileEntityBlock.InitData(supportedFacings, canActive, teClass, cropType, cropType.getMaxAge());
+		pendingInitData.set(data);
+		Ic2TileEntityBlock ret = new Ic2TileEntityBlock(settings, teClass, canActive, data, defaultDrop, allowWrenchRotating, cropType);
+		pendingInitData.remove();
+		return ret;
+	}
+
+	private static Ic2TileEntity getTe(BlockGetter world, BlockPos pos)
+	{
+		BlockEntity te = world.getBlockEntity(pos);
+		return te instanceof Ic2TileEntity ? (Ic2TileEntity) te : null;
 	}
 
 	private IntegerProperty getAgeProperty(int cropMaxAge)
@@ -142,7 +148,7 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 	{
 		return this.teClass;
 	}
-	
+
 	public boolean canActive()
 	{
 		return this.canActive;
@@ -441,13 +447,6 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 	}
 
 	@Override
-	public boolean canSetFacing(Level world, BlockPos pos, Direction newDirection, Player player)
-	{
-		Ic2TileEntity te = getTe(world, pos);
-		return te != null && te.canSetFacingWrench(newDirection, player);
-	}
-
-	@Override
 	public boolean setFacing(Level world, BlockPos pos, Direction newDirection, Player player)
 	{
 		Ic2TileEntity te = getTe(world, pos);
@@ -484,12 +483,6 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 
 		Obscuration component = te.getComponent(Obscuration.class);
 		return component != null && component.applyObscuration(side, new Obscuration.ObscurationData(refState, refVariant, refSide, refColorMultipliers));
-	}
-
-	private static Ic2TileEntity getTe(BlockGetter world, BlockPos pos)
-	{
-		BlockEntity te = world.getBlockEntity(pos);
-		return te instanceof Ic2TileEntity ? (Ic2TileEntity) te : null;
 	}
 
 	public Ic2TileEntity getDummyTe()

@@ -5,10 +5,9 @@ import ic2.api.network.INetworkTileEntityEventListener;
 import ic2.api.tile.IEnergyStorage;
 import ic2.core.IC2;
 import ic2.core.block.tileentity.TileEntityBase;
-import ic2.core.init.MainConfig;
+import ic2.core.init.IC2Config;
 import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.ref.Ic2SoundEvents;
-import ic2.core.util.ConfigUtil;
 import ic2.core.util.StackUtil;
 import ic2.core.util.Util;
 
@@ -52,6 +51,11 @@ public class TileEntityTeleporter extends TileEntityBase implements INetworkTile
 	public TileEntityTeleporter(BlockPos pos, BlockState state)
 	{
 		super(Ic2BlockEntities.TELEPORTER, pos, state);
+	}
+
+	private static int getStackCost(ItemStack stack)
+	{
+		return StackUtil.isEmpty(stack) ? 0 : 100 * StackUtil.getSize(stack) / stack.getMaxStackSize();
 	}
 
 	@Override
@@ -282,7 +286,7 @@ public class TileEntityTeleporter extends TileEntityBase implements INetworkTile
 
 	public int getWeightOf(Entity user)
 	{
-		boolean teleporterUseInventoryWeight = ConfigUtil.getBool(MainConfig.get(), "balance/teleporterUseInventoryWeight");
+		boolean teleporterUseInventoryWeight = IC2Config.balance.teleporterUseInventoryWeight.get();
 		int weight = 0;
 		if (user instanceof ItemEntity)
 		{
@@ -335,11 +339,6 @@ public class TileEntityTeleporter extends TileEntityBase implements INetworkTile
 		}
 
 		return weight;
-	}
-
-	private static int getStackCost(ItemStack stack)
-	{
-		return StackUtil.isEmpty(stack) ? 0 : 100 * StackUtil.getSize(stack) / stack.getMaxStackSize();
 	}
 
 	private void onTeleportTo()

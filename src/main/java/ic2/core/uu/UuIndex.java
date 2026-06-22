@@ -1,14 +1,15 @@
 package ic2.core.uu;
 
 import ic2.core.IC2;
-import ic2.core.init.MainConfig;
-import ic2.core.util.Config;
+import ic2.core.init.IC2Config;
 import ic2.core.util.ConfigUtil;
 import ic2.core.util.LogCategory;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import net.minecraft.world.item.ItemStack;
@@ -61,72 +62,95 @@ public class UuIndex
 
 	public void refresh(boolean reset)
 	{
-		Config config = MainConfig.get().getSub("balance/uu-values/world scan");
-		if (config == null)
+		List<? extends String> worldScanList = IC2Config.balance.uuValues.worldScan.get();
+		if (worldScanList.isEmpty())
 		{
 			IC2.log.info(LogCategory.Uu, "Loading predefined UU world scan values, run /ic2 uu-world-scan <small|medium|large> to calibrate them for your world.");
-			config = new Config("uu scan values");
-
-			try
-			{
-				config.load(IC2.class.getResourceAsStream("/assets/ic2/config/uu_scan_values.ini"));
-			} catch (Exception e)
-			{
-				throw new RuntimeException("Error loading base config", e);
-			}
+			loadScanValuesFromLegacyIni();
 		} else
 		{
 			IC2.log.debug(LogCategory.Uu, "Loading UU world scan values from the user config.");
-		}
-
-		Iterator<Config.Value> it = config.valueIterator();
-
-		while (it.hasNext())
-		{
-			Config.Value value = it.next();
-
-			ItemStack stack;
-			try
+			for (String entry : worldScanList)
 			{
-				stack = ConfigUtil.asStack(value.name);
-			} catch (ParseException e)
-			{
-				throw new Config.ParseException("invalid key", value, e);
-			}
-
-			if (stack == null)
-			{
-				IC2.log.warn(LogCategory.Uu, "UU world-scan config: Can't find ItemStack for %s, ignoring the entry in line %d.", value.name, value.getLine());
-			} else
-			{
-				this.add(stack, value.getDouble());
+				parseUuEntry(entry, "world scan");
 			}
 		}
 
-		it = MainConfig.get().getSub("balance/uu-values/predefined").valueIterator();
-
-		while (it.hasNext())
+		for (String entry : IC2Config.balance.uuValues.predefined.get())
 		{
-			Config.Value value = it.next();
-
-			ItemStack stack;
-			try
-			{
-				stack = ConfigUtil.asStack(value.name);
-			} catch (ParseException e)
-			{
-				throw new Config.ParseException("invalid key", value, e);
-			}
-
-			if (stack == null)
-			{
-				IC2.log.warn(LogCategory.Uu, "UU predefined config: Can't find ItemStack for %s, ignoring the entry in line %d.", value.name, value.getLine());
-			} else
-			{
-				this.add(stack, value.getDouble());
-			}
+			parseUuEntry(entry, "predefined");
 		}
 
 		UuGraph.build(reset);
+	}
+
+	private void parseUuEntry(String entry, String category)
+	{
+		int splitPos = entry.lastIndexOf(' ');
+		if (splitPos <= 0) return;
+
+		String itemName = entry.substring(0, splitPos);
+		String valueStr = entry.substring(splitPos + 1);
+
+		ItemStack stack;
+		try
+		{
+			stack = ConfigUtil.asStack(itemName);
+		} catch (ParseException e)
+		{
+			throw new RuntimeException(e);
+		}
+
+		if (stack == null)
+		{
+			IC2.log.warn(LogCategory.Uu, "UU %s config: Can't find ItemStack for %s.", category, itemName);
+			return;
+		}
+
+		try
+		{
+			this.add(stack, Double.parseDouble(valueStr));
+		} catch (NumberFormatException e)
+		{
+			IC2.log.warn(LogCategory.Uu, "UU %s config: Invalid value %s for %s.", category, valueStr, itemName);
+		}
+	}
+
+	private void loadScanValuesFromLegacyIni()
+	{
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+			IC2.class.getResourceAsStream("/assets/ic2/config/uu_scan_values.ini"), StandardCharsets.UTF_8)))
+		{
+			String line;
+			while ((line = reader.readLine()) != null)
+			{
+				line = line.trim();
+				if (line.isEmpty() || line.startsWith(";")) continue;
+
+				int eqPos = line.indexOf('=');
+				if (eqPos <= 0) continue;
+
+				String itemName = line.substring(0, eqPos).trim();
+				String valueStr = line.substring(eqPos + 1).trim();
+
+				ItemStack stack = ConfigUtil.asStack(itemName);
+				if (stack != null)
+				{
+					try
+					{
+						this.add(stack, Double.parseDouble(valueStr));
+					} catch (NumberFormatException e)
+					{
+						IC2.log.warn(LogCategory.Uu, "UU scan default config: Invalid value %s for %s.", valueStr, itemName);
+					}
+				} else
+				{
+					IC2.log.warn(LogCategory.Uu, "UU scan default config: Can't find ItemStack for %s.", itemName);
+				}
+			}
+		} catch (Exception e)
+		{
+			throw new RuntimeException("Error loading default UU scan values", e);
+		}
 	}
 }

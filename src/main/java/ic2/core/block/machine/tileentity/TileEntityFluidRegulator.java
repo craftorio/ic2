@@ -33,15 +33,15 @@ import net.minecraft.world.level.block.state.BlockState;
 @NotClassic
 public class TileEntityFluidRegulator extends TileEntityElectricMachine implements IHasGui, INetworkClientTileEntityEventListener
 {
-	private int mode;
-	private int updateTicker;
-	private int outputmb;
-	private boolean newActive;
 	public final InvSlotOutput wasseroutputSlot;
 	public final InvSlotConsumableLiquidByTank wasserinputSlot;
 	@GuiSynced
 	protected final Fluids.InternalFluidTank fluidTank;
 	protected final Fluids fluids = this.addComponent(new Fluids(this));
+	private int mode;
+	private int updateTicker;
+	private int outputmb;
+	private boolean newActive;
 
 	public TileEntityFluidRegulator(BlockPos pos, BlockState state)
 	{

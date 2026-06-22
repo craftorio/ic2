@@ -31,6 +31,67 @@ public class SoundManagerClient extends SoundManager
 {
 	private final Map<SoundManagerClient.WeakObject, List<SoundClient>> objectToSoundMap = new ConcurrentHashMap<>();
 
+	public static SoundInstance onSoundPlayed(SoundInstance sound)
+	{
+		if (sound == null) return null;
+		SoundSource category = sound.getSource();
+		String name = sound.getLocation().getPath();
+		if (category == SoundSource.BLOCKS && name.endsWith(".hit") || category == SoundSource.BLOCKS && name.endsWith(".break"))
+		{
+			LocalPlayer player = Minecraft.getInstance().player;
+			ItemStack stack = null;
+			if (player != null)
+			{
+				stack = player.getInventory().getSelected();
+			}
+
+			if (stack != null && stack.getItem() instanceof IHitSoundOverride hitSoundOverride)
+			{
+				Level world = player.getCommandSenderWorld();
+				BlockHitResult mop = getMovingObjectPositionFromPlayer(world, player);
+				BlockPos pos = new BlockPos((int) sound.getX(), (int) sound.getY(), (int) sound.getZ());
+				if (mop.getType() == Type.BLOCK && pos.equals(mop.getBlockPos()))
+				{
+					SoundEvent replaceSound;
+					if (name.endsWith(".hit"))
+					{
+						replaceSound = hitSoundOverride.getHitSoundForBlock(player, world, pos, stack);
+					} else
+					{
+						replaceSound = hitSoundOverride.getBreakSoundForBlock(player, world, pos, stack);
+					}
+
+					if (replaceSound != null)
+					{
+						sound = null;
+						world.playSound(player, pos, replaceSound, category, 1.0F, 1.0F);
+					}
+				}
+			}
+		}
+
+		return sound;
+	}
+
+	private static BlockHitResult getMovingObjectPositionFromPlayer(Level worldIn, Player playerIn)
+	{
+		float f = playerIn.getXRot();
+		float f1 = playerIn.getYRot();
+		double d0 = playerIn.getX();
+		double d1 = playerIn.getY() + playerIn.getEyeHeight(playerIn.getPose());
+		double d2 = playerIn.getZ();
+		Vec3 vec3 = new Vec3(d0, d1, d2);
+		float f2 = Mth.cos(-f1 * (float) (Math.PI / 180.0) - (float) Math.PI);
+		float f3 = Mth.sin(-f1 * (float) (Math.PI / 180.0) - (float) Math.PI);
+		float f4 = -Mth.cos(-f * (float) (Math.PI / 180.0));
+		float f5 = Mth.sin(-f * (float) (Math.PI / 180.0));
+		float f6 = f3 * f4;
+		float f7 = f2 * f4;
+		double d3 = 5.0;
+		Vec3 vec31 = vec3.add(f6 * d3, f5 * d3, f7 * d3);
+		return worldIn.clip(new ClipContext(vec3, vec31, Block.OUTLINE, Fluid.NONE, playerIn));
+	}
+
 	@Override
 	public Sound createSound(Object obj, SoundEvent soundEvent, SoundSource soundCategory, LivingEntity entity, float volume, float pitch)
 	{
@@ -123,67 +184,6 @@ public class SoundManagerClient extends SoundManager
 	{
 		super.tick();
 		this.objectToSoundMap.forEach((object, soundClientList) -> soundClientList.forEach(SoundClient::tick));
-	}
-
-	public static SoundInstance onSoundPlayed(SoundInstance sound)
-	{
-		if (sound == null) return null;
-		SoundSource category = sound.getSource();
-		String name = sound.getLocation().getPath();
-		if (category == SoundSource.BLOCKS && name.endsWith(".hit") || category == SoundSource.BLOCKS && name.endsWith(".break"))
-		{
-			LocalPlayer player = Minecraft.getInstance().player;
-			ItemStack stack = null;
-			if (player != null)
-			{
-				stack = player.getInventory().getSelected();
-			}
-
-			if (stack != null && stack.getItem() instanceof IHitSoundOverride hitSoundOverride)
-			{
-				Level world = player.getCommandSenderWorld();
-				BlockHitResult mop = getMovingObjectPositionFromPlayer(world, player);
-				BlockPos pos = new BlockPos((int) sound.getX(), (int) sound.getY(), (int) sound.getZ());
-				if (mop.getType() == Type.BLOCK && pos.equals(mop.getBlockPos()))
-				{
-					SoundEvent replaceSound;
-					if (name.endsWith(".hit"))
-					{
-						replaceSound = hitSoundOverride.getHitSoundForBlock(player, world, pos, stack);
-					} else
-					{
-						replaceSound = hitSoundOverride.getBreakSoundForBlock(player, world, pos, stack);
-					}
-
-					if (replaceSound != null)
-					{
-						sound = null;
-						world.playSound(player, pos, replaceSound, category, 1.0F, 1.0F);
-					}
-				}
-			}
-		}
-
-		return sound;
-	}
-
-	private static BlockHitResult getMovingObjectPositionFromPlayer(Level worldIn, Player playerIn)
-	{
-		float f = playerIn.getXRot();
-		float f1 = playerIn.getYRot();
-		double d0 = playerIn.getX();
-		double d1 = playerIn.getY() + playerIn.getEyeHeight(playerIn.getPose());
-		double d2 = playerIn.getZ();
-		Vec3 vec3 = new Vec3(d0, d1, d2);
-		float f2 = Mth.cos(-f1 * (float) (Math.PI / 180.0) - (float) Math.PI);
-		float f3 = Mth.sin(-f1 * (float) (Math.PI / 180.0) - (float) Math.PI);
-		float f4 = -Mth.cos(-f * (float) (Math.PI / 180.0));
-		float f5 = Mth.sin(-f * (float) (Math.PI / 180.0));
-		float f6 = f3 * f4;
-		float f7 = f2 * f4;
-		double d3 = 5.0;
-		Vec3 vec31 = vec3.add(f6 * d3, f5 * d3, f7 * d3);
-		return worldIn.clip(new ClipContext(vec3, vec31, Block.OUTLINE, Fluid.NONE, playerIn));
 	}
 
 	public static class WeakObject extends WeakReference<Object>

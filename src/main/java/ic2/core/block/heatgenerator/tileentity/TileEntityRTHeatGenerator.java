@@ -6,12 +6,11 @@ import ic2.core.block.heatgenerator.container.ContainerRTHeatGenerator;
 import ic2.core.block.invslot.InvSlotConsumable;
 import ic2.core.block.invslot.InvSlotConsumableItemStack;
 import ic2.core.block.tileentity.TileEntityHeatSourceInventory;
-import ic2.core.init.MainConfig;
+import ic2.core.init.IC2Config;
 import ic2.core.network.GrowingBuffer;
 import ic2.core.profile.NotClassic;
 import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.ref.Ic2Items;
-import ic2.core.util.ConfigUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -21,9 +20,9 @@ import net.minecraft.world.level.block.state.BlockState;
 @NotClassic
 public class TileEntityRTHeatGenerator extends TileEntityHeatSourceInventory implements IHasGui
 {
-	private boolean newActive;
+	public static final float outputMultiplier = 2.0F * (float) IC2Config.balance.energy.heatGenerator.radioisotope.get().floatValue();
 	public final InvSlotConsumable fuelSlot = new InvSlotConsumableItemStack(this, "fuelSlot", 6, new ItemStack(Ic2Items.RTG_PELLET));
-	public static final float outputMultiplier = 2.0F * ConfigUtil.getFloat(MainConfig.get(), "balance/energy/heatgenerator/radioisotope");
+	private boolean newActive;
 
 	public TileEntityRTHeatGenerator(BlockPos pos, BlockState state)
 	{

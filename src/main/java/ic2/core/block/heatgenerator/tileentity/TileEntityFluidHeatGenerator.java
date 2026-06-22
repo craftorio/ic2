@@ -13,13 +13,12 @@ import ic2.core.block.invslot.InvSlotOutput;
 import ic2.core.block.tileentity.TileEntityHeatSourceInventory;
 import ic2.core.fluid.Ic2FluidStack;
 import ic2.core.fluid.Ic2FluidTank;
-import ic2.core.init.MainConfig;
+import ic2.core.init.IC2Config;
 import ic2.core.network.GrowingBuffer;
 import ic2.core.network.GuiSynced;
 import ic2.core.profile.NotClassic;
 import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.ref.Ic2Fluids;
-import ic2.core.util.ConfigUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Inventory;
@@ -34,11 +33,11 @@ public class TileEntityFluidHeatGenerator extends TileEntityHeatSourceInventory 
 	public final InvSlotOutput outputSlot;
 	@GuiSynced
 	protected final Ic2FluidTank fluidTank;
-	private short ticker = 0;
+	protected final Fluids fluids;
 	protected int burnAmount = 0;
 	protected int production = 0;
 	boolean newActive = false;
-	protected final Fluids fluids;
+	private short ticker = 0;
 
 	public TileEntityFluidHeatGenerator(BlockPos pos, BlockState state)
 	{
@@ -47,6 +46,20 @@ public class TileEntityFluidHeatGenerator extends TileEntityHeatSourceInventory 
 		this.outputSlot = new InvSlotOutput(this, "output", 1);
 		this.fluids = this.addComponent(new Fluids(this));
 		this.fluidTank = this.fluids.addTankInsert("fluidTank", 10000, Fluids.fluidPredicate(Recipes.semiFluidGenerator));
+	}
+
+	public static void init()
+	{
+		Recipes.fluidHeatGenerator = new FluidHeatManager();
+		if ((float) IC2Config.balance.energy.generator.semiFluidBiogas.get().floatValue() > 0.0F)
+		{
+			addFuel(Ic2Fluids.BIOGAS.still(), 10, Math.round(32.0F * (float) IC2Config.balance.energy.heatGenerator.semiFluidBiogas.get().floatValue()));
+		}
+	}
+
+	public static void addFuel(Fluid fluid, int amount, int heat)
+	{
+		Recipes.fluidHeatGenerator.addFluid(fluid, amount, heat);
 	}
 
 	@Override
@@ -73,20 +86,6 @@ public class TileEntityFluidHeatGenerator extends TileEntityHeatSourceInventory 
 	public boolean isConverting()
 	{
 		return this.getTankAmount() > 0 && this.HeatBuffer < this.getMaxHeatEmittedPerTick();
-	}
-
-	public static void init()
-	{
-		Recipes.fluidHeatGenerator = new FluidHeatManager();
-		if (ConfigUtil.getFloat(MainConfig.get(), "balance/energy/generator/semiFluidBiogas") > 0.0F)
-		{
-			addFuel(Ic2Fluids.BIOGAS.still(), 10, Math.round(32.0F * ConfigUtil.getFloat(MainConfig.get(), "balance/energy/heatgenerator/semiFluidBiogas")));
-		}
-	}
-
-	public static void addFuel(Fluid fluid, int amount, int heat)
-	{
-		Recipes.fluidHeatGenerator.addFluid(fluid, amount, heat);
 	}
 
 	@Override

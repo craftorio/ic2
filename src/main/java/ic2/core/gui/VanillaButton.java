@@ -7,7 +7,6 @@ import net.minecraft.resources.ResourceLocation;
 
 public class VanillaButton extends Button<VanillaButton>
 {
-	protected IEnableHandler disableHandler;
 	private static final ResourceLocation texture = ResourceLocation.withDefaultNamespace("textures/gui/widgets.png");
 	private static final int uNormal = 0;
 	private static final int vNormal = 66;
@@ -24,10 +23,43 @@ public class VanillaButton extends Button<VanillaButton>
 	private static final int colorNormal = 14737632;
 	private static final int colorHover = 16777120;
 	private static final int colorDisabled = 10526880;
+	protected IEnableHandler disableHandler;
 
 	public VanillaButton(Ic2Gui<?> gui, int x, int y, int width, int height, IClickHandler handler)
 	{
 		super(gui, x, y, width, height, handler);
+	}
+
+	private static void drawVerticalPiece(Ic2Gui<?> gui, PoseStack matrices, int x, int y, int width, int height, int u, int v)
+	{
+		int minTop = 2;
+		int minBottom = 3;
+
+		while (height < minTop + minBottom)
+		{
+			if (minTop > minBottom)
+			{
+				minTop--;
+			} else
+			{
+				minBottom--;
+			}
+		}
+
+		int cHeight = Math.min(height, 20) - minBottom;
+		gui.drawTexturedRect(matrices, x, y, width, cHeight, u, v);
+		y += cHeight;
+		height -= cHeight;
+
+		while (height > 20 - minTop)
+		{
+			cHeight = Math.min(height, 20 - minTop) - minBottom;
+			gui.drawTexturedRect(matrices, x, y, width, cHeight, u, v + minTop);
+			y += cHeight;
+			height -= cHeight;
+		}
+
+		gui.drawTexturedRect(matrices, x, y, width, height, u, v + 20 - height);
 	}
 
 	public VanillaButton withDisableHandler(IEnableHandler handler)
@@ -92,38 +124,6 @@ public class VanillaButton extends Button<VanillaButton>
 
 		drawVerticalPiece(this.gui, guiGraphics.pose(), cx, this.y, remainingWidth, this.height, u + 200 - remainingWidth, v);
 		super.drawBackground(guiGraphics, mouseX, mouseY);
-	}
-
-	private static void drawVerticalPiece(Ic2Gui<?> gui, PoseStack matrices, int x, int y, int width, int height, int u, int v)
-	{
-		int minTop = 2;
-		int minBottom = 3;
-
-		while (height < minTop + minBottom)
-		{
-			if (minTop > minBottom)
-			{
-				minTop--;
-			} else
-			{
-				minBottom--;
-			}
-		}
-
-		int cHeight = Math.min(height, 20) - minBottom;
-		gui.drawTexturedRect(matrices, x, y, width, cHeight, u, v);
-		y += cHeight;
-		height -= cHeight;
-
-		while (height > 20 - minTop)
-		{
-			cHeight = Math.min(height, 20 - minTop) - minBottom;
-			gui.drawTexturedRect(matrices, x, y, width, cHeight, u, v + minTop);
-			y += cHeight;
-			height -= cHeight;
-		}
-
-		gui.drawTexturedRect(matrices, x, y, width, height, u, v + 20 - height);
 	}
 
 	protected boolean isActive(int mouseX, int mouseY)

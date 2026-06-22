@@ -13,8 +13,8 @@ import java.util.Arrays;
 
 public class GrowingBuffer extends OutputStream implements IGrowingBuffer
 {
-	private static byte[] emptyBuffer = new byte[0];
 	private static final Charset utf8 = Charset.forName("UTF-8");
+	private static byte[] emptyBuffer = new byte[0];
 	private byte[] buffer;
 	private int pos;
 	private int altPos;

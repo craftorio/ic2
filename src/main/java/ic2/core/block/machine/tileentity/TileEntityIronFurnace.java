@@ -33,6 +33,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class TileEntityIronFurnace extends TileEntityBase implements IHasGui, IGuiValueProvider, INetworkClientTileEntityEventListener
 {
+	public static final short operationLength = 160;
 	public final InvSlotProcessableSmelting inputSlot;
 	public final InvSlotOutput outputSlot;
 	public final InvSlotConsumableFuel fuelSlot;
@@ -43,7 +44,6 @@ public class TileEntityIronFurnace extends TileEntityBase implements IHasGui, IG
 	@GuiSynced
 	public short progress = 0;
 	protected double xp = 0.0;
-	public static final short operationLength = 160;
 
 	public TileEntityIronFurnace(BlockPos pos, BlockState state)
 	{
@@ -51,6 +51,29 @@ public class TileEntityIronFurnace extends TileEntityBase implements IHasGui, IG
 		this.inputSlot = new InvSlotProcessableSmelting(this, "input", 1);
 		this.outputSlot = new InvSlotOutput(this, "output", 1);
 		this.fuelSlot = new InvSlotConsumableFuel(this, "fuel", 1, true);
+	}
+
+	public static double spawnXP(Player player, double xp)
+	{
+		Level world = player.getCommandSenderWorld();
+		long balls = (long) Math.floor(xp);
+
+		while (balls > 0L)
+		{
+			int amount;
+			if (balls < 2477L)
+			{
+				amount = ExperienceOrb.getExperienceValue((int) balls);
+			} else
+			{
+				amount = 2477;
+			}
+
+			balls -= amount;
+			world.addFreshEntity(new ExperienceOrb(world, player.getX(), player.getY() + 0.5, player.getZ() + 0.5, amount));
+		}
+
+		return xp - Math.floor(xp);
 	}
 
 	@Override
@@ -139,29 +162,6 @@ public class TileEntityIronFurnace extends TileEntityBase implements IHasGui, IG
 				);
 			}
 		}
-	}
-
-	public static double spawnXP(Player player, double xp)
-	{
-		Level world = player.getCommandSenderWorld();
-		long balls = (long) Math.floor(xp);
-
-		while (balls > 0L)
-		{
-			int amount;
-			if (balls < 2477L)
-			{
-				amount = ExperienceOrb.getExperienceValue((int) balls);
-			} else
-			{
-				amount = 2477;
-			}
-
-			balls -= amount;
-			world.addFreshEntity(new ExperienceOrb(world, player.getX(), player.getY() + 0.5, player.getZ() + 0.5, amount));
-		}
-
-		return xp - Math.floor(xp);
 	}
 
 	private void operate()

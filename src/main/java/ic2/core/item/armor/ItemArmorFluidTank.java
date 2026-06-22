@@ -29,6 +29,18 @@ public abstract class ItemArmorFluidTank extends ItemArmorUtility implements Sta
 		this.allowfluid = allowfluid;
 	}
 
+	private static Component getTooltipComponent(ItemStack stack)
+	{
+		Ic2FluidStack fs = Ic2FluidStack.get(stack);
+		if (fs.isEmpty())
+		{
+			return Component.translatable("ic2.item.fluid_container.empty");
+		} else
+		{
+			return Component.translatable("ic2.item.fluid_container.with_fluid", Component.translatable(fs.getFluidTypeKey()), fs.getAmountMb());
+		}
+	}
+
 	@Override
 	public int getCapacityMb(ItemStack stack)
 	{
@@ -93,19 +105,6 @@ public abstract class ItemArmorFluidTank extends ItemArmorUtility implements Sta
 		List<String> info = new ArrayList<>();
 		info.add(getTooltipComponent(stack).getString());
 		return info;
-	}
-
-	private static Component getTooltipComponent(ItemStack stack)
-	{
-		Ic2FluidStack fs = Ic2FluidStack.get(stack);
-		if (fs.isEmpty())
-		{
-			return Component.translatable("ic2.item.fluid_container.empty");
-		}
-		else
-		{
-			return Component.translatable("ic2.item.fluid_container.with_fluid", Component.translatable(fs.getFluidTypeKey()), fs.getAmountMb());
-		}
 	}
 
 	public boolean isValidRepairItem(@NotNull ItemStack par1ItemStack, @NotNull ItemStack par2ItemStack)

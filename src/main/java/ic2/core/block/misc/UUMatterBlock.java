@@ -57,8 +57,7 @@ public class UUMatterBlock extends LiquidBlock
 				if (heldItem.isEmpty())
 				{
 					player.setItemInHand(hand, waterBottle);
-				}
-				else if (!player.getInventory().add(waterBottle))
+				} else if (!player.getInventory().add(waterBottle))
 				{
 					player.drop(waterBottle, false);
 				}
@@ -84,13 +83,11 @@ public class UUMatterBlock extends LiquidBlock
 				if (neighborFluidState.isSource())
 				{
 					world.setBlockAndUpdate(neighborPos, Blocks.OBSIDIAN.defaultBlockState());
-				}
-				else
+				} else
 				{
 					world.setBlockAndUpdate(neighborPos, Blocks.COBBLESTONE.defaultBlockState());
 				}
-			}
-			else if (neighborFluidState.isSource())
+			} else if (neighborFluidState.isSource())
 			{
 				world.setBlock(neighborPos, Blocks.AIR.defaultBlockState(), 3);
 			}

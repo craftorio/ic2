@@ -6,7 +6,6 @@ import ic2.core.ref.Ic2Items;
 import ic2.core.util.StackUtil;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,6 +29,6 @@ public class RecyclerResolver implements ILateRecipeResolver
 			}
 		}
 
-		return Arrays.asList(new RecipeTransformation(transformCost, Collections.singletonList(input), new LeanItemStack(Ic2Items.SCRAP)));
+		return List.of(new RecipeTransformation(transformCost, Collections.singletonList(input), new LeanItemStack(Ic2Items.SCRAP)));
 	}
 }

@@ -69,191 +69,6 @@ public class ItemDebug extends Item implements PriorityUsableItem, ISpecialElect
 		super(settings);
 	}
 
-	@Override
-	public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context)
-	{
-		Level world = context.getLevel();
-		BlockPos pos = context.getClickedPos();
-		Player player = context.getPlayer();
-		ItemDebug.Mode mode = getMode(stack);
-		if (IC2.keyboard.isModeSwitchKeyDown(player))
-		{
-			if (!world.isClientSide)
-			{
-				mode = ItemDebug.Mode.modes[(mode.ordinal() + 1) % ItemDebug.Mode.modes.length];
-				setMode(stack, mode);
-				IC2.sideProxy.messagePlayer(player, "Debug Item Mode: " + mode.getName());
-				return InteractionResult.SUCCESS;
-			} else
-			{
-				return InteractionResult.PASS;
-			}
-		} else
-		{
-			BlockEntity blockEntity = world.getBlockEntity(pos);
-			if (blockEntity instanceof IDebuggable dbg)
-			{
-				if (world.isClientSide)
-				{
-					return InteractionResult.PASS;
-				}
-
-				if (dbg.isDebuggable())
-				{
-					IC2.sideProxy.messagePlayer(player, dbg.getDebugText());
-				}
-
-			} else
-			{
-				ItemDebug.Output output = new ItemDebug.Output();
-				switch (mode)
-				{
-					case InterfacesFields:
-					case InterfacesFieldsRetrace:
-					{
-						String plat = getPlatform(world);
-						BlockState state = world.getBlockState(pos);
-						Block block = state.getBlock();
-						BlockEntity te = world.getBlockEntity(pos);
-						output.both("[%s] block state: %s%nname: %s%ncls: %s%nbe: %s", plat, state, block.getDescriptionId(), block.getClass().getName(), te);
-						if (te != null)
-						{
-							output.part("[%s] interfaces:", plat);
-							Class<?> c = te.getClass();
-
-							do
-							{
-								for (Class<?> i : c.getInterfaces())
-								{
-									output.part(' ').part(i.getName());
-								}
-
-								c = c.getSuperclass();
-							} while (c != null);
-
-							output.partToConsole();
-						}
-
-						output.console("block fields:");
-						dumpObjectFields(block, output);
-						if (te != null)
-						{
-							output.console("");
-							output.console("tile entity fields:");
-							dumpObjectFields(te, output);
-						}
-						break;
-					}
-					case TileData:
-					{
-						if (world.isClientSide)
-						{
-							return InteractionResult.PASS;
-						}
-
-						BlockEntity tileEntity = world.getBlockEntity(pos);
-						if (tileEntity instanceof Ic2TileEntity te)
-						{
-							output.chat("Block: Active=%b Facing=%s", te.getActive(), te.getFacing());
-
-							for (TileEntityComponent comp : te.getComponents())
-							{
-								if (comp instanceof Energy energy)
-								{
-									output.chat("Energy: %.2f / %.2f", energy.getEnergy(), energy.getCapacity());
-								} else if (comp instanceof Redstone redstone)
-								{
-									output.chat("Redstone: %d", redstone.getRedstoneInput());
-								}
-							}
-						}
-
-						if (tileEntity instanceof TileEntityBaseGenerator te)
-						{
-							output.chat("BaseGen: Fuel=%d", te.fuel);
-						}
-
-						if (tileEntity instanceof IEnergyStorage te)
-						{
-							output.chat("EnergyStorage: Stored=%d", te.getStored());
-						}
-
-						if (tileEntity instanceof IReactor te)
-						{
-							output.chat(
-								"Reactor: Heat=%d MaxHeat=%d HEM=%f Output=%f", te.getHeat(), te.getMaxHeat(), te.getHeatEffectModifier(), te.getReactorEnergyOutput()
-							);
-						}
-
-						if (tileEntity instanceof IPersonalBlock te)
-						{
-							output.chat("PersonalBlock: CanAccess=%b", te.permitsAccess(player.getGameProfile()));
-						}
-
-						if (tileEntity instanceof TileEntityCrop te)
-						{
-							CropCard crop = te.getCrop();
-							String id = crop != null ? crop.getOwner() + ":" + crop.getId() : "none";
-							output.chat(
-								"Crop: Crop=%s Size=%d Growth=%d Gain=%d Resistance=%d Nutrients=%d Water=%d GrowthPoints=%d%n Cross=%b",
-								id,
-								te.getCurrentAge(),
-								te.getStatGrowth(),
-								te.getStatGain(),
-								te.getStatResistance(),
-								te.getStorageNutrients(),
-								te.getStorageWater(),
-								te.getGrowthPoints(),
-								te.isCrossingBase()
-							);
-						}
-						break;
-					}
-					case EnergyNet:
-					{
-						if (world.isClientSide)
-						{
-							return InteractionResult.PASS;
-						}
-
-						ByteArrayOutputStream consoleBuffer = new ByteArrayOutputStream();
-						PrintStream consoleStream = new PrintStream(consoleBuffer, false, StandardCharsets.UTF_8);
-						ByteArrayOutputStream chatBuffer = new ByteArrayOutputStream();
-						PrintStream chatStream = new PrintStream(consoleBuffer, false, StandardCharsets.UTF_8);
-						if (!((EnergyNetGlobal) EnergyNet.instance).dumpDebugInfo(world, pos, consoleStream, chatStream))
-						{
-							return InteractionResult.PASS;
-						}
-
-						chatStream.flush();
-						consoleStream.flush();
-						if (consoleBuffer.size() > 0)
-						{
-							output.console(consoleBuffer.toString(StandardCharsets.UTF_8).stripTrailing());
-						}
-
-						if (chatBuffer.size() > 0)
-						{
-							output.chat(chatBuffer.toString(StandardCharsets.UTF_8).stripTrailing());
-						}
-						break;
-					}
-					case Accelerate:
-					case AccelerateX100:
-						if (world.isClientSide)
-						{
-							return InteractionResult.PASS;
-						}
-
-						accelerate(world, pos, mode == ItemDebug.Mode.Accelerate ? 1000 : 100000, output);
-				}
-
-				output.flush(player);
-			}
-			return world.isClientSide ? InteractionResult.PASS : InteractionResult.SUCCESS;
-		}
-	}
-
 	private static boolean accelerate(Level world, BlockPos pos, int count, ItemDebug.Output output)
 	{
 		BlockState state = world.getBlockState(pos);
@@ -318,11 +133,6 @@ public class ItemDebug extends Item implements PriorityUsableItem, ISpecialElect
 
 		}
 		return true;
-	}
-
-	public InteractionResult interactLivingEntity(ItemStack stack, Player user, LivingEntity entity, InteractionHand hand)
-	{
-		return handleEntity(stack, user, entity);
 	}
 
 	private static InteractionResult handleEntity(ItemStack stack, Player player, Entity entity)
@@ -609,6 +419,196 @@ public class ItemDebug extends Item implements PriorityUsableItem, ISpecialElect
 				return ret;
 			}
 		}
+	}
+
+	@Override
+	public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context)
+	{
+		Level world = context.getLevel();
+		BlockPos pos = context.getClickedPos();
+		Player player = context.getPlayer();
+		ItemDebug.Mode mode = getMode(stack);
+		if (IC2.keyboard.isModeSwitchKeyDown(player))
+		{
+			if (!world.isClientSide)
+			{
+				mode = ItemDebug.Mode.modes[(mode.ordinal() + 1) % ItemDebug.Mode.modes.length];
+				setMode(stack, mode);
+				IC2.sideProxy.messagePlayer(player, "Debug Item Mode: " + mode.getName());
+				return InteractionResult.SUCCESS;
+			} else
+			{
+				return InteractionResult.PASS;
+			}
+		} else
+		{
+			BlockEntity blockEntity = world.getBlockEntity(pos);
+			if (blockEntity instanceof IDebuggable dbg)
+			{
+				if (world.isClientSide)
+				{
+					return InteractionResult.PASS;
+				}
+
+				if (dbg.isDebuggable())
+				{
+					IC2.sideProxy.messagePlayer(player, dbg.getDebugText());
+				}
+
+			} else
+			{
+				ItemDebug.Output output = new ItemDebug.Output();
+				switch (mode)
+				{
+					case InterfacesFields:
+					case InterfacesFieldsRetrace:
+					{
+						String plat = getPlatform(world);
+						BlockState state = world.getBlockState(pos);
+						Block block = state.getBlock();
+						BlockEntity te = world.getBlockEntity(pos);
+						output.both("[%s] block state: %s%nname: %s%ncls: %s%nbe: %s", plat, state, block.getDescriptionId(), block.getClass().getName(), te);
+						if (te != null)
+						{
+							output.part("[%s] interfaces:", plat);
+							Class<?> c = te.getClass();
+
+							do
+							{
+								for (Class<?> i : c.getInterfaces())
+								{
+									output.part(' ').part(i.getName());
+								}
+
+								c = c.getSuperclass();
+							} while (c != null);
+
+							output.partToConsole();
+						}
+
+						output.console("block fields:");
+						dumpObjectFields(block, output);
+						if (te != null)
+						{
+							output.console("");
+							output.console("tile entity fields:");
+							dumpObjectFields(te, output);
+						}
+						break;
+					}
+					case TileData:
+					{
+						if (world.isClientSide)
+						{
+							return InteractionResult.PASS;
+						}
+
+						BlockEntity tileEntity = world.getBlockEntity(pos);
+						if (tileEntity instanceof Ic2TileEntity te)
+						{
+							output.chat("Block: Active=%b Facing=%s", te.getActive(), te.getFacing());
+
+							for (TileEntityComponent comp : te.getComponents())
+							{
+								if (comp instanceof Energy energy)
+								{
+									output.chat("Energy: %.2f / %.2f", energy.getEnergy(), energy.getCapacity());
+								} else if (comp instanceof Redstone redstone)
+								{
+									output.chat("Redstone: %d", redstone.getRedstoneInput());
+								}
+							}
+						}
+
+						if (tileEntity instanceof TileEntityBaseGenerator te)
+						{
+							output.chat("BaseGen: Fuel=%d", te.fuel);
+						}
+
+						if (tileEntity instanceof IEnergyStorage te)
+						{
+							output.chat("EnergyStorage: Stored=%d", te.getStored());
+						}
+
+						if (tileEntity instanceof IReactor te)
+						{
+							output.chat(
+								"Reactor: Heat=%d MaxHeat=%d HEM=%f Output=%f", te.getHeat(), te.getMaxHeat(), te.getHeatEffectModifier(), te.getReactorEnergyOutput()
+							);
+						}
+
+						if (tileEntity instanceof IPersonalBlock te)
+						{
+							output.chat("PersonalBlock: CanAccess=%b", te.permitsAccess(player.getGameProfile()));
+						}
+
+						if (tileEntity instanceof TileEntityCrop te)
+						{
+							CropCard crop = te.getCrop();
+							String id = crop != null ? crop.getOwner() + ":" + crop.getId() : "none";
+							output.chat(
+								"Crop: Crop=%s Size=%d Growth=%d Gain=%d Resistance=%d Nutrients=%d Water=%d GrowthPoints=%d%n Cross=%b",
+								id,
+								te.getCurrentAge(),
+								te.getStatGrowth(),
+								te.getStatGain(),
+								te.getStatResistance(),
+								te.getStorageNutrients(),
+								te.getStorageWater(),
+								te.getGrowthPoints(),
+								te.isCrossingBase()
+							);
+						}
+						break;
+					}
+					case EnergyNet:
+					{
+						if (world.isClientSide)
+						{
+							return InteractionResult.PASS;
+						}
+
+						ByteArrayOutputStream consoleBuffer = new ByteArrayOutputStream();
+						PrintStream consoleStream = new PrintStream(consoleBuffer, false, StandardCharsets.UTF_8);
+						ByteArrayOutputStream chatBuffer = new ByteArrayOutputStream();
+						PrintStream chatStream = new PrintStream(consoleBuffer, false, StandardCharsets.UTF_8);
+						if (!((EnergyNetGlobal) EnergyNet.instance).dumpDebugInfo(world, pos, consoleStream, chatStream))
+						{
+							return InteractionResult.PASS;
+						}
+
+						chatStream.flush();
+						consoleStream.flush();
+						if (consoleBuffer.size() > 0)
+						{
+							output.console(consoleBuffer.toString(StandardCharsets.UTF_8).stripTrailing());
+						}
+
+						if (chatBuffer.size() > 0)
+						{
+							output.chat(chatBuffer.toString(StandardCharsets.UTF_8).stripTrailing());
+						}
+						break;
+					}
+					case Accelerate:
+					case AccelerateX100:
+						if (world.isClientSide)
+						{
+							return InteractionResult.PASS;
+						}
+
+						accelerate(world, pos, mode == ItemDebug.Mode.Accelerate ? 1000 : 100000, output);
+				}
+
+				output.flush(player);
+			}
+			return world.isClientSide ? InteractionResult.PASS : InteractionResult.SUCCESS;
+		}
+	}
+
+	public InteractionResult interactLivingEntity(ItemStack stack, Player user, LivingEntity entity, InteractionHand hand)
+	{
+		return handleEntity(stack, user, entity);
 	}
 
 	@Override

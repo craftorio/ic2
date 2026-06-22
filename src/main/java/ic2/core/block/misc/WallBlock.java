@@ -30,6 +30,11 @@ public class WallBlock extends Block implements StainableBlock, RetexturableBloc
 		types.put(color, this);
 	}
 
+	public static WallBlock get(DyeColor color)
+	{
+		return types.get(color);
+	}
+
 	@Override
 	public DyeColor getColor(Level world, BlockPos pos, Direction side)
 	{
@@ -75,10 +80,5 @@ public class WallBlock extends Block implements StainableBlock, RetexturableBloc
 
 		world.setBlockAndUpdate(pos, state);
 		return false;
-	}
-
-	public static WallBlock get(DyeColor color)
-	{
-		return types.get(color);
 	}
 }

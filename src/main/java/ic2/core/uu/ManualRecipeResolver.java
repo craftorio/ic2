@@ -13,6 +13,18 @@ public class ManualRecipeResolver implements IRecipeResolver
 {
 	private static final double transformCost = 0.0;
 
+	private static RecipeTransformation toTransform(Item input, Item output)
+	{
+		return toTransform(new ItemStack(input), new ItemStack(output));
+	}
+
+	private static RecipeTransformation toTransform(ItemStack input, ItemStack output)
+	{
+		List<List<LeanItemStack>> inputs = Collections.singletonList(Collections.singletonList(new LeanItemStack(input)));
+		List<LeanItemStack> outputs = Collections.singletonList(new LeanItemStack(output));
+		return new RecipeTransformation(0.0, inputs, outputs);
+	}
+
 	@Override
 	public List<RecipeTransformation> getTransformations()
 	{
@@ -24,17 +36,5 @@ public class ManualRecipeResolver implements IRecipeResolver
 		ret.add(toTransform(Ic2Items.DUAL_MOX_FUEL_ROD, Ic2Items.DEPLETED_DUAL_MOX_FUEL_ROD));
 		ret.add(toTransform(Ic2Items.QUAD_MOX_FUEL_ROD, Ic2Items.DEPLETED_QUAD_MOX_FUEL_ROD));
 		return ret;
-	}
-
-	private static RecipeTransformation toTransform(Item input, Item output)
-	{
-		return toTransform(new ItemStack(input), new ItemStack(output));
-	}
-
-	private static RecipeTransformation toTransform(ItemStack input, ItemStack output)
-	{
-		List<List<LeanItemStack>> inputs = Collections.singletonList(Collections.singletonList(new LeanItemStack(input)));
-		List<LeanItemStack> outputs = Collections.singletonList(new LeanItemStack(output));
-		return new RecipeTransformation(0.0, inputs, outputs);
 	}
 }

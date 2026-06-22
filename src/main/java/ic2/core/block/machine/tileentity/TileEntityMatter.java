@@ -20,7 +20,7 @@ import ic2.core.block.invslot.InvSlotUpgrade;
 import ic2.core.block.machine.container.ContainerMatter;
 import ic2.core.fluid.Ic2FluidStack;
 import ic2.core.fluid.Ic2FluidTank;
-import ic2.core.init.MainConfig;
+import ic2.core.init.IC2Config;
 import ic2.core.network.GrowingBuffer;
 import ic2.core.network.GuiSynced;
 import ic2.core.profile.NotClassic;
@@ -28,7 +28,6 @@ import ic2.core.recipe.MatterAmplifierRecipeManager;
 import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.ref.Ic2Fluids;
 import ic2.core.ref.Ic2Items;
-import ic2.core.util.ConfigUtil;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -45,15 +44,9 @@ import net.minecraft.world.level.block.state.BlockState;
 @NotClassic
 public class TileEntityMatter extends TileEntityElectricMachine implements IHasGui, IUpgradableBlock, IExplosionPowerOverride
 {
-	private static final int DEFAULT_TIER = ConfigUtil.getInt(MainConfig.get(), "balance/matterFabricatorTier");
-	public int scrap = 0;
-	private double lastEnergy;
 	private static final int StateIdle = 0;
 	private static final int StateRunning = 1;
 	private static final int StateRunningScrap = 2;
-	private int state = 0;
-	private int prevState = 0;
-	public boolean redstonePowered = false;
 	public final InvSlotUpgrade upgradeSlot;
 	public final InvSlotProcessable<IRecipeInput, Integer, ItemStack> amplifierSlot = new InvSlotProcessable<IRecipeInput, Integer, ItemStack>(
 		this, "scrap", 1, Recipes.matterFabricator
@@ -77,11 +70,16 @@ public class TileEntityMatter extends TileEntityElectricMachine implements IHasG
 	public final Ic2FluidTank fluidTank;
 	protected final Redstone redstone;
 	protected final Fluids fluids;
+	public int scrap = 0;
+	public boolean redstonePowered = false;
+	private double lastEnergy;
+	private int state = 0;
+	private int prevState = 0;
 
 	public TileEntityMatter(BlockPos pos, BlockState state)
 	{
 		super(
-			Ic2BlockEntities.MATTER_GENERATOR, pos, state, Math.round(1000000.0F * ConfigUtil.getFloat(MainConfig.get(), "balance/uuEnergyFactor")), DEFAULT_TIER
+			Ic2BlockEntities.MATTER_GENERATOR, pos, state, Math.round(1000000.0F * (float) IC2Config.balance.uuEnergyFactor.get().floatValue()), getDefaultTier()
 		);
 		this.upgradeSlot = new InvSlotUpgrade(this, "upgrade", 4);
 		this.redstone = this.addComponent(new Redstone(this));
@@ -101,6 +99,11 @@ public class TileEntityMatter extends TileEntityElectricMachine implements IHasG
 		});
 	}
 
+	private static int getDefaultTier()
+	{
+		return IC2Config.balance.matterFabricatorTier.get();
+	}
+
 	public static void init()
 	{
 		Recipes.matterAmplifier = new MatterAmplifierRecipeManager();
@@ -115,6 +118,12 @@ public class TileEntityMatter extends TileEntityElectricMachine implements IHasG
 
 	public static void addAmplifier(IRecipeInput input, int amplification)
 	{
+	}
+
+	private static int applyModifier(int base, int extra, double multiplier)
+	{
+		double ret = Math.round(((double) base + extra) * multiplier);
+		return ret > 2.147483647E9 ? Integer.MAX_VALUE : (int) ret;
 	}
 
 	@Override
@@ -268,13 +277,7 @@ public class TileEntityMatter extends TileEntityElectricMachine implements IHasG
 	public void setUpgradestat()
 	{
 		this.upgradeSlot.onChanged();
-		this.energy.setSinkTier(applyModifier(DEFAULT_TIER, this.upgradeSlot.extraTier, 1.0));
-	}
-
-	private static int applyModifier(int base, int extra, double multiplier)
-	{
-		double ret = Math.round(((double) base + extra) * multiplier);
-		return ret > 2.147483647E9 ? Integer.MAX_VALUE : (int) ret;
+		this.energy.setSinkTier(applyModifier(getDefaultTier(), this.upgradeSlot.extraTier, 1.0));
 	}
 
 	@Override

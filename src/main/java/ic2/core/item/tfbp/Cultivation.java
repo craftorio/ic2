@@ -26,6 +26,42 @@ public class Cultivation extends TerraformerBase
 {
 	static List<BlockState> plants = new ArrayList<>();
 
+	private static boolean growPlantsOn(Level world, BlockPos pos)
+	{
+		BlockPos above = pos.above();
+		BlockState state = world.getBlockState(above);
+		Block block = state.getBlock();
+		if (state.isAir() || block == Blocks.TALL_GRASS && world.random.nextInt(4) == 0)
+		{
+			BlockState plant = pickRandomPlant(world.random);
+			if (plant.getValues().containsKey(DirectionalBlock.FACING))
+			{
+				plant = (BlockState) plant.setValue(DirectionalBlock.FACING, Util.HORIZONTAL_DIRS[world.random.nextInt(Util.HORIZONTAL_DIRS.length)]);
+			}
+
+			if (plant.getBlock() instanceof CropBlock)
+			{
+				world.setBlockAndUpdate(pos, Blocks.FARMLAND.defaultBlockState());
+			} else if (plant.getBlock() instanceof DoublePlantBlock)
+			{
+				world.setBlockAndUpdate(above, (BlockState) plant.setValue(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER));
+				world.setBlockAndUpdate(above.above(), (BlockState) plant.setValue(DoublePlantBlock.HALF, DoubleBlockHalf.UPPER));
+				return true;
+			}
+
+			world.setBlockAndUpdate(above, plant);
+			return true;
+		} else
+		{
+			return false;
+		}
+	}
+
+	private static BlockState pickRandomPlant(RandomSource random)
+	{
+		return plants.get(random.nextInt(plants.size()));
+	}
+
 	@Override
 	void init()
 	{
@@ -87,41 +123,5 @@ public class Cultivation extends TerraformerBase
 		{
 			return block == Blocks.GRASS ? growPlantsOn(world, pos) : false;
 		}
-	}
-
-	private static boolean growPlantsOn(Level world, BlockPos pos)
-	{
-		BlockPos above = pos.above();
-		BlockState state = world.getBlockState(above);
-		Block block = state.getBlock();
-		if (state.isAir() || block == Blocks.TALL_GRASS && world.random.nextInt(4) == 0)
-		{
-			BlockState plant = pickRandomPlant(world.random);
-			if (plant.getValues().containsKey(DirectionalBlock.FACING))
-			{
-				plant = (BlockState) plant.setValue(DirectionalBlock.FACING, Util.HORIZONTAL_DIRS[world.random.nextInt(Util.HORIZONTAL_DIRS.length)]);
-			}
-
-			if (plant.getBlock() instanceof CropBlock)
-			{
-				world.setBlockAndUpdate(pos, Blocks.FARMLAND.defaultBlockState());
-			} else if (plant.getBlock() instanceof DoublePlantBlock)
-			{
-				world.setBlockAndUpdate(above, (BlockState) plant.setValue(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER));
-				world.setBlockAndUpdate(above.above(), (BlockState) plant.setValue(DoublePlantBlock.HALF, DoubleBlockHalf.UPPER));
-				return true;
-			}
-
-			world.setBlockAndUpdate(above, plant);
-			return true;
-		} else
-		{
-			return false;
-		}
-	}
-
-	private static BlockState pickRandomPlant(RandomSource random)
-	{
-		return plants.get(random.nextInt(plants.size()));
 	}
 }

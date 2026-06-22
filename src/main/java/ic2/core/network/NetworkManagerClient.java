@@ -48,6 +48,31 @@ public class NetworkManagerClient extends NetworkManager
 {
 	private GrowingBuffer largePacketBuffer;
 
+	private static void processChatPacket(GrowingBuffer buffer)
+	{
+		final String messages = buffer.readString();
+		IC2.sideProxy.requestTick(false, () ->
+		{
+			for (String line : messages.split("[\\r\\n]+"))
+			{
+				IC2.sideProxy.messagePlayer(null, line);
+			}
+		});
+	}
+
+	private static void processConsolePacket(GrowingBuffer buffer)
+	{
+		String messages = buffer.readString();
+		PrintStream console = new PrintStream(new FileOutputStream(FileDescriptor.out));
+
+		for (String line : messages.split("[\\r\\n]+"))
+		{
+			console.println(line);
+		}
+
+		console.flush();
+	}
+
 	@Override
 	protected boolean isClient()
 	{
@@ -346,31 +371,6 @@ public class NetworkManagerClient extends NetworkManager
 				}
 			}
 		}
-	}
-
-	private static void processChatPacket(GrowingBuffer buffer)
-	{
-		final String messages = buffer.readString();
-		IC2.sideProxy.requestTick(false, () ->
-		{
-			for (String line : messages.split("[\\r\\n]+"))
-			{
-				IC2.sideProxy.messagePlayer(null, line);
-			}
-		});
-	}
-
-	private static void processConsolePacket(GrowingBuffer buffer)
-	{
-		String messages = buffer.readString();
-		PrintStream console = new PrintStream(new FileOutputStream(FileDescriptor.out));
-
-		for (String line : messages.split("[\\r\\n]+"))
-		{
-			console.println(line);
-		}
-
-		console.flush();
 	}
 
 	@Override

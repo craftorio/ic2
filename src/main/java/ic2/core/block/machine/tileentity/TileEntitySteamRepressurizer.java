@@ -8,14 +8,13 @@ import ic2.core.block.tileentity.TileEntityInventory;
 import ic2.core.fluid.Ic2FluidStack;
 import ic2.core.fluid.Ic2FluidTank;
 import ic2.core.gui.dynamic.DynamicContainer;
-import ic2.core.init.MainConfig;
+import ic2.core.init.IC2Config;
 import ic2.core.network.GrowingBuffer;
 import ic2.core.network.GuiSynced;
 import ic2.core.profile.NotClassic;
 import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.ref.Ic2FluidTags;
 import ic2.core.ref.Ic2Fluids;
-import ic2.core.util.ConfigUtil;
 import ic2.core.util.Util;
 
 import java.util.Iterator;
@@ -34,20 +33,44 @@ import net.minecraft.world.level.material.Fluid;
 @NotClassic
 public class TileEntitySteamRepressurizer extends TileEntityInventory implements IHasGui
 {
+	protected static final int CONSUMPTION = 10;
 	private static Fluid detectedSteamFluid;
-	protected int currentHeat;
 	@GuiSynced
 	protected final Ic2FluidTank output;
 	@GuiSynced
 	protected final Ic2FluidTank input;
-	protected static final int CONSUMPTION = 10;
 	protected final Fluids fluids = this.addComponent(new Fluids(this));
+	protected int currentHeat;
 
 	public TileEntitySteamRepressurizer(BlockPos pos, BlockState state)
 	{
 		super(Ic2BlockEntities.STEAM_REPRESSURIZER, pos, state);
 		this.input = this.fluids.addTankInsert("input", 10000, Fluids.fluidPredicate(Ic2Fluids.STEAM.still(), Ic2Fluids.SUPERHEATED_STEAM.still()));
 		this.output = this.fluids.addTankExtract("output", 10000);
+	}
+
+	public static boolean hasSteam()
+	{
+		return getSteam() != null;
+	}
+
+	private static Fluid getSteam()
+	{
+		Fluid ret = detectedSteamFluid;
+		if (ret == null)
+		{
+			var tag = net.minecraft.core.registries.BuiltInRegistries.FLUID.getTag(Ic2FluidTags.STEAM);
+			if (tag.isPresent())
+			{
+				for (Holder<Fluid> entry : tag.get())
+				{
+					detectedSteamFluid = ret = entry.value();
+					break;
+				}
+			}
+		}
+
+		return ret;
 	}
 
 	@Override
@@ -62,11 +85,6 @@ public class TileEntitySteamRepressurizer extends TileEntityInventory implements
 	{
 		super.saveAdditional(nbt);
 		nbt.putInt("heat", this.currentHeat);
-	}
-
-	public static boolean hasSteam()
-	{
-		return getSteam() != null;
 	}
 
 	@Override
@@ -129,10 +147,10 @@ public class TileEntitySteamRepressurizer extends TileEntityInventory implements
 		Fluid fluid = this.input.getFluidStack().getFluid();
 		if (fluid == Ic2Fluids.STEAM.still())
 		{
-			return ConfigUtil.getInt(MainConfig.get(), "balance/steamRepressurizer/steamPerSteam");
+			return IC2Config.balance.steamRepressurizer.steamPerSteam.get();
 		} else if (fluid == Ic2Fluids.SUPERHEATED_STEAM.still())
 		{
-			return ConfigUtil.getInt(MainConfig.get(), "balance/steamRepressurizer/steamPerSuperSteam");
+			return IC2Config.balance.steamRepressurizer.steamPerSuperSteam.get();
 		} else
 		{
 			throw new IllegalStateException("Unknown tank contents: " + fluid);
@@ -160,24 +178,5 @@ public class TileEntitySteamRepressurizer extends TileEntityInventory implements
 	public boolean getGuiState(String name)
 	{
 		return "valid".equals(name) ? hasSteam() : super.getGuiState(name);
-	}
-
-	private static Fluid getSteam()
-	{
-		Fluid ret = detectedSteamFluid;
-		if (ret == null)
-		{
-			var tag = net.minecraft.core.registries.BuiltInRegistries.FLUID.getTag(Ic2FluidTags.STEAM);
-			if (tag.isPresent())
-			{
-				for (Holder<Fluid> entry : tag.get())
-				{
-					detectedSteamFluid = ret = entry.value();
-					break;
-				}
-			}
-		}
-
-		return ret;
 	}
 }

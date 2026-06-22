@@ -12,11 +12,6 @@ public class RecipeButton extends Button<RecipeButton>
 {
 	public static Function<String[], IClickHandler> jeiRecipeListOpener;
 
-	public static boolean canUse()
-	{
-		return jeiRecipeListOpener != null;
-	}
-
 	public RecipeButton(GuiElement<?> wrapping, String[] categories)
 	{
 		this(wrapping.gui, wrapping.x, wrapping.y, wrapping.width, wrapping.height, categories);
@@ -24,7 +19,12 @@ public class RecipeButton extends Button<RecipeButton>
 
 	public RecipeButton(Ic2Gui<?> gui, int x, int y, int width, int height, String[] categories)
 	{
-		super(gui, x, y, width, height, (IClickHandler) jeiRecipeListOpener.apply(categories));
+		super(gui, x, y, width, height, jeiRecipeListOpener.apply(categories));
+	}
+
+	public static boolean canUse()
+	{
+		return jeiRecipeListOpener != null;
 	}
 
 	@Override

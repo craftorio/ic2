@@ -1,10 +1,9 @@
 package ic2.core.block.generator.tileentity;
 
 import ic2.api.energy.tile.IHeatSource;
-import ic2.core.init.MainConfig;
+import ic2.core.init.IC2Config;
 import ic2.core.profile.NotClassic;
 import ic2.core.ref.Ic2BlockEntities;
-import ic2.core.util.ConfigUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
@@ -15,7 +14,7 @@ import net.minecraft.world.level.block.state.BlockState;
 @NotClassic
 public class TileEntityStirlingGenerator extends TileEntityConversionGenerator
 {
-	private final double productionpeerheat = (double) (0.5F * ConfigUtil.getFloat(MainConfig.get(), "balance/energy/generator/Stirling"));
+	private final double productionpeerheat = (double) (0.5F * (float) IC2Config.balance.energy.generator.stirling.get().floatValue());
 	protected IHeatSource source;
 
 	public TileEntityStirlingGenerator(BlockPos pos, BlockState state)

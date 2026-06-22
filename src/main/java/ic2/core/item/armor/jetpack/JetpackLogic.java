@@ -15,9 +15,10 @@ public class JetpackLogic
 {
 	private static boolean lastJetpackUsed;
 	private static Sound jetpackSound;
+
 	public static boolean useJetpack(Player player, boolean hoverMode, IJetpack jetpack, ItemStack stack)
 	{
-		
+
 		if (jetpack.getChargeLevel(stack) <= 0.0)
 		{
 			return false;

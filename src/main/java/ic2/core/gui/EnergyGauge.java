@@ -17,6 +17,12 @@ public class EnergyGauge extends Gauge<EnergyGauge>
 {
 	private final Energy energy;
 
+	public EnergyGauge(Ic2Gui<?> gui, int x, int y, Ic2TileEntity te, EnergyGauge.EnergyGaugeStyle style)
+	{
+		super(gui, x, y, style.properties);
+		this.energy = te.getComponent(Energy.class);
+	}
+
 	public static EnergyGauge asBar(Ic2Gui<?> gui, int x, int y, Ic2TileEntity te)
 	{
 		return new EnergyGauge(gui, x, y, te, EnergyGauge.EnergyGaugeStyle.Bar);
@@ -25,12 +31,6 @@ public class EnergyGauge extends Gauge<EnergyGauge>
 	public static EnergyGauge asBolt(Ic2Gui<?> gui, int x, int y, Ic2TileEntity te)
 	{
 		return new EnergyGauge(gui, x, y, te, EnergyGauge.EnergyGaugeStyle.Bolt);
-	}
-
-	public EnergyGauge(Ic2Gui<?> gui, int x, int y, Ic2TileEntity te, EnergyGauge.EnergyGaugeStyle style)
-	{
-		super(gui, x, y, style.properties);
-		this.energy = te.getComponent(Energy.class);
 	}
 
 	@Override

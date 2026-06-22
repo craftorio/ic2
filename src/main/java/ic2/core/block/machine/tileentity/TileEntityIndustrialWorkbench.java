@@ -53,54 +53,6 @@ public class TileEntityIndustrialWorkbench extends TileEntityInventory implement
 		super(Ic2BlockEntities.INDUSTRIAL_WORKBENCH, pos, state);
 	}
 
-	@Override
-	public void onPlaced(ItemStack stack, LivingEntity placer, Direction facing)
-	{
-		super.onPlaced(stack, placer, facing);
-		if (!stack.hasTag() || !stack.getTag().contains("PLACED"))
-		{
-			this.leftCrafting.tool.put(new ItemStack(Ic2Items.FORGE_HAMMER));
-			this.rightCrafting.tool.put(new ItemStack(Ic2Items.CUTTER));
-		}
-	}
-
-	@Override
-	public ItemStack adjustDrop(ItemStack drop, boolean wrench)
-	{
-		drop = super.adjustDrop(drop, wrench);
-		StackUtil.getOrCreateNbtData(drop).putBoolean("PLACED", true);
-		return drop;
-	}
-
-	public void rebalance()
-	{
-		if (!this.craftingGrid.isEmpty())
-		{
-			boolean changed = false;
-			CraftingContainer crafting = new SimpleCraftingInventory.InvSlotCraftingInventory(this.craftingGrid, 3);
-			int index = 0;
-
-			for (int size = this.craftingStorage.size(); index < size; index++)
-			{
-				if (!this.craftingStorage.isEmpty(index))
-				{
-					Tuple.T2<List<ItemStack>, ? extends IntCollection> changes = StackUtil.balanceStacks(crafting, this.craftingStorage.get(index));
-					if (!changes.b.isEmpty())
-					{
-						changed = true;
-						ItemStack toPut = changes.a.isEmpty() ? StackUtil.emptyStack : changes.a.get(0);
-						this.craftingStorage.put(index, toPut);
-					}
-				}
-			}
-
-			if (changed)
-			{
-				this.setChanged();
-			}
-		}
-	}
-
 	private static int getPossible(int max, ItemStack existing, ItemStack in)
 	{
 		int amount = Math.min(max, in.isStackable() ? in.getMaxStackSize() : 1);
@@ -147,6 +99,54 @@ public class TileEntityIndustrialWorkbench extends TileEntityInventory implement
 		}
 
 		return gridItem;
+	}
+
+	@Override
+	public void onPlaced(ItemStack stack, LivingEntity placer, Direction facing)
+	{
+		super.onPlaced(stack, placer, facing);
+		if (!stack.hasTag() || !stack.getTag().contains("PLACED"))
+		{
+			this.leftCrafting.tool.put(new ItemStack(Ic2Items.FORGE_HAMMER));
+			this.rightCrafting.tool.put(new ItemStack(Ic2Items.CUTTER));
+		}
+	}
+
+	@Override
+	public ItemStack adjustDrop(ItemStack drop, boolean wrench)
+	{
+		drop = super.adjustDrop(drop, wrench);
+		StackUtil.getOrCreateNbtData(drop).putBoolean("PLACED", true);
+		return drop;
+	}
+
+	public void rebalance()
+	{
+		if (!this.craftingGrid.isEmpty())
+		{
+			boolean changed = false;
+			CraftingContainer crafting = new SimpleCraftingInventory.InvSlotCraftingInventory(this.craftingGrid, 3);
+			int index = 0;
+
+			for (int size = this.craftingStorage.size(); index < size; index++)
+			{
+				if (!this.craftingStorage.isEmpty(index))
+				{
+					Tuple.T2<List<ItemStack>, ? extends IntCollection> changes = StackUtil.balanceStacks(crafting, this.craftingStorage.get(index));
+					if (!changes.b.isEmpty())
+					{
+						changed = true;
+						ItemStack toPut = changes.a.isEmpty() ? StackUtil.emptyStack : changes.a.get(0);
+						this.craftingStorage.put(index, toPut);
+					}
+				}
+			}
+
+			if (changed)
+			{
+				this.setChanged();
+			}
+		}
 	}
 
 	public void clear(Player player)
@@ -196,7 +196,6 @@ public class TileEntityIndustrialWorkbench extends TileEntityInventory implement
 
 	public static class InvSlotCraftingCombo
 	{
-		protected CraftingRecipe recipe;
 		public final InvSlotConsumable input;
 		public final InvSlotConsumableTag tool;
 		public final CraftingContainer crafting = new SimpleCraftingInventory(2, 1)
@@ -232,6 +231,7 @@ public class TileEntityIndustrialWorkbench extends TileEntityInventory implement
 			}
 		};
 		public final ResultContainer resultInv = new ResultContainer();
+		protected CraftingRecipe recipe;
 
 		public InvSlotCraftingCombo(TileEntityInventory base, String name, TagKey<Item> tool)
 		{

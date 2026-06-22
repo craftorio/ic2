@@ -10,11 +10,10 @@ import ic2.core.block.invslot.InvSlotConsumableClass;
 import ic2.core.block.invslot.InvSlotConsumableKineticRotor;
 import ic2.core.block.kineticgenerator.container.ContainerWindKineticGenerator;
 import ic2.core.event.WorldData;
-import ic2.core.init.MainConfig;
+import ic2.core.init.IC2Config;
 import ic2.core.network.GrowingBuffer;
 import ic2.core.profile.NotClassic;
 import ic2.core.ref.Ic2BlockEntities;
-import ic2.core.util.ConfigUtil;
 import ic2.core.util.StackUtil;
 import ic2.core.util.Util;
 
@@ -35,6 +34,8 @@ import net.minecraft.world.level.block.state.BlockState;
 @NotClassic
 public class TileEntityWindKineticGenerator extends TileEntityAbstractKineticGenerator implements IRotorProvider, IHasGui
 {
+	public static final float outputModifier = 10.0F * (float) IC2Config.balance.energy.kineticGenerator.wind.get().floatValue();
+	private static final ResourceLocation woodenRotorTexture = ResourceLocation.fromNamespaceAndPath("ic2", "textures/item/rotor/wood_rotor_model.png");
 	public final InvSlotConsumableClass rotorSlot;
 	private double windStrength;
 	private int obstructedCrossSection;
@@ -42,8 +43,6 @@ public class TileEntityWindKineticGenerator extends TileEntityAbstractKineticGen
 	private float rotationSpeed;
 	private float angle = 0.0F;
 	private long lastCheck;
-	public static final float outputModifier = 10.0F * ConfigUtil.getFloat(MainConfig.get(), "balance/energy/kineticgenerator/wind");
-	private static final ResourceLocation woodenRotorTexture = ResourceLocation.fromNamespaceAndPath("ic2", "textures/item/rotor/wood_rotor_model.png");
 
 	public TileEntityWindKineticGenerator(BlockPos pos, BlockState state)
 	{

@@ -132,6 +132,12 @@ public abstract class ExplosiveEntity extends Entity
 		return this.causingEntity;
 	}
 
+	public ExplosiveEntity setCausingEntity(LivingEntity igniter1)
+	{
+		this.causingEntity = igniter1;
+		return this;
+	}
+
 	protected MovementEmission getMovementEmission()
 	{
 		return MovementEmission.NONE;
@@ -157,24 +163,18 @@ public abstract class ExplosiveEntity extends Entity
 		return 0.15F;
 	}
 
-	public void setFuse(int fuse)
-	{
-		this.entityData.set(FUSE, fuse);
-	}
-
 	public int getFuse()
 	{
 		return (Integer) this.entityData.get(FUSE);
 	}
 
+	public void setFuse(int fuse)
+	{
+		this.entityData.set(FUSE, fuse);
+	}
+
 	public Packet<ClientGamePacketListener> getAddEntityPacket()
 	{
 		return new ClientboundAddEntityPacket(this);
-	}
-
-	public ExplosiveEntity setCausingEntity(LivingEntity igniter1)
-	{
-		this.causingEntity = igniter1;
-		return this;
 	}
 }

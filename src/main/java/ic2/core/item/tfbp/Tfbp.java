@@ -21,6 +21,15 @@ public class Tfbp extends Item implements ITerraformingBP
 	public final int range;
 	final TerraformerBase logic;
 
+	public Tfbp(Properties settings, double consume, int range, TerraformerBase logic)
+	{
+		super(settings);
+		this.consume = consume;
+		this.range = range;
+		this.logic = logic;
+		instances.add(this);
+	}
+
 	public static void init()
 	{
 		for (Tfbp instance : instances)
@@ -30,15 +39,6 @@ public class Tfbp extends Item implements ITerraformingBP
 				instance.logic.init();
 			}
 		}
-	}
-
-	public Tfbp(Properties settings, double consume, int range, TerraformerBase logic)
-	{
-		super(settings);
-		this.consume = consume;
-		this.range = range;
-		this.logic = logic;
-		instances.add(this);
 	}
 
 	@Override

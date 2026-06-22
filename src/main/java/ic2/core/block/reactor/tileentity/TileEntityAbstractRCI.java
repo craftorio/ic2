@@ -32,11 +32,11 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public abstract class TileEntityAbstractRCI extends TileEntityElectricMachine implements IUpgradableBlock, IHasGui
 {
-	private TileEntityNuclearReactorElectric reactor;
-	private final ItemStack target;
-	private final double energyPerOperation = 1000.0;
 	public final InvSlotConsumableItemStack inputSlot;
 	public final InvSlotUpgrade upgradeSlot;
+	private final ItemStack target;
+	private final double energyPerOperation = 1000.0;
+	private TileEntityNuclearReactorElectric reactor;
 
 	protected TileEntityAbstractRCI(BlockEntityType<? extends TileEntityAbstractRCI> type, BlockPos pos, BlockState state, ItemStack target, ItemStack coolant)
 	{

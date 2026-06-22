@@ -5,8 +5,8 @@ public enum MouseButton
 	left(0),
 	right(1);
 
-	public final int id;
 	private static final MouseButton[] map = createMap();
+	public final int id;
 
 	MouseButton(int id)
 	{

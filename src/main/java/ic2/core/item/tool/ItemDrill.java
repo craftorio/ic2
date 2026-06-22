@@ -38,32 +38,6 @@ public class ItemDrill extends ItemElectricTool implements IMiningDrill, IHitSou
 		this.extraSpeedMultiplier = miningSpeed / material.getSpeed();
 	}
 
-	@Override
-	public float getDestroySpeed(ItemStack stack, BlockState state)
-	{
-		float speed = super.getDestroySpeed(stack, state);
-		if (speed == 1.0F)
-		{
-			return speed;
-		}
-
-		Player player = getPlayerHoldingItem(stack);
-		if (player != null)
-		{
-			if (player.isEyeInFluid(FluidTags.WATER) && !EnchantmentHelper.hasAquaAffinity(player))
-			{
-				speed *= 3.0F;
-			}
-
-			if (!player.onGround())
-			{
-				speed *= 3.0F;
-			}
-		}
-
-		return speed * this.extraSpeedMultiplier;
-	}
-
 	private static Player getPlayerHoldingItem(ItemStack stack)
 	{
 		if (IC2.sideProxy.isRendering())
@@ -91,6 +65,32 @@ public class ItemDrill extends ItemElectricTool implements IMiningDrill, IHitSou
 		}
 
 		return null;
+	}
+
+	@Override
+	public float getDestroySpeed(ItemStack stack, BlockState state)
+	{
+		float speed = super.getDestroySpeed(stack, state);
+		if (speed == 1.0F)
+		{
+			return speed;
+		}
+
+		Player player = getPlayerHoldingItem(stack);
+		if (player != null)
+		{
+			if (player.isEyeInFluid(FluidTags.WATER) && !EnchantmentHelper.hasAquaAffinity(player))
+			{
+				speed *= 3.0F;
+			}
+
+			if (!player.onGround())
+			{
+				speed *= 3.0F;
+			}
+		}
+
+		return speed * this.extraSpeedMultiplier;
 	}
 
 	@Override

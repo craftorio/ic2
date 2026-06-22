@@ -38,16 +38,16 @@ public class TileEntitySteamGenerator extends TileEntityInventory implements IHa
 	private static final int maxCalcification = 100000;
 	private static final int steamExpansion = 100;
 	private static final float epsilon = 1.0E-4F;
+	public final Ic2FluidTank waterTank;
+	protected final Fluids fluids = this.addComponent(new Fluids(this));
 	private int heatInput = 0;
 	private int inputMB = 0;
-	public final Ic2FluidTank waterTank;
 	private int calcification = 0;
 	private int outputMB = 0;
 	private TileEntitySteamGenerator.outputType outputFluid = TileEntitySteamGenerator.outputType.NONE;
 	private float systemHeat;
 	private int pressure = 0;
 	private boolean newActive = false;
-	protected final Fluids fluids = this.addComponent(new Fluids(this));
 
 	public TileEntitySteamGenerator(BlockPos pos, BlockState state)
 	{

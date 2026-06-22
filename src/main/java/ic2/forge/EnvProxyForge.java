@@ -99,23 +99,27 @@ public final class EnvProxyForge implements EnvProxy
 	static final DeferredRegister<MenuType<?>> screenHandlerRegistry = DeferredRegister.create(ForgeRegistries.MENU_TYPES, "ic2");
 	static final DeferredRegister<EntityType<?>> entityRegistry = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, "ic2");
 	static final DeferredRegister<MobEffect> statusEffectRegistry = DeferredRegister.create(ForgeRegistries.MOB_EFFECTS, "ic2");
+	static final DeferredRegister<CreativeModeTab> creativeTabRegistry = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, "ic2");
+	static final List<TabRegistration> pendingTabRegistrations = new ArrayList<>();
+	static final DeferredRegister<FoliagePlacerType<?>> foliagePlacerRegistry = DeferredRegister.create(ForgeRegistries.FOLIAGE_PLACER_TYPES, "ic2");
+	static final DeferredRegister<RecipeType<?>> recipeTypeRegistry = DeferredRegister.create(ForgeRegistries.RECIPE_TYPES, "ic2");
+	static final DeferredRegister<RecipeSerializer<?>> recipeSerializerRegistry = DeferredRegister.create(ForgeRegistries.RECIPE_SERIALIZERS, "ic2");
+	private static final boolean isClient = FMLEnvironment.dist.isClient();
 	static List<Runnable> pendingItemRegistrations = new ArrayList<>();
 	static List<ConfiguredFeatureRegistration<?, ?>> configuredFeatureRegistrations = new ArrayList<>();
 	static List<EnvProxyForge.PlacedFeatureRegistration<?>> placedFeatureRegistrations = new ArrayList<>();
 	static List<EnvProxyForge.PlacementModifierTypeRegistration> placementModifierTypeRegistrations = new ArrayList<>();
-
-	static final DeferredRegister<CreativeModeTab> creativeTabRegistry = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, "ic2");
-	static final List<TabRegistration> pendingTabRegistrations = new ArrayList<>();
-
-	record TabRegistration(ResourceLocation id, Supplier<ItemStack> icon, Ic2ItemGroupType groupType)
-	{
-	}
-
-	static final DeferredRegister<FoliagePlacerType<?>> foliagePlacerRegistry = DeferredRegister.create(ForgeRegistries.FOLIAGE_PLACER_TYPES, "ic2");
-	static final DeferredRegister<RecipeType<?>> recipeTypeRegistry = DeferredRegister.create(ForgeRegistries.RECIPE_TYPES, "ic2");
-	static final DeferredRegister<RecipeSerializer<?>> recipeSerializerRegistry = DeferredRegister.create(ForgeRegistries.RECIPE_SERIALIZERS, "ic2");
 	static HashMap<Item, Integer> burnTimeRecord = new HashMap<>();
-	private static final boolean isClient = FMLEnvironment.dist.isClient();
+
+	static void registerPendingItems()
+	{
+		for (Runnable r : pendingItemRegistrations)
+		{
+			r.run();
+		}
+
+		pendingItemRegistrations.clear();
+	}
 
 	@Override
 	public boolean isClientEnv()
@@ -447,14 +451,8 @@ public final class EnvProxyForge implements EnvProxy
 		return !MinecraftForge.EVENT_BUS.post(event);
 	}
 
-	static void registerPendingItems()
+	record TabRegistration(ResourceLocation id, Supplier<ItemStack> icon, Ic2ItemGroupType groupType)
 	{
-		for (Runnable r : pendingItemRegistrations)
-		{
-			r.run();
-		}
-
-		pendingItemRegistrations.clear();
 	}
 
 	record ConfiguredFeatureRegistration<FC extends FeatureConfiguration, F extends Feature<FC>>(

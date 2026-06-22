@@ -339,6 +339,13 @@ public class TextProvider
 		return Collections.emptyMap();
 	}
 
+	public interface ITextProvider
+	{
+		String get(Object var1, Map<String, TextProvider.ITextProvider> var2);
+
+		String getOptional(Object var1, Map<String, TextProvider.ITextProvider> var2);
+	}
+
 	private abstract static class AbstractTextProvider implements TextProvider.ITextProvider
 	{
 		@Override
@@ -394,13 +401,6 @@ public class TextProvider
 		{
 			return "";
 		}
-	}
-
-	public interface ITextProvider
-	{
-		String get(Object var1, Map<String, TextProvider.ITextProvider> var2);
-
-		String getOptional(Object var1, Map<String, TextProvider.ITextProvider> var2);
 	}
 
 	private static class Merge extends TextProvider.AbstractTextProvider

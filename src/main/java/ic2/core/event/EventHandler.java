@@ -22,6 +22,7 @@ import ic2.core.block.machine.tileentity.TileEntityRecycler;
 import ic2.core.crop.Ic2Crops;
 import ic2.core.energy.grid.EnergyNetGlobal;
 import ic2.core.init.BlocksItems;
+import ic2.core.init.IC2Config;
 import ic2.core.init.MainConfig;
 import ic2.core.init.Rezepte;
 import ic2.core.item.ElectricItemManager;
@@ -98,11 +99,6 @@ public final class EventHandler
 		Ic2RecipeSerializers.init();
 		Ic2WorldGen.init();
 		TileEntityRecycler.init();
-		TileEntityMatter.init();
-		TileEntitySemifluidGenerator.init();
-		TileEntityFluidHeatGenerator.init();
-		TileEntityLiquidHeatExchanger.init();
-		TileEntityFermenter.init();
 		TileEntityElectrolyzer.init();
 		Rezepte.registerRecipes();
 		Ic2Crops.init();
@@ -113,6 +109,12 @@ public final class EventHandler
 
 	public static void onInit()
 	{
+		MainConfig.ignoreInvalidRecipes = IC2Config.recipes.ignoreInvalidRecipes.get();
+		TileEntityMatter.init();
+		TileEntitySemifluidGenerator.init();
+		TileEntityFluidHeatGenerator.init();
+		TileEntityLiquidHeatExchanger.init();
+		TileEntityFermenter.init();
 		JetpackHandler.init();
 		JetpackAttachmentRecipe.init();
 	}

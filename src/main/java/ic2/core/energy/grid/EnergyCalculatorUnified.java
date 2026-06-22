@@ -12,7 +12,7 @@ import ic2.api.energy.tile.IOverloadHandler;
 import ic2.core.IC2;
 import ic2.core.Ic2DamageSource;
 import ic2.core.Ic2Explosion;
-import ic2.core.init.MainConfig;
+import ic2.core.init.IC2Config;
 import ic2.core.util.LogCategory;
 import ic2.core.util.Util;
 
@@ -43,110 +43,6 @@ import org.apache.commons.lang3.mutable.MutableDouble;
 
 public class EnergyCalculatorUnified implements IEnergyCalculator
 {
-	@Override
-	public void handleGridChange(Grid grid)
-	{
-		GridData data = getData(grid);
-		updateCache(grid, data);
-	}
-
-	@Override
-	public boolean runSyncStep(EnergyNetLocal enet)
-	{
-		boolean foundAny = false;
-
-		for (Tile tile : enet.getSources())
-		{
-			IEnergySource source = (IEnergySource) tile.getMainTile();
-			int packets = 1;
-			IMultiEnergySource multiSource;
-			double amount;
-			if (!tile.isDisabled() && (amount = source.getOfferedEnergy()) > 0.0 && (!(source instanceof IMultiEnergySource) || !(multiSource = (IMultiEnergySource) source).sendMultipleEnergyPackets() || (packets = multiSource.getMultipleEnergyPacketAmount()) > 0))
-			{
-				int tier = source.getSourceTier();
-				if (tier < 0)
-				{
-					if (EnergyNetSettings.logGridCalculationIssues)
-					{
-						IC2.log.warn(LogCategory.EnergyNet, "Tile %s reported an invalid tier (%d).", Util.toString(source, enet.getWorld(), EnergyNet.instance.getPos(source)), tier);
-					}
-
-					tile.setSourceData(0.0, 0);
-				} else
-				{
-					foundAny = true;
-					double power = EnergyNet.instance.getPowerFromTier(tier);
-					amount = Math.min(amount, power * packets);
-					tile.setSourceData(amount, packets);
-				}
-			} else
-			{
-				tile.setSourceData(0.0, 0);
-			}
-		}
-
-		return foundAny;
-	}
-
-	@Override
-	public boolean runSyncStep(Grid grid)
-	{
-		GridData data = getData(grid);
-		return runCalculation(grid, data);
-	}
-
-	@Override
-	public void runAsyncStep(Grid grid)
-	{
-		GridData data = getData(grid);
-		if (data.active)
-		{
-			runCalculation(grid, data);
-		}
-	}
-
-	@Override
-	public NodeStats getNodeStats(Tile tile)
-	{
-		double in = 0.0;
-		double out = 0.0;
-		double max = 0.0;
-
-		for (Node node : tile.getNodes())
-		{
-			GridData data = node.getGrid().getData();
-			if (data != null && data.active)
-			{
-				int calcId = data.currentCalcId;
-				Collection<EnergyPath> paths = getPaths(node, data);
-				double sum = 0.0;
-
-				for (EnergyPath path : paths)
-				{
-					if (path.lastCalcId == calcId)
-					{
-						sum += path.energySupplied;
-						max = Math.max(path.maxPacketConducted, max);
-					}
-				}
-
-				if (node.getType() == NodeType.Source)
-				{
-					out += sum;
-				} else if (node.getType() == NodeType.Sink)
-				{
-					in += sum;
-				} else
-				{
-					in += sum;
-					out += sum;
-				}
-			}
-		}
-
-		return new NodeStats(in, out, max);
-	}
-
 	private static Collection<EnergyPath> getPaths(Node node, GridData data)
 	{
 		List<EnergyPath> ret;
@@ -187,73 +83,6 @@ public class EnergyCalculatorUnified implements IEnergyCalculator
 			data.pathCache.put(node, ret);
 		}
 		return ret;
-	}
-
-	@Override
-	public void dumpNodeInfo(Node node, String prefix, PrintStream console, PrintStream chat)
-	{
-		GridData data = getData(node.getGrid());
-		Collection<EnergyPath> paths = getPaths(node, data);
-		switch (node.getType())
-		{
-			case Source:
-				chat.printf("%s%d connected sink nodes%n", prefix, paths.size());
-				break;
-			case Sink:
-				chat.printf("%s%d connected source nodes%n", prefix, paths.size());
-				break;
-			case Conductor:
-				chat.printf("%s%d paths across this conductor%n", prefix, paths.size());
-		}
-
-		double sum = 0.0;
-		double max = 0.0;
-		int calcId = data.currentCalcId;
-		int n = 0;
-
-		for (EnergyPath path : paths)
-		{
-			boolean printPathEnergy = false;
-			if (n < 8)
-			{
-				switch (node.getType())
-				{
-					case Source:
-						chat.printf("%s %s", prefix, path.target);
-						break;
-					case Sink:
-						chat.printf("%s %s", prefix, path.source);
-						break;
-					case Conductor:
-						chat.printf("%s %s -> %s", prefix, path.source, path.target);
-				}
-
-				printPathEnergy = true;
-			} else if (n == 8)
-			{
-				chat.printf("%d more %n", paths.size() - 8);
-			}
-
-			n++;
-			if (path.lastCalcId != calcId)
-			{
-				if (printPathEnergy)
-				{
-					chat.println(" (idle)");
-				}
-			} else
-			{
-				if (printPathEnergy)
-				{
-					chat.printf(" (%.2f EU, max packet %.2f EU)%n", path.energySupplied, path.maxPacketConducted);
-				}
-
-				sum += path.energySupplied;
-				max = Math.max(path.maxPacketConducted, max);
-			}
-		}
-
-		chat.printf("%s last tick: %.2f EU, max packet %.2f EU%n", prefix, sum, max);
 	}
 
 	private static void updateCache(Grid grid, GridData data)
@@ -594,8 +423,7 @@ public class EnergyCalculatorUnified implements IEnergyCalculator
 				{
 					skipped = new ArrayList<>(link.skippedNodes);
 					Collections.reverse(skipped);
-				}
-				else
+				} else
 				{
 					skipped = link.skippedNodes;
 				}
@@ -806,7 +634,7 @@ public class EnergyCalculatorUnified implements IEnergyCalculator
 
 	private static void applyCableEffects(Collection<EnergyPath> eventPaths, Level world)
 	{
-		if (MainConfig.get().get("misc/enableEnetCableMeltdown").getBool())
+		if (IC2Config.misc.enableEnetCableMeltdown.get())
 		{
 			Set<Tile> cablesToRemove = Collections.newSetFromMap(new IdentityHashMap<>());
 			Set<Tile> cablesToStrip = Collections.newSetFromMap(new IdentityHashMap<>());
@@ -933,7 +761,7 @@ public class EnergyCalculatorUnified implements IEnergyCalculator
 
 	private static void explodeTile(Level world, Tile tile, double maxPower)
 	{
-		if (MainConfig.get().get("misc/enableEnetExplosions").getBool())
+		if (IC2Config.misc.enableEnetExplosions.get())
 		{
 			int tier = EnergyNet.instance.getTierFromPower(maxPower);
 
@@ -983,6 +811,177 @@ public class EnergyCalculatorUnified implements IEnergyCalculator
 		return ret;
 	}
 
+	@Override
+	public void handleGridChange(Grid grid)
+	{
+		GridData data = getData(grid);
+		updateCache(grid, data);
+	}
+
+	@Override
+	public boolean runSyncStep(EnergyNetLocal enet)
+	{
+		boolean foundAny = false;
+
+		for (Tile tile : enet.getSources())
+		{
+			IEnergySource source = (IEnergySource) tile.getMainTile();
+			int packets = 1;
+			IMultiEnergySource multiSource;
+			double amount;
+			if (!tile.isDisabled() && (amount = source.getOfferedEnergy()) > 0.0 && (!(source instanceof IMultiEnergySource) || !(multiSource = (IMultiEnergySource) source).sendMultipleEnergyPackets() || (packets = multiSource.getMultipleEnergyPacketAmount()) > 0))
+			{
+				int tier = source.getSourceTier();
+				if (tier < 0)
+				{
+					if (EnergyNetSettings.logGridCalculationIssues)
+					{
+						IC2.log.warn(LogCategory.EnergyNet, "Tile %s reported an invalid tier (%d).", Util.toString(source, enet.getWorld(), EnergyNet.instance.getPos(source)), tier);
+					}
+
+					tile.setSourceData(0.0, 0);
+				} else
+				{
+					foundAny = true;
+					double power = EnergyNet.instance.getPowerFromTier(tier);
+					amount = Math.min(amount, power * packets);
+					tile.setSourceData(amount, packets);
+				}
+			} else
+			{
+				tile.setSourceData(0.0, 0);
+			}
+		}
+
+		return foundAny;
+	}
+
+	@Override
+	public boolean runSyncStep(Grid grid)
+	{
+		GridData data = getData(grid);
+		return runCalculation(grid, data);
+	}
+
+	@Override
+	public void runAsyncStep(Grid grid)
+	{
+		GridData data = getData(grid);
+		if (data.active)
+		{
+			runCalculation(grid, data);
+		}
+	}
+
+	@Override
+	public NodeStats getNodeStats(Tile tile)
+	{
+		double in = 0.0;
+		double out = 0.0;
+		double max = 0.0;
+
+		for (Node node : tile.getNodes())
+		{
+			GridData data = node.getGrid().getData();
+			if (data != null && data.active)
+			{
+				int calcId = data.currentCalcId;
+				Collection<EnergyPath> paths = getPaths(node, data);
+				double sum = 0.0;
+
+				for (EnergyPath path : paths)
+				{
+					if (path.lastCalcId == calcId)
+					{
+						sum += path.energySupplied;
+						max = Math.max(path.maxPacketConducted, max);
+					}
+				}
+
+				if (node.getType() == NodeType.Source)
+				{
+					out += sum;
+				} else if (node.getType() == NodeType.Sink)
+				{
+					in += sum;
+				} else
+				{
+					in += sum;
+					out += sum;
+				}
+			}
+		}
+
+		return new NodeStats(in, out, max);
+	}
+
+	@Override
+	public void dumpNodeInfo(Node node, String prefix, PrintStream console, PrintStream chat)
+	{
+		GridData data = getData(node.getGrid());
+		Collection<EnergyPath> paths = getPaths(node, data);
+		switch (node.getType())
+		{
+			case Source:
+				chat.printf("%s%d connected sink nodes%n", prefix, paths.size());
+				break;
+			case Sink:
+				chat.printf("%s%d connected source nodes%n", prefix, paths.size());
+				break;
+			case Conductor:
+				chat.printf("%s%d paths across this conductor%n", prefix, paths.size());
+		}
+
+		double sum = 0.0;
+		double max = 0.0;
+		int calcId = data.currentCalcId;
+		int n = 0;
+
+		for (EnergyPath path : paths)
+		{
+			boolean printPathEnergy = false;
+			if (n < 8)
+			{
+				switch (node.getType())
+				{
+					case Source:
+						chat.printf("%s %s", prefix, path.target);
+						break;
+					case Sink:
+						chat.printf("%s %s", prefix, path.source);
+						break;
+					case Conductor:
+						chat.printf("%s %s -> %s", prefix, path.source, path.target);
+				}
+
+				printPathEnergy = true;
+			} else if (n == 8)
+			{
+				chat.printf("%d more %n", paths.size() - 8);
+			}
+
+			n++;
+			if (path.lastCalcId != calcId)
+			{
+				if (printPathEnergy)
+				{
+					chat.println(" (idle)");
+				}
+			} else
+			{
+				if (printPathEnergy)
+				{
+					chat.printf(" (%.2f EU, max packet %.2f EU)%n", path.energySupplied, path.maxPacketConducted);
+				}
+
+				sum += path.energySupplied;
+				max = Math.max(path.maxPacketConducted, max);
+			}
+		}
+
+		chat.printf("%s last tick: %.2f EU, max packet %.2f EU%n", prefix, sum, max);
+	}
+
 	private record OptLink(Node nodeA, Node nodeB, double loss, List<Node> skippedNodes)
 	{
 		Node getNeighbor(Node node)
@@ -997,12 +996,12 @@ public class EnergyCalculatorUnified implements IEnergyCalculator
 
 	private static class GridData
 	{
-		boolean active;
 		final Map<Node, List<EnergyPath>> energySourceToEnergyPathMap = new IdentityHashMap<>();
 		final List<Node> activeSources = new ArrayList<>();
 		final Map<Node, MutableDouble> activeSinks = new IdentityHashMap<>();
 		final Set<EnergyPath> eventPaths = Collections.newSetFromMap(new IdentityHashMap<>());
 		final Map<Node, List<EnergyPath>> pathCache = new IdentityHashMap<>();
+		boolean active;
 		int currentCalcId = -1;
 	}
 }

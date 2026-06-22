@@ -83,8 +83,8 @@ public class SlotGrid extends GuiElement<SlotGrid>
 		public static final SlotGrid.SlotStyle Normal = new SlotGrid.SlotStyle(103, 7, 18, 18);
 		public static final SlotGrid.SlotStyle Large = new SlotGrid.SlotStyle(99, 35, 26, 26);
 		public static final SlotGrid.SlotStyle Plain = new SlotGrid.SlotStyle(16, 16);
-		private static final Map<String, SlotGrid.SlotStyle> map = getMap();
 		public static final int refSize = 16;
+		private static final Map<String, SlotGrid.SlotStyle> map = getMap();
 		public final int u;
 		public final int v;
 		public final int width;

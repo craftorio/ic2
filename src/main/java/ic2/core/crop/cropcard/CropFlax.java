@@ -51,10 +51,4 @@ public class CropFlax extends Ic2CropCard
 	{
 		return new ItemStack(Items.STRING);
 	}
-
-	@Override
-	public int getAgeAfterHarvest(ICropTile crop)
-	{
-		return 0;
-	}
 }

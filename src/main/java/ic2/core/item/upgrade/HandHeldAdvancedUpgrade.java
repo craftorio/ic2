@@ -25,17 +25,26 @@ import net.minecraft.world.item.ItemStack;
 
 public class HandHeldAdvancedUpgrade extends HandHeldInventory implements IHolographicSlotProvider, IGuiConditionProvider
 {
+	private static final int META_GUI = 0;
+	private static final int DAMAGE_GUI = 1;
+	private static final int ENERGY_GUI = 2;
+	private static final int ORE_GUI = 3;
+	private static final ResourceLocation GUI_XML = IC2.getIdentifier("advanced_upgrade");
 	@GuiSynced
 	protected boolean meta;
 	@GuiSynced
 	protected boolean energy;
 	@ClientModifiable
 	protected NbtSettings nbt;
-	private static final int META_GUI = 0;
-	private static final int DAMAGE_GUI = 1;
-	private static final int ENERGY_GUI = 2;
-	private static final int ORE_GUI = 3;
-	private static final ResourceLocation GUI_XML = IC2.getIdentifier("advanced_upgrade");
+
+	public HandHeldAdvancedUpgrade(Player player, InteractionHand hand, ItemStack containerStack)
+	{
+		super(player, hand, checkContainerStack(player, containerStack), 9);
+		CompoundTag nbt = StackUtil.getOrCreateNbtData(containerStack);
+		this.meta = readTag(nbt, "meta");
+		this.nbt = NbtSettings.getFromNBT(getTag(nbt, "nbt").getByte("type"));
+		this.energy = readTag(nbt, "energy");
+	}
 
 	private static ItemStack checkContainerStack(Player player, ItemStack containerStack)
 	{
@@ -48,32 +57,6 @@ public class HandHeldAdvancedUpgrade extends HandHeldInventory implements IHolog
 		} else
 		{
 			return containerStack;
-		}
-	}
-
-	public HandHeldAdvancedUpgrade(Player player, InteractionHand hand, ItemStack containerStack)
-	{
-		super(player, hand, checkContainerStack(player, containerStack), 9);
-		CompoundTag nbt = StackUtil.getOrCreateNbtData(containerStack);
-		this.meta = readTag(nbt, "meta");
-		this.nbt = NbtSettings.getFromNBT(getTag(nbt, "nbt").getByte("type"));
-		this.energy = readTag(nbt, "energy");
-	}
-
-	@Override
-	protected void save()
-	{
-		super.save();
-		if (IC2.sideProxy.isSimulating())
-		{
-			CompoundTag nbt = this.containerStack.getTag();
-			assert nbt != null;
-			writeTag(nbt, "meta", this.meta);
-			CompoundTag tag = getTag(nbt, "nbt");
-			tag.putBoolean("active", this.nbt.enabled());
-			tag.putByte("type", this.nbt.getForNBT());
-			nbt.put("nbtSettings", tag);
-			writeTag(nbt, "energy", this.energy);
 		}
 	}
 
@@ -109,6 +92,23 @@ public class HandHeldAdvancedUpgrade extends HandHeldInventory implements IHolog
 			default:
 				IC2.log.warn(LogCategory.Network, "Unexpected delegate ID: " + ID);
 				return null;
+		}
+	}
+
+	@Override
+	protected void save()
+	{
+		super.save();
+		if (IC2.sideProxy.isSimulating())
+		{
+			CompoundTag nbt = this.containerStack.getTag();
+			assert nbt != null;
+			writeTag(nbt, "meta", this.meta);
+			CompoundTag tag = getTag(nbt, "nbt");
+			tag.putBoolean("active", this.nbt.enabled());
+			tag.putByte("type", this.nbt.getForNBT());
+			nbt.put("nbtSettings", tag);
+			writeTag(nbt, "energy", this.energy);
 		}
 	}
 

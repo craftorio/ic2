@@ -5,15 +5,15 @@ import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 
 public class SplitterFoamCableBlock extends AbstractSplitterCableBlock
 {
+	protected SplitterFoamCableBlock(Properties settings)
+	{
+		super(settings, CableType.splitter, 0);
+	}
+
 	public static SplitterFoamCableBlock create(Properties settings)
 	{
 		prepareCreate(CableType.splitter, 0);
 		return new SplitterFoamCableBlock(settings);
-	}
-
-	protected SplitterFoamCableBlock(Properties settings)
-	{
-		super(settings, CableType.splitter, 0);
 	}
 
 	@Override

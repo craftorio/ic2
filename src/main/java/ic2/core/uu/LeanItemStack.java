@@ -6,7 +6,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
-class LeanItemStack
+public class LeanItemStack
 {
 	private final Item item;
 	private final CompoundTag nbt;

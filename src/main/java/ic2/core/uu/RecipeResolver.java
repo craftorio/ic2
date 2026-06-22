@@ -15,24 +15,6 @@ public class RecipeResolver implements IRecipeResolver
 {
 	private static final double transformCost = 1.0;
 
-	@Override
-	public List<RecipeTransformation> getTransformations()
-	{
-		List<RecipeTransformation> ret = new ArrayList<>();
-
-		for (Recipe<?> irecipe : IC2.sideProxy.getRecipeManager().getRecipes())
-		{
-			NonNullList<Ingredient> inputs = irecipe.getIngredients();
-			ItemStack output = irecipe.getResultItem((net.minecraft.core.RegistryAccess) null);
-			if (!StackUtil.isEmpty(output) && !inputs.isEmpty())
-			{
-				ret.add(new RecipeTransformation(1.0, toDoubleStackList(inputs), new LeanItemStack(output)));
-			}
-		}
-
-		return ret;
-	}
-
 	private static List<List<LeanItemStack>> toDoubleStackList(List<Ingredient> list)
 	{
 		List<List<LeanItemStack>> ret = new ArrayList<>(list.size());
@@ -48,6 +30,24 @@ public class RecipeResolver implements IRecipeResolver
 			}
 
 			ret.add(toAdd);
+		}
+
+		return ret;
+	}
+
+	@Override
+	public List<RecipeTransformation> getTransformations()
+	{
+		List<RecipeTransformation> ret = new ArrayList<>();
+
+		for (Recipe<?> irecipe : IC2.sideProxy.getRecipeManager().getRecipes())
+		{
+			NonNullList<Ingredient> inputs = irecipe.getIngredients();
+			ItemStack output = irecipe.getResultItem((net.minecraft.core.RegistryAccess) null);
+			if (!StackUtil.isEmpty(output) && !inputs.isEmpty())
+			{
+				ret.add(new RecipeTransformation(1.0, toDoubleStackList(inputs), new LeanItemStack(output)));
+			}
 		}
 
 		return ret;

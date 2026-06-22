@@ -7,13 +7,6 @@ import net.minecraft.world.item.ItemStack;
 
 public interface IHazmatLike
 {
-	boolean addsProtection(LivingEntity var1, EquipmentSlot var2, ItemStack var3);
-
-	default boolean fullyProtects(LivingEntity entity, EquipmentSlot slot, ItemStack stack)
-	{
-		return false;
-	}
-
 	static boolean hasCompleteHazmat(LivingEntity living)
 	{
 		for (EquipmentSlot slot : EquipmentSlot.values())
@@ -40,5 +33,12 @@ public interface IHazmatLike
 		}
 
 		return true;
+	}
+
+	boolean addsProtection(LivingEntity var1, EquipmentSlot var2, ItemStack var3);
+
+	default boolean fullyProtects(LivingEntity entity, EquipmentSlot slot, ItemStack stack)
+	{
+		return false;
 	}
 }

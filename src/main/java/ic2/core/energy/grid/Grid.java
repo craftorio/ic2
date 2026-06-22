@@ -513,7 +513,7 @@ public class Grid
 				{
 					out.close();
 				}
-			} catch (IOException var16)
+			} catch (IOException ignored)
 			{
 			}
 		}

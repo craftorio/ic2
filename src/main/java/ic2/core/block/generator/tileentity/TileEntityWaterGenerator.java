@@ -5,11 +5,10 @@ import ic2.core.block.invslot.InvSlot;
 import ic2.core.block.invslot.InvSlotConsumableLiquid;
 import ic2.core.block.invslot.InvSlotConsumableLiquidByList;
 import ic2.core.gui.dynamic.IGuiValueProvider;
-import ic2.core.init.MainConfig;
+import ic2.core.init.IC2Config;
 import ic2.core.network.GuiSynced;
 import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.ref.Ic2SoundEvents;
-import ic2.core.util.ConfigUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.ItemStack;
@@ -19,22 +18,20 @@ import net.minecraft.world.level.material.Fluids;
 
 public class TileEntityWaterGenerator extends TileEntityBaseRotorGenerator implements IGuiValueProvider
 {
-	private static final double energyMultiplier = ConfigUtil.getDouble(MainConfig.get(), "balance/energy/generator/water");
-	private static final boolean allowAutomation = ConfigUtil.getBool(MainConfig.get(), "balance/watermillAutomation");
-	public final InvSlotConsumableLiquid fuelSlot;
 	private static final int tickRate = 128;
-	private int ticker = IC2.random.nextInt(128);
+	public final InvSlotConsumableLiquid fuelSlot;
 	@GuiSynced
 	public int water = 0;
 	public int microStorage = 0;
 	public int maxWater = 2000;
+	private int ticker = IC2.random.nextInt(128);
 
 	public TileEntityWaterGenerator(BlockPos pos, BlockState state)
 	{
 		super(Ic2BlockEntities.WATER_GENERATOR, pos, state, 2.0, 1, 4, 2);
 		this.production = 2.0;
 		this.fuelSlot = new InvSlotConsumableLiquidByList(
-			this, "fuel", allowAutomation ? InvSlot.Access.IO : InvSlot.Access.NONE, 1, InvSlot.InvSide.TOP, InvSlotConsumableLiquid.OpType.Drain, Fluids.WATER
+			this, "fuel", IC2Config.balance.watermillAutomation.get() ? InvSlot.Access.IO : InvSlot.Access.NONE, 1, InvSlot.InvSide.TOP, InvSlotConsumableLiquid.OpType.Drain, Fluids.WATER
 		);
 	}
 
@@ -109,7 +106,7 @@ public class TileEntityWaterGenerator extends TileEntityBaseRotorGenerator imple
 			this.updateWaterCount();
 		}
 
-		this.water = (int) Math.round(this.water * energyMultiplier);
+		this.water = (int) Math.round(this.water * IC2Config.balance.energy.generator.water.get());
 		if (this.water > 0)
 		{
 			this.microStorage = this.microStorage + this.water;

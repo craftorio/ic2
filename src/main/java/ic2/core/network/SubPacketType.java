@@ -22,24 +22,23 @@ public enum SubPacketType
 	TileEntityData(false, true),
 	RequestGUI(false, true);
 
+	private static final SubPacketType[] values = values();
+
+	static
+	{
+		if (values.length > 255)
+		{
+			throw new RuntimeException("too many sub packet types");
+		}
+	}
+
 	private boolean serverToClient;
 	private boolean clientToServer;
-	private static final SubPacketType[] values = values();
 
 	SubPacketType(boolean serverToClient, boolean clientToServer)
 	{
 		this.serverToClient = serverToClient;
 		this.clientToServer = clientToServer;
-	}
-
-	public void writeTo(GrowingBuffer out)
-	{
-		out.writeByte(this.getId());
-	}
-
-	public int getId()
-	{
-		return this.ordinal() + 1;
 	}
 
 	public static SubPacketType read(GrowingBuffer in, boolean simulating)
@@ -63,11 +62,13 @@ public enum SubPacketType
 		}
 	}
 
-	static
+	public void writeTo(GrowingBuffer out)
 	{
-		if (values.length > 255)
-		{
-			throw new RuntimeException("too many sub packet types");
-		}
+		out.writeByte(this.getId());
+	}
+
+	public int getId()
+	{
+		return this.ordinal() + 1;
 	}
 }

@@ -33,8 +33,8 @@ import org.jetbrains.annotations.NotNull;
 
 public abstract class AbstractItemNanoSaber extends ItemElectricTool implements ISwingSoundItem
 {
-	private int soundTicker = 0;
 	public static final int ANIMATION_FRAME = 4;
+	private int soundTicker = 0;
 
 	public AbstractItemNanoSaber(Properties settings)
 	{
@@ -42,6 +42,22 @@ public abstract class AbstractItemNanoSaber extends ItemElectricTool implements 
 		this.maxCharge = 160000;
 		this.transferLimit = 500;
 		this.tier = 3;
+	}
+
+	public static boolean isActive(ItemStack stack)
+	{
+		CompoundTag nbt = StackUtil.getOrCreateNbtData(stack);
+		return isActive(nbt);
+	}
+
+	public static boolean isActive(CompoundTag nbt)
+	{
+		return nbt.getBoolean("is_activated");
+	}
+
+	private static void setActive(CompoundTag nbt, boolean active)
+	{
+		nbt.putBoolean("is_activated", active);
 	}
 
 	@Override
@@ -213,22 +229,6 @@ public abstract class AbstractItemNanoSaber extends ItemElectricTool implements 
 	public Rarity getRarity(@NotNull ItemStack stack)
 	{
 		return Rarity.UNCOMMON;
-	}
-
-	public static boolean isActive(ItemStack stack)
-	{
-		CompoundTag nbt = StackUtil.getOrCreateNbtData(stack);
-		return isActive(nbt);
-	}
-
-	public static boolean isActive(CompoundTag nbt)
-	{
-		return nbt.getBoolean("is_activated");
-	}
-
-	private static void setActive(CompoundTag nbt, boolean active)
-	{
-		nbt.putBoolean("is_activated", active);
 	}
 
 	@Override

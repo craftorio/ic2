@@ -9,6 +9,7 @@ import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 public class ContainerHandHeldInventory<T extends HandHeldInventory> extends ContainerBase<T>
 {
@@ -18,7 +19,7 @@ public class ContainerHandHeldInventory<T extends HandHeldInventory> extends Con
 	}
 
 	@Override
-	public void clicked(int slot, int button, ClickType type, Player player)
+	public void clicked(int slot, int button, @NotNull ClickType type, @NotNull Player player)
 	{
 		ItemStack stack = null;
 		boolean closeGUI = false;

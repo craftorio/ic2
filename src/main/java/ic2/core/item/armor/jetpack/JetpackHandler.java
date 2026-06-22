@@ -35,14 +35,14 @@ import net.minecraftforge.event.TickEvent;
 
 public class JetpackHandler implements IBackupElectricItemManager
 {
+	static final ItemStack jetpack = new ItemStack(Ic2Items.JETPACK_ELECTRIC);
 	private static final Map<Player, ItemStack> playerArmorBuffer = new WeakHashMap<>();
+	public static JetpackHandler instance;
 	@OnlyIn(Dist.CLIENT)
 	private static LayerJetpackOverride render;
 	@OnlyIn(Dist.CLIENT)
 	private static Field renderLayers;
 	private boolean internalHandlesCheck = false;
-	static final ItemStack jetpack = new ItemStack(Ic2Items.JETPACK_ELECTRIC);
-	public static JetpackHandler instance;
 
 	private JetpackHandler()
 	{

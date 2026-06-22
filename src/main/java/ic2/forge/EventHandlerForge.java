@@ -215,8 +215,7 @@ public final class EventHandlerForge
 		if (remaining <= 0.0F)
 		{
 			event.setCanceled(true);
-		}
-		else
+		} else
 		{
 			event.setAmount(remaining);
 		}

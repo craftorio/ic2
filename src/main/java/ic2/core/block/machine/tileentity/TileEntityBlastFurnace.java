@@ -41,16 +41,7 @@ import net.minecraft.world.level.block.state.BlockState;
 @NotClassic
 public class TileEntityBlastFurnace extends TileEntityInventory implements IUpgradableBlock, IHasGui, IGuiValueProvider
 {
-	public int heat = 0;
 	public static int maxHeat = 50000;
-	@GuiSynced
-	public float guiHeat;
-	protected final Redstone redstone;
-	protected final Fluids fluids;
-	protected int progress = 0;
-	protected int progressNeeded = 300;
-	@GuiSynced
-	protected float guiProgress;
 	public final InvSlotProcessableGeneric inputSlot = new InvSlotProcessableGeneric(this, "input", 1, Recipes.blast_furnace);
 	public final InvSlotOutput outputSlot = new InvSlotOutput(this, "output", 2);
 	public final InvSlotConsumableLiquidByList tankInputSlot = new InvSlotConsumableLiquidByList(this, "cellInput", 1, Ic2Fluids.AIR.still());
@@ -58,6 +49,15 @@ public class TileEntityBlastFurnace extends TileEntityInventory implements IUpgr
 	public final InvSlotUpgrade upgradeSlot = new InvSlotUpgrade(this, "upgrade", 2);
 	@GuiSynced
 	public final Ic2FluidTank fluidTank;
+	protected final Redstone redstone;
+	protected final Fluids fluids;
+	public int heat = 0;
+	@GuiSynced
+	public float guiHeat;
+	protected int progress = 0;
+	protected int progressNeeded = 300;
+	@GuiSynced
+	protected float guiProgress;
 
 	public TileEntityBlastFurnace(BlockPos pos, BlockState state)
 	{

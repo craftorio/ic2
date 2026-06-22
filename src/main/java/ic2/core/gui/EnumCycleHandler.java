@@ -21,8 +21,8 @@ public class EnumCycleHandler<E extends Enum<E>> extends CycleHandler
 	{
 		super(uS, vS, uE, vE, overlayStep, vertical, set.length, new INumericValueHandler()
 		{
-			private E currentValue = start;
 			private final int[] index = this.makeIndexMap();
+			private E currentValue = start;
 
 			private int[] makeIndexMap()
 			{

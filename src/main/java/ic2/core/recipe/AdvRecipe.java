@@ -8,10 +8,10 @@ import com.google.gson.JsonSyntaxException;
 import ic2.api.item.ElectricItem;
 import ic2.api.recipe.IRecipeInput;
 import ic2.compat.Ic2CraftingRecipe;
-import ic2.core.init.MainConfig;
+import ic2.core.init.IC2ClientConfig;
 import ic2.core.recipe.v2.RecipeIo;
 import ic2.core.ref.Ic2RecipeSerializers;
-import ic2.core.util.ConfigUtil;
+
 import ic2.core.util.StackUtil;
 import ic2.core.util.Util;
 
@@ -49,41 +49,6 @@ public class AdvRecipe implements Ic2CraftingRecipe
 	public final boolean hidden;
 	public final boolean consuming;
 	private final ResourceLocation id;
-
-	private static AdvRecipe create(ResourceLocation id, int width, int height, IRecipeInput[] ingredients, ItemStack result, boolean isConsuming, boolean isHidden)
-	{
-		int mask = 0;
-		List<IRecipeInput> inputs = new ArrayList<>();
-
-		for (int y = 0; y < 3; y++)
-		{
-			for (int x = 0; x < 3; x++)
-			{
-				mask <<= 1;
-				if (x < width && y < height && ingredients[x + y * width] != null)
-				{
-					mask |= 1;
-					inputs.add(ingredients[x + y * width]);
-				}
-			}
-		}
-
-		IRecipeInput[] input = inputs.toArray(new IRecipeInput[0]);
-		boolean mirror = false;
-		if (width != 1)
-		{
-			for (int y = 0; y < height; y++)
-			{
-				if (ingredients[y * width] != ingredients[width - 1 + y * width])
-				{
-					mirror = true;
-					break;
-				}
-			}
-		}
-
-		return new AdvRecipe(id, width, height, mirror, mask, input, result, isConsuming, isHidden);
-	}
 
 	private AdvRecipe(ResourceLocation id, int width, int height, boolean mirror, int mask, IRecipeInput[] input, ItemStack result, boolean isConsuming, boolean isHidden)
 	{
@@ -166,6 +131,59 @@ public class AdvRecipe implements Ic2CraftingRecipe
 		}
 	}
 
+	private static AdvRecipe create(ResourceLocation id, int width, int height, IRecipeInput[] ingredients, ItemStack result, boolean isConsuming, boolean isHidden)
+	{
+		int mask = 0;
+		List<IRecipeInput> inputs = new ArrayList<>();
+
+		for (int y = 0; y < 3; y++)
+		{
+			for (int x = 0; x < 3; x++)
+			{
+				mask <<= 1;
+				if (x < width && y < height && ingredients[x + y * width] != null)
+				{
+					mask |= 1;
+					inputs.add(ingredients[x + y * width]);
+				}
+			}
+		}
+
+		IRecipeInput[] input = inputs.toArray(new IRecipeInput[0]);
+		boolean mirror = false;
+		if (width != 1)
+		{
+			for (int y = 0; y < height; y++)
+			{
+				if (ingredients[y * width] != ingredients[width - 1 + y * width])
+				{
+					mirror = true;
+					break;
+				}
+			}
+		}
+
+		return new AdvRecipe(id, width, height, mirror, mask, input, result, isConsuming, isHidden);
+	}
+
+	public static boolean canShow(Object[] input, ItemStack output, boolean hidden)
+	{
+		return !hidden || !IC2ClientConfig.misc.hideSecretRecipes.get();
+	}
+
+	private static boolean checkMask(int mask, int[] request)
+	{
+		for (int cmpMask : request)
+		{
+			if (mask == cmpMask)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	public boolean matches(@NotNull CraftingContainer inventoryCrafting, @NotNull Level world)
 	{
 		return this.assemble(inventoryCrafting) != StackUtil.emptyStack;
@@ -221,27 +239,9 @@ public class AdvRecipe implements Ic2CraftingRecipe
 		return this.output;
 	}
 
-	public static boolean canShow(Object[] input, ItemStack output, boolean hidden)
-	{
-		return !hidden || !ConfigUtil.getBool(MainConfig.get(), "misc/hideSecretRecipes");
-	}
-
 	public boolean canShow()
 	{
 		return canShow(this.input, this.output, this.hidden);
-	}
-
-	private static boolean checkMask(int mask, int[] request)
-	{
-		for (int cmpMask : request)
-		{
-			if (mask == cmpMask)
-			{
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	private ItemStack checkItems(Container inventory, IRecipeInput[] request)
@@ -349,49 +349,6 @@ public class AdvRecipe implements Ic2CraftingRecipe
 
 	public static final class Serializer implements RecipeSerializer<AdvRecipe>
 	{
-		public @NotNull AdvRecipe fromJson(@NotNull ResourceLocation id, @NotNull JsonObject json)
-		{
-			Map<String, IRecipeInput> symbols = readSymbols(GsonHelper.getAsJsonObject(json, "key"));
-			String[] pattern = getPattern(GsonHelper.getAsJsonArray(json, "pattern"));
-			int width = pattern[0].length();
-			int height = pattern.length;
-			IRecipeInput[] ingredients = createPatternMatrix(pattern, symbols, width, height);
-			ItemStack result = RecipeIo.parseOutput(GsonHelper.getAsJsonObject(json, "result"));
-			boolean consuming = GsonHelper.getAsBoolean(json, "consuming", false);
-			boolean hidden = GsonHelper.getAsBoolean(json, "hidden", false);
-			return AdvRecipe.create(id, width, height, ingredients, result, consuming, hidden);
-		}
-
-		public AdvRecipe fromNetwork(@NotNull ResourceLocation id, FriendlyByteBuf buf)
-		{
-			IRecipeInput[] ingredients = new IRecipeInput[buf.readVarInt()];
-
-			for (int i = 0; i < ingredients.length; i++)
-			{
-				ingredients[i] = RecipeIo.readInput(buf);
-			}
-
-			return new AdvRecipe(id, buf.readVarInt(), buf.readVarInt(), buf.readBoolean(), buf.readInt(), ingredients, buf.readItem(), buf.readBoolean(), buf.readBoolean());
-		}
-
-		public void toNetwork(FriendlyByteBuf buf, AdvRecipe recipe)
-		{
-			buf.writeVarInt(recipe.input.length);
-
-			for (IRecipeInput ing : recipe.input)
-			{
-				RecipeIo.writeInput(buf, ing);
-			}
-
-			buf.writeVarInt(recipe.inputWidth);
-			buf.writeVarInt(recipe.inputHeight);
-			buf.writeBoolean(recipe.inputMirrored != null);
-			buf.writeInt(recipe.masks[0]);
-			buf.writeItem(recipe.output);
-			buf.writeBoolean(recipe.consuming);
-			buf.writeBoolean(recipe.hidden);
-		}
-
 		private static Map<String, IRecipeInput> readSymbols(JsonObject json)
 		{
 			HashMap<String, IRecipeInput> map = Maps.newHashMap();
@@ -477,6 +434,49 @@ public class AdvRecipe implements Ic2CraftingRecipe
 			{
 				return ingredients;
 			}
+		}
+
+		public @NotNull AdvRecipe fromJson(@NotNull ResourceLocation id, @NotNull JsonObject json)
+		{
+			Map<String, IRecipeInput> symbols = readSymbols(GsonHelper.getAsJsonObject(json, "key"));
+			String[] pattern = getPattern(GsonHelper.getAsJsonArray(json, "pattern"));
+			int width = pattern[0].length();
+			int height = pattern.length;
+			IRecipeInput[] ingredients = createPatternMatrix(pattern, symbols, width, height);
+			ItemStack result = RecipeIo.parseOutput(GsonHelper.getAsJsonObject(json, "result"));
+			boolean consuming = GsonHelper.getAsBoolean(json, "consuming", false);
+			boolean hidden = GsonHelper.getAsBoolean(json, "hidden", false);
+			return AdvRecipe.create(id, width, height, ingredients, result, consuming, hidden);
+		}
+
+		public AdvRecipe fromNetwork(@NotNull ResourceLocation id, FriendlyByteBuf buf)
+		{
+			IRecipeInput[] ingredients = new IRecipeInput[buf.readVarInt()];
+
+			for (int i = 0; i < ingredients.length; i++)
+			{
+				ingredients[i] = RecipeIo.readInput(buf);
+			}
+
+			return new AdvRecipe(id, buf.readVarInt(), buf.readVarInt(), buf.readBoolean(), buf.readInt(), ingredients, buf.readItem(), buf.readBoolean(), buf.readBoolean());
+		}
+
+		public void toNetwork(FriendlyByteBuf buf, AdvRecipe recipe)
+		{
+			buf.writeVarInt(recipe.input.length);
+
+			for (IRecipeInput ing : recipe.input)
+			{
+				RecipeIo.writeInput(buf, ing);
+			}
+
+			buf.writeVarInt(recipe.inputWidth);
+			buf.writeVarInt(recipe.inputHeight);
+			buf.writeBoolean(recipe.inputMirrored != null);
+			buf.writeInt(recipe.masks[0]);
+			buf.writeItem(recipe.output);
+			buf.writeBoolean(recipe.consuming);
+			buf.writeBoolean(recipe.hidden);
 		}
 	}
 }

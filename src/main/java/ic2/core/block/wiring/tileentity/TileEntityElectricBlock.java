@@ -15,9 +15,8 @@ import ic2.core.block.invslot.InvSlotDischarge;
 import ic2.core.block.tileentity.Ic2TileEntityBlock;
 import ic2.core.block.tileentity.TileEntityInventory;
 import ic2.core.block.wiring.ContainerElectricBlock;
-import ic2.core.init.MainConfig;
+import ic2.core.init.IC2Config;
 import ic2.core.network.GrowingBuffer;
-import ic2.core.util.ConfigUtil;
 import ic2.core.util.StackUtil;
 
 import java.util.EnumSet;
@@ -41,14 +40,14 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 public abstract class TileEntityElectricBlock extends TileEntityInventory implements IHasGui, INetworkClientTileEntityEventListener, IEnergyStorage
 {
-	protected double output;
-	public byte redstoneMode = 0;
 	public static byte redstoneModes = 7;
 	public final InvSlotCharge chargeSlot;
 	public final InvSlotDischarge dischargeSlot;
 	public final Energy energy;
 	public final Redstone redstone;
 	public final RedstoneEmitter rsEmitter;
+	public byte redstoneMode = 0;
+	protected double output;
 
 	public TileEntityElectricBlock(BlockEntityType<? extends TileEntityElectricBlock> type, BlockPos pos, BlockState state, int tier, int output, int maxStorage)
 	{
@@ -168,7 +167,7 @@ public abstract class TileEntityElectricBlock extends TileEntityInventory implem
 		drop = super.adjustDrop(drop, wrench);
 		if (wrench || this.teBlock.getDefaultDrop() == Ic2TileEntityBlock.DefaultDrop.Self)
 		{
-			double retainedRatio = ConfigUtil.getDouble(MainConfig.get(), "balance/energyRetainedInStorageBlockDrops");
+			double retainedRatio = IC2Config.balance.energyRetainedInStorageBlockDrops.get();
 			double totalEnergy = this.energy.getEnergy();
 			if (retainedRatio > 0.0 && totalEnergy > 0.0)
 			{
@@ -193,11 +192,6 @@ public abstract class TileEntityElectricBlock extends TileEntityInventory implem
 	}
 
 	@Override
-	public void setStored(int energy)
-	{
-	}
-
-	@Override
 	public int addEnergy(int amount)
 	{
 		this.energy.addEnergy(amount);
@@ -208,6 +202,11 @@ public abstract class TileEntityElectricBlock extends TileEntityInventory implem
 	public int getStored()
 	{
 		return (int) this.energy.getEnergy();
+	}
+
+	@Override
+	public void setStored(int energy)
+	{
 	}
 
 	@Override

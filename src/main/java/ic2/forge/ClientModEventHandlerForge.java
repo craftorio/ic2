@@ -17,6 +17,25 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 public final class ClientModEventHandlerForge
 {
+	private static <T extends BlockEntity> void registerBer(ClientEnvProxyForge.BerRegistration<T> reg, EntityRenderersEvent.RegisterRenderers event)
+	{
+		event.registerBlockEntityRenderer(reg.blockEntityType(), reg.blockEntityRendererProvider());
+	}
+
+	private static <T extends Entity> void registerEntityRenderer(
+		ClientEnvProxyForge.EntityRendererRegistration<T> reg, EntityRenderersEvent.RegisterRenderers event
+	)
+	{
+		event.registerEntityRenderer(reg.type(), reg.factory());
+	}
+
+	private static <T extends BlockEntity> void registerBlockEntityRenderer(
+		ClientEnvProxyForge.BlockEntityRendererRegistration<T> reg, EntityRenderersEvent.RegisterRenderers event
+	)
+	{
+		event.registerBlockEntityRenderer(reg.type(), reg.factory());
+	}
+
 	@SubscribeEvent
 	public void onRegisterBlockColorProviders(RegisterColorHandlersEvent.Block event)
 	{
@@ -54,31 +73,12 @@ public final class ClientModEventHandlerForge
 		}
 	}
 
-	private static <T extends BlockEntity> void registerBer(ClientEnvProxyForge.BerRegistration<T> reg, EntityRenderersEvent.RegisterRenderers event)
-	{
-		event.registerBlockEntityRenderer(reg.blockEntityType(), reg.blockEntityRendererProvider());
-	}
-
-	private static <T extends Entity> void registerEntityRenderer(
-		ClientEnvProxyForge.EntityRendererRegistration<T> reg, EntityRenderersEvent.RegisterRenderers event
-	)
-	{
-		event.registerEntityRenderer(reg.type(), reg.factory());
-	}
-
-	private static <T extends BlockEntity> void registerBlockEntityRenderer(
-		ClientEnvProxyForge.BlockEntityRendererRegistration<T> reg, EntityRenderersEvent.RegisterRenderers event
-	)
-	{
-		event.registerBlockEntityRenderer(reg.type(), reg.factory());
-	}
-
 	@SubscribeEvent
 	public void onModelRegistry(ModelEvent.RegisterGeometryLoaders event)
 	{
 		event.register("be", new BeModelLoader());
 		event.register("cable", new CableModelLoader());
-			event.register("mask_overlay", new MaskOverlayItemLoader());
+		event.register("mask_overlay", new MaskOverlayItemLoader());
 	}
 
 	@SubscribeEvent
@@ -89,7 +89,7 @@ public final class ClientModEventHandlerForge
 			event.register(keybinding);
 		}
 	}
-	
+
 	@SubscribeEvent
 	public void onClientSetup(FMLClientSetupEvent event)
 	{

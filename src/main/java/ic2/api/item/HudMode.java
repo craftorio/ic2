@@ -7,12 +7,22 @@ public enum HudMode
 	EXTENDED("ic2.hud.extended"),
 	ADVANCED("ic2.hud.advanced");
 
-	private final String translationKey;
 	private static final HudMode[] VALUES = values();
+	private final String translationKey;
 
 	HudMode(String key)
 	{
 		this.translationKey = key;
+	}
+
+	public static HudMode getFromID(int ID)
+	{
+		return VALUES[ID % VALUES.length];
+	}
+
+	public static int getMaxMode()
+	{
+		return VALUES.length - 1;
 	}
 
 	public boolean shouldDisplay()
@@ -33,15 +43,5 @@ public enum HudMode
 	public int getID()
 	{
 		return this.ordinal();
-	}
-
-	public static HudMode getFromID(int ID)
-	{
-		return VALUES[ID % VALUES.length];
-	}
-
-	public static int getMaxMode()
-	{
-		return VALUES.length - 1;
 	}
 }

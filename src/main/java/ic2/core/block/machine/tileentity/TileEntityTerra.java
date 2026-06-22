@@ -22,14 +22,74 @@ import net.minecraft.world.phys.Vec3;
 
 public class TileEntityTerra extends TileEntityElectricMachine
 {
-	public int failedAttempts = 0;
-	private BlockPos lastPos;
-	public int inactiveTicks = 0;
 	public final InvSlotConsumableClass tfbpSlot = new InvSlotConsumableClass(this, "tfbp", 1, ITerraformingBP.class);
+	public int failedAttempts = 0;
+	public int inactiveTicks = 0;
+	private BlockPos lastPos;
 
 	public TileEntityTerra(BlockPos pos, BlockState state)
 	{
 		super(Ic2BlockEntities.TERRAFORMER, pos, state, 100000, 4);
+	}
+
+	public static BlockPos getFirstSolidBlockFrom(Level world, BlockPos pos, int yOffset)
+	{
+		MutableBlockPos ret = new MutableBlockPos(pos.getX(), pos.getY() + yOffset, pos.getZ());
+
+		while (ret.getY() >= 0)
+		{
+			BlockState state = world.getBlockState(ret);
+			if (state.isSolidRender(world, pos))
+			{
+				return ret.immutable();
+			}
+
+			ret.move(Direction.DOWN);
+		}
+
+		return null;
+	}
+
+	public static BlockPos getFirstBlockFrom(Level world, BlockPos pos, int yOffset)
+	{
+		MutableBlockPos ret = new MutableBlockPos(pos.getX(), pos.getY() + yOffset, pos.getZ());
+
+		while (ret.getY() >= 0)
+		{
+			if (!world.isEmptyBlock(ret))
+			{
+				return new BlockPos(ret);
+			}
+
+			ret.move(Direction.DOWN);
+		}
+
+		return null;
+	}
+
+	public static boolean switchGround(Level world, BlockPos pos, Block from, BlockState to, boolean upwards)
+	{
+		MutableBlockPos cPos = new MutableBlockPos(pos.getX(), pos.getY(), pos.getZ());
+
+		while (cPos.getY() >= 0)
+		{
+			Block block = world.getBlockState(cPos).getBlock();
+			if (upwards && block != from || !upwards && block == from)
+			{
+				break;
+			}
+
+			cPos.move(Direction.DOWN);
+		}
+
+		if ((!upwards || cPos.getY() != pos.getY()) && (upwards || cPos.getY() >= 0))
+		{
+			world.setBlockAndUpdate(upwards ? cPos.above() : new BlockPos(cPos), to);
+			return true;
+		} else
+		{
+			return false;
+		}
 	}
 
 	@Override
@@ -148,66 +208,6 @@ public class TileEntityTerra extends TileEntityElectricMachine
 		}
 
 		this.tfbpSlot.put(tfbp);
-	}
-
-	public static BlockPos getFirstSolidBlockFrom(Level world, BlockPos pos, int yOffset)
-	{
-		MutableBlockPos ret = new MutableBlockPos(pos.getX(), pos.getY() + yOffset, pos.getZ());
-
-		while (ret.getY() >= 0)
-		{
-			BlockState state = world.getBlockState(ret);
-			if (state.isSolidRender(world, pos))
-			{
-				return ret.immutable();
-			}
-
-			ret.move(Direction.DOWN);
-		}
-
-		return null;
-	}
-
-	public static BlockPos getFirstBlockFrom(Level world, BlockPos pos, int yOffset)
-	{
-		MutableBlockPos ret = new MutableBlockPos(pos.getX(), pos.getY() + yOffset, pos.getZ());
-
-		while (ret.getY() >= 0)
-		{
-			if (!world.isEmptyBlock(ret))
-			{
-				return new BlockPos(ret);
-			}
-
-			ret.move(Direction.DOWN);
-		}
-
-		return null;
-	}
-
-	public static boolean switchGround(Level world, BlockPos pos, Block from, BlockState to, boolean upwards)
-	{
-		MutableBlockPos cPos = new MutableBlockPos(pos.getX(), pos.getY(), pos.getZ());
-
-		while (cPos.getY() >= 0)
-		{
-			Block block = world.getBlockState(cPos).getBlock();
-			if (upwards && block != from || !upwards && block == from)
-			{
-				break;
-			}
-
-			cPos.move(Direction.DOWN);
-		}
-
-		if ((!upwards || cPos.getY() != pos.getY()) && (upwards || cPos.getY() >= 0))
-		{
-			world.setBlockAndUpdate(upwards ? cPos.above() : new BlockPos(cPos), to);
-			return true;
-		} else
-		{
-			return false;
-		}
 	}
 
 	@Override

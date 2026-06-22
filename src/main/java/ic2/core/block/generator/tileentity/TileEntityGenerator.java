@@ -2,11 +2,10 @@ package ic2.core.block.generator.tileentity;
 
 import ic2.core.block.invslot.InvSlotConsumableFuel;
 import ic2.core.gui.dynamic.IGuiValueProvider;
-import ic2.core.init.MainConfig;
+import ic2.core.init.IC2Config;
 import ic2.core.network.GuiSynced;
 import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.ref.Ic2SoundEvents;
-import ic2.core.util.ConfigUtil;
 import ic2.core.util.ParticleUtil;
 
 
@@ -25,7 +24,7 @@ public class TileEntityGenerator extends TileEntityBaseGenerator implements IGui
 
 	public TileEntityGenerator(BlockPos pos, BlockState state)
 	{
-		super(Ic2BlockEntities.GENERATOR, pos, state, Math.round(10.0F * ConfigUtil.getFloat(MainConfig.get(), "balance/energy/generator/generator")), 1, 4000);
+		super(Ic2BlockEntities.GENERATOR, pos, state, Math.round(10.0F * IC2Config.balance.energy.generator.generator.get().floatValue()), 1, 4000);
 		this.fuelSlot = new InvSlotConsumableFuel(this, "fuel", 1, false);
 	}
 

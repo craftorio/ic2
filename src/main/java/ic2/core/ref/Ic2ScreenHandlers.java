@@ -79,9 +79,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 public final class Ic2ScreenHandlers
 {
 	private static final EnvProxy.ExtendedClientScreenHandlerFactory<ContainerBase<?>> MANAGED_CLIENT_BE_HANDLER = createManagedBeClientHandler();
-	private static final EnvProxy.ExtendedClientScreenHandlerFactory<ContainerBase<?>> MANAGED_CLIENT_ITEM_HANDLER = createManagedItemClientHandler();
 	public static final MenuType<DynamicContainer<TileEntityInventory>> DYNAMIC_BE = registerManagedBe("dynamic_be");
-	public static final MenuType<DynamicContainer<HandHeldInventory>> DYNAMIC_ITEM = registerManagedItem("dynamic_item");
 	public static final MenuType<ContainerSolarGenerator> SOLAR_GENERATOR = registerManagedBe("solar_generator");
 	public static final MenuType<ContainerElectricHeatGenerator> ELECTRIC_HEAT_GENERATOR = registerManagedBe("electric_heat_generator");
 	public static final MenuType<ContainerFluidHeatGenerator> FLUID_HEAT_GENERATOR = registerManagedBe("fluid_heat_generator");
@@ -126,6 +124,8 @@ public final class Ic2ScreenHandlers
 	public static final MenuType<ContainerWeightedItemDistributor> WEIGHTED_ITEM_DISTRIBUTOR = registerManagedBe("weighted_item_distributor");
 	public static final MenuType<ContainerIndustrialWorkbench> INDUSTRIAL_WORKBENCH = registerManagedBe("industrial_workbench");
 	public static final MenuType<ContainerBatchCrafter> BATCH_CRAFTER = registerManagedBe("batch_crafter");
+	private static final EnvProxy.ExtendedClientScreenHandlerFactory<ContainerBase<?>> MANAGED_CLIENT_ITEM_HANDLER = createManagedItemClientHandler();
+	public static final MenuType<DynamicContainer<HandHeldInventory>> DYNAMIC_ITEM = registerManagedItem("dynamic_item");
 	public static final MenuType<DynamicContainer<HandHeldAdvancedUpgrade>> ADVANCED_UPGRADE = registerManagedItem("advanced_upgrade");
 	public static final MenuType<HandHeldOre.ContainerEditOre> ADVANCED_UPGRADE_EDIT_ORE = registerManagedItem("advanced_upgrade/edit_ore");
 	public static final MenuType<HandHeldValueConfig.ContainerValueConfig> ADVANCED_UPGRADE_VALUE_CONFIG = registerManagedItem("advanced_upgrade/value_config");

@@ -177,8 +177,7 @@ public class EventHandlerClient
 					out.add(Component.translatable("ic2.item.tooltip.Store", (long) stored));
 				}
 			}
-		}
-		else if (stack.getItem() instanceof BlockItem blockItem && blockItem.getBlock() instanceof AbstractCableBlock cableBlock)
+		} else if (stack.getItem() instanceof BlockItem blockItem && blockItem.getBlock() instanceof AbstractCableBlock cableBlock)
 		{
 			ResourceLocation rl = ForgeRegistries.ITEMS.getKey(blockItem);
 			out.add(Component.translatable("item.ic2." + rl.getPath() + ".tooltip", cableBlock.getLoss()).withStyle(ChatFormatting.GRAY));

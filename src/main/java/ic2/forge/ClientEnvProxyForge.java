@@ -133,7 +133,8 @@ public final class ClientEnvProxyForge implements ClientEnvProxy
 		return Component.translatable(stack.getFluid().getFluidType().getDescriptionId(EnvFluidHandlerForge.getForgeFs(stack))).getString();
 	}
 
-	record BerRegistration<T extends BlockEntity>(BlockEntityType<? extends T> blockEntityType, BlockEntityRendererProvider<T> blockEntityRendererProvider)
+	record BerRegistration<T extends BlockEntity>(BlockEntityType<? extends T> blockEntityType,
+	                                              BlockEntityRendererProvider<T> blockEntityRendererProvider)
 	{
 	}
 
@@ -141,7 +142,8 @@ public final class ClientEnvProxyForge implements ClientEnvProxy
 	{
 	}
 
-	record BlockEntityRendererRegistration<B extends BlockEntity>(BlockEntityType<? extends B> type, BlockEntityRendererProvider<B> factory)
+	record BlockEntityRendererRegistration<B extends BlockEntity>(BlockEntityType<? extends B> type,
+	                                                              BlockEntityRendererProvider<B> factory)
 	{
 	}
 

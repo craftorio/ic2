@@ -49,6 +49,10 @@ public class TileEntityBatchCrafter
 	IGuiValueProvider,
 	INetworkClientTileEntityEventListener
 {
+	public static final int defaultTier = 1;
+	public static final int defaultEnergyConsume = 2;
+	public static final int defaultOperationLength = 40;
+	public static final int defaultEnergyStorage = 20000;
 	private static final Set<UpgradableProperty> UPGRADES = EnumSet.of(
 		UpgradableProperty.Processing,
 		UpgradableProperty.Transformer,
@@ -56,17 +60,9 @@ public class TileEntityBatchCrafter
 		UpgradableProperty.ItemConsuming,
 		UpgradableProperty.ItemProducing
 	);
-	public static final int defaultTier = 1;
-	public static final int defaultEnergyConsume = 2;
-	public static final int defaultOperationLength = 40;
-	public static final int defaultEnergyStorage = 20000;
 	@ClientModifiable
 	public final ItemStack[] craftingGrid = new ItemStack[9];
 	public final InvSlot[] ingredientsRow = new InvSlot[this.craftingGrid.length];
-	public final InvSlotOutput craftingOutput = new InvSlotOutput(this, "output", 1, InvSlot.InvSide.SIDE);
-	public final InvSlotOutput containerOutput = new InvSlotOutput(this, "containersOut", this.craftingGrid.length, InvSlot.InvSide.NOTSIDE);
-	public final InvSlotUpgrade upgradeSlot = new InvSlotUpgrade(this, "upgrade", 4);
-	protected final CraftingContainer crafting = new SimpleCraftingInventory.ArrayCraftingInventory(this.craftingGrid, 3);
 	public final CraftingContainer ingredients = new SimpleCraftingInventory(3, 3)
 	{
 		@Override
@@ -82,14 +78,18 @@ public class TileEntityBatchCrafter
 		}
 	};
 	public final Predicate<Tuple.T2<ItemStack, Integer>> acceptPredicate = input -> this.ingredientsRow[(Integer) input.b].accepts((ItemStack) input.a);
-	protected CraftingRecipe recipe = null;
-	protected boolean canCraft = false;
-	protected boolean newChange = true;
-	protected boolean attemptToBalance = false;
+	public final InvSlotOutput craftingOutput = new InvSlotOutput(this, "output", 1, InvSlot.InvSide.SIDE);
+	public final InvSlotOutput containerOutput = new InvSlotOutput(this, "containersOut", this.craftingGrid.length, InvSlot.InvSide.NOTSIDE);
+	public final InvSlotUpgrade upgradeSlot = new InvSlotUpgrade(this, "upgrade", 4);
+	protected final CraftingContainer crafting = new SimpleCraftingInventory.ArrayCraftingInventory(this.craftingGrid, 3);
 	public ItemStack recipeOutput = StackUtil.emptyStack;
 	public int energyConsume;
 	public int operationLength;
 	public int operationsPerTick;
+	protected CraftingRecipe recipe = null;
+	protected boolean canCraft = false;
+	protected boolean newChange = true;
+	protected boolean attemptToBalance = false;
 	protected short progress = 0;
 	protected float guiProgress = 0.0F;
 

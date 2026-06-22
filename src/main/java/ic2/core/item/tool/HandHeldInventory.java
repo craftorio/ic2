@@ -23,12 +23,12 @@ import net.minecraft.world.item.ItemStack;
 
 public abstract class HandHeldInventory implements IHasGui
 {
-	protected ItemStack containerStack;
-	protected final ItemStack[] inventory;
-	public final Player player;
-	protected final InteractionHand hand;
-	private boolean cleared;
 	private static final Set<Player> PLAYERS_IN_GUI = new HashSet<>();
+	public final Player player;
+	protected final ItemStack[] inventory;
+	protected final InteractionHand hand;
+	protected ItemStack containerStack;
+	private boolean cleared;
 
 	public HandHeldInventory(Player player, InteractionHand hand, ItemStack containerStack, int inventorySize)
 	{
@@ -56,6 +56,11 @@ public abstract class HandHeldInventory implements IHasGui
 				}
 			}
 		}
+	}
+
+	public static void addMaintainedPlayer(Player player)
+	{
+		PLAYERS_IN_GUI.add(player);
 	}
 
 	public int getContainerSize()
@@ -343,10 +348,5 @@ public abstract class HandHeldInventory implements IHasGui
 
 	public void onEvent(String event)
 	{
-	}
-
-	public static void addMaintainedPlayer(Player player)
-	{
-		PLAYERS_IN_GUI.add(player);
 	}
 }

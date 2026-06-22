@@ -14,13 +14,12 @@ import ic2.core.block.kineticgenerator.container.ContainerSteamKineticGenerator;
 import ic2.core.block.machine.tileentity.TileEntityCondenser;
 import ic2.core.fluid.Ic2FluidStack;
 import ic2.core.fluid.Ic2FluidTank;
-import ic2.core.init.MainConfig;
+import ic2.core.init.IC2Config;
 import ic2.core.network.GrowingBuffer;
 import ic2.core.profile.NotClassic;
 import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.ref.Ic2Fluids;
 import ic2.core.ref.Ic2Items;
-import ic2.core.util.ConfigUtil;
 import ic2.core.util.LiquidUtil;
 import ic2.core.util.Util;
 
@@ -40,17 +39,16 @@ import net.minecraft.world.level.block.state.BlockState;
 @NotClassic
 public class TileEntitySteamKineticGenerator extends TileEntityAbstractKineticGenerator implements IHasGui, IUpgradableBlock
 {
-	protected final Ic2FluidTank steamTank;
-	protected final Ic2FluidTank distilledWaterTank;
 	public final InvSlotUpgrade upgradeSlot = new InvSlotUpgrade(this, "upgrade", 1);
 	public final InvSlotConsumable turbineSlot = new InvSlotConsumableItemStack(this, "Turbineslot", 1, new ItemStack(Ic2Items.STEAM_TURBINE));
-	private static final float outputModifier = ConfigUtil.getFloat(MainConfig.get(), "balance/energy/kineticgenerator/steam");
+	protected final Ic2FluidTank steamTank;
+	protected final Ic2FluidTank distilledWaterTank;
+	protected final Fluids fluids;
 	private int kuOutput;
 	private boolean ventingSteam;
 	private boolean throttled;
 	private boolean isTurbineFilledWithWater = false;
 	private int condensationProgress = 0;
-	protected final Fluids fluids;
 
 	public TileEntitySteamKineticGenerator(BlockPos pos, BlockState state)
 	{
@@ -140,7 +138,7 @@ public class TileEntitySteamKineticGenerator extends TileEntityAbstractKineticGe
 			throttle = 1.0F - (float) waterAmount / this.distilledWaterTank.getCapacity();
 		}
 
-		this.kuOutput = (int) (rawOutput * throttle * outputModifier);
+		this.kuOutput = (int) (rawOutput * throttle * (float) IC2Config.balance.energy.kineticGenerator.steam.get().floatValue());
 		if (this.condensationProgress >= 100)
 		{
 			if (this.distilledWaterTank.fillMbUnchecked(Ic2FluidStack.create(Ic2Fluids.DISTILLED_WATER.still(), 1), true) == 1)

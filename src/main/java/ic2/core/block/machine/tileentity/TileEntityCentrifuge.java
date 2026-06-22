@@ -22,8 +22,8 @@ import net.minecraft.world.level.block.state.BlockState;
 @NotClassic
 public class TileEntityCentrifuge extends TileEntityStandardMachine<IRecipeInput, Collection<ItemStack>, ItemStack>
 {
-	protected final Redstone redstone;
 	public static final short maxHeat = 5000;
+	protected final Redstone redstone;
 	@GuiSynced
 	public short heat = 0;
 	@GuiSynced
@@ -34,6 +34,11 @@ public class TileEntityCentrifuge extends TileEntityStandardMachine<IRecipeInput
 		super(Ic2BlockEntities.CENTRIFUGE, pos, state, 48, 500, 3, 2);
 		this.inputSlot = new InvSlotProcessableGeneric(this, "input", 1, Recipes.centrifuge);
 		this.redstone = this.addComponent(new Redstone(this));
+	}
+
+	private static short min(short a, short b)
+	{
+		return a <= b ? a : b;
 	}
 
 	@Override
@@ -53,11 +58,6 @@ public class TileEntityCentrifuge extends TileEntityStandardMachine<IRecipeInput
 	public double getHeatRatio()
 	{
 		return (double) this.heat / this.workheat;
-	}
-
-	private static short min(short a, short b)
-	{
-		return a <= b ? a : b;
 	}
 
 	@Override

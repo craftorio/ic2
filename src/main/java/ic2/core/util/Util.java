@@ -39,9 +39,9 @@ public final class Util
 {
 	public static final Direction[] ALL_DIRS = Direction.values();
 	public static final Direction[] HORIZONTAL_DIRS = Arrays.copyOfRange(ALL_DIRS, 2, 6);
+	public static final Set<Direction> horizontalFacings = Collections.unmodifiableSet(EnumSet.copyOf(Arrays.asList(HORIZONTAL_DIRS)));
 	public static final Set<Direction> noFacings = Collections.emptySet();
 	public static final Set<Direction> onlyNorth = Collections.unmodifiableSet(EnumSet.of(Direction.NORTH));
-	public static final Set<Direction> horizontalFacings = Collections.unmodifiableSet(EnumSet.copyOf(Arrays.asList(HORIZONTAL_DIRS)));
 	public static final Set<Direction> verticalFacings = Collections.unmodifiableSet(EnumSet.of(Direction.DOWN, Direction.UP));
 	public static final Set<Direction> downSideFacings = Collections.unmodifiableSet(EnumSet.complementOf(EnumSet.of(Direction.UP)));
 	public static final Set<Direction> allFacings = Collections.unmodifiableSet(EnumSet.allOf(Direction.class));
@@ -238,7 +238,7 @@ public final class Util
 							found = true;
 							break;
 						}
-					} catch (NoSuchMethodException var13)
+					} catch (NoSuchMethodException ignored)
 					{
 					}
 

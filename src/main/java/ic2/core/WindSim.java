@@ -4,11 +4,11 @@ import net.minecraft.world.level.Level;
 
 public class WindSim
 {
-	private int windStrength = 5 + IC2.random.nextInt(20);
-	private int windDirection = IC2.random.nextInt(360);
-	public int windTicker;
 	private final Level world;
 	private final double[] windHeightCoefficients;
+	public int windTicker;
+	private int windStrength = 5 + IC2.random.nextInt(20);
+	private int windDirection = IC2.random.nextInt(360);
 
 	public WindSim(Level world)
 	{
@@ -71,7 +71,7 @@ public class WindSim
 
 	public void updateWind()
 	{
-		if (this.windTicker++ % 128 == 0)
+		if ((this.windTicker++ & 127) == 0)
 		{
 			int upChance = 10;
 			int downChance = 10;
@@ -94,12 +94,13 @@ public class WindSim
 			switch (IC2.random.nextInt(3))
 			{
 				case 0:
-					this.windDirection = this.chancewindDirection(-18);
+					this.windDirection = this.chanceWindDirection(-18);
+					break;
+				case 2:
+					this.windDirection = this.chanceWindDirection(18);
 				case 1:
 				default:
 					break;
-				case 2:
-					this.windDirection = this.chancewindDirection(18);
 			}
 		}
 	}
@@ -107,11 +108,9 @@ public class WindSim
 	public double getWindAt(double height)
 	{
 		double ret = this.windStrength;
-		double heightMultiplier = this.windHeightCoefficients[0] * height
-			+ this.windHeightCoefficients[1] * height * height
-			+ this.windHeightCoefficients[2] * height * height * height;
+		double heightMultiplier = ((this.windHeightCoefficients[2] * height + this.windHeightCoefficients[1]) * height + this.windHeightCoefficients[0]) * height;
 		heightMultiplier = Math.max(0.0, heightMultiplier);
-		ret *= heightMultiplier;
+		ret *= heightMultiplier * 2.4;
 		if (this.world.isThundering())
 		{
 			ret *= 1.5;
@@ -120,7 +119,7 @@ public class WindSim
 			ret *= 1.25;
 		}
 
-		return ret * 2.4;
+		return ret;
 	}
 
 	public double getMaxWind()
@@ -128,15 +127,16 @@ public class WindSim
 		return 108.0;
 	}
 
-	private int chancewindDirection(int amount)
+	// TODO
+	private int chanceWindDirection(int amount)
 	{
 		this.windDirection += amount;
 		if (this.windDirection < 0)
 		{
-			return 359 - this.windDirection;
+			return 360 + this.windDirection;
 		} else
 		{
-			return this.windDirection > 359 ? 0 + (this.windDirection - 359) : this.windDirection;
+			return this.windDirection > 359 ? (this.windDirection - 359) : this.windDirection;
 		}
 	}
 }

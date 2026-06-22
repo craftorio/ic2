@@ -10,15 +10,6 @@ import net.minecraftforge.registries.ForgeRegistries;
 public interface Ic2FluidStack
 {
 	Ic2FluidStack EMPTY = create(Fluids.EMPTY, 0);
-	
-	default String getFluidTypeKey()
-	{
-		// Returns a string like: `fluid_type.ic2.xxx` for the fluid type, or null if the stack is empty.
-		if (isEmpty()) return null;
-		
-		return "fluid_type." + String.valueOf(ForgeRegistries.FLUIDS.getKey(getFluid())).replace(':', '.');
-		
-	}
 
 	static Ic2FluidStack create(Fluid fluid, int amount)
 	{
@@ -46,6 +37,15 @@ public interface Ic2FluidStack
 	static Ic2FluidStack read(CompoundTag nbt)
 	{
 		return FluidHandler.ENV_HANDLER.readFluidStack(nbt);
+	}
+
+	default String getFluidTypeKey()
+	{
+		// Returns a string like: `fluid_type.ic2.xxx` for the fluid type, or null if the stack is empty.
+		if (isEmpty()) return null;
+
+		return "fluid_type." + String.valueOf(ForgeRegistries.FLUIDS.getKey(getFluid())).replace(':', '.');
+
 	}
 
 	Ic2FluidStack copy();

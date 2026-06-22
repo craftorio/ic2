@@ -46,6 +46,17 @@ public class ItemSprayer extends Item implements StandardFluidItem, IBoxable
 	{
 		super(settings);
 	}
+
+	private static boolean canPlaceFoam(Level world, BlockPos pos, Target target)
+	{
+		return switch (target)
+		{
+			case ANY -> world.getBlockState(pos).canBeReplaced();
+			case SCAFFOLD -> world.getBlockState(pos).is(Blocks.SCAFFOLDING);
+			case CABLE -> world.getBlockState(pos).getBlock() instanceof CableBlock;
+		};
+	}
+
 	@Override
 	public void appendHoverText(@NotNull ItemStack item, @Nullable Level level, @NotNull List<Component> components, @NotNull TooltipFlag flag)
 	{
@@ -55,10 +66,10 @@ public class ItemSprayer extends Item implements StandardFluidItem, IBoxable
 		{
 			all = fluid.getAmountMb();
 		}
-		
+
 		components.add(Component.translatable("item.ic2.foam_sprayer.tooltip.content", String.valueOf(all)));
 	}
-	
+
 	@Override
 	public int getCapacityMb(ItemStack stack)
 	{
@@ -70,7 +81,7 @@ public class ItemSprayer extends Item implements StandardFluidItem, IBoxable
 	{
 		return fs.getFluid() == Ic2Fluids.CONSTRUCTION_FOAM.still();
 	}
-	
+
 	@Override
 	public @NotNull InteractionResultHolder<ItemStack> use(Level world, @NotNull Player player, @NotNull InteractionHand hand)
 	{
@@ -238,16 +249,6 @@ public class ItemSprayer extends Item implements StandardFluidItem, IBoxable
 	public boolean canBeStoredInToolbox(ItemStack stack)
 	{
 		return true;
-	}
-
-	private static boolean canPlaceFoam(Level world, BlockPos pos, Target target)
-	{
-		return switch (target)
-		{
-			case ANY -> world.getBlockState(pos).canBeReplaced();
-			case SCAFFOLD -> world.getBlockState(pos).is(Blocks.SCAFFOLDING);
-			case CABLE -> world.getBlockState(pos).getBlock() instanceof CableBlock;
-		};
 	}
 
 	private enum Target

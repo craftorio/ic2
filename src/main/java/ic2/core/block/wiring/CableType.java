@@ -11,12 +11,12 @@ public enum CableType
 	splitter(0, Integer.MAX_VALUE, 0.5F, 0.5, 8192);
 
 	public static final float insulationThickness = 0.0625F;
+	public static final CableType[] values = values();
 	public final int maxInsulation;
 	public final int minColoredInsulation;
 	public final float thickness;
 	public final double loss;
 	public final int capacity;
-	public static final CableType[] values = values();
 
 	CableType(int maxInsulation, int minColoredInsulation, float thickness, double loss, int capacity)
 	{

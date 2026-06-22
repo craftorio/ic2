@@ -10,6 +10,21 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class Desertification extends TerraformerBase
 {
+	private static boolean isPlant(Block block)
+	{
+		for (BlockState state : Cultivation.plants)
+		{
+			if (state.getBlock() == block)
+			{
+				return true;
+			}
+		}
+
+		return block.builtInRegistryHolder().is(BlockTags.SAPLINGS)
+			|| block.builtInRegistryHolder().is(BlockTags.CROPS)
+			|| block.builtInRegistryHolder().is(BlockTags.FLOWERS);
+	}
+
 	@Override
 	boolean terraform(Level world, BlockPos pos)
 	{
@@ -55,20 +70,5 @@ public class Desertification extends TerraformerBase
 			TileEntityTerra.switchGround(world, pos, Blocks.DIRT, sand, false);
 			return true;
 		}
-	}
-
-	private static boolean isPlant(Block block)
-	{
-		for (BlockState state : Cultivation.plants)
-		{
-			if (state.getBlock() == block)
-			{
-				return true;
-			}
-		}
-
-		return block.builtInRegistryHolder().is(BlockTags.SAPLINGS)
-			|| block.builtInRegistryHolder().is(BlockTags.CROPS)
-			|| block.builtInRegistryHolder().is(BlockTags.FLOWERS);
 	}
 }

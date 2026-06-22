@@ -47,11 +47,11 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 {
 	public static final int textHeight = 8;
 	protected static Runnable closeHandler;
-	private boolean fixKeyEvents = false;
-	private GuiGraphics guiGraphics;
+	protected final List<GuiElement<?>> elements = new ArrayList<>();
 	private final Set<GuiElement.ImplementedMethod> elementMethods = EnumSet.noneOf(GuiElement.ImplementedMethod.class);
 	private final Queue<Ic2Gui.Tooltip> queuedTooltips = new ArrayDeque<>();
-	protected final List<GuiElement<?>> elements = new ArrayList<>();
+	private boolean fixKeyEvents = false;
+	private GuiGraphics guiGraphics;
 
 	public Ic2Gui(T container, Inventory playerInventory, Component title)
 	{
@@ -68,6 +68,28 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 		super(container, playerInventory, title);
 		this.imageHeight = ySize;
 		this.imageWidth = xSize;
+	}
+
+	private static List<ItemStack> getCompatibleUpgrades(IUpgradableBlock block)
+	{
+		List<ItemStack> ret = new ArrayList<>();
+		Set<UpgradableProperty> properties = block.getUpgradableProperties();
+
+		for (ItemStack stack : UpgradeRegistry.getUpgrades())
+		{
+			IUpgradeItem item = (IUpgradeItem) stack.getItem();
+			if (item.isSuitableFor(stack, properties))
+			{
+				ret.add(stack);
+			}
+		}
+
+		return ret;
+	}
+
+	public static void bindTexture(ResourceLocation id)
+	{
+		RenderSystem.setShaderTexture(0, id);
 	}
 
 	public final T getContainer()
@@ -196,23 +218,6 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 
 			this.drawTooltip(mouseX, mouseY, text);
 		}
-	}
-
-	private static List<ItemStack> getCompatibleUpgrades(IUpgradableBlock block)
-	{
-		List<ItemStack> ret = new ArrayList<>();
-		Set<UpgradableProperty> properties = block.getUpgradableProperties();
-
-		for (ItemStack stack : UpgradeRegistry.getUpgrades())
-		{
-			IUpgradeItem item = (IUpgradeItem) stack.getItem();
-			if (item.isSuitableFor(stack, properties))
-			{
-				ret.add(stack);
-			}
-		}
-
-		return ret;
 	}
 
 	public boolean mouseScrolled(double mouseX, double mouseY, double scrollDelta)
@@ -653,11 +658,6 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 	protected final void bindTexture()
 	{
 		bindTexture(this.getTextureLocation());
-	}
-
-	public static void bindTexture(ResourceLocation id)
-	{
-		RenderSystem.setShaderTexture(0, id);
 	}
 
 	protected IClickHandler createEventSender(int event)

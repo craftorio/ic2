@@ -13,16 +13,16 @@ import org.lwjgl.opengl.GL11;
 
 public abstract class AbstractScrollingList<T extends AbstractScrollingList<T, I>, I extends AbstractScrollingList.IListItem> extends GuiElement<T>
 {
-	protected float scroll = 0.0F;
-	protected boolean scrolling = false;
-	protected int mouseScrollOffset = -1;
-	protected final List<I> items;
 	private static final int SCROLL_BAR_WIDTH = 5;
 	private static final int LIST_AREA_WIDTH = 7;
 	private static final int ITEM_HEIGHT = 10;
 	private static final int ITEM_GAP = 11;
 	private static final int SCROLL_SPEED = 3;
 	private static final boolean DEBUG_SCISSOR = false;
+	protected final List<I> items;
+	protected float scroll = 0.0F;
+	protected boolean scrolling = false;
+	protected int mouseScrollOffset = -1;
 
 	public AbstractScrollingList(Ic2Gui<?> gui, int x, int y, int width, int height)
 	{

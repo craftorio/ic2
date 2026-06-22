@@ -160,10 +160,12 @@ public class Log
 			{
 				this.log(LogCategory.General, Level.WARN, t2, "Log string format failed.");
 
+				StringBuilder msgBuilder = new StringBuilder(msg);
 				for (Object arg : args)
 				{
-					msg = msg + " " + arg;
+					msgBuilder.append(" ").append(arg);
 				}
+				msg = msgBuilder.toString();
 			}
 		}
 

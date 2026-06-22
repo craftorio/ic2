@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.zip.DeflaterOutputStream;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.Connection;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundCustomPayloadPacket;
@@ -48,8 +47,63 @@ import net.minecraft.world.phys.Vec3;
 
 public class NetworkManager implements INetworkManager
 {
-	private static final int maxPacketDataLength = 32766;
 	public static final ResourceLocation channelId = IC2.getIdentifier("m");
+
+	private static TeUpdateDataServer getTeUpdateData(BlockEntity te)
+	{
+		assert IC2.sideProxy.isSimulating();
+		if (te == null)
+		{
+			throw new NullPointerException();
+		}
+
+		WorldData worldData = WorldData.get(te.getLevel());
+		TeUpdateDataServer ret = worldData.tesToUpdate.get(te);
+		if (ret == null)
+		{
+			ret = new TeUpdateDataServer();
+			worldData.tesToUpdate.put(te, ret);
+		}
+
+		return ret;
+	}
+
+	static <T extends Collection<ServerPlayer>> T getPlayersInRange(Level world, BlockPos pos, T result)
+	{
+		if (!(world instanceof ServerLevel))
+		{
+			return result;
+		}
+
+		result.addAll(((ServerLevel) world).getChunkSource().chunkMap.getPlayers(new ChunkPos(pos), false));
+		return result;
+	}
+
+	static void writeFieldData(Object object, String fieldName, GrowingBuffer out) throws IOException
+	{
+		int pos = fieldName.indexOf(61);
+		if (pos != -1)
+		{
+			out.writeString(fieldName.substring(0, pos));
+			DataEncoder.encode(out, fieldName.substring(pos + 1));
+		} else
+		{
+			out.writeString(fieldName);
+
+			try
+			{
+				DataEncoder.encode(out, ReflectionUtil.getValueRecursive(object, fieldName));
+			} catch (NoSuchFieldException e)
+			{
+				throw new RuntimeException("Can't find field " + fieldName + " in " + object.getClass().getName(), e);
+			}
+		}
+	}
+
+	protected static ByteBuf makePacket(GrowingBuffer buffer, boolean advancePos)
+	{
+		return buffer.toByteBuf(advancePos);
+	}
 
 	protected boolean isClient()
 	{
@@ -140,25 +194,6 @@ public class NetworkManager implements INetworkManager
 		{
 			return field;
 		}
-	}
-
-	private static TeUpdateDataServer getTeUpdateData(BlockEntity te)
-	{
-		assert IC2.sideProxy.isSimulating();
-		if (te == null)
-		{
-			throw new NullPointerException();
-		}
-
-		WorldData worldData = WorldData.get(te.getLevel());
-		TeUpdateDataServer ret = worldData.tesToUpdate.get(te);
-		if (ret == null)
-		{
-			ret = new TeUpdateDataServer();
-			worldData.tesToUpdate.put(te, ret);
-		}
-
-		return ret;
 	}
 
 	public final void updateTileEntityFieldTo(BlockEntity te, String field, ServerPlayer player)
@@ -292,7 +327,7 @@ public class NetworkManager implements INetworkManager
 		assert false;
 	}
 
-	private final void handleSubData(GrowingBuffer buffer, ItemStack stack, Integer ID)
+	private void handleSubData(GrowingBuffer buffer, ItemStack stack, Integer ID)
 	{
 		boolean subInv = ID != null && stack.getItem() instanceof IHandHeldSubInventory;
 		buffer.writeBoolean(subInv);
@@ -541,72 +576,47 @@ public class NetworkManager implements INetworkManager
 						final int event = is.readInt();
 						if (stack.getItem() instanceof INetworkItemEventListener)
 						{
-							IC2.sideProxy.requestTick(true, new Runnable()
-							{
-								@Override
-								public void run()
-								{
-									((INetworkItemEventListener) stack.getItem()).onNetworkEvent(stack, player, event);
-								}
-							});
+							IC2.sideProxy.requestTick(true, () -> ((INetworkItemEventListener) stack.getItem()).onNetworkEvent(stack, player, event));
 						}
 						break;
 					}
 					case KeyUpdate:
 						final int keyState = is.readInt();
-						IC2.sideProxy.requestTick(true, new Runnable()
-						{
-							@Override
-							public void run()
-							{
-								IC2.keyboard.processKeyUpdate(player, keyState);
-							}
-						});
+						IC2.sideProxy.requestTick(true, () -> IC2.keyboard.processKeyUpdate(player, keyState));
 						break;
 					case TileEntityEvent:
 					{
 						final Object teDeferred = DataEncoder.decodeDeferred(is, BlockEntity.class);
 						final int event = is.readInt();
-						IC2.sideProxy.requestTick(true, new Runnable()
+						IC2.sideProxy.requestTick(true, () ->
 						{
-							@Override
-							public void run()
+							BlockEntity te = DataEncoder.getValue(teDeferred, player.getServer());
+							if (te instanceof INetworkClientTileEntityEventListener)
 							{
-								BlockEntity te = DataEncoder.getValue(teDeferred, player.getServer());
-								if (te instanceof INetworkClientTileEntityEventListener)
-								{
-									((INetworkClientTileEntityEventListener) te).onNetworkEvent(player, event);
-								}
+								((INetworkClientTileEntityEventListener) te).onNetworkEvent(player, event);
 							}
 						});
 						break;
 					}
 					case RequestGUI:
 						final boolean hand = is.readBoolean();
-						if (hand)
-						{
-							Object teDeferredx = null;
-						} else
+						if (!hand)
 						{
 							DataEncoder.decodeDeferred(is, BlockEntity.class);
 						}
 
-						IC2.sideProxy.requestTick(true, new Runnable()
+						IC2.sideProxy.requestTick(true, () ->
 						{
-							@Override
-							public void run()
+							if (hand)
 							{
-								if (hand)
+								for (InteractionHand hand1 : Util.HANDS)
 								{
-									for (InteractionHand hand : Util.HANDS)
+									ItemStack stack = player.getItemInHand(hand1);
+									if (stack.getItem() instanceof IHandHeldInventory)
 									{
-										ItemStack stack = player.getItemInHand(hand);
-										if (stack.getItem() instanceof IHandHeldInventory)
-										{
-											IHasGui gui = ((IHandHeldInventory) stack.getItem()).getInventory(player, hand, stack);
-											gui.openManagedItem(player, hand, null);
-											break;
-										}
+										IHasGui gui = ((IHandHeldInventory) stack.getItem()).getInventory(player, hand1, stack);
+										gui.openManagedItem(player, hand1, null);
+										break;
 									}
 								}
 							}
@@ -733,11 +743,6 @@ public class NetworkManager implements INetworkManager
 	public void initiateKeyUpdate(int keyState)
 	{
 	}
-
-	public void sendLoginData()
-	{
-	}
-
 	public final void initiateExplosionEffect(Level world, Vec3 pos, Ic2Explosion.Type type)
 	{
 		assert !this.isClient();
@@ -776,42 +781,5 @@ public class NetworkManager implements INetworkManager
 		ServerGamePacketListenerImpl handler = player.connection;
 		Packet<?> packet = new ClientboundCustomPayloadPacket(channelId, new FriendlyByteBuf(data));
 		handler.send(packet);
-	}
-
-	static <T extends Collection<ServerPlayer>> T getPlayersInRange(Level world, BlockPos pos, T result)
-	{
-		if (!(world instanceof ServerLevel))
-		{
-			return result;
-		}
-
-		((ServerLevel) world).getChunkSource().chunkMap.getPlayers(new ChunkPos(pos), false).forEach(result::add);
-		return result;
-	}
-
-	static void writeFieldData(Object object, String fieldName, GrowingBuffer out) throws IOException
-	{
-		int pos = fieldName.indexOf(61);
-		if (pos != -1)
-		{
-			out.writeString(fieldName.substring(0, pos));
-			DataEncoder.encode(out, fieldName.substring(pos + 1));
-		} else
-		{
-			out.writeString(fieldName);
-
-			try
-			{
-				DataEncoder.encode(out, ReflectionUtil.getValueRecursive(object, fieldName));
-			} catch (NoSuchFieldException e)
-			{
-				throw new RuntimeException("Can't find field " + fieldName + " in " + object.getClass().getName(), e);
-			}
-		}
-	}
-
-	protected static ByteBuf makePacket(GrowingBuffer buffer, boolean advancePos)
-	{
-		return buffer.toByteBuf(advancePos);
 	}
 }

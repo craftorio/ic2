@@ -5,7 +5,7 @@ import ic2.api.recipe.IRecipeInput;
 import ic2.api.recipe.MachineRecipe;
 import ic2.api.recipe.RecipeOutput;
 import ic2.core.IC2;
-import ic2.core.init.MainConfig;
+import ic2.core.init.IC2Config;
 import ic2.core.util.LogCategory;
 import ic2.core.util.StackUtil;
 
@@ -20,6 +20,38 @@ import net.minecraft.world.item.ItemStack;
 
 public class BasicMachineRecipeManager extends MachineRecipeHelper<IRecipeInput, Collection<ItemStack>> implements IBasicMachineRecipeManager
 {
+	private static boolean checkListEquality(Collection<ItemStack> a, Collection<ItemStack> b)
+	{
+		if (a.size() != b.size())
+		{
+			return false;
+		}
+
+		ListIterator<ItemStack> itB = new ArrayList<>(b).listIterator();
+
+		label32:
+		for (ItemStack stack : a)
+		{
+			while (itB.hasNext())
+			{
+				if (StackUtil.checkItemEqualityStrict(stack, itB.next()))
+				{
+					itB.remove();
+
+					while (itB.hasPrevious())
+					{
+						itB.previous();
+					}
+					continue label32;
+				}
+			}
+
+			return false;
+		}
+
+		return true;
+	}
+
 	protected IRecipeInput getForInput(IRecipeInput input)
 	{
 		return input;
@@ -225,41 +257,9 @@ public class BasicMachineRecipeManager extends MachineRecipeHelper<IRecipeInput,
 		}
 	}
 
-	private static boolean checkListEquality(Collection<ItemStack> a, Collection<ItemStack> b)
-	{
-		if (a.size() != b.size())
-		{
-			return false;
-		}
-
-		ListIterator<ItemStack> itB = new ArrayList<>(b).listIterator();
-
-		label32:
-		for (ItemStack stack : a)
-		{
-			while (itB.hasNext())
-			{
-				if (StackUtil.checkItemEqualityStrict(stack, itB.next()))
-				{
-					itB.remove();
-
-					while (itB.hasPrevious())
-					{
-						itB.previous();
-					}
-					continue label32;
-				}
-			}
-
-			return false;
-		}
-
-		return true;
-	}
-
 	private void displayError(String msg)
 	{
-		if (MainConfig.ignoreInvalidRecipes)
+		if (IC2Config.recipes.ignoreInvalidRecipes.get())
 		{
 			IC2.log.warn(LogCategory.Recipe, msg);
 		} else

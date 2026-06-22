@@ -14,7 +14,7 @@ import ic2.core.block.invslot.InvSlotUpgrade;
 import ic2.core.block.machine.container.ContainerAdvMiner;
 import ic2.core.block.tileentity.Ic2TileEntityBlock;
 import ic2.core.fluid.FluidHandler;
-import ic2.core.init.MainConfig;
+import ic2.core.init.IC2Config;
 import ic2.core.init.OreValues;
 import ic2.core.item.tool.ItemScanner;
 import ic2.core.item.tool.ItemScannerAdv;
@@ -22,7 +22,6 @@ import ic2.core.network.GrowingBuffer;
 import ic2.core.profile.NotClassic;
 import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.ref.Ic2Items;
-import ic2.core.util.ConfigUtil;
 import ic2.core.util.StackUtil;
 
 import java.util.ArrayList;
@@ -47,21 +46,21 @@ import net.minecraft.world.level.block.state.BlockState;
 @NotClassic
 public class TileEntityAdvMiner extends TileEntityElectricMachine implements IHasGui, INetworkClientTileEntityEventListener, IUpgradableBlock
 {
-	private int maxBlockScanCount;
 	public final int defaultTier;
 	public final int workTick;
-	public boolean blacklist = true;
-	public boolean silkTouch = false;
-	private BlockPos mineTarget;
-	private short ticker = 0;
 	public final InvSlotConsumableId scannerSlot = new InvSlotConsumableId(this, "scanner", InvSlot.Access.IO, 1, InvSlot.InvSide.BOTTOM, Ic2Items.SCANNER, Ic2Items.ADVANCED_SCANNER);
 	public final InvSlotUpgrade upgradeSlot = new InvSlotUpgrade(this, "upgrade", 4);
 	public final InvSlot filterSlot = new InvSlot(this, "list", null, 15);
 	protected final Redstone redstone;
+	public boolean blacklist = true;
+	public boolean silkTouch = false;
+	private int maxBlockScanCount;
+	private BlockPos mineTarget;
+	private short ticker = 0;
 
 	public TileEntityAdvMiner(BlockPos pos, BlockState state)
 	{
-		this(pos, state, Math.min(2 + ConfigUtil.getInt(MainConfig.get(), "balance/minerDischargeTier"), 5));
+		this(pos, state, Math.min(2 + IC2Config.balance.minerDischargeTier.get(), 5));
 	}
 
 	public TileEntityAdvMiner(BlockPos pos, BlockState state, int tier)
@@ -379,7 +378,7 @@ public class TileEntityAdvMiner extends TileEntityElectricMachine implements IHa
 		drop = super.adjustDrop(drop, wrench);
 		if (wrench || this.teBlock.getDefaultDrop() == Ic2TileEntityBlock.DefaultDrop.Self)
 		{
-			double retainedRatio = ConfigUtil.getDouble(MainConfig.get(), "balance/energyRetainedInStorageBlockDrops");
+			double retainedRatio = IC2Config.balance.energyRetainedInStorageBlockDrops.get();
 			if (retainedRatio > 0.0)
 			{
 				CompoundTag nbt = StackUtil.getOrCreateNbtData(drop);

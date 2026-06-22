@@ -30,8 +30,8 @@ import net.minecraft.world.level.block.state.BlockState;
 public class TileEntityReactorFluidPort extends TileEntityInventory implements IHasGui, IUpgradableBlock, IReactorChamber
 {
 	public final InvSlotUpgrade upgradeSlot = new InvSlotUpgrade(this, "upgrade", 1);
-	private final FluidReactorLookup lookup = this.addComponent(new FluidReactorLookup(this));
 	protected final Fluids fluids = this.addComponent(new Fluids(this));
+	private final FluidReactorLookup lookup = this.addComponent(new FluidReactorLookup(this));
 
 	public TileEntityReactorFluidPort(BlockPos pos, BlockState state)
 	{

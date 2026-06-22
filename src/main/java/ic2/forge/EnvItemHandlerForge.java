@@ -234,6 +234,11 @@ final class EnvItemHandlerForge implements EnvItemHandler
 			}
 		}
 
+		static EnvItemHandlerForge.HandlerForge ofNullable(Container inventory, Direction side)
+		{
+			return inventory == null ? null : new EnvItemHandlerForge.HandlerForge(inventory, side);
+		}
+
 		@Override
 		public void setStackInSlot(int slot, @NotNull ItemStack stack)
 		{
@@ -297,11 +302,6 @@ final class EnvItemHandlerForge implements EnvItemHandler
 		private Container getDelegate()
 		{
 			return this.inventory;
-		}
-
-		static EnvItemHandlerForge.HandlerForge ofNullable(Container inventory, Direction side)
-		{
-			return inventory == null ? null : new EnvItemHandlerForge.HandlerForge(inventory, side);
 		}
 	}
 }

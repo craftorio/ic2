@@ -19,6 +19,18 @@ public class TankGauge extends GuiElement<TankGauge>
 	private final Ic2FluidTank tank;
 	private final TankGauge.TankGuiStyle style;
 
+	private TankGauge(Ic2Gui<?> gui, int x, int y, int width, int height, Ic2FluidTank tank, TankGauge.TankGuiStyle style)
+	{
+		super(gui, x, y, width, height);
+		if (tank == null)
+		{
+			throw new NullPointerException("null tank");
+		}
+
+		this.tank = tank;
+		this.style = style;
+	}
+
 	public static TankGauge createNormal(Ic2Gui<?> gui, int x, int y, Ic2FluidTank tank)
 	{
 		return new TankGauge(gui, x, y, 20, 55, tank, TankGauge.TankGuiStyle.Normal);
@@ -32,18 +44,6 @@ public class TankGauge extends GuiElement<TankGauge>
 	public static TankGauge createBorderless(Ic2Gui<?> gui, int x, int y, Ic2FluidTank tank, boolean mirrored)
 	{
 		return new TankGauge(gui, x, y, 12, 47, tank, mirrored ? TankGauge.TankGuiStyle.BorderlessMirrored : TankGauge.TankGuiStyle.Borderless);
-	}
-
-	private TankGauge(Ic2Gui<?> gui, int x, int y, int width, int height, Ic2FluidTank tank, TankGauge.TankGuiStyle style)
-	{
-		super(gui, x, y, width, height);
-		if (tank == null)
-		{
-			throw new NullPointerException("null tank");
-		}
-
-		this.tank = tank;
-		this.style = style;
 	}
 
 	@Override

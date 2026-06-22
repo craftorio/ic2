@@ -94,6 +94,7 @@ public final class SideProxyClient implements SideProxy
 	public static final Minecraft mc = Minecraft.getInstance();
 	public static final Keyboard keyboard = new KeyboardClient();
 	private static final SoundManager soundManager = new SoundManagerClient();
+
 	@Override
 	public void preInit()
 	{
@@ -350,7 +351,8 @@ public final class SideProxyClient implements SideProxy
 	public void messagePlayer(Player player, String translatable, Object... args)
 	{
 		if (player == null) player = mc.player;
-		if (player != null) player.displayClientMessage(Component.translatable(translatable, args.length > 0 ? SideProxyServer.getMessageComponents(args) : new Object[0]), false);
+		if (player != null)
+			player.displayClientMessage(Component.translatable(translatable, args.length > 0 ? SideProxyServer.getMessageComponents(args) : new Object[0]), false);
 	}
 
 	@Override
@@ -358,5 +360,5 @@ public final class SideProxyClient implements SideProxy
 	{
 		envProxy.registerBer(type, KineticGeneratorRenderer::new);
 	}
-	
+
 }

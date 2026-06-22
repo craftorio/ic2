@@ -44,6 +44,41 @@ public class Ic2FenceBlock extends FenceBlock
 		this.canBoost = canBoost;
 	}
 
+	private static TileEntityMagnetizer getMagnetizer(BlockGetter world, BlockPos pos, Direction side, BlockState state, boolean checkPower)
+	{
+		if (state.getBlock() != Ic2Blocks.MAGNETIZER)
+		{
+			return null;
+		}
+
+		if (world.getBlockEntity(pos) instanceof TileEntityMagnetizer ret)
+		{
+			if (side != null && !side.getOpposite().equals(ret.getFacing()))
+			{
+				return null;
+			}
+
+			if (!checkPower || ret.canBoost())
+			{
+				return ret;
+			}
+		}
+
+		return null;
+	}
+
+	public static boolean hasMetalShoes(Player player)
+	{
+		ItemStack shoes = (ItemStack) player.getInventory().armor.get(0);
+		Item item = shoes.getItem();
+		return item == Items.IRON_BOOTS || item == Items.GOLDEN_BOOTS || item == Items.CHAINMAIL_BOOTS || ItemWrapper.isMetalArmor(shoes, player);
+	}
+
+	private static Map<Direction, BooleanProperty> getConnectProperties()
+	{
+		return CrossCollisionBlock.PROPERTY_BY_DIRECTION;
+	}
+
 	public BlockState getStateForPlacement(BlockPlaceContext ctx)
 	{
 		FluidState fluidState = ctx.getLevel().getFluidState(ctx.getClickedPos());
@@ -161,36 +196,6 @@ public class Ic2FenceBlock extends FenceBlock
 				}
 			}
 		}
-	}
-
-	private static TileEntityMagnetizer getMagnetizer(BlockGetter world, BlockPos pos, Direction side, BlockState state, boolean checkPower)
-	{
-		if (state.getBlock() != Ic2Blocks.MAGNETIZER)
-		{
-			return null;
-		}
-
-		if (world.getBlockEntity(pos) instanceof TileEntityMagnetizer ret)
-		{
-			if (side != null && !side.getOpposite().equals(ret.getFacing()))
-			{
-				return null;
-			}
-
-			if (!checkPower || ret.canBoost())
-			{
-				return ret;
-			}
-		}
-
-		return null;
-	}
-
-	public static boolean hasMetalShoes(Player player)
-	{
-		ItemStack shoes = (ItemStack) player.getInventory().armor.get(0);
-		Item item = shoes.getItem();
-		return item == Items.IRON_BOOTS || item == Items.GOLDEN_BOOTS || item == Items.CHAINMAIL_BOOTS || ItemWrapper.isMetalArmor(shoes, player);
 	}
 
 	private boolean isPowered(Level world, BlockPos start)
@@ -331,10 +336,5 @@ public class Ic2FenceBlock extends FenceBlock
 		}
 
 		return ret;
-	}
-
-	private static Map<Direction, BooleanProperty> getConnectProperties()
-	{
-		return CrossCollisionBlock.PROPERTY_BY_DIRECTION;
 	}
 }

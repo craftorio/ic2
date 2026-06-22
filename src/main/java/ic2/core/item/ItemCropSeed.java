@@ -32,6 +32,20 @@ public class ItemCropSeed extends Item implements ICropSeed
 		super(settings);
 	}
 
+	public static ItemStack generateItemStackFromValues(CropCard crop, int statGrowth, int statGain, int statResistance, int scan)
+	{
+		ItemStack stack = new ItemStack(Ic2Items.CROP_SEED_BACK);
+		CompoundTag tag = new CompoundTag();
+		tag.putString("owner", crop.getOwner());
+		tag.putString("id", crop.getId());
+		tag.putByte("growth", (byte) statGrowth);
+		tag.putByte("gain", (byte) statGain);
+		tag.putByte("resistance", (byte) statResistance);
+		tag.putByte("scan", (byte) scan);
+		stack.setTag(tag);
+		return stack;
+	}
+
 	public String getDescriptionId(ItemStack itemstack)
 	{
 		if (itemstack == null)
@@ -104,20 +118,6 @@ public class ItemCropSeed extends Item implements ICropSeed
 				items.add(generateItemStackFromValues(crop, 1, 1, 1, 4));
 			}
 		}
-	}
-
-	public static ItemStack generateItemStackFromValues(CropCard crop, int statGrowth, int statGain, int statResistance, int scan)
-	{
-		ItemStack stack = new ItemStack(Ic2Items.CROP_SEED_BACK);
-		CompoundTag tag = new CompoundTag();
-		tag.putString("owner", crop.getOwner());
-		tag.putString("id", crop.getId());
-		tag.putByte("growth", (byte) statGrowth);
-		tag.putByte("gain", (byte) statGain);
-		tag.putByte("resistance", (byte) statResistance);
-		tag.putByte("scan", (byte) scan);
-		stack.setTag(tag);
-		return stack;
 	}
 
 	@Override

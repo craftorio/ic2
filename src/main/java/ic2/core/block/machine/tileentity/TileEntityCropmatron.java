@@ -35,9 +35,6 @@ import net.minecraft.world.level.block.state.BlockState;
 public class TileEntityCropmatron extends TileEntityElectricMachine implements IHasGui, IUpgradableBlock
 {
 	public final InvSlotUpgrade upgradeSlot;
-	public int scanX = -4;
-	public int scanY = -1;
-	public int scanZ = -4;
 	public final InvSlotConsumable fertilizerSlot;
 	public final InvSlotOutput wasseroutputSlot;
 	public final InvSlotOutput exOutputSlot;
@@ -46,6 +43,9 @@ public class TileEntityCropmatron extends TileEntityElectricMachine implements I
 	protected final Ic2FluidTank waterTank;
 	protected final Ic2FluidTank exTank;
 	protected final Fluids fluids = this.addComponent(new Fluids(this));
+	public int scanX = -4;
+	public int scanY = -1;
+	public int scanZ = -4;
 
 	public TileEntityCropmatron(BlockPos pos, BlockState state)
 	{

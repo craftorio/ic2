@@ -45,17 +45,17 @@ public class TileEntityTradeOMat
 	INetworkTileEntityEventListener,
 	INetworkClientTileEntityEventListener
 {
-	private int ticker;
-	private GameProfile owner = null;
-	public int totalTradeCount = 0;
-	public int stock = 0;
-	public boolean infinite = false;
 	private static final int stockUpdateRate = 64;
 	private static final int EventTrade = 0;
 	public final InvSlot demandSlot;
 	public final InvSlot offerSlot;
 	public final InvSlotConsumableLinked inputSlot;
 	public final InvSlotOutput outputSlot;
+	public int totalTradeCount = 0;
+	public int stock = 0;
+	public boolean infinite = false;
+	private int ticker;
+	private GameProfile owner = null;
 
 	public TileEntityTradeOMat(BlockPos pos, BlockState state)
 	{

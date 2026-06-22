@@ -32,8 +32,8 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class GuiIndustrialWorkbench extends Ic2Gui<ContainerIndustrialWorkbench>
 {
-	public static Predicate<Screen> jeiScreenRecipesGuiCheck;
 	private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath("ic2", "textures/gui/guiindustrialworkbench.png");
+	public static Predicate<Screen> jeiScreenRecipesGuiCheck;
 
 	public GuiIndustrialWorkbench(ContainerIndustrialWorkbench container, Inventory playerInventory, Component title)
 	{

@@ -1,9 +1,8 @@
 package ic2.core.block.kineticgenerator.tileentity;
 
-import ic2.core.init.MainConfig;
+import ic2.core.init.IC2Config;
 import ic2.core.profile.NotClassic;
 import ic2.core.ref.Ic2BlockEntities;
-import ic2.core.util.ConfigUtil;
 import ic2.core.util.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -17,9 +16,8 @@ import net.minecraft.world.phys.Vec3;
 @NotClassic
 public class TileEntityManualKineticGenerator extends TileEntityAbstractKineticGenerator
 {
-	public int clicks;
 	public static final int maxClicksPerTick = 10;
-	private static final float outputModifier = Math.round(ConfigUtil.getFloat(MainConfig.get(), "balance/energy/kineticgenerator/manual"));
+	public int clicks;
 
 	public TileEntityManualKineticGenerator(BlockPos pos, BlockState state)
 	{
@@ -58,7 +56,7 @@ public class TileEntityManualKineticGenerator extends TileEntityAbstractKineticG
 						ku = 20;
 					}
 
-					ku = (int) (ku * outputModifier);
+					ku = (int) (ku * Math.round((float) IC2Config.balance.energy.kineticGenerator.manual.get().floatValue()));
 					this.kuBuffer = Math.min(this.kuBuffer + ku, this.maxKuBuffer);
 					player.causeFoodExhaustion(0.25F);
 					this.clicks++;

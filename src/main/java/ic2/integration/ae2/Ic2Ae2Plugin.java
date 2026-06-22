@@ -244,6 +244,21 @@ public final class Ic2Ae2Plugin
 	{
 
 		@Nullable
+		private static IEnergyStorage getFeStorage(BlockEntity be)
+		{
+			IEnergyStorage storage = be.getCapability(ForgeCapabilities.ENERGY, null).orElse(null);
+			if (storage != null && storage.canReceive()) return storage;
+
+			for (Direction dir : Direction.values())
+			{
+				storage = be.getCapability(ForgeCapabilities.ENERGY, dir).orElse(null);
+				if (storage != null && storage.canReceive()) return storage;
+			}
+
+			return null;
+		}
+
+		@Nullable
 		private Object getGridNode()
 		{
 			BlockEntity be = world.getBlockEntity(pos);
@@ -358,21 +373,6 @@ public final class Ic2Ae2Plugin
 
 			int feFree = storage.getMaxEnergyStored() - storage.getEnergyStored();
 			return feFree / EU_TO_AE_RATIO;
-		}
-
-		@Nullable
-		private static IEnergyStorage getFeStorage(BlockEntity be)
-		{
-			IEnergyStorage storage = be.getCapability(ForgeCapabilities.ENERGY, null).orElse(null);
-			if (storage != null && storage.canReceive()) return storage;
-
-			for (Direction dir : Direction.values())
-			{
-				storage = be.getCapability(ForgeCapabilities.ENERGY, dir).orElse(null);
-				if (storage != null && storage.canReceive()) return storage;
-			}
-
-			return null;
 		}
 
 		@Override

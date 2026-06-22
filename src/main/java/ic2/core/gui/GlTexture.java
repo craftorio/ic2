@@ -37,6 +37,11 @@ public class GlTexture implements Closeable
 	protected int canvasWidth;
 	protected int canvasHeight;
 
+	public GlTexture(ResourceLocation loc)
+	{
+		this.loc = loc;
+	}
+
 	public static void init()
 	{
 		ResourceManager manager = Minecraft.getInstance().getResourceManager();
@@ -94,11 +99,6 @@ public class GlTexture implements Closeable
 
 		textures.put(identifier, texture);
 		return texture;
-	}
-
-	public GlTexture(ResourceLocation loc)
-	{
-		this.loc = loc;
 	}
 
 	protected void load(ResourceManager manager) throws IOException

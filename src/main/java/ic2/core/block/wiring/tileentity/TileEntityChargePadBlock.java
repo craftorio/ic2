@@ -33,9 +33,9 @@ public abstract class TileEntityChargePadBlock extends TileEntityElectricBlock
 {
 	private static final List<AABB> aabbs = List.of(new AABB(0.0, 0.0, 0.0, 1.0, 0.9375, 1.0));
 	private static final DustParticleOptions effect = new DustParticleOptions(new Vector3f(0.2F, 0.2F, 1.0F), 1.0F);
+	public static byte redstoneModes = 2;
 	private int updateTicker;
 	private Player player = null;
-	public static byte redstoneModes = 2;
 
 	public TileEntityChargePadBlock(BlockEntityType<? extends TileEntityChargePadBlock> type, BlockPos pos, BlockState state, int tier, int output, int maxStorage)
 	{
@@ -154,7 +154,7 @@ public abstract class TileEntityChargePadBlock extends TileEntityElectricBlock
 				if (this.chargeItem(stack, chargeFactor)) return;
 			}
 		}
-		
+
 		for (int i = 0; i < 9; i++)
 		{
 			stack = player.getInventory().items.get(i);

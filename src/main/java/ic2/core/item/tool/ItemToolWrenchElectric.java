@@ -7,7 +7,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Item.Properties;
 import net.minecraft.world.item.context.UseOnContext;
 
 public class ItemToolWrenchElectric extends ItemElectricTool implements PriorityUsableItem, IBoxable
@@ -34,7 +33,7 @@ public class ItemToolWrenchElectric extends ItemElectricTool implements Priority
 			return InteractionResult.PASS;
 		}
 
-		int useResult = ItemToolWrench.onWrenchUse(player, stack, context, this.canTakeDamage(stack, 10.0));
+		int useResult = ItemToolWrench.onWrenchUse(player, context, this.canTakeDamage(stack, 10.0));
 		switch (useResult)
 		{
 			case -2:

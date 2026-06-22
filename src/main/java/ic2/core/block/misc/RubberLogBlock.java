@@ -107,9 +107,9 @@ public class RubberLogBlock extends RotatedPillarBlock
 		wet_west(Direction.WEST, true),
 		wet_east(Direction.EAST, true);
 
+		private static final RubberLogBlock.RubberWoodState[] values = values();
 		public final Direction facing;
 		public final boolean wet;
-		private static final RubberLogBlock.RubberWoodState[] values = values();
 
 		RubberWoodState(Direction facing, boolean wet)
 		{

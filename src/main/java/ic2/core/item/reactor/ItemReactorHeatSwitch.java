@@ -138,12 +138,12 @@ public class ItemReactorHeatSwitch extends ItemReactorHeatStorage
 			IReactorComponent comp = (IReactorComponent) stack.getItem();
 			if (comp.canStoreHeat(stack, reactor, x, y))
 			{
-				heatAcceptors.add(new ItemReactorHeatSwitch.ItemStackCoord(stack, x, y));
+				heatAcceptors.add(new ItemStackCoord(stack, x, y));
 			}
 		}
 	}
 
-	private class ItemStackCoord
+	private static class ItemStackCoord
 	{
 		public ItemStack stack;
 		public int x;

@@ -62,9 +62,43 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 	public static final BooleanProperty WEST = BlockStateProperties.WEST;
 	private static final Map<CableType, Int2ReferenceMap<AbstractCableBlock>> types = new EnumMap<>(CableType.class);
 	private static boolean pendingHasColor;
-	private final boolean hasColor;
 	final CableType type;
 	final int insulation;
+	private final boolean hasColor;
+
+	protected AbstractCableBlock(Properties settings, CableType type, int insulation)
+	{
+		super(type.getThickness(insulation) / 2.0F, settings);
+		if (insulation > type.maxInsulation)
+		{
+			throw new IllegalArgumentException("invalid insulation " + insulation + " for type " + type);
+		}
+
+		this.type = type;
+		this.insulation = insulation;
+		this.hasColor = insulation >= type.minColoredInsulation;
+		BlockState defaultState = this.stateDefinition.any();
+		if (!this.isFoam())
+		{
+			defaultState = defaultState.setValue(WATERLOGGED, false);
+		}
+
+		this.initializeState(defaultState);
+		if (type.maxInsulation > 0)
+		{
+			types.computeIfAbsent(type, t -> new Int2ReferenceOpenHashMap<>(t.maxInsulation + 1)).put(insulation, this);
+		}
+	}
+
+	protected static void prepareCreate(CableType type, int insulation)
+	{
+		pendingHasColor = insulation >= type.minColoredInsulation;
+	}
+
+	public static DyeColor getColor(BlockState state, CableType type, int insulation)
+	{
+		return insulation >= type.minColoredInsulation ? state.getValue(colorProperty) : DEFAULT_COLOR;
+	}
 
 	public abstract boolean isFoam();
 
@@ -104,35 +138,6 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 		}
 
 		return ret;
-	}
-
-	protected static void prepareCreate(CableType type, int insulation)
-	{
-		pendingHasColor = insulation >= type.minColoredInsulation;
-	}
-
-	protected AbstractCableBlock(Properties settings, CableType type, int insulation)
-	{
-		super(type.getThickness(insulation) / 2.0F, settings);
-		if (insulation > type.maxInsulation)
-		{
-			throw new IllegalArgumentException("invalid insulation " + insulation + " for type " + type);
-		}
-
-		this.type = type;
-		this.insulation = insulation;
-		this.hasColor = insulation >= type.minColoredInsulation;
-		BlockState defaultState = this.stateDefinition.any();
-		if (!this.isFoam())
-		{
-			defaultState = defaultState.setValue(WATERLOGGED, false);
-		}
-
-		this.initializeState(defaultState);
-		if (type.maxInsulation > 0)
-		{
-			types.computeIfAbsent(type, t -> new Int2ReferenceOpenHashMap<>(t.maxInsulation + 1)).put(insulation, this);
-		}
 	}
 
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
@@ -308,11 +313,6 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 		return getColor(state, this.type, this.insulation);
 	}
 
-	public static DyeColor getColor(BlockState state, CableType type, int insulation)
-	{
-		return insulation >= type.minColoredInsulation ? state.getValue(colorProperty) : DEFAULT_COLOR;
-	}
-
 	public boolean tryAddInsulation(BlockState state, Level world, BlockPos pos)
 	{
 		if (this.insulation >= this.type.maxInsulation)
@@ -426,9 +426,9 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 
 	private final class Conductor implements ILocatable, IColoredEnergyTile, IEnergyConductor
 	{
-		private BlockState state;
 		private final Level world;
 		private final BlockPos pos;
+		private BlockState state;
 
 		Conductor(BlockState state, Level world, BlockPos pos)
 		{

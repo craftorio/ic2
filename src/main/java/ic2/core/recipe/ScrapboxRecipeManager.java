@@ -29,6 +29,10 @@ public final class ScrapboxRecipeManager implements IScrapboxManager
 {
 	private final List<ScrapboxRecipeManager.Drop> drops = new ArrayList<>();
 
+	private ScrapboxRecipeManager()
+	{
+	}
+
 	public static void setup()
 	{
 		if (Recipes.scrapboxDrops != null)
@@ -42,10 +46,6 @@ public final class ScrapboxRecipeManager implements IScrapboxManager
 	public static void load()
 	{
 		((ScrapboxRecipeManager) Recipes.scrapboxDrops).addBuiltinDrops();
-	}
-
-	private ScrapboxRecipeManager()
-	{
 	}
 
 	public boolean addRecipe(IRecipeInput input, Collection<ItemStack> output, CompoundTag metadata, boolean replace)
@@ -239,10 +239,10 @@ public final class ScrapboxRecipeManager implements IScrapboxManager
 
 	private static class Drop
 	{
+		static float topChance;
 		final ItemStack item;
 		final float originalChance;
 		final float upperChanceBound;
-		static float topChance;
 
 		Drop(ItemStack item, float chance)
 		{

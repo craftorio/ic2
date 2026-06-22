@@ -22,9 +22,9 @@ import net.minecraft.world.level.block.state.BlockState;
 @NotClassic
 public class TileEntityBlockCutter extends TileEntityStandardMachine<IRecipeInput, Collection<ItemStack>, ItemStack>
 {
+	public final InvSlotConsumableClass cutterSlot;
 	@GuiSynced
 	private boolean bladeTooWeak = false;
-	public final InvSlotConsumableClass cutterSlot;
 
 	public TileEntityBlockCutter(BlockPos pos, BlockState state)
 	{

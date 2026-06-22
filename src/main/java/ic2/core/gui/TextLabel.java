@@ -23,6 +23,35 @@ public class TextLabel extends GuiElement<TextLabel>
 	private final boolean centerX;
 	private final boolean centerY;
 
+	private TextLabel(
+		Ic2Gui<?> gui,
+		int x,
+		int y,
+		int width,
+		int height,
+		TextProvider.ITextProvider textProvider,
+		IntSupplier color,
+		boolean shadow,
+		boolean fixedHoverWidth,
+		boolean fixedHoverHeight,
+		int baseX,
+		int baseY,
+		boolean centerX,
+		boolean centerY
+	)
+	{
+		super(gui, x, y, width, height);
+		this.textProvider = textProvider;
+		this.color = color;
+		this.shadow = shadow;
+		this.fixedHoverWidth = fixedHoverWidth;
+		this.fixedHoverHeight = fixedHoverHeight;
+		this.baseX = baseX;
+		this.baseY = baseY;
+		this.centerX = centerX;
+		this.centerY = centerY;
+	}
+
 	public static TextLabel create(Ic2Gui<?> gui, int x, int y, String text, int color, boolean shadow)
 	{
 		return create(gui, x, y, TextProvider.of(text), color, shadow);
@@ -148,35 +177,6 @@ public class TextLabel extends GuiElement<TextLabel>
 		}
 
 		return new TextLabel(gui, x, y, width, height, textProvider, color, shadow, fixedHoverWidth, fixedHoverHeight, baseX, baseY, centerX, centerY);
-	}
-
-	private TextLabel(
-		Ic2Gui<?> gui,
-		int x,
-		int y,
-		int width,
-		int height,
-		TextProvider.ITextProvider textProvider,
-		IntSupplier color,
-		boolean shadow,
-		boolean fixedHoverWidth,
-		boolean fixedHoverHeight,
-		int baseX,
-		int baseY,
-		boolean centerX,
-		boolean centerY
-	)
-	{
-		super(gui, x, y, width, height);
-		this.textProvider = textProvider;
-		this.color = color;
-		this.shadow = shadow;
-		this.fixedHoverWidth = fixedHoverWidth;
-		this.fixedHoverHeight = fixedHoverHeight;
-		this.baseX = baseX;
-		this.baseY = baseY;
-		this.centerX = centerX;
-		this.centerY = centerY;
 	}
 
 	private static int getWidth(Ic2Gui<?> gui, TextProvider.ITextProvider textProvider)

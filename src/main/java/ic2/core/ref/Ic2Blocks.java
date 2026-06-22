@@ -193,6 +193,7 @@ public final class Ic2Blocks
 	{
 	});
 	public static final Block RUBBER_SIGN = register("rubber_sign", new Ic2SignBlock(Properties.of().mapColor(RUBBER_LOG.defaultMapColor()).noCollission().strength(1.0F).sound(SoundType.WOOD), Ic2SignType.RUBBER));
+	public static final Block RUBBER_WALL_SIGN = register("rubber_wall_sign", new Ic2WallSignBlock(Properties.of().mapColor(RUBBER_LOG.defaultMapColor()).noCollission().strength(1.0F).sound(SoundType.WOOD).lootFrom(ForgeRegistries.BLOCKS.getDelegateOrThrow(RUBBER_SIGN)), Ic2SignType.RUBBER));
 	public static final Block RUBBER_SLAB = register("rubber_slab", new SlabBlock(Properties.of().mapColor(MapColor.WOOD).strength(2.0F, 3.0F).sound(SoundType.WOOD)));
 	public static final Block RUBBER_STAIRS = register("rubber_stairs", new StairBlock(RUBBER_PLANKS::defaultBlockState, Properties.of().mapColor(MapColor.PODZOL).strength(2.0F, 3.0F).sound(SoundType.WOOD))
 	{
@@ -200,31 +201,12 @@ public final class Ic2Blocks
 	public static final Block RUBBER_TRAPDOOR = register("rubber_trapdoor", new TrapDoorBlock(Properties.of().mapColor(MapColor.PODZOL).strength(3.0F).sound(SoundType.WOOD).noOcclusion().isValidSpawn(Ic2Blocks::never), BlockSetType.OAK)
 	{
 	});
-	public static final Block RUBBER_WALL_SIGN = register("rubber_wall_sign", new Ic2WallSignBlock(Properties.of().mapColor(RUBBER_LOG.defaultMapColor()).noCollission().strength(1.0F).sound(SoundType.WOOD).lootFrom(ForgeRegistries.BLOCKS.getDelegateOrThrow(RUBBER_SIGN)), Ic2SignType.RUBBER));
 	public static final Block IRON_FENCE = register("iron_fence", new Ic2FenceBlock(Properties.of().strength(5.0F, 10.0F), true));
 	public static final Block RESIN_SHEET = register("resin_sheet", new Ic2SheetBlock(Properties.of().strength(1.6F, 0.5F)));
 	public static final Block RUBBER_SHEET = register("rubber_sheet", new Ic2SheetBlock(Properties.of().strength(0.8F, 2.0F)));
 	public static final Block WOOL_SHEET = register("wool_sheet", new Ic2SheetBlock(Properties.of().strength(0.8F, 0.8F)));
 	public static final Block REINFORCED_GLASS = register("reinforced_glass", new Ic2GlassBlock(Properties.of().noOcclusion().strength(5.0F, 180.0F).sound(SoundType.GLASS).isValidSpawn((state, world, pos, type) -> false)));
 	public static final Block FOAM = register("foam", new FoamBlock(Properties.of().noOcclusion().strength(0.01F, 10.0F).randomTicks().sound(SoundType.WOOL)));
-	private static final Properties wallSettings = Properties.of().strength(3.0F, 30.0F).requiresCorrectToolForDrops().sound(SoundType.STONE);
-	public static final Block WHITE_WALL = register("white_wall", new WallBlock(wallSettings, DyeColor.WHITE));
-	public static final Block ORANGE_WALL = register("orange_wall", new WallBlock(wallSettings, DyeColor.ORANGE));
-	public static final Block MAGENTA_WALL = register("magenta_wall", new WallBlock(wallSettings, DyeColor.MAGENTA));
-	public static final Block LIGHT_BLUE_WALL = register("light_blue_wall", new WallBlock(wallSettings, DyeColor.LIGHT_BLUE));
-	public static final Block YELLOW_WALL = register("yellow_wall", new WallBlock(wallSettings, DyeColor.YELLOW));
-	public static final Block LIME_WALL = register("lime_wall", new WallBlock(wallSettings, DyeColor.LIME));
-	public static final Block PINK_WALL = register("pink_wall", new WallBlock(wallSettings, DyeColor.PINK));
-	public static final Block GRAY_WALL = register("gray_wall", new WallBlock(wallSettings, DyeColor.GRAY));
-	public static final Block LIGHT_GRAY_WALL = register("light_gray_wall", new WallBlock(wallSettings, DyeColor.LIGHT_GRAY));
-	public static final Block CYAN_WALL = register("cyan_wall", new WallBlock(wallSettings, DyeColor.CYAN));
-	public static final Block PURPLE_WALL = register("purple_wall", new WallBlock(wallSettings, DyeColor.PURPLE));
-	public static final Block BLUE_WALL = register("blue_wall", new WallBlock(wallSettings, DyeColor.BLUE));
-	public static final Block BROWN_WALL = register("brown_wall", new WallBlock(wallSettings, DyeColor.BROWN));
-	public static final Block GREEN_WALL = register("green_wall", new WallBlock(wallSettings, DyeColor.GREEN));
-	public static final Block RED_WALL = register("red_wall", new WallBlock(wallSettings, DyeColor.RED));
-	public static final Block BLACK_WALL = register("black_wall", new WallBlock(wallSettings, DyeColor.BLACK));
-	public static final Block OBSCURED_WALL = register("obscured_wall", Ic2TileEntityBlock.create(wallSettings, TileEntityWall.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.noFacings, false));
 	public static final Block MINING_PIPE = register("mining_pipe", new MiningPipeBlock(Properties.of().strength(6.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL)));
 	public static final Block MINING_PIPE_TIP = register("mining_pipe_tip", new Block(Properties.of().strength(6.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL)));
 	public static final Block REINFORCED_DOOR = register("reinforced_door", new DoorBlock(Properties.of().strength(50.0F, 150.0F).sound(SoundType.METAL), BlockSetType.IRON)
@@ -297,36 +279,8 @@ public final class Ic2Blocks
 	public static final Block ENERGY_O_MAT = register("energy_o_mat", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(-1.0F, 3600000.0F).requiresCorrectToolForDrops().sound(SoundType.METAL), TileEntityEnergyOMat.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.allFacings, false));
 	public static final Block PERSONAL_CHEST = register("personal_chest", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(-1.0F, 3600000.0F).requiresCorrectToolForDrops().sound(SoundType.METAL), TileEntityPersonalChest.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.horizontalFacings, false));
 	public static final Block TRADE_O_MAT = register("trade_o_mat", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(-1.0F, 3600000.0F).requiresCorrectToolForDrops().sound(SoundType.METAL), TileEntityTradeOMat.class, true, Ic2TileEntityBlock.DefaultDrop.Self, Util.horizontalFacings, false));
-	private static final Properties cableSettings = Properties.of().strength(0.5F, 5.0F).sound(SoundType.METAL);
-	private static final Properties insulatedCableSettings = Properties.of().strength(0.5F, 5.0F).sound(SoundType.WOOL);
-	public static final FoamCableBlock COPPER_FOAM_CABLE = register("copper_foam_cable", FoamCableBlock.create(cableSettings, CableType.copper, 0));
-	public static final Block COPPER_CABLE = register("copper_cable", CableBlock.create(cableSettings, CableType.copper, 0, COPPER_FOAM_CABLE));
-	public static final FoamCableBlock INSULATED_COPPER_FOAM_CABLE = register("insulated_copper_foam_cable", FoamCableBlock.create(insulatedCableSettings, CableType.copper, 1));
-	public static final Block INSULATED_COPPER_CABLE = register("insulated_copper_cable", CableBlock.create(insulatedCableSettings, CableType.copper, 1, INSULATED_COPPER_FOAM_CABLE));
 	public static final FoamCableBlock GLASS_FIBRE_FOAM_CABLE = register("glass_fibre_foam_cable", FoamCableBlock.create(Properties.of().strength(0.5F, 5.0F).sound(SoundType.GLASS), CableType.glass, 0));
 	public static final Block GLASS_FIBRE_CABLE = register("glass_fibre_cable", CableBlock.create(Properties.of().strength(0.5F, 5.0F).sound(SoundType.GLASS), CableType.glass, 0, GLASS_FIBRE_FOAM_CABLE));
-	public static final FoamCableBlock GOLD_FOAM_CABLE = register("gold_foam_cable", FoamCableBlock.create(cableSettings, CableType.gold, 0));
-	public static final Block GOLD_CABLE = register("gold_cable", CableBlock.create(cableSettings, CableType.gold, 0, GOLD_FOAM_CABLE));
-	public static final FoamCableBlock INSULATED_GOLD_FOAM_CABLE = register("insulated_gold_foam_cable", FoamCableBlock.create(insulatedCableSettings, CableType.gold, 1));
-	public static final Block INSULATED_GOLD_CABLE = register("insulated_gold_cable", CableBlock.create(insulatedCableSettings, CableType.gold, 1, INSULATED_GOLD_FOAM_CABLE));
-	public static final FoamCableBlock DOUBLE_INSULATED_GOLD_FOAM_CABLE = register("double_insulated_gold_foam_cable", FoamCableBlock.create(insulatedCableSettings, CableType.gold, 2));
-	public static final Block DOUBLE_INSULATED_GOLD_CABLE = register("double_insulated_gold_cable", CableBlock.create(insulatedCableSettings, CableType.gold, 2, DOUBLE_INSULATED_GOLD_FOAM_CABLE));
-	public static final FoamCableBlock IRON_FOAM_CABLE = register("iron_foam_cable", FoamCableBlock.create(cableSettings, CableType.iron, 0));
-	public static final Block IRON_CABLE = register("iron_cable", CableBlock.create(cableSettings, CableType.iron, 0, IRON_FOAM_CABLE));
-	public static final FoamCableBlock INSULATED_IRON_FOAM_CABLE = register("insulated_iron_foam_cable", FoamCableBlock.create(insulatedCableSettings, CableType.iron, 1));
-	public static final Block INSULATED_IRON_CABLE = register("insulated_iron_cable", CableBlock.create(insulatedCableSettings, CableType.iron, 1, INSULATED_IRON_FOAM_CABLE));
-	public static final FoamCableBlock DOUBLE_INSULATED_IRON_FOAM_CABLE = register("double_insulated_iron_foam_cable", FoamCableBlock.create(insulatedCableSettings, CableType.iron, 2));
-	public static final Block DOUBLE_INSULATED_IRON_CABLE = register("double_insulated_iron_cable", CableBlock.create(insulatedCableSettings, CableType.iron, 2, DOUBLE_INSULATED_IRON_FOAM_CABLE));
-	public static final FoamCableBlock TRIPLE_INSULATED_IRON_FOAM_CABLE = register("triple_insulated_iron_foam_cable", FoamCableBlock.create(insulatedCableSettings, CableType.iron, 3));
-	public static final Block TRIPLE_INSULATED_IRON_CABLE = register("triple_insulated_iron_cable", CableBlock.create(insulatedCableSettings, CableType.iron, 3, TRIPLE_INSULATED_IRON_FOAM_CABLE));
-	public static final FoamCableBlock TIN_FOAM_CABLE = register("tin_foam_cable", FoamCableBlock.create(cableSettings, CableType.tin, 0));
-	public static final Block TIN_CABLE = register("tin_cable", CableBlock.create(cableSettings, CableType.tin, 0, TIN_FOAM_CABLE));
-	public static final FoamCableBlock INSULATED_TIN_FOAM_CABLE = register("insulated_tin_foam_cable", FoamCableBlock.create(insulatedCableSettings, CableType.tin, 1));
-	public static final Block INSULATED_TIN_CABLE = register("insulated_tin_cable", CableBlock.create(insulatedCableSettings, CableType.tin, 1, INSULATED_TIN_FOAM_CABLE));
-	public static final DetectorFoamCableBlock DETECTOR_FOAM_CABLE = register("detector_foam_cable", DetectorFoamCableBlock.create(cableSettings));
-	public static final Block DETECTOR_CABLE = register("detector_cable", DetectorCableBlock.create(cableSettings, DETECTOR_FOAM_CABLE));
-	public static final SplitterFoamCableBlock SPLITTER_FOAM_CABLE = register("splitter_foam_cable", SplitterFoamCableBlock.create(cableSettings));
-	public static final Block SPLITTER_CABLE = register("splitter_cable", SplitterCableBlock.create(cableSettings, SPLITTER_FOAM_CABLE));
 	public static final Block BATBOX_CHARGEPAD = register("batbox_chargepad", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL).noOcclusion(), TileEntityChargePadBatBox.class, true, Ic2TileEntityBlock.DefaultDrop.Self, Util.downSideFacings, true));
 	public static final Block CESU_CHARGEPAD = register("cesu_chargepad", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL).noOcclusion(), TileEntityChargePadCESU.class, true, Ic2TileEntityBlock.DefaultDrop.Self, Util.downSideFacings, true));
 	public static final Block MFE_CHARGEPAD = register("mfe_chargepad", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL).noOcclusion(), TileEntityChargePadMFE.class, true, Ic2TileEntityBlock.DefaultDrop.Self, Util.downSideFacings, true));
@@ -348,6 +302,63 @@ public final class Ic2Blocks
 	public static final Block WEIGHTED_ITEM_DISTRIBUTOR = register("weighted_item_distributor", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL), TileEntityWeightedItemDistributor.class, false, Ic2TileEntityBlock.DefaultDrop.Machine, Util.allFacings, true));
 	public static final Block RCI_RSH = register("rci_rsh", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL), TileEntityRCI_RSH.class, true, Ic2TileEntityBlock.DefaultDrop.AdvMachine, Util.allFacings, true));
 	public static final Block RCI_LZH = register("rci_lzh", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL), TileEntityRCI_LZH.class, true, Ic2TileEntityBlock.DefaultDrop.AdvMachine, Util.allFacings, true));
+	public static final Block INDUSTRIAL_WORKBENCH = register("industrial_workbench", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL), TileEntityIndustrialWorkbench.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.horizontalFacings, true));
+	public static final Block BATCH_CRAFTER = register("batch_crafter", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL), TileEntityBatchCrafter.class, true, Ic2TileEntityBlock.DefaultDrop.AdvMachine, Util.horizontalFacings, true));
+	public static final Block WOODEN_STORAGE_BOX = register("wooden_storage_box", Ic2TileEntityBlock.create(Properties.of().strength(1.0F, 10.0F).sound(SoundType.WOOD), TileEntityWoodenStorageBox.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.noFacings, false));
+	public static final Block IRON_STORAGE_BOX = register("iron_storage_box", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(1.0F, 15.0F).sound(SoundType.METAL), TileEntityIronStorageBox.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.noFacings, false));
+	public static final Block BRONZE_STORAGE_BOX = register("bronze_storage_box", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(1.0F, 15.0F).sound(SoundType.METAL), TileEntityBronzeStorageBox.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.noFacings, false));
+	public static final Block STEEL_STORAGE_BOX = register("steel_storage_box", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 20.0F).sound(SoundType.METAL), TileEntitySteelStorageBox.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.noFacings, false));
+	public static final Block IRIDIUM_STORAGE_BOX = register("iridium_storage_box", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(3.0F, 100.0F).sound(SoundType.METAL), TileEntityIridiumStorageBox.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.noFacings, false));
+	public static final Block BRONZE_TANK = register("bronze_tank", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(3.0F, 15.0F).sound(SoundType.METAL), TileEntityBronzeTank.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.noFacings, false));
+	public static final Block IRON_TANK = register("iron_tank", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(3.0F, 15.0F).sound(SoundType.METAL), TileEntityIronTank.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.noFacings, false));
+	public static final Block STEEL_TANK = register("steel_tank", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(4.0F, 20.0F).sound(SoundType.METAL), TileEntitySteelTank.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.noFacings, false));
+	public static final Block IRIDIUM_TANK = register("iridium_tank", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(5.0F, 100.0F).sound(SoundType.METAL), TileEntityIridiumTank.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.noFacings, false));
+	private static final Properties wallSettings = Properties.of().strength(3.0F, 30.0F).requiresCorrectToolForDrops().sound(SoundType.STONE);
+	public static final Block WHITE_WALL = register("white_wall", new WallBlock(wallSettings, DyeColor.WHITE));
+	public static final Block ORANGE_WALL = register("orange_wall", new WallBlock(wallSettings, DyeColor.ORANGE));
+	public static final Block MAGENTA_WALL = register("magenta_wall", new WallBlock(wallSettings, DyeColor.MAGENTA));
+	public static final Block LIGHT_BLUE_WALL = register("light_blue_wall", new WallBlock(wallSettings, DyeColor.LIGHT_BLUE));
+	public static final Block YELLOW_WALL = register("yellow_wall", new WallBlock(wallSettings, DyeColor.YELLOW));
+	public static final Block LIME_WALL = register("lime_wall", new WallBlock(wallSettings, DyeColor.LIME));
+	public static final Block PINK_WALL = register("pink_wall", new WallBlock(wallSettings, DyeColor.PINK));
+	public static final Block GRAY_WALL = register("gray_wall", new WallBlock(wallSettings, DyeColor.GRAY));
+	public static final Block LIGHT_GRAY_WALL = register("light_gray_wall", new WallBlock(wallSettings, DyeColor.LIGHT_GRAY));
+	public static final Block CYAN_WALL = register("cyan_wall", new WallBlock(wallSettings, DyeColor.CYAN));
+	public static final Block PURPLE_WALL = register("purple_wall", new WallBlock(wallSettings, DyeColor.PURPLE));
+	public static final Block BLUE_WALL = register("blue_wall", new WallBlock(wallSettings, DyeColor.BLUE));
+	public static final Block BROWN_WALL = register("brown_wall", new WallBlock(wallSettings, DyeColor.BROWN));
+	public static final Block GREEN_WALL = register("green_wall", new WallBlock(wallSettings, DyeColor.GREEN));
+	public static final Block RED_WALL = register("red_wall", new WallBlock(wallSettings, DyeColor.RED));
+	public static final Block BLACK_WALL = register("black_wall", new WallBlock(wallSettings, DyeColor.BLACK));
+	public static final Block OBSCURED_WALL = register("obscured_wall", Ic2TileEntityBlock.create(wallSettings, TileEntityWall.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.noFacings, false));
+	private static final Properties cableSettings = Properties.of().strength(0.5F, 5.0F).sound(SoundType.METAL);
+	public static final FoamCableBlock COPPER_FOAM_CABLE = register("copper_foam_cable", FoamCableBlock.create(cableSettings, CableType.copper, 0));
+	public static final Block COPPER_CABLE = register("copper_cable", CableBlock.create(cableSettings, CableType.copper, 0, COPPER_FOAM_CABLE));
+	public static final FoamCableBlock GOLD_FOAM_CABLE = register("gold_foam_cable", FoamCableBlock.create(cableSettings, CableType.gold, 0));
+	public static final Block GOLD_CABLE = register("gold_cable", CableBlock.create(cableSettings, CableType.gold, 0, GOLD_FOAM_CABLE));
+	public static final FoamCableBlock IRON_FOAM_CABLE = register("iron_foam_cable", FoamCableBlock.create(cableSettings, CableType.iron, 0));
+	public static final Block IRON_CABLE = register("iron_cable", CableBlock.create(cableSettings, CableType.iron, 0, IRON_FOAM_CABLE));
+	public static final FoamCableBlock TIN_FOAM_CABLE = register("tin_foam_cable", FoamCableBlock.create(cableSettings, CableType.tin, 0));
+	public static final Block TIN_CABLE = register("tin_cable", CableBlock.create(cableSettings, CableType.tin, 0, TIN_FOAM_CABLE));
+	public static final DetectorFoamCableBlock DETECTOR_FOAM_CABLE = register("detector_foam_cable", DetectorFoamCableBlock.create(cableSettings));
+	public static final Block DETECTOR_CABLE = register("detector_cable", DetectorCableBlock.create(cableSettings, DETECTOR_FOAM_CABLE));
+	public static final SplitterFoamCableBlock SPLITTER_FOAM_CABLE = register("splitter_foam_cable", SplitterFoamCableBlock.create(cableSettings));
+	public static final Block SPLITTER_CABLE = register("splitter_cable", SplitterCableBlock.create(cableSettings, SPLITTER_FOAM_CABLE));
+	private static final Properties insulatedCableSettings = Properties.of().strength(0.5F, 5.0F).sound(SoundType.WOOL);
+	public static final FoamCableBlock INSULATED_COPPER_FOAM_CABLE = register("insulated_copper_foam_cable", FoamCableBlock.create(insulatedCableSettings, CableType.copper, 1));
+	public static final Block INSULATED_COPPER_CABLE = register("insulated_copper_cable", CableBlock.create(insulatedCableSettings, CableType.copper, 1, INSULATED_COPPER_FOAM_CABLE));
+	public static final FoamCableBlock INSULATED_GOLD_FOAM_CABLE = register("insulated_gold_foam_cable", FoamCableBlock.create(insulatedCableSettings, CableType.gold, 1));
+	public static final Block INSULATED_GOLD_CABLE = register("insulated_gold_cable", CableBlock.create(insulatedCableSettings, CableType.gold, 1, INSULATED_GOLD_FOAM_CABLE));
+	public static final FoamCableBlock DOUBLE_INSULATED_GOLD_FOAM_CABLE = register("double_insulated_gold_foam_cable", FoamCableBlock.create(insulatedCableSettings, CableType.gold, 2));
+	public static final Block DOUBLE_INSULATED_GOLD_CABLE = register("double_insulated_gold_cable", CableBlock.create(insulatedCableSettings, CableType.gold, 2, DOUBLE_INSULATED_GOLD_FOAM_CABLE));
+	public static final FoamCableBlock INSULATED_IRON_FOAM_CABLE = register("insulated_iron_foam_cable", FoamCableBlock.create(insulatedCableSettings, CableType.iron, 1));
+	public static final Block INSULATED_IRON_CABLE = register("insulated_iron_cable", CableBlock.create(insulatedCableSettings, CableType.iron, 1, INSULATED_IRON_FOAM_CABLE));
+	public static final FoamCableBlock DOUBLE_INSULATED_IRON_FOAM_CABLE = register("double_insulated_iron_foam_cable", FoamCableBlock.create(insulatedCableSettings, CableType.iron, 2));
+	public static final Block DOUBLE_INSULATED_IRON_CABLE = register("double_insulated_iron_cable", CableBlock.create(insulatedCableSettings, CableType.iron, 2, DOUBLE_INSULATED_IRON_FOAM_CABLE));
+	public static final FoamCableBlock TRIPLE_INSULATED_IRON_FOAM_CABLE = register("triple_insulated_iron_foam_cable", FoamCableBlock.create(insulatedCableSettings, CableType.iron, 3));
+	public static final Block TRIPLE_INSULATED_IRON_CABLE = register("triple_insulated_iron_cable", CableBlock.create(insulatedCableSettings, CableType.iron, 3, TRIPLE_INSULATED_IRON_FOAM_CABLE));
+	public static final FoamCableBlock INSULATED_TIN_FOAM_CABLE = register("insulated_tin_foam_cable", FoamCableBlock.create(insulatedCableSettings, CableType.tin, 1));
+	public static final Block INSULATED_TIN_CABLE = register("insulated_tin_cable", CableBlock.create(insulatedCableSettings, CableType.tin, 1, INSULATED_TIN_FOAM_CABLE));
 	private static final Properties cropSettings = Properties.of().strength(0.8F, 0.2F).sound(SoundType.CROP).noCollission();
 	public static final Block CROP_STICK = register("crop_stick", Ic2TileEntityBlock.create(cropSettings, TileEntityCrop.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.noFacings, false, Ic2CropType.none));
 	public static final Block WEED_CROP = register("weed_crop", Ic2TileEntityBlock.create(cropSettings, TileEntityCrop.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.noFacings, false, Ic2CropType.weed));
@@ -402,17 +413,12 @@ public final class Ic2Blocks
 	public static final Block SPIDERNIP_CROP = register("spidernip_crop", Ic2TileEntityBlock.create(cropSettings, TileEntityCrop.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.noFacings, false, Ic2CropType.spidernip));
 	public static final Block TEARSTALKS_CROP = register("tearstalks_crop", Ic2TileEntityBlock.create(cropSettings, TileEntityCrop.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.noFacings, false, Ic2CropType.tearstalks));
 	public static final Block WITHEREED_CROP = register("withereed_crop", Ic2TileEntityBlock.create(cropSettings, TileEntityCrop.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.noFacings, false, Ic2CropType.withereed));
-	public static final Block INDUSTRIAL_WORKBENCH = register("industrial_workbench", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL), TileEntityIndustrialWorkbench.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.horizontalFacings, true));
-	public static final Block BATCH_CRAFTER = register("batch_crafter", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL), TileEntityBatchCrafter.class, true, Ic2TileEntityBlock.DefaultDrop.AdvMachine, Util.horizontalFacings, true));
-	public static final Block WOODEN_STORAGE_BOX = register("wooden_storage_box", Ic2TileEntityBlock.create(Properties.of().strength(1.0F, 10.0F).sound(SoundType.WOOD), TileEntityWoodenStorageBox.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.noFacings, false));
-	public static final Block IRON_STORAGE_BOX = register("iron_storage_box", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(1.0F, 15.0F).sound(SoundType.METAL), TileEntityIronStorageBox.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.noFacings, false));
-	public static final Block BRONZE_STORAGE_BOX = register("bronze_storage_box", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(1.0F, 15.0F).sound(SoundType.METAL), TileEntityBronzeStorageBox.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.noFacings, false));
-	public static final Block STEEL_STORAGE_BOX = register("steel_storage_box", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 20.0F).sound(SoundType.METAL), TileEntitySteelStorageBox.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.noFacings, false));
-	public static final Block IRIDIUM_STORAGE_BOX = register("iridium_storage_box", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(3.0F, 100.0F).sound(SoundType.METAL), TileEntityIridiumStorageBox.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.noFacings, false));
-	public static final Block BRONZE_TANK = register("bronze_tank", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(3.0F, 15.0F).sound(SoundType.METAL), TileEntityBronzeTank.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.noFacings, false));
-	public static final Block IRON_TANK = register("iron_tank", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(3.0F, 15.0F).sound(SoundType.METAL), TileEntityIronTank.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.noFacings, false));
-	public static final Block STEEL_TANK = register("steel_tank", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(4.0F, 20.0F).sound(SoundType.METAL), TileEntitySteelTank.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.noFacings, false));
-	public static final Block IRIDIUM_TANK = register("iridium_tank", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(5.0F, 100.0F).sound(SoundType.METAL), TileEntityIridiumTank.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.noFacings, false));
+
+	static
+	{
+		IC2.envProxy.registerFlammableBlock(RUBBER_LEAVES, 20, 30);
+		IC2.envProxy.registerFlammableBlock(RUBBER_LOG, 20, 4);
+	}
 
 	public static void init()
 	{
@@ -437,11 +443,5 @@ public final class Ic2Blocks
 	private static Boolean canSpawnOnLeaves(BlockState state, BlockGetter world, BlockPos pos, EntityType<?> type)
 	{
 		return type == EntityType.OCELOT || type == EntityType.PARROT;
-	}
-
-	static
-	{
-		IC2.envProxy.registerFlammableBlock(RUBBER_LEAVES, 20, 30);
-		IC2.envProxy.registerFlammableBlock(RUBBER_LOG, 20, 4);
 	}
 }

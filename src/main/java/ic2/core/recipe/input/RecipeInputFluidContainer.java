@@ -19,9 +19,9 @@ import org.apache.commons.lang3.mutable.MutableObject;
 
 public class RecipeInputFluidContainer extends RecipeInputBase
 {
+	private static volatile List<ItemStack> containerItems = null;
 	public final Fluid fluid;
 	public final int amount;
-	private static volatile List<ItemStack> containerItems = null;
 
 	RecipeInputFluidContainer(Fluid fluid)
 	{
@@ -32,47 +32,6 @@ public class RecipeInputFluidContainer extends RecipeInputBase
 	{
 		this.fluid = fluid;
 		this.amount = amount;
-	}
-
-	@Override
-	public boolean matches(ItemStack subject)
-	{
-		Ic2FluidStack fs = Ic2FluidStack.get(subject);
-		return fs != null && !fs.isEmpty() ? fs.getFluid() == this.fluid && fs.getAmountMb() >= this.amount : this.fluid == null;
-	}
-
-	@Override
-	public int getAmount()
-	{
-		return 1;
-	}
-
-	@Override
-	protected List<ItemStack> listStacks()
-	{
-		return getFluidContainer(this.fluid);
-	}
-
-	@Override
-	public String toString()
-	{
-		return "RInputFluidContainer<" + this.amount + "x" + this.fluid + ">";
-	}
-
-	@Override
-	public boolean equals(Object obj)
-	{
-		RecipeInputFluidContainer other;
-		return obj != null && this.getClass() == obj.getClass() && (other = (RecipeInputFluidContainer) obj).fluid == this.fluid && other.amount == this.amount;
-	}
-
-	@Override
-	public JsonElement toJson()
-	{
-		JsonObject obj = new JsonObject();
-		obj.addProperty("fluid", BuiltInRegistries.FLUID.getKey(this.fluid).toString());
-		obj.addProperty("amount", this.amount);
-		return obj;
 	}
 
 	public static List<ItemStack> getFluidContainer(Fluid fluid)
@@ -152,5 +111,46 @@ public class RecipeInputFluidContainer extends RecipeInputBase
 
 		containerItems = ret;
 		return ret;
+	}
+
+	@Override
+	public boolean matches(ItemStack subject)
+	{
+		Ic2FluidStack fs = Ic2FluidStack.get(subject);
+		return fs != null && !fs.isEmpty() ? fs.getFluid() == this.fluid && fs.getAmountMb() >= this.amount : this.fluid == null;
+	}
+
+	@Override
+	public int getAmount()
+	{
+		return 1;
+	}
+
+	@Override
+	protected List<ItemStack> listStacks()
+	{
+		return getFluidContainer(this.fluid);
+	}
+
+	@Override
+	public String toString()
+	{
+		return "RInputFluidContainer<" + this.amount + "x" + this.fluid + ">";
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		RecipeInputFluidContainer other;
+		return obj != null && this.getClass() == obj.getClass() && (other = (RecipeInputFluidContainer) obj).fluid == this.fluid && other.amount == this.amount;
+	}
+
+	@Override
+	public JsonElement toJson()
+	{
+		JsonObject obj = new JsonObject();
+		obj.addProperty("fluid", BuiltInRegistries.FLUID.getKey(this.fluid).toString());
+		obj.addProperty("amount", this.amount);
+		return obj;
 	}
 }

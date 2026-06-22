@@ -16,16 +16,33 @@ import net.minecraft.world.item.ItemStack;
 
 public class UpgradesWidget extends GuiElement<UpgradesWidget>
 {
-	private final List<ItemStack> compatibleUpgrades;
 	private static final int xCoord = 96;
 	private static final int yCoord = 128;
 	private static final int iWidth = 10;
 	private static final int iHeight = 10;
+	private final List<ItemStack> compatibleUpgrades;
 
 	public UpgradesWidget(Ic2Gui<?> gui, int x, int y, IUpgradableBlock te)
 	{
 		super(gui, x, y, 10, 10);
 		this.compatibleUpgrades = getCompatibleUpgrades(te);
+	}
+
+	private static List<ItemStack> getCompatibleUpgrades(IUpgradableBlock block)
+	{
+		List<ItemStack> ret = new ArrayList<>();
+		Set<UpgradableProperty> properties = block.getUpgradableProperties();
+
+		for (ItemStack stack : UpgradeRegistry.getUpgrades())
+		{
+			IUpgradeItem item = (IUpgradeItem) stack.getItem();
+			if (item.isSuitableFor(stack, properties))
+			{
+				ret.add(stack);
+			}
+		}
+
+		return ret;
 	}
 
 	@Override
@@ -44,23 +61,6 @@ public class UpgradesWidget extends GuiElement<UpgradesWidget>
 		for (ItemStack itemstack : this.compatibleUpgrades)
 		{
 			ret.add(itemstack.getHoverName());
-		}
-
-		return ret;
-	}
-
-	private static List<ItemStack> getCompatibleUpgrades(IUpgradableBlock block)
-	{
-		List<ItemStack> ret = new ArrayList<>();
-		Set<UpgradableProperty> properties = block.getUpgradableProperties();
-
-		for (ItemStack stack : UpgradeRegistry.getUpgrades())
-		{
-			IUpgradeItem item = (IUpgradeItem) stack.getItem();
-			if (item.isSuitableFor(stack, properties))
-			{
-				ret.add(stack);
-			}
 		}
 
 		return ret;

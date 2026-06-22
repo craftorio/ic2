@@ -31,6 +31,59 @@ public class Ic2SheetBlock extends Block
 		super(settings);
 	}
 
+	private static boolean canSupportWeight(Level world, BlockPos pos)
+	{
+		int maxRange = 16;
+		MutableBlockPos cPos = new MutableBlockPos();
+
+		for (Direction axis : positiveHorizontalFacings)
+		{
+			for (int dir = -1; dir <= 1; dir += 2)
+			{
+				cPos.set(pos);
+				boolean supported = false;
+
+				for (int i = 0; i < 16; i++)
+				{
+					cPos.move(axis, dir);
+					BlockState state = world.getBlockState(cPos);
+					if (state.getBlock().isCollisionShapeFullBlock(state, world, cPos))
+					{
+						supported = true;
+						break;
+					}
+
+					if (state != Ic2Blocks.RUBBER_SHEET.defaultBlockState())
+					{
+						break;
+					}
+
+					cPos.move(Direction.DOWN);
+					BlockState baseState = world.getBlockState(cPos);
+					if (baseState.getBlock().isCollisionShapeFullBlock(baseState, world, cPos))
+					{
+						supported = true;
+						break;
+					}
+
+					cPos.move(Direction.UP);
+				}
+
+				if (!supported)
+				{
+					break;
+				}
+
+				if (dir == 1)
+				{
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
 	@Nullable
 	public BlockState getStateForPlacement(BlockPlaceContext ctx)
 	{
@@ -151,58 +204,5 @@ public class Ic2SheetBlock extends Block
 				entity.fallDistance = (float) (entity.fallDistance * 0.95);
 			}
 		}
-	}
-
-	private static boolean canSupportWeight(Level world, BlockPos pos)
-	{
-		int maxRange = 16;
-		MutableBlockPos cPos = new MutableBlockPos();
-
-		for (Direction axis : positiveHorizontalFacings)
-		{
-			for (int dir = -1; dir <= 1; dir += 2)
-			{
-				cPos.set(pos);
-				boolean supported = false;
-
-				for (int i = 0; i < 16; i++)
-				{
-					cPos.move(axis, dir);
-					BlockState state = world.getBlockState(cPos);
-					if (state.getBlock().isCollisionShapeFullBlock(state, world, cPos))
-					{
-						supported = true;
-						break;
-					}
-
-					if (state != Ic2Blocks.RUBBER_SHEET.defaultBlockState())
-					{
-						break;
-					}
-
-					cPos.move(Direction.DOWN);
-					BlockState baseState = world.getBlockState(cPos);
-					if (baseState.getBlock().isCollisionShapeFullBlock(baseState, world, cPos))
-					{
-						supported = true;
-						break;
-					}
-
-					cPos.move(Direction.UP);
-				}
-
-				if (!supported)
-				{
-					break;
-				}
-
-				if (dir == 1)
-				{
-					return true;
-				}
-			}
-		}
-
-		return false;
 	}
 }

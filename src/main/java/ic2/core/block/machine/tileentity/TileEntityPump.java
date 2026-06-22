@@ -38,24 +38,23 @@ import net.minecraft.world.level.block.state.BlockState;
 public class TileEntityPump extends TileEntityElectricMachine implements IHasGui, IUpgradableBlock, IGuiValueProvider
 {
 	public final int defaultTier;
-	public int energyConsume;
-	public int operationsPerTick;
 	public final int defaultEnergyStorage;
 	public final int defaultEnergyConsume;
 	public final int defaultOperationLength;
-	private Sound sound;
-	private TileEntityMiner miner = null;
-	public boolean redstonePowered = false;
 	public final InvSlotConsumableLiquid containerSlot;
 	public final InvSlotOutput outputSlot;
 	public final InvSlotUpgrade upgradeSlot;
 	@GuiSynced
 	protected final Ic2FluidTank fluidTank;
+	protected final Fluids fluids;
+	public int energyConsume;
+	public int operationsPerTick;
 	public short progress = 0;
 	public int operationLength;
 	@GuiSynced
 	public float guiProgress;
-	protected final Fluids fluids;
+	private Sound sound;
+	private TileEntityMiner miner = null;
 
 	public TileEntityPump(BlockPos pos, BlockState state)
 	{
@@ -66,7 +65,7 @@ public class TileEntityPump extends TileEntityElectricMachine implements IHasGui
 		this.defaultEnergyConsume = this.energyConsume = 1;
 		this.defaultOperationLength = this.operationLength = 20;
 		this.defaultTier = 1;
-		this.defaultEnergyStorage = 1 * this.operationLength;
+		this.defaultEnergyStorage = this.operationLength;
 		this.fluids = this.addComponent(new Fluids(this));
 		this.fluidTank = this.fluids.addTankExtract("fluid", 8000);
 	}

@@ -9,8 +9,8 @@ import net.minecraft.world.level.Level;
 
 public class TickHandler
 {
-	private static final boolean debugupdate = System.getProperty("ic2.debugupdate") != null;
-	private static final Map<IWorldTickCallback, Throwable> debugTraces = debugupdate ? new WeakHashMap<>() : null;
+	private static final boolean debugUpdate = System.getProperty("ic2.debugUpdate") != null;
+	private static final Map<IWorldTickCallback, Throwable> debugTraces = debugUpdate ? new WeakHashMap<>() : null;
 	private static Throwable lastDebugTrace;
 
 	public static void onWorldTickStart(Level world)
@@ -65,7 +65,7 @@ public class TickHandler
 	public static void requestSingleWorldTick(Level world, IWorldTickCallback callback)
 	{
 		WorldData.get(world).singleUpdates.add(callback);
-		if (debugupdate)
+		if (debugUpdate)
 		{
 			debugTraces.put(callback, new Throwable());
 		}
@@ -83,12 +83,11 @@ public class TickHandler
 			worldData.continuousUpdatesToAdd.add(update);
 		}
 
-		if (debugupdate)
+		if (debugUpdate)
 		{
 			debugTraces.put(update, new Throwable());
 		}
 	}
-
 	public static void removeContinuousWorldTick(Level world, IWorldTickCallback update)
 	{
 		WorldData worldData = WorldData.get(world);
@@ -101,12 +100,6 @@ public class TickHandler
 			worldData.continuousUpdatesToRemove.add(update);
 		}
 	}
-
-	public static Throwable getLastDebugTrace()
-	{
-		return lastDebugTrace;
-	}
-
 	private static void processUpdates(Level world, WorldData worldData)
 	{
 		world.getProfiler().push("single-update");
@@ -114,7 +107,7 @@ public class TickHandler
 		IWorldTickCallback callback;
 		while ((callback = worldData.singleUpdates.poll()) != null)
 		{
-			if (debugupdate)
+			if (debugUpdate)
 			{
 				lastDebugTrace = debugTraces.remove(callback);
 			}
@@ -127,7 +120,7 @@ public class TickHandler
 
 		for (IWorldTickCallback update : worldData.continuousUpdates)
 		{
-			if (debugupdate)
+			if (debugUpdate)
 			{
 				lastDebugTrace = debugTraces.remove(update);
 			}
@@ -136,15 +129,20 @@ public class TickHandler
 		}
 
 		worldData.continuousUpdatesInUse = false;
-		if (debugupdate)
+		if (debugUpdate)
 		{
 			lastDebugTrace = null;
 		}
 
 		worldData.continuousUpdates.addAll(worldData.continuousUpdatesToAdd);
 		worldData.continuousUpdatesToAdd.clear();
-		worldData.continuousUpdates.removeAll(worldData.continuousUpdatesToRemove);
+		worldData.continuousUpdatesToRemove.forEach(worldData.continuousUpdates::remove);
 		worldData.continuousUpdatesToRemove.clear();
 		world.getProfiler().pop();
+	}
+
+	public static Throwable getLastDebugTrace()
+	{
+		return lastDebugTrace;
 	}
 }

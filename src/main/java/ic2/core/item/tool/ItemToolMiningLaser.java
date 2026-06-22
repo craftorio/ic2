@@ -46,6 +46,27 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
 		this.tier = 3;
 	}
 
+	private static Vector3 adjustStartPos(Vector3 pos, Vector3 dir)
+	{
+		return pos.addScaled(dir, 0.2);
+	}
+
+	private static String getModeString(int mode)
+	{
+		return switch (mode)
+		{
+			case 0 -> "item.ic2.mining_laser.tooltip.mode.mining";
+			case 1 -> "item.ic2.mining_laser.tooltip.mode.lowFocus";
+			case 2 -> "item.ic2.mining_laser.tooltip.mode.longRange";
+			case 3 -> "item.ic2.mining_laser.tooltip.mode.horizontal";
+			case 4 -> "item.ic2.mining_laser.tooltip.mode.superHeat";
+			case 5 -> "item.ic2.mining_laser.tooltip.mode.scatter";
+			case 6 -> "item.ic2.mining_laser.tooltip.mode.explosive";
+			case 7 -> "item.ic2.mining_laser.tooltip.mode.3x3";
+			default -> throw new NoSuchElementException("No such mode: " + mode);
+		};
+	}
+
 	@Override
 	public boolean isBarVisible(ItemStack stack)
 	{
@@ -288,11 +309,6 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
 		return InteractionResult.FAIL;
 	}
 
-	private static Vector3 adjustStartPos(Vector3 pos, Vector3 dir)
-	{
-		return pos.addScaled(dir, 0.2);
-	}
-
 	private void setLaserVelocity(Projectile laser, Entity shooter, Vector3 direction)
 	{
 		laser.shoot(direction.x, direction.y, direction.z, (float) 3.0, (float) 1.0);
@@ -354,21 +370,5 @@ public class ItemToolMiningLaser extends ItemElectricTool implements INetworkIte
 			case 6:
 				this.playShotSound(player, Ic2SoundEvents.ITEM_LASER_EXPLOSIVE);
 		}
-	}
-
-	private static String getModeString(int mode)
-	{
-		return switch (mode)
-		{
-			case 0 -> "item.ic2.mining_laser.tooltip.mode.mining";
-			case 1 -> "item.ic2.mining_laser.tooltip.mode.lowFocus";
-			case 2 -> "item.ic2.mining_laser.tooltip.mode.longRange";
-			case 3 -> "item.ic2.mining_laser.tooltip.mode.horizontal";
-			case 4 -> "item.ic2.mining_laser.tooltip.mode.superHeat";
-			case 5 -> "item.ic2.mining_laser.tooltip.mode.scatter";
-			case 6 -> "item.ic2.mining_laser.tooltip.mode.explosive";
-			case 7 -> "item.ic2.mining_laser.tooltip.mode.3x3";
-			default -> throw new NoSuchElementException("No such mode: " + mode);
-		};
 	}
 }

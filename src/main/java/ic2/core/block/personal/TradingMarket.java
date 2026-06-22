@@ -92,7 +92,7 @@ public class TradingMarket
 
 	public Stream<BlockPos> tradersAround(BlockPos position, int radius)
 	{
-		long squareRadius = radius * radius;
+		long squareRadius = (long) radius * radius;
 		return this.traders.stream().filter(pos -> position.distSqr(pos) <= squareRadius);
 	}
 

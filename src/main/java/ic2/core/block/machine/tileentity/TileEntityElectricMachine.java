@@ -10,8 +10,8 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public abstract class TileEntityElectricMachine extends TileEntityBase
 {
-	protected final Energy energy;
 	public final InvSlotDischarge dischargeSlot;
+	protected final Energy energy;
 
 	public TileEntityElectricMachine(BlockEntityType<? extends TileEntityElectricMachine> type, BlockPos pos, BlockState state, int maxEnergy, int tier)
 	{

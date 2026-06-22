@@ -13,9 +13,9 @@ public final class Node
 	final int uid;
 	final Tile tile;
 	final NodeType nodeType;
+	List<NodeLink> links = new ArrayList<>();
 	private boolean isExtraNode = false;
 	private Grid grid;
-	List<NodeLink> links = new ArrayList<>();
 
 	Node(int uid, Tile tile, NodeType nodeType)
 	{

@@ -31,11 +31,11 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class TileEntityElectrolyzer extends TileEntityElectricMachine implements IUpgradableBlock, IHasGui, CustomGauge.IGaugeRatioProvider
 {
+	public final InvSlotUpgrade upgradeSlot;
+	protected final Fluids fluids = this.addComponent(new Fluids(this));
 	protected int progress = 0;
 	protected IElectrolyzerRecipeManager.ElectrolyzerRecipe recipe = null;
 	protected Ic2FluidTank input;
-	public final InvSlotUpgrade upgradeSlot;
-	protected final Fluids fluids = this.addComponent(new Fluids(this));
 
 	public TileEntityElectrolyzer(BlockPos pos, BlockState state)
 	{

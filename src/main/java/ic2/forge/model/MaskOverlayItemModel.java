@@ -5,16 +5,15 @@ import ic2.core.item.tool.ItemObscurator;
 import ic2.core.util.StackUtil;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
+import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
@@ -24,6 +23,7 @@ import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -43,13 +43,12 @@ public class MaskOverlayItemModel implements Ic2Model, BakedModel
 	private BakedModel baseModel;
 	private List<BakedQuad> baseQuads;
 	private List<OverlayQuad> overlayTemplates;
-	private TextureAtlasSprite baseSprite;
 	private float uS, vS, uE, vE;
 
 	private final ItemOverrides itemOverrides = new ItemOverrides()
 	{
 		@Override
-		public BakedModel resolve(BakedModel originalModel, ItemStack stack, @Nullable net.minecraft.client.multiplayer.ClientLevel level, @Nullable LivingEntity entity, int seed)
+		public BakedModel resolve(@NotNull BakedModel originalModel, @NotNull ItemStack stack, @Nullable net.minecraft.client.multiplayer.ClientLevel level, @Nullable LivingEntity entity, int seed)
 		{
 			CompoundTag nbt = StackUtil.getOrCreateNbtData(stack);
 			BlockState state = ItemObscurator.getState(nbt);
@@ -83,157 +82,6 @@ public class MaskOverlayItemModel implements Ic2Model, BakedModel
 		return ResourceLocation.fromNamespaceAndPath(maskLocation.getNamespace(), "textures/" + maskLocation.getPath() + ".png");
 	}
 
-	@Override
-	public BakedModel bake(
-		IGeometryBakingContext owner,
-		ModelBaker bakery,
-		Function<Material, TextureAtlasSprite> spriteGetter,
-		ModelState modelTransform,
-		ItemOverrides overrides,
-		ResourceLocation modelLocation
-	)
-	{
-		this.baseModel = bakery.bake(this.baseModelLocation, modelTransform, spriteGetter);
-		if (this.baseModel == null)
-		{
-			throw new IllegalStateException("missing base model " + this.baseModelLocation);
-		}
-
-		RandomSource rand = RandomSource.create(42L);
-		this.baseQuads = this.baseModel.getQuads(null, null, rand, ModelData.EMPTY, null);
-
-		TextureAtlasSprite maskSprite = spriteGetter.apply(new Material(TextureAtlas.LOCATION_BLOCKS, this.maskTextureLocation));
-		this.baseSprite = maskSprite;
-
-		try
-		{
-			ResourceLocation maskResLoc = maskToResource(this.maskTextureLocation);
-			NativeImage maskImage = NativeImage.read(
-				Minecraft.getInstance().getResourceManager().getResource(maskResLoc).get().open()
-			);
-
-			int width = maskImage.getWidth();
-			int height = maskImage.getHeight();
-			List<Area> areas = searchAreas(readMask(maskImage), width);
-			maskImage.close();
-
-			float texWidth = this.baseSprite.contents().width() / 16f;
-			float texHeight = this.baseSprite.contents().height() / 16f;
-
-			float zF = (7.5f - this.offset) / 16f;
-			float zB = (8.5f + this.offset) / 16f;
-
-			this.overlayTemplates = new ArrayList<>(areas.size());
-
-			for (Area area : areas)
-			{
-				float xS = area.x / (float) width * texWidth;
-				float yS = 1f - area.y / (float) height * texHeight;
-				float xE = (area.x + area.width) / (float) width * texWidth;
-				float yE = 1f - (area.y + area.height) / (float) height * texHeight;
-
-				BakedQuad frontQuad = createQuad(xS, yS, xE, yE, zF, Direction.SOUTH, this.baseSprite);
-				BakedQuad backQuad = createQuad(xS, yS, xE, yE, zB, Direction.NORTH, this.baseSprite);
-				this.overlayTemplates.add(new OverlayQuad(frontQuad, backQuad, xS, yS, xE, yE));
-			}
-
-			if (this.scaleOverlay)
-			{
-				calcOverlayBounds(areas, width, height, texWidth, texHeight);
-			}
-			else
-			{
-				this.uS = this.vS = 0f;
-				this.uE = this.vE = 1f;
-			}
-		}
-		catch (IOException e)
-		{
-			this.overlayTemplates = Collections.emptyList();
-			this.uS = this.vS = 0f;
-			this.uE = this.vE = 1f;
-		}
-
-		return this;
-	}
-
-	@Override
-	public @NotNull List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @NotNull RandomSource random, ModelData extraData, @Nullable net.minecraft.client.renderer.RenderType renderType)
-	{
-		return this.baseQuads;
-	}
-
-	@Override
-	public @NotNull List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @NotNull RandomSource random)
-	{
-		return this.baseQuads;
-	}
-
-	@Override
-	public boolean useAmbientOcclusion()
-	{
-		return this.baseModel.useAmbientOcclusion();
-	}
-
-	@Override
-	public boolean isGui3d()
-	{
-		return this.baseModel.isGui3d();
-	}
-
-	@Override
-	public boolean usesBlockLight()
-	{
-		return this.baseModel.usesBlockLight();
-	}
-
-	@Override
-	public boolean isCustomRenderer()
-	{
-		return false;
-	}
-
-	@Override
-	public @NotNull TextureAtlasSprite getParticleIcon()
-	{
-		return this.baseModel.getParticleIcon();
-	}
-
-	@Override
-	public @NotNull ItemOverrides getOverrides()
-	{
-		return this.itemOverrides;
-	}
-
-	private List<BakedQuad> buildOverlayQuads(ItemObscurator.ObscuredRenderInfo renderInfo, int[] colorMultipliers)
-	{
-		List<BakedQuad> result = new ArrayList<>(this.overlayTemplates.size() * 2);
-
-		for (int qi = 0; qi < this.overlayTemplates.size(); qi++)
-		{
-			OverlayQuad template = this.overlayTemplates.get(qi);
-
-			int ti = qi % renderInfo.tints.length;
-			TextureAtlasSprite sprite = renderInfo.sprites[ti];
-			int colorMul = colorMultipliers[ti];
-
-			float quS = renderInfo.uvs[qi * 4];
-			float qvS = renderInfo.uvs[qi * 4 + 1];
-			float quE = renderInfo.uvs[qi * 4 + 2];
-			float qvE = renderInfo.uvs[qi * 4 + 3];
-
-			float mappedUS = uS + (quS - sprite.getU0()) / (sprite.getU1() - sprite.getU0()) * (uE - uS);
-			float mappedVS = vS + (qvS - sprite.getV0()) / (sprite.getV1() - sprite.getV0()) * (vE - vS);
-			float mappedUE = uS + (quE - sprite.getU0()) / (sprite.getU1() - sprite.getU0()) * (uE - uS);
-			float mappedVE = vS + (qvE - sprite.getV0()) / (sprite.getV1() - sprite.getV0()) * (vE - vS);
-
-			result.add(remapQuad(template.frontQuad, sprite, mappedUS, mappedVS, mappedUE, mappedVE, colorMul));
-			result.add(remapQuad(template.backQuad, sprite, mappedUS, mappedVS, mappedUE, mappedVE, colorMul));
-		}
-
-		return result;
-	}
-
 	private static BakedQuad remapQuad(BakedQuad template, TextureAtlasSprite sprite, float uS, float vS, float uE, float vE, int colorMul)
 	{
 		int[] oldData = template.getVertices();
@@ -245,10 +93,10 @@ public class MaskOverlayItemModel implements Ic2Model, BakedModel
 		// v1: (xE, yS) bottom-right → UV (uE, vS)
 		// v2: (xE, yE) top-right    → UV (uE, vE)
 		// v3: (xS, yE) top-left     → UV (uS, vE)
-		newData[0 * stride + 4] = Float.floatToRawIntBits(uS);
-		newData[0 * stride + 5] = Float.floatToRawIntBits(vS);
-		newData[1 * stride + 4] = Float.floatToRawIntBits(uE);
-		newData[1 * stride + 5] = Float.floatToRawIntBits(vS);
+		newData[4] = Float.floatToRawIntBits(uS);
+		newData[5] = Float.floatToRawIntBits(vS);
+		newData[stride + 4] = Float.floatToRawIntBits(uE);
+		newData[stride + 5] = Float.floatToRawIntBits(vS);
 		newData[2 * stride + 4] = Float.floatToRawIntBits(uE);
 		newData[2 * stride + 5] = Float.floatToRawIntBits(vE);
 		newData[3 * stride + 4] = Float.floatToRawIntBits(uS);
@@ -330,27 +178,6 @@ public class MaskOverlayItemModel implements Ic2Model, BakedModel
 		return face.getStepX() & 0xFF | ((face.getStepY() & 0xFF) << 8) | ((face.getStepZ() & 0xFF) << 16);
 	}
 
-	private void calcOverlayBounds(List<Area> areas, int width, int height, float texWidth, float texHeight)
-	{
-		int minX = Integer.MAX_VALUE;
-		int minY = Integer.MAX_VALUE;
-		int maxX = Integer.MIN_VALUE;
-		int maxY = Integer.MIN_VALUE;
-
-		for (Area area : areas)
-		{
-			if (area.x < minX) minX = area.x;
-			if (area.y < minY) minY = area.y;
-			if (area.x + area.width > maxX) maxX = area.x + area.width;
-			if (area.y + area.height > maxY) maxY = area.y + area.height;
-		}
-
-		this.uS = minX / (float) width * texWidth;
-		this.vS = 1f - maxY / (float) height * texHeight;
-		this.uE = maxX / (float) width * texWidth;
-		this.vE = 1f - minY / (float) height * texHeight;
-	}
-
 	private static BitSet readMask(NativeImage img)
 	{
 		int w = img.getWidth();
@@ -396,81 +223,236 @@ public class MaskOverlayItemModel implements Ic2Model, BakedModel
 		return ret;
 	}
 
-	private static class Area
+	@Override
+	public BakedModel bake(
+		IGeometryBakingContext owner,
+		ModelBaker bakery,
+		Function<Material, TextureAtlasSprite> spriteGetter,
+		ModelState modelTransform,
+		ItemOverrides overrides,
+		ResourceLocation modelLocation
+	)
 	{
-		final int x, y, width, height;
-
-		Area(int x, int y, int width, int height)
+		this.baseModel = bakery.bake(this.baseModelLocation, modelTransform, spriteGetter);
+		if (this.baseModel == null)
 		{
-			this.x = x;
-			this.y = y;
-			this.width = width;
-			this.height = height;
+			throw new IllegalStateException("missing base model " + this.baseModelLocation);
 		}
+
+		RandomSource rand = RandomSource.create(42L);
+		this.baseQuads = this.baseModel.getQuads(null, null, rand, ModelData.EMPTY, null);
+
+		TextureAtlasSprite maskSprite = spriteGetter.apply(new Material(TextureAtlas.LOCATION_BLOCKS, this.maskTextureLocation));
+
+		try (SpriteContents tex = maskSprite.contents())
+		{
+			ResourceLocation maskResLoc = maskToResource(this.maskTextureLocation);
+			Optional<Resource> resOpt = Minecraft.getInstance().getResourceManager().getResource(maskResLoc);
+			NativeImage maskImage = resOpt.isPresent() ? NativeImage.read(resOpt.get().open()) : null;
+			
+			int width = maskImage.getWidth();
+			int height = maskImage.getHeight();
+			List<Area> areas = searchAreas(readMask(maskImage), width);
+			maskImage.close();
+
+			float texWidth = tex.width() / 16f;
+			float texHeight = tex.height() / 16f;
+
+			float zF = (7.5f - this.offset) / 16f;
+			float zB = (8.5f + this.offset) / 16f;
+
+			this.overlayTemplates = new ArrayList<>(areas.size());
+
+			for (Area area : areas)
+			{
+				float xS = area.x / (float) width * texWidth;
+				float yS = 1f - area.y / (float) height * texHeight;
+				float xE = (area.x + area.width) / (float) width * texWidth;
+				float yE = 1f - (area.y + area.height) / (float) height * texHeight;
+
+				BakedQuad frontQuad = createQuad(xS, yS, xE, yE, zF, Direction.SOUTH, maskSprite);
+				BakedQuad backQuad = createQuad(xS, yS, xE, yE, zB, Direction.NORTH, maskSprite);
+				this.overlayTemplates.add(new OverlayQuad(frontQuad, backQuad, xS, yS, xE, yE));
+			}
+
+			if (this.scaleOverlay)
+			{
+				calcOverlayBounds(areas, width, height, texWidth, texHeight);
+			} else
+			{
+				this.uS = this.vS = 0f;
+				this.uE = this.vE = 1f;
+			}
+		} catch (IOException e)
+		{
+			this.overlayTemplates = Collections.emptyList();
+			this.uS = this.vS = 0f;
+			this.uE = this.vE = 1f;
+		}
+
+		return this;
 	}
 
-	private static class OverlayQuad
+	@Override
+	public @NotNull List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @NotNull RandomSource random, @NotNull ModelData extraData, @Nullable net.minecraft.client.renderer.RenderType renderType)
 	{
-		final BakedQuad frontQuad;
-		final BakedQuad backQuad;
-		final float xS, yS, xE, yE;
-
-		OverlayQuad(BakedQuad frontQuad, BakedQuad backQuad, float xS, float yS, float xE, float yE)
-		{
-			this.frontQuad = frontQuad;
-			this.backQuad = backQuad;
-			this.xS = xS;
-			this.yS = yS;
-			this.xE = xE;
-			this.yE = yE;
-		}
+		return this.baseQuads;
 	}
 
-	private static class OverlaidModel implements BakedModel
+	@Override
+	public @NotNull List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @NotNull RandomSource random)
 	{
-		private final BakedModel baseModel;
-		private final List<BakedQuad> baseQuads;
-		private final List<BakedQuad> overlayQuads;
-
-		OverlaidModel(BakedModel baseModel, List<BakedQuad> baseQuads, List<BakedQuad> overlayQuads)
-		{
-			this.baseModel = baseModel;
-			this.baseQuads = baseQuads;
-			this.overlayQuads = overlayQuads;
-		}
-
-		@Override
-		public @NotNull List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @NotNull RandomSource random, ModelData extraData, @Nullable net.minecraft.client.renderer.RenderType renderType)
-		{
-			if (side != null) return this.baseQuads;
-			List<BakedQuad> combined = new ArrayList<>(this.baseQuads.size() + this.overlayQuads.size());
-			combined.addAll(this.baseQuads);
-			combined.addAll(this.overlayQuads);
-			return combined;
-		}
-
-		@Override
-		public @NotNull List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @NotNull RandomSource random)
-		{
-			return this.getQuads(state, side, random, ModelData.EMPTY, null);
-		}
-
-		@Override
-		public boolean useAmbientOcclusion() { return this.baseModel.useAmbientOcclusion(); }
-
-		@Override
-		public boolean isGui3d() { return this.baseModel.isGui3d(); }
-
-		@Override
-		public boolean usesBlockLight() { return this.baseModel.usesBlockLight(); }
-
-		@Override
-		public boolean isCustomRenderer() { return false; }
-
-		@Override
-		public @NotNull TextureAtlasSprite getParticleIcon() { return this.baseModel.getParticleIcon(); }
-
-		@Override
-		public @NotNull ItemOverrides getOverrides() { return ItemOverrides.EMPTY; }
+		return this.baseQuads;
 	}
+
+	@Override
+	public boolean useAmbientOcclusion()
+	{
+		return this.baseModel.useAmbientOcclusion();
+	}
+
+	@Override
+	public boolean isGui3d()
+	{
+		return this.baseModel.isGui3d();
+	}
+
+	@Override
+	public boolean usesBlockLight()
+	{
+		return this.baseModel.usesBlockLight();
+	}
+
+	@Override
+	public boolean isCustomRenderer()
+	{
+		return false;
+	}
+
+	@Override
+	public @NotNull TextureAtlasSprite getParticleIcon()
+	{
+		return this.baseModel.getParticleIcon();
+	}
+
+	@Override
+	public @NotNull ItemOverrides getOverrides()
+	{
+		return this.itemOverrides;
+	}
+
+	private List<BakedQuad> buildOverlayQuads(ItemObscurator.ObscuredRenderInfo renderInfo, int[] colorMultipliers)
+	{
+		List<BakedQuad> result = new ArrayList<>(this.overlayTemplates.size() * 2);
+
+		for (int qi = 0; qi < this.overlayTemplates.size(); qi++)
+		{
+			OverlayQuad template = this.overlayTemplates.get(qi);
+
+			int ti = qi % renderInfo.tints.length;
+			TextureAtlasSprite sprite = renderInfo.sprites[ti];
+			int colorMul = colorMultipliers[ti];
+
+			float quS = renderInfo.uvs[qi * 4];
+			float qvS = renderInfo.uvs[qi * 4 + 1];
+			float quE = renderInfo.uvs[qi * 4 + 2];
+			float qvE = renderInfo.uvs[qi * 4 + 3];
+
+			float mappedUS = uS + (quS - sprite.getU0()) / (sprite.getU1() - sprite.getU0()) * (uE - uS);
+			float mappedVS = vS + (qvS - sprite.getV0()) / (sprite.getV1() - sprite.getV0()) * (vE - vS);
+			float mappedUE = uS + (quE - sprite.getU0()) / (sprite.getU1() - sprite.getU0()) * (uE - uS);
+			float mappedVE = vS + (qvE - sprite.getV0()) / (sprite.getV1() - sprite.getV0()) * (vE - vS);
+
+			result.add(remapQuad(template.frontQuad, sprite, mappedUS, mappedVS, mappedUE, mappedVE, colorMul));
+			result.add(remapQuad(template.backQuad, sprite, mappedUS, mappedVS, mappedUE, mappedVE, colorMul));
+		}
+
+		return result;
+	}
+
+	private void calcOverlayBounds(List<Area> areas, int width, int height, float texWidth, float texHeight)
+	{
+		int minX = Integer.MAX_VALUE;
+		int minY = Integer.MAX_VALUE;
+		int maxX = Integer.MIN_VALUE;
+		int maxY = Integer.MIN_VALUE;
+
+		for (Area area : areas)
+		{
+			if (area.x < minX) minX = area.x;
+			if (area.y < minY) minY = area.y;
+			if (area.x + area.width > maxX) maxX = area.x + area.width;
+			if (area.y + area.height > maxY) maxY = area.y + area.height;
+		}
+
+		this.uS = minX / (float) width * texWidth;
+		this.vS = 1f - maxY / (float) height * texHeight;
+		this.uE = maxX / (float) width * texWidth;
+		this.vE = 1f - minY / (float) height * texHeight;
+	}
+
+	private record Area(int x, int y, int width, int height)
+		{
+		}
+
+	private record OverlayQuad(BakedQuad frontQuad, BakedQuad backQuad, float xS, float yS, float xE, float yE)
+		{
+		}
+
+	private record OverlaidModel(BakedModel baseModel, List<BakedQuad> baseQuads,
+	                             List<BakedQuad> overlayQuads) implements BakedModel
+		{
+
+			@Override
+			public @NotNull List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @NotNull RandomSource random, ModelData extraData, @Nullable RenderType renderType)
+			{
+				if (side != null) return this.baseQuads;
+				List<BakedQuad> combined = new ArrayList<>(this.baseQuads.size() + this.overlayQuads.size());
+				combined.addAll(this.baseQuads);
+				combined.addAll(this.overlayQuads);
+				return combined;
+			}
+	
+			@Override
+			public @NotNull List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @NotNull RandomSource random)
+			{
+				return this.getQuads(state, side, random, ModelData.EMPTY, null);
+			}
+	
+			@Override
+			public boolean useAmbientOcclusion()
+			{
+				return this.baseModel.useAmbientOcclusion();
+			}
+	
+			@Override
+			public boolean isGui3d()
+			{
+				return this.baseModel.isGui3d();
+			}
+	
+			@Override
+			public boolean usesBlockLight()
+			{
+				return this.baseModel.usesBlockLight();
+			}
+	
+			@Override
+			public boolean isCustomRenderer()
+			{
+				return false;
+			}
+	
+			@Override
+			public @NotNull TextureAtlasSprite getParticleIcon()
+			{
+				return this.baseModel.getParticleIcon();
+			}
+	
+			@Override
+			public @NotNull ItemOverrides getOverrides()
+			{
+				return ItemOverrides.EMPTY;
+			}
+		}
 }

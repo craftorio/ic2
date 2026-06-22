@@ -94,217 +94,6 @@ public abstract class Gauge<T extends Gauge<T>> extends GuiElement<T>
 		}
 	}
 
-	public static class GaugeProperties
-	{
-		public final short uInner;
-		public final short vInner;
-		public final short innerWidth;
-		public final short innerHeight;
-		public final short hoverXOffset;
-		public final short hoverYOffset;
-		public final short hoverWidth;
-		public final short hoverHeight;
-		public final short bgXOffset;
-		public final short bgYOffset;
-		public final short bgWidth;
-		public final short bgHeight;
-		public final short uBgInactive;
-		public final short vBgInactive;
-		public final short uBgActive;
-		public final short vBgActive;
-		public final boolean vertical;
-		public final boolean reverse;
-		public final boolean smooth;
-		public final ResourceLocation texture;
-
-		public GaugeProperties(
-			int uInner,
-			int vInner,
-			int innerWidth,
-			int innerHeight,
-			int hoverXOffset,
-			int hoverYOffset,
-			int hoverWidth,
-			int hoverHeight,
-			int bgXOffset,
-			int bgYOffset,
-			int bgWidth,
-			int bgHeight,
-			int uBgInactive,
-			int vBgInactive,
-			int uBgActive,
-			int vBgActive,
-			boolean vertical,
-			boolean reverse,
-			boolean smooth,
-			ResourceLocation texture
-		)
-		{
-			this.uInner = (short) uInner;
-			this.vInner = (short) vInner;
-			this.innerWidth = (short) innerWidth;
-			this.innerHeight = (short) innerHeight;
-			this.hoverXOffset = (short) hoverXOffset;
-			this.hoverYOffset = (short) hoverYOffset;
-			this.hoverWidth = (short) hoverWidth;
-			this.hoverHeight = (short) hoverHeight;
-			this.bgXOffset = (short) bgXOffset;
-			this.bgYOffset = (short) bgYOffset;
-			this.bgWidth = (short) bgWidth;
-			this.bgHeight = (short) bgHeight;
-			this.uBgInactive = (short) uBgInactive;
-			this.vBgInactive = (short) vBgInactive;
-			this.uBgActive = (short) uBgActive;
-			this.vBgActive = (short) vBgActive;
-			this.vertical = vertical;
-			this.reverse = reverse;
-			this.smooth = smooth;
-			this.texture = texture;
-		}
-	}
-
-	public static class GaugePropertyBuilder
-	{
-		private final short uInner;
-		private final short vInner;
-		private final short innerWidth;
-		private final short innerHeight;
-		private short hoverXOffset;
-		private short hoverYOffset;
-		private short hoverWidth;
-		private short hoverHeight;
-		private short bgXOffset;
-		private short bgYOffset;
-		private short bgWidth;
-		private short bgHeight;
-		private short uBgInactive;
-		private short vBgInactive;
-		private short uBgActive;
-		private short vBgActive;
-		private final boolean vertical;
-		private final boolean reverse;
-		private boolean smooth = true;
-		private ResourceLocation texture = GuiElement.commonTexture;
-
-		public GaugePropertyBuilder(int uInner, int vInner, int innerWidth, int innerHeight, Gauge.GaugePropertyBuilder.GaugeOrientation dir)
-		{
-			this.uInner = toShort(uInner);
-			this.vInner = toShort(vInner);
-			this.innerWidth = this.hoverWidth = toShort(innerWidth);
-			this.innerHeight = this.hoverHeight = toShort(innerHeight);
-			this.vertical = dir.vertical;
-			this.reverse = dir.reverse;
-		}
-
-		public Gauge.GaugePropertyBuilder withHoverBorder(int border)
-		{
-			this.hoverXOffset = toShort(-border);
-			this.hoverYOffset = toShort(-border);
-			this.hoverWidth = toShort(this.innerWidth + 2 * border);
-			this.hoverHeight = toShort(this.innerHeight + 2 * border);
-			return this;
-		}
-
-		public Gauge.GaugePropertyBuilder withHover(int hoverXOffset, int hoverYOffset, int hoverWidth, int hoverHeight)
-		{
-			this.hoverXOffset = toShort(hoverXOffset);
-			this.hoverYOffset = toShort(hoverYOffset);
-			this.hoverWidth = toShort(hoverWidth);
-			this.hoverHeight = toShort(hoverHeight);
-			return this;
-		}
-
-		public Gauge.GaugePropertyBuilder withBackground(int uBg, int vBg)
-		{
-			return this.withBackground(0, 0, this.innerWidth, this.innerHeight, uBg, vBg);
-		}
-
-		public Gauge.GaugePropertyBuilder withBackground(int bgXOffset, int bgYOffset, int bgWidth, int bgHeight, int uBg, int vBg)
-		{
-			return this.withBackground(bgXOffset, bgYOffset, bgWidth, bgHeight, uBg, vBg, uBg, vBg);
-		}
-
-		public Gauge.GaugePropertyBuilder withBackground(int uBgInactive, int vBgInactive, int uBgActive, int vBgActive)
-		{
-			return this.withBackground(0, 0, this.innerWidth, this.innerHeight, uBgInactive, vBgInactive, uBgActive, vBgActive);
-		}
-
-		public Gauge.GaugePropertyBuilder withBackground(
-			int bgXOffset, int bgYOffset, int bgWidth, int bgHeight, int uBgInactive, int vBgInactive, int uBgActive, int vBgActive
-		)
-		{
-			this.bgXOffset = toShort(bgXOffset);
-			this.bgYOffset = toShort(bgYOffset);
-			this.bgWidth = toShort(bgWidth);
-			this.bgHeight = toShort(bgHeight);
-			this.uBgInactive = toShort(uBgInactive);
-			this.vBgInactive = toShort(vBgInactive);
-			this.uBgActive = toShort(uBgActive);
-			this.vBgActive = toShort(vBgActive);
-			return this;
-		}
-
-		public Gauge.GaugePropertyBuilder withSmooth(boolean smooth)
-		{
-			this.smooth = smooth;
-			return this;
-		}
-
-		public Gauge.GaugePropertyBuilder withTexture(ResourceLocation texture)
-		{
-			this.texture = texture;
-			return this;
-		}
-
-		public Gauge.GaugeProperties build()
-		{
-			return new Gauge.GaugeProperties(
-				this.uInner,
-				this.vInner,
-				this.innerWidth,
-				this.innerHeight,
-				this.hoverXOffset,
-				this.hoverYOffset,
-				this.hoverWidth,
-				this.hoverHeight,
-				this.bgXOffset,
-				this.bgYOffset,
-				this.bgWidth,
-				this.bgHeight,
-				this.uBgInactive,
-				this.vBgInactive,
-				this.uBgActive,
-				this.vBgActive,
-				this.vertical,
-				this.reverse,
-				this.smooth,
-				this.texture
-			);
-		}
-
-		private static short toShort(int value)
-		{
-			return (short) value;
-		}
-
-		public enum GaugeOrientation
-		{
-			Up(true, true),
-			Down(true, false),
-			Left(false, true),
-			Right(false, false);
-
-			final boolean vertical;
-			final boolean reverse;
-
-			GaugeOrientation(boolean vertical, boolean reverse)
-			{
-				this.vertical = vertical;
-				this.reverse = reverse;
-			}
-		}
-	}
-
 	public enum GaugeStyle implements Gauge.IGaugeStyle
 	{
 		Fuel(
@@ -401,18 +190,12 @@ public abstract class Gauge<T extends Gauge<T>> extends GuiElement<T>
 		);
 
 		private static final Map<String, Gauge.IGaugeStyle> map = getMap();
-		private final String name = this.name().toLowerCase(Locale.ENGLISH);
 		public final Gauge.GaugeProperties properties;
+		private final String name = this.name().toLowerCase(Locale.ENGLISH);
 
 		GaugeStyle(Gauge.GaugeProperties properties)
 		{
 			this.properties = properties;
-		}
-
-		@Override
-		public Gauge.GaugeProperties getProperties()
-		{
-			return this.properties;
 		}
 
 		public static void addStyle(String name, Gauge.IGaugeStyle style)
@@ -444,10 +227,227 @@ public abstract class Gauge<T extends Gauge<T>> extends GuiElement<T>
 
 			return ret;
 		}
+
+		@Override
+		public Gauge.GaugeProperties getProperties()
+		{
+			return this.properties;
+		}
 	}
 
 	public interface IGaugeStyle
 	{
 		Gauge.GaugeProperties getProperties();
+	}
+
+	public static class GaugeProperties
+	{
+		public final short uInner;
+		public final short vInner;
+		public final short innerWidth;
+		public final short innerHeight;
+		public final short hoverXOffset;
+		public final short hoverYOffset;
+		public final short hoverWidth;
+		public final short hoverHeight;
+		public final short bgXOffset;
+		public final short bgYOffset;
+		public final short bgWidth;
+		public final short bgHeight;
+		public final short uBgInactive;
+		public final short vBgInactive;
+		public final short uBgActive;
+		public final short vBgActive;
+		public final boolean vertical;
+		public final boolean reverse;
+		public final boolean smooth;
+		public final ResourceLocation texture;
+
+		public GaugeProperties(
+			int uInner,
+			int vInner,
+			int innerWidth,
+			int innerHeight,
+			int hoverXOffset,
+			int hoverYOffset,
+			int hoverWidth,
+			int hoverHeight,
+			int bgXOffset,
+			int bgYOffset,
+			int bgWidth,
+			int bgHeight,
+			int uBgInactive,
+			int vBgInactive,
+			int uBgActive,
+			int vBgActive,
+			boolean vertical,
+			boolean reverse,
+			boolean smooth,
+			ResourceLocation texture
+		)
+		{
+			this.uInner = (short) uInner;
+			this.vInner = (short) vInner;
+			this.innerWidth = (short) innerWidth;
+			this.innerHeight = (short) innerHeight;
+			this.hoverXOffset = (short) hoverXOffset;
+			this.hoverYOffset = (short) hoverYOffset;
+			this.hoverWidth = (short) hoverWidth;
+			this.hoverHeight = (short) hoverHeight;
+			this.bgXOffset = (short) bgXOffset;
+			this.bgYOffset = (short) bgYOffset;
+			this.bgWidth = (short) bgWidth;
+			this.bgHeight = (short) bgHeight;
+			this.uBgInactive = (short) uBgInactive;
+			this.vBgInactive = (short) vBgInactive;
+			this.uBgActive = (short) uBgActive;
+			this.vBgActive = (short) vBgActive;
+			this.vertical = vertical;
+			this.reverse = reverse;
+			this.smooth = smooth;
+			this.texture = texture;
+		}
+	}
+
+	public static class GaugePropertyBuilder
+	{
+		private final short uInner;
+		private final short vInner;
+		private final short innerWidth;
+		private final short innerHeight;
+		private final boolean vertical;
+		private final boolean reverse;
+		private short hoverXOffset;
+		private short hoverYOffset;
+		private short hoverWidth;
+		private short hoverHeight;
+		private short bgXOffset;
+		private short bgYOffset;
+		private short bgWidth;
+		private short bgHeight;
+		private short uBgInactive;
+		private short vBgInactive;
+		private short uBgActive;
+		private short vBgActive;
+		private boolean smooth = true;
+		private ResourceLocation texture = GuiElement.commonTexture;
+
+		public GaugePropertyBuilder(int uInner, int vInner, int innerWidth, int innerHeight, Gauge.GaugePropertyBuilder.GaugeOrientation dir)
+		{
+			this.uInner = toShort(uInner);
+			this.vInner = toShort(vInner);
+			this.innerWidth = this.hoverWidth = toShort(innerWidth);
+			this.innerHeight = this.hoverHeight = toShort(innerHeight);
+			this.vertical = dir.vertical;
+			this.reverse = dir.reverse;
+		}
+
+		private static short toShort(int value)
+		{
+			return (short) value;
+		}
+
+		public Gauge.GaugePropertyBuilder withHoverBorder(int border)
+		{
+			this.hoverXOffset = toShort(-border);
+			this.hoverYOffset = toShort(-border);
+			this.hoverWidth = toShort(this.innerWidth + 2 * border);
+			this.hoverHeight = toShort(this.innerHeight + 2 * border);
+			return this;
+		}
+
+		public Gauge.GaugePropertyBuilder withHover(int hoverXOffset, int hoverYOffset, int hoverWidth, int hoverHeight)
+		{
+			this.hoverXOffset = toShort(hoverXOffset);
+			this.hoverYOffset = toShort(hoverYOffset);
+			this.hoverWidth = toShort(hoverWidth);
+			this.hoverHeight = toShort(hoverHeight);
+			return this;
+		}
+
+		public Gauge.GaugePropertyBuilder withBackground(int uBg, int vBg)
+		{
+			return this.withBackground(0, 0, this.innerWidth, this.innerHeight, uBg, vBg);
+		}
+
+		public Gauge.GaugePropertyBuilder withBackground(int bgXOffset, int bgYOffset, int bgWidth, int bgHeight, int uBg, int vBg)
+		{
+			return this.withBackground(bgXOffset, bgYOffset, bgWidth, bgHeight, uBg, vBg, uBg, vBg);
+		}
+
+		public Gauge.GaugePropertyBuilder withBackground(int uBgInactive, int vBgInactive, int uBgActive, int vBgActive)
+		{
+			return this.withBackground(0, 0, this.innerWidth, this.innerHeight, uBgInactive, vBgInactive, uBgActive, vBgActive);
+		}
+
+		public Gauge.GaugePropertyBuilder withBackground(
+			int bgXOffset, int bgYOffset, int bgWidth, int bgHeight, int uBgInactive, int vBgInactive, int uBgActive, int vBgActive
+		)
+		{
+			this.bgXOffset = toShort(bgXOffset);
+			this.bgYOffset = toShort(bgYOffset);
+			this.bgWidth = toShort(bgWidth);
+			this.bgHeight = toShort(bgHeight);
+			this.uBgInactive = toShort(uBgInactive);
+			this.vBgInactive = toShort(vBgInactive);
+			this.uBgActive = toShort(uBgActive);
+			this.vBgActive = toShort(vBgActive);
+			return this;
+		}
+
+		public Gauge.GaugePropertyBuilder withSmooth(boolean smooth)
+		{
+			this.smooth = smooth;
+			return this;
+		}
+
+		public Gauge.GaugePropertyBuilder withTexture(ResourceLocation texture)
+		{
+			this.texture = texture;
+			return this;
+		}
+
+		public Gauge.GaugeProperties build()
+		{
+			return new Gauge.GaugeProperties(
+				this.uInner,
+				this.vInner,
+				this.innerWidth,
+				this.innerHeight,
+				this.hoverXOffset,
+				this.hoverYOffset,
+				this.hoverWidth,
+				this.hoverHeight,
+				this.bgXOffset,
+				this.bgYOffset,
+				this.bgWidth,
+				this.bgHeight,
+				this.uBgInactive,
+				this.vBgInactive,
+				this.uBgActive,
+				this.vBgActive,
+				this.vertical,
+				this.reverse,
+				this.smooth,
+				this.texture
+			);
+		}
+
+		public enum GaugeOrientation
+		{
+			Up(true, true),
+			Down(true, false),
+			Left(false, true),
+			Right(false, false);
+
+			final boolean vertical;
+			final boolean reverse;
+
+			GaugeOrientation(boolean vertical, boolean reverse)
+			{
+				this.vertical = vertical;
+				this.reverse = reverse;
+			}
+		}
 	}
 }

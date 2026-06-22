@@ -21,7 +21,8 @@ import net.minecraft.world.item.ItemStack;
 
 public class Process extends TileEntityComponent
 {
-	protected int progress = 0;
+	private final InvSlotProcessable<IRecipeInput, Collection<ItemStack>, ItemStack> inputSlot;
+	private final InvSlotOutput outputSlot;
 	public int defaultEnergyConsume;
 	public int operationDuration;
 	public int defaultTier;
@@ -29,9 +30,45 @@ public class Process extends TileEntityComponent
 	public int energyConsume;
 	public int operationLength;
 	public int operationsPerTick;
-	private final InvSlotProcessable<IRecipeInput, Collection<ItemStack>, ItemStack> inputSlot;
-	private final InvSlotOutput outputSlot;
+	protected int progress = 0;
 	private InvSlotUpgrade upgradeSlot;
+
+	public Process(TileEntityInventory parent, Recipes.IGetter<? extends IMachineRecipeManager<IRecipeInput, Collection<ItemStack>, ItemStack>> recipeManager)
+	{
+		this(parent, recipeManager, 2, 100, 1, 0);
+	}
+
+	public Process(
+		TileEntityInventory parent,
+		Recipes.IGetter<? extends IMachineRecipeManager<IRecipeInput, Collection<ItemStack>, ItemStack>> recipeManager,
+		int operationCost,
+		int operationDuration,
+		int outputSlots,
+		int upgradeSlots
+	)
+	{
+		this(parent, new InvSlotProcessableGeneric(parent, "input", 1, recipeManager), operationCost, operationDuration, outputSlots, upgradeSlots);
+	}
+
+	protected Process(
+		TileEntityInventory parent,
+		InvSlotProcessable<IRecipeInput, Collection<ItemStack>, ItemStack> inputSlot,
+		int operationCost,
+		int operationDuration,
+		int outputSlots,
+		int upgradeSlots
+	)
+	{
+		super(parent);
+		this.operationDuration = operationDuration;
+		assert inputSlot != null;
+		this.inputSlot = inputSlot;
+		this.outputSlot = new InvSlotOutput(parent, "output", outputSlots);
+		if (parent instanceof IUpgradableBlock && upgradeSlots > 0)
+		{
+			this.upgradeSlot = InvSlotUpgrade.createUnchecked(parent, "upgrade", upgradeSlots);
+		}
+	}
 
 	public static Process asFurnace(TileEntityInventory parent)
 	{
@@ -153,41 +190,10 @@ public class Process extends TileEntityComponent
 		return new Process(parent, Recipes.metalformerRolling, operationCost, operationDuration, outputSlots, upgradeSlots);
 	}
 
-	public Process(TileEntityInventory parent, Recipes.IGetter<? extends IMachineRecipeManager<IRecipeInput, Collection<ItemStack>, ItemStack>> recipeManager)
+	public static int applyModifier(int base, int extra, double multiplier)
 	{
-		this(parent, recipeManager, 2, 100, 1, 0);
-	}
-
-	public Process(
-		TileEntityInventory parent,
-		Recipes.IGetter<? extends IMachineRecipeManager<IRecipeInput, Collection<ItemStack>, ItemStack>> recipeManager,
-		int operationCost,
-		int operationDuration,
-		int outputSlots,
-		int upgradeSlots
-	)
-	{
-		this(parent, new InvSlotProcessableGeneric(parent, "input", 1, recipeManager), operationCost, operationDuration, outputSlots, upgradeSlots);
-	}
-
-	protected Process(
-		TileEntityInventory parent,
-		InvSlotProcessable<IRecipeInput, Collection<ItemStack>, ItemStack> inputSlot,
-		int operationCost,
-		int operationDuration,
-		int outputSlots,
-		int upgradeSlots
-	)
-	{
-		super(parent);
-		this.operationDuration = operationDuration;
-		assert inputSlot != null;
-		this.inputSlot = inputSlot;
-		this.outputSlot = new InvSlotOutput(parent, "output", outputSlots);
-		if (parent instanceof IUpgradableBlock && upgradeSlots > 0)
-		{
-			this.upgradeSlot = InvSlotUpgrade.createUnchecked(parent, "upgrade", upgradeSlots);
-		}
+		double ret = Math.round(((double) base + extra) * multiplier);
+		return ret > 2.147483647E9 ? Integer.MAX_VALUE : (int) ret;
 	}
 
 	public void readFromNBT(CompoundTag nbt)
@@ -198,12 +204,6 @@ public class Process extends TileEntityComponent
 	public void writeToNBT(CompoundTag nbt)
 	{
 		nbt.putInt("progress", this.progress);
-	}
-
-	public static int applyModifier(int base, int extra, double multiplier)
-	{
-		double ret = Math.round(((double) base + extra) * multiplier);
-		return ret > 2.147483647E9 ? Integer.MAX_VALUE : (int) ret;
 	}
 
 	public void setOverclockRates()

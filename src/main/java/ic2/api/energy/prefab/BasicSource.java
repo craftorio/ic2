@@ -61,22 +61,6 @@ public class BasicSource extends BasicEnergyTile implements IEnergySource
 		}
 	}
 
-	public void setSourceTier(int tier)
-	{
-		if (tier < 0)
-		{
-			throw new IllegalArgumentException("invalid tier: " + tier);
-		}
-
-		double power = EnergyNet.instance.getPowerFromTier(tier);
-		if (this.getCapacity() < power)
-		{
-			this.setCapacity(power);
-		}
-
-		this.tier = tier;
-	}
-
 	@Override
 	public boolean emitsEnergyTo(IEnergyAcceptor receiver, Direction direction)
 	{
@@ -99,6 +83,22 @@ public class BasicSource extends BasicEnergyTile implements IEnergySource
 	public int getSourceTier()
 	{
 		return this.tier;
+	}
+
+	public void setSourceTier(int tier)
+	{
+		if (tier < 0)
+		{
+			throw new IllegalArgumentException("invalid tier: " + tier);
+		}
+
+		double power = EnergyNet.instance.getPowerFromTier(tier);
+		if (this.getCapacity() < power)
+		{
+			this.setCapacity(power);
+		}
+
+		this.tier = tier;
 	}
 
 	@Override

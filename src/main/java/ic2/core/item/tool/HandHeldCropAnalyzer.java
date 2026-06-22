@@ -26,6 +26,17 @@ public class HandHeldCropAnalyzer extends HandHeldInventory
 		super(player, hand, containerStack, 3);
 	}
 
+	public static int energyForLevel(int level)
+	{
+		return switch (level)
+		{
+			case 1 -> 90;
+			case 2 -> 900;
+			case 3 -> 9000;
+			default -> 10;
+		};
+	}
+
 	private ItemStack getAnalyzedStack()
 	{
 		ItemStack output = this.inventory[SLOT_OUTPUT];
@@ -115,17 +126,6 @@ public class HandHeldCropAnalyzer extends HandHeldInventory
 		return !StackUtil.isEmpty(stack) && stack.getItem() instanceof ICropSeed ? ((ICropSeed) stack.getItem()).getResistanceFromStack(stack) : -1;
 	}
 
-	public static int energyForLevel(int level)
-	{
-		return switch (level)
-		{
-			case 1 -> 90;
-			case 2 -> 900;
-			case 3 -> 9000;
-			default -> 10;
-		};
-	}
-
 	public void tryScan()
 	{
 		if (scanning) return;
@@ -160,8 +160,7 @@ public class HandHeldCropAnalyzer extends HandHeldInventory
 			this.inventory[SLOT_OUTPUT] = input;
 			this.inventory[SLOT_INPUT] = StackUtil.emptyStack;
 			this.save();
-		}
-		finally
+		} finally
 		{
 			scanning = false;
 		}

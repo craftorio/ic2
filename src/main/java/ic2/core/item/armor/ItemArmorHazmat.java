@@ -17,12 +17,6 @@ public class ItemArmorHazmat extends ItemArmorUtility implements IHazmatLike
 		super(Ic2ArmorMaterials.HAZMAT, settings, type);
 	}
 
-	@Override
-	public boolean addsProtection(LivingEntity entity, EquipmentSlot slot, ItemStack stack)
-	{
-		return true;
-	}
-
 	public static boolean hasCompleteHazmat(LivingEntity living)
 	{
 		for (EquipmentSlot slot : EquipmentSlot.values())
@@ -56,6 +50,12 @@ public class ItemArmorHazmat extends ItemArmorUtility implements IHazmatLike
 		return source.is(DamageTypeTags.IS_FIRE)
 			|| source == Ic2DamageSource.electricity
 			|| source == Ic2DamageSource.radiation;
+	}
+
+	@Override
+	public boolean addsProtection(LivingEntity entity, EquipmentSlot slot, ItemStack stack)
+	{
+		return true;
 	}
 
 	public boolean absorbFall(ItemStack stack, LivingEntity entity, float distance)

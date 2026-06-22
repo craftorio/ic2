@@ -33,6 +33,34 @@ public class ItemArmorNanoSuit extends ItemArmorElectric implements IItemHudProv
 		super(material, slot, settings, 1000000.0, 1600.0, 3);
 	}
 
+	static void getNightVisionOrNot(@NotNull ItemStack stack, Player player, CompoundTag nbtData, byte toggleTimer, boolean isNightVisionEnabled)
+	{
+		if (IC2.sideProxy.isSimulating() && toggleTimer > 0)
+		{
+			nbtData.putByte("toggle_timer", --toggleTimer);
+		}
+
+		if (isNightVisionEnabled && IC2.sideProxy.isSimulating() && ElectricItem.manager.use(stack, 1.0, player))
+		{
+			int skylight = player.getCommandSenderWorld().getMaxLocalRawBrightness(BlockPos.containing(player.position()));
+			affectPlayer(player, skylight);
+
+		}
+	}
+
+	static void affectPlayer(Player player, int skylight)
+	{
+		if (skylight > 8)
+		{
+			player.removeEffect(MobEffects.NIGHT_VISION);
+			player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 100, 0, true, true));
+		} else
+		{
+			player.removeEffect(MobEffects.BLINDNESS);
+			player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 300, 0, true, true));
+		}
+	}
+
 	@Override
 	public int getEnergyPerDamage()
 	{
@@ -112,35 +140,6 @@ public class ItemArmorNanoSuit extends ItemArmorElectric implements IItemHudProv
 
 				getNightVisionOrNot(stack, player, nbtData, toggleTimer, isNightVisionEnabled);
 			}
-		}
-	}
-
-	static void getNightVisionOrNot(@NotNull ItemStack stack, Player player, CompoundTag nbtData, byte toggleTimer, boolean isNightVisionEnabled)
-	{
-		if (IC2.sideProxy.isSimulating() && toggleTimer > 0)
-		{
-			nbtData.putByte("toggle_timer", --toggleTimer);
-		}
-
-		if (isNightVisionEnabled && IC2.sideProxy.isSimulating() && ElectricItem.manager.use(stack, 1.0, player))
-		{
-			int skylight = player.getCommandSenderWorld().getMaxLocalRawBrightness(BlockPos.containing(player.position()));
-			affectPlayer(player, skylight);
-
-		}
-	}
-
-	static void affectPlayer(Player player, int skylight)
-	{
-		if (skylight > 8)
-		{
-			player.removeEffect(MobEffects.NIGHT_VISION);
-			player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 100, 0, true, true));
-		}
-		else
-		{
-			player.removeEffect(MobEffects.BLINDNESS);
-			player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 300, 0, true, true));
 		}
 	}
 

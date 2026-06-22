@@ -4,11 +4,10 @@ import ic2.core.IC2;
 import ic2.core.WindSim;
 import ic2.core.event.WorldData;
 import ic2.core.gui.dynamic.IGuiValueProvider;
-import ic2.core.init.MainConfig;
+import ic2.core.init.IC2Config;
 import ic2.core.network.GuiSynced;
 import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.ref.Ic2SoundEvents;
-import ic2.core.util.ConfigUtil;
 import ic2.core.util.StackUtil;
 import ic2.core.util.Util;
 
@@ -23,8 +22,6 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class TileEntityWindGenerator extends TileEntityBaseRotorGenerator implements IGuiValueProvider.IActiveGuiValueProvider
 {
-	private static final double energyMultiplier = ConfigUtil.getDouble(MainConfig.get(), "balance/energy/generator/wind");
-	private static final double windToEnergy = 0.1 * energyMultiplier;
 	private static final double safeWindRatio = 0.5;
 	private static final int tickRate = 128;
 	private int ticker = IC2.random.nextInt(128);
@@ -56,7 +53,7 @@ public class TileEntityWindGenerator extends TileEntityBaseRotorGenerator implem
 
 			this.production = 0.0;
 			this.overheatRatio = 0.0;
-			if (windToEnergy <= 0.0)
+			if (0.1 * IC2Config.balance.energy.generator.wind.get() <= 0.0)
 			{
 				return false;
 			}
@@ -84,7 +81,7 @@ public class TileEntityWindGenerator extends TileEntityBaseRotorGenerator implem
 				return false;
 			}
 
-			this.production = wind * windToEnergy;
+			this.production = wind * 0.1 * IC2Config.balance.energy.generator.wind.get();
 		}
 
 		return super.gainEnergy();

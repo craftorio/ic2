@@ -7,12 +7,11 @@ import ic2.core.block.invslot.InvSlot;
 import ic2.core.block.invslot.InvSlotConsumableItemStack;
 import ic2.core.block.invslot.InvSlotDischarge;
 import ic2.core.block.kineticgenerator.container.ContainerElectricKineticGenerator;
-import ic2.core.init.MainConfig;
+import ic2.core.init.IC2Config;
 import ic2.core.network.GrowingBuffer;
 import ic2.core.profile.NotClassic;
 import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.ref.Ic2Items;
-import ic2.core.util.ConfigUtil;
 
 import java.util.Collections;
 import java.util.EnumSet;
@@ -29,17 +28,17 @@ import net.minecraft.world.level.block.state.BlockState;
 @NotClassic
 public class TileEntityElectricKineticGenerator extends TileEntityAbstractKineticGenerator implements IHasGui
 {
-	public InvSlotConsumableItemStack slotMotor;
-	public InvSlotDischarge dischargeSlot;
-	private final float kuPerEU;
-	public double ku = 0.0;
 	public final int maxKU = 1000;
 	protected final Energy energy;
+	private final float kuPerEU;
+	public InvSlotConsumableItemStack slotMotor;
+	public InvSlotDischarge dischargeSlot;
+	public double ku = 0.0;
 
 	public TileEntityElectricKineticGenerator(BlockPos pos, BlockState state)
 	{
 		super(Ic2BlockEntities.ELECTRIC_KINETIC_GENERATOR, pos, state);
-		this.kuPerEU = 4.0F * ConfigUtil.getFloat(MainConfig.get(), "balance/energy/kineticgenerator/electric");
+		this.kuPerEU = 4.0F * (float) IC2Config.balance.energy.kineticGenerator.electric.get().floatValue();
 		this.slotMotor = new InvSlotConsumableItemStack(this, "slotMotor", 10, new ItemStack(Ic2Items.ELECTRIC_MOTOR));
 		this.slotMotor.setStackSizeLimit(1);
 		this.dischargeSlot = new InvSlotDischarge(this, InvSlot.Access.NONE, 4);

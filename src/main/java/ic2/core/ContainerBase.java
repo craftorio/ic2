@@ -25,24 +25,36 @@ import net.minecraft.world.inventory.ResultSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class ContainerBase<T extends Container> extends AbstractContainerMenu
 {
-	protected static final int windowBorder = 8;
-	protected static final int slotSize = 16;
-	protected static final int slotDistance = 2;
-	protected static final int slotSeparator = 4;
-	protected static final int hotbarYOffset = -24;
-	protected static final int inventoryYOffset = -82;
 	private static final Field field_Container_listeners = ReflectionUtil.getField(AbstractContainerMenu.class, "listeners", "field_7765", "containerListeners");
-	protected final Player player;
 	public final T base;
+	protected final Player player;
 
 	public ContainerBase(MenuType<?> type, int syncId, Inventory playerInventory, T base)
 	{
 		super(type, syncId);
 		this.player = playerInventory.player;
 		this.base = base;
+	}
+
+	protected static boolean isValidTargetSlot(Slot slot, ItemStack stack, boolean allowEmpty, boolean requireInputOnly)
+	{
+		if (slot instanceof SlotInvSlotReadOnly || slot instanceof SlotHologramSlot)
+		{
+			return false;
+		} else if (!slot.mayPlace(stack))
+		{
+			return false;
+		} else if (!allowEmpty && !slot.hasItem())
+		{
+			return false;
+		} else
+		{
+			return !requireInputOnly || slot instanceof SlotInvSlot && ((SlotInvSlot) slot).invSlot.canInput();
+		}
 	}
 
 	protected void addPlayerInventorySlots(Inventory playerInventory, int height)
@@ -58,20 +70,20 @@ public abstract class ContainerBase<T extends Container> extends AbstractContain
 		{
 			for (int col = 0; col < 9; col++)
 			{
-				this.addSlot(new Slot(playerInventory, col + row * 9 + 9, xStart + col * 18, height + -82 + row * 18));
+				this.addSlot(new Slot(playerInventory, col + row * 9 + 9, xStart + col * 18, height - 82 + row * 18));
 			}
 		}
 
 		for (int col = 0; col < 9; col++)
 		{
-			this.addSlot(new Slot(playerInventory, col, xStart + col * 18, height + -24));
+			this.addSlot(new Slot(playerInventory, col, xStart + col * 18, height - 24));
 		}
 	}
 
-	public void clicked(int slotIndex, int button, ClickType clickType, Player player)
+	public void clicked(int slotIndex, int button, @NotNull ClickType clickType, @NotNull Player player)
 	{
 		Slot slot;
-		if (slotIndex >= 0 && slotIndex < this.slots.size() && (slot = (Slot) this.slots.get(slotIndex)) instanceof SlotHologramSlot)
+		if (slotIndex >= 0 && slotIndex < this.slots.size() && (slot = this.slots.get(slotIndex)) instanceof SlotHologramSlot)
 		{
 			((SlotHologramSlot) slot).slotClick(button, clickType, player, this);
 		} else
@@ -80,10 +92,10 @@ public abstract class ContainerBase<T extends Container> extends AbstractContain
 		}
 	}
 
-	public final ItemStack quickMoveStack(Player player, int sourceSlotIndex)
+	public final @NotNull ItemStack quickMoveStack(@NotNull Player player, int sourceSlotIndex)
 	{
-		Slot sourceSlot = (Slot) this.slots.get(sourceSlotIndex);
-		if (sourceSlot != null && sourceSlot.hasItem())
+		Slot sourceSlot = this.slots.get(sourceSlotIndex);
+		if (sourceSlot.hasItem())
 		{
 			ItemStack sourceItemStack = sourceSlot.getItem();
 			int oldSourceItemStackSize = StackUtil.getSize(sourceItemStack);
@@ -159,24 +171,7 @@ public abstract class ContainerBase<T extends Container> extends AbstractContain
 		return sourceItemStack;
 	}
 
-	protected static final boolean isValidTargetSlot(Slot slot, ItemStack stack, boolean allowEmpty, boolean requireInputOnly)
-	{
-		if (slot instanceof SlotInvSlotReadOnly || slot instanceof SlotHologramSlot)
-		{
-			return false;
-		} else if (!slot.mayPlace(stack))
-		{
-			return false;
-		} else if (!allowEmpty && !slot.hasItem())
-		{
-			return false;
-		} else
-		{
-			return !requireInputOnly ? true : slot instanceof SlotInvSlot && ((SlotInvSlot) slot).invSlot.canInput();
-		}
-	}
-
-	public boolean stillValid(Player entityplayer)
+	public boolean stillValid(@NotNull Player entityplayer)
 	{
 		return this.base.stillValid(entityplayer);
 	}

@@ -30,3 +30,6 @@ def main():
                 print(f"Sorted {lines_sorted} lines in {file_path}")
     
     print(f"Total lines sorted: {total_lines}")
+
+if __name__ == "__main__":
+    main()

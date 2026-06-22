@@ -127,14 +127,13 @@ public abstract class TileEntityStandardMachine<RI, RO, I>
 		super.updateEntityServer();
 		boolean needsInvUpdate = false;
 		MachineRecipeResult<RI, RO, I> result;
-		RI input;
 		if (this.inputSlot == null)
 		{
 			return;
 		}
 		if (this.recipeResult == null
 			|| (result = this.inputSlot.process()) == null
-			|| (input = result.getRecipe().getInput()) != null && !input.equals(this.recipeResult.getRecipe().getInput()))
+			|| !isSameRecipeInput(result.getRecipe().getInput(), this.recipeResult.getRecipe().getInput()))
 		{
 			this.recipeResult = this.getRecipeResult();
 			this.progress = 0;
@@ -191,6 +190,26 @@ public abstract class TileEntityStandardMachine<RI, RO, I>
 		this.dischargeSlot.setTier(tier);
 		this.energy.setCapacity(this.upgradeSlot.getEnergyStorage(this.defaultEnergyStorage, this.defaultOperationLength, this.defaultEnergyConsume));
 		this.progress = (short) Math.floor(previousProgress * this.operationLength + 0.1);
+	}
+
+	private static <RI> boolean isSameRecipeInput(RI a, RI b)
+	{
+		if (a == b)
+		{
+			return true;
+		}
+
+		if (a == null || b == null)
+		{
+			return false;
+		}
+
+		if (a instanceof ItemStack aStack && b instanceof ItemStack bStack)
+		{
+			return StackUtil.checkItemEqualityStrict(aStack, bStack);
+		}
+
+		return a.equals(b);
 	}
 
 	private boolean canOperate()

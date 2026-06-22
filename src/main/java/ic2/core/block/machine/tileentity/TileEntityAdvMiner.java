@@ -14,7 +14,6 @@ import ic2.core.block.invslot.InvSlotUpgrade;
 import ic2.core.block.machine.container.ContainerAdvMiner;
 import ic2.core.block.tileentity.Ic2TileEntityBlock;
 import ic2.core.fluid.FluidHandler;
-import ic2.core.item.EnvItemHandler;
 import ic2.core.init.MainConfig;
 import ic2.core.init.OreValues;
 import ic2.core.item.tool.ItemScanner;
@@ -25,7 +24,6 @@ import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.ref.Ic2Items;
 import ic2.core.util.ConfigUtil;
 import ic2.core.util.StackUtil;
-import ic2.core.util.Util;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -243,38 +241,9 @@ public class TileEntityAdvMiner extends TileEntityElectricMachine implements IHa
 	public void doMine(BlockPos pos, BlockState state)
 	{
 		Level world = this.getLevel();
-		List<ItemStack> drops = StackUtil.getDrops(world, pos, state, null, 0, this.silkTouch);
+		StackUtil.distributeDrops(this, new ArrayList<>(StackUtil.getDrops(world, pos, state, null, 0, this.silkTouch)));
 		world.removeBlock(pos, false);
 		this.energy.useEnergy(512.0);
-		if (!drops.isEmpty())
-		{
-			List<ItemStack> remainder = new ArrayList<>();
-			for (ItemStack drop : drops)
-			{
-				ItemStack remaining = drop.copy();
-				for (Direction dir : Util.ALL_DIRS)
-				{
-					EnvItemHandler.AdjacentInventory inv = StackUtil.ENV.getAdjacentInventory(this, dir);
-					if (inv != null)
-					{
-						int deposited = StackUtil.ENV.deposit(inv, remaining, false);
-						if (deposited > 0)
-						{
-							remaining.shrink(deposited);
-							if (remaining.isEmpty()) break;
-						}
-					}
-				}
-				if (!remaining.isEmpty())
-				{
-					remainder.add(remaining);
-				}
-			}
-			for (ItemStack stack : remainder)
-			{
-				StackUtil.dropAsEntity(world, pos, stack);
-			}
-		}
 	}
 
 	public boolean canMine(BlockPos pos, Block block, BlockState state)

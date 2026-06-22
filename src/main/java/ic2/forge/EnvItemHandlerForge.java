@@ -123,7 +123,24 @@ final class EnvItemHandlerForge implements EnvItemHandler
 	@Override
 	public int distribute(BlockEntity source, ItemStack stack, boolean simulate)
 	{
-		return 0;
+		int totalDeposited = 0;
+		ItemStack remaining = stack.copy();
+
+		for (EnvItemHandler.AdjacentInventory inv : this.getAdjacentInventories(source))
+		{
+			int deposited = this.deposit(inv, remaining.copy(), simulate);
+			if (deposited > 0)
+			{
+				totalDeposited += deposited;
+				remaining.shrink(deposited);
+				if (remaining.isEmpty())
+				{
+					break;
+				}
+			}
+		}
+
+		return totalDeposited;
 	}
 
 	@Nullable

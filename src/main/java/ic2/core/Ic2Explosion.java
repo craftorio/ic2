@@ -231,7 +231,7 @@ public class Ic2Explosion extends Explosion
 				{
 					Entity entity = entry.entity;
 					entity.hurt(this.damageSource, (float) entry.damage);
-					if (entity instanceof Player player && this.type == Type.Nuclear && this.igniter != null && player == this.igniter && player.getHealth() <= 0.0F)
+					if (entity instanceof Player player && this.type == Type.Nuclear && this.igniter != null && player == this.igniter && !player.isAlive())
 					{
 						IC2.grantAdvancement(player, "ic2/build_generator/build_compressor/build_nuclear_reactor/make_nuclear_reactor_explode/die_from_own_nuke");
 					}

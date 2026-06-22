@@ -8,10 +8,6 @@
 
 我们非常感谢社区的支持和耐心等待，特别是那些参与测试和提供反馈的玩家们。这个版本的发布离不开大家的努力和贡献。
 
-## 待添加项
-
-## 准备删除
-
 ## 已知问题
 
 ### 紧急
@@ -44,3 +40,8 @@
 - 翻译：以中文为基准, 重做翻译（翻译有小巧思，致歉）。全部扁平化
 - 矿脉生成，请使用 [JustEnoughResources](https://github.com/way2muchnoise/JustEnoughResources) 查看。
 - 尚未添加管道系统
+
+### 大特性
+
+- IC2 电网目前支持 [Applied Energetics 2](https://modrinth.com/mod/ae2) 的能源接收器！
+- 您可以安装 [Configured](https://modrinth.com/mod/configured) 来使用 GUI 调整 IC2 的配置文件！

@@ -243,20 +243,18 @@ public class MaskOverlayItemModel implements Ic2Model, BakedModel
 		this.baseQuads = this.baseModel.getQuads(null, null, rand, ModelData.EMPTY, null);
 
 		TextureAtlasSprite maskSprite = spriteGetter.apply(new Material(TextureAtlas.LOCATION_BLOCKS, this.maskTextureLocation));
-
-		try (SpriteContents tex = maskSprite.contents())
+		try
 		{
 			ResourceLocation maskResLoc = maskToResource(this.maskTextureLocation);
-			Optional<Resource> resOpt = Minecraft.getInstance().getResourceManager().getResource(maskResLoc);
-			NativeImage maskImage = resOpt.isPresent() ? NativeImage.read(resOpt.get().open()) : null;
-			
+			NativeImage maskImage = NativeImage.read(Minecraft.getInstance().getResourceManager().getResource(maskResLoc).get().open());
+
 			int width = maskImage.getWidth();
 			int height = maskImage.getHeight();
 			List<Area> areas = searchAreas(readMask(maskImage), width);
 			maskImage.close();
 
-			float texWidth = tex.width() / 16f;
-			float texHeight = tex.height() / 16f;
+			float texWidth = maskSprite.contents().width() / 16f;
+			float texHeight = maskSprite.contents().height() / 16f;
 
 			float zF = (7.5f - this.offset) / 16f;
 			float zB = (8.5f + this.offset) / 16f;

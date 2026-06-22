@@ -7,7 +7,6 @@ import ic2.api.upgrade.UpgradableProperty;
 import ic2.core.ContainerBase;
 import ic2.core.IHasGui;
 import ic2.core.Ic2Player;
-import ic2.core.block.IInventorySlotHolder;
 import ic2.core.block.invslot.InvSlot;
 import ic2.core.block.invslot.InvSlotConsumable;
 import ic2.core.block.invslot.InvSlotConsumableBlock;
@@ -170,7 +169,7 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
 			BlockState state = world.getBlockState(operatingPos);
 			if (state.getBlock() != Ic2Blocks.MINING_PIPE_TIP)
 			{
-				return operatingPos.getY() > world.getMinBuildHeight() ? this.digDown(operatingPos, state, false) : false;
+				return operatingPos.getY() > world.getMinBuildHeight() && this.digDown(operatingPos, state, false);
 			} else
 			{
 				TileEntityMiner.MineResult result = this.mineLevel(operatingPos.getY());
@@ -345,7 +344,7 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
 				} else if (this.pumpMode)
 				{
 					LiquidUtil.LiquidData liquid = LiquidUtil.getLiquid(world, target);
-					if (liquid != null && this.canPump(target))
+					if (liquid != null && this.canPump())
 					{
 						isValidTarget = true;
 					}
@@ -405,7 +404,7 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
 			} else if (!state.isAir())
 			{
 				LiquidUtil.LiquidData liquid = LiquidUtil.getLiquid(world, target);
-				if (liquid == null || liquid.isSource || this.pumpMode && this.canPump(target))
+				if (liquid == null || liquid.isSource || this.pumpMode && this.canPump())
 				{
 					isBlocking = true;
 				}
@@ -440,7 +439,7 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
 			LiquidUtil.LiquidData liquidData = LiquidUtil.getLiquid(world, target);
 			if (liquidData != null)
 			{
-				if (liquidData.isSource || this.pumpMode && this.canPump(target))
+				if (liquidData.isSource || this.pumpMode && this.canPump())
 				{
 					this.liquidPos = new BlockPos(target);
 					this.canProvideLiquid = true;
@@ -573,7 +572,7 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
 		}
 	}
 
-	public boolean canPump(BlockPos target)
+	public boolean canPump()
 	{
 		return false;
 	}
@@ -605,7 +604,7 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
 					return true;
 				} else
 				{
-					return !this.drillSlot.isEmpty() ? this.drillSlot.get().isCorrectToolForDrops(state) : false;
+					return !this.drillSlot.isEmpty() && this.drillSlot.get().isCorrectToolForDrops(state);
 				}
 			}
 		} else
@@ -687,7 +686,7 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
 		Working,
 		Done,
 		Failed_Temp,
-		Failed_Perm;
+		Failed_Perm
 	}
 
 	enum Mode
@@ -698,6 +697,6 @@ public class TileEntityMiner extends TileEntityElectricMachine implements IHasGu
 		MineDrill,
 		MineDDrill,
 		MineIDrill,
-		MineCustomDrill;
+		MineCustomDrill
 	}
 }

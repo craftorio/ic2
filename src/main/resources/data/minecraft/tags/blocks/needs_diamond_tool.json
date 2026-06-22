@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "ic2:reinforced_stone",
+    "ic2:reinforced_glass",
+    "ic2:reinforced_door"
+  ]
+}

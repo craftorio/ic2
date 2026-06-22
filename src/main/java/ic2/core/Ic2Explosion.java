@@ -65,12 +65,6 @@ public class Ic2Explosion extends Explosion
 	private final List<Ic2Explosion.EntityDamage> entitiesInRange = new ArrayList<>();
 	private final long[][] destroyedBlockPositions;
 	private BlockGetter chunkCache;
-	private static final double dropPowerLimit = 8.0;
-	private static final double damageAtDropPowerLimit = 32.0;
-	private static final double accelerationAtDropPowerLimit = 0.7;
-	private static final double motionLimit = 60.0;
-	private static final int secondaryRayCount = 5;
-	private static final int bitSetElementSize = 2;
 
 	public Ic2Explosion(Level world, Entity entity, double x, double y, double z, float power, float drop)
 	{
@@ -130,6 +124,52 @@ public class Ic2Explosion extends Explosion
 	public Ic2Explosion(Level world, Entity entity, BlockPos pos, int i, float f, Ic2Explosion.Type heat)
 	{
 		this(world, entity, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, i, f, heat);
+	}
+
+	private static double getEntityHealth(Entity entity)
+	{
+		return entity instanceof ItemEntity ? 5.0 : Double.POSITIVE_INFINITY;
+	}
+
+	private static long[] makeArray(int size)
+	{
+		return new long[(size * 2 + 8 - 2) / 8];
+	}
+
+	private static int nextSetIndex(int start, long[] array)
+	{
+		int offset = start % 8;
+
+		for (int i = start / 8; i < array.length; i++)
+		{
+			long aval = array[i];
+			int j = offset;
+
+			while (j < 8)
+			{
+				int val = (int) (aval >> j & (1 << 2) - 1);
+				if (val != 0)
+				{
+					return i * 8 + j;
+				}
+
+				j += 2;
+			}
+
+			offset = 0;
+		}
+
+		return -1;
+	}
+
+	private static int getAtIndex(int index, long[] array)
+	{
+		return (int) (array[index / 8] >>> index % 8 & (1 << 2) - 1);
+	}
+
+	private static void setAtIndex(int index, long[] array, int value)
+	{
+		array[index / 8] = array[index / 8] | (long) value << index % 8;
 	}
 
 	public void doExplosion()
@@ -193,12 +233,12 @@ public class Ic2Explosion extends Explosion
 					entity.hurt(this.damageSource, (float) entry.damage);
 					if (entity instanceof Player player && this.type == Type.Nuclear && this.igniter != null && player == this.igniter && player.getHealth() <= 0.0F)
 					{
-						IC2.grantAdvancement(player, "ic2/die_from_own_nuke");
+						IC2.grantAdvancement(player, "ic2/build_generator/build_compressor/build_nuclear_reactor/make_nuclear_reactor_explode/die_from_own_nuke");
 					}
 
 					if (entity instanceof Player player && this.type == Type.Electrical)
 					{
-						IC2.grantAdvancement(player, "ic2/explode_machine");
+						IC2.grantAdvancement(player, "ic2/build_generator/explode_machine");
 					}
 
 					double motionSq = Util.square(entry.motionX) + Util.square(entry.motionY) + Util.square(entry.motionZ);
@@ -248,7 +288,7 @@ public class Ic2Explosion extends Explosion
 					.withParameter(LootContextParams.ORIGIN, new Vec3(this.explosionX, this.explosionY, this.explosionZ))
 					.withParameter(LootContextParams.TOOL, ItemStack.EMPTY)
 					.withOptionalParameter(LootContextParams.THIS_ENTITY, this.exploder);
-				
+
 				for (int destroyedBlockPosIndex = 0; destroyedBlockPosIndex < this.destroyedBlockPositions.length; destroyedBlockPosIndex++)
 				{
 					int y = destroyedBlockPosIndex + this.worldMinHeight;
@@ -267,9 +307,6 @@ public class Ic2Explosion extends Explosion
 							tmpPos.set(x, y, z);
 							BlockState state = this.chunkCache.getBlockState(tmpPos);
 							Block block = state.getBlock();
-							if (this.power < 20.0F)
-							{
-							}
 
 							if (doDrops && block.dropFromExplosion(this) && getAtIndex(index, bitSet) == 1)
 							{
@@ -330,11 +367,6 @@ public class Ic2Explosion extends Explosion
 				}
 			}
 		}
-	}
-
-	public void destroy(int x, int y, int z, boolean noDrop)
-	{
-		this.destroyUnchecked(x, y, z, noDrop);
 	}
 
 	private void destroyUnchecked(int x, int y, int z, boolean noDrop)
@@ -532,50 +564,13 @@ public class Ic2Explosion extends Explosion
 		return this.type == Ic2Explosion.Type.Nuclear || this.type == Ic2Explosion.Type.ReactorMeltdown;
 	}
 
-	private static double getEntityHealth(Entity entity)
+	public enum Type
 	{
-		return entity instanceof ItemEntity ? 5.0 : Double.POSITIVE_INFINITY;
-	}
-
-	private static long[] makeArray(int size)
-	{
-		return new long[(size * 2 + 8 - 2) / 8];
-	}
-
-	private static int nextSetIndex(int start, long[] array)
-	{
-		int offset = start % 8;
-
-		for (int i = start / 8; i < array.length; i++)
-		{
-			long aval = array[i];
-			int j = offset;
-
-			while (j < 8)
-			{
-				int val = (int) (aval >> j & (1 << 2) - 1);
-				if (val != 0)
-				{
-					return i * 8 + j;
-				}
-
-				j += 2;
-			}
-
-			offset = 0;
-		}
-
-		return -1;
-	}
-
-	private static int getAtIndex(int index, long[] array)
-	{
-		return (int) (array[index / 8] >>> index % 8 & (1 << 2) - 1);
-	}
-
-	private static void setAtIndex(int index, long[] array, int value)
-	{
-		array[index / 8] = array[index / 8] | (long) value << index % 8;
+		Normal,
+		Heat,
+		Electrical,
+		Nuclear,
+		ReactorMeltdown
 	}
 
 	private static class DropData
@@ -616,15 +611,6 @@ public class Ic2Explosion extends Explosion
 			this.distance = distance;
 			this.health = health;
 		}
-	}
-
-	public enum Type
-	{
-		Normal,
-		Heat,
-		Electrical,
-		Nuclear,
-		ReactorMeltdown
 	}
 
 	private static class XZPosition

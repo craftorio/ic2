@@ -58,7 +58,7 @@ public class Tfbp extends Item implements ITerraformingBP
 	{
 		if (this == Ic2Items.CULTIVATION_TFBP && world.dimension() == Level.END)
 		{
-			IC2.grantAdvancement(player, "ic2/terraform_end_cultivation");
+			IC2.grantAdvancement(player, "ic2/build_generator/build_compressor/build_matter_gen/build_terraformer/terraform_end_cultivation");
 		}
 
 		return true;

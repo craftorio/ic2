@@ -168,7 +168,7 @@ public final class EventHandlerForge
 			&& event.getSource() == player.level().damageSources().fall()
 			&& JetpackHandler.hasJetpack(player.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.CHEST)))
 		{
-			IC2.grantAdvancement(player, "ic2/fall_with_jetpack");
+			IC2.grantAdvancement(player, "ic2/build_generator/build_batbox/build_jetpack/fall_with_jetpack");
 		}
 	}
 

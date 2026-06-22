@@ -210,7 +210,7 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 				ret = true;
 			} else if (air <= 0)
 			{
-				IC2.grantAdvancement(player, "ic2/starve_with_q_helmet");
+				IC2.grantAdvancement(player, "ic2/build_generator/build_compressor/build_nano_suit/build_quantum_suits/starve_with_q_helmet");
 			}
 
 			if (ElectricItem.manager.canUse(stack, 1000.0) && player.getFoodData().needsFood())
@@ -243,7 +243,7 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 				}
 			} else if (player.getFoodData().getFoodLevel() <= 0)
 			{
-				IC2.grantAdvancement(player, "ic2/starve_with_q_helmet");
+				IC2.grantAdvancement(player, "ic2/build_generator/build_compressor/build_nano_suit/build_quantum_suits/starve_with_q_helmet");
 			}
 
 			for (MobEffectInstance effect : new LinkedList<>(player.getActiveEffects()))

@@ -347,7 +347,7 @@ public class TileEntityReplicator extends TileEntityElectricMachine implements I
 					this.mode = TileEntityReplicator.Mode.SINGLE;
 					if (player != null)
 					{
-						IC2.grantAdvancement(player, "ic2/replicate_object");
+						IC2.grantAdvancement(player, "ic2/build_generator/build_compressor/acquire_matter/replicate_object");
 					}
 				}
 				break;
@@ -357,7 +357,7 @@ public class TileEntityReplicator extends TileEntityElectricMachine implements I
 					this.mode = TileEntityReplicator.Mode.CONTINUOUS;
 					if (player != null)
 					{
-						IC2.grantAdvancement(player, "ic2/replicate_object");
+						IC2.grantAdvancement(player, "ic2/build_generator/build_compressor/acquire_matter/replicate_object");
 					}
 				}
 		}

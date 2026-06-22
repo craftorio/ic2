@@ -1076,5 +1076,9 @@
 	"item.ic2.tooltip.jetpack.toggle": "Press %s+%s to toggle Hover Mode",
 	"ic2.frequency_transmitter.tooltip.blank": "<Empty>",
 	"ic2.frequency_transmitter.tooltip.target": "Target: (%s,%s,%s)",
-	"ic2.item.tooltip.power_tier": "Power Tier: %s"
+	"ic2.item.tooltip.power_tier": "Power Tier: %s",
+	"block.ic2.carrot_crop": "Carrot",
+	"block.ic2.stickreed_crop": "Sticky Reed",
+	"block.ic2.redwheat_crop": "Red Wheat,,
+	"block.ic2.eatingplant_crop": "食人花"
 }

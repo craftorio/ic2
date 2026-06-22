@@ -484,7 +484,11 @@ class ChangeHandler
 	{
 		for (Node node : tile.nodes)
 		{
-			node.getGrid().remove(node);
+			Grid grid = node.getGrid();
+			if (grid != null)
+			{
+				grid.remove(node);
+			}
 		}
 	}
 }

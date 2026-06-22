@@ -11,16 +11,7 @@ import ic2.core.util.Util;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.ArrayDeque;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 
 import net.minecraft.core.BlockPos;
 
@@ -229,7 +220,7 @@ public class Grid
 				}
 			}
 
-			if (gridCount <= 1)
+			if (gridCount == 1)
 			{
 				return;
 			}
@@ -308,6 +299,11 @@ public class Grid
 
 	void merge(Grid grid, Map<Node, Node> nodeReplacements)
 	{
+		if (grid == null)
+		{
+			return;
+		}
+
 		if (EnergyNetSettings.logGridUpdatesVerbose)
 		{
 			IC2.log.debug(LogCategory.EnergyNet, "%d Merge %s -> %s.", this.uid, grid, this);
@@ -332,7 +328,7 @@ public class Grid
 
 						found = true;
 
-						for (NodeLink link : node.links)
+						for (NodeLink link : new ArrayList<>(node.links))
 						{
 							link.replaceNode(node, node2);
 							node2.links.add(link);
@@ -436,86 +432,78 @@ public class Grid
 		return new GridInfo(this.uid, this.nodes.size(), complexNodes, minX, minY, minZ, maxX, maxY, maxZ);
 	}
 
-	void dumpInfo(String prefix, PrintStream console, PrintStream chat)
+	void dumpInfo(PrintStream chat)
 	{
-		chat.printf("%sGrid %d info:%n", prefix, this.uid);
-		chat.printf("%s %d nodes%n", prefix, this.nodes.size());
+		chat.printf("%sGrid %d info:%n", " ", this.uid);
+		chat.printf("%s %d nodes%n", " ", this.nodes.size());
 	}
 
-	void dumpNodeInfo(Node node, String prefix, PrintStream console, PrintStream chat)
+	void dumpNodeInfo(Node node, PrintStream console, PrintStream chat)
 	{
 		IEnergyTile ioTile = node.getTile().getMainTile();
-		chat.printf("%sNode %s info:%n", prefix, node);
-		chat.printf("%s pos: %s%n", prefix, Util.formatPosition(EnergyNet.instance.getWorld(ioTile), EnergyNet.instance.getPos(ioTile)));
-		chat.printf("%s type: %s%n", prefix, node.nodeType);
+		chat.printf("%sNode %s info:%n", " ", node);
+		chat.printf("%s pos: %s%n", " ", Util.formatPosition(EnergyNet.instance.getWorld(ioTile), EnergyNet.instance.getPos(ioTile)));
+		chat.printf("%s type: %s%n", " ", node.nodeType);
 		switch (node.nodeType)
 		{
-			case Conductor:
-			default:
-				break;
 			case Sink:
 				IEnergySink sink = (IEnergySink) ioTile;
-				chat.printf("%s demanded: %.2f%n", prefix, sink.getDemandedEnergy());
-				chat.printf("%s tier: %d%n", prefix, sink.getSinkTier());
+				chat.printf("%s demanded: %.2f%n", " ", sink.getDemandedEnergy());
+				chat.printf("%s tier: %d%n", " ", sink.getSinkTier());
 				break;
 			case Source:
 				IEnergySource source = (IEnergySource) ioTile;
-				chat.printf("%s offered: %.2f%n", prefix, source.getOfferedEnergy());
-				chat.printf("%s tier: %d%n", prefix, source.getSourceTier());
+				chat.printf("%s offered: %.2f%n", " ", source.getOfferedEnergy());
+				chat.printf("%s tier: %d%n", " ", source.getSourceTier());
+			case Conductor:
+			default:
+				break;
 		}
 
-		chat.printf("%s %d neighbor links:%n", prefix, node.links.size());
+		chat.printf("%s %d neighbor links:%n", " ", node.links.size());
 
 		for (NodeLink link : node.links)
 		{
-			chat.printf("%s  %s %.4f %s%n", prefix, link.getNeighbor(node), link.loss, link.skippedNodes);
+			chat.printf("%s  %s %.4f %s%n", " ", link.getNeighbor(node), link.loss, link.skippedNodes);
 		}
 
-		EnergyNetGlobal.getCalculator().dumpNodeInfo(node, prefix + " ", console, chat);
+		EnergyNetGlobal.getCalculator().dumpNodeInfo(node, " " + " ", console, chat);
 	}
 
 	void dumpGraph()
 	{
-		FileWriter out = null;
 
-		try
-		{
-			out = new FileWriter("graph_" + this.uid + "_raw.txt");
-			out.write("graph nodes {\n  overlap=false;\n");
-			Collection<Node> nodesToDump = this.nodes.values();
-			Set<Node> dumpedConnections = new HashSet<>();
-
-			for (Node node : nodesToDump)
-			{
-				out.write("  \"" + node + "\";\n");
-
-				for (NodeLink link : node.links)
-				{
-					Node neighbor = link.getNeighbor(node);
-					if (!dumpedConnections.contains(neighbor))
-					{
-						out.write("  \"" + node + "\" -- \"" + neighbor + "\" [label=\"" + link.loss + "\"];\n");
-					}
-				}
-
-				dumpedConnections.add(node);
-			}
-
-			out.write("}\n");
-		} catch (IOException e)
-		{
-			IC2.log.debug(LogCategory.EnergyNet, e, "Graph saving failed.");
-		} finally
+		try (FileWriter out = new FileWriter("graph_" + this.uid + "_raw.txt"))
 		{
 			try
 			{
-				if (out != null)
+				out.write("graph nodes {\n  overlap=false;\n");
+				Collection<Node> nodesToDump = this.nodes.values();
+				Set<Node> dumpedConnections = new HashSet<>();
+
+				for (Node node : nodesToDump)
 				{
-					out.close();
+					out.write("  \"" + node + "\";\n");
+
+					for (NodeLink link : node.links)
+					{
+						Node neighbor = link.getNeighbor(node);
+						if (!dumpedConnections.contains(neighbor))
+						{
+							out.write("  \"" + node + "\" -- \"" + neighbor + "\" [label=\"" + link.loss + "\"];\n");
+						}
+					}
+
+					dumpedConnections.add(node);
 				}
-			} catch (IOException ignored)
+
+				out.write("}\n");
+			} catch (IOException e)
 			{
+				IC2.log.debug(LogCategory.EnergyNet, e, "Graph saving failed.");
 			}
+		} catch (IOException ignored)
+		{
 		}
 	}
 }

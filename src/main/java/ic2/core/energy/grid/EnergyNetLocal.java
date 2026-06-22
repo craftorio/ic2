@@ -264,8 +264,8 @@ public class EnergyNetLocal
 			Grid grid = node.getGrid();
 			if (processedGrids.add(grid))
 			{
-				grid.dumpNodeInfo(node, " ", console, chat);
-				grid.dumpInfo(" ", console, chat);
+				grid.dumpNodeInfo(node, console, chat);
+				grid.dumpInfo(chat);
 				grid.dumpGraph();
 			}
 		}

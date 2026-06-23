@@ -26,13 +26,6 @@ public class GuiToolMeter extends Ic2Gui<ContainerMeter>
 	}
 
 	@Override
-	public void containerTick()
-	{
-		super.containerTick();
-		this.getContainer().broadcastChanges();
-	}
-
-	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
 	{
 		int xMin = (this.width - this.imageWidth) / 2;

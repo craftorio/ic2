@@ -7,27 +7,20 @@ import ic2.api.network.ClientModifiable;
 import ic2.core.IC2;
 import ic2.core.item.ContainerHandHeldInventory;
 import ic2.core.ref.Ic2ScreenHandlers;
-import net.minecraft.world.inventory.DataSlot;
 
 public class ContainerMeter extends ContainerHandHeldInventory<HandHeldMeter>
 {
-	private static final int SCALE = 1000;
-
 	private IEnergyTile uut;
-	private final DataSlot resultAvg = DataSlot.standalone();
-	private final DataSlot resultMin = DataSlot.standalone();
-	private final DataSlot resultMax = DataSlot.standalone();
-	private final DataSlot resultCount = DataSlot.standalone();
+	private double resultAvg;
+	private double resultMin;
+	private double resultMax;
+	private int resultCount;
 	@ClientModifiable
 	private ContainerMeter.Mode mode = ContainerMeter.Mode.EnergyIn;
 
 	public ContainerMeter(int syncId, HandHeldMeter inventory)
 	{
 		super(Ic2ScreenHandlers.METER, syncId, inventory);
-		this.addDataSlot(this.resultAvg);
-		this.addDataSlot(this.resultMin);
-		this.addDataSlot(this.resultMax);
-		this.addDataSlot(this.resultCount);
 	}
 
 	@Override
@@ -49,50 +42,49 @@ public class ContainerMeter extends ContainerHandHeldInventory<HandHeldMeter>
 					case EnergyGain -> stats.getEnergyIn() - stats.getEnergyOut();
 					case Voltage -> stats.getVoltage();
 				};
-				int scaled = (int) Math.round(result * SCALE);
-				if (this.resultCount.get() == 0)
+
+				if (this.resultCount == 0)
 				{
-					this.resultAvg.set(scaled);
-					this.resultMin.set(scaled);
-					this.resultMax.set(scaled);
+					this.resultAvg = this.resultMin = this.resultMax = result;
 				} else
 				{
-					if (scaled < this.resultMin.get())
+					if (result < this.resultMin)
 					{
-						this.resultMin.set(scaled);
+						this.resultMin = result;
 					}
 
-					if (scaled > this.resultMax.get())
+					if (result > this.resultMax)
 					{
-						this.resultMax.set(scaled);
+						this.resultMax = result;
 					}
 
-					this.resultAvg.set((int) (((long) this.resultAvg.get() * this.resultCount.get() + scaled) / (this.resultCount.get() + 1)));
+					this.resultAvg = (this.resultAvg * this.resultCount + result) / (this.resultCount + 1);
 				}
 
-				this.resultCount.set(this.resultCount.get() + 1);
+				this.resultCount++;
+				IC2.network.get(true).sendContainerFields(this, "resultAvg", "resultMin", "resultMax", "resultCount");
 			}
 		}
 	}
 
 	public double getResultAvg()
 	{
-		return this.resultAvg.get() / (double) SCALE;
+		return this.resultAvg;
 	}
 
 	public double getResultMin()
 	{
-		return this.resultMin.get() / (double) SCALE;
+		return this.resultMin;
 	}
 
 	public double getResultMax()
 	{
-		return this.resultMax.get() / (double) SCALE;
+		return this.resultMax;
 	}
 
 	public int getResultCount()
 	{
-		return this.resultCount.get();
+		return this.resultCount;
 	}
 
 	public ContainerMeter.Mode getMode()
@@ -111,7 +103,7 @@ public class ContainerMeter extends ContainerHandHeldInventory<HandHeldMeter>
 	{
 		if (IC2.sideProxy.isSimulating())
 		{
-			this.resultCount.set(0);
+			this.resultCount = 0;
 		} else
 		{
 			IC2.network.get(false).sendContainerEvent(this, "reset");

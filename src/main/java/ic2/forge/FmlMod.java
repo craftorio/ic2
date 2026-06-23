@@ -14,6 +14,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.Feature;
+import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -192,9 +194,14 @@ public final class FmlMod
 		{
 			for (EnvProxyForge.ConfiguredFeatureRegistration<?, ?> reg : EnvProxyForge.configuredFeatureRegistrations)
 			{
-				ConfiguredFeature<?, ?> cf = new ConfiguredFeature<>(reg.feature(), reg.config());
+				ConfiguredFeature<?, ?> cf = createConfiguredFeature(reg);
 				event.register(Registries.CONFIGURED_FEATURE, reg.id(), () -> cf);
 			}
 		}
+	}
+
+	private static <FC extends FeatureConfiguration, F extends Feature<FC>> ConfiguredFeature<FC, ?> createConfiguredFeature(EnvProxyForge.ConfiguredFeatureRegistration<FC, F> reg)
+	{
+		return new ConfiguredFeature<>(reg.feature(), reg.config());
 	}
 }

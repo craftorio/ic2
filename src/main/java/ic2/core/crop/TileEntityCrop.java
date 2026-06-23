@@ -48,6 +48,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.mutable.MutableObject;
+import net.minecraft.util.RandomSource;
 
 public class TileEntityCrop extends Ic2TileEntity implements ICropTile
 {
@@ -866,6 +867,7 @@ public class TileEntityCrop extends Ic2TileEntity implements ICropTile
 	@Override
 	public boolean pick()
 	{
+     RandomSource rng = RandomSource.create();
 		if (this.crop == null)
 		{
 			return false;
@@ -883,7 +885,7 @@ public class TileEntityCrop extends Ic2TileEntity implements ICropTile
 		int dropCount = 0;
 		if (bonus)
 		{
-			if (world.random.nextFloat() <= (firstchance + 1.0F) * 0.8F)
+			if (rng.nextFloat() <= (firstchance + 1.0F) * 0.8F)
 			{
 				dropCount++;
 			}
@@ -895,11 +897,11 @@ public class TileEntityCrop extends Ic2TileEntity implements ICropTile
 				chance *= 0.95F;
 			}
 
-			if (world.random.nextFloat() <= chance)
+			if (rng.nextFloat() <= chance)
 			{
 				dropCount++;
 			}
-		} else if (world.random.nextFloat() <= firstchance * 1.5F)
+		} else if (rng.nextFloat() <= firstchance * 1.5F)
 		{
 			dropCount++;
 		}

@@ -55,6 +55,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.util.RandomSource;
 
 public final class StackUtil
 {
@@ -731,12 +732,13 @@ public final class StackUtil
 
 	public static void dropAsEntity(Level world, BlockPos pos, ItemStack stack)
 	{
+     RandomSource rng = RandomSource.create();
 		if (!isEmpty(stack))
 		{
 			double f = 0.7;
-			double dx = world.random.nextFloat() * f + (1.0 - f) * 0.5;
-			double dy = world.random.nextFloat() * f + (1.0 - f) * 0.5;
-			double dz = world.random.nextFloat() * f + (1.0 - f) * 0.5;
+			double dx = rng.nextFloat() * f + (1.0 - f) * 0.5;
+			double dy = rng.nextFloat() * f + (1.0 - f) * 0.5;
+			double dz = rng.nextFloat() * f + (1.0 - f) * 0.5;
 			ItemEntity entityItem = new ItemEntity(world, pos.getX() + dx, pos.getY() + dy, pos.getZ() + dz, stack.copy());
 			entityItem.setDefaultPickUpDelay();
 			world.addFreshEntity(entityItem);

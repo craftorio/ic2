@@ -27,6 +27,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import org.apache.commons.lang3.mutable.MutableObject;
+import net.minecraft.util.RandomSource;
 
 public class LiquidUtil
 {
@@ -500,6 +501,7 @@ public class LiquidUtil
 
 	public static boolean fillWorldFluidBlock(Ic2FluidStack fs, Level world, BlockPos pos, boolean simulate)
 	{
+     RandomSource rng = RandomSource.create();
 		if (fs != null && fs.getAmountMb() >= 1000)
 		{
 			Fluid fluid = fs.getFluid();
@@ -525,7 +527,7 @@ public class LiquidUtil
 
 				if (world.dimensionType().ultraWarm() && fluidBlock == Blocks.WATER)
 				{
-					world.playSound(null, pos, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 0.5F, 2.6F + (world.random.nextFloat() - world.random.nextFloat()) * 0.8F);
+					world.playSound(null, pos, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 0.5F, 2.6F + (rng.nextFloat() - rng.nextFloat()) * 0.8F);
 
 					for (int i = 0; i < 8; i++)
 					{

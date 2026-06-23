@@ -26,6 +26,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.gameevent.GameEvent.Context;
+import net.minecraft.util.RandomSource;
 
 public class ItemTreetap extends Item implements IBoxable
 {
@@ -36,6 +37,7 @@ public class ItemTreetap extends Item implements IBoxable
 
 	public static boolean attemptExtract(Player player, Level world, BlockPos pos, Direction side, BlockState state, List<ItemStack> stacks, boolean isElectric)
 	{
+     RandomSource rng = RandomSource.create();
 		assert state.getBlock() == Ic2Blocks.RUBBER_LOG;
 		RubberLogBlock.RubberWoodState rwState = (RubberLogBlock.RubberWoodState) state.getValue(RubberLogBlock.stateProperty);
 		if (rwState.isPlain() || rwState.facing != side)
@@ -50,10 +52,10 @@ public class ItemTreetap extends Item implements IBoxable
 				world.setBlockAndUpdate(pos, (BlockState) state.setValue(RubberLogBlock.stateProperty, rwState.getDry()));
 				if (stacks != null)
 				{
-					stacks.add(StackUtil.copyWithSize(new ItemStack(Ic2Items.RESIN), world.random.nextInt(3) + 1));
+					stacks.add(StackUtil.copyWithSize(new ItemStack(Ic2Items.RESIN), rng.nextInt(3) + 1));
 				} else
 				{
-					ejectResin(world, pos, side, world.random.nextInt(3) + 1);
+					ejectResin(world, pos, side, rng.nextInt(3) + 1);
 				}
 			}
 
@@ -64,14 +66,14 @@ public class ItemTreetap extends Item implements IBoxable
 			boolean ret = false;
 			if (!world.isClientSide)
 			{
-				if (world.random.nextInt(5) == 0)
+				if (rng.nextInt(5) == 0)
 				{
 					world.setBlockAndUpdate(pos, (BlockState) state.setValue(RubberLogBlock.stateProperty, RubberLogBlock.RubberWoodState.plain));
 					triggerToolUseEvent(world, pos, player, state, isElectric);
 					ret = true;
 				}
 
-				if (world.random.nextInt(5) == 0)
+				if (rng.nextInt(5) == 0)
 				{
 					ejectResin(world, pos, side, 1);
 					if (stacks != null)

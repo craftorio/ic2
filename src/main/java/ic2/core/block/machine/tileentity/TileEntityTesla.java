@@ -88,7 +88,7 @@ public class TileEntityTesla extends Ic2TileEntity
 			{
 				if (world instanceof ServerLevel worldServer)
 				{
-					RandomSource rnd = world.random;
+					RandomSource rnd = RandomSource.create();
 					System.out.println(entity);
 
 					for (int i = 0; i < damage; i++)

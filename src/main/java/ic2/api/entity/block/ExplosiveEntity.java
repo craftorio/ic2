@@ -19,6 +19,7 @@ import net.minecraft.world.entity.Entity.MovementEmission;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
+import net.minecraft.util.RandomSource;
 
 public abstract class ExplosiveEntity extends Entity
 {
@@ -47,7 +48,8 @@ public abstract class ExplosiveEntity extends Entity
 	{
 		this(type, world);
 		this.absMoveTo(x, y, z);
-		double angle = (Math.PI * 2) * world.random.nextDouble();
+		RandomSource rng = RandomSource.create();
+		double angle = (Math.PI * 2) * rng.nextDouble();
 		this.setDeltaMovement(-Math.sin(angle) * 0.02, 0.2, -Math.cos(angle) * 0.02);
 		this.xo = x;
 		this.yo = y;

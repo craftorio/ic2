@@ -28,15 +28,16 @@ public class Cultivation extends TerraformerBase
 
 	private static boolean growPlantsOn(Level world, BlockPos pos)
 	{
+     RandomSource rng = RandomSource.create();
 		BlockPos above = pos.above();
 		BlockState state = world.getBlockState(above);
 		Block block = state.getBlock();
-		if (state.isAir() || block == Blocks.TALL_GRASS && world.random.nextInt(4) == 0)
+		if (state.isAir() || block == Blocks.TALL_GRASS && rng.nextInt(4) == 0)
 		{
-			BlockState plant = pickRandomPlant(world.random);
+			BlockState plant = pickRandomPlant(rng);
 			if (plant.getValues().containsKey(DirectionalBlock.FACING))
 			{
-				plant = (BlockState) plant.setValue(DirectionalBlock.FACING, Util.HORIZONTAL_DIRS[world.random.nextInt(Util.HORIZONTAL_DIRS.length)]);
+				plant = (BlockState) plant.setValue(DirectionalBlock.FACING, Util.HORIZONTAL_DIRS[rng.nextInt(Util.HORIZONTAL_DIRS.length)]);
 			}
 
 			if (plant.getBlock() instanceof CropBlock)

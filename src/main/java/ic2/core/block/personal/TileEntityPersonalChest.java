@@ -40,6 +40,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.util.RandomSource;
 
 public class TileEntityPersonalChest extends TileEntityInventory implements IPersonalBlock, IHasGui
 {
@@ -112,12 +113,13 @@ public class TileEntityPersonalChest extends TileEntityInventory implements IPer
 	@Override
 	protected void updateEntityClient()
 	{
+     RandomSource rng = RandomSource.create();
 		super.updateEntityClient();
 		this.prevLidAngle = this.lidAngle;
 		if (this.usingPlayerCount > 0 && this.lidAngle <= 0)
 		{
 			Level world = this.getLevel();
-			world.playSound(null, this.worldPosition, SoundEvents.CHEST_OPEN, SoundSource.BLOCKS, 0.5F, world.random.nextFloat() * 0.1F + 0.9F);
+			world.playSound(null, this.worldPosition, SoundEvents.CHEST_OPEN, SoundSource.BLOCKS, 0.5F, rng.nextFloat() * 0.1F + 0.9F);
 		}
 
 		if (this.usingPlayerCount == 0 && this.lidAngle > 0 || this.usingPlayerCount > 0 && this.lidAngle < 10)
@@ -134,7 +136,7 @@ public class TileEntityPersonalChest extends TileEntityInventory implements IPer
 			if (this.lidAngle < closeThreshold && this.prevLidAngle >= closeThreshold)
 			{
 				Level world = this.getLevel();
-				world.playSound(null, this.worldPosition, SoundEvents.CHEST_CLOSE, SoundSource.BLOCKS, 0.5F, world.random.nextFloat() * 0.1F + 0.9F);
+				world.playSound(null, this.worldPosition, SoundEvents.CHEST_CLOSE, SoundSource.BLOCKS, 0.5F, rng.nextFloat() * 0.1F + 0.9F);
 			}
 		}
 	}

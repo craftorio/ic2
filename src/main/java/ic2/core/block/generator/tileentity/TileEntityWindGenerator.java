@@ -19,6 +19,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.util.RandomSource;
 
 public class TileEntityWindGenerator extends TileEntityBaseRotorGenerator implements IGuiValueProvider.IActiveGuiValueProvider
 {
@@ -44,6 +45,7 @@ public class TileEntityWindGenerator extends TileEntityBaseRotorGenerator implem
 	@Override
 	public boolean gainEnergy()
 	{
+     RandomSource rng = RandomSource.create();
 		if (++this.ticker % 128 == 0)
 		{
 			if (this.ticker % 1024 == 0)
@@ -68,11 +70,11 @@ public class TileEntityWindGenerator extends TileEntityBaseRotorGenerator implem
 
 			double windRatio = wind / windSim.getMaxWind();
 			this.overheatRatio = Math.max(0.0, (windRatio - 0.5) / 0.5);
-			if (wind > windSim.getMaxWind() * 0.5 && world.random.nextInt(5000) <= this.production - 5.0)
+			if (wind > windSim.getMaxWind() * 0.5 && rng.nextInt(5000) <= this.production - 5.0)
 			{
 				if (Util.harvestBlock(world, this.worldPosition))
 				{
-					for (int i = world.random.nextInt(5); i > 0; i--)
+					for (int i = rng.nextInt(5); i > 0; i--)
 					{
 						StackUtil.dropAsEntity(world, this.worldPosition, new ItemStack(Items.IRON_INGOT));
 					}

@@ -34,6 +34,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.util.RandomSource;
 
 @NotClassic
 public class TileEntityWaterKineticGenerator extends TileEntityAbstractKineticGenerator implements IRotorProvider, IHasGui
@@ -67,6 +68,7 @@ public class TileEntityWaterKineticGenerator extends TileEntityAbstractKineticGe
 	@Override
 	protected void updateEntityServer()
 	{
+     RandomSource rng = RandomSource.create();
 		super.updateEntityServer();
 		if (this.updateTicker++ % this.getTickRate() == 0)
 		{
@@ -156,7 +158,7 @@ public class TileEntityWaterKineticGenerator extends TileEntityAbstractKineticGe
 					IC2.network.get(true).updateTileEntityField(this, "rotationSpeed");
 					this.waterFlow = (int) (
 						this.waterFlow
-							* (this.getEfficiency() * (1.0F - 0.3F * world.random.nextFloat() - 0.1F * ((float) obstructedCrossSection / crossSection)))
+							* (this.getEfficiency() * (1.0F - 0.3F * rng.nextFloat() - 0.1F * ((float) obstructedCrossSection / crossSection)))
 					);
 					rotorDamage = 1;
 				}

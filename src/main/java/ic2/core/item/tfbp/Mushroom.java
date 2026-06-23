@@ -11,11 +11,13 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.MushroomBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.util.RandomSource;
 
 public class Mushroom extends TerraformerBase
 {
 	private static boolean growBlockWithDependancy(Level world, BlockPos pos, Block target, Block dependancy)
 	{
+     RandomSource rng = RandomSource.create();
 		MutableBlockPos cPos = new MutableBlockPos();
 
 		for (int xm = pos.getX() - 1; dependancy != null && xm < pos.getX() + 1; xm++)
@@ -96,7 +98,7 @@ public class Mushroom extends TerraformerBase
 				return false;
 			}
 
-			Block shroom = world.random.nextBoolean() ? Blocks.BROWN_MUSHROOM : Blocks.RED_MUSHROOM;
+			Block shroom = rng.nextBoolean() ? Blocks.BROWN_MUSHROOM : Blocks.RED_MUSHROOM;
 			world.setBlockAndUpdate(above, shroom.defaultBlockState());
 			return true;
 		} else

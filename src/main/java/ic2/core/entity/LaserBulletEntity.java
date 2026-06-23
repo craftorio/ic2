@@ -37,6 +37,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import org.jetbrains.annotations.NotNull;
+import net.minecraft.util.RandomSource;
 
 public class LaserBulletEntity extends ThrowableProjectile
 {
@@ -187,6 +188,7 @@ public class LaserBulletEntity extends ThrowableProjectile
 
 	private boolean hitBlock(BlockPos pos, Direction side)
 	{
+     RandomSource rng = RandomSource.create();
 		Level world = this.getCommandSenderWorld();
 		Player playerOwner = this.owner instanceof Player ? (Player) this.owner : Ic2Player.get(world);
 		if (playerOwner == null)
@@ -264,7 +266,7 @@ public class LaserBulletEntity extends ThrowableProjectile
 				this.power = 0.0F;
 			}
 
-			if (world.random.nextInt(10) == 0 && state.isFlammable(world, pos, Direction.UP))
+			if (rng.nextInt(10) == 0 && state.isFlammable(world, pos, Direction.UP))
 			{
 				world.setBlockAndUpdate(pos, Blocks.FIRE.defaultBlockState());
 			}

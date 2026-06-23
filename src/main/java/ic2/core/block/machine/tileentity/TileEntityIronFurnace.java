@@ -30,6 +30,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.util.RandomSource;
 
 public class TileEntityIronFurnace extends TileEntityBase implements IHasGui, IGuiValueProvider, INetworkClientTileEntityEventListener
 {
@@ -143,12 +144,13 @@ public class TileEntityIronFurnace extends TileEntityBase implements IHasGui, IG
 	@Override
 	protected void updateEntityClient()
 	{
+     RandomSource rng = RandomSource.create();
 		super.updateEntityClient();
 		if (this.getActive())
 		{
 			Level world = this.getLevel();
 			ParticleUtil.showFurnaceFlames(world, this.worldPosition, this.getFacing());
-			if (world.random.nextDouble() < 0.1)
+			if (rng.nextDouble() < 0.1)
 			{
 				world.playLocalSound(
 					this.worldPosition.getX() + 0.5,

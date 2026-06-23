@@ -11,6 +11,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.util.RandomSource;
 
 public class Irrigation extends TerraformerBase
 {
@@ -49,7 +50,8 @@ public class Irrigation extends TerraformerBase
 
 	private static boolean spreadGrass(Level world, BlockPos pos)
 	{
-		if (world.random.nextBoolean())
+     RandomSource rng = RandomSource.create();
+		if (rng.nextBoolean())
 		{
 			return false;
 		} else
@@ -80,7 +82,8 @@ public class Irrigation extends TerraformerBase
 	@Override
 	boolean terraform(Level world, BlockPos pos)
 	{
-		if (world.random.nextInt(48000) == 0)
+     RandomSource rng = RandomSource.create();
+		if (rng.nextInt(48000) == 0)
 		{
 			world.getLevelData().setRaining(true);
 			return true;

@@ -121,7 +121,7 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 
 	public static void showHeatEffects(Level world, BlockPos pos, int heat)
 	{
-		RandomSource rnd = world.random;
+		RandomSource rnd = RandomSource.create();
 		if (rnd.nextInt(8) == 0)
 		{
 			int puffs = heat / 1000;
@@ -438,6 +438,7 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 
 	public boolean calculateHeatEffects()
 	{
+     RandomSource rng = RandomSource.create();
 		if (this.heat >= 4000 && IC2.sideProxy.isSimulating() && !(IC2Config.protection.reactorExplosionPowerLimit.get() <= 0.0F))
 		{
 			float power = (float) this.heat / this.maxHeat;
@@ -448,7 +449,7 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 			}
 
 			Level world = this.getLevel();
-			if (power >= 0.85F && world.random.nextFloat() <= 0.2F * this.hem)
+			if (power >= 0.85F && rng.nextFloat() <= 0.2F * this.hem)
 			{
 				BlockPos coordination = this.getRandCoordination(2);
 				BlockState state = world.getBlockState(coordination);
@@ -482,11 +483,11 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 					EntitySelector.NO_CREATIVE_OR_SPECTATOR
 				))
 				{
-					entity.hurt(Ic2DamageSource.radiation, (int) (world.random.nextInt(4) * this.hem));
+        entity.hurt(Ic2DamageSource.radiation, (int) (rng.nextInt(4) * this.hem));
 				}
 			}
 
-			if (power >= 0.5F && world.random.nextFloat() <= this.hem)
+			if (power >= 0.5F && rng.nextFloat() <= this.hem)
 			{
 				BlockPos coordination = this.getRandCoordination(2);
 				BlockState state = world.getBlockState(coordination);
@@ -496,7 +497,7 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 				}
 			}
 
-			if (power >= 0.4F && world.random.nextFloat() <= this.hem)
+			if (power >= 0.4F && rng.nextFloat() <= this.hem)
 			{
 				BlockPos coordination = this.getRandCoordination(2);
 				if (world.getBlockEntity(coordination) == null)
@@ -515,6 +516,7 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 
 	public BlockPos getRandCoordination(int radius)
 	{
+     RandomSource rng = RandomSource.create();
 		if (radius <= 0)
 		{
 			return null;
@@ -527,9 +529,9 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 		{
 			ret = this.worldPosition
 				.offset(
-					world.random.nextInt(2 * radius + 1) - radius,
-					world.random.nextInt(2 * radius + 1) - radius,
-					world.random.nextInt(2 * radius + 1) - radius
+					rng.nextInt(2 * radius + 1) - radius,
+					rng.nextInt(2 * radius + 1) - radius,
+					rng.nextInt(2 * radius + 1) - radius
 				);
 		} while (ret.equals(this.worldPosition));
 

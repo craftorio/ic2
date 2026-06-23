@@ -7,6 +7,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.util.RandomSource;
 
 public class Desertification extends TerraformerBase
 {
@@ -28,6 +29,7 @@ public class Desertification extends TerraformerBase
 	@Override
 	boolean terraform(Level world, BlockPos pos)
 	{
+     RandomSource rng = RandomSource.create();
 		pos = TileEntityTerra.getFirstBlockFrom(world, pos, 10);
 		if (pos == null)
 		{
@@ -52,7 +54,7 @@ public class Desertification extends TerraformerBase
 				return true;
 			} else if (block != Blocks.ICE && block != Blocks.SNOW)
 			{
-				if ((state.is(BlockTags.PLANKS) || state.is(BlockTags.LOGS_THAT_BURN)) && world.random.nextInt(15) == 0)
+				if ((state.is(BlockTags.PLANKS) || state.is(BlockTags.LOGS_THAT_BURN)) && rng.nextInt(15) == 0)
 				{
 					world.setBlockAndUpdate(pos, Blocks.FIRE.defaultBlockState());
 					return true;

@@ -69,6 +69,7 @@ public class RubberLogBlock extends RotatedPillarBlock
 
 	public @NotNull InteractionResult use(@NotNull BlockState state, @NotNull Level world, @NotNull BlockPos pos, Player player, @NotNull InteractionHand hand, @NotNull BlockHitResult hit)
 	{
+     RandomSource rng = RandomSource.create();
 		ItemStack mainHandItem = player.getMainHandItem();
 		if (!(mainHandItem.getItem() instanceof AxeItem))
 		{
@@ -79,7 +80,7 @@ public class RubberLogBlock extends RotatedPillarBlock
 		RubberLogBlock.RubberWoodState resinState = state.getValue(stateProperty);
 		if (resinState == RubberLogBlock.RubberWoodState.wet_north || resinState == RubberLogBlock.RubberWoodState.wet_south || resinState == RubberLogBlock.RubberWoodState.wet_west || resinState == RubberLogBlock.RubberWoodState.wet_east)
 		{
-			this.dropResin(world, pos, world.random.nextInt(2) + 1);
+			this.dropResin(world, pos, rng.nextInt(2) + 1);
 		}
 
 		return InteractionResult.sidedSuccess(world.isClientSide);

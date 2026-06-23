@@ -26,6 +26,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraft.util.RandomSource;
 
 @NotClassic
 public class TileEntitySteamGenerator extends TileEntityInventory implements IHasGui, IGuiValueProvider, INetworkClientTileEntityEventListener
@@ -104,6 +105,7 @@ public class TileEntitySteamGenerator extends TileEntityInventory implements IHa
 
 	private boolean work()
 	{
+     RandomSource rng = RandomSource.create();
 		this.heatInput = this.requestHeat(1200);
 		if (this.heatInput <= 0)
 		{
@@ -206,7 +208,7 @@ public class TileEntitySteamGenerator extends TileEntityInventory implements IHa
 			if (remaining > 0)
 			{
 				Level world = this.getLevel();
-				if (world.random.nextInt(10) == 0)
+				if (rng.nextInt(10) == 0)
 				{
 					new Ic2Explosion(world, null, this.worldPosition, 1, 1.0F, Ic2Explosion.Type.Heat).doExplosion();
 				} else if (remaining >= 100)

@@ -218,7 +218,7 @@ public class TileEntityTeleporter extends TileEntityBase implements INetworkTile
 	private void spawnParticles(int n, BlockPos pos, int green, int blue)
 	{
 		Level world = this.getLevel();
-		RandomSource rnd = world.random;
+		RandomSource rnd = RandomSource.create();
 		DustParticleOptions effect = new DustParticleOptions(new Vector3f(-1 / 255.0F, green / 255.0F, blue / 255.0F), 1.0F);
 
 		for (int i = 0; i < n; i++)

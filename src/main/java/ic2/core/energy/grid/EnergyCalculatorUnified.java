@@ -474,7 +474,7 @@ public class EnergyCalculatorUnified implements IEnergyCalculator
 		if (!activeSources.isEmpty() && !activeSinks.isEmpty())
 		{
 			Level world = grid.getEnergyNet().getWorld();
-			RandomSource rand = world.random;
+			RandomSource rand = RandomSource.create();
 			boolean shufflePaths = (world.getGameTime() & 3L) != 0L;
 			int sourcesOffset;
 			if (activeSources.size() > 1)

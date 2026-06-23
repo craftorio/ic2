@@ -19,6 +19,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.util.RandomSource;
 
 public class TileEntityTerra extends TileEntityElectricMachine
 {
@@ -95,6 +96,7 @@ public class TileEntityTerra extends TileEntityElectricMachine
 	@Override
 	protected void updateEntityServer()
 	{
+     RandomSource rng = RandomSource.create();
 		super.updateEntityServer();
 		boolean newActive = false;
 		ItemStack stack = this.tfbpSlot.get();
@@ -115,9 +117,9 @@ public class TileEntityTerra extends TileEntityElectricMachine
 				{
 					int range = tfbp.getRange(stack) / 10;
 					nextPos = new BlockPos(
-						this.lastPos.getX() - world.random.nextInt(range + 1) + world.random.nextInt(range + 1),
+						this.lastPos.getX() - rng.nextInt(range + 1) + rng.nextInt(range + 1),
 						this.worldPosition.getY(),
-						this.lastPos.getZ() - world.random.nextInt(range + 1) + world.random.nextInt(range + 1)
+						this.lastPos.getZ() - rng.nextInt(range + 1) + rng.nextInt(range + 1)
 					);
 				} else
 				{
@@ -128,9 +130,9 @@ public class TileEntityTerra extends TileEntityElectricMachine
 
 					int range = tfbp.getRange(stack) * (this.failedAttempts + 1) / 5;
 					nextPos = new BlockPos(
-						this.worldPosition.getX() - world.random.nextInt(range + 1) + world.random.nextInt(range + 1),
+						this.worldPosition.getX() - rng.nextInt(range + 1) + rng.nextInt(range + 1),
 						this.worldPosition.getY(),
-						this.worldPosition.getZ() - world.random.nextInt(range + 1) + world.random.nextInt(range + 1)
+						this.worldPosition.getZ() - rng.nextInt(range + 1) + rng.nextInt(range + 1)
 					);
 				}
 

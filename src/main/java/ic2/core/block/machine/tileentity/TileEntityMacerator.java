@@ -22,6 +22,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.util.RandomSource;
 
 public class TileEntityMacerator extends TileEntityStandardMachine<IRecipeInput, Collection<ItemStack>, ItemStack>
 {
@@ -37,15 +38,16 @@ public class TileEntityMacerator extends TileEntityStandardMachine<IRecipeInput,
 	@Override
 	protected void updateEntityClient()
 	{
+     RandomSource rng = RandomSource.create();
 		super.updateEntityClient();
 		Level world = this.getLevel();
-		if (this.getActive() && world.random.nextInt(8) == 0)
+		if (this.getActive() && rng.nextInt(8) == 0)
 		{
 			for (int i = 0; i < 4; i++)
 			{
-				double x = this.worldPosition.getX() + 0.5 + world.random.nextFloat() * 0.6 - 0.3;
-				double y = this.worldPosition.getY() + 1 + world.random.nextFloat() * 0.2 - 0.1;
-				double z = this.worldPosition.getZ() + 0.5 + world.random.nextFloat() * 0.6 - 0.3;
+				double x = this.worldPosition.getX() + 0.5 + rng.nextFloat() * 0.6 - 0.3;
+				double y = this.worldPosition.getY() + 1 + rng.nextFloat() * 0.2 - 0.1;
+				double z = this.worldPosition.getZ() + 0.5 + rng.nextFloat() * 0.6 - 0.3;
 				world.addParticle(ParticleTypes.SMOKE, x, y, z, 0.0, 0.0, 0.0);
 			}
 		}

@@ -21,6 +21,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.util.RandomSource;
 
 public abstract class TileEntityExplosive extends TileEntityInventory implements Redstone.IRedstoneChangeHandler
 {
@@ -94,6 +95,7 @@ public abstract class TileEntityExplosive extends TileEntityInventory implements
 
 	protected boolean explode(LivingEntity igniter, boolean shortFuse)
 	{
+     RandomSource rng = RandomSource.create();
 		ExplosiveEntity entity = this.getEntity(igniter);
 		if (entity == null)
 		{
@@ -111,7 +113,7 @@ public abstract class TileEntityExplosive extends TileEntityInventory implements
 		world.removeBlock(this.worldPosition, false);
 		if (shortFuse)
 		{
-			entity.setFuse(world.random.nextInt(Math.max(1, entity.getFuse() / 4)) + entity.getFuse() / 8);
+			entity.setFuse(rng.nextInt(Math.max(1, entity.getFuse() / 4)) + entity.getFuse() / 8);
 		}
 
 		world.addFreshEntity(entity);

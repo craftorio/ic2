@@ -3,6 +3,7 @@ plugins {
     id 'idea'
     id 'maven-publish'
     id 'net.minecraftforge.gradle' version '[6.0,6.2)'
+    id 'com.modrinth.minotaur' version '2.+'
 }
 
 version = System.getenv("MOD_VERSION") ?: mod_version
@@ -88,6 +89,18 @@ publishing {
     }
 }
 
+modrinth {
+    token = System.getenv("MODRINTH_TOKEN")
+    projectId = modrinth_project_id
+    versionNumber = mod_version
+    versionName = "${mod_name} ${mod_version}"
+    versionType = mod_version.contains("-release") ? "release" : "beta"
+    uploadFile = tasks.jar.archiveFile
+    gameVersions = [minecraft_version]
+    loaders = ["forge"]
+    changelog = project.file('release.md').exists() ? project.file('release.md').text : ""
+}
+
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
@@ -129,3 +142,126 @@ tasks.register('syncVersion') {
         logger.error("Notice: current version is: ${version}")
     }
 }
+
+// ========== Release workflow tasks ==========
+
+tasks.register('checkTag') {
+    group = 'publishing'
+    description = 'Check if the version tag already exists locally or remotely. Fails if it does.'
+    doLast {
+        def version = mod_version
+
+        // Check local tag
+        def localResult = new ByteArrayOutputStream()
+        exec {
+            commandLine 'git', 'tag', '-l', version
+            standardOutput = localResult
+        }
+        if (localResult.toString().trim() == version) {
+            throw new GradleException(
+                "Tag '${version}' already exists locally!\n" +
+                "Delete it with: git tag -d ${version}\n" +
+                "Or bump the mod_version in gradle.properties."
+            )
+        }
+
+        // Check remote tag
+        def remoteResult = new ByteArrayOutputStream()
+        exec {
+            commandLine 'git', 'ls-remote', '--tags', 'origin', "refs/tags/${version}"
+            standardOutput = remoteResult
+            ignoreExitValue = true
+        }
+        if (!remoteResult.toString().trim().isEmpty()) {
+            throw new GradleException(
+                "Tag '${version}' already exists on remote!\n" +
+                "Delete it with: git push origin --delete ${version}\n" +
+                "Or bump the mod_version in gradle.properties."
+            )
+        }
+
+        logger.lifecycle("Tag '${version}' is available (not found locally or remotely).")
+    }
+}
+
+tasks.register('tagRelease') {
+    group = 'publishing'
+    description = 'Create and push git tag for the current version.'
+    dependsOn 'checkTag'
+    doLast {
+        def version = mod_version
+        exec {
+            commandLine 'git', 'tag', version
+        }
+        logger.lifecycle("Created tag '${version}' on HEAD.")
+        exec {
+            commandLine 'git', 'push', 'origin', version
+        }
+        logger.lifecycle("Pushed tag '${version}' to origin.")
+    }
+}
+
+tasks.register('githubRelease') {
+    group = 'publishing'
+    description = 'Create GitHub Release via gh CLI and upload the built jar.'
+    dependsOn 'build', 'tagRelease'
+    doLast {
+        def version = mod_version
+        def jarFile = tasks.jar.archiveFile.get().asFile
+        def releaseNotes = file('release.md')
+
+        if (!jarFile.exists()) {
+            throw new GradleException(
+                "Jar file not found: ${jarFile.absolutePath}\n" +
+                "Has the build step succeeded?"
+            )
+        }
+
+        // Check if gh CLI is available
+        boolean ghAvailable = false
+        try {
+            def result = exec {
+                commandLine 'gh', '--version'
+                standardOutput = new ByteArrayOutputStream()
+                errorOutput = new ByteArrayOutputStream()
+                ignoreExitValue = true
+            }
+            ghAvailable = (result.exitValue == 0)
+        } catch (Exception ignored) {
+            // gh not found in PATH
+        }
+        if (!ghAvailable) {
+            throw new GradleException(
+                "GitHub CLI (gh) is not installed or not in PATH.\n" +
+                "Install it from: https://cli.github.com/\n" +
+                "Or run: winget install GitHub.cli\n" +
+                "Then authenticate: gh auth login"
+            )
+        }
+
+        def args = [
+            'gh', 'release', 'create', version,
+            jarFile.absolutePath,
+            '--title', "${mod_name} ${version}",
+            '--notes-file', releaseNotes.absolutePath
+        ]
+        if (!version.contains('-release')) {
+            args << '--prerelease'
+        }
+
+        exec {
+            commandLine args
+        }
+        logger.lifecycle("Created GitHub Release '${version}' with jar: ${jarFile.name}")
+    }
+}
+
+tasks.register('publishRelease') {
+    group = 'publishing'
+    description = 'Full release workflow: build, tag, GitHub Release, and Modrinth publish.'
+    dependsOn 'githubRelease', 'modrinth'
+}
+
+// Enforce task ordering
+tasks.named('githubRelease') { mustRunAfter 'tagRelease' }
+tasks.named('modrinth') { mustRunAfter 'githubRelease' }

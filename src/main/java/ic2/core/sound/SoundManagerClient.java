@@ -48,24 +48,30 @@ public class SoundManagerClient extends SoundManager
 			if (stack != null && stack.getItem() instanceof IHitSoundOverride hitSoundOverride)
 			{
 				Level world = player.getCommandSenderWorld();
-				BlockHitResult mop = getMovingObjectPositionFromPlayer(world, player);
 				BlockPos pos = new BlockPos((int) sound.getX(), (int) sound.getY(), (int) sound.getZ());
-				if (mop.getType() == Type.BLOCK && pos.equals(mop.getBlockPos()))
+
+				SoundEvent replaceSound = null;
+				if (name.endsWith(".hit"))
 				{
-					SoundEvent replaceSound;
-					if (name.endsWith(".hit"))
+					BlockHitResult mop = getMovingObjectPositionFromPlayer(world, player);
+					if (mop.getType() == Type.BLOCK && pos.equals(mop.getBlockPos()))
 					{
 						replaceSound = hitSoundOverride.getHitSoundForBlock(player, world, pos, stack);
-					} else
+					}
+				} else
+				{
+					// For break sounds, the block is already destroyed so the raycast misses.
+					// Use a distance check instead to confirm it's within player reach.
+					if (player.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) <= 36.0)
 					{
 						replaceSound = hitSoundOverride.getBreakSoundForBlock(player, world, pos, stack);
 					}
+				}
 
-					if (replaceSound != null)
-					{
-						sound = null;
-						world.playSound(player, pos, replaceSound, category, 1.0F, 1.0F);
-					}
+				if (replaceSound != null)
+				{
+					sound = null;
+					world.playSound(player, pos, replaceSound, category, 1.0F, 1.0F);
 				}
 			}
 		}

@@ -227,21 +227,37 @@ public abstract class ItemElectricTool extends DiggerItem implements IElectricIt
 		{
 			if (isEquipped)
 			{
+				boolean hasPower = ElectricItem.manager.canUse(itemstack, 1.0);
+
 				if (!this.wasEquipped)
 				{
-					this.initSound((LivingEntity) entity, itemstack);
-					if (this.idleSound != null)
+					if (hasPower)
+					{
+						this.initSound((LivingEntity) entity, itemstack);
+						if (this.idleSound != null)
+						{
+							this.idleSound.play();
+						}
+
+						if (this.startSound != null)
+						{
+							this.startSound.playOnce();
+						}
+					}
+				} else if (this.idleSound != null)
+				{
+					if (hasPower && !this.idleSound.isPlaying())
 					{
 						this.idleSound.play();
-					}
-
-					if (this.startSound != null)
+					} else if (!hasPower)
 					{
-						this.startSound.playOnce();
+						if (this.stopSound != null)
+						{
+							this.stopSound.playOnce();
+						}
+
+						this.clearSound((LivingEntity) entity);
 					}
-				} else if (this.idleSound != null && !this.idleSound.isPlaying())
-				{
-					this.idleSound.play();
 				}
 			} else if (this.idleSound != null && entity instanceof LivingEntity theEntity)
 			{

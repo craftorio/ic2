@@ -153,7 +153,7 @@ public class ItemDrill extends ItemElectricTool implements IMiningDrill, IHitSou
 	@Override
 	protected SoundEvent getIdleSound(LivingEntity player, ItemStack stack)
 	{
-		return Ic2SoundEvents.ITEM_DRILL_IDLE;
+		return stack.getItem() == Ic2Items.DRILL ? Ic2SoundEvents.ITEM_DRILL_IDLE : null;
 	}
 
 	@Override

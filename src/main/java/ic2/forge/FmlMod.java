@@ -18,7 +18,6 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.IExtensionPoint.DisplayTest;
-import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -57,14 +56,13 @@ public final class FmlMod
 		if (FMLEnvironment.dist.isClient())
 		{
 			modEventBus.register(new ClientModEventHandlerForge());
-			ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, IC2ClientConfig.SPEC);
+			this.ctx.registerConfig(ModConfig.Type.CLIENT, IC2ClientConfig.SPEC);
 		}
 
 		Ic2Fluids.init();
-		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, IC2Config.SPEC);
+		this.ctx.registerConfig(ModConfig.Type.COMMON, IC2Config.SPEC);
 	}
-
-
+	
 	@SubscribeEvent
 	public void load(FMLCommonSetupEvent event)
 	{
@@ -194,7 +192,7 @@ public final class FmlMod
 		{
 			for (EnvProxyForge.ConfiguredFeatureRegistration<?, ?> reg : EnvProxyForge.configuredFeatureRegistrations)
 			{
-				ConfiguredFeature<?, ?> cf = new ConfiguredFeature(reg.feature(), reg.config());
+				ConfiguredFeature<?, ?> cf = new ConfiguredFeature<>(reg.feature(), reg.config());
 				event.register(Registries.CONFIGURED_FEATURE, reg.id(), () -> cf);
 			}
 		}

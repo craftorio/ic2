@@ -11,6 +11,21 @@
       "entries": [
         {
           "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:copy_nbt",
+              "ops": [
+                {
+                  "op": "replace",
+                  "source": "energy",
+                  "target": "energy"
+                }
+              ],
+              "source": {
+                "type": "ic2:block_nbt"
+              }
+            }
+          ],
           "name": "ic2:cesu"
         }
       ],

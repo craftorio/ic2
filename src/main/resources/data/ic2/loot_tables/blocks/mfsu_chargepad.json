@@ -11,7 +11,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "ic2:mfsu_chargepad"
+          "name": "ic2:advanced_machine"
         }
       ],
       "rolls": 1.0

@@ -11,7 +11,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "ic2:mfe_chargepad"
+          "name": "ic2:machine"
         }
       ],
       "rolls": 1.0

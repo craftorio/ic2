@@ -11,12 +11,14 @@ import ic2.api.item.IElectricItem;
 import ic2.core.IC2;
 import ic2.core.Ic2ItemGroupType;
 import ic2.core.fluid.EnvFluidHandler;
+import ic2.core.item.BlockItemEnergyStorage;
 import ic2.core.item.ElectricItemManager;
 import ic2.core.item.ItemCropSeed;
 import ic2.core.item.EnvItemHandler;
 import ic2.core.item.armor.ItemArmorFluidTank;
 import ic2.core.ref.Ic2Items;
 import ic2.core.network.GrowingBuffer;
+import ic2.core.util.StackUtil;
 import ic2.core.proxy.EnvProxy;
 
 import java.util.ArrayList;
@@ -298,6 +300,12 @@ public final class EnvProxyForge implements EnvProxy
 						if (item instanceof IElectricItem)
 						{
 							output.accept(ElectricItemManager.getCharged(item, Double.POSITIVE_INFINITY));
+						}
+						if (item instanceof BlockItemEnergyStorage energyItem)
+						{
+							ItemStack chargedStack = new ItemStack(item);
+							StackUtil.getOrCreateNbtData(chargedStack).putDouble("energy", energyItem.maxEnergy);
+							output.accept(chargedStack);
 						}
 						if (item instanceof ItemArmorFluidTank tankItem)
 						{

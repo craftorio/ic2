@@ -12,6 +12,10 @@ import ic2.core.block.generator.tileentity.TileEntityStirlingGenerator;
 import ic2.core.block.generator.tileentity.TileEntityWaterGenerator;
 import ic2.core.block.generator.tileentity.TileEntityWindGenerator;
 import ic2.core.block.heatgenerator.tileentity.TileEntityElectricHeatGenerator;
+import ic2.core.block.steam.BlockRefractoryBricks;
+import ic2.core.block.steam.TileEntityCokeKiln;
+import ic2.core.block.steam.TileEntityCokeKilnGrate;
+import ic2.core.block.steam.TileEntityCokeKilnHatch;
 import ic2.core.block.heatgenerator.tileentity.TileEntityFluidHeatGenerator;
 import ic2.core.block.heatgenerator.tileentity.TileEntityRTHeatGenerator;
 import ic2.core.block.heatgenerator.tileentity.TileEntitySolidHeatGenerator;
@@ -162,6 +166,7 @@ public final class Ic2Blocks
 	public static final Block TIN_BLOCK = register("tin_block", new Block(Properties.of().strength(4.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL)));
 	public static final Block URANIUM_BLOCK = register("uranium_block", new Block(Properties.of().strength(6.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL)));
 	public static final Block REINFORCED_STONE = register("reinforced_stone", new Block(Properties.of().strength(80.0F, 180.0F).requiresCorrectToolForDrops()));
+	public static final Block REFRACTORY_BRICKS = register("refractory_bricks", new BlockRefractoryBricks());
 	public static final Block MACHINE = register("machine", new Block(Properties.of().strength(5.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL)));
 	public static final Block ADVANCED_MACHINE = register("advanced_machine", new Block(Properties.of().strength(8.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.METAL)));
 	public static final Block REACTOR_VESSEL = register("reactor_vessel", new Block(Properties.of().strength(40.0F, 90.0F).requiresCorrectToolForDrops()));
@@ -313,6 +318,9 @@ public final class Ic2Blocks
 	public static final Block IRON_TANK = register("iron_tank", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(3.0F, 15.0F).sound(SoundType.METAL), TileEntityIronTank.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.noFacings, false));
 	public static final Block STEEL_TANK = register("steel_tank", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(4.0F, 20.0F).sound(SoundType.METAL), TileEntitySteelTank.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.noFacings, false));
 	public static final Block IRIDIUM_TANK = register("iridium_tank", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(5.0F, 100.0F).sound(SoundType.METAL), TileEntityIridiumTank.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.noFacings, false));
+	public static final Block COKE_KILN = register("coke_kiln", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.STONE), TileEntityCokeKiln.class, true, Ic2TileEntityBlock.DefaultDrop.Self, Util.horizontalFacings, true));
+	public static final Block COKE_KILN_HATCH = register("coke_kiln_hatch", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.STONE), TileEntityCokeKilnHatch.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.allFacings, true));
+	public static final Block COKE_KILN_GRATE = register("coke_kiln_grate", Ic2TileEntityBlock.create(Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F, 10.0F).requiresCorrectToolForDrops().sound(SoundType.STONE), TileEntityCokeKilnGrate.class, false, Ic2TileEntityBlock.DefaultDrop.Self, Util.allFacings, true));
 	private static final Properties wallSettings = Properties.of().strength(3.0F, 30.0F).requiresCorrectToolForDrops().sound(SoundType.STONE);
 	public static final Block WHITE_WALL = register("white_wall", new WallBlock(wallSettings, DyeColor.WHITE));
 	public static final Block ORANGE_WALL = register("orange_wall", new WallBlock(wallSettings, DyeColor.ORANGE));

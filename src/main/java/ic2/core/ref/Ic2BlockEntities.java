@@ -12,6 +12,9 @@ import ic2.core.block.generator.tileentity.TileEntityStirlingGenerator;
 import ic2.core.block.generator.tileentity.TileEntityWaterGenerator;
 import ic2.core.block.generator.tileentity.TileEntityWindGenerator;
 import ic2.core.block.heatgenerator.tileentity.TileEntityElectricHeatGenerator;
+import ic2.core.block.steam.TileEntityCokeKiln;
+import ic2.core.block.steam.TileEntityCokeKilnGrate;
+import ic2.core.block.steam.TileEntityCokeKilnHatch;
 import ic2.core.block.heatgenerator.tileentity.TileEntityFluidHeatGenerator;
 import ic2.core.block.heatgenerator.tileentity.TileEntityRTHeatGenerator;
 import ic2.core.block.heatgenerator.tileentity.TileEntitySolidHeatGenerator;
@@ -290,6 +293,9 @@ public final class Ic2BlockEntities
 	public static final BlockEntityType<TileEntityIronTank> IRON_TANK = register("iron_tank", TileEntityIronTank::new, Ic2Blocks.IRON_TANK);
 	public static final BlockEntityType<TileEntitySteelTank> STEEL_TANK = register("steel_tank", TileEntitySteelTank::new, Ic2Blocks.STEEL_TANK);
 	public static final BlockEntityType<TileEntityIridiumTank> IRIDIUM_TANK = register("iridium_tank", TileEntityIridiumTank::new, Ic2Blocks.IRIDIUM_TANK);
+	public static final BlockEntityType<TileEntityCokeKiln> COKE_KILN = register("coke_kiln", TileEntityCokeKiln::new, Ic2Blocks.COKE_KILN);
+	public static final BlockEntityType<TileEntityCokeKilnHatch> COKE_KILN_HATCH = register("coke_kiln_hatch", TileEntityCokeKilnHatch::new, Ic2Blocks.COKE_KILN_HATCH);
+	public static final BlockEntityType<TileEntityCokeKilnGrate> COKE_KILN_GRATE = register("coke_kiln_grate", TileEntityCokeKilnGrate::new, Ic2Blocks.COKE_KILN_GRATE);
 
 
 

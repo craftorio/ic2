@@ -57,6 +57,7 @@ import ic2.core.item.tool.Ic2Hoe;
 import ic2.core.item.tool.Ic2Pickaxe;
 import ic2.core.item.tool.ItemDebug;
 import ic2.core.item.tool.ItemSprayer;
+import ic2.core.item.ItemCoke;
 import ic2.core.item.tool.ItemDrill;
 import ic2.core.item.tool.ItemDrillIridium;
 import ic2.core.item.tool.ItemElectricToolChainsaw;
@@ -117,6 +118,7 @@ public final class Ic2Items
 	public static final Item TIN_BLOCK = register("tin_block", new BlockItem(Ic2Blocks.TIN_BLOCK, new Properties()));
 	public static final Item URANIUM_BLOCK = register("uranium_block", new BlockItem(Ic2Blocks.URANIUM_BLOCK, new Properties()));
 	public static final Item REINFORCED_STONE = register("reinforced_stone", new BlockItem(Ic2Blocks.REINFORCED_STONE, new Properties()));
+	public static final Item REFRACTORY_BRICKS = register("refractory_bricks", new BlockItem(Ic2Blocks.REFRACTORY_BRICKS, new Properties()));
 	public static final Item MACHINE = register("machine", new BlockItem(Ic2Blocks.MACHINE, new Properties()));
 	public static final Item ADVANCED_MACHINE = register("advanced_machine", new BlockItem(Ic2Blocks.ADVANCED_MACHINE, new Properties()));
 	public static final Item SILVER_BLOCK = register("silver_block", new BlockItem(Ic2Blocks.SILVER_BLOCK, new Properties()));
@@ -205,6 +207,9 @@ public final class Ic2Items
 	public static final Item IRON_TANK = register("iron_tank", new BlockItem(Ic2Blocks.IRON_TANK, new Properties()));
 	public static final Item STEEL_TANK = register("steel_tank", new BlockItem(Ic2Blocks.STEEL_TANK, new Properties().rarity(Rarity.UNCOMMON)));
 	public static final Item IRIDIUM_TANK = register("iridium_tank", new BlockItem(Ic2Blocks.IRIDIUM_TANK, new Properties().rarity(Rarity.RARE)));
+	public static final Item COKE_KILN = register("coke_kiln", new BlockItem(Ic2Blocks.COKE_KILN, new Properties()));
+	public static final Item COKE_KILN_HATCH = register("coke_kiln_hatch", new BlockItem(Ic2Blocks.COKE_KILN_HATCH, new Properties()));
+	public static final Item COKE_KILN_GRATE = register("coke_kiln_grate", new BlockItem(Ic2Blocks.COKE_KILN_GRATE, new Properties()));
 	public static final Item GENERATOR = register("generator", new BlockItem(Ic2Blocks.GENERATOR, new Properties()));
 	public static final Item GEO_GENERATOR = register("geo_generator", new BlockItem(Ic2Blocks.GEO_GENERATOR, new Properties()));
 	public static final Item KINETIC_GENERATOR = register("kinetic_generator", new BlockItem(Ic2Blocks.KINETIC_GENERATOR, new Properties()));
@@ -376,6 +381,7 @@ public final class Ic2Items
 	public static final Item IRIDIUM_SHARD = register("iridium_shard", new Item(new Properties().rarity(Rarity.UNCOMMON)));
 	public static final Item RESIN = register("resin", new Item(new Properties()));
 	public static final Item SLAG = register("slag", new Item(new Properties()));
+	public static final Item COKE = register("coke", new ItemCoke());
 	public static final Item IODINE = register("iodine", new Item(new Properties()));
 	public static final Item WATER_SHEET = register("water_sheet", new Item(new Properties()));
 	public static final Item LAVA_SHEET = register("lava_sheet", new Item(new Properties()));
@@ -787,6 +793,9 @@ public final class Ic2Items
 		addToCreativeTab(Ic2ItemGroupType.MACHINES, () -> CHUNK_LOADER);
 		addToCreativeTab(Ic2ItemGroupType.MACHINES, () -> COMPRESSOR);
 		addToCreativeTab(Ic2ItemGroupType.MACHINES, () -> CONDENSER);
+		addToCreativeTab(Ic2ItemGroupType.MACHINES, () -> COKE_KILN);
+		addToCreativeTab(Ic2ItemGroupType.MACHINES, () -> COKE_KILN_HATCH);
+		addToCreativeTab(Ic2ItemGroupType.MACHINES, () -> COKE_KILN_GRATE);
 		addToCreativeTab(Ic2ItemGroupType.MACHINES, () -> CROPMATRON);
 		addToCreativeTab(Ic2ItemGroupType.MACHINES, () -> CROP_HARVESTER);
 		addToCreativeTab(Ic2ItemGroupType.MACHINES, () -> ELECTRIC_FURNACE);
@@ -848,6 +857,7 @@ public final class Ic2Items
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> COAL_CHUNK);
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> COAL_DUST);
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> COAL_FUEL_DUST);
+		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> COKE);
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> COIL);
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> COIN);
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> COPPER_BOILER);
@@ -929,6 +939,7 @@ public final class Ic2Items
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> RAW_TIN);
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> RAW_URANIUM);
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> RESIN);
+		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> REFRACTORY_BRICKS);
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> RE_ENRICHED_URANIUM);
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> RTG_PELLET);
 		addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> RUBBER);

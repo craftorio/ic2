@@ -33,20 +33,14 @@ import net.minecraft.world.phys.AABB;
 
 public class CropEating extends Ic2CropCard
 {
-	private final double movementMultiplier = 0.5;
-	private final double length = 1.0;
-
 	public CropEating(ICropType cropType)
 	{
 		super(cropType);
 	}
 
-	private static boolean hasMetalAromor(LivingEntity entity)
+	private static boolean hasMetalArmor(LivingEntity entity)
 	{
-		if (!(entity instanceof Player player))
-		{
-			return false;
-		} else
+		if (entity instanceof Player player)
 		{
 			for (ItemStack stack : player.getInventory().armor)
 			{
@@ -56,8 +50,8 @@ public class CropEating extends Ic2CropCard
 				}
 			}
 
-			return false;
 		}
+		return false;
 	}
 
 	@Override
@@ -140,8 +134,8 @@ public class CropEating extends Ic2CropCard
 					if (!(entity instanceof Player) || !((Player) entity).getAbilities().instabuild)
 					{
 						entity.setDeltaMovement((xcentered - entity.getX()) * 0.5, Math.min(entity.getDeltaMovement().y(), -0.05), (zcentered - entity.getZ()) * 0.5);
-						entity.hurt(Ic2DamageSource.create(crop.getWorldObj(), "cropEating"), (crop.getCurrentAge() + 1) * 2.0F);
-						if (!hasMetalAromor(entity))
+						entity.hurt(Ic2DamageSource.create(crop.getWorldObj(), "crop_eating"), (crop.getCurrentAge() + 1) * 2.0F);
+						if (!hasMetalArmor(entity))
 						{
 							entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 64, 50));
 							entity.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 64, 0));

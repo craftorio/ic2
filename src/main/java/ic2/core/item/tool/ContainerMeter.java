@@ -14,10 +14,10 @@ public class ContainerMeter extends ContainerHandHeldInventory<HandHeldMeter>
 	private static final int SCALE = 1000;
 
 	private IEnergyTile uut;
-	private DataSlot resultAvg = DataSlot.standalone();
-	private DataSlot resultMin = DataSlot.standalone();
-	private DataSlot resultMax = DataSlot.standalone();
-	private DataSlot resultCount = DataSlot.standalone();
+	private final DataSlot resultAvg = DataSlot.standalone();
+	private final DataSlot resultMin = DataSlot.standalone();
+	private final DataSlot resultMax = DataSlot.standalone();
+	private final DataSlot resultCount = DataSlot.standalone();
 	@ClientModifiable
 	private ContainerMeter.Mode mode = ContainerMeter.Mode.EnergyIn;
 
@@ -141,6 +141,6 @@ public class ContainerMeter extends ContainerHandHeldInventory<HandHeldMeter>
 		EnergyIn,
 		EnergyOut,
 		EnergyGain,
-		Voltage;
+		Voltage
 	}
 }

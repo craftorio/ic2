@@ -50,6 +50,7 @@ import ic2.core.world.Ic2WorldGen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
@@ -308,6 +309,16 @@ public final class EventHandler
 	{
 		if (victim instanceof Player player)
 		{
+			if (ItemArmorHazmat.hazmatAbsorbs(source) && ItemArmorHazmat.hasCompleteHazmat(victim))
+			{
+				if (source.is(DamageTypeTags.IS_FIRE))
+				{
+					victim.setRemainingFireTicks(0);
+				}
+
+				return 0.0F;
+			}
+
 			return ItemArmorElectric.damageArmor(player, source, amount);
 		}
 		return amount;

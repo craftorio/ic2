@@ -13,6 +13,7 @@ public class Ic2SoundEvents
 	public static final SoundEvent ITEM_ELECTRIC_SHUTDOWN = register("item.electric.shutdown");
 	public static final SoundEvent ITEM_BATTERY_USE = register("item.battery.use");
 	public static final SoundEvent ITEM_JETPACK_LOOP = register("item.jetpack.loop");
+	public static final SoundEvent ITEM_JETPACK_FIRE = register("item.jetpack.fire");
 	public static final SoundEvent ITEM_TREETAP_ELECTRIC_USE = register("item.treetap.electric.use");
 	public static final SoundEvent ITEM_CHAINSAW_IDLE = register("item.chainsaw.idle");
 	public static final SoundEvent ITEM_CHAINSAW_STOP = register("item.chainsaw.stop");
@@ -47,8 +48,8 @@ public class Ic2SoundEvents
 	public static final SoundEvent MACHINE_COMPRESSOR_OPERATE = register("machine.compressor.operate");
 	public static final SoundEvent MACHINE_ELECTROLYZER_LOOP = register("machine.electrolyzer.loop");
 	public static final SoundEvent MACHINE_EXTRACTOR_OPERATE = register("machine.extractor.operate");
-	public static final SoundEvent MACHINE_FABRICATOR_LOOP = register("machine.fabricator.loop");
-	public static final SoundEvent MACHINE_FABRICATOR_SCRAP = register("machine.fabricator.scrap");
+	public static final SoundEvent MACHINE_MATTER_GENERATOR_LOOP = register("machine.matter_generator.loop");
+	public static final SoundEvent MACHINE_MATTER_GENERATOR_SCRAP = register("machine.matter_generator.scrap");
 	public static final SoundEvent MACHINE_FURNACE_ELECTRIC_START = register("machine.furnace.electric.start");
 	public static final SoundEvent MACHINE_FURNACE_ELECTRIC_STOP = register("machine.furnace.electric.stop");
 	public static final SoundEvent MACHINE_FURNACE_ELECTRIC_LOOP = register("machine.furnace.electric.loop");

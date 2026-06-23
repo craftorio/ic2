@@ -17,6 +17,7 @@
 - 蒸汽动能发生机的显示重叠（GuiSteamKineticGenerator）
 - 拟态板完全是坏的 `ItemObscurator`
 - 日光灯不能用（仅限合成）
+- 物质生成机废料增幅声音没修好
 
 ### 不急
 

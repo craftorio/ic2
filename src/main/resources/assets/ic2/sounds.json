@@ -77,6 +77,14 @@
       }
     ]
   },
+  "item.jetpack.fire": {
+    "sounds": [
+      {
+        "name": "ic2:tools/jetpack/jetpack_fire",
+        "stream": true
+      }
+    ]
+  },
   "item.laser.shoot": {
     "sounds": [
       "ic2:tools/laser/shoot"
@@ -212,14 +220,14 @@
       "ic2:machines/extractor/operate"
     ]
   },
-  "machine.fabricator.loop": {
+  "machine.matter_generator.loop": {
     "sounds": [
-      "ic2:machines/fabricator/loop"
+      "ic2:machines/matter_generator/loop"
     ]
   },
-  "machine.fabricator.scrap": {
+  "machine.matter_generator.scrap": {
     "sounds": [
-      "ic2:machines/fabricator/scrap"
+      "ic2:machines/matter_generator/scrap"
     ]
   },
   "machine.furnace.electric.loop": {

@@ -28,6 +28,7 @@ import ic2.core.recipe.MatterAmplifierRecipeManager;
 import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.ref.Ic2Fluids;
 import ic2.core.ref.Ic2Items;
+import ic2.core.ref.Ic2SoundEvents;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -36,6 +37,7 @@ import java.util.Set;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -314,5 +316,17 @@ public class TileEntityMatter extends TileEntityElectricMachine implements IHasG
 	public float getExplosionPower(int tier, float defaultPower)
 	{
 		return 15.0F;
+	}
+
+	@Override
+	public SoundEvent getLoopingSoundEvent()
+	{
+		return Ic2SoundEvents.MACHINE_MATTER_GENERATOR_LOOP;
+	}
+
+	@Override
+	public SoundEvent getSubLoopingSoundEvent()
+	{
+		return Ic2SoundEvents.MACHINE_MATTER_GENERATOR_SCRAP;
 	}
 }

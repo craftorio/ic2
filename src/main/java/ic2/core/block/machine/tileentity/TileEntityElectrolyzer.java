@@ -16,6 +16,7 @@ import ic2.core.network.GrowingBuffer;
 import ic2.core.recipe.ElectrolyzerRecipeManager;
 import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.ref.Ic2Fluids;
+import ic2.core.ref.Ic2SoundEvents;
 import ic2.core.util.LiquidUtil;
 
 import java.util.EnumSet;
@@ -24,6 +25,7 @@ import java.util.Set;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -201,5 +203,11 @@ public class TileEntityElectrolyzer extends TileEntityElectricMachine implements
 	public double getRatio()
 	{
 		return this.recipe == null ? 0.0 : (double) this.progress / this.recipe.ticksNeeded;
+	}
+
+	@Override
+	public SoundEvent getLoopingSoundEvent()
+	{
+		return Ic2SoundEvents.MACHINE_ELECTROLYZER_LOOP;
 	}
 }

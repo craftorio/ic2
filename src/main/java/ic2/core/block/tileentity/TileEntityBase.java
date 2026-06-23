@@ -124,14 +124,20 @@ public class TileEntityBase extends TileEntityInventory
 
 	public boolean stopLoopingSound()
 	{
+		boolean stopped = false;
 		if (this.loopingSound != null)
 		{
 			this.loopingSound.stop();
-			return true;
-		} else
-		{
-			return false;
+			stopped = true;
 		}
+
+		if (this.subLoopingSound != null)
+		{
+			this.subLoopingSound.stop();
+			stopped = true;
+		}
+
+		return stopped;
 	}
 
 	public boolean stopStartSound()
@@ -214,9 +220,9 @@ public class TileEntityBase extends TileEntityInventory
 	protected void updateSubLoopingSound()
 	{
 		SoundEvent loopingSoundEvent = this.getSubLoopingSoundEvent();
-		if (loopingSoundEvent != null && this.loopingSound == null)
+		if (loopingSoundEvent != null && this.subLoopingSound == null)
 		{
-			this.loopingSound = IC2.soundManager.createSound(this, loopingSoundEvent, SoundSource.BLOCKS, this.getBlockPos(), 1.0F, 1.0F);
+			this.subLoopingSound = IC2.soundManager.createSound(this, loopingSoundEvent, SoundSource.BLOCKS, this.getBlockPos(), 1.0F, 1.0F);
 		}
 	}
 
@@ -233,6 +239,7 @@ public class TileEntityBase extends TileEntityInventory
 	{
 		this.startSound = null;
 		this.loopingSound = null;
+		this.subLoopingSound = null;
 		this.stopSound = null;
 		this.interruptSound = null;
 	}

@@ -1,6 +1,7 @@
 package ic2.core.item.armor.jetpack;
 
 import ic2.core.IC2;
+import ic2.core.item.armor.ItemArmorJetpackElectric;
 import ic2.core.ref.Ic2SoundEvents;
 import ic2.core.sound.Sound;
 import ic2.core.util.StackUtil;
@@ -174,9 +175,7 @@ public class JetpackLogic
 					{
 						if (jetpackSound == null)
 						{
-							jetpackSound = IC2.soundManager.createSound(
-								player, Ic2SoundEvents.ITEM_JETPACK_LOOP, SoundSource.PLAYERS, player, 1.0F, 1.0F
-							);
+							jetpackSound = IC2.soundManager.createSound(player, jetpack instanceof ItemArmorJetpackElectric ? Ic2SoundEvents.ITEM_JETPACK_LOOP : Ic2SoundEvents.ITEM_JETPACK_FIRE, SoundSource.PLAYERS, player, 1.0F, 1.0F);
 						}
 
 						if (jetpackSound != null)

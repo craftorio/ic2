@@ -17,7 +17,7 @@ import ic2.core.gui.dynamic.IGuiValueProvider;
 import ic2.core.network.GrowingBuffer;
 import ic2.core.network.GuiSynced;
 import ic2.core.ref.Ic2BlockEntities;
-import ic2.core.sound.Sound;
+import ic2.core.ref.Ic2SoundEvents;
 import ic2.core.util.LiquidUtil;
 import ic2.core.util.PumpUtil;
 import ic2.core.util.Util;
@@ -29,6 +29,7 @@ import java.util.Set;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -53,7 +54,6 @@ public class TileEntityPump extends TileEntityElectricMachine implements IHasGui
 	public int operationLength;
 	@GuiSynced
 	public float guiProgress;
-	private Sound sound;
 	private TileEntityMiner miner = null;
 
 	public TileEntityPump(BlockPos pos, BlockState state)
@@ -83,12 +83,6 @@ public class TileEntityPump extends TileEntityElectricMachine implements IHasGui
 	@Override
 	protected void onUnloaded()
 	{
-		if (IC2.sideProxy.isRendering() && this.sound != null)
-		{
-			IC2.soundManager.removeSound(this, this.sound);
-			this.sound = null;
-		}
-
 		this.miner = null;
 		super.onUnloaded();
 	}
@@ -277,6 +271,12 @@ public class TileEntityPump extends TileEntityElectricMachine implements IHasGui
 	public double getEnergy()
 	{
 		return this.energy.getEnergy();
+	}
+
+	@Override
+	public SoundEvent getLoopingSoundEvent()
+	{
+		return Ic2SoundEvents.MACHINE_PUMP_OPERATE;
 	}
 
 	@Override

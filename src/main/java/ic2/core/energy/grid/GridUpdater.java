@@ -15,10 +15,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 class GridUpdater implements Runnable
 {
+	private static final long AWAIT_TIMEOUT_MS = 5000L;
 	private final EnergyNetLocal enet;
 	private final Queue<GridChange> changes = new ArrayDeque<>();
 	private final GridUpdater.GridCalcTask[] calcTaskCache = new GridUpdater.GridCalcTask[16];
 	private final AtomicInteger pendingCalculations = new AtomicInteger(0);
+	private final AtomicInteger generation = new AtomicInteger(0);
 	private boolean busy;
 	private boolean isChangeStep;
 
@@ -34,6 +36,7 @@ class GridUpdater implements Runnable
 		assert !this.busy;
 		this.busy = true;
 		this.isChangeStep = true;
+		this.generation.incrementAndGet();
 
 		GridChange change;
 		while ((change = changes.poll()) != null && change != EnergyNetLocal.QUEUE_DELAY_CHANGE)
@@ -57,6 +60,7 @@ class GridUpdater implements Runnable
 		if (this.enet.hasGrids() && EnergyNetGlobal.getCalculator().runSyncStep(this.enet))
 		{
 			this.busy = true;
+			this.generation.incrementAndGet();
 			Collection<Grid> grids = this.enet.getGrids();
 			this.pendingCalculations.set(grids.size());
 			int cacheIdx = 0;
@@ -81,6 +85,7 @@ class GridUpdater implements Runnable
 					}
 
 					task.grid = grid;
+					task.taskGeneration = this.generation.get();
 					IC2.threadPool.execute(task);
 				} else
 				{
@@ -106,15 +111,37 @@ class GridUpdater implements Runnable
 		{
 			synchronized (this)
 			{
+				long startTime = System.currentTimeMillis();
+
 				while (this.busy)
 				{
-					this.wait();
+					long elapsed = System.currentTimeMillis() - startTime;
+					long remaining = AWAIT_TIMEOUT_MS - elapsed;
+					if (remaining <= 0L)
+					{
+						IC2.log.error(LogCategory.EnergyNet, "GridUpdater.awaitCompletion() timed out after %dms! " +
+							"pendingCalculations=%d, isChangeStep=%b, changes=%d. " +
+							"Forcing state reset to prevent server hang. This may indicate a deadlock or infinite loop in energy net calculation.",
+							elapsed, this.pendingCalculations.get(), this.isChangeStep, this.changes.size());
+						this.forceClear();
+						break;
+					}
+
+					this.wait(remaining);
 				}
 			}
 		} catch (InterruptedException e)
 		{
 			throw new RuntimeException(e);
 		}
+	}
+
+	private synchronized void forceClear()
+	{
+		this.generation.incrementAndGet();
+		this.pendingCalculations.set(0);
+		this.busy = false;
+		this.notifyAll();
 	}
 
 	public boolean isInChangeStep()
@@ -128,10 +155,10 @@ class GridUpdater implements Runnable
 		try
 		{
 			this.updateGrid();
-		} catch (Exception e)
+		} catch (Throwable t)
 		{
-			IC2.log.error(LogCategory.EnergyNet, e, "Unhandled exception in GridUpdater.run(), clearing busy flag.");
-			this.clearBusy();
+			IC2.log.error(LogCategory.EnergyNet, t, "Unhandled exception/error in GridUpdater.run(), force-clearing busy flag.");
+			this.forceClear();
 		}
 	}
 
@@ -170,15 +197,16 @@ class GridUpdater implements Runnable
 			}
 
 			this.notifyCalculator();
-		} catch (Exception e)
+		} catch (Throwable t)
 		{
-			IC2.log.error(LogCategory.EnergyNet, e, "Unhandled exception in GridUpdater.updateGrid(), clearing busy flag.");
-			this.clearBusy();
+			IC2.log.error(LogCategory.EnergyNet, t, "Unhandled exception/error in GridUpdater.updateGrid(), force-clearing busy flag.");
+			this.forceClear();
 		}
 	}
 
 	private void notifyCalculator()
 	{
+		int gen = this.generation.get();
 		List<Grid> dirtyGrids = new ArrayList<>();
 
 		for (Grid grid : this.enet.getGrids())
@@ -201,17 +229,23 @@ class GridUpdater implements Runnable
 				{
 					GridUpdater.GridUpdateTask task = new GridUpdater.GridUpdateTask();
 					task.grid = dirtyGrids.get(i);
+					task.taskGeneration = gen;
 					IC2.threadPool.execute(task);
 				}
 			}
 
 			EnergyNetGlobal.getCalculator().handleGridChange(dirtyGrids.get(0));
-			this.onTaskDone();
+			this.onTaskDone(gen);
 		}
 	}
 
-	private void onTaskDone()
+	private void onTaskDone(int taskGeneration)
 	{
+		if (this.generation.get() != taskGeneration)
+		{
+			return;
+		}
+
 		if (this.pendingCalculations.decrementAndGet() == 0)
 		{
 			this.clearBusy();
@@ -227,26 +261,42 @@ class GridUpdater implements Runnable
 	private class GridCalcTask implements Runnable
 	{
 		Grid grid;
+		int taskGeneration;
 
 		@Override
 		public void run()
 		{
-			EnergyNetGlobal.getCalculator().runAsyncStep(this.grid);
+			try
+			{
+				EnergyNetGlobal.getCalculator().runAsyncStep(this.grid);
+			} catch (Throwable t)
+			{
+				IC2.log.error(LogCategory.EnergyNet, t, "Unhandled exception/error in GridCalcTask.run() for grid %s.", this.grid);
+			}
+
 			this.grid = null;
-			GridUpdater.this.onTaskDone();
+			GridUpdater.this.onTaskDone(this.taskGeneration);
 		}
 	}
 
 	private class GridUpdateTask implements Runnable
 	{
 		Grid grid;
+		int taskGeneration;
 
 		@Override
 		public void run()
 		{
-			EnergyNetGlobal.getCalculator().handleGridChange(this.grid);
+			try
+			{
+				EnergyNetGlobal.getCalculator().handleGridChange(this.grid);
+			} catch (Throwable t)
+			{
+				IC2.log.error(LogCategory.EnergyNet, t, "Unhandled exception/error in GridUpdateTask.run() for grid %s.", this.grid);
+			}
+
 			this.grid = null;
-			GridUpdater.this.onTaskDone();
+			GridUpdater.this.onTaskDone(this.taskGeneration);
 		}
 	}
 }

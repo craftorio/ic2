@@ -2,6 +2,7 @@ package ic2.core.item.reactor;
 
 import ic2.api.reactor.IReactor;
 import ic2.core.profile.NotClassic;
+import ic2.core.ref.Ic2Items;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Item.Properties;
 
@@ -19,7 +20,10 @@ public class ItemReactorLithiumCell extends AbstractDamageableReactorComponent
 		if (heatrun)
 		{
 			int myLevel = this.getUse(stack) + reactor.getHeat() / 3000;
-			if (myLevel < this.getMaxUse())
+			if (myLevel >= this.getMaxUse())
+			{
+				reactor.setItemAt(youX, youY, new ItemStack(Ic2Items.TRITIUM_FUEL_ROD));
+			} else
 			{
 				this.setUse(stack, myLevel);
 			}

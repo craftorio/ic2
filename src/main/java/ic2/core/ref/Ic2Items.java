@@ -466,6 +466,7 @@ public final class Ic2Items
 	public static final Item DUAL_MOX_FUEL_ROD = register("dual_mox_fuel_rod", new ItemReactorMOX(new Properties(), 2));
 	public static final Item QUAD_MOX_FUEL_ROD = register("quad_mox_fuel_rod", new ItemReactorMOX(new Properties(), 4));
 	public static final Item LITHIUM_FUEL_ROD = register("lithium_fuel_rod", new ItemReactorLithiumCell(new Properties()));
+	public static final Item TRITIUM_FUEL_ROD = register("tritium_fuel_rod", new Item(new Properties()));
 	public static final Item DEPLETED_ISOTOPE_FUEL_ROD = register("depleted_isotope_fuel_rod", new ItemReactorDepletedUranium(new Properties()));
 	public static final Item EMPTY_MUG = register("empty_mug", new ItemMug(new Properties().stacksTo(1), ItemMug.MugType.empty));
 	public static final Item COFFEE_MUG = register("coffee_mug", new ItemMug(new Properties().stacksTo(1), ItemMug.MugType.coffee));

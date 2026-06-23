@@ -31,12 +31,12 @@ public class ItemReactorUranium extends AbstractDamageableReactorComponent
 		this.numberOfCells = cells;
 	}
 
-	protected static int checkPulsable(IReactor reactor, int x, int y, ItemStack stack, int mex, int mey)
+	protected static int checkPulsable(IReactor reactor, int x, int y, ItemStack stack, int mex, int mey, boolean heatRun)
 	{
 		ItemStack other = reactor.getItemAt(x, y);
 		return other != null
 			&& other.getItem() instanceof IReactorComponent
-			&& ((IReactorComponent) other.getItem()).acceptUraniumPulse(other, reactor, stack, x, y, mex, mey, true)
+			&& ((IReactorComponent) other.getItem()).acceptUraniumPulse(other, reactor, stack, x, y, mex, mey, heatRun)
 			? 1
 			: 0;
 	}
@@ -60,14 +60,19 @@ public class ItemReactorUranium extends AbstractDamageableReactorComponent
 				{
 					for (int i = 0; i < pulses; i++)
 					{
-						this.acceptUraniumPulse(stack, reactor, stack, x, y, x, y, false);
+						this.acceptUraniumPulse(stack, reactor, stack, x, y, x, y, heatRun);
 					}
+
+					pulses += checkPulsable(reactor, x - 1, y, stack, x, y, heatRun)
+						+ checkPulsable(reactor, x + 1, y, stack, x, y, heatRun)
+						+ checkPulsable(reactor, x, y - 1, stack, x, y, heatRun)
+						+ checkPulsable(reactor, x, y + 1, stack, x, y, heatRun);
 				} else
 				{
-					pulses += checkPulsable(reactor, x - 1, y, stack, x, y)
-						+ checkPulsable(reactor, x + 1, y, stack, x, y)
-						+ checkPulsable(reactor, x, y - 1, stack, x, y)
-						+ checkPulsable(reactor, x, y + 1, stack, x, y);
+					pulses += checkPulsable(reactor, x - 1, y, stack, x, y, heatRun)
+						+ checkPulsable(reactor, x + 1, y, stack, x, y, heatRun)
+						+ checkPulsable(reactor, x, y - 1, stack, x, y, heatRun)
+						+ checkPulsable(reactor, x, y + 1, stack, x, y, heatRun);
 					int heat = triangularNumber(pulses) * 4;
 					heat = this.getFinalHeat(stack, reactor, x, y, heat);
 					Queue<ItemStackCoordination> heatAcceptors = new ArrayDeque<>();

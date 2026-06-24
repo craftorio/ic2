@@ -152,7 +152,7 @@ public class TileEntityFluidHeatGenerator extends TileEntityHeatSourceInventory 
 			IFluidHeatManager.BurnProperty property = Recipes.fluidHeatGenerator.getBurnProperty(this.getFluidfromTank());
 			if (property != null)
 			{
-				return this.production = property.heat;
+				return this.production = property.heat();
 			}
 		}
 
@@ -166,7 +166,7 @@ public class TileEntityFluidHeatGenerator extends TileEntityHeatSourceInventory 
 			IFluidHeatManager.BurnProperty property = Recipes.fluidHeatGenerator.getBurnProperty(this.getFluidfromTank());
 			if (property != null)
 			{
-				this.burnAmount = property.amount;
+				this.burnAmount = property.amount();
 				return;
 			}
 		}

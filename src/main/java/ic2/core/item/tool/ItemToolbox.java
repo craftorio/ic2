@@ -29,7 +29,7 @@ public class ItemToolbox extends Item implements IHandHeldInventory
 			this.getInventory(player, hand, stack).openManagedItem(player, hand, null);
 		}
 
-		return new InteractionResultHolder(InteractionResult.SUCCESS, stack);
+		return new InteractionResultHolder<>(InteractionResult.SUCCESS, stack);
 	}
 
 	public boolean onDroppedByPlayer(ItemStack stack, Player player)

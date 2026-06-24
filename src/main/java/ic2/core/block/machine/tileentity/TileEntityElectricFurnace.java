@@ -52,7 +52,7 @@ public class TileEntityElectricFurnace extends TileEntityStandardMachine<ItemSta
 	public void operateOnce(MachineRecipeResult<ItemStack, ItemStack, ItemStack> result, Collection<ItemStack> processResult)
 	{
 		super.operateOnce(result, processResult);
-		this.xp = this.xp + result.getRecipe().getMetaData().getFloat("experience");
+		this.xp = this.xp + result.recipe().getMetaData().getFloat("experience");
 	}
 
 	@Override

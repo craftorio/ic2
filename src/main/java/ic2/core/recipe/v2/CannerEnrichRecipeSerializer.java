@@ -31,8 +31,8 @@ public class CannerEnrichRecipeSerializer implements RecipeSerializer<RecipeHold
 
 	public void toNetwork(FriendlyByteBuf buf, RecipeHolder<ICannerEnrichRecipeManager.Input, Ic2FluidStack> recipe)
 	{
-		RecipeIo.writeFluidStack(buf, recipe.recipe().getInput().fluid);
-		RecipeIo.writeInput(buf, recipe.recipe().getInput().additive);
+		RecipeIo.writeFluidStack(buf, recipe.recipe().getInput().fluid());
+		RecipeIo.writeInput(buf, recipe.recipe().getInput().additive());
 		RecipeIo.writeFluidStack(buf, recipe.recipe().getOutput());
 	}
 }

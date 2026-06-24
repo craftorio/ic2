@@ -21,7 +21,7 @@ public class CannerBottleRecipeWrapper implements IJeiRecipeWrapper
 	@Override
 	public List<List<ItemStack>> getInputs()
 	{
-		return List.of(this.input.container.getInputs(), this.input.fill.getInputs());
+		return List.of(this.input.container().getInputs(), this.input.fill().getInputs());
 	}
 
 	@Override

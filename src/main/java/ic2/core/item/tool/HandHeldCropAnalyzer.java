@@ -73,7 +73,7 @@ public class HandHeldCropAnalyzer extends HandHeldInventory
 	{
 		CropCard crop = this.getCrop();
 		if (crop == null) return "0";
-		int tier = crop.getProperties().getTier();
+		int tier = crop.getProperties().tier();
 		return switch (tier)
 		{
 			case 1 -> "I";

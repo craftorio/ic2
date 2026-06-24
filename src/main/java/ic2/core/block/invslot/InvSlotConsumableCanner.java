@@ -15,20 +15,18 @@ public class InvSlotConsumableCanner extends InvSlotConsumableLiquid
 	@Override
 	public boolean accepts(ItemStack stack)
 	{
-		switch (((TileEntityCanner) this.base).getMode())
+		return switch (((TileEntityCanner) this.base).getMode())
 		{
-			case BottleSolid:
-				return Recipes.cannerBottle
-					.get(this.base.getParent().getLevel())
-					.apply(new ICannerBottleRecipeManager.RawInput(stack, ((TileEntityCanner) this.base).inputSlot.get()), true)
-					!= null;
-			case BottleLiquid:
-			case EmptyLiquid:
-			case EnrichLiquid:
-				return super.accepts(stack);
-			default:
+			case BottleSolid -> Recipes.cannerBottle
+				.get(this.base.getParent().getLevel())
+				.apply(new ICannerBottleRecipeManager.RawInput(stack, ((TileEntityCanner) this.base).inputSlot.get()), true)
+				!= null;
+			case BottleLiquid, EmptyLiquid, EnrichLiquid -> super.accepts(stack);
+			default ->
+			{
 				assert false;
-				return false;
-		}
+				yield false;
+			}
+		};
 	}
 }

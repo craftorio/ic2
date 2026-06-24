@@ -67,7 +67,7 @@ public class DynamicGui<T extends Container> extends GuiDefaultBackground<Dynami
 						&& !(this.menu.base instanceof INetworkClientTileEntityEventListener)
 						&& !this.isHandHeldGUI())
 					{
-						throw new RuntimeException("Invalid base " + ((DynamicContainer) this.menu).base + " for button elements");
+						throw new RuntimeException("Invalid base " + ((DynamicContainer<?>) this.menu).base + " for button elements");
 					}
 
 					Button<?> button = null;
@@ -110,7 +110,7 @@ public class DynamicGui<T extends Container> extends GuiDefaultBackground<Dynami
 					if (!(this.menu.base instanceof Ic2TileEntity)
 						|| !((Ic2TileEntity) this.menu.base).hasComponent(Energy.class))
 					{
-						throw new RuntimeException("invalid base " + ((DynamicContainer) this.menu).base + " for energygauge elements");
+						throw new RuntimeException("invalid base " + ((DynamicContainer<?>) this.menu).base + " for energygauge elements");
 					}
 
 					GuiParser.EnergyGaugeNode node = (GuiParser.EnergyGaugeNode) rawNode;
@@ -121,14 +121,14 @@ public class DynamicGui<T extends Container> extends GuiDefaultBackground<Dynami
 				{
 					if (!(this.menu.base instanceof IGuiValueProvider))
 					{
-						throw new RuntimeException("invalid base " + ((DynamicContainer) this.menu).base + " for gauge elements");
+						throw new RuntimeException("invalid base " + ((DynamicContainer<?>) this.menu).base + " for gauge elements");
 					}
 
 					GuiParser.GaugeNode node = (GuiParser.GaugeNode) rawNode;
 					final boolean isActiveLinked = node.activeLinked;
 					if (isActiveLinked && !(this.menu.base instanceof IGuiValueProvider.IActiveGuiValueProvider))
 					{
-						throw new RuntimeException("Invalid base " + ((DynamicContainer) this.menu).base + " for active linked gauge elements");
+						throw new RuntimeException("Invalid base " + ((DynamicContainer<?>) this.menu).base + " for active linked gauge elements");
 					}
 
 					parentNode.addElement(
@@ -181,7 +181,7 @@ public class DynamicGui<T extends Container> extends GuiDefaultBackground<Dynami
 					}
 
 					GuiParser.SlotGridNode node = (GuiParser.SlotGridNode) rawNode;
-					InvSlot slot = ((IInventorySlotHolder) this.menu.base).getInventorySlot(node.name);
+					InvSlot slot = ((IInventorySlotHolder<?>) this.menu.base).getInventorySlot(node.name);
 					if (slot == null)
 					{
 						throw new RuntimeException("Invalid InvSlot name " + node.name + " for base " + ((DynamicContainer<?>) this.menu).base);

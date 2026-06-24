@@ -14,14 +14,13 @@ class RecipeUtil
 	{
 		List<List<LeanItemStack>> ret = new ArrayList<>(x.length);
 
-		for (int i = 0; i < x.length; i++)
+		for (List<ItemStack> listIn : x)
 		{
-			List<ItemStack> listIn = x[i];
 			if (listIn != null)
 			{
 				List<LeanItemStack> listOut = new ArrayList<>(listIn.size());
 
-				for (ItemStack stack : x[i])
+				for (ItemStack stack : listIn)
 				{
 					listOut.add(new LeanItemStack(stack, 1));
 				}

@@ -266,13 +266,10 @@ public abstract class HandHeldInventory implements IHasGui
 					category.setDetail("Container", this.player.containerMenu == null ? null : this.player.containerMenu.getClass().getName());
 					if (this.player.level().isClientSide)
 					{
-						category.setDetail("GUI", new CrashReportDetail<String>()
+						category.setDetail("GUI", () ->
 						{
-							public String call() throws Exception
-							{
-								Screen gui = Minecraft.getInstance().screen;
-								return gui == null ? null : gui.getClass().getName();
-							}
+							Screen gui = Minecraft.getInstance().screen;
+							return gui == null ? null : gui.getClass().getName();
 						});
 					}
 
@@ -336,14 +333,7 @@ public abstract class HandHeldInventory implements IHasGui
 
 	public SlotHologramSlot.ChangeCallback makeSaveCallback()
 	{
-		return new SlotHologramSlot.ChangeCallback()
-		{
-			@Override
-			public void onChanged(int index)
-			{
-				HandHeldInventory.this.save();
-			}
-		};
+		return index -> HandHeldInventory.this.save();
 	}
 
 	public void onEvent(String event)

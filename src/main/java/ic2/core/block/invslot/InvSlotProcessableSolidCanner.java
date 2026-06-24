@@ -19,7 +19,7 @@ public class InvSlotProcessableSolidCanner extends InvSlotProcessable<ICannerBot
 
 	protected void setInput(ICannerBottleRecipeManager.RawInput input)
 	{
-		((TileEntitySolidCanner) this.base).canInputSlot.put(input.container);
-		this.put(input.fill);
+		((TileEntitySolidCanner) this.base).canInputSlot.put(input.container());
+		this.put(input.fill());
 	}
 }

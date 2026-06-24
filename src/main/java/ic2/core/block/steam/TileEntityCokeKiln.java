@@ -28,11 +28,11 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
@@ -477,38 +477,28 @@ public class TileEntityCokeKiln extends TileEntityBase implements IHasGui, IGuiV
 		info.add("");
 	}
 
-	public static class CokeRecipe
-	{
-		public final net.minecraft.world.item.Item inputItem; // null for tag-based matching (logWood)
-		public final ItemStack outputItem;
-		public final Ic2FluidStack outputFluid;
-		public final int operationDuration;
-		public final boolean matchLogs;
-
-		public CokeRecipe(net.minecraft.world.item.Item inputItem, ItemStack outputItem, Ic2FluidStack outputFluid, int operationDuration, boolean matchLogs)
+	/**
+	 * @param inputItem null for tag-based matching (logWood)
+	 */
+	public record CokeRecipe(Item inputItem, ItemStack outputItem, Ic2FluidStack outputFluid, int operationDuration,
+	                         boolean matchLogs)
 		{
-			this.inputItem = inputItem;
-			this.outputItem = outputItem;
-			this.outputFluid = outputFluid;
-			this.operationDuration = operationDuration;
-			this.matchLogs = matchLogs;
-		}
 
-		public boolean matches(ItemStack stack)
-		{
-			if (stack.isEmpty())
+			public boolean matches(ItemStack stack)
 			{
+				if (stack.isEmpty())
+				{
+					return false;
+				}
+				if (this.matchLogs)
+				{
+					return stack.is(ItemTags.LOGS);
+				}
+				if (this.inputItem != null)
+				{
+					return stack.getItem() == this.inputItem;
+				}
 				return false;
 			}
-			if (this.matchLogs)
-			{
-				return stack.is(ItemTags.LOGS);
-			}
-			if (this.inputItem != null)
-			{
-				return stack.getItem() == this.inputItem;
-			}
-			return false;
 		}
-	}
 }

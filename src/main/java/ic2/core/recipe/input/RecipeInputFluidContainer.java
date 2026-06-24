@@ -44,7 +44,7 @@ public class RecipeInputFluidContainer extends RecipeInputBase
 
 		List<ItemStack> ret = new ArrayList<>();
 		Ic2FluidStack fillFs = Ic2FluidStack.create(fluid, Integer.MAX_VALUE);
-		MutableObject<ItemStack> container = new MutableObject();
+		MutableObject<ItemStack> container = new MutableObject<>();
 
 		for (ItemStack stack : containerItems)
 		{
@@ -71,7 +71,7 @@ public class RecipeInputFluidContainer extends RecipeInputBase
 		}
 
 		ret = new ArrayList<>();
-		MutableObject<ItemStack> container = new MutableObject();
+		MutableObject<ItemStack> container = new MutableObject<>();
 
 		for (Item item : BuiltInRegistries.ITEM)
 		{

@@ -1,13 +1,12 @@
 package ic2.core.block.wiring;
 
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 
 public class SplitterFoamCableBlock extends AbstractSplitterCableBlock
 {
 	protected SplitterFoamCableBlock(Properties settings)
 	{
-		super(settings, CableType.splitter, 0);
+		super(settings);
 	}
 
 	public static SplitterFoamCableBlock create(Properties settings)

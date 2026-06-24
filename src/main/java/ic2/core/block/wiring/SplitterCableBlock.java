@@ -1,7 +1,6 @@
 package ic2.core.block.wiring;
 
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 
 public class SplitterCableBlock extends AbstractSplitterCableBlock
 {
@@ -9,7 +8,7 @@ public class SplitterCableBlock extends AbstractSplitterCableBlock
 
 	protected SplitterCableBlock(Properties settings, SplitterFoamCableBlock foamCableBlock)
 	{
-		super(settings, CableType.splitter, 0);
+		super(settings);
 		this.foamCableBlock = foamCableBlock;
 	}
 

@@ -121,9 +121,7 @@ public class EventHandlerClient
 	{
 		assert target.getType() == Type.BLOCK;
 		ItemStack inHand = StackUtil.get(player, InteractionHand.MAIN_HAND);
-		if (inHand.getItem() instanceof IEnhancedOverlayProvider)
-		{
-		}
+		inHand.getItem();
 	}
 
 	public static boolean onDrawBlockHighlightLast(Player player, BlockHitResult target, float partialTicks, PoseStack matrix, MultiBufferSource buffers)

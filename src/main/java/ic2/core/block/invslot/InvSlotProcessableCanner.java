@@ -70,22 +70,22 @@ public class InvSlotProcessableCanner extends InvSlotProcessable<Object, Object,
 			case BottleSolid:
 			{
 				ICannerBottleRecipeManager.RawInput input = (ICannerBottleRecipeManager.RawInput) rawInput;
-				canInputSlot.put(input.container);
-				this.put(input.fill);
+				canInputSlot.put(input.container());
+				this.put(input.fill());
 				break;
 			}
 			case EnrichLiquid:
 			{
 				ICannerEnrichRecipeManager.RawInput input = (ICannerEnrichRecipeManager.RawInput) rawInput;
-				this.put(input.additive);
-				tank.drainMbUnchecked(input.fluid == null ? tank.getFluidAmount() : tank.getFluidAmount() - input.fluid.getAmountMb(), false);
+				this.put(input.additive());
+				tank.drainMbUnchecked(input.fluid() == null ? tank.getFluidAmount() : tank.getFluidAmount() - input.fluid().getAmountMb(), false);
 				break;
 			}
 			case BottleLiquid:
 			{
 				IFillFluidContainerRecipeManager.Input input = (IFillFluidContainerRecipeManager.Input) rawInput;
-				canInputSlot.put(input.container);
-				tank.drainMbUnchecked(input.fluid == null ? tank.getFluidAmount() : tank.getFluidAmount() - input.fluid.getAmountMb(), false);
+				canInputSlot.put(input.container());
+				tank.drainMbUnchecked(input.fluid() == null ? tank.getFluidAmount() : tank.getFluidAmount() - input.fluid().getAmountMb(), false);
 				break;
 			}
 			case EmptyLiquid:

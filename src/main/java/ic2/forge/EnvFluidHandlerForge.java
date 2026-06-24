@@ -99,7 +99,7 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 			return FluidStack.EMPTY;
 		} else
 		{
-			return fs instanceof Ic2FluidStackImpl ? ((Ic2FluidStackImpl) fs).parent : new FluidStack(fs.getFluid(), fs.getAmountMb());
+			return fs instanceof Ic2FluidStackImpl ? ((Ic2FluidStackImpl) fs).parent() : new FluidStack(fs.getFluid(), fs.getAmountMb());
 		}
 	}
 
@@ -363,7 +363,7 @@ class EnvFluidHandlerForge implements EnvFluidHandler
 	@Override
 	public CompoundTag getFluidStackNbt(Ic2FluidStack fs)
 	{
-		return fs instanceof Ic2FluidStackImpl ? ((Ic2FluidStackImpl) fs).parent.getTag() : null;
+		return fs instanceof Ic2FluidStackImpl ? ((Ic2FluidStackImpl) fs).parent().getTag() : null;
 	}
 
 	@Override

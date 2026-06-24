@@ -323,7 +323,7 @@ public class EnergyNetLocal
 		}
 
 		this.gridChangesQueue.add(QUEUE_DELAY_CHANGE);
-		assert this.gridChangesQueue.size() >= 1;
+		assert !this.gridChangesQueue.isEmpty();
 	}
 
 	public Level getWorld()

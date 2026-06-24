@@ -398,6 +398,6 @@ public class TileEntityReplicator extends TileEntityElectricMachine implements I
 	{
 		STOPPED,
 		SINGLE,
-		CONTINUOUS;
+		CONTINUOUS
 	}
 }

@@ -79,17 +79,17 @@ public class RecipeInputItemStack extends RecipeInputBase
 
 		if (tag instanceof ByteArrayTag byteArray)
 		{
-			return byteArray.size() == 0;
+			return byteArray.isEmpty();
 		}
 
 		if (tag instanceof IntArrayTag intArray)
 		{
-			return intArray.size() == 0;
+			return intArray.isEmpty();
 		}
 
 		if (tag instanceof LongArrayTag longArray)
 		{
-			return longArray.size() == 0;
+			return longArray.isEmpty();
 		}
 
 		if (tag instanceof ListTag list)

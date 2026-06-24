@@ -21,12 +21,12 @@ public class CannerEnrichRecipeManager implements ICannerEnrichRecipeManager
 
 	public boolean addRecipe(ICannerEnrichRecipeManager.Input input, Ic2FluidStack output, CompoundTag metadata, boolean replace)
 	{
-		if (input.fluid == null)
+		if (input.fluid() == null)
 		{
 			throw new NullPointerException("The fluid recipe input is null.");
 		}
 
-		if (input.additive == null)
+		if (input.additive() == null)
 		{
 			throw new NullPointerException("The additive recipe input is null.");
 		}
@@ -36,7 +36,7 @@ public class CannerEnrichRecipeManager implements ICannerEnrichRecipeManager
 			throw new NullPointerException("The recipe output is null.");
 		}
 
-		if (!LiquidUtil.check(input.fluid))
+		if (!LiquidUtil.check(input.fluid()))
 		{
 			throw new IllegalArgumentException("The fluid recipe input is invalid.");
 		}
@@ -46,9 +46,9 @@ public class CannerEnrichRecipeManager implements ICannerEnrichRecipeManager
 			throw new IllegalArgumentException("The fluid recipe output is invalid.");
 		}
 
-		for (ItemStack stack : input.additive.getInputs())
+		for (ItemStack stack : input.additive().getInputs())
 		{
-			MachineRecipe<ICannerEnrichRecipeManager.Input, Ic2FluidStack> recipe = this.getRecipe(input.fluid, stack, true);
+			MachineRecipe<ICannerEnrichRecipeManager.Input, Ic2FluidStack> recipe = this.getRecipe(input.fluid(), stack, true);
 			if (recipe != null)
 			{
 				if (!replace)
@@ -76,20 +76,20 @@ public class CannerEnrichRecipeManager implements ICannerEnrichRecipeManager
 		ICannerEnrichRecipeManager.RawInput input, boolean acceptTest
 	)
 	{
-		MachineRecipe<ICannerEnrichRecipeManager.Input, Ic2FluidStack> recipe = this.getRecipe(input.fluid, input.additive, acceptTest);
+		MachineRecipe<ICannerEnrichRecipeManager.Input, Ic2FluidStack> recipe = this.getRecipe(input.fluid(), input.additive(), acceptTest);
 		if (recipe == null)
 		{
 			return null;
 		}
 
 		Ic2FluidStack remainingFluid;
-		if (input.fluid == null)
+		if (input.fluid() == null)
 		{
 			remainingFluid = null;
 		} else
 		{
-			remainingFluid = input.fluid.copy();
-			remainingFluid.decreaseMb(recipe.getInput().fluid.getAmountMb());
+			remainingFluid = input.fluid().copy();
+			remainingFluid.decreaseMb(recipe.getInput().fluid().getAmountMb());
 			if (remainingFluid.isEmpty())
 			{
 				remainingFluid = null;
@@ -97,7 +97,7 @@ public class CannerEnrichRecipeManager implements ICannerEnrichRecipeManager
 		}
 
 		return recipe.getResult(
-			new ICannerEnrichRecipeManager.RawInput(remainingFluid, StackUtil.copyShrunk(input.additive, recipe.getInput().additive.getAmount()))
+			new ICannerEnrichRecipeManager.RawInput(remainingFluid, StackUtil.copyShrunk(input.additive(), recipe.getInput().additive().getAmount()))
 		);
 	}
 
@@ -107,10 +107,10 @@ public class CannerEnrichRecipeManager implements ICannerEnrichRecipeManager
 		{
 			for (MachineRecipe<ICannerEnrichRecipeManager.Input, Ic2FluidStack> recipe : this.recipes)
 			{
-				if ((fluid == null || fluid.hasExactFluid(recipe.getInput().fluid) && (acceptTest || recipe.getInput().fluid.getAmountMb() <= fluid.getAmountMb()))
+				if ((fluid == null || fluid.hasExactFluid(recipe.getInput().fluid()) && (acceptTest || recipe.getInput().fluid().getAmountMb() <= fluid.getAmountMb()))
 					&& (
 					additive == null
-						|| recipe.getInput().additive.matches(additive) && (acceptTest || recipe.getInput().additive.getAmount() <= StackUtil.getSize(additive))
+						|| recipe.getInput().additive().matches(additive) && (acceptTest || recipe.getInput().additive().getAmount() <= StackUtil.getSize(additive))
 				))
 				{
 					return recipe;
@@ -137,8 +137,8 @@ public class CannerEnrichRecipeManager implements ICannerEnrichRecipeManager
 
 		if (adjustInput)
 		{
-			fluid.setAmountMb(result.getAdjustedInput().fluid == null ? 0 : result.getAdjustedInput().fluid.getAmountMb());
-			additive.setCount(StackUtil.isEmpty(result.getAdjustedInput().additive) ? 0 : StackUtil.getSize(result.getAdjustedInput().additive));
+			fluid.setAmountMb(result.adjustedInput().fluid() == null ? 0 : result.adjustedInput().fluid().getAmountMb());
+			additive.setCount(StackUtil.isEmpty(result.adjustedInput().additive()) ? 0 : StackUtil.getSize(result.adjustedInput().additive()));
 		}
 
 		CompoundTag output = new CompoundTag();

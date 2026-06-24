@@ -78,60 +78,46 @@ public class SlotGrid extends GuiElement<SlotGrid>
 		return slot != null && slot.hasItem();
 	}
 
-	public static final class SlotStyle
-	{
-		public static final SlotGrid.SlotStyle Normal = new SlotGrid.SlotStyle(103, 7, 18, 18);
-		public static final SlotGrid.SlotStyle Large = new SlotGrid.SlotStyle(99, 35, 26, 26);
-		public static final SlotGrid.SlotStyle Plain = new SlotGrid.SlotStyle(16, 16);
-		public static final int refSize = 16;
-		private static final Map<String, SlotGrid.SlotStyle> map = getMap();
-		public final int u;
-		public final int v;
-		public final int width;
-		public final int height;
-		public final ResourceLocation background;
-
-		public SlotStyle(int u, int v, int width, int height)
+	public record SlotStyle(int u, int v, int width, int height, ResourceLocation background)
 		{
-			this(u, v, width, height, GuiElement.commonTexture);
-		}
+			public static final SlotStyle Normal = new SlotStyle(103, 7, 18, 18);
+			public static final SlotStyle Large = new SlotStyle(99, 35, 26, 26);
+			public static final SlotStyle Plain = new SlotStyle(16, 16);
+			public static final int refSize = 16;
+			private static final Map<String, SlotStyle> map = getMap();
 
-		public SlotStyle(int width, int height)
-		{
-			this(0, 0, width, height, null);
-		}
-
-		public SlotStyle(int u, int v, int width, int height, ResourceLocation background)
-		{
-			this.u = u;
-			this.v = v;
-			this.width = width;
-			this.height = height;
-			this.background = background;
-		}
-
-		public static void registerVarient(String name, SlotGrid.SlotStyle newSlotStyle)
-		{
-			assert name != null && newSlotStyle != null;
-			SlotGrid.SlotStyle old = map.put(name.toLowerCase(Locale.ENGLISH), newSlotStyle);
-			if (old != null)
+			public SlotStyle(int u, int v, int width, int height)
 			{
-				throw new RuntimeException("Duplicate slot instance for name! " + name + " -> " + old + " and " + newSlotStyle);
+				this(u, v, width, height, GuiElement.commonTexture);
+			}
+	
+			public SlotStyle(int width, int height)
+			{
+				this(0, 0, width, height, null);
+			}
+
+			public static void registerVarient(String name, SlotStyle newSlotStyle)
+			{
+				assert name != null && newSlotStyle != null;
+				SlotStyle old = map.put(name.toLowerCase(Locale.ENGLISH), newSlotStyle);
+				if (old != null)
+				{
+					throw new RuntimeException("Duplicate slot instance for name! " + name + " -> " + old + " and " + newSlotStyle);
+				}
+			}
+	
+			public static SlotStyle get(String name)
+			{
+				return map.get(name);
+			}
+	
+			private static Map<String, SlotStyle> getMap()
+			{
+				Map<String, SlotStyle> ret = new HashMap<>(6, 0.5F);
+				ret.put("normal", Normal);
+				ret.put("large", Large);
+				ret.put("plain", Plain);
+				return ret;
 			}
 		}
-
-		public static SlotGrid.SlotStyle get(String name)
-		{
-			return map.get(name);
-		}
-
-		private static Map<String, SlotGrid.SlotStyle> getMap()
-		{
-			Map<String, SlotGrid.SlotStyle> ret = new HashMap<>(6, 0.5F);
-			ret.put("normal", Normal);
-			ret.put("large", Large);
-			ret.put("plain", Plain);
-			return ret;
-		}
-	}
 }

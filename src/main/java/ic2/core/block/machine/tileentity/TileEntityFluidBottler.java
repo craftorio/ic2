@@ -54,7 +54,7 @@ public class TileEntityFluidBottler extends TileEntityStandardMachine<Void, Obje
 	protected Collection<ItemStack> getOutput(Object output)
 	{
 		return output instanceof IEmptyFluidContainerRecipeManager.Output
-			? ((IEmptyFluidContainerRecipeManager.Output) output).container
+			? ((IEmptyFluidContainerRecipeManager.Output) output).container()
 			: super.getOutput(output);
 	}
 
@@ -63,15 +63,15 @@ public class TileEntityFluidBottler extends TileEntityStandardMachine<Void, Obje
 	{
 		if (result.getOutput() instanceof IEmptyFluidContainerRecipeManager.Output)
 		{
-			this.drainInputSlot.put((ItemStack) result.getAdjustedInput());
-			Ic2FluidStack fs = ((IEmptyFluidContainerRecipeManager.Output) result.getOutput()).fluid;
+			this.drainInputSlot.put((ItemStack) result.adjustedInput());
+			Ic2FluidStack fs = ((IEmptyFluidContainerRecipeManager.Output) result.getOutput()).fluid();
 			this.fluidTank.fillMbUnchecked(fs, false);
 		} else
 		{
-			IFillFluidContainerRecipeManager.Input adjInput = (IFillFluidContainerRecipeManager.Input) result.getAdjustedInput();
-			this.fillInputSlot.put(adjInput.container);
+			IFillFluidContainerRecipeManager.Input adjInput = (IFillFluidContainerRecipeManager.Input) result.adjustedInput();
+			this.fillInputSlot.put(adjInput.container());
 			this.fluidTank
-				.drainMbUnchecked(adjInput.fluid == null ? this.fluidTank.getFluidAmount() : this.fluidTank.getFluidAmount() - adjInput.fluid.getAmountMb(), false);
+				.drainMbUnchecked(adjInput.fluid() == null ? this.fluidTank.getFluidAmount() : this.fluidTank.getFluidAmount() - adjInput.fluid().getAmountMb(), false);
 		}
 
 		this.outputSlot.add(processResult);
@@ -88,8 +88,8 @@ public class TileEntityFluidBottler extends TileEntityStandardMachine<Void, Obje
 				false
 			);
 		if (emptyRes != null
-			&& emptyRes.getOutput().fluid.getAmountMb() <= this.fluidTank.getCapacity() - this.fluidTank.getFluidAmount()
-			&& this.outputSlot.canAdd(emptyRes.getOutput().container))
+			&& emptyRes.getOutput().fluid().getAmountMb() <= this.fluidTank.getCapacity() - this.fluidTank.getFluidAmount()
+			&& this.outputSlot.canAdd(emptyRes.getOutput().container()))
 		{
 			return (MachineRecipeResult) emptyRes;
 		}

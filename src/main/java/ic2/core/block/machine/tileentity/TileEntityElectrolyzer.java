@@ -82,9 +82,9 @@ public class TileEntityElectrolyzer extends TileEntityElectricMachine implements
 		{
 			assert this.recipe != null;
 			this.setActive(true);
-			this.energy.useEnergy(this.recipe.EUaTick);
+			this.energy.useEnergy(this.recipe.EUaTick());
 			this.progress++;
-			if (this.progress >= this.recipe.ticksNeeded)
+			if (this.progress >= this.recipe.ticksNeeded())
 			{
 				this.operate();
 				this.progress = 0;
@@ -111,11 +111,11 @@ public class TileEntityElectrolyzer extends TileEntityElectricMachine implements
 		}
 
 		this.recipe = Recipes.electrolyzer.getElectrolysisInformation(this.input.getFluidStack().getFluid());
-		if (this.recipe != null && !(this.energy.getEnergy() < this.recipe.EUaTick) && this.input.getFluidAmount() >= this.recipe.inputAmount)
+		if (this.recipe != null && !(this.energy.getEnergy() < this.recipe.EUaTick()) && this.input.getFluidAmount() >= this.recipe.inputAmount())
 		{
-			for (IElectrolyzerRecipeManager.ElectrolyzerOutput output : this.recipe.outputs)
+			for (IElectrolyzerRecipeManager.ElectrolyzerOutput output : this.recipe.outputs())
 			{
-				if (!this.canFillTank(output.tankDirection, output.getOutput()))
+				if (!this.canFillTank(output.tankDirection(), output.getOutput()))
 				{
 					return false;
 				}
@@ -131,11 +131,11 @@ public class TileEntityElectrolyzer extends TileEntityElectricMachine implements
 	protected void operate()
 	{
 		assert this.recipe != null;
-		this.input.drainMbUnchecked(this.recipe.inputAmount, false);
+		this.input.drainMbUnchecked(this.recipe.inputAmount(), false);
 
-		for (IElectrolyzerRecipeManager.ElectrolyzerOutput output : this.recipe.outputs)
+		for (IElectrolyzerRecipeManager.ElectrolyzerOutput output : this.recipe.outputs())
 		{
-			this.fillTank(output.tankDirection, output.getOutput());
+			this.fillTank(output.tankDirection(), output.getOutput());
 		}
 	}
 
@@ -202,7 +202,7 @@ public class TileEntityElectrolyzer extends TileEntityElectricMachine implements
 	@Override
 	public double getRatio()
 	{
-		return this.recipe == null ? 0.0 : (double) this.progress / this.recipe.ticksNeeded;
+		return this.recipe == null ? 0.0 : (double) this.progress / this.recipe.ticksNeeded();
 	}
 
 	@Override

@@ -69,11 +69,11 @@ public class TileEntitySemifluidGenerator extends TileEntityBaseGenerator
 		if (ret != null)
 		{
 			ISemiFluidFuelManager.BurnProperty property = Recipes.semiFluidGenerator.getBurnProperty(ret.getFluid());
-			if (property != null && ret.getAmountMb() >= property.amount)
+			if (property != null && ret.getAmountMb() >= property.amount())
 			{
-				this.fluidTank.drainMbUnchecked(property.amount, false);
-				this.production = property.power;
-				this.fuel = this.fuel + property.amount;
+				this.fluidTank.drainMbUnchecked(property.amount(), false);
+				this.production = property.power();
+				this.fuel = this.fuel + property.amount();
 				dirty = true;
 			}
 		}

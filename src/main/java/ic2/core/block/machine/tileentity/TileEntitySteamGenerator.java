@@ -106,7 +106,7 @@ public class TileEntitySteamGenerator extends TileEntityInventory implements IHa
 	private boolean work()
 	{
      RandomSource rng = RandomSource.create();
-		this.heatInput = this.requestHeat(1200);
+		this.heatInput = this.requestHeat();
 		if (this.heatInput <= 0)
 		{
 			return false;
@@ -243,10 +243,10 @@ public class TileEntitySteamGenerator extends TileEntityInventory implements IHa
 		this.systemHeat = Math.max(this.systemHeat - cool, BiomeUtil.getBiomeTemperature(this.getLevel(), this.worldPosition));
 	}
 
-	private int requestHeat(int requestHeat)
+	private int requestHeat()
 	{
 		Level world = this.getLevel();
-		int targetHeat = requestHeat;
+		int targetHeat = 1200;
 
 		for (Direction dir : Util.ALL_DIRS)
 		{
@@ -258,13 +258,13 @@ public class TileEntitySteamGenerator extends TileEntityInventory implements IHa
 					targetHeat -= hs.drawHeat(dir.getOpposite(), request, false);
 					if (targetHeat == 0)
 					{
-						return requestHeat;
+						return 1200;
 					}
 				}
 			}
 		}
 
-		return requestHeat - targetHeat;
+		return 1200 - targetHeat;
 	}
 
 	@Override

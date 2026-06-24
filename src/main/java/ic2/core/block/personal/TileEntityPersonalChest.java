@@ -320,7 +320,7 @@ public class TileEntityPersonalChest extends TileEntityInventory implements IPer
 	public ContainerBase<?> createServerScreenHandler(int syncId, Player player)
 	{
 		this.startOpen(player);
-		return new DynamicContainer<TileEntityInventory>(
+		return new DynamicContainer<>(
 			Ic2ScreenHandlers.DYNAMIC_BE, syncId, player.getInventory(), this, GuiParser.parse(Util.getName(this.getBlockType()), this.getClass())
 		)
 		{

@@ -174,8 +174,8 @@ public class TileEntityLiquidHeatExchanger extends TileEntityHeatSourceInventory
 			if (Recipes.liquidCooldownManager.acceptsFluid(fluidInputTank))
 			{
 				ILiquidHeatExchangerManager.HeatExchangeProperty hep = Recipes.liquidCooldownManager.getHeatExchangeProperty(fluidInputTank);
-				fluidOutput = hep.outputFluid;
-				hUper1mb = hep.huPerMB;
+				fluidOutput = hep.outputFluid();
+				hUper1mb = hep.huPerMB();
 			}
 
 			if (fluidOutput == null)

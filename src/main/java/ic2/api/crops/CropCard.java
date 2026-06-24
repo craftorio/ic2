@@ -105,7 +105,7 @@ public abstract class CropCard
 
 	public int getGrowthDuration(ICropTile cropTile)
 	{
-		return this.getProperties().getTier() * 200;
+		return this.getProperties().tier() * 200;
 	}
 
 	public boolean canGrow(ICropTile cropTile)
@@ -140,7 +140,7 @@ public abstract class CropCard
 
 	public double dropGainChance()
 	{
-		return Math.pow(0.95, this.getProperties().getTier());
+		return Math.pow(0.95, this.getProperties().tier());
 	}
 
 	@Deprecated
@@ -177,7 +177,7 @@ public abstract class CropCard
 			base /= 2.0F;
 		}
 
-		for (int i = 0; i < this.getProperties().getTier(); i++)
+		for (int i = 0; i < this.getProperties().tier(); i++)
 		{
 			base = (float) (base * 0.8);
 		}

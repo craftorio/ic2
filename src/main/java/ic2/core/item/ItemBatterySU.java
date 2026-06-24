@@ -47,10 +47,10 @@ public class ItemBatterySU extends Item implements IBoxable, IItemHudInfo
 		if (!Util.isSimilar(energy, this.capacity))
 		{
 			stack = StackUtil.decSize(stack);
-			return new InteractionResultHolder(InteractionResult.SUCCESS, stack);
+			return new InteractionResultHolder<>(InteractionResult.SUCCESS, stack);
 		} else
 		{
-			return new InteractionResultHolder(InteractionResult.PASS, stack);
+			return new InteractionResultHolder<>(InteractionResult.PASS, stack);
 		}
 	}
 

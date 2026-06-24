@@ -35,7 +35,7 @@ public interface IHasGui extends Container
 
 	ContainerBase<?> createServerScreenHandler(int var1, Player var2);
 
-	default void writeScreenOpenData(Player player, InteractionHand hand, GrowingBuffer buffer) throws IOException
+	default void writeScreenOpenData(Player player, InteractionHand hand, GrowingBuffer buffer)
 	{
 	}
 
@@ -77,14 +77,8 @@ public interface IHasGui extends Container
 	{
 		GrowingBuffer buffer = new GrowingBuffer(50);
 
-		try
-		{
-			Ic2ScreenHandlers.writeManagedItemData(player, hand, subGuiId, buffer);
-			this.writeScreenOpenData(player, hand, buffer);
-		} catch (IOException e)
-		{
-			throw new RuntimeException(e);
-		}
+		Ic2ScreenHandlers.writeManagedItemData(player, hand, subGuiId, buffer);
+		this.writeScreenOpenData(player, hand, buffer);
 
 		buffer.flip();
 		final Item item = player.getItemInHand(hand).getItem();

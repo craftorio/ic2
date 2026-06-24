@@ -10,7 +10,6 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntCollection;
 import it.unimi.dsi.fastutil.ints.IntIterator;
 import it.unimi.dsi.fastutil.ints.IntList;
-import it.unimi.dsi.fastutil.ints.IntListIterator;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 
@@ -354,7 +353,7 @@ public final class StackUtil
 			throw new IllegalArgumentException("empty stack");
 		} else
 		{
-			return new Predicate<ItemStack>()
+			return new Predicate<>()
 			{
 				public boolean test(ItemStack input)
 				{
@@ -377,7 +376,7 @@ public final class StackUtil
 			throw new NullPointerException("null item");
 		} else
 		{
-			return new Predicate<ItemStack>()
+			return new Predicate<>()
 			{
 				public boolean test(ItemStack input)
 				{
@@ -413,7 +412,7 @@ public final class StackUtil
 
 	public static Predicate<ItemStack> recipeInput(IRecipeInput item)
 	{
-		return new Predicate<ItemStack>()
+		return new Predicate<>()
 		{
 			public boolean test(ItemStack input)
 			{
@@ -604,7 +603,7 @@ public final class StackUtil
 
 	public static boolean damage(Player player, InteractionHand hand, Predicate<ItemStack> request, int amount)
 	{
-		return damage0(player, hand, request, amount, false) != emptyStack;
+		return damage0(player, hand, request, amount) != emptyStack;
 	}
 
 	public static void damageOrError(Player player, InteractionHand hand, int amount)
@@ -620,7 +619,7 @@ public final class StackUtil
 		}
 	}
 
-	private static ItemStack damage0(Player player, InteractionHand hand, Predicate<ItemStack> request, int amount, boolean copyOutput)
+	private static ItemStack damage0(Player player, InteractionHand hand, Predicate<ItemStack> request, int amount)
 	{
 		if (amount <= 0)
 		{
@@ -654,14 +653,14 @@ public final class StackUtil
 				clear(player, hand);
 			} else
 			{
-				ret = copyOutput ? copy(stack) : stack;
+				ret = false ? copy(stack) : stack;
 				set(player, hand, stack);
 			}
 
 			return ret;
 		} else
 		{
-			return copyOutput ? copy(stack) : stack;
+			return false ? copy(stack) : stack;
 		}
 	}
 
@@ -885,13 +884,7 @@ public final class StackUtil
 
 	public static Tuple.T2<List<ItemStack>, ? extends IntCollection> balanceStacks(Container inv, Collection<ItemStack> additionalItems)
 	{
-		return balanceStacks(inv, new Predicate<Tuple.T2<ItemStack, Integer>>()
-		{
-			public boolean test(Tuple.T2<ItemStack, Integer> input)
-			{
-				return !StackUtil.isEmpty(inv.getItem(input.b));
-			}
-		}, getSlotsFromInv(inv), additionalItems);
+		return balanceStacks(inv, input -> !StackUtil.isEmpty(inv.getItem(input.b)), getSlotsFromInv(inv), additionalItems);
 	}
 
 	public static Tuple.T2<List<ItemStack>, ? extends IntCollection> balanceStacks(Container inv, Predicate<Tuple.T2<ItemStack, Integer>> canInsert)
@@ -995,11 +988,9 @@ public final class StackUtil
 		if (!currentWorkingSet.isEmpty())
 		{
 			assert amount <= 0;
-			IntListIterator var14 = currentWorkingSet.iterator();
 
-			while (var14.hasNext())
+			for (int currentSlot : currentWorkingSet)
 			{
-				int currentSlot = (Integer) var14.next();
 				inv.setItem(currentSlot, emptyStack);
 			}
 		}

@@ -148,23 +148,19 @@ class TeUpdate
 			printDebugOutput(worldId, updateData);
 		}
 
-		IC2.sideProxy.requestTick(false, new Runnable()
+		IC2.sideProxy.requestTick(false, () ->
 		{
-			@Override
-			public void run()
+			Level world = IC2.sideProxy.getPlayerWorld();
+			if (world != null && Util.getDimId(world).equals(worldId))
 			{
-				Level world = IC2.sideProxy.getPlayerWorld();
-				if (world != null && Util.getDimId(world).equals(worldId))
+				for (TeUpdateDataClient.TeData update : updateData.getTes())
 				{
-					for (TeUpdateDataClient.TeData update : updateData.getTes())
+					try
 					{
-						try
-						{
-							TeUpdate.apply(update, world);
-						} catch (Throwable t)
-						{
-							IC2.log.warn(LogCategory.Network, t, "TE update at %s failed.", Util.formatPosition(world, update.pos));
-						}
+						TeUpdate.apply(update, world);
+					} catch (Throwable t)
+					{
+						IC2.log.warn(LogCategory.Network, t, "TE update at %s failed.", Util.formatPosition(world, update.pos));
 					}
 				}
 			}
@@ -229,7 +225,7 @@ class TeUpdate
 		}
 
 		out.setLength(out.length() - 1);
-		IC2.log.info(LogCategory.Network, "Received TE Update:\n" + out.toString());
+		IC2.log.info(LogCategory.Network, "Received TE Update:\n" + out);
 	}
 
 	private static void apply(TeUpdateDataClient.TeData update, Level world)

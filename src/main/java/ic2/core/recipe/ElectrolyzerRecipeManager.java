@@ -40,7 +40,7 @@ public class ElectrolyzerRecipeManager implements IElectrolyzerRecipeManager
 	public IElectrolyzerRecipeManager.ElectrolyzerOutput[] getOutput(Fluid input)
 	{
 		IElectrolyzerRecipeManager.ElectrolyzerRecipe er = this.getElectrolysisInformation(input);
-		return er == null ? null : er.outputs;
+		return er == null ? null : er.outputs();
 	}
 
 	@Override

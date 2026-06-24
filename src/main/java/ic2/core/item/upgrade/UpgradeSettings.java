@@ -55,14 +55,12 @@ public class UpgradeSettings
 
 	public boolean doComparison(int value)
 	{
-		switch (this.comparison)
+		return switch (this.comparison)
 		{
-			case COMPARISON:
-				return this.main.compare(Integer.parseInt(this.mainBox), value);
-			case RANGE:
-				return this.main.compare(Integer.parseInt(this.mainBox), value) && this.extra.compare(value, Integer.parseInt(this.extraBox));
-			default:
-				throw new IllegalStateException("Unexpected comparison type " + this.comparison);
-		}
+			case COMPARISON -> this.main.compare(Integer.parseInt(this.mainBox), value);
+			case RANGE ->
+				this.main.compare(Integer.parseInt(this.mainBox), value) && this.extra.compare(value, Integer.parseInt(this.extraBox));
+			default -> throw new IllegalStateException("Unexpected comparison type " + this.comparison);
+		};
 	}
 }

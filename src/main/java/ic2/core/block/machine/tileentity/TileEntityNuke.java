@@ -7,7 +7,6 @@ import ic2.core.block.invslot.InvSlotConsumableId;
 import ic2.core.gui.dynamic.DynamicContainer;
 import ic2.core.init.IC2Config;
 import ic2.core.network.GrowingBuffer;
-import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.ref.Ic2Items;
 import ic2.core.util.StackUtil;
 import net.minecraft.core.BlockPos;
@@ -36,7 +35,7 @@ public class TileEntityNuke extends TileEntityBridgeNuke implements IHasGui
 
 	public TileEntityNuke(BlockPos pos, BlockState state)
 	{
-		super(Ic2BlockEntities.NUKE, pos, state);
+		super(pos, state);
 		this.outsideSlot = new InvSlotConsumableId(this, "outsideSlot", 1, Ic2Items.ITNT);
 	}
 

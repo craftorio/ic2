@@ -120,47 +120,35 @@ public class Obscuration extends TileEntityComponent
 		return this.dataMap == null ? null : Arrays.copyOf(this.dataMap, this.dataMap.length);
 	}
 
-	public static class ObscurationData
-	{
-		public final BlockState state;
-		public final String variant;
-		public final Direction side;
-		public final int[] colorMultipliers;
-
-		public ObscurationData(BlockState state, String variant, Direction side, int[] colorMultipliers)
+	public record ObscurationData(BlockState state, String variant, Direction side, int[] colorMultipliers)
 		{
-			this.state = state;
-			this.variant = variant;
-			this.side = side;
-			this.colorMultipliers = colorMultipliers;
-		}
 
-		@Override
-		public boolean equals(Object obj)
-		{
-			if (obj == this)
+			@Override
+			public boolean equals(Object obj)
 			{
-				return true;
-			} else
+				if (obj == this)
+				{
+					return true;
+				} else
+				{
+					return !(obj instanceof ObscurationData o)
+						? false
+						: o.state.equals(this.state)
+						  && o.variant.equals(this.variant)
+						  && o.side == this.side
+						  && Arrays.equals(o.colorMultipliers, this.colorMultipliers);
+				}
+			}
+	
+			@Override
+			public int hashCode()
 			{
-				return !(obj instanceof Obscuration.ObscurationData o)
-					? false
-					: o.state.equals(this.state)
-					  && o.variant.equals(this.variant)
-					  && o.side == this.side
-					  && Arrays.equals(o.colorMultipliers, this.colorMultipliers);
+				return (this.state.hashCode() * 7 + this.side.ordinal()) * 23;
+			}
+	
+			public ObscurationData intern()
+			{
+				return this;
 			}
 		}
-
-		@Override
-		public int hashCode()
-		{
-			return (this.state.hashCode() * 7 + this.side.ordinal()) * 23;
-		}
-
-		public Obscuration.ObscurationData intern()
-		{
-			return this;
-		}
-	}
 }

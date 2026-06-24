@@ -57,8 +57,8 @@ public class WorldData
 			this.energyNet = EnergyNetLocal.create(world);
 			this.tradeMarket = new TradingMarket(world);
 			this.windSim = new WindSim(world);
-			this.loadedChunks = new Long2ObjectOpenHashMap();
-			this.chunkLoaders = new Object2ObjectOpenHashMap();
+			this.loadedChunks = new Long2ObjectOpenHashMap<>();
+			this.chunkLoaders = new Object2ObjectOpenHashMap<>();
 		} else
 		{
 			this.energyNet = null;

@@ -117,13 +117,13 @@ public class TileEntityStirlingKineticGenerator extends TileEntityAbstractKineti
 		{
 			ILiquidHeatExchangerManager.HeatExchangeProperty property = Recipes.liquidHeatUpManager
 				.getHeatExchangeProperty(this.inputTank.getFluidStack().getFluid());
-			if (this.outputTank.isEmpty() || this.outputTank.hasExactFluid(property.outputFluid))
+			if (this.outputTank.isEmpty() || this.outputTank.hasExactFluid(property.outputFluid()))
 			{
 				int heatbufferToUse = this.heatBuffer / 4;
 				heatbufferToUse = Math.min(
 					heatbufferToUse,
 					(
-						Math.min(this.outputTank.getCapacity() - this.outputTank.getFluidAmount(), this.inputTank.getFluidAmount()) * property.huPerMB
+						Math.min(this.outputTank.getCapacity() - this.outputTank.getFluidAmount(), this.inputTank.getFluidAmount()) * property.huPerMB()
 							- this.liquidHeatStored
 					)
 				);
@@ -136,14 +136,14 @@ public class TileEntityStirlingKineticGenerator extends TileEntityAbstractKineti
 					newActive = true;
 				}
 
-				if (this.liquidHeatStored >= property.huPerMB)
+				if (this.liquidHeatStored >= property.huPerMB())
 				{
-					int mbToConvert = this.liquidHeatStored / property.huPerMB;
+					int mbToConvert = this.liquidHeatStored / property.huPerMB();
 					mbToConvert = this.inputTank.drainMbUnchecked(mbToConvert, true).getAmountMb();
-					mbToConvert = this.outputTank.fillMbUnchecked(Ic2FluidStack.create(property.outputFluid, mbToConvert), true);
-					this.liquidHeatStored = this.liquidHeatStored - mbToConvert * property.huPerMB;
+					mbToConvert = this.outputTank.fillMbUnchecked(Ic2FluidStack.create(property.outputFluid(), mbToConvert), true);
+					this.liquidHeatStored = this.liquidHeatStored - mbToConvert * property.huPerMB();
 					this.inputTank.drainMbUnchecked(mbToConvert, false);
-					this.outputTank.fillMbUnchecked(Ic2FluidStack.create(property.outputFluid, mbToConvert), false);
+					this.outputTank.fillMbUnchecked(Ic2FluidStack.create(property.outputFluid(), mbToConvert), false);
 				}
 			}
 		}

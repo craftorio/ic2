@@ -38,7 +38,7 @@ final class DynamicCableModelForge extends DynamicCableModel<List<BakedQuad>[], 
 	private static final ModelProperty<List<BakedQuad>[]> MESH_DATA = new ModelProperty<>();
 	private static final int stride = 8;
 
-	protected DynamicCableModelForge(CableType type, int insulation, CableFoam foam, boolean active)
+	DynamicCableModelForge(CableType type, int insulation, CableFoam foam, boolean active)
 	{
 		super(type, insulation, foam, active);
 	}

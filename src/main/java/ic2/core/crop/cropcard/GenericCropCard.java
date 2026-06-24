@@ -6,7 +6,6 @@ import ic2.api.crops.ICropTile;
 import ic2.api.crops.ICropType;
 import ic2.core.IC2;
 import ic2.core.crop.Ic2CropCard;
-import ic2.core.ref.Ic2Items;
 import ic2.core.util.StackUtil;
 
 import java.util.ArrayList;
@@ -103,7 +102,7 @@ public class GenericCropCard extends Ic2CropCard
 	{
 		if (this.drops != null && this.drops.length > 0)
 		{
-			ItemStack[] gains = this.optimizeItemStackArray(this.drops, true);
+			ItemStack[] gains = this.optimizeItemStackArray(this.drops);
 			if (this.specialDrops != null && this.specialDrops.length > 0)
 			{
 				int roulette = IC2.random.nextInt(this.specialDrops.length * 2 + 2);
@@ -124,7 +123,7 @@ public class GenericCropCard extends Ic2CropCard
 	@Override
 	public int getGrowthDuration(ICropTile cropTile)
 	{
-		return this.growthSpeed < 200 ? this.properties.getTier() * 200 : this.properties.getTier() * this.growthSpeed;
+		return this.growthSpeed < 200 ? this.properties.tier() * 200 : this.properties.tier() * this.growthSpeed;
 	}
 
 	@Override
@@ -263,7 +262,7 @@ public class GenericCropCard extends Ic2CropCard
 
 	public GenericCropCard setDrops(ItemStack[] drops)
 	{
-		this.drops = this.optimizeItemStackArray(drops, true);
+		this.drops = this.optimizeItemStackArray(drops);
 		return this;
 	}
 
@@ -275,7 +274,7 @@ public class GenericCropCard extends Ic2CropCard
 
 	public GenericCropCard setSpecialDrops(ItemStack[] specialDrops)
 	{
-		this.specialDrops = this.optimizeItemStackArray(specialDrops, true);
+		this.specialDrops = this.optimizeItemStackArray(specialDrops);
 		return this;
 	}
 
@@ -309,7 +308,7 @@ public class GenericCropCard extends Ic2CropCard
 		return this;
 	}
 
-	private ItemStack[] optimizeItemStackArray(ItemStack[] array, boolean copy)
+	private ItemStack[] optimizeItemStackArray(ItemStack[] array)
 	{
 		ItemStack[] optimizedArray = new ItemStack[array.length];
 		int tracker = 0;
@@ -318,7 +317,7 @@ public class GenericCropCard extends Ic2CropCard
 		{
 			if (!StackUtil.isEmpty(element))
 			{
-				optimizedArray[tracker++] = copy ? element.copy() : element;
+				optimizedArray[tracker++] = true ? element.copy() : element;
 			}
 		}
 

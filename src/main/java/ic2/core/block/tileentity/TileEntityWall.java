@@ -25,14 +25,7 @@ public class TileEntityWall extends Ic2TileEntity
 	public TileEntityWall(BlockPos pos, BlockState state)
 	{
 		super(Ic2BlockEntities.WALL, pos, state);
-		this.obscuration = this.addComponent(new Obscuration(this, new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				IC2.network.get(true).updateTileEntityField(TileEntityWall.this, "obscuration");
-			}
-		}));
+		this.obscuration = this.addComponent(new Obscuration(this, () -> IC2.network.get(true).updateTileEntityField(TileEntityWall.this, "obscuration")));
 	}
 
 	public void setColor(DyeColor color)
@@ -123,39 +116,31 @@ public class TileEntityWall extends Ic2TileEntity
 		return true;
 	}
 
-	public static class WallRenderState
-	{
-		public final DyeColor color;
-		public final Obscuration.ObscurationData[] obscurations;
-
-		public WallRenderState(DyeColor color, Obscuration.ObscurationData[] obscurations)
+	public record WallRenderState(DyeColor color, Obscuration.ObscurationData[] obscurations)
 		{
-			this.color = color;
-			this.obscurations = obscurations;
-		}
 
-		@Override
-		public boolean equals(Object obj)
-		{
-			if (obj == this)
+			@Override
+			public boolean equals(Object obj)
 			{
-				return true;
-			} else
+				if (obj == this)
+				{
+					return true;
+				} else
+				{
+					return !(obj instanceof WallRenderState o) ? false : o.color == this.color && Arrays.equals(o.obscurations, this.obscurations);
+				}
+			}
+	
+			@Override
+			public int hashCode()
 			{
-				return !(obj instanceof TileEntityWall.WallRenderState o) ? false : o.color == this.color && Arrays.equals(o.obscurations, this.obscurations);
+				return this.color.hashCode() * 31 + Arrays.hashCode(this.obscurations);
+			}
+	
+			@Override
+			public String toString()
+			{
+				return "WallState<" + this.color + ", " + Arrays.toString(this.obscurations) + ">";
 			}
 		}
-
-		@Override
-		public int hashCode()
-		{
-			return this.color.hashCode() * 31 + Arrays.hashCode(this.obscurations);
-		}
-
-		@Override
-		public String toString()
-		{
-			return "WallState<" + this.color + ", " + Arrays.toString(this.obscurations) + ">";
-		}
-	}
 }

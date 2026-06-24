@@ -164,16 +164,8 @@ class GridUpdater implements Runnable
 
 	private void prepareUpdate()
 	{
-		Iterator<GridChange> it = this.changes.iterator();
 
-		while (it.hasNext())
-		{
-			GridChange change = it.next();
-			if (!ChangeHandler.prepareSync(this.enet, change))
-			{
-				it.remove();
-			}
-		}
+		this.changes.removeIf(change -> !ChangeHandler.prepareSync(this.enet, change));
 	}
 
 	private void updateGrid()

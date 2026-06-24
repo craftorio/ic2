@@ -9,7 +9,6 @@ import java.util.concurrent.CompletableFuture;
 
 import net.minecraft.core.Holder;
 import net.minecraft.util.random.SimpleWeightedRandomList;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
@@ -32,8 +31,6 @@ public class Ic2WorldGen
 			.add(Ic2Blocks.RUBBER_LOG.defaultBlockState().setValue(RubberLogBlock.stateProperty, RubberLogBlock.RubberWoodState.wet_west), 1)
 	);
 	public static final CompletableFuture<Holder<ConfiguredFeature<TreeConfiguration, ?>>> RUBBER_TREE = register(
-		"rubber_tree",
-		Feature.TREE,
 		new TreeConfigurationBuilder(
 			RUBBER_LOG_PROVIDER,
 			new StraightTrunkPlacer(4, 4, 0),
@@ -71,9 +68,9 @@ public class Ic2WorldGen
 	}
 
 	private static <FC extends FeatureConfiguration, F extends Feature<FC>> CompletableFuture<Holder<ConfiguredFeature<FC, ?>>> register(
-		String name, F feature, FC config
+		FC config
 	)
 	{
-		return IC2.envProxy.registerConfiguredFeature(IC2.getIdentifier(name), feature, config);
+		return IC2.envProxy.registerConfiguredFeature(IC2.getIdentifier("rubber_tree"), (F) Feature.TREE, config);
 	}
 }

@@ -12,15 +12,7 @@ public interface ISemiFluidFuelManager extends ILiquidAcceptManager
 
 	Map<Fluid, ISemiFluidFuelManager.BurnProperty> getBurnProperties();
 
-	final class BurnProperty
-	{
-		public final int amount;
-		public final double power;
-
-		public BurnProperty(int amount, double power)
+	record BurnProperty(int amount, double power)
 		{
-			this.amount = amount;
-			this.power = power;
 		}
-	}
 }

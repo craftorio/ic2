@@ -20,6 +20,6 @@ public interface IKineticRotor
 	enum GearboxType
 	{
 		WATER,
-		WIND;
+		WIND
 	}
 }

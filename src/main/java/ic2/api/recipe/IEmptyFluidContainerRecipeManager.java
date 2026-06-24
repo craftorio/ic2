@@ -12,15 +12,7 @@ public interface IEmptyFluidContainerRecipeManager extends IMachineRecipeManager
 {
 	MachineRecipeResult<Void, IEmptyFluidContainerRecipeManager.Output, ItemStack> apply(ItemStack var1, Fluid var2, FluidContainerOutputMode var3, boolean var4);
 
-	class Output
-	{
-		public final Collection<ItemStack> container;
-		public final Ic2FluidStack fluid;
-
-		public Output(Collection<ItemStack> container, Ic2FluidStack fluid)
+	record Output(Collection<ItemStack> container, Ic2FluidStack fluid)
 		{
-			this.container = container;
-			this.fluid = fluid;
 		}
-	}
 }

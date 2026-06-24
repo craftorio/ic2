@@ -135,16 +135,16 @@ public class TileEntityFermenter extends TileEntityInventory implements IHasGui,
 		{
 			IFermenterRecipeManager.FermentationProperty fp = Recipes.fermenter.getFermentationInformation(this.inputTank.getFluidStack().getFluid());
 			if (fp != null
-				&& this.inputTank.getFluidAmount() >= fp.inputAmount
-				&& fp.outputAmount <= this.outputTank.getCapacity() - this.outputTank.getFluidAmount())
+				&& this.inputTank.getFluidAmount() >= fp.inputAmount()
+				&& fp.outputAmount() <= this.outputTank.getCapacity() - this.outputTank.getFluidAmount())
 			{
 				this.heatBuffer = this.heatBuffer + ((IHeatSource) te).drawHeat(dir.getOpposite(), 100, false);
-				if (this.heatBuffer >= fp.heat)
+				if (this.heatBuffer >= fp.heat())
 				{
-					this.heatBuffer = this.heatBuffer - fp.heat;
-					this.inputTank.drainMbUnchecked(fp.inputAmount, false);
+					this.heatBuffer = this.heatBuffer - fp.heat();
+					this.inputTank.drainMbUnchecked(fp.inputAmount(), false);
 					this.outputTank.fillMbUnchecked(fp.getOutput(), false);
-					this.progress = this.progress + fp.inputAmount;
+					this.progress = this.progress + fp.inputAmount();
 				}
 
 				return true;
@@ -182,7 +182,7 @@ public class TileEntityFermenter extends TileEntityInventory implements IHasGui,
 				IFermenterRecipeManager.FermentationProperty fp = Recipes.fermenter.getFermentationInformation(this.inputTank.getFluidStack().getFluid());
 				if (fp != null)
 				{
-					maxHeatBuff = fp.heat;
+					maxHeatBuff = fp.heat();
 				}
 			}
 
@@ -198,25 +198,28 @@ public class TileEntityFermenter extends TileEntityInventory implements IHasGui,
 
 	public int gaugeLiquidScaled(int i, int tank)
 	{
-		switch (tank)
+		return switch (tank)
 		{
-			case 0:
+			case 0 ->
+			{
 				if (this.inputTank.isEmpty())
 				{
-					return 0;
+					yield 0;
 				}
 
-				return this.inputTank.getFluidAmount() * i / this.inputTank.getCapacity();
-			case 1:
+				yield this.inputTank.getFluidAmount() * i / this.inputTank.getCapacity();
+			}
+			case 1 ->
+			{
 				if (this.outputTank.isEmpty())
 				{
-					return 0;
+					yield 0;
 				}
 
-				return this.outputTank.getFluidAmount() * i / this.outputTank.getCapacity();
-			default:
-				return 0;
-		}
+				yield this.outputTank.getFluidAmount() * i / this.outputTank.getCapacity();
+			}
+			default -> 0;
+		};
 	}
 
 	public Ic2FluidTank getInputTank()

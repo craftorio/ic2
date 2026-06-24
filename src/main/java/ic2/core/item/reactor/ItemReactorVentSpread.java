@@ -30,9 +30,8 @@ public class ItemReactorVentSpread extends AbstractReactorComponent
 	private void cool(IReactor reactor, int x, int y)
 	{
 		ItemStack stack = reactor.getItemAt(x, y);
-		if (stack != null && stack.getItem() instanceof IReactorComponent)
+		if (stack != null && stack.getItem() instanceof IReactorComponent comp)
 		{
-			IReactorComponent comp = (IReactorComponent) stack.getItem();
 			if (comp.canStoreHeat(stack, reactor, x, y))
 			{
 				int self = comp.alterHeat(stack, reactor, x, y, -this.sideVent);

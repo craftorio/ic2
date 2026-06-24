@@ -117,14 +117,7 @@ public abstract class GuiWeightedDistributor<T extends ContainerBase<? extends I
 
 						((IWeightedDistributor) GuiWeightedDistributor.this.getContainer().base).updatePriority(false);
 					}
-				}).withDisableHandler(new IEnableHandler()
-				{
-					@Override
-					public boolean isEnabled()
-					{
-						return ((IWeightedDistributor) GuiWeightedDistributor.this.getContainer().base).getFacing() != facing;
-					}
-				}).withText(facing.getSerializedName().substring(0, 1).toUpperCase(Locale.ENGLISH)).withTooltip(getNameForFacing(facing)));
+				}).withDisableHandler(() -> ((IWeightedDistributor) GuiWeightedDistributor.this.getContainer().base).getFacing() != facing).withText(facing.getSerializedName().substring(0, 1).toUpperCase(Locale.ENGLISH)).withTooltip(getNameForFacing(facing)));
 			}
 			this.addElement(TextLabel.create(this, 8, 21 + y * 18, switch (y)
 			{
@@ -157,22 +150,15 @@ public abstract class GuiWeightedDistributor<T extends ContainerBase<? extends I
 
 	private static String getNameForFacing(Direction facing)
 	{
-		switch (facing)
+		return switch (facing)
 		{
-			case WEST:
-				return "ic2.dir.West";
-			case EAST:
-				return "ic2.dir.East";
-			case DOWN:
-				return "ic2.dir.Bottom";
-			case UP:
-				return "ic2.dir.Top";
-			case NORTH:
-				return "ic2.dir.North";
-			case SOUTH:
-				return "ic2.dir.South";
-			default:
-				throw new IllegalStateException("Unexpected direction: " + facing);
-		}
+			case WEST -> "ic2.dir.West";
+			case EAST -> "ic2.dir.East";
+			case DOWN -> "ic2.dir.Bottom";
+			case UP -> "ic2.dir.Top";
+			case NORTH -> "ic2.dir.North";
+			case SOUTH -> "ic2.dir.South";
+			default -> throw new IllegalStateException("Unexpected direction: " + facing);
+		};
 	}
 }

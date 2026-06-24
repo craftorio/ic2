@@ -43,32 +43,26 @@ public class PlayerHead extends ItemImage
 		return tooltip;
 	}
 
-	private static final class PlayerHeadSupplier implements Supplier<ItemStack>
-	{
-		private final GameProfile profile;
-
-		PlayerHeadSupplier(GameProfile profile)
+	private record PlayerHeadSupplier(GameProfile profile) implements Supplier<ItemStack>
 		{
-			this.profile = profile;
-		}
 
-		public ItemStack get()
-		{
-			CompletableFuture<GameProfile> future = new CompletableFuture<>();
-			SkullBlockEntity.updateGameprofile(this.profile, future::complete);
-
-			try
+			public ItemStack get()
 			{
-				return PlayerHead.IMAGE_MAKER.computeIfAbsent(future.get(), resolvedProfile ->
+				CompletableFuture<GameProfile> future = new CompletableFuture<>();
+				SkullBlockEntity.updateGameprofile(this.profile, future::complete);
+	
+				try
 				{
-					ItemStack skull = new ItemStack(Items.PLAYER_HEAD);
-					StackUtil.getOrCreateNbtData(skull).put("SkullOwner", NbtUtils.writeGameProfile(new CompoundTag(), resolvedProfile));
-					return skull;
-				});
-			} catch (InterruptedException | ExecutionException e)
-			{
-				throw new RuntimeException(e);
+					return PlayerHead.IMAGE_MAKER.computeIfAbsent(future.get(), resolvedProfile ->
+					{
+						ItemStack skull = new ItemStack(Items.PLAYER_HEAD);
+						StackUtil.getOrCreateNbtData(skull).put("SkullOwner", NbtUtils.writeGameProfile(new CompoundTag(), resolvedProfile));
+						return skull;
+					});
+				} catch (InterruptedException | ExecutionException e)
+				{
+					throw new RuntimeException(e);
+				}
 			}
 		}
-	}
 }

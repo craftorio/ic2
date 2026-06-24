@@ -33,33 +33,33 @@ public class FillFluidContainerRecipeManager implements IFillFluidContainerRecip
 		IFillFluidContainerRecipeManager.Input input, FluidContainerOutputMode outputMode, boolean acceptTest
 	)
 	{
-		if (!StackUtil.isEmpty(input.container) && input.fluid != null)
+		if (!StackUtil.isEmpty(input.container()) && input.fluid() != null)
 		{
-			if (input.fluid.isEmpty())
+			if (input.fluid().isEmpty())
 			{
 				return null;
 			}
 
-			LiquidUtil.FluidOperationResult result = LiquidUtil.fillContainer(input.container, input.fluid, outputMode);
+			LiquidUtil.FluidOperationResult result = LiquidUtil.fillContainer(input.container(), input.fluid(), outputMode);
 			if (result == null)
 			{
 				return null;
 			}
 
 			Collection<ItemStack> output = StackUtil.isEmpty(result.extraOutput) ? Collections.emptyList() : Collections.singletonList(result.extraOutput);
-			Ic2FluidStack changedFluid = result.fluidChange.getAmountMb() >= input.fluid.getAmountMb()
+			Ic2FluidStack changedFluid = result.fluidChange.getAmountMb() >= input.fluid().getAmountMb()
 				? null
-				: input.fluid.copyWithAmountMb(input.fluid.getAmountMb() - result.fluidChange.getAmountMb());
+				: input.fluid().copyWithAmountMb(input.fluid().getAmountMb() - result.fluidChange.getAmountMb());
 			return (MachineRecipeResult) new MachineRecipe<>(null, output).getResult(new IFillFluidContainerRecipeManager.Input(result.inPlaceOutput, changedFluid));
 		} else if (!acceptTest)
 		{
 			return null;
-		} else if (StackUtil.isEmpty(input.container) && input.fluid == null)
+		} else if (StackUtil.isEmpty(input.container()) && input.fluid() == null)
 		{
 			return null;
 		} else
 		{
-			return !StackUtil.isEmpty(input.container) && !LiquidUtil.isFillableFluidContainer(input.container)
+			return !StackUtil.isEmpty(input.container()) && !LiquidUtil.isFillableFluidContainer(input.container())
 				? null
 				: (MachineRecipeResult) new MachineRecipe<>(null, Collections.emptyList()).getResult(input);
 		}

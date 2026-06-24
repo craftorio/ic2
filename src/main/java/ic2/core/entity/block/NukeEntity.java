@@ -27,9 +27,8 @@ public class NukeEntity extends ExplosiveEntity
 	public InteractionResult interact(Player player, InteractionHand hand)
 	{
 		ItemStack stack = StackUtil.get(player, hand);
-		if (!StackUtil.isEmpty(stack) && stack.getItem() instanceof ItemToolWrench)
+		if (!StackUtil.isEmpty(stack) && stack.getItem() instanceof ItemToolWrench wrench)
 		{
-			ItemToolWrench wrench = (ItemToolWrench) stack.getItem();
 			if (wrench.canTakeDamage())
 			{
 				if (this.level().isClientSide)

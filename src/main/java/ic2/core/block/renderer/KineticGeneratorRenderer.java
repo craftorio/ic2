@@ -23,7 +23,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class KineticGeneratorRenderer<T extends BlockEntity & IRotorProvider> implements BlockEntityRenderer<T>
 {
-	private static final Int2ReferenceMap<ModelPart> rotorModels = new Int2ReferenceOpenHashMap();
+	private static final Int2ReferenceMap<ModelPart> rotorModels = new Int2ReferenceOpenHashMap<>();
 
 	public KineticGeneratorRenderer(Context ctx)
 	{

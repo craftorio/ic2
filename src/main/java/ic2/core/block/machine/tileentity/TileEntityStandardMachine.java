@@ -153,7 +153,7 @@ public abstract class TileEntityStandardMachine<RI, RO, I>
 		}
 		if (this.recipeResult == null
 			|| (result = this.inputSlot.process()) == null
-			|| !isSameRecipeInput(result.getRecipe().getInput(), this.recipeResult.getRecipe().getInput()))
+			|| !isSameRecipeInput(result.recipe().getInput(), this.recipeResult.recipe().getInput()))
 		{
 			this.recipeResult = this.getRecipeResult();
 			this.progress = 0;

@@ -32,15 +32,11 @@ public class ContainerBatchCrafter extends ContainerElectricMachine<TileEntityBa
 		{
 			for (int x = 0; x < 3; x++)
 			{
-				this.addSlot(new SlotHologramSlot(tileEntity.craftingGrid, x + y * 3, 30 + x * 18, 17 + y * 18, 1, new SlotHologramSlot.ChangeCallback()
+				this.addSlot(new SlotHologramSlot(tileEntity.craftingGrid, x + y * 3, 30 + x * 18, 17 + y * 18, 1, index ->
 				{
-					@Override
-					public void onChanged(int index)
+					if (ContainerBatchCrafter.this.base.hasLevel() && !ContainerBatchCrafter.this.base.getLevel().isClientSide)
 					{
-						if (ContainerBatchCrafter.this.base.hasLevel() && !ContainerBatchCrafter.this.base.getLevel().isClientSide)
-						{
-							ContainerBatchCrafter.this.base.matrixChange(index);
-						}
+						ContainerBatchCrafter.this.base.matrixChange(index);
 					}
 				}));
 			}

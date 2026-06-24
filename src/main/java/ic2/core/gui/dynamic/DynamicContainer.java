@@ -37,7 +37,7 @@ public class DynamicContainer<T extends Container> extends ContainerBase<T>
 
 	public static DynamicContainer<TileEntityInventory> create(int syncId, Inventory playerInventory, TileEntityInventory base)
 	{
-		return new DynamicContainer(
+		return new DynamicContainer<>(
 			Ic2ScreenHandlers.DYNAMIC_BE,
 			syncId,
 			playerInventory,
@@ -68,10 +68,10 @@ public class DynamicContainer<T extends Container> extends ContainerBase<T>
 				case playerinventory:
 				{
 					GuiParser.PlayerInventoryNode node = (GuiParser.PlayerInventoryNode) rawNode;
-					int xOffset = (node.style.width - 16) / 2;
-					int yOffset = (node.style.height - 16) / 2;
-					int width = node.style.width + node.spacing;
-					int height = node.style.height + node.spacing;
+					int xOffset = (node.style.width() - 16) / 2;
+					int yOffset = (node.style.height() - 16) / 2;
+					int width = node.style.width() + node.spacing;
+					int height = node.style.height() + node.spacing;
 
 					for (int row = 0; row < 3; row++)
 					{
@@ -101,8 +101,8 @@ public class DynamicContainer<T extends Container> extends ContainerBase<T>
 						throw new RuntimeException("Invalid InvSlot name " + node.name + " for base " + this.base);
 					}
 
-					int x = node.x + (node.style.width - 16) / 2;
-					int y = node.y + (node.style.height - 16) / 2;
+					int x = node.x + (node.style.width() - 16) / 2;
+					int y = node.y + (node.style.height() - 16) / 2;
 					this.addSlot(new SlotInvSlot(slot, node.index, x, y));
 					break;
 				}
@@ -114,7 +114,7 @@ public class DynamicContainer<T extends Container> extends ContainerBase<T>
 					}
 
 					GuiParser.SlotGridNode node = (GuiParser.SlotGridNode) rawNode;
-					InvSlot slot = ((IInventorySlotHolder) this.base).getInventorySlot(node.name);
+					InvSlot slot = ((IInventorySlotHolder<?>) this.base).getInventorySlot(node.name);
 					if (slot == null)
 					{
 						throw new RuntimeException("Invalid InvSlot name " + node.name + " for base " + this.base);
@@ -123,13 +123,13 @@ public class DynamicContainer<T extends Container> extends ContainerBase<T>
 					int size = slot.size();
 					if (size > node.offset)
 					{
-						int x0 = node.x + (node.style.width - 16) / 2;
-						int y0 = node.y + (node.style.height - 16) / 2;
+						int x0 = node.x + (node.style.width() - 16) / 2;
+						int y0 = node.y + (node.style.height() - 16) / 2;
 						GuiParser.SlotGridNode.SlotGridDimension dim = node.getDimension(size);
 						int rows = dim.rows();
 						int cols = dim.cols();
-						int width = node.style.width + node.spacing;
-						int height = node.style.height + node.spacing;
+						int width = node.style.width() + node.spacing;
+						int height = node.style.height() + node.spacing;
 						int idx = node.offset;
 						if (!node.vertical)
 						{
@@ -177,8 +177,8 @@ public class DynamicContainer<T extends Container> extends ContainerBase<T>
 					}
 
 					GuiParser.SlotHologramNode node = (GuiParser.SlotHologramNode) rawNode;
-					int x = node.x + (node.style.width - 16) / 2;
-					int y = node.y + (node.style.height - 16) / 2;
+					int x = node.x + (node.style.width() - 16) / 2;
+					int y = node.y + (node.style.height() - 16) / 2;
 					this.addSlot(
 						new SlotHologramSlot(
 							((IHolographicSlotProvider) this.base).getStacksForName(node.name), node.index, x, y, node.stackSizeLimit, this.getCallback()

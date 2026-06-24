@@ -12,15 +12,7 @@ public interface IFluidHeatManager extends ILiquidAcceptManager
 
 	Map<Fluid, IFluidHeatManager.BurnProperty> getBurnProperties();
 
-	class BurnProperty
-	{
-		public final int amount;
-		public final int heat;
-
-		public BurnProperty(int amount, int heat)
+	record BurnProperty(int amount, int heat)
 		{
-			this.amount = amount;
-			this.heat = heat;
 		}
-	}
 }

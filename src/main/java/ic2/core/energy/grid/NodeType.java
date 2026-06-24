@@ -4,5 +4,5 @@ public enum NodeType
 {
 	Source,
 	Sink,
-	Conductor;
+	Conductor
 }

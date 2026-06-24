@@ -30,9 +30,7 @@ public class EnergyNetGlobal implements IEnergyNet
 
 	public static EnergyNetGlobal create()
 	{
-		if (System.getProperty("IC2ExpEnet") != null)
-		{
-		}
+		System.getProperty("IC2ExpEnet");
 
 		calculator = new EnergyCalculatorUnified();
 		return new EnergyNetGlobal();

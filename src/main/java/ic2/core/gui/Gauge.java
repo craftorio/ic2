@@ -240,29 +240,12 @@ public abstract class Gauge<T extends Gauge<T>> extends GuiElement<T>
 		Gauge.GaugeProperties getProperties();
 	}
 
-	public static class GaugeProperties
+	public record GaugeProperties(short uInner, short vInner, short innerWidth, short innerHeight, short hoverXOffset,
+	                              short hoverYOffset, short hoverWidth, short hoverHeight, short bgXOffset,
+	                              short bgYOffset, short bgWidth, short bgHeight, short uBgInactive, short vBgInactive,
+	                              short uBgActive, short vBgActive, boolean vertical, boolean reverse, boolean smooth,
+	                              ResourceLocation texture)
 	{
-		public final short uInner;
-		public final short vInner;
-		public final short innerWidth;
-		public final short innerHeight;
-		public final short hoverXOffset;
-		public final short hoverYOffset;
-		public final short hoverWidth;
-		public final short hoverHeight;
-		public final short bgXOffset;
-		public final short bgYOffset;
-		public final short bgWidth;
-		public final short bgHeight;
-		public final short uBgInactive;
-		public final short vBgInactive;
-		public final short uBgActive;
-		public final short vBgActive;
-		public final boolean vertical;
-		public final boolean reverse;
-		public final boolean smooth;
-		public final ResourceLocation texture;
-
 		public GaugeProperties(
 			int uInner,
 			int vInner,
@@ -286,26 +269,7 @@ public abstract class Gauge<T extends Gauge<T>> extends GuiElement<T>
 			ResourceLocation texture
 		)
 		{
-			this.uInner = (short) uInner;
-			this.vInner = (short) vInner;
-			this.innerWidth = (short) innerWidth;
-			this.innerHeight = (short) innerHeight;
-			this.hoverXOffset = (short) hoverXOffset;
-			this.hoverYOffset = (short) hoverYOffset;
-			this.hoverWidth = (short) hoverWidth;
-			this.hoverHeight = (short) hoverHeight;
-			this.bgXOffset = (short) bgXOffset;
-			this.bgYOffset = (short) bgYOffset;
-			this.bgWidth = (short) bgWidth;
-			this.bgHeight = (short) bgHeight;
-			this.uBgInactive = (short) uBgInactive;
-			this.vBgInactive = (short) vBgInactive;
-			this.uBgActive = (short) uBgActive;
-			this.vBgActive = (short) vBgActive;
-			this.vertical = vertical;
-			this.reverse = reverse;
-			this.smooth = smooth;
-			this.texture = texture;
+			this((short) uInner, (short) vInner, (short) innerWidth, (short) innerHeight, (short) hoverXOffset, (short) hoverYOffset, (short) hoverWidth, (short) hoverHeight, (short) bgXOffset, (short) bgYOffset, (short) bgWidth, (short) bgHeight, (short) uBgInactive, (short) vBgInactive, (short) uBgActive, (short) vBgActive, vertical, reverse, smooth, texture);
 		}
 	}
 

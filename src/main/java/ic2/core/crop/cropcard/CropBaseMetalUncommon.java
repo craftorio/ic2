@@ -28,7 +28,7 @@ public class CropBaseMetalUncommon extends CropBaseMetalCommon
 	@Override
 	public double dropGainChance()
 	{
-		return Math.pow(0.95, this.getProperties().getTier());
+		return Math.pow(0.95, this.getProperties().tier());
 	}
 
 	@Override

@@ -9,18 +9,15 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ForgeRegistries;
 
-final class Ic2FluidStackImpl implements Ic2FluidStack
+record Ic2FluidStackImpl(FluidStack parent) implements Ic2FluidStack
 {
-	final FluidStack parent;
-
-	public Ic2FluidStackImpl(FluidStack parent)
+	Ic2FluidStackImpl
 	{
 		if (parent == null)
 		{
 			throw new NullPointerException();
 		}
 
-		this.parent = parent;
 	}
 
 	@Override

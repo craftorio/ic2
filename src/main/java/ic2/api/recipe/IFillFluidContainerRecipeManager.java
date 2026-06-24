@@ -13,15 +13,7 @@ public interface IFillFluidContainerRecipeManager extends IMachineRecipeManager<
 		IFillFluidContainerRecipeManager.Input var1, FluidContainerOutputMode var2, boolean var3
 	);
 
-	class Input
-	{
-		public final ItemStack container;
-		public final Ic2FluidStack fluid;
-
-		public Input(ItemStack container, Ic2FluidStack fluid)
+	record Input(ItemStack container, Ic2FluidStack fluid)
 		{
-			this.container = container;
-			this.fluid = fluid;
 		}
-	}
 }

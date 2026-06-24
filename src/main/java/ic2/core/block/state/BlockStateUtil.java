@@ -20,13 +20,11 @@ public class BlockStateUtil
 		}
 
 		StringBuilder ret = new StringBuilder();
-		UnmodifiableIterator var3 = properties.entrySet().iterator();
 
-		while (var3.hasNext())
+		for (Entry<Property<?>, Comparable<?>> entry : properties.entrySet())
 		{
-			Entry<Property<?>, Comparable<?>> entry = (Entry<Property<?>, Comparable<?>>) var3.next();
 			Property property = entry.getKey();
-			if (ret.length() > 0)
+			if (!ret.isEmpty())
 			{
 				ret.append(',');
 			}

@@ -36,9 +36,9 @@ public class TileEntityCentrifuge extends TileEntityStandardMachine<IRecipeInput
 		this.redstone = this.addComponent(new Redstone(this));
 	}
 
-	private static short min(short a, short b)
+	private static short min(short b)
 	{
-		return a <= b ? a : b;
+		return (short) 5000 <= b ? (short) 5000 : b;
 	}
 
 	@Override
@@ -73,7 +73,7 @@ public class TileEntityCentrifuge extends TileEntityStandardMachine<IRecipeInput
 			MachineRecipeResult<? extends IRecipeInput, ? extends Collection<ItemStack>, ? extends ItemStack> output = super.getRecipeResult();
 			if (output != null && !this.redstone.hasRedstoneInput())
 			{
-				heatRequested = min((short) 5000, output.getRecipe().getMetaData().getShort("minHeat"));
+				heatRequested = min(output.recipe().getMetaData().getShort("minHeat"));
 				this.workheat = heatRequested;
 				if (this.heat > heatRequested)
 				{
@@ -107,12 +107,12 @@ public class TileEntityCentrifuge extends TileEntityStandardMachine<IRecipeInput
 		MachineRecipeResult<IRecipeInput, Collection<ItemStack>, ItemStack> ret = super.getRecipeResult();
 		if (ret != null)
 		{
-			if (ret.getRecipe().getMetaData() == null)
+			if (ret.recipe().getMetaData() == null)
 			{
 				return null;
 			}
 
-			if (ret.getRecipe().getMetaData().getInt("minHeat") > this.heat)
+			if (ret.recipe().getMetaData().getInt("minHeat") > this.heat)
 			{
 				return null;
 			}

@@ -69,7 +69,7 @@ public class PriorityExecutor extends ThreadPoolExecutor
 	{
 		High,
 		Default,
-		Low;
+		Low
 	}
 
 	public interface CustomPriority
@@ -155,13 +155,13 @@ public class PriorityExecutor extends ThreadPoolExecutor
 		}
 
 		@Override
-		public void put(E e) throws InterruptedException
+		public void put(E e)
 		{
 			this.offer(e);
 		}
 
 		@Override
-		public boolean offer(E e, long timeout, TimeUnit unit) throws InterruptedException
+		public boolean offer(E e, long timeout, TimeUnit unit)
 		{
 			return this.offer(e);
 		}

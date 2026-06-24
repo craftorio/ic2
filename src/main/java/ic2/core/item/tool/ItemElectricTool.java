@@ -5,7 +5,6 @@ import ic2.api.item.IElectricItem;
 import ic2.api.item.IItemHudInfo;
 import ic2.api.network.INetworkItemEventListener;
 import ic2.core.IC2;
-import ic2.core.item.ElectricItemManager;
 import ic2.core.item.ElectricItemTooltipHandler;
 import ic2.core.ref.Ic2BlockTags;
 import ic2.core.ref.Ic2SoundEvents;
@@ -19,7 +18,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -33,7 +31,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.DiggerItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Tier;
@@ -64,12 +61,12 @@ public abstract class ItemElectricTool extends DiggerItem implements IElectricIt
 
 	protected ItemElectricTool(Properties settings, int operationEnergyCost, Tier material, Collection<TagKey<Block>> effectiveBlocks)
 	{
-		this(settings, 2.0F, -3.0F, operationEnergyCost, material, effectiveBlocks);
+		this(settings, 2.0F, operationEnergyCost, material, effectiveBlocks);
 	}
 
-	private ItemElectricTool(Properties settings, float attackDamage, float attackSpeed, int operationEnergyCost, Tier material, Collection<TagKey<Block>> effectiveBlocks)
+	private ItemElectricTool(Properties settings, float attackDamage, int operationEnergyCost, Tier material, Collection<TagKey<Block>> effectiveBlocks)
 	{
-		super(attackDamage, attackSpeed, material, effectiveBlocks.isEmpty() ? Ic2BlockTags.EMPTY : effectiveBlocks.iterator().next(), settings);
+		super(attackDamage, (float) -3.0, material, effectiveBlocks.isEmpty() ? Ic2BlockTags.EMPTY : effectiveBlocks.iterator().next(), settings);
 		this.operationEnergyCost = operationEnergyCost;
 		this.effectiveBlocks = effectiveBlocks;
 	}

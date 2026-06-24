@@ -17,8 +17,8 @@ public class CannerEnrichRecipeWrapper
 
 	public CannerEnrichRecipeWrapper(MachineRecipe<ICannerEnrichRecipeManager.Input, Ic2FluidStack> recipe)
 	{
-		this.fluidInput = recipe.getInput().fluid;
-		this.additiveInputs = recipe.getInput().additive.getInputs();
+		this.fluidInput = recipe.getInput().fluid();
+		this.additiveInputs = recipe.getInput().additive().getInputs();
 		this.fluidOutput = recipe.getOutput();
 	}
 

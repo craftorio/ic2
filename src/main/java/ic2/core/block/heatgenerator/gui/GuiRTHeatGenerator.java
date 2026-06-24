@@ -16,13 +16,7 @@ public class GuiRTHeatGenerator extends Ic2Gui<ContainerRTHeatGenerator>
 	public GuiRTHeatGenerator(ContainerRTHeatGenerator container, Inventory playerInventory, Component title)
 	{
 		super(container, playerInventory, title);
-		this.addElement(TextLabel.create(this, 49, 66, 79, 13, TextProvider.of(new Supplier<String>()
-		{
-			public String get()
-			{
-				return container.base.gettransmitHeat() + " / " + container.base.getMaxHeatEmittedPerTick();
-			}
-		}), 5752026, false, 0, 0, true, true).withTooltip("ic2.RTHeatGenerator.gui.tooltipheat"));
+		this.addElement(TextLabel.create(this, 49, 66, 79, 13, TextProvider.of((Supplier<String>) () -> container.base.gettransmitHeat() + " / " + container.base.getMaxHeatEmittedPerTick()), 5752026, false, 0, 0, true, true).withTooltip("ic2.RTHeatGenerator.gui.tooltipheat"));
 	}
 
 	@Override

@@ -284,7 +284,7 @@ public class TileEntityEnergyOMat
 	}
 
 	@Override
-	public void writeScreenOpenData(Player player, InteractionHand hand, GrowingBuffer buffer) throws IOException
+	public void writeScreenOpenData(Player player, InteractionHand hand, GrowingBuffer buffer)
 	{
 		buffer.writeBoolean(this.permitsAccess(player.getGameProfile()));
 	}

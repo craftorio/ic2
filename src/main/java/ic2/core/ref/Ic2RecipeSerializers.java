@@ -27,7 +27,7 @@ public final class Ic2RecipeSerializers
 	public static final BasicMachineRecipeSerializer COMPRESSOR = register("compressor", new BasicMachineRecipeSerializer(Ic2RecipeTypes.COMPRESSOR, null));
 	public static final BasicMachineRecipeSerializer CENTRIFUGE = register("centrifuge", new BasicMachineRecipeSerializer(Ic2RecipeTypes.CENTRIFUGE, intMeta("minHeat")));
 	public static final BasicMachineRecipeSerializer BLOCK_CUTTER = register("block_cutter", new BasicMachineRecipeSerializer(Ic2RecipeTypes.BLOCK_CUTTER, intMeta("hardness")));
-	public static final BasicMachineRecipeSerializer BLAST_FURNACE = register("blast_furnace", new BasicMachineRecipeSerializer(Ic2RecipeTypes.BLAST_FURNACE, twoIntsMeta("fluid", "duration")));
+	public static final BasicMachineRecipeSerializer BLAST_FURNACE = register("blast_furnace", new BasicMachineRecipeSerializer(Ic2RecipeTypes.BLAST_FURNACE, twoIntsMeta()));
 	public static final BasicMachineRecipeSerializer METAL_FORMER_EXTRUDING = register("metal_former_extruding", new BasicMachineRecipeSerializer(Ic2RecipeTypes.METAL_FORMER_EXTRUDING, null));
 	public static final BasicMachineRecipeSerializer METAL_FORMER_CUTTING = register("metal_former_cutting", new BasicMachineRecipeSerializer(Ic2RecipeTypes.METAL_FORMER_CUTTING, null));
 	public static final BasicMachineRecipeSerializer METAL_FORMER_ROLLING = register("metal_former_rolling", new BasicMachineRecipeSerializer(Ic2RecipeTypes.METAL_FORMER_ROLLING, null));
@@ -57,15 +57,15 @@ public final class Ic2RecipeSerializers
 		};
 	}
 
-	private static Function<JsonObject, CompoundTag> twoIntsMeta(String name1, String name2)
+	private static Function<JsonObject, CompoundTag> twoIntsMeta()
 	{
 		return json ->
 		{
-			int metaValue1 = GsonHelper.getAsInt(json, name1);
-			int metaValue2 = GsonHelper.getAsInt(json, name2);
+			int metaValue1 = GsonHelper.getAsInt(json, "fluid");
+			int metaValue2 = GsonHelper.getAsInt(json, "duration");
 			CompoundTag nbt = new CompoundTag();
-			nbt.putInt(name1, metaValue1);
-			nbt.putInt(name2, metaValue2);
+			nbt.putInt("fluid", metaValue1);
+			nbt.putInt("duration", metaValue2);
 			return nbt;
 		};
 	}

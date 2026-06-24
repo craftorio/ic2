@@ -9,5 +9,5 @@ public enum Ic2ItemGroupType
 	TOOLS_AND_UTILITIES,
 	COMBAT,
 	MATERIALS,
-	FARMING;
+	FARMING
 }

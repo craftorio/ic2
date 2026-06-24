@@ -149,7 +149,7 @@ public final class ScrapboxRecipeManager implements IScrapboxManager
 		{
 			if (adjustInput)
 			{
-				input.setCount(StackUtil.getSize(result.getAdjustedInput()));
+				input.setCount(StackUtil.getSize(result.adjustedInput()));
 			}
 
 			return result.getOutput().iterator().next();

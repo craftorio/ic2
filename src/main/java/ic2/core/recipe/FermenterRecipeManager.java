@@ -40,7 +40,7 @@ public class FermenterRecipeManager implements IFermenterRecipeManager
 			return null;
 		} else
 		{
-			return fp.output == null ? null : Ic2FluidStack.create(fp.output, fp.outputAmount);
+			return fp.output() == null ? null : Ic2FluidStack.create(fp.output(), fp.outputAmount());
 		}
 	}
 

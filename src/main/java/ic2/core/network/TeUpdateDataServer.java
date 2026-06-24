@@ -36,12 +36,7 @@ public class TeUpdateDataServer
 	{
 		if (!this.globalFields.contains(name))
 		{
-			Set<String> playerFields = this.playerFieldMap.get(player);
-			if (playerFields == null)
-			{
-				playerFields = new HashSet<>();
-				this.playerFieldMap.put(player, playerFields);
-			}
+			Set<String> playerFields = this.playerFieldMap.computeIfAbsent(player, k -> new HashSet<>());
 
 			playerFields.add(name);
 		}

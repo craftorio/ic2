@@ -66,11 +66,11 @@ public class SmeltingRecipeManager implements IMachineRecipeManager<ItemStack, I
 				return null;
 			}
 
-			MachineRecipe<ItemStack, ItemStack> result = normal.getRecipe();
+			MachineRecipe<ItemStack, ItemStack> result = normal.recipe();
 			IRecipeInput resultIn = Recipes.inputFactory.forStack(result.getInput());
 			Collection<ItemStack> resultOut = Collections.singletonList(result.getOutput());
 			CompoundTag resultNBT = result.getMetaData();
-			return new MachineRecipe<>(resultIn, resultOut, resultNBT).getResult(normal.getAdjustedInput());
+			return new MachineRecipe<>(resultIn, resultOut, resultNBT).getResult(normal.adjustedInput());
 		}
 
 		@Override

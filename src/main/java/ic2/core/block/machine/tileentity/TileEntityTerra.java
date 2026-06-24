@@ -171,13 +171,10 @@ public class TileEntityTerra extends TileEntityElectricMachine
 				return InteractionResult.SUCCESS;
 			}
 
-			ItemStack stack = StackUtil.consumeAndGet(player, hand, new Predicate<ItemStack>()
+			ItemStack stack = StackUtil.consumeAndGet(player, hand, (Predicate<ItemStack>) input ->
 			{
-				public boolean apply(ItemStack input)
-				{
-					Item item = input.getItem();
-					return item instanceof ITerraformingBP && ((ITerraformingBP) item).canInsert(input, player, world, TileEntityTerra.this.worldPosition);
-				}
+				Item item = input.getItem();
+				return item instanceof ITerraformingBP && ((ITerraformingBP) item).canInsert(input, player, world, TileEntityTerra.this.worldPosition);
 			}, 1);
 			if (!StackUtil.isEmpty(stack))
 			{

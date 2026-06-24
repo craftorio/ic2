@@ -44,9 +44,9 @@ public class CannerBottleRecipeManager implements ICannerBottleRecipeManager
 		{
 			MachineRecipe<ICannerBottleRecipeManager.Input, ItemStack> recipe = it.next();
 
-			for (ItemStack containerStack : input.container.getInputs())
+			for (ItemStack containerStack : input.container().getInputs())
 			{
-				for (ItemStack fillStack : input.fill.getInputs())
+				for (ItemStack fillStack : input.fill().getInputs())
 				{
 					if (recipe.getInput().matches(containerStack, fillStack))
 					{
@@ -56,15 +56,15 @@ public class CannerBottleRecipeManager implements ICannerBottleRecipeManager
 								.warn(
 									LogCategory.Recipe,
 									"ambiguous recipe: ["
-										+ input.container.getInputs()
+										+ input.container().getInputs()
 										+ "+"
-										+ input.fill.getInputs()
+										+ input.fill().getInputs()
 										+ " -> "
 										+ output
 										+ "], conflicts with ["
-										+ recipe.getInput().container.getInputs()
+										+ recipe.getInput().container().getInputs()
 										+ "+"
-										+ recipe.getInput().fill.getInputs()
+										+ recipe.getInput().fill().getInputs()
 										+ " -> "
 										+ recipe.getOutput()
 										+ "]"
@@ -102,13 +102,13 @@ public class CannerBottleRecipeManager implements ICannerBottleRecipeManager
 			ICannerBottleRecipeManager.Input recipeInput = recipe.getInput();
 			if (acceptTest && StackUtil.isEmpty(container))
 			{
-				if (recipeInput.fill.matches(fill))
+				if (recipeInput.fill().matches(fill))
 				{
 					return new RecipeOutput(null, recipe.getOutput());
 				}
 			} else if (acceptTest && StackUtil.isEmpty(fill))
 			{
-				if (recipeInput.container.matches(container))
+				if (recipeInput.container().matches(container))
 				{
 					return new RecipeOutput(null, recipe.getOutput());
 				}
@@ -117,8 +117,8 @@ public class CannerBottleRecipeManager implements ICannerBottleRecipeManager
 				if (!acceptTest
 					&& (
 					StackUtil.isEmpty(container)
-						|| StackUtil.getSize(container) < recipeInput.container.getAmount()
-						|| StackUtil.getSize(fill) < recipeInput.fill.getAmount()
+						|| StackUtil.getSize(container) < recipeInput.container().getAmount()
+						|| StackUtil.getSize(fill) < recipeInput.fill().getAmount()
 				))
 				{
 					break;
@@ -128,10 +128,10 @@ public class CannerBottleRecipeManager implements ICannerBottleRecipeManager
 				{
 					if (!StackUtil.isEmpty(container))
 					{
-						container.shrink(recipeInput.container.getAmount());
+						container.shrink(recipeInput.container().getAmount());
 					}
 
-					fill.shrink(recipeInput.fill.getAmount());
+					fill.shrink(recipeInput.fill().getAmount());
 				}
 
 				new RecipeOutput(null, recipe.getOutput());
@@ -146,8 +146,8 @@ public class CannerBottleRecipeManager implements ICannerBottleRecipeManager
 		ICannerBottleRecipeManager.RawInput input, boolean acceptTest
 	)
 	{
-		boolean emptyContainer = StackUtil.isEmpty(input.container);
-		boolean emptyFill = StackUtil.isEmpty(input.fill);
+		boolean emptyContainer = StackUtil.isEmpty(input.container());
+		boolean emptyFill = StackUtil.isEmpty(input.fill());
 		if (acceptTest || !emptyContainer && !emptyFill)
 		{
 			if (acceptTest && emptyContainer && emptyFill)
@@ -159,14 +159,14 @@ public class CannerBottleRecipeManager implements ICannerBottleRecipeManager
 			{
 				if ((
 					emptyContainer
-						|| recipe.getInput().container.matches(input.container) && recipe.getInput().container.getAmount() <= StackUtil.getSize(input.container)
+						|| recipe.getInput().container().matches(input.container()) && recipe.getInput().container().getAmount() <= StackUtil.getSize(input.container())
 				)
-					&& (emptyFill || recipe.getInput().fill.matches(input.fill) && recipe.getInput().fill.getAmount() <= StackUtil.getSize(input.fill)))
+					&& (emptyFill || recipe.getInput().fill().matches(input.fill()) && recipe.getInput().fill().getAmount() <= StackUtil.getSize(input.fill())))
 				{
 					return recipe.getResult(
 						new ICannerBottleRecipeManager.RawInput(
-							emptyContainer ? StackUtil.emptyStack : StackUtil.copyShrunk(input.container, recipe.getInput().container.getAmount()),
-							emptyFill ? StackUtil.emptyStack : StackUtil.copyShrunk(input.fill, recipe.getInput().fill.getAmount())
+							emptyContainer ? StackUtil.emptyStack : StackUtil.copyShrunk(input.container(), recipe.getInput().container().getAmount()),
+							emptyFill ? StackUtil.emptyStack : StackUtil.copyShrunk(input.fill(), recipe.getInput().fill().getAmount())
 						)
 					);
 				}

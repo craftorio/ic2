@@ -227,7 +227,7 @@ public class TileEntityTradeOMat
 		super.onLoaded();
 		if (this.level == null)
 		{
-			IC2.log.error(LogCategory.Block, "World object is null while trade-o-mat block entity at: \"" + this.worldPosition.toString() + "\" is loaded");
+			IC2.log.error(LogCategory.Block, "World object is null while trade-o-mat block entity at: \"" + this.worldPosition + "\" is loaded");
 		} else
 		{
 			if (!this.level.isClientSide)
@@ -248,7 +248,7 @@ public class TileEntityTradeOMat
 		{
 			if (this.level == null)
 			{
-				IC2.log.error(LogCategory.Block, "World object is null while trade-o-mat block entity at: \"" + this.worldPosition.toString() + "\" is activated");
+				IC2.log.error(LogCategory.Block, "World object is null while trade-o-mat block entity at: \"" + this.worldPosition + "\" is activated");
 			}
 
 			if (!this.level.isClientSide)
@@ -281,7 +281,7 @@ public class TileEntityTradeOMat
 		super.onUnloaded();
 		if (this.level == null)
 		{
-			IC2.log.error(LogCategory.Block, "World object is null while trade-o-mat block entity at: \"" + this.worldPosition.toString() + "\" is unloaded");
+			IC2.log.error(LogCategory.Block, "World object is null while trade-o-mat block entity at: \"" + this.worldPosition + "\" is unloaded");
 		}
 
 		if (!this.level.isClientSide && this.isWireless())
@@ -347,7 +347,7 @@ public class TileEntityTradeOMat
 	}
 
 	@Override
-	public void writeScreenOpenData(Player player, InteractionHand hand, GrowingBuffer buffer) throws IOException
+	public void writeScreenOpenData(Player player, InteractionHand hand, GrowingBuffer buffer)
 	{
 		boolean open = this.permitsAccess(player.getGameProfile());
 		buffer.writeBoolean(open);

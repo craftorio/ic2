@@ -7,7 +7,6 @@ import ic2.api.recipe.Recipes;
 import ic2.api.upgrade.IUpgradableBlock;
 import ic2.api.upgrade.UpgradableProperty;
 import ic2.core.ContainerBase;
-import ic2.core.IC2;
 import ic2.core.IHasGui;
 import ic2.core.block.comp.Fluids;
 import ic2.core.block.comp.Redstone;
@@ -77,14 +76,14 @@ public class TileEntityBlastFurnace extends TileEntityInventory implements IUpgr
 		if (result != null && this.isHot())
 		{
 			this.setActive(true);
-			if (result.getRecipe().getMetaData().getInt("fluid") <= this.fluidTank.getFluidAmount())
+			if (result.recipe().getMetaData().getInt("fluid") <= this.fluidTank.getFluidAmount())
 			{
 				this.progress++;
-				this.fluidTank.drainMbUnchecked(result.getRecipe().getMetaData().getInt("fluid"), false);
+				this.fluidTank.drainMbUnchecked(result.recipe().getMetaData().getInt("fluid"), false);
 			}
 
-			this.progressNeeded = result.getRecipe().getMetaData().getInt("duration");
-			if (this.progress >= result.getRecipe().getMetaData().getInt("duration"))
+			this.progressNeeded = result.recipe().getMetaData().getInt("duration");
+			if (this.progress >= result.recipe().getMetaData().getInt("duration"))
 			{
 				this.operateOnce(result, result.getOutput());
 				needsInvUpdate = true;
@@ -128,7 +127,7 @@ public class TileEntityBlastFurnace extends TileEntityInventory implements IUpgr
 		} else
 		{
 			MachineRecipeResult<IRecipeInput, Collection<ItemStack>, ItemStack> output = this.inputSlot.process();
-			if (output != null && output.getRecipe().getMetaData() != null)
+			if (output != null && output.recipe().getMetaData() != null)
 			{
 				return this.outputSlot.canAdd(output.getOutput()) ? output : null;
 			} else

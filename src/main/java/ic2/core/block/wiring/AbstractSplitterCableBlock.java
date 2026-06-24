@@ -5,7 +5,6 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.Property;
@@ -14,9 +13,9 @@ public abstract class AbstractSplitterCableBlock extends AbstractCableBlock
 {
 	public static final BooleanProperty active = BooleanProperty.create("active");
 
-	protected AbstractSplitterCableBlock(Properties settings, CableType type, int insulation)
+	protected AbstractSplitterCableBlock(Properties settings)
 	{
-		super(settings, type, insulation);
+		super(settings, CableType.splitter, 0);
 		this.registerDefaultState((BlockState) this.defaultBlockState().setValue(active, false));
 	}
 

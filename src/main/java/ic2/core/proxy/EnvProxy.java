@@ -153,7 +153,7 @@ public interface EnvProxy
 		OVERWORLD,
 		SWAMP,
 		JUNGLE,
-		FOREST;
+		FOREST
 	}
 
 	enum BiomeType
@@ -191,7 +191,7 @@ public interface EnvProxy
 		SWAMP,
 		VOID,
 		WASTELAND,
-		WATER;
+		WATER
 	}
 
 	interface ExtendedClientScreenHandlerFactory<T>

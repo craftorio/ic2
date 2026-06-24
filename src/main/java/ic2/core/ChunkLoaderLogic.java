@@ -39,14 +39,12 @@ public final class ChunkLoaderLogic
 
 		ChunkLoaderLogic.SavedState state = (ChunkLoaderLogic.SavedState) world.getDataStorage()
 			.computeIfAbsent(ChunkLoaderLogic.SavedState::new, ChunkLoaderLogic.SavedState::new, savedStateId);
-		((Set) state.chunksToChunkLoaders.computeIfAbsent(loaderChunk, ignore -> new ObjectOpenHashSet(1))).add(pos);
+		((Set) state.chunksToChunkLoaders.computeIfAbsent(loaderChunk, ignore -> new ObjectOpenHashSet<>(1))).add(pos);
 		WorldData worldData = WorldData.get(world);
-		LongIterator var7 = chunks.iterator();
 
-		while (var7.hasNext())
+		for (long chunk : chunks)
 		{
-			long chunk = (Long) var7.next();
-			Set<BlockPos> loaders = (Set<BlockPos>) worldData.loadedChunks.computeIfAbsent(chunk, ignore -> new ObjectOpenHashSet(1));
+			Set<BlockPos> loaders = (Set<BlockPos>) worldData.loadedChunks.computeIfAbsent(chunk, ignore -> new ObjectOpenHashSet<>(1));
 			if (loaders.isEmpty())
 			{
 				addChunkTicket(world, new ChunkPos(chunk));
@@ -83,11 +81,9 @@ public final class ChunkLoaderLogic
 		LongSet positions = (LongSet) worldData.chunkLoaders.remove(pos);
 		if (positions != null)
 		{
-			LongIterator var4 = positions.iterator();
 
-			while (var4.hasNext())
+			for (long chunkPos : positions)
 			{
-				long chunkPos = (Long) var4.next();
 				Set<BlockPos> loaders = (Set<BlockPos>) worldData.loadedChunks.get(chunkPos);
 				if (loaders != null && loaders.remove(pos) && loaders.isEmpty())
 				{
@@ -138,7 +134,7 @@ public final class ChunkLoaderLogic
 				long chunk = (Long) it.next();
 				if (prev.add(chunk))
 				{
-					Set<BlockPos> loaders = (Set<BlockPos>) worldData.loadedChunks.computeIfAbsent(chunk, ignore -> new ObjectOpenHashSet());
+					Set<BlockPos> loaders = (Set<BlockPos>) worldData.loadedChunks.computeIfAbsent(chunk, ignore -> new ObjectOpenHashSet<>());
 					if (loaders.isEmpty())
 					{
 						addChunkTicket(world, new ChunkPos(chunk));
@@ -156,14 +152,12 @@ public final class ChunkLoaderLogic
 		if (state != null && !state.chunksToChunkLoaders.isEmpty())
 		{
 			WorldData worldData = WorldData.get(world);
-			ObjectIterator var3 = state.chunksToChunkLoaders.long2ObjectEntrySet().iterator();
 
-			while (var3.hasNext())
+			for (Entry<Set<BlockPos>> entry : state.chunksToChunkLoaders.long2ObjectEntrySet())
 			{
-				Entry<Set<BlockPos>> entry = (Entry<Set<BlockPos>>) var3.next();
 				long chunkPos = entry.getLongKey();
 				Set<BlockPos> loaders = (Set<BlockPos>) entry.getValue();
-				worldData.loadedChunks.put(chunkPos, new ObjectOpenHashSet(loaders));
+				worldData.loadedChunks.put(chunkPos, new ObjectOpenHashSet<>(loaders));
 
 				for (BlockPos pos : loaders)
 				{
@@ -209,7 +203,7 @@ public final class ChunkLoaderLogic
 
 	private static final class SavedState extends SavedData
 	{
-		final Long2ObjectMap<Set<BlockPos>> chunksToChunkLoaders = new Long2ObjectOpenHashMap();
+		final Long2ObjectMap<Set<BlockPos>> chunksToChunkLoaders = new Long2ObjectOpenHashMap<>();
 
 		SavedState()
 		{
@@ -223,7 +217,7 @@ public final class ChunkLoaderLogic
 			{
 				CompoundTag contentTag = loaders.getCompound(i);
 				BlockPos pos = new BlockPos(contentTag.getInt("x"), contentTag.getInt("y"), contentTag.getInt("z"));
-				((Set) this.chunksToChunkLoaders.computeIfAbsent(ChunkPos.asLong(pos), ignore -> new ObjectOpenHashSet(1))).add(pos);
+				((Set) this.chunksToChunkLoaders.computeIfAbsent(ChunkPos.asLong(pos), ignore -> new ObjectOpenHashSet<>(1))).add(pos);
 			}
 		}
 
@@ -231,12 +225,9 @@ public final class ChunkLoaderLogic
 		{
 			ListTag loaders = new ListTag();
 			nbt.put("loaders", loaders);
-			ObjectIterator var3 = this.chunksToChunkLoaders.values().iterator();
 
-			while (var3.hasNext())
+			for (Set<BlockPos> positions : this.chunksToChunkLoaders.values())
 			{
-				Set<BlockPos> positions = (Set<BlockPos>) var3.next();
-
 				for (BlockPos pos : positions)
 				{
 					CompoundTag contentTag = new CompoundTag();

@@ -11,5 +11,5 @@ public enum UpgradableProperty
 	ItemProducing,
 	FluidConsuming,
 	FluidProducing,
-	RemotelyAccessible;
+	RemotelyAccessible
 }

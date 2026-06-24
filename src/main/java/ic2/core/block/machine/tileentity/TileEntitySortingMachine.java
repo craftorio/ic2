@@ -188,9 +188,7 @@ public class TileEntitySortingMachine extends TileEntityElectricMachine implemen
 									stack = StackUtil.decSize(stack, amountx);
 									this.buffer.put(index, stack);
 									this.energy.useEnergy(20.0);
-									if (StackUtil.isEmpty(stack))
-									{
-									}
+									StackUtil.isEmpty(stack);
 								}
 								continue label87;
 							}

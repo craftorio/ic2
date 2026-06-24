@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
@@ -53,7 +52,7 @@ public class RecipeIo
 			JsonObject object = json.getAsJsonObject();
 			if (object.has("fluid"))
 			{
-				return new RecipeInputFluidContainer(asFluid(object.get("fluid"), "fluid"), GsonHelper.getAsInt(object, "amount"));
+				return new RecipeInputFluidContainer(asFluid(object.get("fluid")), GsonHelper.getAsInt(object, "amount"));
 			}
 
 			if (object.has("data"))
@@ -93,7 +92,7 @@ public class RecipeIo
 
 	public static Ic2FluidStack parseFluidStack(JsonObject json)
 	{
-		Fluid fluid = asFluid(json.get("fluid"), "fluid");
+		Fluid fluid = asFluid(json.get("fluid"));
 		int amountMb = GsonHelper.getAsInt(json, "amount");
 		return FluidHandler.createFluidStackMb(fluid, amountMb, null);
 	}
@@ -148,7 +147,7 @@ public class RecipeIo
 	{
 		Item item = GsonHelper.getAsItem(json, "item");
 		int count = GsonHelper.getAsInt(json, "count", 1);
-		CompoundTag nbt = getNbt(json, "nbt", null);
+		CompoundTag nbt = getNbt(json);
 		ItemStack stack = new ItemStack(item, count);
 		stack.setTag(nbt);
 		return stack;
@@ -159,7 +158,7 @@ public class RecipeIo
 		Item item = GsonHelper.getAsItem(json, "item");
 		int count = GsonHelper.getAsInt(json, "count", 1);
 		int weight = GsonHelper.getAsInt(json, "weight", 1);
-		CompoundTag nbt = getNbt(json, "nbt", null);
+		CompoundTag nbt = getNbt(json);
 		ItemStack stack = new ItemStack(item, count);
 		stack.setTag(nbt);
 		randomOutput.addOutput(stack, weight);
@@ -321,7 +320,7 @@ public class RecipeIo
 		return FluidHandler.createFluidStackMb(BuiltInRegistries.FLUID.byId(buf.readVarInt()), buf.readVarInt(), null);
 	}
 
-	private static Fluid asFluid(JsonElement element, String name)
+	private static Fluid asFluid(JsonElement element)
 	{
 		if (element.isJsonPrimitive())
 		{
@@ -329,10 +328,10 @@ public class RecipeIo
 			return BuiltInRegistries.FLUID
 				// TODO
 				.getOptional(ResourceLocation.parse(string))
-				.orElseThrow(() -> new JsonSyntaxException("Expected " + name + " to be an fluid, was unknown string '" + string + "'"));
+				.orElseThrow(() -> new JsonSyntaxException("Expected " + "fluid" + " to be an fluid, was unknown string '" + string + "'"));
 		} else
 		{
-			throw new JsonSyntaxException("Expected " + name + " to be an fluid, was " + GsonHelper.getType(element));
+			throw new JsonSyntaxException("Expected " + "fluid" + " to be an fluid, was " + GsonHelper.getType(element));
 		}
 	}
 
@@ -350,8 +349,8 @@ public class RecipeIo
 
 	@Nullable
 	@Contract("_,_,!null->!null;_,_,null->_")
-	private static CompoundTag getNbt(JsonObject object, String key, @Nullable CompoundTag defaultNbt)
+	private static CompoundTag getNbt(JsonObject object)
 	{
-		return object.has(key) ? asNbt(object.get(key), key) : defaultNbt;
+		return object.has("nbt") ? asNbt(object.get("nbt"), "nbt") : null;
 	}
 }

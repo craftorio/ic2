@@ -133,9 +133,8 @@ public class ItemReactorHeatSwitch extends ItemReactorHeatStorage
 	private void checkHeatAcceptor(IReactor reactor, int x, int y, ArrayList<ItemReactorHeatSwitch.ItemStackCoord> heatAcceptors)
 	{
 		ItemStack stack = reactor.getItemAt(x, y);
-		if (stack != null && stack.getItem() instanceof IReactorComponent)
+		if (stack != null && stack.getItem() instanceof IReactorComponent comp)
 		{
-			IReactorComponent comp = (IReactorComponent) stack.getItem();
 			if (comp.canStoreHeat(stack, reactor, x, y))
 			{
 				heatAcceptors.add(new ItemStackCoord(stack, x, y));

@@ -52,11 +52,11 @@ public class TileEntityBlockCutter extends TileEntityStandardMachine<IRecipeInpu
 			}
 
 			MachineRecipeResult<IRecipeInput, Collection<ItemStack>, ItemStack> ret = super.getRecipeResult();
-			if (ret != null && ret.getRecipe().getMetaData() != null)
+			if (ret != null && ret.recipe().getMetaData() != null)
 			{
 				ItemStack bladeStack = this.cutterSlot.get();
 				IBlockCuttingBlade blade = (IBlockCuttingBlade) bladeStack.getItem();
-				if (ret.getRecipe().getMetaData().getInt("hardness") > blade.getHardness(bladeStack))
+				if (ret.recipe().getMetaData().getInt("hardness") > blade.getHardness(bladeStack))
 				{
 					if (!this.bladeTooWeak)
 					{

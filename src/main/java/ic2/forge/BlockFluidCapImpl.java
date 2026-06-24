@@ -70,7 +70,7 @@ final class BlockFluidCapImpl implements ICapabilityProvider
 
 			for (FluidTankInfo info : infos)
 			{
-				if (((info.getDrainSideMask() | info.getFillSideMask()) & sideMaskReq) != 0)
+				if (((info.drainSideMask() | info.fillSideMask()) & sideMaskReq) != 0)
 				{
 					ret++;
 				}
@@ -91,7 +91,7 @@ final class BlockFluidCapImpl implements ICapabilityProvider
 
 			for (FluidTankInfo info : infos)
 			{
-				if (((info.getDrainSideMask() | info.getFillSideMask()) & sideMaskReq) != 0 && tank-- == 0)
+				if (((info.drainSideMask() | info.fillSideMask()) & sideMaskReq) != 0 && tank-- == 0)
 				{
 					return info;
 				}
@@ -104,21 +104,21 @@ final class BlockFluidCapImpl implements ICapabilityProvider
 		public int getTankCapacity(int tank)
 		{
 			FluidTankInfo info = this.getTankInfo(tank);
-			return info != null ? info.getCapacity() : 0;
+			return info != null ? info.capacity() : 0;
 		}
 
 		@Override
 		public FluidStack getFluidInTank(int tank)
 		{
 			FluidTankInfo info = this.getTankInfo(tank);
-			return info != null ? EnvFluidHandlerForge.getForgeFs(info.getContent()) : FluidStack.EMPTY;
+			return info != null ? EnvFluidHandlerForge.getForgeFs(info.content()) : FluidStack.EMPTY;
 		}
 
 		@Override
 		public boolean isFluidValid(int tank, FluidStack fs)
 		{
 			FluidTankInfo info = this.getTankInfo(tank);
-			return info != null && info.getCapacity() > 0;
+			return info != null && info.capacity() > 0;
 		}
 
 		@Override

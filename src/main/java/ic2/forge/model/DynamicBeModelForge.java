@@ -48,9 +48,9 @@ final class DynamicBeModelForge extends DynamicBeModel<List<List<BakedQuad>>> im
 
 	private static List<BakedQuad> getObscuredQuads(Obscuration.ObscurationData data, Direction targetFace)
 	{
-		BakedModel refModel = Minecraft.getInstance().getBlockRenderer().getBlockModelShaper().getBlockModel(data.state);
+		BakedModel refModel = Minecraft.getInstance().getBlockRenderer().getBlockModelShaper().getBlockModel(data.state());
 		RandomSource rand = RandomSource.create(42L);
-		List<BakedQuad> refQuads = refModel.getQuads(data.state, data.side, rand, ModelData.EMPTY, null);
+		List<BakedQuad> refQuads = refModel.getQuads(data.state(), data.side(), rand, ModelData.EMPTY, null);
 
 		if (refQuads.isEmpty())
 		{
@@ -63,14 +63,14 @@ final class DynamicBeModelForge extends DynamicBeModel<List<List<BakedQuad>>> im
 		{
 			BakedQuad quad = refQuads.get(i);
 
-			if (data.side != targetFace)
+			if (data.side() != targetFace)
 			{
-				quad = transformQuadFace(quad, data.side, targetFace);
+				quad = transformQuadFace(quad, data.side(), targetFace);
 			}
 
-			if (data.colorMultipliers != null && i < data.colorMultipliers.length && data.colorMultipliers[i] != -1)
+			if (data.colorMultipliers() != null && i < data.colorMultipliers().length && data.colorMultipliers()[i] != -1)
 			{
-				quad = tintQuad(quad, data.colorMultipliers[i]);
+				quad = tintQuad(quad, data.colorMultipliers()[i]);
 			}
 
 			result.add(quad);

@@ -367,11 +367,8 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 	public void removed()
 	{
 		super.removed();
-		if (this.fixKeyEvents)
-		{
-			// TODO: In 1.20.1, keyboardHandler.setSendRepeatsToGui was removed.
-			// this.minecraft.keyboardHandler.setSendRepeatsToGui(false);
-		}
+		// TODO: In 1.20.1, keyboardHandler.setSendRepeatsToGui was removed.
+		// this.minecraft.keyboardHandler.setSendRepeatsToGui(false);
 
 		if (closeHandler != null)
 		{
@@ -674,17 +671,10 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 	{
 		if (this.menu.base instanceof BlockEntity)
 		{
-			return new IClickHandler()
-			{
-				@Override
-				public void onClick(MouseButton button)
-				{
-					IC2.network.get(false).initiateClientTileEntityEvent((BlockEntity) Ic2Gui.this.menu.base, event);
-				}
-			};
+			return button -> IC2.network.get(false).initiateClientTileEntityEvent((BlockEntity) Ic2Gui.this.menu.base, event);
 		} else
 		{
-			throw new IllegalArgumentException("not applicable for " + ((ContainerBase) this.menu).base);
+			throw new IllegalArgumentException("not applicable for " + ((ContainerBase<?>) this.menu).base);
 		}
 	}
 

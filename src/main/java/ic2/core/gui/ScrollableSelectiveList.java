@@ -47,27 +47,30 @@ public class ScrollableSelectiveList extends AbstractScrollingList<ScrollableSel
 
 	protected boolean onItemClick(ScrollableSelectiveList.ISelectableListItem item, MouseButton button, int mouseX, int mouseY)
 	{
-		switch (button)
+		return switch (button)
 		{
-			case left:
+			case left ->
+			{
 				if (this.currentSelected != item)
 				{
 					this.setSelected(item);
-					return true;
+					yield true;
 				}
 
-				return false;
-			case right:
+				yield false;
+			}
+			case right ->
+			{
 				if (this.currentSelected == item)
 				{
 					item.onDeselected();
-					return true;
+					yield true;
 				}
 
-				return false;
-			default:
-				return false;
-		}
+				yield false;
+			}
+			default -> false;
+		};
 	}
 
 	public interface ISelectableListItem extends AbstractScrollingList.IListItem

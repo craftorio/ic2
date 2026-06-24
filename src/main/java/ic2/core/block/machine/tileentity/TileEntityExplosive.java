@@ -79,9 +79,8 @@ public abstract class TileEntityExplosive extends TileEntityInventory implements
 	@Override
 	protected void onEntityCollision(Entity entity)
 	{
-		if (!this.getLevel().isClientSide && entity instanceof Projectile && entity.isOnFire())
+		if (!this.getLevel().isClientSide && entity instanceof Projectile arrow && entity.isOnFire())
 		{
-			Projectile arrow = (Projectile) entity;
 			Entity owner = arrow.getOwner();
 			this.explode(owner instanceof LivingEntity ? (LivingEntity) owner : null, false);
 		}

@@ -34,16 +34,16 @@ public class ItemToolWrenchElectric extends ItemElectricTool implements Priority
 		}
 
 		int useResult = ItemToolWrench.onWrenchUse(player, context, this.canTakeDamage(stack, 10.0));
-		switch (useResult)
+		return switch (useResult)
 		{
-			case -2:
-				return InteractionResult.PASS;
-			case -1:
-				return InteractionResult.FAIL;
-			default:
+			case -2 -> InteractionResult.PASS;
+			case -1 -> InteractionResult.FAIL;
+			default ->
+			{
 				this.consumeEnergy(stack, useResult, player);
-				return InteractionResult.SUCCESS;
-		}
+				yield InteractionResult.SUCCESS;
+			}
+		};
 	}
 
 	public boolean canTakeDamage(ItemStack stack, double amount)

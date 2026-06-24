@@ -16,5 +16,5 @@ public enum LogCategory
 	SubModule,
 	Transport,
 	Uu,
-	WorldGen;
+	WorldGen
 }

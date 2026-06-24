@@ -74,9 +74,8 @@ public class TileEntityCropHarvester extends TileEntityElectricMachine implement
 		this.energy.useEnergy(1.0);
 		Level world = this.getLevel();
 		BlockEntity tileEntity = world.getBlockEntity(this.worldPosition.offset(this.scanX, this.scanY, this.scanZ));
-		if (tileEntity instanceof TileEntityCrop && !this.isInvFull())
+		if (tileEntity instanceof TileEntityCrop crop && !this.isInvFull())
 		{
-			TileEntityCrop crop = (TileEntityCrop) tileEntity;
 			if (crop.getCrop() != null)
 			{
 				List<ItemStack> drops = null;

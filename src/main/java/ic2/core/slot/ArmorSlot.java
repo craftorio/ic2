@@ -10,7 +10,7 @@ import net.minecraft.world.entity.EquipmentSlot.Type;
 public class ArmorSlot
 {
 	private static final EquipmentSlot[] armorSlots = getArmorSlots();
-	private static final List<EquipmentSlot> armorSlotList = Collections.unmodifiableList(Arrays.asList(armorSlots));
+	private static final List<EquipmentSlot> armorSlotList = List.of(armorSlots);
 
 	public static EquipmentSlot get(int index)
 	{

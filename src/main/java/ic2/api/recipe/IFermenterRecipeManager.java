@@ -16,24 +16,12 @@ public interface IFermenterRecipeManager extends ILiquidAcceptManager
 
 	Map<Fluid, IFermenterRecipeManager.FermentationProperty> getRecipeMap();
 
-	final class FermentationProperty
-	{
-		public final int inputAmount;
-		public final int heat;
-		public final Fluid output;
-		public final int outputAmount;
-
-		public FermentationProperty(int inputAmount, int heat, Fluid output, int outputAmount)
+	record FermentationProperty(int inputAmount, int heat, Fluid output, int outputAmount)
 		{
-			this.inputAmount = inputAmount;
-			this.heat = heat;
-			this.output = output;
-			this.outputAmount = outputAmount;
-		}
 
-		public Ic2FluidStack getOutput()
-		{
-			return this.output == null ? null : Ic2FluidStack.create(this.output, this.outputAmount);
+			public Ic2FluidStack getOutput()
+			{
+				return this.output == null ? null : Ic2FluidStack.create(this.output, this.outputAmount);
+			}
 		}
-	}
 }

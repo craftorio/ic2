@@ -60,19 +60,15 @@ public class FluidReactorLookup extends TileEntityComponent
 			}
 
 			this.reactor = null;
-			WorldUtil.findTileEntities(world, pos, 2, new WorldUtil.ITileEntityResultHandler()
+			WorldUtil.findTileEntities(world, pos, 2, te ->
 			{
-				@Override
-				public boolean onMatch(BlockEntity te)
+				if (te instanceof TileEntityNuclearReactorElectric cReactor && cReactor.isFluidCooled())
 				{
-					if (te instanceof TileEntityNuclearReactorElectric cReactor && cReactor.isFluidCooled())
-					{
-						FluidReactorLookup.this.reactor = cReactor;
-						return true;
-					} else
-					{
-						return false;
-					}
+					FluidReactorLookup.this.reactor = cReactor;
+					return true;
+				} else
+				{
+					return false;
 				}
 			});
 		}

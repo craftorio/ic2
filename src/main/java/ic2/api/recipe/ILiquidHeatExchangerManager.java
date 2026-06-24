@@ -14,15 +14,7 @@ public interface ILiquidHeatExchangerManager extends ILiquidAcceptManager
 
 	ILiquidAcceptManager getSingleDirectionLiquidManager();
 
-	class HeatExchangeProperty
-	{
-		public final Fluid outputFluid;
-		public final int huPerMB;
-
-		public HeatExchangeProperty(Fluid outputFluid, int huPerMB)
+	record HeatExchangeProperty(Fluid outputFluid, int huPerMB)
 		{
-			this.outputFluid = outputFluid;
-			this.huPerMB = huPerMB;
 		}
-	}
 }

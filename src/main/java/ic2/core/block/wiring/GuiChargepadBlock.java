@@ -25,34 +25,10 @@ public class GuiChargepadBlock extends Ic2Gui<ContainerChargepadBlock>
 	{
 		super(container, playerInventory, title, 161);
 		this.addElement(EnergyGauge.asBar(this, 79, 38, container.base));
-		this.addElement(new VanillaButton(this, 152, 4, 20, 20, this.createEventSender(0)).withIcon(new Supplier<ItemStack>()
-		{
-			public ItemStack get()
-			{
-				return new ItemStack(Items.REDSTONE);
-			}
-		}).withTooltip(new Supplier<String>()
-		{
-			public String get()
-			{
-				return container.base.getRedstoneMode();
-			}
-		}));
+		this.addElement(new VanillaButton(this, 152, 4, 20, 20, this.createEventSender(0)).withIcon((Supplier<ItemStack>) () -> new ItemStack(Items.REDSTONE)).withTooltip((Supplier<String>) () -> container.base.getRedstoneMode()));
 		this.addElement(TextLabel.create(this, 79, 25, TextProvider.ofTranslated("ic2.EUStorage.gui.info.level"), 4210752, false));
-		this.addElement(TextLabel.create(this, 110, 35, TextProvider.of(new Supplier<String>()
-		{
-			public String get()
-			{
-				return " " + (int) Math.min(container.base.energy.getEnergy(), container.base.energy.getCapacity());
-			}
-		}), 4210752, false));
-		this.addElement(TextLabel.create(this, 110, 45, TextProvider.of(new Supplier<String>()
-		{
-			public String get()
-			{
-				return "/" + (int) container.base.energy.getCapacity();
-			}
-		}), 4210752, false));
+		this.addElement(TextLabel.create(this, 110, 35, TextProvider.of((Supplier<String>) () -> " " + (int) Math.min(container.base.energy.getEnergy(), container.base.energy.getCapacity())), 4210752, false));
+		this.addElement(TextLabel.create(this, 110, 45, TextProvider.of((Supplier<String>) () -> "/" + (int) container.base.energy.getCapacity()), 4210752, false));
 	}
 
 	@Override

@@ -36,14 +36,14 @@ class LogOutputStream extends OutputStream
 	}
 
 	@Override
-	public void write(int b) throws IOException
+	public void write(int b)
 	{
 		this.inputBuffer.put((byte) b);
 		this.runDecoder();
 	}
 
 	@Override
-	public void write(byte[] b, int off, int len) throws IOException
+	public void write(byte[] b, int off, int len)
 	{
 		while (len > 0)
 		{
@@ -56,7 +56,7 @@ class LogOutputStream extends OutputStream
 	}
 
 	@Override
-	public void flush() throws IOException
+	public void flush()
 	{
 		this.runDecoder();
 	}
@@ -65,7 +65,7 @@ class LogOutputStream extends OutputStream
 	public void close() throws IOException
 	{
 		this.flush();
-		if (this.output.length() > 0)
+		if (!this.output.isEmpty())
 		{
 			this.log.log(this.category, this.level, this.output.toString());
 			this.output.setLength(0);

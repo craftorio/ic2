@@ -174,7 +174,7 @@ public class LiquidUtil
 			}
 
 			ItemStack singleStack = StackUtil.copyWithSize(inPlace, 1);
-			MutableObject<ItemStack> newStack = new MutableObject();
+			MutableObject<ItemStack> newStack = new MutableObject<>();
 			if (fluid == null)
 			{
 				fs = FluidHandler.drainMb(singleStack, maxAmount, false, newStack);
@@ -234,7 +234,7 @@ public class LiquidUtil
 			ItemStack inPlace = StackUtil.copy(stack);
 			ItemStack singleStack = StackUtil.copyWithSize(inPlace, 1);
 			Ic2FluidStack fsChange = fsIn.copy();
-			MutableObject<ItemStack> newStack = new MutableObject();
+			MutableObject<ItemStack> newStack = new MutableObject<>();
 			int amount = FluidHandler.fillMb(singleStack, fsChange, false, newStack);
 			if (amount <= 0)
 			{

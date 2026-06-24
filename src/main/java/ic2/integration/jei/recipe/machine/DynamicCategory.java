@@ -61,28 +61,28 @@ public class DynamicCategory extends IORecipeCategory<IORecipeWrapper>
 				case energygauge:
 				{
 					GuiParser.EnergyGaugeNode node = (GuiParser.EnergyGaugeNode) rawNode;
-					SlotPosition pos = new SlotPosition(node.x + node.style.properties.bgXOffset, node.y + node.style.properties.bgYOffset);
+					SlotPosition pos = new SlotPosition(node.x + node.style.properties.bgXOffset(), node.y + node.style.properties.bgYOffset());
 					IDrawableStatic energyBackground = guiHelper.createDrawable(
-						node.style.properties.texture,
-						node.style.properties.uBgInactive,
-						node.style.properties.vBgInactive,
-						node.style.properties.bgWidth,
-						node.style.properties.bgHeight
+						node.style.properties.texture(),
+						node.style.properties.uBgInactive(),
+						node.style.properties.vBgInactive(),
+						node.style.properties.bgWidth(),
+						node.style.properties.bgHeight()
 					);
 					elements.add(new Tuple.T2<>(energyBackground, pos));
 					energyBackground = guiHelper.createDrawable(
-						node.style.properties.texture,
-						node.style.properties.uInner,
-						node.style.properties.vInner,
-						node.style.properties.innerWidth,
-						node.style.properties.innerHeight
+						node.style.properties.texture(),
+						node.style.properties.uInner(),
+						node.style.properties.vInner(),
+						node.style.properties.innerWidth(),
+						node.style.properties.innerHeight()
 					);
 					IDrawableAnimated energyAnimated = guiHelper.createAnimatedDrawable(
 						energyBackground,
 						300,
-						node.style.properties.reverse
-							? (node.style.properties.vertical ? StartDirection.TOP : StartDirection.RIGHT)
-							: (node.style.properties.vertical ? StartDirection.BOTTOM : StartDirection.LEFT),
+						node.style.properties.reverse()
+							? (node.style.properties.vertical() ? StartDirection.TOP : StartDirection.RIGHT)
+							: (node.style.properties.vertical() ? StartDirection.BOTTOM : StartDirection.LEFT),
 						true
 					);
 					elements.add(new Tuple.T2<>(energyAnimated, new SlotPosition(node.x, node.y)));
@@ -92,13 +92,13 @@ public class DynamicCategory extends IORecipeCategory<IORecipeWrapper>
 				{
 					GuiParser.GaugeNode node = (GuiParser.GaugeNode) rawNode;
 					Gauge.GaugeProperties properties = node.style.getProperties();
-					SlotPosition pos = new SlotPosition(node.x + properties.bgXOffset, node.y + properties.bgYOffset);
+					SlotPosition pos = new SlotPosition(node.x + properties.bgXOffset(), node.y + properties.bgYOffset());
 					IDrawableStatic guageBackground = guiHelper.createDrawable(
-						properties.texture, properties.uBgActive, properties.vBgActive, properties.bgWidth, properties.bgHeight
+						properties.texture(), properties.uBgActive(), properties.vBgActive(), properties.bgWidth(), properties.bgHeight()
 					);
 					elements.add(new Tuple.T2<>(guageBackground, pos));
 					guageBackground = guiHelper.createDrawable(
-						properties.texture, properties.uInner, properties.vInner, properties.innerWidth, properties.innerHeight
+						properties.texture(), properties.uInner(), properties.vInner(), properties.innerWidth(), properties.innerHeight()
 					);
 					IDrawable gaugeForeground;
 					if (node.style == Gauge.GaugeStyle.HeatCentrifuge)
@@ -118,9 +118,9 @@ public class DynamicCategory extends IORecipeCategory<IORecipeWrapper>
 						gaugeForeground = guiHelper.createAnimatedDrawable(
 							guageBackground,
 							speed,
-							properties.reverse
-								? (properties.vertical ? StartDirection.BOTTOM : StartDirection.TOP)
-								: (properties.vertical ? StartDirection.TOP : StartDirection.LEFT),
+							properties.reverse()
+								? (properties.vertical() ? StartDirection.BOTTOM : StartDirection.TOP)
+								: (properties.vertical() ? StartDirection.TOP : StartDirection.LEFT),
 							false
 						);
 					}
@@ -143,11 +143,11 @@ public class DynamicCategory extends IORecipeCategory<IORecipeWrapper>
 					GuiParser.SlotNode node = (GuiParser.SlotNode) rawNode;
 					SlotPosition pos = new SlotPosition(node.x, node.y, node.style);
 					IDrawable drawable = guiHelper.createDrawable(
-						GuiElement.commonTexture, pos.style().u, pos.style().v, pos.style().width, pos.style().height
+						GuiElement.commonTexture, pos.style().u(), pos.style().v(), pos.style().width(), pos.style().height()
 					);
 					elements.add(new Tuple.T2<>(drawable, pos));
-					int extraX = (node.style.width - 16) / 2;
-					int extraY = (node.style.height - 16) / 2;
+					int extraX = (node.style.width() - 16) / 2;
+					int extraY = (node.style.height() - 16) / 2;
 					String slotName = node.name.toLowerCase(Locale.ENGLISH);
 					if (!slotName.contains("input") && !slotName.equals("cutter_input_slot"))
 					{
@@ -180,11 +180,11 @@ public class DynamicCategory extends IORecipeCategory<IORecipeWrapper>
 					if (size > node.offset)
 					{
 						GuiParser.SlotGridNode.SlotGridDimension dim = node.getDimension(size);
-						IDrawable drawable = guiHelper.createDrawable(GuiElement.commonTexture, node.style.u, node.style.v, node.style.width, node.style.height);
+						IDrawable drawable = guiHelper.createDrawable(GuiElement.commonTexture, node.style.u(), node.style.v(), node.style.width(), node.style.height());
 						boolean isInput = node.name.toLowerCase().contains("input");
 						boolean isOutput = node.name.toLowerCase().contains("output");
-						int extraX = (node.style.width - 16) / 2;
-						int extraY = (node.style.height - 16) / 2;
+						int extraX = (node.style.width() - 16) / 2;
+						int extraY = (node.style.height() - 16) / 2;
 
 						for (int i = 0; i < dim.cols(); i++)
 						{
@@ -195,7 +195,7 @@ public class DynamicCategory extends IORecipeCategory<IORecipeWrapper>
 									continue label99;
 								}
 
-								SlotPosition posx = new SlotPosition(node.x + i * node.style.width, node.y + j * node.style.height, node.style);
+								SlotPosition posx = new SlotPosition(node.x + i * node.style.width(), node.y + j * node.style.height(), node.style);
 								elements.add(new Tuple.T2<>(drawable, posx));
 								if (isInput)
 								{

@@ -36,7 +36,7 @@ public class ElectrolyzerTank extends AbstractFluidSlot
 		this.output = null;
 		if (this.electrolyzer.hasRecipe())
 		{
-			IElectrolyzerRecipeManager.ElectrolyzerOutput[] outputs = this.electrolyzer.getCurrentRecipe().outputs;
+			IElectrolyzerRecipeManager.ElectrolyzerOutput[] outputs = this.electrolyzer.getCurrentRecipe().outputs();
 			int length = outputs.length;
 			if (length < this.id)
 			{

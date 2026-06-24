@@ -172,7 +172,7 @@ public class TileEntityIronFurnace extends TileEntityBase implements IHasGui, IG
 		ItemStack output = result.getOutput();
 		this.outputSlot.add(output);
 		this.inputSlot.consume(result);
-		this.xp = this.xp + result.getRecipe().getMetaData().getFloat("experience");
+		this.xp = this.xp + result.recipe().getMetaData().getFloat("experience");
 	}
 
 	private boolean canOperate()

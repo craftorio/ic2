@@ -43,7 +43,7 @@ public abstract class InvSlotProcessable<RI, RO, I> extends InvSlotConsumable
 			throw new IllegalStateException("consume from empty slot");
 		}
 
-		this.setInput(result.getAdjustedInput());
+		this.setInput(result.adjustedInput());
 	}
 
 	public void setRecipeManager(Recipes.IGetter<? extends IMachineRecipeManager<RI, RO, I>> recipeManager)

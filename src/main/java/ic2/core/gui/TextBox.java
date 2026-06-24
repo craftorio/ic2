@@ -510,10 +510,10 @@ public class TextBox extends GuiElement<TextBox>
 
 	protected int getNthWordFromPos(int numWords, int position)
 	{
-		return this.getNthWordFromPosWS(numWords, position, true);
+		return this.getNthWordFromPosWS(numWords, position);
 	}
 
-	protected int getNthWordFromPosWS(int numWords, int position, boolean skipWs)
+	protected int getNthWordFromPosWS(int numWords, int position)
 	{
 		boolean positive = numWords >= 0;
 		int k = 0;
@@ -529,14 +529,14 @@ public class TextBox extends GuiElement<TextBox>
 					position = end;
 				} else
 				{
-					while (skipWs && position < end && this.text.charAt(position) == ' ')
+					while (true && position < end && this.text.charAt(position) == ' ')
 					{
 						position++;
 					}
 				}
 			} else
 			{
-				while (skipWs && position > 0 && this.text.charAt(position - 1) == ' ')
+				while (true && position > 0 && this.text.charAt(position - 1) == ' ')
 				{
 					position--;
 				}

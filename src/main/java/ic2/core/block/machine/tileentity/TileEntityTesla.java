@@ -74,7 +74,7 @@ public class TileEntityTesla extends Ic2TileEntity
 			),
 			EntitySelector.NO_CREATIVE_OR_SPECTATOR
 		);
-		if (entities.size() == 0)
+		if (entities.isEmpty())
 		{
 			return false;
 		}

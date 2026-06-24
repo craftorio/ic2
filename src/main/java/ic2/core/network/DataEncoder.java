@@ -28,7 +28,6 @@ import java.util.UUID;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.NbtIo;
@@ -224,17 +223,17 @@ public final class DataEncoder
 				break;
 			case ElectrolyzerRecipe:
 				IElectrolyzerRecipeManager.ElectrolyzerRecipe recipe = (IElectrolyzerRecipeManager.ElectrolyzerRecipe) o;
-				os.writeInt(recipe.inputAmount);
-				os.writeInt(recipe.EUaTick);
-				os.writeInt(recipe.ticksNeeded);
-				IElectrolyzerRecipeManager.ElectrolyzerOutput[] outputs = recipe.outputs;
+				os.writeInt(recipe.inputAmount());
+				os.writeInt(recipe.EUaTick());
+				os.writeInt(recipe.ticksNeeded());
+				IElectrolyzerRecipeManager.ElectrolyzerOutput[] outputs = recipe.outputs();
 				os.writeByte(outputs.length);
 
 				for (IElectrolyzerRecipeManager.ElectrolyzerOutput output : outputs)
 				{
-					encode(os, output.fluid, false);
-					os.writeInt(output.fluidAmount);
-					os.writeByte(output.tankDirection.get3DDataValue());
+					encode(os, output.fluid(), false);
+					os.writeInt(output.fluidAmount());
+					os.writeByte(output.tankDirection().get3DDataValue());
 				}
 				break;
 			case Enchantment:
@@ -419,13 +418,7 @@ public final class DataEncoder
 
 					return (IResolvableValue<Object>) server ->
 					{
-						try
-						{
-							return ince.decode(is);
-						} catch (IOException e)
-						{
-							throw new RuntimeException("Unexpected error", e);
-						}
+						return ince.decode(is);
 					};
 				}
 			case Array:
@@ -648,7 +641,7 @@ public final class DataEncoder
 
 	public static <T> T getValue(Object decoded, MinecraftServer server)
 	{
-		return (T) (decoded instanceof DataEncoder.IResolvableValue ? ((DataEncoder.IResolvableValue) decoded).get(server) : decoded);
+		return (T) (decoded instanceof DataEncoder.IResolvableValue ? ((IResolvableValue<?>) decoded).get(server) : decoded);
 	}
 
 	public static <T> boolean copyValue(T src, T dst)

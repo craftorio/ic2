@@ -37,24 +37,25 @@ public class ItemMug extends Item implements ItemLike
 			if (type != null && type != ItemMug.MugType.empty)
 			{
 				int maxAmplifier;
-				int extraDuration;
-				switch (type)
+				int extraDuration = switch (type)
 				{
-					case cold_coffee:
+					case cold_coffee ->
+					{
 						maxAmplifier = 1;
-						extraDuration = 600;
-						break;
-					case dark_coffee:
+						yield 600;
+					}
+					case dark_coffee ->
+					{
 						maxAmplifier = 5;
-						extraDuration = 1200;
-						break;
-					case coffee:
+						yield 1200;
+					}
+					case coffee ->
+					{
 						maxAmplifier = 6;
-						extraDuration = 1200;
-						break;
-					default:
-						throw new IllegalStateException("unexpected type: " + type);
-				}
+						yield 1200;
+					}
+					default -> throw new IllegalStateException("unexpected type: " + type);
+				};
 
 				int highest = 0;
 				int x = this.amplifyEffect(player, MobEffects.MOVEMENT_SPEED, maxAmplifier, extraDuration);
@@ -147,6 +148,6 @@ public class ItemMug extends Item implements ItemLike
 		empty,
 		cold_coffee,
 		dark_coffee,
-		coffee;
+		coffee
 	}
 }

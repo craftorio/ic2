@@ -28,21 +28,21 @@ public class BasicButton extends Button<BasicButton>
 
 	public enum ButtonStyle
 	{
-		AdvMinerReset(192, 32, 36, 15),
-		AdvMinerMode(228, 32, 18, 15),
-		AdvMinerSilkTouch(192, 47, 18, 15);
+		AdvMinerReset(192, 32, 36),
+		AdvMinerMode(228, 32, 18),
+		AdvMinerSilkTouch(192, 47, 18);
 
 		final int u;
 		final int v;
 		final int width;
 		final int height;
 
-		ButtonStyle(int u, int v, int width, int height)
+		ButtonStyle(int u, int v, int width)
 		{
 			this.u = u;
 			this.v = v;
 			this.width = width;
-			this.height = height;
+			this.height = 15;
 		}
 	}
 }

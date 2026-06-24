@@ -36,13 +36,10 @@ public class TileEntityReactorFluidPort extends TileEntityInventory implements I
 	public TileEntityReactorFluidPort(BlockPos pos, BlockState state)
 	{
 		super(Ic2BlockEntities.REACTOR_FLUID_PORT, pos, state);
-		this.fluids.addUnmanagedTankHook(new Supplier<Collection<Fluids.InternalFluidTank>>()
+		this.fluids.addUnmanagedTankHook(() ->
 		{
-			public Collection<Fluids.InternalFluidTank> get()
-			{
-				TileEntityNuclearReactorElectric reactor = TileEntityReactorFluidPort.this.getReactorInstance();
-				return reactor == null ? Collections.emptySet() : Arrays.asList(reactor.inputTank, reactor.outputTank);
-			}
+			TileEntityNuclearReactorElectric reactor = TileEntityReactorFluidPort.this.getReactorInstance();
+			return reactor == null ? Collections.emptySet() : Arrays.asList(reactor.inputTank, reactor.outputTank);
 		});
 	}
 

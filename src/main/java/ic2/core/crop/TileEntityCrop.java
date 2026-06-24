@@ -289,7 +289,7 @@ public class TileEntityCrop extends Ic2TileEntity implements ICropTile
 
 			int totalGrowth = 0;
 			int baseGrowth = 3 + IC2.random.nextInt(7) + this.getStatGrowth();
-			int minimumQuality = (this.crop.getProperties().getTier() - 1) * 4 + this.getStatGrowth() + this.statGain + this.statResistance;
+			int minimumQuality = (this.crop.getProperties().tier() - 1) * 4 + this.getStatGrowth() + this.statGain + this.statResistance;
 			minimumQuality = Math.max(minimumQuality, 0);
 			int providedQuality = this.crop.getWeightInfluences(this, this.getTerrainHumidity(), this.getTerrainNutrients(), this.getTerrainAirQuality()) * 5;
 			if (providedQuality >= minimumQuality)
@@ -1374,7 +1374,7 @@ public class TileEntityCrop extends Ic2TileEntity implements ICropTile
 			}
 		}
 
-		int diff = newCrop.getProperties().getTier() - oldCrop.getProperties().getTier();
+		int diff = newCrop.getProperties().tier() - oldCrop.getProperties().tier();
 		if (diff > 1)
 		{
 			value -= 2 * diff;
@@ -1447,9 +1447,7 @@ public class TileEntityCrop extends Ic2TileEntity implements ICropTile
 						base += 27 - sideCrop.statResistance;
 					}
 
-					if (base >= IC2.random.nextInt(16))
-					{
-					}
+					IC2.random.nextInt(16);
 				}
 			}
 		}

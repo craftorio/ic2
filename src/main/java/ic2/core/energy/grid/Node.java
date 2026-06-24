@@ -104,34 +104,24 @@ public final class Node
 
 	double getInnerLoss()
 	{
-		switch (this.nodeType)
+		return switch (this.nodeType)
 		{
-			case Source:
-				return 0.002;
-			case Sink:
-				return 0.002;
-			case Conductor:
-				return ((IEnergyConductor) this.tile.getMainTile()).getConductionLoss();
-			default:
-				throw new RuntimeException("invalid nodetype: " + this.nodeType);
-		}
+			case Source -> 0.002;
+			case Sink -> 0.002;
+			case Conductor -> ((IEnergyConductor) this.tile.getMainTile()).getConductionLoss();
+			default -> throw new RuntimeException("invalid nodetype: " + this.nodeType);
+		};
 	}
 
 	@Override
 	public String toString()
 	{
-		String type = null;
-		switch (this.nodeType)
+		String type = switch (this.nodeType)
 		{
-			case Source:
-				type = "E";
-				break;
-			case Sink:
-				type = "A";
-				break;
-			case Conductor:
-				type = "C";
-		}
+			case Source -> "E";
+			case Sink -> "A";
+			case Conductor -> "C";
+		};
 
 		return this.tile + "|" + type + "|" + this.uid;
 	}

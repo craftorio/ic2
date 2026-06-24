@@ -345,24 +345,24 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 					if (outputRoom > 0 && inputFluid != null)
 					{
 						ILiquidHeatExchangerManager.HeatExchangeProperty prop = Recipes.liquidHeatUpManager.getHeatExchangeProperty(inputFluid.getFluid());
-						int fluidOutput = huOtput / prop.huPerMB;
+						int fluidOutput = huOtput / prop.huPerMB();
 						Ic2FluidStack draincoolant;
 						if (fluidOutput < outputRoom)
 						{
-							this.EmitHeatbuffer = (int) (huOtput % prop.huPerMB / getHuOutputModifier());
+							this.EmitHeatbuffer = (int) (huOtput % prop.huPerMB() / getHuOutputModifier());
 							this.EmitHeat = (int) (huOtput / getHuOutputModifier());
 							draincoolant = this.inputTank.drainMbUnchecked(fluidOutput, true);
 						} else
 						{
-							this.EmitHeat = outputRoom * prop.huPerMB;
+							this.EmitHeat = outputRoom * prop.huPerMB();
 							draincoolant = this.inputTank.drainMbUnchecked(outputRoom, true);
 						}
 
 						if (draincoolant != null)
 						{
-							this.EmitHeat = draincoolant.getAmountMb() * prop.huPerMB;
-							huOtput -= this.inputTank.drainMbUnchecked(draincoolant.getAmountMb(), false).getAmountMb() * prop.huPerMB;
-							this.outputTank.fillMbUnchecked(Ic2FluidStack.create(prop.outputFluid, draincoolant.getAmountMb()), false);
+							this.EmitHeat = draincoolant.getAmountMb() * prop.huPerMB();
+							huOtput -= this.inputTank.drainMbUnchecked(draincoolant.getAmountMb(), false).getAmountMb() * prop.huPerMB();
+							this.outputTank.fillMbUnchecked(Ic2FluidStack.create(prop.outputFluid(), draincoolant.getAmountMb()), false);
 						} else
 						{
 							this.EmitHeat = 0;
@@ -549,9 +549,8 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 				for (int x = 0; x < size; x++)
 				{
 					ItemStack stack = this.reactorSlot.get(x, y);
-					if (stack != null && stack.getItem() instanceof IReactorComponent)
+					if (stack != null && stack.getItem() instanceof IReactorComponent comp)
 					{
-						IReactorComponent comp = (IReactorComponent) stack.getItem();
 						comp.processChamber(stack, this, x, y, pass == 0);
 					}
 				}
@@ -948,28 +947,23 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory implem
 
 		int range = 2;
 		final MutableBoolean foundConflict = new MutableBoolean();
-		WorldUtil.findTileEntities(this.getLevel(), this.worldPosition, 4, new WorldUtil.ITileEntityResultHandler()
+		WorldUtil.findTileEntities(this.getLevel(), this.worldPosition, 4, te ->
 		{
-			@Override
-			public boolean onMatch(BlockEntity te)
+			if (!(te instanceof TileEntityNuclearReactorElectric reactor))
 			{
-				if (!(te instanceof TileEntityNuclearReactorElectric))
+				return false;
+			} else if (te == TileEntityNuclearReactorElectric.this)
+			{
+				return false;
+			} else
+			{
+				if (reactor.isFullSize() && reactor.hasFluidChamber())
 				{
-					return false;
-				} else if (te == TileEntityNuclearReactorElectric.this)
-				{
-					return false;
+					foundConflict.setTrue();
+					return true;
 				} else
 				{
-					TileEntityNuclearReactorElectric reactor = (TileEntityNuclearReactorElectric) te;
-					if (reactor.isFullSize() && reactor.hasFluidChamber())
-					{
-						foundConflict.setTrue();
-						return true;
-					} else
-					{
-						return false;
-					}
+					return false;
 				}
 			}
 		});

@@ -111,7 +111,7 @@ public class LiquidHeatExchangerManager implements ILiquidHeatExchangerManager
 			}
 
 			ILiquidHeatExchangerManager.HeatExchangeProperty property = LiquidHeatExchangerManager.this.getHeatExchangeProperty(fluid);
-			return !LiquidHeatExchangerManager.this.getOpposite().acceptsFluid(property.outputFluid);
+			return !LiquidHeatExchangerManager.this.getOpposite().acceptsFluid(property.outputFluid());
 		}
 
 		@Override
@@ -122,7 +122,7 @@ public class LiquidHeatExchangerManager implements ILiquidHeatExchangerManager
 
 			for (Entry<Fluid, ILiquidHeatExchangerManager.HeatExchangeProperty> e : LiquidHeatExchangerManager.this.map.entrySet())
 			{
-				if (!opposite.acceptsFluid(e.getValue().outputFluid))
+				if (!opposite.acceptsFluid(e.getValue().outputFluid()))
 				{
 					ret.add(e.getKey());
 				}

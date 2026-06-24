@@ -62,10 +62,10 @@ public class ItemBattery extends BaseElectricItem implements INetworkItemEventLi
 				}
 			}
 
-			return new InteractionResultHolder(InteractionResult.SUCCESS, stack);
+			return new InteractionResultHolder<>(InteractionResult.SUCCESS, stack);
 		} else
 		{
-			return new InteractionResultHolder(InteractionResult.PASS, stack);
+			return new InteractionResultHolder<>(InteractionResult.PASS, stack);
 		}
 	}
 

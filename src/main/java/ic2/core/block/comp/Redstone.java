@@ -238,27 +238,19 @@ public class Redstone extends TileEntityComponent
 		int getRedstoneInput(int var1);
 	}
 
-	private static class LinkHandler implements Redstone.IRedstoneChangeHandler, Redstone.IRedstoneModifier
-	{
-		private final Redstone origin;
-		private final Redstone receiver;
-
-		public LinkHandler(Redstone origin, Redstone receiver)
+	private record LinkHandler(Redstone origin, Redstone receiver) implements IRedstoneChangeHandler, IRedstoneModifier
 		{
-			this.origin = origin;
-			this.receiver = receiver;
-		}
 
-		@Override
-		public void onRedstoneChange(int newLevel)
-		{
-			this.receiver.update();
+			@Override
+			public void onRedstoneChange(int newLevel)
+			{
+				this.receiver.update();
+			}
+	
+			@Override
+			public int getRedstoneInput(int redstoneInput)
+			{
+				return Math.max(redstoneInput, this.origin.redstoneInput);
+			}
 		}
-
-		@Override
-		public int getRedstoneInput(int redstoneInput)
-		{
-			return Math.max(redstoneInput, this.origin.redstoneInput);
-		}
-	}
 }

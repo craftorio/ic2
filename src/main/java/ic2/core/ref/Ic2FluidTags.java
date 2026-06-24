@@ -8,15 +8,15 @@ import net.minecraft.world.level.material.Fluid;
 
 public final class Ic2FluidTags
 {
-	public static final TagKey<Fluid> STEAM = create("c:steam", "forge:steam");
+	public static final TagKey<Fluid> STEAM = create();
 
 	public static void init()
 	{
 	}
 
-	private static TagKey<Fluid> create(String fabricName, String forgeName)
+	private static TagKey<Fluid> create()
 	{
-		ResourceLocation id = ResourceLocation.parse(IC2.envProxy.isFabricEnv() ? fabricName : forgeName);
+		ResourceLocation id = ResourceLocation.parse(IC2.envProxy.isFabricEnv() ? "c:steam" : "forge:steam");
 		return TagKey.create(Registries.FLUID, id);
 	}
 }

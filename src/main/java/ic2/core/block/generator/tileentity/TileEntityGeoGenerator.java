@@ -70,8 +70,6 @@ public class TileEntityGeoGenerator extends TileEntityBaseGenerator
 	protected void onBlockBreak()
 	{
 		super.onBlockBreak();
-		if (!this.fluidTank.isEmpty())
-		{
-		}
+		this.fluidTank.isEmpty();
 	}
 }

@@ -11,9 +11,9 @@ public class TankFluidSlot extends AbstractFluidSlot
 {
 	final Ic2FluidTank tank;
 
-	protected TankFluidSlot(Ic2Gui<?> gui, int x, int y, int width, int height, Ic2FluidTank tank)
+	protected TankFluidSlot(Ic2Gui<?> gui, int x, int y, Ic2FluidTank tank)
 	{
-		super(gui, x, y, width, height);
+		super(gui, x, y, 18, 18);
 		if (tank == null)
 		{
 			throw new NullPointerException("Null FluidTank instance.");
@@ -24,7 +24,7 @@ public class TankFluidSlot extends AbstractFluidSlot
 
 	public static TankFluidSlot createFluidSlot(Ic2Gui<?> gui, int x, int y, Ic2FluidTank tank)
 	{
-		return new TankFluidSlot(gui, x, y, 18, 18, tank);
+		return new TankFluidSlot(gui, x, y, tank);
 	}
 
 	@Override

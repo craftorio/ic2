@@ -9,7 +9,7 @@ import net.minecraft.world.item.Item;
 
 public class BoatType
 {
-	private static final Set<BoatType> VALUES = new ObjectArraySet();
+	private static final Set<BoatType> VALUES = new ObjectArraySet<>();
 	private final String name;
 	private final Item baseItem;
 

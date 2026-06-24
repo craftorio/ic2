@@ -23,6 +23,6 @@ class GridChange
 	enum Type
 	{
 		ADDITION,
-		REMOVAL;
+		REMOVAL
 	}
 }

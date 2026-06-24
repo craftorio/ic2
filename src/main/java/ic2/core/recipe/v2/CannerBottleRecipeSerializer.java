@@ -31,8 +31,8 @@ public class CannerBottleRecipeSerializer implements RecipeSerializer<RecipeHold
 
 	public void toNetwork(FriendlyByteBuf buf, RecipeHolder<ICannerBottleRecipeManager.Input, ItemStack> recipe)
 	{
-		RecipeIo.writeInput(buf, recipe.recipe().getInput().container);
-		RecipeIo.writeInput(buf, recipe.recipe().getInput().fill);
+		RecipeIo.writeInput(buf, recipe.recipe().getInput().container());
+		RecipeIo.writeInput(buf, recipe.recipe().getInput().fill());
 		buf.writeItem(recipe.recipe().getOutput());
 	}
 }

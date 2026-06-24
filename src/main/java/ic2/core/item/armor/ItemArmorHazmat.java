@@ -24,12 +24,11 @@ public class ItemArmorHazmat extends ItemArmorUtility implements IHazmatLike
 			if (slot.getType() == EquipmentSlot.Type.ARMOR)
 			{
 				ItemStack stack = living.getItemBySlot(slot);
-				if (stack == null || !(stack.getItem() instanceof IHazmatLike))
+				if (stack == null || !(stack.getItem() instanceof IHazmatLike hazmat))
 				{
 					return false;
 				}
 
-				IHazmatLike hazmat = (IHazmatLike) stack.getItem();
 				if (!hazmat.addsProtection(living, slot, stack))
 				{
 					return false;

@@ -50,10 +50,10 @@ public class HandHeldAdvancedUpgrade extends HandHeldInventory implements IHolog
 	{
 		if (!player.getCommandSenderWorld().isClientSide
 			&& player.containerMenu instanceof ContainerHandHeldInventory
-			&& ((ContainerHandHeldInventory) player.containerMenu).base instanceof HandHeldUpgradeOption)
+			&& ((ContainerHandHeldInventory<?>) player.containerMenu).base instanceof HandHeldUpgradeOption)
 		{
 			addMaintainedPlayer(player);
-			return ((HandHeldInventory) ((ContainerHandHeldInventory) player.containerMenu).base).getContainerStack();
+			return ((HandHeldInventory) ((ContainerHandHeldInventory<?>) player.containerMenu).base).getContainerStack();
 		} else
 		{
 			return containerStack;
@@ -79,20 +79,18 @@ public class HandHeldAdvancedUpgrade extends HandHeldInventory implements IHolog
 
 	static IHasGui delegate(Player player, InteractionHand hand, ItemStack stack, int ID)
 	{
-		switch (ID)
+		return switch (ID)
 		{
-			case 0:
-				return new HandHeldValueConfig(new HandHeldAdvancedUpgrade(player, hand, stack), "meta");
-			case 1:
-				return null;
-			case 2:
-				return new HandHeldValueConfig(new HandHeldAdvancedUpgrade(player, hand, stack), "energy");
-			case 3:
-				return new HandHeldOre(new HandHeldAdvancedUpgrade(player, hand, stack));
-			default:
+			case 0 -> new HandHeldValueConfig(new HandHeldAdvancedUpgrade(player, hand, stack), "meta");
+			case 1 -> null;
+			case 2 -> new HandHeldValueConfig(new HandHeldAdvancedUpgrade(player, hand, stack), "energy");
+			case 3 -> new HandHeldOre(new HandHeldAdvancedUpgrade(player, hand, stack));
+			default ->
+			{
 				IC2.log.warn(LogCategory.Network, "Unexpected delegate ID: " + ID);
-				return null;
-		}
+				yield null;
+			}
+		};
 	}
 
 	@Override

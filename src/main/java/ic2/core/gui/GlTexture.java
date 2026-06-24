@@ -49,28 +49,18 @@ public class GlTexture implements Closeable
 		{
 			((ReloadableResourceManager) manager)
 				.registerReloadListener(
-					new PreparableReloadListener()
+					(synchronizer, managerx, prepareProfiler, applyProfiler, prepareExecutor, applyExecutor) ->
 					{
-						public CompletableFuture<Void> reload(
-							PreparationBarrier synchronizer,
-							ResourceManager managerx,
-							ProfilerFiller prepareProfiler,
-							ProfilerFiller applyProfiler,
-							Executor prepareExecutor,
-							Executor applyExecutor
-						)
+						for (GlTexture texture : GlTexture.textures.values())
 						{
-							for (GlTexture texture : GlTexture.textures.values())
+							if (texture != null)
 							{
-								if (texture != null)
-								{
-									texture.close();
-								}
+								texture.close();
 							}
-
-							GlTexture.textures.clear();
-							return CompletableFuture.completedFuture(null);
 						}
+
+						GlTexture.textures.clear();
+						return CompletableFuture.completedFuture(null);
 					}
 				);
 		} else

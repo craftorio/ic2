@@ -74,7 +74,7 @@ public class TileEntityCanner extends TileEntityStandardMachine<Object, Object, 
 		if (this.mode == TileEntityCanner.Mode.EmptyLiquid)
 		{
 			IEmptyFluidContainerRecipeManager.Output output = (IEmptyFluidContainerRecipeManager.Output) result.getOutput();
-			this.getOutputTank().fillMbUnchecked(output.fluid, false);
+			this.getOutputTank().fillMbUnchecked(output.fluid(), false);
 		} else if (this.mode == TileEntityCanner.Mode.EnrichLiquid)
 		{
 			Ic2FluidStack output = ((Ic2FluidStack) result.getOutput()).copy();
@@ -118,7 +118,7 @@ public class TileEntityCanner extends TileEntityStandardMachine<Object, Object, 
 			return Collections.emptyList();
 		} else
 		{
-			return output instanceof IEmptyFluidContainerRecipeManager.Output ? ((IEmptyFluidContainerRecipeManager.Output) output).container : super.getOutput(output);
+			return output instanceof IEmptyFluidContainerRecipeManager.Output ? ((IEmptyFluidContainerRecipeManager.Output) output).container() : super.getOutput(output);
 		}
 	}
 
@@ -150,7 +150,7 @@ public class TileEntityCanner extends TileEntityStandardMachine<Object, Object, 
 		if (this.mode == TileEntityCanner.Mode.EmptyLiquid)
 		{
 			IEmptyFluidContainerRecipeManager.Output output = (IEmptyFluidContainerRecipeManager.Output) result.getOutput();
-			if (this.getOutputTank().fillMbUnchecked(output.fluid, true) != output.fluid.getAmountMb())
+			if (this.getOutputTank().fillMbUnchecked(output.fluid(), true) != output.fluid().getAmountMb())
 			{
 				return null;
 			}

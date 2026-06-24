@@ -177,6 +177,18 @@ public class TileEntityMatter extends TileEntityElectricMachine implements IHasG
 			}
 
 			this.activate(playSubSound);
+			// 确保 sub sound 的状态与 playSubSound 一致（处理机器已在运行中时加入/耗尽废料的情况）
+			if (this.getActive())
+			{
+				if (playSubSound && this.subLoopingSound != null && !this.subLoopingSound.isPlaying())
+				{
+					this.subLoopingSound.play();
+				} else if (!playSubSound && this.subLoopingSound != null && this.subLoopingSound.isPlaying())
+				{
+					this.subLoopingSound.stop();
+				}
+			}
+
 			if (this.scrap < 10000)
 			{
 				MachineRecipeResult<IRecipeInput, Integer, ItemStack> recipe = this.amplifierSlot.process();

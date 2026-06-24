@@ -179,7 +179,14 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 		{
 			tooltip.add(Component.translatable("item.ic2.tooltip.jetpack.toggle", Minecraft.getInstance().options.keyJump.getKey().getDisplayName(), KeyboardClient.modeSwitchKey.getKey().getDisplayName()));
 		}
-
+		if (this.getEquipmentSlot() == EquipmentSlot.LEGS)
+		{
+			tooltip.add(Component.translatable("item.ic2.tooltip.speed.toggle", KeyboardClient.altKey.getKey().getDisplayName(), Minecraft.getInstance().options.keyShift.getKey().getDisplayName()));
+		}
+		if (this.getEquipmentSlot() == EquipmentSlot.FEET)
+		{
+			tooltip.add(Component.translatable("item.ic2.tooltip.jump.toggle", KeyboardClient.altKey.getKey().getDisplayName(), Minecraft.getInstance().options.keyJump.getKey().getDisplayName()));
+		}
 	}
 
 	@Override
@@ -318,83 +325,135 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric implements IJetpack,
 			player.clearFire();
 		} else if (equipSlot == EquipmentSlot.LEGS)
 		{
-			boolean enableQuantumSpeedOnSprint;
-			if (IC2.sideProxy.isRendering())
+			boolean speedEnabled = !nbtData.contains("speed_enabled") || nbtData.getBoolean("speed_enabled");
+			if (IC2.keyboard.isAltKeyDown(player) && IC2.keyboard.isSneakKeyDown(player) && toggleTimer == 0)
 			{
-				enableQuantumSpeedOnSprint = IC2ClientConfig.misc.quantumSpeedOnSprint.get();
-			} else
-			{
-				enableQuantumSpeedOnSprint = true;
-			}
-
-			if (ElectricItem.manager.canUse(stack, 1000.0)
-				&& (player.onGround() || player.isInWater())
-				&& IC2.keyboard.isForwardKeyDown(player)
-				&& (enableQuantumSpeedOnSprint && player.isSprinting() || !enableQuantumSpeedOnSprint && IC2.keyboard.isBoostKeyDown(player)))
-			{
-				byte speedTicker = nbtData.getByte("speed_ticker");
-				if (++speedTicker >= 10)
+				toggleTimer = 10;
+				speedEnabled = !speedEnabled;
+				if (IC2.sideProxy.isSimulating())
 				{
-					speedTicker = 0;
-					ElectricItem.manager.use(stack, 1000.0, player);
-					ret = true;
-				}
-
-				nbtData.putByte("speed_ticker", speedTicker);
-				float speed = 0.22F;
-				if (player.isInWater())
-				{
-					speed = 0.1F;
-					if (IC2.keyboard.isJumpKeyDown(player))
+					nbtData.putBoolean("speed_enabled", speedEnabled);
+					if (speedEnabled)
 					{
-						Vec3 motion = player.getDeltaMovement();
-						player.setDeltaMovement(motion.x, motion.y + 0.1F, motion.z);
+						IC2.sideProxy.messagePlayer(player, "ic2.speed.mode.enabled");
+					} else
+					{
+						IC2.sideProxy.messagePlayer(player, "ic2.speed.mode.disabled");
 					}
 				}
+			}
 
-				float yawRad = player.getYRot() * (float) Math.PI / 180.0F;
-				Vec3 motion = player.getDeltaMovement();
-				player.setDeltaMovement(motion.x + (-Math.sin(yawRad) * speed), motion.y, motion.z + (Math.cos(yawRad) * speed));
+			if (IC2.sideProxy.isSimulating() && toggleTimer > 0)
+			{
+				nbtData.putByte("toggle_timer", --toggleTimer);
+			}
+
+			if (speedEnabled)
+			{
+				boolean enableQuantumSpeedOnSprint;
+				if (IC2.sideProxy.isRendering())
+				{
+					enableQuantumSpeedOnSprint = IC2ClientConfig.misc.quantumSpeedOnSprint.get();
+				} else
+				{
+					enableQuantumSpeedOnSprint = true;
+				}
+
+				if (ElectricItem.manager.canUse(stack, 1000.0)
+					&& (player.onGround() || player.isInWater())
+					&& IC2.keyboard.isForwardKeyDown(player)
+					&& (enableQuantumSpeedOnSprint && player.isSprinting() || !enableQuantumSpeedOnSprint && IC2.keyboard.isBoostKeyDown(player)))
+				{
+					byte speedTicker = nbtData.getByte("speed_ticker");
+					if (++speedTicker >= 10)
+					{
+						speedTicker = 0;
+						ElectricItem.manager.use(stack, 1000.0, player);
+						ret = true;
+					}
+
+					nbtData.putByte("speed_ticker", speedTicker);
+					float speed = 0.22F;
+					if (player.isInWater())
+					{
+						speed = 0.1F;
+						if (IC2.keyboard.isJumpKeyDown(player))
+						{
+							Vec3 motion = player.getDeltaMovement();
+							player.setDeltaMovement(motion.x, motion.y + 0.1F, motion.z);
+						}
+					}
+
+					float yawRad = player.getYRot() * (float) Math.PI / 180.0F;
+					Vec3 motion = player.getDeltaMovement();
+					player.setDeltaMovement(motion.x + (-Math.sin(yawRad) * speed), motion.y, motion.z + (Math.cos(yawRad) * speed));
+				}
 			}
 
 		} else if (equipSlot == EquipmentSlot.FEET)
 		{
-			if (IC2.sideProxy.isSimulating())
+			boolean jumpEnabled = !nbtData.contains("jump_enabled") || nbtData.getBoolean("jump_enabled");
+			if (IC2.keyboard.isAltKeyDown(player) && IC2.keyboard.isJumpKeyDown(player) && toggleTimer == 0)
 			{
-				boolean wasOnGround = !nbtData.contains("on_ground") || nbtData.getBoolean("on_ground");
-				if (wasOnGround && !player.onGround() && IC2.keyboard.isJumpKeyDown(player) && IC2.keyboard.isBoostKeyDown(player))
+				toggleTimer = 10;
+				jumpEnabled = !jumpEnabled;
+				if (IC2.sideProxy.isSimulating())
 				{
-					ElectricItem.manager.use(stack, 4000.0, player);
-					ret = true;
-				}
-
-				if (player.onGround() != wasOnGround)
-				{
-					nbtData.putBoolean("on_ground", player.onGround());
-				}
-			} else
-			{
-				if (ElectricItem.manager.canUse(stack, 4000.0) && player.onGround())
-				{
-					this.jumpCharge = 1.0F;
-				}
-
-				if (player.getDeltaMovement().y >= 0.0 && this.jumpCharge > 0.0F && !player.isInWater())
-				{
-					if (IC2.keyboard.isJumpKeyDown(player) && IC2.keyboard.isBoostKeyDown(player))
+					nbtData.putBoolean("jump_enabled", jumpEnabled);
+					if (jumpEnabled)
 					{
-						if (this.jumpCharge == 1.0F)
+						IC2.sideProxy.messagePlayer(player, "ic2.jump.mode.enabled");
+					} else
+					{
+						IC2.sideProxy.messagePlayer(player, "ic2.jump.mode.disabled");
+					}
+				}
+			}
+
+			if (IC2.sideProxy.isSimulating() && toggleTimer > 0)
+			{
+				nbtData.putByte("toggle_timer", --toggleTimer);
+			}
+
+			if (jumpEnabled)
+			{
+				if (IC2.sideProxy.isSimulating())
+				{
+					boolean wasOnGround = !nbtData.contains("on_ground") || nbtData.getBoolean("on_ground");
+					if (wasOnGround && !player.onGround() && IC2.keyboard.isJumpKeyDown(player) && IC2.keyboard.isBoostKeyDown(player))
+					{
+						ElectricItem.manager.use(stack, 4000.0, player);
+						ret = true;
+					}
+
+					if (player.onGround() != wasOnGround)
+					{
+						nbtData.putBoolean("on_ground", player.onGround());
+					}
+				} else
+				{
+					if (ElectricItem.manager.canUse(stack, 4000.0) && player.onGround())
+					{
+						this.jumpCharge = 1.0F;
+					}
+
+					if (player.getDeltaMovement().y >= 0.0 && this.jumpCharge > 0.0F && !player.isInWater())
+					{
+						if (IC2.keyboard.isJumpKeyDown(player) && IC2.keyboard.isBoostKeyDown(player))
 						{
-							Vec3 motion = player.getDeltaMovement();
-							player.setDeltaMovement(motion.x * 3.5, motion.y, motion.z * 3.5);
-						}
+							if (this.jumpCharge == 1.0F)
+							{
+								Vec3 motion = player.getDeltaMovement();
+								player.setDeltaMovement(motion.x * 3.5, motion.y, motion.z * 3.5);
+							}
 
-						Vec3 motion = player.getDeltaMovement();
-						player.setDeltaMovement(motion.x, motion.y + this.jumpCharge * 0.3F, motion.z);
-						this.jumpCharge = (float) (this.jumpCharge * 0.75);
-					} else if (this.jumpCharge < 1.0F)
-					{
-						this.jumpCharge = 0.0F;
+							Vec3 motion = player.getDeltaMovement();
+							player.setDeltaMovement(motion.x, motion.y + this.jumpCharge * 0.3F, motion.z);
+							this.jumpCharge = (float) (this.jumpCharge * 0.75);
+						} else if (this.jumpCharge < 1.0F)
+						{
+							this.jumpCharge = 0.0F;
+						}
 					}
 				}
 			}

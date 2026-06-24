@@ -7,6 +7,7 @@ import ic2.api.item.IElectricItem;
 import ic2.api.item.IItemHudInfo;
 import ic2.api.item.IItemHudProvider;
 import ic2.core.item.armor.jetpack.IJetpack;
+import ic2.core.item.armor.ItemArmorQuantumSuit;
 import ic2.core.ref.Ic2Items;
 import ic2.core.util.StackUtil;
 import ic2.core.util.Util;
@@ -18,6 +19,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.nbt.CompoundTag;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -80,6 +82,14 @@ public class GuiOverlayer
 					{
 						guiGraphics.drawString(this.mc.font, charge + "%", 25, 41, 0xFFFFFF);
 						guiGraphics.renderItem(legs, 5, 36);
+						if (legs.getItem() instanceof ItemArmorQuantumSuit)
+						{
+							CompoundTag legsNbt = StackUtil.getOrCreateNbtData(legs);
+							if (!legsNbt.contains("speed_enabled") || legsNbt.getBoolean("speed_enabled"))
+							{
+								guiGraphics.renderItem(Ic2Items.NANO_LEGGINGS.getDefaultInstance(), 50, 36);
+							}
+						}
 					}
 				}
 
@@ -90,6 +100,14 @@ public class GuiOverlayer
 					{
 						guiGraphics.drawString(this.mc.font, charge + "%", 25, 56, 0xFFFFFF);
 						guiGraphics.renderItem(boots, 5, 52);
+						if (boots.getItem() instanceof ItemArmorQuantumSuit)
+						{
+							CompoundTag bootsNbt = StackUtil.getOrCreateNbtData(boots);
+							if (!bootsNbt.contains("jump_enabled") || bootsNbt.getBoolean("jump_enabled"))
+							{
+								guiGraphics.renderItem(Ic2Items.NANO_BOOTS.getDefaultInstance(), 50, 52);
+							}
+						}
 					}
 				}
 

@@ -14,7 +14,6 @@
 
 - 创造模式物品栏乱序（目前是按照注册顺序的，后续会调整为分类顺序）
 - 末影珍珠粉材质更改
-- 蒸汽动能发生机的显示重叠（GuiSteamKineticGenerator）
 - 拟态板完全是坏的 `ItemObscurator`
 - 日光灯不能用（仅限合成）
 
@@ -48,3 +47,4 @@
 
 - IC2 电网目前支持 [Applied Energetics 2](https://modrinth.com/mod/ae2) 的能源接收器！
 - 您可以安装 [Configured](https://modrinth.com/mod/configured) 来使用 GUI 调整 IC2 的配置文件！
+- 高级采矿机现在支持采矿过滤卡来自定义更多的矿石名单！

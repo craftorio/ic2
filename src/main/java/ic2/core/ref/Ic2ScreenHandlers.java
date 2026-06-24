@@ -52,6 +52,7 @@ import ic2.core.gui.dynamic.DynamicContainer;
 import ic2.core.item.IHandHeldInventory;
 import ic2.core.item.IHandHeldSubInventory;
 import ic2.core.item.tool.ContainerMeter;
+import ic2.core.item.tool.ContainerMiningFilter;
 import ic2.core.item.tool.ContainerToolScanner;
 import ic2.core.item.tool.ContainerToolbox;
 import ic2.core.item.tool.ContainerAnalyzer;
@@ -133,6 +134,7 @@ public final class Ic2ScreenHandlers
 	public static final MenuType<ContainerMeter> METER = registerManagedItem("meter");
 	public static final MenuType<ContainerToolbox> TOOL_BOX = registerManagedItem("tool_box");
 	public static final MenuType<ContainerAnalyzer> CROP_ANALYZER = registerManagedItem("crop_analyzer");
+	public static final MenuType<ContainerMiningFilter> MINING_FILTER = registerManagedItem("mining_filter");
 
 	public static void init()
 	{

@@ -51,6 +51,7 @@ import ic2.core.item.tool.ItemDrill;
 import ic2.core.item.tool.ItemDrillIridium;
 import ic2.core.item.tool.ItemElectricToolChainsaw;
 import ic2.core.item.tool.ItemFrequencyTransmitter;
+import ic2.core.item.tool.ItemMiningFilterCard;
 import ic2.core.item.tool.ItemNanoSaber;
 import ic2.core.item.tool.ItemObscurator;
 import ic2.core.item.tool.ItemScanner;
@@ -490,6 +491,7 @@ public final class Ic2Items
 	public static final Item BRONZE_SHOVEL = register("bronze_shovel", new ShovelItem(Ic2ToolMaterials.BRONZE, 1.5F, -3.0F, new Properties()));
 	public static final Item BRONZE_PICKAXE = register("bronze_pickaxe", new Ic2Pickaxe(Ic2ToolMaterials.BRONZE, 1, -2.8F, new Properties()));
 	public static final Item FREQUENCY_TRANSMITTER = register("frequency_transmitter", new ItemFrequencyTransmitter(new Properties().stacksTo(1)));
+	public static final Item MINING_FILTER_CARD = register("mining_filter_card", new ItemMiningFilterCard(new Properties().stacksTo(1)));
 	public static final Item CROWBAR = register("crowbar", new ItemToolCrowbar(Tiers.IRON, new Properties().durability(250)));
 	public static final Item ADVANCED_SCANNER = register("advanced_scanner", new ItemScannerAdv(new Properties().stacksTo(1)));
 	public static final Item CHAINSAW = register("chainsaw", new ItemElectricToolChainsaw(new Properties().stacksTo(1)));
@@ -1067,6 +1069,7 @@ public final class Ic2Items
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> LIME_PAINTER);
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> MAGENTA_PAINTER);
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> METER);
+		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> MINING_FILTER_CARD);
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> MINING_LASER);
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> MINING_PIPE);
 		addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> MUSHROOM_TFBP);

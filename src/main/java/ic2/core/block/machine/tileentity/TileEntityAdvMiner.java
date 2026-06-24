@@ -16,6 +16,7 @@ import ic2.core.block.tileentity.Ic2TileEntityBlock;
 import ic2.core.fluid.FluidHandler;
 import ic2.core.init.IC2Config;
 import ic2.core.init.OreValues;
+import ic2.core.item.tool.ItemMiningFilterCard;
 import ic2.core.item.tool.ItemScanner;
 import ic2.core.item.tool.ItemScannerAdv;
 import ic2.core.network.GrowingBuffer;
@@ -33,6 +34,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -51,6 +53,7 @@ public class TileEntityAdvMiner extends TileEntityElectricMachine implements IHa
 	public final InvSlotConsumableId scannerSlot = new InvSlotConsumableId(this, "scanner", InvSlot.Access.IO, 1, InvSlot.InvSide.BOTTOM, Ic2Items.SCANNER, Ic2Items.ADVANCED_SCANNER);
 	public final InvSlotUpgrade upgradeSlot = new InvSlotUpgrade(this, "upgrade", 4);
 	public final InvSlot filterSlot = new InvSlot(this, "list", null, 15);
+	public final InvSlot cardSlot = new InvSlot(this, "card", InvSlot.Access.I, 1);
 	protected final Redstone redstone;
 	public boolean blacklist = true;
 	public boolean silkTouch = false;
@@ -266,37 +269,59 @@ public class TileEntityAdvMiner extends TileEntityElectricMachine implements IHa
 				return false;
 			}
 
-			if (this.blacklist)
+			ItemStack cardStack = this.cardSlot.get();
+			if (!StackUtil.isEmpty(cardStack) && cardStack.getItem() instanceof ItemMiningFilterCard)
 			{
-				for (ItemStack drop : drops)
+				CompoundTag nbt = cardStack.getTag();
+				if (nbt != null)
 				{
-					for (ItemStack filter : this.filterSlot)
+					boolean cardBlacklist = !nbt.contains("blacklist") || nbt.getBoolean("blacklist");
+					List<ItemStack> cardFilter = new ArrayList<>();
+					ListTag items = nbt.getList("Items", 10);
+					for (int i = 0; i < items.size(); i++)
 					{
-						if (StackUtil.checkItemEquality(drop, filter))
-						{
-							return false;
-						}
+						cardFilter.add(ItemStack.of(items.getCompound(i)));
 					}
+					return evaluateFilter(drops, cardFilter, cardBlacklist);
 				}
-
-				return true;
-			} else
-			{
-				for (ItemStack drop : drops)
-				{
-					for (ItemStack filter : this.filterSlot)
-					{
-						if (StackUtil.checkItemEquality(drop, filter))
-						{
-							return true;
-						}
-					}
-				}
-
-				return false;
 			}
+
+			return evaluateFilter(drops, this.filterSlot, this.blacklist);
 		} else
 		{
+			return false;
+		}
+	}
+
+	private boolean evaluateFilter(List<ItemStack> drops, Iterable<ItemStack> filterItems, boolean isBlacklist)
+	{
+		if (isBlacklist)
+		{
+			for (ItemStack drop : drops)
+			{
+				for (ItemStack filter : filterItems)
+				{
+					if (StackUtil.checkItemEquality(drop, filter))
+					{
+						return false;
+					}
+				}
+			}
+
+			return true;
+		} else
+		{
+			for (ItemStack drop : drops)
+			{
+				for (ItemStack filter : filterItems)
+				{
+					if (StackUtil.checkItemEquality(drop, filter))
+					{
+						return true;
+					}
+				}
+			}
+
 			return false;
 		}
 	}

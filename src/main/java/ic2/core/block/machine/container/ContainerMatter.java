@@ -16,7 +16,7 @@ public class ContainerMatter extends ContainerFullInv<TileEntityMatter>
 		super(Ic2ScreenHandlers.MATTER_GENERATOR, syncId, playerInventory, be, 166);
 		this.addSlot(new SlotInvSlot(be.amplifierSlot, 0, 72, 40));
 		this.addSlot(new SlotInvSlot(be.outputSlot, 0, 125, 59));
-		this.addSlot(new SlotInvSlot(be.containerslot, 0, 125, 23));
+		this.addSlot(new SlotInvSlot(be.containerSlot, 0, 125, 23));
 
 		for (int i = 0; i < 4; i++)
 		{

@@ -25,11 +25,11 @@ public class InvSlotConsumableLiquidByList extends InvSlotConsumableLiquid
 		int count,
 		InvSlot.InvSide preferredSide1,
 		InvSlotConsumableLiquid.OpType opType,
-		Fluid... fluidlist
+		Fluid... fluidList
 	)
 	{
 		super(base1, name1, access1, count, preferredSide1, opType);
-		this.acceptedFluids = new HashSet<>(Arrays.asList(fluidlist));
+		this.acceptedFluids = new HashSet<>(Arrays.asList(fluidList));
 	}
 
 	@Override

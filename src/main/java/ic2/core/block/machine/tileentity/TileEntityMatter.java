@@ -46,11 +46,8 @@ import net.minecraft.world.level.block.state.BlockState;
 @NotClassic
 public class TileEntityMatter extends TileEntityElectricMachine implements IHasGui, IUpgradableBlock, IExplosionPowerOverride
 {
-	private static final int StateIdle = 0;
-	private static final int StateRunning = 1;
-	private static final int StateRunningScrap = 2;
 	public final InvSlotUpgrade upgradeSlot;
-	public final InvSlotProcessable<IRecipeInput, Integer, ItemStack> amplifierSlot = new InvSlotProcessable<IRecipeInput, Integer, ItemStack>(
+	public final InvSlotProcessable<IRecipeInput, Integer, ItemStack> amplifierSlot = new InvSlotProcessable<>(
 		this, "scrap", 1, Recipes.matterFabricator
 	)
 	{
@@ -65,7 +62,7 @@ public class TileEntityMatter extends TileEntityElectricMachine implements IHasG
 		}
 	};
 	public final InvSlotOutput outputSlot = new InvSlotOutput(this, "output", 1);
-	public final InvSlotConsumableLiquid containerslot = new InvSlotConsumableLiquidByList(
+	public final InvSlotConsumableLiquid containerSlot = new InvSlotConsumableLiquidByList(
 		this, "container", InvSlot.Access.I, 1, InvSlot.InvSide.TOP, InvSlotConsumableLiquid.OpType.Fill, Ic2Fluids.UU_MATTER.still()
 	);
 	@GuiSynced
@@ -75,13 +72,12 @@ public class TileEntityMatter extends TileEntityElectricMachine implements IHasG
 	public int scrap = 0;
 	public boolean redstonePowered = false;
 	private double lastEnergy;
-	private int state = 0;
 	private int prevState = 0;
 
 	public TileEntityMatter(BlockPos pos, BlockState state)
 	{
 		super(
-			Ic2BlockEntities.MATTER_GENERATOR, pos, state, Math.round(1000000.0F * (float) IC2Config.balance.uuEnergyFactor.get().floatValue()), getDefaultTier()
+			Ic2BlockEntities.MATTER_GENERATOR, pos, state, Math.round(1000000.0F * IC2Config.balance.uuEnergyFactor.get().floatValue()), getDefaultTier()
 		);
 		this.upgradeSlot = new InvSlotUpgrade(this, "upgrade", 4);
 		this.redstone = this.addComponent(new Redstone(this));
@@ -122,9 +118,9 @@ public class TileEntityMatter extends TileEntityElectricMachine implements IHasG
 	{
 	}
 
-	private static int applyModifier(int base, int extra, double multiplier)
+	private static int applyModifier(int base, int extra)
 	{
-		double ret = Math.round(((double) base + extra) * multiplier);
+		double ret = Math.round(((double) base + extra));
 		return ret > 2.147483647E9 ? Integer.MAX_VALUE : (int) ret;
 	}
 
@@ -177,7 +173,6 @@ public class TileEntityMatter extends TileEntityElectricMachine implements IHasG
 			}
 
 			this.activate(playSubSound);
-			// 确保 sub sound 的状态与 playSubSound 一致（处理机器已在运行中时加入/耗尽废料的情况）
 			if (this.getActive())
 			{
 				if (playSubSound && this.subLoopingSound != null && !this.subLoopingSound.isPlaying())
@@ -204,7 +199,7 @@ public class TileEntityMatter extends TileEntityElectricMachine implements IHasG
 				needsInvUpdate = this.attemptGeneration();
 			}
 
-			needsInvUpdate |= this.containerslot.processFromTank(this.fluidTank, this.outputSlot);
+			needsInvUpdate |= this.containerSlot.processFromTank(this.fluidTank, this.outputSlot);
 			this.lastEnergy = this.energy.getEnergy();
 			if (needsInvUpdate)
 			{
@@ -212,22 +207,10 @@ public class TileEntityMatter extends TileEntityElectricMachine implements IHasG
 			}
 		} else
 		{
-			this.setState(0);
+			this.setState();
 			this.setActive(false);
 		}
 	}
-
-	public boolean amplificationIsAvailable()
-	{
-		if (this.scrap > 0)
-		{
-			return true;
-		}
-
-		MachineRecipeResult<? extends IRecipeInput, ? extends Integer, ? extends ItemStack> recipe = this.amplifierSlot.process();
-		return recipe != null && recipe.getOutput() > 0;
-	}
-
 	public boolean attemptGeneration()
 	{
 		if (this.fluidTank.getFluidAmount() + 1 > this.fluidTank.getCapacity())
@@ -258,15 +241,14 @@ public class TileEntityMatter extends TileEntityElectricMachine implements IHasG
 		return new ContainerMatter(syncId, inventory, this);
 	}
 
-	private void setState(int aState)
+	private void setState()
 	{
-		this.state = aState;
-		if (this.prevState != this.state)
+		if (this.prevState != 0)
 		{
 			IC2.network.get(true).updateTileEntityField(this, "state");
 		}
 
-		this.prevState = this.state;
+		this.prevState = 0;
 	}
 
 	@Override
@@ -291,7 +273,7 @@ public class TileEntityMatter extends TileEntityElectricMachine implements IHasG
 	public void setUpgradestat()
 	{
 		this.upgradeSlot.onChanged();
-		this.energy.setSinkTier(applyModifier(getDefaultTier(), this.upgradeSlot.extraTier, 1.0));
+		this.energy.setSinkTier(applyModifier(getDefaultTier(), this.upgradeSlot.extraTier));
 	}
 
 	@Override

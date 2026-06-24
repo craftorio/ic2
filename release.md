@@ -1,4 +1,4 @@
-# 2.10.29-ex120
+0# 2.10.29-ex120
 
 我们很高兴宣布：适用于 1.20.1 Forge 版本的 IndustrialCraft 2 **正式版** 终于发布了！
 
@@ -17,7 +17,6 @@
 - 蒸汽动能发生机的显示重叠（GuiSteamKineticGenerator）
 - 拟态板完全是坏的 `ItemObscurator`
 - 日光灯不能用（仅限合成）
-- 物质生成机废料增幅声音没修好
 
 ### 不急
 
@@ -32,8 +31,13 @@
 ### 要做
 
 - 燃料棒（锂）和燃料棒（氚）：考虑后续版本的聚变堆
-- 高级太阳能：移植
-- 重力装甲：移植
+
+### 准备迁移的联动 Mod
+
+- [Iridium Source](https://www.mcmod.cn/class/2588.html)
+- [METS](https://www.mcmod.cn/class/2217.html)
+- [Gravitation Suite](https://www.mcmod.cn/class/255.html)
+- [ASP](https://www.mcmod.cn/class/23.html)
 
 ## 与原版的区别
 
@@ -41,7 +45,7 @@
 
 - 充电座：现在的无线充电机制不受电压等级限制，但充电速率仍然受限于充电座的规格；充电的顺序为：主手、副手、头盔、胸甲、护腿、靴子、快捷栏0~8、物品栏从左上到右下。
 - 删除：旧版粉色粘球形态的 UU 物质、精炼铁锭
-- 翻译：以中文为基准, 重做翻译（翻译有小巧思，致歉）。全部扁平化
+- 翻译：以中文为基准, 重做翻译。全部扁平化
 - 矿脉生成，请使用 [JustEnoughResources](https://github.com/way2muchnoise/JustEnoughResources) 查看。
 
 ### 大特性

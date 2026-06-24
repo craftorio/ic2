@@ -1,10 +1,42 @@
 {
   "variants": {
-    "active=false": {
+    "facing=down,active=false": {
+      "model": "ic2:block/wiring/chargepad/batbox_chargepad",
+      "x": 90
+    },
+    "facing=down,active=true": {
+      "model": "ic2:block/wiring/chargepad/batbox_chargepad_active",
+      "x": 90
+    },
+    "facing=north,active=false": {
       "model": "ic2:block/wiring/chargepad/batbox_chargepad"
     },
-    "active=true": {
+    "facing=north,active=true": {
       "model": "ic2:block/wiring/chargepad/batbox_chargepad_active"
+    },
+    "facing=south,active=false": {
+      "model": "ic2:block/wiring/chargepad/batbox_chargepad",
+      "y": 180
+    },
+    "facing=south,active=true": {
+      "model": "ic2:block/wiring/chargepad/batbox_chargepad_active",
+      "y": 180
+    },
+    "facing=east,active=false": {
+      "model": "ic2:block/wiring/chargepad/batbox_chargepad",
+      "y": 90
+    },
+    "facing=east,active=true": {
+      "model": "ic2:block/wiring/chargepad/batbox_chargepad_active",
+      "y": 90
+    },
+    "facing=west,active=false": {
+      "model": "ic2:block/wiring/chargepad/batbox_chargepad",
+      "y": 270
+    },
+    "facing=west,active=true": {
+      "model": "ic2:block/wiring/chargepad/batbox_chargepad_active",
+      "y": 270
     }
   }
 }

@@ -11,6 +11,25 @@
       "entries": [
         {
           "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:copy_name",
+              "source": "block_entity"
+            },
+            {
+              "function": "minecraft:copy_nbt",
+              "ops": [
+                {
+                  "op": "replace",
+                  "source": "Contents",
+                  "target": "Contents"
+                }
+              ],
+              "source": {
+                "type": "ic2:block_nbt"
+              }
+            }
+          ],
           "name": "ic2:steel_storage_box"
         }
       ],

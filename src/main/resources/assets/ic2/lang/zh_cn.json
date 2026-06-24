@@ -447,6 +447,8 @@
 "death.attack.ic2.radiation.player": "%1$s在试图逃离%2$s时死于辐射",
 "death.attack.ic2.reactorExplosion": "%1$s被核反应堆炸死了",
 "death.attack.ic2.reactorExplosion.player": "%1$s试图逃离%2$s时被核反应堆炸死了",
+"death.attack.ic2.crop_eating": "%1$s被食人花吃掉了",
+"death.attack.ic2.crop_eating.player": "%1$s在试图逃离%2$s时被食人花吃掉了",
 "effect.ic2.radiation": "辐射",
 "fluid_type.ic2.air": "压缩空气",
 "fluid_type.ic2.biogas": "沼气",

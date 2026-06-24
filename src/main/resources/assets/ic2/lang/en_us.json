@@ -447,6 +447,8 @@
 "death.attack.ic2.radiation.player": "%1$s died of radiation poisoning whilst trying to escape %2$s",
 "death.attack.ic2.reactorExplosion": "%1$s was killed by a nuclear reactor meltdown",
 "death.attack.ic2.reactorExplosion.player": "%1$s was killed by a nuclear reactor meltdown whilst trying to escape %2$s",
+"death.attack.ic2.crop_eating": "%1$s was eaten by a crop",
+"death.attack.ic2.crop_eating.player": "%1$s was eaten by a crop whilst trying to escape %2$s",
 "effect.ic2.radiation": "Radiation",
 "fluid_type.ic2.air": "Compressed Air",
 "fluid_type.ic2.biogas": "Biogas",

@@ -425,6 +425,8 @@
 	"death.attack.ic2.radiation.player": "%1$s погиб от радиационного отравления, пытаясь спастись от %2$s",
 	"death.attack.ic2.reactorExplosion": "%1$s погиб при расплавлении ядерного реактора",
 	"death.attack.ic2.reactorExplosion.player": "%1$s погиб при расплавлении ядерного реактора, пытаясь спастись от %2$s",
+	"death.attack.ic2.crop_eating": "%1$s был съеден растением",
+	"death.attack.ic2.crop_eating.player": "%1$s был съеден растением, пытаясь спастись от %2$s",
 	"effect.ic2.radiation": "Радиация",
 	"fluid_type.ic2.air": "Сжатый воздух",
 	"fluid_type.ic2.biogas": "Биогаз",

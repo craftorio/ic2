@@ -87,7 +87,7 @@ public class TileEntityBase extends TileEntityInventory
 		}
 	}
 
-	public boolean startPlaySound(boolean playSubSound)
+	public void startPlaySound(boolean playSubSound)
 	{
 		if (this.startSound != null)
 		{
@@ -97,15 +97,13 @@ public class TileEntityBase extends TileEntityInventory
 			}
 
 			this.startSound.playOnce();
-			return true;
 		} else
 		{
 			this.playLoopingSound(playSubSound);
-			return false;
 		}
 	}
 
-	public boolean playLoopingSound(boolean playSubSound)
+	public void playLoopingSound(boolean playSubSound)
 	{
 		if (this.loopingSound != null)
 		{
@@ -114,65 +112,44 @@ public class TileEntityBase extends TileEntityInventory
 			{
 				this.subLoopingSound.play();
 			}
-
-			return true;
-		} else
-		{
-			return false;
 		}
 	}
 
-	public boolean stopLoopingSound()
+	public void stopLoopingSound()
 	{
-		boolean stopped = false;
 		if (this.loopingSound != null)
 		{
 			this.loopingSound.stop();
-			stopped = true;
 		}
 
 		if (this.subLoopingSound != null)
 		{
 			this.subLoopingSound.stop();
-			stopped = true;
 		}
 
-		return stopped;
 	}
 
-	public boolean stopStartSound()
+	public void stopStartSound()
 	{
 		if (this.startSound != null)
 		{
 			this.startSound.stop();
-			return true;
-		} else
-		{
-			return false;
 		}
 	}
 
-	public boolean playStopSound()
+	public void playStopSound()
 	{
 		if (this.stopSound != null)
 		{
 			this.stopSound.playOnce();
-			return true;
-		} else
-		{
-			return false;
 		}
 	}
 
-	public boolean playInterruptSound()
+	public void playInterruptSound()
 	{
 		if (this.interruptSound != null)
 		{
 			this.interruptSound.playOnce();
-			return true;
-		} else
-		{
-			return false;
 		}
 	}
 
@@ -243,12 +220,6 @@ public class TileEntityBase extends TileEntityInventory
 		this.stopSound = null;
 		this.interruptSound = null;
 	}
-
-	protected boolean isLoopingSoundPlaying()
-	{
-		return this.loopingSound != null && this.loopingSound.isPlaying();
-	}
-
 	protected boolean isLoopingSoundIdling()
 	{
 		return this.loopingSound != null && !this.loopingSound.isPlaying();

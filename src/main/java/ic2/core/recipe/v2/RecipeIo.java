@@ -56,7 +56,7 @@ public class RecipeIo
 				return new RecipeInputFluidContainer(asFluid(object.get("fluid"), "fluid"), GsonHelper.getAsInt(object, "amount"));
 			}
 
-			if (object.has("nbt"))
+			if (object.has("data"))
 			{
 				Item item = GsonHelper.getAsItem(object, "item");
 				ItemStack stack = new ItemStack(item, count);

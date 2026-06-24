@@ -950,7 +950,7 @@
 	"item.ic2.mining_laser.tooltip.mode.lossless": "Без втрат",
 	"item.ic2.mining_laser.tooltip.mode.lowFocus": "Слабофокусний",
 	"item.ic2.mining_laser.tooltip.mode.mining": "Гірничий",
-	"item.ic2.mining_laser.tooltip.mode.noShear": "Без зрізання",
+	"item.ic2.mining_laser.tooltip.mode.no_shear": "Без зрізання",
 	"item.ic2.mining_laser.tooltip.mode.normal": "Звичайний",
 	"item.ic2.mining_laser.tooltip.mode.not_in_hand": "Заряджати предмети не в руці",
 	"item.ic2.mining_laser.tooltip.mode.scatter": "Розсіювання",

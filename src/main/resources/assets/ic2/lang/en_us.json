@@ -1014,7 +1014,7 @@
 "item.ic2.mining_laser.tooltip.mode.lossless": "Lossless",
 "item.ic2.mining_laser.tooltip.mode.lowFocus": "Low-Focus",
 "item.ic2.mining_laser.tooltip.mode.mining": "Mining",
-"item.ic2.mining_laser.tooltip.mode.noShear": "No Shearing",
+"item.ic2.mining_laser.tooltip.mode.no_shear": "No Shearing",
 "item.ic2.mining_laser.tooltip.mode.normal": "Normal",
 "item.ic2.mining_laser.tooltip.mode.not_in_hand": "Charge Items not in hand",
 "item.ic2.mining_laser.tooltip.mode.scatter": "Scatter",

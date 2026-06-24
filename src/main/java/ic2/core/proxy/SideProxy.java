@@ -59,5 +59,7 @@ public interface SideProxy
 
 	void messagePlayer(Player player, String translatable, Object... args);
 
+	void messagePlayer(Player player, Component translatable);
+
 	<T extends BlockEntity & IRotorProvider> void registerRotorProvider(BlockEntityType<T> var1);
 }

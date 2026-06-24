@@ -39,7 +39,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.gameevent.GameEvent.Context;
-import net.minecraftforge.common.IForgeShearable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -79,11 +78,11 @@ public class ItemElectricToolChainsaw extends ItemElectricTool implements IHitSo
 			if (compoundTag.getBoolean("disableShear"))
 			{
 				compoundTag.putBoolean("disableShear", false);
-				IC2.sideProxy.messagePlayer(player, "item.ic2.mining_laser.tooltip.mode", "item.ic2.mining_laser.tooltip.mode.normal");
+				IC2.sideProxy.messagePlayer(player, Component.translatable("item.ic2.mining_laser.tooltip.mode", Component.translatable("item.ic2.mining_laser.tooltip.mode.normal")));
 			} else
 			{
 				compoundTag.putBoolean("disableShear", true);
-				IC2.sideProxy.messagePlayer(player, "item.ic2.mining_laser.tooltip.mode", "item.ic2.mining_laser.tooltip.mode.noShear");
+				IC2.sideProxy.messagePlayer(player, Component.translatable("item.ic2.mining_laser.tooltip.mode", Component.translatable("item.ic2.mining_laser.tooltip.mode.no_shear")));
 			}
 		}
 

@@ -950,7 +950,7 @@
 	"item.ic2.mining_laser.tooltip.mode.lossless": "Без потерь",
 	"item.ic2.mining_laser.tooltip.mode.lowFocus": "Слабофокусный",
 	"item.ic2.mining_laser.tooltip.mode.mining": "Добыча",
-	"item.ic2.mining_laser.tooltip.mode.noShear": "Без стрижки",
+	"item.ic2.mining_laser.tooltip.mode.no_shear": "Без стрижки",
 	"item.ic2.mining_laser.tooltip.mode.normal": "Обычный",
 	"item.ic2.mining_laser.tooltip.mode.not_in_hand": "Заряжать предметы не в руке",
 	"item.ic2.mining_laser.tooltip.mode.scatter": "Рассеивание",

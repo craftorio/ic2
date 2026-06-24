@@ -233,6 +233,12 @@ public final class SideProxyServer implements SideProxy
 	}
 
 	@Override
+	public void messagePlayer(Player player, Component translatable)
+	{
+		messagePlayer(player, translatable.getString());
+	}
+
+	@Override
 	public <T extends BlockEntity & IRotorProvider> void registerRotorProvider(BlockEntityType<T> type)
 	{
 	}

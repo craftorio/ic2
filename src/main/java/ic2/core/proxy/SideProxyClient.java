@@ -355,6 +355,11 @@ public final class SideProxyClient implements SideProxy
 			player.displayClientMessage(Component.translatable(translatable, args.length > 0 ? SideProxyServer.getMessageComponents(args) : new Object[0]), false);
 	}
 
+	public void messagePlayer(Player player, Component translatable)
+	{
+		messagePlayer(player, translatable.getString());
+	}
+
 	@Override
 	public <T extends BlockEntity & IRotorProvider> void registerRotorProvider(BlockEntityType<T> type)
 	{

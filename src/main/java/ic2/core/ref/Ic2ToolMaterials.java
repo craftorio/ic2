@@ -4,7 +4,7 @@ import java.util.function.Supplier;
 
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.level.ItemLike;
+import org.jetbrains.annotations.NotNull;
 
 public enum Ic2ToolMaterials implements Tier
 {
@@ -15,16 +15,16 @@ public enum Ic2ToolMaterials implements Tier
 	private final int itemDurability;
 	private final float miningSpeed;
 	private final float attackDamage;
-	private final int enchantability;
+	private final int enchantAbility;
 	private final Supplier<Ingredient> repairIngredient;
 
-	Ic2ToolMaterials(int miningLevel, int itemDurability, float miningSpeed, float attackDamage, int enchantability, Supplier<Ingredient> repairIngredient)
+	Ic2ToolMaterials(int miningLevel, int itemDurability, float miningSpeed, float attackDamage, int enchantAbility, Supplier<Ingredient> repairIngredient)
 	{
 		this.miningLevel = miningLevel;
 		this.itemDurability = itemDurability;
 		this.miningSpeed = miningSpeed;
 		this.attackDamage = attackDamage;
-		this.enchantability = enchantability;
+		this.enchantAbility = enchantAbility;
 		this.repairIngredient = repairIngredient;
 	}
 
@@ -50,10 +50,10 @@ public enum Ic2ToolMaterials implements Tier
 
 	public int getEnchantmentValue()
 	{
-		return this.enchantability;
+		return this.enchantAbility;
 	}
 
-	public Ingredient getRepairIngredient()
+	public @NotNull Ingredient getRepairIngredient()
 	{
 		return this.repairIngredient.get();
 	}

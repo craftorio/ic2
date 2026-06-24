@@ -950,7 +950,7 @@
 	"item.ic2.mining_laser.tooltip.mode.lossless": "Bezstratny",
 	"item.ic2.mining_laser.tooltip.mode.lowFocus": "Niskiej ostrości",
 	"item.ic2.mining_laser.tooltip.mode.mining": "Górniczy",
-	"item.ic2.mining_laser.tooltip.mode.noShear": "Bez strzyżenia",
+	"item.ic2.mining_laser.tooltip.mode.no_shear": "Bez strzyżenia",
 	"item.ic2.mining_laser.tooltip.mode.normal": "Normalny",
 	"item.ic2.mining_laser.tooltip.mode.not_in_hand": "Ładuj przedmioty spoza ręki",
 	"item.ic2.mining_laser.tooltip.mode.scatter": "Rozproszony",

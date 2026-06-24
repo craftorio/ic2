@@ -1014,7 +1014,7 @@
 "item.ic2.mining_laser.tooltip.mode.lossless": "无损模式",
 "item.ic2.mining_laser.tooltip.mode.lowFocus": "低聚焦模式",
 "item.ic2.mining_laser.tooltip.mode.mining": "挖矿模式",
-"item.ic2.mining_laser.tooltip.mode.noShear": "不剪叶子模式",
+"item.ic2.mining_laser.tooltip.mode.no_shear": "不剪叶子模式",
 "item.ic2.mining_laser.tooltip.mode.normal": "标准模式",
 "item.ic2.mining_laser.tooltip.mode.not_in_hand": "给工具栏中不在手上的物品充电",
 "item.ic2.mining_laser.tooltip.mode.scatter": "散射模式",

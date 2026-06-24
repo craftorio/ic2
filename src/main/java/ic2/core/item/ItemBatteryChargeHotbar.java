@@ -35,7 +35,7 @@ public class ItemBatteryChargeHotbar extends ItemBattery implements IBoxable
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag context)
+	public void appendHoverText(@NotNull ItemStack stack, Level world, @NotNull List<Component> tooltip, @NotNull TooltipFlag context)
 	{
 		super.appendHoverText(stack, world, tooltip, context);
 		Mode mode = getMode(stack);

@@ -103,7 +103,7 @@ public class ItemToolCrowbar extends TieredItem implements IEnhancedOverlayProvi
 	@OnlyIn(Dist.CLIENT)
 	public void appendHoverText(@NotNull ItemStack stack, Level worldIn, List<Component> info, @NotNull TooltipFlag flagIn)
 	{
-		info.add(Component.translatable("item.ic2.crowbar.tooltip.remove", Minecraft.getInstance().options.keyRight.getName()));
+		info.add(Component.translatable("item.ic2.crowbar.tooltip.remove", Minecraft.getInstance().options.keyRight.getKey().getDisplayName()));
 	}
 
 	@Override

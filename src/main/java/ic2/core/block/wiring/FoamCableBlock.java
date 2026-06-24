@@ -1,7 +1,6 @@
 package ic2.core.block.wiring;
 
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 
 public class FoamCableBlock extends AbstractCableBlock
 {
@@ -27,6 +26,6 @@ public class FoamCableBlock extends AbstractCableBlock
 	@Override
 	public boolean isHardFoam(BlockState state)
 	{
-		return ((CableFoam) state.getValue(foamProperty)).isHard();
+		return state.getValue(foamProperty).isHard();
 	}
 }

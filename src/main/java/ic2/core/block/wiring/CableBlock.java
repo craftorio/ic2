@@ -1,7 +1,6 @@
 package ic2.core.block.wiring;
 
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 
 public class CableBlock extends AbstractCableBlock
 {

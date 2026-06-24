@@ -24,6 +24,7 @@ import ic2.core.proxy.EnvProxy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -293,6 +294,7 @@ public final class EnvProxyForge implements EnvProxy
 				List<Supplier<Item>> items = Ic2Items.CREATIVE_TAB_ITEMS.get(groupType);
 				if (items != null)
 				{
+					items.sort(Comparator.comparing(s -> BuiltInRegistries.ITEM.getKey(s.get()).toString()));
 					for (Supplier<Item> itemSupplier : items)
 					{
 						Item item = itemSupplier.get();

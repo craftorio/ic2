@@ -16,7 +16,7 @@ import net.minecraftforge.client.event.sound.PlaySoundEvent;
 import net.minecraftforge.client.event.sound.SoundEngineLoadEvent;
 import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -98,12 +98,6 @@ public final class ClientEventHandlerForge
 	public void onGuiCreate(ScreenEvent.Init event)
 	{
 		EventHandlerClient.onGuiCreate(event.getScreen(), event.getListenersList(), event::addListener);
-	}
-
-	@SubscribeEvent
-	public void onDrawTooltip(ItemTooltipEvent event)
-	{
-		EventHandlerClient.onDrawTooltip(event.getItemStack(), event.getToolTip());
 	}
 
 	@SubscribeEvent

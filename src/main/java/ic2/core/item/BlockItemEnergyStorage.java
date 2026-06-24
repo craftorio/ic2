@@ -1,9 +1,8 @@
 package ic2.core.item;
 
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.level.block.Block;
 
-public class BlockItemEnergyStorage extends BlockItem
+public class BlockItemEnergyStorage extends ItemBlockIc2
 {
 	public final int maxEnergy;
 

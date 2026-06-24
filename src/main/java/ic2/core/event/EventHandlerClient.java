@@ -1,16 +1,10 @@
 package ic2.core.event;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import ic2.api.energy.EnergyNet;
 import ic2.api.item.ElectricItem;
 import ic2.api.item.IEnhancedOverlayProvider;
 import ic2.core.GuiOverlayer;
 import ic2.core.IC2;
-import ic2.core.block.comp.Energy;
-import ic2.core.block.tileentity.Ic2TileEntity;
-import ic2.core.block.tileentity.Ic2TileEntityBlock;
-import ic2.core.block.wiring.AbstractCableBlock;
-import ic2.core.block.wiring.tileentity.TileEntityElectricBlock;
 import ic2.core.fluid.FluidHandler;
 import ic2.core.item.IHandHeldInventory;
 import ic2.core.item.tool.AbstractItemNanoSaber;
@@ -26,7 +20,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
@@ -35,13 +28,10 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -152,38 +142,6 @@ public class EventHandlerClient
 
 	public static void onGuiCreate(Screen screen, List<GuiEventListener> widgets, Consumer<GuiEventListener> widgetAdder)
 	{
-	}
-
-	public static void onDrawTooltip(ItemStack stack, List<Component> out)
-	{
-		if (stack.getItem() instanceof BlockItem blockItem && blockItem.getBlock() instanceof Ic2TileEntityBlock block)
-		{
-			Ic2TileEntity dummyTe = block.getDummyTe();
-			if (dummyTe.hasComponent(Energy.class))
-			{
-				Energy energy = dummyTe.getComponent(Energy.class);
-				if (!energy.getSourceDirs().isEmpty())
-				{
-					out.add(Component.translatable("ic2.item.tooltip.power_tier", energy.getSourceTier()).withStyle(ChatFormatting.GRAY));
-				} else if (!energy.getSinkDirs().isEmpty())
-				{
-					out.add(Component.translatable("ic2.item.tooltip.power_tier", energy.getSinkTier()).withStyle(ChatFormatting.GRAY));
-				}
-
-				if (dummyTe instanceof TileEntityElectricBlock electricBlock)
-				{
-					out.add(Component.translatable("ic2.item.tooltip.Output",
-						Math.round(EnergyNet.instance.getPowerFromTier(energy.getSourceTier()))));
-					out.add(Component.translatable("ic2.item.tooltip.Capacity", electricBlock.getCapacity()));
-					double stored = stack.hasTag() ? stack.getTag().getDouble("energy") : 0.0;
-					out.add(Component.translatable("ic2.item.tooltip.Store", (long) stored));
-				}
-			}
-		} else if (stack.getItem() instanceof BlockItem blockItem && blockItem.getBlock() instanceof AbstractCableBlock cableBlock)
-		{
-			ResourceLocation rl = ForgeRegistries.ITEMS.getKey(blockItem);
-			out.add(Component.translatable("item.ic2." + rl.getPath() + ".tooltip", cableBlock.getLoss()).withStyle(ChatFormatting.GRAY));
-		}
 	}
 
 	private static final GuiOverlayer guiOverlayer = new GuiOverlayer(SideProxyClient.mc);

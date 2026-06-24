@@ -41,7 +41,7 @@ public class ItemScanner extends BaseElectricItem implements IBoxable, IHandHeld
 	}
 
 	@OnlyIn(Dist.CLIENT)
-	public void appendHoverText(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag advanced)
+	public void appendHoverText(@NotNull ItemStack stack, Level world, @NotNull List<Component> tooltip, @NotNull TooltipFlag advanced)
 	{
 		super.appendHoverText(stack, world, tooltip, advanced);
 		tooltip.add(Component.translatable("ic2.scanner.range", this.getScanRange()).withStyle(ChatFormatting.GRAY));

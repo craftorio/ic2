@@ -24,10 +24,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -62,7 +59,7 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 	public static final BooleanProperty WEST = BlockStateProperties.WEST;
 	private static final Map<CableType, Int2ReferenceMap<AbstractCableBlock>> types = new EnumMap<>(CableType.class);
 	private static boolean pendingHasColor;
-	final CableType type;
+	public final CableType type;
 	final int insulation;
 	private final boolean hasColor;
 
@@ -103,7 +100,6 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 	public abstract boolean isFoam();
 
 	public abstract boolean isHardFoam(BlockState var1);
-
 	public void initializeState(BlockState defaultState)
 	{
 		if (this.isFoam())
@@ -140,7 +136,7 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 		return ret;
 	}
 
-	protected void createBlockStateDefinition(Builder<Block, BlockState> builder)
+	protected void createBlockStateDefinition(@NotNull Builder<Block, BlockState> builder)
 	{
 		if (this.isFoam())
 		{

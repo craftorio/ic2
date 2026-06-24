@@ -111,7 +111,7 @@ public final class ClientEventHandlerForge
 	{
 		if (event.getOverlay() == VanillaGuiOverlay.HOTBAR.type())
 		{
-			EventHandlerClient.onRenderHotBar();
+			EventHandlerClient.onRenderHotBar(event.getGuiGraphics());
 		}
 	}
 

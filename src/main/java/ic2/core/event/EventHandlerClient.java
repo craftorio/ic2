@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import ic2.api.energy.EnergyNet;
 import ic2.api.item.ElectricItem;
 import ic2.api.item.IEnhancedOverlayProvider;
+import ic2.core.GuiOverlayer;
 import ic2.core.IC2;
 import ic2.core.block.comp.Energy;
 import ic2.core.block.tileentity.Ic2TileEntity;
@@ -26,6 +27,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.model.EntityModel;
@@ -184,8 +186,11 @@ public class EventHandlerClient
 		}
 	}
 
-	public static void onRenderHotBar()
+	private static final GuiOverlayer guiOverlayer = new GuiOverlayer(SideProxyClient.mc);
+
+	public static void onRenderHotBar(GuiGraphics guiGraphics)
 	{
+		guiOverlayer.render(guiGraphics);
 	}
 
 	public static SoundInstance onSoundPlayed(SoundInstance sound)

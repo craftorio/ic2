@@ -630,6 +630,9 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 
 	public void drawTooltip(int x, int y, List<Component> text)
 	{
+		// 清空之前的 tooltip，确保只有最后处理的（视觉最上层的）元素 tooltip 被渲染
+		// 避免 TankGauge + SlotGrid 等重叠元素的 tooltip 叠加显示
+		this.queuedTooltips.clear();
 		this.queuedTooltips.add(new Ic2Gui.Tooltip(text, x, y));
 	}
 
@@ -641,6 +644,13 @@ public abstract class Ic2Gui<T extends ContainerBase<? extends Container>> exten
 
 	protected void flushTooltips(GuiGraphics guiGraphics)
 	{
+		// 如果 vanilla 接下来会渲染 slot 物品 tooltip，跳过 IC2 的 tooltip，避免与物品 tooltip 重叠
+		if (this.hoveredSlot != null && this.hoveredSlot.hasItem() && this.menu.getCarried().isEmpty())
+		{
+			this.queuedTooltips.clear();
+			return;
+		}
+
 		for (Ic2Gui.Tooltip tooltip : this.queuedTooltips)
 		{
 			guiGraphics.renderTooltip(this.font, tooltip.text, java.util.Optional.empty(), tooltip.x, tooltip.y);

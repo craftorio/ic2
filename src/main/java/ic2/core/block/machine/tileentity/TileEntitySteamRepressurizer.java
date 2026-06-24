@@ -17,23 +17,22 @@ import ic2.core.ref.Ic2FluidTags;
 import ic2.core.ref.Ic2Fluids;
 import ic2.core.util.Util;
 
-import java.util.Iterator;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.tags.ITag;
+
+import java.util.Objects;
 
 @NotClassic
 public class TileEntitySteamRepressurizer extends TileEntityInventory implements IHasGui
 {
-	protected static final int CONSUMPTION = 10;
 	private static Fluid detectedSteamFluid;
 	@GuiSynced
 	protected final Ic2FluidTank output;
@@ -59,15 +58,13 @@ public class TileEntitySteamRepressurizer extends TileEntityInventory implements
 		Fluid ret = detectedSteamFluid;
 		if (ret == null)
 		{
-			var tag = net.minecraft.core.registries.BuiltInRegistries.FLUID.getTag(Ic2FluidTags.STEAM);
-			if (tag.isPresent())
+			ITag<Fluid> tag = Objects.requireNonNull(ForgeRegistries.FLUIDS.tags()).getTag(Ic2FluidTags.STEAM);
+			for (Fluid entry : tag)
 			{
-				for (Holder<Fluid> entry : tag.get())
-				{
-					detectedSteamFluid = ret = entry.value();
-					break;
-				}
+				detectedSteamFluid = ret = entry;
+				break;
 			}
+
 		}
 
 		return ret;

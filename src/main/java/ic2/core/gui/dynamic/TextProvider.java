@@ -1,7 +1,5 @@
 package ic2.core.gui.dynamic;
 
-import com.google.common.base.Supplier;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -11,6 +9,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.function.Supplier;
 
 import net.minecraft.network.chat.Component;
 
@@ -342,8 +341,6 @@ public class TextProvider
 	public interface ITextProvider
 	{
 		String get(Object var1, Map<String, TextProvider.ITextProvider> var2);
-
-		String getOptional(Object var1, Map<String, TextProvider.ITextProvider> var2);
 	}
 
 	private abstract static class AbstractTextProvider implements TextProvider.ITextProvider
@@ -353,12 +350,6 @@ public class TextProvider
 		{
 			String result = this.getRaw(base, tokens);
 			return result != null ? result : "ERROR";
-		}
-
-		@Override
-		public final String getOptional(Object base, Map<String, TextProvider.ITextProvider> tokens)
-		{
-			return this.getRaw(base, tokens);
 		}
 
 		protected abstract String getRaw(Object var1, Map<String, TextProvider.ITextProvider> var2);

@@ -12,3 +12,6 @@ authors="${mod_authors}"
 description='''
 ${mod_description}
 '''
+
+[[mixin]]
+config="ic2.mixins.json"

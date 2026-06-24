@@ -33,6 +33,11 @@
                   "op": "replace",
                   "source": "LootTableSeed",
                   "target": "BlockEntityTag.LootTableSeed"
+                },
+                {
+                  "op": "replace",
+                  "source": "PLACED",
+                  "target": "PLACED"
                 }
               ],
               "source": {

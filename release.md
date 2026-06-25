@@ -11,7 +11,7 @@ We'd apologize for our documentations are in Chinese. Please use translation.
 - 创造模式物品栏乱序（目前是按照注册顺序的，后续会调整为分类顺序）
 - 末影珍珠粉材质更改
 - 拟态板物品模型不显示
-- 日光灯不能用（仅限合成）
+- 电表什么都不显示
 
 ### 不急
 
@@ -20,7 +20,8 @@ We'd apologize for our documentations are in Chinese. Please use translation.
 
 ### 要做
 
-- 燃料棒（锂）和燃料棒（氚）：考虑后续版本的聚变堆
+- 燃料棒（锂）和燃料棒（氚）：原版无功能，考虑聚变堆
+- 改写电网，从 EU 发包到引入电流概念
 
 ### 准备迁移的联动 Mod
 

@@ -30,11 +30,14 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SupportType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class TileEntityLuminator extends Ic2TileEntity
 {
@@ -50,16 +53,16 @@ public class TileEntityLuminator extends Ic2TileEntity
 		comparator.setUpdate(this.energy::getComparatorValue);
 	}
 
-	public static boolean isValidPosition(Level world, BlockPos pos, Direction side)
+	public static boolean isValidPosition(LevelReader world, BlockPos pos, Direction side)
 	{
-		if (!world.isClientSide)
+		if (world instanceof Level level && !level.isClientSide)
 		{
 			if (world.getBlockState(pos).isFaceSturdy(world, pos, side, SupportType.FULL))
 			{
 				return true;
 			}
 
-			IEnergyTile tile = EnergyNet.instance.getSubTile(world, pos);
+			IEnergyTile tile = EnergyNet.instance.getSubTile(level, pos);
 			return tile instanceof IEnergyEmitter;
 		} else
 		{
@@ -120,6 +123,21 @@ public class TileEntityLuminator extends Ic2TileEntity
 			this.setActive(lit);
 			this.updateLight();
 		}
+
+		if (lit)
+		{
+			this.igniteTouchingMonsters();
+		}
+	}
+
+	private void igniteTouchingMonsters()
+	{
+		AABB bounds = aabbMap.get(this.getFacing()).get(0).move(this.worldPosition);
+		for (Monster monster : this.getLevel().getEntitiesOfClass(Monster.class, bounds, Entity::isAlive))
+		{
+			boolean isUndead = monster.getMobType() == MobType.UNDEAD;
+			monster.setRemainingFireTicks(isUndead ? 20 : 10);
+		}
 	}
 
 	private boolean isLit()
@@ -165,20 +183,15 @@ public class TileEntityLuminator extends Ic2TileEntity
 	}
 
 	@Override
-	protected List<AABB> getAabbs(boolean forCollision)
+	protected VoxelShape getCollisionShape()
 	{
-		return aabbMap.get(this.getFacing());
+		return Shapes.empty();
 	}
 
 	@Override
-	protected void onEntityCollision(Entity entity)
+	protected List<AABB> getAabbs(boolean forCollision)
 	{
-		super.onEntityCollision(entity);
-		if (this.getActive() && entity instanceof Monster)
-		{
-			boolean isUndead = ((LivingEntity) entity).getMobType() == MobType.UNDEAD;
-			entity.setRemainingFireTicks(isUndead ? 20 : 10);
-		}
+		return aabbMap.get(this.getFacing());
 	}
 
 	@Override

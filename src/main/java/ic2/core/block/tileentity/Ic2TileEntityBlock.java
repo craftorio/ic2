@@ -8,6 +8,7 @@ import ic2.api.tile.RetexturableBlock;
 import ic2.core.block.comp.ComparatorEmitter;
 import ic2.core.block.comp.Obscuration;
 import ic2.core.block.comp.RedstoneEmitter;
+import ic2.core.block.wiring.tileentity.TileEntityLuminator;
 import ic2.core.crop.Ic2CropType;
 import ic2.core.crop.TileEntityCrop;
 import ic2.core.util.Util;
@@ -251,7 +252,13 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 
 		if (this.facingProperty != null)
 		{
-			ret = ret.setValue(this.facingProperty, this.getPlacementFacing(ctx.getPlayer(), ctx.getNearestLookingDirection()));
+			Direction facing = this.teClass == TileEntityLuminator.class
+				? ctx.getClickedFace()
+				: this.getPlacementFacing(ctx.getPlayer(), ctx.getNearestLookingDirection());
+			if (this.getSupportedFacings().contains(facing))
+			{
+				ret = ret.setValue(this.facingProperty, facing);
+			}
 		}
 
 		if (this.canActive)
@@ -306,6 +313,12 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 
 	public boolean canSurvive(BlockState state, LevelReader world, BlockPos pos)
 	{
+		if (this.teClass == TileEntityLuminator.class && this.facingProperty != null)
+		{
+			Direction facing = state.getValue(this.facingProperty);
+			return TileEntityLuminator.isValidPosition(world, pos.relative(facing.getOpposite()), facing);
+		}
+
 		return this.cropType == null ? super.canSurvive(state, world, pos) : CropSoilType.contains(world.getBlockState(pos.below()).getBlock()) && super.canSurvive(state, world, pos);
 	}
 

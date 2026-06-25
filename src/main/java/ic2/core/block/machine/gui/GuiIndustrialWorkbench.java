@@ -148,7 +148,7 @@ public class GuiIndustrialWorkbench extends Ic2Gui<ContainerIndustrialWorkbench>
 				}
 			}));
 		}
-		this.addElement(new VanillaButton(this, 93, 42, 16, 16, button -> IC2.network.get(false).sendContainerEvent(GuiIndustrialWorkbench.this.menu, "clear")).withTooltip("Clear"));
+		this.addElement(new VanillaButton(this, 93, 42, 16, 16, button -> IC2.network.get(false).sendContainerEvent(GuiIndustrialWorkbench.this.menu, "clear")).withTooltip("ic2.IndustrialWorkbench.gui.clear"));
 		this.addElement(Image.create(this, 94, 43, 14, 14, GuiElement.commonTexture, 256, 256, 210, 47, 224, 61));
 	}
 

@@ -10,9 +10,14 @@
         <slotgrid name="upgrade" x="151" y="7" cols="1"/>
         <button type="recipe" x="84" y="25" width="3" height="28" event="centrifuge"></button>
     </environment>
-    <gauge name="progress" x="84" y="25" style="progresscentrifuge"></gauge>
+    <tooltip text="ic2.Centrifuge.gui.progress">
+        <gauge name="progress" x="84" y="25" style="progresscentrifuge"/>
+    </tooltip>
     <energygauge x="15" y="38"/>
-    <gauge name="heat" x="68" y="67" style="heatcentrifuge"/>
-    <!--<text x="14" y="25" >Heat</text>-->
+    <text x="14" y="58">{ic2.Centrifuge.gui.heat}</text>
+    <text x="14" y="69">%base.getHeat()%</text>
+    <tooltip text="ic2.Centrifuge.gui.tooltipheat">
+        <gauge name="heat" x="68" y="67" style="heatcentrifuge"/>
+    </tooltip>
     <playerInventory x="7" y="83"/>
 </gui>

@@ -9,7 +9,6 @@ import java.util.List;
 
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 public class ElectrolyzerTank extends AbstractFluidSlot
@@ -80,7 +79,7 @@ public class ElectrolyzerTank extends AbstractFluidSlot
 		List<Component> ret = super.getToolTip();
 		if (this.output != null)
 		{
-			ret.add(Component.literal("Output Tank: " + StringUtils.capitalize(((Direction) this.output.getRight()).getSerializedName())));
+			ret.add(Component.translatable("ic2.Electrolyzer.gui.outputTank", Component.translatable(getDirectionKey((Direction) this.output.getRight()))));
 		}
 
 		return ret;
@@ -90,5 +89,18 @@ public class ElectrolyzerTank extends AbstractFluidSlot
 	protected Ic2FluidStack getFluidStack()
 	{
 		return this.output != null ? (Ic2FluidStack) this.output.getLeft() : null;
+	}
+
+	private static String getDirectionKey(Direction facing)
+	{
+		return switch (facing)
+		{
+			case WEST -> "ic2.dir.West";
+			case EAST -> "ic2.dir.East";
+			case DOWN -> "ic2.dir.Bottom";
+			case UP -> "ic2.dir.Top";
+			case NORTH -> "ic2.dir.North";
+			case SOUTH -> "ic2.dir.South";
+		};
 	}
 }

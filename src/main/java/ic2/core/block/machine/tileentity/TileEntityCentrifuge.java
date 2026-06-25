@@ -60,6 +60,11 @@ public class TileEntityCentrifuge extends TileEntityStandardMachine<IRecipeInput
 		return (double) this.heat / this.workheat;
 	}
 
+	public String getHeat()
+	{
+		return this.heat + " / " + this.workheat + " hU";
+	}
+
 	@Override
 	protected void updateEntityServer()
 	{

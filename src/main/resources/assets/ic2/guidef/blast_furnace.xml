@@ -7,12 +7,22 @@
     <environment name="game">
         <slotgrid name="upgrade" x="151" y="7" cols="1"/>
         <button type="recipe" x="80" y="35" width="22" height="15" event="blast_furnace"></button>
+        <only if="airmiss">
+            <text x="56" y="18" width="70" align="center" color="0xFF4040">{ic2.BlastFurnace.gui.airmiss}</text>
+        </only>
     </environment>
-    <slot name="cellInput" x="7" y="52"/>
     <slot name="cellOutput" x="25" y="52"/>
-    <fluidslot x="55" y="42" name="fluid"/>
-    <gauge name="progress" x="80" y="35" style="progressarrow"/>
-    <text x="14" y="25">Heat</text>
-    <gauge name="heat" x="15" y="34" style="heatcentrifuge"/>
+    <tooltip text="ic2.BlastFurnace.gui.toolair">
+        <slot name="cellInput" x="7" y="52"/>
+        <fluidslot x="55" y="42" name="fluid"/>
+    </tooltip>
+    <tooltip text="ic2.BlastFurnace.gui.progress">
+        <gauge name="progress" x="80" y="35" style="progressarrow"/>
+    </tooltip>
+    <text x="14" y="25">{ic2.BlastFurnace.gui.heat}</text>
+    <text x="14" y="36">%base.getHeat()%</text>
+    <tooltip text="ic2.BlastFurnace.gui.tooltipheat">
+        <gauge name="heat" x="15" y="34" style="heatcentrifuge"/>
+    </tooltip>
     <playerInventory x="7" y="83"/>
 </gui>

@@ -18,6 +18,7 @@ import ic2.core.block.invslot.InvSlotUpgrade;
 import ic2.core.block.tileentity.TileEntityInventory;
 import ic2.core.fluid.Ic2FluidTank;
 import ic2.core.gui.dynamic.DynamicContainer;
+import ic2.core.gui.dynamic.IGuiConditionProvider;
 import ic2.core.gui.dynamic.IGuiValueProvider;
 import ic2.core.network.GrowingBuffer;
 import ic2.core.network.GuiSynced;
@@ -39,7 +40,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 @NotClassic
-public class TileEntityBlastFurnace extends TileEntityInventory implements IUpgradableBlock, IHasGui, IGuiValueProvider
+public class TileEntityBlastFurnace extends TileEntityInventory implements IUpgradableBlock, IHasGui, IGuiValueProvider, IGuiConditionProvider
 {
 	public static int maxHeat = 50000;
 	public final InvSlotProcessableGeneric inputSlot = new InvSlotProcessableGeneric(this, "input", 1, Recipes.blast_furnace);
@@ -222,6 +223,25 @@ public class TileEntityBlastFurnace extends TileEntityInventory implements IUpgr
 		{
 			throw new IllegalArgumentException();
 		}
+	}
+
+	public String getHeat()
+	{
+		return this.heat + " / " + maxHeat + " hU";
+	}
+
+	@Override
+	public boolean getGuiState(String name)
+	{
+		if ("airmiss".equals(name))
+		{
+			MachineRecipeResult<IRecipeInput, Collection<ItemStack>, ItemStack> result = this.getOutput();
+			return result != null
+				&& this.isHot()
+				&& result.getRecipe().getMetaData().getInt("fluid") > this.fluidTank.getFluidAmount();
+		}
+
+		return super.getGuiState(name);
 	}
 
 	@Override

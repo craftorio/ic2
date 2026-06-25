@@ -1,4 +1,3 @@
 {
-  "loader": "ic2:be",
-  "id": "ic2:block/be/cf/obscured_wall"
+  "loader": "ic2:wall"
 }

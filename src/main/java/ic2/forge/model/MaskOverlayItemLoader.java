@@ -12,7 +12,7 @@ public final class MaskOverlayItemLoader implements IGeometryLoader<Ic2Model>
 	{
 		ResourceLocation base = ResourceLocation.parse(obj.get("base").getAsString());
 		ResourceLocation mask = ResourceLocation.parse(obj.get("mask").getAsString());
-		boolean scaleOverlay = obj.has("scale_overlay") ? obj.get("scale_overlay").getAsBoolean() : true;
+		boolean scaleOverlay = !obj.has("scale_overlay") || obj.get("scale_overlay").getAsBoolean();
 		float offset = obj.has("offset") ? obj.get("offset").getAsFloat() : 0.001f;
 		return new MaskOverlayItemModel(base, mask, scaleOverlay, offset);
 	}

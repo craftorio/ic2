@@ -30,7 +30,48 @@ public class TileEntityWall extends Ic2TileEntity
 
 	public void setColor(DyeColor color)
 	{
+		if (this.color == color)
+		{
+			return;
+		}
+
 		this.color = color;
+		if (this.getLevel() == null)
+		{
+			return;
+		}
+
+		if (!this.getLevel().isClientSide)
+		{
+			IC2.network.get(true).updateTileEntityField(this, "color");
+			this.setChanged();
+		} else if (this.updateRenderState())
+		{
+			this.rerender();
+		}
+	}
+
+	public DyeColor getColor()
+	{
+		return this.color;
+	}
+
+	public void initializeFromWall(
+		DyeColor color,
+		Direction side,
+		BlockState refState,
+		String refVariant,
+		Direction refSide,
+		int[] colorMultipliers
+	)
+	{
+		this.color = color;
+		this.obscuration.applyObscuration(side, new Obscuration.ObscurationData(refState, refVariant, refSide, colorMultipliers));
+		if (this.getLevel() != null && !this.getLevel().isClientSide)
+		{
+			this.setChanged();
+			IC2.network.get(true).updateTileEntityField(this, "color");
+		}
 	}
 
 	@Override
@@ -88,7 +129,7 @@ public class TileEntityWall extends Ic2TileEntity
 		this.color = color;
 		if (!this.getLevel().isClientSide)
 		{
-			IC2.network.get(true).updateTileEntityField(this, "obscuration");
+			IC2.network.get(true).updateTileEntityField(this, "color");
 			this.setChanged();
 		} else if (this.updateRenderState())
 		{

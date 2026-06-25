@@ -4,6 +4,7 @@ import ic2.core.event.EventHandlerClient;
 import ic2.forge.model.BeModelLoader;
 import ic2.forge.model.CableModelLoader;
 import ic2.forge.model.MaskOverlayItemLoader;
+import ic2.forge.model.WallModelLoader;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.world.entity.Entity;
@@ -79,6 +80,7 @@ public final class ClientModEventHandlerForge
 		event.register("be", new BeModelLoader());
 		event.register("cable", new CableModelLoader());
 		event.register("mask_overlay", new MaskOverlayItemLoader());
+		event.register("wall", new WallModelLoader());
 	}
 
 	@SubscribeEvent

@@ -33,6 +33,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.client.model.data.ModelData;
 
 public class ItemObscurator extends BaseElectricItem implements PriorityUsableItem, IPlayerItemDataListener
 {
@@ -107,10 +108,9 @@ public class ItemObscurator extends BaseElectricItem implements PriorityUsableIt
 		nbt.remove("refBlock");
 		nbt.remove("refVariant");
 		nbt.remove("refSide");
-		nbt.remove("refColorMul");
+		nbt.remove("refColorMuls");
 	}
 
-	// TODO
 	public static ItemObscurator.ObscuredRenderInfo getRenderInfo(BlockState state, Direction side)
 	{
 		if (ItemBlockRenderTypes.getChunkRenderType(state) == RenderType.translucent())
@@ -119,14 +119,13 @@ public class ItemObscurator extends BaseElectricItem implements PriorityUsableIt
 		}
 
 		BakedModel model = ModelUtil.getBlockModel(state);
+		if (model == null)
+		{
+			return null;
+		}
 
 		RandomSource rand = RandomSource.create(42L);
-		// @Nullable BlockState state,
-		//    @Nullable Direction side,
-		//    @NotNull RandomSource rand,
-		//    @NotNull ModelData data,
-		//    @Nullable RenderType renderType
-		List<BakedQuad> faceQuads = model.getQuads(state, side, rand);
+		List<BakedQuad> faceQuads = model.getQuads(state, side, rand, ModelData.EMPTY, null);
 		if (faceQuads.isEmpty())
 		{
 			return null;
@@ -140,13 +139,13 @@ public class ItemObscurator extends BaseElectricItem implements PriorityUsableIt
 		for (BakedQuad faceQuad : faceQuads)
 		{
 			ClientEnvProxy.QuadData data = SideProxyClient.envProxy.getQuadData(faceQuad);
-			float[] positions = data.positions();
+			float[] positions = normalizeBlockPositions(data.positions());
 			int dx = side.getStepX();
 			int dy = side.getStepY();
 			int dz = side.getStepZ();
-			int xS = (dx + 1) / 2;
-			int yS = (dy + 1) / 2;
-			int zS = (dz + 1) / 2;
+			float xS = (dx + 1) / 2;
+			float yS = (dy + 1) / 2;
+			float zS = (dz + 1) / 2;
 			int firstVertex = -1;
 
 			for (int v = 0; v < 4; v++)
@@ -189,17 +188,52 @@ public class ItemObscurator extends BaseElectricItem implements PriorityUsableIt
 
 		if (uvsOffset == 0)
 		{
-			return null;
+			return getRenderInfoFallback(faceQuads);
 		}
 
 		if (uvsOffset < uvs.length)
 		{
+			int quadCount = uvsOffset / 4;
 			uvs = Arrays.copyOf(uvs, uvsOffset);
-			tints = Arrays.copyOf(tints, uvsOffset / 4);
+			tints = Arrays.copyOf(tints, quadCount);
+			sprites = Arrays.copyOf(sprites, quadCount);
 		}
 
 		tints = internTints(tints);
 		return new ItemObscurator.ObscuredRenderInfo(uvs, tints, sprites);
+	}
+
+	private static ItemObscurator.ObscuredRenderInfo getRenderInfoFallback(List<BakedQuad> faceQuads)
+	{
+		float[] uvs = new float[faceQuads.size() * 4];
+		int[] tints = new int[faceQuads.size()];
+		TextureAtlasSprite[] sprites = new TextureAtlasSprite[faceQuads.size()];
+
+		for (int i = 0; i < faceQuads.size(); i++)
+		{
+			ClientEnvProxy.QuadData data = SideProxyClient.envProxy.getQuadData(faceQuads.get(i));
+			float[] uvsIn = data.uvs();
+			uvs[i * 4] = uvsIn[0];
+			uvs[i * 4 + 1] = uvsIn[1];
+			uvs[i * 4 + 2] = uvsIn[4];
+			uvs[i * 4 + 3] = uvsIn[5];
+			tints[i] = data.tint();
+			sprites[i] = data.sprite();
+		}
+
+		return new ItemObscurator.ObscuredRenderInfo(uvs, internTints(tints), sprites);
+	}
+
+	private static float[] normalizeBlockPositions(float[] positions)
+	{
+		float[] ret = new float[positions.length];
+
+		for (int i = 0; i < positions.length; i++)
+		{
+			ret[i] = positions[i] / 16.0f;
+		}
+
+		return ret;
 	}
 
 	public static int[] internTints(int[] tints)
@@ -245,7 +279,12 @@ public class ItemObscurator extends BaseElectricItem implements PriorityUsableIt
 		BlockPos pos = context.getClickedPos();
 		Direction side = context.getClickedFace();
 		Player player = context.getPlayer();
-		if (!player.isShiftKeyDown() && !world.isClientSide && ElectricItem.manager.canUse(stack, 5000.0))
+		if (player == null)
+		{
+			return InteractionResult.PASS;
+		}
+
+		if (!player.isCrouching() && !world.isClientSide && ElectricItem.manager.canUse(stack, 5000.0))
 		{
 			CompoundTag nbt = StackUtil.getOrCreateNbtData(stack);
 			BlockState refState;
@@ -278,7 +317,7 @@ public class ItemObscurator extends BaseElectricItem implements PriorityUsableIt
 				clear(nbt);
 				return InteractionResult.PASS;
 			}
-		} else if (player.isShiftKeyDown() && world.isClientSide && ElectricItem.manager.canUse(stack, 20000.0))
+		} else if (player.isCrouching() && world.isClientSide && ElectricItem.manager.canUse(stack, 20000.0))
 		{
 			return this.scanBlock(stack, player, world, pos, side) ? InteractionResult.SUCCESS : InteractionResult.PASS;
 		} else
@@ -316,32 +355,39 @@ public class ItemObscurator extends BaseElectricItem implements PriorityUsableIt
 			return false;
 		}
 
-		IC2.network.get(false).sendPlayerItemData(player, player.getInventory().selected, state.getBlock(), variant, side, colorMultipliers);
+		IC2.network.get(false).sendPlayerItemData(player, player.getInventory().selected, state.getBlock(), variant, side.ordinal(), colorMultipliers);
 		return true;
 	}
 
 	@Override
 	public void onPlayerItemNetworkData(Player player, int slot, Object... data)
 	{
-		if (data[0] instanceof Block)
+		if (data.length < 4 || !(data[0] instanceof Block block) || !(data[1] instanceof String variant) || !(data[3] instanceof int[] colorMultipliers))
 		{
-			if (data[1] instanceof String)
-			{
-				if (data[2] instanceof Integer)
-				{
-					if (data[3] instanceof int[])
-					{
-						ItemStack stack = player.getInventory().items.get(slot);
-						if (ElectricItem.manager.use(stack, 20000.0, player))
-						{
-							CompoundTag nbt = StackUtil.getOrCreateNbtData(stack);
-							setState(nbt, (Block) data[0], (String) data[1]);
-							setSide(nbt, (Integer) data[2]);
-							setColorMultipliers(nbt, (int[]) data[3]);
-						}
-					}
-				}
-			}
+			return;
+		}
+
+		int sideOrdinal = -1;
+		if (data[2] instanceof Integer ordinal)
+		{
+			sideOrdinal = ordinal;
+		} else if (data[2] instanceof Direction direction)
+		{
+			sideOrdinal = direction.ordinal();
+		}
+
+		if (sideOrdinal < 0 || sideOrdinal >= Util.ALL_DIRS.length)
+		{
+			return;
+		}
+
+		ItemStack stack = player.getInventory().items.get(slot);
+		if (ElectricItem.manager.use(stack, 20000.0, player))
+		{
+			CompoundTag nbt = StackUtil.getOrCreateNbtData(stack);
+			setState(nbt, block, variant);
+			setSide(nbt, sideOrdinal);
+			setColorMultipliers(nbt, colorMultipliers);
 		}
 	}
 

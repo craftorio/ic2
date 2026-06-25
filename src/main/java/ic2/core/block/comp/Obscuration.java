@@ -100,6 +100,11 @@ public class Obscuration extends TileEntityComponent
 		}
 
 		this.dataMap[side.ordinal()] = data.intern();
+		if (this.parent.getLevel() != null && !this.parent.getLevel().isClientSide)
+		{
+			this.parent.setChanged();
+		}
+
 		this.changeHandler.run();
 		return true;
 	}

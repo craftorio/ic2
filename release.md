@@ -10,7 +10,7 @@ We'd apologize for our documentations are in Chinese. Please use translation.
 
 - 创造模式物品栏乱序（目前是按照注册顺序的，后续会调整为分类顺序）
 - 末影珍珠粉材质更改
-- 拟态板完全是坏的 `ItemObscurator`
+- 拟态板物品模型不显示
 - 日光灯不能用（仅限合成）
 
 ### 不急

@@ -7,6 +7,7 @@ import ic2.core.util.Util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
@@ -205,19 +206,26 @@ final class DynamicBeModelForge extends DynamicBeModel<List<List<BakedQuad>>> im
 	public @NotNull List<BakedQuad> getQuads(BlockState state, Direction side, @NotNull RandomSource rand, ModelData extraData, @Nullable RenderType renderType)
 	{
 		List<List<BakedQuad>> mesh = extraData.get(MESH_DATA);
-		return mesh.get(getIdx(side));
+		if (mesh == null)
+		{
+			return Collections.emptyList();
+		}
+
+		List<BakedQuad> quads = mesh.get(getIdx(side));
+		return quads != null ? quads : Collections.emptyList();
 	}
 
 	protected List<List<BakedQuad>> generateMesh(BakedModel baseModel, int rot, boolean rotX)
 	{
+		RandomSource rand = RandomSource.create(42L);
 		List<List<BakedQuad>> mesh = new ArrayList<>(7);
 
-		for (int i = 0; i < 7; i++) mesh.add(null);
+		for (int i = 0; i < 7; i++) mesh.add(Collections.emptyList());
 
 		for (int i = 0; i < 7; i++)
 		{
 			Direction face = i < 6 ? Util.ALL_DIRS[i] : null;
-			List<BakedQuad> quads = baseModel.getQuads(null, face, null, null, null);
+			List<BakedQuad> quads = baseModel.getQuads(null, face, rand, ModelData.EMPTY, null);
 			int writeIdx = i;
 			if (rot != 0)
 			{

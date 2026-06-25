@@ -1,5 +1,7 @@
 {
   "loader": "ic2:mask_overlay",
   "base": "ic2:item/obscurator_raw",
-  "mask": "ic2:item/tool/electric/obscurator_mask"
+  "mask": "ic2:item/tool/electric/obscurator_mask",
+  "scale_overlay": true,
+  "offset": 0.001
 }

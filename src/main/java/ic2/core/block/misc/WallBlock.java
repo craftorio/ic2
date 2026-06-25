@@ -68,14 +68,15 @@ public class WallBlock extends Block implements StainableBlock, RetexturableBloc
 		int[] refColorMultipliers
 	)
 	{
-		world.setBlockAndUpdate(pos, Ic2Blocks.OBSCURED_WALL.defaultBlockState());
+		if (!world.setBlock(pos, Ic2Blocks.OBSCURED_WALL.defaultBlockState(), Block.UPDATE_ALL))
+		{
+			return false;
+		}
+
 		if (world.getBlockEntity(pos) instanceof TileEntityWall wallBe)
 		{
-			wallBe.setColor(this.color);
-			if (wallBe.getBlockType().retexture(wallBe.getBlockState(), world, pos, side, player, refState, refVariant, refSide, refColorMultipliers))
-			{
-				return true;
-			}
+			wallBe.initializeFromWall(this.color, side, refState, refVariant, refSide, refColorMultipliers);
+			return true;
 		}
 
 		world.setBlockAndUpdate(pos, state);

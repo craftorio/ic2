@@ -12,10 +12,8 @@ We'd apologize for our documentations are in Chinese. Please use translation.
 - 末影珍珠粉材质更改
 - 拟态板完全是坏的 `ItemObscurator`
 - 日光灯不能用（仅限合成）
-- 堆叠状态的能量水晶和兰波顿水晶贴图不对
 
 ### 不急
-
 
 - 自动弹出升级、自动抽入升级、撬棍：原版还没有配方
 - 尚未添加：管道系统

@@ -17,7 +17,7 @@ public interface IElectricItemManager
 
 	default double getChargeLevel(ItemStack stack)
 	{
-		return Math.max(0.0, Math.min(1.0, this.getCharge(stack) / this.getMaxCharge(stack)));
+		return stack.getItem() instanceof IElectricItem ? this.getStackChargeLevel(stack) : 0.0;
 	}
 
 	default double getStackChargeLevel(ItemStack stack)

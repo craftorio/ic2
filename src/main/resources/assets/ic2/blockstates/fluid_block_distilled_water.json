@@ -1,0 +1,20 @@
+{
+  "variants": {
+    "level=0": { "model": "ic2:block/fluid_block_distilled_water" },
+    "level=1": { "model": "ic2:block/fluid_block_distilled_water" },
+    "level=2": { "model": "ic2:block/fluid_block_distilled_water" },
+    "level=3": { "model": "ic2:block/fluid_block_distilled_water" },
+    "level=4": { "model": "ic2:block/fluid_block_distilled_water" },
+    "level=5": { "model": "ic2:block/fluid_block_distilled_water" },
+    "level=6": { "model": "ic2:block/fluid_block_distilled_water" },
+    "level=7": { "model": "ic2:block/fluid_block_distilled_water" },
+    "level=8": { "model": "ic2:block/fluid_block_distilled_water" },
+    "level=9": { "model": "ic2:block/fluid_block_distilled_water" },
+    "level=10": { "model": "ic2:block/fluid_block_distilled_water" },
+    "level=11": { "model": "ic2:block/fluid_block_distilled_water" },
+    "level=12": { "model": "ic2:block/fluid_block_distilled_water" },
+    "level=13": { "model": "ic2:block/fluid_block_distilled_water" },
+    "level=14": { "model": "ic2:block/fluid_block_distilled_water" },
+    "level=15": { "model": "ic2:block/fluid_block_distilled_water" }
+  }
+}

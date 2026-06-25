@@ -1,0 +1,20 @@
+{
+  "variants": {
+    "level=0": { "model": "ic2:block/fluid_block_uu_matter" },
+    "level=1": { "model": "ic2:block/fluid_block_uu_matter" },
+    "level=2": { "model": "ic2:block/fluid_block_uu_matter" },
+    "level=3": { "model": "ic2:block/fluid_block_uu_matter" },
+    "level=4": { "model": "ic2:block/fluid_block_uu_matter" },
+    "level=5": { "model": "ic2:block/fluid_block_uu_matter" },
+    "level=6": { "model": "ic2:block/fluid_block_uu_matter" },
+    "level=7": { "model": "ic2:block/fluid_block_uu_matter" },
+    "level=8": { "model": "ic2:block/fluid_block_uu_matter" },
+    "level=9": { "model": "ic2:block/fluid_block_uu_matter" },
+    "level=10": { "model": "ic2:block/fluid_block_uu_matter" },
+    "level=11": { "model": "ic2:block/fluid_block_uu_matter" },
+    "level=12": { "model": "ic2:block/fluid_block_uu_matter" },
+    "level=13": { "model": "ic2:block/fluid_block_uu_matter" },
+    "level=14": { "model": "ic2:block/fluid_block_uu_matter" },
+    "level=15": { "model": "ic2:block/fluid_block_uu_matter" }
+  }
+}

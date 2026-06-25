@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:block/block",
   "textures": {
-    "particle": "ic2:block/fluid/hot_coolant_still"
+    "particle": "ic2:block/fluid/weed_ex_still"
   }
 }

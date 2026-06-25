@@ -16,6 +16,7 @@ import ic2.core.sound.SoundManagerClient;
 import ic2.core.util.StackUtil;
 import ic2.core.util.Util;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -23,6 +24,7 @@ import java.util.function.Consumer;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
@@ -34,6 +36,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
@@ -45,6 +49,21 @@ public class EventHandlerClient
 {
 	public static void onClientSetup()
 	{
+		List<Block> fluidBlocks = new ArrayList<>();
+		for (Block block : ForgeRegistries.BLOCKS.getValues())
+		{
+			ResourceLocation id = ForgeRegistries.BLOCKS.getKey(block);
+			if (id != null && "ic2".equals(id.getNamespace()) && id.getPath().startsWith("fluid_block_"))
+			{
+				fluidBlocks.add(block);
+			}
+		}
+
+		if (!fluidBlocks.isEmpty())
+		{
+			SideProxyClient.envProxy.registerBlockLayer(RenderType.translucent(), fluidBlocks.toArray(Block[]::new));
+		}
+
 		SideProxyClient.envProxy.registerModelPredicateProvider(IC2.getIdentifier("charge"), (stack, world, entity, seed) -> (float) ElectricItem.manager.getChargeLevel(stack));
 
 		for (Direction direction : Util.ALL_DIRS)

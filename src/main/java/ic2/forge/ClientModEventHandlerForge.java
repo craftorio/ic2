@@ -93,6 +93,8 @@ public final class ClientModEventHandlerForge
 	@SubscribeEvent
 	public void onClientSetup(FMLClientSetupEvent event)
 	{
+		EventHandlerClient.onClientSetup();
+
 		for (ClientEnvProxyForge.BlockLayerRegistration reg : ClientEnvProxyForge.blockLayerRegistrations)
 		{
 			for (var block : reg.blocks())
@@ -100,7 +102,5 @@ public final class ClientModEventHandlerForge
 				ItemBlockRenderTypes.setRenderLayer(block, reg.layer());
 			}
 		}
-
-		EventHandlerClient.onClientSetup();
 	}
 }

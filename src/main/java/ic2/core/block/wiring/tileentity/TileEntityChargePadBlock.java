@@ -80,30 +80,33 @@ public abstract class TileEntityChargePadBlock extends TileEntityElectricBlock
 	@Override
 	protected void updateEntityServer()
 	{
-		super.updateEntityServer();
 		boolean needsInvUpdate = false;
 		if (this.updateTicker++ % this.getTickRate() == 0)
 		{
 			if (this.player != null && this.energy.getEnergy() >= 1.0)
 			{
-				if (!this.getActive())
-				{
-					this.setActive(true);
-				}
-
-				this.getItems(this.player);
+				boolean charged = this.getItems(this.player);
 				this.player = null;
-				needsInvUpdate = true;
+				if (charged != this.getActive())
+				{
+					this.setActive(charged);
+					needsInvUpdate = true;
+				} else if (charged)
+				{
+					needsInvUpdate = true;
+				}
 			} else if (this.getActive())
 			{
 				this.setActive(false);
 				needsInvUpdate = true;
 			}
+		}
 
-			if (needsInvUpdate)
-			{
-				this.setChanged();
-			}
+		super.updateEntityServer();
+
+		if (needsInvUpdate)
+		{
+			this.setChanged();
 		}
 	}
 
@@ -130,20 +133,20 @@ public abstract class TileEntityChargePadBlock extends TileEntityElectricBlock
 	}
 
 	// Logic: Main hand, Offhand, Armor, Stack, Inventory
-	protected void getItems(Player player)
+	protected boolean getItems(Player player)
 	{
 		int chargeFactor = (int) this.output;
 
 		ItemStack stack = player.getMainHandItem();
 		if (!stack.isEmpty())
 		{
-			if (this.chargeItem(stack, chargeFactor)) return;
+			if (this.chargeItem(stack, chargeFactor)) return true;
 		}
 
 		stack = player.getOffhandItem();
 		if (!stack.isEmpty())
 		{
-			if (this.chargeItem(stack, chargeFactor)) return;
+			if (this.chargeItem(stack, chargeFactor)) return true;
 		}
 
 		for (int i = player.getInventory().armor.size() - 1; i >= 0; i--)
@@ -151,7 +154,7 @@ public abstract class TileEntityChargePadBlock extends TileEntityElectricBlock
 			stack = player.getInventory().armor.get(i);
 			if (!stack.isEmpty())
 			{
-				if (this.chargeItem(stack, chargeFactor)) return;
+				if (this.chargeItem(stack, chargeFactor)) return true;
 			}
 		}
 
@@ -160,7 +163,7 @@ public abstract class TileEntityChargePadBlock extends TileEntityElectricBlock
 			stack = player.getInventory().items.get(i);
 			if (!stack.isEmpty())
 			{
-				if (this.chargeItem(stack, chargeFactor)) return;
+				if (this.chargeItem(stack, chargeFactor)) return true;
 			}
 		}
 
@@ -169,15 +172,17 @@ public abstract class TileEntityChargePadBlock extends TileEntityElectricBlock
 			stack = player.getInventory().items.get(i);
 			if (!stack.isEmpty())
 			{
-				if (this.chargeItem(stack, chargeFactor)) return;
+				if (this.chargeItem(stack, chargeFactor)) return true;
 			}
 		}
+
+		return false;
 	}
 
 	@Override
 	protected boolean shouldEmitRedstone()
 	{
-		return this.redstoneMode == 0 && this.getActive() || this.redstoneMode == 1 && !this.getActive();
+		return (this.redstoneMode == 0 && this.getActive()) || (this.redstoneMode == 1 && !this.getActive());
 	}
 
 	@Override

@@ -5,7 +5,9 @@ import ic2.api.block.BreakableBlock;
 import ic2.api.crops.CropSoilType;
 import ic2.api.tile.IWrenchAble;
 import ic2.api.tile.RetexturableBlock;
+import ic2.core.block.comp.ComparatorEmitter;
 import ic2.core.block.comp.Obscuration;
+import ic2.core.block.comp.RedstoneEmitter;
 import ic2.core.crop.Ic2CropType;
 import ic2.core.crop.TileEntityCrop;
 import ic2.core.util.Util;
@@ -326,6 +328,40 @@ public final class Ic2TileEntityBlock extends Block implements EntityBlock, IWre
 		{
 			tileEntity.onNeighborChange(sourceBlock, sourcePos);
 		}
+	}
+
+	public boolean isSignalSource(BlockState state)
+	{
+		return this.dummyTe.get().hasComponent(RedstoneEmitter.class);
+	}
+
+	public int getSignal(BlockState state, BlockGetter world, BlockPos pos, Direction direction)
+	{
+		Ic2TileEntity te = getTe(world, pos);
+		if (te == null)
+		{
+			return 0;
+		}
+
+		RedstoneEmitter emitter = te.getComponent(RedstoneEmitter.class);
+		return emitter != null ? emitter.getLevel() : 0;
+	}
+
+	public boolean hasAnalogOutputSignal(BlockState state)
+	{
+		return this.dummyTe.get().hasComponent(ComparatorEmitter.class);
+	}
+
+	public int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos)
+	{
+		Ic2TileEntity te = getTe(world, pos);
+		if (te == null)
+		{
+			return 0;
+		}
+
+		ComparatorEmitter emitter = te.getComponent(ComparatorEmitter.class);
+		return emitter != null ? emitter.getLevel() : 0;
 	}
 
 	public void entityInside(BlockState state, Level world, BlockPos pos, Entity entity)

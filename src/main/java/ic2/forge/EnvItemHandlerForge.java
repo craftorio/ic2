@@ -17,8 +17,11 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.Container;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -39,6 +42,20 @@ final class EnvItemHandlerForge implements EnvItemHandler
 			return privilegedInventory;
 		} else if (target instanceof RandomizableContainerBlockEntity containerBlockEntity)
 		{
+			BlockState state = target.getBlockState();
+			if (state.getBlock() instanceof ChestBlock chestBlock)
+			{
+				Level level = target.getLevel();
+				if (level != null)
+				{
+					Container combined = ChestBlock.getContainer(chestBlock, state, level, target.getBlockPos(), true);
+					if (combined != null)
+					{
+						return combined;
+					}
+				}
+			}
+
 			return containerBlockEntity;
 		} else
 		{

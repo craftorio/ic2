@@ -3,6 +3,7 @@ package ic2.forge;
 import com.mojang.blaze3d.shaders.FogShape;
 import ic2.core.event.EventHandlerClient;
 import ic2.core.event.TickHandler;
+import ic2.core.sound.DeferredSoundOps;
 import ic2.core.proxy.SideProxyClient;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.resources.sounds.SoundInstance;
@@ -29,6 +30,9 @@ public final class ClientEventHandlerForge
 		if (event.phase == TickEvent.Phase.START)
 		{
 			TickHandler.onClientTick();
+		} else if (event.phase == TickEvent.Phase.END)
+		{
+			DeferredSoundOps.flush();
 		}
 	}
 

@@ -48,43 +48,47 @@ public class SoundClient extends Sound
 	public void play()
 	{
 		super.play();
-		if (this.repeatInstance != null && !this.vanillaManager.isActive(this.repeatInstance))
+		this.isStarted = true;
+		DeferredSoundOps.run(() ->
 		{
-			if (this.vanillaManager.isActive(this.onceInstance))
+			if (this.repeatInstance != null && !this.vanillaManager.isActive(this.repeatInstance))
 			{
-				this.vanillaManager.stop(this.onceInstance);
+				if (this.vanillaManager.isActive(this.onceInstance))
+				{
+					this.vanillaManager.stop(this.onceInstance);
+				}
+
+				this.vanillaManager.play(this.repeatInstance);
+				this.startedSoundList.add(this.repeatInstance);
 			}
 
-			this.vanillaManager.play(this.repeatInstance);
-			this.startedSoundList.add(this.repeatInstance);
-		}
-
-		if (this.entityTrackingInstance != null && !this.vanillaManager.isActive(this.entityTrackingInstance))
-		{
-			this.vanillaManager.play(this.entityTrackingInstance);
-			this.startedSoundList.add(this.entityTrackingInstance);
-		}
-
-		this.isStarted = true;
+			if (this.entityTrackingInstance != null && !this.vanillaManager.isActive(this.entityTrackingInstance))
+			{
+				this.vanillaManager.play(this.entityTrackingInstance);
+				this.startedSoundList.add(this.entityTrackingInstance);
+			}
+		});
 	}
 
 	@Override
 	public void playOnce()
 	{
 		super.playOnce();
-		if (this.onceInstance != null)
-		{
-			this.vanillaManager.play(this.onceInstance);
-			this.startedSoundList.add(this.onceInstance);
-		}
-
-		if (this.entityTrackingInstance != null)
-		{
-			this.entityTrackingInstance.playOnce();
-			this.startedSoundList.add(this.entityTrackingInstance);
-		}
-
 		this.isStarted = true;
+		DeferredSoundOps.run(() ->
+		{
+			if (this.onceInstance != null)
+			{
+				this.vanillaManager.play(this.onceInstance);
+				this.startedSoundList.add(this.onceInstance);
+			}
+
+			if (this.entityTrackingInstance != null)
+			{
+				this.entityTrackingInstance.playOnce();
+				this.startedSoundList.add(this.entityTrackingInstance);
+			}
+		});
 	}
 
 	@Override
@@ -92,9 +96,12 @@ public class SoundClient extends Sound
 	{
 		super.stop();
 		this.isStarted = false;
-		this.vanillaManager.stop(this.repeatInstance);
-		this.vanillaManager.stop(this.onceInstance);
-		this.vanillaManager.stop(this.entityTrackingInstance);
+		DeferredSoundOps.run(() ->
+		{
+			this.vanillaManager.stop(this.repeatInstance);
+			this.vanillaManager.stop(this.onceInstance);
+			this.vanillaManager.stop(this.entityTrackingInstance);
+		});
 	}
 
 	private boolean isPlayingSound(SoundInstance instance)

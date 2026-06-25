@@ -71,7 +71,8 @@ public class SoundManagerClient extends SoundManager
 				if (replaceSound != null)
 				{
 					sound = null;
-					world.playSound(player, pos, replaceSound, category, 1.0F, 1.0F);
+					SoundEvent replacement = replaceSound;
+					DeferredSoundOps.run(() -> world.playSound(player, pos, replacement, category, 1.0F, 1.0F));
 				}
 			}
 		}
@@ -129,21 +130,21 @@ public class SoundManagerClient extends SoundManager
 	public void pauseAll()
 	{
 		super.pauseAll();
-		SideProxyClient.mc.getSoundManager().pause();
+		DeferredSoundOps.run(() -> SideProxyClient.mc.getSoundManager().pause());
 	}
 
 	@Override
 	public void resumeAll()
 	{
 		super.resumeAll();
-		SideProxyClient.mc.getSoundManager().resume();
+		DeferredSoundOps.run(() -> SideProxyClient.mc.getSoundManager().resume());
 	}
 
 	@Override
 	public void stopAll()
 	{
 		super.stopAll();
-		SideProxyClient.mc.getSoundManager().stop();
+		DeferredSoundOps.run(() -> SideProxyClient.mc.getSoundManager().stop());
 	}
 
 	@Override

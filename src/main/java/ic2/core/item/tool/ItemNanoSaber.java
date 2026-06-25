@@ -18,7 +18,7 @@ public class ItemNanoSaber extends AbstractItemNanoSaber
 		super(settings);
 	}
 
-	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack)
+	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(ItemStack stack, EquipmentSlot slot)
 	{
 		if (slot != EquipmentSlot.MAINHAND)
 		{
@@ -38,5 +38,10 @@ public class ItemNanoSaber extends AbstractItemNanoSaber
 		builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Tool modifier", dmg, Operation.ADDITION));
 		builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Tool modifier", speed, Operation.ADDITION));
 		return builder.build();
+	}
+
+	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack)
+	{
+		return this.getAttributeModifiers(stack, slot);
 	}
 }

@@ -13,6 +13,7 @@ import ic2.core.item.armor.jetpack.JetpackHandler;
 import ic2.core.fluid.FluidBeBridge;
 import ic2.core.fluid.Ic2FluidBlock;
 import ic2.core.fluid.Ic2FluidItem;
+import ic2.core.item.tool.AbstractItemNanoSaber;
 import ic2.core.util.LogCategory;
 import ic2.core.util.Util;
 import net.minecraft.core.BlockPos;
@@ -59,6 +60,7 @@ public final class EventHandlerForge
 {
 	private static final ResourceLocation fluidCapId = IC2.getIdentifier("fluid");
 	private static final ResourceLocation itemCapId = IC2.getIdentifier("item");
+	private static final ResourceLocation nanoSaberCapId = IC2.getIdentifier("nano_saber_state");
 
 	@SubscribeEvent
 	public void serverStart(ServerStartingEvent event)
@@ -372,6 +374,9 @@ public final class EventHandlerForge
 		if (item instanceof Ic2FluidItem)
 		{
 			event.addCapability(fluidCapId, new ItemFluidCapImpl(stack));
+		} else if (item instanceof AbstractItemNanoSaber)
+		{
+			event.addCapability(nanoSaberCapId, new ItemNanoSaberCapImpl(stack));
 		}
 	}
 }

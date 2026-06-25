@@ -17,6 +17,7 @@ import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.IExtensionPoint.DisplayTest;
@@ -63,6 +64,7 @@ public final class FmlMod
 
 		Ic2Fluids.init();
 		this.ctx.registerConfig(ModConfig.Type.COMMON, IC2Config.SPEC);
+		modEventBus.addListener(NanoSaberCapabilities::register);
 	}
 	
 	@SubscribeEvent

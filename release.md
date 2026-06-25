@@ -16,7 +16,7 @@ We'd apologize for our documentations are in Chinese. Please use translation.
 
 ### 不急
 
-- 纳米剑 `nano_saber`: 右键激活不显示剑
+
 - 自动弹出升级、自动抽入升级、撬棍：原版还没有配方
 - 尚未添加：管道系统
 

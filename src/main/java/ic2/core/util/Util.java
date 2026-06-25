@@ -30,6 +30,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
@@ -307,15 +308,15 @@ public final class Util
 
 	public static boolean canShear(BlockState state)
 	{
-		return state.is(BlockTags.LEAVES)
-			|| state.is(Blocks.COBWEB)
-			|| state.is(Blocks.GRASS)
-			|| state.is(Blocks.FERN)
-			|| state.is(Blocks.DEAD_BUSH)
-			|| state.is(Blocks.HANGING_ROOTS)
-			|| state.is(Blocks.VINE)
-			|| state.is(Blocks.TRIPWIRE)
-			|| state.is(BlockTags.WOOL);
+		return state.is(BlockTags.LEAVES) || state.getBlock() instanceof LeavesBlock ||
+			state.is(Blocks.COBWEB) ||
+			state.is(Blocks.GRASS) ||
+			state.is(Blocks.FERN) ||
+			state.is(Blocks.DEAD_BUSH) ||
+			state.is(Blocks.HANGING_ROOTS) ||
+			state.is(Blocks.VINE) ||
+			state.is(Blocks.TRIPWIRE) ||
+			state.is(BlockTags.WOOL);
 	}
 
 	public static Vector3 getEyePosition(Entity entity)

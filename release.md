@@ -1,4 +1,4 @@
-# 2.10.30-ex120
+# 2.10.31-ex120
 
 欢迎来到制作和反馈清单。这里记录了下版本的计划和已知问题。
 
@@ -12,7 +12,6 @@ We'd apologize for our documentations are in Chinese. Please use translation.
 - 末影珍珠粉材质更改
 - 拟态板完全是坏的 `ItemObscurator`
 - 日光灯不能用（仅限合成）
-- 服务器端电锯会对其他树叶种类不剪叶子模式失灵（慢）
 - 堆叠状态的能量水晶和兰波顿水晶贴图不对
 
 ### 不急

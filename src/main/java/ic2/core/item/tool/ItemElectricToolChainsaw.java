@@ -20,14 +20,12 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Shearable;
 import net.minecraft.world.entity.monster.piglin.PiglinAi;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -39,6 +37,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.gameevent.GameEvent.Context;
+import net.minecraftforge.common.IForgeShearable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -147,16 +146,33 @@ public class ItemElectricToolChainsaw extends ItemElectricTool implements IHitSo
 
 	public @NotNull InteractionResult interactLivingEntity(@NotNull ItemStack stack, @NotNull Player user, @NotNull LivingEntity entity, @NotNull InteractionHand hand)
 	{
-		// TODO: Use IForgeShearable
-		if (entity instanceof Shearable shearable && !StackUtil.getOrCreateNbtData(stack).getBoolean("disableShear") && this.consumeEnergy(stack, this.operationEnergyCost, user) && shearable.readyForShearing())
+		if (!StackUtil.getOrCreateNbtData(stack).getBoolean("disableShear"))
 		{
-			shearable.shear(SoundSource.PLAYERS);
-			this.playUsingSound(user);
-			return InteractionResult.SUCCESS;
-		} else
-		{
-			return InteractionResult.PASS;
+			if (entity instanceof IForgeShearable shearable)
+			{
+				Level level = entity.level();
+				BlockPos pos = entity.blockPosition();
+
+				if (shearable.isShearable(stack, level, pos))
+				{
+					if (this.consumeEnergy(stack, this.operationEnergyCost, user))
+					{
+						List<ItemStack> drops = shearable.onSheared(user, stack, level, pos, 0);
+
+						for (ItemStack drop : drops)
+						{
+							if (!drop.isEmpty())
+							{
+								entity.spawnAtLocation(drop);
+							}
+						}
+						this.playUsingSound(user);
+						return InteractionResult.SUCCESS;
+					}
+				}
+			}
 		}
+		return InteractionResult.PASS;
 	}
 
 	public void playUsingSound(LivingEntity user)

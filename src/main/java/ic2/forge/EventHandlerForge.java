@@ -46,6 +46,8 @@ import net.minecraftforge.event.furnace.FurnaceFuelBurnTimeEvent;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.level.ChunkDataEvent;
 import net.minecraftforge.event.level.ChunkEvent;
+import net.minecraftforge.event.level.ChunkWatchEvent;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -104,6 +106,13 @@ public final class EventHandlerForge
 		{
 			EventHandler.onChunkSave((LevelChunk) chunk, event.getData());
 		}
+	}
+
+	@SubscribeEvent
+	public void onChunkWatch(ChunkWatchEvent.Watch event)
+	{
+		LevelChunk chunk = event.getLevel().getChunk(event.getPos().x, event.getPos().z);
+		EventHandler.onChunkWatch((ServerPlayer) event.getPlayer(), chunk);
 	}
 
 	@SubscribeEvent

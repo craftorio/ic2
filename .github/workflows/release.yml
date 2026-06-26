@@ -1,0 +1,92 @@
+name: Release
+
+# Tag formats:
+#   release/<mod_version>  e.g. release/2.10.31-ex120
+#   <mod_version>            e.g. 2.10.31-ex120  (version from gradle.properties)
+on:
+  push:
+    tags:
+      - "release/*"
+      - "2.10.*"
+  workflow_dispatch:
+    inputs:
+      mod_version:
+        description: Mod version
+        required: true
+        default: "2.10.31-ex120"
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve versions
+        id: versions
+        run: |
+          mod_id="$(grep '^mod_id=' gradle.properties | cut -d= -f2)"
+          mod_default="$(grep '^mod_version=' gradle.properties | cut -d= -f2)"
+
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            release_tag="${{ github.event.inputs.mod_version }}"
+            mod_version="${{ github.event.inputs.mod_version }}"
+          else
+            release_tag="${GITHUB_REF_NAME}"
+
+            if [[ "$release_tag" == release/* ]]; then
+              mod_version="${release_tag#release/}"
+
+              if [[ -z "$mod_version" ]]; then
+                echo "::error::Tag payload must be <mod_version>, got: $release_tag"
+                exit 1
+              fi
+            else
+              mod_version="$release_tag"
+            fi
+          fi
+
+          if [[ "$mod_version" == *"-release"* ]]; then
+            echo "prerelease=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "prerelease=true" >> "$GITHUB_OUTPUT"
+          fi
+
+          echo "release_tag=$release_tag" >> "$GITHUB_OUTPUT"
+          echo "mod_id=$mod_id" >> "$GITHUB_OUTPUT"
+          echo "mod_version=$mod_version" >> "$GITHUB_OUTPUT"
+          echo "minecraft_version=$(grep '^minecraft_version=' gradle.properties | cut -d= -f2)" >> "$GITHUB_OUTPUT"
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build mod
+        run: ./gradlew build --no-daemon
+        env:
+          MOD_VERSION: ${{ steps.versions.outputs.mod_version }}
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.versions.outputs.release_tag }}
+          name: IndustrialCraft 2 ${{ steps.versions.outputs.mod_version }}
+          prerelease: ${{ steps.versions.outputs.prerelease }}
+          body: |
+            Mod version: `${{ steps.versions.outputs.mod_version }}`
+            Minecraft: `${{ steps.versions.outputs.minecraft_version }}`
+            Tag: `${{ steps.versions.outputs.release_tag }}`
+          files: build/libs/${{ steps.versions.outputs.mod_id }}-forge-${{ steps.versions.outputs.mod_version }}.jar
+          generate_release_notes: true

@@ -22,6 +22,8 @@ public class Grid
 	private final Map<Integer, Node> nodes = new HashMap<>();
 	private boolean dirty;
 	private Object data;
+	private int stuckTicks;
+	private volatile boolean rebuildRequested;
 
 	Grid(EnergyNetLocal enet)
 	{
@@ -53,6 +55,43 @@ public class Grid
 		}
 
 		this.dirty = false;
+		return true;
+	}
+
+	public void noteCalcResult(boolean hadCapacity, boolean delivered)
+	{
+		if (!EnergyNetSettings.enableEnetSelfHeal)
+		{
+			return;
+		}
+
+		if (hadCapacity && !delivered)
+		{
+			if (++this.stuckTicks >= EnergyNetSettings.stuckGridRebuildThreshold)
+			{
+				this.rebuildRequested = true;
+				this.stuckTicks = 0;
+			}
+		} else
+		{
+			this.stuckTicks = 0;
+		}
+	}
+
+	public void requestRebuild()
+	{
+		this.rebuildRequested = true;
+		this.stuckTicks = 0;
+	}
+
+	public boolean consumeRebuildRequest()
+	{
+		if (!this.rebuildRequested)
+		{
+			return false;
+		}
+
+		this.rebuildRequested = false;
 		return true;
 	}
 

@@ -501,11 +501,28 @@ public class EnergyCalculatorUnified implements IEnergyCalculator
 				data.eventPaths.clear();
 			}
 
+			grid.noteCalcResult(true, hasDeliveredThisTick(data, calcId));
 			return true;
 		} else
 		{
+			grid.noteCalcResult(false, false);
 			return false;
 		}
+	}
+
+	private static boolean hasDeliveredThisTick(GridData data, int calcId)
+	{
+		for (List<EnergyPath> srcPaths : data.energySourceToEnergyPathMap.values())
+		{
+			for (EnergyPath path : srcPaths)
+			{
+				if (path.lastCalcId == calcId && path.energySupplied > 0.0)
+				{
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	private static void distribute(Node srcNode, GridData data, boolean shufflePaths, int calcId, RandomSource rand)

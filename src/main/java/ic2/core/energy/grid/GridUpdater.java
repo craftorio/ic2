@@ -141,6 +141,11 @@ class GridUpdater implements Runnable
 		this.generation.incrementAndGet();
 		this.pendingCalculations.set(0);
 		this.busy = false;
+		if (EnergyNetSettings.enableEnetSelfHeal)
+		{
+			this.enet.rebuildAllRequested = true;
+		}
+
 		this.notifyAll();
 	}
 
@@ -258,12 +263,15 @@ class GridUpdater implements Runnable
 		@Override
 		public void run()
 		{
-			try
+			if (GridUpdater.this.generation.get() == this.taskGeneration)
 			{
-				EnergyNetGlobal.getCalculator().runAsyncStep(this.grid);
-			} catch (Throwable t)
-			{
-				IC2.log.error(LogCategory.EnergyNet, t, "Unhandled exception/error in GridCalcTask.run() for grid %s.", this.grid);
+				try
+				{
+					EnergyNetGlobal.getCalculator().runAsyncStep(this.grid);
+				} catch (Throwable t)
+				{
+					IC2.log.error(LogCategory.EnergyNet, t, "Unhandled exception/error in GridCalcTask.run() for grid %s.", this.grid);
+				}
 			}
 
 			this.grid = null;
@@ -279,12 +287,15 @@ class GridUpdater implements Runnable
 		@Override
 		public void run()
 		{
-			try
+			if (GridUpdater.this.generation.get() == this.taskGeneration)
 			{
-				EnergyNetGlobal.getCalculator().handleGridChange(this.grid);
-			} catch (Throwable t)
-			{
-				IC2.log.error(LogCategory.EnergyNet, t, "Unhandled exception/error in GridUpdateTask.run() for grid %s.", this.grid);
+				try
+				{
+					EnergyNetGlobal.getCalculator().handleGridChange(this.grid);
+				} catch (Throwable t)
+				{
+					IC2.log.error(LogCategory.EnergyNet, t, "Unhandled exception/error in GridUpdateTask.run() for grid %s.", this.grid);
+				}
 			}
 
 			this.grid = null;

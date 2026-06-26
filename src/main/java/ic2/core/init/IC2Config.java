@@ -466,6 +466,8 @@ public class IC2Config
 		public final ForgeConfigSpec.BooleanValue roundEnetLoss;
 		public final ForgeConfigSpec.BooleanValue enableEnetExplosions;
 		public final ForgeConfigSpec.BooleanValue enableEnetCableMeltdown;
+		public final ForgeConfigSpec.BooleanValue enableEnetSelfHeal;
+		public final ForgeConfigSpec.IntValue enetStuckGridRebuildThreshold;
 
 		Misc(ForgeConfigSpec.Builder b)
 		{
@@ -487,6 +489,18 @@ public class IC2Config
 			enableEnetExplosions = b.define("enableEnetExplosions", true);
 			b.comment("Same for cable meltdown.");
 			enableEnetCableMeltdown = b.define("enableEnetCableMeltdown", true);
+			b.comment(
+				"Detect grids that have active sources and demanding sinks but are not delivering energy",
+				"(e.g. due to a tile that got stuck in disabled state after an internal error or timeout),",
+				"and re-register their tiles to repair the grid without a server restart."
+			);
+			enableEnetSelfHeal = b.define("enableEnetSelfHeal", true);
+			b.comment(
+				"Number of consecutive ticks a grid must look stuck before the self-heal triggers a rebuild.",
+				"Lower = faster recovery but more false positives on bursty workloads; higher = safer.",
+				"20 ticks = 1 second."
+			);
+			enetStuckGridRebuildThreshold = b.defineInRange("enetStuckGridRebuildThreshold", 200, 20, 6000);
 			b.pop();
 		}
 	}
@@ -502,6 +516,7 @@ public class IC2Config
 		public final ForgeConfigSpec.BooleanValue logEnetApiAccessTraces;
 		public final ForgeConfigSpec.BooleanValue logGridUpdatesVerbose;
 		public final ForgeConfigSpec.BooleanValue logGridCalculationIssues;
+		public final ForgeConfigSpec.BooleanValue logEnetSelfHeal;
 
 		Debug(ForgeConfigSpec.Builder b)
 		{
@@ -520,6 +535,8 @@ public class IC2Config
 			logGridUpdatesVerbose = b.define("logGridUpdatesVerbose", false);
 			b.comment("Log problems occurring during energy network calculations.");
 			logGridCalculationIssues = b.define("logGridCalculationIssues", true);
+			b.comment("Log when the energy net self-heal detects a stuck grid and rebuilds it.");
+			logEnetSelfHeal = b.define("logEnetSelfHeal", true);
 			b.pop();
 		}
 	}

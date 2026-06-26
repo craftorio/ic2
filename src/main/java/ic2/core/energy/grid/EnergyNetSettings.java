@@ -11,7 +11,11 @@ public class EnergyNetSettings
 	public static final boolean roundLossDown = IC2Config.misc.roundEnetLoss.get();
 	public static final int changesQueueDelay = 1;
 	public static final int bfsThreshold = 2048;
+	public static final boolean enableEnetSelfHeal = IC2Config.misc.enableEnetSelfHeal.get();
+	public static final int stuckGridRebuildThreshold = IC2Config.misc.enetStuckGridRebuildThreshold.get();
+	public static final int maxRebuildsPerTick = 8;
 	public static boolean logGridUpdateIssues = IC2Config.debug.logGridUpdateIssues.get();
 	public static boolean logGridUpdatesVerbose = IC2Config.debug.logGridUpdatesVerbose.get();
 	public static boolean logGridCalculationIssues = IC2Config.debug.logGridCalculationIssues.get();
+	public static boolean logEnetSelfHeal = IC2Config.debug.logEnetSelfHeal.get();
 }

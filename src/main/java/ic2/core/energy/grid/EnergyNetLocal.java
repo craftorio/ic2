@@ -24,6 +24,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.SectionPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.ChunkSource;
 
 public class EnergyNetLocal
@@ -38,6 +39,7 @@ public class EnergyNetLocal
 	private final Set<IEnergyTile> ioTilesToNotify = Collections.newSetFromMap(new IdentityHashMap<>());
 	private final GridUpdater updater = new GridUpdater(this);
 	private final List<Grid> grids = new ArrayList<>();
+	volatile boolean rebuildAllRequested;
 	int nextNodeId;
 	int nextGridId;
 
@@ -313,6 +315,7 @@ public class EnergyNetLocal
 	public void onTickEnd()
 	{
 		this.updater.awaitCompletion();
+		this.processRebuildRequests();
 		if (!this.gridChangesQueue.isEmpty() && this.gridChangesQueue.peek() != QUEUE_DELAY_CHANGE)
 		{
 			this.updater.startChangeCalc(this.gridChangesQueue, this.gridAdditionsMap);
@@ -324,6 +327,110 @@ public class EnergyNetLocal
 
 		this.gridChangesQueue.add(QUEUE_DELAY_CHANGE);
 		assert !this.gridChangesQueue.isEmpty();
+	}
+
+	private void processRebuildRequests()
+	{
+		if (!EnergyNetSettings.enableEnetSelfHeal)
+		{
+			return;
+		}
+
+		if (this.rebuildAllRequested)
+		{
+			this.rebuildAllRequested = false;
+			for (Grid grid : this.grids)
+			{
+				grid.requestRebuild();
+			}
+
+			if (EnergyNetSettings.logEnetSelfHeal)
+			{
+				IC2.log.warn(LogCategory.EnergyNet, "Marked all %d grids in %s for rebuild after a force-clear event.", this.grids.size(), this.world.dimension().location());
+			}
+		}
+
+		int budget = EnergyNetSettings.maxRebuildsPerTick;
+		if (budget <= 0)
+		{
+			return;
+		}
+
+		List<Grid> snapshot = null;
+		for (Grid grid : this.grids)
+		{
+			if (grid.consumeRebuildRequest())
+			{
+				if (snapshot == null)
+				{
+					snapshot = new ArrayList<>();
+				}
+
+				snapshot.add(grid);
+				if (snapshot.size() >= budget)
+				{
+					break;
+				}
+			}
+		}
+
+		if (snapshot == null)
+		{
+			return;
+		}
+
+		for (Grid grid : snapshot)
+		{
+			this.rebuildGrid(grid);
+		}
+	}
+
+	private void rebuildGrid(Grid grid)
+	{
+		Set<IEnergyTile> ioTiles = Collections.newSetFromMap(new IdentityHashMap<>());
+
+		for (Node node : grid.getNodes())
+		{
+			ioTiles.add(node.getTile().getMainTile());
+		}
+
+		if (ioTiles.isEmpty())
+		{
+			return;
+		}
+
+		List<IEnergyTile> live = new ArrayList<>(ioTiles.size());
+
+		for (IEnergyTile ioTile : ioTiles)
+		{
+			BlockPos pos = EnergyNet.instance.getPos(ioTile);
+			if (!this.world.isLoaded(pos))
+			{
+				continue;
+			}
+
+			if (ioTile instanceof BlockEntity be && be.isRemoved())
+			{
+				continue;
+			}
+
+			live.add(ioTile);
+		}
+
+		if (EnergyNetSettings.logEnetSelfHeal)
+		{
+			IC2.log.warn(LogCategory.EnergyNet, "Rebuilding %s in %s: re-registering %d/%d tiles.", grid, this.world.dimension().location(), live.size(), ioTiles.size());
+		}
+
+		for (IEnergyTile ioTile : live)
+		{
+			EnergyNet.instance.removeTile(ioTile);
+		}
+
+		for (IEnergyTile ioTile : live)
+		{
+			EnergyNet.instance.addTileUnchecked(ioTile);
+		}
 	}
 
 	public Level getWorld()

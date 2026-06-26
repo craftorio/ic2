@@ -7,6 +7,8 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class TileEntityBase extends TileEntityInventory
 {
@@ -15,6 +17,7 @@ public class TileEntityBase extends TileEntityInventory
 	protected Sound startSound;
 	protected Sound stopSound;
 	protected Sound interruptSound;
+	private boolean clientLastActive;
 
 	public TileEntityBase(BlockEntityType<? extends TileEntityInventory> type, BlockPos pos, BlockState state)
 	{
@@ -25,9 +28,47 @@ public class TileEntityBase extends TileEntityInventory
 	protected void updateEntityServer()
 	{
 		super.updateEntityServer();
-		if (this.getActive() && this.isLoopingSoundIdling())
+		// Looping sound playback is driven client-side; on a dedicated server IC2.soundManager is a no-op
+		// so loopingSound is null and this restart logic never ran. updateEntityClient now handles persistence.
+	}
+
+	@OnlyIn(Dist.CLIENT)
+	@Override
+	protected void updateEntityClient()
+	{
+		super.updateEntityClient();
+		if (this.loopingSound != null)
 		{
-			this.loopingSound.play();
+			if (this.getActive() && !this.loopingSound.isPlaying())
+			{
+				this.loopingSound.play();
+			} else if (!this.getActive() && this.loopingSound.isPlaying())
+			{
+				this.loopingSound.stop();
+			}
+		}
+	}
+
+	@Override
+	public void onNetworkUpdate(String field)
+	{
+		super.onNetworkUpdate(field);
+		if (field.equals("active") && this.level != null && this.level.isClientSide)
+		{
+			boolean nowActive = this.getActive();
+			if (nowActive != this.clientLastActive)
+			{
+				this.clientLastActive = nowActive;
+				if (nowActive)
+				{
+					this.startPlaySound(false);
+				} else
+				{
+					this.stopStartSound();
+					this.stopLoopingSound();
+					this.playStopSound();
+				}
+			}
 		}
 	}
 
@@ -66,7 +107,10 @@ public class TileEntityBase extends TileEntityInventory
 		if (!this.getActive())
 		{
 			this.teBlock.setActive(this.level, this.worldPosition, this.getBlockState(), true);
-			this.startPlaySound(playSubSound);
+			if (this.level != null && this.level.isClientSide)
+			{
+				this.startPlaySound(playSubSound);
+			}
 		}
 	}
 
@@ -75,14 +119,17 @@ public class TileEntityBase extends TileEntityInventory
 		if (this.getActive())
 		{
 			this.teBlock.setActive(this.level, this.worldPosition, this.getBlockState(), false);
-			this.stopStartSound();
-			this.stopLoopingSound();
-			if (isInterrupted)
+			if (this.level != null && this.level.isClientSide)
 			{
-				this.playInterruptSound();
-			} else
-			{
-				this.playStopSound();
+				this.stopStartSound();
+				this.stopLoopingSound();
+				if (isInterrupted)
+				{
+					this.playInterruptSound();
+				} else
+				{
+					this.playStopSound();
+				}
 			}
 		}
 	}

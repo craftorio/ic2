@@ -1,6 +1,7 @@
 package ic2.core.event;
 
 import ic2.api.block.BreakableBlock;
+import ic2.api.network.INetworkDataProvider;
 import ic2.api.energy.EnergyNet;
 import ic2.api.item.BlockBreakableItem;
 import ic2.api.item.ElectricItem;
@@ -53,6 +54,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -191,6 +193,17 @@ public final class EventHandler
 		if (!chunk.getLevel().isClientSide)
 		{
 			ChunkLoaderLogic.onChunkUnload(chunk);
+		}
+	}
+
+	public static void onChunkWatch(ServerPlayer player, LevelChunk chunk)
+	{
+		for (BlockEntity be : chunk.getBlockEntities().values())
+		{
+			if (be instanceof INetworkDataProvider)
+			{
+				IC2.network.get(false).sendInitialData(be, player);
+			}
 		}
 	}
 

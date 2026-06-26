@@ -255,4 +255,10 @@ public class TileEntityInduction extends TileEntityElectricMachine implements IH
 	{
 		return Ic2SoundEvents.MACHINE_INTERRUPT1;
 	}
+
+	@Override
+	protected float getMachineSoundVolume()
+	{
+		return 0.67F;
+	}
 }

@@ -1,6 +1,7 @@
 package ic2.core.block.tileentity;
 
 import ic2.core.IC2;
+import ic2.core.block.tileentity.Ic2TileEntityBlock;
 import ic2.core.sound.Sound;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvent;
@@ -39,10 +40,11 @@ public class TileEntityBase extends TileEntityInventory
 		super.updateEntityClient();
 		if (this.loopingSound != null)
 		{
-			if (this.getActive() && !this.loopingSound.isPlaying())
+			boolean active = this.isSoundActive();
+			if (active && !this.loopingSound.isPlaying())
 			{
 				this.loopingSound.play();
-			} else if (!this.getActive() && this.loopingSound.isPlaying())
+			} else if (!active && this.loopingSound.isPlaying())
 			{
 				this.loopingSound.stop();
 			}
@@ -55,20 +57,8 @@ public class TileEntityBase extends TileEntityInventory
 		super.onNetworkUpdate(field);
 		if (field.equals("active") && this.level != null && this.level.isClientSide)
 		{
-			boolean nowActive = this.getActive();
-			if (nowActive != this.clientLastActive)
-			{
-				this.clientLastActive = nowActive;
-				if (nowActive)
-				{
-					this.startPlaySound(false);
-				} else
-				{
-					this.stopStartSound();
-					this.stopLoopingSound();
-					this.playStopSound();
-				}
-			}
+			this.initSound();
+			this.applyClientActiveSoundTransition();
 		}
 	}
 
@@ -89,6 +79,10 @@ public class TileEntityBase extends TileEntityInventory
 	{
 		this.initSound();
 		super.onLoaded();
+		if (this.level != null && this.level.isClientSide)
+		{
+			this.syncClientSoundOnLoad();
+		}
 	}
 
 	public void setActiveState(boolean active, boolean playSubSound)
@@ -219,7 +213,7 @@ public class TileEntityBase extends TileEntityInventory
 		SoundEvent startSoundEvent = this.getStartSoundEvent();
 		if (startSoundEvent != null && this.startSound == null)
 		{
-			this.startSound = IC2.soundManager.createSound(this, startSoundEvent, SoundSource.BLOCKS, this.getBlockPos(), 1.0F, 1.0F);
+			this.startSound = IC2.soundManager.createSound(this, startSoundEvent, SoundSource.BLOCKS, this.getBlockPos(), this.getMachineSoundVolume(), 1.0F);
 		}
 	}
 
@@ -228,7 +222,7 @@ public class TileEntityBase extends TileEntityInventory
 		SoundEvent stopSoundEvent = this.getStopSoundEvent();
 		if (stopSoundEvent != null && this.stopSound == null)
 		{
-			this.stopSound = IC2.soundManager.createSound(this, stopSoundEvent, SoundSource.BLOCKS, this.getBlockPos(), 1.0F, 1.0F);
+			this.stopSound = IC2.soundManager.createSound(this, stopSoundEvent, SoundSource.BLOCKS, this.getBlockPos(), this.getMachineSoundVolume(), 1.0F);
 		}
 	}
 
@@ -237,7 +231,7 @@ public class TileEntityBase extends TileEntityInventory
 		SoundEvent loopingSoundEvent = this.getLoopingSoundEvent();
 		if (loopingSoundEvent != null && this.loopingSound == null)
 		{
-			this.loopingSound = IC2.soundManager.createSound(this, loopingSoundEvent, SoundSource.BLOCKS, this.getBlockPos(), 1.0F, 1.0F);
+			this.loopingSound = IC2.soundManager.createSound(this, loopingSoundEvent, SoundSource.BLOCKS, this.getBlockPos(), this.getMachineSoundVolume(), 1.0F);
 		}
 	}
 
@@ -246,7 +240,7 @@ public class TileEntityBase extends TileEntityInventory
 		SoundEvent loopingSoundEvent = this.getSubLoopingSoundEvent();
 		if (loopingSoundEvent != null && this.subLoopingSound == null)
 		{
-			this.subLoopingSound = IC2.soundManager.createSound(this, loopingSoundEvent, SoundSource.BLOCKS, this.getBlockPos(), 1.0F, 1.0F);
+			this.subLoopingSound = IC2.soundManager.createSound(this, loopingSoundEvent, SoundSource.BLOCKS, this.getBlockPos(), this.getMachineSoundVolume(), 1.0F);
 		}
 	}
 
@@ -255,7 +249,7 @@ public class TileEntityBase extends TileEntityInventory
 		SoundEvent interruptSoundEvent = this.getInterruptSoundEvent();
 		if (interruptSoundEvent != null && this.interruptSound == null)
 		{
-			this.interruptSound = IC2.soundManager.createSound(this, interruptSoundEvent, SoundSource.BLOCKS, this.getBlockPos(), 1.0F, 1.0F);
+			this.interruptSound = IC2.soundManager.createSound(this, interruptSoundEvent, SoundSource.BLOCKS, this.getBlockPos(), this.getMachineSoundVolume(), 1.0F);
 		}
 	}
 
@@ -270,6 +264,50 @@ public class TileEntityBase extends TileEntityInventory
 	protected boolean isLoopingSoundIdling()
 	{
 		return this.loopingSound != null && !this.loopingSound.isPlaying();
+	}
+
+	protected boolean isSoundActive()
+	{
+		if (this.teBlock.canActive() && this.getBlockState().hasProperty(Ic2TileEntityBlock.ACTIVE))
+		{
+			return this.getBlockState().getValue(Ic2TileEntityBlock.ACTIVE);
+		}
+
+		return this.getActive();
+	}
+
+	@OnlyIn(Dist.CLIENT)
+	private void applyClientActiveSoundTransition()
+	{
+		boolean active = this.isSoundActive();
+		if (active == this.clientLastActive)
+		{
+			return;
+		}
+
+		if (active)
+		{
+			this.startPlaySound(false);
+		} else
+		{
+			this.stopStartSound();
+			this.stopLoopingSound();
+			this.playStopSound();
+		}
+
+		this.clientLastActive = active;
+	}
+
+	@OnlyIn(Dist.CLIENT)
+	private void syncClientSoundOnLoad()
+	{
+		boolean active = this.isSoundActive();
+		if (active && this.loopingSound != null && !this.loopingSound.isPlaying())
+		{
+			this.loopingSound.play();
+		}
+
+		this.clientLastActive = active;
 	}
 
 	public SoundEvent getStartSoundEvent()
@@ -295,5 +333,10 @@ public class TileEntityBase extends TileEntityInventory
 	public SoundEvent getInterruptSoundEvent()
 	{
 		return null;
+	}
+
+	protected float getMachineSoundVolume()
+	{
+		return 1.0F;
 	}
 }

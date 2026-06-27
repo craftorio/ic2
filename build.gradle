@@ -251,9 +251,6 @@ tasks.register('githubRelease') {
             '--title', "${mod_name} ${version}",
             '--notes-file', releaseNotes.absolutePath
         ]
-        if (!version.contains('-release')) {
-            args << '--prerelease'
-        }
 
         exec {
             commandLine args

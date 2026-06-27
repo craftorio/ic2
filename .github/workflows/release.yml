@@ -53,12 +53,6 @@ jobs:
             fi
           fi
 
-          if [[ "$mod_version" == *"-release"* ]]; then
-            echo "prerelease=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "prerelease=true" >> "$GITHUB_OUTPUT"
-          fi
-
           echo "release_tag=$release_tag" >> "$GITHUB_OUTPUT"
           echo "mod_id=$mod_id" >> "$GITHUB_OUTPUT"
           echo "mod_version=$mod_version" >> "$GITHUB_OUTPUT"
@@ -86,7 +80,6 @@ jobs:
         with:
           tag_name: ${{ steps.versions.outputs.release_tag }}
           name: IndustrialCraft 2 ${{ steps.versions.outputs.mod_version }}
-          prerelease: ${{ steps.versions.outputs.prerelease }}
           body: |
             Mod version: `${{ steps.versions.outputs.mod_version }}`
             Minecraft: `${{ steps.versions.outputs.minecraft_version }}`

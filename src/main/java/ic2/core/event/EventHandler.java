@@ -202,7 +202,7 @@ public final class EventHandler
 		{
 			if (be instanceof INetworkDataProvider)
 			{
-				IC2.network.get(false).sendInitialData(be, player);
+				IC2.network.get(true).sendInitialData(be, player);
 			}
 		}
 	}

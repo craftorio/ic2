@@ -184,6 +184,26 @@ public class EnergyNetLocal
 		}
 	}
 
+	void cancelPendingAdditionAt(BlockPos pos)
+	{
+		for (GridChange change : this.gridChangesQueue)
+		{
+			if (change != QUEUE_DELAY_CHANGE && change.type == GridChange.Type.ADDITION && change.pos.equals(pos))
+			{
+				this.gridAdditionsMap.remove(change.ioTile);
+				this.gridChangesQueue.remove(change);
+				if (EnergyNetSettings.logGridUpdatesVerbose)
+				{
+					IC2.log.debug(LogCategory.EnergyNet, "Cancelled pending addition at %s.", Util.formatPosition(this.world, pos));
+				}
+
+				return;
+			}
+		}
+
+		this.updater.cancelPendingAdditionAt(pos);
+	}
+
 	public Collection<Tile> getSources()
 	{
 		return this.sources;

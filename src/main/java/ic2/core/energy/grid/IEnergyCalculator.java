@@ -8,6 +8,8 @@ public interface IEnergyCalculator
 {
 	void handleGridChange(Grid var1);
 
+	void ensureGridPaths(Grid var1);
+
 	boolean runSyncStep(EnergyNetLocal var1);
 
 	boolean runSyncStep(Grid var1);

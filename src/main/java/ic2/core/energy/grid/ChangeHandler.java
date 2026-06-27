@@ -52,9 +52,9 @@ class ChangeHandler
 			return false;
 		} else if (type != GridChange.Type.REMOVAL && !world.isLoaded(pos))
 		{
-			if (EnergyNetSettings.logGridUpdateIssues)
+			if (EnergyNetSettings.logGridUpdatesVerbose)
 			{
-				IC2.log.warn(LogCategory.EnergyNet, "Tile %s was unloaded in grid update (%s)", Util.toString(ioTile, enet.getWorld(), pos), type);
+				IC2.log.debug(LogCategory.EnergyNet, "Tile %s was unloaded in grid update (%s)", Util.toString(ioTile, enet.getWorld(), pos), type);
 			}
 
 			return false;

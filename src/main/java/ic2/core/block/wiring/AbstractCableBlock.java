@@ -8,6 +8,7 @@ import ic2.api.energy.tile.IEnergyEmitter;
 import ic2.api.energy.tile.IEnergyTile;
 import ic2.api.info.ILocatable;
 import ic2.core.block.ChunkLoadAwareBlock;
+import ic2.core.energy.grid.EnergyNetGlobal;
 import ic2.core.item.tool.ItemToolCutter;
 import ic2.core.ref.Ic2BlockTags;
 import ic2.core.ref.Ic2Fluids;
@@ -394,7 +395,7 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 	@Override
 	public void onLoad(BlockState state, Level world, BlockPos pos)
 	{
-		this.addToEnet(state, world, pos, false);
+		this.addToEnet(state, world, pos, true);
 	}
 
 	@Override
@@ -405,10 +406,24 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 
 	protected void addToEnet(BlockState state, Level world, BlockPos pos, boolean checkConflicting)
 	{
-		if (!checkConflicting || EnergyNet.instance.getTile(world, pos) == null)
+		if (world.isClientSide)
 		{
-			EnergyNet.instance.addLocatableTile(new AbstractCableBlock.Conductor(state, world, pos));
+			return;
 		}
+
+		IEnergyTile existing = EnergyNet.instance.getTile(world, pos);
+		if (existing != null)
+		{
+			if (checkConflicting)
+			{
+				EnergyNet.instance.removeTile(existing);
+			} else
+			{
+				return;
+			}
+		}
+
+		EnergyNet.instance.addLocatableTile(new AbstractCableBlock.Conductor(state, world, pos));
 	}
 
 	protected void removeFromEnet(BlockState state, Level world, BlockPos pos)
@@ -417,6 +432,9 @@ public abstract class AbstractCableBlock extends PipeBlock implements ChunkLoadA
 		if (tile != null)
 		{
 			EnergyNet.instance.removeTile(tile);
+		} else if (!world.isClientSide)
+		{
+			EnergyNetGlobal.cancelPendingAdditionAt(world, pos);
 		}
 	}
 

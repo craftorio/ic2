@@ -439,11 +439,61 @@ public class EnergyCalculatorUnified implements IEnergyCalculator
 		return ret;
 	}
 
+	private static boolean hasSourceAndSinkNodes(Grid grid)
+	{
+		boolean hasSource = false;
+		boolean hasSink = false;
+
+		for (Node node : grid.getNodes())
+		{
+			if (node.getType() == NodeType.Source)
+			{
+				hasSource = true;
+			} else if (node.getType() == NodeType.Sink)
+			{
+				hasSink = true;
+			}
+
+			if (hasSource && hasSink)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	@Override
+	public void ensureGridPaths(Grid grid)
+	{
+		GridData data = getData(grid);
+		if (data.active || !hasSourceAndSinkNodes(grid))
+		{
+			return;
+		}
+
+		updateCache(grid, data);
+		if (!data.active)
+		{
+			grid.noteCalcResult(true, false);
+		}
+	}
+
 	private static boolean runCalculation(Grid grid, GridData data)
 	{
 		if (!data.active)
 		{
-			return false;
+			if (!hasSourceAndSinkNodes(grid))
+			{
+				return false;
+			}
+
+			updateCache(grid, data);
+			if (!data.active)
+			{
+				grid.noteCalcResult(true, false);
+				return false;
+			}
 		}
 
 		List<Node> activeSources = data.activeSources;

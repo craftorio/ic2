@@ -19,11 +19,10 @@ import java.util.Objects;
 import java.util.Map.Entry;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -123,9 +122,15 @@ class TeUpdate
 				Object value = DataEncoder.decode(buffer);
 				if (fieldName.equals("teBlk"))
 				{
-					String id = ((String) Objects.requireNonNull(value)).split(":")[1];
-					ResourceLocation identifier = IC2.getIdentifier(id);
-					teData.teType = (Ic2TileEntityBlock) BuiltInRegistries.BLOCK.get(identifier);
+					ResourceLocation identifier = ResourceLocation.tryParse((String) Objects.requireNonNull(value));
+					if (identifier != null)
+					{
+						Block block = Util.getBlock(identifier);
+						if (block instanceof Ic2TileEntityBlock ic2Block)
+						{
+							teData.teType = ic2Block;
+						}
+					}
 				} else
 				{
 					teData.addField(fieldName, value);

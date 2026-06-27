@@ -4,6 +4,8 @@ import ic2.api.energy.tile.IEnergyTile;
 import ic2.core.IC2;
 import ic2.core.util.LogCategory;
 
+import net.minecraft.core.BlockPos;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -57,6 +59,15 @@ class GridUpdater implements Runnable
 	{
 		assert !this.busy;
 		this.isChangeStep = false;
+		if (this.enet.hasGrids())
+		{
+			IEnergyCalculator calculator = EnergyNetGlobal.getCalculator();
+			for (Grid grid : this.enet.getGrids())
+			{
+				calculator.ensureGridPaths(grid);
+			}
+		}
+
 		if (this.enet.hasGrids() && EnergyNetGlobal.getCalculator().runSyncStep(this.enet))
 		{
 			this.busy = true;
@@ -152,6 +163,11 @@ class GridUpdater implements Runnable
 	public boolean isInChangeStep()
 	{
 		return this.isChangeStep;
+	}
+
+	void cancelPendingAdditionAt(BlockPos pos)
+	{
+		this.changes.removeIf(change -> change.type == GridChange.Type.ADDITION && change.pos.equals(pos));
 	}
 
 	@Override

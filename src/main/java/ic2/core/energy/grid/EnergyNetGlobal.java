@@ -122,6 +122,11 @@ public class EnergyNetGlobal implements IEnergyNet
 		addTile(tile, tile.getWorldObj(), tile.getPosition());
 	}
 
+	public static void cancelPendingAdditionAt(Level world, BlockPos pos)
+	{
+		getLocal(world).cancelPendingAdditionAt(pos);
+	}
+
 	@Override
 	public void removeTile(IEnergyTile tile)
 	{

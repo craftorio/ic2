@@ -67,7 +67,10 @@ public class Grid
 
 		if (hadCapacity && !delivered)
 		{
-			if (++this.stuckTicks >= EnergyNetSettings.stuckGridRebuildThreshold)
+			if (this.stuckTicks++ == 0)
+			{
+				EnergyNetGlobal.getCalculator().handleGridChange(this);
+			} else if (this.stuckTicks >= EnergyNetSettings.stuckGridRebuildThreshold)
 			{
 				this.rebuildRequested = true;
 				this.stuckTicks = 0;

@@ -1,8 +1,8 @@
 name: Release
 
 # Tag formats:
-#   release/<mod_version>  e.g. release/2.10.32-ex120
-#   <mod_version>            e.g. 2.10.32-ex120  (version from gradle.properties)
+#   release/<mod_version>  e.g. release/2.10.33-ex120
+#   <mod_version>            e.g. 2.10.33-ex120  (version from gradle.properties)
 on:
   push:
     tags:
@@ -13,7 +13,7 @@ on:
       mod_version:
         description: Mod version
         required: true
-        default: "2.10.32-ex120"
+        default: "2.10.33-ex120"
 
 concurrency:
   group: release-${{ github.ref }}

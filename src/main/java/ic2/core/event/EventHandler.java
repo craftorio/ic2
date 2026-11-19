@@ -128,7 +128,6 @@ public final class EventHandler
 		UuIndex.instance.init();
 		UuIndex.instance.refresh(true);
 		IC2.sideProxy.onPostInit();
-		IC2.sideProxy.requestTick(!IC2.envProxy.isClientEnv(), ChunkLoadAwareBlockHandler::init);
 		IC2.log.debug(LogCategory.General, "Finished post-init after %d ms.", (System.nanoTime() - startTime) / 1000000L);
 	}
 

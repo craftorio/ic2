@@ -6,6 +6,7 @@ import ic2.core.init.IC2Config;
 import ic2.core.network.NetworkManager;
 import ic2.core.loot.Ic2LootNbtProviderTypes;
 import ic2.core.ref.Ic2Fluids;
+import ic2.core.block.ChunkLoadAwareBlockHandler;
 import ic2.integration.ae2.Ic2Ae2Plugin;
 
 import java.util.ArrayList;
@@ -103,6 +104,7 @@ public final class FmlMod
 		}
 
 		EventHandler.onInitLate();
+		event.enqueueWork(ChunkLoadAwareBlockHandler::init);
 	}
 
 	@SubscribeEvent

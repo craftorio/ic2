@@ -321,6 +321,7 @@ public class Grid
 							assert !extraNode.links.isEmpty();
 							grid.add(extraNode);
 							assert extraNode.getGrid() != null;
+							continue;
 						}
 
 						if (EnergyNetSettings.logGridUpdatesVerbose)
